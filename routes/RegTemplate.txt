@@ -1,0 +1,61 @@
+     <table cellpadding="0" cellspacing="0" border="0" style="width:600px;  border:solid 1px #ccc;font-family:'Trebuchet MS', Arial, Helvetica, sans-serif; font-size:14px; color:#5d5d5d;">
+	<tr>
+    	<td style="font-size:16px; padding:10px;">Hello <strong style="color:#0b89ba;">[Firstname] [Lastname]</strong>,</td>
+    </tr>
+    <tr>
+    	<td style="	"></td>
+    </tr>
+    <tr>
+    	<td style="text-align:left; padding: 10px; font-size:18px; background:#EEEEEE; color:#F00;">
+        	<strong>Congratulations, your registration is successful.</strong>
+        </td>
+    </tr>
+     <tr>
+    	<td style="height:15px;"></td>
+    </tr>
+    <tr>
+    	<td>
+        <table cellpadding="0" cellspacing="0" border="0" style="width:600px; padding:10px; font-family:'Trebuchet MS', Arial, Helvetica, sans-serif; font-size:14px; color:#5d5d5d; line-height:22px;">
+	
+
+    <tr>
+    	<td>Your EZEID is <strong style="color:#0b89ba;">[EZEID]</strong>. <br><br></td>
+    </tr>
+    <tr>
+    	<td>
+        	1. To send EZEID  to any of your contact information and primary location , please forward the URL <strong style="text-decoration:underline; color:#156685">www.ezeid.com?ID=[EZEID].PIN</strong><br><br>
+            
+            2. To send address of your additional location, then please use the following URLs:<br>
+<strong style="text-decoration:underline; color:#156685">www.ezeid.com?ID=[EZEID].L1.PIN</strong> – To share your fist non-primary location<br>
+<strong style="text-decoration:underline; color:#156685">www.ezeid.com?ID=[EZEID].L2.PIN</strong> – To share your second non-primary location<br><br>
+
+3. Use the following URLs to share the respective documents,<br>
+<strong style="text-decoration:underline; color:#156685">www.ezeid.com?ID=[EZEID].CV.PIN</strong> – To share your CV<br>
+<strong style="text-decoration:underline; color:#156685">www.ezeid.com?ID=[EZEID].ID.PIN</strong> – To send the copy of your ID Document<br>
+<strong style="text-decoration:underline; color:#156685">www.ezeid.com?ID=[EZEID].DL.PIN</strong> – To send the copy of your Driver’s License Document<br>
+<strong style="text-decoration:underline; color:#156685">www.ezeid.com?ID=[EZEID].PP.PIN</strong> – To send the copy of your Passport Document<br><br>
+
+
+or your can just share your EZEID so that the user can access it directly from the web site <strong style="text-decoration:underline; color:#156685">http://www.ezeid.com</strong> <br><br>
+
+Wishing you all the best,
+
+EZEID Team
+
+
+        </td>
+    </tr>
+    
+</table>
+        </td>
+    </tr>
+    <tr>
+    	<td style="text-align:center; padding: 15px 0; background:#0b89ba; color:#fff;">The Safest and Easiest way to create and share your personal or business
+information with others.</td>
+    </tr>
+    
+    <tr>
+    	<td style="text-align:center; padding: 15px 0; background:#5d5d5d; color:#fff;">Copyright&copy; 2015: TalentMicro Innovations</td>
+    </tr>
+</table>
+  

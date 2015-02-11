@@ -1,0 +1,88 @@
+<body ng-app="ezeidApp">
+<div id="wrapper" ng-controller="BusinessListController as BusinessListCtrl">
+    <header-section></header-section>
+    <div class="container" style="padding-top:80px;">
+        <div class="row">
+            <div class="col-md-7 col-md-offset-1" style="float: left;">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4>Business List</h4>
+                    </div>
+                    <div class="panel-body">
+                        <div class="col-lg-12">
+                            <div class="well well-lg">
+                                <div class="col-lg-10" style="margin: auto; float: none;">
+
+                                    <form name="businessForm" ng-submit="businessForm.$valid && BusinessListCtrl.saveBusinessList()" novalidate>
+                                        <div class="form_style">
+                                            <ul>
+                                                <div style="margin-top:-40px">
+                                                    <h5>Category</h5>
+                                                    <li class="dsp_block">
+                                                        <div class="pull-left wd100p">
+                                                            <select class="form-control emptyBox" ng-model="BusinessListCtrl._businessInfo.CategoryID"
+                                                                    ng-options="category.CategoryID as category.CategoryTitle for category in BusinessListCtrl.categories">
+                                                                <option value="" default selected>--Category--</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="clearfix"></div>
+                                                    </li>
+
+                                                    <h5>Keywords</h5>
+                                                    <li class="dsp_block">
+                                                        <div class="pull-left wd100p" style="width:100%; margin-top: 10px;">
+                                                            <textarea style="resize:none; height:120px;" name="keyWord" id="keyWord" class="form-control  emptyBox" ng-class="businessForm.keyWord.$touched && !BusinessListCtrl._businessInfo.Keywords.length ? 'mandatoryTextBoxCV' : ''" ng-model="BusinessListCtrl._businessInfo.Keywords" placeholder="Type Keywords"></textarea>
+                                                        </div>
+                                                        <div class="clearfix"></div>
+                                                    </li>
+
+                                                    <h5>Brochure Upload</h5>
+                                                    <div class="clearfix"></div>
+                                                    <li class="dsp_block">
+                                                        <!--<div class="pull-left wd48p" >-->
+                                                        <!--<input type="file" style="width:62%;margin: 0px auto;float: left;" class="form-control emptyBox" onchange="angular.element(this).scope().uploadFile(this.files)"/>-->
+                                                        <!--<span ng-show="BusinessListCtrl._businessInfo.BRDocFilename != 'null'"> <a target="_self" ng-show="BusinessListCtrl._businessInfo.BRDocFilename" style="margin-left:5px; margin-top: 10px!important;" href="BusinessListCtrl._businessInfo.BRDoc" download="BusinessListCtrl._businessInfo.BRDocFilename">{{BusinessListCtrl._businessInfo.BRDocFilename}}</a></span>-->
+                                                        <!--<a href="BusinessListCtrl._businessInfo.BRDoc" download>Download</a>-->
+                                                        <!--</div>-->
+                                                        <div class="pull-left wd100p">
+                                                            <input type="file" class="form-control emptyBox" onchange="angular.element(this).scope().uploadFile(this.files)"/>
+                                            <span class="pull-right"  ng-controller="DocumentController"
+                                                  style="margin-top:8px;"
+                                                  ng-show="form.Doc!= 'null'">
+                                                    <a ng-show="BusinessListCtrl._businessInfo.BRDocFilename" class="blue" target="_blank" href="/ewTgetDocument?TokenNo={{Token}}&&RefType=6">
+                                                        Download Document
+                                                    </a>
+                                                    <!--<a target="_self" href="{{form.RefDoc}}" download="{{form.RefDoc}}">{{form.RefFileName}}</a>-->
+                                                </span>
+                                                        </div>
+
+                                                        <div class="clearfix"></div>
+                                                    </li>
+                                                    <li class="dsp_block">
+                                                        <div class="clearfix"></div>
+                                                    <li class="dsp_block marT10px">
+                                                        <input type="submit" ng-disabled="!BusinessListCtrl._businessInfo.Keywords" class="btn-primary btn wd34p pull-left" value="Save"/>
+                                                        <input type="button" class="btn-primary btn wd34p pull-left" style="margin-left: 5px;" value="Close" onclick="window.location.href='#/home'"/>
+                                                    </li>
+                                                    </li>
+                                                </div>
+                                            </ul>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+                <div class="col-md-4 pull-right">
+                    <img src="images/Adds-3.gif">
+                    <img src="images/Adds-4.gif" style="margin-top:10px!important;">
+                </div>
+
+
+        </div>
+    </div>
+</div>
+</body>

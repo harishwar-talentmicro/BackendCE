@@ -1,0 +1,163 @@
+/** Added for text field make red border **/
+.emptyBox
+{
+    border:1px solid #ff0000!important;
+}
+.mandatoryTextBox
+{
+   background-color: #FAA9A3;
+   color: #000000;
+}
+.mandatoryTextBoxCV
+{
+    background-color: #FAA9A3!important;
+    color: #000000!important;
+}
+.msgRed
+{
+    color :#FF0000;
+    margin-left:-10px!important;
+    margin-top:10px!important;
+}
+.msgBox
+{
+ height: 65px;
+ width: 100%;
+}
+.selectedNotification {
+    opacity: 10 !important;
+}
+.setHeader
+{
+    color: #000000;
+    font-size: 16px;
+}
+#previousNote
+{
+    height: 50px;
+    max-height: 50px;
+}
+.addNote
+{
+    margin-top: 2%;
+}
+.orangeActiveButton
+{
+    background-color: #FBB917 !important;
+}
+.fixTextArea
+{
+    width: 600px;
+    min-width:580px;
+    max-width:580px;
+
+    height:65px;
+    min-height:65px;
+    max-height:65px;
+}
+.closeHomeDelivery {
+    width: 50px;
+    height: 50px;
+    border-radius: 50px;
+    text-align: center;
+    top: -26px;
+    cursor: pointer;
+    right: -25px;
+    position: absolute;
+    background: url(../images/close_icon.png) no-repeat;
+    text-indent: -999px;
+    overflow: hidden;
+}
+.datePickerWidth{
+
+}
+.appoint_marT{
+    margin-top:8px;
+
+}
+.closeCV {
+    width: 50px;
+    height: 50px;
+    border-radius: 50px;
+    text-align: center;
+    top: -26px;
+    cursor: pointer;
+    right: -25px;
+    position: absolute;
+    background: url(../images/close_icon.png) no-repeat;
+    text-indent: -999px;
+    overflow: hidden;
+}
+.no_select {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+.termsMargin
+{
+   padding-top:1%!important;
+    display: block;
+
+}
+
+.tabDisplay{
+    text-align: center;
+    list-style: none;
+    margin: 0px;
+    padding-left: 0;
+    height: 50px;
+    right: 0;
+    position: absolute;
+    z-index: 1000;
+    margin-right: 6px;
+}
+.tab {
+    float: left;
+    padding: 10px;
+    border: 1px solid #ffffff;
+    border-right: 0px;
+    border-top: 0px;
+    margin-top: 1px;
+    cursor: pointer;
+    min-width: 100px;
+    background-color: #188FBE;
+    color: #ffffff;
+}
+
+.tabDisplay > .tab:active{
+    border-bottom: none;
+    color:#48ABD2;
+}
+
+.tabActive{
+    border-bottom: none;
+    color:#48ABD2;
+    background:none;
+}
+
+.tabActive:first-child{
+    border-left:none;
+}
+
+.tab:last-child{
+    border-radius: 0px 22px 0px 0px;
+}
+
+.tab:first-child{
+    border: none;
+}
+
+.wd66p{
+    width: 66%!important;
+}
+
+.wd11p{
+    width: 11%!important;
+}
+
+.wd88p{
+    width: 88%!important;
+}

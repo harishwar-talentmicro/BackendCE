@@ -1,0 +1,30 @@
+<footer>
+    <div class="Popup_window form_style map_popup_iconTerm" id="Legal_popup">
+        <div class="window_page  Maping_popup">
+            <span class="closelink" id="legal-popup-close">X</span>
+            <div class="clearfix"></div>
+            <div  class="row mar_editTop">
+                <h3  style="text-align: center"><span class="">Legal</span></h3>
+                <div ng-include="'html/legal.html'"  style="width: 98%; height: 350px; overflow-y: scroll; padding: 5px;">
+                    <!-- Terms.html include hear... -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container" style="padding-bottom:15px !important">
+        <p>
+            Copyright © TalentMicro Innovations Pvt. Ltd.<br>
+            <span><a href="#" ng-click="FooterCtrl.ContactUS()">Contact us</a> | <a style="cursor:pointer;" id="legal-link">Legal</a> | PATENT IN PROCESS NO.6622/CHE/2014</span>
+            <div class="social-media">
+                <a href="#" class="pr">social icon</a>
+                <a href="#" class="tw">Twitter</a>
+                <a href="#" class="fb">Facebook</a>
+                <a href="#" class="lk">Linkedin</a>
+            </div>
+            <div class="app-store">
+                <a href="#" class="apple"></a>
+                <a href="#" class="google-play"></a>
+            </div>
+    </div>
+    <div class="clearfix"></div>
+</footer>

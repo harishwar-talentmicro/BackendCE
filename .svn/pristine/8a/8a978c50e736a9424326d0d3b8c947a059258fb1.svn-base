@@ -1,0 +1,448 @@
+
+<body ng-app="ezeidApp">
+    <div id="wrapper" ng-controller="HomeController as Home">
+        <header-section></header-section>
+        <div ng-controller="SearchController as search">
+
+        <div class="Popup_window form_style map_popup_iconActions" id="download_popup">
+            <div class="window_page Maping_popup">
+                <span class="closeCV" ng-click="search.closeDownloadForm()">X</span>
+                <form name="downloadRequestForm" novalidate>
+                    <h3 class="marB15px">Download Document</h3>
+                    <div class="col-md-12">
+                        Click<a href="/ewtGetSearchDocuments?Token={{_userInfo.Token}}&&Keywords={{search.Criteria.Keywords}}"><b> {{search.downloadData.Filename}} </b></a>to download.
+                       <!-- Click<a ng-click="search.downloadDocument()"><b> {{search.downloadData.Filename}} </b></a>to download.-->
+                        <br/>
+                         <!--  <a  href="/ewtGetSearchDocuments?Token={{_userInfo.Token}}&&Keywords={{search.Criteria.Keywords}}"> click</a>-->
+                    </div><br/><br/>
+
+                    <div class="col-md-12">
+                        <span>File Name: {{search.downloadData.Filename}} | NO: {{search.downloadData.No}} | Expiry Date: {{search.downloadData.date}}</span>
+                        </div>
+                    <br/>
+                </form>
+            </div>
+        </div>
+
+            <div class="Popup_window form_style map_popup_iconActions" id="SalesEnquiryRequest_popup">
+                <div class="window_page Maping_popup">
+                    <span class="closelink" ng-click="search.closeSalesEnquiryForm()">X</span>
+                    <form name="salesEnquiryForm" ng-submit="salesEnquiryForm.$valid && search.sendSalesEnquiry()" novalidate>
+                        <h3 class="marB15px">Sales Enquiry</h3>
+                        <div class="col-md-12">
+                            <p style="margin-top:-7px;">
+                                Enter your Requirement (You do not need to submit your contacts numbers, instead we
+                                will send your EZE ID Card)
+                            </p>
+                        </div>
+                        <div class="form-group">
+                            <textarea class="form-control fixTextArea emptyBox" name="salesMessage" ng-model="search.salesMessage" placeholder="Type Message here" required></textarea><br />
+                            <!--<input type="text" name="salesMessage" ng-model="search.salesMessage" class="msgBox form-control ng-pristine ng-valid ng-touched" placeholder="Type Message here" required>-->
+                        </div>
+                        <div class="form-group">
+                            <input type="submit" ng-disabled="!search.salesMessage" class="btn btn-primary text_Box" value="Send" />
+                            <input type="reset" class="btn btn-primary marR10px cancelEnq text_Box" ng-click="search.closeSalesEnquiryForm()" value="Cancel" />
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="Popup_window form_style map_popup_iconActions" id="sendMessage_popup">
+                <div class="window_page Maping_popup">
+                    <span class="closeCV" ng-click="search.closeSendMessageForm()">X</span>
+                    <form name="sendMessageForm" ng-submit="sendMessageForm.$valid && search.sendUserMessage()" novalidate>
+                        <h3 class="marB15px">Message</h3>
+                        <div class="col-md-12">
+                            <p>
+                                Enter your Message (You do not need to submit your contacts numbers, instead we
+                                will send your EZE ID Card)
+                            </p>
+                        </div>
+                        <div class="form-group">
+                            <textarea class="form-control fixTextArea emptyBox" name="sendMessage" ng-model="search.SendMessage" placeholder="Type Message here" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <input type="submit" ng-disabled="!search.sendMessage" class="btn btn-primary" value="Send" />
+                            <input type="reset" class="btn btn-primary marR10px cancelEnq" ng-click="search.closeSendMessageForm()" value="Cancel" />
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="Popup_window form_style map_popup_iconActions" id="HomeDelivery_popup">
+                <div class="window_page Maping_popup">
+                    <span class="closeHomeDelivery" ng-click="search.closeHomeDeliverForm()">X</span>
+                    <form name="homeDeliverForm" ng-submit="homeDeliverForm.$valid && search.sendHomeDelivery()" novalidate>
+                        <h3 class="marB15px">Home Delivery</h3>
+                        <div class="col-md-12">
+                            <p style="margin-top:-7px;">
+                                Enter your Requirement (You do not need to submit your contacts numbers, instead we
+                                will send your EZE ID Card)
+                            </p>
+                        </div>
+                        <div class="form-group">
+                            <textarea class="form-control fixTextArea emptyBox" name="homeDeliverMessage" ng-model="search.HomeDeliverMessage" placeholder="Type here" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <input type="submit" ng-disabled="!search.HomeDeliverMessage" class="btn btn-primary text_BoxHome" value="Send" />
+                            <input type="reset" ng-click="search.closeHomeDeliverForm()" class="btn btn-primary marR10px cancelEnq text_BoxHome" value="Cancel" />
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="Popup_window form_style map_popup_iconActions" id="Reservation_popup">
+                <div class="window_page Maping_popup">
+                    <span class="closelink" ng-click="search.closeReservationForm()">X</span>
+                    <span style="margin-top:-2px;float:right; border:1px solid #000000;background:#FAA9A3;color:#000000;" ng-show="(reservationForm.$submitted || reservationForm.dateTime.$touched && !search.ReservationDateTime.length) || (reservationForm.$submitted || reservationForm.reservationMessage.$touched && !search.ReservationMessage.length)">
+                        <span ng-show="reservationForm.dateTime.$error.required || reservationForm.reservationMessage.$error.required ">* Mandatory</span>
+                    </span>
+                    <form name="reservationForm" ng-submit="reservationForm.$valid && search.sendReservation(_userInfo.Type==1 ? '6' : '3')" novalidate>
+                        <h3 ng-show="_userInfo.Type==1" class="marB15px">Appointment</h3>
+                        <h3 ng-show="_userInfo.Type==2" class="marB15px">Reservation</h3>
+
+                        <div class="form-group">
+                            <p>
+                                <label>
+                                    Reservation Date & Time:
+                                    <input ng-model="search.ReservationDateTime" ng-class="reservationForm.dateTime.$touched && !search.ReservationDateTime.length ? 'mandatoryTextBox' : ''" name="dateTime" class="datePickerWidth emptyBox" id="expenseClaimDate" name="expenseClaimDate" required />
+                                </label>
+                            </p>
+                            <textarea id="reservationMessage" ng-class="reservationForm.$submitted || reservationForm.reservationMessage.$touched && !search.ReservationMessage.length ? 'mandatoryTextBox' : ''" class="form-control fixTextArea emptyBox" name="reservationMessage" ng-model="search.ReservationMessage" placeholder="Reservation requirement details" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <input type="submit" ng-disabled="!search.ReservationDateTime || !search.ReservationMessage" class="btn btn-primary appoint_marT" value="Send" />
+                            <input type="reset" ng-click="search.closeReservationForm()" class="btn btn-primary marR10px cancelEnq appoint_marT" value="Cancel" />
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="Popup_window form_style map_popup_iconActions" id="ServiceRequest_popup">
+                <div class="window_page Maping_popup">
+                    <span class="closelink" ng-click="search.closeServiceRequestForm()">X</span>
+                    <form name="serviceRequestForm" ng-submit="serviceRequestForm.$valid && search.sendServiceRequest()" novalidate>
+                        <h3 class="marB15px">Service Request</h3>
+                        <div class="col-md-12">
+                            <p>
+                                Enter your Requirement (You do not need to submit your contacts numbers, instead we
+                                will send your EZE ID Card)
+                            </p>
+                        </div>
+                        <div class="form-group">
+                            <textarea class="form-control fixTextArea emptyBox" name="serviceRequestMessage" ng-model="search.ServiceRequestMessage" placeholder="Type here" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <input type="submit" ng-disabled="!search.ServiceRequestMessage" class="btn btn-primary" value="Send" />
+                            <input type="reset" ng-click="search.closeServiceRequestForm()" class="btn btn-primary marR10px cancelEnq" value="Cancel" />
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="Popup_window form_style map_popup_iconActions" id="CV_popup">
+                <div class="window_page Maping_popup">
+                    <span class="closeCV" ng-click="search.closeCVForm()">X</span>
+                    <form name="cvRequestForm" ng-submit="cvRequestForm.$valid && search.sendCV()" novalidate>
+                        <h3 class="marB15px">CV Confirm</h3>
+                        <div class="col-md-12">
+                            Are you want to send your CV to {{search.CompanyName}} Company ?
+                        </div><br /><br />
+
+                        <div class="form-group">
+                           <!-- <input type="submit" class="btn btn-primary" data-ng-model="search.showCVSendButton"  ng-show="false" value="Send" />-->
+                            <input type="button" class="btn btn-primary" ng-click="search.checkForCVAvailability()" value="Yes" />
+                            <input type="reset" ng-click="search.closeCVForm()" class="btn btn-primary marR10px cancelEnq" value="Cancel" />
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="Popup_window form_style" id="Maping_popup" style="display:none;">
+                <div class="window_page Maping_popup">
+                    <span class="closelink" ng-click="search.closeMappingPopup()" >X</span>
+                    <div style="margin-left:0px;" class="row">
+                        <div class="col-md-3">  SAi123..
+                            <img ng-show="search.mInfo.Picture!=''" ng-src="{{search.mInfo.Picture}}" height="120px" width="120px">
+                            <img ng-hide="search.mInfo.Picture!=''" ng-src="images/Map_logo.png" height="120px" width="120px">
+                            <br>
+                            <div class="clearfix"></div>
+                            <span class="name_fontSize">{{search.mInfo.EZEID}}</span>
+                        </div>
+                        <div class="col-md-7">
+                            <span class="heading">{{search.mInfo.FirstName}}{{" "+search.mInfo.LastName}}</span>
+                            <br>
+                            <span>
+                                {{search.mInfo.AddressLine1 + ", "}}{{search.mInfo.AddressLine2+ ", "}}
+                                {{search.mInfo.CityTitle+ ", "}}
+                            </span><br>
+                            <span>{{search.mInfo.StateTitle+ ", "}} {{search.mInfo.CountryTitle +", "}} </span>
+                            <span>Postal Code: {{search.mInfo.PostalCode}} </span>
+                            <br>
+                            <span>P: {{search.mInfo.PhoneNumber == "" ? "--------" : search.mInfo.PhoneNumber}}</span>   | <span> M:  {{search.mInfo.MobileNumber == "" ? "--------" : search.mInfo.MobileNumber}}</span>  <!--<a href="#" class="msg-link">messege</a>-->
+                            <br>
+                            <span ng-show="search.mInfo.EMailID != ''">
+                                <span style="display:block">
+                                    <a style="position:relative;float:left; display:block" href="#" class="email-link">{{search.mInfo.EMailID}}</a>
+                                </span>
+                            </span>
+                            <span ng-show="search.mInfo.Website != ''">
+                                <a style="position:relative; float:left" href="#" class="web-link">{{search.mInfo.Website}}</a>
+                            </span>
+                            <div> </div>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="col-md-2">
+                            <img ng-show="search.mInfo.Icon!=''" width="60" height="60" ng-src="{{search.mInfo.Icon}}" class="img2-marR">
+                            <img ng-hide="search.mInfo.Icon!=''" src="images/user_40.png" height="60" width="60" class="img2-marR" />
+                            <img ng-show="search.mInfo.EZEIDVerifiedID != 2" style="margin-top: 64px; margin-left: -63px;" width="60" height="60" ng-src="images/Question_40.png" class=" icon_img" />
+                            <img ng-show="search.mInfo.EZEIDVerifiedID == 2" width="60" height="60" ng-src="images/correct_40.png" style="margin-top: 64px; margin-left: -63px;" class=" icon_img" />
+                        </div>
+                    </div>
+                    <div class="clearfix"></div>
+                    <div class="clearfix"></div>
+                    <ul ng-show="search.isIndividualUser(1)" style="position:relative;top:-5px">
+                        <button ng-disabled="search.mInfo.EZEIDVerifiedID != '2'" class="noti-icon" ng-click="search.openSendMessageForm()" title="Message">Message</button>
+                        <button ng-disabled="search.mInfo.EZEIDVerifiedID != '2'" class="appoinment-icon" title="Appointment" ng-click="search.openReservationForm()">Appointment</button>
+                        <button class="direction-icon" ng-click="search.getdirections(search.mInfo)" title="Directions">Directions</button>
+                        <div class="clearfix"></div>
+                    </ul>
+                    <div class="clearfix"></div>
+                    <ul ng-hide="search.isIndividualUser(1)" style="position:relative;">
+                        <button class="sales-icon" ng-hide="search.mInfo.SalesEnquiryButton==0" ng-disabled="search.mInfo.SalesEnquiryButton==2 || search.mInfo.EZEIDVerifiedID == '1'" title="Sales Enquiry" ng-click="search.openSalesEnquiryForm()">Sales Enquiry</button>
+                        <button class="home-icon" ng-hide="search.mInfo.HomeDeliveryButton==0" ng-disabled="search.mInfo.HomeDeliveryButton==2 || search.mInfo.EZEIDVerifiedID == '1'" title="Home Delivery" ng-click="search.openHomeDeliverForm()">Home Delivery</button>
+                        <button class="reservation-icon" ng-hide="search.mInfo.ReservationButton==0" ng-disabled="search.mInfo.ReservationButton==2 || search.mInfo.EZEIDVerifiedID == '1'" title="Reservation" ng-click="search.openReservationForm()">Reservation</button>
+                        <button class="support-icon" ng-hide="search.mInfo.SupportButton==0" ng-disabled="search.mInfo.SupportButton==2 || search.mInfo.EZEIDVerifiedID == '1'" title="Support Request" ng-click="search.openServiceRequestForm()">Support Request</button>
+
+                        <button class="sendcv-icon" ng-hide="search.mInfo.CVButton==0" ng-disabled="search.mInfo.CVButton==2 || search.mInfo.EZEIDVerifiedID == '1'" title="Send CV" ng-click="search.openCVForm()">Send CV</button>
+                        <!--<a class=" " href="CVAttachment.html" ng-hide="search.mInfo.CVButton==0" ng-disabled="search.mInfo.CVButton==2 || search.mInfo.EZEIDVerifiedID == '1'" title="Send CV">
+                             <button class="sendcv-icon" title="Send CV" ng-disabled="search.mInfo.EZEIDVerifiedID == '1'"> Send CV </button>
+                        </a>-->
+                        <button class="direction-icon" ng-click="search.getdirections(search.mInfo)" title="Directions">Directions</button>
+                        <div class="clearfix"></div>
+                    </ul>
+                    <div class="clearfix"></div>
+                    <div style="margin-top:5px!important;position:relative" class="parking pull-left" ng-hide="search.isIndividualUser(1)">
+                        <a class="car-parking active" ng-show="search.mInfo.ParkingStatus==1" title="Parking">Parking</a>
+                        <a class="no-parking active" ng-show="search.mInfo.ParkingStatus==4" title="No Parking">No Parking</a>
+                        <a class="val-parking active" ng-show="search.mInfo.ParkingStatus==3" title="Vallet Parking">Vallet Parking</a>
+                        <a class="road-parking active" ng-show="search.mInfo.ParkingStatus==2" title="Road Parking">Road Parking</a>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="search_user" ng-hide="search.isIndividualUser(1)" class="col-md-offset-1">
+                        <p ng-show="search.mInfo.OpenStatus==1" class="open-close"><i>OPEN</i> Working hours :  {{search.mInfo.WorkingHours}}</p>
+                        <p ng-hide="search.mInfo.OpenStatus==1" ng-click="search.closeHomeDeliverForm()" class="close-close"><i>CLOSE</i> Working hours :  {{search.mInfo.WorkingHours}}</p>
+                    </div>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <div class="Popup_window form_style map_popup_iconTerm" id="Help_popup">
+                <div class="window_page  Maping_popup">
+                    <span class="closelink" ng-click="closeHelpPopup()">X</span>
+                    <div class="clearfix"></div>
+                    <div class="row mar_editTop">
+                        <h3  style="text-align: center"><span class="">Help</span></h3>
+                        <div ng-include="'html/help.html'"  style="width: 98%; height: 350px; overflow-y: scroll; padding: 5px;">
+                            <!-- Terms.html include hear... -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="container" style="padding-top:80px;">
+                <div class="row">
+                    <div class="col-md-7" style="margin: auto; float: none;">
+                        <div class="panel panel-default">
+                            <form class="form-signin" role="form" novalidate ng-submit="search.getSearch()">
+                                <!--------------------------------------New Code---------------------------------->
+                                <div class="container-fluid">
+                                    <div class="bottom-clearfix"></div>
+                                    <div class="row row-margin-fix">
+                                        <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5">
+                                            <!-- 1st block--->
+                                            <label>
+                                                Search by  <input value="1" id="EZEID" ng-model="search.Criteria.SearchType" type="radio">
+                                                <label for="EZEID">EZEID</label>
+                                                <input value="2" id="Keywords" ng-model="search.Criteria.SearchType" type="radio" ng-click="search.SearchTypeKeyWord()">
+                                                <label for="Keywords">Key words</label>
+                                            </label>
+                                        </div>
+                                        <!--<div class="col-lg-6 col-md-6 col-sm-6 col-xs-1">-->
+                                            <!--&lt;!&ndash; 1st block-&ndash;&gt;-->
+                                        <!--</div>-->
+                                        <div class="col-lg-1 col-md-1 col-sm-1 col-xs-5 col-lg-offset-5 col-md-offset-5 col-sm-offset-5 col-xs-offset-5">
+                                            <a ng-click="openHelpPopup()" id="SearchHelp" style="cursor: pointer">Help?</a>
+                                        </div>
+                                    </div>
+                                    <div class="bottom-clearfix"></div>
+                                    <div class="row row-margin-fix">
+
+                                        <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10">
+                                            <label for="inputEmail" class="sr-only">Email address</label>
+                                            <input id="inputEmail" class="form-control" ng-model="search.Criteria.Keywords" placeholder="{{search.Placeholder}}" ng-click="search.SearchTypeKeyWord()" required autofocus type="text">
+                                        </div>
+                                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
+                                            <button class="btn btn-primary pull-right marL5px" ng-hide="true" type="button">Pick First Match</button>
+                                            <button  ng-disabled="!search.Criteria.Keywords" class="btn btn-block btn-primary pull-left" type="submit">Search</button>
+                                        </div>
+                                    </div>
+                                    <div class="bottom-clearfix"></div>
+                                    <div class="row row-margin-fix">
+                                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                                            <select class="form-control pull-left" ng-init="search.Criteria.OpenStatus = search.OpenStatuses[0]" ng-model="search.Criteria.OpenStatus" ng-disabled="search.isEZEIDselected('1')"
+                                                    ng-options="status.id as status.label for status in search.OpenStatuses">
+                                                <option value="">Any</option>
+                                            </select>
+
+                                        </div>
+                                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                                            <select class="form-control pull-left"
+                                                    ng-model="search.Criteria.Proximity" ng-disabled="search.isEZEIDselected('1')"
+                                                    ng-options="proximity.MetersValue as proximity.Title for proximity in search.proximities">
+                                            </select>
+
+                                        </div>
+                                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-4">
+                                            <div style="display:table-cell;vertical-align:middle;height:34px;">
+                                            <input type="checkbox" ng-model="search.Criteria.ParkingStatus" name="parking" value="1,2"><span> Show Places with Parking only</span>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <div class="bottom-clearfix"></div>
+
+                                </div>
+
+                                <!--------------------------------------New Code ends ---------------------------->
+                                <div class="clearfix"></div>
+                                <!--<img src="images/Business-Card_2.gif" width="100%" height="223">-->
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="row" ng-show="search.IsShowForm">
+                   <div class="window_page Maping_popup" style="margin-top: 0%;border: solid 1px #08749C; min-height: 48px; width: 57.50%;padding: 5px; margin-bottom: 1%;">
+                       <span class="closeCVSmall" ng-click="search.closeDownloadForm()">X</span>
+
+                          <div class="col-md-12">
+                                Click<a href="/ewtGetSearchDocuments?Token={{_userInfo.Token}}&&Keywords={{search.Criteria.Keywords}}"><b> {{search.downloadData.Filename}} </b></a>to download.
+                                <br/>
+                            </div>
+                            <div class="col-md-12">
+                               <!-- <span>File Name: {{search.downloadData.Filename}} | NO: {{search.downloadData.No}} | Expiry Date: {{search.downloadData.date}}</span>-->
+                                <span> NO: {{search.downloadData.No}}  {{search.downloadData.date != "" ? "| Expiry Date:"+search.downloadData.date : ""}}</span>
+                            </div>
+                    </div>
+                </div>
+
+
+                <!--<div class="row" ng-controller="TabController as Tab">-->
+                <div class="row">
+                    <div class="col-md-7" style="margin: auto; float: none;">
+                        <ul class="tabDisplay" role="group" ng-model="selectedTab">
+                            <li ng-click="selectTab('')" ng-class="{tabActive: selectedTab == ''}" class="tab">Home</li>
+
+                            <li ng-show="showInfoTab" ng-click="selectTab('info')"  ng-class="{tabActive: selectedTab == 'info'}" class="tab">Information</li>
+
+                            <li ng-click="selectTab('maps')" ng-class="{tabActive: selectedTab == 'maps'}" class="tab">Map</li>
+                        </ul>
+
+                        <div class="panel panel-default" style="border-radius: 0px 24px 0px 0px;height:390px;padding-top:29px;overflow: hidden;">
+                            <div ng-show="selectedTab == 'info'">
+                                <div class="window_page Maping_popup" style="margin-top: 2%; margin-bottom: 2%; border: solid 1px #08749D">
+                                    <div style="margin-left:0px;" class="row">
+                                        <div class="col-md-3 text-center">
+                                            <img ng-show="search.mInfo.Picture!=''" ng-src="{{search.mInfo.Picture}}" height="120px" width="120px">
+                                            <img ng-hide="search.mInfo.Picture!=''" ng-src="images/Map_logo.png" height="120px" width="120px">
+                                            <br>
+                                            <div class="clearfix"></div>
+                                            <span class="info-tab-text-center text-center">{{search.mInfo.EZEID}}</span>
+                                        </div>
+                                        <div class="col-md-7">
+                                            <span class="heading" style="color: #000;text-shadow: none;font-size: 18px;">{{search.mInfo.FirstName}}{{" "+search.mInfo.LastName}}</span>
+                                            <br>
+                                            <span>
+                                                {{search.mInfo.AddressLine1 + ", "}}{{search.mInfo.AddressLine2+ ", "}}
+                                                {{search.mInfo.CityTitle+ ", "}}
+                                            </span><br>
+                                            <span>{{search.mInfo.StateTitle+ ", "}} {{search.mInfo.CountryTitle +", "}} </span>
+                                            <span>Postal Code: {{search.mInfo.PostalCode}} </span>
+                                            <br>
+                                            <span>P: {{search.mInfo.PhoneNumber == "" ? "--------" :search.mInfo.ISDPhoneNumber}} {{search.mInfo.PhoneNumber == "" ? "--------" : search.mInfo.PhoneNumber}}</span>   | <span> M: {{search.mInfo.MobileNumber == "" ? "--------" : search.mInfo.ISDMobileNumber}} {{search.mInfo.MobileNumber == "" ? "--------" : search.mInfo.MobileNumber}}</span>  <!--<a href="#" class="msg-link">messege</a>-->
+                                            <br>
+                            <span ng-show="search.mInfo.EMailID != ''">
+                                <span style="display:block">
+                                    <p class="text text-primary">{{search.mInfo.EMailID}}</p>
+                                    
+                                </span>
+                            </span>
+                            <span ng-show="search.mInfo.Website != ''">
+                                <a style="position:relative; float:left" href="#" class="web-link">{{search.mInfo.Website}}</a>
+                            </span>
+                                            <div class="clearfix"></div>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <div ng-hide="(search.mInfo.IDTypeID == 1)">
+                                            <img ng-show="search.mInfo.Icon!=''" width="60" height="60" ng-src="{{search.mInfo.Icon}}" class="img2-marR">
+                                            <img ng-hide="search.mInfo.Icon!=''" src="images/user_40.png" height="60" width="60" class="img2-marR" />
+                                                
+                                                </div>
+                                                <h4 style="color:#19BD00;" ng-show="search.mInfo.EZEIDVerifiedID == 2"><i class="fa fa-2x fa-check"></i></h4>
+                                                <h4 style="color:#F00;" ng-show="search.mInfo.EZEIDVerifiedID != 2"><i class="fa fa-2x fa-question"></i></h4>
+<!--
+                                            <img ng-show="search.mInfo.EZEIDVerifiedID != 2" style="margin-top: 64px; margin-left: -63px;" width="60" height="60" ng-src="images/Question_40.png" class=" icon_img" />
+                                            <img ng-show="search.mInfo.EZEIDVerifiedID == 2" width="60" height="60" ng-src="images/correct_40.png" style="margin-top: 64px; margin-left: -63px;" class=" icon_img" />
+-->
+                                        </div>
+                                    </div>
+                                    <div class="clearfix"></div>
+                                    <div class="clearfix"></div>
+                                    <ul ng-show="search.isIndividualUser(1)" style="position:relative;top:-5px">
+                                        <button ng-disabled="search.mInfo.EZEIDVerifiedID != '2'" class="noti-icon" ng-click="search.openSendMessageForm()" title="Message">Message</button>
+                                        <button ng-disabled="search.mInfo.EZEIDVerifiedID != '2'" class="appoinment-icon" title="Appointment" ng-click="search.openReservationForm()">Appointment</button>
+                                        <button class="direction-icon" ng-click="search.getdirections(search.mInfo)" title="Directions">Directions</button>
+                                        <div class="clearfix"></div>
+                                    </ul>
+                                    <div class="clearfix"></div>
+                                    <ul ng-hide="(search.mInfo.IDTypeID == 1)" style="position:relative;">
+                                        <button class="sales-icon" ng-hide="search.mInfo.SalesEnquiryButton==0" ng-disabled="search.mInfo.SalesEnquiryButton==2 || search.mInfo.EZEIDVerifiedID == '1'" title="Sales Enquiry" ng-click="search.openSalesEnquiryForm()">Sales Enquiry</button>
+                                        <button class="home-icon" ng-hide="search.mInfo.HomeDeliveryButton==0" ng-disabled="search.mInfo.HomeDeliveryButton==2 || search.mInfo.EZEIDVerifiedID == '1'" title="Home Delivery" ng-click="search.openHomeDeliverForm()">Home Delivery</button>
+                                        <button class="reservation-icon" ng-hide="search.mInfo.ReservationButton==0" ng-disabled="search.mInfo.ReservationButton==2 || search.mInfo.EZEIDVerifiedID == '1'" title="Reservation" ng-click="search.openReservationForm()">Reservation</button>
+                                        <button class="support-icon" ng-hide="search.mInfo.SupportButton==0" ng-disabled="search.mInfo.SupportButton==2 || search.mInfo.EZEIDVerifiedID == '1'" title="Support Request" ng-click="search.openServiceRequestForm()">Support Request</button>
+
+                                        <button class="sendcv-icon" ng-hide="search.mInfo.CVButton==0" ng-disabled="search.mInfo.CVButton==2 || search.mInfo.EZEIDVerifiedID == '1'" title="Send CV" ng-click="search.openCVForm()">Send CV</button>
+                                        <!--<a class=" " href="CVAttachment.html" ng-hide="search.mInfo.CVButton==0" ng-disabled="search.mInfo.CVButton==2 || search.mInfo.EZEIDVerifiedID == '1'" title="Send CV">
+                                             <button class="sendcv-icon" title="Send CV" ng-disabled="search.mInfo.EZEIDVerifiedID == '1'"> Send CV </button>
+                                        </a>-->
+                                        <button class="direction-icon" ng-click="search.getdirections(search.mInfo)" title="Directions">Directions</button>
+                                        <div class="clearfix"></div>
+                                    </ul>
+                                    <div class="clearfix"></div>
+                                    <div style="margin-top:5px!important;position:relative" class="parking pull-left" ng-hide="search.isIndividualUser(1)">
+                                        <a class="car-parking active" ng-show="search.mInfo.ParkingStatus==1" title="Parking">Parking</a>
+                                        <a class="no-parking active" ng-show="search.mInfo.ParkingStatus==4" title="No Parking">No Parking</a>
+                                        <a class="val-parking active" ng-show="search.mInfo.ParkingStatus==3" title="Vallet Parking">Vallet Parking</a>
+                                        <a class="road-parking active" ng-show="search.mInfo.ParkingStatus==2" title="Road Parking">Road Parking</a>
+                                        <div class="clearfix"></div>
+                                    </div>
+                                    <div class="search_user" ng-hide="search.isIndividualUser(1)" class="col-md-offset-1">
+                                        <p ng-show="search.mInfo.OpenStatus==1" class="open-close"><i>OPEN</i> Working hours :  {{search.mInfo.WorkingHours}}</p>
+                                        <p ng-hide="search.mInfo.OpenStatus==1" ng-click="search.closeHomeDeliverForm()" class="close-close"><i>CLOSE</i> Working hours :  {{search.mInfo.WorkingHours}}</p>
+                                    </div>
+                                </div>
+                                <div class="clearfix"></div>
+                            </div>
+                            <div ng-show="selectedTab == ''"><img src="images/home_ad.png"></div>
+                            <div ng-show="selectedTab == 'maps'" >
+                                <div style="display:block;">
+                                    <img id="mapClocH" style="padding-top:8px;cursor:pointer;" ng-click="search.getMyLocation()" src="images/myloc.png" />
+                                    <input id="txtSearch" class="form-control pull-left marL5px" type="text" placeholder="Search Location" autocomplete="off" style=" z-index: 0; top:0px;margin-top:10px; width: 400px;">
+                                    <!--<button class="btn btn-primary pull-left marL10px marT10px" ng-click="search.SearchOnMap(search.MSerText)" ng-disabled="search.MSerText==undefined" type="button">Find</button>-->
+                                </div>
+<!--                                <div id="map-canvasH" style="width: 100%; height: 360px; position: relative; overflow: hidden; transform: translateZ(0px); background-color: rgb(229, 227, 223);">-->
+                                <div id="map-canvasH">
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div> <!-- /container -->
+    </div>
+</body>

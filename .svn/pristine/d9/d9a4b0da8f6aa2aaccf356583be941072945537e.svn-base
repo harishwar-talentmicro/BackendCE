@@ -1,0 +1,322 @@
+<style type="text/css">
+    .btn-file {
+        position: relative;
+        overflow: hidden;
+    }
+    .btn-file input[type=file] {
+        position: absolute;
+        top: 0;
+        right: 0;
+        min-width: 100%;
+        min-height: 100%;
+        font-size: 100px;
+        text-align: right;
+        filter: alpha(opacity=0);
+        opacity: 0;
+        outline: none;
+        background: white;
+        cursor: inherit;
+        display: block;
+    }
+</style>
+<!--<body ng-app="ezeidApp">-->
+
+<!--ng-controller="DocumentController"-->
+<div ng-app="ezeidApp" id="wrapper" ng-controller="ProfileController as profile">
+    <header-section></header-section>
+
+    <div class="Popup_window form_style map_popup_iconTerm" id="Terms_popup">
+        <div class="window_page  Maping_popup">
+            <span class="closelink" ng-click="msgCtrl.closeAddNoteForm()">X</span>
+
+            dfhgifhgfi
+
+           <!-- <form name="AddNoteForm" ng-submit="AddNoteForm.$valid && msgCtrl.sendNote(msgCtrl.item)" novalidate>
+                <h3 class="marB15px marBpx">Message</h3>
+                <div class="form-group">
+                    <textarea id="previousNote" class="form-control fixTextArea" name="previousNote" ng-model="msgCtrl.Message" readonly></textarea><br/>
+                    &lt;!&ndash; <input id="previousNote" type="text" name="previousNote" ng-model="msgCtrl.Message" class="msgBox form-control" readonly><br/>&ndash;&gt;
+                    <sapn></sapn>
+                    <textarea class="form-control fixTextArea" name="noteMessage" ng-model="msgCtrl.NoteMessage" placeholder="Type Notes here"></textarea><br/>
+                    &lt;!&ndash;<input type="text" name="noteMessage" ng-model="msgCtrl.NoteMessage" class="text_Box msgBox form-control" placeholder="Type Notes here"><br/>&ndash;&gt;
+                    <span class="text_Box">Status:</span>
+                    <div class="btn-group text_Box">
+                        <label class="btn btn-primary panelTextSize" ng-class="radioModel = msgCtrl.item.Status == 0 ? 'orangeActiveButton': ''" ng-click="msgCtrl.UpdateStatus(msgCtrl.item,0)" ng-model="radioModel = msgCtrl.item.Status == 0 ? 'New': ''" btn-radio="'New'">New</label>
+                        <label class="btn btn-primary panelTextSize" ng-class="radioModel = msgCtrl.item.Status == 1 ? 'orangeActiveButton': ''" ng-click="msgCtrl.UpdateStatus(msgCtrl.item,1)" ng-model="radioModel = msgCtrl.item.Status == 1 ? 'InProcess': ''" btn-radio="'InProcess'">Accepted</label>
+                        <label class="btn btn-primary panelTextSize" ng-class="radioModel = msgCtrl.item.Status == 2 ? 'orangeActiveButton': ''" ng-click="msgCtrl.UpdateStatus(msgCtrl.item,2)" ng-model="radioModel = msgCtrl.item.Status == 2 ? 'Closed': ''" btn-radio="'Closed'">{{msgCtrl.item.MessageType == "5" ? "Hired" : "Completed"}} </label>
+                        <label class="btn btn-primary panelTextSize" ng-class="radioModel = msgCtrl.item.Status == 3 ? 'orangeActiveButton': ''" ng-click="msgCtrl.UpdateStatus(msgCtrl.item,3)" ng-model="radioModel = msgCtrl.item.Status == 3 ? 'Dropped': ''" btn-radio="'Dropped'">Rejected</label>
+                    </div>
+                    <h3 class="status_line"><span class="line_top"></span></h3>
+                </div>
+
+                <div class="form-group">
+                    <input type="submit" class="btn btn-primary msg_butt" value="Save" />
+                    <input type="button" ng-click="msgCtrl.closeAddNoteForm()"  class="btn btn-primary marR10px cancelEnq msg_butt" value="Cancel" />
+                </div>
+            </form>-->
+        </div>
+    </div>
+
+    <div class="container" style="padding-top:80px;">
+        <div class="row">
+            <div class="col-md-8" style="margin: auto; float: none;">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4>Update your profile456
+                            <span class="col-md-offset-3 small" style="color:#FF0000;">
+                                <span class="" ng-show="profile._info.Password !=  profile._info.CPassword && profile._info.Password.length > 0 &&  profile._info.CPassword.length > 0"> Password mismatch...</span>
+                                <span class="" ng-show="UserForm.email.$error.pattern">Not valid email!</span>
+
+                                <span style="border:1px solid #000000;background:#FAA9A3;color:#000000;" ng-show="(UserForm.$submitted || UserForm.EZEID.$touched && !profile_info.EZEID.length) || (UserForm.$submitted || UserForm.PWD.$touched && !profile_info.Password.length) || (UserForm.$submitted || UserForm.CPWD.$touched && !profile._info.CPassword.length)
+                                    || (UserForm.$submitted || UserForm.FName.$touched && !profile._info.FirstName.length) || (UserForm.$submitted || UserForm.LName.$touched && !profile._info.LastName.length) || (UserForm.$submitted || UserForm.addLine2.$touched && !profile._info.AddressLine2.length)
+                                    || (UserForm.$submitted || UserForm.phoneNo.$touched && !profile._info.PhoneNumber.length) || (UserForm.$submitted || UserForm.MobileNumber.$touched && !profile._info.MobileNumber.length) || (UserForm.$submitted || UserForm.streetName.$touched && !profile._info.AddressLine1.length)
+                                    || (UserForm.$submitted || UserForm.city.$touched && !profile._info.CityTitle.length) || (UserForm.$submitted || UserForm.postalCode.$touched && !profile._info.PostalCode.length)">
+
+
+                                    <span ng-model=" profile._info.showMandatory" ng-show="UserForm.EZEID.$error.required || UserForm.PWD.$error.required  || UserForm.CPWD.$error.required
+                                      || UserForm.FName.$error.required || UserForm.LName.$error.required || UserForm.addLine2.$error.required
+                                       || UserForm.phoneNo.$error.required || UserForm.MobileNumber.$error.required || UserForm.streetName.$error.required
+                                        || UserForm.city.$error.required || UserForm.postalCode .$error.required">* Mandatory</span>
+                                </span>
+                           </span>
+                        </h4>
+
+                    </div>
+                    <div class="panel-body">
+                        <div class="well well-lg">
+                            <div class="col-lg-12" style="margin: auto; float: none;">
+                                <form name="UserForm" novalidate class="form-inline">
+                                    <div class="row">
+                                        <div class="col-lg-2">
+                                            <span><label>ID Type</label></span>
+                                        </div>
+                                        <div class="col-lg-10">
+                                            &nbsp;
+                                            <input type="radio" name="EZType"  ng-model="profile._info.IDTypeID" id="Individual" value="1"  checked required> Individual
+                                            &nbsp;
+                                            <input type="radio" name="EZType" ng-model="profile._info.IDTypeID"  id="Business" value="2" required> Business
+                                            &nbsp;
+                                            <input type="radio" name="EZType" ng-model="profile._info.IDTypeID" id="Venue" value="3" required> Public Place
+                                        </div>
+                                    </div>
+                                    <br/>
+                                    <div class="row mar_editTop">
+                                        <div class="col-lg-6">
+                                            <div class="form-group">
+                                                <input type="text" style='text-transform:uppercase' ng-pattern="/^[a-zA-Z0-9]*$/"
+                                                       ng-class="UserForm.$submitted || UserForm.EZEID.$touched && !profile._info.EZEID.length ? 'mandatoryTextBox' : ''"
+                                                       name="EZEID" id="EZEID" class="form-control emptyBox" maxlength="15" ng-model="profile._info.EZEID" placeholder="Enter EZE ID"
+                                                        style="width: 90px" required>
+                                                <button type="button" name="btnCheckID" ng-click="profile.CheckisIDAvailable()" ng-disabled="!profile._info.EZEID.length" class="btn btn-primary" >Check Availability</button>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-lg-2" >
+                                          <span ng-show="UserForm.EZEID.$touched && profile._info.EZEID.length" class="font12px dsp_block padT10px">
+                                                <span style="color:red" ng-if="UserForm.EZEID.$touched && (profile._info.IsIDAvailable==false || profile._info.IsAuthenticate==false) " class="font14px">
+                                                  No Available</span>
+                                                <span ng-show="UserForm.EZEID.$touched && (profile._info.IsIDAvailable==true || profile._info.IsAuthenticate==true)" class="green font14px">
+                                                   Available</span>
+                                           </span>
+                                        </div>
+
+                                        <div class="col-lg-4" ng-show="!_userInfo.IsAuthenticate==true">
+                                            <input type="password" name="PWD" ng-model="profile._info.Password"
+                                                   ng-class="UserForm.$submitted || UserForm.PWD.$touched && !profile._info.Password.length ? 'mandatoryTextBox' : ''"
+                                                   class="form-control emptyBox" id="password" required maxlength="20" placeholder="Password" style="width: 48%">
+                                            <input type="password" name="CPWD" ng-model="profile._info.CPassword"
+                                                   ng-class="UserForm.$submitted || UserForm.CPWD.$touched && !profile._info.CPassword.length ? 'mandatoryTextBox' : ''"
+                                                   class="form-control emptyBox" id="re-password" required maxlength="20" placeholder="Re-Enter Password" style="width: 48%">
+                                        </div>
+                                    </div>
+                                    <br/>
+                                    <div class="row mar_editTop">
+                                        <div class="col-lg-6">
+                                            <input type="text" class="form-control emptyBox" name="FName" id="FName" ng-model="profile._info.FirstName"
+                                                   ng-class="UserForm.$submitted || UserForm.FName.$touched && !profile._info.FirstName.length ? 'mandatoryTextBox' : ''"
+                                                   placeholder="First Name" style="width: 48%" required>
+                                            <input type="text" class="form-control emptyBox" name="LName" id="LName" ng-model="profile._info.LastName"
+                                                   ng-class="UserForm.$submitted || UserForm.LName.$touched && !profile._info.LastName.length ? 'mandatoryTextBox' : ''"
+                                                   placeholder="Middle,  Last Name"  style="width: 48%">
+                                        </div>
+                                        <div class="col-lg-6">
+                                            <input type="checkbox" ng-model="profile._info.SecurePin"> Secure your EZE ID by a PIN
+                                            <input ng-disabled="!profile._info.SecurePin" type="text" class="form-control" name="pin" onkeypress="return isNumberKey(event);" id="PIN" ng-model="profile._info.PIN" required maxlength="3" placeholder="Enter PIN"
+                                                   style="width: 90px">
+                                        </div>
+                                    </div>
+                                    <br/>
+                                    <div class="row mar_editTop">
+                                        <span><label>&nbsp;Choose your location from the Map below by moving the marker on map to the exact location</label></span><br/>
+                                        <div class="col-lg-12" style="margin: auto; float: none;">
+                                            <div class="panel panel-default">
+                                               <!-- <div style="display:none;">
+                                                    <img id="mapCloc" style="padding-top:8px;cursor:pointer;" ng-click="search.getMyLocation()" src="images/myloc.png" />
+                                                    <input id="txtSearch" class="form-control pull-left marL5px" type="text" placeholder="Search Location" autocomplete="off" style=" z-index: 0; top:0px;margin-top:10px; width: 400px;">
+                                                    &lt;!&ndash;<button class="btn btn-primary pull-left marL10px marT10px" ng-click="search.SearchOnMap(search.MSerText)" ng-disabled="search.MSerText==undefined" type="button">Find</button>&ndash;&gt;
+                                                </div>
+                                                <div id="map-canvas" style="width: 100%; height: 140px; position: relative; overflow: hidden; transform: translateZ(0px); background-color: rgb(229, 227, 223);">
+                                                </div>-->
+                                                <!--<div style="display:block;">-->
+                                                <div style="display:block;">
+                                                    <img id="mapCloc" style="padding-top:8px;cursor:pointer;" ng-click="profile.getMyLocation()" src="images/myloc.png" />
+                                                    <input id="txtSearch" class="form-control pull-left marL5px" type="text" placeholder="Search Location" autocomplete="off" style="z-index: 1; top: 0px; margin-top: 3px; width: 400px; position: absolute; left: 36px;" >
+                                                    <!--<button class="btn btn-primary pull-right" ng-click="search.SearchOnMap(search.MSerText)" ng-disabled="search.MSerText==undefined" type="button" style="z-index: 1; top: 0px; margin-top: 3px; position: absolute; ">Find</button>-->
+                                                </div>
+                                                <div id="map-canvas" style="width: 100%; height: 140px; position: relative; overflow: hidden; transform: translateZ(0px); background-color: rgb(229, 227, 223);">
+                                                </div>
+
+                                            </div>
+                                                <span ng-hide="true">
+                                                    <input type="text" name="LatLong" class="form-control" ng-model="profile._info.Latitude" required />
+                                                    <input type="text" name="LatLong" class="form-control" ng-model="profile._info.Longitude" required />
+                                                </span>
+                                        </div>
+                                    </div>
+                                    <br/>
+                                    <div class="row mar_editTop">
+                                        <div class="col-lg-12">
+                                            <div class="col-lg-6">
+                                                <div class="row mar_editTop mar_editLeft">
+                                                    <span><label><strong>&nbsp;Primary Address</strong> </label></span><br/>
+                                                    <input type="text" class="form-control emptyBox" id="streeName" name="streeName" ng-model="profile._info.AddressLine1"
+                                                           ng-class="UserForm.$submitted || UserForm.streeName.$touched && !profile._info.AddressLine1.length ? 'mandatoryTextBox' : ''"
+                                                           placeholder="No., Building Name, Street Name" style="width: 48%" required>
+                                                    <input type="text" class="form-control emptyBox" id="block" name="addLine2" ng-model="profile._info.AddressLine2"
+                                                           ng-class="UserForm.$submitted || UserForm.addLine2.$touched && !profile._info.AddressLine2.length ? 'mandatoryTextBox' : ''"
+                                                           placeholder="Block, Area, Sector"  style="width: 48%" required>
+                                                </div>
+                                                <br/>
+                                                <div class="row mar_editTop mar_editLeft">
+
+                                                     <select class="form-control emptyBox" style="width: 48%" name="countries" ng-model="profile._info.CountryID"
+                                                            ng-change="profile.getStates(profile._info.CountryID)" ng-options="country.CountryID as country.CountryName  for country in profile.countries" required>
+                                                     </select>
+
+                                                    <select class="form-control emptyBox" style="width: 48%" name="states" ng-model="profile._info.StateID"
+                                                            ng-change="profile.getCities(profile._info.StateID)"
+                                                            ng-options="state.StateID as state.StateName for state in profile.states" required>
+
+                                                    </select>
+                                                 </div>
+                                                <br/>
+                                                <div class="row mar_editTop mar_editLeft">
+                                                    <input type="text" class="form-control emptyBox" data-ng-model="profile._info.CityTitle" name="city" id="city"
+                                                           ng-class="UserForm.$submitted || UserForm.city.$touched && !profile._info.CityTitle.length ? 'mandatoryTextBox' : ''"
+                                                           placeholder="City" style="width: 48%" required>
+                                                    <input type="text" class="form-control emptyBox"  data-ng-model="profile._info.PostalCode" name="postalCode" id="postalCode"
+                                                           ng-class="UserForm.$submitted || UserForm.postalCode.$touched && !profile._info.PostalCode.length ? 'mandatoryTextBox' : ''"
+                                                           placeholder="Postal Code" onkeypress="return isNumberKey(event);" style="width: 48%" required>
+                                                </div>
+                                                <br/>
+                                                <div class="row mar_editTop mar_editLeft">
+                                                    <span><label><strong>&nbsp;Contact Information</strong> </label></span><br/>
+
+                                                    <span class="form-control" style="padding-left:0px;width:13%;border: 1px solid #CCCCCC; text-align: right">{{profile._info.ISDPhoneNumber}}</span>
+                                                    <input type="text" style="width: 34%;" id="phone" class="form-control emptyBox" ng-model="profile._info.PhoneNumber" name="phoneNo"
+                                                           ng-class="UserForm.$submitted || UserForm.phoneNo.$touched && !profile._info.PhoneNumber.length ? 'mandatoryTextBox' : ''"
+                                                           onkeypress="return isNumberKey(event);" maxlength="10" placeholder="Phone Number" style="width: 48%"
+                                                           required>
+
+                                                    <span class="form-control" style="padding-left:0px;width:13%;border: 1px solid #CCCCCC;text-align: right ">{{profile._info.ISDMobileNumber}}</span>
+                                                    <input type="text" style="width: 34%;" id="mobile_phone"class="form-control emptyBox" ng-model="profile._info.MobileNumber"
+                                                           ng-class="UserForm.$submitted || UserForm.MobileNumber.$touched && !profile._info.MobileNumber.length ? 'mandatoryTextBox' : ''"
+                                                           onkeypress="return isNumberKey(event);" name="MobileNumber" placeholder="Mobile Number" maxlength="10"  style="width: 48%" required>
+                                                </div>
+                                                <br/>
+                                                <div class="row mar_editTop mar_editLeft">
+                                                    <input type="email" name="email" class="form-control" ng-model="profile._info.EMailID" ng-pattern="/^[a-z]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5}$/" placeholder="E-mail ID" style="width: 48%">
+                                                    <input type="text" name="website"
+                                                           ng-model="profile._info.Website" class="form-control" placeholder="WebSite" style="width: 48%">
+                                                </div><br/>
+                                                <div class="row mar_editTop mar_editLeft">
+                                                    <input type="text" class="form-control" ng-model="profile._info.CompanyName" placeholder="Company Name" style="width: 48%">
+                                                    <input type="text" class="form-control" ng-model="profile._info.JobTitle" placeholder="Job Title"  style="width: 48%">
+                                                </div><br/>
+                                                <div class="row mar_editTop mar_editLeft">
+                                                    <input type="text" id="target" class="form-control" ng-model="profile._info.LaptopSLNO" placeholder="Laptop Model & SL. No" style="width: 48%">
+                                                    <input type="text" class="form-control" ng-model="profile._info.VehicleNumber" placeholder="Car Registration Number"  style="width: 48%">
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <div class="col-lg-8" style="margin: auto; float: none;">
+                                                   <!--<span ng-hide="_userInfo.IsAuthenticate"> <img ng-show="!image" src="images/user_200.png" width="200"/></span>-->
+                                                    <span ng-show="!profile._info.Picture"> <img ng-show="!image" src="images/user_200.png" width="200"/></span>
+                                                    <img ng-show="profile._info.Picture" width="200" name="Image" src="{{profile._info.Picture}}" required />
+                                                    <div class="col-lg-12 text-center">
+                                                        <span class="btn btn-primary btn-file">
+                                                            Attach Picture <input type="file" onchange="angular.element(this).scope().uploadImageForEditLocation(this.files)" accept="image/*" image="image" resize-max-height="200" resize-max-width="200" resize-quality="0.7">
+                                                        </span>
+                                                    </div>
+                                                    <p/>
+                                                    &nbsp;
+                                                    &nbsp;
+                                                    <div class="text-center">
+                                                        <img ng-show="profile._info.IDTypeID == '2' && !profile._info.Icon" src="images/defaultSmallicon.png">
+                                                        <img ng-show="profile._info.IDTypeID == '2'" src="{{profile._info.Icon}}">
+                                                        <span ng-disabled="profile._info.IDTypeID != 2" class="btn btn-primary btn-file">
+                                                            Attach Logo <input type="file" onchange="angular.element(this).scope().uploadIcon(this.files)" accept="image/*" image="image" resize-max-height="48" resize-max-width="48" resize-quality="0.7">
+                                                        </span>
+                                                        <!--<input type="hidden" ng-init="" ng-model="profile._info.New" id="bigImage" name="bigImage" >-->
+                                                        <!--<input type="text" name="bigImage" ng-init="" id="bigImage" ng-model="profile._info.Picture" style="display: none;"/>-->
+                                                        <!--{{profile._info.New}}-->
+                                                     </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br/>
+                                    <div ng-show="!_userInfo.IsAuthenticate" class="row mar_editTop">
+                                        <span><label><strong>&nbsp;Terms and conditions</strong> </label></span><br/>
+                                            <div ng-include="'html/terms.html'"  style="width: 98%; height: 150px; overflow-y: scroll; padding: 5px;">
+                                                 <!-- Terms.html include hear... -->
+                                            </div>
+                                      </div>
+                                    <p></p>
+                                    <div ng-show="!_userInfo.IsAuthenticate" class="row mar_editLeft">
+                                        <div class="checkbox">
+                                            <label>
+                                                <input type="checkbox" ng-model="profile._info.Terms">
+                                                <span>I have fully read and understood the <a href="#" class="" ng-click="profile.openTermsAndConditionForm()" id="termConditions">terms and condition</a> of EZE ID</span>
+
+                                                <button type="button" ng-click="profile.openTermsAndConditionForm()" class="btn btn-primary">Terms..</button>
+
+
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <br/>
+                                    <button type="submit"
+                                            ng-disabled="!profile._info.Terms || !profile._info.EZEID || !profile._info.Password || !profile._info.CPassword || !profile._info.FirstName || !profile._info.LastName || !profile._info.AddressLine1
+                                            || !profile._info.AddressLine2 || !profile._info.CityTitle || !profile._info.PostalCode || !profile._info.PhoneNumber || !profile._info.MobileNumber || profile._info.Password != profile._info.CPassword "
+                                            ng-hide="_userInfo.IsAuthenticate" ng-click="profile.savePrimaryRegistration(UserForm)" class="btn btn-primary">Generate EZEID</button>
+                                    <button type="submit" ng-show="_userInfo.IsAuthenticate"
+                                            ng-disabled="!profile._info.EZEID || !profile._info.FirstName || !profile._info.LastName || !profile._info.AddressLine1
+                                            || !profile._info.AddressLine2 || !profile._info.CityTitle || !profile._info.PostalCode || !profile._info.PhoneNumber || !profile._info.MobileNumber "
+
+                                            ng-click="profile.savePrimaryRegistration(UserForm)" class="btn btn-primary">Save</button>
+                                    <button type="submit" class="btn btn-default " onclick="window.location.href='#/home'">Cancel</button>
+
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <!--terms and condition template-->
+            <div class="Popup_window form_style" id="term-condition">
+                <div class="changePass_popUp Maping_popup">
+                    <span ng-click="" class="closelink">X</span>
+                    <h3><span class="mar_forget">Terms and conditions</span></h3>
+                     <p>EZEID</p>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+
+</div>
+<!--</body>-->
