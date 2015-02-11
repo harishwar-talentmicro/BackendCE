@@ -10,6 +10,9 @@ angular.module('ezeidApp').controller('LocationsController', function ($rootScop
 //        google.maps.event.trigger(map, "resize");
 //    }
 
+    //Test ...
+    //Test  2
+
     var SLocCtrl = this;
     var map;
     var mapOptions;
