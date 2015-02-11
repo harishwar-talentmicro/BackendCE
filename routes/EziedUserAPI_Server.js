@@ -1410,7 +1410,7 @@ exports.FnGetUserDetails = function (req, res) {
 
         var Token = req.query.Token;
         if (Token != null && Token != '') {
-            FnValidateToken(token, function (err, Result) {
+            FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
                         db.query('CALL pGetEZEIDDetails(' + db.escape(Token) + ')', function (err, UserDetailsResult) {
@@ -1472,7 +1472,7 @@ exports.FnGetSecondaryLocation = function (req, res) {
         var Token = req.query.Token;
 
         if (Token != null && Token != '') {
-            FnValidateToken(token, function (err, Result) {
+            FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
                         db.query('CALL pGetSecondaryLocationDetails(' + db.escape(Token) + ')', function (err, SecondaryResult) {
