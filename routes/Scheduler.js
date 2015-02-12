@@ -1,4 +1,4 @@
-﻿
+
 var schedule = require('node-schedule');
 var DbHelper = require('./../helpers/DatabaseHandler'),
 db = DbHelper.getDBContext();
@@ -108,27 +108,40 @@ function FnSendMailEzeid(MailContent, CallBack) {
                 IsSent: false
             };
             var RtnResponse = JSON.parse(JSON.stringify(RtnResponse));
-            var nodemailer = require('nodemailer');
-            var smtpTransport = require('nodemailer-smtp-transport');
-            var transporter = nodemailer.createTransport(smtpTransport({
-                host: 'smtp.sendgrid.net',
-                port: 25,
-                auth: {
-                    user: 'ezeid',
-                    pass: 'Ezeid2015'
-                }
-            }));
-            transporter.sendMail(MailContent, function (error, info) {
-                if (error) {
-                    console.log('FnSendMailEzeid: sending mail error ' + error);
-                    CallBack(null, null);
-                }
-                else {
-                    console.log('FnSendMailEzeid: Message sent: ' + info.response);
+           var request = require('request');
+            var BodyData = {
+                api_user: 'ezeid',
+                api_key: 'Ezeid2015',
+                to: MailContent.to,
+                toname: '',
+                subject: MailContent.subject,
+                html: MailContent.html,
+                from: 'noreply@ezeid.com'
+            };
+             request.post({ url: 'https://api.sendgrid.com/api/mail.send.json', form: BodyData }, function (err, httpResponse, body) {
+                 
+               //  console.log(httpResponse);
+             if(!err){
+                 var msg = JSON.parse(body);
+                 console.log(msg.message);
+                 if(msg.message == 'success'){
+                     console.log('FnSendMailEzeid: Mail sent');
                     RtnResponse.IsSent = true;
                     CallBack(null, RtnResponse);
-                }
-            });
+                 }
+                 else
+                 {
+                    console.log('FnSendMailEzeid: Mail not sent');
+                    CallBack(null, null);
+                 }
+             }
+                 else{
+                    console.log('FnSendMailEzeid: sending mail error ' + err);
+                    CallBack(null, null);   
+                 }
+             });
+
+          
         }
         else {
             CallBack(null, null);
