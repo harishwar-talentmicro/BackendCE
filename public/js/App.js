@@ -101,7 +101,7 @@
     });
 
     // Search Controller
-    ezeid.controller('SearchController', function ($http, $rootScope, $scope, $compile, $timeout, Notification, $filter, $location, $window,$q) {
+    ezeid.controller('SearchController', function ($http, $rootScope, $scope, $compile, $timeout, Notification, $filter, $location, $window) {
 
 //
 //        function reSizeHomeMap() {
@@ -434,7 +434,7 @@
                                     });
                                 } 
                                 else {
-                                    Notification.error({ message: 'No Results found..!', delay: MsgDelay });
+                                    Notification.error({ message: 'Invalid key or not found…', delay: MsgDelay });
                                 }
                             });
                             
@@ -467,7 +467,7 @@
                        // PlaceMarker(data);//older one
                     }
                     else {
-                        Notification.error({ message: 'No Results found..!', delay: MsgDelay });
+                        Notification.error({ message: 'Invalid key or not found…', delay: MsgDelay });
                         try{
                                 PlaceMarker(null);
                                 console.log('Markers placement done 1');
@@ -670,7 +670,9 @@
         //Send Reservation
         SearchSec.sendReservation = function (messageType) {
             if ($rootScope._userInfo.IsAuthenticate == true) {
-                var dateTime = $filter('date')(SearchSec.ReservationDateTime, 'MM/dd/yyyy HH:mm:ss');  /*dd-MM-yyyy HH:mm a*/
+                 var dateTime = $filter('date')(new Date(SearchSec.ReservationDateTime), 'MM/dd/yyyy HH:mm:ss');
+                //var dateTime = $filter('date')(SearchSec.ReservationDateTime, 'MM/dd/yyyy HH:mm:ss');  /*dd-MM-yyyy HH:mm a*/
+                    console.log(dateTime);
                 $http({ method: 'post', url: GURL + 'ewtSaveMessage', data: { TokenNo: $rootScope._userInfo.Token, ToMasterID: SearchSec.mInfo.TID, MessageType: messageType, Message: SearchSec.ReservationMessage, TaskDateTime: dateTime, LocID :SearchSec.LocID } }).success(function (data) {
                     if (data.IsSuccessfull) {
                         $('#Reservation_popup').slideUp();
@@ -678,7 +680,7 @@
                         SearchSec.ReservationDateTime = "";
                         Notification.success({ message: 'Message send success', delay: MsgDelay });
                         document.getElementById("reservationMessage").className = "form-control fixTextArea emptyBox";
-                        document.getElementById("expenseClaimDate").className = "datePickerWidth emptyBox";
+                      //  document.getElementById("expenseClaimDate").className = "datePickerWidth emptyBox";
                     }
                     else {
                         Notification.error({ message: 'Sorry..! Message not send ', delay: MsgDelay });
@@ -1402,74 +1404,75 @@
           }
              //Save and Update Primary Registration
             this.savePrimaryRegistration = function (UserForm) {
-
-                console.log("SAi1");
-              /*  else
-                {
-                    console.log("SAi2");
-                    isValid = true;
-                }*/
-
                 if(isValidate())
                 {
-                    console.log("SAi3");
-                    // create/Save profile
-                    profile._info.SalesEnquiryButton =  profile._info.SalesEnquiryButton == true ? 1 : 0;
-                    profile._info.HomeDeliveryButton = profile._info.HomeDeliveryButton == true ? 1 : 0;
-                    profile._info.ReservationButton = profile._info.ReservationButton == true ? 1 : 0;
-                    profile._info.SupportButton = profile._info.SupportButton == true ? 1 : 0;
-                    profile._info.CVButton = profile._info.CVButton == true ? 1 : 0;
-                    profile._info.Gender = (profile._info.Gender == undefined || profile._info.Gender == null )? 2 : profile._info.Gender ;
+                    var sEzeid = profile._info.EZEID;
+                    var lastTwo = sEzeid.substr(sEzeid.length - 2);
+                    if(lastTwo != "ap")
+                    {
+                        // create/Save profile
+                        profile._info.SalesEnquiryButton =  profile._info.SalesEnquiryButton == true ? 1 : 0;
+                        profile._info.HomeDeliveryButton = profile._info.HomeDeliveryButton == true ? 1 : 0;
+                        profile._info.ReservationButton = profile._info.ReservationButton == true ? 1 : 0;
+                        profile._info.SupportButton = profile._info.SupportButton == true ? 1 : 0;
+                        profile._info.CVButton = profile._info.CVButton == true ? 1 : 0;
+                        profile._info.Gender = (profile._info.Gender == undefined || profile._info.Gender == null )? 2 : profile._info.Gender ;
 
-                    if(profile._info.IDTypeID == 1)
-                    {
-                        profile._info.Icon = $rootScope.smallImage;
-                    }
-                    else
-                    {
-                        if(isBusinessIcon == 1)
+                        if(profile._info.IDTypeID == 1)
                         {
                             profile._info.Icon = $rootScope.smallImage;
                         }
-                    }
-                    profile._info.LanguageID = 1;
-                    profile._info.IDTypeID = parseInt(profile._info.IDTypeID, 10);
-                    profile._info.Token = $rootScope._userInfo.Token;
-                    $http({
-                        method: "POST",
-                        url: GURL + 'ewSavePrimaryEZEData',
-                        data: JSON.stringify(profile._info),
-                        headers: { 'Content-Type': 'application/json' }
-                    }).success(function (data) {
-                            if (data.IsAuthenticate) {
-                                $rootScope._userInfo = data;
-                                if (typeof (Storage) !== "undefined") {
-                                    var encrypted = CryptoJS.AES.encrypt(JSON.stringify(data), "EZEID");
-                                    localStorage.setItem("_token", encrypted);
-                                } else {
-                                    alert('Sorry..! Browser does not support');
-                                    window.location.href = "#/home";
-                                }
-                                document.getElementById("EZEID").className = "form-control emptyBox";
-                                document.getElementById("password").className = "form-control emptyBox";
-                                document.getElementById("re-password").className = "form-control emptyBox";
-                                document.getElementById("FName").className = "form-control emptyBox";
-                                document.getElementById("LName").className = "form-control emptyBox";
-                                document.getElementById("streeName").className = "form-control emptyBox";
-                                document.getElementById("block").className = "form-control emptyBox";
-                                document.getElementById("city").className = "form-control emptyBox";
-                                document.getElementById("postalCode").className = "form-control emptyBox";
-                                document.getElementById("mobile_phone").className = "form-control emptyBox";
-
-                                getISDCode(profile._info.CountryID);
-                                window.location.href = "#/home";
-                                Notification.success({ message: "Saved... ", delay: MsgDelay });
-                            } else {
-                                if (UserForm.$valid) {
-                                    Notification.error({ message: "Registration failed", delay: MsgDelay });
-                                }
+                        else
+                        {
+                            if(isBusinessIcon == 1)
+                            {
+                                profile._info.Icon = $rootScope.smallImage;
                             }
-                        });
+                        }
+                        profile._info.LanguageID = 1;
+                        profile._info.IDTypeID = parseInt(profile._info.IDTypeID, 10);
+                        profile._info.Token = $rootScope._userInfo.Token;
+                        $http({
+                            method: "POST",
+                            url: GURL + 'ewSavePrimaryEZEData',
+                            data: JSON.stringify(profile._info),
+                            headers: { 'Content-Type': 'application/json' }
+                        }).success(function (data) {
+                                if (data.IsAuthenticate) {
+                                    $rootScope._userInfo = data;
+                                    if (typeof (Storage) !== "undefined") {
+                                        var encrypted = CryptoJS.AES.encrypt(JSON.stringify(data), "EZEID");
+                                        sessionStorage.setItem("_token", encrypted);
+                                    } else {
+                                        alert('Sorry..! Browser does not support');
+                                        window.location.href = "#/home";
+                                    }
+                                    document.getElementById("EZEID").className = "form-control emptyBox";
+                                    document.getElementById("password").className = "form-control emptyBox";
+                                    document.getElementById("re-password").className = "form-control emptyBox";
+                                    document.getElementById("FName").className = "form-control emptyBox";
+                                    document.getElementById("LName").className = "form-control emptyBox";
+                                    document.getElementById("streeName").className = "form-control emptyBox";
+                                    document.getElementById("block").className = "form-control emptyBox";
+                                    document.getElementById("city").className = "form-control emptyBox";
+                                    document.getElementById("postalCode").className = "form-control emptyBox";
+                                    document.getElementById("mobile_phone").className = "form-control emptyBox";
+
+                                    getISDCode(profile._info.CountryID);
+                                    window.location.href = "#/home";
+                                    Notification.success({ message: "Saved... ", delay: MsgDelay });
+                   }
+                    else {
+                                    if (UserForm.$valid) {
+                                        Notification.error({ message: "Registration failed", delay: MsgDelay });
+                                    }
+                                }
+                            });
+                    }
+                    else
+                    {
+                        Notification.error({ message: "Not available...", delay: MsgDelay });
+                    }
                 }
                 else
                 {
@@ -1815,355 +1818,6 @@
             _pageValue = _pageValue + 1;
             LoadHistory(_pageValue);
         };
-
-    });
-
-
-   /* ezeid.controller('CVAttachController', function ($rootScope, $scope, $http, $q, $timeout, Notification, $window ) {
-
-        //$compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|blo??b|coui):/);
-        *//*$compileProvider.aHrefSanitizationWhitelist(/^\s*(|blob|):/); });*//*
-
-        var CVAttachCtrl = this;
-        CVAttachCtrl._CVInfo={};
-        var MsgDelay = 2000;
-        if ($rootScope._userInfo) {
-        }
-        else {
-            if (typeof (Storage) !== "undefined") {
-                var encrypted = localStorage.getItem("_token");
-                if (encrypted) {
-                    var decrypted = CryptoJS.AES.decrypt(encrypted, "EZEID");
-                    var Jsonstring = decrypted.toString(CryptoJS.enc.Utf8);
-                    if (Jsonstring) {
-                        $rootScope._userInfo = JSON.parse(Jsonstring);
-                    }
-                }
-                else {
-                    $rootScope._userInfo = {
-                        IsAuthenticate: false,
-                        Token: '',
-                        FirstName: '',
-                        Type:'',
-                        Icon:''
-                    };
-                }
-            } else {
-                // Sorry! No Web Storage support..
-                $rootScope._userInfo = {
-                    IsAuthenticate: false,
-                    Token: '',
-                    FirstName: '',
-                    Type:'',
-                    Icon:''
-                };
-                alert('Sorry..! Browser does not support');
-                window.location.href = "index.html";
-            }
-        }
-
-        $scope.$watch('_userInfo.IsAuthenticate', function () {
-            if ($rootScope._userInfo.IsAuthenticate == true) {
-                getCVInfo();
-            } else {
-                window.location.href = "index.html";
-            }
-        });
-
-        $http({ method: 'get', url: GURL + 'ewmGetFunctions?LangID=1'}).success(function (data) {
-            var _obj = { FunctionID: 0, FunctionName: '--Select Function--' };
-            data.splice(0, 0, _obj);
-            CVAttachCtrl.Functions = data;
-            console.log(data);
-        });
-
-        this.getRoleForFunction=function(_functionId){
-            CVAttachCtrl.RoleTypes = "";
-            *//*$http({ method: 'get', url: GURL + 'ewmGetRoleType?LangID=1&FunctionID='+CVAttachCtrl._CVInfo.FunctionID}).success(function (data) {*//*
-            $http({ method: 'get', url: GURL + 'ewmGetRoleType?LangID=1&FunctionID='+_functionId}).success(function (data) {
-
-                CVAttachCtrl.RoleTypes = data;
-            });
-        };
-
-        $http({ method: 'get', url: GURL + 'ewmGetCountry?LangID=1' }).success(function (data) {
-            var _obj = { CountryID: 0, CountryName: '--Country--', ISDCode: '' };
-            data.splice(0, 0, _obj);
-            CVAttachCtrl.countries = data;
-        });
-        this.getStates = function (CountryID) {
-            $http({ method: 'get', url: GURL + 'ewmGetState?LangID=1&CountryID=' + CountryID }).success(function (data) {
-                var _obj = { StateID: 0, StateName: '--State--' };
-                CVAttachCtrl.states = data;
-            });
-        };
-        this.getCities = function (StateID) {
-            $http({ method: 'get', url: GURL + 'ewmGetCity?LangID=1&StateID=' + StateID }).success(function (data) {
-                var _obj = { CityD: 0, CityName: '--City--' };
-                CVAttachCtrl.cities = data;
-            });
-        };
-
-
-        $scope.uploadFile = function (files) {
-             console.log(files);
-            CVAttachCtrl._CVInfo.CVDocFile = files[0].name;
-            fileToDataURL(files[0]).then(function (dataURL) {
-                CVAttachCtrl._CVInfo.CVDoc = dataURL;
-                var enc=Base64.encode(dataURL);
-                var dec=Base64.decode(enc);
-                console.log(dec);
-                window.open(dec,'_blank');
-                console.log(CVAttachCtrl._CVInfo.CVDoc);
-                //onDownload(dec);
-            });
-        };
-
-        var fileToDataURL = function (file) {
-            var deferred = $q.defer();
-            var reader = new FileReader();
-            reader.onload = function (e) {
-                deferred.resolve(e.target.result);
-            };
-            reader.readAsDataURL(file);
-            return deferred.promise;
-        };
-
-        *//*   function onDownload(dataToDownload) {
-         document.location = 'data:Application/octet-stream,' +
-         encodeURIComponent(dataToDownload);
-         }*//*
-
-        this.saveCVDocInfo=function(){
-            CVAttachCtrl._CVInfo. TokenNo=$rootScope._userInfo.Token;
-            CVAttachCtrl._CVInfo.Status=parseInt(CVAttachCtrl._CVInfo.Status);
-            $http({
-                method: "POST",
-                url: GURL + 'ewtSaveCVInfo',
-                data: JSON.stringify(CVAttachCtrl._CVInfo),
-                headers: { 'Content-Type': 'application/json' }
-            }).success(function (data) {
-                if(data.IsSuccessfull) {
-                    Notification.success({message: "Successfully Saved CV Info", delay: MsgDelay});
-                    getCVInfo();
-                }else{
-                    Notification.error({message: "CV Info Not Saved !...", delay: MsgDelay});
-                }
-            });
-        };
-
-        this.download = function(){
-            alert(CVAttachCtrl._CVInfo.CVDoc);
-            window.location.assign(CVAttachCtrl._CVInfo.CVDoc);
-            $window.open(CVAttachCtrl._CVInfo.CVDoc);
-        }
-
-        function getCVInfo(){
-            $http({
-                method: 'get',
-                url: GURL + 'ewtGetCVInfo?TokenNo=' + $rootScope._userInfo.Token
-            }).success(function (data) {
-                console.log(data);
-                CVAttachCtrl._CVInfo=data[0];
-                //CVAttachCtrl.getRoleForFunction();
-            });
-        };
-
-        this.closeCVDocInfo=function(cvForm){
-            if($rootScope._userInfo.IsAuthenticate==false){
-                cvForm.$setPristine(true);
-            }
-
-        };
-
-        var content = 'file content';
-        var blob = new Blob([ CVAttachCtrl._CVInfo.CVDoc ], { type : 'text/plain' });
-        $scope.url = (window.URL || window.webkitURL).createObjectURL( blob );
-
-    });
-*/
-
-    ezeid.controller('CVAttachController', function ($rootScope, $scope, $http, $q, $timeout, Notification, $window ) {
-
-        //$compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|blo‌​b|coui):/);
-        /*$compileProvider.aHrefSanitizationWhitelist(/^\s*(|blob|):/); });*/
-
-        var CVAttachCtrl = this;
-        CVAttachCtrl._CVInfo={};
-        var MsgDelay = 2000;
-        if ($rootScope._userInfo) {
-        }
-        else {
-            if (typeof (Storage) !== "undefined") {
-                var encrypted = localStorage.getItem("_token");
-                if (encrypted) {
-                    var decrypted = CryptoJS.AES.decrypt(encrypted, "EZEID");
-                    var Jsonstring = decrypted.toString(CryptoJS.enc.Utf8);
-                    if (Jsonstring) {
-                        $rootScope._userInfo = JSON.parse(Jsonstring);
-                    }
-                }
-                else {
-                    $rootScope._userInfo = {
-                        IsAuthenticate: false,
-                        Token: '',
-                        FirstName: '',
-                        Type:'',
-                        Icon:''
-                    };
-                }
-            } else {
-                // Sorry! No Web Storage support..
-                $rootScope._userInfo = {
-                    IsAuthenticate: false,
-                    Token: '',
-                    FirstName: '',
-                    Type:'',
-                    Icon:''
-                };
-                alert('Sorry..! Browser does not support');
-                window.location.href = "index.html";
-            }
-        }
-
-        $scope.$watch('_userInfo.IsAuthenticate', function () {
-            if ($rootScope._userInfo.IsAuthenticate == true) {
-                getCVInfo();
-            } else {
-                window.location.href = "index.html";
-                CVAttachCtrl._CVInfo.Status = 1;
-            }
-        });
-
-        $http({ method: 'get', url: GURL + 'ewmGetFunctions?LangID=1'}).success(function (data) {
-           // var _obj = { FunctionID:0, FunctionName: '--Select Function--' };
-            //data.splice(0, 0, _obj);
-            CVAttachCtrl.Functions = data;
-            console.log(data);
-        });
-
-        this.getRoleForFunction=function(_functionId){
-            console.log(_functionId);
-           // CVAttachCtrl.RoleTypes = "";
-            /*$http({ method: 'get', url: GURL + 'ewmGetRoleType?LangID=1&FunctionID='+CVAttachCtrl._CVInfo.FunctionID}).success(function (data) {*/
-            $http({ method: 'get', url: GURL + 'ewmGetRoles?LangID=1&FunctionID='+_functionId}).success(function (data) {
-
-                CVAttachCtrl.RoleTypes = data;
-            });
-        };
-
-        $http({ method: 'get', url: GURL + 'ewmGetCountry?LangID=1' }).success(function (data) {
-            var _obj = { CountryID: 0, CountryName: '--Country--', ISDCode: '' };
-            data.splice(0, 0, _obj);
-            CVAttachCtrl.countries = data;
-        });
-        this.getStates = function (CountryID) {
-            $http({ method: 'get', url: GURL + 'ewmGetState?LangID=1&CountryID=' + CountryID }).success(function (data) {
-                var _obj = { StateID: 0, StateName: '--State--' };
-                CVAttachCtrl.states = data;
-            });
-        };
-        this.getCities = function (StateID) {
-            $http({ method: 'get', url: GURL + 'ewmGetCity?LangID=1&StateID=' + StateID }).success(function (data) {
-                var _obj = { CityD: 0, CityName: '--City--' };
-                CVAttachCtrl.cities = data;
-            });
-        };
-
-        //Created by Abhishek
-        $scope.uploadFile = function (files) {
-            CVAttachCtrl._CVInfo.CVDocFile = files[0].name;
-            for (var i = 0; i < files.length; i++) {
-                var $file = files[i];
-                var formData = new FormData();
-                formData.append('file', $file);
-                //formData.append('RefType', $scope.OptionSelected);
-                formData.append('TokenNo', $rootScope._userInfo.Token);
-                formData.append('RefType', 7);
-                console.log(formData);
-
-
-                $http({ method: 'POST', url: '/ewTUploadDoc/', data: formData,
-                    headers: { 'Content-Type': undefined }, transformRequest: angular.identity })
-                    .success(function (data, status, headers, config) {
-                        console.log("uploaded");
-                    }).
-                    error(function(data, status, headers, config) {
-                        console.log("upload ERROR");
-                    });
-            }
-        };
-
-        var fileToDataURL = function (file) {
-            var deferred = $q.defer();
-            var reader = new FileReader();
-            reader.onload = function (e) {
-                deferred.resolve(e.target.result);
-            };
-            reader.readAsDataURL(file);
-            return deferred.promise;
-        };
-
-        /*   function onDownload(dataToDownload) {
-         document.location = 'data:Application/octet-stream,' +
-         encodeURIComponent(dataToDownload);
-         }*/
-
-        this.saveCVDocInfo=function(){
-            CVAttachCtrl._CVInfo.TokenNo=$rootScope._userInfo.Token;
-            CVAttachCtrl._CVInfo.Status=parseInt(CVAttachCtrl._CVInfo.Status);
-            $http({
-                method: "POST",
-                url: GURL + 'ewtSaveCVInfo',
-                data: JSON.stringify(CVAttachCtrl._CVInfo),
-                headers: { 'Content-Type': 'application/json' }
-            }).success(function (data) {
-                    if(data.IsSuccessfull) {
-                        Notification.success({message: "Saved...", delay: MsgDelay});
-                        getCVInfo();
-                    }else{
-                        Notification.error({message: "Sorry..! not saved", delay: MsgDelay});
-                    }
-                });
-        };
-
-        this.download = function(){
-            alert(CVAttachCtrl._CVInfo.CVDoc);
-            window.location.assign(CVAttachCtrl._CVInfo.CVDoc);
-            $window.open(CVAttachCtrl._CVInfo.CVDoc);
-        }
-
-        function getCVInfo(){
-            $http({
-                method: 'get',
-                url: GURL + 'ewtGetCVInfo?TokenNo=' + $rootScope._userInfo.Token
-            }).success(function (data) {
-                    if(data != 'null')
-                    {
-                        console.log("SAi1");
-                        console.log(data);
-                        CVAttachCtrl._CVInfo=data[0];
-                        CVAttachCtrl.getRoleForFunction(data[0].FunctionID);
-                    }
-                    else
-                    {
-                        console.log("SAi2");
-                        CVAttachCtrl._CVInfo.Status= 1;
-                    }
-
-                });
-        };
-
-        this.closeCVDocInfo=function(cvForm){
-            if($rootScope._userInfo.IsAuthenticate==false){
-                cvForm.$setPristine(true);
-            }
-
-        };
-
-        var content = 'file content';
-        var blob = new Blob([ CVAttachCtrl._CVInfo.CVDoc ], { type : 'text/plain' });
-        $scope.url = (window.URL || window.webkitURL).createObjectURL( blob );
 
     });
 
