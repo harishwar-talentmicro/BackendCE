@@ -1460,6 +1460,7 @@
                                         window.location.href = "#/home";
                                     }
                                     document.getElementById("EZEID").className = "form-control emptyBox";
+                                    document.getElementById("EZEID1").className = "form-control emptyBox";
                                     document.getElementById("password").className = "form-control emptyBox";
                                     document.getElementById("re-password").className = "form-control emptyBox";
                                     document.getElementById("FName").className = "form-control emptyBox";

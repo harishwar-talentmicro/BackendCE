@@ -53,7 +53,7 @@
                     <div class="panel-body">
                         <div class="well well-lg">
                             <div class="col-lg-12" style="margin: auto; float: none;">
-                                   <div class="row">
+                                   <div class="row"  ng-show="!_userInfo.IsAuthenticate==true" >
                                         <div class="col-lg-2">
                                             <span><label>ID Type</label></span>
                                         </div>
@@ -67,14 +67,18 @@
                                         </div>
                                     </div>
                                     <br/>
-                                    <div class="row mar_editTop">
+                                    <div class="row mar_editTop"  ng-show="!_userInfo.IsAuthenticate==true" >
                                         <div class="col-lg-6">
-                                            <div class="form-group">
-                                                <input type="text" style='text-transform:uppercase' ng-pattern="/^[a-zA-Z0-9]*$/"
-                                                       ng-class="UserForm.EZEID.$touched && !profile._info.EZEID.length ? 'mandatoryTextBox' : ''"
-                                                       name="EZEID" id="EZEID" class="form-control emptyBox" maxlength="15" ng-model="profile._info.EZEID" placeholder="Enter EZE ID"
-                                                        style="width: 90px" required>
-                                                <button type="button" name="btnCheckID" ng-click="profile.CheckisIDAvailable()" ng-disabled="!profile._info.EZEID.length" class="btn btn-primary" >Check Availability</button>
+                                            <div class="form-group" >
+
+
+
+                                                     <input  type="text" style='text-transform:uppercase' ng-pattern="/^[a-zA-Z0-9]*$/"
+                                                            ng-class="UserForm.EZEID.$touched && !profile._info.EZEID.length ? 'mandatoryTextBox' : ''"
+                                                            name="EZEID" id="EZEID" class="form-control emptyBox" maxlength="15" ng-model="profile._info.EZEID" placeholder="Enter EZE ID"
+                                                            style="width: 90px" required >
+
+                                                      <button type="button" name="btnCheckID" ng-click="profile.CheckisIDAvailable()" ng-disabled="!profile._info.EZEID.length" class="btn btn-primary" >Check Availability</button>
                                             </div>
                                         </div>
 
