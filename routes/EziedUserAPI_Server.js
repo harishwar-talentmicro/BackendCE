@@ -534,7 +534,6 @@ exports.FnLogin = function (req, res) {
                                 if (TokenResult.affectedRows > 0) {
                                     //res.setHeader('Cookie','Token='+Encrypt);
 				    res.cookie('Token',Encrypt,{maxAge:900000,httpOnly:true});
-                                    
                                     RtnMessage.Token = Encrypt;
                                     RtnMessage.IsAuthenticate = true;
                                     RtnMessage.FirstName = loginResult[0].FirstName;
@@ -606,6 +605,7 @@ exports.FnLogout = function (req, res) {
             Type: 0,
             Icon: ''
         };
+
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
         if (Token != null && Token != '') {
 
