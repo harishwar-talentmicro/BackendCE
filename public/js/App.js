@@ -1,19 +1,3 @@
-function readCookie(cookieName)
-{
-    //Added
-   var allcookies = document.cookie;
-   cookiearray  = allcookies.split(';');
-   // Now take key value pair out of this array
-   for(var i=0; i<cookiearray.length; i++){
-      name = cookiearray[i].split('=')[0];
-      value = cookiearray[i].split('=')[1];
-      if(name == cookieName){
-          return value;
-      }
-   }
-   return null;
-}
-
 (function () {
     var ezeid = angular.module('ezeidApp',
         ['ngHeader','ngRoute', 'ngFooter', 'ui-notification', 'kendo.directives','imageupload']);
@@ -40,20 +24,6 @@ function readCookie(cookieName)
 
     var MsgDelay = 2000;
 
-    ezeid.run(function($rootScope){
-        var userId = readCookie('Token');
-        if(userId !== null && userId !== undefined && userId !== '')
-        {
-            //@todo
-            //Put the code to getUserInformation from server and set it to $rootScope._user
-            $http.get('/ewtGetUserDetails?'+userId).then(function(userInfo){
-                $rootScope._userInfo = userInfo
-            },function(){
-                //error handler
-            });
-        }
-    });
-    
     // define controller for wizard
     ezeid.controller('SampleWizardController', function($scope, $q, $timeout) {
 
@@ -86,7 +56,7 @@ function readCookie(cookieName)
         }
         else {
             if (typeof (Storage) !== "undefined") {
-                var encrypted = sessionStorage.getItem("_token");
+                var encrypted = localStorage.getItem("_token");
                 if (encrypted) {
                     var decrypted = CryptoJS.AES.decrypt(encrypted, "EZEID");
                     var Jsonstring = decrypted.toString(CryptoJS.enc.Utf8);
@@ -870,7 +840,7 @@ function readCookie(cookieName)
     }
     else {
         if (typeof (Storage) !== "undefined") {
-            var encrypted = sessionStorage.getItem("_token");
+            var encrypted = localStorage.getItem("_token");
             if (encrypted) {
                 var decrypted = CryptoJS.AES.decrypt(encrypted, "EZEID");
                 var Jsonstring = decrypted.toString(CryptoJS.enc.Utf8);
@@ -1434,24 +1404,12 @@ function readCookie(cookieName)
           }
              //Save and Update Primary Registration
             this.savePrimaryRegistration = function (UserForm) {
-
-                console.log("SAi1");
-              /*  else
-                {
-                    console.log("SAi2");
-                    isValid = true;
-                }*/
-
                 if(isValidate())
                 {
                     var sEzeid = profile._info.EZEID;
-
                     var lastTwo = sEzeid.substr(sEzeid.length - 2);
-                   // console.log(lastFive);
-                   // alert(lastFive);
                     if(lastTwo != "ap")
                     {
-
                         // create/Save profile
                         profile._info.SalesEnquiryButton =  profile._info.SalesEnquiryButton == true ? 1 : 0;
                         profile._info.HomeDeliveryButton = profile._info.HomeDeliveryButton == true ? 1 : 0;
@@ -1503,7 +1461,8 @@ function readCookie(cookieName)
                                     getISDCode(profile._info.CountryID);
                                     window.location.href = "#/home";
                                     Notification.success({ message: "Saved... ", delay: MsgDelay });
-                                } else {
+                   }
+                    else {
                                     if (UserForm.$valid) {
                                         Notification.error({ message: "Registration failed", delay: MsgDelay });
                                     }
@@ -1612,7 +1571,7 @@ function readCookie(cookieName)
         }
         else {
             if (typeof (Storage) !== "undefined") {
-                var encrypted = sessionStorage.getItem("_token");
+                var encrypted = localStorage.getItem("_token");
                 if (encrypted) {
                     var decrypted = CryptoJS.AES.decrypt(encrypted, "EZEID");
                     var Jsonstring = decrypted.toString(CryptoJS.enc.Utf8);
@@ -1788,7 +1747,7 @@ function readCookie(cookieName)
         }
         else {
             if (typeof (Storage) !== "undefined") {
-                var encrypted = sessionStorage.getItem("_token");
+                var encrypted = localStorage.getItem("_token");
                 if (encrypted) {
                     var decrypted = CryptoJS.AES.decrypt(encrypted, "EZEID");
                     var Jsonstring = decrypted.toString(CryptoJS.enc.Utf8);
