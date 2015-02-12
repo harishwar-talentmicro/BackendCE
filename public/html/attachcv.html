@@ -1,6 +1,31 @@
+<style type="text/css">
+    .btn-file {
+        position: relative;
+        overflow: hidden;
+    }
+    .btn-file input[type=file] {
+        position: absolute;
+        top: 0;
+        right: 0;
+        min-width: 100%;
+        min-height: 100%;
+        font-size: 100px;
+        text-align: right;
+        filter: alpha(opacity=0);
+        opacity: 0;
+        outline: none;
+        background: white;
+        cursor: inherit;
+        display: block;
+    }
+</style>
 
-<div id="wrapper" ng-app="cv_attachApp" ng-controller="CVAttachController as CVAttachCtrl">
-    <header-section></header-section>
+<body ng-app="ezeidApp">
+    <div id="wrapper" ng-controller="CVAttachController as CVAttachCtrl">
+        <header-section></header-section>
+
+   <!-- <div id="wrapper" ng-app="cv_attachApp" ng-controller="CVAttachController as CVAttachCtrl">
+    <header-section></header-section>-->
     <!-- Main jumbotron for a primary marketing message or call to action -->
     <div class="container" style="padding-top:90px; position:relative;">
         <!-- Example row of columns -->
@@ -22,18 +47,18 @@
                                                 <option value="" default selected>--select function--</option>
                                                 <!--<option value="" default selected>{{CVAttachCtrl.Functions[0].FunctionName}}</option>-->
                                             </select>
-                                               <!-- <span style="color:red" ng-show="cvForm.$submitted || cvForm.function.$touched">
-                                                    <span ng-show="cvForm.function.$error.required">* mandatory</span>
-                                                </span>-->
+                                            <!-- <span style="color:red" ng-show="cvForm.$submitted || cvForm.function.$touched">
+                                                 <span ng-show="cvForm.function.$error.required">* mandatory</span>
+                                             </span>-->
                                         </div>
                                         <div class="pull-right wd48p">
                                             <select class="form-control emptyBox" name="role" ng-model="CVAttachCtrl._CVInfo.RoleID"
                                                     ng-options="Role.RoleID as Role.RoleName for Role in CVAttachCtrl.RoleTypes">
                                                 <option value="" default selected>--select role--</option>
                                             </select>
-                                               <!-- <span style="color:red" ng-show="cvForm.$submitted || cvForm.role.$touched">
-                                                    <span ng-show="cvForm.role.$error.required">* mandatory</span>
-                                                </span>-->
+                                            <!-- <span style="color:red" ng-show="cvForm.$submitted || cvForm.role.$touched">
+                                                 <span ng-show="cvForm.role.$error.required">* mandatory</span>
+                                             </span>-->
                                         </div>
                                         <div class="clearfix"></div>
                                     </li>
@@ -43,12 +68,17 @@
                                     <li class="dsp_block">
                                         <div class="pull-left wd48p">
                                             <input type="text"  ng-class="cvForm.keySkills.$touched && !CVAttachCtrl._CVInfo.KeySkills.length ? 'mandatoryTextBoxCV' : ''" name="keySkills" class="form-control emptyBox" ng-model="CVAttachCtrl._CVInfo.KeySkills" placeholder="Key Skills" required/>
-                                       </div>
+                                        </div>
                                         <div class="pull-right wd48p">
-                                            <input type="file" class="form-control emptyBox" onchange="angular.element(this).scope().uploadFile(this.files)"/>
+                                           <!-- <input type="file" class="form-control emptyBox" onchange="angular.element(this).scope().uploadFile(this.files)"/>-->
+
+                                             <span class="btn btn-primary btn-file">
+                                                Choose File <input type="file" onchange="angular.element(this).scope().uploadFile(this.files)">
+                                             </span>
+
                                             <span class="pull-right"  ng-controller="DocumentController"
                                                   style="margin-top:8px;"
-                                                  ng-show="form.Doc!= 'null'">
+                                                  ng-show="showLink">
                                                     <a class="blue" target="_blank" href="/ewTgetDocument?TokenNo={{Token}}&&RefType=7">
                                                         Download Document
                                                     </a>
@@ -67,7 +97,7 @@
                                     <h5 class="pull-left wd48p">CV Status</h5>
                                     <h5 class="pull-right wd48p">Enable PIN&nbsp;<span class="pull-left check-box-style marR5px"><input type="checkbox" ng-model="CVAttachCtrl.EnablePin"/></span></h5>
                                     <li class="dsp_block">
-                                       <!-- <div class="pull-left wd48p check-box-style emptyBox" ng-init="CVAttachCtrl._CVInfo.Status=1;">-->
+                                        <!-- <div class="pull-left wd48p check-box-style emptyBox" ng-init="CVAttachCtrl._CVInfo.Status=1;">-->
                                         <div class="pull-left wd48p check-box-style emptyBox">
                                             <!--<input type="radio" name="CVStatus" ng-model="CVAttachCtrl._CVInfo.Status" checked ng-checked="CVAttachCtrl._CVInfo.Status != 2 ? true : false "
                                                    id="Visible" class="check-box pull-left"  value="1" style="margin-left: 10px; margin-top: 10px;"/>-->
@@ -102,5 +132,7 @@
         </div>
     </div>
 </div>
-
+</body>
+<!--
 <script src="js/CVAttachment.js"></script>
+-->

@@ -1,18 +1,6 @@
 
 angular.module('ezeidApp').controller('LocationsController', function ($rootScope, $scope, $http, $q, $timeout, Notification, $filter, $interval) {
 
-//     $interval(function() {
-//        reSizeHomeMap();
-//        map.setCenter(new google.maps.LatLng($rootScope.CLoc.CLat, $rootScope.CLoc.CLong));
-//    },2000);
-//
-//    function reSizeHomeMap() {
-//        google.maps.event.trigger(map, "resize");
-//    }
-
-    //Test ...
-    //Test  2
-
     var SLocCtrl = this;
     var map;
     var mapOptions;

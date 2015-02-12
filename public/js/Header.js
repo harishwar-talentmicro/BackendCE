@@ -214,9 +214,9 @@ HeaderApp.directive('headerSection', function (Notification) {
 
             $('.closelink').click(function () {
                 $('#ChangePassword_popup').slideUp();
-                SignCtrl.OldPassword="";
+               /* SignCtrl.OldPassword="";
                 SignCtrl.NewPassword="";
-                SignCtrl.ReEnterPassword="";
+                SignCtrl.ReEnterPassword="";*/
                 document.getElementById("OldPassword").className = "form-control wd_oldPass changePass_inpMar emptyBox change_PadLeft";
                 document.getElementById("NewPassword").className = "form-control wd_oldPass changePass_inpMar emptyBox change_PadLeft";
                 document.getElementById("ReEnterPassword").className = "form-control wd_oldPass changePass_inpMar emptyBox change_PadLeft";
