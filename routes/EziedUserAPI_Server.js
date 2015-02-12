@@ -532,7 +532,9 @@ exports.FnLogin = function (req, res) {
                                 //  console.log(TokenResult);
 
                                 if (TokenResult.affectedRows > 0) {
-                                    res.setHeader('Cookie','Token='+Encrypt);
+                                    //res.setHeader('Cookie','Token='+Encrypt);
+				    res.cookie('Token',Encrypt,{maxAge:900000,httpOnly:true});
+                                    
                                     RtnMessage.Token = Encrypt;
                                     RtnMessage.IsAuthenticate = true;
                                     RtnMessage.FirstName = loginResult[0].FirstName;
@@ -612,6 +614,7 @@ exports.FnLogout = function (req, res) {
                 if (!err) {
                     RtnMessage.IsAuthenticate = false;
                     console.log('FnLogout: tmaster: Logout success');
+		    res.clearCookie('Token');
                     res.send(RtnMessage);
                 }
                 else {

@@ -17,11 +17,16 @@ HeaderApp.directive('headerSection', function (Notification) {
                 if (!SignCtrl.Captcha) {
                     $http({
                         method: 'post', url: GURL + 'ewLogin', data: Logdata
-                    }).success(function (data) {
+                    }).success(function (data,status,x) {
                         $rootScope._userInfo = data;
+                        console.log(data);
+                        console.log(status);
+                        console.log(x);
+                        //
+                        
                         if (typeof (Storage) !== "undefined") {
                             var encrypted = CryptoJS.AES.encrypt(JSON.stringify(data), "EZEID");
-                            sessionStorage.setItem("_token", encrypted);
+                            localStorage.setItem("_token", encrypted);
                         } else {
                             alert('Sorry..! Browser does not support');
                             window.location.href = "index.html";
@@ -134,7 +139,7 @@ HeaderApp.directive('headerSection', function (Notification) {
 
             this.Logout = function () {
                 $http({ method: 'get', url: GURL + 'ewLogout?Token=' + $rootScope._userInfo.Token }).success(function (data) {
-                    sessionStorage.removeItem("_token");
+                    localStorage.removeItem("_token");
                     $rootScope._userInfo = data;
                     $rootScope.IsIdAvailable = false;
                   //  Notification.success({ message: "Sign Out Success", delay: MsgDelay });
@@ -163,7 +168,7 @@ HeaderApp.directive('headerSection', function (Notification) {
                         $rootScope._userInfo = data;
                         if (typeof (Storage) !== "undefined") {
                             var encrypted = CryptoJS.AES.encrypt(JSON.stringify(data), "EZEID");
-                            sessionStorage.setItem("_token", encrypted);
+                            localStorage.setItem("_token", encrypted);
                         } else {
                             alert('Sorry..! Browser does not support');
                             window.location.href = "index.html";
