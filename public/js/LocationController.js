@@ -106,8 +106,14 @@ angular.module('ezeidApp').controller('LocationsController', function ($rootScop
         SLocCtrl._locInfo.ReservationButton = SLocCtrl._locInfo.ReservationButton == 1 ? true : false;
         SLocCtrl._locInfo.SupportButton = SLocCtrl._locInfo.SupportButton == 1 ? true : false;
         SLocCtrl._locInfo.CVButton = SLocCtrl._locInfo.CVButton == 1 ? true : false;
+        try{
+            initialize1();
+        }
+        catch(ex)
+        {
+            console.log('Map load exception');
+        }
 
-        initialize1();
     };
     this.deleteSecLoc = function (row) {
         row.Token = $rootScope._userInfo.Token;

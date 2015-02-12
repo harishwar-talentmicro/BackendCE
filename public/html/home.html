@@ -35,13 +35,13 @@
                                 will send your EZE ID Card)
                             </p>
                         </div>
-                        <div class="form-group">
+                        <div class="form-group" style="float: left;">
                             <textarea class="form-control fixTextArea emptyBox" name="salesMessage" ng-model="search.salesMessage" placeholder="Type Message here" required></textarea><br />
                             <!--<input type="text" name="salesMessage" ng-model="search.salesMessage" class="msgBox form-control ng-pristine ng-valid ng-touched" placeholder="Type Message here" required>-->
                         </div>
                         <div class="form-group">
                             <input type="submit" ng-disabled="!search.salesMessage" class="btn btn-primary text_Box" value="Send" />
-                            <input type="reset" class="btn btn-primary marR10px cancelEnq text_Box" ng-click="search.closeSalesEnquiryForm()" value="Cancel" />
+                            <input type="reset" class="btn btn-primary marR10px cancelEnq text_Box" ng-click="search.closeSalesEnquiryForm()" value="Close" />
                         </div>
                     </form>
                 </div>
@@ -79,12 +79,12 @@
                                 will send your EZE ID Card)
                             </p>
                         </div>
-                        <div class="form-group">
+                        <div class="form-group" style="float: left;">
                             <textarea class="form-control fixTextArea emptyBox" name="homeDeliverMessage" ng-model="search.HomeDeliverMessage" placeholder="Type here" required></textarea>
                         </div>
                         <div class="form-group">
                             <input type="submit" ng-disabled="!search.HomeDeliverMessage" class="btn btn-primary text_BoxHome" value="Send" />
-                            <input type="reset" ng-click="search.closeHomeDeliverForm()" class="btn btn-primary marR10px cancelEnq text_BoxHome" value="Cancel" />
+                            <input type="reset" ng-click="search.closeHomeDeliverForm()" class="btn btn-primary marR10px cancelEnq text_BoxHome" value="Close" />
                         </div>
                     </form>
                 </div>
@@ -112,7 +112,7 @@
                         </div>
                         <div class="form-group">
                             <input type="submit" ng-disabled="!search.ReservationDateTime || !search.ReservationMessage" class="btn btn-primary appoint_marT" value="Send" />
-                            <input type="reset" ng-click="search.closeReservationForm()" class="btn btn-primary marR10px cancelEnq appoint_marT" value="Cancel" />
+                            <input type="reset" ng-click="search.closeReservationForm()" class="btn btn-primary marR10px cancelEnq appoint_marT" value="Close" />
                         </div>
                     </form>
                 </div>
@@ -128,12 +128,12 @@
                                 will send your EZE ID Card)
                             </p>
                         </div>
-                        <div class="form-group">
+                        <div class="form-group" style="float: left;">
                             <textarea class="form-control fixTextArea emptyBox" name="serviceRequestMessage" ng-model="search.ServiceRequestMessage" placeholder="Type here" required></textarea>
                         </div>
                         <div class="form-group">
                             <input type="submit" ng-disabled="!search.ServiceRequestMessage" class="btn btn-primary" value="Send" />
-                            <input type="reset" ng-click="search.closeServiceRequestForm()" class="btn btn-primary marR10px cancelEnq" value="Cancel" />
+                            <input type="reset" ng-click="search.closeServiceRequestForm()" class="btn btn-primary marR10px cancelEnq" value="Close" />
                         </div>
                     </form>
                 </div>
@@ -150,7 +150,7 @@
                         <div class="form-group">
                            <!-- <input type="submit" class="btn btn-primary" data-ng-model="search.showCVSendButton"  ng-show="false" value="Send" />-->
                             <input type="button" class="btn btn-primary" ng-click="search.checkForCVAvailability()" value="Yes" />
-                            <input type="reset" ng-click="search.closeCVForm()" class="btn btn-primary marR10px cancelEnq" value="Cancel" />
+                            <input type="reset" ng-click="search.closeCVForm()" class="btn btn-primary marR10px cancelEnq" value="Close" />
                         </div>
                     </form>
                 </div>
@@ -159,7 +159,7 @@
                 <div class="window_page Maping_popup">
                     <span class="closelink" ng-click="search.closeMappingPopup()" >X</span>
                     <div style="margin-left:0px;" class="row">
-                        <div class="col-md-3">  SAi123..
+                        <div class="col-md-3">
                             <img ng-show="search.mInfo.Picture!=''" ng-src="{{search.mInfo.Picture}}" height="120px" width="120px">
                             <img ng-hide="search.mInfo.Picture!=''" ng-src="images/Map_logo.png" height="120px" width="120px">
                             <br>

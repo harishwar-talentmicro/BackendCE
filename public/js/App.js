@@ -607,7 +607,7 @@
 
         SearchSec.sendUserMessage = function () {
             if ($rootScope._userInfo.IsAuthenticate == true) {
-                $http({ method: 'post', url: GURL + 'ewtSaveMessage', data: { TokenNo: $rootScope._userInfo.Token, ToMasterID: SearchSec.mInfo.TID, MessageType: 1, Message: SearchSec.SendMessage, TaskDateTime: today, LocID :SearchSec.LocID } }).success(function (data) {
+                $http({ method: 'post', url: GURL + 'ewtSaveMessage', data: { TokenNo: $rootScope._userInfo.Token, ToMasterID: SearchSec.mInfo.TID, MessageType: 0, Message: SearchSec.SendMessage, TaskDateTime: today, LocID :SearchSec.LocID } }).success(function (data) {
                     if (data.IsSuccessfull) {
                         $('#sendMessage_popup').slideUp();
                         SearchSec.SendMessage = "";
@@ -748,15 +748,16 @@
         SearchSec.sendCV = function () {
 
              if ($rootScope._userInfo.IsAuthenticate == true) {
-                 $http({ method: 'post', url: GURL + 'ewtSaveMessage', data: { TokenNo: $rootScope._userInfo.Token, ToMasterID: SearchSec.mInfo.TID, MessageType: 4, Message: "", TaskDateTime: today, LocID :SearchSec.LocID } }).success(function (data) {
+                 $http({ method: 'post', url: GURL + 'ewtSaveMessage', data: { TokenNo: $rootScope._userInfo.Token, ToMasterID: SearchSec.mInfo.TID, MessageType: 5, Message: "", TaskDateTime: today, LocID :SearchSec.LocID } }).success(function (data) {
  
                      if (data.IsSuccessfull) {
 
                          SearchSec.ServiceRequestMessage = "";
-                         //Notification.success({ message: 'CV send success', delay: MsgDelay });
+                         $('#CV_popup').slideUp();
+                         Notification.success({ message: 'CV send success', delay: MsgDelay });
                      }
                      else {
-                         //Notification.error({ message: 'Sorry..! Message not send ', delay: MsgDelay });
+                         Notification.error({ message: 'Sorry..! Message not send ', delay: MsgDelay });
                      }
                  });
              }
@@ -775,6 +776,7 @@
                     if (data.IsSuccessfull)
                     {
                          SearchSec.sendCV();
+
                     }
                      else
                      {
@@ -946,12 +948,22 @@
             $('#Terms_popup').slideUp();
         }
         this.CheckisIDAvailable = function () {
+
+            var sEzeid = profile._info.EZEID;
+            var lastTwo = sEzeid.substr(sEzeid.length - 2);
+            if(lastTwo != "ap")
+            {
                $http({
-                method: 'get',
-                url: GURL + 'ewGetEZEID?EZEID=' + profile._info.EZEID
-            }).success(function (data) {
-                profile._info.IsIDAvailable = data.IsIdAvailable;
-            });
+                    method: 'get',
+                    url: GURL + 'ewGetEZEID?EZEID=' + profile._info.EZEID
+                }).success(function (data) {
+                    profile._info.IsIDAvailable = data.IsIdAvailable;
+                });
+            }
+            else
+            {
+                profile._info.IsIDAvailable = false;
+            }
         };
 
         //Maps
@@ -1472,6 +1484,7 @@
                     else
                     {
                         Notification.error({ message: "Not available...", delay: MsgDelay });
+                        profile._info.IsIDAvailable = false;
                     }
                 }
                 else
