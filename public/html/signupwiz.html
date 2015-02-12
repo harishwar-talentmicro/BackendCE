@@ -44,7 +44,9 @@
                 <div class="panel panel-default">
                 <form name="UserForm" novalidate class="form-inline">
                     <div class="panel-heading">
-                        <h4> {{heading}}
+                        <h4> {{heading}}: {{profile._info.EZEID}}<span ng-show="profile._info.IDTypeID ==1"> (Individual)</span>
+                                                                <span ng-show="profile._info.IDTypeID ==2"> (Business)</span>
+                                                                <span ng-show="profile._info.IDTypeID ==3"> (Public Place)</span>
                             <span class="col-md-offset-3 small" style="color:#FF0000; float: right;">
                                 <span style="border:1px solid #000000;background:#FAA9A3;color:#000000;">Mandatory </span>
                             </span>

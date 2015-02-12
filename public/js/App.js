@@ -873,15 +873,7 @@
             }
         }
 
-        if($rootScope._userInfo.IsAuthenticate){
-            $scope.heading = 'Update Profile';
-            showCurrentLocation = false;
-        }
-        else
-        {
-            $scope.heading = 'Create New Profile';
-            showCurrentLocation = true;
-        }
+
 
         $http({ method: 'get', url: GURL + 'ewmGetCountry?LangID=1' }).success(function (data) {
             if ($rootScope._userInfo.Token == false) {
@@ -905,6 +897,17 @@
             }
         });
 
+
+        if($rootScope._userInfo.IsAuthenticate){
+            $scope.heading = 'Update Profile';
+            showCurrentLocation = false;
+        }
+        else
+        {
+            $scope.heading = 'Create New Profile';
+            showCurrentLocation = true;
+        }
+
         //Custom Methods
         function GetUserDetails() {
             //$rootScope.IsIdAvailable = true;
@@ -920,6 +923,7 @@
                     profile._info.ISDPhoneNumber = data[0].ISDPhoneNumber;
                     profile._info.Latitude = data[0].Latitude;
                     profile._info.Longitude = data[0].Longitude;
+                    profile._info.EZEID = data[0].EZEID;
 
                     profile._info.SalesEnquiryButton =  profile._info.SalesEnquiryButton == 1 ? true : false;
                     profile._info.HomeDeliveryButton = profile._info.HomeDeliveryButton == 1 ? true : false;
