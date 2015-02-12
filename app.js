@@ -5,8 +5,10 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser'), cors = require('cors'),
     LocationManager = require('./routes/EziedUserAPI_Server');
+var compress = require('compression');
 
 var app = express();
+app.use(compress());
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 app.use(cors());

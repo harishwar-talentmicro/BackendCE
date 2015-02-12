@@ -1,3 +1,18 @@
+function readCookie(cookieName)
+{
+    //Added
+   var allcookies = document.cookie;
+   cookiearray  = allcookies.split(';');
+   // Now take key value pair out of this array
+   for(var i=0; i<cookiearray.length; i++){
+      name = cookiearray[i].split('=')[0];
+      value = cookiearray[i].split('=')[1];
+      if(name == cookieName){
+          return value;
+      }
+   }
+   return null;
+}
 
 (function () {
     var ezeid = angular.module('ezeidApp',
@@ -20,10 +35,25 @@
             .otherwise({ templateUrl: 'html/home.html' });
     }]);
 
-    var GURL = '/'; //http://10.0.100.103:8084/';
+    var GURL = '/';
+    //http://10.0.100.103:8084/';
 
     var MsgDelay = 2000;
 
+    ezeid.run(function($rootScope){
+        var userId = readCookie('Token');
+        if(userId !== null && userId !== undefined && userId !== '')
+        {
+            //@todo
+            //Put the code to getUserInformation from server and set it to $rootScope._user
+            $http.get('/ewtGetUserDetails?'+userId).then(function(userInfo){
+                $rootScope._userInfo = userInfo
+            },function(){
+                //error handler
+            });
+        }
+    });
+    
     // define controller for wizard
     ezeid.controller('SampleWizardController', function($scope, $q, $timeout) {
 
@@ -101,7 +131,7 @@
     });
 
     // Search Controller
-    ezeid.controller('SearchController', function ($http, $rootScope, $scope, $compile, $timeout, Notification, $filter, $location, $window) {
+    ezeid.controller('SearchController', function ($http, $rootScope, $scope, $compile, $timeout, Notification, $filter, $location, $window,$q) {
 
 //
 //        function reSizeHomeMap() {
@@ -366,7 +396,10 @@
         $http({ method: 'get', url: GURL + 'ewmGetProxmity?LangID=1' }).success(function (data) {
             //var _obj = { Title: '--Proximity--', MetersValue: 0 };
             //data.splice(0, 0, _obj);
-            SearchSec.proximities = data;;
+            SearchSec.proximities = data;
+            if(!map){
+                initialize();
+            }
         });
 
 //        SearchSec.OpenStatuses = [{ id: 0, label: "Any" }, { id: 1, label: "Open" }, { id: 2, label: "Closed" }];
@@ -431,7 +464,7 @@
                                     });
                                 } 
                                 else {
-                                    Notification.error({ message: 'Invalid key or not found…', delay: MsgDelay });
+                                    Notification.error({ message: 'No Results found..!', delay: MsgDelay });
                                 }
                             });
                             
@@ -440,34 +473,22 @@
                             
                             /******************** Code for checking map load and handling it with reload ****************/
                             //MapIsLoaded variable is set by map eventListener idle
-                            function mapReload(data) {
-                                try{
-                                    PlaceMarker(data);     
-                                    
-                                }
-                                catch(ex){
-//                                    if($scope.mapReloadCount<3){
-                                        console.log('Map reloaded');
-                                        $scope.$watch('isMapLoaded',function(v1,v2){
-                                            if(v2)
-                                            {
-                                                google.maps.event.trigger(map, "resize");
-        //                                        map.setCenter(new google.maps.LatLng($rootScope.CLoc.CLat, $rootScope.CLoc.CLong));
-                                                $timeout(function(){ console.log(data);PlaceMarker(data)},3000);
-                                            }
-                                        });
-                                        //                                        $scope.mapReloadCount++;
-                                    }
-                                }//function mapReload ends
+                           
                             
                             try{
+                               
                                 PlaceMarker(data);
-                                console.log('Markers placement done');
                             }
                             
                             catch(ex){
-                                console.log('Marker placement delayed');
-                                $timeout(mapReload(data),4000);
+                                if(!map){
+                                        initialize();
+                                }
+                                $scope.$watch('isMapLoaded',function(var1,var2){
+                                    if(var2){
+                                        PlaceMarker(data);
+                                    }
+                                });
                             }
                             //If map is not loaded wait for few seconds and then try to reload it and then place marker
                             
@@ -476,14 +497,34 @@
                        // PlaceMarker(data);//older one
                     }
                     else {
-                        Notification.error({ message: 'Invalid key or not found…', delay: MsgDelay });
-                        PlaceMarker(null);
+                        Notification.error({ message: 'No Results found..!', delay: MsgDelay });
+                        try{
+                                PlaceMarker(null);
+                                console.log('Markers placement done 1');
+                            }
+                            
+                            catch(ex){
+                                if(!map){
+                                        initialize();
+                                }
+                                $scope.$watch('isMapLoaded',function(var1,var2){
+                                    if(var2){
+                                        PlaceMarker(null);
+                                    }
+                                });
+                            }
+                        //PlaceMarker(null);
                     }
                 });
             }
             else {
                 //Redirect to Login page
                 $('#SignIn_popup').slideDown();
+                $rootScope.defer = $q.defer();
+                var prom = $rootScope.defer.promise;
+                prom.then(function(d){
+                    SearchSec.getSearch();
+                });
             }
         };
 
@@ -1392,79 +1433,73 @@
              //Save and Update Primary Registration
             this.savePrimaryRegistration = function (UserForm) {
 
+                console.log("SAi1");
+              /*  else
+                {
+                    console.log("SAi2");
+                    isValid = true;
+                }*/
 
                 if(isValidate())
                 {
-                    var sEzeid = profile._info.EZEID;
+                    console.log("SAi3");
+                    // create/Save profile
+                    profile._info.SalesEnquiryButton =  profile._info.SalesEnquiryButton == true ? 1 : 0;
+                    profile._info.HomeDeliveryButton = profile._info.HomeDeliveryButton == true ? 1 : 0;
+                    profile._info.ReservationButton = profile._info.ReservationButton == true ? 1 : 0;
+                    profile._info.SupportButton = profile._info.SupportButton == true ? 1 : 0;
+                    profile._info.CVButton = profile._info.CVButton == true ? 1 : 0;
+                    profile._info.Gender = (profile._info.Gender == undefined || profile._info.Gender == null )? 2 : profile._info.Gender ;
 
-                    var lastTwo = sEzeid.substr(sEzeid.length - 2);
-                   // console.log(lastFive);
-                   // alert(lastFive);
-                    if(lastTwo != "ap")
+                    if(profile._info.IDTypeID == 1)
                     {
-
-                        // create/Save profile
-                        profile._info.SalesEnquiryButton =  profile._info.SalesEnquiryButton == true ? 1 : 0;
-                        profile._info.HomeDeliveryButton = profile._info.HomeDeliveryButton == true ? 1 : 0;
-                        profile._info.ReservationButton = profile._info.ReservationButton == true ? 1 : 0;
-                        profile._info.SupportButton = profile._info.SupportButton == true ? 1 : 0;
-                        profile._info.CVButton = profile._info.CVButton == true ? 1 : 0;
-                        profile._info.Gender = (profile._info.Gender == undefined || profile._info.Gender == null )? 2 : profile._info.Gender ;
-
-                        if(profile._info.IDTypeID == 1)
-                        {
-                            profile._info.Icon = $rootScope.smallImage;
-                        }
-                        else
-                        {
-                            if(isBusinessIcon == 1)
-                            {
-                                profile._info.Icon = $rootScope.smallImage;
-                            }
-                        }
-                        profile._info.LanguageID = 1;
-                        profile._info.IDTypeID = parseInt(profile._info.IDTypeID, 10);
-                        profile._info.Token = $rootScope._userInfo.Token;
-                        $http({
-                            method: "POST",
-                            url: GURL + 'ewSavePrimaryEZEData',
-                            data: JSON.stringify(profile._info),
-                            headers: { 'Content-Type': 'application/json' }
-                        }).success(function (data) {
-                                if (data.IsAuthenticate) {
-                                    $rootScope._userInfo = data;
-                                    if (typeof (Storage) !== "undefined") {
-                                        var encrypted = CryptoJS.AES.encrypt(JSON.stringify(data), "EZEID");
-                                        sessionStorage.setItem("_token", encrypted);
-                                    } else {
-                                        alert('Sorry..! Browser does not support');
-                                        window.location.href = "#/home";
-                                    }
-                                    document.getElementById("EZEID").className = "form-control emptyBox";
-                                    document.getElementById("password").className = "form-control emptyBox";
-                                    document.getElementById("re-password").className = "form-control emptyBox";
-                                    document.getElementById("FName").className = "form-control emptyBox";
-                                    document.getElementById("LName").className = "form-control emptyBox";
-                                    document.getElementById("streeName").className = "form-control emptyBox";
-                                    document.getElementById("block").className = "form-control emptyBox";
-                                    document.getElementById("city").className = "form-control emptyBox";
-                                    document.getElementById("postalCode").className = "form-control emptyBox";
-                                    document.getElementById("mobile_phone").className = "form-control emptyBox";
-
-                                    getISDCode(profile._info.CountryID);
-                                    window.location.href = "#/home";
-                                    Notification.success({ message: "Saved... ", delay: MsgDelay });
-                                } else {
-                                    if (UserForm.$valid) {
-                                        Notification.error({ message: "Registration failed", delay: MsgDelay });
-                                    }
-                                }
-                            });
+                        profile._info.Icon = $rootScope.smallImage;
                     }
                     else
                     {
-                        Notification.error({ message: "Not available...", delay: MsgDelay });
+                        if(isBusinessIcon == 1)
+                        {
+                            profile._info.Icon = $rootScope.smallImage;
+                        }
                     }
+                    profile._info.LanguageID = 1;
+                    profile._info.IDTypeID = parseInt(profile._info.IDTypeID, 10);
+                    profile._info.Token = $rootScope._userInfo.Token;
+                    $http({
+                        method: "POST",
+                        url: GURL + 'ewSavePrimaryEZEData',
+                        data: JSON.stringify(profile._info),
+                        headers: { 'Content-Type': 'application/json' }
+                    }).success(function (data) {
+                            if (data.IsAuthenticate) {
+                                $rootScope._userInfo = data;
+                                if (typeof (Storage) !== "undefined") {
+                                    var encrypted = CryptoJS.AES.encrypt(JSON.stringify(data), "EZEID");
+                                    sessionStorage.setItem("_token", encrypted);
+                                } else {
+                                    alert('Sorry..! Browser does not support');
+                                    window.location.href = "#/home";
+                                }
+                                document.getElementById("EZEID").className = "form-control emptyBox";
+                                document.getElementById("password").className = "form-control emptyBox";
+                                document.getElementById("re-password").className = "form-control emptyBox";
+                                document.getElementById("FName").className = "form-control emptyBox";
+                                document.getElementById("LName").className = "form-control emptyBox";
+                                document.getElementById("streeName").className = "form-control emptyBox";
+                                document.getElementById("block").className = "form-control emptyBox";
+                                document.getElementById("city").className = "form-control emptyBox";
+                                document.getElementById("postalCode").className = "form-control emptyBox";
+                                document.getElementById("mobile_phone").className = "form-control emptyBox";
+
+                                getISDCode(profile._info.CountryID);
+                                window.location.href = "#/home";
+                                Notification.success({ message: "Saved... ", delay: MsgDelay });
+                            } else {
+                                if (UserForm.$valid) {
+                                    Notification.error({ message: "Registration failed", delay: MsgDelay });
+                                }
+                            }
+                        });
                 }
                 else
                 {
@@ -1813,10 +1848,175 @@
 
     });
 
+
    /* ezeid.controller('CVAttachController', function ($rootScope, $scope, $http, $q, $timeout, Notification, $window ) {
 
-        //$compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|blo‌​b|coui):/);
+        //$compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|blo??b|coui):/);
         *//*$compileProvider.aHrefSanitizationWhitelist(/^\s*(|blob|):/); });*//*
+
+        var CVAttachCtrl = this;
+        CVAttachCtrl._CVInfo={};
+        var MsgDelay = 2000;
+        if ($rootScope._userInfo) {
+        }
+        else {
+            if (typeof (Storage) !== "undefined") {
+                var encrypted = sessionStorage.getItem("_token");
+                if (encrypted) {
+                    var decrypted = CryptoJS.AES.decrypt(encrypted, "EZEID");
+                    var Jsonstring = decrypted.toString(CryptoJS.enc.Utf8);
+                    if (Jsonstring) {
+                        $rootScope._userInfo = JSON.parse(Jsonstring);
+                    }
+                }
+                else {
+                    $rootScope._userInfo = {
+                        IsAuthenticate: false,
+                        Token: '',
+                        FirstName: '',
+                        Type:'',
+                        Icon:''
+                    };
+                }
+            } else {
+                // Sorry! No Web Storage support..
+                $rootScope._userInfo = {
+                    IsAuthenticate: false,
+                    Token: '',
+                    FirstName: '',
+                    Type:'',
+                    Icon:''
+                };
+                alert('Sorry..! Browser does not support');
+                window.location.href = "index.html";
+            }
+        }
+
+        $scope.$watch('_userInfo.IsAuthenticate', function () {
+            if ($rootScope._userInfo.IsAuthenticate == true) {
+                getCVInfo();
+            } else {
+                window.location.href = "index.html";
+            }
+        });
+
+        $http({ method: 'get', url: GURL + 'ewmGetFunctions?LangID=1'}).success(function (data) {
+            var _obj = { FunctionID: 0, FunctionName: '--Select Function--' };
+            data.splice(0, 0, _obj);
+            CVAttachCtrl.Functions = data;
+            console.log(data);
+        });
+
+        this.getRoleForFunction=function(_functionId){
+            CVAttachCtrl.RoleTypes = "";
+            *//*$http({ method: 'get', url: GURL + 'ewmGetRoleType?LangID=1&FunctionID='+CVAttachCtrl._CVInfo.FunctionID}).success(function (data) {*//*
+            $http({ method: 'get', url: GURL + 'ewmGetRoleType?LangID=1&FunctionID='+_functionId}).success(function (data) {
+
+                CVAttachCtrl.RoleTypes = data;
+            });
+        };
+
+        $http({ method: 'get', url: GURL + 'ewmGetCountry?LangID=1' }).success(function (data) {
+            var _obj = { CountryID: 0, CountryName: '--Country--', ISDCode: '' };
+            data.splice(0, 0, _obj);
+            CVAttachCtrl.countries = data;
+        });
+        this.getStates = function (CountryID) {
+            $http({ method: 'get', url: GURL + 'ewmGetState?LangID=1&CountryID=' + CountryID }).success(function (data) {
+                var _obj = { StateID: 0, StateName: '--State--' };
+                CVAttachCtrl.states = data;
+            });
+        };
+        this.getCities = function (StateID) {
+            $http({ method: 'get', url: GURL + 'ewmGetCity?LangID=1&StateID=' + StateID }).success(function (data) {
+                var _obj = { CityD: 0, CityName: '--City--' };
+                CVAttachCtrl.cities = data;
+            });
+        };
+
+
+        $scope.uploadFile = function (files) {
+             console.log(files);
+            CVAttachCtrl._CVInfo.CVDocFile = files[0].name;
+            fileToDataURL(files[0]).then(function (dataURL) {
+                CVAttachCtrl._CVInfo.CVDoc = dataURL;
+                var enc=Base64.encode(dataURL);
+                var dec=Base64.decode(enc);
+                console.log(dec);
+                window.open(dec,'_blank');
+                console.log(CVAttachCtrl._CVInfo.CVDoc);
+                //onDownload(dec);
+            });
+        };
+
+        var fileToDataURL = function (file) {
+            var deferred = $q.defer();
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                deferred.resolve(e.target.result);
+            };
+            reader.readAsDataURL(file);
+            return deferred.promise;
+        };
+
+        *//*   function onDownload(dataToDownload) {
+         document.location = 'data:Application/octet-stream,' +
+         encodeURIComponent(dataToDownload);
+         }*//*
+
+        this.saveCVDocInfo=function(){
+            CVAttachCtrl._CVInfo. TokenNo=$rootScope._userInfo.Token;
+            CVAttachCtrl._CVInfo.Status=parseInt(CVAttachCtrl._CVInfo.Status);
+            $http({
+                method: "POST",
+                url: GURL + 'ewtSaveCVInfo',
+                data: JSON.stringify(CVAttachCtrl._CVInfo),
+                headers: { 'Content-Type': 'application/json' }
+            }).success(function (data) {
+                if(data.IsSuccessfull) {
+                    Notification.success({message: "Successfully Saved CV Info", delay: MsgDelay});
+                    getCVInfo();
+                }else{
+                    Notification.error({message: "CV Info Not Saved !...", delay: MsgDelay});
+                }
+            });
+        };
+
+        this.download = function(){
+            alert(CVAttachCtrl._CVInfo.CVDoc);
+            window.location.assign(CVAttachCtrl._CVInfo.CVDoc);
+            $window.open(CVAttachCtrl._CVInfo.CVDoc);
+        }
+
+        function getCVInfo(){
+            $http({
+                method: 'get',
+                url: GURL + 'ewtGetCVInfo?TokenNo=' + $rootScope._userInfo.Token
+            }).success(function (data) {
+                console.log(data);
+                CVAttachCtrl._CVInfo=data[0];
+                //CVAttachCtrl.getRoleForFunction();
+            });
+        };
+
+        this.closeCVDocInfo=function(cvForm){
+            if($rootScope._userInfo.IsAuthenticate==false){
+                cvForm.$setPristine(true);
+            }
+
+        };
+
+        var content = 'file content';
+        var blob = new Blob([ CVAttachCtrl._CVInfo.CVDoc ], { type : 'text/plain' });
+        $scope.url = (window.URL || window.webkitURL).createObjectURL( blob );
+
+    });
+*/
+
+    ezeid.controller('CVAttachController', function ($rootScope, $scope, $http, $q, $timeout, Notification, $window ) {
+
+        //$compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|blo‌​b|coui):/);
+        /*$compileProvider.aHrefSanitizationWhitelist(/^\s*(|blob|):/); });*/
 
         var CVAttachCtrl = this;
         CVAttachCtrl._CVInfo={};
@@ -1866,7 +2066,7 @@
         });
 
         $http({ method: 'get', url: GURL + 'ewmGetFunctions?LangID=1'}).success(function (data) {
-            // var _obj = { FunctionID:0, FunctionName: '--Select Function--' };
+           // var _obj = { FunctionID:0, FunctionName: '--Select Function--' };
             //data.splice(0, 0, _obj);
             CVAttachCtrl.Functions = data;
             console.log(data);
@@ -1874,8 +2074,8 @@
 
         this.getRoleForFunction=function(_functionId){
             console.log(_functionId);
-            // CVAttachCtrl.RoleTypes = "";
-            *//*$http({ method: 'get', url: GURL + 'ewmGetRoleType?LangID=1&FunctionID='+CVAttachCtrl._CVInfo.FunctionID}).success(function (data) {*//*
+           // CVAttachCtrl.RoleTypes = "";
+            /*$http({ method: 'get', url: GURL + 'ewmGetRoleType?LangID=1&FunctionID='+CVAttachCtrl._CVInfo.FunctionID}).success(function (data) {*/
             $http({ method: 'get', url: GURL + 'ewmGetRoles?LangID=1&FunctionID='+_functionId}).success(function (data) {
 
                 CVAttachCtrl.RoleTypes = data;
@@ -1934,10 +2134,10 @@
             return deferred.promise;
         };
 
-        *//*   function onDownload(dataToDownload) {
+        /*   function onDownload(dataToDownload) {
          document.location = 'data:Application/octet-stream,' +
          encodeURIComponent(dataToDownload);
-         }*//*
+         }*/
 
         this.saveCVDocInfo=function(){
             CVAttachCtrl._CVInfo.TokenNo=$rootScope._userInfo.Token;
@@ -1949,10 +2149,10 @@
                 headers: { 'Content-Type': 'application/json' }
             }).success(function (data) {
                     if(data.IsSuccessfull) {
-                        Notification.success({message: "Successfully Saved CV Info", delay: MsgDelay});
+                        Notification.success({message: "Saved...", delay: MsgDelay});
                         getCVInfo();
                     }else{
-                        Notification.error({message: "CV Info Not Saved !...", delay: MsgDelay});
+                        Notification.error({message: "Sorry..! not saved", delay: MsgDelay});
                     }
                 });
         };
@@ -1996,5 +2196,5 @@
         $scope.url = (window.URL || window.webkitURL).createObjectURL( blob );
 
     });
-*/
+
 })();

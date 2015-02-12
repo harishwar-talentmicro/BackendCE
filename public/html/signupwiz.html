@@ -293,13 +293,17 @@
                                     </div>
 
                                     <br/>
-                                    <button type="submit"
-                                            ng-disabled="!profile._info.Terms" ng-hide="_userInfo.IsAuthenticate" ng-click="profile.savePrimaryRegistration(UserForm)" class="btn btn-primary">Generate EZEID</button>
-                                    <button type="submit" ng-show="_userInfo.IsAuthenticate"
-                                            ng-disabled="!profile._info.EZEID || !profile._info.FirstName || !profile._info.LastName || !profile._info.AddressLine1
-                                            || !profile._info.AddressLine2 || !profile._info.CityTitle || !profile._info.PostalCode || !profile._info.MobileNumber "
-                                            ng-click="profile.savePrimaryRegistration(UserForm)" class="btn btn-primary">Save</button>
+                                   <button type="submit" ng-show="_userInfo.IsAuthenticate" ng-disabled="!profile._info.EZEID || !profile._info.FirstName || !profile._info.LastName || !profile._info.AddressLine1
+                                           || !profile._info.AddressLine2 || !profile._info.CityTitle || !profile._info.PostalCode || !profile._info.MobileNumber "
+                                           ng-click="profile.savePrimaryRegistration(UserForm)" class="btn btn-primary">Save</button>
+                                    <button type="submit" ng-hide="_userInfo.IsAuthenticate" ng-disabled="!profile._info.Terms"
+                                            ng-click="profile.savePrimaryRegistration(UserForm)" class="btn btn-primary">Generate EZEID</button>
+                                   <!--<button type="submit" ng-show="_userInfo.IsAuthenticate" ng-disabled="!profile._info.EZEID || !profile._info.FirstName || !profile._info.LastName || !profile._info.AddressLine1
+                                           || !profile._info.AddressLine2 || !profile._info.CityTitle || !profile._info.PostalCode || !profile._info.MobileNumber "
+                                           ng-click="profile.savePrimaryRegistration(UserForm)" class="btn btn-primary">Save</button>-->
                                     <button type="reset" class="btn btn-primary" onclick="window.location.href='#/home'">Close</button>
+
+
 
                                 <!--</form>-->
                             </div>

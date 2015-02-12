@@ -33,88 +33,6 @@ function utcToLocal(utc) {
 var rule = new schedule.RecurrenceRule();
 rule.minute = new schedule.Range(0, 59, 1);
 
-
-var RegistrationScheduler = schedule.scheduleJob(rule, function () {
-    try {
-        var query = 'select ifnull(master.ezeid,"") as EZEID, ifnull(master.FirstName,"") as FirstName , ifnull(master.LastName,"") as LastName, ifnull(loc.emailId,"") as EmailID  from tmaster master left outer join tlocations loc on master.tid=loc.MasterID where master.InsertFlag=1 and loc.seqno = 0 and loc.emailId is not null';
-        db.query(query, function (err, RegResult) {
-            if (!err) {
-                if (RegResult.length > 0) {
-                    console.log(RegResult);
-
-                    for(var i = 0; i < RegResult.length; i++)
-                    {
-                        var RegData = RegResult[i];
-                        console.log(RegData);
-                        var FirstName = RegData.FirstName;
-                        var Lastname = RegData.LastName;
-                        var Ezeid = RegData.EZEID;
-                        var EmailID = RegData.EmailID;
-                        var fs = require('fs');
-                        fs.readFile("RegTemplate.txt", "utf8", function (err, data) {
-                            if (err) throw err;
-
-                            console.log(FirstName);
-                            console.log(Lastname);
-                            console.log(Ezeid);
-                            console.log(EmailID);
-
-                            data = data.replace("[Firstname]", FirstName);
-                            data = data.replace("[Lastname]", Lastname);
-                            data = data.replace("[EZEID]", Ezeid);
-
-                            var mailOptions = {
-                                from: 'noreply@ezeid.com',
-                                to: EmailID,
-                                subject: 'Welcome to EZEID',
-                                html: data // html body
-                            };
-                            FnSendMailEzeid(mailOptions, function (err, Result) {
-                                if (!err) {
-                                    if (Result != null) {
-                                        console.log('FnRegistration: Mail Sent Successfully');
-                                        var query = 'update tmaster set InsertFlag=2 where EZEID ='+ db.escape(Ezeid);
-                                        db.query(query, function (err, UpdateResult) {
-                                            if (!err) {
-                                                console.log('update happened');
-                                            }
-                                            else {
-                                                console.log('Update not happened');
-                                            }
-                                        });
-
-                                       // res.send(RtnMessage);
-                                    }
-                                    else {
-                                        console.log('FnRegistration: Mail not Sent Successfully');
-                                        //res.send(RtnMessage);
-                                    }
-                                }
-                                else {
-                                    console.log('FnRegistration:Error in sending mails' + err);
-                                   // res.send(RtnMessage);
-                                }
-                            });
-
-                        });
-                    }
-                }
-                else {
-                    console.log('No user for sending mails');
-                }
-            }
-            else {
-                console.log('Error in getting primary data for sending mails.' + err);
-            }
-        });
-    }
-    catch (ex) {
-        throw new Error(ex);
-    }
-
-
-});
-
 var MessageScheduler = schedule.scheduleJob(rule, function () {
     try {
         var query = 'select * from tMailbox where sentstatus = 0';
@@ -193,10 +111,10 @@ function FnSendMailEzeid(MailContent, CallBack) {
             var nodemailer = require('nodemailer');
             var smtpTransport = require('nodemailer-smtp-transport');
             var transporter = nodemailer.createTransport(smtpTransport({
-                host: 'mail.name.com',
+                host: 'smtp.sendgrid.net',
                 port: 25,
                 auth: {
-                    user: 'noreply@ezeid.com',
+                    user: 'ezeid',
                     pass: 'Ezeid2015'
                 }
             }));

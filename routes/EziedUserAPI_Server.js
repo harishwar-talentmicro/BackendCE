@@ -532,6 +532,7 @@ exports.FnLogin = function (req, res) {
                                 //  console.log(TokenResult);
 
                                 if (TokenResult.affectedRows > 0) {
+                                    res.setHeader('Cookie','Token='+Encrypt);
                                     RtnMessage.Token = Encrypt;
                                     RtnMessage.IsAuthenticate = true;
                                     RtnMessage.FirstName = loginResult[0].FirstName;
@@ -747,8 +748,8 @@ exports.FnForgetPassword = function (req, res) {
                                         if (err) throw err;
                                         data = data.replace("[Firstname]", UserResult[0].FirstName);
                                         data = data.replace("[Lastname]", UserResult[0].LastName);
-                                        data = data.replace("[Password]", UserResult[0].EncryptPWD);
-
+                                        data = data.replace("[Password]", Password);
+console.log(UserResult[0].EMailID);
                                         //console.log('Body:' + data);
                                         var mailOptions = {
                                             from: EZEIDEmail,
@@ -756,22 +757,19 @@ exports.FnForgetPassword = function (req, res) {
                                             subject: 'Password reset request',
                                             html: data // html body
                                         };
-                                        console.log(mailOptions);
+
                                         // send mail with defined transport object
-                                        FnSendMailEzeid(mailOptions, function (err, Result) {
+                                        //message Type 7 - Forgot password mails service
+                                        var post = { MessageType: 7, ToMailID: mailOptions.to, Subject: mailOptions.subject, Body: mailOptions.html };
+                                        // console.log(post);
+                                        var query = db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
+                                            // Neat!
                                             if (!err) {
-                                                if (Result != null) {
-                                                    console.log('FnForgetPassword: Mail Sent Successfully');
-                                                    res.send(RtnMessage);
-                                                }
-                                                else {
-                                                    console.log('FnForgetPassword: Mail not Sent Successfully');
-                                                    res.send(RtnMessage);
-                                                }
+                                                console.log('FnRegistration: Mail saved Successfully');
+                                                res.send(RtnMessage);
                                             }
                                             else {
-                                                console.log('FnForgetPassword:Error in sending mails' + err);
-                                                res.statusCode = 500;
+                                                console.log('FnRegistration: Mail not Saved Successfully' + err);
                                                 res.send(RtnMessage);
                                             }
                                         });
@@ -1700,7 +1698,7 @@ exports.FnRegistration = function (req, res) {
                                     };
                                     //console.log('Mail Option:' + mailOptions);
                                     // send mail with defined transport object
-                                    var post = { MessageType: 0, ToMailID: mailOptions.to, Subject: mailOptions.subject, Body: mailOptions.html };
+                                    var post = { MessageType: 8, ToMailID: mailOptions.to, Subject: mailOptions.subject, Body: mailOptions.html };
                                     // console.log(post);
                                     var query = db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
                                         // Neat!
