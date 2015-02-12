@@ -3,3 +3,4 @@ node_modules/
 bin/*.log
 bin/uploads/
 Gruntfile.js
+npm-debug.log
