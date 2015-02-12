@@ -101,7 +101,7 @@
     });
 
     // Search Controller
-    ezeid.controller('SearchController', function ($http, $rootScope, $scope, $compile, $timeout, Notification, $filter, $location, $window) {
+    ezeid.controller('SearchController', function ($http, $rootScope, $scope, $compile, $timeout, Notification, $filter, $location, $window, $q) {
 
 //
 //        function reSizeHomeMap() {
