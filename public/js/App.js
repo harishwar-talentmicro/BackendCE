@@ -161,7 +161,9 @@
             Longitude: $rootScope.CLoc.CLong
         };
 
-        $scope.isMapLoaded = false;
+        $scope.isMapLoaded = false;         //Set to true with map event 'idle'
+        $scope.isMapReady = false;          //Set to true when map canvas is drawn and map is fully visible
+        
         
         function initialize () {
             //// Create the search box and link it to the UI element.
@@ -237,6 +239,9 @@
             google.maps.event.addListenerOnce(map, 'idle', function () {
                 console.log('I am idle');
                 $scope.isMapLoaded = true;
+                $timeout(function(){
+                    $scope.isMapReady = true;
+                },2000);
                 if(SearchSec.IsSearchPending){
                     SearchSec.getSearch();
                 }
@@ -523,9 +528,15 @@
                     
                     if(tabName == 'map')
                     {
-                        $scope.infoClass = "";
-                        $scope.mapClass = "level-1";
-                        $scope.adClass = "";
+                        if($scope.isMapReady && $scope.isMapLoaded)
+                        {
+                            $scope.infoClass = "";
+                            $scope.mapClass = "level-1";
+                            $scope.adClass = "";
+                        }
+                        else{
+                            Notification.error({message:'Map is loading! Please wait..',delay:MsgDelay});
+                        }
                     }
                     
                 };
