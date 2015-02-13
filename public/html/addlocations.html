@@ -159,7 +159,7 @@
                                                     </div><br/>
 
                                                  <!-- <div class="mar_editTop" ng-show="_userInfo.Type==2 && _userInfo.EZEIDVerifiedID == 2">-->
-                                                    <div ng-show="_userInfo.Type==2 && _userInfo.search.mInfo.EZEIDVerifiedID == 2">
+                                                    <div ng-show="SLocCtrl.profile._info.EZEIDVerifiedID == 2 && SLocCtrl.profile._info.IDTypeID == 2">
                                                          <div class="row " style="margin-left:0px;margin-right:0px;">
                                                             <span><label><strong>&nbsp;Settings</strong> </label></span><br/>
                                                             <select class="form-control emptyBox pull-left " style="width:45%;" name="selectParkingStatus" ng-model="SLocCtrl._locInfo.ParkingStatus"

@@ -4,7 +4,7 @@ angular.module('ezeidApp').controller('LocationsController', function ($rootScop
     var SLocCtrl = this;
     var map;
     var mapOptions;
-    
+    SLocCtrl.profile = {};
     $scope.isMapLoaded = false;
 //    var myinfowindow = new google.maps.InfoWindow({
 //        content: ''
@@ -17,7 +17,6 @@ angular.module('ezeidApp').controller('LocationsController', function ($rootScop
     SLocCtrl.LocationsList = [];
     SLocCtrl._locInfo = {};
     SLocCtrl.mapInit = false;
-
     if ($rootScope._userInfo) {
     }
     else {
@@ -56,12 +55,30 @@ angular.module('ezeidApp').controller('LocationsController', function ($rootScop
     $scope.$watch('_userInfo.IsAuthenticate', function () {
         if ($rootScope._userInfo.IsAuthenticate == true) {
             getSecondaryLoc();
+            GetUserDetails();
         } else {
 
+            SLocCtrl.profile._info = {};
+            SLocCtrl.profile._info.IDTypeID = 1;
+            SLocCtrl.profile._info.NameTitleID = 1;
+            SLocCtrl.profile._info.ParkingStatus = 1;
+            SLocCtrl.profile._info.OpenStatus = 1;
             window.location.href = "/";
         }
     });
 
+    //Custom Methods
+        function GetUserDetails() {
+            //$rootScope.IsIdAvailable = true;
+            $http({
+                method: 'get',
+                url: GURL + 'ewtGetUserDetails?Token=' + $rootScope._userInfo.Token
+            }).success(function (data) {
+                    SLocCtrl.profile._info = data[0];
+             });
+        }
+
+    
     this.openNewLocationForm = function (secLocForm) {
 
       //  var stateId = SLocCtrl._locInfo.StateID;
