@@ -64,17 +64,13 @@ angular.module('ezeidApp').controller('BusinessListController', function($http, 
             //formData.append('RefType', $scope.OptionSelected);
             formData.append('TokenNo', $rootScope._userInfo.Token);
             formData.append('RefType', 6);
-            console.log(formData);
-
 
             $http({ method: 'POST', url: '/ewTUploadDoc/', data: formData,
                 headers: { 'Content-Type': undefined }, transformRequest: angular.identity })
                 .success(function (data, status, headers, config) {
-                    console.log("uploaded");
-                }).
+               }).
                 error(function(data, status, headers, config) {
-                    console.log("upload ERROR");
-                });
+                 });
         }
     };
    //End of Upload
@@ -114,15 +110,9 @@ angular.module('ezeidApp').controller('BusinessListController', function($http, 
          method: 'get',
          url: GURL + 'ewtGetBussinessListing?TokenNo=' + $rootScope._userInfo.Token
          }).success(function (data) {
-         console.log(data);
             BusinessListCtrl._businessInfo=data[0];
          });
      };
 
-    /*this.closeCVDocInfo=function(cvForm){
-        if($rootScope._userInfo.IsAuthenticate==false){
-            cvForm.$setPristine(true);
-        }
 
-    };*/
 });

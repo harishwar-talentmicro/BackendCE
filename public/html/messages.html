@@ -34,7 +34,7 @@
     <div class="container" style="padding-top:90px; position:relative;">
         <!-- Example row of columns -->
         <div class="row">
-            <div class="col-sm-9">
+            <div class="col-sm-8" style="margin: auto; float: none;">
                 <div class="panel panel-default" style="min-height: 367px">
                     <div class="panel-body">
                         <h3><span class="text_color">Inbox</span>
@@ -88,11 +88,7 @@
                                     <td class="panelPd5px msg_pos" >{{_item.CreatedDate | date:'dd/MMM HH:mm a'}}</td>
                                     <td class="panelPd5px msg_pos">
                                         <div class="btn-group">
-                                            <!--<label ng-show="_item.Status == 0" ng-click="msgCtrl.openAddNoteForm(_item,0)" class="btn btn-primary panelTextSize borLeft">New</label>
-                                            <label ng-show="_item.Status == 1" ng-click="msgCtrl.openAddNoteForm(_item,1)" class="btn btn-primary panelTextSize borLeft">In-Process</label>
-                                            <label ng-show="_item.Status == 2" ng-click="msgCtrl.openAddNoteForm(_item,2)" class="btn btn-primary panelTextSize borLeft">Closed</label>
-                                            <label ng-show="_item.Status == 3" ng-click="msgCtrl.openAddNoteForm(_item,3)" class="btn btn-primary panelTextSize borLeft">Dropped</label>-->
-                                            <label ng-show="_item.Status == 0" ng-click="msgCtrl.openAddNoteForm(_item,0)" class="btn btn-primary panelTextSize borLeft">New</label>
+                                           <label ng-show="_item.Status == 0" ng-click="msgCtrl.openAddNoteForm(_item,0)" class="btn btn-primary panelTextSize borLeft">New</label>
                                             <label ng-show="_item.Status == 1" ng-click="msgCtrl.openAddNoteForm(_item,1)" class="btn btn-primary panelTextSize borLeft">Accepted</label>
                                             <label ng-show="_item.Status == 2" ng-click="msgCtrl.openAddNoteForm(_item,2)" class="btn btn-primary panelTextSize borLeft">Completed</label>
                                             <label ng-show="_item.Status == 3" ng-click="msgCtrl.openAddNoteForm(_item,3)" class="btn btn-primary panelTextSize borLeft">Rejected</label>
@@ -114,12 +110,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-3">
-                <img src="images/Adds-3.gif">
-            </div>
-            <div class="col-md-3 marT15px">
-                <img src="images/Adds-4.gif">
-            </div>
+
         </div>
     </div>
 </div>

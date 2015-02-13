@@ -46,7 +46,7 @@ angular.module('imageupload', [])
             //draw image on canvas
             var ctx = canvas.getContext("2d");
             ctx.drawImage(origImage, 0, 0, width, height);
-            console.log("big",canvas.toDataURL(type, quality));
+           // console.log("big",canvas.toDataURL(type, quality));
 
             //small image
             var canvas1 = getResizeArea();
@@ -58,7 +58,7 @@ angular.module('imageupload', [])
             //draw image on canvas
             var ctx1 = canvas1.getContext("2d");
             ctx1.drawImage(origImage, 0, 0, width1, height1);
-            console.log("small",canvas1.toDataURL(type, quality));
+          //  console.log("small",canvas1.toDataURL(type, quality));
 
             $rootScope.smallImage=canvas1.toDataURL(type, quality);
 

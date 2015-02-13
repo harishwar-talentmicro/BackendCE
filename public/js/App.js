@@ -1,6 +1,6 @@
 (function () {
     var ezeid = angular.module('ezeidApp',
-        ['ngHeader','ngRoute', 'ngFooter', 'ui-notification', 'kendo.directives','imageupload']);
+        ['ngHeader','ngRoute', 'ngFooter', 'ui-notification','imageupload']);
 
     ezeid.config(['$routeProvider',function($routeProvider){
         $routeProvider.when('/index',{templateUrl: 'html/index.html'})
@@ -9,13 +9,13 @@
             .when('/acchist',{templateUrl: 'html/accesshistory.html'})
             .when('/editprofile',{templateUrl: 'html/signupwiz.html'})
             .when('/addloc',{templateUrl: 'html/addlocations.html'})
-            .when('/addnewloc',{templateUrl: 'html/addnewlocations.html'})
             .when('/attachcv',{templateUrl: 'html/attachcv.html'})
             .when('/busslist',{templateUrl: 'html/businesslist.html'})
             .when('/documents',{templateUrl: 'html/documents.html'})
             .when('/terms',{templateUrl: 'html/terms.html'})
             .when('/help',{templateUrl: 'html/help.html'})
             .when('/legal',{templateUrl: 'html/legal.html'})
+            .when('/congratulations',{templateUrl: 'html/congratulations.html'})
             .otherwise({ templateUrl: 'html/home.html' });
     }]);
 
@@ -102,19 +102,6 @@
 
     // Search Controller
     ezeid.controller('SearchController', function ($http, $rootScope, $scope, $compile, $timeout, Notification, $filter, $location, $window, $q) {
-
-//
-//        function reSizeHomeMap() {
-//            google.maps.event.trigger(map, "resize");
-//            
-//            map.setCenter(new google.maps.LatLng($rootScope.CLoc.CLat, $rootScope.CLoc.CLong));
-//         }
-//
-//        $scope.selectedTab = "";
-//        if ($location.search()['ID'] != undefined) {
-//         }
-
-        
         var map;
         var marker;
         var markers = [];
@@ -237,7 +224,7 @@
             });
 
             google.maps.event.addListenerOnce(map, 'idle', function () {
-                console.log('I am idle');
+
                 $scope.isMapLoaded = true;
                 $timeout(function(){
                     $scope.isMapReady = true;
@@ -475,8 +462,7 @@
                         Notification.error({ message: 'Invalid key or not found…', delay: MsgDelay });
                         try{
                                 PlaceMarker(null);
-                                console.log('Markers placement done 1');
-                            }
+                           }
                             
                             catch(ex){
                                 if(!map){
@@ -520,6 +506,7 @@
                     
                     if(tabName == 'ad')
                     {
+
                          $scope.infoClass = "";
                         $scope.mapClass = "";
                         $scope.adClass = "level-1";
@@ -683,8 +670,7 @@
             if ($rootScope._userInfo.IsAuthenticate == true) {
                  var dateTime = $filter('date')(new Date(SearchSec.ReservationDateTime), 'MM/dd/yyyy HH:mm:ss');
                 //var dateTime = $filter('date')(SearchSec.ReservationDateTime, 'MM/dd/yyyy HH:mm:ss');  /*dd-MM-yyyy HH:mm a*/
-                    console.log(dateTime);
-                $http({ method: 'post', url: GURL + 'ewtSaveMessage', data: { TokenNo: $rootScope._userInfo.Token, ToMasterID: SearchSec.mInfo.TID, MessageType: messageType, Message: SearchSec.ReservationMessage, TaskDateTime: dateTime, LocID :SearchSec.LocID } }).success(function (data) {
+               $http({ method: 'post', url: GURL + 'ewtSaveMessage', data: { TokenNo: $rootScope._userInfo.Token, ToMasterID: SearchSec.mInfo.TID, MessageType: messageType, Message: SearchSec.ReservationMessage, TaskDateTime: dateTime, LocID :SearchSec.LocID } }).success(function (data) {
                     if (data.IsSuccessfull) {
                         $('#Reservation_popup').slideUp();
                         SearchSec.ReservationMessage = "";
@@ -821,13 +807,11 @@
         // Would write the value of the QueryString-variable called name to the console  
         var Qstr = getQueryStringValue("ID");
 
-      //  console.log("QUERY STRING");
-        if (Qstr != "") {
+       if (Qstr != "") {
             SearchSec.Criteria.Keywords = Qstr;
             SearchSec.IsSearchPending = true;
             SearchSec.Criteria.SearchType = "1";
-//          SearchSec.getSearch();
-        }
+      }
     });
 
     ezeid.controller('ProfileController', function ($rootScope, $scope, $http, $q, $timeout, Notification ,$filter) {
@@ -1082,66 +1066,11 @@
             });
         }
         function getAddressForLocation(results) {
-
-           /* if ($rootScope._userInfo.IsAuthenticate == false)
-            {*/
                 profile._info.CityTitle = "";
                 profile._info.PostalCode = "";
 
                 angular.forEach(results, function (mapResultValue, index) {
-                  /*  if ($rootScope._userInfo.IsAuthenticate == false)
-                    {
-                       // console.log(mapResultValue);
-                        if (mapResultValue.types[0] == 'street_number') {
-                            profile._info.AddressLine1 = mapResultValue.long_name;
-                           // $scope.$apply();
-                        }
-                        if (mapResultValue.types[0] == 'route') {
-                            if (profile._info.AddressLine1 != "") {
-                                profile._info.AddressLine1 += "," + mapResultValue.long_name;
-                               // $scope.$apply();
-                            } else {
-                                profile._info.AddressLine1 = mapResultValue.long_name;
-                               // $scope.$apply();
-                            }
-                        }
-                        if (mapResultValue.types[0] == 'neighborhood') {
-                            if (profile._info.AddressLine1 != "") {
-                                profile._info.AddressLine1 += "," + mapResultValue.long_name;
-                               // $scope.$apply();
-                            } else {
-                                profile._info.AddressLine1 = mapResultValue.long_name;
-                               // $scope.$apply();
-                            }
-                        }
-                        if (mapResultValue.types[0] == 'sublocality_level_3') {
-                            if (profile._info.AddressLine2 != "") {
-                                profile._info.AddressLine2 += "," + mapResultValue.long_name;
-                              //  $scope.$apply();
-                            } else {
-                                profile._info.AddressLine2 = mapResultValue.long_name;
-                               // $scope.$apply();
-                            }
-                        }
-                        if (mapResultValue.types[0] == 'sublocality_level_2') {
-                            if (profile._info.AddressLine2 != "") {
-                                profile._info.AddressLine2 += "," + mapResultValue.long_name;
-                              //  $scope.$apply();
-                            } else {
-                                profile._info.AddressLine2 = mapResultValue.long_name;
-                                //$scope.$apply();
-                            }
-                        }
-                        if (mapResultValue.types[0] == 'sublocality_level_1') {
-                            if (profile._info.AddressLine2 != "") {
-                                profile._info.AddressLine2 += "," + mapResultValue.long_name;
-                                //$scope.$apply();
-                            } else {
-                                profile._info.AddressLine2 = mapResultValue.long_name;
-                               // $scope.$apply();
-                            }
-                        }
-                    } */
+
                     if (mapResultValue.types[0] == 'locality') {
                         if (profile._info.CityTitle != "") {
                             profile._info.CityTitle += "," + mapResultValue.long_name;
@@ -1305,7 +1234,6 @@
             isStateFilter = (isStateFilter == "") ? false : true;
              $http({ method: 'get', url: GURL + 'ewmGetState?LangID=1&CountryID=' + CountryID }).success(function (data) {
                 if ($rootScope._userInfo.Token == false) {
-                    console.log("SAi");
                     var _obj = { StateID: 0, StateName: '--State--' };
                     data.splice(0, 0, _obj);
                     profile._info.StateID = _obj.StateID;
@@ -1381,11 +1309,7 @@
                     notificationMessage += notificationMessage != "" ? ", Address1 Required " : "Address1 Required";
                     errorList.push(' Address1 Required');
                 }
-                if(!profile._info.AddressLine2)
-                {
-                    notificationMessage += notificationMessage != "" ? ", AddressLine2 Required " : "AddressLine2 Required";
-                    errorList.push(' AddressLine2 Required');
-                }
+
                 if(!profile._info.CountryID)
                 {
                     notificationMessage += notificationMessage != "" ? ", Country Required " : "Country Required";
@@ -1475,20 +1399,17 @@
                                         window.location.href = "#/home";
                                     }
                                     document.getElementById("EZEID").className = "form-control emptyBox";
-                                    document.getElementById("EZEID1").className = "form-control emptyBox";
                                     document.getElementById("password").className = "form-control emptyBox";
                                     document.getElementById("re-password").className = "form-control emptyBox";
                                     document.getElementById("FName").className = "form-control emptyBox";
                                     document.getElementById("LName").className = "form-control emptyBox";
                                     document.getElementById("streeName").className = "form-control emptyBox";
-                                    document.getElementById("block").className = "form-control emptyBox";
                                     document.getElementById("city").className = "form-control emptyBox";
                                     document.getElementById("postalCode").className = "form-control emptyBox";
                                     document.getElementById("mobile_phone").className = "form-control emptyBox";
 
                                     getISDCode(profile._info.CountryID);
-                                    window.location.href = "#/home";
-                                    Notification.success({ message: "Saved... ", delay: MsgDelay });
+                                    window.location.href = "#/congratulations";
                    }
                     else {
                                     if (UserForm.$valid) {
@@ -1521,16 +1442,10 @@
                     /* profile._info.Icon = "";
                      profile._info.IconFileName = "";*/
                 } else {
-                  //  profile._info.Icon = $rootScope.smallImage;
                     profile._info.IconFileName = image[0].name;
                 }
+          });
 
-                var enc=Base64.encode(dataURL);
-                var dec=Base64.decode(enc);
-               // window.open(dec,'_blank');
-        });
-
-         Notification.success({ message: "Saved...", delay: MsgDelay });
          };
 
         var fileToDataURL = function (file) {
@@ -1566,9 +1481,8 @@
             return Math.round(bytes / Math.pow(1024, i), 2) + ' ' + sizes[i];
         };
 
-          profile.parkingStatus = [{ id: 0, label: "Parking Status" }, { id: 1, label: "Parking Available" }, { id: 2, label: "Public Parking" }, { id: 3, label: "Valet Parking" }, { id: 4, label: "No parking" }];
-
-          profile.gender = [{ id: 0, label: "Male" }, { id: 1, label: "Female" }, { id: 2, label: "UnSpecified" }];
+        profile.parkingStatus = [{ id: 0, label: "Parking Status" },{ id: 1, label: "Public Parking" }, { id: 2, label: "Valet Parking" }, { id: 3, label: "No parking" }];
+        profile.gender = [{ id: 0, label: "Male" }, { id: 1, label: "Female" }, { id: 2, label: "Unspecified" }];
     });
 
 
@@ -1693,8 +1607,7 @@
 
         //open Add Note Form
         this.openAddNoteForm = function (_item){
-            //alert(_item.Notes);
-            msgSen.item =_item;
+           msgSen.item =_item;
             msgSen.Message =_item.Message;
             msgSen.NoteMessage =_item.Notes;
             $('#Notes_popup').slideDown();
@@ -1847,7 +1760,6 @@
             _pageValue = _pageValue + 1;
             LoadHistory(_pageValue);
         };
-
     });
 
 })();
