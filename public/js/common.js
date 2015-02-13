@@ -19,11 +19,6 @@ $(document).ready(function (e) {
     })
 });
 
-/*function isNumberKey(evt){
-    var charCode = (evt.which) ? evt.which : evt.keyCode
-    return !(charCode > 31 && (charCode < 48 || charCode > 57));
-}*/
-
 $(document).ready(function (e) {
 
     $('.Advanced-show').click(function () {
@@ -53,10 +48,6 @@ $(document).ready(function (e) {
     $('.closeNewLocation').click(function () {
         $('#AddNewLocation').slideUp();
     })
-
-    //$('.signin_cancel').click(function () {
-    //    $('#SignIn_popup').slideUp();
-    //})
 
     $('#addPhotoOtherLoc').click(function () {
         $('.addPhoto_Colum').slideDown();
@@ -110,21 +101,10 @@ $(document).ready(function (e) {
         $('#Maping_popup').slideUp();
     })
 
-
     $('.inbox-icons a').click(function () {
         $('.inbox-icons a').removeClass("active");
         $(this).addClass("active");
     });
-
-  /*  //To input numbers only
-    function isNumberKey(evt)
-    {
-        var charCode = (evt.which) ? evt.which : event.keyCode
-        if (charCode > 31 && (charCode < 48 || charCode > 57))
-            return false;
-        return true;
-    }*/
-
 });
 
 

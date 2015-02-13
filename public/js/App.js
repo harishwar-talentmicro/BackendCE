@@ -1,6 +1,6 @@
 (function () {
     var ezeid = angular.module('ezeidApp',
-        ['ngHeader','ngRoute', 'ngFooter', 'ui-notification', 'kendo.directives','imageupload']);
+        ['ngHeader','ngRoute', 'ngFooter', 'ui-notification','imageupload']);
 
     ezeid.config(['$routeProvider',function($routeProvider){
         $routeProvider.when('/index',{templateUrl: 'html/index.html'})
@@ -9,13 +9,13 @@
             .when('/acchist',{templateUrl: 'html/accesshistory.html'})
             .when('/editprofile',{templateUrl: 'html/signupwiz.html'})
             .when('/addloc',{templateUrl: 'html/addlocations.html'})
-            .when('/addnewloc',{templateUrl: 'html/addnewlocations.html'})
             .when('/attachcv',{templateUrl: 'html/attachcv.html'})
             .when('/busslist',{templateUrl: 'html/businesslist.html'})
             .when('/documents',{templateUrl: 'html/documents.html'})
             .when('/terms',{templateUrl: 'html/terms.html'})
             .when('/help',{templateUrl: 'html/help.html'})
             .when('/legal',{templateUrl: 'html/legal.html'})
+            .when('/congratulations',{templateUrl: 'html/congratulations.html'})
             .otherwise({ templateUrl: 'html/home.html' });
     }]);
 
@@ -515,6 +515,7 @@
                     
                     if(tabName == 'ad')
                     {
+
                          $scope.infoClass = "";
                         $scope.mapClass = "";
                         $scope.adClass = "level-1";
@@ -1370,11 +1371,7 @@
                     notificationMessage += notificationMessage != "" ? ", Address1 Required " : "Address1 Required";
                     errorList.push(' Address1 Required');
                 }
-                if(!profile._info.AddressLine2)
-                {
-                    notificationMessage += notificationMessage != "" ? ", AddressLine2 Required " : "AddressLine2 Required";
-                    errorList.push(' AddressLine2 Required');
-                }
+
                 if(!profile._info.CountryID)
                 {
                     notificationMessage += notificationMessage != "" ? ", Country Required " : "Country Required";
@@ -1464,20 +1461,17 @@
                                         window.location.href = "#/home";
                                     }
                                     document.getElementById("EZEID").className = "form-control emptyBox";
-                                    document.getElementById("EZEID1").className = "form-control emptyBox";
                                     document.getElementById("password").className = "form-control emptyBox";
                                     document.getElementById("re-password").className = "form-control emptyBox";
                                     document.getElementById("FName").className = "form-control emptyBox";
                                     document.getElementById("LName").className = "form-control emptyBox";
                                     document.getElementById("streeName").className = "form-control emptyBox";
-                                    document.getElementById("block").className = "form-control emptyBox";
                                     document.getElementById("city").className = "form-control emptyBox";
                                     document.getElementById("postalCode").className = "form-control emptyBox";
                                     document.getElementById("mobile_phone").className = "form-control emptyBox";
 
                                     getISDCode(profile._info.CountryID);
-                                    window.location.href = "#/home";
-                                    Notification.success({ message: "Saved... ", delay: MsgDelay });
+                                    window.location.href = "#/congratulations";
                    }
                     else {
                                     if (UserForm.$valid) {
@@ -1514,12 +1508,12 @@
                     profile._info.IconFileName = image[0].name;
                 }
 
-                var enc=Base64.encode(dataURL);
-                var dec=Base64.decode(enc);
+              //  var enc=Base64.encode(dataURL);
+              //  var dec=Base64.decode(enc);
                // window.open(dec,'_blank');
         });
 
-         Notification.success({ message: "Saved...", delay: MsgDelay });
+        // Notification.success({ message: "Saved...", delay: MsgDelay });
          };
 
         var fileToDataURL = function (file) {
@@ -1555,9 +1549,8 @@
             return Math.round(bytes / Math.pow(1024, i), 2) + ' ' + sizes[i];
         };
 
-          profile.parkingStatus = [{ id: 0, label: "Parking Status" }, { id: 1, label: "Parking Available" }, { id: 2, label: "Public Parking" }, { id: 3, label: "Valet Parking" }, { id: 4, label: "No parking" }];
-
-          profile.gender = [{ id: 0, label: "Male" }, { id: 1, label: "Female" }, { id: 2, label: "UnSpecified" }];
+        profile.parkingStatus = [{ id: 0, label: "Parking Status" },{ id: 1, label: "Public Parking" }, { id: 2, label: "Valet Parking" }, { id: 3, label: "No parking" }];
+        profile.gender = [{ id: 0, label: "Male" }, { id: 1, label: "Female" }, { id: 2, label: "Unspecified" }];
     });
 
 
