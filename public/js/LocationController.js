@@ -115,7 +115,6 @@ angular.module('ezeidApp').controller('LocationsController', function ($rootScop
         }
         catch(ex)
         {
-            console.log('Map load exception');
         }
 
     };
@@ -152,8 +151,7 @@ angular.module('ezeidApp').controller('LocationsController', function ($rootScop
             SLocCtrl._locInfo.ReservationButton = SLocCtrl._locInfo.ReservationButton == true ? 1 : 0;
             SLocCtrl._locInfo.SupportButton = SLocCtrl._locInfo.SupportButton == true ? 1 : 0;
             SLocCtrl._locInfo.CVButton = SLocCtrl._locInfo.CVButton == true ? 1 : 0;
-            console.log(SLocCtrl._locInfo);
-                $http({
+               $http({
                 method: "POST",
                 url: GURL + 'ewmAddLocation',
                 data: JSON.stringify(SLocCtrl._locInfo),

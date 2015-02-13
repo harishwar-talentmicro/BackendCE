@@ -102,19 +102,6 @@
 
     // Search Controller
     ezeid.controller('SearchController', function ($http, $rootScope, $scope, $compile, $timeout, Notification, $filter, $location, $window, $q) {
-
-//
-//        function reSizeHomeMap() {
-//            google.maps.event.trigger(map, "resize");
-//            
-//            map.setCenter(new google.maps.LatLng($rootScope.CLoc.CLat, $rootScope.CLoc.CLong));
-//         }
-//
-//        $scope.selectedTab = "";
-//        if ($location.search()['ID'] != undefined) {
-//         }
-
-        
         var map;
         var marker;
         var markers = [];
@@ -237,7 +224,7 @@
             });
 
             google.maps.event.addListenerOnce(map, 'idle', function () {
-                console.log('I am idle');
+
                 $scope.isMapLoaded = true;
                 $timeout(function(){
                     $scope.isMapReady = true;
@@ -475,8 +462,7 @@
                         Notification.error({ message: 'Invalid key or not found…', delay: MsgDelay });
                         try{
                                 PlaceMarker(null);
-                                console.log('Markers placement done 1');
-                            }
+                           }
                             
                             catch(ex){
                                 if(!map){
@@ -684,8 +670,7 @@
             if ($rootScope._userInfo.IsAuthenticate == true) {
                  var dateTime = $filter('date')(new Date(SearchSec.ReservationDateTime), 'MM/dd/yyyy HH:mm:ss');
                 //var dateTime = $filter('date')(SearchSec.ReservationDateTime, 'MM/dd/yyyy HH:mm:ss');  /*dd-MM-yyyy HH:mm a*/
-                    console.log(dateTime);
-                $http({ method: 'post', url: GURL + 'ewtSaveMessage', data: { TokenNo: $rootScope._userInfo.Token, ToMasterID: SearchSec.mInfo.TID, MessageType: messageType, Message: SearchSec.ReservationMessage, TaskDateTime: dateTime, LocID :SearchSec.LocID } }).success(function (data) {
+               $http({ method: 'post', url: GURL + 'ewtSaveMessage', data: { TokenNo: $rootScope._userInfo.Token, ToMasterID: SearchSec.mInfo.TID, MessageType: messageType, Message: SearchSec.ReservationMessage, TaskDateTime: dateTime, LocID :SearchSec.LocID } }).success(function (data) {
                     if (data.IsSuccessfull) {
                         $('#Reservation_popup').slideUp();
                         SearchSec.ReservationMessage = "";
@@ -822,13 +807,11 @@
         // Would write the value of the QueryString-variable called name to the console  
         var Qstr = getQueryStringValue("ID");
 
-      //  console.log("QUERY STRING");
-        if (Qstr != "") {
+       if (Qstr != "") {
             SearchSec.Criteria.Keywords = Qstr;
             SearchSec.IsSearchPending = true;
             SearchSec.Criteria.SearchType = "1";
-//          SearchSec.getSearch();
-        }
+      }
     });
 
     ezeid.controller('ProfileController', function ($rootScope, $scope, $http, $q, $timeout, Notification ,$filter) {
@@ -1083,66 +1066,11 @@
             });
         }
         function getAddressForLocation(results) {
-
-           /* if ($rootScope._userInfo.IsAuthenticate == false)
-            {*/
                 profile._info.CityTitle = "";
                 profile._info.PostalCode = "";
 
                 angular.forEach(results, function (mapResultValue, index) {
-                  /*  if ($rootScope._userInfo.IsAuthenticate == false)
-                    {
-                       // console.log(mapResultValue);
-                        if (mapResultValue.types[0] == 'street_number') {
-                            profile._info.AddressLine1 = mapResultValue.long_name;
-                           // $scope.$apply();
-                        }
-                        if (mapResultValue.types[0] == 'route') {
-                            if (profile._info.AddressLine1 != "") {
-                                profile._info.AddressLine1 += "," + mapResultValue.long_name;
-                               // $scope.$apply();
-                            } else {
-                                profile._info.AddressLine1 = mapResultValue.long_name;
-                               // $scope.$apply();
-                            }
-                        }
-                        if (mapResultValue.types[0] == 'neighborhood') {
-                            if (profile._info.AddressLine1 != "") {
-                                profile._info.AddressLine1 += "," + mapResultValue.long_name;
-                               // $scope.$apply();
-                            } else {
-                                profile._info.AddressLine1 = mapResultValue.long_name;
-                               // $scope.$apply();
-                            }
-                        }
-                        if (mapResultValue.types[0] == 'sublocality_level_3') {
-                            if (profile._info.AddressLine2 != "") {
-                                profile._info.AddressLine2 += "," + mapResultValue.long_name;
-                              //  $scope.$apply();
-                            } else {
-                                profile._info.AddressLine2 = mapResultValue.long_name;
-                               // $scope.$apply();
-                            }
-                        }
-                        if (mapResultValue.types[0] == 'sublocality_level_2') {
-                            if (profile._info.AddressLine2 != "") {
-                                profile._info.AddressLine2 += "," + mapResultValue.long_name;
-                              //  $scope.$apply();
-                            } else {
-                                profile._info.AddressLine2 = mapResultValue.long_name;
-                                //$scope.$apply();
-                            }
-                        }
-                        if (mapResultValue.types[0] == 'sublocality_level_1') {
-                            if (profile._info.AddressLine2 != "") {
-                                profile._info.AddressLine2 += "," + mapResultValue.long_name;
-                                //$scope.$apply();
-                            } else {
-                                profile._info.AddressLine2 = mapResultValue.long_name;
-                               // $scope.$apply();
-                            }
-                        }
-                    } */
+
                     if (mapResultValue.types[0] == 'locality') {
                         if (profile._info.CityTitle != "") {
                             profile._info.CityTitle += "," + mapResultValue.long_name;
@@ -1306,7 +1234,6 @@
             isStateFilter = (isStateFilter == "") ? false : true;
              $http({ method: 'get', url: GURL + 'ewmGetState?LangID=1&CountryID=' + CountryID }).success(function (data) {
                 if ($rootScope._userInfo.Token == false) {
-                    console.log("SAi");
                     var _obj = { StateID: 0, StateName: '--State--' };
                     data.splice(0, 0, _obj);
                     profile._info.StateID = _obj.StateID;
@@ -1515,16 +1442,10 @@
                     /* profile._info.Icon = "";
                      profile._info.IconFileName = "";*/
                 } else {
-                  //  profile._info.Icon = $rootScope.smallImage;
                     profile._info.IconFileName = image[0].name;
                 }
+          });
 
-              //  var enc=Base64.encode(dataURL);
-              //  var dec=Base64.decode(enc);
-               // window.open(dec,'_blank');
-        });
-
-        // Notification.success({ message: "Saved...", delay: MsgDelay });
          };
 
         var fileToDataURL = function (file) {
@@ -1686,8 +1607,7 @@
 
         //open Add Note Form
         this.openAddNoteForm = function (_item){
-            //alert(_item.Notes);
-            msgSen.item =_item;
+           msgSen.item =_item;
             msgSen.Message =_item.Message;
             msgSen.NoteMessage =_item.Notes;
             $('#Notes_popup').slideDown();
@@ -1840,7 +1760,6 @@
             _pageValue = _pageValue + 1;
             LoadHistory(_pageValue);
         };
-
     });
 
 })();

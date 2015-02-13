@@ -55,15 +55,15 @@
                 <div class="row quick_butt">
                     <div class="col-md-12 col-md-offset">
                         <input type="submit" class="btn btn-primary wdButt1 pull-left marLL10px" value="Sign In"/>
-                        <input type="button" ng-click="SignInCtrl.reset(SignInForm)" class="btn btn-primary wdButt1 signin_cancel marL10px" value="Cancel"/>
+                        <input type="button" ng-click="SignInCtrl.reset(SignInForm)" class="btn btn-primary wdButt1 signin_cancel marL10px" value="Close"/>
                     </div>
                 </div>
                 <div class="clearfix mob_marT15px"></div>
                 <div class="row">
                     <div class="col-md-12 col-md-offset-3">
                         <!--<a href="#" class="marL110px" id="forgetPasswd" ng-click="SignInCtrl.openQuickSignUpForm()">Quick Sign Up</a>  |-->
-                        <a href="ProfileInfo.html" class="">Full Sign Up</a>  |
-                        <a href="#" class="" id="forgetPasswd" ng-click="SignInCtrl.openForgotPasswordForm()">Forgot Password ?</a>
+                        <a href ng-click="SignInCtrl.openRegistrationForm()" class="">Full Sign Up</a>  |
+                        <a href class="" id="forgetPasswd" ng-click="SignInCtrl.openForgotPasswordForm()">Forgot Password ?</a>
                     </div>
                 </div>
             </div>
@@ -88,7 +88,7 @@
                 <div class="clearfix"></div>
                 <li class="dsp_block padT10px forget_padd">
                     <input type="submit" ng-disabled="!SignInCtrl.EzeId" class="btn btn-primary pull-left wd_forget1" ng-click="SignInCtrl.forgotPassword()" value="Submit"/>
-                    <input type="reset" class="btn btn-primary pull-left signin_cancel wd_forget1 marL10px" ng-click="SignInCtrl.closeForgotPasswordForm()" value="Cancel"/>
+                    <input type="reset" class="btn btn-primary pull-left signin_cancel wd_forget1 marL10px" ng-click="SignInCtrl.closeForgotPasswordForm()" value="Close"/>
                 </li>
                 <div class="clearfix"></div>
                 <div ng-model="SignInCtrl.ForgotMessage" class="msgRed" ng-show="SignInCtrl.ForgotMessage.length">Error please try again</div>

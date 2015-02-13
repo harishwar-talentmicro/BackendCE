@@ -19,11 +19,7 @@ HeaderApp.directive('headerSection', function (Notification) {
                         method: 'post', url: GURL + 'ewLogin', data: Logdata
                     }).success(function (data,status,x) {
                         $rootScope._userInfo = data;
-                        console.log(data);
-                        console.log(status);
-                        console.log(x);
-                        //
-                        
+
                         if (typeof (Storage) !== "undefined") {
                             var encrypted = CryptoJS.AES.encrypt(JSON.stringify(data), "EZEID");
                             localStorage.setItem("_token", encrypted);
@@ -70,7 +66,9 @@ HeaderApp.directive('headerSection', function (Notification) {
                     method: 'post', url: GURL + 'ewtForgetPassword', data: {EZEID:SignCtrl.EzeId}
                 }).success(function (data) {
                     if(data.IsChanged){
+                        $('#SignIn_popup').slideUp();
                         $('#forgot-password').slideUp();
+
                        Notification.success({ message: "Password sent to your registered email", delay: MsgDelay });
                         SignCtrl.EzeId="";
                         SignCtrl.ForgotMessage = "";
@@ -82,8 +80,17 @@ HeaderApp.directive('headerSection', function (Notification) {
             };
             this.closeForgotPasswordForm=function(){
                 SignCtrl.ForgotMessage = "";
+                $('#SignIn_popup').slideUp();
                 $('#forgot-password').slideUp();
             };
+
+            // open registration page
+            //forgot password
+            this.openRegistrationForm=function(){
+                $('#SignIn_popup').slideUp();
+                window.location.href = "#/editprofile";
+            };
+
             //Change password
             this.changePassword = function () {
                 if( !SignCtrl.OldPassword=="" && !SignCtrl.NewPassword=="" && !SignCtrl.ReEnterPassword=="")

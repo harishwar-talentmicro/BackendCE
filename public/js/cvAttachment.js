@@ -1,6 +1,3 @@
-/**
- * Created by Abhishek on 30-01-2015.
- */
 angular.module('ezeidApp').controller('CVAttachController', function($http, $rootScope, $scope, $timeout, Notification, $filter,$q, $window){
 
     var CVAttachCtrl = this;
@@ -57,9 +54,6 @@ angular.module('ezeidApp').controller('CVAttachController', function($http, $roo
     });
 
     this.getRoleForFunction=function(_functionId){
-        console.log(_functionId);
-        // CVAttachCtrl.RoleTypes = "";
-        /*$http({ method: 'get', url: GURL + 'ewmGetRoleType?LangID=1&FunctionID='+CVAttachCtrl._CVInfo.FunctionID}).success(function (data) {*/
         $http({ method: 'get', url: GURL + 'ewmGetRoles?LangID=1&FunctionID='+_functionId}).success(function (data) {
 
             CVAttachCtrl.RoleTypes = data;
@@ -94,17 +88,13 @@ angular.module('ezeidApp').controller('CVAttachController', function($http, $roo
             //formData.append('RefType', $scope.OptionSelected);
             formData.append('TokenNo', $rootScope._userInfo.Token);
             formData.append('RefType', 7);
-            console.log(formData);
-
 
             $http({ method: 'POST', url: '/ewTUploadDoc/', data: formData,
                 headers: { 'Content-Type': undefined }, transformRequest: angular.identity })
                 .success(function (data, status, headers, config) {
-                    console.log("uploaded");
-                    Notification.success({ message: "Saved... ", delay: MsgDelay });
+                   Notification.success({ message: "Saved... ", delay: MsgDelay });
                 }).
                 error(function(data, status, headers, config) {
-                    console.log("upload ERROR");
                 });
         }
     };
@@ -119,10 +109,6 @@ angular.module('ezeidApp').controller('CVAttachController', function($http, $roo
         return deferred.promise;
     };
 
-    /*   function onDownload(dataToDownload) {
-     document.location = 'data:Application/octet-stream,' +
-     encodeURIComponent(dataToDownload);
-     }*/
 
     this.saveCVDocInfo=function(){
         CVAttachCtrl._CVInfo.TokenNo=$rootScope._userInfo.Token;
@@ -143,7 +129,6 @@ angular.module('ezeidApp').controller('CVAttachController', function($http, $roo
     };
 
     this.download = function(){
-       // alert(CVAttachCtrl._CVInfo.CVDoc);
         window.location.assign(CVAttachCtrl._CVInfo.CVDoc);
         $window.open(CVAttachCtrl._CVInfo.CVDoc);
     }
@@ -153,8 +138,7 @@ angular.module('ezeidApp').controller('CVAttachController', function($http, $roo
             method: 'get',
             url: GURL + 'ewtGetCVInfo?TokenNo=' + $rootScope._userInfo.Token
         }).success(function (data) {
-                console.log(data);
-                if(data != 'null')
+               if(data != 'null')
                 {
                     CVAttachCtrl._CVInfo=data[0];
                     CVAttachCtrl.getRoleForFunction(data[0].FunctionID);
