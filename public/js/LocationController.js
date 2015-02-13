@@ -4,6 +4,8 @@ angular.module('ezeidApp').controller('LocationsController', function ($rootScop
     var SLocCtrl = this;
     var map;
     var mapOptions;
+    
+    $scope.isMapLoaded = false;
 //    var myinfowindow = new google.maps.InfoWindow({
 //        content: ''
 //    });
@@ -20,7 +22,7 @@ angular.module('ezeidApp').controller('LocationsController', function ($rootScop
     }
     else {
         if (typeof (Storage) !== "undefined") {
-            var encrypted = sessionStorage.getItem("_token");
+            var encrypted = localStorage.getItem("_token");
             if (encrypted) {
                 var decrypted = CryptoJS.AES.decrypt(encrypted, "EZEID");
                 var Jsonstring = decrypted.toString(CryptoJS.enc.Utf8);
@@ -83,9 +85,9 @@ angular.module('ezeidApp').controller('LocationsController', function ($rootScop
         SLocCtrl._locInfo.ReservationButton = 0;
         SLocCtrl._locInfo.SupportButton = 0;
         SLocCtrl._locInfo.CVButton = 0;
-
+        if(!map){
             initialize1();
-
+        }
         //To set by default selected
          SLocCtrl._locInfo.ParkingStatus = 0;
          SLocCtrl._locInfo.OpenStatus = 1;
@@ -107,7 +109,9 @@ angular.module('ezeidApp').controller('LocationsController', function ($rootScop
         SLocCtrl._locInfo.SupportButton = SLocCtrl._locInfo.SupportButton == 1 ? true : false;
         SLocCtrl._locInfo.CVButton = SLocCtrl._locInfo.CVButton == 1 ? true : false;
         try{
-            initialize1();
+            if(!map){
+                initialize1();
+            }
         }
         catch(ex)
         {
@@ -148,7 +152,7 @@ angular.module('ezeidApp').controller('LocationsController', function ($rootScop
             SLocCtrl._locInfo.ReservationButton = SLocCtrl._locInfo.ReservationButton == true ? 1 : 0;
             SLocCtrl._locInfo.SupportButton = SLocCtrl._locInfo.SupportButton == true ? 1 : 0;
             SLocCtrl._locInfo.CVButton = SLocCtrl._locInfo.CVButton == true ? 1 : 0;
-
+            console.log(SLocCtrl._locInfo);
                 $http({
                 method: "POST",
                 url: GURL + 'ewmAddLocation',
@@ -246,19 +250,7 @@ angular.module('ezeidApp').controller('LocationsController', function ($rootScop
             Zoom: 16
         });
 
-        var ClocBtn = (document.getElementById('mapClocl'));
-        map.controls[google.maps.ControlPosition.TOP_RIGHT].push(ClocBtn);
-
-        if (JSON.stringify(SLocCtrl._locInfo) != '{}') {
-            initialLocation = new google.maps.LatLng(SLocCtrl._locInfo.Latitude, SLocCtrl._locInfo.Longitude);
-            PlaceCurrentLocationMarker(initialLocation);
-            map.setCenter(currentLoc);
-        } else {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(FindCurrentLocation);
-            }
-        }
-
+        
         //directionsDisplay.setMap(map);
         // Try W3C Geolocation (Preferred)
         if (navigator.geolocation) {
@@ -279,52 +271,85 @@ angular.module('ezeidApp').controller('LocationsController', function ($rootScop
             //PlaceMarker(initialLocation);
         }
 
-        //// Create the search box and link it to the UI element.
-        var input = (document.getElementById('txtSearch'));
-
-        map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
-
-        var searchBox = new google.maps.places.SearchBox((input));
-
-        // Listen for the event fired when the user selects an item from the
-        // pick list. Retrieve the matching places for that item.
-        google.maps.event.addListener(searchBox, 'places_changed', function () {
-            var places = searchBox.getPlaces();
-
-            if (places.length == 0) {
-                return;
-            }
-            for (var i = 0, marker; marker = markers[i]; i++) {
-                marker.setMap(null);
-            }
-
-            // For each place, get the icon, place name, and location.
-            markers = [];
-            var bounds = new google.maps.LatLngBounds();
-            if (places.length > 0) {
-                var place = places[0];
-                $rootScope.CLoc.CLat = place.geometry.location.k;
-                $rootScope.CLoc.CLong = place.geometry.location.D;
-                var loc = new google.maps.LatLng($rootScope.CLoc.CLat, $rootScope.CLoc.CLong);
-                PlaceCurrentLocationMarker(loc);
-            }
-        });
-
-        // Bias the SearchBox results towards places that are within the bounds of the
-        // current map's viewport.
-        google.maps.event.addListener(map, 'bounds_changed', function () {
-            var bounds = map.getBounds();
-            searchBox.setBounds(bounds);
-        });
-
+        
+        
+        
         google.maps.event.addListenerOnce(map, 'idle', function () {
 
+            $scope.isMapLoaded = true;
+            
+            /************************************ Added *************************************/
+            
+                            //// Create the search box and link it to the UI element.
+            var input = (document.getElementById('txtSearch1'));
+
+            console.log(input);
+            map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
+
+            var searchBox = new google.maps.places.SearchBox((input));
+
+            /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
+            
+            var ClocBtn = (document.getElementById('mapClocl'));
+            map.controls[google.maps.ControlPosition.TOP_RIGHT].push(ClocBtn);
+
+            if (JSON.stringify(SLocCtrl._locInfo) != '{}') {
+                initialLocation = new google.maps.LatLng(SLocCtrl._locInfo.Latitude, SLocCtrl._locInfo.Longitude);
+                PlaceCurrentLocationMarker(initialLocation);
+                map.setCenter(currentLoc);
+            } else {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(FindCurrentLocation);
+                }
+            }
+            
+            
+            /*____________________________________________________________________________*/
+            // Listen for the event fired when the user selects an item from the
+            // pick list. Retrieve the matching places for that item.
+            google.maps.event.addListener(searchBox, 'places_changed', function () {
+                var places = searchBox.getPlaces();
+
+                if (places.length == 0) {
+                    return;
+                }
+                for (var i = 0, marker; marker = markers[i]; i++) {
+                    marker.setMap(null);
+                }
+
+                // For each place, get the icon, place name, and location.
+                markers = [];
+                var bounds = new google.maps.LatLngBounds();
+                if (places.length > 0) {
+                    var place = places[0];
+                    $rootScope.CLoc.CLat = place.geometry.location.k;
+                    $rootScope.CLoc.CLong = place.geometry.location.D;
+                    var loc = new google.maps.LatLng($rootScope.CLoc.CLat, $rootScope.CLoc.CLong);
+                    PlaceCurrentLocationMarker(loc);
+                }
+            });
+
+            /*____________________________________________________________________________*/
+            
+            /*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+            // Bias the SearchBox results towards places that are within the bounds of the
+            // current map's viewport.
+            google.maps.event.addListener(map, 'bounds_changed', function () {
+                var bounds = map.getBounds();
+                searchBox.setBounds(bounds);
+            });
+
+            /*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+            
+            /************************************ Added ends ********************************/
             //   console.log("IDLE ONCE");
             if(SLocCtrl.IsSearchPending){
                 SLocCtrl.getSearch();
             }
         });
 
+        
+        
         $(window).resize(function() {
             google.maps.event.trigger(map, "resize");
         });
@@ -475,7 +500,9 @@ angular.module('ezeidApp').controller('LocationsController', function ($rootScop
 
     this.isMapInitialized = function () {
          if (SLocCtrl.mapInit == false) {
-            initialize1();
+             if(!map){
+                initialize1();
+            }
             SLocCtrl.mapInit = true;
         }
      };

@@ -96,7 +96,7 @@
                                                 <div class="panel panel-default">
                                                     <div style="display:block;">
                                                         <img id="mapClocl" style="padding-top:8px;cursor:pointer;" ng-click="SLocCtrl.getMyLocation()" src="images/myloc.png" />
-                                                        <input id="txtSearch" class="form-control pull-left marL5px" type="text" placeholder="Search Location" autocomplete="off" style="z-index: 1; top: 0px; margin-top: 3px; width: 400px; position: absolute; left: 36px;" >
+                                                        <input id="txtSearch1" class="form-control pull-left marL5px" type="text" placeholder="Search Location" autocomplete="off" style="z-index: 1; top: 0px; margin-top: 3px; width: 400px; position: absolute; left: 36px;" >
                                                     </div>
                                                     <div id="map-canvasl" style="width: 100%; height: 140px; position: relative; overflow: hidden; transform: translateZ(0px); background-color: rgb(229, 227, 223);">
                                                     </div>
@@ -159,8 +159,8 @@
                                                     </div><br/>
 
                                                  <!-- <div class="mar_editTop" ng-show="_userInfo.Type==2 && _userInfo.EZEIDVerifiedID == 2">-->
-                                                    <div ng-show="_userInfo.Type==2">
-                                                         <div class="row ">
+                                                    <div ng-show="_userInfo.Type==2 && _userInfo.search.mInfo.EZEIDVerifiedID == 2">
+                                                         <div class="row " style="margin-left:0px;margin-right:0px;">
                                                             <span><label><strong>&nbsp;Settings</strong> </label></span><br/>
                                                             <select class="form-control emptyBox pull-left " style="width:45%;" name="selectParkingStatus" ng-model="SLocCtrl._locInfo.ParkingStatus"
                                                                     ng-options="status.id as status.label for status in SLocCtrl.parkingStatus" required>
