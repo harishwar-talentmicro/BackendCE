@@ -142,7 +142,7 @@ function FnMessageMail(MessageContent, CallBack) {
             var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
             var fs = require('fs');
             var MessageType = null;
-            console.log(MessageContent.MessageType);
+            //  console.log(MessageContent.MessageType);
 
             if (MessageContent.MessageType == 0) {
                 MessageType = 1;
@@ -153,7 +153,7 @@ function FnMessageMail(MessageContent, CallBack) {
             }
             var query = db.escape(MessageContent.Token) + ',' + db.escape(MessageContent.LocID) + ',' + db.escape(MessageType);
 
-            console.log(query);//console.log('FnSaveMessage: Inserting data: ' + query);
+            //  console.log(query);//console.log('FnSaveMessage: Inserting data: ' + query);
             db.query('CALL PgetMailSendingDetails(' + query + ')', function (err, MessageContentResult) {
                 if (!err) {
                     if (MessageContentResult[0] != null) {
@@ -163,13 +163,13 @@ function FnMessageMail(MessageContent, CallBack) {
                                 if (MessageContent.MessageType == 0) {
                                     fs.readFile("Individual.txt", "utf8", function (err, data) {
                                         if (err) throw err;
-                                        console.log(MessageContentResult);
+                                        // console.log(MessageContentResult);
                                         data = data.replace('[IsVerified]', MessageContentResult[0].EZEIDVerifiedID);
                                         data = data.replace("[EZEID]", MessageContentResult[0].EZEID);
                                         data = data.replace("[Message]", MessageContent.Message);
                                         data = data.replace("[https://www.ezeid.com?ID=]", 'https://www.ezeid.com?ID=' + MessageContentResult[0].EZEID);
                                         // console.log('Body:' + data);
-                                        console.log(MessageContentResult[0].ToMailID);
+                                        //  console.log(MessageContentResult[0].ToMailID);
                                         var TomailOptions = {
                                             from: 'noreply@ezeid.com',
                                             to: MessageContentResult[0].ToMailID,
@@ -230,7 +230,7 @@ function FnMessageMail(MessageContent, CallBack) {
                                         data = data.replace("[https://www.ezeid.com?ID=]", 'https://www.ezeid.com?ID=' + MessageContentResult[0].EZEID);
 
                                         // console.log('Body:' + data);
-                                        console.log(MessageContentResult[0].ToMailID);
+                                        //  console.log(MessageContentResult[0].ToMailID);
                                         var mailOptions = {
                                             from: 'noreply@ezeid.com',
                                             to: MessageContentResult[0].ToMailID,
@@ -269,7 +269,7 @@ function FnMessageMail(MessageContent, CallBack) {
                                         data = data.replace("[ActionDate]", MessageContent.TaskDateTime);
                                         data = data.replace("[https://www.ezeid.com?ID=]", 'https://www.ezeid.com?ID=' + MessageContentResult[0].EZEID);
                                         // console.log('Body:' + data);
-                                        console.log(MessageContentResult[0].ToMailID);
+                                        // console.log(MessageContentResult[0].ToMailID);
                                         var mailOptions = {
                                             from: 'noreply@ezeid.com',
                                             to: MessageContentResult[0].ToMailID,
@@ -298,7 +298,7 @@ function FnMessageMail(MessageContent, CallBack) {
                                         data = data.replace("[Message]", MessageContent.Message);
                                         data = data.replace("[https://www.ezeid.com?ID=]", 'https://www.ezeid.com?ID=' + MessageContentResult[0].EZEID);
                                         // console.log('Body:' + data);
-                                        console.log(MessageContentResult[0].ToMailID);
+                                        //  console.log(MessageContentResult[0].ToMailID);
                                         var mailOptions = {
                                             from: 'noreply@ezeid.com',
                                             to: MessageContentResult[0].ToMailID,
@@ -322,7 +322,7 @@ function FnMessageMail(MessageContent, CallBack) {
                                 } else if (MessageContent.MessageType == 5) {
                                     fs.readFile("CV.txt", "utf8", function (err, data) {
                                         if (err) throw err;
-                                        console.log(MessageContentResult);
+                                        //  console.log(MessageContentResult);
                                         data = data.replace("[IsVerified]", MessageContentResult[0].EZEIDVerifiedID);
                                         data = data.replace("[EZEID]", MessageContentResult[0].EZEID);
                                         data = data.replace("[Functions]", MessageContentResult[0].Function);
@@ -335,7 +335,7 @@ function FnMessageMail(MessageContent, CallBack) {
                                         else {
                                             data = data.replace("[PIN]", MessageContentResult[0].DocPin);
                                         }
-                                        console.log(MessageContentResult[0].ToMailID);
+                                        // console.log(MessageContentResult[0].ToMailID);
                                         // console.log('Body:' + data);
                                         var mailOptions = {
                                             from: 'noreply@ezeid.com',
@@ -376,7 +376,7 @@ function FnMessageMail(MessageContent, CallBack) {
                                         data = data.replace("[ActionDate]", MessageContent.TaskDateTime);
                                         data = data.replace("[https://www.ezeid.com?ID=]", 'https://www.ezeid.com?ID=' + MessageContentResult[0].EZEID);
                                         // console.log('Body:' + data);
-                                        console.log(MessageContentResult[0].ToMailID);
+                                        // console.log(MessageContentResult[0].ToMailID);
                                         var mailOptions = {
                                             from: 'noreply@ezeid.com',
                                             to: MessageContentResult[0].ToMailID,
@@ -478,7 +478,7 @@ exports.FnToken = function (req, res) {
     try {
         FnValidateToken('70084b50d3c43822fbef', function (err, Result) {
             if (!err) {
-                console.log(Result);
+                // console.log(Result);
                 res.send(Result);
             }
             else {
@@ -517,7 +517,7 @@ exports.FnLogin = function (req, res) {
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
         if (UserName != null && UserName != '' && Password != null && Password != '') {
             var EncryptPWD = FnEncryptPassword(Password);
-            console.log(EncryptPWD);
+            // console.log(EncryptPWD);
             var Query = 'select TID,FirstName,LastName,EZEID,IDTypeID,Token,Icon from tmaster where EZEID=' + db.escape(UserName) + ' and Password=' + db.escape(EncryptPWD);
             db.query(Query, function (err, loginResult) {
                 if (!err) {
@@ -533,7 +533,7 @@ exports.FnLogin = function (req, res) {
 
                                 if (TokenResult.affectedRows > 0) {
                                     //res.setHeader('Cookie','Token='+Encrypt);
-				    res.cookie('Token',Encrypt,{maxAge:900000,httpOnly:true});
+                                    res.cookie('Token', Encrypt, { maxAge: 900000, httpOnly: true });
                                     RtnMessage.Token = Encrypt;
                                     RtnMessage.IsAuthenticate = true;
                                     RtnMessage.FirstName = loginResult[0].FirstName;
@@ -614,7 +614,7 @@ exports.FnLogout = function (req, res) {
                 if (!err) {
                     RtnMessage.IsAuthenticate = false;
                     console.log('FnLogout: tmaster: Logout success');
-		    res.clearCookie('Token');
+                    res.clearCookie('Token');
                     res.send(RtnMessage);
                 }
                 else {
@@ -729,9 +729,9 @@ exports.FnForgetPassword = function (req, res) {
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
         if (EZEID != null) {
             var Password = FnRandomPassword();
-            console.log(Password);
+            // console.log(Password);
             var EncryptPWD = FnEncryptPassword(Password);
-            console.log(EncryptPWD);
+            // console.log(EncryptPWD);
             var Query = 'Update tmaster set Password= ' + db.escape(EncryptPWD) + ' where EZEID=' + db.escape(EZEID);
             // console.log('FnForgotPassword: ' + Query);
             db.query(Query, function (err, ForgetPasswordResult) {
@@ -752,7 +752,7 @@ exports.FnForgetPassword = function (req, res) {
                                         data = data.replace("[Firstname]", UserResult[0].FirstName);
                                         data = data.replace("[Lastname]", UserResult[0].LastName);
                                         data = data.replace("[Password]", Password);
-console.log(UserResult[0].EMailID);
+                                        //console.log(UserResult[0].EMailID);
                                         //console.log('Body:' + data);
                                         var mailOptions = {
                                             from: EZEIDEmail,
@@ -952,7 +952,7 @@ exports.FnGetState = function (req, res) {
 
         if (CountryID.toString() != 'NaN' && LangID.toString() != 'NaN') {
             var Query = 'Select StateID, StateName  from mstate where LangID=' + db.escape(LangID) + ' and CountryID=' + db.escape(CountryID);
-            console.log(Query);
+           // console.log(Query);
             db.query(Query, function (err, StateResult) {
                 if (!err) {
                     if (StateResult.length > 0) {
@@ -960,8 +960,8 @@ exports.FnGetState = function (req, res) {
                         db.query(Query, function (err, CountryResult) {
                             if (!err) {
                                 if (CountryResult.length) {
-                                    console.log(CountryResult);
-                                    console.log(CountryResult[0].ISDCode);
+                                   // console.log(CountryResult);
+                                  //  console.log(CountryResult[0].ISDCode);
                                     res.setHeader('ISDCode', CountryResult[0].ISDCode);
                                     res.send(StateResult);
                                     console.log('FnGetState: mcountry: State sent successfully');
@@ -1628,7 +1628,7 @@ exports.FnRegistration = function (req, res) {
         if (PIN == '') {
             PIN = null;
         }
-        console.log('PIN: ' + PIN);
+      //  console.log('PIN: ' + PIN);
         var RtnMessage = {
             Token: '',
             IsAuthenticate: false,
@@ -1672,13 +1672,13 @@ exports.FnRegistration = function (req, res) {
                    db.escape(LaptopSLNO) + ',' + db.escape(VehicleNumber) + ',' + db.escape(Picture) + ',' + db.escape(PictureFileName) + ',' + db.escape(WebSite) + ',' + db.escape(Operation) + ',' + db.escape(AboutCompany) + ',' + db.escape(StatusID) + ',' + db.escape(Icon) + ',' + db.escape(IconFileName) + ',' +
            db.escape(ParkingStatus) + ',' + db.escape(OpenStatus) + ',' + db.escape(WorkingHours) + ',' + db.escape(SalesEnquiryMailID) + ',' + db.escape(HomeDeliveryMailID) + ',' + db.escape(ReservationMailID) + ',' + db.escape(SupportMailID) + ',' + db.escape(CVMailID) + ',' + db.escape(ISDPhoneNumber) + ',' + db.escape(ISDMobileNumber) + ',' +
            db.escape(SalesEnquiryButton) + ',' + db.escape(HomeDeliveryButton) + ',' + db.escape(ReservationButton) + ',' + db.escape(SupportButton) + ',' + db.escape(CVButton) + ',' + db.escape(Gender) + ',' + db.escape(DOBDate);
-            console.log(InsertQuery);
+          //  console.log(InsertQuery);
             db.query('CALL pSaveEZEIDData(' + InsertQuery + ')', function (err, InsertResult) {
                 if (!err) {
                     // console.log('InsertResult: ' + InsertResult);
                     if (InsertResult != null) {
-                        console.log(InsertResult);
-                        if(InsertResult.affectedRows > 0){
+                      //  console.log(InsertResult);
+                        if (InsertResult.affectedRows > 0) {
                             RtnMessage.FirstName = FirstName;
                             RtnMessage.IsAuthenticate = true;
                             RtnMessage.Token = TokenNo;
@@ -1730,8 +1730,7 @@ exports.FnRegistration = function (req, res) {
                                 res.send(RtnMessage);
                             }
                         }
-                        else
-                        {
+                        else {
                             console.log(RtnMessage);
                             res.send(RtnMessage);
                             console.log('FnRegistration:tmaster: Registration Failed');
@@ -1918,7 +1917,7 @@ exports.FnAddLocation = function (req, res) {
         var StateID = parseInt(req.body.StateID);
         var CountryID = parseInt(req.body.CountryID);
         var PostalCode = req.body.PostalCode;
-        var PIN = parseInt(req.body.PIN);
+        var PIN = req.body.PIN;
         var PhoneNumber = req.body.PhoneNumber;
         var MobileNumber = req.body.MobileNumber;
         var EMailID = req.body.EMailID;
@@ -1951,11 +1950,11 @@ exports.FnAddLocation = function (req, res) {
             OpenStatus = 0;
         }
 
-        if (PIN.toString() == 'NaN') {
-            PIN = 0;
+        if (PIN == '') {
+            PIN = null;
         }
 
-        if (TID.toString() != 'NaN' && Token != null && CityName != null && StateID.toString() != 'NaN' && CountryID.toString() != 'NaN' && LocTitle != null && AddressLine1 != null && Longitude.toString() != 'NaN' && Latitude.toString() != 'NaN' && PIN.toString() != 'NaN') {
+        if (TID.toString() != 'NaN' && Token != null && CityName != null && StateID.toString() != 'NaN' && CountryID.toString() != 'NaN' && LocTitle != null && AddressLine1 != null && Longitude.toString() != 'NaN' && Latitude.toString() != 'NaN') {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
@@ -1965,7 +1964,7 @@ exports.FnAddLocation = function (req, res) {
                                         db.escape(VehicleNumber) + ',' + db.escape(Picture) + ',' + db.escape(PictureFileName) + ',' + db.escape(Website) + ',' + db.escape(ParkingStatus) + ',' + db.escape(OpenStatus) + ',' +
                                         db.escape(WorkingHours) + ',' + db.escape(SalesEnquiryMailID) + ',' + db.escape(HomeDeliveryMailID) + ',' + db.escape(ReservationMailID) + ',' + db.escape(SupportMailID) + ',' + db.escape(CVMailID) + ',' + db.escape(ISDPhoneNumber) + ',' + db.escape(ISDMobileNumber) + ',' +
                                        db.escape(SalesEnquiryButton) + ',' + db.escape(HomeDeliveryButton) + ',' + db.escape(ReservationButton) + ',' + db.escape(SupportButton) + ',' + db.escape(CVButton);
-                        console.log('InsertQuery:' + InsertQuery);
+                      //  console.log('InsertQuery:' + InsertQuery);
                         db.query('CALL pInsertLocationData(' + InsertQuery + ')', function (err, InsertResult) {
                             if (!err) {
                                 if (InsertResult != null) {
@@ -2052,9 +2051,7 @@ exports.FnAddLocation = function (req, res) {
             else if (CountryID.toString() == 'NaN') {
                 console.log('FnAddLocation: CountryID   is empty');
             }
-            else if (PIN.toString() == 'NaN') {
-                console.log('FnAddLocation: PIN   is empty');
-            }
+           
             res.statusCode = 400;
             res.send([]);
         }
@@ -2081,7 +2078,7 @@ exports.FnDeleteLocation = function (req, res) {
                 if (!err) {
                     if (Result != null) {
                         var query = 'DELETE FROM tlocations where TID=' + db.escape(TID);
-                        console.log('FnDeleteLocation: DeleteQuery : ' + query);
+                      //  console.log('FnDeleteLocation: DeleteQuery : ' + query);
                         db.query(query, function (err, DeleteResult) {
                             if (!err) {
                                 console.log('DeleteQuery: ' + DeleteResult);
@@ -2238,8 +2235,8 @@ exports.FnGetAccessHistory = function (req, res) {
                         var ToPage = 25 * Page;
                         var FromPage = ToPage - 24;
 
-                        if (FromPage <= 0) {
-                            FromPage = 1;
+                        if (FromPage <= 1) {
+                            FromPage = 0;
                         }
 
                         db.query('CALL pAccessHistory(' + db.escape(Token) + ',' + db.escape(FromPage) + ',' + db.escape(ToPage) + ')', function (err, AccessHistoryResult) {
@@ -2313,10 +2310,7 @@ exports.FnSaveMessage = function (req, res) {
         var TaskDateTime = req.body.TaskDateTime;
         var Notes = req.body.Notes;
         var LocID = req.body.LocID;
-        if (LocID == null) {
-            LocID = 0;
-        }
-        console.log(LocID);
+
         var RtnMessage = {
             IsSuccessfull: false
         };
@@ -2325,7 +2319,7 @@ exports.FnSaveMessage = function (req, res) {
         if (Token != null) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
-                    if (Result != null && ToMasterID.toString() != 'NaN') {
+                    if (Result != null && ToMasterID.toString() != 'NaN' && LocID != null) {
                         var TaskDate = null;
                         if (TaskDateTime != null) {
                             // datechange = new Date(new Date(TaskDateTime).toUTCString());
@@ -2334,10 +2328,10 @@ exports.FnSaveMessage = function (req, res) {
                         }
                         // console.log(datechange);
                         var query = db.escape(Token) + ',' + db.escape(MessageType) + ',' + db.escape(Message) + ',' + db.escape(Status) + ',' + db.escape(TaskDate) + ',' + db.escape(ToMasterID) + ',' + db.escape(Notes) + ',' + db.escape(LocID);
-                        console.log(query);
+                       // console.log(query);
                         db.query('CALL pSaveMessages(' + query + ')', function (err, InsertResult) {
                             if (!err) {
-                                console.log(InsertResult);
+                                //console.log(InsertResult);
                                 if (InsertResult.affectedRows > 0) {
                                     RtnMessage.IsSuccessfull = true;
                                     console.log('FnSaveMessage: Messages Saved successfully');
@@ -2350,7 +2344,7 @@ exports.FnSaveMessage = function (req, res) {
                                         Message: Message,
                                         TaskDateTime: TaskDateTime
                                     };
-                                    console.log(MessageContent);
+                                    //console.log(MessageContent);
                                     FnMessageMail(MessageContent, function (err, Result) {
                                         if (!err) {
                                             if (Result != null) {
@@ -2382,6 +2376,9 @@ exports.FnSaveMessage = function (req, res) {
                     }
                     else {
                         if (ToMasterID.toString() == 'NaN') {
+                            console.log('FnSaveMessage: ToMasterID is empty');
+                            res.statusCode = 400;
+                        } else if (LocID == null) {
                             console.log('FnSaveMessage: ToMasterID is empty');
                             res.statusCode = 400;
                         }
@@ -2433,8 +2430,8 @@ exports.FnGetMessages = function (req, res) {
                         if (FromPage <= 1) {
                             FromPage = 0;
                         }
-                        console.log('From Page: ' + FromPage);
-                        console.log('To Page: ' + ToPage);
+                      //  console.log('From Page: ' + FromPage);
+                        //console.log('To Page: ' + ToPage);
                         db.query('CALL pGetMessages(' + db.escape(Token) + ',' + db.escape(FromPage) + ',' + db.escape(ToPage) + ',' + db.escape(Status) + ',' + db.escape(MessageType) + ')', function (err, MessagesResult) {
                             if (!err) {
                                 //  console.log(MessagesResult);
@@ -2581,7 +2578,7 @@ exports.FnUpdateProfilePicture = function (req, res) {
         var Token = req.body.TokenNo;
         var Picture = req.body.Picture;
         var PictureFileName = req.body.PictureFileName;
-        console.log('FnUpdateProfilePicture');
+        //console.log('FnUpdateProfilePicture');
         var RtnMessage = {
             IsSuccessfull: false
         };
@@ -2703,7 +2700,7 @@ exports.FnSaveCVInfo = function (req, res) {
                         }
 
                         var query = db.escape(FunctionID) + ',' + db.escape(RoleID) + ',' + db.escape(KeySkills) + ',' + db.escape(Status) + ',' + db.escape(Pin) + ',' + db.escape(Token);
-                        console.log(query);
+                        //console.log(query);
                         db.query('CALL pSaveCVInfo(' + query + ')', function (err, InsertResult) {
                             if (!err) {
                                 RtnMessage.IsSuccessfull = true;
@@ -2823,7 +2820,7 @@ exports.FnUpdateDocPin = function (req, res) {
                         var query = db.escape(token) + ',' + db.escape(tPin);
                         db.query('CALL pUpdateDocPIN(' + query + ')', function (err, UpdateResult) {
                             if (!err) {
-                                console.log(UpdateResult);
+                              //  console.log(UpdateResult);
                                 // console.log('FnUpdateMessageStatus: Update result' + UpdateResult);
                                 if (UpdateResult.affectedRows > 0) {
                                     RtnMessage.IsUpdated = true;
@@ -3042,13 +3039,13 @@ exports.FnSaveDoc = function (req, res) {
                     if (Result != null && tRefType.toString() != 'NaN') {
                         if (tRefExpiryDate != null) {
                             tRefExpiryDate = new Date(tRefExpiryDate);
-                            console.log(tRefExpiryDate);
+                            //console.log(tRefExpiryDate);
                         }
                         var query = db.escape(Token) + ',' + db.escape(tRefNo) + ',' + db.escape(tRefExpiryDate) + ',' + db.escape(tRefType);
-                        console.log('FnSaveDoc: Inserting data: ' + query);
+                        //console.log('FnSaveDoc: Inserting data: ' + query);
                         db.query('CALL pSaveDocs(' + query + ')', function (err, InsertResult) {
                             if (!err) {
-                                console.log(InsertResult);
+                                //console.log(InsertResult);
                                 if (InsertResult.affectedRows > 0) {
                                     RtnMessage.IsSuccessfull = true;
                                     console.log('Document Saved successfully');
@@ -3114,7 +3111,7 @@ exports.FnGetDoc = function (req, res) {
                     if (Result != null) {
                         db.query('CALL pGetDocs(' + db.escape(Token) + ',' + db.escape(Type) + ')', function (err, DocumentResult) {
                             if (!err) {
-                                console.log(DocumentResult);
+                                //console.log(DocumentResult);
                                 if (DocumentResult[0] != null) {
                                     if (DocumentResult[0].length > 0) {
                                         res.send(DocumentResult[0]);
@@ -3188,10 +3185,10 @@ exports.FnUpdateBussinessListing = function (req, res) {
                     if (Result != null) {
                         //  var fileName = BrochureDocFile.split('.').pop();
                         var query = db.escape(token) + ',' + db.escape(Keywords) + ',' + db.escape(CategoryID);
-                        console.log(query);
+                        //console.log(query);
                         db.query('CALL pUpdateBusinesslist(' + query + ')', function (err, UpdateResult) {
                             if (!err) {
-                                console.log(UpdateResult);
+                                //console.log(UpdateResult);
                                 // console.log('FnUpdateMessageStatus: Update result' + UpdateResult);
                                 if (UpdateResult.affectedRows > 0) {
                                     RtnMessage.IsUpdated = true;
@@ -3321,7 +3318,7 @@ exports.FnUploadDocument = function (req, res) {
         var RefFileName = req.files.file.path;
         //var RefFileName = req.body.Filename;
         var tRefType = req.body.RefType;
-        console.log(req.body);
+        //console.log(req.body);
 
         FnValidateToken(Token, function (err, Result) {
             if (!err) {
@@ -3333,10 +3330,10 @@ exports.FnUploadDocument = function (req, res) {
                             if (RefFileName != null) {
                                 fileName = RefFileName.split('.').pop();
                             }
-                            console.log(Token);
+                            //console.log(Token);
                             fs.readFile(RefFileName, function (err, original_data) {
                                 var query = db.escape(Token) + ',' + db.escape(original_data) + ',' + db.escape(fileName) + ',' + db.escape(tRefType) + ',' + db.escape(CntType);
-                                console.log(query);
+                                //console.log(query);
                                 db.query('CALL pSaveDocsFile(' + query + ')', function (err, InsertResult) {
                                     if (!err) {
                                         //    console.log(InsertResult);
@@ -3398,7 +3395,7 @@ exports.FnGetDocument = function (req, res) {
                 if (!err) {
                     if (Result != null) {
                         var query = db.escape(Token) + ',' + db.escape(Type);
-                        console.log(query);
+                        //console.log(query);
                         db.query('CALL  pGetDocsFile(' + query + ')', function (err, DocumentResult) {
                             if (!err) {
                                 if (DocumentResult[0] != null) {
@@ -3406,14 +3403,14 @@ exports.FnGetDocument = function (req, res) {
                                         DocumentResult = DocumentResult[0];
                                         //console.log(DocumentResult)
                                         var docs = DocumentResult[0];
-                                        console.log(docs.ContentType);
-                                        console.log(docs.Filename);
+                                        //console.log(docs.ContentType);
+                                        //console.log(docs.Filename);
                                         // console.log(docs.IDDocBlob);
                                         res.setHeader('Content-Type', docs.ContentType);
                                         res.setHeader('Content-Disposition', 'attachment; filename=' + docs.Filename);
                                         res.setHeader('Cache-Control', 'public, max-age=0');
                                         res.writeHead('200', { 'Content-Type': docs.ContentType });
-                                        console.log(docs.Docs);
+                                        //console.log(docs.Docs);
                                         res.end(docs.Docs, 'base64');
                                         console.log('FnGetDocument: Document sent successfully-1');
                                     }
@@ -3473,7 +3470,7 @@ exports.FnGetSearchDocuments = function (req, res) {
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         var find = req.query.Keywords;
         var token = req.query.Token;
-        console.log(token);
+        //console.log(token);
         if (token != null && find != null && token != '' && find != '') {
             FnValidateToken(token, function (err, Result) {
                 if (!err) {
@@ -3483,38 +3480,38 @@ exports.FnGetSearchDocuments = function (req, res) {
                         var DocType = '';
                         var FindArray = find.split('.');
 
-                        console.log('findarray: ' + FindArray.length);
+                        //console.log('findarray: ' + FindArray.length);
                         if (FindArray.length > 0) {
                             EZEID = FindArray[0];
                             //checking the fisrt condition
                             if (FindArray.length > 1) {
                                 if (FindArray[1] != '') {
                                     if (FindArray[1].toUpperCase() == 'ID') {
-                                        console.log('ID');
+                                        //console.log('ID');
                                         DocType = 'ID';
                                     }
                                     else if (FindArray[1].toUpperCase() == 'DL') {
-                                        console.log('DL');
+                                        //console.log('DL');
                                         DocType = 'DL';
                                     }
                                     else if (FindArray[1].toUpperCase() == 'PP') {
-                                        console.log('PP');
+                                        //console.log('PP');
                                         DocType = 'PP';
                                     }
                                     else if (FindArray[1].toUpperCase() == 'BR') {
-                                        console.log('BR');
+                                        //console.log('BR');
                                         DocType = 'BR';
                                     }
                                     else if (FindArray[1].toUpperCase() == 'CV') {
-                                        console.log('CV');
+                                        //console.log('CV');
                                         DocType = 'CV';
                                     }
                                     else if (FindArray[1].toUpperCase() == 'D1') {
-                                        console.log('D1');
+                                        //console.log('D1');
                                         DocType = 'D1';
                                     }
                                     else if (FindArray[1].toUpperCase() == 'D2') {
-                                        console.log('D2');
+                                        //console.log('D2');
                                         DocType = 'D2';
                                     }
                                     else {
@@ -3529,7 +3526,7 @@ exports.FnGetSearchDocuments = function (req, res) {
                             }
                         }
                         var SearchQuery = db.escape(EZEID) + ',' + db.escape(Pin) + ',' + db.escape(DocType);
-                        console.log('SearchQuery: ' + SearchQuery);
+                        //console.log('SearchQuery: ' + SearchQuery);
                         db.query('CALL  PGetSearchDocuments(' + SearchQuery + ')', function (err, SearchResult) {
                             // db.query(searchQuery, function (err, SearchResult) {
                             if (!err) {
@@ -3611,7 +3608,7 @@ exports.FnSearchByKeywords = function (req, res) {
         var Longitude = parseFloat(req.body.Longitude);
         var ParkingStatus = req.body.ParkingStatus;
         var OpenCloseStatus = req.body.OpenStatus;
-        console.log(token);
+        //console.log(token);
         if (token != null && token != '') {
             FnValidateToken(token, function (err, Result) {
                 if (!err) {
@@ -3623,7 +3620,7 @@ exports.FnSearchByKeywords = function (req, res) {
                                 var DocType = '';
                                 var FindArray = find.split('.');
                                 var SearchType = 0;
-                                console.log('findarray: ' + FindArray.length);
+                                //console.log('findarray: ' + FindArray.length);
                                 if (FindArray.length > 0) {
                                     EZEID = FindArray[0];
                                     //checking the fisrt condition
@@ -3633,37 +3630,37 @@ exports.FnSearchByKeywords = function (req, res) {
                                                 LocSeqNo = FindArray[1].toString().substring(1, FindArray[1].length);
                                             }
                                             else if (FindArray[1].toUpperCase() == 'ID') {
-                                                console.log('ID');
+                                                //console.log('ID');
                                                 SearchType = 2;
                                                 DocType = 'ID';
                                             }
                                             else if (FindArray[1].toUpperCase() == 'DL') {
-                                                console.log('DL');
+                                                //console.log('DL');
                                                 SearchType = 2;
                                                 DocType = 'DL';
                                             }
                                             else if (FindArray[1].toUpperCase() == 'PP') {
-                                                console.log('PP');
+                                                //console.log('PP');
                                                 SearchType = 2;
                                                 DocType = 'PP';
                                             }
                                             else if (FindArray[1].toUpperCase() == 'BR') {
-                                                console.log('BR');
+                                                //console.log('BR');
                                                 SearchType = 2;
                                                 DocType = 'BR';
                                             }
                                             else if (FindArray[1].toUpperCase() == 'CV') {
-                                                console.log('CV');
+                                                //console.log('CV');
                                                 SearchType = 2;
                                                 DocType = 'CV';
                                             }
                                             else if (FindArray[1].toUpperCase() == 'D1') {
-                                                console.log('D1');
+                                                //console.log('D1');
                                                 SearchType = 2;
                                                 DocType = 'D1';
                                             }
                                             else if (FindArray[1].toUpperCase() == 'D2') {
-                                                console.log('D2');
+                                                //console.log('D2');
                                                 SearchType = 2;
                                                 DocType = 'D2';
                                             }
@@ -3680,7 +3677,7 @@ exports.FnSearchByKeywords = function (req, res) {
                                     }
                                 }
                                 var SearchQuery = db.escape('') + ',' + db.escape(CategoryID) + ',' + db.escape(0) + ',' + db.escape(0.00) + ',' + db.escape(0.00) + ',' + db.escape(EZEID) + ',' + db.escape(LocSeqNo) + ',' + db.escape(Pin) + ',' + db.escape(SearchType) + ',' + db.escape(DocType) + ',' + db.escape("0") + ',' + db.escape("0");
-                                console.log('SearchQuery: ' + SearchQuery);
+                                //console.log('SearchQuery: ' + SearchQuery);
                                 db.query('CALL pSearchResult(' + SearchQuery + ')', function (err, SearchResult) {
                                     // db.query(searchQuery, function (err, SearchResult) {
                                     if (!err) {
@@ -3729,10 +3726,10 @@ exports.FnSearchByKeywords = function (req, res) {
                             if (find != null && find != '' && Proximity.toString() != 'NaN' && Latitude.toString() != 'NaN' && Longitude.toString() != 'NaN' && CategoryID != null) {
 
                                 var InsertQuery = db.escape(find) + ',' + db.escape(CategoryID) + ',' + db.escape(Proximity) + ',' + db.escape(Latitude) + ',' + db.escape(Longitude) + ',' + db.escape('') + ',' + db.escape(0) + ',' + db.escape(0) + ',' + db.escape(1) + ',' + db.escape('') + ',' + db.escape(ParkingStatus) + ',' + db.escape(OpenCloseStatus);
-                                console.log('SearchQuery: ' + InsertQuery);
+                                //console.log('SearchQuery: ' + InsertQuery);
                                 db.query('CALL pSearchResult(' + InsertQuery + ')', function (err, SearchResult) {
                                     if (!err) {
-                                        console.log(SearchResult);
+                                        //console.log(SearchResult);
                                         if (SearchResult[0] != null) {
                                             if (SearchResult[0].length > 0) {
                                                 res.send(SearchResult[0]);
@@ -3744,7 +3741,7 @@ exports.FnSearchByKeywords = function (req, res) {
                                                     console.log('SearchQuery without Proximity: ' + InsertProximityQuery);
                                                     db.query('CALL pSearchResult(' + InsertProximityQuery + ')', function (err, SearchProximityResult) {
                                                         if (!err) {
-                                                            console.log(SearchProximityResult);
+                                                            //console.log(SearchProximityResult);
                                                             if (SearchProximityResult[0] != null) {
                                                                 if (SearchProximityResult[0].length > 0) {
                                                                     res.send(SearchProximityResult[0]);
@@ -3913,13 +3910,13 @@ exports.FnUpdatePwdEncryption = function (req, res) {
                     //var EncryptPWD;
                     for (var i = 0; i < UserResult.length; i++) {
                         var RegData = UserResult[i];
-                        console.log('user details');
-                        console.log(RegData);
-                        console.log(RegData.Password);
+                        //console.log('user details');
+                        //console.log(RegData);
+                        //console.log(RegData.Password);
                         var EncryptPWD = null;
                         if (typeof RegData.Password != 'undefined' && RegData.Password != '' && RegData.Password != null) {
                             EncryptPWD = FnEncryptPassword(RegData.Password);
-                            console.log(EncryptPWD);
+                           // console.log(EncryptPWD);
                             var query = 'update tmaster set password= ' + db.escape(EncryptPWD) + ' where TID =' + db.escape(RegData.TID);
                             //console.log(query);
                             db.query(query, function (err, UpdateResult) {
@@ -3988,7 +3985,7 @@ exports.FnGetLoginCheck = function (req, res) {
                     }
                     else {
                         console.log('FnGetLoginCheck: Invalid token');
-                       // res.statusCode = 401;
+                        // res.statusCode = 401;
                         res.send(RtnMessage);
                     }
                 }
