@@ -160,7 +160,7 @@ function FnMessageMail(MessageContent, CallBack) {
                         if (MessageContentResult[0].length > 0) {
                             MessageContentResult = MessageContentResult[0];
                             if (MessageContentResult[0].ToMailID != '') {
-                                if (MessageContent.MessageType == 0) {
+                               /* if (MessageContent.MessageType == 0) {
                                     fs.readFile("Individual.txt", "utf8", function (err, data) {
                                         if (err) throw err;
                                         // console.log(MessageContentResult);
@@ -192,7 +192,8 @@ function FnMessageMail(MessageContent, CallBack) {
                                         });
                                     });
                                 }
-                                else if (MessageContent.MessageType == 1) {
+                                else */
+                                if (MessageContent.MessageType == 1) {
                                     fs.readFile("SalesEnquiry.txt", "utf8", function (err, data) {
                                         if (err) throw err;
                                         data = data.replace("[IsVerified]", MessageContentResult[0].EZEIDVerifiedID);
@@ -357,7 +358,8 @@ function FnMessageMail(MessageContent, CallBack) {
                                             }
                                         });
                                     });
-                                } else if (MessageContent.MessageType == 6) {
+                                }
+                                /*else if (MessageContent.MessageType == 6) {
                                     fs.readFile("Appointment.txt", "utf8", function (err, data) {
                                         if (err) throw err;
                                         var moment = require('moment');
@@ -397,7 +399,7 @@ function FnMessageMail(MessageContent, CallBack) {
                                             }
                                         });
                                     });
-                                }
+                                }*/
                             }
                             else {
                                 console.log('FnMessageMail: Email  is empty');
