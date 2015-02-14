@@ -465,7 +465,7 @@
                            
                             
                             try{
-                               
+                                console.log(data);
                                 PlaceMarker(data);
                             }
                             
@@ -475,7 +475,9 @@
                                 }
                                 $scope.$watch('isMapLoaded',function(var1,var2){
                                     if(var2){
+                                        console.log(data);
                                         PlaceMarker(data);
+                                        
                                     }
                                 });
                             }
@@ -843,6 +845,8 @@
     });
 
     ezeid.controller('ProfileController', function ($rootScope, $scope, $http, $q, $timeout, Notification ,$filter) {
+        
+        
         var profile = this;
         profile._info = {};
         profile.categories = [];
@@ -876,6 +880,47 @@
 
     var MsgDelay = 2000;
     var isBusinessIcon = 0; // 1 = icon is for business Type
+        
+        
+        /***************************** Camera Code ***************************************/
+        $scope.isShowCamera = false;
+        
+
+        Webcam.set({
+				// live preview size
+				width: 250,
+				height: 200,
+				
+				// device capture size
+				dest_width: 250,
+				dest_height: 200,
+				
+				// final cropped size
+				crop_width: 200,
+				crop_height: 200,
+				
+				// format and quality
+				image_format: 'png',
+				jpeg_quality: 90
+			});
+        $scope.showCamera = function(){
+            $scope.isShowCamera = true;
+            Webcam.attach( '#camera' );
+        };
+        
+        $scope.clickPicture = function(){
+                $scope.isShowCamera = false;
+                //Webcam.reset();
+                
+                Webcam.snap( function(data_uri) {
+                        profile._info.Picture = data_uri;
+
+                    // shut down camera, stop capturing
+                    Webcam.reset();
+                });
+              };
+        
+        /***************************** Camera Code ends **********************************/
     if ($rootScope._userInfo) {
     }
     else {
@@ -1212,6 +1257,7 @@
             }
         }
         function PlaceCurrentLocationMarker(location) {
+            console.log('I executed');
              if (marker != undefined) {
                 marker.setMap(null);
             }
