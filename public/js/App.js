@@ -25,6 +25,33 @@
     var MsgDelay = 2000;
 
     // define controller for wizard
+    ezeid.directive('dateTimePicker', function() {
+            return {
+                restrict: 'E',
+                replace: true,
+                scope: {
+                    recipient: '='
+                },
+                template:
+                    '<div class="input-group date emptyBox" id="datetimepicker1" >'+
+                        '<input type="text" class="form-control" placeholder="Birth Date" name="recipientDateTime" data-date-time/>'+
+                        '<span class="input-group-addon"><span class="glyphicon glyphicon-calendar" ></span>'+
+                        '</span>'+
+                    '</div>',
+                link: function(scope, element, attrs, ngModel) {
+                var input = element.find('input');
+                console.log(input);
+                    input.bind('blur',function(){
+                        console.log(input.val());
+                        scope.recipient = input.val();
+                    });
+//                element.bind('blur keyup change', function(){
+//                    console.log(input.val());
+//                    scope.recipient.datetime = input.val();
+//                });
+            }
+        }
+    });
     ezeid.controller('SampleWizardController', function($scope, $q, $timeout) {
 
             $scope.user = {};
@@ -568,8 +595,8 @@
         };
 
         SearchSec.sendSalesEnquiry = function () {
-            if ($rootScope._userInfo.IsAuthenticate == true) {
-                $http({ method: 'post', url: GURL + 'ewtSaveMessage', data: { TokenNo: $rootScope._userInfo.Token, ToMasterID: SearchSec.mInfo.TID, MessageType: 1, Message: SearchSec.salesMessage, TaskDateTime: today, LocID :SearchSec.LocID } }).success(function (data) {
+           if ($rootScope._userInfo.IsAuthenticate == true) {
+                $http({ method: 'post', url: GURL + 'ewtSaveMessage', data: { TokenNo: $rootScope._userInfo.Token, ToMasterID: SearchSec.mInfo.TID, MessageType: 1, Message: SearchSec.salesMessage, TaskDateTime: today, LocID :SearchSec.mInfo.LocID } }).success(function (data) {
                     if (data.IsSuccessfull) {
                         $('#SalesEnquiryRequest_popup').slideUp();
                         SearchSec.salesMessage = "";
@@ -605,7 +632,7 @@
 
         SearchSec.sendUserMessage = function () {
             if ($rootScope._userInfo.IsAuthenticate == true) {
-                $http({ method: 'post', url: GURL + 'ewtSaveMessage', data: { TokenNo: $rootScope._userInfo.Token, ToMasterID: SearchSec.mInfo.TID, MessageType: 0, Message: SearchSec.SendMessage, TaskDateTime: today, LocID :SearchSec.LocID } }).success(function (data) {
+                $http({ method: 'post', url: GURL + 'ewtSaveMessage', data: { TokenNo: $rootScope._userInfo.Token, ToMasterID: SearchSec.mInfo.TID, MessageType: 0, Message: SearchSec.SendMessage, TaskDateTime: today, LocID :SearchSec.mInfo.LocID } }).success(function (data) {
                     if (data.IsSuccessfull) {
                         $('#sendMessage_popup').slideUp();
                         SearchSec.SendMessage = "";
@@ -636,7 +663,7 @@
         //Send Home Delivery
         SearchSec.sendHomeDelivery = function () {
             if ($rootScope._userInfo.IsAuthenticate == true) {
-                $http({ method: 'post', url: GURL + 'ewtSaveMessage', data: { TokenNo: $rootScope._userInfo.Token, ToMasterID: SearchSec.mInfo.TID, MessageType: 2, Message: SearchSec.HomeDeliverMessage, TaskDateTime: today, LocID :SearchSec.LocID } }).success(function (data) {
+                $http({ method: 'post', url: GURL + 'ewtSaveMessage', data: { TokenNo: $rootScope._userInfo.Token, ToMasterID: SearchSec.mInfo.TID, MessageType: 2, Message: SearchSec.HomeDeliverMessage, TaskDateTime: today, LocID :SearchSec.mInfo.LocID } }).success(function (data) {
 
                     if (data.IsSuccessfull) {
                         $('#HomeDelivery_popup').slideUp();
@@ -667,10 +694,11 @@
 
         //Send Reservation
         SearchSec.sendReservation = function (messageType) {
+            console.log(SearchSec.mInfo.LocID);
             if ($rootScope._userInfo.IsAuthenticate == true) {
                  var dateTime = $filter('date')(new Date(SearchSec.ReservationDateTime), 'MM/dd/yyyy HH:mm:ss');
                 //var dateTime = $filter('date')(SearchSec.ReservationDateTime, 'MM/dd/yyyy HH:mm:ss');  /*dd-MM-yyyy HH:mm a*/
-               $http({ method: 'post', url: GURL + 'ewtSaveMessage', data: { TokenNo: $rootScope._userInfo.Token, ToMasterID: SearchSec.mInfo.TID, MessageType: messageType, Message: SearchSec.ReservationMessage, TaskDateTime: dateTime, LocID :SearchSec.LocID } }).success(function (data) {
+               $http({ method: 'post', url: GURL + 'ewtSaveMessage', data: { TokenNo: $rootScope._userInfo.Token, ToMasterID: SearchSec.mInfo.TID, MessageType: messageType, Message: SearchSec.ReservationMessage, TaskDateTime: dateTime, LocID :SearchSec.mInfo.LocID} }).success(function (data) {
                     if (data.IsSuccessfull) {
                         $('#Reservation_popup').slideUp();
                         SearchSec.ReservationMessage = "";
@@ -707,7 +735,7 @@
         //Send Service Request
         SearchSec.sendServiceRequest = function () {
             if ($rootScope._userInfo.IsAuthenticate == true) {
-                $http({ method: 'post', url: GURL + 'ewtSaveMessage', data: { TokenNo: $rootScope._userInfo.Token, ToMasterID: SearchSec.mInfo.TID, MessageType: 4, Message: SearchSec.ServiceRequestMessage, TaskDateTime: today, LocID :SearchSec.LocID } }).success(function (data) {
+                $http({ method: 'post', url: GURL + 'ewtSaveMessage', data: { TokenNo: $rootScope._userInfo.Token, ToMasterID: SearchSec.mInfo.TID, MessageType: 4, Message: SearchSec.ServiceRequestMessage, TaskDateTime: today, LocID :SearchSec.mInfo.LocID } }).success(function (data) {
 
                     if (data.IsSuccessfull) {
                         $('#ServiceRequest_popup').slideUp();
@@ -745,7 +773,7 @@
         SearchSec.sendCV = function () {
 
              if ($rootScope._userInfo.IsAuthenticate == true) {
-                 $http({ method: 'post', url: GURL + 'ewtSaveMessage', data: { TokenNo: $rootScope._userInfo.Token, ToMasterID: SearchSec.mInfo.TID, MessageType: 5, Message: "", TaskDateTime: today, LocID :SearchSec.LocID } }).success(function (data) {
+                 $http({ method: 'post', url: GURL + 'ewtSaveMessage', data: { TokenNo: $rootScope._userInfo.Token, ToMasterID: SearchSec.mInfo.TID, MessageType: 5, Message: "", TaskDateTime: today, LocID :SearchSec.mInfo.LocID } }).success(function (data) {
  
                      if (data.IsSuccessfull) {
 
@@ -823,6 +851,21 @@
         profile.countries = [];
         profile.states = [];
         var showCurrentLocation = true;
+
+        $('#datetimepicker1').datetimepicker({
+
+            format: 'DD-MMM-YYYY'
+        });
+
+        $scope.$on('$locationChangeStart', function( event ) {
+            var answer = confirm("Are you sure you want to leave this page?")
+            if (!answer) {
+                event.preventDefault();
+            }
+        });
+
+            //    $('#datetimepicker1').datetimepicker();
+
 
         var map;
         var mapOptions;
@@ -1303,6 +1346,7 @@
             }
          }
        // isValidate = function ()
+       // $scope.dateNew;
         function isValidate()
         {
              var notificationMessage = "";
@@ -1380,6 +1424,8 @@
                 }
                 if(profile._info.IDTypeID  == '1')
                 {
+                    console.log(profile._info.DOB);
+                   // console.log($scope.dateNew);
                     if(!profile._info.DOB)
                     {
                         notificationMessage += notificationMessage != "" ? ", Date of birth Required " : "Date of birth Required";
@@ -1400,6 +1446,8 @@
             this.savePrimaryRegistration = function (UserForm) {
                 if(isValidate())
                 {
+                    console.log(profile._info.DOB);
+
                     var sEzeid = profile._info.EZEID;
                     var lastTwo = sEzeid.substr(sEzeid.length - 2);
                     if(lastTwo != "ap")
