@@ -293,12 +293,12 @@
                     var pos = new google.maps.LatLng(_item.Latitude, _item.Longitude);
                     //Pushing position of markers to fit in bounds
                     latLngList.push(pos);
-                    
+                    var mTitle = (_item.IDTypeID == 2 && _item.CompanyName !== "")? _item.CompanyName : _item.Name;
                     var marker = new google.maps.Marker({
                         position: pos,
                         map: map,
                         icon: mapIcon,
-                        title: _item.FirstName + ' ' + _item.LastName
+                        title: mTitle
                     });
 //                    map.setCenter(pos);
                     var currentPos = google.maps.LatLng($rootScope.CLoc.CLat,$rootScope.CLoc.CLong);
@@ -438,7 +438,6 @@
                            
                             
                             try{
-                                console.log(data);
                                 PlaceMarker(data);
                             }
                             
@@ -448,7 +447,6 @@
                                 }
                                 $scope.$watch('isMapLoaded',function(var1,var2){
                                     if(var2){
-                                        console.log(data);
                                         PlaceMarker(data);
                                         
                                     }
@@ -1214,8 +1212,7 @@
             }
         }
         function PlaceCurrentLocationMarker(location) {
-            console.log('I executed');
-             if (marker != undefined) {
+            if (marker != undefined) {
                 marker.setMap(null);
             }
             map.setCenter(location);
