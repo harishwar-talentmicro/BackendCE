@@ -898,8 +898,8 @@
 				crop_height: 200,
 				
 				// format and quality
-				image_format: 'png',
-				jpeg_quality: 90
+				image_format: 'jpeg',
+				jpeg_quality: 92
 			});
         $scope.showCamera = function(){
             $scope.isShowCamera = true;
