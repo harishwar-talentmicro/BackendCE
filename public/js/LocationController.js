@@ -67,6 +67,47 @@ angular.module('ezeidApp').controller('LocationsController', function ($rootScop
         }
     });
 
+    
+     /***************************** Camera Code ***************************************/
+        $scope.isShowCamera = false;
+        
+
+        Webcam.set({
+				// live preview size
+				width: 250,
+				height: 200,
+				
+				// device capture size
+				dest_width: 250,
+				dest_height: 200,
+				
+				// final cropped size
+				crop_width: 200,
+				crop_height: 200,
+				
+				// format and quality
+				image_format: 'jpeg',
+				jpeg_quality: 92
+			});
+        $scope.showCamera = function(){
+            $scope.isShowCamera = true;
+            Webcam.attach( '#camera' );
+        };
+        
+        $scope.clickPicture = function(){
+                $scope.isShowCamera = false;
+                //Webcam.reset();
+                
+                Webcam.snap( function(data_uri) {
+                        SLocCtrl._locInfo.Picture = data_uri;
+
+                    // shut down camera, stop capturing
+                    Webcam.reset();
+                });
+              };
+        
+        /***************************** Camera Code ends **********************************/
+    
     //Custom Methods
         function GetUserDetails() {
             //$rootScope.IsIdAvailable = true;
