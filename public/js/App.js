@@ -40,9 +40,7 @@
                     '</div>',
                 link: function(scope, element, attrs, ngModel) {
                 var input = element.find('input');
-                console.log(input);
                     input.bind('blur',function(){
-                        console.log(input.val());
                         scope.recipient = input.val();
                     });
 //                element.bind('blur keyup change', function(){
@@ -114,6 +112,9 @@
             }
         }
 
+        $('#datetimepicker1').datetimepicker({
+           format: "ddd, DD MM YYYY - hh:mm A"
+        });
         /**
          * Opens Help Popup when help link is clicked
          */
