@@ -25,6 +25,31 @@
     var MsgDelay = 2000;
 
     // define controller for wizard
+    ezeid.directive('dateTimePicker', function() {
+            return {
+                restrict: 'E',
+                replace: true,
+                scope: {
+                    recipient: '='
+                },
+                template:
+                    '<div class="input-group date emptyBox" id="datetimepicker1" >'+
+                        '<input type="text" class="form-control" placeholder="Birth Date" name="recipientDateTime" data-date-time/>'+
+                        '<span class="input-group-addon"><span class="glyphicon glyphicon-calendar" ></span>'+
+                        '</span>'+
+                    '</div>',
+                link: function(scope, element, attrs, ngModel) {
+                var input = element.find('input');
+                    input.bind('blur',function(){
+                        scope.recipient = input.val();
+                    });
+//                element.bind('blur keyup change', function(){
+//                    console.log(input.val());
+//                    scope.recipient.datetime = input.val();
+//                });
+            }
+        }
+    });
     ezeid.controller('SampleWizardController', function($scope, $q, $timeout) {
 
             $scope.user = {};
@@ -87,6 +112,9 @@
             }
         }
 
+        $('#datetimepicker1').datetimepicker({
+           format: "ddd, DD MM YYYY - hh:mm A"
+        });
         /**
          * Opens Help Popup when help link is clicked
          */
@@ -293,12 +321,12 @@
                     var pos = new google.maps.LatLng(_item.Latitude, _item.Longitude);
                     //Pushing position of markers to fit in bounds
                     latLngList.push(pos);
-                    
+                    var mTitle = (_item.IDTypeID == 2 && _item.CompanyName !== "")? _item.CompanyName : _item.Name;
                     var marker = new google.maps.Marker({
                         position: pos,
                         map: map,
                         icon: mapIcon,
-                        title: _item.FirstName + ' ' + _item.LastName
+                        title: mTitle
                     });
 //                    map.setCenter(pos);
                     var currentPos = google.maps.LatLng($rootScope.CLoc.CLat,$rootScope.CLoc.CLong);
@@ -438,7 +466,6 @@
                            
                             
                             try{
-                               
                                 PlaceMarker(data);
                             }
                             
@@ -449,6 +476,7 @@
                                 $scope.$watch('isMapLoaded',function(var1,var2){
                                     if(var2){
                                         PlaceMarker(data);
+                                        
                                     }
                                 });
                             }
@@ -568,8 +596,8 @@
         };
 
         SearchSec.sendSalesEnquiry = function () {
-            if ($rootScope._userInfo.IsAuthenticate == true) {
-                $http({ method: 'post', url: GURL + 'ewtSaveMessage', data: { TokenNo: $rootScope._userInfo.Token, ToMasterID: SearchSec.mInfo.TID, MessageType: 1, Message: SearchSec.salesMessage, TaskDateTime: today, LocID :SearchSec.LocID } }).success(function (data) {
+           if ($rootScope._userInfo.IsAuthenticate == true) {
+                $http({ method: 'post', url: GURL + 'ewtSaveMessage', data: { TokenNo: $rootScope._userInfo.Token, ToMasterID: SearchSec.mInfo.TID, MessageType: 1, Message: SearchSec.salesMessage, TaskDateTime: today, LocID :SearchSec.mInfo.LocID } }).success(function (data) {
                     if (data.IsSuccessfull) {
                         $('#SalesEnquiryRequest_popup').slideUp();
                         SearchSec.salesMessage = "";
@@ -605,7 +633,7 @@
 
         SearchSec.sendUserMessage = function () {
             if ($rootScope._userInfo.IsAuthenticate == true) {
-                $http({ method: 'post', url: GURL + 'ewtSaveMessage', data: { TokenNo: $rootScope._userInfo.Token, ToMasterID: SearchSec.mInfo.TID, MessageType: 0, Message: SearchSec.SendMessage, TaskDateTime: today, LocID :SearchSec.LocID } }).success(function (data) {
+                $http({ method: 'post', url: GURL + 'ewtSaveMessage', data: { TokenNo: $rootScope._userInfo.Token, ToMasterID: SearchSec.mInfo.TID, MessageType: 0, Message: SearchSec.SendMessage, TaskDateTime: today, LocID :SearchSec.mInfo.LocID } }).success(function (data) {
                     if (data.IsSuccessfull) {
                         $('#sendMessage_popup').slideUp();
                         SearchSec.SendMessage = "";
@@ -636,7 +664,7 @@
         //Send Home Delivery
         SearchSec.sendHomeDelivery = function () {
             if ($rootScope._userInfo.IsAuthenticate == true) {
-                $http({ method: 'post', url: GURL + 'ewtSaveMessage', data: { TokenNo: $rootScope._userInfo.Token, ToMasterID: SearchSec.mInfo.TID, MessageType: 2, Message: SearchSec.HomeDeliverMessage, TaskDateTime: today, LocID :SearchSec.LocID } }).success(function (data) {
+                $http({ method: 'post', url: GURL + 'ewtSaveMessage', data: { TokenNo: $rootScope._userInfo.Token, ToMasterID: SearchSec.mInfo.TID, MessageType: 2, Message: SearchSec.HomeDeliverMessage, TaskDateTime: today, LocID :SearchSec.mInfo.LocID } }).success(function (data) {
 
                     if (data.IsSuccessfull) {
                         $('#HomeDelivery_popup').slideUp();
@@ -667,10 +695,10 @@
 
         //Send Reservation
         SearchSec.sendReservation = function (messageType) {
-            if ($rootScope._userInfo.IsAuthenticate == true) {
+           if ($rootScope._userInfo.IsAuthenticate == true) {
                  var dateTime = $filter('date')(new Date(SearchSec.ReservationDateTime), 'MM/dd/yyyy HH:mm:ss');
                 //var dateTime = $filter('date')(SearchSec.ReservationDateTime, 'MM/dd/yyyy HH:mm:ss');  /*dd-MM-yyyy HH:mm a*/
-               $http({ method: 'post', url: GURL + 'ewtSaveMessage', data: { TokenNo: $rootScope._userInfo.Token, ToMasterID: SearchSec.mInfo.TID, MessageType: messageType, Message: SearchSec.ReservationMessage, TaskDateTime: dateTime, LocID :SearchSec.LocID } }).success(function (data) {
+               $http({ method: 'post', url: GURL + 'ewtSaveMessage', data: { TokenNo: $rootScope._userInfo.Token, ToMasterID: SearchSec.mInfo.TID, MessageType: messageType, Message: SearchSec.ReservationMessage, TaskDateTime: dateTime, LocID :SearchSec.mInfo.LocID} }).success(function (data) {
                     if (data.IsSuccessfull) {
                         $('#Reservation_popup').slideUp();
                         SearchSec.ReservationMessage = "";
@@ -707,7 +735,7 @@
         //Send Service Request
         SearchSec.sendServiceRequest = function () {
             if ($rootScope._userInfo.IsAuthenticate == true) {
-                $http({ method: 'post', url: GURL + 'ewtSaveMessage', data: { TokenNo: $rootScope._userInfo.Token, ToMasterID: SearchSec.mInfo.TID, MessageType: 4, Message: SearchSec.ServiceRequestMessage, TaskDateTime: today, LocID :SearchSec.LocID } }).success(function (data) {
+                $http({ method: 'post', url: GURL + 'ewtSaveMessage', data: { TokenNo: $rootScope._userInfo.Token, ToMasterID: SearchSec.mInfo.TID, MessageType: 4, Message: SearchSec.ServiceRequestMessage, TaskDateTime: today, LocID :SearchSec.mInfo.LocID } }).success(function (data) {
 
                     if (data.IsSuccessfull) {
                         $('#ServiceRequest_popup').slideUp();
@@ -745,7 +773,7 @@
         SearchSec.sendCV = function () {
 
              if ($rootScope._userInfo.IsAuthenticate == true) {
-                 $http({ method: 'post', url: GURL + 'ewtSaveMessage', data: { TokenNo: $rootScope._userInfo.Token, ToMasterID: SearchSec.mInfo.TID, MessageType: 5, Message: "", TaskDateTime: today, LocID :SearchSec.LocID } }).success(function (data) {
+                 $http({ method: 'post', url: GURL + 'ewtSaveMessage', data: { TokenNo: $rootScope._userInfo.Token, ToMasterID: SearchSec.mInfo.TID, MessageType: 5, Message: "", TaskDateTime: today, LocID :SearchSec.mInfo.LocID } }).success(function (data) {
  
                      if (data.IsSuccessfull) {
 
@@ -815,13 +843,31 @@
     });
 
     ezeid.controller('ProfileController', function ($rootScope, $scope, $http, $q, $timeout, Notification ,$filter) {
+        
+        
         var profile = this;
         profile._info = {};
         profile.categories = [];
         profile.countries = [];
         profile.states = [];
         var showCurrentLocation = true;
+        $scope.isCloseButtonClicked = false;
 
+        $('#datetimepicker1').datetimepicker({
+
+            format: 'DD-MMM-YYYY'
+        });
+          $scope.$on('$locationChangeStart', function( event ) {
+            if($scope.isCloseButtonClicked == false)
+                {
+                    var answer = confirm("Are you sure you want to leave this page?")
+                    if (!answer) {
+                        event.preventDefault();
+                    }
+                }
+         });
+
+  //    $('#datetimepicker1').datetimepicker();
         var map;
         var mapOptions;
 //        var myinfowindow = new google.maps.InfoWindow({
@@ -833,6 +879,47 @@
 
     var MsgDelay = 2000;
     var isBusinessIcon = 0; // 1 = icon is for business Type
+        
+        
+        /***************************** Camera Code ***************************************/
+        $scope.isShowCamera = false;
+        
+
+        Webcam.set({
+				// live preview size
+				width: 250,
+				height: 200,
+				
+				// device capture size
+				dest_width: 250,
+				dest_height: 200,
+				
+				// final cropped size
+				crop_width: 200,
+				crop_height: 200,
+				
+				// format and quality
+				image_format: 'jpeg',
+				jpeg_quality: 92
+			});
+        $scope.showCamera = function(){
+            $scope.isShowCamera = true;
+            Webcam.attach( '#camera' );
+        };
+        
+        $scope.clickPicture = function(){
+                $scope.isShowCamera = false;
+                //Webcam.reset();
+                
+                Webcam.snap( function(data_uri) {
+                        profile._info.Picture = data_uri;
+
+                    // shut down camera, stop capturing
+                    Webcam.reset();
+                });
+              };
+        
+        /***************************** Camera Code ends **********************************/
     if ($rootScope._userInfo) {
     }
     else {
@@ -1169,7 +1256,7 @@
             }
         }
         function PlaceCurrentLocationMarker(location) {
-             if (marker != undefined) {
+            if (marker != undefined) {
                 marker.setMap(null);
             }
             map.setCenter(location);
@@ -1260,6 +1347,7 @@
             }
          }
        // isValidate = function ()
+       // $scope.dateNew;
         function isValidate()
         {
              var notificationMessage = "";
@@ -1383,6 +1471,9 @@
                         profile._info.LanguageID = 1;
                         profile._info.IDTypeID = parseInt(profile._info.IDTypeID, 10);
                         profile._info.Token = $rootScope._userInfo.Token;
+
+                        var sTokenString = "";
+                        sTokenString = profile._info.Token;
                         $http({
                             method: "POST",
                             url: GURL + 'ewSavePrimaryEZEData',
@@ -1409,7 +1500,17 @@
                                     document.getElementById("mobile_phone").className = "form-control emptyBox";
 
                                     getISDCode(profile._info.CountryID);
-                                    window.location.href = "#/congratulations";
+                                    if (sTokenString == "")
+                                    {
+                                      $scope.isCloseButtonClicked = true;
+                                      window.location.href = "#/congratulations";
+                                    }
+                                    else
+                                    {
+                                        $scope.isCloseButtonClicked = true;
+                                        window.location.href = "#/home";
+                                    }
+
                    }
                     else {
                                     if (UserForm.$valid) {
@@ -1430,7 +1531,13 @@
                 }
         };
 
-        //Upload Picture
+        this.closeRegistrationForm = function () {
+            $scope.isCloseButtonClicked = true;
+            window.location.href = "#/home";
+        }
+
+
+            //Upload Picture
         $scope.uploadImageForEditLocation = function (image) {
             profile._info.PictureFileName = image[0].name;
             fileToDataURL(image[0]).then(function (dataURL) {
@@ -1555,6 +1662,7 @@
         });
 
         function LoadNotifications(_pageValue){
+
             //_pageValue = _pageValue + 1;
             $http({ method: 'get', url: GURL + 'ewtGetMessages?TokenNo=' + $rootScope._userInfo.Token +'&Page='+_pageValue+'&Status='+msgSen.Status.id +'&MessageType='+msgSen.MessageType.id}).success(function (data) {
 

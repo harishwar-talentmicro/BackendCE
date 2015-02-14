@@ -59,6 +59,11 @@ angular.module('ezeidApp').controller('DocumentController', function($http, $roo
     };
 
     var MsgDelay = 2000;
+    
+    $('#datetimepicker1').datetimepicker({
+
+            format: 'DD-MMM-YYYY'
+    });
 
     $scope.$watch('_userInfo.IsAuthenticate', function () {
         if ($rootScope._userInfo.IsAuthenticate == true) {

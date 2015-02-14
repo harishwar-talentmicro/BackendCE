@@ -57,9 +57,12 @@
                                                     View
                                                 </a>
                                             </div>
+<!--
                                             <div class="form-group">
                                                <input placeholder="Expiry date"  class="form-control" type="text" onfocus="(this.type='date')" id="expirydate" data-ng-model="form.RefExpiryDate" style="width: 86%; float:left; margin-top: 15px;">
                                             </div>
+-->
+                                            <date-time-picker recipient="form.RefExpiryDate"></date-time-picker>
 
                                             <div class="form-group" >
                                                <!-- <input type="file" class="form-control" data-ng-model="fileSelected"

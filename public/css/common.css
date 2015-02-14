@@ -376,3 +376,16 @@ TABS FOR LOCATION CONTROLLER
 {
     margin-left: 1px;
 }
+
+.btn-camera{
+    background: url('../images/camera-icon.png');
+height: 40px;
+width: 40px;
+outline: none;
+border: none;
+background-size: contain;
+display: inline-block;
+position: absolute;
+margin-top: -5px;
+margin-left: 5px;
+}

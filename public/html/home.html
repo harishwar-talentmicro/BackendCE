@@ -105,8 +105,11 @@
                                     Reservation Date & Time:
                                     <!--<input ng-model="search.ReservationDateTime" ng-class="reservationForm.dateTime.$touched && !search.ReservationDateTime.length ? 'mandatoryTextBox' : ''" name="dateTime" class="datePickerWidth emptyBox" id="expenseClaimDate" name="expenseClaimDate" required />-->
                                    <!-- <input  ng-model="search.ReservationDateTime" placeholder="select date" name="dateTime" class="datePickerWidth emptyBox" type="text" onfocus="(this.type='date')">-->
-                                    <input  ng-model="search.ReservationDateTime" name="dateTime" class="datePickerWidth emptyBox" type="datetime-local" name="dtl" >
+<!--                                    <input  ng-model="search.ReservationDateTime" name="dateTime" class="datePickerWidth emptyBox" type="datetime-local" name="dtl" >-->
                                 </label>
+                                <span style="width:60%;display:block;">
+                                <date-time-picker recipient="search.ReservationDateTime"></date-time-picker>
+                                    </span>
                             </p>
                             <textarea id="reservationMessage" ng-class="reservationForm.reservationMessage.$touched && !search.ReservationMessage.length ? 'mandatoryTextBox' : ''" class="form-control fixTextArea emptyBox" name="reservationMessage" ng-model="search.ReservationMessage" placeholder="Reservation requirement details" required></textarea>
                         </div>
@@ -340,7 +343,7 @@
                 <div class="row">
                     <div class="col-md-7" style="margin: auto; float: none;">
                         <ul class="tabDisplay" role="group">
-                            <li id="btn-ad" ng-show="search.mInfo.InfoTab" ng-click="selectTab('ad')" class="tab">Home</li>
+                            <li id="btn-ad" ng-show="0" ng-click="selectTab('ad')" class="tab">Home</li>
                             <li id="btn-info" ng-show="showInfoTab" ng-click="selectTab('info')"  ng-class="{tabActive: infoClass == 'level-1'}" class="tab">Information</li>
 
                             <li id="btn-map" ng-click="selectTab('map')" ng-class="{tabActive: mapClass == 'level-1'}" class="tab">Map</li>
@@ -481,7 +484,7 @@
                                             <div style="margin-top:5px!important;text-align:center;" ng-hide="search.isIndividualUser(1)">
                                                 
                                                 
-                                                <img src="images/Open___48.png" ng-show="search.mInfo.OpenStatus==1"/>
+                                                <img src="images/Open__48.png" ng-show="search.mInfo.OpenStatus==1"/>
                                                 <img src="images/Closed___48.png" ng-hide="search.mInfo.OpenStatus==1" />
                                             </div>
                                         </div>

@@ -202,10 +202,18 @@
                                                 <div class="col-lg-6">
                                                     <div class="col-lg-8" style="margin: auto; float: none;">
                                                         <!--<span ng-hide="_locInfo.IsAuthenticate"> <img ng-show="!image" src="images/user_200.png" width="200"/></span>-->
-                                                        <span ng-show="!SLocCtrl._locInfo.Picture"> <img ng-show="!image" src="images/user_200.png" width="200"/></span>
-                                                        <img ng-show="SLocCtrl._locInfo.Picture" width="200" name="Image" src="{{SLocCtrl._locInfo.Picture}}" required />
+                                                        <div ng-hide="isShowCamera">
+                                                            <span ng-show="!SLocCtrl._locInfo.Picture"> <img ng-show="!image" src="images/user_200.png" width="200"/></span>
+                                                            <img ng-show="SLocCtrl._locInfo.Picture" width="200" name="Image" src="{{SLocCtrl._locInfo.Picture}}" required />
+                                                        </div>
+                                                        
+                                                        <div style="border:1px solid #EEEE;text-align:center;" id="camera-container" ng-show="isShowCamera">
+                                                            <div id="camera"></div>
+                                                            <button class="btn btn-primary" title="Click picture" ng-click="clickPicture()">Click Picture</button>
+                                                        </div>
 
-                                                        <div class="col-lg-12 text-center">
+                                                        <div ng-hide="isShowCamera" style="margin-top:20px;" class="col-lg-12 text-center">
+                                                            <button class="btn-camera" style="margin-left:-50px;" title="Take Picture" ng-click="showCamera()"></button>
                                                              <span class="btn btn-primary btn-file">
                                                                 Attach Picture <input type="file" onchange="angular.element(this).scope().uploadImageForOtherLocation(this.files)" accept="image/*" image="image" resize-max-height="200" resize-max-width="200" resize-quality="0.7">
                                                             </span>
