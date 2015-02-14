@@ -282,9 +282,9 @@
                                                     <!--<span class="input-group-addon"><span class="glyphicon glyphicon-calendar" ></span>-->
                                                     <!--</span>-->
                                                 <!--</div>-->
-                                                <date-time-picker recipient="profile._info.DOB" ></date-time-picker>
+                                                <date-time-picker recipient="profile._info.DOB"  style="width:24%; margin-top: 0px;"></date-time-picker>
 
-                                                <select class="form-control " style="width:24%; margin-top: -4px;" name="Gender" ng-model="profile._info.Gender"
+                                                <select class="form-control " style="width:24%; margin-top: 0px;" name="Gender" ng-model="profile._info.Gender"
                                                         ng-options="status.id as status.label for status in profile.gender" required>
                                                     <option value="">Select Gender </option>
                                                 </select>
@@ -316,7 +316,7 @@
                                            ng-click="profile.savePrimaryRegistration(UserForm)" class="btn btn-primary">Save</button>
                                     <button type="submit" ng-hide="_userInfo.IsAuthenticate" ng-disabled="!profile._info.Terms"
                                             ng-click="profile.savePrimaryRegistration(UserForm)" class="btn btn-primary">Generate EZEID</button>
-                                   <button type="reset" class="btn btn-primary" onclick="window.location.href='#/home'">Close</button>
+                                   <button type="reset" class="btn btn-primary" ng-click="profile.closeRegistrationForm()" >Close</button>
 
                             </div>
                         </div>
