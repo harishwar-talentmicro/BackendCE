@@ -1593,7 +1593,7 @@ exports.FnRegistration = function (req, res) {
         var TokenNo = req.body.Token;
         //Operation I means insert operation and U means update operation
         var Operation = "I";
-        if (TokenNo != '') {
+        if (TokenNo != '' && TokenNo != null) {
             Operation = "U";
         }
         var Icon = req.body.Icon;
@@ -2379,7 +2379,7 @@ exports.FnSaveMessage = function (req, res) {
                             console.log('FnSaveMessage: ToMasterID is empty');
                             res.statusCode = 400;
                         } else if (LocID == null) {
-                            console.log('FnSaveMessage: ToMasterID is empty');
+                            console.log('FnSaveMessage: LocID is empty');
                             res.statusCode = 400;
                         }
                         else {
