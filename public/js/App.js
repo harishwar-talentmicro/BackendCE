@@ -40,9 +40,7 @@
                     '</div>',
                 link: function(scope, element, attrs, ngModel) {
                 var input = element.find('input');
-                console.log(input);
-                    input.bind('blur',function(){
-                        console.log(input.val());
+                   input.bind('blur',function(){
                         scope.recipient = input.val();
                     });
 //                element.bind('blur keyup change', function(){
@@ -694,8 +692,7 @@
 
         //Send Reservation
         SearchSec.sendReservation = function (messageType) {
-            console.log(SearchSec.mInfo.LocID);
-            if ($rootScope._userInfo.IsAuthenticate == true) {
+           if ($rootScope._userInfo.IsAuthenticate == true) {
                  var dateTime = $filter('date')(new Date(SearchSec.ReservationDateTime), 'MM/dd/yyyy HH:mm:ss');
                 //var dateTime = $filter('date')(SearchSec.ReservationDateTime, 'MM/dd/yyyy HH:mm:ss');  /*dd-MM-yyyy HH:mm a*/
                $http({ method: 'post', url: GURL + 'ewtSaveMessage', data: { TokenNo: $rootScope._userInfo.Token, ToMasterID: SearchSec.mInfo.TID, MessageType: messageType, Message: SearchSec.ReservationMessage, TaskDateTime: dateTime, LocID :SearchSec.mInfo.LocID} }).success(function (data) {
@@ -851,22 +848,23 @@
         profile.countries = [];
         profile.states = [];
         var showCurrentLocation = true;
+        $scope.isCloseButtonClicked = false;
 
         $('#datetimepicker1').datetimepicker({
 
             format: 'DD-MMM-YYYY'
         });
+          $scope.$on('$locationChangeStart', function( event ) {
+            if($scope.isCloseButtonClicked == false)
+                {
+                    var answer = confirm("Are you sure you want to leave this page?")
+                    if (!answer) {
+                        event.preventDefault();
+                    }
+                }
+         });
 
-        $scope.$on('$locationChangeStart', function( event ) {
-            var answer = confirm("Are you sure you want to leave this page?")
-            if (!answer) {
-                event.preventDefault();
-            }
-        });
-
-            //    $('#datetimepicker1').datetimepicker();
-
-
+  //    $('#datetimepicker1').datetimepicker();
         var map;
         var mapOptions;
 //        var myinfowindow = new google.maps.InfoWindow({
@@ -1424,8 +1422,6 @@
                 }
                 if(profile._info.IDTypeID  == '1')
                 {
-                    console.log(profile._info.DOB);
-                   // console.log($scope.dateNew);
                     if(!profile._info.DOB)
                     {
                         notificationMessage += notificationMessage != "" ? ", Date of birth Required " : "Date of birth Required";
@@ -1446,8 +1442,6 @@
             this.savePrimaryRegistration = function (UserForm) {
                 if(isValidate())
                 {
-                    console.log(profile._info.DOB);
-
                     var sEzeid = profile._info.EZEID;
                     var lastTwo = sEzeid.substr(sEzeid.length - 2);
                     if(lastTwo != "ap")
@@ -1474,6 +1468,9 @@
                         profile._info.LanguageID = 1;
                         profile._info.IDTypeID = parseInt(profile._info.IDTypeID, 10);
                         profile._info.Token = $rootScope._userInfo.Token;
+
+                        var sTokenString = "";
+                        sTokenString = profile._info.Token;
                         $http({
                             method: "POST",
                             url: GURL + 'ewSavePrimaryEZEData',
@@ -1500,7 +1497,17 @@
                                     document.getElementById("mobile_phone").className = "form-control emptyBox";
 
                                     getISDCode(profile._info.CountryID);
-                                    window.location.href = "#/congratulations";
+                                    if (sTokenString == "")
+                                    {
+                                      $scope.isCloseButtonClicked = true;
+                                      window.location.href = "#/congratulations";
+                                    }
+                                    else
+                                    {
+                                        $scope.isCloseButtonClicked = true;
+                                        window.location.href = "#/home";
+                                    }
+
                    }
                     else {
                                     if (UserForm.$valid) {
@@ -1521,7 +1528,13 @@
                 }
         };
 
-        //Upload Picture
+        this.closeRegistrationForm = function () {
+            $scope.isCloseButtonClicked = true;
+            window.location.href = "#/home";
+        }
+
+
+            //Upload Picture
         $scope.uploadImageForEditLocation = function (image) {
             profile._info.PictureFileName = image[0].name;
             fileToDataURL(image[0]).then(function (dataURL) {
@@ -1646,6 +1659,7 @@
         });
 
         function LoadNotifications(_pageValue){
+
             //_pageValue = _pageValue + 1;
             $http({ method: 'get', url: GURL + 'ewtGetMessages?TokenNo=' + $rootScope._userInfo.Token +'&Page='+_pageValue+'&Status='+msgSen.Status.id +'&MessageType='+msgSen.MessageType.id}).success(function (data) {
 
