@@ -8,6 +8,10 @@ FooterApp.directive('footerSection', function () {
             this.ContactUS = function () {
                 window.location.href = "index.html?ID=TALENTMICRO";
             };
+
+            this.closeLegal = function() {
+                $("#Legal_popup").slideUp();
+            };
         },
         controllerAs: 'FooterCtrl',
         link: function () {
@@ -18,5 +22,10 @@ FooterApp.directive('footerSection', function () {
                 $("#Legal_popup").slideUp();
             });
         }
+
     };
+
+
+
+
 });
