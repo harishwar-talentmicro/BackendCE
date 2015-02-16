@@ -113,8 +113,8 @@
                                                 <div class="col-lg-6">
                                                     <div class="row mar_editTop" style="margin-left:0px;margin-right:0px;">
                                                         <span><label><strong>&nbsp;Primary Address</strong> </label></span><br/>
-                                                        <input type="text" name="Add1" class="form-control emptyBox" id="streeName" ng-model="SLocCtrl._locInfo.AddressLine1" ng-class="SecLocForm.Add1.$touched && !SLocCtrl._locInfo.AddressLine1.length ? 'mandatoryTextBox' : ''" placeholder="No., Building Name, Street Name" style="width: 48%" required>
-                                                        <input type="text" name="Add2" class="form-control emptyBox" id="block" ng-model="SLocCtrl._locInfo.AddressLine2" ng-class="SecLocForm.Add2.$touched && !SLocCtrl._locInfo.AddressLine2.length ? 'mandatoryTextBox' : ''" placeholder="Block, Area, Sector"  style="width: 48%" required>
+                                                        <input type="text" name="Add1" class="form-control emptyBox" maxlength="45" id="streeName" ng-model="SLocCtrl._locInfo.AddressLine1" ng-class="SecLocForm.Add1.$touched && !SLocCtrl._locInfo.AddressLine1.length ? 'mandatoryTextBox' : ''" placeholder="No., Building Name, Street Name" style="width: 48%" required>
+                                                        <input type="text" name="Add2" class="form-control" maxlength="45" id="block" ng-model="SLocCtrl._locInfo.AddressLine2" placeholder="Block, Area, Sector"  style="width: 48%" >
                                                     </div>
                                                     <br/>
                                                     <div class="row mar_editTop" style="margin-left:0px;margin-right:0px;">
@@ -226,11 +226,11 @@
                                         </div>
                                             <br/>
                                             <input style="margin-top:-30px;" ng-hide="SLocCtrl.editSecLocEnb" type="submit" ng-click="SLocCtrl.saveNewLoc(SecLocForm)"
-                                                   ng-disabled="!SLocCtrl._locInfo.LocTitle || !SLocCtrl._locInfo.AddressLine1 || !SLocCtrl._locInfo.AddressLine2 || !SLocCtrl._locInfo.CityTitle || !SLocCtrl._locInfo.PostalCode || !SLocCtrl._locInfo.MobileNumber" class="btn-primary btn" value="Save"/>
+                                                   ng-disabled="!SLocCtrl._locInfo.LocTitle || !SLocCtrl._locInfo.AddressLine1 || !SLocCtrl._locInfo.CityTitle || !SLocCtrl._locInfo.PostalCode || !SLocCtrl._locInfo.MobileNumber" class="btn-primary btn" value="Save"/>
                                             <input style="margin-top:-30px;" ng-show="SLocCtrl.editSecLocEnb" type="submit" ng-click="SLocCtrl.updateNewLoc(SecLocForm)"
                                                    class="btn-primary btn" value="Update"/>
                                             <input style="margin-top:-30px;" type="button" ng-click="SLocCtrl.closeNewLoc(SecLocForm)"
-                                                   class="btn-primary btn" value="close"/>
+                                                   class="btn-primary btn" value="Close"/>
                                         </div>
                                  <!--</form>-->
 

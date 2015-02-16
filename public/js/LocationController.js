@@ -156,6 +156,7 @@ angular.module('ezeidApp').controller('LocationsController', function ($rootScop
       //  SLocCtrl._locInfo.StateID = stateId;
 
         SLocCtrl._locInfo = SLocCtrl.LocationsList[index];
+
         SLocCtrl.editSecLocEnb = true;
         //SLocCtrl._locInfo = row;
         SLocCtrl.IsShowForm = true;
@@ -222,7 +223,6 @@ angular.module('ezeidApp').controller('LocationsController', function ($rootScop
 
                     document.getElementById("Location").className = "form-control emptyBox";
                     document.getElementById("streeName").className = "form-control emptyBox";
-                    document.getElementById("block").className = "form-control emptyBox";
                     document.getElementById("cities").className = "form-control emptyBox";
                     document.getElementById("postalCode").className = "form-control emptyBox";
                     document.getElementById("mobile_phone").className = "form-control emptyBox";
@@ -428,8 +428,8 @@ angular.module('ezeidApp').controller('LocationsController', function ($rootScop
     }
     function getAddressForLocation(results) {
 
-        SLocCtrl._locInfo.AddressLine1 = "";
-        SLocCtrl._locInfo.AddressLine2 = "";
+       // SLocCtrl._locInfo.AddressLine1 = "";
+       // SLocCtrl._locInfo.AddressLine2 = "";
         //SLocCtrl._locInfo.CountryID = "";
         //  SLocCtrl._locInfo.StateID = "";
         SLocCtrl._locInfo.CityTitle  = "";
@@ -437,7 +437,7 @@ angular.module('ezeidApp').controller('LocationsController', function ($rootScop
 
         angular.forEach(results, function (mapResultValue, index) {
 
-            if (mapResultValue.types[0] == 'street_number') {
+            /*if (mapResultValue.types[0] == 'street_number') {
                 SLocCtrl._locInfo.AddressLine1 = mapResultValue.long_name;
                // $scope.$apply();
             }
@@ -485,7 +485,7 @@ angular.module('ezeidApp').controller('LocationsController', function ($rootScop
                     SLocCtrl._locInfo.AddressLine2 = mapResultValue.long_name;
                   //  $scope.$apply();
                 }
-            }
+            }*/
 
             if (mapResultValue.types[0] == 'locality') {
                 if (SLocCtrl._locInfo.CityTitle  != "") {
