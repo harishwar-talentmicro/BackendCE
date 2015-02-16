@@ -264,7 +264,7 @@
                                                 Search by  <input value="1" id="EZEID" ng-model="search.Criteria.SearchType" type="radio">
                                                 <label for="EZEID">EZEID</label>
                                                 <input value="2" id="Keywords" ng-model="search.Criteria.SearchType" type="radio" ng-click="search.SearchTypeKeyWord()">
-                                                <label for="Keywords">Key words</label>
+                                                <label for="Keywords">Keywords</label>
                                             </label>
                                         </div>
                                         <!--<div class="col-lg-6 col-md-6 col-sm-6 col-xs-1">-->
@@ -288,26 +288,32 @@
                                     </div>
                                     <div class="bottom-clearfix"></div>
                                     <div class="row row-margin-fix">
-                                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3" ng-hide="1">
                                             <select class="form-control pull-left" ng-init="search.Criteria.OpenStatus = search.OpenStatuses[0]" ng-model="search.Criteria.OpenStatus" ng-disabled="search.isEZEIDselected('1')"
                                                     ng-options="status.id as status.label for status in search.OpenStatuses">
                                                 <option value="">Any</option>
                                             </select>
 
                                         </div>
-                                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                                        <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12" style="padding-right:0px;" ng-hide="search.isEZEIDselected('1')">
+                                            <div style="display:table-cell;vertical-align:middle;height:34px;">
+                                            Search near map <a ng-click="selectTab('map')" style="cursor:pointer;">location</a>  within
+                                            </div>
+                                        </div>
+<!--                                        <img src="./images/map_marker.png" height="24px" width="24px">-->
+                                        <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6" ng-hide="search.isEZEIDselected('1')">
                                             <select class="form-control pull-left"
                                                     ng-model="search.Criteria.Proximity" ng-disabled="search.isEZEIDselected('1')"
                                                     >
                                                 <option value="{{proximity.MilesValue}}"  ng-selected="{{proximity.MilesValue == 1}}" ng-repeat="proximity in search.proximities">{{proximity.Title}}</option>
                                                 <option value="0">Any</option>
                                             </select>
-                                            
-
                                         </div>
-                                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-4">
+                                        <div class="col-lg-5 col-md-5 col-sm-6 col-xs-12">
+                                            
                                             <div style="display:table-cell;vertical-align:middle;height:34px;">
-                                            <input type="checkbox" ng-model="search.Criteria.ParkingStatus" name="parking" value="1,2"><span> Show Places with Parking only</span>
+                                                <span ng-hide="search.isEZEIDselected('1')" >Proximity </span> 
+                                            <input type="checkbox" ng-model="search.Criteria.ParkingStatus" name="parking" value="1,2"><span> Show Places with Parking</span>
                                             </div>
                                         </div>
 
@@ -498,11 +504,11 @@
                                 <div class="row row-margin-fix" ng-show="search.isIndividualUser(1)">
                                     <div class="col-lg-10 col-sm-10 col-md-10 col-xs-10">
                                         <div class="row row-margin-clearfix">
-                                            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 col-lg-offset-2 col-md-offset-2 col-sm-offset-2 col-xs-offset-2" ng-hide="search.mInfo.EZEIDVerifiedID != '2'" ng-click="search.openSendMessageForm()"  title="Message">
+                                            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 col-lg-offset-2 col-md-offset-2 col-sm-offset-2 col-xs-offset-2" ng-click="search.openSendMessageForm()"  title="Message">
                                                 <button  class="info-icon-btn noti-icon">Message</button>
 
                                             </div>
-                                            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2" ng-hide="search.mInfo.EZEIDVerifiedID != '2'" title="Appointment" ng-click="search.openReservationForm()">
+                                            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2" title="Appointment" ng-click="search.openReservationForm()">
                                                 <button class="info-icon-btn appoinment-icon" >Appointment</button>
 
                                             </div>
@@ -522,24 +528,24 @@
                                     
                                     <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10">
                                         <div class="row">
-                                            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 col-lg-offset-2 col-sm-offset-2 col-md-offset-2 col-xs-offset-2" ng-hide="search.mInfo.SalesEnquiryButton==0" ng-disabled="search.mInfo.SalesEnquiryButton==2 || search.mInfo.EZEIDVerifiedID == '1'" title="Sales Enquiry" ng-click="search.openSalesEnquiryForm()">
+                                            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 col-lg-offset-2 col-sm-offset-2 col-md-offset-2 col-xs-offset-2" ng-hide="search.mInfo.SalesEnquiryButton==2 || search.mInfo.EZEIDVerifiedID == '1'" ng-disabled="search.mInfo.SalesEnquiryButton==2 || search.mInfo.EZEIDVerifiedID == '1'" title="Sales Enquiry" ng-click="search.openSalesEnquiryForm()">
                                                 <button class="info-icon-btn sales-icon">Sales Enquiry</button>
                                                 
                                             </div>
-                                            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2" ng-hide="search.mInfo.HomeDeliveryButton==0" ng-disabled="search.mInfo.HomeDeliveryButton==2 || search.mInfo.EZEIDVerifiedID == '1'" title="Home Delivery" ng-click="search.openHomeDeliverForm()">
+                                            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2" ng-hide="search.mInfo.HomeDeliveryButton==2 || search.mInfo.EZEIDVerifiedID == '1'" ng-disabled="search.mInfo.HomeDeliveryButton==2 || search.mInfo.EZEIDVerifiedID == '1'" title="Home Delivery" ng-click="search.openHomeDeliverForm()">
                                                 <button class="info-icon-btn home-icon">Home Delivery</button>
 
                                             </div>
-                                            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2"  ng-hide="search.mInfo.ReservationButton==0" ng-disabled="search.mInfo.ReservationButton==2 || search.mInfo.EZEIDVerifiedID == '1'" title="Reservation" ng-click="search.openReservationForm()">
+                                            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2"  ng-hide="search.mInfo.ReservationButton==2 || search.mInfo.EZEIDVerifiedID == '1'" ng-disabled="search.mInfo.ReservationButton==2 || search.mInfo.EZEIDVerifiedID == '1'" title="Reservation" ng-click="search.openReservationForm()">
                                                                                         <button class="info-icon-btn reservation-icon"> Reservation</button>
 
                                             </div>
-                                            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2" ng-hide="search.mInfo.SupportButton==0" ng-disabled="search.mInfo.SupportButton==2 || search.mInfo.EZEIDVerifiedID == '1'" title="Support Request" ng-click="search.openServiceRequestForm()">
+                                            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2" ng-hide="search.mInfo.SupportButton==2 || search.mInfo.EZEIDVerifiedID == '1'" ng-disabled="search.mInfo.SupportButton==2 || search.mInfo.EZEIDVerifiedID == '1'" title="Support Request" ng-click="search.openServiceRequestForm()">
                                                 <button class="info-icon-btn support-icon" >Support Request</button>
 
                                             </div>
                                             <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2"  ng-disabled="search.mInfo.CVButton==2 || search.mInfo.EZEIDVerifiedID == '1'" title="Send CV" ng-click="search.openCVForm()">
-                                                <button class="info-icon-btn sendcv-icon" ng-hide="search.mInfo.CVButton==0">Send CV</button>
+                                                <button class="info-icon-btn sendcv-icon" ng-hide="search.mInfo.CVButton==2 || search.mInfo.EZEIDVerifiedID == '1'">Send CV</button>
                                         
                                             </div>
                                         </div>
