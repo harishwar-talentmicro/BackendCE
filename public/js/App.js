@@ -68,14 +68,12 @@
                 link: function(scope, element, attrs, ngModel) {
                 var input = element.find('input');
                 input.bind('blur change keyup',function(){
-                    console.log(scope.recipient);
                     scope.recipient = input.val();
                     scope.$apply();
                 });
                     
                 scope.$watch('recipient',function(oldVal,newVal){
                     $(input[0]).val(oldVal);
-                    console.log(scope.recipient);
                 });
             }
         }
@@ -143,7 +141,7 @@
         }
 
         $('#datetimepicker1').datetimepicker({
-           format: "ddd, DD MM YYYY - hh:mm A"
+           format: "DD-MMM-YYYY  hh:mm A"
         });
         /**
          * Opens Help Popup when help link is clicked
@@ -170,8 +168,8 @@
             content: ''
         });
         var service;
-        var today = $filter('date')(new Date(), 'MM/dd/yyyy HH:mm:ss');
-
+        var today = moment(new Date()).utc().format('DD-MMM-YYYY hh:mm A');
+        
         $('#datetimepicker1').datetimepicker({
 
             format: 'DD-MMM-YYYY  HH:mm: a'
@@ -184,15 +182,6 @@
         }
 
         var SearchSec = this;
-        
-//        
-//        // Checking if the map is loaded or not 
-//        $interval(function() {
-//            try{
-//                
-//            }
-//            
-//        },2000);
         
         SearchSec.IsShowForm = false;
 
@@ -362,7 +351,8 @@
                     var marker = new google.maps.Marker({
                         position: pos,
                         map: map,
-                        icon: mapIcon,
+                        icon: (_item.Icon !== "") ? _item.Icon : mapIcon,
+                        
                         title: mTitle
                     });
 //                    map.setCenter(pos);
@@ -733,8 +723,12 @@
         //Send Reservation
         SearchSec.sendReservation = function (messageType) {
            if ($rootScope._userInfo.IsAuthenticate == true) {
-                 var dateTime = $filter('date')(new Date(SearchSec.ReservationDateTime), 'MM/dd/yyyy HH:mm:ss');
-                //var dateTime = $filter('date')(SearchSec.ReservationDateTime, 'MM/dd/yyyy HH:mm:ss');  /*dd-MM-yyyy HH:mm a*/
+               
+               /**
+                * Converting LOCAL Time to UTC Time
+               */
+               var dateTime = moment(SearchSec.ReservationDateTime).utc().format('DD-MMM-YYYY hh:mm A');
+               
                $http({ method: 'post', url: GURL + 'ewtSaveMessage', data: { TokenNo: $rootScope._userInfo.Token, ToMasterID: SearchSec.mInfo.TID, MessageType: messageType, Message: SearchSec.ReservationMessage, TaskDateTime: dateTime, LocID :SearchSec.mInfo.LocID} }).success(function (data) {
                     if (data.IsSuccessfull) {
                         $('#Reservation_popup').slideUp();
@@ -1056,7 +1050,6 @@
                     profile._info.ReservationButton = profile._info.ReservationButton == 1 ? true : false;
                     profile._info.SupportButton = profile._info.SupportButton == 1 ? true : false;
                     profile._info.CVButton = profile._info.CVButton == 1 ? true : false;
-                console.log(data[0].DOB);
                     profile._info.DOB = data[0].DOB;
                     // profile._info.DOB = $filter('date')(new Date(data[0].DOB), 'dd-MMM-yyyy');
                     // console.log(profile._info.DOB);
@@ -1705,6 +1698,28 @@
             }
         });
 
+        /**
+         * Function for converting UTC time from server to LOCAL timezone
+        */
+        var convertTimeToLocal = function(timeFromServer,dateFormat){
+            if(!dateFormat){
+                dateFormat = 'DD-MMM-YYYY hh:mm A';
+            }
+            var x = new Date(timeFromServer);
+            var mom1 = moment(x);
+            return mom1.add((mom1.utcOffset()),'m').format(dateFormat);
+        };
+        
+        /**
+         * Function for converting LOCAL time (local timezone) to server time
+        */
+        var convertTimeToUTC = function(localTime,dateFormat){
+            if(!dateFormat){
+                dateFormat = 'DD-MMM-YYYY hh:mm A';
+            }
+            return moment(localTime).utc().format(dateFormat);
+        };
+        
         function LoadNotifications(_pageValue){
 
             //_pageValue = _pageValue + 1;
@@ -1713,6 +1728,7 @@
                 //if (data.length > 0) {
                 if (data != 'null') {
                     for (var i = 0; i < data.length; i++) {
+                        data[i].TaskDateTime = convertTimeToLocal(data[i].TaskDateTime,'DD-MMM-YYYY hh:mm A');
                         msgSen.msgs.push(data[i]);
                         showPaging = data[0]['NextPage'];
                     }
@@ -1881,12 +1897,37 @@
             }
         });
 
+        /**
+         * Function for converting UTC time from server to LOCAL timezone
+        */
+        var convertTimeToLocal = function(timeFromServer,dateFormat){
+            if(!dateFormat){
+                dateFormat = 'DD-MMM-YYYY hh:mm A';
+            }
+            var x = new Date(timeFromServer);
+            var mom1 = moment(x);
+            return mom1.add((mom1.utcOffset()),'m').format(dateFormat);
+        };
+        
+        /**
+         * Function for converting LOCAL time (local timezone) to server time
+        */
+        var convertTimeToUTC = function(localTime,dateFormat){
+            if(!dateFormat){
+                dateFormat = 'DD-MMM-YYYY hh:mm A';
+            }
+            return moment(localTime).utc().format(dateFormat);
+        };
+        
+        
         function LoadHistory(_pageValue){
 
             $http({ method: 'get', url: GURL + 'ewtGetAccessHistory?TokenNo=' + $rootScope._userInfo.Token + '&Page='+_pageValue }).success(function (data) {
 
                 if (data != 'null') {
                     for (var i = 0; i < data.length; i++) {
+                        data[i].AccessDate = convertTimeToLocal(data[i].AccessDate,'DD-MMM-YYYY hh:mm A');
+                        
                         msgSen.msgs.push(data[i]);
                         showPaging = data[0]['NextPage'];
                     }
