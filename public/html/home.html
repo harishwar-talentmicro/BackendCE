@@ -245,6 +245,10 @@
                         <div ng-include="'html/help.html'"  style="width: 98%; height: 350px; overflow-y: scroll; padding: 5px;">
                             <!-- Terms.html include hear... -->
                         </div>
+                        <span style="text-align: center">
+                             <input type="button" style="margin-left: 45%; margin-top: 1%;" ng-click="closeHelpPopup()" class="btn btn-primary " value="Close">
+                        </span>
+
                     </div>
                 </div>
             </div>
@@ -287,7 +291,7 @@
                                         </div>
                                     </div>
                                     <div class="bottom-clearfix"></div>
-                                    <div class="row row-margin-fix">
+                                    <div class="row row-margin-fix" ng-show="SearchSec.IsFilterRowVisible">
                                         <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3" ng-hide="1">
                                             <select class="form-control pull-left" ng-init="search.Criteria.OpenStatus = search.OpenStatuses[0]" ng-model="search.Criteria.OpenStatus" ng-disabled="search.isEZEIDselected('1')"
                                                     ng-options="status.id as status.label for status in search.OpenStatuses">
@@ -367,6 +371,11 @@
                                                 <img ng-hide="search.mInfo.Picture!=''" ng-src="images/Map_logo.png" height="120px" width="120px">    
                                             </div>
                                         </div>
+                                        <div class="row text-center">
+                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                <h4 style="font-weight:bold;text-transform:uppercase;">{{search.mInfo.EZEID}}</h4>
+                                            </div>
+                                        </div>
                                         
                                     </div>
                                     
@@ -441,7 +450,7 @@
                                     <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
                                         <div class="row text-center">
                                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                                <h4>{{search.mInfo.EZEID}}</h4>
+                                                
                                             </div>
                                         </div>
                                     </div>

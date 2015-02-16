@@ -520,7 +520,7 @@ exports.FnLogin = function (req, res) {
         if (UserName != null && UserName != '' && Password != null && Password != '') {
             var EncryptPWD = FnEncryptPassword(Password);
             // console.log(EncryptPWD);
-            var Query = 'select TID,FirstName,LastName,EZEID,IDTypeID,Token,Icon from tmaster where StatusID=1 and  EZEID=' + db.escape(UserName) + ' and Password=' + db.escape(EncryptPWD);
+            var Query = 'select TID,FirstName,LastName,EZEID,IDTypeID,Token,Icon from tmaster where EZEID=' + db.escape(UserName) + ' and Password=' + db.escape(EncryptPWD);
             db.query(Query, function (err, loginResult) {
                 if (!err) {
                     if (loginResult.length > 0) {
@@ -4074,9 +4074,8 @@ exports.FnLoginAP = function (req, res) {
         };
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
         if (UserName != null && UserName != '' && Password != null && Password != '') {
-            var EncryptPassword= FnEncryptPassword(Password);
-            console.log(EncryptPassword);
-            var Query = 'select TID, FullName,APMasterID from tapuser where APLoginID=' + db.escape(UserName) + ' and APPassword=' + db.escape(EncryptPassword);
+
+            var Query = 'select TID, FullName,APMasterID from tapuser where APLoginID=' + db.escape(UserName) + ' and APPassword=' + db.escape(Password);
             db.query(Query, function (err, loginResult) {
                 if (!err) {
                     if (loginResult.length > 0) {
