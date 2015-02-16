@@ -53,40 +53,45 @@
                                         <form>
                                             <div class="form-group">
                                                 <input type="text" class="form-control" id="idnumber" data-ng-model="form.RefNo" placeholder="{{IdPlaceHolder}}" style="margin-bottom: 6%; width: 86%; float:left;">
-                                               <!-- <a style="float: right; margin-top: 7px;" ng-show="showDownloadLink" class="blue" target="_blank" href="/ewTgetDocument?TokenNo={{Token}}&&RefType={{OptionSelected}}">
+                                                <!--<a style="float: right; margin-top: 7px;" ng-show="showDownloadLink" class="blue" target="_blank" href="/ewTgetDocument?TokenNo={{Token}}&&RefType={{OptionSelected}}">
                                                     View
                                                 </a>-->
                                             </div>
-<!--
-                                            <div class="form-group">
-                                               <input placeholder="Expiry date"  class="form-control" type="text" onfocus="(this.type='date')" id="expirydate" data-ng-model="form.RefExpiryDate" style="width: 86%; float:left; margin-top: 15px;">
-                                            </div>
--->
-                                            <date-time-picker  recipient="form.RefExpiryDate" style="margin-top:1%"></date-time-picker>
+
+                                            <date-time-picker  recipient="form.RefExpiryDate" style="margin-top:1%; width: 86%;"></date-time-picker>
 
                                             <div class="form-group" >
-                                               <!-- <input type="file" class="form-control" data-ng-model="fileSelected"
-                                                       onchange="angular.element(this).scope().uploadFile(this.files)" style="width: 86%; float:left; margin-top: 15px;"/>
-                                                -->
-                                                <span class="btn btn-primary btn-file" style="width: 86%; float:left; margin-top: 15px;">
-                                                    Choose File <input type="file" onchange="angular.element(this).scope().uploadFile(this.files)">
+                                               <span class="btn btn-primary btn-file" style="width: 72%; float:left; margin-top: 15px;">
+                                                      <span ng-show="showDownloadLink">
+                                                       Choose File (Selected)
+                                                       </span>
+                                                       <span ng-hide="showDownloadLink">
+                                                           Choose File (Empty)
+                                                       </span>
+
+                                                <input type="file" onchange="angular.element(this).scope().uploadFile(this.files)">
                                                 </span>
 
-                                                <span class="pull-right"
+                                                <a style="float: right; margin-top: 25px; margin-right: 40px;" ng-show="showDownloadLink" class="blue" target="_blank" href="/ewTgetDocument?TokenNo={{Token}}&&RefType={{OptionSelected}}">
+                                                    View
+                                                </a>
+
+                                                <!--<span class="pull-right"
                                                      style="margin-top:8px;"
                                                     ng-show="form.Doc!= 'null'">
 
-                                                   <!-- <a ng-show="showDownloadLink" class="blue" target="_blank" href="/ewTgetDocument?TokenNo={{Token}}&&RefType={{OptionSelected}}">
+                                                  &lt;!&ndash; <a ng-show="showDownloadLink" class="blue" target="_blank" href="/ewTgetDocument?TokenNo={{Token}}&&RefType={{OptionSelected}}">
                                                         Download Document
-                                                    </a>-->
-                                                </span><br/>
+                                                    </a>&ndash;&gt;
+                                                </span>-->
                                                 <br/>
                                             </div>
-                                            <p></p>
-                                            <p></p>
+                                            <div class="form-group" style="padding-top: 39px;">
+                                                <button style="float:left; margin-top: 5px;" type="submit" ng-disabled="!form.RefNo.length || !form.RefExpiryDate.length" class="btn btn-primary" ng-click="OnSaveDocument()">Save</button>
+                                                <button style=" margin-top: 5px; margin-left: 5px;"  type="submit" ng-click="closeDocument()" class="btn btn-primary">Close</button>
+                                            </div>
 
-                                            <button style="float:left; margin-top: 15px;" type="submit" ng-disabled="!form.RefNo.length || !form.RefExpiryDate.length" class="btn btn-primary" ng-click="OnSaveDocument()">Save</button>
-                                            <button style="margin-left:5px;  margin-top: 15px;"  type="submit" ng-click="closeDocument()" class="btn btn-primary">Close</button>
+
                                         </form>
                                     </div>
                                 </div>

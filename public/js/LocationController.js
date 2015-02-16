@@ -89,10 +89,16 @@ angular.module('ezeidApp').controller('LocationsController', function ($rootScop
 				image_format: 'jpeg',
 				jpeg_quality: 92
 			});
+
         $scope.showCamera = function(){
             $scope.isShowCamera = true;
             Webcam.attach( '#camera' );
         };
+
+        $scope.hideCamera = function(){
+            Webcam.reset();
+            $scope.isShowCamera = false;
+        }
         
         $scope.clickPicture = function(){
                 $scope.isShowCamera = false;

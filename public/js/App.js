@@ -885,13 +885,17 @@
         $scope.isCloseButtonClicked = false;
 
         $('#datetimepicker1').datetimepicker({
-
             format: 'DD-MMM-YYYY'
         });
+        //Below code not allow user to select feture date
+        $("#datetimepicker1").on("dp.change",function (e) {
+            $('#datetimepicker1').data("DateTimePicker").maxDate(e.date);
+        });
+
           $scope.$on('$locationChangeStart', function( event ) {
             if($scope.isCloseButtonClicked == false)
                 {
-                    var answer = confirm("Are you sure you want to leave this page?")
+                    var answer = confirm("Click OK to exit this page")
                     if (!answer) {
                         event.preventDefault();
                     }
@@ -941,7 +945,10 @@
             $scope.isShowCamera = true;
             Webcam.attach( '#camera' );
         };
-        
+        $scope.hideCamera = function(){
+            Webcam.reset();
+            $scope.isShowCamera = false;
+        };
         $scope.clickPicture = function(){
                 $scope.isShowCamera = false;
                 //Webcam.reset();
