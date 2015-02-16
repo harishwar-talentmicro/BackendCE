@@ -4327,9 +4327,9 @@ exports.FnChangePasswordAP = function (req, res) {
             FnValidateTokenAP(TokenNo, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
-                        //var EncryptOldPWD = FnEncryptPassword(OldPassword);
-                        //var EncryptNewPWD = FnEncryptPassword(NewPassword);
-                        var Query = db.escape(TokenNo) + ',' + db.escape(OldPassword) + ',' + db.escape(NewPassword);
+                        var EncryptOldPWD = FnEncryptPassword(OldPassword);
+                        var EncryptNewPWD = FnEncryptPassword(NewPassword);
+                        var Query = db.escape(TokenNo) + ',' + db.escape(EncryptOldPWD) + ',' + db.escape(EncryptNewPWD);
                         db.query('CALL pChangePasswordAP(' + Query + ')', function (err, ChangePasswordResult) {
                             if (!err) {
                                 //console.log(ChangePasswordResult);
@@ -4396,8 +4396,8 @@ exports.FnForgetPasswordAP = function (req, res) {
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
         if (LoginID != null) {
             var Password = FnRandomPassword();
-            //  var EncryptPWD = FnEncryptPassword(Password);
-            var Query = 'Update tapuser set APPassword= ' + db.escape(Password) + ' where APLoginID=' + db.escape(LoginID);
+             var EncryptPWD = FnEncryptPassword(Password);
+            var Query = 'Update tapuser set APPassword= ' + db.escape(EncryptPWD) + ' where APLoginID=' + db.escape(LoginID);
             // console.log('FnForgotPassword: ' + Query);
             db.query(Query, function (err, ForgetPasswordResult) {
                 if (!err) {
@@ -4416,30 +4416,27 @@ exports.FnForgetPasswordAP = function (req, res) {
                                         if (err) throw err;
                                         data = data.replace("[Firstname]", UserResult[0].Fullname);
                                         data = data.replace("[Lastname]", "");
-                                        data = data.replace("[Password]", UserResult[0].APPassword);
+                                        data = data.replace("[Password]", Password);
 
-                                        //console.log('Body:' + data);
                                         var mailOptions = {
-                                            from: EZEIDEmail,
+                                            from: 'noreply@ezeid.com',
                                             to: UserResult[0].EMailID,
                                             subject: 'Password reset request',
                                             html: data // html body
                                         };
-                                        console.log(mailOptions);
+
                                         // send mail with defined transport object
-                                        FnSendMailEzeid(mailOptions, function (err, Result) {
+                                        //message Type 7 - Forgot password mails service
+                                        var post = { MessageType: 7, ToMailID: mailOptions.to, Subject: mailOptions.subject, Body: mailOptions.html };
+                                        // console.log(post);
+                                        var query = db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
+                                            // Neat!
                                             if (!err) {
-                                                if (Result != null) {
-                                                    console.log('FnForgetPassword: Mail Sent Successfully');
-                                                    res.send(RtnMessage);
-                                                }
-                                                else {
-                                                    console.log('FnForgetPassword: Mail not Sent Successfully');
-                                                    res.send(RtnMessage);
-                                                }
+                                                console.log('FnRegistration: Mail saved Successfully');
+                                                res.send(RtnMessage);
                                             }
                                             else {
-                                                console.log('FnForgetPassword:Error in sending mails' + err);
+                                                console.log('FnRegistration: Mail not Saved Successfully' + err);
                                                 res.send(RtnMessage);
                                             }
                                         });
