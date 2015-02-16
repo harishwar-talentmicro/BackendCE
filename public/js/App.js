@@ -2,7 +2,27 @@
     var ezeid = angular.module('ezeidApp',
         ['ngHeader','ngRoute', 'ngFooter', 'ui-notification','imageupload']);
 
-    ezeid.config(['$routeProvider',function($routeProvider){
+    //HTTP Interceptor for detecting token expiry
+    //Reloads the whole page in case of Unauthorized response from api
+    ezeid.factory('ezeidInterceptor',['$rootScope','Notification','$timeout',function($rootScope,Notification,$timeout){
+        var ezeidInterceptor = {
+            responseError : function(respErr){
+                if(respErr.status == 401 && resp.statusText == 'Unauthorized'){
+                    localStorage.removeItem("_token");
+                    $rootScope._userInfo = data;
+                    $rootScope.IsIdAvailable = false;
+                    Notification.error({message:'Your session has expired! Please login to continue',delay:4000});
+                    $timeout(function(){
+                        //Reloading page on token expiry                    
+                        window.location.reload(true);
+                    },3000);
+                }
+            }
+        };
+        return ezeidInterceptor;
+    }]);
+    
+    ezeid.config(['$routeProvider','$httpProvider',function($routeProvider,$httpProvider){
         $routeProvider.when('/index',{templateUrl: 'html/index.html'})
             .when('/home',{templateUrl: 'html/home.html'})
             .when('/messages',{templateUrl: 'html/messages.html'})
@@ -17,36 +37,39 @@
             .when('/legal',{templateUrl: 'html/legal.html'})
             .when('/congratulations',{templateUrl: 'html/congratulations.html'})
             .otherwise({ templateUrl: 'html/home.html' });
+        $httpProvider.interceptors.push('ezeidInterceptor');
     }]);
 
     var GURL = '/';
     //http://10.0.100.103:8084/';
 
     var MsgDelay = 2000;
-
+    
     // define controller for wizard
     ezeid.directive('dateTimePicker', function() {
             return {
                 restrict: 'E',
                 replace: true,
+                require : '?ngModel',
                 scope: {
                     recipient: '='
                 },
                 template:
                     '<div class="input-group date emptyBox" id="datetimepicker1" >'+
                         '<input type="text" class="form-control" placeholder="Birth Date" name="recipientDateTime" data-date-time/>'+
-                        '<span class="input-group-addon"><span class="glyphicon glyphicon-calendar" ></span>'+
+                        '<span class="input-group-addon"><span class="glyphicon glyphicon-calendar" >'+
                         '</span>'+
                     '</div>',
                 link: function(scope, element, attrs, ngModel) {
                 var input = element.find('input');
-                    input.bind('blur',function(){
-                        scope.recipient = input.val();
-                    });
-//                element.bind('blur keyup change', function(){
-//                    console.log(input.val());
-//                    scope.recipient.datetime = input.val();
-//                });
+                input.bind('blur change keyup',function(){
+                    scope.recipient = input.val();
+                    scope.$apply();
+                });
+                    
+                scope.$watch('recipient',function(oldVal,newVal){
+                    $(input[0]).val(oldVal);
+                });
             }
         }
     });
@@ -902,6 +925,8 @@
 				image_format: 'jpeg',
 				jpeg_quality: 92
 			});
+        Webcam.on('error',function($scope.webCamErrorHandler){
+        });
         $scope.showCamera = function(){
             $scope.isShowCamera = true;
             Webcam.attach( '#camera' );
@@ -918,7 +943,10 @@
                     Webcam.reset();
                 });
               };
-        
+        $scope.webCamErrorHandler = function(){
+            $scope.isShowCamera = false;
+            Notification.error({message:'Webcam is not present',delay:MsgDelay});
+        };
         /***************************** Camera Code ends **********************************/
     if ($rootScope._userInfo) {
     }
