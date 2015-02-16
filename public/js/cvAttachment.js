@@ -7,7 +7,7 @@ angular.module('ezeidApp').controller('CVAttachController', function($http, $roo
     }
     else {
         if (typeof (Storage) !== "undefined") {
-            var encrypted = sessionStorage.getItem("_token");
+            var encrypted = localStorage.getItem("_token");
             if (encrypted) {
                 var decrypted = CryptoJS.AES.decrypt(encrypted, "EZEID");
                 var Jsonstring = decrypted.toString(CryptoJS.enc.Utf8);
@@ -92,6 +92,7 @@ angular.module('ezeidApp').controller('CVAttachController', function($http, $roo
             $http({ method: 'POST', url: '/ewTUploadDoc/', data: formData,
                 headers: { 'Content-Type': undefined }, transformRequest: angular.identity })
                 .success(function (data, status, headers, config) {
+                    getCVInfo();
                    Notification.success({ message: "Saved... ", delay: MsgDelay });
                 }).
                 error(function(data, status, headers, config) {
@@ -134,15 +135,19 @@ angular.module('ezeidApp').controller('CVAttachController', function($http, $roo
     }
 
     function getCVInfo(){
+        console.log("SAi111");
         $http({
             method: 'get',
             url: GURL + 'ewtGetCVInfo?TokenNo=' + $rootScope._userInfo.Token
         }).success(function (data) {
+                console.log("SAi1");
+                console.log(data);
                if(data != 'null')
                 {
                     CVAttachCtrl._CVInfo=data[0];
                     CVAttachCtrl.getRoleForFunction(data[0].FunctionID);
 
+                        console.log(data[0].CVDocFile);
                     if(data[0].CVDocFile == "")
                     {
                         $scope.showLink = false;
@@ -152,17 +157,20 @@ angular.module('ezeidApp').controller('CVAttachController', function($http, $roo
                     }
                 }
                 else
-                {
+                {console.log(data[0]);
                     CVAttachCtrl._CVInfo.Status= 1;
-
-                    if(data[0].CVDocFile != "")
+                    $scope.showLink = false;
+                    if(data[0].CVDocFile != "" && data[0] != "n" )
                     {
+                      //  console.log("SAi2");
                         $scope.showLink = true;
                     }
                     else
                     {
+                      //  console.log("SAi");
                         $scope.showLink = false;
                     }
+
                 }
 
             });

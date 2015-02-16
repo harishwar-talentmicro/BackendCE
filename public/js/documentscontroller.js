@@ -1,12 +1,11 @@
 
 angular.module('ezeidApp').controller('DocumentController', function($http, $rootScope, $scope, $timeout, Notification, $filter,$q) {
-
-    if ($rootScope._userInfo) {
+  if ($rootScope._userInfo) {
 
     }
     else {
         if (typeof (Storage) !== "undefined") {
-            var encrypted = sessionStorage.getItem("_token");
+            var encrypted = localStorage.getItem("_token");
             if (encrypted) {
                 var decrypted = CryptoJS.AES.decrypt(encrypted, "EZEID");
                 var Jsonstring = decrypted.toString(CryptoJS.enc.Utf8);
@@ -80,7 +79,7 @@ angular.module('ezeidApp').controller('DocumentController', function($http, $roo
             method: 'get',
             url: GURL + 'ewtGetDocPin?TokenNo=' + $rootScope._userInfo.Token
         }).success(function (data) {
-                $scope.Pin = data[0].DocPIN;
+               $scope.Pin = data[0].DocPIN;
             });
     }
 
@@ -108,6 +107,7 @@ angular.module('ezeidApp').controller('DocumentController', function($http, $roo
             $http({ method: 'POST', url: '/ewTUploadDoc/', data: formData,
                 headers: { 'Content-Type': undefined }, transformRequest: angular.identity })
                 .success(function (data, status, headers, config) {
+                    GetUserDetails();
                     Notification.success({ message: "Saved...", delay: MsgDelay });
                 });
                 error(function(data, status, headers, config) {
@@ -141,6 +141,7 @@ angular.module('ezeidApp').controller('DocumentController', function($http, $roo
         if($rootScope._userInfo && $rootScope._userInfo.Token){
             $http({ method: 'get', url: '/ewtGetDoc?TokenNo=' + $rootScope._userInfo.Token + '&&Type='+ option }).success(function (data) {
                // if(data && data.length > 0){
+
                     if(data && data.length > 0 && data[0].No != '' && data !='null'){
                     if($scope.OptionSelected==1){
                         $scope.IdPlaceHolder = "Enter ID number";
@@ -161,7 +162,7 @@ angular.module('ezeidApp').controller('DocumentController', function($http, $roo
 
                     }else if($scope.OptionSelected==3){
 
-                       $scope.IdPlaceHolder = "Enter Driving Licence number";
+                        $scope.IdPlaceHolder = "Enter Driving Licence number";
 
                         $scope.form.RefNo = data[0].No;
                         $scope.form.RefExpiryDate = $filter('date')(new Date(data[0].ExpiryDate), 'dd-MMM-yyyy');

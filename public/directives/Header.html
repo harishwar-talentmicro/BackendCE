@@ -31,7 +31,7 @@
                     <ul style="margin-top:10px!important;" class="pad0px">
                         <li class="dsp_block padT10px">
                             <div class="pull-left wd48p marL10px">
-                                <input type="text" name="UserName" class="form-control wd10_px user_input mar_leftInp emptyBox"  ng-class="SignInForm.UserName.$touched && !SignInCtrl.LInfo.UserName.length ? 'mandatoryTextBox' : ''" ng-model="SignInCtrl.LInfo.UserName" placeholder="Type EZE ID" required>
+                                <input type="text" name="UserName" style='text-transform:uppercase' class="form-control wd10_px user_input mar_leftInp emptyBox"  ng-class="SignInForm.UserName.$touched && !SignInCtrl.LInfo.UserName.length ? 'mandatoryTextBox' : ''" ng-model="SignInCtrl.LInfo.UserName" placeholder="Type EZE ID" required>
                             </div>
                             <div class="clearfix mob_marT15px"></div>
                             <div class="pull-left wd48p marL10px">
@@ -82,7 +82,7 @@
             <ul style="padding-bottom: 11px!important;margin-bottom:8px!important;" class="pad0px">
                 <li class="dsp_block padT10px">
                     <div class="pull-left wd48p forget_padd">
-                        <input type="text" name="ezeid" class="form-control wd_forget wd_forgetP2 emptyBox" ng-model="SignInCtrl.EzeId" placeholder="Enter Your EZEID ... "required/>
+                        <input type="text" name="ezeid" class="form-control wd_forget wd_forgetP2 emptyBox" style='text-transform:uppercase' ng-model="SignInCtrl.EzeId" placeholder="Enter Your EZEID ... "required/>
                     </div>
                 </li>
                 <div class="clearfix"></div>
@@ -496,7 +496,7 @@
 <li class="dsp_block">
     <!--<input type="submit" ng-disabled="SignUpForm.$invalid" class="btn btn-primary pull-left quick_butt" value="Sign Up Now">-->
     <input type="submit" ng-disabled="!SignInCtrl.RegInfo.EZEID || !SignInCtrl.RegInfo.Password || !SignInCtrl.RegInfo.CPassword || !SignInCtrl.RegInfo.FirstName || !SignInCtrl.RegInfo.LastName || !SignInCtrl.RegInfo.MobileNumber || SignInCtrl.RegInfo.Password != SignInCtrl.RegInfo.CPassword" class="btn btn-primary pull-left quick_butt" value="Sign Up Now">
-    <input type="reset" ng-click="SignInCtrl.resetSignUpForm(SignUpForm)" class="btn btn-primary marL10px pull-left Popup_cancel quick_butt" value="Cancel">
+    <input type="reset" ng-click="SignInCtrl.resetSignUpForm(SignUpForm)" class="btn btn-primary marL10px pull-left Popup_cancel quick_butt" value="Close">
 
 </li>
 </ul>
