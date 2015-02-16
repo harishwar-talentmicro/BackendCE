@@ -33,14 +33,14 @@
                             <ul>
                                 <h3>CV Attachment</h3>
                                 <div>
-                                    <h5>Relevant Functions</h5>
+                                    <h5>Function & Role</h5>
                                     <li class="dsp_block">
                                         <div class="pull-left wd48p">
                                             <!--ng-class="cvForm.$submitted || cvForm.function.$touched && !CVAttachCtrl._CVInfo.FunctionID.length ? 'mandatoryTextBox' : ''"-->
                                             <select class="form-control emptyBox" name="function" ng-model="CVAttachCtrl._CVInfo.FunctionID"
                                                     ng-options="Function.FunctionID as Function.FunctionName for Function in CVAttachCtrl.Functions"
                                                     ng-change="CVAttachCtrl.getRoleForFunction(CVAttachCtrl._CVInfo.FunctionID)" required>
-                                                <option value="" default selected>--select function--</option>
+                                                <option value="" default selected> --Select Function-- </option>
                                                 <!--<option value="" default selected>{{CVAttachCtrl.Functions[0].FunctionName}}</option>-->
                                             </select>
                                             <!-- <span style="color:red" ng-show="cvForm.$submitted || cvForm.function.$touched">
@@ -50,7 +50,7 @@
                                         <div class="pull-right wd48p">
                                             <select class="form-control emptyBox" name="role" ng-model="CVAttachCtrl._CVInfo.RoleID"
                                                     ng-options="Role.RoleID as Role.RoleName for Role in CVAttachCtrl.RoleTypes">
-                                                <option value="" default selected>--select role--</option>
+                                                <option value="" default selected> --Select Role-- </option>
                                             </select>
                                             <!-- <span style="color:red" ng-show="cvForm.$submitted || cvForm.role.$touched">
                                                  <span ng-show="cvForm.role.$error.required">* mandatory</span>
@@ -69,14 +69,20 @@
                                            <!-- <input type="file" class="form-control emptyBox" onchange="angular.element(this).scope().uploadFile(this.files)"/>-->
 
                                              <span class="btn btn-primary btn-file">
-                                                Choose File <input type="file" onchange="angular.element(this).scope().uploadFile(this.files)">
+                                               <span ng-show="showLink">
+                                                   Choose File (Selected)
+                                               </span>
+                                                 <span ng-hide="showLink">
+                                                   Choose File (Empty)
+                                               </span>
+                                                 <input type="file" onchange="angular.element(this).scope().uploadFile(this.files)">
                                              </span>
 
                                             <span class="pull-right"  ng-controller="DocumentController"
                                                   style="margin-top:8px;"
                                                   ng-show="showLink">
                                                     <a class="blue" target="_blank" href="/ewTgetDocument?TokenNo={{Token}}&&RefType=7">
-                                                        Download Document
+                                                        view
                                                     </a>
                                                     <!--<a target="_self" href="{{form.RefDoc}}" download="{{form.RefDoc}}">{{form.RefFileName}}</a>-->
                                                 </span>
@@ -100,12 +106,12 @@
                                             <label for="NotVisible" style="margin-top: 8px;" class="pull-left under_label">Not Visible</label>
                                         </div>
                                         <div class="pull-right wd48p">
-                                            <input ng-show="CVAttachCtrl.EnablePin" maxlength="3" numbers-only="numbers-only" type="text" class="form-control" ng-model="CVAttachCtrl._CVInfo.Pin" placeholder="Pin"/>
+                                            <input ng-show="CVAttachCtrl.EnablePin" maxlength="3" numbers-only="numbers-only" type="text" style="width: 15%;" class="form-control" ng-model="CVAttachCtrl._CVInfo.Pin" placeholder="Pin"/>
                                         </div>
                                         <div class="clearfix"></div>
                                     <li class="dsp_block marT10px">
-                                        <input type="submit" class="btn-primary btn wd28p pull-left" value="Save"/>
-                                        <input type="button" class="btn-primary btn wd28p pull-left" style="margin-left: 5px;" value="Close" onclick="window.location.href='/'"/>
+                                        <input type="submit" class="btn btn-primary pull-left" value="Save"/>
+                                        <input type="button" class="btn btn-primary pull-left" style="margin-left: 5px;" value="Close" onclick="window.location.href='/'"/>
                                     </li>
                                     </li>
                                 </div>

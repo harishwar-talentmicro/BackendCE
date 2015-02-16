@@ -378,7 +378,7 @@ TABS FOR LOCATION CONTROLLER
 }
 
 .btn-camera{
-    background: url('../images/camera-icon.png');
+    background: url('../images/camera.png');
 height: 40px;
 width: 40px;
 outline: none;
@@ -388,4 +388,16 @@ display: inline-block;
 position: absolute;
 margin-top: -5px;
 margin-left: 5px;
+}
+.btn-nocamera{
+    background: url('../images/no_camera.png');
+    height: 40px;
+    width: 40px;
+    outline: none;
+    border: none;
+    background-size: contain;
+    display: inline-block;
+    position: absolute;
+    margin-top: -5px;
+    margin-left: 5px;
 }

@@ -68,14 +68,12 @@
                 link: function(scope, element, attrs, ngModel) {
                 var input = element.find('input');
                 input.bind('blur change keyup',function(){
-                    console.log(scope.recipient);
-                    scope.recipient = input.val();
+                  scope.recipient = input.val();
                     scope.$apply();
                 });
                     
                 scope.$watch('recipient',function(oldVal,newVal){
                     $(input[0]).val(oldVal);
-                    console.log(scope.recipient);
                 });
             }
         }
@@ -891,13 +889,17 @@
         $scope.isCloseButtonClicked = false;
 
         $('#datetimepicker1').datetimepicker({
-
             format: 'DD-MMM-YYYY'
         });
+        //Below code not allow user to select feture date
+        $("#datetimepicker1").on("dp.change",function (e) {
+            $('#datetimepicker1').data("DateTimePicker").maxDate(e.date);
+        });
+
           $scope.$on('$locationChangeStart', function( event ) {
             if($scope.isCloseButtonClicked == false)
                 {
-                    var answer = confirm("Are you sure you want to leave this page?")
+                    var answer = confirm("Click OK to exit this page")
                     if (!answer) {
                         event.preventDefault();
                     }
@@ -947,7 +949,10 @@
             $scope.isShowCamera = true;
             Webcam.attach( '#camera' );
         };
-        
+        $scope.hideCamera = function(){
+            Webcam.reset();
+            $scope.isShowCamera = false;
+        };
         $scope.clickPicture = function(){
                 $scope.isShowCamera = false;
                 //Webcam.reset();
@@ -1056,8 +1061,7 @@
                     profile._info.ReservationButton = profile._info.ReservationButton == 1 ? true : false;
                     profile._info.SupportButton = profile._info.SupportButton == 1 ? true : false;
                     profile._info.CVButton = profile._info.CVButton == 1 ? true : false;
-                console.log(data[0].DOB);
-                    profile._info.DOB = data[0].DOB;
+                   profile._info.DOB = data[0].DOB;
                     // profile._info.DOB = $filter('date')(new Date(data[0].DOB), 'dd-MMM-yyyy');
                     // console.log(profile._info.DOB);
                     initialize();

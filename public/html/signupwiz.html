@@ -209,11 +209,12 @@
                                                     </div>
                                                     <div style="border:1px solid #EEEE;text-align:center;" id="camera-container" ng-show="isShowCamera">
                                                         <div id="camera"></div>
+                                                        <button class="btn-nocamera" style="margin-left: -44%; margin-top: -2px;" title="Close camera" ng-click="hideCamera()"></button>
                                                         <button class="btn btn-primary" title="Click picture" ng-click="clickPicture()">Click Picture</button>
+
                                                     </div>
                                                     <div ng-hide="isShowCamera" class="col-lg-12 text-center" style="margin-top: 5px;">
-                                                        <button class="btn-camera" title="Take Picture" ng-click="showCamera()"></button>
-                                                        
+                                                        <button class="btn-camera" style="margin-top: -3px;" title="Take Picture" ng-click="showCamera()"></button>
                                                         <span style="margin-left:50px" class="btn btn-primary btn-file">
                                                             Attach Picture <input type="file" onchange="angular.element(this).scope().uploadImageForEditLocation(this.files)" accept="image/*" image="image" resize-max-height="200" resize-max-width="200" resize-quality="0.7">
                                                         </span>
