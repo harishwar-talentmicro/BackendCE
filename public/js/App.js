@@ -2,24 +2,31 @@
     var ezeid = angular.module('ezeidApp',
         ['ngHeader','ngRoute', 'ngFooter', 'ui-notification','imageupload']);
 
-//    //HTTP Interceptor for detecting token expiry
-//    //Reloads the whole page in case of Unauthorized response from api
-//    ezeid.factory('ezeidInterceptor',['$rootScope','Notification','$timeout',function($rootScope,Notification,$timeout){
-//        return {
-//            responseError : function(respErr){
-//                if(respErr.status == 401 && resp.statusText == 'Unauthorized'){
-//                    localStorage.removeItem("_token");
-//                    $rootScope._userInfo = data;
-//                    $rootScope.IsIdAvailable = false;
+    //HTTP Interceptor for detecting token expiry
+    //Reloads the whole page in case of Unauthorized response from api
+    ezeid.factory('ezeidInterceptor',['$rootScope','$timeout',function($rootScope,$timeout){
+        return {
+            responseError : function(respErr){
+                if(respErr.status == 401 && respErr.statusText == 'Unauthorized'){
+                    try{
+                    localStorage.removeItem("_token");
+                    }
+                    catch(ex)
+                    {
+                            
+                    }
+                    $rootScope._userInfo = null;
+                    $rootScope.IsIdAvailable = false;
 //                    Notification.error({message:'Your session has expired! Please login to continue',delay:4000});
-//                    $timeout(function(){
-//                        //Reloading page on token expiry                    
-//                        window.location.reload(true);
-//                    },3000);
-//                }
-//            }
-//        };
-//    }]);
+                    $timeout(function(){
+                        //Reloading page on token expiry                    
+                        window.location.reload(true);
+                        
+                    },3000);
+                }
+            }
+        };
+    }]);
     
     ezeid.config(['$routeProvider','$httpProvider',function($routeProvider,$httpProvider){
         $routeProvider.when('/index',{templateUrl: 'html/index.html'})
@@ -37,7 +44,7 @@
             .when('/congratulations',{templateUrl: 'html/congratulations.html'})
             .otherwise({ templateUrl: 'html/home.html' });
         
-//        $httpProvider.interceptors.push("ezeidInterceptor");
+        $httpProvider.interceptors.push("ezeidInterceptor");
     }]);
 
 //    
@@ -176,7 +183,15 @@
         });
 
 
-
+        $rootScope.$watch('_userInfo.IsAuthenticate',function(oldval,newval){
+           try{
+               for (var i = 0; i < markers.length; i++) {
+                markers[i].setMap(null);
+              }
+           } 
+            catch(ex){}
+        });
+        
         function getQueryStringValue(key) {
             return unescape(window.location.search.replace(new RegExp("^(?:.*[&\\?]" + escape(key).replace(/[\.\+\*]/g, "\\$&") + "(?:\\=([^&]*))?)?.*$", "i"), "$1"));
         }
@@ -184,6 +199,7 @@
         var SearchSec = this;
         
         SearchSec.IsShowForm = false;
+        SearchSec.IsFilterRowVisible = true;
 
         SearchSec.categories = [];
         SearchSec.proximities = [];
@@ -453,6 +469,7 @@
                             SearchSec.downloadData = data[0];
                            // $('#download_popup').slideDown();
                             SearchSec.IsShowForm = true;
+                            SearchSec.IsFilterRowVisible = false;
                             //$scope.showInfoTab = true;
                         }
                         else
@@ -855,6 +872,7 @@
         //close download form
         SearchSec.closeDownloadForm = function () {
             $('#download_popup').slideUp();
+            SearchSec.IsFilterRowVisible = true;
             SearchSec.IsShowForm = false;
         };
 
