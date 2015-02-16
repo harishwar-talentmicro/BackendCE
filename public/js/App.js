@@ -172,6 +172,13 @@
         var service;
         var today = $filter('date')(new Date(), 'MM/dd/yyyy HH:mm:ss');
 
+        $('#datetimepicker1').datetimepicker({
+
+            format: 'DD-MMM-YYYY  HH:mm: a'
+        });
+
+
+
         function getQueryStringValue(key) {
             return unescape(window.location.search.replace(new RegExp("^(?:.*[&\\?]" + escape(key).replace(/[\.\+\*]/g, "\\$&") + "(?:\\=([^&]*))?)?.*$", "i"), "$1"));
         }
