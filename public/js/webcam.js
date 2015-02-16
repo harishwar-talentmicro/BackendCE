@@ -50,16 +50,17 @@ var Webcam = {
 		live: null,
 		uploadcomplete: null,
 		uploadprogress: null,
-		error: function(callbackFn) { 
+		error: function() { 
+            console.log('camera.js');
             try{
-                callbackFn();
+//                callbackFn();
             }
             catch(ex){
                 console.log('Webcam error ! callback undefined');
             }
         }
 	}, // callback 
-    hook functions
+    //hook functions
 	
 	init: function() {
 		// initialize, check for getUserMedia support

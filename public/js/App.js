@@ -2,25 +2,24 @@
     var ezeid = angular.module('ezeidApp',
         ['ngHeader','ngRoute', 'ngFooter', 'ui-notification','imageupload']);
 
-    //HTTP Interceptor for detecting token expiry
-    //Reloads the whole page in case of Unauthorized response from api
-    ezeid.factory('ezeidInterceptor',['$rootScope','Notification','$timeout',function($rootScope,Notification,$timeout){
-        var ezeidInterceptor = {
-            responseError : function(respErr){
-                if(respErr.status == 401 && resp.statusText == 'Unauthorized'){
-                    localStorage.removeItem("_token");
-                    $rootScope._userInfo = data;
-                    $rootScope.IsIdAvailable = false;
-                    Notification.error({message:'Your session has expired! Please login to continue',delay:4000});
-                    $timeout(function(){
-                        //Reloading page on token expiry                    
-                        window.location.reload(true);
-                    },3000);
-                }
-            }
-        };
-        return ezeidInterceptor;
-    }]);
+//    //HTTP Interceptor for detecting token expiry
+//    //Reloads the whole page in case of Unauthorized response from api
+//    ezeid.factory('ezeidInterceptor',['$rootScope','Notification','$timeout',function($rootScope,Notification,$timeout){
+//        return {
+//            responseError : function(respErr){
+//                if(respErr.status == 401 && resp.statusText == 'Unauthorized'){
+//                    localStorage.removeItem("_token");
+//                    $rootScope._userInfo = data;
+//                    $rootScope.IsIdAvailable = false;
+//                    Notification.error({message:'Your session has expired! Please login to continue',delay:4000});
+//                    $timeout(function(){
+//                        //Reloading page on token expiry                    
+//                        window.location.reload(true);
+//                    },3000);
+//                }
+//            }
+//        };
+//    }]);
     
     ezeid.config(['$routeProvider','$httpProvider',function($routeProvider,$httpProvider){
         $routeProvider.when('/index',{templateUrl: 'html/index.html'})
@@ -37,8 +36,14 @@
             .when('/legal',{templateUrl: 'html/legal.html'})
             .when('/congratulations',{templateUrl: 'html/congratulations.html'})
             .otherwise({ templateUrl: 'html/home.html' });
-        $httpProvider.interceptors.push('ezeidInterceptor');
+        
+//        $httpProvider.interceptors.push("ezeidInterceptor");
     }]);
+
+//    
+//    ezeid.run(['$httpProvider','ezeidInterceptor',function($httpProvider,ezeidInterceptor){
+//        
+//    }]);
 
     var GURL = '/';
     //http://10.0.100.103:8084/';
@@ -63,12 +68,14 @@
                 link: function(scope, element, attrs, ngModel) {
                 var input = element.find('input');
                 input.bind('blur change keyup',function(){
+                    console.log(scope.recipient);
                     scope.recipient = input.val();
                     scope.$apply();
                 });
                     
                 scope.$watch('recipient',function(oldVal,newVal){
                     $(input[0]).val(oldVal);
+                    console.log(scope.recipient);
                 });
             }
         }
@@ -925,7 +932,9 @@
 				image_format: 'jpeg',
 				jpeg_quality: 92
 			});
-        Webcam.on('error',function($scope.webCamErrorHandler){
+        Webcam.on('error',function(){
+            $scope.isShowCamera = false;
+            Notification.error({message:'Camera not found',delay:MsgDelay});
         });
         $scope.showCamera = function(){
             $scope.isShowCamera = true;
@@ -943,7 +952,7 @@
                     Webcam.reset();
                 });
               };
-        $scope.webCamErrorHandler = function(){
+        var webCamErrorHandler = function(){
             $scope.isShowCamera = false;
             Notification.error({message:'Webcam is not present',delay:MsgDelay});
         };
@@ -1040,8 +1049,8 @@
                     profile._info.ReservationButton = profile._info.ReservationButton == 1 ? true : false;
                     profile._info.SupportButton = profile._info.SupportButton == 1 ? true : false;
                     profile._info.CVButton = profile._info.CVButton == 1 ? true : false;
-                    profile._info.DOB =  new Date(data[0].DOB);
-
+                console.log(data[0].DOB);
+                    profile._info.DOB = data[0].DOB;
                     // profile._info.DOB = $filter('date')(new Date(data[0].DOB), 'dd-MMM-yyyy');
                     // console.log(profile._info.DOB);
                     initialize();
