@@ -34,7 +34,7 @@
                 },
                 template:
                     '<div class="input-group date emptyBox" id="datetimepicker1" >'+
-                        '<input type="text" class="form-control" placeholder="Birth Date" name="recipientDateTime" data-date-time/>'+
+                        '<input type="text" class="form-control" placeholder="Date" name="recipientDateTime" data-date-time/>'+
                         '<span class="input-group-addon"><span class="glyphicon glyphicon-calendar" ></span>'+
                         '</span>'+
                     '</div>',

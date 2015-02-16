@@ -147,9 +147,9 @@
                                                     <span><label><strong>&nbsp;Primary Address</strong> </label></span><br/>
                                                     <input type="text" class="form-control emptyBox" id="streeName" name="streeName" ng-model="profile._info.AddressLine1"
                                                            ng-class="UserForm.streeName.$touched && !profile._info.AddressLine1.length ? 'mandatoryTextBox' : ''"
-                                                           placeholder="No., Building Name, Street Name" style="width: 48%" required>
+                                                           placeholder="No., Building Name, Street Name" style="width: 48%" maxlength="45" required>
                                                     <input type="text" class="form-control" id="block" name="addLine2" ng-model="profile._info.AddressLine2"
-                                                            placeholder="Block, Area, Sector"  style="width: 48%" >
+                                                            placeholder="Block, Area, Sector"  style="width: 48%" maxlength="45">
                                                 </div>
                                                 <br/>
                                                 <div class="row mar_editTop mar_editLeft">
