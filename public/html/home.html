@@ -1,5 +1,5 @@
 
-<body ng-app="ezeidApp">
+<body ng-app="ezeidApp" style="overflow-y:hidden; overflow-x:hidden;">
     <div id="wrapper" ng-controller="HomeController as Home">
         <header-section></header-section>
         <div ng-controller="SearchController as search">
@@ -282,45 +282,43 @@
                                     <div class="row row-margin-fix">
 
                                         <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10">
-                                            <label for="inputEmail" class="sr-only">Email address</label>
+                                           <!-- <label for="inputEmail" class="sr-only">Email address</label>-->
                                             <input id="inputEmail" class="form-control" ng-model="search.Criteria.Keywords" placeholder="{{search.Placeholder}}" ng-click="search.SearchTypeKeyWord()" required autofocus type="text">
                                         </div>
                                         <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
-                                            <button class="btn btn-primary pull-right marL5px" ng-hide="true" type="button">Pick First Match</button>
                                             <button  ng-disabled="!search.Criteria.Keywords" class="btn btn-block btn-primary pull-left" type="submit">Search</button>
                                         </div>
                                     </div>
                                     <div class="bottom-clearfix"></div>
-                                    <div class="row row-margin-fix" ng-show="SearchSec.IsFilterRowVisible">
-                                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3" ng-hide="1">
-                                            <select class="form-control pull-left" ng-init="search.Criteria.OpenStatus = search.OpenStatuses[0]" ng-model="search.Criteria.OpenStatus" ng-disabled="search.isEZEIDselected('1')"
-                                                    ng-options="status.id as status.label for status in search.OpenStatuses">
-                                                <option value="">Any</option>
-                                            </select>
+                                    <div class="row row-margin-fix" ng-show="search.IsFilterRowVisible">
+                                            <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3" ng-hide="1">
+                                                <select class="form-control pull-left" ng-init="search.Criteria.OpenStatus = search.OpenStatuses[0]" ng-model="search.Criteria.OpenStatus" ng-disabled="search.isEZEIDselected('1')"
+                                                        ng-options="status.id as status.label for status in search.OpenStatuses">
+                                                    <option value="">Any</option>
+                                                </select>
 
-                                        </div>
-                                        <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12" style="padding-right:0px;" ng-hide="search.isEZEIDselected('1')">
-                                            <div style="display:table-cell;vertical-align:middle;height:34px;">
-                                            Search near map <a ng-click="selectTab('map')" style="cursor:pointer;">location</a>  within
                                             </div>
-                                        </div>
-<!--                                        <img src="./images/map_marker.png" height="24px" width="24px">-->
-                                        <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6" ng-hide="search.isEZEIDselected('1')">
-                                            <select class="form-control pull-left"
-                                                    ng-model="search.Criteria.Proximity" ng-disabled="search.isEZEIDselected('1')"
-                                                    >
-                                                <option value="{{proximity.MilesValue}}"  ng-selected="{{proximity.MilesValue == 1}}" ng-repeat="proximity in search.proximities">{{proximity.Title}}</option>
-                                                <option value="0">Any</option>
-                                            </select>
-                                        </div>
-                                        <div class="col-lg-5 col-md-5 col-sm-6 col-xs-12">
-                                            
-                                            <div style="display:table-cell;vertical-align:middle;height:34px;">
-                                                <span ng-hide="search.isEZEIDselected('1')" >Proximity </span> 
-                                            <input type="checkbox" ng-model="search.Criteria.ParkingStatus" name="parking" value="1,2"><span> Show Places with Parking</span>
+                                            <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12" style="padding-right:0px;" ng-hide="search.isEZEIDselected('1')">
+                                                <div style="display:table-cell;vertical-align:middle;height:34px;">
+                                                Search near map <a ng-click="selectTab('map')" style="cursor:pointer;">location</a>  within
+                                                </div>
                                             </div>
-                                        </div>
+    <!--                                        <img src="./images/map_marker.png" height="24px" width="24px">-->
+                                            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6" ng-hide="search.isEZEIDselected('1')">
+                                                <select class="form-control pull-left"
+                                                        ng-model="search.Criteria.Proximity" ng-disabled="search.isEZEIDselected('1')"
+                                                        >
+                                                    <option value="{{proximity.MilesValue}}"  ng-selected="{{proximity.MilesValue == 1}}" ng-repeat="proximity in search.proximities">{{proximity.Title}}</option>
+                                                    <option value="0">Any</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-lg-5 col-md-5 col-sm-6 col-xs-12" ng-hide="search.isEZEIDselected('1')">
 
+                                                <div style="display:table-cell;vertical-align:middle;height:34px;">
+                                                    <span>Proximity </span>
+                                                    <input type="checkbox" ng-model="search.Criteria.ParkingStatus" name="parking" value="1,2"><span> Show Places with Parking</span>
+                                                </div>
+                                            </div>
                                     </div>
                                     <div class="bottom-clearfix"></div>
 
