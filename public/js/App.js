@@ -86,7 +86,6 @@
         }
     });
     ezeid.controller('SampleWizardController', function($scope, $q, $timeout) {
-
             $scope.user = {};
 
             $scope.saveState = function() {
@@ -176,7 +175,7 @@
         });
         var service;
         var today = moment(new Date()).utc().format('DD-MMM-YYYY hh:mm A');
-        
+
         $('#datetimepicker1').datetimepicker({
 
             format: 'DD-MMM-YYYY  HH:mm: a'
@@ -184,6 +183,7 @@
 
 
         $rootScope.$watch('_userInfo.IsAuthenticate',function(oldval,newval){
+
            try{
                for (var i = 0; i < markers.length; i++) {
                 markers[i].setMap(null);
@@ -191,7 +191,7 @@
            } 
             catch(ex){}
         });
-        
+
         function getQueryStringValue(key) {
             return unescape(window.location.search.replace(new RegExp("^(?:.*[&\\?]" + escape(key).replace(/[\.\+\*]/g, "\\$&") + "(?:\\=([^&]*))?)?.*$", "i"), "$1"));
         }
@@ -205,6 +205,8 @@
         SearchSec.proximities = [];
         SearchSec.mInfo = {};
         SearchSec.Placeholder = 'Type EZEID';
+        var userType = "";
+
         SearchSec.mInfo.InfoTab = true;
         $scope.showInfoTab = false;
 
@@ -218,10 +220,15 @@
             Longitude: $rootScope.CLoc.CLong
         };
 
+
+
+
+
+
+
         $scope.isMapLoaded = false;         //Set to true with map event 'idle'
         $scope.isMapReady = false;          //Set to true when map canvas is drawn and map is fully visible
-        
-        
+
         function initialize () {
             //// Create the search box and link it to the UI element.
             
@@ -237,8 +244,25 @@
             map.controls[google.maps.ControlPosition.TOP_RIGHT].push(ClocBtn)
             var input = /** @type {HTMLInputElement} */(document.getElementById('txtSearch'));
             map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
+            
+            /********** Google Maps autocomplete **************/
+            var options = {
+              types: ['establishment']
+            };
 
-  var searchBox = new google.maps.places.SearchBox(
+            autocomplete = new google.maps.places.Autocomplete(input, options);
+            google.maps.event.addListener(autocomplete,'place_changed',function(){
+                var place = autocomplete.getPlace();
+                $rootScope.CLoc.CLat = place.geometry.location.k;
+                $rootScope.CLoc.CLong = place.geometry.location.D;
+                var loc = new google.maps.LatLng($rootScope.CLoc.CLat, $rootScope.CLoc.CLong);
+                PlaceCurrentLocationMarker(loc);
+            });
+            /********** Google Maps autocomplete ends *********/
+            
+            
+
+            var searchBox = new google.maps.places.SearchBox(
     /** @type {HTMLInputElement} */(input));
             //directionsDisplay.setMap(map);
             // Try W3C Geolocation (Preferred)
@@ -384,14 +408,8 @@
                                     $timeout(function () {
                                         SearchSec.mInfo = data[0];
                                         
-                                       // $('#Maping_popup').slideDown();
-                                        //$scope.selectedTab = "info";
                                         $scope.showInfoTab = true;
                                         $scope.selectTab('info');
-                                        //var content = document.getElementById('Maping_popup').innerHTML;
-                                        //var compiled = $compile(content)($scope);
-                                        //myinfowindow.setContent(compiled[0]);
-                                        //myinfowindow.open(map, sen);
                                     });
                                 }
                                 else {
@@ -494,8 +512,16 @@
                                    }
                                     $timeout(function () {
                                         SearchSec.mInfo = data[0];
-                                        //    $('#Maping_popup').slideDown();
-                                    });
+
+                                        if(SearchSec.mInfo.IDTypeID  == 2)
+                                        {
+                                            SearchSec.reservationPlaceHolder = "Reservation requirement details";
+                                        }
+                                        else
+                                        {
+                                            SearchSec.reservationPlaceHolder = "Appointment requirement details";
+                                        }
+                                   });
                                 } 
                                 else {
                                     Notification.error({ message: 'Invalid key or not found…', delay: MsgDelay });
@@ -753,6 +779,8 @@
                         SearchSec.ReservationDateTime = "";
                         Notification.success({ message: 'Message send success', delay: MsgDelay });
                         document.getElementById("reservationMessage").className = "form-control fixTextArea emptyBox";
+                        document.getElementById("reservationMessage1").className = "form-control fixTextArea emptyBox";
+                        document.getElementById("reservationMessage2").className = "form-control fixTextArea emptyBox";
                       //  document.getElementById("expenseClaimDate").className = "datePickerWidth emptyBox";
                     }
                     else {
@@ -770,8 +798,7 @@
         SearchSec.closeReservationForm = function () {
             $('#Reservation_popup').slideUp();
             document.getElementById("reservationMessage").className = "form-control fixTextArea emptyBox";
-            document.getElementById("expenseClaimDate").className = "datePickerWidth emptyBox";
-            SearchSec.ReservationDateTime = "";
+             //document.getElementById("expenseClaimDate").className = "datePickerWidth emptyBox";
             SearchSec.ReservationDateTime = "";
         };
 
@@ -922,11 +949,11 @@
 
     var MsgDelay = 2000;
     var isBusinessIcon = 0; // 1 = icon is for business Type
+    var isReSizeImage = false;
         
         
         /***************************** Camera Code ***************************************/
         $scope.isShowCamera = false;
-        
 
         Webcam.set({
 				// live preview size
@@ -940,7 +967,7 @@
 				// final cropped size
 				crop_width: 200,
 				crop_height: 200,
-				
+
 				// format and quality
 				image_format: 'jpeg',
 				jpeg_quality: 92
@@ -949,10 +976,12 @@
             $scope.isShowCamera = false;
             Notification.error({message:'Camera not found',delay:MsgDelay});
         });
+
         $scope.showCamera = function(){
             $scope.isShowCamera = true;
             Webcam.attach( '#camera' );
         };
+
         $scope.hideCamera = function(){
             Webcam.reset();
             $scope.isShowCamera = false;
@@ -962,9 +991,17 @@
                 //Webcam.reset();
                 
                 Webcam.snap( function(data_uri) {
-                        profile._info.Picture = data_uri;
 
-                    // shut down camera, stop capturing
+                   // if(profile._info.IDTypeID != 1)
+                  //  {
+                        profile._info.Picture = data_uri;
+                   /* }
+                    else
+                   {
+                        profile._info.Icon= data_uri;
+                    }*/
+
+                    // out down camera, stop capturing
                     Webcam.reset();
                 });
               };
@@ -1670,10 +1707,15 @@
         msgSen.MessageType={id:"0,1,2,3,4,5,6",label:'All'};
         msgSen.msgs = [];
         var showPaging = "N";
+        AutoRefresh = true;
 
         $interval(function() {
             msgSen.msgs = [];
-            LoadNotifications(_pageValue);
+            if(AutoRefresh == true)
+            {
+                LoadNotifications(_pageValue);
+            }
+
         },RefreshTime);
 
         this.refreshNotificationGrid=function(){
@@ -1681,6 +1723,11 @@
             LoadNotifications(_pageValue);
             RefreshTime = Miliseconds;
         };
+
+        $scope.$on('$locationChangeStart', function( event ) {
+            var AutoRefresh = false;
+
+        });
 
         if ($rootScope._userInfo) {
 

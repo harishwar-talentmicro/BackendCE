@@ -10,7 +10,7 @@
 
 </script>
 <div>
-<form name="SignInForm" novalidate ng-submit="SignInForm.$valid && SignInCtrl.LoginUser(SignInCtrl.LInfo,SignInForm)">
+    <form name="SignInForm" novalidate ng-submit="SignInForm.$valid && SignInCtrl.LoginUser(SignInCtrl.LInfo,SignInForm)">
     <div class="Popup_window form_style" id="SignIn_popup">
         <div class="window_page wdLogin Maping_popup">
             <span ng-click="SignInCtrl.reset(SignInForm)" class="closelink">X</span>
@@ -31,7 +31,7 @@
                     <ul style="margin-top:10px!important;" class="pad0px">
                         <li class="dsp_block padT10px">
                             <div class="pull-left wd48p marL10px">
-                                <input type="text" name="UserName" style='text-transform:uppercase' class="form-control wd10_px user_input mar_leftInp emptyBox"  ng-class="SignInForm.UserName.$touched && !SignInCtrl.LInfo.UserName.length ? 'mandatoryTextBox' : ''" ng-model="SignInCtrl.LInfo.UserName" placeholder="Type EZE ID" required>
+                                <input type="text" name="UserName" id="UserName" autofocus="autofocus" style='text-transform:uppercase' class="form-control wd10_px user_input mar_leftInp emptyBox"  ng-class="SignInForm.UserName.$touched && !SignInCtrl.LInfo.UserName.length ? 'mandatoryTextBox' : ''" ng-model="SignInCtrl.LInfo.UserName" placeholder="Type EZE ID" required />
                             </div>
                             <div class="clearfix mob_marT15px"></div>
                             <div class="pull-left wd48p marL10px">
@@ -73,7 +73,7 @@
     </div>
 </form>
 
-<div class="Popup_window form_style no_select" id="forgot-password">
+    <div class="Popup_window form_style no_select" id="forgot-password">
     <div class="window_page wd_forgetPass Maping_popup">
         <span ng-click="SignInCtrl.closeForgotPasswordForm()" class="closelink">X</span>
         <h3><span class="mar_forget">Forgot Password ?</span></h3>
@@ -98,31 +98,6 @@
         </form>
     </div>
 </div>
-
-<!--<form>
-    <div class="Popup_window form_style" id="AccsHistory_popup">
-        <div class="window_page Maping_popup">
-            <span class="closelink">X</span>
-            <h3>Access History</h3>
-            <div class="clearfix"></div>
-            <div class="table-responsive" style="max-height:300px; overflow:auto;">
-                <table cellpadding="0" cellspacing="0" border="0"
-                       width="100%" class="table-bordered table-striped table-condensed">
-                    <tr>
-                        <th width="50%">Date Time </th>
-                        <th width="30%">Name</th>
-                        <th width="20%">City</th>
-                    </tr>
-                    <tr ng-repeat="_item in SignInCtrl.AccsHis">
-                        <td>{{_item.AccessDate}}</td>
-                        <td>{{_item.Name}}</td>
-                        <td>{{_item.City}}</td>
-                    </tr>
-                </table>
-            </div>
-        </div>
-    </div>
-</form>-->
 
 <div class="Popup_window form_style" id="ChangePassword_popup">
     <div class="changePass_popUp Maping_popup">

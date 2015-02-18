@@ -1,9 +1,11 @@
 angular.module('imageupload', [])
     .directive('image', function($q,$rootScope) {
-        'use strict'
+        /*'use strict'*/
         var URL = window.URL || window.webkitURL;
 
         var getResizeArea = function () {
+
+            console.log("SAi 01");
             var resizeAreaId = 'fileupload-resize-area';
 
             var resizeArea = document.getElementById(resizeAreaId);
@@ -14,12 +16,13 @@ angular.module('imageupload', [])
                 resizeArea.style.visibility = 'hidden';
                 document.body.appendChild(resizeArea);
             }
-
             return resizeArea;
         }
 
         var resizeImage = function (origImage, options) {
 
+            console.log("SAi 02");
+            console.log("sai Resize called");
             var maxHeight = options.resizeMaxHeight || 300;
             var maxWidth = options.resizeMaxWidth || 250;
             var quality = options.resizeQuality || 0.7;
@@ -71,6 +74,7 @@ angular.module('imageupload', [])
 
 
         var createImage = function(url, callback) {
+            console.log("SAi 03");
             var image = new Image();
             image.onload = function() {
                 callback(image);
@@ -79,6 +83,7 @@ angular.module('imageupload', [])
         };
 
         var fileToDataURL = function (file) {
+            console.log("SAi 04");
             var deferred = $q.defer();
             var reader = new FileReader();
             reader.onload = function (e) {
@@ -117,7 +122,7 @@ angular.module('imageupload', [])
                         if(attrs.multiple)
                             scope.image.push(imageResult);
                         else
-                            scope.image = imageResult; 
+                            scope.image = imageResult;
                     });
                 };
 
