@@ -1696,7 +1696,23 @@ exports.FnRegistration = function (req, res) {
                                         data = data.replace("[Firstname]", FirstName);
                                         data = data.replace("[Lastname]", LastName);
                                         data = data.replace("[EZEID]", EZEID);
-                                        // console.log('Body:' + data);
+                                        data = data.replace("[EZEID]", EZEID);  //REG Detials
+                                        data = data.replace("[EZEID]", EZEID); //L1
+                                        data = data.replace("[EZEID]", EZEID); //L2
+                                        data = data.replace("[EZEID]", EZEID); //CV
+                                        data = data.replace("[EZEID]", EZEID); //ID
+                                        data = data.replace("[EZEID]", EZEID); //DL
+                                        data = data.replace("[EZEID]", EZEID); //PP
+
+                                        if(PIN == null){
+                                           data = data.replace(".PIN","");
+                                        }
+                                        else
+                                        {
+                                            data = data.replace("PIN",PIN);
+                                        }
+
+                                      //  console.log(data);
                                         var mailOptions = {
                                             from: 'noreply@ezeid.com',
                                             to: EMailID,
@@ -2324,7 +2340,7 @@ exports.FnSaveMessage = function (req, res) {
         if (Token != null) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
-                    if (Result != null && ToMasterID.toString() != 'NaN' && LocID != null) {
+                    if (Result != null && ToMasterID.toString() != 'NaN' && LocID != null && CurrentTaskDate != null) {
                         var TaskDate = null;
                         if (TaskDateTime != null) {
                             // datechange = new Date(new Date(TaskDateTime).toUTCString());
@@ -2385,6 +2401,9 @@ exports.FnSaveMessage = function (req, res) {
                             res.statusCode = 400;
                         } else if (LocID == null) {
                             console.log('FnSaveMessage: LocID is empty');
+                            res.statusCode = 400;
+                        } else if (CurrentTaskDate == null) {
+                            console.log('FnSaveMessage: CurrentTaskDate is empty');
                             res.statusCode = 400;
                         }
                         else {
@@ -3337,6 +3356,7 @@ exports.FnUploadDocument = function (req, res) {
                             }
                             //console.log(Token);
                             fs.readFile(RefFileName, function (err, original_data) {
+                                console.log(original_data);
                                 var query = db.escape(Token) + ',' + db.escape(original_data) + ',' + db.escape(fileName) + ',' + db.escape(tRefType) + ',' + db.escape(CntType);
                                 //console.log(query);
                                 db.query('CALL pSaveDocsFile(' + query + ')', function (err, InsertResult) {
@@ -3410,7 +3430,7 @@ exports.FnGetDocument = function (req, res) {
                                         var docs = DocumentResult[0];
                                         //console.log(docs.ContentType);
                                         //console.log(docs.Filename);
-                                        // console.log(docs.IDDocBlob);
+                                         console.log(docs);
                                         res.setHeader('Content-Type', docs.ContentType);
                                         res.setHeader('Content-Disposition', 'attachment; filename=' + docs.Filename);
                                         res.setHeader('Cache-Control', 'public, max-age=0');
@@ -4194,13 +4214,8 @@ exports.FnGetUserDetailsAP = function (req, res) {
             FnValidateTokenAP(TokenNo, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
-            //  var Query = 'Select  b.TID as LocationID,IDTypeID,a.EZEID,EZEIDVerifiedID,EZEIDVerifiedByID,StatusID,FirstName,LastName,ifnull(CompanyName,"") as CompanyName,CategoryID,FunctionID,RoleID,ifnull(JobTitle,"") as JobTitle,NameTitleID,AboutCompany,LanguageID,Keywords,LocTitle,Latitude,Longitude,Altitude,AddressLine1,AddressLine2,CityID,StateID,CountryID,PostalCode,b.PIN,EMailID,EMailVerifiedID,PhoneNumber,MobileNumber,LaptopSLNO,VehicleNumber,Website,SeqNo,Picture,PictureFileName,ifnull((Select CityName from mcity where CityID=b.CityID and LangID=a.LanguageID),"") as CityTitle,ifnull((Select CountryName from mcountry where CountryID=b.CountryID and LangID=a.LanguageID),"") as CountryTitle,ifnull((Select StateName from mstate where StateID=b.StateID and LangID=a.LanguageID),"") as StateTitle,ifnull((Select CategoryTitle from mcategory where CategoryID=a.CategoryID and LangID=a.LanguageID),"") as CategoryTitle from tlocations b,tmaster a where b.EZEID=a.EZEID and b.SeqNo=0 and Token=' + db.escape(Token) + ';';
-            var Query = 'Select a.TID as MasterID, b.TID as LocationID,IDTypeID,a.EZEID,ifnull(EZEIDVerifiedID,0) as EZEIDVerifiedID,ifnull(EZEIDVerifiedByID,0) EZEIDVerifiedByID,ifnull(StatusID,0) as StatusID,FirstName,ifnull(LastName,"") as LastName,ifnull(CompanyName,"") as CompanyName,ifnull(CategoryID,0) as CategoryID,ifnull(FunctionID,0) as FunctionID,ifnull(RoleID,0) as RoleID,ifnull(JobTitle,"") as JobTitle,ifnull(NameTitleID,0) as NameTitleID,ifnull(AboutCompany,"") as AboutCompany,ifnull(LanguageID,1) as LanguageID,ifnull(Keywords,"") as Keywords,ifnull(LocTitle,"") as LocTitle,Latitude,Longitude,Altitude,ifnull(AddressLine1,"") as AddressLine1,ifnull(AddressLine2,"") as AddressLine2,CityID,StateID,CountryID,ifnull(PostalCode,"") as PostalCode,b.PIN,ifnull(EMailID,"") as EMailID,ifnull(EMailVerifiedID,"") as EMailVerifiedID,ifnull(PhoneNumber,"") as PhoneNumber, ifnull(MobileNumber,"") as MobileNumber,ifnull(LaptopSLNO,"") as LaptopSLNO,ifnull(VehicleNumber,"") as VehicleNumber,ifnull(Website,"") as Website,ifnull(Picture,"") as Picture,ifnull(PictureFileName,"") as PictureFileName ,ifnull((Select CityName from mcity where CityID=b.CityID and LangID=a.LanguageID),"") as CityTitle,ifnull((Select CountryName from mcountry where CountryID=b.CountryID and LangID=a.LanguageID),"") as CountryTitle,ifnull((Select StateName from mstate where StateID=b.StateID and LangID=a.LanguageID),"") as StateTitle,ifnull(d.ParkingStatus,1) as ParkingStatus,ifnull(d.OpenStatus,1) as OpenStatus,ifnull(d.WorkingHours,"") as WorkingHours,ifnull(d.SalesEnquiryButton,1) as SalesEnquiryButton ,ifnull(d.SalesEnquiryMailID,"") as SalesEnquiryMailID,ifnull(d.HomeDeliveryButton,1) as HomeDeliveryButton,ifnull(d.HomeDeliveryMailID,"") as HomeDeliveryMailID,ifnull(d.ReservationButton,1) as ReservationButton,ifnull(d.ReservationMailID,"") as ReservationMailID,ifnull(d.SupportButton,1) as SupportButton,ifnull(d.SupportMailID,"") as SupportMailID,ifnull(d.CVButton,1) as CVButton,ifnull(d.CVMailID,"") as CVMailID,ifnull((Select CategoryTitle from mcategory where CategoryID=a.CategoryID and LangID=a.LanguageID),"") as CategoryTitle, ifnull(a.Icon,"") as Icon, ifnull(a.IconFileName,"") as IconFileName  from tlocations b left outer Join tlcoationsettings d On b.TID=d.LocID,tmaster a left outer Join tDocs c On a.TID=c.MasterID where b.EZEID=a.EZEID and b.SeqNo=0  and a.EZEID= ' + db.escape(EZEID);
-
-            //below query commented for phase1
-            //var Query0 = 'Select a.TID as MasterID, b.TID as LocationID,IDTypeID,a.EZEID,EZEIDVerifiedID,EZEIDVerifiedByID,StatusID,FirstName,LastName,ifnull(CompanyName,"") as CompanyName,CategoryID,FunctionID,RoleID,ifnull(JobTitle,"") as JobTitle,NameTitleID,AboutCompany,LanguageID,Keywords,LocTitle,Latitude,Longitude,Altitude,AddressLine1,AddressLine2,CityID,StateID,CountryID,PostalCode,b.PIN,EMailID,EMailVerifiedID,PhoneNumber,MobileNumber,LaptopSLNO,VehicleNumber,Website,SeqNo,Picture,PictureFileName ,ifnull((Select CityName from mcity where CityID=b.CityID and LangID=a.LanguageID),"") as CityTitle,c.IDNo,c.IDExpiryDate,c.PPNo,c.PPIssuedDate,c.PPExpiryDate,(CASE WHEN c.IDDoc IS NOT NULL THEN 1 ELSE 0 END) as IDDoc,ifnull(c.IDDocFile,"") as IDDocFile,(CASE WHEN c.PPDoc IS NOT NULL THEN 1 ELSE 0 END) as PPDoc,ifnull(c.PPDocFile,"") as PPDocFile,(CASE WHEN c.CVDoc IS NOT NULL THEN 1 ELSE 0 END) as CVDoc,ifnull(c.CVDocFile,"") as CVDocFile,(CASE WHEN c.BrochureDoc IS NOT NULL THEN 1 ELSE 0 END) as BrochureDoc,ifnull(c.BrochureDocFile,"") as BrochureDocFile,(CASE WHEN c.D1Doc IS NOT NULL THEN 1 ELSE 0 END) as D1Doc,ifnull(c.D1DocFile,"") as D1DocFile,(CASE WHEN c.D2Doc IS NOT NULL THEN 1 ELSE 0 END) as D2Doc,ifnull(c.D2DocFile,"") as D2DocFile,ifnull((Select CountryName from mcountry where CountryID=b.CountryID and LangID=a.LanguageID),"") as CountryTitle,ifnull((Select StateName from mstate where StateID=b.StateID and LangID=a.LanguageID),"") as StateTitle,ifnull(d.ParkingStatus,1) as ParkingStatus,ifnull(d.OpenStatus,1) as OpenStatus,d.WorkingHours,ifnull(d.SalesEnquiryButton,1) as SalesEnquiryButton ,d.SalesEnquiryMailID,ifnull(d.HomeDeliveryButton,1) as HomeDeliveryButton,HomeDeliveryMailID,ifnull(d.ReservationButton,1) as ReservationButton,d.ReservationMailID,ifnull(d.SupportButton,1) as SupportButton,d.SupportMailID,ifnull(d.CVButton,1) as CVButton,d.CVMailID,ifnull((Select CategoryTitle from mcategory where CategoryID=a.CategoryID and LangID=a.LanguageID),"") as CategoryTitle from tlocations b left outer Join tlcoationsettings d On b.TID=d.LocID,tmaster a left outer Join tDocs c On a.TID=c.MasterID where b.EZEID=a.EZEID and b.SeqNo=0 and Token=' + db.escape(Token) + ';';
-            //var Query2 = 'Select a.TID as MasterID, b.TID as LocationID,IDTypeID,a.EZEID,EZEIDVerifiedID,EZEIDVerifiedByID,StatusID,FirstName,LastName,CompanyName,CategoryID,FunctionID,RoleID,JobTitle,NameTitleID,AboutCompany,LanguageID,Keywords,LocTitle,Latitude,Longitude,Altitude,AddressLine1,AddressLine2,CityID,StateID,CountryID,PostalCode,b.PIN,EMailID,EMailVerifiedID,PhoneNumber,MobileNumber,LaptopSLNO,VehicleNumber,Website,SeqNo,Picture,PictureFileName ,ifnull((Select CityName from mcity where CityID=b.CityID and LangID=a.LanguageID),"") as CityTitle,c.IDNo,c.IDExpiryDate,c.PPNo,c.PPIssuedDate,c.PPExpiryDate,(CASE WHEN c.IDDoc IS NOT NULL THEN 1 ELSE 0 END) as IDDoc,(CASE WHEN c.PPDoc IS NOT NULL THEN 1 ELSE 0 END) as PPDoc,(CASE WHEN c.CVDoc IS NOT NULL THEN 1 ELSE 0 END) as CVDoc,(CASE WHEN c.BrochureDoc IS NOT NULL THEN 1 ELSE 0 END) as BrochureDoc,(CASE WHEN c.D1Doc IS NOT NULL THEN 1 ELSE 0 END) as D1Doc,(CASE WHEN c.D2Doc IS NOT NULL THEN 1 ELSE 0 END) as D2Doc,ifnull((Select CountryName from mcountry where CountryID=b.CountryID and LangID=a.LanguageID),"") as CountryTitle,ifnull((Select StateName from mstate where StateID=b.StateID and LangID=a.LanguageID),"") as StateTitle,ifnull(d.ParkingStatus,1) as ParkingStatus,ifnull(d.OpenStatus,1) as OpenStatus,d.WorkingHours,ifnull(d.SalesEnquiryButton,1) as SalesEnquiryButton,d.SalesEnquiryMailID,ifnull(d.HomeDeliveryButton,1) as HomeDeliveryButton,HomeDeliveryMailID,ifnull(d.ReservationButton,1) as ReservationButton,d.ReservationMailID,ifnull(d.SupportButton,1) as SupportButton,d.SupportMailID,ifnull(d.CVButton,1) as CVButton,d.CVMailID from tlocations b left outer Join tlcoationsettings d On b.TID=d.LocID,tmaster a left outer Join tDocs c On a.TID=c.MasterID where b.EZEID=a.EZEID and b.SeqNo<>0 and Token=' + db.escape(Token);
-
+            //var Query = 'Select a.TID as MasterID, b.TID as LocationID,IDTypeID,a.EZEID,ifnull(EZEIDVerifiedID,0) as EZEIDVerifiedID,ifnull(EZEIDVerifiedByID,0) EZEIDVerifiedByID,ifnull(StatusID,0) as StatusID,FirstName,ifnull(LastName,"") as LastName,ifnull(CompanyName,"") as CompanyName,ifnull(CategoryID,0) as CategoryID,ifnull(FunctionID,0) as FunctionID,ifnull(RoleID,0) as RoleID,ifnull(JobTitle,"") as JobTitle,ifnull(NameTitleID,0) as NameTitleID,ifnull(AboutCompany,"") as AboutCompany,ifnull(LanguageID,1) as LanguageID,ifnull(Keywords,"") as Keywords,ifnull(LocTitle,"") as LocTitle,Latitude,Longitude,Altitude,ifnull(AddressLine1,"") as AddressLine1,ifnull(AddressLine2,"") as AddressLine2,CityID,StateID,CountryID,ifnull(PostalCode,"") as PostalCode,b.PIN,ifnull(EMailID,"") as EMailID,ifnull(EMailVerifiedID,"") as EMailVerifiedID,ifnull(PhoneNumber,"") as PhoneNumber, ifnull(MobileNumber,"") as MobileNumber,ifnull(LaptopSLNO,"") as LaptopSLNO,ifnull(VehicleNumber,"") as VehicleNumber,ifnull(Website,"") as Website,ifnull(Picture,"") as Picture,ifnull(PictureFileName,"") as PictureFileName ,ifnull((Select CityName from mcity where CityID=b.CityID and LangID=a.LanguageID),"") as CityTitle,ifnull((Select CountryName from mcountry where CountryID=b.CountryID and LangID=a.LanguageID),"") as CountryTitle,ifnull((Select StateName from mstate where StateID=b.StateID and LangID=a.LanguageID),"") as StateTitle,ifnull(d.ParkingStatus,1) as ParkingStatus,ifnull(d.OpenStatus,1) as OpenStatus,ifnull(d.WorkingHours,"") as WorkingHours,ifnull(d.SalesEnquiryButton,1) as SalesEnquiryButton ,ifnull(d.SalesEnquiryMailID,"") as SalesEnquiryMailID,ifnull(d.HomeDeliveryButton,1) as HomeDeliveryButton,ifnull(d.HomeDeliveryMailID,"") as HomeDeliveryMailID,ifnull(d.ReservationButton,1) as ReservationButton,ifnull(d.ReservationMailID,"") as ReservationMailID,ifnull(d.SupportButton,1) as SupportButton,ifnull(d.SupportMailID,"") as SupportMailID,ifnull(d.CVButton,1) as CVButton,ifnull(d.CVMailID,"") as CVMailID,ifnull((Select CategoryTitle from mcategory where CategoryID=a.CategoryID and LangID=a.LanguageID),"") as CategoryTitle, ifnull(a.Icon,"") as Icon, ifnull(a.IconFileName,"") as IconFileName  from tlocations b left outer Join tlcoationsettings d On b.TID=d.LocID,tmaster a left outer Join tDocs c On a.TID=c.MasterID where b.EZEID=a.EZEID and b.SeqNo=0  and a.EZEID= ' + db.escape(EZEID);
+                var Query ='Select a.TID as MasterID, b.TID as LocationID,IDTypeID,a.EZEID,ifnull(EZEIDVerifiedID,0) as EZEIDVerifiedID,ifnull(EZEIDVerifiedByID,0) EZEIDVerifiedByID,ifnull(StatusID,0) as StatusID,FirstName,ifnull(LastName,"") as LastName,ifnull(CategoryID,0) as CategoryID,ifnull(LanguageID,1) as LanguageID,ifnull(Keywords,"") as Keywords,ifnull(LocTitle,"") as LocTitle,Latitude,Longitude,Altitude,ifnull(Picture,"") as Picture,ifnull(PictureFileName,"") as PictureFileName, ifnull(a.Icon,"") as Icon, ifnull(a.IconFileName,"") as IconFileName,ifnull(doc.BRDocFilename,"") as BRDocFilename, ifnull(doc.BRDoc,"") as BRDoc,ifnull(doc.BRContentType,"") as BRContentType  from tlocations b ,tmaster a left outer Join tDocs c On a.TID=c.MasterID left outer join tdocs doc on a.TID= doc.MasterID where b.EZEID=a.EZEID and b.SeqNo=0  and a.EZEID=' + db.escape(EZEID);
             db.query(Query, function (err, UserDetailsResult) {
                 if (!err) {
                     if (UserDetailsResult != null) {
@@ -4283,7 +4298,9 @@ exports.FnUpdateUserProfileAP = function (req, res) {
         var BrochureDoc = req.body.BrochureDoc;
         var BrochureDocFile = req.body.BrochureDocFile;
         var ActiveInactive = req.body.ActiveInactive;
+        var BRContentType = req.body.BRContentType;
         var Token = req.body.Token;
+        var Rating = req.body.Rating;
         var RtnMessage = {
             IsSuccessful: false
         };
@@ -4292,12 +4309,25 @@ exports.FnUpdateUserProfileAP = function (req, res) {
             FnValidateTokenAP(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
-
+//                        var base64 = require('base64-js')
+//                        var brochurefile =  base64.toByteArray(BrochureDoc);
+//                        console.log(brochurefile);
             var InsertQuery = db.escape(CategoryID) + ',' + db.escape(Latitude) + ',' + db.escape(Longitude) + ',' +
                    db.escape(EZEIDVerifiedID) + ',' + db.escape(TID) + ',' + db.escape(Keywords) + ',' + db.escape(Picture) + ',' + db.escape(PictureFileName) + ',' +
                    db.escape(Icon) + ',' + db.escape(IconFileName) + ',' + db.escape(EZEID) + ',' +
-                   db.escape(BrochureDoc) + ',' + db.escape(BrochureDocFile) + ',' + db.escape(ActiveInactive);
-            console.log('InsertQuery: ' + InsertQuery);
+                   db.escape(BrochureDoc) + ',' + db.escape(BrochureDocFile) + ',' + db.escape(ActiveInactive)+ ',' + db.escape(BRContentType)+ ',' + db.escape(Rating);
+           // console.log('InsertQuery: ' + InsertQuery);
+                        console.log('******** File created from base64 encoded string ********')
+                        var FileName = 'D:\\shailesh\\' + BrochureDocFile;
+                        var fs = require('fs');
+                        var bitmap = new Buffer(BrochureDoc, 'base64');
+                        console.log('******File content after buffer');
+                        console.log(bitmap);
+                        console.log('*****File content after buffer');
+                        // write buffer to file
+                        fs.writeFileSync(FileName, bitmap);
+                        console.log('******** File created from base64 encoded string ********')
+
             db.query('CALL pUpdateUserProfileAP(' + InsertQuery + ')', function (err, InsertResult) {
                 if (!err) {
                     console.log(InsertResult);
