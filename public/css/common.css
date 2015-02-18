@@ -404,4 +404,25 @@ margin-left: 5px;
 .setUpperChar
 {
     text-transform:uppercase;
+
+/*********************** Footer fix *************************/
+
+html, body {
+  height: 100%;
+}
+
+.container-fluid{
+    min-height: 100%;
+    margin-bottom: -60px;
+}
+
+.container-fluid:after{
+    height:80px;
+    content:"";
+    display:block;
+}
+
+/** Fix for google maps autocomplete not appearing **/
+.pac-container{
+    z-index: 1200;
 }

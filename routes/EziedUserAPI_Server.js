@@ -520,7 +520,7 @@ exports.FnLogin = function (req, res) {
         if (UserName != null && UserName != '' && Password != null && Password != '') {
             var EncryptPWD = FnEncryptPassword(Password);
             // console.log(EncryptPWD);
-            var Query = 'select TID,FirstName,LastName,EZEID,IDTypeID,Token,Icon from tmaster where EZEID=' + db.escape(UserName) + ' and Password=' + db.escape(EncryptPWD);
+            var Query = 'select TID,FirstName,LastName,EZEID,IDTypeID,Token,Icon from tmaster where StatusID=1 and  EZEID=' + db.escape(UserName) + ' and Password=' + db.escape(EncryptPWD);
             db.query(Query, function (err, loginResult) {
                 if (!err) {
                     if (loginResult.length > 0) {
@@ -1974,7 +1974,7 @@ exports.FnAddLocation = function (req, res) {
                                         //res.send(InsertResult);
                                         // console.log(InsertResult);
                                         console.log('Addlocation: Location added successfully');
-                                        var selectqry = 'Select tlocations.TID,MasterID,EZEID,LocTitle,Latitude,Longitude,Altitude,AddressLine1,AddressLine2,Area,StateID,CountryID,PostalCode,PIN,EMailID,EMailVerifiedID,PhoneNumber,MobileNumber, LaptopSLNO,VehicleNumber,CreatedDate,LUDate,Website,SeqNo,Picture,PictureFileName,locSetting.ParkingStatus,locSetting.OpenStatus,locSetting.WorkingHours,locSetting.SalesEnquiryMailID,locSetting.HomeDeliveryMailID,locSetting.ReservationMailID,locSetting.SupportMailID,locSetting.CVMailID,ifnull((Select CityName from mcity where CityID=tlocations.CityID),"") as CityTitle from tlocations left outer join tlcoationsettings  locSetting on locSetting.LocID= tlocations.TID';
+                                        var selectqry = 'Select tlocations.TID,MasterID,EZEID,LocTitle,Latitude,Longitude,Altitude,AddressLine1,AddressLine2,Area,StateID,CountryID,PostalCode,PIN,EMailID,EMailVerifiedID,ifnull(PhoneNumber,"") as PhoneNumber,MobileNumber,ifnull(ISDPhoneNumber,"") as ISDPhoneNumber ,ifnull(ISDMobileNumber,"") as ISDMobileNumber, LaptopSLNO,VehicleNumber,CreatedDate,LUDate,Website,SeqNo,Picture,PictureFileName,locSetting.ParkingStatus,locSetting.OpenStatus,locSetting.WorkingHours,locSetting.SalesEnquiryMailID,locSetting.HomeDeliveryMailID,locSetting.ReservationMailID,locSetting.SupportMailID,locSetting.CVMailID,ifnull((Select CityName from mcity where CityID=tlocations.CityID),"") as CityTitle from tlocations left outer join tlcoationsettings  locSetting on locSetting.LocID= tlocations.TID';
                                         if (TID == 0) {
                                             selectqry = selectqry + ' order by tlocations.TID desc limit 1';
                                         }
@@ -2310,9 +2310,12 @@ exports.FnSaveMessage = function (req, res) {
         var Message = req.body.Message;
         var Status = 0;
         var TaskDateTime = req.body.TaskDateTime;
+        var CurrentTaskDate = req.body.CurrentTaskDate;
         var Notes = req.body.Notes;
         var LocID = req.body.LocID;
-
+//        if(CurrentTaskDate == null){
+//            CurrentTaskDate = TaskDateTime;
+//        }
         var RtnMessage = {
             IsSuccessfull: false
         };
@@ -2344,7 +2347,7 @@ exports.FnSaveMessage = function (req, res) {
                                         LocID: LocID,
                                         MessageType: MessageType,
                                         Message: Message,
-                                        TaskDateTime: TaskDateTime
+                                        TaskDateTime: CurrentTaskDate
                                     };
                                     //console.log(MessageContent);
                                     FnMessageMail(MessageContent, function (err, Result) {
@@ -4074,8 +4077,8 @@ exports.FnLoginAP = function (req, res) {
         };
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
         if (UserName != null && UserName != '' && Password != null && Password != '') {
-
-            var Query = 'select TID, FullName,APMasterID from tapuser where APLoginID=' + db.escape(UserName) + ' and APPassword=' + db.escape(Password);
+            var encryptPassword= FnEncryptPassword(Password);
+            var Query = 'select TID, FullName,APMasterID from tapuser where APLoginID=' + db.escape(UserName) + ' and APPassword=' + db.escape(encryptPassword);
             db.query(Query, function (err, loginResult) {
                 if (!err) {
                     if (loginResult.length > 0) {
@@ -4184,9 +4187,13 @@ exports.FnGetUserDetailsAP = function (req, res) {
 
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-
+        var TokenNo = req.query.Token;
         var EZEID = req.query.EZEID;
-        if (EZEID != null && EZEID != '') {
+        if (EZEID != null && EZEID != '' && TokenNo != null) {
+
+            FnValidateTokenAP(TokenNo, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
             //  var Query = 'Select  b.TID as LocationID,IDTypeID,a.EZEID,EZEIDVerifiedID,EZEIDVerifiedByID,StatusID,FirstName,LastName,ifnull(CompanyName,"") as CompanyName,CategoryID,FunctionID,RoleID,ifnull(JobTitle,"") as JobTitle,NameTitleID,AboutCompany,LanguageID,Keywords,LocTitle,Latitude,Longitude,Altitude,AddressLine1,AddressLine2,CityID,StateID,CountryID,PostalCode,b.PIN,EMailID,EMailVerifiedID,PhoneNumber,MobileNumber,LaptopSLNO,VehicleNumber,Website,SeqNo,Picture,PictureFileName,ifnull((Select CityName from mcity where CityID=b.CityID and LangID=a.LanguageID),"") as CityTitle,ifnull((Select CountryName from mcountry where CountryID=b.CountryID and LangID=a.LanguageID),"") as CountryTitle,ifnull((Select StateName from mstate where StateID=b.StateID and LangID=a.LanguageID),"") as StateTitle,ifnull((Select CategoryTitle from mcategory where CategoryID=a.CategoryID and LangID=a.LanguageID),"") as CategoryTitle from tlocations b,tmaster a where b.EZEID=a.EZEID and b.SeqNo=0 and Token=' + db.escape(Token) + ';';
             var Query = 'Select a.TID as MasterID, b.TID as LocationID,IDTypeID,a.EZEID,ifnull(EZEIDVerifiedID,0) as EZEIDVerifiedID,ifnull(EZEIDVerifiedByID,0) EZEIDVerifiedByID,ifnull(StatusID,0) as StatusID,FirstName,ifnull(LastName,"") as LastName,ifnull(CompanyName,"") as CompanyName,ifnull(CategoryID,0) as CategoryID,ifnull(FunctionID,0) as FunctionID,ifnull(RoleID,0) as RoleID,ifnull(JobTitle,"") as JobTitle,ifnull(NameTitleID,0) as NameTitleID,ifnull(AboutCompany,"") as AboutCompany,ifnull(LanguageID,1) as LanguageID,ifnull(Keywords,"") as Keywords,ifnull(LocTitle,"") as LocTitle,Latitude,Longitude,Altitude,ifnull(AddressLine1,"") as AddressLine1,ifnull(AddressLine2,"") as AddressLine2,CityID,StateID,CountryID,ifnull(PostalCode,"") as PostalCode,b.PIN,ifnull(EMailID,"") as EMailID,ifnull(EMailVerifiedID,"") as EMailVerifiedID,ifnull(PhoneNumber,"") as PhoneNumber, ifnull(MobileNumber,"") as MobileNumber,ifnull(LaptopSLNO,"") as LaptopSLNO,ifnull(VehicleNumber,"") as VehicleNumber,ifnull(Website,"") as Website,ifnull(Picture,"") as Picture,ifnull(PictureFileName,"") as PictureFileName ,ifnull((Select CityName from mcity where CityID=b.CityID and LangID=a.LanguageID),"") as CityTitle,ifnull((Select CountryName from mcountry where CountryID=b.CountryID and LangID=a.LanguageID),"") as CountryTitle,ifnull((Select StateName from mstate where StateID=b.StateID and LangID=a.LanguageID),"") as StateTitle,ifnull(d.ParkingStatus,1) as ParkingStatus,ifnull(d.OpenStatus,1) as OpenStatus,ifnull(d.WorkingHours,"") as WorkingHours,ifnull(d.SalesEnquiryButton,1) as SalesEnquiryButton ,ifnull(d.SalesEnquiryMailID,"") as SalesEnquiryMailID,ifnull(d.HomeDeliveryButton,1) as HomeDeliveryButton,ifnull(d.HomeDeliveryMailID,"") as HomeDeliveryMailID,ifnull(d.ReservationButton,1) as ReservationButton,ifnull(d.ReservationMailID,"") as ReservationMailID,ifnull(d.SupportButton,1) as SupportButton,ifnull(d.SupportMailID,"") as SupportMailID,ifnull(d.CVButton,1) as CVButton,ifnull(d.CVMailID,"") as CVMailID,ifnull((Select CategoryTitle from mcategory where CategoryID=a.CategoryID and LangID=a.LanguageID),"") as CategoryTitle, ifnull(a.Icon,"") as Icon, ifnull(a.IconFileName,"") as IconFileName  from tlocations b left outer Join tlcoationsettings d On b.TID=d.LocID,tmaster a left outer Join tDocs c On a.TID=c.MasterID where b.EZEID=a.EZEID and b.SeqNo=0  and a.EZEID= ' + db.escape(EZEID);
 
@@ -4214,12 +4221,28 @@ exports.FnGetUserDetailsAP = function (req, res) {
 
                 }
                 else {
+                                res.statusCode=500;
                     res.send('null');
                     console.log('FnGetUserDetailsAP : tmaster:' + err);
                 }
             });
         }
         else {
+                        res.statusCode=401;
+                        res.send('null');
+                        console.log("Invalid Token");
+                    }
+                }
+                else
+                {
+                    res.statusCode=500;
+                    res.send('null');
+                    console.log("Error in validating the token: "+err);
+                }
+            });
+        }
+        else {
+            res.statusCode=400;
             res.send('null');
             console.log('FnGetUserDetailsAP :  EZEID is empty');
         }
@@ -4259,16 +4282,21 @@ exports.FnUpdateUserProfileAP = function (req, res) {
         var IconFileName = req.body.IconFileName;
         var BrochureDoc = req.body.BrochureDoc;
         var BrochureDocFile = req.body.BrochureDocFile;
-
+        var ActiveInactive = req.body.ActiveInactive;
+        var Token = req.body.Token;
         var RtnMessage = {
-            IsSuccessful: false,
+            IsSuccessful: false
         };
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
-        if (EZEID != null && TID.toString() != 'NaN') {
+        if (EZEID != null && TID.toString() != 'NaN' && Token != null) {
+            FnValidateTokenAP(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+
             var InsertQuery = db.escape(CategoryID) + ',' + db.escape(Latitude) + ',' + db.escape(Longitude) + ',' +
                    db.escape(EZEIDVerifiedID) + ',' + db.escape(TID) + ',' + db.escape(Keywords) + ',' + db.escape(Picture) + ',' + db.escape(PictureFileName) + ',' +
                    db.escape(Icon) + ',' + db.escape(IconFileName) + ',' + db.escape(EZEID) + ',' +
-                   db.escape(BrochureDoc) + ',' + db.escape(BrochureDocFile);
+                   db.escape(BrochureDoc) + ',' + db.escape(BrochureDocFile) + ',' + db.escape(ActiveInactive);
             console.log('InsertQuery: ' + InsertQuery);
             db.query('CALL pUpdateUserProfileAP(' + InsertQuery + ')', function (err, InsertResult) {
                 if (!err) {
@@ -4291,14 +4319,22 @@ exports.FnUpdateUserProfileAP = function (req, res) {
                     }
                 }
                 else {
-
+                                res.statusCode=500;
                     res.send(RtnMessage);
                     console.log('FnUpdateUserProfileAP:tmaster:' + err);
                 }
             });
         }
+                }
         else {
-
+                    res.statusCode=401;
+                    res.send(RtnMessage);
+                    console.log('FnUpdateUserProfileAP:tmaster: Invalid Token');
+                }
+            });
+        }
+        else {
+            res.statusCode=400;
             res.send(RtnMessage);
             console.log('FnUpdateUserProfileAP:tmaster: Manditatory field empty');
         }

@@ -244,8 +244,25 @@
             map.controls[google.maps.ControlPosition.TOP_RIGHT].push(ClocBtn)
             var input = /** @type {HTMLInputElement} */(document.getElementById('txtSearch'));
             map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
+            
+            /********** Google Maps autocomplete **************/
+            var options = {
+              types: ['establishment']
+            };
 
-  var searchBox = new google.maps.places.SearchBox(
+            autocomplete = new google.maps.places.Autocomplete(input, options);
+            google.maps.event.addListener(autocomplete,'place_changed',function(){
+                var place = autocomplete.getPlace();
+                $rootScope.CLoc.CLat = place.geometry.location.k;
+                $rootScope.CLoc.CLong = place.geometry.location.D;
+                var loc = new google.maps.LatLng($rootScope.CLoc.CLat, $rootScope.CLoc.CLong);
+                PlaceCurrentLocationMarker(loc);
+            });
+            /********** Google Maps autocomplete ends *********/
+            
+            
+
+            var searchBox = new google.maps.places.SearchBox(
     /** @type {HTMLInputElement} */(input));
             //directionsDisplay.setMap(map);
             // Try W3C Geolocation (Preferred)
