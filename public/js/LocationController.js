@@ -162,6 +162,11 @@ angular.module('ezeidApp').controller('LocationsController', function ($rootScop
         if(!map){
             initialize1();
         }
+        else{
+            navigator.geolocation.getCurrentPosition(FindCurrentLocation, function () {
+                handleNoGeolocation();
+            });
+        }
         //To set by default selected
          SLocCtrl._locInfo.ParkingStatus = 0;
          SLocCtrl._locInfo.OpenStatus = 1;
@@ -187,10 +192,18 @@ angular.module('ezeidApp').controller('LocationsController', function ($rootScop
             if(!map){
                 initialize1();
             }
+            else{
+                var pos = new google.maps.LatLng(SLocCtrl._locInfo.Latitude,SLocCtrl._locInfo.Longitude);
+                PlaceCurrentLocationMarker(pos);
+                map.setZoon(15);
+                var bounds = new google.maps.LatLngBounds();
+                bounds.extend(pos);
+                map.fitBounds(bounds);
+                
+            }
         }
         catch(ex)
-        {
-        }
+        {}
 
     };
     this.deleteSecLoc = function (row) {
@@ -436,8 +449,7 @@ angular.module('ezeidApp').controller('LocationsController', function ($rootScop
 
             if (JSON.stringify(SLocCtrl._locInfo) != '{}') {
                 initialLocation = new google.maps.LatLng(SLocCtrl._locInfo.Latitude, SLocCtrl._locInfo.Longitude);
-                PlaceCurrentLocationMarker(initialLocation);
-                map.setCenter(currentLoc);
+                PlaceCurrentLocationMarker(initialLocation);                
             } else {
                 if (navigator.geolocation) {
                     navigator.geolocation.getCurrentPosition(FindCurrentLocation);
@@ -450,7 +462,6 @@ angular.module('ezeidApp').controller('LocationsController', function ($rootScop
             // pick list. Retrieve the matching places for that item.
             google.maps.event.addListener(searchBox, 'places_changed', function () {
                 var places = searchBox.getPlaces();
-
                 if (places.length == 0) {
                     return;
                 }
@@ -463,9 +474,13 @@ angular.module('ezeidApp').controller('LocationsController', function ($rootScop
                 var bounds = new google.maps.LatLngBounds();
                 if (places.length > 0) {
                     var place = places[0];
-                    $rootScope.CLoc.CLat = place.geometry.location.k;
-                    $rootScope.CLoc.CLong = place.geometry.location.D;
-                    var loc = new google.maps.LatLng($rootScope.CLoc.CLat, $rootScope.CLoc.CLong);
+//                    $rootScope.CLoc.CLat = place.geometry.location.lat();
+//                    $rootScope.CLoc.CLong = place.geometry.location.lng();
+//                    
+                    SLocCtrl._locInfo.Latitude = place.geometry.location.lat();
+                    SLocCtrl._locInfo.Longitude = place.geometry.location.lng();
+                    
+                    var loc = new google.maps.LatLng(SLocCtrl._locInfo.Latitude, SLocCtrl._locInfo.Longitude);
                     PlaceCurrentLocationMarker(loc);
                 }
             });

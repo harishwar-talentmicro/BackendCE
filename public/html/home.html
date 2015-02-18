@@ -298,9 +298,9 @@
                                                 </select>
 
                                             </div>
-                                            <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12" style="padding-right:0px;" ng-hide="search.isEZEIDselected('1')">
+                                            <div class="col-lg-2 col-md-2 col-sm-12 col-xs-12" style="padding-right:0px;" ng-hide="search.isEZEIDselected('1')">
                                                 <div style="display:table-cell;vertical-align:middle;height:34px;">
-                                                Search near map <a ng-click="selectTab('map')" style="cursor:pointer;">location</a>  within
+                                                Search within 
                                                 </div>
                                             </div>
     <!--                                        <img src="./images/map_marker.png" height="24px" width="24px">-->
@@ -312,14 +312,14 @@
                                                     <option value="0">Any</option>
                                                 </select>
                                             </div>
-                                            <div class="col-lg-5 col-md-5 col-sm-6 col-xs-12" ng-hide="search.isEZEIDselected('1')">
+                                            <div class="col-lg-7 col-md-7 col-sm-6 col-xs-12" ng-hide="search.isEZEIDselected('1')" style="padding:0px;">
 
                                                 <div style="display:table-cell;vertical-align:middle;height:34px;">
-                                                    <span>Proximity </span>
+                                                    <span>Proximity from map <a ng-click="selectTab('map')" style="cursor:pointer;">location</a></span> &nbsp;
                                                     <input type="checkbox" ng-model="search.Criteria.ParkingStatus" name="parking" value="1,2"><span> Show Places with Parking</span>
+                                                
                                                 </div>
-                                            </div>
-                                    </div>
+                                            </div>                                    </div>
                                     <div class="bottom-clearfix"></div>
 
                                 </div>
