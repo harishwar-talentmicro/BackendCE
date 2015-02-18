@@ -10,7 +10,7 @@ angular.module('ezeidApp').controller('LegalController', function ($rootScope, $
     }
     else {
         if (typeof (Storage) !== "undefined") {
-            var encrypted = sessionStorage.getItem("_token");
+            var encrypted = localStorage.getItem("_token");
             if (encrypted) {
                 var decrypted = CryptoJS.AES.decrypt(encrypted, "EZEID");
                 var Jsonstring = decrypted.toString(CryptoJS.enc.Utf8);

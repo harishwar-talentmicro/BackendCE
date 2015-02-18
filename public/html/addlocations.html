@@ -150,6 +150,7 @@
                                                     <br/>
                                                     <div class="row mar_editTop" style="margin-left:0px;margin-right:0px;">
                                                         <input type="email" name="email" class="form-control" ng-model="SLocCtrl._locInfo.EMailID" ng-pattern="/^[a-z]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5}$/" placeholder="E-mail ID" style="width: 48%">
+                                                        <span ng-show="SecLocForm.email.$error.email" ng-if="SecLocForm.email.$error.email == true ? SLocCtrl._locInfo.isWrongEmailPattern = true : SLocCtrl._locInfo.isWrongEmailPattern = false"></span>
                                                         <input type="text" name="website" ng-model="SLocCtrl._locInfo.Website" class="form-control" placeholder="WebSite"  style="width: 48%">
                                                     </div><br/>
                                                     <div class="row mar_editTop" style="margin-left:0px;margin-right:0px;" ng-show="_userInfo.Type==1">
@@ -177,24 +178,29 @@
                                                             <input type="checkbox" ng-model="SLocCtrl._locInfo.SalesEnquiryButton">
                                                             <input type="email" name="salesMail" class="form-control wd40p" ng-model="SLocCtrl._locInfo.SalesEnquiryMailID"
                                                                    placeholder="Sales Enquiry Mail ID" ng-pattern="/^[a-z]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5}$/">
+                                                            <span ng-show="SecLocForm.salesMail.$error.email" ng-if="SecLocForm.salesMail.$error.email == true ? SLocCtrl._locInfo.isWrongEmailPatternSales = true : SLocCtrl._locInfo.isWrongEmailPatternSales = false"></span>
                                                         </div><br/>
                                                         <div class="row mar_editTop" style="margin-left:0px;margin-right:0px;">
                                                             <input type="checkbox" ng-model="SLocCtrl._locInfo.HomeDeliveryButton">
                                                             <input type="email" name="homeMail" class="form-control wd40p" ng-model="SLocCtrl._locInfo.HomeDeliveryMailID"
                                                                    placeholder="Home Delivery Mail ID" ng-pattern="/^[a-z]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5}$/">
+                                                            <span ng-show="SecLocForm.homeMail.$error.email" ng-if="SecLocForm.homeMail.$error.email == true ? SLocCtrl._locInfo.isWrongEmailPatternHome = true : SLocCtrl._locInfo.isWrongEmailPatternHome = false"></span>
                                                             <input type="checkbox" ng-model="SLocCtrl._locInfo.ReservationButton">
                                                             <input type="email" name="reserveMail" class="form-control wd40p" ng-model="SLocCtrl._locInfo.ReservationMailID"
                                                                    placeholder="Reservation Mail ID" ng-pattern="/^[a-z]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5}$/">
+                                                            <span ng-show="SecLocForm.reserveMail.$error.email" ng-if="SecLocForm.reserveMail.$error.email == true ? SLocCtrl._locInfo.isWrongEmailPatternReservation = true : SLocCtrl._locInfo.isWrongEmailPatternReservation = false"></span>
                                                         </div><br/>
                                                         <div class="row mar_editTop" style="margin-left:0px;margin-right:0px;">
                                                             <input type="checkbox" ng-model="SLocCtrl._locInfo.SupportButton">
                                                             <input type="email" name="supportMail" class="form-control wd40p" ng-model="SLocCtrl._locInfo.SupportMailID"
                                                                    placeholder="Support Mail ID"
                                                                    ng-pattern="/^[a-z]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5}$/">
+                                                            <span ng-show="SecLocForm.supportMail.$error.email" ng-if="SecLocForm.supportMail.$error.email == true ? SLocCtrl._locInfo.isWrongEmailPatternSupport = true : SLocCtrl._locInfo.isWrongEmailPatternSupport = false"></span>
                                                             <input type="checkbox" ng-model="SLocCtrl._locInfo.CVButton">
                                                             <input type="email" name="cvMail" class="form-control wd40p" ng-model="SLocCtrl._locInfo.CVMailID"
                                                                    placeholder="CV Mail ID"
                                                                    ng-pattern="/^[a-z]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5}$/">
+                                                            <span ng-show="SecLocForm.cvMail.$error.email" ng-if="SecLocForm.cvMail.$error.email == true ? SLocCtrl._locInfo.isWrongEmailPatternCV = true : SLocCtrl._locInfo.isWrongEmailPatternCV = false"></span>
                                                         </div><br/>
                                                     </div>
 

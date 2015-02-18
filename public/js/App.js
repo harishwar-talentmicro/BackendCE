@@ -68,7 +68,7 @@
                 },
                 template:
                     '<div class="input-group date emptyBox" id="datetimepicker1" >'+
-                        '<input type="text" class="form-control" placeholder="Birth Date" name="recipientDateTime" data-date-time/>'+
+                        '<input type="text" class="form-control" placeholder="Date" name="recipientDateTime" data-date-time/>'+
                         '<span class="input-group-addon"><span class="glyphicon glyphicon-calendar" >'+
                         '</span>'+
                     '</div>',
@@ -879,6 +879,7 @@
         //close download form
         SearchSec.SearchTypeKeyWord = function () {
             SearchSec.IsShowForm = false;
+            SearchSec.IsFilterRowVisible = true;
         };
 
         // Would write the value of the QueryString-variable called name to the console  
@@ -891,8 +892,7 @@
       }
     });
 
-    ezeid.controller('ProfileController', function ($rootScope, $scope, $http, $q, $timeout, Notification ,$filter) {
-        
+    ezeid.controller('ProfileController', function ($rootScope, $scope, $http, $q, $timeout, Notification, $filter) {
         
         var profile = this;
         profile._info = {};
@@ -909,16 +909,6 @@
         $("#datetimepicker1").on("dp.change",function (e) {
             $('#datetimepicker1').data("DateTimePicker").maxDate(e.date);
         });
-
-          $scope.$on('$locationChangeStart', function( event ) {
-            if($scope.isCloseButtonClicked == false)
-                {
-                    var answer = confirm("Click OK to exit this page")
-                    if (!answer) {
-                        event.preventDefault();
-                    }
-                }
-         });
 
   //    $('#datetimepicker1').datetimepicker();
         var map;
@@ -1018,8 +1008,6 @@
             }
         }
 
-
-
         $http({ method: 'get', url: GURL + 'ewmGetCountry?LangID=1' }).success(function (data) {
             if ($rootScope._userInfo.Token == false) {
                 var _obj = { CountryID: 0, CountryName: '--Country--', ISDCode: '####' };
@@ -1097,6 +1085,7 @@
         }
         this.CheckisIDAvailable = function () {
 
+            $scope.disableAvalabilityButton = true;
             var sEzeid = profile._info.EZEID;
             var lastTwo = sEzeid.substr(sEzeid.length - 2);
             if(lastTwo != "ap")
@@ -1113,6 +1102,11 @@
                 profile._info.IsIDAvailable = false;
             }
         };
+
+        this.ezeidBoxClicked = function () {
+            $scope.disableAvalabilityButton = false;
+        };
+
 
         //Maps
         function initialize() {
@@ -1353,7 +1347,6 @@
             }
         };
 
-
         $http({ method: 'get', url: GURL + 'ewmGetCategory?LangID=1' }).success(function (data) {
             var _obj = { CategoryID: 0, CategoryTitle: '--Category--' };
             data.splice(0, 0, _obj);
@@ -1408,39 +1401,33 @@
                 }
             }
          }
-       // isValidate = function ()
-       // $scope.dateNew;
+
         function isValidate()
         {
-             var notificationMessage = "";
-             
-//            if ($rootScope._userInfo.IsAuthenticate == false)
-//            {
+                var notificationMessage = "";
                 var errorList  = [];
                 // Check validations
                 if(!profile._info.EZEID)
                 {
-                    notificationMessage += notificationMessage != "" ? ", EZE ID Required " : "EZE ID Required";
                     errorList.push('EZEID is Required');
-                    
                 }
+
+                if($scope.disableAvalabilityButton == false)
+                {
+                    errorList.push('First to Check EZE ID availability');
+                }
+
                 if(!profile._info.Password && $rootScope._userInfo.IsAuthenticate == false)
                 {
-                    notificationMessage += notificationMessage != "" ? ", Password Required " : "Password Required";
                     errorList.push('Password is Required');
-                    
                 }
                 if(!profile._info.CPassword && $rootScope._userInfo.IsAuthenticate == false)
                 {
-                    notificationMessage += notificationMessage != "" ? ", Re-Enter Password Required " : "Re-Enter Password Required";
                     errorList.push('Re-Enter Password is Required');
-                    
                 }
                 if(profile._info.Password != profile._info.CPassword && $rootScope._userInfo.IsAuthenticate == false)
                 {
-                    notificationMessage += notificationMessage != "" ? ", Password Mismatch " : "Password Mismatch";
                     errorList.push('Password Mismatch');
-                    
                 }
                 if(!profile._info.FirstName)
                 {
@@ -1450,46 +1437,62 @@
                 }
                 if(!profile._info.LastName)
                 {
-                    notificationMessage += notificationMessage != "" ? ", Last Name Required " : "Last Name Required";
                     errorList.push(' Last Name Required ');
-                    
                 }
                 if(!profile._info.AddressLine1)
                 {
-                    notificationMessage += notificationMessage != "" ? ", Address1 Required " : "Address1 Required";
                     errorList.push(' Address1 Required');
                 }
-
                 if(!profile._info.CountryID)
                 {
-                    notificationMessage += notificationMessage != "" ? ", Country Required " : "Country Required";
                     errorList.push('Country Required');
                 }
                 if(!profile._info.StateID)
                 {
-                    notificationMessage += notificationMessage != "" ? ", State Required " : "State Required";
                     errorList.push('State Required');
                 }
                 if(!profile._info.CityTitle)
                 {
-                    notificationMessage += notificationMessage != "" ? ", City Required " : "City Required";
                     errorList.push(' City Required ');
                 }
                 if(!profile._info.PostalCode)
                 {
-                    notificationMessage += notificationMessage != "" ? ", PostalCode Required " : "PostalCode Required";
                     errorList.push('PostalCode Required ');
                 }
                 if(!profile._info.MobileNumber)
                 {
-                    notificationMessage += notificationMessage != "" ? ", Mobile Number Required " : "MobileNumber Required";
                     errorList.push('Mobile Number Required ');
                 }
+
+                if(profile._info.isWrongEmailPattern)
+                {
+                    errorList.push('Not valid email!');
+                }
+                if(profile._info.isWrongEmailPatternSales)
+                {
+                    errorList.push('Not valid email!');
+                }
+                if(profile._info.isWrongEmailPatternHome)
+                {
+                    errorList.push('Not valid email!');
+                }
+                if(profile._info.isWrongEmailPatternReservation)
+                {
+                    errorList.push('Not valid email!');
+                }
+                if(profile._info.isWrongEmailPatternSupport)
+                {
+                    errorList.push('Not valid email!');
+                }
+                if(profile._info.isWrongEmailPatternCV)
+                {
+                    errorList.push('Not valid email!');
+                }
+
                 if(profile._info.IDTypeID  == '1')
                 {
                     if(!profile._info.DOB)
                     {
-                        notificationMessage += notificationMessage != "" ? ", Date of birth Required " : "Date of birth Required";
                         errorList.push('Date of birth Required ');
                     }
                 }
@@ -1546,7 +1549,7 @@
                                     $rootScope._userInfo = data;
                                     if (typeof (Storage) !== "undefined") {
                                         var encrypted = CryptoJS.AES.encrypt(JSON.stringify(data), "EZEID");
-                                        sessionStorage.setItem("_token", encrypted);
+                                        localStorage.setItem("_token", encrypted);
                                     } else {
                                         alert('Sorry..! Browser does not support');
                                         window.location.href = "#/home";
@@ -1608,6 +1611,7 @@
 
                 if (!profile._info.IDTypeID == 2) {
 
+                    profile._info.Icon = $rootScope.smallImage;
                     /* profile._info.Icon = "";
                      profile._info.IconFileName = "";*/
                 } else {
@@ -1631,9 +1635,10 @@
         //Upload Icon
         $scope.uploadIcon = function (image) {
             isBusinessIcon = 1;
-           // profile._info.Icon = $rootScope.smallImage;
+            profile._info.Icon = $rootScope.smallImage;
+          //  console.log(profile._info.Icon);
             profile._info.IconFileName = image[0].name;
-            Notification.success({ message: "Saved...", delay: MsgDelay });
+           // Notification.success({ message: "Saved...", delay: MsgDelay });
         };
 
         this.closeAddPhotoForEditLocation = function () {
@@ -1653,7 +1658,6 @@
         profile.parkingStatus = [{ id: 0, label: "Parking Status" },{ id: 1, label: "Public Parking" }, { id: 2, label: "Valet Parking" }, { id: 3, label: "No parking" }];
         profile.gender = [{ id: 0, label: "Male" }, { id: 1, label: "Female" }, { id: 2, label: "Unspecified" }];
     });
-
 
     var Miliseconds = 300000;
     var RefreshTime = Miliseconds;

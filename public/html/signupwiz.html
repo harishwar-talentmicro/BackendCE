@@ -47,8 +47,8 @@
                     <div class="panel-heading">
                         <h4> {{heading}}
                                 <span ng-show="_userInfo.IsAuthenticate==true"> : {{profile._info.EZEID}}<span ng-show="profile._info.IDTypeID ==1"> (Individual)</span>
-                                                                <span ng-show="profile._info.IDTypeID ==2"> (Business)</span>
-                                                                <span ng-show="profile._info.IDTypeID ==3"> (Public Place)</span>
+                                    <span ng-show="profile._info.IDTypeID ==2"> (Business)</span>
+                                    <span ng-show="profile._info.IDTypeID ==3"> (Public Place)</span>
                                 </span>
                             <span class="col-md-offset-3 small" style="color:#FF0000; float: right;">
                                 <span style="border:1px solid #000000;background:#FAA9A3;color:#000000;">Mandatory </span>
@@ -77,12 +77,13 @@
                                    <div class="row mar_editTop"  ng-show="!_userInfo.IsAuthenticate==true" >
                                         <div class="col-lg-6">
                                             <div class="form-group" >
-                                                <input  type="text" style='text-transform:uppercase' ng-pattern="/^[a-zA-Z0-9]*$/"
+                                                <input  type="text" style='text-transform:uppercase' ng-pattern="/^[a-zA-Z0-9]*$/" ng-click="profile.ezeidBoxClicked()"
                                                             ng-class="UserForm.EZEID.$touched && !profile._info.EZEID.length ? 'mandatoryTextBox' : ''"
                                                             name="EZEID" id="EZEID" class="form-control emptyBox" maxlength="15" ng-model="profile._info.EZEID" placeholder="Enter EZE ID"
                                                             style="width: 90px" required >
 
-                                                 <button type="button" name="btnCheckID" ng-click="profile.CheckisIDAvailable()" ng-disabled="!profile._info.EZEID.length" class="btn btn-primary" >Check Availability</button>
+                                                 <!--<button type="button" name="btnCheckID" ng-click="profile.CheckisIDAvailable()" ng-disabled="!profile._info.EZEID.length" class="btn btn-primary" >Check Availability</button>-->
+                                                <button type="button" name="btnCheckID" ng-click="profile.CheckisIDAvailable()" ng-disabled="!profile._info.EZEID.length || disableAvalabilityButton" class="btn btn-primary" >Check Availability</button>
                                             </div>
                                         </div>
 
@@ -192,6 +193,7 @@
                                                 <br/>
                                                 <div class="row mar_editTop mar_editLeft">
                                                     <input type="email" name="email" class="form-control" ng-model="profile._info.EMailID" ng-pattern="/^[a-z]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5}$/" placeholder="E-mail ID" style="width: 48%">
+                                                    <span ng-show="UserForm.email.$error.email" ng-if="UserForm.email.$error.email == true ? profile._info.isWrongEmailPattern = true : profile._info.isWrongEmailPattern = false"></span>
                                                     <input type="text" name="website"
                                                            ng-model="profile._info.Website" class="form-control" placeholder="Website" style="width: 48%">
                                                 </div><br/>
@@ -231,7 +233,7 @@
                                                         <img ng-show="profile._info.IDTypeID == '2' && _userInfo.IsAuthenticate==true" src="{{profile._info.Icon}}"  ng-class="!profile._info.Icon ? 'setAttachLogoPosition' : 'setAttachLogo'" >
                                                         <!--<img ng-show="profile._info.IDTypeID == '2' && _userInfo.IsAuthenticate==true" src="{{profile._info.Icon}}" ng-class="profile._info.IDTypeID == '2' && _userInfo.IsAuthenticate==false ? 'setAttachLogo' : ''" >-->
                                                         <span ng-hide="profile._info.IDTypeID != 2" class="btn btn-primary btn-file">
-                                                            Attach Logo <input type="file" onchange="angular.element(this).scope().uploadIcon(this.files)" accept="image/*" resize-max-height="48" resize-max-width="48" resize-quality="0.7">
+                                                            Attach Logo <input type="file" onchange="angular.element(this).scope().uploadIcon(this.files)" accept="image/*" image="image" resize-max-height="48" resize-max-width="48" resize-quality="0.7">
                                                         </span>
                                                       </div>
                                                 </div>
@@ -256,24 +258,29 @@
                                                 <input type="checkbox" ng-model="SLocCtrl._locInfo.SalesEnquiryButton">
                                                 <input type="email" name="salesMail" class="form-control wd40p" ng-model="profile._info.SalesEnquiryMailID"
                                                        placeholder="Sales Enquiry Mail ID" ng-pattern="/^[a-z]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5}$/">
+                                                <span ng-show="UserForm.salesMail.$error.email" ng-if="UserForm.salesMail.$error.email == true ? profile._info.isWrongEmailPatternSales = true : profile._info.isWrongEmailPatternSales = false"></span>
                                             </div><br/>
                                             <div class="row mar_editTop">
                                                 <input type="checkbox" ng-model="profile._info.HomeDeliveryButton">
                                                 <input type="email" name="homeMail" class="form-control wd40p" ng-model="profile._info.HomeDeliveryMailID"
                                                        placeholder="Home Delivery Mail ID" ng-pattern="/^[a-z]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5}$/">
+                                                <span ng-show="UserForm.homeMail.$error.email" ng-if="UserForm.homeMail.$error.email == true ? profile._info.isWrongEmailPatternHome = true : profile._info.isWrongEmailPatternHome = false"></span>
                                                 <input type="checkbox" ng-model="profile._info.ReservationButton">
                                                 <input type="email" name="reserveMail" class="form-control wd40p" ng-model="profile._info.ReservationMailID"
                                                        placeholder="Reservation Mail ID" ng-pattern="/^[a-z]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5}$/">
+                                                <span ng-show="UserForm.reserveMail.$error.email" ng-if="UserForm.reserveMail.$error.email == true ? profile._info.isWrongEmailPatternReservation = true : profile._info.isWrongEmailPatternReservation = false"></span>
                                             </div><br/>
                                             <div class="row mar_editTop">
                                                 <input type="checkbox" ng-model="profile._info.SupportButton">
                                                 <input type="email" name="supportMail" class="form-control wd40p" ng-model="profile._info.SupportMailID"
                                                        placeholder="Support Mail ID"
                                                        ng-pattern="/^[a-z]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5}$/">
+                                                <span ng-show="UserForm.supportMail.$error.email" ng-if="UserForm.supportMail.$error.email == true ? profile._info.isWrongEmailPatternSupport = true : profile._info.isWrongEmailPatternSupport = false"></span>
                                                 <input type="checkbox" ng-model="profile._info.CVButton">
                                                 <input type="email" name="cvMail" class="form-control wd40p" ng-model="profile._info.CVMailID"
                                                        placeholder="CV Mail ID"
                                                        ng-pattern="/^[a-z]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5}$/">
+                                                    <span ng-show="UserForm.cvMail.$error.email" ng-if="UserForm.cvMail.$error.email == true ? profile._info.isWrongEmailPatternCV = true : profile._info.isWrongEmailPatternCV = false"></span>
                                             </div><br/>
                                         </div>
                                         <div  class="col-lg-12" style="padding-left: 10px;" ng-show="profile._info.IDTypeID == '1'">

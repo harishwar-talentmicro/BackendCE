@@ -125,8 +125,11 @@ angular.module('ezeidApp').controller('LocationsController', function ($rootScop
              });
         }
 
-    
+
     this.openNewLocationForm = function (secLocForm) {
+
+
+
 
       //  var stateId = SLocCtrl._locInfo.StateID;
         SLocCtrl._locInfo = {};
@@ -149,6 +152,13 @@ angular.module('ezeidApp').controller('LocationsController', function ($rootScop
         SLocCtrl._locInfo.ReservationButton = 0;
         SLocCtrl._locInfo.SupportButton = 0;
         SLocCtrl._locInfo.CVButton = 0;
+
+        document.getElementById("mobile_phone").className = "form-control emptyBox";
+        document.getElementById("Location").className = "form-control emptyBox";
+        document.getElementById("streeName").className = "form-control emptyBox";
+        document.getElementById("cities").className = "form-control emptyBox";
+        document.getElementById("postalCode").className = "form-control emptyBox";
+
         if(!map){
             initialize1();
         }
@@ -158,7 +168,7 @@ angular.module('ezeidApp').controller('LocationsController', function ($rootScop
     };
     this.openEditSecLocForm = function (row,index) {
 
-        //var stateId = SLocCtrl._locInfo.StateID;
+         //var stateId = SLocCtrl._locInfo.StateID;
       //  SLocCtrl._locInfo.StateID = stateId;
 
         SLocCtrl._locInfo = SLocCtrl.LocationsList[index];
@@ -203,11 +213,82 @@ angular.module('ezeidApp').controller('LocationsController', function ($rootScop
             }
         });
     };
+
+    function isValidate()
+    {
+        var notificationMessage = "";
+        var errorList  = [];
+        // Check validations
+
+
+
+        if(!SLocCtrl._locInfo.AddressLine1)
+        {
+            errorList.push(' Address1 Required');
+        }
+        if(!SLocCtrl._locInfo.CountryID)
+        {
+            errorList.push('Country Required');
+        }
+        if(!SLocCtrl._locInfo.StateID)
+        {
+            errorList.push('State Required');
+        }
+        if(!SLocCtrl._locInfo.CityTitle)
+        {
+            errorList.push('City Required ');
+        }
+        if(!SLocCtrl._locInfo.PostalCode)
+        {
+            errorList.push('PostalCode Required ');
+        }
+        if(!SLocCtrl._locInfo.MobileNumber)
+        {
+            errorList.push('Mobile Number Required ');
+        }
+
+        if(SLocCtrl._locInfo.isWrongEmailPattern)
+        {
+            errorList.push('Not valid email!');
+        }
+        if(SLocCtrl._locInfo.isWrongEmailPatternSales)
+        {
+            errorList.push('Not valid email!');
+        }
+        if(SLocCtrl._locInfo.isWrongEmailPatternHome)
+        {
+            errorList.push('Not valid email!');
+        }
+        if(SLocCtrl._locInfo.isWrongEmailPatternReservation)
+        {
+            errorList.push('Not valid email!');
+        }
+        if(SLocCtrl._locInfo.isWrongEmailPatternSupport)
+        {
+            errorList.push('Not valid email!');
+        }
+        if(SLocCtrl._locInfo.isWrongEmailPatternCV)
+        {
+            errorList.push('Not valid email!');
+        }
+
+        if(errorList.length>0){
+            for(var i = errorList.length; i>0;i--)
+            {
+                Notification.error({ message: errorList[i-1], delay: MsgDelay });
+            }
+        };
+        //Return false if errorList is greater than zero
+        return (errorList.length>0)? false : true;
+    }
+
     this.saveNewLoc = function (secLocForm) {
 
+        if(isValidate())
+        {
             SLocCtrl._locInfo.Icon = $rootScope.smallImage;
             SLocCtrl._locInfo.Token = $rootScope._userInfo.Token;
-           // SLocCtrl._locInfo.TID = 0;
+            // SLocCtrl._locInfo.TID = 0;
             SLocCtrl._locInfo.PIN = SLocCtrl._locInfo.PIN  == "" ? "" : SLocCtrl._locInfo.PIN;
             SLocCtrl._locInfo.Altitude = 0;
 
@@ -216,28 +297,30 @@ angular.module('ezeidApp').controller('LocationsController', function ($rootScop
             SLocCtrl._locInfo.ReservationButton = SLocCtrl._locInfo.ReservationButton == true ? 1 : 0;
             SLocCtrl._locInfo.SupportButton = SLocCtrl._locInfo.SupportButton == true ? 1 : 0;
             SLocCtrl._locInfo.CVButton = SLocCtrl._locInfo.CVButton == true ? 1 : 0;
-               $http({
+            $http({
                 method: "POST",
                 url: GURL + 'ewmAddLocation',
                 data: JSON.stringify(SLocCtrl._locInfo),
                 headers: { 'Content-Type': 'application/json' }
             }).success(function (data) {
-                if (data != 'null') {
-                    SLocCtrl.LocationsList.push(data[0]);
-
-                    SLocCtrl.IsShowForm = false;
-
                     document.getElementById("Location").className = "form-control emptyBox";
                     document.getElementById("streeName").className = "form-control emptyBox";
                     document.getElementById("cities").className = "form-control emptyBox";
                     document.getElementById("postalCode").className = "form-control emptyBox";
                     document.getElementById("mobile_phone").className = "form-control emptyBox";
-                    window.location.href = '#/addloc';
-                    Notification.success({ message: "Saved... ", delay: MsgDelay });
-                } else {
-                    Notification.error({ message: "Sorry..! not saved", delay: MsgDelay });
-                }
-            });
+                    if (data != 'null') {
+                        SLocCtrl.LocationsList.push(data[0]);
+
+                        SLocCtrl.IsShowForm = false;
+                        window.location.href = '#/addloc';
+                        Notification.success({ message: "Saved... ", delay: MsgDelay });
+                    } else {
+                        Notification.error({ message: "Sorry..! not saved", delay: MsgDelay });
+                    }
+                });
+        }
+
+
     };
     this.updateNewLoc = function (secLocForm) {
         SLocCtrl._locInfo.Token = $rootScope._userInfo.Token;
@@ -304,9 +387,7 @@ angular.module('ezeidApp').controller('LocationsController', function ($rootScop
     function initialize1() {
 
         var initialLocation;
-
         var currentLoc = new google.maps.LatLng(12.295810, 76.639381);
-
         map = new google.maps.Map(document.getElementById('map-canvasl'), {
             mapTypeId: google.maps.MapTypeId.ROADMAP,
             Zoom: 16
@@ -332,8 +413,6 @@ angular.module('ezeidApp').controller('LocationsController', function ($rootScop
             PlaceCurrentLocationMarker(initialLocation);
             //PlaceMarker(initialLocation);
         }
-
-        
         
         
         google.maps.event.addListenerOnce(map, 'idle', function () {
@@ -345,7 +424,7 @@ angular.module('ezeidApp').controller('LocationsController', function ($rootScop
                             //// Create the search box and link it to the UI element.
             var input = (document.getElementById('txtSearch1'));
 
-            console.log(input);
+           // console.log(input);
             map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
 
             var searchBox = new google.maps.places.SearchBox((input));
@@ -409,16 +488,11 @@ angular.module('ezeidApp').controller('LocationsController', function ($rootScop
                 SLocCtrl.getSearch();
             }
         });
-
-        
         
         $(window).resize(function() {
             google.maps.event.trigger(map, "resize");
         });
-
     }
-
-
 
     function getReverseGeocodingData(lat, lng) {
         var latlng = new google.maps.LatLng(lat, lng);
@@ -526,6 +600,7 @@ angular.module('ezeidApp').controller('LocationsController', function ($rootScop
             if (mapResultValue.types[0] == 'country') {
                 if (SLocCtrl._locInfo.Country != "") {
                     SLocCtrl._locInfo.Country = mapResultValue.long_name;
+
                     //$scope.$apply();
                 } else {
                     SLocCtrl._locInfo.Country = mapResultValue.long_name;
@@ -535,9 +610,10 @@ angular.module('ezeidApp').controller('LocationsController', function ($rootScop
 
         });
 
-        if( SLocCtrl._locInfo.CountryID == null || SLocCtrl._locInfo.CountryID == "")
-        {
+       // if( SLocCtrl._locInfo.CountryID == null || SLocCtrl._locInfo.CountryID == "")
+       // {
             var countryFileredString = $filter('filter')(SLocCtrl.countries, SLocCtrl._locInfo.Country)
+
 
             for (var key in countryFileredString)
             {
@@ -548,7 +624,7 @@ angular.module('ezeidApp').controller('LocationsController', function ($rootScop
                     SLocCtrl._locInfo.ISDPhoneNumber = countryFileredString[key].ISDCode;
                 }
             }
-        }
+       // }
         updateState(SLocCtrl._locInfo.CountryID);
         getISDCode(SLocCtrl._locInfo.CountryID);
 
@@ -675,8 +751,6 @@ angular.module('ezeidApp').controller('LocationsController', function ($rootScop
             }
         }
 /*
-        console.log(countryData);
-
         SLocCtrl._locInfo.ISDMobileNumber = countryData[0].ISDCode;
         SLocCtrl._locInfo.ISDPhoneNumber = countryData[0].ISDCode;*/
     }
