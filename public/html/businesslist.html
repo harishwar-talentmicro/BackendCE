@@ -69,14 +69,12 @@
                                                                 Choose File <input type="file" onchange="angular.element(this).scope().uploadFile(this.files)">
                                                             </span>
 
-                                                <span class="pull-right"  ng-controller="DocumentController"
-                                                  style="margin-top:8px;"
-                                                  ng-show="false">
-                                                    <a ng-show="BusinessListCtrl._businessInfo.BRDocFilename" class="blue" target="_blank" href="/ewTgetDocument?TokenNo={{Token}}&&RefType=6">
-                                                        Download Document
-                                                    </a>
-                                                    <!--<a target="_self" href="{{form.RefDoc}}" download="{{form.RefDoc}}">{{form.RefFileName}}</a>-->
-                                                </span>
+                                                            <span class="pull-right"  ng-controller="DocumentController" style="margin-top:8px;" ng-show="isShowDownloadLink">
+                                                                <a ng-show="BusinessListCtrl._businessInfo.BRDocFilename" class="blue" target="_blank" href="/ewTgetDocument?TokenNo={{Token}}&&RefType=6">
+                                                                    Download Document
+                                                                </a>
+                                                                <!--<a target="_self" href="{{form.RefDoc}}" download="{{form.RefDoc}}">{{form.RefFileName}}</a>-->
+                                                            </span>
                                                         </div>
 
                                                         <div class="clearfix"></div>

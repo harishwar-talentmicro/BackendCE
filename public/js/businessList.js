@@ -1,7 +1,4 @@
-/**
- * Created by Abhishek on 30-01-2015.
- */
-angular.module('ezeidApp').controller('BusinessListController', function($http, $rootScope, $scope, $timeout, Notification, $filter,$q){
+angular.module('ezeidApp').controller('BusinessListController', function($http, $rootScope, $scope, $timeout, Notification, $filter, $q){
 
     var BusinessListCtrl = this;
     BusinessListCtrl._businessInfo={};
@@ -52,6 +49,7 @@ angular.module('ezeidApp').controller('BusinessListController', function($http, 
     $http({ method: 'get', url: GURL + 'ewmGetCategory?LangID=1' }).success(function (data) {
        /*  var _obj = { CategoryID: 0, CategoryTitle: '--Category--' };
          data.splice(0, 0, _obj);*/
+
         BusinessListCtrl.categories = data;
     });
 
@@ -68,6 +66,7 @@ angular.module('ezeidApp').controller('BusinessListController', function($http, 
             $http({ method: 'POST', url: '/ewTUploadDoc/', data: formData,
                 headers: { 'Content-Type': undefined }, transformRequest: angular.identity })
                 .success(function (data, status, headers, config) {
+                    getBusinessInfo();
                }).
                 error(function(data, status, headers, config) {
                  });
@@ -110,7 +109,19 @@ angular.module('ezeidApp').controller('BusinessListController', function($http, 
          method: 'get',
          url: GURL + 'ewtGetBussinessListing?TokenNo=' + $rootScope._userInfo.Token
          }).success(function (data) {
+
             BusinessListCtrl._businessInfo=data[0];
+
+            if(data[0].BRDocFilename)
+            {
+                $scope.isShowDownloadLink = true;
+            }
+            else
+            {
+                $scope.isShowDownloadLink = false;
+            }
+                 console.log(data[0]);
+
          });
      };
 

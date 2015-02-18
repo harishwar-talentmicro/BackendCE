@@ -127,10 +127,6 @@ angular.module('ezeidApp').controller('LocationsController', function ($rootScop
 
 
     this.openNewLocationForm = function (secLocForm) {
-
-
-
-
       //  var stateId = SLocCtrl._locInfo.StateID;
         SLocCtrl._locInfo = {};
 
@@ -219,9 +215,6 @@ angular.module('ezeidApp').controller('LocationsController', function ($rootScop
         var notificationMessage = "";
         var errorList  = [];
         // Check validations
-
-
-
         if(!SLocCtrl._locInfo.AddressLine1)
         {
             errorList.push(' Address1 Required');

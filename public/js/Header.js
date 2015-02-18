@@ -11,6 +11,7 @@ HeaderApp.directive('headerSection', function (Notification) {
             this.AccsHis = [];
             SignCtrl.RegInfo = {};
 
+
             //login
             this.LoginUser = function (Logdata, form) {
 
