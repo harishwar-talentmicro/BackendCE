@@ -60,8 +60,13 @@ angular.module('ezeidApp').controller('DocumentController', function($http, $roo
     var MsgDelay = 2000;
     
     $('#datetimepicker1').datetimepicker({
-
-            format: 'DD-MMM-YYYY'
+       format: "d-M-Y",
+        hours12: false,
+        mask: true,
+        timepicker:false
+    });
+    $('#datetimepicker1').siblings('.input-group-addon').on('click',function(){
+        $('#datetimepicker1').trigger('focus');
     });
 
     $scope.$watch('_userInfo.IsAuthenticate', function () {
