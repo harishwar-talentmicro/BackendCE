@@ -67,8 +67,8 @@
                     recipient: '='
                 },
                 template:
-                    '<div class="input-group date emptyBox" id="datetimepicker1" >'+
-                        '<input type="text" class="form-control" placeholder="Date" name="recipientDateTime" data-date-time/>'+
+                    '<div class="input-group datetimepicker">'+
+                        '<input type="text" class="form-control" placeholder="Date"  id="datetimepicker1"  name="recipientDateTime"/>'+
                         '<span class="input-group-addon"><span class="glyphicon glyphicon-calendar" >'+
                         '</span>'+
                     '</div>',
@@ -147,7 +147,12 @@
         }
 
         $('#datetimepicker1').datetimepicker({
-           format: "DD-MMM-YYYY  hh:mm A"
+           format: "d-M-Y  h:m A",
+            hours12: false,
+            mask: true
+        });
+        $('#datetimepicker1').siblings('.input-group-addon').on('click',function(){
+            $('#datetimepicker1').trigger('focus');
         });
         /**
          * Opens Help Popup when help link is clicked
@@ -180,9 +185,15 @@
 
         $('#datetimepicker1').datetimepicker({
 
-            format: 'DD-MMM-YYYY  HH:mm: a'
+            format: "d-M-Y  h:m A",
+            hours12: false,
+            minDate: 0,
+            minTime : 0,
+            mask:true
         });
-
+        $('#datetimepicker1').siblings('.input-group-addon').on('click',function(){
+            $('#datetimepicker1').trigger('focus');
+        });
 
         $rootScope.$watch('_userInfo.IsAuthenticate',function(oldval,newval){
 
@@ -981,20 +992,18 @@
         $scope.isCloseButtonClicked = false;
 
         $('#datetimepicker1').datetimepicker({
-            format: 'DD-MMM-YYYY'
+            format: 'd-M-Y',
+            hours12: false,
+            maxDate: 0,
+            timepicker : false,
+            mask: true
         });
-        //Below code not allow user to select feture date
-        $("#datetimepicker1").on("dp.change",function (e) {
-            $('#datetimepicker1').data("DateTimePicker").maxDate(e.date);
+        $('#datetimepicker1').siblings('.input-group-addon').on('click',function(){
+            $('#datetimepicker1').trigger('focus');
         });
-
-  //    $('#datetimepicker1').datetimepicker();
+       
         var map;
         var mapOptions;
-//        var myinfowindow = new google.maps.InfoWindow({
-//            content: ''
-//        });
-
         var marker;
         var markers = [];
 
