@@ -55,6 +55,12 @@ angular.module('ezeidApp').controller('BusinessListController', function($http, 
 
     //Created by Abhishek
     $scope.uploadFile = function (files) {
+
+       /* fileToDataURL(files[0]).then(function (dataURL) {
+
+            console.log(dataURL);
+
+        });*/
         for (var i = 0; i < files.length; i++) {
             var $file = files[i];
             var formData = new FormData();

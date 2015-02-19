@@ -175,6 +175,8 @@
         });
         var service;
         var today = moment(new Date()).utc().format('DD-MMM-YYYY hh:mm A');
+        var currentBanner = 1;
+
 
         $('#datetimepicker1').datetimepicker({
 
@@ -203,11 +205,15 @@
 
         SearchSec.categories = [];
         SearchSec.proximities = [];
+
+        $scope.form_rating = 0;
+
         SearchSec.mInfo = {};
         SearchSec.Placeholder = 'Type EZEID';
         var userType = "";
 
         SearchSec.mInfo.InfoTab = true;
+
         $scope.showInfoTab = false;
 
         SearchSec.Criteria = {
@@ -219,12 +225,6 @@
             Latitude: $rootScope.CLoc.CLat,
             Longitude: $rootScope.CLoc.CLong
         };
-
-
-
-
-
-
 
         $scope.isMapLoaded = false;         //Set to true with map event 'idle'
         $scope.isMapReady = false;          //Set to true when map canvas is drawn and map is fully visible
@@ -482,7 +482,7 @@
                     if (data != 'null' && data.length>0) {
                         var _item = data[0];
 
-                         if(data[0].Filename)
+                        if(data[0].Filename)
                         {
                             SearchSec.downloadData = data[0];
                            // $('#download_popup').slideDown();
@@ -510,10 +510,15 @@
 //                                       $scope.selectedTab = "maps";
                                         $scope.selectTab('map');
                                    }
+
+
                                     $timeout(function () {
                                         SearchSec.mInfo = data[0];
+                                        //Call for banner
+                                        getBanner(1);
+                                        $scope.form_rating = data[0].Rating;
 
-                                        if(SearchSec.mInfo.IDTypeID  == 2)
+                                        if(SearchSec.mInfo.IDTypeID == 2)
                                         {
                                             SearchSec.reservationPlaceHolder = "Reservation requirement details";
                                         }
@@ -604,11 +609,9 @@
                     
                     if(tabName == 'ad')
                     {
-
                          $scope.infoClass = "";
                         $scope.mapClass = "";
                         $scope.adClass = "level-1";
-
                     }
                     
                     if(tabName == 'map')
@@ -623,8 +626,56 @@
                             Notification.error({message:'Map is loading! Please wait..',delay:MsgDelay});
                         }
                     }
-                    
                 };
+
+        //call for previous banner
+        SearchSec.getPreviousBanner = function () {
+            currentBanner = currentBanner - 1;
+            if(currentBanner >= SearchSec.mInfo.Banners)
+            {
+                //Disable previous button
+                getBanner(currentBanner);
+            }
+        };
+
+        //call for next banner
+        SearchSec.getNextBanner = function () {
+            currentBanner = currentBanner + 1;
+            if(currentBanner <= SearchSec.mInfo.Banners)
+            {
+                //Disable next button
+                getBanner(currentBanner);
+            }
+        };
+
+        function getBanner(_requestedBannerValue){
+            console.log("Banner called 677");
+         $http({ method: 'get', url: GURL + 'ewtGetBannerPictureAP?Token=' + $rootScope._userInfo.Token +'&SeqNo='+_requestedBannerValue+'&Ezeid='+SearchSec.mInfo.EZEID}).success(function (data) {
+
+                //if (data.length > 0) {
+                console.log(data);
+                if (data != 'null') {
+
+                    //disable next button
+                    if(currentBanner >= SearchSec.mInfo.Banners)
+                    {
+                        $scope.nextButton = true;
+                    }
+                    //disabled previous button
+                    if(currentBanner <= SearchSec.mInfo.Banners)
+                    {
+                        $scope.previousButton = true;
+                    }
+                }
+                else
+                {
+                    msgSen.showMoreButton = false;
+                    Notification.error({ message: "No Message found..!", delay: MsgDelay });
+                }
+            });
+        }
+
+
         function getMapSearchResults(results, status) {
             if (status == google.maps.places.PlacesServiceStatus.OK) {
                 if (results.length > 0) {
@@ -1637,15 +1688,12 @@
             $scope.isCloseButtonClicked = true;
             window.location.href = "#/home";
         }
-
-
-            //Upload Picture
+        //Upload Picture
         $scope.uploadImageForEditLocation = function (image) {
             profile._info.PictureFileName = image[0].name;
             fileToDataURL(image[0]).then(function (dataURL) {
 
                 profile._info.Picture = dataURL;
-
                 if (!profile._info.IDTypeID == 2) {
 
                     profile._info.Icon = $rootScope.smallImage;
