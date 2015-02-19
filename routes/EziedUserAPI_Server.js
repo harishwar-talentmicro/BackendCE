@@ -3356,8 +3356,7 @@ exports.FnUploadDocument = function (req, res) {
                             }
                             //console.log(Token);
                             fs.readFile(RefFileName, function (err, original_data) {
-                                console.log(original_data);
-                                var query = db.escape(Token) + ',' + db.escape(original_data) + ',' + db.escape(fileName) + ',' + db.escape(tRefType) + ',' + db.escape(CntType);
+                                var query = db.escape(Token) + ',' + db.escape( new Buffer(original_data).toString('base64')) + ',' + db.escape(fileName) + ',' + db.escape(tRefType) + ',' + db.escape(CntType);
                                 //console.log(query);
                                 db.query('CALL pSaveDocsFile(' + query + ')', function (err, InsertResult) {
                                     if (!err) {
@@ -3426,11 +3425,8 @@ exports.FnGetDocument = function (req, res) {
                                 if (DocumentResult[0] != null) {
                                     if (DocumentResult[0].length > 0) {
                                         DocumentResult = DocumentResult[0];
-                                        //console.log(DocumentResult)
                                         var docs = DocumentResult[0];
-                                        //console.log(docs.ContentType);
-                                        //console.log(docs.Filename);
-                                         console.log(docs);
+                                        // console.log(docs);
                                         res.setHeader('Content-Type', docs.ContentType);
                                         res.setHeader('Content-Disposition', 'attachment; filename=' + docs.Filename);
                                         res.setHeader('Cache-Control', 'public, max-age=0');
@@ -4222,6 +4218,7 @@ exports.FnGetUserDetailsAP = function (req, res) {
                         if (UserDetailsResult.length > 0) {
                             //console.log('FnGetUserDetails: Token: ' + Token);
                             console.log('FnGetUserDetailsAP : tmaster: User details sent successfully');
+                          //  console.log(UserDetailsResult);
                             res.send(UserDetailsResult);
                         }
                         else {
@@ -4309,25 +4306,11 @@ exports.FnUpdateUserProfileAP = function (req, res) {
             FnValidateTokenAP(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
-//                        var base64 = require('base64-js')
-//                        var brochurefile =  base64.toByteArray(BrochureDoc);
-//                        console.log(brochurefile);
             var InsertQuery = db.escape(CategoryID) + ',' + db.escape(Latitude) + ',' + db.escape(Longitude) + ',' +
                    db.escape(EZEIDVerifiedID) + ',' + db.escape(TID) + ',' + db.escape(Keywords) + ',' + db.escape(Picture) + ',' + db.escape(PictureFileName) + ',' +
                    db.escape(Icon) + ',' + db.escape(IconFileName) + ',' + db.escape(EZEID) + ',' +
                    db.escape(BrochureDoc) + ',' + db.escape(BrochureDocFile) + ',' + db.escape(ActiveInactive)+ ',' + db.escape(BRContentType)+ ',' + db.escape(Rating);
            // console.log('InsertQuery: ' + InsertQuery);
-                        console.log('******** File created from base64 encoded string ********')
-                        var FileName = 'D:\\shailesh\\' + BrochureDocFile;
-                        var fs = require('fs');
-                        var bitmap = new Buffer(BrochureDoc, 'base64');
-                        console.log('******File content after buffer');
-                        console.log(bitmap);
-                        console.log('*****File content after buffer');
-                        // write buffer to file
-                        fs.writeFileSync(FileName, bitmap);
-                        console.log('******** File created from base64 encoded string ********')
-
             db.query('CALL pUpdateUserProfileAP(' + InsertQuery + ')', function (err, InsertResult) {
                 if (!err) {
                     console.log(InsertResult);
