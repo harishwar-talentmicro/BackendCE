@@ -114,6 +114,7 @@ app.get('/ewmGetFunctionRoleMapping', LocationManager.FnGetFunctionRoleMapping);
 app.get('/ewmUpdatePwdEncryption', LocationManager.FnUpdatePwdEncryption);
 app.post('/ewtCheckCV', LocationManager.FnCheckCV);
 app.get('/ewtGetLoginCheck', LocationManager.FnGetLoginCheck);
+app.get('/ewtGetBannerPicture', LocationManager.FnGetBannerPicture);
 //below service are for EZEIDAP
 app.post('/ewLoginAP', LocationManager.FnLoginAP);
 app.get('/ewLogoutAP', LocationManager.FnLogoutAP);
@@ -126,6 +127,8 @@ app.post('/ewtSaveEZEIDDataAP', LocationManager.FnSaveAPEZEID);
 app.post('/ewtSaveEZEIDPictureAP', LocationManager.FnSaveAPEZEIDPicture);
 app.get('/ewtGetEZEIDDataAP', LocationManager.FnGetAPEZEID);
 app.get('/ewtGetEZEIDPictureAP', LocationManager.FnGetAPEZEIDPicture);
+app.post('/ewtSaveBannerPictureAP', LocationManager.FnSaveBannerPictureAP);
+app.get('/ewtGetBannerPictureAP', LocationManager.FnGetBannerPictureAP);
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
     console.log('404 : Page not found');
