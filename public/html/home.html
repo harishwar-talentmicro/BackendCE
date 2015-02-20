@@ -99,7 +99,6 @@
                         <h3 ng-show="search.mInfo.IDTypeID==1" class="marB15px">Appointment</h3>
                         <h3 ng-show="search.mInfo.IDTypeID==2" class="marB15px">Reservation</h3>
 
-
                         <div class="form-group">
                             <p>
                                 <label>
@@ -109,12 +108,11 @@
 
                                 </label>
                                 <span style="width:60%;display:block;">
-                                <date-time-picker recipient="search.ReservationDateTime"></date-time-picker>
-                                    </span>
+                                     <date-time-picker recipient="search.ReservationDateTime"></date-time-picker>
+                                </span>
                             </p>
                             <textarea id="reservationMessage" ng-class="reservationForm.reservationMessage.$touched && !search.ReservationMessage.length ? 'mandatoryTextBox' : ''" class="form-control fixTextArea emptyBox" name="reservationMessage" ng-model="search.ReservationMessage"
                                       placeholder="{{search.reservationPlaceHolder}}" required></textarea>
-
 
                         </div>
                         <div class="form-group">
@@ -307,11 +305,7 @@
                                             </div>
                                             <div class="col-lg-2 col-md-2 col-sm-12 col-xs-12" style="padding-right:0px;" ng-hide="search.isEZEIDselected('1')">
                                                 <div style="display:table-cell;vertical-align:middle;height:34px;">
-<<<<<<< HEAD
-                                                Search within <a ng-click="selectTab('map')" style="cursor:pointer;">location</a>  within
-=======
-                                                Search within 
->>>>>>> 17b7a5ae8e79c2ff38601c67e4d1b040b0c576f3
+                                                Search within
                                                 </div>
                                             </div>
     <!--                                        <img src="./images/map_marker.png" height="24px" width="24px">-->
@@ -323,10 +317,11 @@
                                                     <option value="0">Any</option>
                                                 </select>
                                             </div>
-                                            <div class="col-lg-5 col-md-5 col-sm-6 col-xs-12" ng-hide="search.isEZEIDselected('1')">
+                                            <div class="col-lg-7 col-md-7 col-sm-7 col-xs-12" ng-hide="search.isEZEIDselected('1')">
 
                                                 <div style="display:table-cell;vertical-align:middle;height:34px;">
-                                                    <span>Proximity </span>
+                                                    <span>proximity from </span>
+                                                    <a ng-click="selectTab('map')" style="cursor:pointer;"><b>map location</b></a>
                                                     <input type="checkbox" ng-model="search.Criteria.ParkingStatus" name="parking" value="1,2"><span> Show Places with Parking</span>
                                                 </div>
                                             </div>
@@ -364,7 +359,6 @@
                         <ul class="tabDisplay" role="group">
                             <li id="btn-ad" ng-show="0" ng-click="selectTab('ad')" class="tab">Home</li>
                             <li id="btn-info" ng-show="showInfoTab" ng-click="selectTab('info')"  ng-class="{tabActive: infoClass == 'level-1'}" class="tab">Information</li>
-
                             <li id="btn-map" ng-click="selectTab('map')" ng-class="{tabActive: mapClass == 'level-1'}" class="tab">Map</li>
                         </ul>
 
@@ -372,7 +366,48 @@
                             <div class="tab-view {{adClass}}" style="background:url('../images/home_ad.png');background-repeat:no-repeat;"></div>
                             <!------------------------ New info tab code ------------------------------------------>    
                             <div class="tab-view {{infoClass}}" style="background:#fff;">
+                                <div class="row" ng-show="search.mInfo.IDTypeID == 2">
+                                    <div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 text-center" style="margin-left: 3%;">
+                                        <div >
+                                            <img src="images/test.jpg" height="110" width="100%"/>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <div class="col-lg-1" style="margin-left: 3%; margin-top: 3%;">
+                                            <img ng-click="search.getPreviousBanner()" src="images/arrow_left.jpg" />
+                                        </div>
+                                        <div class="col-lg-1"  style=" margin-top: 3%;">
+                                            <img ng-click="search.getNextBanner()" src="images/arrow_right.jpg" />
+                                        </div>
+                                    </div>
+
+
+                                    <div class="starRating" style="margin-top: 3%; margin-left: 1%;">
+                                        <div>
+                                            <div>
+                                                <div>
+                                                    <div>
+                                                        <input id="rating1" disabled type="radio" name="form_rating" ng-model="form_rating" value="1">
+                                                        <label for="rating1"><span>1</span></label>
+                                                    </div>
+                                                    <input id="rating2" disabled type="radio" name="form_rating" ng-model="form_rating" value="2">
+                                                    <label for="rating2"><span>2</span></label>
+                                                </div>
+                                                <input id="rating3" disabled type="radio" name="form_rating" ng-model="form_rating" value="3">
+                                                <label for="rating3"><span>3</span></label>
+                                            </div>
+                                            <input id="rating4" disabled type="radio" name="form_rating" ng-model="form_rating" value="4">
+                                            <label for="rating4"><span>4</span></label>
+                                        </div>
+                                        <input id="rating5" disabled type="radio" name="form_rating" ng-model="form_rating" value="5">
+                                        <label for="rating5"><span>5</span></label>
+                                    </div>
+
+
+                                </div>
                                 <div class="row">
+
                                     <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 text-center">
                                         <div class="row text-center">
                                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
@@ -385,27 +420,17 @@
                                                 <h4 style="font-weight:bold;text-transform:uppercase;">{{search.mInfo.EZEID}}</h4>
                                             </div>
                                         </div>
-                                        
                                     </div>
                                     
                                     <div class="col-lg-7 col-md-7 col-sm-7 col-xs-12 text-center">
                                         <div class="row">
                                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                                <h2 class="text-center"  style="line-height:0;padding-bottom:10px;">{{search.mInfo.FirstName}}{{" "+search.mInfo.LastName}}</h2>
+                                                <h2 class="text-center"  style="line-height:0;padding-bottom:3px;">{{search.mInfo.FirstName}}{{" "+search.mInfo.LastName}}</h2>
                                             </div>
                                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                                 <h4 class="text-center"  style="line-height:1;">
-                                                    {{search.mInfo.AddressLine1 + ", "}}
-                                                </h4>
-                                            </div>
-                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                                <h4 class="text-center" style="line-height:1">
-                                                    {{search.mInfo.AddressLine2+ ", "}} {{search.mInfo.CityTitle+ ", "}}
-                                                </h4>
-                                            </div>
-                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                                <h4 class="text-center" style="line-height:0.2;">
-                                                    {{search.mInfo.StateTitle+ ", "}} {{search.mInfo.CountryTitle +", "}} Postal Code: {{search.mInfo.PostalCode}} 
+                                                    {{search.mInfo.AddressLine1 + ", "}} {{search.mInfo.AddressLine2+ ", "}} {{search.mInfo.CityTitle+ ", "}}
+                                                    {{search.mInfo.StateTitle+ ", "}} {{search.mInfo.CountryTitle +", "}} {{search.mInfo.PostalCode}}
                                                 </h4>
                                             </div>
                                         </div>
@@ -448,8 +473,6 @@
                                                 <img ng-hide="(search.mInfo.EZEIDVerifiedID == 2)" src="images/not_verified_48.png" />
                                             </div>
                                         </div>
-                                            
-                                        
                                     </div>
                                 </div>
                                 
