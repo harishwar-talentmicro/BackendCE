@@ -555,37 +555,41 @@
                 if($rootScope._userInfo.Token == "")
                 {
                     $rootScope._userInfo.Token = 2;
+
+                    $scope.Token = 2;
                 }
                 else
                 {
                     console.log($rootScope._userInfo.Token);
                 }
 
-
                 SearchSec.Criteria.Latitude = $rootScope.CLoc.CLat;
                 SearchSec.Criteria.Longitude = $rootScope.CLoc.CLong;
                 SearchSec.Criteria.Token = $rootScope._userInfo.Token;
                 $http({ method: 'post', url: GURL + 'ewSearchByKeywords', data: SearchSec.Criteria }).success(function (data) {
+
+
+                    console.log(data[0]);
+
                     if (data != 'null' && data.length>0) {
                         var _item = data[0];
-
                         if(data[0].Filename)
                         {
                             SearchSec.downloadData = data[0];
-                           SearchSec.IsShowForm = true;
+                            SearchSec.IsShowForm = true;
                             SearchSec.IsFilterRowVisible = false;
                        }
                         else
                         {
+                            console.log("Search caled.. else");
+
                             $http({ method: 'get', url: GURL + 'ewtGetSearchInformation?Token=' + $rootScope._userInfo.Token + '&TID=' + _item.TID }).success(function (data) {
                                 if (data != 'null') {
-
                                    if(data.length == 1 && SearchSec.Criteria.SearchType == 1)
                                    {
                                        $scope.showInfoTab = true;
-
                                        $scope.selectTab('info');
-                                  }
+                                   }
                                    else
                                    {
                                        $scope.selectTab('map');
@@ -611,14 +615,14 @@
                                     Notification.error({ message: 'Invalid key or not found…', delay: MsgDelay });
                                 }
                             });
-                            
-                            
+
+
                             //PlaceMarker(data);
-                            
+
                             /******************** Code for checking map load and handling it with reload ****************/
                             //MapIsLoaded variable is set by map eventListener idle
-                           
-                            
+
+
                             try{
                                 PlaceMarker(data);
                             }
@@ -635,7 +639,7 @@
                                 });
                             }
                             //If map is not loaded wait for few seconds and then try to reload it and then place marker
-                            
+
                             /*********************Code for checking map load and handling it with reload ends ****************/
                         }
                        // PlaceMarker(data);//older one

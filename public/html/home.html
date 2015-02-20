@@ -376,7 +376,7 @@
                                 <div class="row" ng-show="search.mInfo.IDTypeID == 2">
                                     <div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 text-center" style="margin-left: 3%;">
                                         <div >
-                                            <img src="{{search.mInfo.BannerImage}}" height="110" width="100%"/>
+                                            <img src="{{search.mInfo.BannerImage}}" height="90" width="100%"/>
                                         </div>
                                     </div>
 
@@ -419,16 +419,16 @@
 
                                     <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 text-center">
                                         <div class="row text-center">
-                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin-top: 3%;">
                                                 <img ng-show="search.mInfo.Picture!=''" ng-src="{{search.mInfo.Picture}}" height="120px" width="120px">
                                                 <img ng-hide="search.mInfo.Picture!=''" ng-src="images/Map_logo.png" height="120px" width="120px">    
                                             </div>
                                         </div>
-                                        <div class="row text-center">
+                                        <!--<div class="row text-center">
                                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                                 <h4 style="font-weight:bold;text-transform:uppercase;">{{search.mInfo.EZEID}}</h4>
                                             </div>
-                                        </div>
+                                        </div>-->
                                     </div>
                                     
                                     <div class="col-lg-7 col-md-7 col-sm-7 col-xs-12 text-center">
@@ -486,12 +486,11 @@
                                 </div>
                                 
                                 
-                                
                                 <div class="row row-margin-clearfix">
                                     <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
                                         <div class="row text-center">
                                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                                
+                                                <h4 style="font-weight:bold;text-transform:uppercase;">{{search.mInfo.EZEID}}</h4>
                                             </div>
                                         </div>
                                     </div>
@@ -578,27 +577,27 @@
                                 
                                 <div class="row row-margin-fix" ng-hide="(search.mInfo.IDTypeID == 1)">
                                     
-                                    <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10">
+                                    <!--<div class="col-lg-10 col-md-10 col-sm-10 col-xs-10" ng-disabled="{{_userInfo.Token == 2}}">-->
+                                    <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10" >
                                         <div class="row">
-                                            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 col-lg-offset-2 col-sm-offset-2 col-md-offset-2 col-xs-offset-2" ng-hide="search.mInfo.SalesEnquiryButton==2 || search.mInfo.EZEIDVerifiedID == '1'" ng-disabled="search.mInfo.SalesEnquiryButton==2 || search.mInfo.EZEIDVerifiedID == '1'" title="Sales Enquiry" ng-click="search.openSalesEnquiryForm()">
+
+                                            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 col-lg-offset-2 col-sm-offset-2 col-md-offset-2 col-xs-offset-2" ng-hide="_userInfo.Token == 2 || search.mInfo.SalesEnquiryButton==2 || search.mInfo.EZEIDVerifiedID == '1'" ng-disabled="search.mInfo.SalesEnquiryButton==2 || search.mInfo.EZEIDVerifiedID == '1'" title="Sales Enquiry" ng-click="search.openSalesEnquiryForm()">
+
                                                 <button class="info-icon-btn sales-icon">Sales Enquiry</button>
                                                 
                                             </div>
-                                            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2" ng-hide="search.mInfo.HomeDeliveryButton==2 || search.mInfo.EZEIDVerifiedID == '1'" ng-disabled="search.mInfo.HomeDeliveryButton==2 || search.mInfo.EZEIDVerifiedID == '1'" title="Home Delivery" ng-click="search.openHomeDeliverForm()">
+                                            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2" ng-hide="_userInfo.Token == 2 || search.mInfo.HomeDeliveryButton==2 || search.mInfo.EZEIDVerifiedID == '1'" ng-disabled="search.mInfo.HomeDeliveryButton==2 || search.mInfo.EZEIDVerifiedID == '1'" title="Home Delivery" ng-click="search.openHomeDeliverForm()">
                                                 <button class="info-icon-btn home-icon">Home Delivery</button>
 
                                             </div>
-                                            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2"  ng-hide="search.mInfo.ReservationButton==2 || search.mInfo.EZEIDVerifiedID == '1'" ng-disabled="search.mInfo.ReservationButton==2 || search.mInfo.EZEIDVerifiedID == '1'" title="Reservation" ng-click="search.openReservationForm()">
-                                                                                        <button class="info-icon-btn reservation-icon"> Reservation</button>
-
+                                            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2"  ng-hide="_userInfo.Token == 2 || search.mInfo.ReservationButton==2 || search.mInfo.EZEIDVerifiedID == '1'" ng-disabled="search.mInfo.ReservationButton==2 || search.mInfo.EZEIDVerifiedID == '1'" title="Reservation" ng-click="search.openReservationForm()">
+                                                <button class="info-icon-btn reservation-icon"> Reservation</button>
                                             </div>
-                                            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2" ng-hide="search.mInfo.SupportButton==2 || search.mInfo.EZEIDVerifiedID == '1'" ng-disabled="search.mInfo.SupportButton==2 || search.mInfo.EZEIDVerifiedID == '1'" title="Support Request" ng-click="search.openServiceRequestForm()">
+                                            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2" ng-hide="_userInfo.Token == 2 || search.mInfo.SupportButton==2 || search.mInfo.EZEIDVerifiedID == '1'" ng-disabled="search.mInfo.SupportButton==2 || search.mInfo.EZEIDVerifiedID == '1'" title="Support Request" ng-click="search.openServiceRequestForm()">
                                                 <button class="info-icon-btn support-icon" >Support Request</button>
-
                                             </div>
-                                            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2"  ng-disabled="search.mInfo.CVButton==2 || search.mInfo.EZEIDVerifiedID == '1'" title="Send CV" ng-click="search.openCVForm()">
+                                            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2"  ng-hide="_userInfo.Token == 2" ng-disabled="search.mInfo.CVButton==2 || search.mInfo.EZEIDVerifiedID == '1'" title="Send CV" ng-click="search.openCVForm()">
                                                 <button class="info-icon-btn sendcv-icon" ng-hide="search.mInfo.CVButton==2 || search.mInfo.EZEIDVerifiedID == '1'">Send CV</button>
-                                        
                                             </div>
                                         </div>
                                     </div>
