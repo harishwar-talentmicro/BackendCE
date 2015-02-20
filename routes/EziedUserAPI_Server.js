@@ -18,6 +18,7 @@ var FinalMessage = {
 };
 var FinalMsgJson = JSON.parse(JSON.stringify(FinalMessage));
 
+var path ='D:\\Mail\\';
 //ezeid email id: 
 var EZEIDEmail = 'noreply@ezeid.com';
 //EzeId services will start from here
@@ -2825,17 +2826,18 @@ exports.FnGetCVInfo = function (req, res) {
 };
 
 exports.FnUpdateDocPin = function (req, res) {
+
     try {
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         var token = req.body.TokenNo;
-        var tPin = parseInt(req.body.Pin);
+        var tPin = req.body.Pin;
         var RtnMessage = {
             IsUpdated: false
         };
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
 
-        if (token != null && token != '' && tPin.toString() != 'NaN') {
+        if (token != null && token != '') {
             FnValidateToken(token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
@@ -2880,9 +2882,7 @@ exports.FnUpdateDocPin = function (req, res) {
             if (token == null || token == '') {
                 console.log('FnUpdateDocPin: token is empty');
             }
-            else if (tPin.toString() == 'NaN') {
-                console.log('FnUpdateDocPin: PIN is empty');
-            }
+
             res.statusCode = 400;
             res.send(RtnMessage);
 
@@ -4053,59 +4053,62 @@ exports.FnGetBannerPicture = function(req, res){
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         var SeqNo = parseInt(req.query.SeqNo);
-        var Token = req.query.Token;
+        var StateTitle = req.query.StateTitle;
         var Ezeid = req.query.Ezeid;
 
-        if (Token != null  && SeqNo.toString() != 'NaN' && Ezeid != null) {
-            FnValidateToken(Token, function (err, Result) {
+        RtnMessage = {
+            Picture: ''
+        };
+        var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
+
+        if ( SeqNo.toString() != 'NaN' && Ezeid != null) {
+            var Query = db.escape(Ezeid)  + ',' + db.escape(SeqNo);
+            //console.log(InsertQuery);
+            db.query('CALL PGetBannerPics(' + Query + ')', function (err, BannerResult) {
                 if (!err) {
-                    if (Result != null) {
-                        var Query = db.escape(Ezeid)  + ',' + db.escape(SeqNo);
-                        //console.log(InsertQuery);
-                        db.query('CALL PGetBannerPics(' + Query + ')', function (err, BannerResult) {
-                            if (!err) {
-                                //console.log(InsertResult);
-                                if (BannerResult != null) {
-                                    if(BannerResult[0].length > 0){
-                                        var Picture = BannerResult[0];
-                                       // res.setHeader('Content-Type', docs.ContentType);
-                                        console.log('FnGetBannerPicture: Banner picture sent successfully');
-                                        //res.setHeader('Content-Disposition', 'attachment; filename=' + docs.Filename);
-                                       res.setHeader('Cache-Control', 'public, max-age=150000');
-                                       // res.writeHead('200', { 'Content-Type': 'image/jpeg' });
-                                        //console.log(docs.Docs);
-                                        //res.end(Picture[0].Picture);
-                                       // console.log('FnGetBannerPicture: Banner picture sent successfully');
-                                        res.send(Picture);
-                                    }
-                                    else
-                                    {
-                                        res.send('null');
-                                        console.log('FnGetBannerPicture:tmaster: save banner Failed');
-                                    }
+                    //console.log(InsertResult);
+                    if (BannerResult != null) {
+                        if(BannerResult[0].length > 0){
+                            var Picture = BannerResult[0];
+                            console.log('FnGetBannerPicture: Banner picture sent successfully');
+                            res.setHeader('Cache-Control', 'public, max-age=150000');
+                            console.log('FnGetBannerPicture: Banner picture sent successfully');
+                            RtnMessage.Picture= Picture[0].Picture;
+                            res.send(RtnMessage);
+                        }
+                        else
+                        {
+                            fs = require('fs');
+                          //  var path = path + StateTitle+'.jpg' ;
+                            fs.exists(path + StateTitle +'.jpg', function( exists ) {
+                                console.log(exists)
+                                if(exists){
+                                    var bitmap = fs.readFileSync(path + StateTitle +'.jpg');
+                                    // convert binary data to base64 encoded string
+                                    RtnMessage.Picture = new Buffer(bitmap).toString('base64');
+                                    res.send(RtnMessage);
+                                    console.log('FnGetBannerPicture: State Banner sent successfully');
                                 }
                                 else {
-                                    res.send('null');
-                                    console.log('FnGetBannerPicture:tmaster: Registration Failed');
+                                   // path ='D:\\Mail\\Default.jpg';
+                                    var bitmap = fs.readFileSync(path + 'Default.jpg');
+                                    // convert binary data to base64 encoded string
+                                    RtnMessage.Picture = new Buffer(bitmap).toString('base64');
+                                    res.send(RtnMessage);
+                                    console.log('FnGetBannerPicture: Default Banner sent successfully');
                                 }
-                            }
-                            else {
-                                res.statusCode=500;
-                                res.send('null');
-                                console.log('FnGetBannerPicture:tmaster:' + err);
-                            }
-                        });
+                            });
+                        }
                     }
                     else {
-                        res.statusCode=401;
-                        console.log('FnGetBannerPicture: Invalid Token')
                         res.send('null');
+                        console.log('FnGetBannerPicture:tmaster: Registration Failed');
                     }
                 }
                 else {
                     res.statusCode=500;
-                    console.log('FnGetBannerPicture: Error in processing Token' + err);
                     res.send('null');
+                    console.log('FnGetBannerPicture:tmaster:' + err);
                 }
             });
         }
@@ -4113,9 +4116,7 @@ exports.FnGetBannerPicture = function(req, res){
             if (SeqNo.toString() == 'NaN') {
                 console.log('FnGetBannerPicture: SeqNo is empty');
             }
-            else if(Token == null) {
-                console.log('FnGetBannerPicture: Token is empty');
-            }else if(Ezeid == null) {
+            else if(Ezeid == null) {
                 console.log('FnGetBannerPicture: Ezeid is empty');
             }
             res.statusCode=400;
