@@ -376,16 +376,18 @@
                                 <div class="row" ng-show="search.mInfo.IDTypeID == 2">
                                     <div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 text-center" style="margin-left: 3%;">
                                         <div >
-                                            <img src="images/test.jpg" height="110" width="100%"/>
+                                            <img src="{{search.mInfo.BannerImage}}" height="110" width="100%"/>
                                         </div>
                                     </div>
 
                                     <div>
                                         <div class="col-lg-1" style="margin-left: 3%; margin-top: 3%;">
-                                            <img ng-click="search.getPreviousBanner()" src="images/arrow_left.jpg" />
+                                            <img ng-show="search.previousButton == true" ng-click="search.getPreviousBanner()" src="images/arrow_left.png" />
+                                            <img ng-show="search.previousButton == false" src="images/arrow_left_gray.png" />
                                         </div>
-                                        <div class="col-lg-1"  style=" margin-top: 3%;">
-                                            <img ng-click="search.getNextBanner()" src="images/arrow_right.jpg" />
+                                        <div class="col-lg-1" style=" margin-top: 3%;">
+                                             <img ng-show="search.nextButton == true" ng-click="search.getNextBanner()" src="images/arrow_right.png" />
+                                             <img ng-show="search.nextButton == false" src="images/arrow_right_grey.png" />
                                         </div>
                                     </div>
 

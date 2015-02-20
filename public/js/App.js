@@ -196,7 +196,7 @@
 
 
     // Search Controller
-    ezeid.controller('SearchController', function ($http, $rootScope, $scope, $compile, $timeout, Notification, $filter, $location, $window, $q, $log) {
+    ezeid.controller('SearchController', function ($http, $rootScope, $scope, $compile, $timeout, Notification, $filter, $location, $window, $q, $log, $interval) {
         var map;
         var marker;
         var markers = [];
@@ -209,6 +209,9 @@
         var service;
         var today = moment(new Date()).utc().format('DD-MMM-YYYY hh:mm A');
         var currentBanner = 1;
+        var Miliseconds = 8000;
+        var RefreshTime = Miliseconds;
+        var AutoRefresh = true;
 
         //Below code is for range slider
         function refreshSwatch (ev, ui) {
@@ -217,7 +220,6 @@
                 blue = $scope.colorpicker.blue;
             colorpicker.refreshSwatch(red, green, blue);
         }
-
 
         // Slider options with event handlers
         $scope.slider = {
@@ -282,6 +284,8 @@
         
         SearchSec.IsShowForm = false;
         SearchSec.IsFilterRowVisible = true;
+        SearchSec.nextButton = true;
+        SearchSec.previousButton =  true;
 
         SearchSec.categories = [];
         SearchSec.proximities = [];
@@ -293,7 +297,6 @@
         var userType = "";
 
         SearchSec.mInfo.InfoTab = true;
-
         $scope.showInfoTab = false;
 
         SearchSec.Criteria = {
@@ -460,9 +463,7 @@
                 for (var i = 0; i < positions.length; i++) {
                     var _item = positions[i];
                     var mapIcon;
-//                    mapIcon = _item.Icon == "" ? 'images/Indi_user.png' : _item.Icon;
-
-                      mapIcon = '/images/Indi_user.png';
+                    mapIcon = '/images/Indi_user.png';
 
                     var pos = new google.maps.LatLng(_item.Latitude, _item.Longitude);
                     //Pushing position of markers to fit in bounds
@@ -515,26 +516,20 @@
             }
         }
 
-       /* $(window).resize(function() {
-         google.maps.event.trigger(map, "resize");
-         });*/
-        $http({ method: 'get', url: GURL + 'ewmGetCategory?LangID=1' }).success(function (data) {
+      $http({ method: 'get', url: GURL + 'ewmGetCategory?LangID=1' }).success(function (data) {
             var _obj = { CategoryID: 0, CategoryTitle: '--Any--' };
             data.splice(0, 0, _obj);
             SearchSec.categories = data;
         });
 
         $http({ method: 'get', url: GURL + 'ewmGetProxmity?LangID=1' }).success(function (data) {
-            //var _obj = { Title: '--Proximity--', MetersValue: 0 };
-            //data.splice(0, 0, _obj);
-            SearchSec.proximities = data;
+           SearchSec.proximities = data;
             if(!map){
                 initialize();
             }
         });
 
-//        SearchSec.OpenStatuses = [{ id: 0, label: "Any" }, { id: 1, label: "Open" }, { id: 2, label: "Closed" }];
-        SearchSec.OpenStatuses = [ { id: 1, label: "Open" }, { id: 2, label: "Closed" }];
+       SearchSec.OpenStatuses = [ { id: 1, label: "Open" }, { id: 2, label: "Closed" }];
 
         SearchSec.isEZEIDselected = function (value) {
             if (SearchSec.Criteria.SearchType == 1)
@@ -549,12 +544,24 @@
         };
 
         SearchSec.getSearch = function () {
-
+            SearchSec.IsSearchButtonClicked = true;
             SearchSec.IsShowForm = false;
             SearchSec.Criteria.ParkingStatus = SearchSec.Criteria.ParkingStatus == 1 ? '1,2' :0;
             SearchSec.Criteria.OpenStatus = (SearchSec.Criteria.OpenStatus.id == 1) ? 0 : SearchSec.Criteria.OpenStatus ;
 
-            if ($rootScope._userInfo.IsAuthenticate == true) {
+            console.log(SearchSec.Criteria.SearchType);
+            if ($rootScope._userInfo.IsAuthenticate == true || SearchSec.Criteria.SearchType == 2) {
+
+                if($rootScope._userInfo.Token == "")
+                {
+                    $rootScope._userInfo.Token = 2;
+                }
+                else
+                {
+                    console.log($rootScope._userInfo.Token);
+                }
+
+
                 SearchSec.Criteria.Latitude = $rootScope.CLoc.CLat;
                 SearchSec.Criteria.Longitude = $rootScope.CLoc.CLong;
                 SearchSec.Criteria.Token = $rootScope._userInfo.Token;
@@ -565,38 +572,30 @@
                         if(data[0].Filename)
                         {
                             SearchSec.downloadData = data[0];
-                           // $('#download_popup').slideDown();
-                            SearchSec.IsShowForm = true;
+                           SearchSec.IsShowForm = true;
                             SearchSec.IsFilterRowVisible = false;
-                            //$scope.showInfoTab = true;
-                        }
+                       }
                         else
                         {
-                            // if(SearchSec.Criteria.Type="1" ){
-
                             $http({ method: 'get', url: GURL + 'ewtGetSearchInformation?Token=' + $rootScope._userInfo.Token + '&TID=' + _item.TID }).success(function (data) {
                                 if (data != 'null') {
 
                                    if(data.length == 1 && SearchSec.Criteria.SearchType == 1)
                                    {
                                        $scope.showInfoTab = true;
-//                                       $scope.selectedTab = "info";
-//                                       
+
                                        $scope.selectTab('info');
-                                       // google.maps.event.trigger(map, "resize");
-                                   }
+                                  }
                                    else
                                    {
-//                                       $scope.selectedTab = "maps";
-                                        $scope.selectTab('map');
+                                       $scope.selectTab('map');
                                    }
-
-
-                                    $timeout(function () {
+                                     $timeout(function () {
                                         SearchSec.mInfo = data[0];
                                         //Call for banner
                                         getBanner(1);
                                         $scope.form_rating = data[0].Rating;
+                                        SearchSec.mInfo.Banners = data[0].Banners;
 
                                         if(SearchSec.mInfo.IDTypeID == 2)
                                         {
@@ -671,7 +670,6 @@
                 });
             }
         };
-
         
         /**
          * Selects a particular tab
@@ -686,7 +684,6 @@
                         $scope.mapClass = "";
                         $scope.adClass = "";
                     }
-                    
                     if(tabName == 'ad')
                     {
                          $scope.infoClass = "";
@@ -708,13 +705,36 @@
                     }
                 };
 
+        //Auto refresh Banner
+        $interval(function() {
+
+            if(AutoRefresh == true && SearchSec.IsSearchButtonClicked)
+            {
+                currentBanner = currentBanner + 1;
+                if(currentBanner <= SearchSec.mInfo.Banners)
+                {
+                    getBanner(currentBanner);
+                }
+                else
+                {
+                    currentBanner = 1;
+                    getBanner(currentBanner);
+                }
+            }
+        },RefreshTime);
+
+        //False when navigate to other page
+        $scope.$on('$locationChangeStart', function( event ) {
+               AutoRefresh = false;
+        });
+
         //call for previous banner
         SearchSec.getPreviousBanner = function () {
             currentBanner = currentBanner - 1;
-            if(currentBanner >= SearchSec.mInfo.Banners)
+            if(currentBanner >= 1)
             {
-                //Disable previous button
                 getBanner(currentBanner);
+                RefreshTime = Miliseconds;
             }
         };
 
@@ -723,28 +743,35 @@
             currentBanner = currentBanner + 1;
             if(currentBanner <= SearchSec.mInfo.Banners)
             {
-                //Disable next button
                 getBanner(currentBanner);
+                RefreshTime = Miliseconds;
             }
         };
 
         function getBanner(_requestedBannerValue){
-            console.log("Banner called 677");
-         $http({ method: 'get', url: GURL + 'ewtGetBannerPictureAP?Token=' + $rootScope._userInfo.Token +'&SeqNo='+_requestedBannerValue+'&Ezeid='+SearchSec.mInfo.EZEID}).success(function (data) {
+        $http({ method: 'get', url: GURL + 'ewtGetBannerPicture?Token=' + $rootScope._userInfo.Token +'&SeqNo='+_requestedBannerValue+'&Ezeid='+SearchSec.mInfo.EZEID}).success(function (data) {
 
-                //if (data.length > 0) {
-                console.log(data);
-                if (data != 'null') {
-
-                    //disable next button
+                if (data[0].Picture != 'null') {
+                    SearchSec.mInfo.BannerImage = data[0].Picture;
                     if(currentBanner >= SearchSec.mInfo.Banners)
                     {
-                        $scope.nextButton = true;
+                        //Disable next button
+                        SearchSec.nextButton = false;
                     }
-                    //disabled previous button
-                    if(currentBanner <= SearchSec.mInfo.Banners)
+                    else
                     {
-                        $scope.previousButton = true;
+                        //Enable next button
+                        SearchSec.nextButton = true;
+                    }
+
+                    if(currentBanner <= 1)
+                    {
+                        //Disabled previous button
+                        SearchSec.previousButton = false;
+                    }
+                    else
+                    {   //Enable previous burron
+                        SearchSec.previousButton = true;
                     }
                 }
                 else
@@ -754,7 +781,6 @@
                 }
             });
         }
-
 
         function getMapSearchResults(results, status) {
             if (status == google.maps.places.PlacesServiceStatus.OK) {
@@ -772,9 +798,6 @@
         }
 
         SearchSec.getdirections = function (data) {
-           // $('#Maping_popup').slideUp();
-
-//            $scope.selectedTab = "map";
             $scope.selectTab('map');
             var start = new google.maps.LatLng($rootScope.CLoc.CLat, $rootScope.CLoc.CLong);
             var end = new google.maps.LatLng(data.Latitude, data.Longitude);
@@ -820,12 +843,6 @@
             $('#SalesEnquiryRequest_popup').slideUp();
             SearchSec.salesMessage = "";
         };
-
-        /*  SearchSec.PrepareMail = function () {
-  
-  //            $('#Maping_popup').slideUp();
-              $('#SalesEnquiryRequest_popup').slideDown();
-          };*/
 
         //open Message form
         SearchSec.openSendMessageForm = function () {
@@ -912,7 +929,6 @@
                         document.getElementById("reservationMessage").className = "form-control fixTextArea emptyBox";
                         document.getElementById("reservationMessage1").className = "form-control fixTextArea emptyBox";
                         document.getElementById("reservationMessage2").className = "form-control fixTextArea emptyBox";
-                      //  document.getElementById("expenseClaimDate").className = "datePickerWidth emptyBox";
                     }
                     else {
                         Notification.error({ message: 'Sorry..! Message not send ', delay: MsgDelay });
@@ -929,7 +945,6 @@
         SearchSec.closeReservationForm = function () {
             $('#Reservation_popup').slideUp();
             document.getElementById("reservationMessage").className = "form-control fixTextArea emptyBox";
-             //document.getElementById("expenseClaimDate").className = "datePickerWidth emptyBox";
             SearchSec.ReservationDateTime = "";
         };
 
@@ -947,7 +962,6 @@
                         $('#ServiceRequest_popup').slideUp();
                         SearchSec.ServiceRequestMessage = "";
                         Notification.success({ message: 'Message send success', delay: MsgDelay });
-
                     }
                     else {
                         Notification.error({ message: 'Sorry..! Message not send ', delay: MsgDelay });
@@ -962,7 +976,6 @@
         // Close Service Request Form
         SearchSec.closeServiceRequestForm = function () {
             $('#ServiceRequest_popup').slideUp();
-
             SearchSec.ServiceRequestMessage = "";
         };
 
@@ -977,12 +990,10 @@
 
         //Send CV Request
         SearchSec.sendCV = function () {
-
              if ($rootScope._userInfo.IsAuthenticate == true) {
                  $http({ method: 'post', url: GURL + 'ewtSaveMessage', data: { TokenNo: $rootScope._userInfo.Token, ToMasterID: SearchSec.mInfo.TID, MessageType: 5, Message: "", TaskDateTime: today, LocID :SearchSec.mInfo.LocID } }).success(function (data) {
  
                      if (data.IsSuccessfull) {
-
                          SearchSec.ServiceRequestMessage = "";
                          $('#CV_popup').slideUp();
                          Notification.success({ message: 'CV send success', delay: MsgDelay });
@@ -1007,7 +1018,6 @@
                     if (data.IsSuccessfull)
                     {
                          SearchSec.sendCV();
-
                     }
                      else
                      {
@@ -1822,8 +1832,7 @@
         profile.gender = [{ id: 0, label: "Male" }, { id: 1, label: "Female" }, { id: 2, label: "Unspecified" }];
     });
 
-    var Miliseconds = 300000;
-    var RefreshTime = Miliseconds;
+
 
     ezeid.controller('NotifyController', function ($scope, $rootScope, $http, Notification, $filter, $interval) {
         var msgSen = this;
@@ -1833,7 +1842,9 @@
         msgSen.MessageType={id:"0,1,2,3,4,5,6",label:'All'};
         msgSen.msgs = [];
         var showPaging = "N";
-        AutoRefresh = true;
+        var Miliseconds = 300000;
+        var RefreshTime = Miliseconds;
+        var AutoRefresh = true;
 
         $interval(function() {
             msgSen.msgs = [];
@@ -1851,8 +1862,7 @@
         };
 
         $scope.$on('$locationChangeStart', function( event ) {
-            var AutoRefresh = false;
-
+            AutoRefresh = false;
         });
 
         if ($rootScope._userInfo) {
