@@ -4030,6 +4030,88 @@ exports.FnGetLoginCheck = function (req, res) {
         throw new Error(ex);
     }
 };
+
+
+exports.FnGetBannerPicture = function(req, res){
+    try{
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        var SeqNo = parseInt(req.query.SeqNo);
+        var Token = req.query.Token;
+        var Ezeid = req.query.Ezeid;
+
+        if (Token != null  && SeqNo.toString() != 'NaN' && Ezeid != null) {
+            FnValidateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+                        var Query = db.escape(Ezeid)  + ',' + db.escape(SeqNo);
+                        //console.log(InsertQuery);
+                        db.query('CALL PGetBannerPics(' + Query + ')', function (err, BannerResult) {
+                            if (!err) {
+                                //console.log(InsertResult);
+                                if (BannerResult != null) {
+                                    if(BannerResult[0].length > 0){
+                                        var Picture = BannerResult[0];
+                                       // res.setHeader('Content-Type', docs.ContentType);
+                                        console.log('FnGetBannerPicture: Banner picture sent successfully');
+                                        //res.setHeader('Content-Disposition', 'attachment; filename=' + docs.Filename);
+                                       res.setHeader('Cache-Control', 'public, max-age=150000');
+                                       // res.writeHead('200', { 'Content-Type': 'image/jpeg' });
+                                        //console.log(docs.Docs);
+                                        //res.end(Picture[0].Picture);
+                                       // console.log('FnGetBannerPicture: Banner picture sent successfully');
+                                        res.send(Picture);
+                                    }
+                                    else
+                                    {
+                                        res.send('null');
+                                        console.log('FnGetBannerPicture:tmaster: save banner Failed');
+                                    }
+                                }
+                                else {
+                                    res.send('null');
+                                    console.log('FnGetBannerPicture:tmaster: Registration Failed');
+                                }
+                            }
+                            else {
+                                res.statusCode=500;
+                                res.send('null');
+                                console.log('FnGetBannerPicture:tmaster:' + err);
+                            }
+                        });
+                    }
+                    else {
+                        res.statusCode=401;
+                        console.log('FnGetBannerPicture: Invalid Token')
+                        res.send('null');
+                    }
+                }
+                else {
+                    res.statusCode=500;
+                    console.log('FnGetBannerPicture: Error in processing Token' + err);
+                    res.send('null');
+                }
+            });
+        }
+        else {
+            if (SeqNo.toString() == 'NaN') {
+                console.log('FnGetBannerPicture: SeqNo is empty');
+            }
+            else if(Token == null) {
+                console.log('FnGetBannerPicture: Token is empty');
+            }else if(Ezeid == null) {
+                console.log('FnGetBannerPicture: Ezeid is empty');
+            }
+            res.statusCode=400;
+            res.send('null');
+        }
+
+    }
+    catch (ex) {
+        console.log('FnGetBannerPicture error:' + ex.description);
+        throw new Error(ex);
+    }
+}
 //EZEIDAP Parts
 
 //app part
@@ -4853,7 +4935,7 @@ exports.FnGetAPEZEIDPicture = function (req, res) {
                     if (Result != null) {
                         db.query('CALL pGetRealEstatePicture(' + db.escape(TID) + ',' + db.escape(PicNo) + ')', function (err, PictuerResult) {
                             if (!err) {
-                                console.log(PictuerResult);
+                               // console.log(PictuerResult);
                                 if (PictuerResult != null) {
                                     if (PictuerResult[0].length > 0) {
                                         res.send(PictuerResult[0]);
@@ -4901,3 +4983,162 @@ exports.FnGetAPEZEIDPicture = function (req, res) {
         throw new Error(ex);
     }
 };
+
+
+exports.FnSaveBannerPictureAP = function(req, res){
+    try{
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        var SeqNo = parseInt(req.body.SeqNo);
+        var Picture = req.body.Picture;
+        var Token = req.body.Token;
+        var Ezeid = req.body.Ezeid;
+        var RtnMessage = {
+            IsSaved: false
+        };
+        var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
+
+        if (Token != null && Picture != null  && SeqNo.toString() != 'NaN' && Ezeid != null) {
+            FnValidateTokenAP(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+                        var InsertQuery = db.escape(Ezeid)  + ',' + db.escape(SeqNo) + ',' + db.escape(Picture);
+                        //console.log(InsertQuery);
+                        db.query('CALL PSaveBannerPics(' + InsertQuery + ')', function (err, InsertResult) {
+                            if (!err) {
+                                //console.log(InsertResult);
+                                if (InsertResult != null) {
+                                    if(InsertResult.affectedRows > 0){
+                                        RtnMessage.IsSaved =true;
+                                        console.log(RtnMessage);
+                                        res.send(RtnMessage);
+                                    }
+                                    else
+                                    {
+                                        console.log(RtnMessage);
+                                        res.send(RtnMessage);
+                                        console.log('FnSaveBannerPicture:tmaster: save banner Failed');
+                                    }
+                                }
+                                else {
+                                    console.log(RtnMessage);
+                                    res.send(RtnMessage);
+                                    console.log('FnSaveBannerPicture:tmaster: Registration Failed');
+                                }
+                            }
+                            else {
+                                res.statusCode=500;
+                                res.send(RtnMessage);
+                                console.log('FnSaveBannerPicture:tmaster:' + err);
+                            }
+                        });
+                    }
+                    else {
+                        res.statusCode=401;
+                        console.log('FnSaveBannerPicture: Invalid Token')
+                        res.send(RtnMessage);
+                    }
+                }
+                else {
+                    res.statusCode=500;
+                    console.log('FnSaveBannerPicture: Error in processing Token' + err);
+                    res.send(RtnMessage);
+                }
+            });
+        }
+        else {
+            if (Picture != null || Picture != '') {
+                console.log('FnSaveBannerPicture: Picture is empty');
+            }
+            else if (SeqNo.toString() == 'NaN') {
+                console.log('FnSaveBannerPicture: SeqNo is empty');
+            }
+            else if(Token == null) {
+                console.log('FnSaveBannerPicture: Token is empty');
+            }else if(Ezeid == null) {
+                console.log('FnSaveBannerPicture: Ezeid is empty');
+            }
+            res.statusCode=400;
+            res.send(RtnMessage);
+        }
+
+    }
+    catch (ex) {
+        console.log('FnSaveBannerPicture error:' + ex.description);
+        throw new Error(ex);
+    }
+}
+
+exports.FnGetBannerPictureAP = function(req, res){
+    try{
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        var SeqNo = parseInt(req.query.SeqNo);
+        var Token = req.query.Token;
+        var Ezeid = req.query.Ezeid;
+
+        if (Token != null  && SeqNo.toString() != 'NaN' && Ezeid != null) {
+            FnValidateTokenAP(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+                        var Query = db.escape(Ezeid)  + ',' + db.escape(SeqNo);
+                        //console.log(InsertQuery);
+                        db.query('CALL PGetBannerPics(' + Query + ')', function (err, BannerResult) {
+                            if (!err) {
+                                //console.log(InsertResult);
+                                if (BannerResult != null) {
+                                    if(BannerResult[0].length > 0){
+                                        var Picture = BannerResult[0];
+
+                                        res.send(Picture[0]);
+                                    }
+                                    else
+                                    {
+                                        res.send('null');
+                                        console.log('FnSaveBannerPicture:tmaster: save banner Failed');
+                                    }
+                                }
+                                else {
+                                    res.send('null');
+                                    console.log('FnSaveBannerPicture:tmaster: Registration Failed');
+                                }
+                            }
+                            else {
+                                res.statusCode=500;
+                                res.send('null');
+                                console.log('FnSaveBannerPicture:tmaster:' + err);
+                            }
+                        });
+                    }
+                    else {
+                        res.statusCode=401;
+                        console.log('FnSaveBannerPicture: Invalid Token')
+                        res.send('null');
+                    }
+                }
+                else {
+                    res.statusCode=500;
+                    console.log('FnSaveBannerPicture: Error in processing Token' + err);
+                    res.send('null');
+                }
+            });
+        }
+        else {
+            if (SeqNo.toString() == 'NaN') {
+                console.log('FnSaveBannerPicture: SeqNo is empty');
+            }
+            else if(Token == null) {
+                console.log('FnSaveBannerPicture: Token is empty');
+            }else if(Ezeid == null) {
+                console.log('FnSaveBannerPicture: Ezeid is empty');
+            }
+            res.statusCode=400;
+            res.send('null');
+        }
+
+    }
+    catch (ex) {
+        console.log('FnSaveBannerPicture error:' + ex.description);
+        throw new Error(ex);
+    }
+}
