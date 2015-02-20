@@ -4371,7 +4371,7 @@ exports.FnUpdateUserProfileAP = function (req, res) {
 
         var EZEID = req.body.EZEID;
         var EZEIDVerifiedID = req.body.EZEIDVerifiedID;
-        var TID = parseInt(req.body.TID);
+       // var TID = parseInt(req.body.TID);
         var CategoryID = req.body.CategoryID;
         if (CategoryID == null || CategoryID == '') {
             CategoryID = 0;
@@ -4439,7 +4439,6 @@ exports.FnUpdateUserProfileAP = function (req, res) {
         }
                 }
         else {
-                    res.statusCode=401;
                     res.send(RtnMessage);
                     console.log('FnUpdateUserProfileAP:tmaster: Invalid Token');
                 }
