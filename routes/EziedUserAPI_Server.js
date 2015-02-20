@@ -4397,50 +4397,95 @@ exports.FnUpdateUserProfileAP = function (req, res) {
         var Token = req.body.Token;
         var Rating = req.body.Rating;
         var Size = req.body.Size;
+        var IDTypeId = req.body.IDTypeID;
         var RtnMessage = {
             IsSuccessful: false
         };
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
-        if (EZEID != null && TID.toString() != 'NaN' && Token != null) {
+        if (EZEID != null && Token != null && IDTypeId != null) {
             FnValidateTokenAP(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
-            var InsertQuery = db.escape(CategoryID) + ',' + db.escape(Latitude) + ',' + db.escape(Longitude) + ',' +
-                   db.escape(EZEIDVerifiedID) + ',' + db.escape(TID) + ',' + db.escape(Keywords) + ',' + db.escape(Picture) + ',' + db.escape(PictureFileName) + ',' +
-                   db.escape(Icon) + ',' + db.escape(IconFileName) + ',' + db.escape(EZEID) + ',' +
-                   db.escape(BrochureDoc) + ',' + db.escape(BrochureDocFile) + ',' + db.escape(ActiveInactive)+ ',' + db.escape(BRContentType)+ ',' + db.escape(Rating) + ',' + db.escape(Size);
-           // console.log('InsertQuery: ' + InsertQuery);
-            db.query('CALL pUpdateUserProfileAP(' + InsertQuery + ')', function (err, InsertResult) {
-                if (!err) {
-                    console.log(InsertResult);
-                    if (InsertResult != null) {
-                        if (InsertResult.affectedRows > 0) {
-                            RtnMessage.IsSuccessful = true;
-                            res.send(RtnMessage);
-                            console.log('FnUpdateUserProfileAP: User Profile update successfully');
+                        if(IDTypeId == 1){
+                            var InsertQuery = db.escape(0) + ',' + db.escape(Latitude) + ',' + db.escape(Longitude) + ',' +
+                                db.escape(EZEIDVerifiedID) + ',' + db.escape(Token) + ',' + db.escape('') + ',' + db.escape('') + ',' + db.escape('') + ',' +
+                                db.escape('') + ',' + db.escape('') + ',' + db.escape(EZEID) + ',' +
+                                db.escape('') + ',' + db.escape('') + ',' + db.escape(0)+ ',' + db.escape('')+ ',' + db.escape(0) + ',' + db.escape(0)+ ',' + db.escape(IDTypeId);
+                            // console.log('InsertQuery: ' + InsertQuery);
+                            db.query('CALL pUpdateUserProfileAP(' + InsertQuery + ')', function (err, InsertResult) {
+                                if (!err) {
+                                    console.log(InsertResult);
+                                    if (InsertResult != null) {
+                                        if (InsertResult.affectedRows > 0) {
+                                            RtnMessage.IsSuccessful = true;
+                                            res.send(RtnMessage);
+                                            console.log('FnUpdateUserProfileAP: User Profile update successfully');
+                                        }
+                                        else {
+                                            res.send(RtnMessage);
+                                            console.log('FnUpdateUserProfileAP:tmaster: User Profile update Failed');
+                                        }
+                                    }
+                                    else {
+                                        //console.log(RtnMessage);
+                                        res.send(RtnMessage);
+                                        console.log('FnUpdateUserProfileAP:tmaster: User Profile update Failed');
+                                    }
+                                }
+                                else {
+                                    res.statusCode=500;
+                                    res.send(RtnMessage);
+                                    console.log('FnUpdateUserProfileAP:tmaster:' + err);
+                                }
+                            });
                         }
-                        else {
-                            res.send(RtnMessage);
-                            console.log('FnUpdateUserProfileAP:tmaster: User Profile update Failed');
+                        else
+                        {
+                            var InsertQuery = db.escape(CategoryID) + ',' + db.escape(Latitude) + ',' + db.escape(Longitude) + ',' +
+                                db.escape(EZEIDVerifiedID) + ',' + db.escape(Token) + ',' + db.escape(Keywords) + ',' + db.escape(Picture) + ',' + db.escape(PictureFileName) + ',' +
+                                db.escape(Icon) + ',' + db.escape(IconFileName) + ',' + db.escape(EZEID) + ',' +
+                                db.escape(BrochureDoc) + ',' + db.escape(BrochureDocFile) + ',' + db.escape(ActiveInactive)+ ',' + db.escape(BRContentType)+ ',' + db.escape(Rating) + ',' + db.escape(Size)+ ',' + db.escape(IDTypeId);
+                            // console.log('InsertQuery: ' + InsertQuery);
+                            db.query('CALL pUpdateUserProfileAP(' + InsertQuery + ')', function (err, InsertResult) {
+                                if (!err) {
+                                    console.log(InsertResult);
+                                    if (InsertResult != null) {
+                                        if (InsertResult.affectedRows > 0) {
+                                            RtnMessage.IsSuccessful = true;
+                                            res.send(RtnMessage);
+                                            console.log('FnUpdateUserProfileAP: User Profile update successfully');
+                                        }
+                                        else {
+                                            res.send(RtnMessage);
+                                            console.log('FnUpdateUserProfileAP:tmaster: User Profile update Failed');
+                                        }
+                                    }
+                                    else {
+                                        //console.log(RtnMessage);
+                                        res.send(RtnMessage);
+                                        console.log('FnUpdateUserProfileAP:tmaster: User Profile update Failed');
+                                    }
+                                }
+                                else {
+                                    res.statusCode=500;
+                                    res.send(RtnMessage);
+                                    console.log('FnUpdateUserProfileAP:tmaster:' + err);
+                                }
+                            });
                         }
-                    }
-                    else {
-                        //console.log(RtnMessage);
-                        res.send(RtnMessage);
-                        console.log('FnUpdateUserProfileAP:tmaster: User Profile update Failed');
-                    }
-                }
-                else {
-                                res.statusCode=500;
-                    res.send(RtnMessage);
-                    console.log('FnUpdateUserProfileAP:tmaster:' + err);
-                }
-            });
+
         }
+                    else
+                    {
+                        res.statusCode=401;
+                        res.send(RtnMessage);
+                        console.log('FnUpdateUserProfileAP:tmaster: Invalid Token');
+                    }
                 }
         else {
+                    res.statusCode=500;
                     res.send(RtnMessage);
-                    console.log('FnUpdateUserProfileAP:tmaster: Invalid Token');
+                    console.log('FnUpdateUserProfileAP:tmaster: error in validating token AP' +err);
                 }
             });
         }
