@@ -285,7 +285,7 @@
                                     <div class="bottom-clearfix"></div>
                                     <div class="row row-margin-fix">
 
-                                        <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10">
+                                        <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5">
                                            <!-- <label for="inputEmail" class="sr-only">Email address</label>-->
                                             <input id="inputEmail" class="form-control" ng-model="search.Criteria.Keywords"   ng-click="search.SearchTypeKeyWord()" required autofocus type="text"
                                                    ng-class="search.Criteria.SearchType == 1 ? 'setUpperChar' : ''">
@@ -293,6 +293,13 @@
                                         <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
                                             <button  ng-disabled="!search.Criteria.Keywords" class="btn btn-block btn-primary pull-left" type="submit">Search</button>
                                         </div>
+                                       <!-- <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5">
+                                            <div class="sliderExample"><a name="ex6"></a>
+                                                <strong>Slider - range max (instead of min)</strong>
+                                                <div ui-slider="{range: 'max'}" ng-model="demoVals.sliderExample6"></div>
+                                                <input type="text" ng-model="demoVals.sliderExample6" />
+                                            </div>
+                                        </div>-->
                                     </div>
                                     <div class="bottom-clearfix"></div>
                                     <div class="row row-margin-fix" ng-show="search.IsFilterRowVisible">
