@@ -18,7 +18,7 @@ var FinalMessage = {
 };
 var FinalMsgJson = JSON.parse(JSON.stringify(FinalMessage));
 
-var path ='D:\\Mail\\';
+var path ='D:\\EZEIDBanner\\';
 //ezeid email id: 
 var EZEIDEmail = 'noreply@ezeid.com';
 //EzeId services will start from here
@@ -3627,6 +3627,7 @@ exports.FnSearchByKeywords = function (req, res) {
         var Longitude = parseFloat(req.body.Longitude);
         var ParkingStatus = req.body.ParkingStatus;
         var OpenCloseStatus = req.body.OpenStatus;
+        var Rating = req.body.Rating;
         //console.log(token);
 
         if (type == "1") {
@@ -3688,7 +3689,7 @@ exports.FnSearchByKeywords = function (req, res) {
                                     }
                                 }
                             }
-                            var SearchQuery = db.escape('') + ',' + db.escape(CategoryID) + ',' + db.escape(0) + ',' + db.escape(0.00) + ',' + db.escape(0.00) + ',' + db.escape(EZEID) + ',' + db.escape(LocSeqNo) + ',' + db.escape(Pin) + ',' + db.escape(SearchType) + ',' + db.escape(DocType) + ',' + db.escape("0") + ',' + db.escape("0");
+                            var SearchQuery = db.escape('') + ',' + db.escape(CategoryID) + ',' + db.escape(0) + ',' + db.escape(0.00) + ',' + db.escape(0.00) + ',' + db.escape(EZEID) + ',' + db.escape(LocSeqNo) + ',' + db.escape(Pin) + ',' + db.escape(SearchType) + ',' + db.escape(DocType) + ',' + db.escape("0") + ',' + db.escape("0") + ',' + db.escape("0");
                             //console.log('SearchQuery: ' + SearchQuery);
                             db.query('CALL pSearchResult(' + SearchQuery + ')', function (err, SearchResult) {
                                 // db.query(searchQuery, function (err, SearchResult) {
@@ -3753,7 +3754,7 @@ exports.FnSearchByKeywords = function (req, res) {
             }
             if (find != null && find != '' && Proximity.toString() != 'NaN' && Latitude.toString() != 'NaN' && Longitude.toString() != 'NaN' && CategoryID != null) {
 
-                var InsertQuery = db.escape(find) + ',' + db.escape(CategoryID) + ',' + db.escape(Proximity) + ',' + db.escape(Latitude) + ',' + db.escape(Longitude) + ',' + db.escape('') + ',' + db.escape(0) + ',' + db.escape(0) + ',' + db.escape(1) + ',' + db.escape('') + ',' + db.escape(ParkingStatus) + ',' + db.escape(OpenCloseStatus);
+                var InsertQuery = db.escape(find) + ',' + db.escape(CategoryID) + ',' + db.escape(Proximity) + ',' + db.escape(Latitude) + ',' + db.escape(Longitude) + ',' + db.escape('') + ',' + db.escape(0) + ',' + db.escape(0) + ',' + db.escape(1) + ',' + db.escape('') + ',' + db.escape(ParkingStatus) + ',' + db.escape(OpenCloseStatus) + ',' + db.escape(Rating);
                 //console.log('SearchQuery: ' + InsertQuery);
                 db.query('CALL pSearchResult(' + InsertQuery + ')', function (err, SearchResult) {
                     if (!err) {
@@ -3765,7 +3766,7 @@ exports.FnSearchByKeywords = function (req, res) {
                             }
                             else {
                                 if (Proximity != 0) {
-                                    var InsertProximityQuery = db.escape(find) + ',' + db.escape(CategoryID) + ',' + db.escape(0) + ',' + db.escape(Latitude) + ',' + db.escape(Longitude) + ',' + db.escape('') + ',' + db.escape(0) + ',' + db.escape(0) + ',' + db.escape(1) + ',' + db.escape('') + ',' + db.escape(ParkingStatus) + ',' + db.escape(OpenCloseStatus);;
+                                    var InsertProximityQuery = db.escape(find) + ',' + db.escape(CategoryID) + ',' + db.escape(0) + ',' + db.escape(Latitude) + ',' + db.escape(Longitude) + ',' + db.escape('') + ',' + db.escape(0) + ',' + db.escape(0) + ',' + db.escape(1) + ',' + db.escape('') + ',' + db.escape(ParkingStatus) + ',' + db.escape(OpenCloseStatus) + ',' + db.escape(Rating);
                                     console.log('SearchQuery without Proximity: ' + InsertProximityQuery);
                                     db.query('CALL pSearchResult(' + InsertProximityQuery + ')', function (err, SearchProximityResult) {
                                         if (!err) {
@@ -4055,47 +4056,57 @@ exports.FnGetBannerPicture = function(req, res){
         var SeqNo = parseInt(req.query.SeqNo);
         var StateTitle = req.query.StateTitle;
         var Ezeid = req.query.Ezeid;
+       // var TokenNo = req.query.Token;
 
         RtnMessage = {
             Picture: ''
         };
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
-
+            Ezeid = Ezeid.split(',').pop();
         if ( SeqNo.toString() != 'NaN' && Ezeid != null) {
-            var Query = db.escape(Ezeid)  + ',' + db.escape(SeqNo);
+            var Query = db.escape(Ezeid) + ',' + db.escape(SeqNo);
             //console.log(InsertQuery);
             db.query('CALL PGetBannerPics(' + Query + ')', function (err, BannerResult) {
                 if (!err) {
                     //console.log(InsertResult);
                     if (BannerResult != null) {
-                        if(BannerResult[0].length > 0){
+                        if (BannerResult[0].length > 0) {
                             var Picture = BannerResult[0];
                             console.log('FnGetBannerPicture: Banner picture sent successfully');
                             res.setHeader('Cache-Control', 'public, max-age=150000');
                             console.log('FnGetBannerPicture: Banner picture sent successfully');
-                            RtnMessage.Picture= Picture[0].Picture;
+                            RtnMessage.Picture = Picture[0].Picture;
                             res.send(RtnMessage);
                         }
-                        else
-                        {
+                        else {
                             fs = require('fs');
-                          //  var path = path + StateTitle+'.jpg' ;
-                            fs.exists(path + StateTitle +'.jpg', function( exists ) {
+                            //  var path = path + StateTitle+'.jpg' ;
+                            fs.exists(path + StateTitle + '.jpg', function (exists) {
                                 console.log(exists)
-                                if(exists){
-                                    var bitmap = fs.readFileSync(path + StateTitle +'.jpg');
+                                if (exists) {
+                                    var bitmap = fs.readFileSync(path + StateTitle + '.jpg');
                                     // convert binary data to base64 encoded string
                                     RtnMessage.Picture = new Buffer(bitmap).toString('base64');
                                     res.send(RtnMessage);
                                     console.log('FnGetBannerPicture: State Banner sent successfully');
                                 }
                                 else {
-                                   // path ='D:\\Mail\\Default.jpg';
-                                    var bitmap = fs.readFileSync(path + 'Default.jpg');
-                                    // convert binary data to base64 encoded string
-                                    RtnMessage.Picture = new Buffer(bitmap).toString('base64');
-                                    res.send(RtnMessage);
-                                    console.log('FnGetBannerPicture: Default Banner sent successfully');
+                                    // path ='D:\\Mail\\Default.jpg';
+                                    fs.exists(path + StateTitle + '.jpg', function (exists) {
+                                        console.log(exists)
+                                        if (exists) {
+
+                                            var bitmap = fs.readFileSync(path + 'Default.jpg');
+                                            // convert binary data to base64 encoded string
+                                            RtnMessage.Picture = new Buffer(bitmap).toString('base64');
+                                            res.send(RtnMessage);
+                                            console.log('FnGetBannerPicture: Default Banner sent successfully');
+                                        }
+                                        else {
+                                            res.send('null');
+                                            console.log('FnGetBannerPicture: Default Banner not available');
+                                        }
+                                    });
                                 }
                             });
                         }
@@ -4106,7 +4117,7 @@ exports.FnGetBannerPicture = function(req, res){
                     }
                 }
                 else {
-                    res.statusCode=500;
+                    res.statusCode = 500;
                     res.send('null');
                     console.log('FnGetBannerPicture:tmaster:' + err);
                 }
@@ -4366,12 +4377,14 @@ exports.FnGetUserDetailsAP = function (req, res) {
 //method to udpate user profile based on ezeid
 exports.FnUpdateUserProfileAP = function (req, res) {
     try {
-        res.setHeader("Access-Control-Allow-Origin", "*");
-        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        res.header('Access-Control-Allow-Credentials', true);
+        res.header('Access-Control-Allow-Origin', "*");
+        res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+        res.header('Access-Control-Allow-Headers', 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept');
 
         var EZEID = req.body.EZEID;
         var EZEIDVerifiedID = req.body.EZEIDVerifiedID;
-        var TID = parseInt(req.body.TID);
+        // var TID = parseInt(req.body.TID);
         var CategoryID = req.body.CategoryID;
         if (CategoryID == null || CategoryID == '') {
             CategoryID = 0;
@@ -4397,51 +4410,85 @@ exports.FnUpdateUserProfileAP = function (req, res) {
         var Token = req.body.Token;
         var Rating = req.body.Rating;
         var Size = req.body.Size;
+        var IDTypeId = req.body.IDTypeID;
         var RtnMessage = {
             IsSuccessful: false
         };
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
-        if (EZEID != null && TID.toString() != 'NaN' && Token != null) {
+        if (EZEID != null && Token != null && IDTypeId != null) {
             FnValidateTokenAP(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
-            var InsertQuery = db.escape(CategoryID) + ',' + db.escape(Latitude) + ',' + db.escape(Longitude) + ',' +
-                   db.escape(EZEIDVerifiedID) + ',' + db.escape(TID) + ',' + db.escape(Keywords) + ',' + db.escape(Picture) + ',' + db.escape(PictureFileName) + ',' +
-                   db.escape(Icon) + ',' + db.escape(IconFileName) + ',' + db.escape(EZEID) + ',' +
-                   db.escape(BrochureDoc) + ',' + db.escape(BrochureDocFile) + ',' + db.escape(ActiveInactive)+ ',' + db.escape(BRContentType)+ ',' + db.escape(Rating) + ',' + db.escape(Size);
-           // console.log('InsertQuery: ' + InsertQuery);
-            db.query('CALL pUpdateUserProfileAP(' + InsertQuery + ')', function (err, InsertResult) {
-                if (!err) {
-                    console.log(InsertResult);
-                    if (InsertResult != null) {
-                        if (InsertResult.affectedRows > 0) {
-                            RtnMessage.IsSuccessful = true;
-                            res.send(RtnMessage);
-                            console.log('FnUpdateUserProfileAP: User Profile update successfully');
+                        if(IDTypeId == 1){
+                            var InsertQuery = db.escape(0) + ',' + db.escape(Latitude) + ',' + db.escape(Longitude) + ',' +
+                                db.escape(EZEIDVerifiedID) + ',' + db.escape(Token) + ',' + db.escape('') + ',' + db.escape('') + ',' + db.escape('') + ',' +
+                                db.escape('') + ',' + db.escape('') + ',' + db.escape(EZEID) + ',' +
+                                db.escape('') + ',' + db.escape('') + ',' + db.escape(0)+ ',' + db.escape('')+ ',' + db.escape(0) + ',' + db.escape(0)+ ',' + db.escape(IDTypeId);
+                           // console.log(InsertQuery);
+                            db.query('CALL pUpdateUserProfileAP(' + InsertQuery + ')', function (err, InsertResult) {
+                                if (!err) {
+                                    console.log(InsertResult);
+                                    if (InsertResult != null) {
+                                        RtnMessage.IsSuccessful = true;
+                                        res.send(RtnMessage);
+                                        console.log('FnUpdateUserProfileAP: User Profile update successfully');
+
+                                    }
+                                    else {
+                                        //console.log(RtnMessage);
+                                        res.send(RtnMessage);
+                                        console.log('FnUpdateUserProfileAP:tmaster: User Profile update Failed');
+                                    }
+                                }
+                                else {
+                                    res.statusCode=500;
+                                    res.send(RtnMessage);
+                                    console.log('FnUpdateUserProfileAP:tmaster:' + err);
+                                }
+                            });
                         }
-                        else {
-                            res.send(RtnMessage);
-                            console.log('FnUpdateUserProfileAP:tmaster: User Profile update Failed');
+                        else
+                        {
+                            var InsertQuery = db.escape(CategoryID) + ',' + db.escape(Latitude) + ',' + db.escape(Longitude) + ',' +
+                                db.escape(EZEIDVerifiedID) + ',' + db.escape(Token) + ',' + db.escape(Keywords) + ',' + db.escape(Picture) + ',' + db.escape(PictureFileName) + ',' +
+                                db.escape(Icon) + ',' + db.escape(IconFileName) + ',' + db.escape(EZEID) + ',' +
+                                db.escape(BrochureDoc) + ',' + db.escape(BrochureDocFile) + ',' + db.escape(ActiveInactive)+ ',' + db.escape(BRContentType)+ ',' + db.escape(Rating) + ',' + db.escape(Size)+ ',' + db.escape(IDTypeId);
+                           // console.log('InsertQuery: ' + InsertQuery);
+                            db.query('CALL pUpdateUserProfileAP(' + InsertQuery + ')', function (err, InsertResult) {
+                                if (!err) {
+                                    console.log(InsertResult);
+                                    if (InsertResult != null) {
+                                        RtnMessage.IsSuccessful = true;
+                                        res.send(RtnMessage);
+                                        console.log('FnUpdateUserProfileAP: User Profile update successfully');
+
+                                    }
+                                    else {
+                                        //console.log(RtnMessage);
+                                        res.send(RtnMessage);
+                                        console.log('FnUpdateUserProfileAP:tmaster: User Profile update Failed');
+                                    }
+                                }
+                                else {
+                                    res.statusCode=500;
+                                    res.send(RtnMessage);
+                                    console.log('FnUpdateUserProfileAP:tmaster:' + err);
+                                }
+                            });
                         }
+
                     }
-                    else {
-                        //console.log(RtnMessage);
+                    else
+                    {
+                        res.statusCode=401;
                         res.send(RtnMessage);
-                        console.log('FnUpdateUserProfileAP:tmaster: User Profile update Failed');
+                        console.log('FnUpdateUserProfileAP:tmaster: Invalid Token');
                     }
                 }
                 else {
-                                res.statusCode=500;
+                    res.statusCode=500;
                     res.send(RtnMessage);
-                    console.log('FnUpdateUserProfileAP:tmaster:' + err);
-                }
-            });
-        }
-                }
-        else {
-                    res.statusCode=401;
-                    res.send(RtnMessage);
-                    console.log('FnUpdateUserProfileAP:tmaster: Invalid Token');
+                    console.log('FnUpdateUserProfileAP:tmaster: error in validating token AP' +err);
                 }
             });
         }
@@ -4456,6 +4503,7 @@ exports.FnUpdateUserProfileAP = function (req, res) {
         throw new Error(ex);
     }
 };
+
 
 //method to change password
 exports.FnChangePasswordAP = function (req, res) {
