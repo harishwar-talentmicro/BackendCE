@@ -1,6 +1,6 @@
 (function () {
     var ezeid = angular.module('ezeidApp',
-        ['ngHeader','ngRoute', 'ngFooter', 'ui-notification','imageupload', 'ui.slider']);
+        ['ngHeader','ngRoute', 'ngFooter', 'ui-notification', 'imageupload']);
 
     //HTTP Interceptor for detecting token expiry
     //Reloads the whole page in case of Unauthorized response from api
@@ -27,33 +27,6 @@
             }
         };
     }]);
-
-    //Below code is for range slider
-    ezeid.factory('colorpicker', function () {
-        function hexFromRGB(r, g, b) {
-            var hex = [r.toString(16), g.toString(16), b.toString(16)];
-            angular.forEach(hex, function(value, key) {
-                if (value.length === 1) hex[key] = "0" + value;
-            });
-            return hex.join('').toUpperCase();
-        }
-        return {
-            refreshSwatch: function (r, g, b) {
-                var color = '#' + hexFromRGB(r, g, b);
-                angular.element('#swatch').css('background-color', color);
-            }
-        };
-    });
-
-    /*
-     // To set an option for all sliders
-     ezeid.factory('uiSliderConfig', function ($log) {
-     return {
-     start: function (event, ui) { $log.info('Event: Slider start - set with uiSliderConfig', event); },
-     stop: function (event, ui) { $log.info('Event: Slider stop - set with uiSliderCOnfig', event); },
-     };
-     });
-     */
 
     ezeid.config(['$routeProvider','$httpProvider',function($routeProvider,$httpProvider){
         $routeProvider.when('/index',{templateUrl: 'html/index.html'})
@@ -83,7 +56,69 @@
     //http://10.0.100.103:8084/';
 
     var MsgDelay = 2000;
-    
+    var ratingValues = "1,2,3,4,5";
+
+    //Below is directives for multi select drop down
+    ezeid.directive('dropdownMultiselect', function(){
+        return {
+            restrict: 'E',
+            scope:{
+                model: '=',
+                options: '=',
+                pre_selected: '=preSelected'
+            },
+            template: "<div class='btn-group' data-ng-class='{open: open}'>"+
+                "<button class='btn btn-small'>Rating</button>"+
+                "<button class='btn btn-small dropdown-toggle' data-ng-click='open=!open;openDropdown()'><span class='caret'></span></button>"+
+                "<ul class='dropdown-menu' aria-labelledby='dropdownMenu' style='z-index: 1001;' id='ratingDropdown'>" +
+                "<li><a data-ng-click='selectAll()'><i class='icon-ok-sign'></i>  Check All</a></li>" +
+                "<li><a data-ng-click='deselectAll();'><i class='icon-remove-sign'></i>  Uncheck All</a></li>" +
+                "<li class='divider'></li>" +
+                "<li data-ng-repeat='option in options'> <a data-ng-click='setSelectedItem()'>{{option.name}}<span data-ng-class='isChecked(option.id)'></span></a></li>" +
+                "</ul>" +
+                "</div>" ,
+                 controller: function($scope){
+                //Default all selected
+                $scope.model = [1,2,3,4,5];
+                $scope.openDropdown = function(){
+                    if ($scope.searchType == 2)
+                    {
+                       $scope.selected_items = [];
+                       for(var i=0; i<$scope.pre_selected.length; i++){
+                            $scope.selected_items.push($scope.pre_selected[i].id);
+                        }
+                    }
+                };
+
+                $scope.selectAll = function () {
+                    $scope.model = _.pluck($scope.options, 'id');
+                    ratingValues = $scope.model.join();
+                };
+                $scope.deselectAll = function() {
+                    $scope.model=[];
+                    ratingValues = $scope.model.join();
+                };
+                $scope.setSelectedItem = function(){
+                    var id = this.option.id;
+                    if (_.contains($scope.model, id)) {
+                        $scope.model = _.without($scope.model, id);
+                    } else {
+                        $scope.model.push(id);
+                    }
+                    ratingValues = $scope.model.join();
+                    return false;
+                };
+                $scope.isChecked = function (id) {
+                    if (_.contains($scope.model, id)) {
+                        return 'icon-ok pull-right';
+                    }
+                    return false;
+                };
+            }
+        }
+    });
+
+
     // define controller for wizard
     ezeid.directive('dateTimePicker', function() {
             return {
@@ -196,7 +231,7 @@
 
 
     // Search Controller
-    ezeid.controller('SearchController', function ($http, $rootScope, $scope, $compile, $timeout, Notification, $filter, $location, $window, $q, $log, $interval) {
+    ezeid.controller('SearchController', function ($http, $rootScope, $scope, $compile, $timeout, Notification, $filter, $location, $window, $q, $interval) {
         var map;
         var marker;
         var markers = [];
@@ -213,47 +248,6 @@
         var RefreshTime = Miliseconds;
         var AutoRefresh = true;
 
-        //Below code is for range slider
-        function refreshSwatch (ev, ui) {
-            var red = $scope.colorpicker.red,
-                green = $scope.colorpicker.green,
-                blue = $scope.colorpicker.blue;
-            colorpicker.refreshSwatch(red, green, blue);
-        }
-
-        // Slider options with event handlers
-        $scope.slider = {
-            'options': {
-                start: function (event, ui) { $log.info('Event: Slider start - set with slider options', event); },
-                stop: function (event, ui) { $log.info('Event: Slider stop - set with slider options', event); }
-            }
-        }
-
-        $scope.demoVals = {
-            sliderExample3:     14,
-            sliderExample4:     14,
-            sliderExample5:     50,
-            sliderExample8:     0.34,
-            sliderExample9:     [-0.52, 0.54],
-            sliderExample10:     -0.37
-        };
-
-        $scope.colorpicker = {
-            red: 255,
-            green: 140,
-            blue: 60,
-            options: {
-                orientation: 'horizontal',
-                min: 0,
-                max: 255,
-                range: 'min',
-                change: refreshSwatch,
-                slide: refreshSwatch
-            }
-        };
-
-        //------------- range slider ends  -----------------//
-
         $('#datetimepicker1').datetimepicker({
 
             format: "d-M-Y  h:m A",
@@ -266,8 +260,7 @@
             $('#datetimepicker1').trigger('focus');
         });
 
-        $rootScope.$watch('_userInfo.IsAuthenticate',function(oldval,newval){
-
+         $rootScope.$watch('_userInfo.IsAuthenticate',function(oldval,newval){
            try{
                for (var i = 0; i < markers.length; i++) {
                 markers[i].setMap(null);
@@ -286,16 +279,13 @@
         SearchSec.IsFilterRowVisible = true;
         SearchSec.nextButton = true;
         SearchSec.previousButton =  true;
-
         SearchSec.categories = [];
         SearchSec.proximities = [];
-
         $scope.form_rating = 0;
 
         SearchSec.mInfo = {};
         SearchSec.Placeholder = 'Type EZEID';
         var userType = "";
-
         SearchSec.mInfo.InfoTab = true;
         $scope.showInfoTab = false;
 
@@ -311,6 +301,18 @@
 
         $scope.isMapLoaded = false;         //Set to true with map event 'idle'
         $scope.isMapReady = false;          //Set to true when map canvas is drawn and map is fully visible
+
+       //Below code is for multi select check box
+        $scope.roles = [
+            {"id": 1, "name": "*", "assignable": true},
+            {"id": 2, "name": "**", "assignable": true},
+            {"id": 3, "name": "***", "assignable": true},
+            {"id": 4, "name": "****", "assignable": true},
+            {"id": 5, "name": "*****", "assignable": true}
+        ];
+
+        $scope.member = {roles: []};
+        $scope.selected_items = [];
 
         function initialize () {
             //// Create the search box and link it to the UI element.
@@ -529,13 +531,15 @@
             }
         });
 
-       SearchSec.OpenStatuses = [ { id: 1, label: "Open" }, { id: 2, label: "Closed" }];
+        SearchSec.OpenStatuses = [ { id: 1, label: "Open" }, { id: 2, label: "Closed" }];
 
         SearchSec.isEZEIDselected = function (value) {
             if (SearchSec.Criteria.SearchType == 1)
                 SearchSec.Placeholder = 'Type EZEID';
             else
                 SearchSec.Placeholder = 'Type Keywords';
+                $scope.searchType = 2;
+
             return value === SearchSec.Criteria.SearchType;
         };
 
@@ -544,13 +548,17 @@
         };
 
         SearchSec.getSearch = function () {
+
+            document.getElementById("ratingDropdown").style.display = 'none';
+
+           // $("ratingDropdown").css('display', 'none');
+            //$( "ratingDropdown" ).addClass( "dropdown-menu" );
+
             SearchSec.IsSearchButtonClicked = true;
             SearchSec.IsShowForm = false;
             SearchSec.Criteria.ParkingStatus = SearchSec.Criteria.ParkingStatus == 1 ? '1,2' :0;
             SearchSec.Criteria.OpenStatus = (SearchSec.Criteria.OpenStatus.id == 1) ? 0 : SearchSec.Criteria.OpenStatus ;
-
-            console.log(SearchSec.Criteria.SearchType);
-            if ($rootScope._userInfo.IsAuthenticate == true || SearchSec.Criteria.SearchType == 2) {
+            if ($rootScope._userInfo.IsAuthenticate == true || SearchSec.Criteria.SearchType == 2 && SearchSec.IsSearchButtonClicked) {
 
                 if($rootScope._userInfo.Token == "")
                 {
@@ -560,16 +568,15 @@
                 }
                 else
                 {
-                    console.log($rootScope._userInfo.Token);
+                   // console.log($rootScope._userInfo.Token);
                 }
 
                 SearchSec.Criteria.Latitude = $rootScope.CLoc.CLat;
                 SearchSec.Criteria.Longitude = $rootScope.CLoc.CLong;
                 SearchSec.Criteria.Token = $rootScope._userInfo.Token;
+
+                //SearchSec.Criteria.Rating =
                 $http({ method: 'post', url: GURL + 'ewSearchByKeywords', data: SearchSec.Criteria }).success(function (data) {
-
-
-                    console.log(data[0]);
 
                     if (data != 'null' && data.length>0) {
                         var _item = data[0];
@@ -578,12 +585,11 @@
                             SearchSec.downloadData = data[0];
                             SearchSec.IsShowForm = true;
                             SearchSec.IsFilterRowVisible = false;
-                       }
+                        }
                         else
                         {
-                            console.log("Search caled.. else");
-
                             $http({ method: 'get', url: GURL + 'ewtGetSearchInformation?Token=' + $rootScope._userInfo.Token + '&TID=' + _item.TID }).success(function (data) {
+
                                 if (data != 'null') {
                                    if(data.length == 1 && SearchSec.Criteria.SearchType == 1)
                                    {
@@ -594,7 +600,7 @@
                                    {
                                        $scope.selectTab('map');
                                    }
-                                     $timeout(function () {
+                                 //    $timeout(function () {
                                         SearchSec.mInfo = data[0];
                                         //Call for banner
                                         getBanner(1);
@@ -609,7 +615,7 @@
                                         {
                                             SearchSec.reservationPlaceHolder = "Appointment requirement details";
                                         }
-                                   });
+                                 //  });
                                 } 
                                 else {
                                     Notification.error({ message: 'Invalid key or not found…', delay: MsgDelay });
@@ -671,7 +677,7 @@
                 var prom = $rootScope.defer.promise;
                 prom.then(function(d){
                     SearchSec.getSearch();
-                });
+                 });
             }
         };
         
@@ -712,9 +718,11 @@
         //Auto refresh Banner
         $interval(function() {
 
-            if(AutoRefresh == true && SearchSec.IsSearchButtonClicked)
+            if(AutoRefresh == true && SearchSec.IsSearchButtonClicked && SearchSec.mInfo.EZEID)
             {
+                console.log("sai123");
                 currentBanner = currentBanner + 1;
+
                 if(currentBanner <= SearchSec.mInfo.Banners)
                 {
                     getBanner(currentBanner);
@@ -753,37 +761,39 @@
         };
 
         function getBanner(_requestedBannerValue){
-        $http({ method: 'get', url: GURL + 'ewtGetBannerPicture?Token=' + $rootScope._userInfo.Token +'&SeqNo='+_requestedBannerValue+'&Ezeid='+SearchSec.mInfo.EZEID}).success(function (data) {
+            if(SearchSec.mInfo.EZEID)
+            {
+                $http({ method: 'get', url: GURL + 'ewtGetBannerPicture?Token=' + $rootScope._userInfo.Token +'&SeqNo='+_requestedBannerValue+'&Ezeid='+SearchSec.mInfo.EZEID+'&StateTitle='+ SearchSec.mInfo.StateTitle}).success(function (data) {
+                    if (data[0].Picture != 'null') {
+                        SearchSec.mInfo.BannerImage = data[0].Picture;
+                        if(currentBanner >= SearchSec.mInfo.Banners)
+                        {
+                            //Disable next button
+                            SearchSec.nextButton = false;
+                        }
+                        else
+                        {
+                            //Enable next button
+                            SearchSec.nextButton = true;
+                        }
 
-                if (data[0].Picture != 'null') {
-                    SearchSec.mInfo.BannerImage = data[0].Picture;
-                    if(currentBanner >= SearchSec.mInfo.Banners)
-                    {
-                        //Disable next button
-                        SearchSec.nextButton = false;
+                        if(currentBanner <= 1)
+                        {
+                            //Disabled previous button
+                            SearchSec.previousButton = false;
+                        }
+                        else
+                        {   //Enable previous burron
+                            SearchSec.previousButton = true;
+                        }
                     }
                     else
                     {
-                        //Enable next button
-                        SearchSec.nextButton = true;
+                        msgSen.showMoreButton = false;
+                        Notification.error({ message: "No Message found..!", delay: MsgDelay });
                     }
-
-                    if(currentBanner <= 1)
-                    {
-                        //Disabled previous button
-                        SearchSec.previousButton = false;
-                    }
-                    else
-                    {   //Enable previous burron
-                        SearchSec.previousButton = true;
-                    }
-                }
-                else
-                {
-                    msgSen.showMoreButton = false;
-                    Notification.error({ message: "No Message found..!", delay: MsgDelay });
-                }
-            });
+                });
+            }
         }
 
         function getMapSearchResults(results, status) {

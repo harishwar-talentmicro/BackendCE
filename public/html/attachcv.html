@@ -106,7 +106,7 @@
                                             <label for="NotVisible" style="margin-top: 8px;" class="pull-left under_label">Not Visible</label>
                                         </div>
                                         <div class="pull-right wd48p">
-                                            <input ng-show="CVAttachCtrl.EnablePin" maxlength="3" numbers-only="numbers-only" type="text" style="width: 15%;" class="form-control" ng-model="CVAttachCtrl._CVInfo.Pin" placeholder="Pin"/>
+                                            <input ng-show="CVAttachCtrl.EnablePin" maxlength="3" onkeypress="return isNumberKey(event);" type="text" style="width: 15%;" class="form-control" ng-model="CVAttachCtrl._CVInfo.Pin" placeholder="Pin"/>
                                         </div>
                                         <div class="clearfix"></div>
                                     <li class="dsp_block marT10px">

@@ -127,6 +127,12 @@ angular.module('ezeidApp').controller('LocationsController', function ($rootScop
 
 
     this.openNewLocationForm = function (secLocForm) {
+
+        document.getElementById("mobile_phone").className = "form-control emptyBox";
+        document.getElementById("Location").className = "form-control emptyBox";
+        document.getElementById("streeName").className = "form-control emptyBox";
+        document.getElementById("cities").className = "form-control emptyBox";
+        document.getElementById("postalCode").className = "form-control emptyBox";
       //  var stateId = SLocCtrl._locInfo.StateID;
         SLocCtrl._locInfo = {};
 
@@ -149,11 +155,7 @@ angular.module('ezeidApp').controller('LocationsController', function ($rootScop
         SLocCtrl._locInfo.SupportButton = 0;
         SLocCtrl._locInfo.CVButton = 0;
 
-        document.getElementById("mobile_phone").className = "form-control emptyBox";
-        document.getElementById("Location").className = "form-control emptyBox";
-        document.getElementById("streeName").className = "form-control emptyBox";
-        document.getElementById("cities").className = "form-control emptyBox";
-        document.getElementById("postalCode").className = "form-control emptyBox";
+
 
         if(!map){
             initialize1();
@@ -309,11 +311,13 @@ angular.module('ezeidApp').controller('LocationsController', function ($rootScop
                 data: JSON.stringify(SLocCtrl._locInfo),
                 headers: { 'Content-Type': 'application/json' }
             }).success(function (data) {
+
                     document.getElementById("Location").className = "form-control emptyBox";
                     document.getElementById("streeName").className = "form-control emptyBox";
                     document.getElementById("cities").className = "form-control emptyBox";
                     document.getElementById("postalCode").className = "form-control emptyBox";
                     document.getElementById("mobile_phone").className = "form-control emptyBox";
+
                     if (data != 'null') {
                         SLocCtrl.LocationsList.push(data[0]);
 
@@ -792,8 +796,8 @@ angular.module('ezeidApp').controller('LocationsController', function ($rootScop
                 SLocCtrl._locInfo.Icon = $rootScope.smallImage;
                 SLocCtrl._locInfo.IconFileName = image[0].name;
             }
-            var enc=Base64.encode(dataURL);
-            var dec=Base64.decode(enc);
+           // var enc=Base64.encode(dataURL);
+           // var dec=Base64.decode(enc);
         });
         Notification.success({ message: "Saved...", delay: MsgDelay });
     };

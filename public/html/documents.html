@@ -41,7 +41,7 @@
                                         </ul>
                                         <form class="navbar-form navbar-left form-inline" role="search">
                                             <div class="form-group">
-                                                <input type="text" class="form-control" data-ng-model="Pin" style="width: 50px;" placeholder="PIN" maxlength="3">
+                                                <input type="text" onkeypress="return isNumberKey(event);" class="form-control" data-ng-model="Pin" style="width: 50px;" placeholder="PIN" maxlength="3">
                                             </div>
                                             <button type="submit" ng-disabled="!Pin.length"  ng-click="DocCtrl.ChangePin()" class="btn btn-primary">Change PIN</button>
                                         </form>
