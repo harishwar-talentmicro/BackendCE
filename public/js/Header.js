@@ -21,6 +21,8 @@ HeaderApp.directive('headerSection', function (Notification) {
                     }).success(function (data,status,x) {
                         $rootScope._userInfo = data;
 
+                           
+
                         if (typeof (Storage) !== "undefined") {
                             var encrypted = CryptoJS.AES.encrypt(JSON.stringify(data), "EZEID");
                             localStorage.setItem("_token", encrypted);

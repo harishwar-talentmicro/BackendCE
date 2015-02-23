@@ -515,13 +515,14 @@ exports.FnLogin = function (req, res) {
             IsAuthenticate: false,
             FirstName: '',
             Type: 0,
-            Icon: ''
+            Icon: '',
+            Verified: 0
         };
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
         if (UserName != null && UserName != '' && Password != null && Password != '') {
             var EncryptPWD = FnEncryptPassword(Password);
             // console.log(EncryptPWD);
-            var Query = 'select TID,FirstName,LastName,EZEID,IDTypeID,Token,Icon from tmaster where StatusID=1 and  EZEID=' + db.escape(UserName) + ' and Password=' + db.escape(EncryptPWD);
+            var Query = 'select TID,FirstName,LastName,EZEID,IDTypeID,Token,Icon, EZEIDVerifiedID from tmaster where StatusID=1 and  EZEID=' + db.escape(UserName) + ' and Password=' + db.escape(EncryptPWD);
             db.query(Query, function (err, loginResult) {
                 if (!err) {
                     if (loginResult.length > 0) {
@@ -542,6 +543,8 @@ exports.FnLogin = function (req, res) {
                                     RtnMessage.FirstName = loginResult[0].FirstName;
                                     RtnMessage.Type = loginResult[0].IDTypeID;
                                     RtnMessage.Icon = loginResult[0].Icon;
+                                    RtnMessage.Verified=loginResult[0].EZEIDVerifiedID;
+
                                     res.send(RtnMessage);
 
                                     console.log('FnLogin:tmaster: Login success');

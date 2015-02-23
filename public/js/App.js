@@ -81,7 +81,7 @@
                 //Default all selected
                 $scope.model = [1,2,3,4,5];
                 $scope.openDropdown = function(){
-                    if ($scope.searchType == 2)
+                if ($scope.searchType == 2)
                     {
                        $scope.selected_items = [];
                        for(var i=0; i<$scope.pre_selected.length; i++){
@@ -549,7 +549,7 @@
 
         SearchSec.getSearch = function () {
 
-            document.getElementById("ratingDropdown").style.display = 'none';
+           // document.getElementById("ratingDropdown").style.display = 'none';
 
            // $("ratingDropdown").css('display', 'none');
             //$( "ratingDropdown" ).addClass( "dropdown-menu" );
@@ -574,8 +574,8 @@
                 SearchSec.Criteria.Latitude = $rootScope.CLoc.CLat;
                 SearchSec.Criteria.Longitude = $rootScope.CLoc.CLong;
                 SearchSec.Criteria.Token = $rootScope._userInfo.Token;
+                SearchSec.Criteria.Rating = ratingValues;
 
-                //SearchSec.Criteria.Rating =
                 $http({ method: 'post', url: GURL + 'ewSearchByKeywords', data: SearchSec.Criteria }).success(function (data) {
 
                     if (data != 'null' && data.length>0) {
@@ -718,9 +718,8 @@
         //Auto refresh Banner
         $interval(function() {
 
-            if(AutoRefresh == true && SearchSec.IsSearchButtonClicked && SearchSec.mInfo.EZEID)
+            if(AutoRefresh == true && SearchSec.IsSearchButtonClicked && SearchSec.mInfo.EZEID && $scope.showInfoTab && SearchSec.mInfo.Banners != 1)
             {
-                console.log("sai123");
                 currentBanner = currentBanner + 1;
 
                 if(currentBanner <= SearchSec.mInfo.Banners)
@@ -761,7 +760,7 @@
         };
 
         function getBanner(_requestedBannerValue){
-            if(SearchSec.mInfo.EZEID)
+           if(SearchSec.mInfo.EZEID)
             {
                 $http({ method: 'get', url: GURL + 'ewtGetBannerPicture?Token=' + $rootScope._userInfo.Token +'&SeqNo='+_requestedBannerValue+'&Ezeid='+SearchSec.mInfo.EZEID+'&StateTitle='+ SearchSec.mInfo.StateTitle}).success(function (data) {
                     if (data.Picture != 'null') {
@@ -934,7 +933,6 @@
                */
                var dateTime = moment(SearchSec.ReservationDateTime).utc().format('DD-MMM-YYYY hh:mm A');
                var currentTaskDate = moment().format('DD-MMM-YYYY hh:mm A');
-               console.log(currentTaskDate);
                $http({ method: 'post', url: GURL + 'ewtSaveMessage', data: { TokenNo: $rootScope._userInfo.Token, ToMasterID: SearchSec.mInfo.TID, MessageType: messageType, Message: SearchSec.ReservationMessage, TaskDateTime: dateTime, LocID :SearchSec.mInfo.LocID,CurrentTaskDate: currentTaskDate } }).success(function (data) {
                     if (data.IsSuccessfull) {
                         $('#Reservation_popup').slideUp();

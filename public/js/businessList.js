@@ -92,14 +92,17 @@ angular.module('ezeidApp').controller('BusinessListController', function($http, 
 
 
     this.saveBusinessList=function(){
-        BusinessListCtrl._businessInfo. TokenNo=$rootScope._userInfo.Token;
+        BusinessListCtrl._businessInfo.TokenNo=$rootScope._userInfo.Token;
         // BusinessListCtrl._businessInfo.Status=parseInt(CVAttachCtrl._businessInfo.Status);
         $http({
             method: "POST",
             url: GURL + 'ewtUpdateBussinessListing',
             data: JSON.stringify(BusinessListCtrl._businessInfo),
             headers: { 'Content-Type': 'application/json' }
-        }).success(function (data) {
+        }).success(function (data,status) {
+                console.log(data);
+                console.log("Satus is:103");
+                console.log(status);
             if(data.IsUpdated) {
                 Notification.success({message: "Saved...", delay: MsgDelay});
                 getBusinessInfo();
