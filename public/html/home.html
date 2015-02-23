@@ -261,7 +261,7 @@
                 <div class="row">
                     <div class="col-md-7" style="margin: auto; float: none;">
                         <div class="panel panel-default">
-                            <form class="form-signin" role="form" novalidate ng-submit="search.getSearch()">
+                            <form class="form-signin" role="form" novalidate>
                                 <!--------------------------------------New Code---------------------------------->
                                 <div class="container-fluid">
                                     <div class="bottom-clearfix"></div>
@@ -285,21 +285,19 @@
                                     <div class="bottom-clearfix"></div>
                                     <div class="row row-margin-fix">
 
-                                        <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5">
+                                        <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8" ng-class="search.isEZEIDselected('1') ? 'searchAreaSize' : '' ">
                                            <!-- <label for="inputEmail" class="sr-only">Email address</label>-->
                                             <input id="inputEmail" class="form-control" ng-model="search.Criteria.Keywords"   ng-click="search.SearchTypeKeyWord()" required autofocus type="text"
                                                    ng-class="search.Criteria.SearchType == 1 ? 'setUpperChar' : ''">
                                         </div>
-                                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
-                                            <button  ng-disabled="!search.Criteria.Keywords" class="btn btn-block btn-primary pull-left" type="submit">Search</button>
+
+                                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2" ng-hide="search.isEZEIDselected('1')">
+                                               <dropdown-multiselect style="margin-left: 3%;" pre-selected="member.roles" model="selected_items" options="roles"></dropdown-multiselect>
                                         </div>
-                                       <!-- <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5">
-                                            <div class="sliderExample"><a name="ex6"></a>
-                                                <strong>Slider - range max (instead of min)</strong>
-                                                <div ui-slider="{range: 'max'}" ng-model="demoVals.sliderExample6"></div>
-                                                <input type="text" ng-model="demoVals.sliderExample6" />
-                                            </div>
-                                        </div>-->
+
+                                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
+                                            <button  ng-disabled="!search.Criteria.Keywords" ng-click="search.getSearch()" class="btn btn-block btn-primary pull-left" type="button">Search</button>
+                                        </div>
                                     </div>
                                     <div class="bottom-clearfix"></div>
                                     <div class="row row-margin-fix" ng-show="search.IsFilterRowVisible">
@@ -318,8 +316,7 @@
     <!--                                        <img src="./images/map_marker.png" height="24px" width="24px">-->
                                             <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6" ng-hide="search.isEZEIDselected('1')">
                                                 <select class="form-control pull-left"
-                                                        ng-model="search.Criteria.Proximity" ng-disabled="search.isEZEIDselected('1')"
-                                                        >
+                                                        ng-model="search.Criteria.Proximity" ng-disabled="search.isEZEIDselected('1')"     >
                                                     <option value="{{proximity.MilesValue}}"  ng-selected="{{proximity.MilesValue == 1}}" ng-repeat="proximity in search.proximities">{{proximity.Title}}</option>
                                                     <option value="0">Any</option>
                                                 </select>

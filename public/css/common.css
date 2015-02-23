@@ -44,6 +44,7 @@
 .orangeActiveButton
 {
     background-color: #FBB917 !important;
+    background: url("") repeat;
 }
 .fixTextArea
 {
@@ -276,7 +277,8 @@ margin-bottom: 10px;
     margin-top: -1px;
 }
 .level-1{
-    z-index: 1110;
+    /*z-index: 1110;*/
+    z-index: 11;
 }
 
 .navbar-fixed-top{
@@ -500,3 +502,28 @@ html, body {
 #green .ui-slider-handle { border-color: #8ae234; }
 #blue .ui-slider-range { background: #729fcf; }
 #blue .ui-slider-handle { border-color: #729fcf; }
+
+.icon-ok {
+    background-position: -288px 0!important;
+}
+[class^="icon-"], [class*=" icon-"] {
+    display: inline-block;
+    width: 18px;
+    height: 20px;
+    line-height: 14px;
+    vertical-align: text-top;
+    background-image: url("../images/glyphicons-halflings.png");
+    background-position: 14px 14px;
+    background-repeat: no-repeat;
+    margin-top: 1px;
+}
+.icon-ok-sign {
+    background-position: -72px -96px;
+}
+.icon-remove-sign {
+    background-position: -48px -96px;
+}
+.searchAreaSize
+{
+    width: 73.666667% !important;
+}

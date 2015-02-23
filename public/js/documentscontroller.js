@@ -38,7 +38,6 @@ angular.module('ezeidApp').controller('DocumentController', function($http, $roo
     var DocCtrl = this;
     $scope.fileSeclected = undefined;
     $scope.IdPlaceHolder = "Enter ID number";
-
     $scope.Token = $rootScope._userInfo.Token;
 
     var original_form = {
@@ -146,8 +145,7 @@ angular.module('ezeidApp').controller('DocumentController', function($http, $roo
         if($rootScope._userInfo && $rootScope._userInfo.Token){
             $http({ method: 'get', url: '/ewtGetDoc?TokenNo=' + $rootScope._userInfo.Token + '&&Type='+ option }).success(function (data) {
                // if(data && data.length > 0){
-
-                    if(data && data.length > 0 && data[0].No != '' && data !='null'){
+                if(data && data.length > 0 && data[0].No != '' && data !='null'){
                     if($scope.OptionSelected==1){
                         $scope.IdPlaceHolder = "Enter ID number";
                          $scope.form.RefNo = data[0].No;
@@ -159,7 +157,7 @@ angular.module('ezeidApp').controller('DocumentController', function($http, $roo
                      }else if($scope.OptionSelected==2){
                         $scope.IdPlaceHolder = "Enter Passport number";
 
-                       $scope.form.RefNo = data[0].No;
+                        $scope.form.RefNo = data[0].No;
                         $scope.form.RefExpiryDate = $filter('date')(new Date(data[0].ExpiryDate), 'dd-MMM-yyyy');
                         $scope.form.RefDoc = data[0].IDDoc;
                         $scope.form.RefFileName = data[0].DocFilename;
@@ -201,6 +199,18 @@ angular.module('ezeidApp').controller('DocumentController', function($http, $roo
                             $scope.form.RefExpiryDate = "";
                             $scope.form.RefDoc = "";
                             $scope.showDownloadLink = false;
+                            if($scope.OptionSelected==1){
+                                $scope.IdPlaceHolder = "Enter ID number";
+                            }
+                            else if($scope.OptionSelected==2){
+                                $scope.IdPlaceHolder = "Enter Passport number";
+                            }else if($scope.OptionSelected==3){
+                                $scope.IdPlaceHolder = "Enter Driving Licence number";
+                            }else if($scope.OptionSelected==4){
+                                $scope.IdPlaceHolder = "Reference No. for Document £1";
+                            }else if($scope.OptionSelected==5){
+                                $scope.IdPlaceHolder = "Reference No. for Document £2";
+                            }
                         }
                         else
                         {
