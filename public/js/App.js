@@ -923,8 +923,9 @@
                 * Converting LOCAL Time to UTC Time
                */
                var dateTime = moment(SearchSec.ReservationDateTime).utc().format('DD-MMM-YYYY hh:mm A');
-               
-               $http({ method: 'post', url: GURL + 'ewtSaveMessage', data: { TokenNo: $rootScope._userInfo.Token, ToMasterID: SearchSec.mInfo.TID, MessageType: messageType, Message: SearchSec.ReservationMessage, TaskDateTime: dateTime, LocID :SearchSec.mInfo.LocID} }).success(function (data) {
+               var currentTaskDate = moment().format('DD-MMM-YYYY hh:mm A');
+               console.log(currentTaskDate);
+               $http({ method: 'post', url: GURL + 'ewtSaveMessage', data: { TokenNo: $rootScope._userInfo.Token, ToMasterID: SearchSec.mInfo.TID, MessageType: messageType, Message: SearchSec.ReservationMessage, TaskDateTime: dateTime, LocID :SearchSec.mInfo.LocID,CurrentTaskDate: currentTaskDate } }).success(function (data) {
                     if (data.IsSuccessfull) {
                         $('#Reservation_popup').slideUp();
                         SearchSec.ReservationMessage = "";
@@ -1135,16 +1136,17 @@
                 
                 Webcam.snap( function(data_uri) {
 
-                   // if(profile._info.IDTypeID != 1)
-                  //  {
-                        profile._info.Picture = data_uri;
-                   /* }
-                    else
-                   {
-                        profile._info.Icon= data_uri;
-                    }*/
+                    //Resize the image and set it as logo if the user is individual
 
-                    // out down camera, stop capturing
+                   profile._info.Picture = data_uri;
+//                    if (!profile._info.IDTypeID == 2) {
+//                        var canvas = document.createElement('canvas');
+//                        profile._info.Icon = $rootScope.smallImage;
+//                        /* profile._info.Icon = "";
+//                         profile._info.IconFileName = "";*/
+//                    } else {
+//                        profile._info.IconFileName = 'camera-snap-1.jpg';
+//                    }
                     Webcam.reset();
                 });
               };
