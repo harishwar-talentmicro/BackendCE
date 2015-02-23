@@ -835,7 +835,8 @@
 
         SearchSec.sendSalesEnquiry = function () {
            if ($rootScope._userInfo.IsAuthenticate == true) {
-                $http({ method: 'post', url: GURL + 'ewtSaveMessage', data: { TokenNo: $rootScope._userInfo.Token, ToMasterID: SearchSec.mInfo.TID, MessageType: 1, Message: SearchSec.salesMessage, TaskDateTime: today, LocID :SearchSec.mInfo.LocID } }).success(function (data) {
+               var currentTaskDate = moment().format('DD-MMM-YYYY hh:mm A');
+                $http({ method: 'post', url: GURL + 'ewtSaveMessage', data: { TokenNo: $rootScope._userInfo.Token, ToMasterID: SearchSec.mInfo.TID, MessageType: 1, Message: SearchSec.salesMessage, TaskDateTime: today, LocID :SearchSec.mInfo.LocID,CurrentTaskDate: currentTaskDate } }).success(function (data) {
                     if (data.IsSuccessfull) {
                         $('#SalesEnquiryRequest_popup').slideUp();
                         SearchSec.salesMessage = "";
@@ -865,7 +866,8 @@
 
         SearchSec.sendUserMessage = function () {
             if ($rootScope._userInfo.IsAuthenticate == true) {
-                $http({ method: 'post', url: GURL + 'ewtSaveMessage', data: { TokenNo: $rootScope._userInfo.Token, ToMasterID: SearchSec.mInfo.TID, MessageType: 0, Message: SearchSec.SendMessage, TaskDateTime: today, LocID :SearchSec.mInfo.LocID } }).success(function (data) {
+                var currentTaskDate = moment().format('DD-MMM-YYYY hh:mm A');
+                $http({ method: 'post', url: GURL + 'ewtSaveMessage', data: { TokenNo: $rootScope._userInfo.Token, ToMasterID: SearchSec.mInfo.TID, MessageType: 0, Message: SearchSec.SendMessage, TaskDateTime: today, LocID :SearchSec.mInfo.LocID,CurrentTaskDate: currentTaskDate } }).success(function (data) {
                     if (data.IsSuccessfull) {
                         $('#sendMessage_popup').slideUp();
                         SearchSec.SendMessage = "";
@@ -896,7 +898,8 @@
         //Send Home Delivery
         SearchSec.sendHomeDelivery = function () {
             if ($rootScope._userInfo.IsAuthenticate == true) {
-                $http({ method: 'post', url: GURL + 'ewtSaveMessage', data: { TokenNo: $rootScope._userInfo.Token, ToMasterID: SearchSec.mInfo.TID, MessageType: 2, Message: SearchSec.HomeDeliverMessage, TaskDateTime: today, LocID :SearchSec.mInfo.LocID } }).success(function (data) {
+                var currentTaskDate = moment().format('DD-MMM-YYYY hh:mm A');
+                $http({ method: 'post', url: GURL + 'ewtSaveMessage', data: { TokenNo: $rootScope._userInfo.Token, ToMasterID: SearchSec.mInfo.TID, MessageType: 2, Message: SearchSec.HomeDeliverMessage, TaskDateTime: today, LocID :SearchSec.mInfo.LocID,CurrentTaskDate : currentTaskDate } }).success(function (data) {
 
                     if (data.IsSuccessfull) {
                         $('#HomeDelivery_popup').slideUp();
@@ -934,7 +937,6 @@
                */
                var dateTime = moment(SearchSec.ReservationDateTime).utc().format('DD-MMM-YYYY hh:mm A');
                var currentTaskDate = moment().format('DD-MMM-YYYY hh:mm A');
-               console.log(currentTaskDate);
                $http({ method: 'post', url: GURL + 'ewtSaveMessage', data: { TokenNo: $rootScope._userInfo.Token, ToMasterID: SearchSec.mInfo.TID, MessageType: messageType, Message: SearchSec.ReservationMessage, TaskDateTime: dateTime, LocID :SearchSec.mInfo.LocID,CurrentTaskDate: currentTaskDate } }).success(function (data) {
                     if (data.IsSuccessfull) {
                         $('#Reservation_popup').slideUp();
@@ -971,7 +973,8 @@
         //Send Service Request
         SearchSec.sendServiceRequest = function () {
             if ($rootScope._userInfo.IsAuthenticate == true) {
-                $http({ method: 'post', url: GURL + 'ewtSaveMessage', data: { TokenNo: $rootScope._userInfo.Token, ToMasterID: SearchSec.mInfo.TID, MessageType: 4, Message: SearchSec.ServiceRequestMessage, TaskDateTime: today, LocID :SearchSec.mInfo.LocID } }).success(function (data) {
+                var currentTaskDate = moment().format('DD-MMM-YYYY hh:mm A');
+                $http({ method: 'post', url: GURL + 'ewtSaveMessage', data: { TokenNo: $rootScope._userInfo.Token, ToMasterID: SearchSec.mInfo.TID, MessageType: 4, Message: SearchSec.ServiceRequestMessage, TaskDateTime: today, LocID :SearchSec.mInfo.LocID,CurrentTaskDate : currentTaskDate } }).success(function (data) {
 
                     if (data.IsSuccessfull) {
                         $('#ServiceRequest_popup').slideUp();
@@ -1006,7 +1009,8 @@
         //Send CV Request
         SearchSec.sendCV = function () {
              if ($rootScope._userInfo.IsAuthenticate == true) {
-                 $http({ method: 'post', url: GURL + 'ewtSaveMessage', data: { TokenNo: $rootScope._userInfo.Token, ToMasterID: SearchSec.mInfo.TID, MessageType: 5, Message: "", TaskDateTime: today, LocID :SearchSec.mInfo.LocID } }).success(function (data) {
+                 var currentTaskDate = moment().format('DD-MMM-YYYY hh:mm A');
+                 $http({ method: 'post', url: GURL + 'ewtSaveMessage', data: { TokenNo: $rootScope._userInfo.Token, ToMasterID: SearchSec.mInfo.TID, MessageType: 5, Message: "", TaskDateTime: today, LocID :SearchSec.mInfo.LocID, CurrentTaskDate: currentTaskDate } }).success(function (data) {
  
                      if (data.IsSuccessfull) {
                          SearchSec.ServiceRequestMessage = "";
