@@ -764,8 +764,8 @@
             if(SearchSec.mInfo.EZEID)
             {
                 $http({ method: 'get', url: GURL + 'ewtGetBannerPicture?Token=' + $rootScope._userInfo.Token +'&SeqNo='+_requestedBannerValue+'&Ezeid='+SearchSec.mInfo.EZEID+'&StateTitle='+ SearchSec.mInfo.StateTitle}).success(function (data) {
-                    if (data[0].Picture != 'null') {
-                        SearchSec.mInfo.BannerImage = data[0].Picture;
+                    if (data.Picture != 'null') {
+                        SearchSec.mInfo.BannerImage = data.Picture;
                         if(currentBanner >= SearchSec.mInfo.Banners)
                         {
                             //Disable next button

@@ -224,7 +224,7 @@
                         <div class="clearfix"></div>
                     </ul>
                     <div class="clearfix"></div>
-                    <div style="margin-top:5px!important;position:relative" class="parking pull-left" ng-hide="search.isIndividualUser(1)">
+                    <div style="position:relative" class="parking pull-left" ng-hide="search.isIndividualUser(1)">
                         <a class="car-parking active" ng-show="search.mInfo.ParkingStatus==1" title="Parking">Parking</a>
                         <a class="no-parking active" ng-show="search.mInfo.ParkingStatus==4" title="No Parking">No Parking</a>
                         <a class="val-parking active" ng-show="search.mInfo.ParkingStatus==3" title="Vallet Parking">Vallet Parking</a>
@@ -533,15 +533,15 @@
                                             </div>
                                         </div>
                                         <div class="col-lg-7">
-                                            <div style="margin-top:5px!important;text-align:center;" ng-hide="search.isIndividualUser(1)">
+                                            <div style="margin-top:0px!important;text-align:center;" ng-hide="search.isIndividualUser(1)">
                                                 
                                                 
-                                                <img src="images/Open__48.png" ng-show="search.mInfo.OpenStatus==1"/>
-                                                <img src="images/Closed___48.png" ng-hide="search.mInfo.OpenStatus==1" />
+                                                <img src="images/Open__48.png" height="45px;" ng-show="search.mInfo.OpenStatus==1"/>
+                                                <img src="images/Closed___48.png" height="45px;" ng-hide="search.mInfo.OpenStatus==1" />
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 col-lg-offset-0 col-md-offset-0 col-sm-offset-0 col-xs-offset-0" style="padding-top:20px;">
+                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 col-lg-offset-0 col-md-offset-0 col-sm-offset-0 col-xs-offset-0" style="padding-top:11px;">
                                         <span ng-show="search.mInfo.IDTypeID != 1">
                                         <h5 ng-show="search.mInfo.OpenStatus==1" style="border:none;">Working hours :  {{search.mInfo.WorkingHours}}</h5>
                                         <h5 ng-hide="search.mInfo.OpenStatus==1"  style="border:none;" ng-click="search.closeHomeDeliverForm()"> Working hours :  {{search.mInfo.WorkingHours}}</h5>
