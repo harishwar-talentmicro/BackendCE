@@ -834,7 +834,8 @@
 
         SearchSec.sendSalesEnquiry = function () {
            if ($rootScope._userInfo.IsAuthenticate == true) {
-                $http({ method: 'post', url: GURL + 'ewtSaveMessage', data: { TokenNo: $rootScope._userInfo.Token, ToMasterID: SearchSec.mInfo.TID, MessageType: 1, Message: SearchSec.salesMessage, TaskDateTime: today, LocID :SearchSec.mInfo.LocID } }).success(function (data) {
+               var currentTaskDate = moment().format('DD-MMM-YYYY hh:mm A');
+                $http({ method: 'post', url: GURL + 'ewtSaveMessage', data: { TokenNo: $rootScope._userInfo.Token, ToMasterID: SearchSec.mInfo.TID, MessageType: 1, Message: SearchSec.salesMessage, TaskDateTime: today, LocID :SearchSec.mInfo.LocID,CurrentTaskDate: currentTaskDate } }).success(function (data) {
                     if (data.IsSuccessfull) {
                         $('#SalesEnquiryRequest_popup').slideUp();
                         SearchSec.salesMessage = "";
@@ -864,7 +865,8 @@
 
         SearchSec.sendUserMessage = function () {
             if ($rootScope._userInfo.IsAuthenticate == true) {
-                $http({ method: 'post', url: GURL + 'ewtSaveMessage', data: { TokenNo: $rootScope._userInfo.Token, ToMasterID: SearchSec.mInfo.TID, MessageType: 0, Message: SearchSec.SendMessage, TaskDateTime: today, LocID :SearchSec.mInfo.LocID } }).success(function (data) {
+                var currentTaskDate = moment().format('DD-MMM-YYYY hh:mm A');
+                $http({ method: 'post', url: GURL + 'ewtSaveMessage', data: { TokenNo: $rootScope._userInfo.Token, ToMasterID: SearchSec.mInfo.TID, MessageType: 0, Message: SearchSec.SendMessage, TaskDateTime: today, LocID :SearchSec.mInfo.LocID,CurrentTaskDate: currentTaskDate } }).success(function (data) {
                     if (data.IsSuccessfull) {
                         $('#sendMessage_popup').slideUp();
                         SearchSec.SendMessage = "";
@@ -895,7 +897,8 @@
         //Send Home Delivery
         SearchSec.sendHomeDelivery = function () {
             if ($rootScope._userInfo.IsAuthenticate == true) {
-                $http({ method: 'post', url: GURL + 'ewtSaveMessage', data: { TokenNo: $rootScope._userInfo.Token, ToMasterID: SearchSec.mInfo.TID, MessageType: 2, Message: SearchSec.HomeDeliverMessage, TaskDateTime: today, LocID :SearchSec.mInfo.LocID } }).success(function (data) {
+                var currentTaskDate = moment().format('DD-MMM-YYYY hh:mm A');
+                $http({ method: 'post', url: GURL + 'ewtSaveMessage', data: { TokenNo: $rootScope._userInfo.Token, ToMasterID: SearchSec.mInfo.TID, MessageType: 2, Message: SearchSec.HomeDeliverMessage, TaskDateTime: today, LocID :SearchSec.mInfo.LocID,CurrentTaskDate : currentTaskDate } }).success(function (data) {
 
                     if (data.IsSuccessfull) {
                         $('#HomeDelivery_popup').slideUp();
@@ -969,7 +972,8 @@
         //Send Service Request
         SearchSec.sendServiceRequest = function () {
             if ($rootScope._userInfo.IsAuthenticate == true) {
-                $http({ method: 'post', url: GURL + 'ewtSaveMessage', data: { TokenNo: $rootScope._userInfo.Token, ToMasterID: SearchSec.mInfo.TID, MessageType: 4, Message: SearchSec.ServiceRequestMessage, TaskDateTime: today, LocID :SearchSec.mInfo.LocID } }).success(function (data) {
+                var currentTaskDate = moment().format('DD-MMM-YYYY hh:mm A');
+                $http({ method: 'post', url: GURL + 'ewtSaveMessage', data: { TokenNo: $rootScope._userInfo.Token, ToMasterID: SearchSec.mInfo.TID, MessageType: 4, Message: SearchSec.ServiceRequestMessage, TaskDateTime: today, LocID :SearchSec.mInfo.LocID,CurrentTaskDate : currentTaskDate } }).success(function (data) {
 
                     if (data.IsSuccessfull) {
                         $('#ServiceRequest_popup').slideUp();
@@ -1004,7 +1008,8 @@
         //Send CV Request
         SearchSec.sendCV = function () {
              if ($rootScope._userInfo.IsAuthenticate == true) {
-                 $http({ method: 'post', url: GURL + 'ewtSaveMessage', data: { TokenNo: $rootScope._userInfo.Token, ToMasterID: SearchSec.mInfo.TID, MessageType: 5, Message: "", TaskDateTime: today, LocID :SearchSec.mInfo.LocID } }).success(function (data) {
+                 var currentTaskDate = moment().format('DD-MMM-YYYY hh:mm A');
+                 $http({ method: 'post', url: GURL + 'ewtSaveMessage', data: { TokenNo: $rootScope._userInfo.Token, ToMasterID: SearchSec.mInfo.TID, MessageType: 5, Message: "", TaskDateTime: today, LocID :SearchSec.mInfo.LocID, CurrentTaskDate: currentTaskDate } }).success(function (data) {
  
                      if (data.IsSuccessfull) {
                          SearchSec.ServiceRequestMessage = "";
@@ -1147,14 +1152,29 @@
                     //Resize the image and set it as logo if the user is individual
 
                    profile._info.Picture = data_uri;
-//                    if (!profile._info.IDTypeID == 2) {
-//                        var canvas = document.createElement('canvas');
-//                        profile._info.Icon = $rootScope.smallImage;
-//                        /* profile._info.Icon = "";
-//                         profile._info.IconFileName = "";*/
-//                    } else {
-//                        profile._info.IconFileName = 'camera-snap-1.jpg';
-//                    }
+
+                    profile._info.PictureFileName = 'camera-snap-1.jpg'
+                    console.log('I am executing');
+                    if (profile._info.IDTypeID !== 2) {
+                        var canvas = document.createElement('canvas');
+                        /******************* Preparing icon file for camera snapshot ***************/
+                        var image = new Image();
+                        image.src = data_uri;
+                        var canvas = document.createElement("canvas");
+                        image.height = 40;
+                        image.width = 40;
+                        var ctx = canvas.getContext("2d");
+                        ctx.clearRect(0, 0, canvas.width, canvas.height);
+                        canvas.width = image.width;
+                        canvas.height = image.height;
+                        ctx.drawImage(image, 0, 0, image.width, image.height);
+                        $rootScope.smallImage = canvas.toDataURL("image/jpeg", 0.7);
+                        /******************* Preparing icon file for camera snapshot ends ***************/
+                        profile._info.Icon = $rootScope.smallImage;
+
+                    } else {
+                        profile._info.IconFileName = 'camera-snap-1.jpg';
+                    }
                     Webcam.reset();
                 });
               };
@@ -1792,16 +1812,18 @@
         }
         //Upload Picture
         $scope.uploadImageForEditLocation = function (image) {
+            console.log(image[0].name);
             profile._info.PictureFileName = image[0].name;
             fileToDataURL(image[0]).then(function (dataURL) {
 
                 profile._info.Picture = dataURL;
                 if (!profile._info.IDTypeID == 2) {
-
+                    console.log('I am if');
                     profile._info.Icon = $rootScope.smallImage;
                     /* profile._info.Icon = "";
                      profile._info.IconFileName = "";*/
                 } else {
+                    console.log('I am else');
                     profile._info.IconFileName = image[0].name;
                 }
           });

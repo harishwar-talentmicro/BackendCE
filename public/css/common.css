@@ -349,7 +349,7 @@ TABS FOR LOCATION CONTROLLER
     max-height: 580px;
     overflow: none;
     overflow-x: none;
-    overflow-y: auto;
+    /*overflow-y: auto;*/
     width: 100%;
     
 }
@@ -526,4 +526,7 @@ html, body {
 .searchAreaSize
 {
     width: 73.666667% !important;
+}
+#fileupload-resize-area{
+    display: none;
 }
