@@ -527,3 +527,6 @@ html, body {
 {
     width: 73.666667% !important;
 }
+#fileupload-resize-area{
+    display: none;
+}
