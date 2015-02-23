@@ -66,7 +66,8 @@
                                                            <!-- <input type="file" class="form-control emptyBox" onchange="angular.element(this).scope().uploadFile(this.files)"/>-->
 
                                                             <span class="btn btn-primary btn-file">
-                                                                Choose File <input type="file" onchange="angular.element(this).scope().uploadFile(this.files)">
+                                                                Choose File <input type="file" onchange="angular.element(this).scope().uploadFile(this.files)"
+                                                                                   accept="doc, docx, rtf, application/pdf, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel,image/*">
                                                             </span>
 
                                                             <span class="pull-right"  ng-controller="DocumentController" style="margin-top:8px;" ng-show="isShowDownloadLink">
