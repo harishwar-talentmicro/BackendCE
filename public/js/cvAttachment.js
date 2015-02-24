@@ -78,6 +78,14 @@ angular.module('ezeidApp').controller('CVAttachController', function($http, $roo
         });
     };
 
+    //if secure pin checkbox is uncheck remove PIN Value
+    this.securePinCliked = function () {
+        if(!CVAttachCtrl.EnablePin)
+        {
+            CVAttachCtrl._CVInfo.Pin = "";
+        }
+    };
+
     //Created by Abhishek
     $scope.uploadFile = function (files) {
         CVAttachCtrl._CVInfo.CVDocFile = files[0].name;
@@ -135,19 +143,24 @@ angular.module('ezeidApp').controller('CVAttachController', function($http, $roo
     }
 
     function getCVInfo(){
-        console.log("SAi111");
-        $http({
+       $http({
             method: 'get',
             url: GURL + 'ewtGetCVInfo?TokenNo=' + $rootScope._userInfo.Token
         }).success(function (data) {
-                console.log("SAi1");
-                console.log(data);
-               if(data != 'null')
+              if(data != 'null')
                 {
                     CVAttachCtrl._CVInfo=data[0];
                     CVAttachCtrl.getRoleForFunction(data[0].FunctionID);
 
-                        console.log(data[0].CVDocFile);
+                    if(CVAttachCtrl._CVInfo.Pin)
+                    {
+                        CVAttachCtrl.EnablePin = true;
+                    }
+                    else
+                    {
+                        CVAttachCtrl.EnablePin = false;
+                    }
+
                     if(data[0].CVDocFile == "")
                     {
                         $scope.showLink = false;
@@ -157,22 +170,17 @@ angular.module('ezeidApp').controller('CVAttachController', function($http, $roo
                     }
                 }
                 else
-                {console.log(data[0]);
-                    CVAttachCtrl._CVInfo.Status= 1;
+                {   CVAttachCtrl._CVInfo.Status= 1;
                     $scope.showLink = false;
                     if(data[0].CVDocFile != "" && data[0] != "n" )
                     {
-                      //  console.log("SAi2");
                         $scope.showLink = true;
                     }
                     else
                     {
-                      //  console.log("SAi");
                         $scope.showLink = false;
                     }
-
                 }
-
             });
     };
 
@@ -180,11 +188,9 @@ angular.module('ezeidApp').controller('CVAttachController', function($http, $roo
         if($rootScope._userInfo.IsAuthenticate==false){
             cvForm.$setPristine(true);
         }
-
     };
 
     var content = 'file content';
     var blob = new Blob([ CVAttachCtrl._CVInfo.CVDoc ], { type : 'text/plain' });
     $scope.url = (window.URL || window.webkitURL).createObjectURL( blob );
-
 });

@@ -1,6 +1,6 @@
 (function () {
     var ezeid = angular.module('ezeidApp',
-        ['ngHeader','ngRoute', 'ngFooter', 'ui-notification', 'imageupload']);
+        ['ngHeader','ngRoute', 'ngFooter', 'ui-notification', 'imageupload','angularjs-dropdown-multiselect']);
 
     //HTTP Interceptor for detecting token expiry
     //Reloads the whole page in case of Unauthorized response from api
@@ -42,6 +42,7 @@
             .when('/help',{templateUrl: 'html/help.html'})
             .when('/legal',{templateUrl: 'html/legal.html'})
             .when('/congratulations',{templateUrl: 'html/congratulations.html'})
+            .when('/blackwhitelist',{templateUrl: 'html/blacklistwhitelist.html'})
             .otherwise({ templateUrl: 'html/home.html' });
         
         $httpProvider.interceptors.push("ezeidInterceptor");
@@ -56,68 +57,7 @@
     //http://10.0.100.103:8084/';
 
     var MsgDelay = 2000;
-    var ratingValues = "1,2,3,4,5";
-
-    //Below is directives for multi select drop down
-    ezeid.directive('dropdownMultiselect', function(){
-        return {
-            restrict: 'E',
-            scope:{
-                model: '=',
-                options: '=',
-                pre_selected: '=preSelected'
-            },
-            template: "<div class='btn-group' data-ng-class='{open: open}'>"+
-                "<button class='btn btn-small'>Rating</button>"+
-                "<button class='btn btn-small dropdown-toggle' data-ng-click='open=!open;openDropdown()'><span class='caret'></span></button>"+
-                "<ul class='dropdown-menu' aria-labelledby='dropdownMenu' style='z-index: 1001;' id='ratingDropdown'>" +
-                "<li><a data-ng-click='selectAll()'><i class='icon-ok-sign'></i>  Check All</a></li>" +
-                "<li><a data-ng-click='deselectAll();'><i class='icon-remove-sign'></i>  Uncheck All</a></li>" +
-                "<li class='divider'></li>" +
-                "<li data-ng-repeat='option in options'> <a data-ng-click='setSelectedItem()'>{{option.name}}<span data-ng-class='isChecked(option.id)'></span></a></li>" +
-                "</ul>" +
-                "</div>" ,
-                 controller: function($scope){
-                //Default all selected
-                $scope.model = [1,2,3,4,5];
-                $scope.openDropdown = function(){
-                if ($scope.searchType == 2)
-                    {
-                       $scope.selected_items = [];
-                       for(var i=0; i<$scope.pre_selected.length; i++){
-                            $scope.selected_items.push($scope.pre_selected[i].id);
-                        }
-                    }
-                };
-
-                $scope.selectAll = function () {
-                    $scope.model = _.pluck($scope.options, 'id');
-                    ratingValues = $scope.model.join();
-                };
-                $scope.deselectAll = function() {
-                    $scope.model=[];
-                    ratingValues = $scope.model.join();
-                };
-                $scope.setSelectedItem = function(){
-                    var id = this.option.id;
-                    if (_.contains($scope.model, id)) {
-                        $scope.model = _.without($scope.model, id);
-                    } else {
-                        $scope.model.push(id);
-                    }
-                    ratingValues = $scope.model.join();
-                    return false;
-                };
-                $scope.isChecked = function (id) {
-                    if (_.contains($scope.model, id)) {
-                        return 'icon-ok pull-right';
-                    }
-                    return false;
-                };
-            }
-        }
-    });
-
+    //var ratingValues = "";
 
     // define controller for wizard
     ezeid.directive('dateTimePicker', function() {
@@ -302,14 +242,33 @@
         $scope.isMapLoaded = false;         //Set to true with map event 'idle'
         $scope.isMapReady = false;          //Set to true when map canvas is drawn and map is fully visible
 
-       //Below code is for multi select check box
-        $scope.roles = [
-            {"id": 1, "name": "*", "assignable": true},
-            {"id": 2, "name": "**", "assignable": true},
-            {"id": 3, "name": "***", "assignable": true},
-            {"id": 4, "name": "****", "assignable": true},
-            {"id": 5, "name": "*****", "assignable": true}
+        //new multi select
+        $scope.ratingModel = [
+            {
+                "id": 1
+            },
+            {
+                "id": 2
+            },
+            {
+                "id": 3
+            },
+            {
+                "id": 4
+            },
+            {
+                "id": 5
+            }
         ];
+
+        $scope.ratingData = [
+            {id: 1, label: "*", "assignable": true},
+            {id: 2, label: "**", "assignable": true},
+            {id: 3, label: "***", "assignable": true},
+            {id: 4, label: "****", "assignable": true},
+            {id: 5, label: "*****", "assignable": true}
+        ];
+        //================
 
         $scope.member = {roles: []};
         $scope.selected_items = [];
@@ -548,12 +507,14 @@
         };
 
         SearchSec.getSearch = function () {
+            var ratingValues = "";
 
-           // document.getElementById("ratingDropdown").style.display = 'none';
+            for (var i=0; i<$scope.ratingModel.length; i++)
+            {
+                ratingValues += $scope.ratingModel[i].id + ',' ;
+            }
 
-           // $("ratingDropdown").css('display', 'none');
-            //$( "ratingDropdown" ).addClass( "dropdown-menu" );
-
+            ratingValues = ratingValues.substring(0,ratingValues.length-1);
             SearchSec.IsSearchButtonClicked = true;
             SearchSec.IsShowForm = false;
             SearchSec.Criteria.ParkingStatus = SearchSec.Criteria.ParkingStatus == 1 ? '1,2' :0;
@@ -1104,14 +1065,12 @@
         var marker;
         var markers = [];
 
-    var MsgDelay = 2000;
-    var isBusinessIcon = 0; // 1 = icon is for business Type
-    var isReSizeImage = false;
-        
+        var MsgDelay = 2000;
+        var isBusinessIcon = 0; // 1 = icon is for business Type
+        var isReSizeImage = false;
         
         /***************************** Camera Code ***************************************/
         $scope.isShowCamera = false;
-
         Webcam.set({
 				// live preview size
 				width: 250,
@@ -1151,10 +1110,9 @@
 
                     //Resize the image and set it as logo if the user is individual
 
-                   profile._info.Picture = data_uri;
+                    profile._info.Picture = data_uri;
 
                     profile._info.PictureFileName = 'camera-snap-1.jpg'
-                    console.log('I am executing');
                     if (profile._info.IDTypeID !== 2) {
                         var canvas = document.createElement('canvas');
                         /******************* Preparing icon file for camera snapshot ***************/
@@ -1267,6 +1225,16 @@
                     profile._info.Latitude = data[0].Latitude;
                     profile._info.Longitude = data[0].Longitude;
                     profile._info.EZEID = data[0].EZEID;
+                    profile._info.PIN = data[0].PIN;
+
+                    if(!profile._info.PIN)
+                    {
+                        profile._info.SecurePin = false;
+                    }
+                    else
+                    {
+                        profile._info.SecurePin = true;
+                    }
 
                     profile._info.SalesEnquiryButton =  profile._info.SalesEnquiryButton == 1 ? true : false;
                     profile._info.HomeDeliveryButton = profile._info.HomeDeliveryButton == 1 ? true : false;
@@ -1315,6 +1283,14 @@
 
         this.ezeidBoxClicked = function () {
             $scope.disableAvalabilityButton = false;
+        };
+
+        //if secure pin checkbox is uncheck remove PIN Value
+        this.securePinCliked = function () {
+            if(!profile._info.SecurePin)
+            {
+                profile._info.PIN = "";
+            }
         };
 
 
@@ -1718,6 +1694,7 @@
           }
              //Save and Update Primary Registration
             this.savePrimaryRegistration = function (UserForm) {
+
                 if(isValidate())
                 {
                     var sEzeid = profile._info.EZEID;
@@ -1784,8 +1761,8 @@
                                     {
                                         $scope.isCloseButtonClicked = true;
                                         window.location.href = "#/home";
+                                        Notification.success({ message: "Updated...", delay: MsgDelay });
                                     }
-
                    }
                     else {
                                     if (UserForm.$valid) {
@@ -1812,18 +1789,15 @@
         }
         //Upload Picture
         $scope.uploadImageForEditLocation = function (image) {
-            console.log(image[0].name);
             profile._info.PictureFileName = image[0].name;
             fileToDataURL(image[0]).then(function (dataURL) {
 
                 profile._info.Picture = dataURL;
                 if (!profile._info.IDTypeID == 2) {
-                    console.log('I am if');
                     profile._info.Icon = $rootScope.smallImage;
                     /* profile._info.Icon = "";
                      profile._info.IconFileName = "";*/
                 } else {
-                    console.log('I am else');
                     profile._info.IconFileName = image[0].name;
                 }
           });
