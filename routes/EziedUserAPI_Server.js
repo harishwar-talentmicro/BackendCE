@@ -2839,7 +2839,9 @@ exports.FnUpdateDocPin = function (req, res) {
             IsUpdated: false
         };
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
-
+        if (tPin == '') {
+            tPin = null;
+            }
         if (token != null && token != '') {
             FnValidateToken(token, function (err, Result) {
                 if (!err) {

@@ -179,7 +179,7 @@
                                                    placeholder="Middle,  Last Name"  style="width: 48%">
                                         </div>
                                         <div class="col-lg-6 setPinDiv">
-                                            <input type="checkbox" ng-model="profile._info.SecurePin"> Secure your EZE ID by a PIN
+                                            <input type="checkbox" ng-model="profile._info.SecurePin" ng-click="profile.securePinCliked()"> Secure your EZE ID by a PIN
                                             <input ng-disabled="!profile._info.SecurePin" type="text" class="form-control" name="pin" onkeypress="return isNumberKey(event);" id="PIN" ng-model="profile._info.PIN" required maxlength="3" placeholder="PIN"
                                                    style="width: 48px">
                                         </div>

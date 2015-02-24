@@ -292,7 +292,7 @@
                                         </div>
 
                                         <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2" ng-hide="search.isEZEIDselected('1')">
-                                               <dropdown-multiselect style="margin-left: 3%;" pre-selected="member.roles" model="selected_items" options="roles"></dropdown-multiselect>
+                                            <div ng-dropdown-multiselect="" options="ratingData" selected-model="ratingModel"></div>
                                         </div>
 
                                         <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
@@ -308,30 +308,36 @@
                                                 </select>
 
                                             </div>
-                                            <div class="col-lg-2 col-md-2 col-sm-12 col-xs-12" style="padding-right:0px;" ng-hide="search.isEZEIDselected('1')">
+                                            <div class="col-lg-2 col-md-2 col-sm-12 col-xs-12" style="padding-right:0px; width: 15.666667%;"
+                                                 ng-hide="search.isEZEIDselected('1')">
                                                 <div style="display:table-cell;vertical-align:middle;height:34px;">
                                                 Search within
                                                 </div>
                                             </div>
-    <!--                                        <img src="./images/map_marker.png" height="24px" width="24px">-->
-                                            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6" ng-hide="search.isEZEIDselected('1')">
+
+                                            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6" ng-hide="search.isEZEIDselected('1')" style="padding-left: 0px; width: 23%;">
                                                 <select class="form-control pull-left"
                                                         ng-model="search.Criteria.Proximity" ng-disabled="search.isEZEIDselected('1')"     >
                                                     <option value="{{proximity.MilesValue}}"  ng-selected="{{proximity.MilesValue == 1}}" ng-repeat="proximity in search.proximities">{{proximity.Title}}</option>
                                                     <option value="0">Any</option>
                                                 </select>
                                             </div>
-                                            <div class="col-lg-7 col-md-7 col-sm-7 col-xs-12" ng-hide="search.isEZEIDselected('1')">
+                                            <div class="col-lg-7 col-md-7 col-sm-7 col-xs-12" ng-hide="search.isEZEIDselected('1')" style="width: 60.333333%;">
 
                                                 <div style="display:table-cell;vertical-align:middle;height:34px;">
                                                     <span>proximity from </span>
                                                     <a ng-click="selectTab('map')" style="cursor:pointer;"><b>map location</b></a>
-                                                    <input type="checkbox" ng-model="search.Criteria.ParkingStatus" name="parking" value="1,2"><span> Show Places with Parking</span>
+                                                    <input type="checkbox" ng-model="search.Criteria.ParkingStatus" name="parking" value="1,2" style="margin-left: 5px;"><span style="margin-left: 4px;"> Show Places with Parking</span>
                                                 </div>
+
+
+
                                             </div>
+
+
+
                                     </div>
                                     <div class="bottom-clearfix"></div>
-
                                 </div>
 
                                 <!--------------------------------------New Code ends ---------------------------->
@@ -441,7 +447,7 @@
                                             </div>
                                         </div>
 
-                                        <div class="row text-left" style="border-bottom: 1px solid #DDD;padding: 5px;margin-top: 5px;">
+                                        <div class="row text-left" style="border-bottom: 1px solid #DDD;padding: 5px;margin-top: 0px; padding-top: 0px;">
                                             
                                             <div class="col-lg-1">
                                                 <img src="images/Telephone_24.png" />
@@ -487,20 +493,20 @@
                                     <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
                                         <div class="row text-center">
                                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                                <h4 style="font-weight:bold;text-transform:uppercase;">{{search.mInfo.EZEID}}</h4>
+                                                <h4 style="font-weight:bold;text-transform:uppercase; margin-top: 6px;">{{search.mInfo.EZEID}}</h4>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12">
-                                        <div class="row text-left" style="border-bottom: 1px solid #DDD;padding: 5px;margin-top: 5px;">
+                                        <div class="row text-left" style="border-bottom: 1px solid #DDD;padding: 5px;margin-top: 0px;">
                                             
-                                            <div class="col-lg-1">
+                                            <div class="col-lg-1" style="width: 6.333333%;">
                                                 <img src="images/MSG_24.png" />
                                             </div>
-                                            <div class="col-lg-4">
+                                            <div class="col-lg-4" style="overflow-x: auto;">
                                                 {{search.mInfo.EMailID}}
                                             </div>
-                                            <div class="col-lg-1">
+                                            <div class="col-lg-1" style="margin-left: 1.5%; width: 5.333333%;">
                                                 <div class="row">
                                                     
                                                     <div class="col-lg-4 text-center">
@@ -514,7 +520,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="col-lg-5">
+                                            <div class="col-lg-5" style="overflow-x: auto;">
                                                 {{search.mInfo.Website}}
                                             </div>
                                         </div>
