@@ -1540,6 +1540,7 @@ exports.FnRegistration = function (req, res) {
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         var IDTypeID = req.body.IDTypeID;
         var EZEID = req.body.EZEID;
+        EZEID = EZEID.toUpperCase();
         var Password = req.body.Password;
         var FirstName = req.body.FirstName;
         var LastName = req.body.LastName;
@@ -1661,7 +1662,7 @@ exports.FnRegistration = function (req, res) {
                 EncryptPWD = FnEncryptPassword(Password);
             }
             var DOBDate = null;
-
+            console.log(EZEID.toUpperCase());
             if (DOB != null && DOB != '') {
                 // datechange = new Date(new Date(TaskDateTime).toUTCString());
                 DOBDate = new Date(DOB);
@@ -1992,7 +1993,7 @@ exports.FnAddLocation = function (req, res) {
                                         //res.send(InsertResult);
                                         // console.log(InsertResult);
                                         console.log('Addlocation: Location added successfully');
-                                        var selectqry = 'Select tlocations.TID,MasterID,EZEID,LocTitle,Latitude,Longitude,Altitude,AddressLine1,AddressLine2,Area,StateID,CountryID,PostalCode,PIN,EMailID,EMailVerifiedID,ifnull(PhoneNumber,"") as PhoneNumber,MobileNumber,ifnull(ISDPhoneNumber,"") as ISDPhoneNumber ,ifnull(ISDMobileNumber,"") as ISDMobileNumber, LaptopSLNO,VehicleNumber,CreatedDate,LUDate,Website,SeqNo,Picture,PictureFileName,locSetting.ParkingStatus,locSetting.OpenStatus,locSetting.WorkingHours,locSetting.SalesEnquiryMailID,locSetting.HomeDeliveryMailID,locSetting.ReservationMailID,locSetting.SupportMailID,locSetting.CVMailID,ifnull((Select CityName from mcity where CityID=tlocations.CityID),"") as CityTitle from tlocations left outer join tlcoationsettings  locSetting on locSetting.LocID= tlocations.TID';
+                                        var selectqry = 'Select tlocations.TID,MasterID,EZEID,LocTitle,Latitude,Longitude,Altitude,AddressLine1,AddressLine2,StateID,CountryID,PostalCode,PIN,EMailID,EMailVerifiedID,ifnull(PhoneNumber,"") as PhoneNumber,MobileNumber,ifnull(ISDPhoneNumber,"") as ISDPhoneNumber ,ifnull(ISDMobileNumber,"") as ISDMobileNumber, LaptopSLNO,VehicleNumber,CreatedDate,LUDate,Website,SeqNo,Picture,PictureFileName,locSetting.ParkingStatus,locSetting.OpenStatus,locSetting.WorkingHours,locSetting.SalesEnquiryMailID,locSetting.HomeDeliveryMailID,locSetting.ReservationMailID,locSetting.SupportMailID,locSetting.CVMailID,ifnull((Select CityName from mcity where CityID=tlocations.CityID),"") as CityTitle from tlocations left outer join tlcoationsettings  locSetting on locSetting.LocID= tlocations.TID';
                                         if (TID == 0) {
                                             selectqry = selectqry + ' order by tlocations.TID desc limit 1';
                                         }
@@ -2331,9 +2332,9 @@ exports.FnSaveMessage = function (req, res) {
         var CurrentTaskDate = req.body.CurrentTaskDate;
         var Notes = req.body.Notes;
         var LocID = req.body.LocID;
-//        if(CurrentTaskDate == null){
-//            CurrentTaskDate = TaskDateTime;
-//        }
+        if(CurrentTaskDate == null){
+            CurrentTaskDate = TaskDateTime;
+        }
         var RtnMessage = {
             IsSuccessfull: false
         };
@@ -5060,8 +5061,13 @@ exports.FnSaveBannerPictureAP = function(req, res){
         var Picture = req.body.Picture;
         var Token = req.body.Token;
         var Ezeid = req.body.Ezeid;
+        var TID = req.body.TID;
+        if(TID == null ){
+            TID = 0;
+        }
         var RtnMessage = {
-            IsSaved: false
+            IsSaved: false,
+            TID: 0
         };
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
 
@@ -5069,28 +5075,23 @@ exports.FnSaveBannerPictureAP = function(req, res){
             FnValidateTokenAP(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
-                        var InsertQuery = db.escape(Ezeid)  + ',' + db.escape(SeqNo) + ',' + db.escape(Picture);
+                        var InsertQuery = db.escape(Ezeid)  + ',' + db.escape(SeqNo) + ',' + db.escape(Picture) + ',' + db.escape(TID);
                         //console.log(InsertQuery);
                         db.query('CALL PSaveBannerPics(' + InsertQuery + ')', function (err, InsertResult) {
                             if (!err) {
-                                //console.log(InsertResult);
+                                console.log(InsertResult);
                                 if (InsertResult != null) {
-                                    if(InsertResult.affectedRows > 0){
+                                    var InsertData = InsertResult[0];
                                         RtnMessage.IsSaved =true;
+                                        RtnMessage.TID=InsertData[0].TID;
                                         console.log(RtnMessage);
                                         res.send(RtnMessage);
-                                    }
-                                    else
-                                    {
-                                        console.log(RtnMessage);
-                                        res.send(RtnMessage);
-                                        console.log('FnSaveBannerPicture:tmaster: save banner Failed');
-                                    }
+
                                 }
                                 else {
                                     console.log(RtnMessage);
                                     res.send(RtnMessage);
-                                    console.log('FnSaveBannerPicture:tmaster: Registration Failed');
+                                    console.log('FnSaveBannerPicture:tmaster: Banner Save Failed');
                                 }
                             }
                             else {
@@ -5209,3 +5210,376 @@ exports.FnGetBannerPictureAP = function(req, res){
         throw new Error(ex);
     }
 }
+
+exports.FnGetSecondaryLocationListAP = function(req, res){
+    try{
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.query.Token;
+        var Ezeid = req.query.EZEID;
+
+        if (Token != null && Ezeid != null) {
+            FnValidateTokenAP(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+
+                        var Query = 'select TID,LocTitle from tlocations where SeqNo>0 and  EZEID=' + db.escape(Ezeid);
+                        db.query(Query, function (err, Result) {
+                            if (!err) {
+                                if (Result.length > 0) {
+                                    console.log("FnGetSecondaryLocationList: Location send successfully");
+                                    res.send(Result);
+                                }
+                                else
+                                {
+                                    console.log("FnGetSecondaryLocationList: Location send failed");
+                                    res.send('null');
+                                }
+                            }
+                            else
+                            {
+                                res.statusCode=500;
+                                res.send('null');
+                                console.log('FnGetSecondaryLocationList: error in getting secondary location list'+err);
+                            }
+                        });
+
+                    }
+                    else {
+                        res.statusCode=401;
+                        console.log('FnGetSecondaryLocationList: Invalid Token')
+                        res.send('null');
+                    }
+                }
+                else {
+                    res.statusCode=500;
+                    console.log('FnGetSecondaryLocationList: Error in processing Token' + err);
+                    res.send('null');
+                }
+            });
+        }
+        else
+        {
+            res.statusCode=400;
+            res.send('null');
+            if(Token == null){
+                console.log('FnGetSecondaryLocationList: token is empty');
+            }
+            else if(Ezeid == null) {
+                console.log('FnGetSecondaryLocationList: Ezeid is empty');
+            }
+
+            console.log('FnGetSecondaryLocationList: Mandatory field is empty');
+
+        }
+    }
+    catch (ex) {
+        console.log('FnGetSecondaryLocationList:' + ex.description);
+        throw new Error(ex);
+    }
+}
+
+exports.FnGetSecondaryLocationAP = function(req, res){
+    try{
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.query.Token;
+        var Ezeid = req.query.EZEID;
+        var Locid = req.query.LocID;
+
+        if (Token != null && Ezeid != null && Locid!=null) {
+            FnValidateTokenAP(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+
+                        var Query = 'select TID, ifnull(LocTitle,"") as LocTitle, Latitude, Longitude, Picture, PictureFileName, Rating from tlocations where SeqNo > 0 and  EZEID=' + db.escape(Ezeid) +' and TID = ' + db.escape(Locid);
+                        db.query(Query, function (err, Result) {
+                            if (!err) {
+                                if (Result.length > 0) {
+                                    console.log("FnGetSecondaryLocationListAP:Location send successfully");
+                                    res.send(Result);
+                                }
+                                else
+                                {
+                                    console.log("FnGetSecondaryLocationListNew:Location send failed");
+                                    res.send('null');
+                                }
+                            }
+                            else
+                            {
+                                res.statusCode=500;
+                                res.send('null');
+                                console.log('FnGetSecondaryLocationAP: error in getting secondary locationAP'+err);
+                            }
+                        });
+                    }
+                    else {
+                        res.statusCode=401;
+                        console.log('FnGetSecondaryLocationAP: Invalid Token')
+                        res.send('null');
+                    }
+                }
+                else {
+                    res.statusCode=500;
+                    console.log('FnGetSecondaryLocationAP: Error in processing Token' + err);
+                    res.send('null');
+                }
+            });
+        }
+        else
+        {
+            res.statusCode=400;
+            res.send('null');
+            if(Token == null){
+                console.log('FnGetSecondaryLocationAP: token is empty');
+            }
+            else if(Ezeid == null) {
+                console.log('FnGetSecondaryLocationAP: Ezeid is empty');
+            }
+            else if(Locid == null) {
+                console.log('FnGetSecondaryLocationAP: Locationid is empty');
+            }
+
+            console.log('FnGetSecondaryLocationAP: Mandatory field is empty');
+
+        }
+    }
+    catch (ex) {
+        console.log('FnGetSecondaryLocationAP:' + ex.description);
+        throw new Error(ex);
+    }
+}
+
+exports.FnUpdateSecondaryLocationAP = function(req, res){
+    try{
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        var Token = req.body.Token;
+        var Locid =req.body.LocID;
+        var LocTitle = req.body.LocTitle;
+        var Latitude = parseFloat(req.body.Latitude);
+        var Longitude = parseFloat(req.body.Longitude);
+        var Picture = req.body.Picture;
+        var PictureFileName = req.body.PictureFileName;
+        var Rating =req.body.Rating;
+        var RtnMessage = {
+            IsUpdated: false
+        };
+        var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
+
+        if (Token != null && Locid != null && LocTitle != null && Longitude.toString() != 'NaN' && Latitude.toString() != 'NaN' && Picture != null && PictureFileName!=null && Rating != null ) {
+            FnValidateTokenAP(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+
+                        var query = db.escape(Locid) + ',' + db.escape(LocTitle) + ',' + db.escape(Picture) + ',' + db.escape(PictureFileName) + ',' + db.escape(Latitude) + ',' + db.escape(Longitude) + ',' + db.escape(Rating);
+                        db.query('CALL pUpdateSecondaryLocationAP(' + query + ')', function (err, UpdateResult) {
+                            if (!err){
+                                if (UpdateResult.affectedRows > 0) {
+                                    RtnMessage.IsUpdated = true;
+                                    res.send(RtnMessage);
+                                    console.log('FnUpdateSecondaryLocationAP:Update successfully');
+                                }
+                                else {
+                                    console.log('FnUpdateSecondaryLocationAP:Update failed');
+                                    res.send(RtnMessage);
+                                }
+                            }
+
+                            else {
+                                console.log('FnUpdateSecondaryLocationAP: error in Updating secondary LocationAP' + err);
+                                res.statusCode = 500;
+                                res.send(RtnMessage);
+                            }
+                        });
+                    }
+                    else {
+                        console.log('FnUpdateSecondaryLocationAP: Invalid token');
+                        res.statusCode = 401;
+                        res.send(RtnMessage);
+                    }
+                }
+                else {
+                    console.log('FnUpdateSecondaryLocationAP:Error in processing Token' + err);
+                    res.statusCode = 500;
+                    res.send(RtnMessage);
+
+                }
+            });
+
+        }
+
+        else {
+            if (Token == null) {
+                console.log('FnUpdateSecondaryLocationAP: Token is empty');
+            }
+            else if (Locid == null) {
+                console.log('FnUpdateSecondaryLocationAP: Locid is empty');
+            }
+            else if (LocTitle == null) {
+                console.log('FnUpdateSecondaryLocationAP: LocTitle is empty');
+            }
+            else if (Latitude.toString() == 'NaN') {
+                console.log('FnUpdateSecondaryLocationAP: latitude is empty');
+            }
+            else if (Longitude.toString() == 'NaN') {
+                console.log('FnUpdateSecondaryLocationAP: longitude is empty');
+            }
+            else if(Picture == null) {
+                console.log('FnUpdateSecondaryLocationAP: Picture is empty');
+            }
+            else if(PictureFileName == null) {
+                console.log('FnUpdateSecondaryLocationAP: PictureFileName is empty');
+            }
+            else if(Rating == null) {
+                console.log('FnUpdateSecondaryLocationAP: Rating is empty');
+            }
+            res.statusCode=400;
+            res.send(RtnMessage);
+        }
+
+    }
+    catch (ex) {
+        console.log('FnUpdateSecondaryLocationAP:' + ex.description);
+        throw new Error(ex);
+    }
+}
+
+exports.FnUpdateIdCardPrintAP = function(req, res){
+    try{
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        var Token = req.body.Token;
+        var EZEID =req.body.EZEID;
+
+        var RtnMessage = {
+            IsUpdated: false
+        };
+        var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
+
+        if (Token != null && EZEID != null) {
+            FnValidateTokenAP(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+                        var query = db.escape(EZEID) + ',' + db.escape(Token);
+                        db.query('CALL pUpdateIDCardAP(' + query + ')', function (err, UpdateIdResult) {
+                            if (!err){
+                                if (UpdateIdResult.affectedRows > 0) {
+                                    RtnMessage.IsUpdated = true;
+                                    res.send(RtnMessage);
+                                    console.log('FnUpdateIdCardPrintAP:Id card details Update successfully');
+                                }
+                                else {
+                                    console.log('FnUpdateIdCardPrintAP:Id card details Update failed');
+                                    res.send(RtnMessage);
+                                }
+                            }
+
+                            else {
+                                console.log('FnUpdateIdCardPrintAP: error in Updating Id card detailsAP' + err);
+                                res.statusCode = 500;
+                                res.send(RtnMessage);
+                            }
+                        });
+                    }
+                    else {
+                        console.log('FnUpdateIdCardPrintAP: Invalid token');
+                        res.statusCode = 401;
+                        res.send(RtnMessage);
+                    }
+                }
+                else {
+                    console.log('FnUpdateIdCardPrintAP:Error in processing Token' + err);
+                    res.statusCode = 500;
+                    res.send(RtnMessage);
+
+                }
+            });
+
+        }
+
+        else {
+            if (Token == null) {
+                console.log('FnUpdateIdCardPrintAP: Token is empty');
+            }
+            else if (EZEID == null) {
+                console.log('FnUpdateIdCardPrintAP: Ezeid is empty');
+            }
+
+            res.statusCode=400;
+            res.send(RtnMessage);
+        }
+
+    }
+    catch (ex) {
+        console.log('FnUpdateIdCardPrintAP:error ' + ex.description);
+        throw new Error(ex);
+    }
+};
+
+exports.FnGetIdCardPrintAP = function (req, res) {
+    try {
+
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        var Token = req.query.Token;
+        var EZEID = req.query.EZEID;
+        if (Token != null && EZEID != null) {
+            FnValidateTokenAP(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+                        db.query('CALL pGetIDCardDetailsAP(' + db.escape(EZEID) + ')', function (err, SecLocationResult) {
+                            if (!err) {
+                                if (SecLocationResult != null) {
+                                    if (SecLocationResult[0].length > 0) {
+                                        console.log('FnGetIdCardPrintAP: ID Card details Sent successfully');
+                                        res.send(SecLocationResult[0]);
+                                    }
+                                    else {
+                                        console.log('FnGetIdCardPrintAP:No ID Card Details found');
+                                        res.send('null');
+                                    }
+                                }
+                                else {
+                                    console.log('FnGetIdCardPrintAP:No ID Card Details found');
+                                    res.send('null');
+                                }
+                            }
+                            else {
+                                console.log('FnGetIdCardPrintAP: error in getting ID Card DetailsAP' + err);
+                                res.statusCode = 500;
+                                res.send('null');
+                            }
+                        });
+                    }
+                    else {
+                        res.statusCode = 401;
+                        res.send('null');
+                        console.log('FnGetIdCardPrintAP: Invalid Token');
+                    }
+                } else {
+
+                    res.statusCode = 500;
+                    res.send('null');
+                    console.log('FnGetIdCardPrintAP: Error in validating token:  ' + err);
+                }
+            });
+        }
+        else {
+            if (Token == null) {
+                console.log('FnGetIdCardPrintAP: Token is empty');
+            }
+            else if (EZEID == null) {
+                console.log('FnGetIdCardPrintAP: EZEID is empty');
+            }
+            res.statusCode=400;
+            res.send('null');
+        }
+    }
+    catch (ex) {
+        console.log('FnGetEZEIDDetailsAP error:' + ex.description);
+        throw new Error(ex);
+    }
+};
