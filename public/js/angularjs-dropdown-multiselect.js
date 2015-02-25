@@ -110,7 +110,7 @@ directiveModule.directive('ngDropdownMultiselect', ['$filter', '$document', '$co
                     selectionCount: 'checked',
                     selectionOf: '/',
                     searchPlaceholder: 'Search...',
-                    buttonDefaultText: 'Rating',
+                    buttonDefaultText: ' Rating ',
                     dynamicButtonTextSuffix: 'checked'
                 };
 
