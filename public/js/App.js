@@ -2151,9 +2151,6 @@
                         data[i].AccessDate = convertTimeToLocal(data[i].AccessDate,'DD-MMM-YYYY hh:mm A');
                         msgSen.msgs.push(data[i]);
                         showPaging = data[0]['NextPage'];
-
-
-
                     }
                     if(showPaging == 'Y')
                     {

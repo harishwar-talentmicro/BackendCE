@@ -4168,7 +4168,7 @@ exports.FnSaveWhiteBlackList = function(req, res){
                 if (!err) {
                     if (Result != null) {
                         var query = db.escape(List) + ',' + db.escape(RelationType) + ',' + db.escape(EZEID) + ',' + db.escape(Tag) + ',' +db.escape(Token);
-                        db.query('CALL pwhiteblacklist(' + query + ')', function (err, InsertResult) {
+                        db.query('CALL pSavewhiteblacklist(' + query + ')', function (err, InsertResult) {
                             if (!err){
                                 if (InsertResult.affectedRows > 0) {
                                     RtnMessage.IsSuccessfull = true;
@@ -4227,6 +4227,156 @@ exports.FnSaveWhiteBlackList = function(req, res){
         throw new Error(ex);
     }
 };
+
+exports.FnGetWhiteBlackList = function (req, res) {
+    try {
+
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.query.Token;
+        //var EZEID = req.query.EZEID;
+
+
+        if (Token != null) {
+            FnValidateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+
+                        db.query('CALL pGetwhiteblacklist(' + db.escape(Token) + ')', function (err, GetResult) {
+                            if (!err) {
+                                if (GetResult != null) {
+                                    if (GetResult[0].length > 0) {
+
+                                        console.log('FnGetWhiteBlackList: white/black list details Sent successfully');
+                                        res.send(GetResult[0]);
+                                    }
+                                    else {
+
+                                        console.log('FnGetWhiteBlackList:No white/black list details found');
+                                        res.send('null');
+                                    }
+                                }
+                                else {
+
+                                    console.log('FnGetWhiteBlackList:No white/black list details found');
+                                    res.send('null');
+                                }
+
+                            }
+                            else {
+
+                                console.log('FnGetWhiteBlackList: error in getting white/black list' + err);
+                                res.statusCode = 500;
+                                res.send('null');
+                            }
+                        });
+                    }
+                    else {
+                        res.statusCode = 401;
+                        res.send('null');
+                        console.log('FnGetWhiteBlackList: Invalid Token');
+                    }
+                } else {
+
+                    res.statusCode = 500;
+                    res.send('null');
+                    console.log('FnGetWhiteBlackList: Error in validating token:  ' + err);
+                }
+            });
+        }
+        else {
+            if (Token == null) {
+                console.log('FnGetWhiteBlackList: Token is empty');
+            }
+
+            res.statusCode=400;
+            res.send('null');
+        }
+    }
+    catch (ex) {
+        console.log('FnGetWhiteBlackList error:' + ex.description);
+        throw new Error(ex);
+    }
+};
+
+exports.FnDeleteWhiteBlackList = function(req, res){
+    try{
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+
+        var Token = req.body.Token;
+        var TID = req.body.TID;
+
+        var RtnMessage = {
+            IsSuccessfull: false
+        };
+
+        var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
+
+        if (TID !=null && Token != null) {
+            FnValidateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+
+                        var query = db.escape(Token) + ',' + db.escape(TID);
+                        db.query('CALL pDeletewhiteblacklist(' + query + ')', function (err, InsertResult) {
+                            if (!err){
+                                if (InsertResult.affectedRows > 0) {
+                                    RtnMessage.IsSuccessfull = true;
+                                    res.send(RtnMessage);
+                                    console.log('FnDeleteWhiteBlackList: White/Black list details delete successfully');
+                                }
+                                else {
+                                    console.log('FnDeleteWhiteBlackList:No delete White/Black list details');
+                                    res.send(RtnMessage);
+                                }
+                            }
+
+                            else {
+                                console.log('FnDeleteWhiteBlackList: error in deleting White/Black list' + err);
+                                res.statusCode = 500;
+                                res.send(RtnMessage);
+                            }
+                        });
+                    }
+                    else {
+                        console.log('FnDeleteWhiteBlackList: Invalid token');
+                        res.statusCode = 401;
+                        res.send(RtnMessage);
+                    }
+                }
+                else {
+                    console.log('FnDeleteWhiteBlackList:Error in processing Token' + err);
+                    res.statusCode = 500;
+                    res.send(RtnMessage);
+
+                }
+            });
+
+        }
+
+        else {
+            if (Token == null) {
+                console.log('FnDeleteWhiteBlackList: Token is empty');
+            }
+            else if (TID == null) {
+                console.log('FnDeleteWhiteBlackList: TID is empty');
+            }
+
+
+            res.statusCode=400;
+            res.send(RtnMessage);
+        }
+
+    }
+    catch (ex) {
+        console.log('FnDeleteWhiteBlackList:error ' + ex.description);
+        throw new Error(ex);
+    }
+}
+
 
 //EZEIDAP Parts
 

@@ -10407,6 +10407,10 @@ a.pr {
 .notification_drp ul li a.personal_doc:hover{ background-position:-8px -1053.50px!important;}
 .notification_drp ul li a.history-icon{ background-position:-8px -193px!important;}
 .notification_drp ul li a.history-icon:hover{ background-position:-8px -238px!important;}
+
+.notification_drp ul li a.blacklist-icon{ background-position:-8px -193px!important;}
+.notification_drp ul li a.history-icon:hover{ background-position:-8px -238px!important;}
+
 .notification_drp ul li a.edit-icon{ background-position:-8px -297px!important;}
 .notification_drp ul li a.edit-icon:hover{ background-position:-8px -343.05px!important;}
 .notification_drp ul li a.addLocation-icon{ background-position:-8px -394px!important;}
