@@ -2066,7 +2066,6 @@
         };
     });
 
-
     ezeid.controller('HistoryController', function ($scope, $rootScope, $http, Notification, $filter, $interval) {
         var msgSen = this;
         var _pageValue = 1;
@@ -2123,12 +2122,14 @@
          * Function for converting UTC time from server to LOCAL timezone
         */
         var convertTimeToLocal = function(timeFromServer,dateFormat){
-            if(!dateFormat){
+           if(!dateFormat){
                 dateFormat = 'DD-MMM-YYYY hh:mm A';
             }
             var x = new Date(timeFromServer);
             var mom1 = moment(x);
+
             return mom1.add((mom1.utcOffset()),'m').format(dateFormat);
+
         };
         
         /**
@@ -2141,7 +2142,6 @@
             return moment(localTime).utc().format(dateFormat);
         };
         
-        
         function LoadHistory(_pageValue){
 
             $http({ method: 'get', url: GURL + 'ewtGetAccessHistory?TokenNo=' + $rootScope._userInfo.Token + '&Page='+_pageValue }).success(function (data) {
@@ -2149,9 +2149,11 @@
                 if (data != 'null') {
                     for (var i = 0; i < data.length; i++) {
                         data[i].AccessDate = convertTimeToLocal(data[i].AccessDate,'DD-MMM-YYYY hh:mm A');
-                        
                         msgSen.msgs.push(data[i]);
                         showPaging = data[0]['NextPage'];
+
+
+
                     }
                     if(showPaging == 'Y')
                     {

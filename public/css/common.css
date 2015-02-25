@@ -286,8 +286,10 @@ margin-bottom: 10px;
 }
 
 .info-icon-btn {
-    width: 67px;
-    height: 52px;
+   /* width: 67px;
+    height: 52px;*/
+    width: 48px;
+    height: 40px;
     display: inline-block;
     padding: 0px;
     margin: 0 10px;
@@ -307,35 +309,35 @@ margin-bottom: 10px;
 }
 
 .info-icon-btn.noti-icon {
-    background-position: -250px;
+    background-position: 0px;
 }
 
 .info-icon-btn.appoinment-icon{
-    background-position: -440px;
+    background-position: -48px;
 }
 
 .info-icon-btn.direction-icon{
-    background-position: -310px;
+    background-position: -387px;
 }
 
 .info-icon-btn.sales-icon{
-   background-position: -130px;
+    background-position: -98px;
 }
 
 .info-icon-btn.reservation-icon{
-    background-position: -190px;
+    background-position: -195px;
 }
 
 .info-icon-btn.support-icon{
-    background-position: -10px;
+    background-position: -242px;
 }
 
 .info-icon-btn.sendcv-icon{
-    background-position: -70px;
+    background-position: -337px;
 }
 
 .info-icon-btn.home-icon{
-    background-position: -375px;
+    background-position: -146px;
 }
 
 /**

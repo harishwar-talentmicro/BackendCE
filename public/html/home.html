@@ -61,7 +61,7 @@
                             <textarea class="form-control fixTextArea emptyBox" name="sendMessage" ng-model="search.SendMessage" placeholder="Type Message here" required></textarea>
                         </div>
                         <div class="form-group">
-                            <input type="submit" ng-disabled="!search.sendMessage" class="btn btn-primary" value="Send" />
+                            <input type="submit" ng-disabled="!search.SendMessage" class="btn btn-primary" value="Send" />
                             <input type="reset" class="btn btn-primary marR10px cancelEnq" ng-click="search.closeSendMessageForm()" value="Close" />
                         </div>
                     </form>
@@ -92,8 +92,8 @@
             <div class="Popup_window form_style map_popup_iconActions" id="Reservation_popup">
                 <div class="window_page Maping_popup">
                     <span class="closelink" ng-click="search.closeReservationForm()">X</span>
-                    <span style="margin-top:-2px;float:right; border:1px solid #000000;background:#FAA9A3;color:#000000;" ng-show="(reservationForm.dateTime.$touched && !search.ReservationDateTime.length) || (reservationForm.reservationMessage.$touched && !search.ReservationMessage.length)">
-                        <span ng-show="reservationForm.dateTime.$error.required || reservationForm.reservationMessage.$error.required ">* Mandatory</span>
+                    <span style="margin-top:-2px;float:right; border:1px solid #000000;background:#FAA9A3;color:#000000;">
+                        <span>Mandatory</span>
                     </span>
                     <form name="reservationForm" ng-submit="reservationForm.$valid && search.sendReservation(_userInfo.Type==1 ? '6' : '3')" novalidate>
                         <h3 ng-show="search.mInfo.IDTypeID==1" class="marB15px">Appointment</h3>
@@ -560,11 +560,9 @@
                                         <div class="row row-margin-clearfix">
                                             <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 col-lg-offset-2 col-md-offset-2 col-sm-offset-2 col-xs-offset-2" ng-click="search.openSendMessageForm()"  title="Message">
                                                 <button  class="info-icon-btn noti-icon">Message</button>
-
                                             </div>
                                             <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2" title="Appointment" ng-click="search.openReservationForm()">
                                                 <button class="info-icon-btn appoinment-icon" >Appointment</button>
-
                                             </div>
                                         </div>
                                     </div>
