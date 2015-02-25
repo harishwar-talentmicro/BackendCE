@@ -115,6 +115,7 @@ app.get('/ewmUpdatePwdEncryption', LocationManager.FnUpdatePwdEncryption);
 app.post('/ewtCheckCV', LocationManager.FnCheckCV);
 app.get('/ewtGetLoginCheck', LocationManager.FnGetLoginCheck);
 app.get('/ewtGetBannerPicture', LocationManager.FnGetBannerPicture);
+app.post('/ewtSaveWhiteBlackList', LocationManager.FnSaveWhiteBlackList);
 //below service are for EZEIDAP
 app.post('/ewLoginAP', LocationManager.FnLoginAP);
 app.get('/ewLogoutAP', LocationManager.FnLogoutAP);

@@ -4146,6 +4146,88 @@ exports.FnGetBannerPicture = function(req, res){
         throw new Error(ex);
     }
 }
+
+exports.FnSaveWhiteBlackList = function(req, res){
+    try{
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var List = req.body.List;
+        var RelationType =parseInt(req.body.RelationType);
+        var Tag = parseInt(req.body.Tag);
+        var EZEID = req.body.EZEID;
+        var Token = req.body.Token;
+
+        var RtnMessage = {
+            IsSuccessfull: false
+        };
+
+        var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
+        if (List!= null && RelationType.toString() != 'NaN' && Tag.toString() != 'NaN' && EZEID !=null && Token != null) {
+            FnValidateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+                        var query = db.escape(List) + ',' + db.escape(RelationType) + ',' + db.escape(EZEID) + ',' + db.escape(Tag) + ',' +db.escape(Token);
+                        db.query('CALL pwhiteblacklist(' + query + ')', function (err, InsertResult) {
+                            if (!err){
+                                if (InsertResult.affectedRows > 0) {
+                                    RtnMessage.IsSuccessfull = true;
+                                    res.send(RtnMessage);
+                                    console.log('FnSaveWhiteBlackList: White/Black list details save successfully');
+                                }
+                                else {
+                                    console.log('FnSaveWhiteBlackList:No Save White/Black list details');
+                                    res.send(RtnMessage);
+                                }
+                            }
+                            else {
+                                console.log('FnSaveWhiteBlackList: error in Updating White/Black list' + err);
+                                res.statusCode = 500;
+                                res.send(RtnMessage);
+                            }
+                        });
+                    }
+                    else {
+                        console.log('FnSaveWhiteBlackList: Invalid token');
+                        res.statusCode = 401;
+                        res.send(RtnMessage);
+                    }
+                }
+                else {
+                    console.log('FnSaveWhiteBlackList:Error in processing Token' + err);
+                    res.statusCode = 500;
+                    res.send(RtnMessage);
+                }
+            });
+        }
+        else {
+            if (List == null) {
+                console.log('FnSaveWhiteBlackList: List is empty');
+            }
+            else if (RelationType == 'NaN') {
+                console.log('FnSaveWhiteBlackList: RelationType is empty');
+            }
+            else if (EZEID == null) {
+                console.log('FnSaveWhiteBlackList: Ezeid is empty');
+            }
+            else if (Tag == 'NaN') {
+                console.log('FnSaveWhiteBlackList: Tag is empty');
+            }
+            else if (Token == null) {
+                console.log('FnSaveWhiteBlackList: Token is empty');
+            }
+
+            res.statusCode=400;
+            res.send(RtnMessage);
+        }
+
+    }
+    catch (ex) {
+        console.log('FnSaveWhiteBlackList:error ' + ex.description);
+        throw new Error(ex);
+    }
+};
+
 //EZEIDAP Parts
 
 //app part
