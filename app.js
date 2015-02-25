@@ -129,6 +129,11 @@ app.get('/ewtGetEZEIDDataAP', LocationManager.FnGetAPEZEID);
 app.get('/ewtGetEZEIDPictureAP', LocationManager.FnGetAPEZEIDPicture);
 app.post('/ewtSaveBannerPictureAP', LocationManager.FnSaveBannerPictureAP);
 app.get('/ewtGetBannerPictureAP', LocationManager.FnGetBannerPictureAP);
+app.get('/ewtGetSecondaryLocListAP',LocationManager.FnGetSecondaryLocationListAP);
+app.get('/ewtGetSecondaryLocAP',LocationManager.FnGetSecondaryLocationAP);
+app.post('/ewtUpdateSecondaryLocationAP', LocationManager.FnUpdateSecondaryLocationAP);
+app.post('/ewtUpdateIdCardPrintAP', LocationManager.FnUpdateIdCardPrintAP);
+app.get('/ewtGetIdCardPrintAP',LocationManager.FnGetIdCardPrintAP);
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
     console.log('404 : Page not found');
