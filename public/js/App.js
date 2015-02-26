@@ -2127,11 +2127,9 @@
            if(!dateFormat){
                 dateFormat = 'DD-MMM-YYYY hh:mm A';
             }
-            var x = new Date(timeFromServer);
-            var mom1 = moment(x);
-
-            return mom1.add((mom1.utcOffset()),'m').format(dateFormat);
-
+            var mom1 = moment(timeFromServer,dateFormat);
+            var ret =  mom1.add((mom1.utcOffset()),'m').format(dateFormat);
+            return ret;
         };
         
         /**
