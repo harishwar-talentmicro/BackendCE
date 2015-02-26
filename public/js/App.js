@@ -427,16 +427,18 @@
                     var _item = positions[i];
                     var mapIcon;
                     mapIcon = '/images/Indi_user.png';
-
+                    var businessIcon = 'images/business-icon_48.png';
+                    var individualIcon = 'images/Individual-Icon_48.png';
                     var pos = new google.maps.LatLng(_item.Latitude, _item.Longitude);
                     //Pushing position of markers to fit in bounds
                     latLngList.push(pos);
+                    console.log('Item Type : '+_item.IDTypeID);
                     var mTitle = (_item.IDTypeID == 2 && _item.CompanyName !== "")? _item.CompanyName : _item.Name;
                     var marker = new google.maps.Marker({
                         position: pos,
                         map: map,
-                        icon: (_item.Icon !== "") ? _item.Icon : mapIcon,
-
+//                        icon: (_item.Icon !== "") ? _item.Icon : mapIcon,
+                        icon: (_item.IDTypeID == 2) ? businessIcon : individualIcon,
                         title: mTitle
                     });
 //                    map.setCenter(pos);
