@@ -47,36 +47,12 @@ angular.module('ezeidApp').controller('BusinessListController', function($http, 
     });
 
     $http({ method: 'get', url: GURL + 'ewmGetCategory?LangID=1' }).success(function (data) {
-       /*  var _obj = { CategoryID: 0, CategoryTitle: '--Category--' };
-         data.splice(0, 0, _obj);*/
 
         BusinessListCtrl.categories = data;
     });
 
-    //Created by Abhishek
-    $scope.uploadFile = function (files) {
-
-       /* fileToDataURL(files[0]).then(function (dataURL) {
-
-            console.log(dataURL);
-
-        });*/
-        for (var i = 0; i < files.length; i++) {
-            var $file = files[i];
-            var formData = new FormData();
-            formData.append('file', $file);
-            //formData.append('RefType', $scope.OptionSelected);
-            formData.append('TokenNo', $rootScope._userInfo.Token);
-            formData.append('RefType', 6);
-
-            $http({ method: 'POST', url: '/ewTUploadDoc/', data: formData,
-                headers: { 'Content-Type': undefined }, transformRequest: angular.identity })
-                .success(function (data, status, headers, config) {
-                    getBusinessInfo();
-               }).
-                error(function(data, status, headers, config) {
-                 });
-        }
+   $scope.uploadFile = function (files) {
+       $scope.DocumentToUpload = files;
     };
    //End of Upload
 
@@ -92,6 +68,23 @@ angular.module('ezeidApp').controller('BusinessListController', function($http, 
 
 
     this.saveBusinessList=function(){
+
+        for (var i = 0; i < $scope.DocumentToUpload.length; i++) {
+            var $file = $scope.DocumentToUpload[i];
+            var formData = new FormData();
+            formData.append('file', $file);
+            formData.append('TokenNo', $rootScope._userInfo.Token);
+            formData.append('RefType', 6);
+
+            $http({ method: 'POST', url: '/ewTUploadDoc/', data: formData,
+                headers: { 'Content-Type': undefined }, transformRequest: angular.identity })
+                .success(function (data, status, headers, config) {
+                   // getBusinessInfo();
+                }).
+                error(function(data, status, headers, config) {
+                });
+        }
+
         BusinessListCtrl._businessInfo.TokenNo=$rootScope._userInfo.Token;
         // BusinessListCtrl._businessInfo.Status=parseInt(CVAttachCtrl._businessInfo.Status);
         $http({
@@ -100,9 +93,7 @@ angular.module('ezeidApp').controller('BusinessListController', function($http, 
             data: JSON.stringify(BusinessListCtrl._businessInfo),
             headers: { 'Content-Type': 'application/json' }
         }).success(function (data,status) {
-                console.log(data);
-                console.log("Satus is:103");
-                console.log(status);
+
             if(data.IsUpdated) {
                 Notification.success({message: "Saved...", delay: MsgDelay});
                 getBusinessInfo();
@@ -129,8 +120,6 @@ angular.module('ezeidApp').controller('BusinessListController', function($http, 
             {
                 $scope.isShowDownloadLink = false;
             }
-                 console.log(data[0]);
-
          });
      };
 

@@ -95,7 +95,8 @@
                     <span style="margin-top:-2px;float:right; border:1px solid #000000;background:#FAA9A3;color:#000000;">
                         <span>Mandatory</span>
                     </span>
-                    <form name="reservationForm" ng-submit="reservationForm.$valid && search.sendReservation(_userInfo.Type==1 ? '6' : '3')" novalidate>
+                   <!-- <form name="reservationForm" ng-submit="reservationForm.$valid && search.sendReservation(_userInfo.Type==1 ? '6' : '3')" novalidate>-->
+                    <form name="reservationForm" ng-submit="reservationForm.$valid && search.sendReservation(search.mInfo.IDTypeID==1 ? '6' : '3')" novalidate>
                         <h3 ng-show="search.mInfo.IDTypeID==1" class="marB15px">Appointment</h3>
                         <h3 ng-show="search.mInfo.IDTypeID==2" class="marB15px">Reservation</h3>
 
@@ -323,19 +324,12 @@
                                                 </select>
                                             </div>
                                             <div class="col-lg-7 col-md-7 col-sm-7 col-xs-12" ng-hide="search.isEZEIDselected('1')" style="width: 60.333333%;">
-
                                                 <div style="display:table-cell;vertical-align:middle;height:34px;">
                                                     <span>proximity from </span>
                                                     <a ng-click="selectTab('map')" style="cursor:pointer;"><b>map location</b></a>
                                                     <input type="checkbox" ng-model="search.Criteria.ParkingStatus" name="parking" value="1,2" style="margin-left: 5px;"><span style="margin-left: 4px;"> Show Places with Parking</span>
                                                 </div>
-
-
-
                                             </div>
-
-
-
                                     </div>
                                     <div class="bottom-clearfix"></div>
                                 </div>
@@ -361,8 +355,6 @@
                             </div>
                     </div>
                 </div>
-
-
                 <!--<div class="row" ng-controller="TabController as Tab">-->
                 <div class="row">
                     <div class="col-md-7" style="margin: auto; float: none;">
@@ -415,7 +407,6 @@
                                         <label for="rating5"><span>5</span></label>
                                     </div>
 
-
                                 </div>
                                 <div class="row">
 
@@ -436,7 +427,11 @@
                                     <div class="col-lg-7 col-md-7 col-sm-7 col-xs-12 text-center">
                                         <div class="row">
                                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                                <h2 class="text-center"  style="line-height:0;padding-bottom:3px;">{{search.mInfo.FirstName}}{{" "+search.mInfo.LastName}}</h2>
+                                                <h2 class="text-center" ng-show="search.mInfo.IDTypeID == 1"  style="line-height:0;padding-bottom:3px;">{{search.mInfo.FirstName}}{{" "+search.mInfo.LastName}}</h2>
+                                                <h2 class="text-center" ng-show="search.mInfo.IDTypeID == 3"  style="line-height:0;padding-bottom:3px;">{{search.mInfo.FirstName}}{{" "+search.mInfo.LastName}}</h2>
+                                                <h2 class="text-center" ng-show="search.mInfo.IDTypeID == 2"  style="line-height:0;padding-bottom:3px;">
+                                                    {{search.mInfo.CompanyName == "" ? search.mInfo.FirstName +" "+search.mInfo.LastName :  search.mInfo.CompanyName}}</h2>
+
                                             </div>
                                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                                 <h4 class="text-center"  style="line-height:1;">

@@ -42,13 +42,12 @@ angular.module('ezeidApp').controller('BlackListWhiteListController', function($
     }
 
     $scope.$watch('_userInfo.IsAuthenticate', function () {
-       // if ($rootScope._userInfo.IsAuthenticate == true) {
+        if ($rootScope._userInfo.IsAuthenticate == true) {
             getBlackWhiteListInfo();
-            console.log("Sai123");
-      /*  } else {
-            console.log("Sai");
+
+       } else {
             window.location.href = "#/";
-        }*/
+        }
     });
 
     function getBlackWhiteListInfo() {
@@ -64,6 +63,11 @@ angular.module('ezeidApp').controller('BlackListWhiteListController', function($
                          blacklist.msgs.push(data[i]);
                         // showPaging = data[0]['NextPage'];
                      }
+                 }
+                 else
+                 {
+                     blacklist.msgs = [];
+                     Notification.error({ message: "No List found..!", delay: MsgDelay });
                  }
             });
     }
@@ -86,14 +90,11 @@ angular.module('ezeidApp').controller('BlackListWhiteListController', function($
                 }
                 else
                 {
-                    console.log(blacklist._info.Tag);
-                    blacklist._info.Tag = blacklist._info.Tag == "" ? 0 : blacklist._info.Tag;
+                    blacklist._info.Tag = blacklist._info.Tag == "" || !blacklist._info.Tag ? 0 : blacklist._info.Tag;
                     blacklist._info.Token = $rootScope._userInfo.Token;
-                    console.log(blacklist._info);
                     $http({ method: 'post', url: GURL + 'ewtSaveWhiteBlackList', data: blacklist._info }).success(function (data) {
                         if (data.IsSuccessfull) {
                             Notification.success({ message: 'Saved...', delay: MsgDelay });
-
                             blacklist._info.List = "";
                             blacklist._info.RelationType = "";
                             blacklist._info.EZEID = "";
@@ -108,18 +109,32 @@ angular.module('ezeidApp').controller('BlackListWhiteListController', function($
              });
     };
 
+    //open DeleteConfirmDialog
+    this.openDeleteConfirmDialog = function (_TID) {
+            $scope.recordtoDelete = _TID;
+            $('#confirmDelete').slideDown();
+    };
+    //close DeleteConfirmDialog
+    this.closeDeleteConfirmDialog = function (_TID) {
+        $scope.recordtoDelete = "";
+        $('#confirmDelete').slideUp();
+    };
+
     // Delete record from list
-    this.deleteFormList=function(_TID){
+    this.deleteFormList=function(){
        var dataToDelete = {
-           TID: _TID,
+           TID: $scope.recordtoDelete,
            Token: $rootScope._userInfo.Token
         };
         $http({ method: 'post', url: GURL + 'ewtDeleteWhiteBlackList', data: dataToDelete }).success(function (data) {
             if (data.IsSuccessfull) {
-                Notification.success({ message: 'Deleted...', delay: MsgDelay });
+                $scope.recordtoDelete = "";
+                $('#confirmDelete').slideUp();
                 getBlackWhiteListInfo();
+                Notification.success({ message: 'Deleted...', delay: MsgDelay });
             }
             else {
+                $scope.recordtoDelete = "";
                 Notification.error({ message: 'Sorry..! not deleted ', delay: MsgDelay });
             }
         });
