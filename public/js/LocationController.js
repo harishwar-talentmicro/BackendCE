@@ -1,5 +1,5 @@
 
-angular.module('ezeidApp').controller('LocationsController', function ($rootScope, $scope, $http, $q, $timeout, Notification, $filter, $interval) {
+angular.module('ezeidApp').controller('LocationsController', function ($window,$rootScope, $scope, $http, $q, $timeout, Notification, $filter, $interval) {
 
     var SLocCtrl = this;
     var map;
@@ -9,6 +9,27 @@ angular.module('ezeidApp').controller('LocationsController', function ($rootScop
 //    var myinfowindow = new google.maps.InfoWindow({
 //        content: ''
 //    });
+
+    /**
+     * Added for confirmation box while navigating to other
+     */
+    $scope.$on('$locationChangeStart',function(event,next,current){
+        if (!$scope.SecLocForm.$dirty) return;
+        if(SLocCtrl.IsShowForm){
+            var confirm = $window.confirm('Are you sure you want to discard the changes without saving?');
+            // Preventing them from navigating away
+            if(!confirm){
+                try{
+                    event.defaultPrevented();
+                }
+                catch(ex){
+                    event.preventDefault();
+                }
+            }
+        }
+    });
+
+
     var marker;
     var markers = [];
 
@@ -382,9 +403,21 @@ angular.module('ezeidApp').controller('LocationsController', function ($rootScop
     }
 
     this.closeNewLoc = function (secLocForm) {
-        if (!$rootScope._userInfo.IsAuthenticate) {
-            secLocForm.$setPristine(true);
+        if (!$scope.SecLocForm.$dirty) {
+            if (!$rootScope._userInfo.IsAuthenticate) {
+                secLocForm.$setPristine(true);
+            }
+            SLocCtrl.IsShowForm = false;
+            return;
         }
+
+
+        var confirm = $window.confirm('Are you sure you want to discard the changes without saving?');
+        // Preventing them from navigating away
+        if(!confirm){
+            return;
+        }
+        secLocForm.$setPristine(true);
         SLocCtrl.IsShowForm = false;
     };
 

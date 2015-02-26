@@ -1041,7 +1041,7 @@
       }
     });
 
-    ezeid.controller('ProfileController', function ($rootScope, $scope, $http, $q, $timeout, Notification, $filter) {
+    ezeid.controller('ProfileController', function ($rootScope, $scope, $http, $q, $timeout, Notification, $filter,$window) {
         
         var profile = this;
         profile._info = {};
@@ -1050,6 +1050,25 @@
         profile.states = [];
         var showCurrentLocation = true;
         $scope.isCloseButtonClicked = false;
+
+        /**
+         * Added for confirmation box while navigating to other
+         */
+        $scope.$on('$locationChangeStart',function(event,next,current){
+            if (!$scope.UserForm.$dirty) return;
+
+            var confirm = $window.confirm('Are you sure you want to discard the changes without saving?');
+            // Preventing them from navigating away
+            if(!confirm){
+                try{
+                    event.defaultPrevented();
+                }
+                catch(ex){
+                    event.preventDefault();
+                }
+            }
+        });
+
 
         $('#datetimepicker1').datetimepicker({
             format: 'd-M-Y',
