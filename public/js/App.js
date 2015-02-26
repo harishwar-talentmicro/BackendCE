@@ -427,16 +427,18 @@
                     var _item = positions[i];
                     var mapIcon;
                     mapIcon = '/images/Indi_user.png';
-
+                    var businessIcon = 'images/business-icon_48.png';
+                    var individualIcon = 'images/Individual-Icon_48.png';
                     var pos = new google.maps.LatLng(_item.Latitude, _item.Longitude);
                     //Pushing position of markers to fit in bounds
                     latLngList.push(pos);
+                    console.log('Item Type : '+_item.IDTypeID);
                     var mTitle = (_item.IDTypeID == 2 && _item.CompanyName !== "")? _item.CompanyName : _item.Name;
                     var marker = new google.maps.Marker({
                         position: pos,
                         map: map,
-                        icon: (_item.Icon !== "") ? _item.Icon : mapIcon,
-
+//                        icon: (_item.Icon !== "") ? _item.Icon : mapIcon,
+                        icon: (_item.IDTypeID == 2) ? businessIcon : individualIcon,
                         title: mTitle
                     });
 //                    map.setCenter(pos);
@@ -1038,7 +1040,7 @@
       }
     });
 
-    ezeid.controller('ProfileController', function ($rootScope, $scope, $http, $q, $timeout, Notification, $filter) {
+    ezeid.controller('ProfileController', function ($rootScope, $scope, $http, $q, $timeout, Notification, $filter,$window) {
         
         var profile = this;
         profile._info = {};
@@ -1047,6 +1049,25 @@
         profile.states = [];
         var showCurrentLocation = true;
         $scope.isCloseButtonClicked = false;
+
+        /**
+         * Added for confirmation box while navigating to other
+         */
+        $scope.$on('$locationChangeStart',function(event,next,current){
+            if (!$scope.UserForm.$dirty) return;
+
+            var confirm = $window.confirm('Are you sure you want to discard the changes without saving?');
+            // Preventing them from navigating away
+            if(!confirm){
+                try{
+                    event.defaultPrevented();
+                }
+                catch(ex){
+                    event.preventDefault();
+                }
+            }
+        });
+
 
         $('#datetimepicker1').datetimepicker({
             format: 'd-M-Y',
@@ -2124,11 +2145,9 @@
            if(!dateFormat){
                 dateFormat = 'DD-MMM-YYYY hh:mm A';
             }
-            var x = new Date(timeFromServer);
-            var mom1 = moment(x);
-
-            return mom1.add((mom1.utcOffset()),'m').format(dateFormat);
-
+            var mom1 = moment(timeFromServer,dateFormat);
+            var ret =  mom1.add((mom1.utcOffset()),'m').format(dateFormat);
+            return ret;
         };
         
         /**
