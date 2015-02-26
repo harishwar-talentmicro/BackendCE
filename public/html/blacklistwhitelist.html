@@ -42,14 +42,14 @@
                                      <span>Tag</span>
 
                                 </div>-->
-                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2" style="width: 13.666667%;">
+                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2" style="width: 13.666667%;" ng-show="blacklist._info.List == 1">
                                     <select class="form-control " name="tags" ng-model="blacklist._info.Tag"
                                             ng-options="tags.id as tags.label for tags in blacklist.Tags" >
                                         <option value=""> --Tags-- </option>
                                     </select>
                                 </div>
                                 <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2" style="width: 14.406667%; padding-right: 0px;">
-                                    <button  ng-disabled="!blacklist._info.EZEID || !blacklist._info.Tag" ng-click="blacklist.addToBlackWhiteList()" class="btn btn-block btn-primary pull-left" type="button">Add</button>
+                                    <button  ng-disabled="!blacklist._info.EZEID || !blacklist._info.List  || !blacklist._info.RelationType" ng-click="blacklist.addToBlackWhiteList()" class="btn btn-block btn-primary pull-left" type="button">Add</button>
                                 </div>
                             </div>
 

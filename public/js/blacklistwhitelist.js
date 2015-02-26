@@ -4,6 +4,8 @@ angular.module('ezeidApp').controller('BlackListWhiteListController', function($
     blacklist._info={};
     blacklist.msgs = [];
     var MsgDelay = 2000;
+    blacklist._info.Tag = "";
+
     if ($rootScope._userInfo) {
     }
     else {
@@ -40,11 +42,13 @@ angular.module('ezeidApp').controller('BlackListWhiteListController', function($
     }
 
     $scope.$watch('_userInfo.IsAuthenticate', function () {
-        if ($rootScope._userInfo.IsAuthenticate == true) {
+       // if ($rootScope._userInfo.IsAuthenticate == true) {
             getBlackWhiteListInfo();
-        } else {
+            console.log("Sai123");
+      /*  } else {
+            console.log("Sai");
             window.location.href = "#/";
-        }
+        }*/
     });
 
     function getBlackWhiteListInfo() {
@@ -52,7 +56,6 @@ angular.module('ezeidApp').controller('BlackListWhiteListController', function($
             method: 'get',
             url: GURL + 'ewtGetWhiteBlackList?Token=' + $rootScope._userInfo.Token
         }).success(function (data) {
-
                  if (data != 'null')
                  {
                      blacklist.msgs = [];
@@ -71,6 +74,7 @@ angular.module('ezeidApp').controller('BlackListWhiteListController', function($
 
     //Add EZE Id to black/white list
     this.addToBlackWhiteList=function(){
+
        //first check EZEID available or not
         $http({
             method: 'get',
@@ -82,10 +86,18 @@ angular.module('ezeidApp').controller('BlackListWhiteListController', function($
                 }
                 else
                 {
+                    console.log(blacklist._info.Tag);
+                    blacklist._info.Tag = blacklist._info.Tag == "" ? 0 : blacklist._info.Tag;
                     blacklist._info.Token = $rootScope._userInfo.Token;
+                    console.log(blacklist._info);
                     $http({ method: 'post', url: GURL + 'ewtSaveWhiteBlackList', data: blacklist._info }).success(function (data) {
                         if (data.IsSuccessfull) {
                             Notification.success({ message: 'Saved...', delay: MsgDelay });
+
+                            blacklist._info.List = "";
+                            blacklist._info.RelationType = "";
+                            blacklist._info.EZEID = "";
+                            blacklist._info.Tag = "";
                             getBlackWhiteListInfo();
                         }
                         else {
@@ -98,10 +110,9 @@ angular.module('ezeidApp').controller('BlackListWhiteListController', function($
 
     // Delete record from list
     this.deleteFormList=function(_TID){
-
        var dataToDelete = {
-            Token: $rootScope._userInfo.Token,
-            TID: _TID
+           TID: _TID,
+           Token: $rootScope._userInfo.Token
         };
         $http({ method: 'post', url: GURL + 'ewtDeleteWhiteBlackList', data: dataToDelete }).success(function (data) {
             if (data.IsSuccessfull) {
