@@ -182,7 +182,9 @@
             content: ''
         });
         var service;
-        var today = moment(new Date()).utc().format('DD-MMM-YYYY hh:mm A');
+        var x = new Date();
+        var today = moment(x.toISOString()).utc().format('DD-MMM-YYYY hh:mm A');
+
         var currentBanner = 1;
         var Miliseconds = 8000;
         var RefreshTime = Miliseconds;
@@ -205,7 +207,7 @@
                for (var i = 0; i < markers.length; i++) {
                 markers[i].setMap(null);
               }
-           } 
+           }
             catch(ex){}
         });
 
@@ -214,7 +216,7 @@
         }
 
         var SearchSec = this;
-        
+
         SearchSec.IsShowForm = false;
         SearchSec.IsFilterRowVisible = true;
         SearchSec.nextButton = true;
@@ -275,7 +277,7 @@
 
         function initialize () {
             //// Create the search box and link it to the UI element.
-            
+
             directionsDisplay = new google.maps.DirectionsRenderer();
             var initialLocation;
             var currentLoc = new google.maps.LatLng(12.295810, 76.639381);
@@ -288,7 +290,7 @@
             map.controls[google.maps.ControlPosition.TOP_RIGHT].push(ClocBtn)
             var input = /** @type {HTMLInputElement} */(document.getElementById('txtSearch'));
             map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
-            
+
             /********** Google Maps autocomplete **************/
             var options = {
               types: ['establishment']
@@ -303,8 +305,8 @@
                 PlaceCurrentLocationMarker(loc);
             });
             /********** Google Maps autocomplete ends *********/
-            
-            
+
+
 
             var searchBox = new google.maps.places.SearchBox(
     /** @type {HTMLInputElement} */(input));
@@ -328,7 +330,7 @@
                 //PlaceMarker(initialLocation);
             }
 
-            
+
 
             // Listen for the event fired when the user selects an item from the
             // pick list. Retrieve the matching places for that item.
@@ -416,7 +418,7 @@
                 Cmarker.setMap(null);
             }
             markers = [];
-            
+
             //Latitude Longitude list for setting up all markers in map display (setting bounds to display all markers in map)
             var latLngList = [];
             latLngList.push(new google.maps.LatLng($rootScope.CLoc.CLat, $rootScope.CLoc.CLong));
@@ -434,13 +436,13 @@
                         position: pos,
                         map: map,
                         icon: (_item.Icon !== "") ? _item.Icon : mapIcon,
-                        
+
                         title: mTitle
                     });
 //                    map.setCenter(pos);
                     var currentPos = google.maps.LatLng($rootScope.CLoc.CLat,$rootScope.CLoc.CLong);
                     map.setCenter(currentPos);
-                    
+
                     markers.push(marker);
                     google.maps.event.addListener(marker, 'click', (function (_item) {
                         return function () {
@@ -449,7 +451,7 @@
                                 if (data != 'null') {
                                     $timeout(function () {
                                         SearchSec.mInfo = data[0];
-                                        
+
                                         $scope.showInfoTab = true;
                                         $scope.selectTab('info');
                                     });
@@ -464,7 +466,7 @@
 
                     })(_item));
                 }
-                
+
                 //Setting up map bounds to display all markers
                 var bounds = new google.maps.LatLngBounds ();
                 //  Go through each...
@@ -577,7 +579,7 @@
                                             SearchSec.reservationPlaceHolder = "Appointment requirement details";
                                         }
                                  //  });
-                                } 
+                                }
                                 else {
                                     Notification.error({ message: 'Invalid key or not found…', delay: MsgDelay });
                                 }
@@ -593,7 +595,7 @@
                             try{
                                 PlaceMarker(data);
                             }
-                            
+
                             catch(ex){
                                 if(!map){
                                         initialize();
@@ -601,7 +603,7 @@
                                 $scope.$watch('isMapLoaded',function(var1,var2){
                                     if(var2){
                                         PlaceMarker(data);
-                                        
+
                                     }
                                 });
                             }
@@ -616,7 +618,7 @@
                         try{
                                 PlaceMarker(null);
                            }
-                            
+
                             catch(ex){
                                 if(!map){
                                         initialize();
@@ -641,7 +643,7 @@
                  });
             }
         };
-        
+
         /**
          * Selects a particular tab
          */
@@ -661,7 +663,7 @@
                         $scope.mapClass = "";
                         $scope.adClass = "level-1";
                     }
-                    
+
                     if(tabName == 'map')
                     {
                         if($scope.isMapReady && $scope.isMapLoaded)
@@ -895,7 +897,7 @@
                /**
                 * Converting LOCAL Time to UTC Time
                */
-               var dateTime = moment(SearchSec.ReservationDateTime).utc().format('DD-MMM-YYYY hh:mm A');
+               var dateTime = moment(SearchSec.ReservationDateTime,"DD-MMM-YYYY hh:mm A").utc().format('DD-MMM-YYYY hh:mm A');
                var currentTaskDate = moment().format('DD-MMM-YYYY hh:mm A');
                $http({ method: 'post', url: GURL + 'ewtSaveMessage', data: { TokenNo: $rootScope._userInfo.Token, ToMasterID: SearchSec.mInfo.TID, MessageType: messageType, Message: SearchSec.ReservationMessage, TaskDateTime: dateTime, LocID :SearchSec.mInfo.LocID,CurrentTaskDate: currentTaskDate } }).success(function (data) {
                     if (data.IsSuccessfull) {
@@ -1939,7 +1941,7 @@
             if(!dateFormat){
                 dateFormat = 'DD-MMM-YYYY hh:mm A';
             }
-            return moment(localTime).utc().format(dateFormat);
+            return moment(localTime,dateFormat).utc().format(dateFormat);
         };
         
         function LoadNotifications(_pageValue){
