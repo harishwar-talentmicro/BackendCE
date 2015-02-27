@@ -7,7 +7,6 @@
             return false;
         return true;
     }
-
 </script>
 <div>
     <form name="SignInForm" novalidate ng-submit="SignInForm.$valid && SignInCtrl.LoginUser(SignInCtrl.LInfo,SignInForm)">
@@ -82,7 +81,7 @@
             <ul style="padding-bottom: 11px!important;margin-bottom:8px!important;" class="pad0px">
                 <li class="dsp_block padT10px">
                     <div class="pull-left wd48p forget_padd">
-                        <input type="text" name="ezeid" class="form-control wd_forget wd_forgetP2 emptyBox" style='text-transform:uppercase' ng-model="SignInCtrl.EzeId" placeholder="Enter Your EZEID ... "required/>
+                        <input type="text" name="ezeid" class="form-control wd_forget wd_forgetP2 emptyBox" style='text-transform:uppercase' ng-model="SignInCtrl.EzeId" placeholder="Enter Your EZEID"required/>
                     </div>
                 </li>
                 <div class="clearfix"></div>
@@ -105,8 +104,7 @@
 
         <form name="ChangePasswordForm" novalidate>
                 <span style="margin-top:-2px;float:right; border:1px solid #000000;background:#FAA9A3;color:#000000;" >
-                    <!--<span ng-model="SignInCtrl.showMandatory" ng-show="ChangePasswordForm.OldPassword.$error.required || ChangePasswordForm.NewPassword.$error.required || ChangePasswordForm.ReEnterPassword.$error.required ">* Mandatory</span>-->
-                     Mandatory
+                    Mandatory
                 </span>
 
              <h3><span class="changePass_mar">Change Password</span></h3>
@@ -157,8 +155,8 @@
             <form class="navbar-form navbar-right" role="form">
                <a class="btn btn-primary" id="signin" ng-hide="$root._userInfo.IsAuthenticate">Sign In</a>
                <a href="#/editprofile" class="btn btn-primary" ng-hide="$root._userInfo.IsAuthenticate">Sign Up Now</a>
-
-                <img ng-show="$root._userInfo.IsAuthenticate" class="user_icon" style="border-radius: 18px;margin-right:-46px;" src="{{$root._userInfo.Icon}}"/>
+                <!--<img ng-show="$root._userInfo.IsAuthenticate" class="user_icon" style="border-radius: 18px;margin-right:-46px;" src="{{$root._userInfo.Icon}}"/>-->
+                <img ng-show="$root._userInfo.IsAuthenticate && $root._userInfo.Icon.length" class="user_icon" style="border-radius: 18px;margin-right:-46px;" src="{{$root._userInfo.Icon}}"/>
                 <a href="#" id="userid" class="btn btn-primary userMarR" ng-show="$root._userInfo.IsAuthenticate">
                     {{$root._userInfo.FirstName}}
                     <img style="position:relative; top:-2px;" src="images/drp_arrow.png">

@@ -5,6 +5,7 @@ angular.module('ezeidApp').controller('BlackListWhiteListController', function($
     blacklist.msgs = [];
     var MsgDelay = 2000;
     blacklist._info.Tag = "";
+    blacklist._info.RelationType = "";
 
     if ($rootScope._userInfo) {
     }
@@ -50,18 +51,41 @@ angular.module('ezeidApp').controller('BlackListWhiteListController', function($
         }
     });
 
+    /**
+     * Function for converting UTC time from server to LOCAL timezone
+     */
+    var convertTimeToLocal = function(timeFromServer,dateFormat){
+        if(!dateFormat){
+            dateFormat = 'DD-MMM-YYYY hh:mm A';
+        }
+        var mom1 = moment(timeFromServer,dateFormat);
+        var ret =  mom1.add((mom1.utcOffset()),'m').format(dateFormat);
+        return ret;
+    };
+
+    /**
+     * Function for converting LOCAL time (local timezone) to server time
+     */
+    var convertTimeToUTC = function(localTime,dateFormat){
+        if(!dateFormat){
+            dateFormat = 'DD-MMM-YYYY hh:mm A';
+        }
+        return moment(localTime).utc().format(dateFormat);
+    };
+
     function getBlackWhiteListInfo() {
          $http({
             method: 'get',
             url: GURL + 'ewtGetWhiteBlackList?Token=' + $rootScope._userInfo.Token
         }).success(function (data) {
+                 console.log(data);
                  if (data != 'null')
                  {
                      blacklist.msgs = [];
                      for (var i = 0; i < data.length; i++) {
-                        // data[i].AccessDate = convertTimeToLocal(data[i].AccessDate,'DD-MMM-YYYY hh:mm A');
-                         blacklist.msgs.push(data[i]);
-                        // showPaging = data[0]['NextPage'];
+                            data[i].CreatedDate = convertTimeToLocal(data[i].CreatedDate,'DD-MMM-YYYY');
+                            blacklist.msgs.push(data[i]);
+                         // showPaging = data[0]['NextPage'];
                      }
                  }
                  else
@@ -90,6 +114,7 @@ angular.module('ezeidApp').controller('BlackListWhiteListController', function($
                 }
                 else
                 {
+                    blacklist._info.RelationType = blacklist._info.RelationType == "" || !blacklist._info.RelationType ? 0 : blacklist._info.RelationType;
                     blacklist._info.Tag = blacklist._info.Tag == "" || !blacklist._info.Tag ? 0 : blacklist._info.Tag;
                     blacklist._info.Token = $rootScope._userInfo.Token;
                     $http({ method: 'post', url: GURL + 'ewtSaveWhiteBlackList', data: blacklist._info }).success(function (data) {
@@ -139,7 +164,6 @@ angular.module('ezeidApp').controller('BlackListWhiteListController', function($
             }
         });
     };
-
     blacklist.listType = [{ id: 2, label: "Black List" }, { id: 1, label: "White List" }];
     blacklist.Tags = [{ id: 1, label: "ID" }, { id: 2, label: "PP" }, { id: 3, label: "DL" }, { id: 4, label: "D1" }, { id: 5, label: "D2" }, { id: 6, label: "CV" }];
 });

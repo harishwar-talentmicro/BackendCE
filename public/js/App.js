@@ -48,16 +48,10 @@
         $httpProvider.interceptors.push("ezeidInterceptor");
     }]);
 
-//    
-//    ezeid.run(['$httpProvider','ezeidInterceptor',function($httpProvider,ezeidInterceptor){
-//        
-//    }]);
-
     var GURL = '/';
     //http://10.0.100.103:8084/';
 
     var MsgDelay = 2000;
-    //var ratingValues = "";
 
     // define controller for wizard
     ezeid.directive('dateTimePicker', function() {
@@ -156,6 +150,8 @@
         $('#datetimepicker1').siblings('.input-group-addon').on('click',function(){
             $('#datetimepicker1').trigger('focus');
         });
+
+
         /**
          * Opens Help Popup when help link is clicked
          */
@@ -432,7 +428,6 @@
                     var pos = new google.maps.LatLng(_item.Latitude, _item.Longitude);
                     //Pushing position of markers to fit in bounds
                     latLngList.push(pos);
-                    console.log('Item Type : '+_item.IDTypeID);
                     var mTitle = (_item.IDTypeID == 2 && _item.CompanyName !== "")? _item.CompanyName : _item.Name;
                     var marker = new google.maps.Marker({
                         position: pos,
@@ -455,16 +450,17 @@
                                         SearchSec.mInfo = data[0];
                                         $scope.showInfoTab = true;
                                         $scope.selectTab('info');
-                                    });
+
+                                        //Call for banner
+                                        SearchSec.IsSearchButtonClicked = true;
+                                        getBanner(1);
+                                   });
                                 }
                                 else {
                                     Notification.error({ message: 'No Results found..!', delay: MsgDelay });
                                 }
                             });
                         }
-
-                         //   google.maps.event.trigger(map, "resize");
-
                     })(_item));
                 }
 
@@ -527,7 +523,6 @@
                 if($rootScope._userInfo.Token == "")
                 {
                     $rootScope._userInfo.Token = 2;
-
                     $scope.Token = 2;
                 }
                 else
@@ -564,7 +559,7 @@
                                    {
                                        $scope.selectTab('map');
                                    }
-                                 //    $timeout(function () {
+                                     $timeout(function () {
                                         SearchSec.mInfo = data[0];
                                         //Call for banner
                                         getBanner(1);
@@ -579,7 +574,7 @@
                                         {
                                             SearchSec.reservationPlaceHolder = "Appointment requirement details";
                                         }
-                                 //  });
+                                   });
                                 }
                                 else {
                                     Notification.error({ message: 'Invalid key or not found…', delay: MsgDelay });
@@ -727,6 +722,7 @@
            if(SearchSec.mInfo.EZEID)
             {
                 $http({ method: 'get', url: GURL + 'ewtGetBannerPicture?Token=' + $rootScope._userInfo.Token +'&SeqNo='+_requestedBannerValue+'&Ezeid='+SearchSec.mInfo.EZEID+'&StateTitle='+ SearchSec.mInfo.StateTitle}).success(function (data) {
+
                     if (data.Picture != 'null') {
                         SearchSec.mInfo.BannerImage = data.Picture;
                         if(currentBanner >= SearchSec.mInfo.Banners)
@@ -1040,7 +1036,7 @@
       }
     });
 
-    ezeid.controller('ProfileController', function ($rootScope, $scope, $http, $q, $timeout, Notification, $filter,$window) {
+    ezeid.controller('ProfileController', function ($rootScope, $scope, $http, $q, $timeout, Notification, $filter, $window) {
         
         var profile = this;
         profile._info = {};
@@ -1067,7 +1063,6 @@
                 }
             }
         });
-
 
         $('#datetimepicker1').datetimepicker({
             format: 'd-M-Y',
@@ -1639,7 +1634,6 @@
                 {
                     notificationMessage += notificationMessage != "" ? ", First Name Required " : "First Name Required";
                     errorList.push('First Name Required');
-                    
                 }
                 if(!profile._info.LastName)
                 {
@@ -1839,7 +1833,6 @@
         $scope.uploadIcon = function (image) {
             isBusinessIcon = 1;
             profile._info.Icon = $rootScope.smallImage;
-          //  console.log(profile._info.Icon);
             profile._info.IconFileName = image[0].name;
            // Notification.success({ message: "Saved...", delay: MsgDelay });
         };
@@ -2182,7 +2175,7 @@
                 else
                 {
                     msgSen.showMoreButton = false;
-                    Notification.error({ message: "No Message found..!", delay: MsgDelay });
+                    Notification.error({ message: "No History found..!", delay: MsgDelay });
                 }
             });
         }

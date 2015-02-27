@@ -1,5 +1,5 @@
 
-angular.module('ezeidApp').controller('LocationsController', function ($window,$rootScope, $scope, $http, $q, $timeout, Notification, $filter, $interval) {
+angular.module('ezeidApp').controller('LocationsController', function ($rootScope, $scope, $http, $q, $timeout, Notification, $filter, $interval, $window) {
 
     var SLocCtrl = this;
     var map;
@@ -333,6 +333,7 @@ angular.module('ezeidApp').controller('LocationsController', function ($window,$
                 headers: { 'Content-Type': 'application/json' }
             }).success(function (data) {
 
+
                     document.getElementById("Location").className = "form-control emptyBox";
                     document.getElementById("streeName").className = "form-control emptyBox";
                     document.getElementById("cities").className = "form-control emptyBox";
@@ -340,10 +341,20 @@ angular.module('ezeidApp').controller('LocationsController', function ($window,$
                     document.getElementById("mobile_phone").className = "form-control emptyBox";
 
                     if (data != 'null') {
-                        SLocCtrl.LocationsList.push(data[0]);
 
-                        SLocCtrl.IsShowForm = false;
+                    //    SLocCtrl.LocationsList.push(data[0]);
+                    //    SLocCtrl.IsShowForm = false;
+
+                        SLocCtrl._locInfo = angular.copy(SLocCtrl._locInfo= []);
+                        $scope.SecLocForm.$setPristine();
+
+                        getSecondaryLoc();
+                        GetUserDetails();
+
                         window.location.href = '#/addloc';
+                        SLocCtrl.IsShowForm = false;
+
+
                         Notification.success({ message: "Saved... ", delay: MsgDelay });
                     } else {
                         Notification.error({ message: "Sorry..! not saved", delay: MsgDelay });

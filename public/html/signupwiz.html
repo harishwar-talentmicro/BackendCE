@@ -259,10 +259,11 @@
                                                 </div><br/>
                                                 <div class="row mar_editTop mar_editLeft">
                                                     <input type="text" class="form-control" ng-model="profile._info.CompanyName" placeholder="Company Name" style="width: 48%">
-                                                    <input type="text" class="form-control" ng-model="profile._info.JobTitle" placeholder="Job Title"  style="width: 48%">
+                                                    <input type="text" ng-show=" profile._info.IDTypeID == 1" class="form-control" maxlength="100" ng-model="profile._info.JobTitle" placeholder="Designation"  style="width: 48%">
+                                                    <input type="text" ng-show=" profile._info.IDTypeID == 2" class="form-control" maxlength="100" ng-model="profile._info.JobTitle" placeholder="About Company"  style="width: 48%">
+                                                    <input type="text" ng-show=" profile._info.IDTypeID == 3" class="form-control" maxlength="100" ng-model="profile._info.JobTitle" placeholder="About Public Place"  style="width: 48%">
                                                 </div><br/>
-                                            </div>
-
+                                            </div>s
 
                                             <div class="col-lg-6">
                                                 <div class="col-lg-8" style="margin: auto; float: none;">

@@ -179,7 +179,7 @@ HeaderApp.directive('headerSection', function (Notification) {
                             localStorage.setItem("_token", encrypted);
                         } else {
                             alert('Sorry..! Browser does not support');
-                            window.location.href = "index.html";
+                            window.location.href = "#/";
                         }
                         if ($rootScope._userInfo.IsAuthenticate == true) {
                             //Notification.success({ message: "SignIn Success", delay: MsgDelay });

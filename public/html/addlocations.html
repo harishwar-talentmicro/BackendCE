@@ -113,7 +113,10 @@
                                                 <div class="col-lg-6">
                                                     <div class="row mar_editTop" style="margin-left:0px;margin-right:0px;">
                                                         <span><label><strong>&nbsp;Primary Address</strong> </label></span><br/>
-                                                        <input type="text" name="Add1" class="form-control emptyBox" maxlength="45" id="streeName" ng-model="SLocCtrl._locInfo.AddressLine1" ng-class="SecLocForm.Add1.$touched && !SLocCtrl._locInfo.AddressLine1.length ? 'mandatoryTextBox' : ''" placeholder="No., Building Name, Street Name" style="width: 48%" required>
+                                                        <input type="text" name="streeName" class="form-control emptyBox" maxlength="45" id="streeName" ng-model="SLocCtrl._locInfo.AddressLine1"
+                                                               ng-class="SecLocForm.streeName.$touched && !SLocCtrl._locInfo.AddressLine1.length ? 'mandatoryTextBox' : ''"
+                                                               placeholder="No., Building Name, Street Name" style="width: 48%" required>
+
                                                         <input type="text" name="Add2" class="form-control" maxlength="45" id="block" ng-model="SLocCtrl._locInfo.AddressLine2" placeholder="Block, Area, Sector"  style="width: 48%" >
                                                     </div>
                                                     <br/>
