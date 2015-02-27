@@ -4,6 +4,7 @@ angular.module('ezeidApp').controller('LocationsController', function ($rootScop
     var SLocCtrl = this;
     var map;
     var mapOptions;
+    var isCancelButton = true;
     SLocCtrl.profile = {};
     $scope.isMapLoaded = false;
 //    var myinfowindow = new google.maps.InfoWindow({
@@ -15,6 +16,7 @@ angular.module('ezeidApp').controller('LocationsController', function ($rootScop
      */
     $scope.$on('$locationChangeStart',function(event,next,current){
         if (!$scope.SecLocForm.$dirty) return;
+        if(!isCancelButton) return;
         if(SLocCtrl.IsShowForm){
             var confirm = $window.confirm('Are you sure you want to discard the changes without saving?');
             // Preventing them from navigating away
@@ -333,6 +335,7 @@ angular.module('ezeidApp').controller('LocationsController', function ($rootScop
                 headers: { 'Content-Type': 'application/json' }
             }).success(function (data) {
 
+                    isCancelButton = false;
 
                     document.getElementById("Location").className = "form-control emptyBox";
                     document.getElementById("streeName").className = "form-control emptyBox";

@@ -1045,13 +1045,14 @@
         profile.states = [];
         var showCurrentLocation = true;
         $scope.isCloseButtonClicked = false;
+        var isCancelButton = true;
 
         /**
          * Added for confirmation box while navigating to other
          */
         $scope.$on('$locationChangeStart',function(event,next,current){
             if (!$scope.UserForm.$dirty) return;
-
+            if(!isCancelButton) return;
             var confirm = $window.confirm('Are you sure you want to discard the changes without saving?');
             // Preventing them from navigating away
             if(!confirm){
@@ -1708,7 +1709,7 @@
           }
              //Save and Update Primary Registration
             this.savePrimaryRegistration = function (UserForm) {
-
+                isCancelButton = false;
                 if(isValidate())
                 {
                     var sEzeid = profile._info.EZEID;
