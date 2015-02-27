@@ -21,14 +21,12 @@ HeaderApp.directive('headerSection', function (Notification) {
                     }).success(function (data,status,x) {
                         $rootScope._userInfo = data;
 
-
-
                         if (typeof (Storage) !== "undefined") {
                             var encrypted = CryptoJS.AES.encrypt(JSON.stringify(data), "EZEID");
                             localStorage.setItem("_token", encrypted);
                         } else {
                             alert('Sorry..! Browser does not support');
-                            window.location.href = "index.html";
+                            window.location.href = "#/";
                         }
                         if ($rootScope._userInfo.IsAuthenticate == true) {
                            // Notification.success({ message: "Sign In Success", delay: MsgDelay });

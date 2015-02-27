@@ -101,7 +101,9 @@ angular.module('ezeidApp').controller('DocumentController', function($http, $roo
     }
 
     $scope.uploadFile = function (files) {
-        for (var i = 0; i < files.length; i++) {
+
+        $scope.DocumentToUpload = files;
+       /* for (var i = 0; i < files.length; i++) {
             var $file = files[i];
             var formData = new FormData();
             formData.append('file', $file);
@@ -116,7 +118,7 @@ angular.module('ezeidApp').controller('DocumentController', function($http, $roo
                 });
                 error(function(data, status, headers, config) {
                 });
-        }
+        }*/
     };
 
     var fileToDataURL = function (file) {
@@ -135,7 +137,6 @@ angular.module('ezeidApp').controller('DocumentController', function($http, $roo
 
     $scope.OnOptionSelected = function(option){
         $scope.OptionSelected = option;
-
         getDocumentDetails(option);
     };
 
@@ -247,6 +248,26 @@ angular.module('ezeidApp').controller('DocumentController', function($http, $roo
     }
 
     $scope.OnSaveDocument = function(){
+
+       //Below code is for upload document
+       for (var i = 0; i < $scope.DocumentToUpload.length; i++) {
+             var $file = $scope.DocumentToUpload[i];
+             var formData = new FormData();
+             formData.append('file', $file);
+             formData.append('RefType', $scope.OptionSelected);
+             formData.append('TokenNo', $rootScope._userInfo.Token);
+
+             $http({ method: 'POST', url: '/ewTUploadDoc/', data: formData,
+                     headers: { 'Content-Type': undefined }, transformRequest: angular.identity })
+                     .success(function (data, status, headers, config) {
+                    // GetUserDetails();
+                   //  Notification.success({ message: "Saved...", delay: MsgDelay });
+                  });
+                    /*error(function(data, status, headers, config) {
+                 });*/
+         }
+
+
         $scope.form.TokenNo = $rootScope._userInfo.Token;
         $scope.form.RefType = $scope.OptionSelected;
         $http({
@@ -257,6 +278,8 @@ angular.module('ezeidApp').controller('DocumentController', function($http, $roo
         }).success(function (data) {
 
             if(data.IsSuccessfull) {
+                $scope.OnOptionSelected($scope.OptionSelected);
+                GetUserDetails();
                 Notification.success({ message: "Saved... ", delay: MsgDelay });
             }else{
                 Notification.error({ message: 'Sorry..! not saved', delay: MsgDelay });

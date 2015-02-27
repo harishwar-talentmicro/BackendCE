@@ -829,11 +829,8 @@ angular.module('ezeidApp').controller('LocationsController', function ($window,$
                 SLocCtrl._locInfo.Icon = $rootScope.smallImage;
                 SLocCtrl._locInfo.IconFileName = image[0].name;
             }
-           // var enc=Base64.encode(dataURL);
-           // var dec=Base64.decode(enc);
         });
-        Notification.success({ message: "Saved...", delay: MsgDelay });
-    };
+     };
 
         var fileToDataURL = function (file) {
             var deferred = $q.defer();

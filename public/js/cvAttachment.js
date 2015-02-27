@@ -86,26 +86,8 @@ angular.module('ezeidApp').controller('CVAttachController', function($http, $roo
         }
     };
 
-    //Created by Abhishek
-    $scope.uploadFile = function (files) {
-        CVAttachCtrl._CVInfo.CVDocFile = files[0].name;
-        for (var i = 0; i < files.length; i++) {
-            var $file = files[i];
-            var formData = new FormData();
-            formData.append('file', $file);
-            //formData.append('RefType', $scope.OptionSelected);
-            formData.append('TokenNo', $rootScope._userInfo.Token);
-            formData.append('RefType', 7);
-
-            $http({ method: 'POST', url: '/ewTUploadDoc/', data: formData,
-                headers: { 'Content-Type': undefined }, transformRequest: angular.identity })
-                .success(function (data, status, headers, config) {
-                    getCVInfo();
-                   Notification.success({ message: "Saved... ", delay: MsgDelay });
-                }).
-                error(function(data, status, headers, config) {
-                });
-        }
+   $scope.uploadFile = function (files) {
+        $scope.DocumentToUpload = files;
     };
 
     var fileToDataURL = function (file) {
@@ -120,6 +102,24 @@ angular.module('ezeidApp').controller('CVAttachController', function($http, $roo
 
 
     this.saveCVDocInfo=function(){
+
+        CVAttachCtrl._CVInfo.CVDocFile = $scope.DocumentToUpload[0].name;
+        for (var i = 0; i < $scope.DocumentToUpload.length; i++) {
+            var $file = $scope.DocumentToUpload[i];
+            var formData = new FormData();
+            formData.append('file', $file);
+            formData.append('TokenNo', $rootScope._userInfo.Token);
+            formData.append('RefType', 7);
+
+            $http({ method: 'POST', url: '/ewTUploadDoc/', data: formData,
+                headers: { 'Content-Type': undefined }, transformRequest: angular.identity })
+                .success(function (data, status, headers, config) {
+                    //getCVInfo();
+                });
+              /*  error(function(data, status, headers, config) {
+                });*/
+        }
+
         CVAttachCtrl._CVInfo.TokenNo=$rootScope._userInfo.Token;
         CVAttachCtrl._CVInfo.Status=parseInt(CVAttachCtrl._CVInfo.Status);
         $http({

@@ -4,6 +4,8 @@ angular.module('ezeidApp').controller('BlackListWhiteListController', function($
     blacklist._info={};
     blacklist.msgs = [];
     var MsgDelay = 2000;
+    blacklist._info.Tag = "";
+
     if ($rootScope._userInfo) {
     }
     else {
@@ -42,7 +44,8 @@ angular.module('ezeidApp').controller('BlackListWhiteListController', function($
     $scope.$watch('_userInfo.IsAuthenticate', function () {
         if ($rootScope._userInfo.IsAuthenticate == true) {
             getBlackWhiteListInfo();
-        } else {
+
+       } else {
             window.location.href = "#/";
         }
     });
@@ -52,7 +55,6 @@ angular.module('ezeidApp').controller('BlackListWhiteListController', function($
             method: 'get',
             url: GURL + 'ewtGetWhiteBlackList?Token=' + $rootScope._userInfo.Token
         }).success(function (data) {
-
                  if (data != 'null')
                  {
                      blacklist.msgs = [];
@@ -61,6 +63,11 @@ angular.module('ezeidApp').controller('BlackListWhiteListController', function($
                          blacklist.msgs.push(data[i]);
                         // showPaging = data[0]['NextPage'];
                      }
+                 }
+                 else
+                 {
+                     blacklist.msgs = [];
+                     Notification.error({ message: "No List found..!", delay: MsgDelay });
                  }
             });
     }
@@ -71,6 +78,7 @@ angular.module('ezeidApp').controller('BlackListWhiteListController', function($
 
     //Add EZE Id to black/white list
     this.addToBlackWhiteList=function(){
+
        //first check EZEID available or not
         $http({
             method: 'get',
@@ -82,10 +90,15 @@ angular.module('ezeidApp').controller('BlackListWhiteListController', function($
                 }
                 else
                 {
+                    blacklist._info.Tag = blacklist._info.Tag == "" || !blacklist._info.Tag ? 0 : blacklist._info.Tag;
                     blacklist._info.Token = $rootScope._userInfo.Token;
                     $http({ method: 'post', url: GURL + 'ewtSaveWhiteBlackList', data: blacklist._info }).success(function (data) {
                         if (data.IsSuccessfull) {
                             Notification.success({ message: 'Saved...', delay: MsgDelay });
+                            blacklist._info.List = "";
+                            blacklist._info.RelationType = "";
+                            blacklist._info.EZEID = "";
+                            blacklist._info.Tag = "";
                             getBlackWhiteListInfo();
                         }
                         else {
@@ -96,19 +109,32 @@ angular.module('ezeidApp').controller('BlackListWhiteListController', function($
              });
     };
 
-    // Delete record from list
-    this.deleteFormList=function(_TID){
+    //open DeleteConfirmDialog
+    this.openDeleteConfirmDialog = function (_TID) {
+            $scope.recordtoDelete = _TID;
+            $('#confirmDelete').slideDown();
+    };
+    //close DeleteConfirmDialog
+    this.closeDeleteConfirmDialog = function (_TID) {
+        $scope.recordtoDelete = "";
+        $('#confirmDelete').slideUp();
+    };
 
+    // Delete record from list
+    this.deleteFormList=function(){
        var dataToDelete = {
-            Token: $rootScope._userInfo.Token,
-            TID: _TID
+           TID: $scope.recordtoDelete,
+           Token: $rootScope._userInfo.Token
         };
         $http({ method: 'post', url: GURL + 'ewtDeleteWhiteBlackList', data: dataToDelete }).success(function (data) {
             if (data.IsSuccessfull) {
-                Notification.success({ message: 'Deleted...', delay: MsgDelay });
+                $scope.recordtoDelete = "";
+                $('#confirmDelete').slideUp();
                 getBlackWhiteListInfo();
+                Notification.success({ message: 'Deleted...', delay: MsgDelay });
             }
             else {
+                $scope.recordtoDelete = "";
                 Notification.error({ message: 'Sorry..! not deleted ', delay: MsgDelay });
             }
         });

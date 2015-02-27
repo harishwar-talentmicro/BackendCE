@@ -54,7 +54,7 @@
                 <div class="clearfix"></div>
                 <div class="row quick_butt">
                     <div class="col-md-12 col-md-offset">
-                        <input type="submit" class="btn btn-primary wdButt1 pull-left marLL10px" value="Sign In"/>
+                        <input type="submit" ng-disabled="!SignInCtrl.LInfo.UserName || !SignInCtrl.LInfo.Password" class="btn btn-primary wdButt1 pull-left marLL10px" value="Sign In"/>
                         <input type="button" ng-click="SignInCtrl.reset(SignInForm)" class="btn btn-primary wdButt1 signin_cancel marL10px" value="Close"/>
                     </div>
                 </div>
@@ -155,16 +155,8 @@
         <div id="navbar" class="navbar-collapse collapse">
 
             <form class="navbar-form navbar-right" role="form">
-                <!--  <h4 class="pull-left">
-                      <span>Unique ID for all Individuals and Business Entities across the world. <br> Claim your favorite EZE ID before others block it.. <br>If you skip now, your will loose your favorite ID for ever.</span>
-                      <img src="images/TopHighlights.gif">
-                  </h4>-->
-                <!-- <h4 class="pull-left">
-                     <span style="color: red">PATENT IN PROCESS NO.6622/CHE/2014</span>
-                 </h4>-->
-                <a class="btn btn-primary" id="signin" ng-hide="$root._userInfo.IsAuthenticate">Sign In</a>
-                <!--<a href="#/editprofile" class="btn btn-primary signUpBackGround" ng-hide="$root._userInfo.IsAuthenticate || $root._userInfo.hideSignUpPage">Sign Up Now</a>-->
-                <a href="#/editprofile" class="btn btn-primary" ng-hide="$root._userInfo.IsAuthenticate">Sign Up Now</a>
+               <a class="btn btn-primary" id="signin" ng-hide="$root._userInfo.IsAuthenticate">Sign In</a>
+               <a href="#/editprofile" class="btn btn-primary" ng-hide="$root._userInfo.IsAuthenticate">Sign Up Now</a>
 
                 <img ng-show="$root._userInfo.IsAuthenticate" class="user_icon" style="border-radius: 18px;margin-right:-46px;" src="{{$root._userInfo.Icon}}"/>
                 <a href="#" id="userid" class="btn btn-primary userMarR" ng-show="$root._userInfo.IsAuthenticate">
@@ -187,7 +179,7 @@
                         <li ng-show="$root._userInfo.Type == 2 && $root._userInfo.Verified == 2"><a class="business-list" href="#/busslist">Business List</a></li>
                         <li ng-show="$root._userInfo.Type == 1"><a class="cv-icon" href="#/attachcv">CV Attachment</a></li>
                         <li><a class="history-icon" href="#/acchist">Access History</a></li>
-                        <li><a class="blacklist-icon" href="#/blackwhitelist">Black/White List</a></li>
+                        <li><a class="blacklist-icon" href="#/blackwhitelist">Blacklist Whitelist</a></li>
                         <li><a class="changePass-icon" href="#" ng-click="SignInCtrl.openChangePasswordForm()">Change Password</a></li>
                     </ul>
                 </div>
@@ -195,76 +187,4 @@
         </div><!--/.navbar-collapse -->
     </div>
 </nav>
-
-<form name="SignUpForm" novalidate ng-submit="SignInCtrl.AddUser(SignUpForm)">
-<div class="Popup_window form_style" id="signup_popup">
-<div class="window_page Maping_popup">
-<span ng-click="SignInCtrl.resetSignUpForm(SignUpForm)" class="closelink">X</span>
-                <span style="margin-top:-2px;float:right; border:1px solid #000000;background:#FAA9A3;color:#000000;" ng-show="(SignUpForm.$submitted || SignUpForm.EZEID.$touched && !SignInCtrl.RegInfo.EZEID.length)
-                || (SignUpForm.$submitted || SignUpForm.Password.$touched && !SignInCtrl.RegInfo.Password.length)
-                || (SignUpForm.$submitted || SignUpForm.CPassword.$touched && !SignInCtrl.RegInfo.CPassword.length)
-                || (SignUpForm.$submitted || SignUpForm.FirstName.$touched && !SignInCtrl.RegInfo.FirstName.length)
-                || (SignUpForm.$submitted || SignUpForm.LastName.$touched && !SignInCtrl.RegInfo.LastName.length)
-                || (SignUpForm.$submitted || SignUpForm.MobileNumber.$touched && !SignInCtrl.RegInfo.MobileNumber.length)">
-                        <span ng-show="SignUpForm.EZEID.$error.required || SignUpForm.Password.$error.required
-                                    || SignUpForm.CPassword.$error.required || SignUpForm.FirstName.$error.required
-                                    || SignUpForm.LastName.$error.required || SignUpForm.MobileNumber.$error.required">* Mandatory</span>
-                    </span>
-
-<h3>Quick Sign Up</h3>
-<div class="clearfix"></div>
-<ul style="padding-left:20px!important;padding-right:20px!important;" class="pad0px quick_sign">
-<li class="dsp_block padT10px">
-    <input type="text" style='text-transform:uppercase' ng-pattern="/^[A-Z0-9]*$/" placeholder="Your preferred EZE ID (0 to 9, A to Z are allowed)" maxlength="15" name="EZEID" ng-model="SignInCtrl.RegInfo.EZEID" ng-class="SignUpForm.$submitted || SignUpForm.EZEID.$touched && !SignInCtrl.RegInfo.EZEID.length ? 'mandatoryTextBox' : ''" class="form-control emptyBox" required>
-    <div class="clearfix"></div>
-</li>
-<li class="dsp_block">
-    <div class="pull-left wd48p">
-        <input type="password" ng-model="SignInCtrl.RegInfo.Password" ng-class="SignUpForm.$submitted || SignUpForm.Password.$touched && !SignInCtrl.RegInfo.Password.length ? 'mandatoryTextBox' : ''" name="Password" class="form-control emptyBox" required placeholder="Password">
-    </div>
-    <div class="pull-right wd48p">
-        <input type="password" ng-model="SignInCtrl.RegInfo.CPassword" name="CPassword" ng-match="SignInCtrl.RegInfo.Password" ng-class="SignUpForm.$submitted || SignUpForm.CPassword.$touched && !SignInCtrl.RegInfo.CPassword.length ? 'mandatoryTextBox' : ''" class="form-control emptyBox" required placeholder="Confirm Password">
-    </div>
-    <div class="clearfix"></div>
-</li>
-<li class="dsp_block ">
-    <div class="pull-left wd48p">
-        <input type="text" placeholder="First Name" name="FirstName" ng-model="SignInCtrl.RegInfo.FirstName" ng-class="SignUpForm.$submitted || SignUpForm.FirstName.$touched && !SignInCtrl.RegInfo.FirstName.length ? 'mandatoryTextBox' : ''" class="form-control emptyBox" required>
-    </div>
-    <div class="pull-right wd48p">
-        <input type="text" ng-model="SignInCtrl.RegInfo.LastName" name="LastName" ng-class="SignUpForm.$submitted || SignUpForm.LastName.$touched && !SignInCtrl.RegInfo.LastName.length ? 'mandatoryTextBox' : ''" class="form-control emptyBox" required placeholder="Last Name">
-    </div>
-    <div class="clearfix"></div>
-</li>
-<li class="dsp_block">
-<div class="pull-left wd48p">
-<!--<input id="mobile-number" type="tel" class="form-control wd30p pull-left" placeholder="">-->
-
-<input type="MobileNumber" maxlength="10"  onkeypress="return isNumberKey(event)" ng-model="SignInCtrl.RegInfo.MobileNumber" name="MobileNumber" ng-class="SignUpForm.$submitted || SignUpForm.MobileNumber.$touched && !SignInCtrl.RegInfo.MobileNumber.length ? 'mandatoryTextBox' : ''" class="form-control wd_mobNo pull-right emptyBox" required placeholder="Mobile No">
-</div>
-<div class="pull-right wd48p">
-    <input type="email" ng-model="SignInCtrl.RegInfo.EMailID" name="EMailID" class="form-control" placeholder="Email ID" ng-pattern="/^[a-z]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5}$/">
-</div>
-<div class="clearfix"></div>
-
-</li>
-<li class="dsp_block">
-    <!--<input type="submit" ng-disabled="SignUpForm.$invalid" class="btn btn-primary pull-left quick_butt" value="Sign Up Now">-->
-    <input type="submit" ng-disabled="!SignInCtrl.RegInfo.EZEID || !SignInCtrl.RegInfo.Password || !SignInCtrl.RegInfo.CPassword || !SignInCtrl.RegInfo.FirstName || !SignInCtrl.RegInfo.LastName || !SignInCtrl.RegInfo.MobileNumber || SignInCtrl.RegInfo.Password != SignInCtrl.RegInfo.CPassword" class="btn btn-primary pull-left quick_butt" value="Sign Up Now">
-    <input type="reset" ng-click="SignInCtrl.resetSignUpForm(SignUpForm)" class="btn btn-primary marL10px pull-left Popup_cancel quick_butt" value="Close">
-
-</li>
-</ul>
-<h3 class="change_line"><span></span></h3>
-<div class="clearfix"></div>
-<span class="marL10px" style="color:red;">{{SignInCtrl.RMessage}}</span>
-<div class="msg_red1" ng-show="SignInCtrl.RegInfo.Password != SignInCtrl.RegInfo.CPassword && SignInCtrl.RegInfo.Password.length > 0 && SignInCtrl.RegInfo.CPassword.length > 0">Password mismatch...</div>
-<span class="msg_red2" ng-show="SignUpForm.EMailID.$error.pattern">Not valid email!</span>
-<div class="clearfix"></div>
-</div>
-<div class="clearfix"></div>
-<div class="clearfix"></div>
-</div>
-</form>
-
 </div>

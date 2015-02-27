@@ -453,7 +453,6 @@
                                 if (data != 'null') {
                                     $timeout(function () {
                                         SearchSec.mInfo = data[0];
-
                                         $scope.showInfoTab = true;
                                         $scope.selectTab('info');
                                     });
@@ -908,8 +907,6 @@
                         SearchSec.ReservationDateTime = "";
                         Notification.success({ message: 'Message send success', delay: MsgDelay });
                         document.getElementById("reservationMessage").className = "form-control fixTextArea emptyBox";
-                        document.getElementById("reservationMessage1").className = "form-control fixTextArea emptyBox";
-                        document.getElementById("reservationMessage2").className = "form-control fixTextArea emptyBox";
                     }
                     else {
                         Notification.error({ message: 'Sorry..! Message not send ', delay: MsgDelay });
