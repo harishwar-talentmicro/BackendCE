@@ -5,8 +5,10 @@
         var charCode = (evt.which) ? evt.which : event.keyCode
         if (charCode > 31 && (charCode < 48 || charCode > 57))
             return false;
+
         return true;
     }
+
 </script>
 <div>
     <form name="SignInForm" novalidate ng-submit="SignInForm.$valid && SignInCtrl.LoginUser(SignInCtrl.LInfo,SignInForm)">
@@ -157,7 +159,7 @@
                <a href="#/editprofile" class="btn btn-primary" ng-hide="$root._userInfo.IsAuthenticate">Sign Up Now</a>
                 <!--<img ng-show="$root._userInfo.IsAuthenticate" class="user_icon" style="border-radius: 18px;margin-right:-46px;" src="{{$root._userInfo.Icon}}"/>-->
                 <img ng-show="$root._userInfo.IsAuthenticate && $root._userInfo.Icon.length" class="user_icon" style="border-radius: 18px;margin-right:-46px;" src="{{$root._userInfo.Icon}}"/>
-                <a href="#" id="userid" class="btn btn-primary userMarR" ng-show="$root._userInfo.IsAuthenticate">
+                <a id="userid" class="btn btn-primary userMarR" ng-show="$root._userInfo.IsAuthenticate">
                     {{$root._userInfo.FirstName}}
                     <img style="position:relative; top:-2px;" src="images/drp_arrow.png">
                 </a>

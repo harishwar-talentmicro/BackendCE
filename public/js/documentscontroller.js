@@ -61,7 +61,7 @@ angular.module('ezeidApp').controller('DocumentController', function($http, $roo
     $('#datetimepicker1').datetimepicker({
        format: "d-M-Y",
         hours12: false,
-        mask: true,
+//        mask: true,
         timepicker:false
     });
     $('#datetimepicker1').siblings('.input-group-addon').on('click',function(){
@@ -89,15 +89,25 @@ angular.module('ezeidApp').controller('DocumentController', function($http, $roo
 
     DocCtrl.ChangePin = function(){
 
-        $http({ method: 'post', url: GURL + 'ewtUpdateDocPin', data: { TokenNo: $rootScope._userInfo.Token, Pin: $scope.Pin} }).success(function (data) {
-            if (data.IsUpdated) {
 
-                Notification.success({ message: 'Saved...', delay: MsgDelay });
+            if($scope.Pin<100 && $scope.Pin != "")
+            {
+                $scope.Pin = ""
+                Notification.error({ message: 'Pin should greater or equal 100 ', delay: MsgDelay });
             }
-            else {
-                Notification.error({ message: 'Sorry..! not saved ', delay: MsgDelay });
+            else
+            {
+                $http({ method: 'post', url: GURL + 'ewtUpdateDocPin', data: { TokenNo: $rootScope._userInfo.Token, Pin: $scope.Pin} }).success(function (data) {
+                    if (data.IsUpdated) {
+
+                        Notification.success({ message: 'Saved...', delay: MsgDelay });
+                    }
+                    else {
+                        Notification.error({ message: 'Sorry..! not saved ', delay: MsgDelay });
+                    }
+                });
             }
-        });
+
     }
 
     $scope.uploadFile = function (files) {

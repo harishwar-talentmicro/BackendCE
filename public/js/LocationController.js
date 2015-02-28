@@ -253,6 +253,15 @@ angular.module('ezeidApp').controller('LocationsController', function ($rootScop
         var notificationMessage = "";
         var errorList  = [];
         // Check validations
+        if(SLocCtrl._locInfo.PIN)
+        {
+            if(SLocCtrl._locInfo.PIN != ""){
+                if(SLocCtrl._locInfo.PIN<100)
+                {
+                     errorList.push('Pin should greater or equal 100');
+                }
+            }
+        }
         if(!SLocCtrl._locInfo.AddressLine1)
         {
             errorList.push(' Address1 Required');
@@ -364,10 +373,12 @@ angular.module('ezeidApp').controller('LocationsController', function ($rootScop
                     }
                 });
         }
-
-
     };
     this.updateNewLoc = function (secLocForm) {
+
+        if(isValidate())
+        {
+
         SLocCtrl._locInfo.Token = $rootScope._userInfo.Token;
 
         SLocCtrl._locInfo.SalesEnquiryButton =  SLocCtrl._locInfo.SalesEnquiryButton == true ? 1 : 0;
@@ -398,6 +409,8 @@ angular.module('ezeidApp').controller('LocationsController', function ($rootScop
                 Notification.error({ message: "Sorry..! not saved", delay: MsgDelay });
             }
         });
+
+        }
     };
 
     //get Locations Function
