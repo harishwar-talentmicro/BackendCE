@@ -868,4 +868,6 @@ angular.module('ezeidApp').controller('LocationsController', function ($rootScop
             reader.readAsDataURL(file);
             return deferred.promise;
         };
+
+    //Test comment
 });
