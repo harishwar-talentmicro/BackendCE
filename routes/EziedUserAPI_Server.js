@@ -3695,7 +3695,7 @@ exports.FnSearchByKeywords = function (req, res) {
                                     }
                                 }
                             }
-                            var SearchQuery = db.escape('') + ',' + db.escape(CategoryID) + ',' + db.escape(0) + ',' + db.escape(0.00) + ',' + db.escape(0.00) + ',' + db.escape(EZEID) + ',' + db.escape(LocSeqNo) + ',' + db.escape(Pin) + ',' + db.escape(SearchType) + ',' + db.escape(DocType) + ',' + db.escape("0") + ',' + db.escape("0") + ',' + db.escape("0");
+                            var SearchQuery = db.escape('') + ',' + db.escape(CategoryID) + ',' + db.escape(0) + ',' + db.escape(0.00) + ',' + db.escape(0.00) + ',' + db.escape(EZEID) + ',' + db.escape(LocSeqNo) + ',' + db.escape(Pin) + ',' + db.escape(SearchType) + ',' + db.escape(DocType) + ',' + db.escape("0") + ',' + db.escape("0") + ',' + db.escape("0") + ',' + db.escape(token);
                             //console.log('SearchQuery: ' + SearchQuery);
                             db.query('CALL pSearchResult(' + SearchQuery + ')', function (err, SearchResult) {
                                 // db.query(searchQuery, function (err, SearchResult) {
@@ -3760,7 +3760,7 @@ exports.FnSearchByKeywords = function (req, res) {
             }
             if (find != null && find != '' && Proximity.toString() != 'NaN' && Latitude.toString() != 'NaN' && Longitude.toString() != 'NaN' && CategoryID != null) {
 
-                var InsertQuery = db.escape(find) + ',' + db.escape(CategoryID) + ',' + db.escape(Proximity) + ',' + db.escape(Latitude) + ',' + db.escape(Longitude) + ',' + db.escape('') + ',' + db.escape(0) + ',' + db.escape(0) + ',' + db.escape(1) + ',' + db.escape('') + ',' + db.escape(ParkingStatus) + ',' + db.escape(OpenCloseStatus) + ',' + db.escape(Rating);
+                var InsertQuery = db.escape(find) + ',' + db.escape(CategoryID) + ',' + db.escape(Proximity) + ',' + db.escape(Latitude) + ',' + db.escape(Longitude) + ',' + db.escape('') + ',' + db.escape(0) + ',' + db.escape(0) + ',' + db.escape(1) + ',' + db.escape('') + ',' + db.escape(ParkingStatus) + ',' + db.escape(OpenCloseStatus) + ',' + db.escape(Rating) + ',' + db.escape(token);
                 //console.log('SearchQuery: ' + InsertQuery);
                 db.query('CALL pSearchResult(' + InsertQuery + ')', function (err, SearchResult) {
                     if (!err) {
@@ -3772,7 +3772,7 @@ exports.FnSearchByKeywords = function (req, res) {
                             }
                             else {
                                 if (Proximity != 0) {
-                                    var InsertProximityQuery = db.escape(find) + ',' + db.escape(CategoryID) + ',' + db.escape(0) + ',' + db.escape(Latitude) + ',' + db.escape(Longitude) + ',' + db.escape('') + ',' + db.escape(0) + ',' + db.escape(0) + ',' + db.escape(1) + ',' + db.escape('') + ',' + db.escape(ParkingStatus) + ',' + db.escape(OpenCloseStatus) + ',' + db.escape(Rating);
+                                    var InsertProximityQuery = db.escape(find) + ',' + db.escape(CategoryID) + ',' + db.escape(0) + ',' + db.escape(Latitude) + ',' + db.escape(Longitude) + ',' + db.escape('') + ',' + db.escape(0) + ',' + db.escape(0) + ',' + db.escape(1) + ',' + db.escape('') + ',' + db.escape(ParkingStatus) + ',' + db.escape(OpenCloseStatus) + ',' + db.escape(Rating) + ',' + db.escape(token);
                                     console.log('SearchQuery without Proximity: ' + InsertProximityQuery);
                                     db.query('CALL pSearchResult(' + InsertProximityQuery + ')', function (err, SearchProximityResult) {
                                         if (!err) {
@@ -4377,6 +4377,86 @@ exports.FnDeleteWhiteBlackList = function(req, res){
     }
 }
 
+exports.FnGetWhiteListCount = function (req, res) {
+    try {
+
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.query.Token;
+        var EZEID = req.query.EZEID;
+        var RtnMessage = {
+            WhiteListCount : 0
+        };
+
+        var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
+        if (Token != null && EZEID!=null) {
+            FnValidateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+
+                        var query = db.escape(Token) + ',' + db.escape(EZEID);
+
+                        db.query('CALL pGetWhiteListCount(' + query + ')', function (err, GetResult) {
+                            if (!err) {
+                                if (GetResult[0] != null) {
+                                    if (GetResult[0].length > 0) {
+                                        var WhiteListCount =GetResult[0];
+                                        RtnMessage.WhiteListCount=WhiteListCount[0].WhiteListCount;
+                                        console.log('FnGetWhiteListCount: white list count Sent successfully');
+                                        res.send(RtnMessage);
+                                    }
+                                    else {
+
+                                        console.log('FnGetWhiteListCount:No white list details found');
+                                        res.send(RtnMessage);
+                                    }
+                                }
+                                else {
+
+                                    console.log('FnGetWhiteListCount:No white list details found');
+                                    res.send(RtnMessage);
+                                }
+
+                            }
+                            else {
+
+                                console.log('FnGetWhiteListCount: error in getting white list' + err);
+                                res.statusCode = 500;
+                                res.send(RtnMessage);
+                            }
+                        });
+                    }
+                    else {
+                        res.statusCode = 401;
+                        res.send(RtnMessage);
+                        console.log('FnGetWhiteListCount: Invalid Token');
+                    }
+                } else {
+
+                    res.statusCode = 500;
+                    res.send(RtnMessage);
+                    console.log('FnGetWhiteListCount: Error in validating token:  ' + err);
+                }
+            });
+        }
+        else {
+            if (Token == null) {
+                console.log('FnGetWhiteListCount: Token is empty');
+            }
+            else if (EZEID == null) {
+                console.log('FnGetWhiteListCount: EZEID is empty');
+            }
+
+            res.statusCode=400;
+            res.send(RtnMessage);
+        }
+    }
+    catch (ex) {
+        console.log('FnGetWhiteListCount error:' + ex.description);
+        throw new Error(ex);
+    }
+};
 
 //EZEIDAP Parts
 

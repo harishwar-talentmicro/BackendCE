@@ -118,6 +118,7 @@ app.get('/ewtGetBannerPicture', LocationManager.FnGetBannerPicture);
 app.post('/ewtSaveWhiteBlackList', LocationManager.FnSaveWhiteBlackList);
 app.get('/ewtGetWhiteBlackList', LocationManager.FnGetWhiteBlackList);
 app.post('/ewtDeleteWhiteBlackList', LocationManager.FnDeleteWhiteBlackList);
+app.get('/ewtGetWhiteListCount', LocationManager.FnGetWhiteListCount);
 //below service are for EZEIDAP
 app.post('/ewLoginAP', LocationManager.FnLoginAP);
 app.get('/ewLogoutAP', LocationManager.FnLogoutAP);
