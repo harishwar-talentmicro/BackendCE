@@ -841,4 +841,6 @@ angular.module('ezeidApp').controller('LocationsController', function ($rootScop
         reader.readAsDataURL(file);
         return deferred.promise;
     };
+
+    //THis is a test comment
 });
