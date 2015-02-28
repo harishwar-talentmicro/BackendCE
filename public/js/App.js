@@ -64,19 +64,19 @@
                 },
                 template:
                     '<div class="input-group datetimepicker">'+
-                        '<input type="text" class="form-control" placeholder="Date"  id="datetimepicker1"  name="recipientDateTime"/>'+
+                        '<input type="text" class="form-control" placeholder="Date"  id="datetimepicker1"  name="recipientDateTime" />'+
                         '<span class="input-group-addon"><span class="glyphicon glyphicon-calendar" >'+
                         '</span>'+
                     '</div>',
                 link: function(scope, element, attrs, ngModel) {
                 var input = element.find('input');
-                input.bind('blur change keyup',function(){
+                input.bind('blur change keyup keypress',function(){
                     scope.recipient = input.val();
                     scope.$apply();
                 });
-                    
-                scope.$watch('recipient',function(oldVal,newVal){
-                    $(input[0]).val(oldVal);
+
+                scope.$watch('recipient',function(newVal,oldVal){
+                    $(input[0]).val(newVal);
                 });
             }
         }
@@ -144,8 +144,7 @@
 
         $('#datetimepicker1').datetimepicker({
            format: "d-M-Y  h:m A",
-            hours12: false,
-            mask: true
+           hours12: false
         });
         $('#datetimepicker1').siblings('.input-group-addon').on('click',function(){
             $('#datetimepicker1').trigger('focus');
@@ -190,9 +189,7 @@
 
             format: "d-M-Y  h:m A",
             hours12: false,
-            minDate: 0,
-            minTime : 0,
-            mask:true
+            minDate: 0
         });
         $('#datetimepicker1').siblings('.input-group-addon').on('click',function(){
             $('#datetimepicker1').trigger('focus');
@@ -1069,13 +1066,12 @@
             format: 'd-M-Y',
             hours12: false,
             maxDate: 0,
-            timepicker : false,
-            mask: true
+            timepicker : false
         });
         $('#datetimepicker1').siblings('.input-group-addon').on('click',function(){
             $('#datetimepicker1').trigger('focus');
         });
-       
+
         var map;
         var mapOptions;
         var marker;
@@ -1356,9 +1352,7 @@
 
             //// Create the search box and link it to the UI element.
             var input = (document.getElementById('txtSearch'));
-
             map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
-
             var searchBox = new google.maps.places.SearchBox((input));
 
             // Listen for the event fired when the user selects an item from the
@@ -1612,6 +1606,17 @@
                 if(!profile._info.EZEID)
                 {
                     errorList.push('EZEID is Required');
+                }
+
+                if(profile._info.PIN)
+                {
+                    if(profile._info.PIN != ""){
+                        if(profile._info.PIN<100)
+                        {
+                             errorList.push('Pin should greater or equal 100');
+                        }
+                    }
+
                 }
 
                 if($scope.disableAvalabilityButton == false)

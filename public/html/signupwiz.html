@@ -20,6 +20,7 @@
     }
 </style>
 <script>
+
     function thumb(files) {
 
         if (files == null || files == undefined) {
@@ -43,11 +44,8 @@
                 reader.onload = GetThumbnail;
                 reader.readAsDataURL(file);
             }
-
-
         }
     }
-
 
     function GetThumbnail(e) {
         var myCan = document.createElement('canvas');
@@ -73,11 +71,8 @@
                 }
                 else
                     alert('unable to get cntxt');
-
             }
-
         }
-
     }
 </script>
 
@@ -263,7 +258,7 @@
                                                     <input type="text" ng-show=" profile._info.IDTypeID == 2" class="form-control" maxlength="100" ng-model="profile._info.JobTitle" placeholder="About Company"  style="width: 48%">
                                                     <input type="text" ng-show=" profile._info.IDTypeID == 3" class="form-control" maxlength="100" ng-model="profile._info.JobTitle" placeholder="About Public Place"  style="width: 48%">
                                                 </div><br/>
-                                            </div>s
+                                            </div>
 
                                             <div class="col-lg-6">
                                                 <div class="col-lg-8" style="margin: auto; float: none;">
@@ -387,7 +382,6 @@
                                     <button type="submit" ng-hide="_userInfo.IsAuthenticate" ng-disabled="!profile._info.Terms"
                                             ng-click="profile.savePrimaryRegistration(UserForm)" class="btn btn-primary">Generate EZEID</button>
                                    <button type="reset" class="btn btn-primary" ng-click="profile.closeRegistrationForm()" >Close</button>
-
                             </div>
                         </div>
                     </div>
@@ -405,5 +399,4 @@
             </div>
         </div>
     </div>
-
 </div>

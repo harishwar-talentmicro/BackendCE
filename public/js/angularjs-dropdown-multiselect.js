@@ -107,11 +107,11 @@ directiveModule.directive('ngDropdownMultiselect', ['$filter', '$document', '$co
                 $scope.texts = {
                     checkAll: 'Check All',
                     uncheckAll: 'Uncheck All',
-                    selectionCount: 'checked',
+                    selectionCount: 'Checked',
                     selectionOf: '/',
                     searchPlaceholder: 'Search...',
                     buttonDefaultText: ' Rating ',
-                    dynamicButtonTextSuffix: 'checked'
+                    dynamicButtonTextSuffix: 'Checked'
                 };
 
                 $scope.searchFilter = $scope.searchFilter || '';

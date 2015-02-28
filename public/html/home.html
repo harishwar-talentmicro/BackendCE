@@ -105,7 +105,6 @@
                                     <span ng-show="search.mInfo.IDTypeID==2"> Reservation Date & Time:</span>
                                     <span ng-show="search.mInfo.IDTypeID==1"> Appointment Date & Time:</span>
                                     <span ng-show="search.mInfo.IDTypeID==3"> Appointment Date & Time:</span>
-
                                 </label>
                                 <span style="width:60%;display:block;">
                                      <date-time-picker recipient="search.ReservationDateTime"></date-time-picker>
@@ -227,8 +226,8 @@
                         <a class="road-parking active" ng-show="search.mInfo.ParkingStatus==2" title="Road Parking">Road Parking</a>
                         <div class="clearfix"></div>
                     </div>
-                    <div class="search_user" ng-hide="search.isIndividualUser(1)" class="col-md-offset-1">
-                        <span ng-show="search.mInfo.IDTypeID != 1">
+                    <div class="search_user" ng-hide="search.isIndividualUser(1)" class="col-md-offset-1" >
+                        <span ng-show="search.mInfo.IDTypeID != 1" style="font-size: 15px;">
                                 <p ng-show="search.mInfo.OpenStatus==1" class="open-close"><i>OPEN</i> Working hours :  {{search.mInfo.WorkingHours}}</p>
                                 <p ng-hide="search.mInfo.OpenStatus==1" ng-click="search.closeHomeDeliverForm()" class="close-close"><i>CLOSE</i> Working hours :  {{search.mInfo.WorkingHours}}</p>
                          </span>
@@ -424,19 +423,19 @@
                                     <div class="col-lg-7 col-md-7 col-sm-7 col-xs-12 text-center">
                                         <div class="row">
                                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                                <h2 class="text-center" ng-show="search.mInfo.IDTypeID == 1"  style="line-height:0;padding-bottom:3px;">{{search.mInfo.FirstName}}{{" "+search.mInfo.LastName}}</h2>
-                                                <h2 class="text-center" ng-show="search.mInfo.IDTypeID == 3"  style="line-height:0;padding-bottom:3px;">{{search.mInfo.FirstName}}{{" "+search.mInfo.LastName}}</h2>
-                                                <h2 class="text-center" ng-show="search.mInfo.IDTypeID == 2"  style="line-height:0;padding-bottom:3px;">{{search.mInfo.CompanyName}}</h2>
+                                                <h2 class="text-center" ng-show="search.mInfo.IDTypeID == 1"  style="font-size: 27px; line-height:0;padding-bottom:3px;">{{search.mInfo.FirstName}}{{" "+search.mInfo.LastName}}</h2>
+                                                <h2 class="text-center" ng-show="search.mInfo.IDTypeID == 3"  style="font-size: 27px; line-height:0;padding-bottom:3px;">{{search.mInfo.FirstName}}{{" "+search.mInfo.LastName}}</h2>
+                                                <h2 class="text-center" ng-show="search.mInfo.IDTypeID == 2"  style="font-size: 27px; line-height:0;padding-bottom:3px;">{{search.mInfo.CompanyName}}</h2>
                                             </div>
                                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                                <h4 class="text-center"  style="line-height:1;">
+                                                <h4 class="text-center"  style="line-height:2; font-size: 15px; margin-top: 3px; margin-bottom: 4px;">
                                                     {{search.mInfo.AddressLine1 + ", "}} {{search.mInfo.AddressLine2+ ", "}} {{search.mInfo.CityTitle+ ", "}}
                                                     {{search.mInfo.StateTitle+ ", "}} {{search.mInfo.CountryTitle +", "}} {{search.mInfo.PostalCode}}
                                                 </h4>
                                             </div>
                                         </div>
 
-                                        <div class="row text-left" style="border-bottom: 1px solid #DDD;padding: 5px;margin-top: 0px; padding-top: 0px;">
+                                        <div class="row text-left" style="font-size: 15px; border-bottom: 1px solid #DDD;padding: 5px;margin-top: 0px; padding-top: 0px;">
                                             
                                             <div class="col-lg-1">
                                                 <img src="images/Telephone_24.png" />
@@ -445,10 +444,10 @@
                                                 {{search.mInfo.PhoneNumber == "" ? "--------" :search.mInfo.ISDPhoneNumber}}  {{search.mInfo.PhoneNumber == "" ? "--------" : search.mInfo.PhoneNumber}}
                                             </div>
                                             
-                                            <div class="col-lg-1">
+                                            <div class="col-lg-1" style="margin-left: 14%;">
                                                 <img src="images/Mobile_24.png" />
                                             </div>
-                                            <div class="col-lg-5">
+                                            <div class="col-lg-5" style="width: 27.666667%;">
                                                 {{search.mInfo.MobileNumber == "" ? "--------" : search.mInfo.MobileNumber}}
                                             </div>
                                         </div>
@@ -492,10 +491,10 @@
                                             <div class="col-lg-1" style="width: 6.333333%;">
                                                 <img src="images/MSG_24.png" />
                                             </div>
-                                            <div class="col-lg-4" style="overflow-x: auto;">
+                                            <div class="col-lg-4" style="width: 44.333333%;word-wrap: break-word;">
                                                 {{search.mInfo.EMailID}}
                                             </div>
-                                            <div class="col-lg-1" style="margin-left: 1.5%; width: 5.333333%;">
+                                            <div class="col-lg-1" style=" margin-left: 1.5%; width: 5.333333%;">
                                                 <div class="row">
                                                     
                                                     <div class="col-lg-4 text-center">
@@ -509,8 +508,8 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="col-lg-5" style="overflow-x: auto;">
-                                                {{search.mInfo.Website}}
+                                            <div class="col-lg-5" style="word-wrap: break-word;">
+                                                <u> <a href="{{search.mInfo.Website}}">{{search.mInfo.Website}}</a></u>
                                             </div>
                                         </div>
                                     </div>
@@ -538,8 +537,8 @@
                                     </div>
                                     <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 col-lg-offset-0 col-md-offset-0 col-sm-offset-0 col-xs-offset-0" style="padding-top:5px;">
                                         <span ng-show="search.mInfo.IDTypeID != 1">
-                                        <h5 ng-show="search.mInfo.OpenStatus==1" style="border:none;">Working hours :  {{search.mInfo.WorkingHours}}</h5>
-                                        <h5 ng-hide="search.mInfo.OpenStatus==1"  style="border:none;" ng-click="search.closeHomeDeliverForm()"> Working hours :  {{search.mInfo.WorkingHours}}</h5>
+                                        <h5 ng-show="search.mInfo.OpenStatus==1"  style="border:none; font-size: 15px;">Working hours :  {{search.mInfo.WorkingHours}}</h5>
+                                        <h5 ng-hide="search.mInfo.OpenStatus==1"  style="border:none; font-size: 15px;" ng-click="search.closeHomeDeliverForm()"> Working hours :  {{search.mInfo.WorkingHours}}</h5>
                                             </span>
                                                 
                                     </div>
