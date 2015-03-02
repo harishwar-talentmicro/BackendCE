@@ -285,17 +285,16 @@
                                     <div class="bottom-clearfix"></div>
                                     <div class="row row-margin-fix">
 
-                                        <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8" ng-class="search.isEZEIDselected('1') ? 'searchAreaSize' : '' ">
+                                        <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8" ng-class="search.isEZEIDselected('1') ? 'searchAreaSize' : 'searchAreaSizeBig' ">
                                             <input id="inputEmail" class="form-control" ng-model="search.Criteria.Keywords"   ng-click="search.SearchTypeKeyWord()" required autofocus type="text"
-                                                   ng-class="search.Criteria.SearchType == 1 ? 'setUpperChar' : ''">
+                                                   ng-class="search.Criteria.SearchType == 1 ? 'setUpperChar' : ''" >
                                         </div>
 
                                         <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2" ng-hide="search.isEZEIDselected('1')">
                                             <div ng-dropdown-multiselect="" options="ratingData" selected-model="ratingModel"></div>
                                         </div>
 
-                                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
-                                            <!--<button  ng-disabled="!search.Criteria.Keywords" ng-click="search.getSearch()" class="btn btn-block btn-primary pull-left" type="button">Search</button>-->
+                                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2" ng-class="search.isEZEIDselected('1') ? 'searchButtonDiv' : 'setSpaceSearchButton' ">
                                             <button  ng-disabled="!search.Criteria.Keywords" class="btn btn-block btn-primary pull-left" type="submit">Search</button>
                                         </div>
                                     </div>
@@ -314,13 +313,14 @@
                                                 </div>
                                             </div>
 
-                                            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6" ng-hide="search.isEZEIDselected('1')" style="padding-left: 0px; width: 23%;">
-                                                <select class="form-control pull-left"
-                                                        ng-model="search.Criteria.Proximity" ng-disabled="search.isEZEIDselected('1')"     >
-                                                    <option value="{{proximity.MilesValue}}"  ng-selected="{{proximity.MilesValue == 1}}" ng-repeat="proximity in search.proximities">{{proximity.Title}}</option>
-                                                    <option value="0">Any</option>
-                                                </select>
-                                            </div>
+                                        <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6" ng-hide="search.isEZEIDselected('1')" style="padding-left: 0px; width: 23%;">
+                                            <select class="form-control pull-left"
+                                                    ng-model="search.Criteria.Proximity" ng-disabled="search.isEZEIDselected('1')"     >
+                                                <option value="{{proximity.MilesValue}}"  ng-selected="{{proximity.MilesValue == 1}}" ng-repeat="proximity in search.proximities">{{proximity.Title}}</option>
+                                                <option value="0">Any</option>
+                                            </select>
+                                        </div>
+
                                             <div class="col-lg-7 col-md-7 col-sm-7 col-xs-12" ng-hide="search.isEZEIDselected('1')" style="width: 60.333333%;">
                                                 <div style="display:table-cell;vertical-align:middle;height:34px;">
                                                     <span>proximity from </span>
@@ -343,7 +343,7 @@
                    <div class="window_page Maping_popup" style="margin-top: 0%;border: solid 1px #08749C; min-height: 48px; width: 57.50%;padding: 5px; margin-bottom: 1%;">
                        <span class="closeCVSmall" ng-click="search.closeDownloadForm()">X</span>
 
-                          <div class="col-md-12">
+                            <div class="col-md-12">
                                 Click<a href="/ewtGetSearchDocuments?Token={{_userInfo.Token}}&&Keywords={{search.Criteria.Keywords}}"><b> {{search.downloadData.Filename}} </b></a>to download.
                                 <br/>
                             </div>
