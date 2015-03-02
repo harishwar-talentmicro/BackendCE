@@ -4385,17 +4385,18 @@ exports.FnGetWhiteListCount = function (req, res) {
 
         var Token = req.query.Token;
         var EZEID = req.query.EZEID;
+        var List=req.query.List;
         var RtnMessage = {
             WhiteListCount : 0
         };
 
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
-        if (Token != null && EZEID!=null) {
+        if (Token != null && EZEID != null && List != null) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
 
-                        var query = db.escape(Token) + ',' + db.escape(EZEID);
+                        var query = db.escape(Token) + ',' + db.escape(EZEID) + ',' + db.escape(List);
 
                         db.query('CALL pGetWhiteListCount(' + query + ')', function (err, GetResult) {
                             if (!err) {
@@ -4447,6 +4448,9 @@ exports.FnGetWhiteListCount = function (req, res) {
             else if (EZEID == null) {
                 console.log('FnGetWhiteListCount: EZEID is empty');
             }
+            else if (List == null) {
+                console.log('FnGetWhiteListCount: List is empty');
+            }
 
             res.statusCode=400;
             res.send(RtnMessage);
@@ -4457,6 +4461,7 @@ exports.FnGetWhiteListCount = function (req, res) {
         throw new Error(ex);
     }
 };
+
 
 //EZEIDAP Parts
 
