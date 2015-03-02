@@ -314,13 +314,14 @@
                                                 </div>
                                             </div>
 
-                                            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6" ng-hide="search.isEZEIDselected('1')" style="padding-left: 0px; width: 23%;">
-                                                <select class="form-control pull-left"
-                                                        ng-model="search.Criteria.Proximity" ng-disabled="search.isEZEIDselected('1')"     >
-                                                    <option value="{{proximity.MilesValue}}"  ng-selected="{{proximity.MilesValue == 1}}" ng-repeat="proximity in search.proximities">{{proximity.Title}}</option>
-                                                    <option value="0">Any</option>
-                                                </select>
-                                            </div>
+                                        <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6" ng-hide="search.isEZEIDselected('1')" style="padding-left: 0px; width: 23%;">
+                                            <select class="form-control pull-left"
+                                                    ng-model="search.Criteria.Proximity" ng-disabled="search.isEZEIDselected('1')"     >
+                                                <option value="{{proximity.MilesValue}}"  ng-selected="{{proximity.MilesValue == 1}}" ng-repeat="proximity in search.proximities">{{proximity.Title}}</option>
+                                                <option value="0">Any</option>
+                                            </select>
+                                        </div>
+
                                             <div class="col-lg-7 col-md-7 col-sm-7 col-xs-12" ng-hide="search.isEZEIDselected('1')" style="width: 60.333333%;">
                                                 <div style="display:table-cell;vertical-align:middle;height:34px;">
                                                     <span>proximity from </span>
