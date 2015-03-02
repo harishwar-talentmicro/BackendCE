@@ -101,15 +101,25 @@ angular.module('ezeidApp').controller('BlackListWhiteListController', function($
        });
 
     //Add To Black list / White list
-    function checkEzeidAlradyExistInListOrNot()
+    /*  function checkEzeidAlradyExistInListOrNot()
     {
         $http({ method: 'get', url: GURL + 'ewtGetWhiteListCount?Token='+ $rootScope._userInfo.Token + '&EZEID=' + blacklist._info.EZEID + '&List=' + blacklist._info.List }).success(function (data) {
 
             console.log(data.WhiteListCount);
+               if(data.WhiteListCount == 0)
+               {
+                   console.log("SAi3");
+                   return false;
+               }
+                else
+               {
+                   console.log("SAi4");
+                   return true;
+               }
 
-            return data.WhiteListCount > 0 ? false : true ;
+            //return data.WhiteListCount != '0' ? true : false;
         });
-    }
+    }*/
 
     // Add record to list
     this.addToList=function(){
@@ -152,7 +162,25 @@ angular.module('ezeidApp').controller('BlackListWhiteListController', function($
                 else
                 {
                     //Check for already in list or not
-                    if(checkEzeidAlradyExistInListOrNot())
+                    $http({ method: 'get', url: GURL + 'ewtGetWhiteListCount?Token='+ $rootScope._userInfo.Token + '&EZEID=' + blacklist._info.EZEID + '&List=' + blacklist._info.List }).success(function (data) {
+
+                        console.log(data.WhiteListCount);
+                        if(data.WhiteListCount == 0)
+                        {
+                            //Add To Black list / White list
+                            addToWhiteListBlackList();
+                        }
+                        else
+                        {
+                            // Confirm Popup open
+                            $('#confirmChange').slideDown();
+                        }
+
+                        //return data.WhiteListCount != '0' ? true : false;
+                    });
+
+
+                 /*   if(checkEzeidAlradyExistInListOrNot())
                     {
                         console.log("Sai1");
                         // Confirm Popup open
@@ -163,7 +191,7 @@ angular.module('ezeidApp').controller('BlackListWhiteListController', function($
                         console.log("Sai2");
                         //Add To Black list / White list
                         addToWhiteListBlackList();
-                    }
+                    }*/
 
                 }
              });
