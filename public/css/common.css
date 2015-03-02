@@ -497,7 +497,19 @@ html, body {
 #blue .ui-slider-handle { border-color: #729fcf; }
 .searchAreaSize
 {
-    width: 73.666667% !important;
+    width: 82.666667% !important;
+}
+.searchAreaSizeBig
+{
+    width: 65.666667%; !important;
+}
+.searchButtonDiv
+{
+    padding-right: 0px;
+}
+.setSpaceSearchButton
+{
+    margin-left: 0.7% !important;
 }
 #fileupload-resize-area{
     display: none;
