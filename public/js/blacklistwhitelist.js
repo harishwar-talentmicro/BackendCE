@@ -157,15 +157,12 @@ angular.module('ezeidApp').controller('BlackListWhiteListController', function($
                         console.log("Sai1");
                         // Confirm Popup open
                         $('#confirmChange').slideDown();
-
-
                     }
                     else
                     {
                         console.log("Sai2");
                         //Add To Black list / White list
                         addToWhiteListBlackList();
-
                     }
 
                 }
