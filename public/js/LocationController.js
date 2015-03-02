@@ -868,5 +868,4 @@ angular.module('ezeidApp').controller('LocationsController', function ($rootScop
             return deferred.promise;
         };
 
-    //Test comment
 });

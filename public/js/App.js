@@ -229,7 +229,7 @@
             SearchType: '1',
             Keywords: '',
             SCategory: 0,
-            Proximity: 1600,
+            Proximity: 1,
             Latitude: $rootScope.CLoc.CLat,
             Longitude: $rootScope.CLoc.CLong
         };
