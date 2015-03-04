@@ -4462,6 +4462,310 @@ exports.FnGetWhiteListCount = function (req, res) {
     }
 };
 
+//below method for get the status type details based on business user
+exports.FnGetStatusType = function (req, res) {
+    try {
+
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.query.Token;
+        var MasterID = req.query.MasterID;
+        var FunctionType = req.query.FunctionType;
+
+        if (Token != null && MasterID != null && FunctionType != null ) {
+            FnValidateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+
+                        var query = db.escape(MasterID) + ',' + db.escape(FunctionType);
+                        db.query('CALL pGetStatusType(' + query + ')', function (err, StatusResult) {
+                            if (!err) {
+                                if (StatusResult != null) {
+                                    if (StatusResult[0].length > 0) {
+
+                                        console.log('FnGetStatusType: Status type details Send successfully');
+                                        res.send(StatusResult[0]);
+                                    }
+                                    else {
+
+                                        console.log('FnGetStatusType:No Status type details found');
+                                        res.send('null');
+                                    }
+                                }
+                                else {
+
+                                    console.log('FnGetStatusType:No Status type details found');
+                                    res.send('null');
+                                }
+                            }
+                            else {
+                                console.log('FnGetStatusType: error in getting Status type details' + err);
+                                res.statusCode = 500;
+                                res.send('null');
+                            }
+                        });
+                    }
+                    else {
+                        res.statusCode = 401;
+                        res.send('null');
+                        console.log('FnGetStatusType: Invalid Token');
+                    }
+                } else {
+
+                    res.statusCode = 500;
+                    res.send('null');
+                    console.log('FnGetStatusType: Error in validating token:  ' + err);
+                }
+            });
+        }
+        else {
+            if (Token == null) {
+                console.log('FnGetStatusType: Token is empty');
+            }
+            else if (MasterID == null) {
+                console.log('FnGetStatusType: MasterID is empty');
+            }
+            else if (FunctionType == null) {
+                console.log('FnGetStatusType: FunctionType is empty');
+            }
+
+            res.statusCode=400;
+            res.send('null');
+        }
+    }
+    catch (ex) {
+        console.log('FnGetStatusType error:' + ex.description);
+        throw new Error(ex);
+    }
+};
+
+//below method for get the action type details based on business user
+exports.FnGetActionType = function (req, res) {
+    try {
+
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.query.Token;
+        var MasterID = req.query.MasterID;
+        var FunctionType = req.query.FunctionType;
+
+        if (Token != null && MasterID != null && FunctionType != null ) {
+            FnValidateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+
+                        var query = db.escape(MasterID) + ',' + db.escape(FunctionType);
+
+                        db.query('CALL pGetActionType(' + query + ')', function (err, StatusResult) {
+                            if (!err) {
+                                if (StatusResult != null) {
+                                    if (StatusResult[0].length > 0) {
+
+                                        console.log('FnGetActionType: Action Type details Send successfully');
+                                        res.send(StatusResult[0]);
+                                    }
+                                    else {
+
+                                        console.log('FnGetActionType:No Action Type details found');
+                                        res.send('null');
+                                    }
+                                }
+                                else {
+
+                                    console.log('FnGetActionType:No Action type details found');
+                                    res.send('null');
+                                }
+
+                            }
+                            else {
+
+                                console.log('FnGetActionType: error in getting Action Type details' + err);
+                                res.statusCode = 500;
+                                res.send('null');
+                            }
+                        });
+                    }
+                    else {
+                        res.statusCode = 401;
+                        res.send('null');
+                        console.log('FnGetActionType: Invalid Token');
+                    }
+                } else {
+
+                    res.statusCode = 500;
+                    res.send('null');
+                    console.log('FnGetActionType: Error in validating token:  ' + err);
+                }
+            });
+        }
+        else {
+            if (Token == null) {
+                console.log('FnGetActionType: Token is empty');
+            }
+            else if (MasterID == null) {
+                console.log('FnGetActionType: MasterID is empty');
+            }
+            else if (FunctionType == null) {
+                console.log('FnGetActionType: FunctionType is empty');
+            }
+
+            res.statusCode=400;
+            res.send('null');
+        }
+    }
+    catch (ex) {
+        console.log('FnGetActionType error:' + ex.description);
+        throw new Error(ex);
+    }
+};
+
+//below method for get the EZEID details
+exports.FnEZEIDPrimaryDetails = function (req, res) {
+    try {
+
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.query.Token;
+        var EZEID = req.query.EZEID;
+
+
+        if (Token != null && EZEID != null ) {
+            FnValidateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+
+                        db.query('CALL pEZEIDPrimaryDetails(' + db.escape(EZEID) + ')', function (err, GetResult) {
+                            if (!err) {
+                                if (GetResult != null) {
+                                    if (GetResult[0].length > 0) {
+
+                                        console.log('FnEZEIDPrimaryDetails: EZEID Primary deatils Send successfully');
+                                        res.send(GetResult[0]);
+                                    }
+                                    else {
+
+                                        console.log('FnEZEIDPrimaryDetails:No EZEID Primary deatils found');
+                                        res.send('null');
+                                    }
+                                }
+                                else {
+
+                                    console.log('FnEZEIDPrimaryDetails:No EZEID Primary deatils found');
+                                    res.send('null');
+                                }
+                            }
+                            else {
+                                console.log('FnEZEIDPrimaryDetails: error in getting EZEID Primary deatils' + err);
+                                res.statusCode = 500;
+                                res.send('null');
+                            }
+                        });
+                    }
+                    else {
+                        res.statusCode = 401;
+                        res.send('null');
+                        console.log('FnEZEIDPrimaryDetails: Invalid Token');
+                    }
+                } else {
+
+                    res.statusCode = 500;
+                    res.send('null');
+                    console.log('FnEZEIDPrimaryDetails: Error in validating token:  ' + err);
+                }
+            });
+        }
+        else {
+            if (Token == null) {
+                console.log('FnEZEIDPrimaryDetails: Token is empty');
+            }
+            else if (EZEID == null) {
+                console.log('FnEZEIDPrimaryDetails: EZEID is empty');
+            }
+
+            res.statusCode=400;
+            res.send('null');
+        }
+    }
+    catch (ex) {
+        console.log('FnEZEIDDetails error:' + ex.description);
+        throw new Error(ex);
+    }
+};
+
+//below method get item list details
+exports.FnGetItemList = function (req, res) {
+    try {
+
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.query.Token;
+        var MasterID = req.query.MasterID;
+
+        if (Token != null && MasterID != null) {
+            FnValidateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+
+                        db.query('CALL pGetItemList(' + db.escape(MasterID) + ')', function (err, GetResult) {
+                            if (!err) {
+                                if (GetResult != null) {
+                                    if (GetResult[0].length > 0) {
+                                        console.log('FnGetItemList: Item list details Send successfully');
+                                        res.send(GetResult[0]);
+                                    }
+                                    else {
+
+                                        console.log('FnGetItemList:No Item list details found');
+                                        res.send('null');
+                                    }
+                                }
+                                else {
+
+                                    console.log('FnGetItemList:No Item list details found');
+                                    res.send('null');
+                                }
+                            }
+                            else {
+
+                                console.log('FnGetItemList: error in getting Item list details' + err);
+                                res.statusCode = 500;
+                                res.send('null');
+                            }
+                        });
+                    }
+                    else {
+                        res.statusCode = 401;
+                        res.send('null');
+                        console.log('FnGetItemList: Invalid Token');
+                    }
+                } else {
+
+                    res.statusCode = 500;
+                    res.send('null');
+                    console.log('FnGetItemList: Error in validating token:  ' + err);
+                }
+            });
+        }
+        else {
+            if (Token == null) {
+                console.log('FnGetItemList: Token is empty');
+            }
+            else if (MasterID == null) {
+                console.log('FnGetItemList: MasterID is empty');
+            }
+            res.statusCode=400;
+            res.send('null');
+        }
+    }
+    catch (ex) {
+        console.log('FnGetItemList error:' + ex.description);
+        throw new Error(ex);
+    }
+};
 
 //EZEIDAP Parts
 
@@ -5055,9 +5359,6 @@ exports.FnGetEZEIDDetailsAP = function (req, res) {
             res.send('null');
 
         }
-
-
-
     }
     catch (ex) {
         console.log('FnGetEZEIDDetailsAP error:' + ex.description);
@@ -5097,30 +5398,33 @@ exports.FnSaveAPEZEID = function (req, res) {
         var Token = req.body.Token;
         var APID = req.body.APID;
         var TID = req.body.TID;
-        var RtnMessage = {
-            TID: 0
-        };
-        var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
-
+        var NoCarParking =parseInt(req.body.NoCarParking);
+        var NoBikeParking =parseInt(req.body.NoBikeParking);
+        var OwnerPayment = req.body.OwnerPayment;
         var tAvailableDate = null;
         if (AvailableDate != null) {
             // datechange = new Date(new Date(TaskDateTime).toUTCString());
             tAvailableDate = new Date(AvailableDate);
             // console.log(TaskDate);
         }
+        var RtnMessage = {
+            TID: 0
+        };
+        var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
+
         FnValidateTokenAP(Token, function (err, Result) {
             if (!err) {
                 if (Result != null) {
                     //console.log('FnRegistration: Token: ' + TokenNo);
-                    var InsertQuery = db.escape(Type) + ',' + db.escape(Preffereduser) + ',' + db.escape(AreaSize) + ',' + db.escape(AreaUOM) + ',' +
-                          db.escape(Rate) + ',' + db.escape(Amount) + ',' + db.escape(SpaceQty) + ',' + db.escape(SpaceType) + ',' + db.escape(FunishedType) + ',' +
-                          db.escape(Description) + ',' + db.escape(Preferences) + ',' + db.escape(Rating) + ',' +
-                          db.escape(EZEID) + ',' + db.escape(Status) + ',' +
-                          db.escape(Reason) + ',' + db.escape(tAvailableDate) + ',' + db.escape(Token) + ',' + db.escape(APID) + ',' + db.escape(Latitude) + ',' + db.escape(Longitude) + ',' + db.escape(TID) + ',' + db.escape(Purpose);
-                    console.log(InsertQuery);
+                    var InsertQuery = db.escape(Type) + ',' + db.escape(Preffereduser) + ',' + db.escape(AreaSize) + ',' +
+                        db.escape(AreaUOM) + ','  + db.escape(Rate) + ',' + db.escape(Amount) + ',' + db.escape(SpaceQty) + ',' + db.escape(SpaceType)
+                        + ',' + db.escape(FunishedType) + ',' + db.escape(Description) + ',' + db.escape(Preferences) + ',' + db.escape(Rating) + ',' +db.escape
+                    (EZEID) + ',' + db.escape(Status) + ',' + db.escape(Reason) + ',' + db.escape(tAvailableDate) + ',' + db.escape(Token) + ',' + db.escape
+                    (APID) + ',' + db.escape(Latitude) + ',' + db.escape(Longitude) + ',' + db.escape(TID) + ',' + db.escape(Purpose) + ',' + db.escape(NoCarParking) + ',' + db.escape(NoBikeParking) + ',' + db.escape(OwnerPayment);
+                   // console.log(InsertQuery);
                     db.query('CALL psaveRealEstateData(' + InsertQuery + ')', function (err, InsertResult) {
                         if (!err) {
-                            console.log(InsertResult);
+                          //  console.log(InsertResult);
                             if (InsertResult != null) {
                                 if (InsertResult[0].length > 0) {
                                     var insert = InsertResult[0];
@@ -5140,17 +5444,20 @@ exports.FnSaveAPEZEID = function (req, res) {
                             }
                         }
                         else {
+                            res.statusCode=500;
                             res.send(RtnMessage);
                             console.log('psaveRealEstateData:psaveRealEstateData:' + err);
                         }
                     });
                 }
                 else {
+                    res.statusCode=401;
                     console.log('psaveRealEstateData: Invalid Token')
                     res.send(RtnMessage);
                 }
             }
             else {
+                res.statusCode=500;
                 console.log('psaveRealEstateData: Error in processing Token' + err);
                 res.send(RtnMessage);
             }
@@ -5899,6 +6206,94 @@ exports.FnGetIdCardPrintAP = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetEZEIDDetailsAP error:' + ex.description);
+        throw new Error(ex);
+    }
+};
+
+exports.FnSearchRealEstateAP = function(req, res){
+    try{
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        var Status = req.body.Status;
+        var Purpose = parseInt(req.body.Purpose);
+        var PropertyType = req.body.PropertyType;
+        var PrefUser = req.body.PrefUser;
+        var SpaceType = req.body.SpaceType;
+        var SpaceQtyF = req.body.SpaceQtyFrom;
+        var SpaceQtyT = req.body.SpaceQtyTo;
+        var RatingFrom = req.body.RatingFrom;
+        var RatingTo = req.body.RatingTo;
+        var Latitude = req.body.Latitude;
+        if (Latitude == null || Latitude == '') {
+            Latitude = 0.0;
+        }
+        var Longitude = req.body.Longitude;
+        if (Longitude == null || Longitude == '') {
+            Longitude = 0.0;
+        }
+        var Proximity = req.body.Proximity;
+        var AreaUOM = req.body.AreaUOM;
+        var AreaFrom = req.body.AreaFrom;
+        var AreaTo = req.body.AreaTo;
+        var FunishedType = req.body.FunishedType;
+        var AmountFrom = req.body.AmountFrom;
+        var AmountTo = req.body.AmountTo;
+        var Token = req.body.Token;
+
+        /*if (Status!=null && Purpose.toString() != 'NaN' && PropertyType!=null && PrefUser!=null && SpaceType !=null && SpaceQtyF !=null && SpaceQtyT !=null && RatingFrom !=null
+         && RatingTo !=null && Latitude !=null && Longitude !=null && Proximity !=null && AreaUOM !=null && AreaFrom !=null
+         && AreaTo !=null && FunishedType !=null && AmountFrom !=null && AmountTo !=null) {*/
+        FnValidateTokenAP(Token, function (err, Result) {
+            if (!err) {
+                if (Result != null) {
+
+                    var SearchQuery = db.escape(Status) + ',' + db.escape(Purpose) + ',' + db.escape(PropertyType) + ',' + db.escape(PrefUser) + ',' +
+                        db.escape(SpaceType) + ',' + db.escape(SpaceQtyF) + ',' + db.escape(SpaceQtyT) + ',' + db.escape(RatingFrom) + ',' + db.escape(RatingTo) + ',' +
+                        db.escape(Latitude) + ',' + db.escape(Longitude) + ',' + db.escape(Proximity) + ',' +db.escape(AreaUOM) + ',' + db.escape(AreaFrom) + ',' +
+                        db.escape(AreaTo) + ',' + db.escape(FunishedType) + ',' + db.escape(AmountFrom) + ',' + db.escape(AmountTo);
+
+                    console.log(SearchQuery);
+
+                    db.query('CALL pSearchRealEstateData(' + SearchQuery + ')', function (err, SearchResult) {
+                        if (!err) {
+                            if (SearchResult[0] != null) {
+                                if (SearchResult[0].length > 0) {
+                                    res.send(SearchResult[0]);
+                                    console.log('FnSearchRealEstateAP:Search result sent successfully');
+                                }
+                                else {
+                                    res.send('null');
+                                    console.log('FnSearchRealEstateAP: No search found');
+                                }
+                            }
+                            else {
+                                res.send('null');
+                                console.log('FnSearchRealEstateAP:No search found');
+                            }
+
+                        }
+                        else {
+                            res.statusCode = 500;
+                            res.send('null');
+                            console.log('FnSearchRealEstateAP: error in getting search RealEstateData' + err);
+                        }
+                    });
+                }
+                else {
+                    res.statusCode = 401;
+                    console.log('FnSearchRealEstateAP: Invalid token');
+                    res.send('null');
+                }
+            }
+            else {
+                console.log('FnSearchRealEstateAP: Error in validating token:' + err);
+                res.statusCode = 500;
+                res.send('null');
+            }
+        });
+    }
+    catch (ex) {
+        console.log('FnSearchRealEstateAP error:' + ex.description);
         throw new Error(ex);
     }
 };
