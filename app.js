@@ -119,6 +119,11 @@ app.post('/ewtSaveWhiteBlackList', LocationManager.FnSaveWhiteBlackList);
 app.get('/ewtGetWhiteBlackList', LocationManager.FnGetWhiteBlackList);
 app.post('/ewtDeleteWhiteBlackList', LocationManager.FnDeleteWhiteBlackList);
 app.get('/ewtGetWhiteListCount', LocationManager.FnGetWhiteListCount);
+app.get('/ewtGetStatusType',LocationManager.FnGetStatusType);
+app.get('/ewtGetActionType',LocationManager.FnGetActionType);
+app.get('/ewtEZEIDPrimaryDetails',LocationManager.FnEZEIDPrimaryDetails);
+app.get('/ewtGetItemList',LocationManager.FnGetItemList);
+
 //below service are for EZEIDAP
 app.post('/ewLoginAP', LocationManager.FnLoginAP);
 app.get('/ewLogoutAP', LocationManager.FnLogoutAP);
@@ -126,7 +131,6 @@ app.get('/ewGetUserDetailsAP', LocationManager.FnGetUserDetailsAP);
 app.post('/ewUpdateUserProfileAP', LocationManager.FnUpdateUserProfileAP);
 app.post('/ewtForgetPasswordAP', LocationManager.FnForgetPasswordAP);
 app.post('/ewtChangePasswordAP', LocationManager.FnChangePasswordAP);
-
 app.post('/ewtSaveEZEIDDataAP', LocationManager.FnSaveAPEZEID);
 app.post('/ewtSaveEZEIDPictureAP', LocationManager.FnSaveAPEZEIDPicture);
 app.get('/ewtGetEZEIDDataAP', LocationManager.FnGetAPEZEID);
@@ -138,6 +142,7 @@ app.get('/ewtGetSecondaryLocAP',LocationManager.FnGetSecondaryLocationAP);
 app.post('/ewtUpdateSecondaryLocationAP', LocationManager.FnUpdateSecondaryLocationAP);
 app.post('/ewtUpdateIdCardPrintAP', LocationManager.FnUpdateIdCardPrintAP);
 app.get('/ewtGetIdCardPrintAP',LocationManager.FnGetIdCardPrintAP);
+app.post('/ewtSearchRealEstateAP', LocationManager.FnSearchRealEstateAP);
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
     console.log('404 : Page not found');
