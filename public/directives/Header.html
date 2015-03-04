@@ -174,6 +174,7 @@
                         <!--<li><a class="dash-icon" href="#/home">Home</a></li>-->
                         <li><a class="edit-icon" href="#/editprofile">Edit Profile</a></li>
                         <li><a class="addLocation-icon" href="#/addloc">Locations</a></li>
+                        <li ng-show="$root._userInfo.Type == 2 && $root._userInfo.Verified == 2"><a class="business-list" href="#/subusers">Subusers</a></li>
                         <li><a class="notification-icon" href="#/messages">Messages</a></li>
                         <li><a class="personal_doc" href="#/documents">Personal Documents</a></li>
                         <li ng-show="$root._userInfo.Type == 2 && $root._userInfo.Verified == 2"><a class="business-list" href="#/busslist">Business List</a></li>

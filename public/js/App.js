@@ -28,6 +28,7 @@
         };
     }]);
 
+
     ezeid.config(['$routeProvider','$httpProvider',function($routeProvider,$httpProvider){
         $routeProvider.when('/index',{templateUrl: 'html/index.html'})
             .when('/home',{templateUrl: 'html/home.html'})
@@ -43,6 +44,7 @@
             .when('/legal',{templateUrl: 'html/legal.html'})
             .when('/congratulations',{templateUrl: 'html/congratulations.html'})
             .when('/blackwhitelist',{templateUrl: 'html/blacklistwhitelist.html'})
+            .when('/subusers',{templateUrl : 'html/subuser.html'})
             .otherwise({ templateUrl: 'html/home.html' });
         
         $httpProvider.interceptors.push("ezeidInterceptor");
