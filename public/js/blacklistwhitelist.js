@@ -95,36 +95,10 @@ angular.module('ezeidApp').controller('BlackListWhiteListController', function($
             });
     }
 
-      //Below code is for getting relation type
+      //Below code is for getting relationship type
       $http({ method: 'get', url: GURL + 'ewmGetRelationType?LangID=1' }).success(function (data) {
          blacklist.Relations = data;
        });
-
-    //Add To Black list / White list
-    /*  function checkEzeidAlradyExistInListOrNot()
-    {
-        $http({ method: 'get', url: GURL + 'ewtGetWhiteListCount?Token='+ $rootScope._userInfo.Token + '&EZEID=' + blacklist._info.EZEID + '&List=' + blacklist._info.List }).success(function (data) {
-
-            console.log(data.WhiteListCount);
-               if(data.WhiteListCount == 0)
-               {
-                   console.log("SAi3");
-                   return false;
-               }
-                else
-               {
-                   console.log("SAi4");
-                   return true;
-               }
-
-            //return data.WhiteListCount != '0' ? true : false;
-        });
-    }*/
-
-    // Add record to list
-    this.addToList=function(){
-        addToWhiteListBlackList();
-    };
 
     //Add To Black list / White list
     function addToWhiteListBlackList()
@@ -164,7 +138,6 @@ angular.module('ezeidApp').controller('BlackListWhiteListController', function($
                     //Check for already in list or not
                     $http({ method: 'get', url: GURL + 'ewtGetWhiteListCount?Token='+ $rootScope._userInfo.Token + '&EZEID=' + blacklist._info.EZEID + '&List=' + blacklist._info.List }).success(function (data) {
 
-                        console.log(data.WhiteListCount);
                         if(data.WhiteListCount == 0)
                         {
                             //Add To Black list / White list
@@ -175,24 +148,7 @@ angular.module('ezeidApp').controller('BlackListWhiteListController', function($
                             // Confirm Popup open
                             $('#confirmChange').slideDown();
                         }
-
-                        //return data.WhiteListCount != '0' ? true : false;
-                    });
-
-
-                 /*   if(checkEzeidAlradyExistInListOrNot())
-                    {
-                        console.log("Sai1");
-                        // Confirm Popup open
-                        $('#confirmChange').slideDown();
-                    }
-                    else
-                    {
-                        console.log("Sai2");
-                        //Add To Black list / White list
-                        addToWhiteListBlackList();
-                    }*/
-
+                   });
                 }
              });
     };

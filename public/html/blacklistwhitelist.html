@@ -25,13 +25,11 @@
         <div class="window_page Maping_popup">
             <span class="closeCV" ng-click="blacklist.closeAddConfirmDialog()">X</span>
             <form name="addConfirmForm" novalidate>
-                <h3 class="marB15px">EZEID already exists in list, Are you sure you want to change?</h3>
+                <h3 ng-show="blacklist._info.List == 2" class="marB15px">EZEID you are trying to add to Blacklist is in Whitelist. Delete the same and try again.</h3>
+                <h3 ng-show="blacklist._info.List == 1" class="marB15px">EZEID you are trying to add to Whitelist is in Blacklist. Delete the same and try again.</h3>
                 <div class="col-md-12" style="margin-left: 30%;">
-                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
-                        <button ng-click="blacklist.addToList()" class="btn btn-block btn-primary pull-left" type="button">Yes</button>
-                    </div>
-                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
-                        <button ng-click="blacklist.closeAddConfirmDialog()" class="btn btn-block btn-primary pull-left" type="button">Close</button>
+                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2" style="margin-left: 9%;">
+                        <button ng-click="blacklist.closeAddConfirmDialog()" class="btn btn-block btn-primary pull-left" type="button">Ok</button>
                     </div>
                 </div>
                 <br/><br/>
