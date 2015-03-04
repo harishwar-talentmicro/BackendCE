@@ -40,6 +40,7 @@ angular.module('ezeidApp').controller('salesenquiryController', function($http, 
         }
     }
 
+
     $('#datetimepicker1').datetimepicker({
         format: "d-M-Y  h:m A",
         hours12: false,
@@ -49,6 +50,12 @@ angular.module('ezeidApp').controller('salesenquiryController', function($http, 
     $('#datetimepicker1').siblings('.input-group-addon').on('click',function(){
         $('#datetimepicker1').trigger('focus');
     });
+
+
+    $scope.toggleModal = function(){
+        $scope.showModal = !$scope.showModal;
+    };
+    $scope.longString = "01234567890123456789";
 
 
     //open SalesEnquiryForm
