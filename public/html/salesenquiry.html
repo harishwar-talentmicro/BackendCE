@@ -160,7 +160,7 @@
     <header-section></header-section>
 
     <!--popup for add new sales enquiry-->
-    <div class="Popup_window form_style map_popup_iconActions" style="height: 120%;" id="addNewSalesEnquiryForm_popup">
+  <!--  <div class="Popup_window form_style map_popup_iconActions" style="height: 120%;" id="addNewSalesEnquiryForm_popup">
         <div class="window_page wdLogin newMaping_popup ">
             <span ng-click="msglist.closeAddNewSalesEnquiryForm()" class="smallCloselink">X</span>
              <div class="signIn_style">
@@ -214,6 +214,67 @@
                     </div>
                     <div class="clearfix mob_marT15px"></div>
             </div>
+            </form>
+            <div class="clearfix"></div>
+        </div>
+        <div class="clearfix"></div>
+    </div>
+-->
+
+    <div class="Popup_window form_style map_popup_iconActions" style="height: 120%;" id="addNewSalesEnquiryForm_popup">
+        <div class="window_page wdLogin newMaping_popup ">
+            <span ng-click="msglist.closeAddNewSalesEnquiryForm()" class="smallCloselink">X</span>
+            <div class="signIn_style">
+                <span class="signIn">Add sales enquiry</span>
+            </div>
+            <div class="clearfix mobile_marT15px"></div>
+            <form name="addSalesEnquiry" novalidate>
+                <div class="row">
+                    <div class="col-lg-12">
+                        <ul style="margin-top:10px!important;" class="pad0px">
+                            <li class="dsp_block padT10px">
+                                <div class="pull-left wd48p marL10px">
+                                    <input type="text" name="Requester" id="Requester" style='text-transform:uppercase' class="form-control wd10_px user_input mar_leftInp emptyBox" ng-model="msglist._info.Requester" ng-class="addSalesEnquiry.Requester.$touched && !msglist._info.Requester.length ? 'mandatoryTextBox' : ''" placeholder="Requester" required />
+                                </div>
+                                <div class="clearfix mob_marT15px"></div>
+                                <div class="pull-left wd48p marL10px">
+                                    <input type="text" name="Title" class="form-control wd10_px mar_leftInp emptyBox" ng-model="msglist._info.Title" ng-class="addSalesEnquiry.Title.$touched && !msglist._info.Title.length ? 'mandatoryTextBox' : ''" placeholder="Title" required>
+                                </div>
+                                <div class="clearfix"></div>
+
+                                <div class="pull-left wd48p marL10px" style="width: 43% !important;">
+                                    <select class="form-control marL10px" name="status">
+                                        <option value = ""> --Status-- </option>
+                                    </select>
+                                </div>
+                                <div class="pull-right wd48p marL10px" style="width: 43% !important; margin-right: 32px;">
+                                    <select class="form-control marL10px" name="status">
+                                        <option value = ""> Call To </option>
+                                        <option value = ""> --Next Action-- </option>
+                                    </select>
+                                </div>
+                                <div class="pull-left wd48p marL10px" style="width: 43% !important; padding-top: 2%; text-align: right;">
+                                    <span class="marL10px"> Next Action Date: </span>
+                                </div>
+                                <div class="pull-right wd48p marL10px" style="width: 50% !important; margin-right: -8px; ">
+                                    <date-time-picker  recipient="msglist._info.NextActionDate" style="margin-top:1%; width: 86%;"></date-time-picker>
+                                </div>
+                                <div class="clearfix"></div>
+                                <div class="pull-left wd48p marL10px" style="width: 90% !important;">
+                                    <textarea class="form-control emptyBox marL10px" style="resize: none;" rows="4" cols="50" name="salesMessage" ng-model="msglist._info.salesMessage" placeholder="Type Message here" required></textarea><br/>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="clearfix"></div>
+                    <div class="row quick_butt">
+                        <div class="col-md-12 col-md-offset">
+                            <input type="submit" ng-disabled="!SignInCtrl.LInfo.UserName || !SignInCtrl.LInfo.Password" class="btn btn-primary wdButt1 pull-left marLL10px" value="Save"/>
+                            <input type="button" ng-click="msglist.closeAddNewSalesEnquiryForm()" class="btn btn-primary wdButt1 signin_cancel marL10px" value="Close"/>
+                        </div>
+                    </div>
+                    <div class="clearfix mob_marT15px"></div>
+                </div>
             </form>
             <div class="clearfix"></div>
         </div>
