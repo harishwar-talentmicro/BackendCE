@@ -1,0 +1,145 @@
+
+<div ng-app="ezeidApp" id="wrapper" ng-controller="ProfileController as profile">
+<header-section></header-section>
+<!--Template of terms and condition pop-up-->
+<div class="Popup_window form_style map_popup_iconTerm" id="Terms_popup">
+    <div class="window_page  Maping_popup">
+        <span class="closelink" ng-click="profile.closedTermsAndConditionForm()">X</span>
+        <div class="clearfix"></div>
+        <div ng-show="!_userInfo.IsAuthenticate" class="row mar_editTop">
+            <h3  style="text-align: center"><span class="mar_forget">Terms and Conditions</span></h3>
+            <div ng-include="'html/terms.html'"  style="width: 98%; height: 350px; overflow-y: scroll; padding: 5px;">
+                <!-- Terms.html include hear... -->
+            </div>
+                 <span style="text-align: center">
+                     <input type="button" style="margin-left: 45%; margin-top: 1%;" ng-click="profile.closedTermsAndConditionForm()" class="btn btn-primary " value="Close">
+                </span>
+        </div>
+    </div>
+</div>
+
+<div class="container" style="padding-top:80px;">
+<div class="row">
+<div class="col-md-8" style="margin: auto; float: none;">
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h4>Sub Users</h4>
+    </div>
+    <div class="panel-body" ng-controller="SubuserController">
+        <!------------- Content goes inside this region ---------------------->
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <button class="btn btn-primary userMarR" ng-click="openModalBox()"><span class="glyphicon glyphicon-plus"></span> Add new Sub user</button>
+            </div>
+
+        </div>
+        <table st-table="subusers" class="table table-striped ezeid-table">
+            <thead>
+                <tr>
+                    <th>S.No.</th>
+                    <th>Username</th>
+                    <th>EZEID</th>
+                    <th>Access Rights</th>
+                    <th>Rules</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="user in subusers">
+                    <td>{{$index+1}}.</td>
+                    <td><a data-index="{{$index}}" ng-click="openModalBox($event)">{{user.userName}}</a></td>
+                    <td>{{user.ezeid | uppercase}}</td>
+                    <td>
+                            <a tabindex="0" data-trigger="focus" role="button" class="btn btn-default link-popover" data-container="body" data-toggle="popover" data-placement="right"
+                                    title="<h4>Access Rights <span class='pull-right glyphicon glyphicon-remove popover-close'></span></h4>" data-content='
+                                        <div class="list-group">
+                                            <a class="list-group-item" ng-hide="subusers[$index].accessRights.sales == 0">
+                                                <h6 class="list-group-item-heading">Sales</h6>
+                                                <p class="list-group-item-text">{{accessRights[subusers[$index].accessRights.sales]}}</p>
+                                            </a>
+                                            <a class="list-group-item" ng-hide="user.accessRights.reservation == 0">
+                                                <h6 class="list-group-item-heading">Reservation</h6>
+                                                <p class="list-group-item-text">{{accessRights[subusers[$index].accessRights.reservation]}}</p>
+                                            </a>
+                                            <a class="list-group-item" ng-hide="user.accessRights.homeDelivery == 0">
+                                                <h6 class="list-group-item-heading">Home Delivery</h6>
+                                                <p class="list-group-item-text">{{accessRights[subusers[$index].accessRights.homeDelivery]}}</p>
+                                            </a>
+                                            <a class="list-group-item" ng-hide="user.accessRights.service == 0">
+                                                <h6 class="list-group-item-heading">Service</h6>
+                                                <p class="list-group-item-text">{{accessRights[subusers[$index].accessRights.service]}}</p>
+                                            </a>
+                                            <a class="list-group-item" ng-hide="user.accessRights.resume == 0">
+                                                <h6 class="list-group-item-heading">Resume</h6>
+                                                <p class="list-group-item-text">{{accessRights[subusers[$index].accessRights.resume]}}</p>
+                                            </a>
+                                        </div>
+                                    '>
+                            See Access Rights
+                            </a>
+
+
+                    </td>
+                    <td>
+                        <button class="btn btn-success">Open Rules</button>
+                    </td>
+                    <td>
+                        <button class="btn" ng-class="(subusers[$index].status == 2)?'btn-success':'btn-danger'">{{(subusers[$index].status==2)?'Active':'Inactive'}}</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <!------------- Content region ends here ---------------------->
+        <!------------ Modal Box starts here -------------------------->
+        <modal title="modalBox.title" visible="showModal">
+            <div class="container-fluid">
+                <form role="form">
+                    <div class="row">
+                        <div class="col-lg-3 col-md-3 col-sm-4 col-xs-8 bottom-clearfix" ng-hide="modalBox.ezeidExists">
+                            <div class="input-group">
+                                <span class="input-group-addon" id="basic-addon1"><span class="glyphicon glyphicon-user"></span> </span>
+                                <input ng-model="modalBox.subuser.ezeid" type="text" class="form-control" placeholder="Subuser EZEID" aria-describedby="basic-addon1">
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-4 bottom-clearfix" ng-hide="modalBox.ezeidExists">
+                            <button class="btn btn-primary"><span class="glyphicon glyphicon-search"></span> CHECK EZEID</button>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 bottom-cleafix" ng-show="modalBox.ezeidExists">
+                            <h4><span class="label label-primary" data-toggle="tooltip" title="Subuser EZEID" data-placement="right">{{modalBox.subuser.ezeid | uppercase}}</span></h4>
+                        </div>
+
+                    </div>
+                    <div class="row" ng-show="modalBox.ezeidExists">
+                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6 bottom-clearfix">
+                            <div class="input-group">
+                                <span class="input-group-addon" id="basic-addon2">{{masterUser.EZEID}}.</span> </span>
+                                <input type="text" class="form-control" placeholder="Username" aria-describedby="basic-addon1">
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6 bottom-clearfix">
+                            <div class="input-group">
+                                <span class="input-group-addon" id="basic-addon3">{{modalBox.subuser.firstName}} {{modalBox.subuser.lastName}}</span>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+        </modal>
+        <!------------ Modal Box starts here -------------------------->
+    </div>
+
+</div>
+</div>
+</div>
+<!--terms and condition template-->
+<div class="Popup_window form_style" id="term-condition">
+    <div class="changePass_popUp Maping_popup">
+        <span ng-click="" class="closelink">X</span>
+        <h3><span class="mar_forget">Terms and conditions</span></h3>
+        <p>EZEID</p>
+    </div>
+</div>
+</div>
+</div>
+</div>

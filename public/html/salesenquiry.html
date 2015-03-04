@@ -1,0 +1,460 @@
+<style type="text/css">
+    /* Some basic styles */
+    *,
+    *:before,
+    *:after {
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing:    border-box;
+        box-sizing:         border-box;
+    }
+
+    a:hover {
+        text-decoration: none;
+    }
+
+    /* Not needed for tooltips to work */
+    header,
+    .content,
+    .content p {
+        margin: 4em 0;
+        text-align: center;
+    }
+
+    /* Add this attribute to the element that needs a tooltip */
+    [data-tooltip] {
+        position: relative;
+        z-index: 2;
+        cursor: pointer;
+    }
+
+    /* Hide the tooltip content by default */
+    [data-tooltip]:before,
+    [data-tooltip]:after {
+        visibility: hidden;
+        -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+        filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    /* Position tooltip above the element */
+    [data-tooltip]:before {
+        position: absolute;
+        bottom: 150%;
+        left: 50%;
+        margin-bottom: 5px;
+        margin-left: -80px;
+        padding: 7px;
+        width: 160px;
+        -webkit-border-radius: 3px;
+        -moz-border-radius:    3px;
+        border-radius:         3px;
+        background-color: #000;
+        background-color: hsla(0, 0%, 20%, 0.9);
+        color: #fff;
+        content: attr(data-tooltip);
+        text-align: center;
+        font-size: 14px;
+        line-height: 1.2;
+    }
+
+    /* Triangle hack to make tooltip look like a speech bubble */
+    [data-tooltip]:after {
+        position: absolute;
+        bottom: 150%;
+        left: 50%;
+        margin-left: -5px;
+        width: 0;
+        border-top: 5px solid #000;
+        border-top: 5px solid hsla(0, 0%, 20%, 0.9);
+        border-right: 5px solid transparent;
+        border-left: 5px solid transparent;
+        content: " ";
+        font-size: 0;
+        line-height: 0;
+    }
+
+    /* Show tooltip content on hover */
+    [data-tooltip]:hover:before,
+    [data-tooltip]:hover:after {
+        visibility: visible;
+        -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=100)";
+        filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=100);
+        opacity: 1;
+    }
+
+    .tabs input[type=radio] {
+        position: absolute;
+        top: -9999px;
+        left: -9999px;
+    }
+    .tabs {
+        width: 98%;
+        float: none;
+        list-style: none;
+        position: relative;
+        padding: 0;
+        margin: 10px auto 10px 1%;
+    }
+    .tabs li{
+        float: left;
+    }
+    .tabs label {
+        display: block;
+        padding: 10px 20px;
+        border-radius: 2px 2px 0 0;
+        color: #08C;
+        font-size: 24px;
+        font-weight: normal;
+        font-family: 'Roboto', helveti;
+       /* background: rgba(255,255,255,0.2);*/
+        background-color: #AADFEB;
+        cursor: pointer;
+        position: relative;
+        top: 3px;
+        -webkit-transition: all 0.2s ease-in-out;
+        -moz-transition: all 0.2s ease-in-out;
+        -o-transition: all 0.2s ease-in-out;
+        transition: all 0.2s ease-in-out;
+    }
+    .tabs label:hover {
+       /* background: rgba(255,255,255,0.5);*/
+        background-color: #D5EFF5;
+        top: 0;
+    }
+
+    [id^=tab]:checked + label {
+        background: #08C;
+        color: white;
+        top: 0;
+    }
+
+    [id^=tab]:checked ~ [id^=tab-content] {
+        display: block;
+    }
+    .tab-content{
+        z-index: 2;
+        display: none;
+        text-align: left;
+        width: 100%;
+        font-size: 14px;
+        line-height: 140%;
+        padding-top: 10px;
+       /* background: #08C;*/
+        border: 1px solid #0099cc;
+        padding: 15px;
+        color: #000;
+        position: absolute;
+        top: 37px;
+        left: 0;
+        box-sizing: border-box;
+        -webkit-animation-duration: 0.5s;
+        -o-animation-duration: 0.5s;
+        -moz-animation-duration: 0.5s;
+        animation-duration: 0.5s;
+    }
+
+
+</style>
+<div id="wrapper" ng-controller="salesenquiryController as msglist">
+    <header-section></header-section>
+
+    <!--popup for add new sales enquiry-->
+  <!--  <div class="Popup_window form_style map_popup_iconActions" style="height: 120%;" id="addNewSalesEnquiryForm_popup">
+        <div class="window_page wdLogin newMaping_popup ">
+            <span ng-click="msglist.closeAddNewSalesEnquiryForm()" class="smallCloselink">X</span>
+             <div class="signIn_style">
+                <span class="signIn">Add sales enquiry</span>
+            </div>
+            <div class="clearfix mobile_marT15px"></div>
+            <form name="addSalesEnquiry" novalidate>
+                <div class="row">
+                    <div class="col-lg-12">
+                        <ul style="margin-top:10px!important;" class="pad0px">
+                            <li class="dsp_block padT10px">
+                                <div class="pull-left wd48p marL10px">
+                                    <input type="text" name="Requester" id="Requester" style='text-transform:uppercase' class="form-control wd10_px user_input mar_leftInp emptyBox" ng-model="msglist._info.Requester" ng-class="addSalesEnquiry.Requester.$touched && !msglist._info.Requester.length ? 'mandatoryTextBox' : ''" placeholder="Requester" required />
+                                </div>
+                                <div class="clearfix mob_marT15px"></div>
+                                <div class="pull-left wd48p marL10px">
+                                    <input type="text" name="Title" class="form-control wd10_px mar_leftInp emptyBox" ng-model="msglist._info.Title" ng-class="addSalesEnquiry.Title.$touched && !msglist._info.Title.length ? 'mandatoryTextBox' : ''" placeholder="Title" required>
+                                </div>
+                                <div class="clearfix"></div>
+
+                                <div class="pull-left wd48p marL10px" style="width: 43% !important;">
+                                    <select class="form-control marL10px" name="status">
+                                        <option value = ""> --Status-- </option>
+                                    </select>
+                                </div>
+                                <div class="pull-right wd48p marL10px" style="width: 43% !important; margin-right: 32px;">
+                                    <select class="form-control marL10px" name="status">
+                                        <option value = ""> Call To </option>
+                                        <option value = ""> --Next Action-- </option>
+                                    </select>
+                                </div>
+                                <div class="pull-left wd48p marL10px" style="width: 43% !important; padding-top: 2%; text-align: right;">
+                                    <span class="marL10px"> Next Action Date: </span>
+                                </div>
+                                <div class="pull-right wd48p marL10px" style="width: 50% !important; margin-right: -8px; ">
+                                    <date-time-picker  recipient="msglist._info.NextActionDate" style="margin-top:1%; width: 86%;"></date-time-picker>
+                                </div>
+                                <div class="clearfix"></div>
+                                <div class="pull-left wd48p marL10px" style="width: 90% !important;">
+                                    <textarea class="form-control emptyBox marL10px" style="resize: none;" rows="4" cols="50" name="salesMessage" ng-model="msglist._info.salesMessage" placeholder="Type Message here" required></textarea><br/>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="clearfix"></div>
+                    <div class="row quick_butt">
+                        <div class="col-md-12 col-md-offset">
+                            <input type="submit" ng-disabled="!SignInCtrl.LInfo.UserName || !SignInCtrl.LInfo.Password" class="btn btn-primary wdButt1 pull-left marLL10px" value="Save"/>
+                            <input type="button" ng-click="msglist.closeAddNewSalesEnquiryForm()" class="btn btn-primary wdButt1 signin_cancel marL10px" value="Close"/>
+                        </div>
+                    </div>
+                    <div class="clearfix mob_marT15px"></div>
+            </div>
+            </form>
+            <div class="clearfix"></div>
+        </div>
+        <div class="clearfix"></div>
+    </div>
+-->
+
+    <div class="Popup_window form_style map_popup_iconActions" style="height: 120%;" id="addNewSalesEnquiryForm_popup">
+        <div class="window_page wdLogin newMaping_popup ">
+            <span ng-click="msglist.closeAddNewSalesEnquiryForm()" class="smallCloselink">X</span>
+            <div class="signIn_style">
+                <span class="signIn">Add sales enquiry</span>
+            </div>
+            <div class="clearfix mobile_marT15px"></div>
+            <form name="addSalesEnquiry" novalidate>
+                <div class="row">
+                    <div class="col-lg-12">
+                        <ul style="margin-top:10px!important;" class="pad0px">
+                            <li class="dsp_block padT10px">
+                                <div class="pull-left wd48p marL10px">
+                                    <input type="text" name="Requester" id="Requester" style='text-transform:uppercase' class="form-control wd10_px user_input mar_leftInp emptyBox" ng-model="msglist._info.Requester" ng-class="addSalesEnquiry.Requester.$touched && !msglist._info.Requester.length ? 'mandatoryTextBox' : ''" placeholder="Requester" required />
+                                </div>
+                                <div class="clearfix mob_marT15px"></div>
+                                <div class="pull-left wd48p marL10px">
+                                    <input type="text" name="Title" class="form-control wd10_px mar_leftInp emptyBox" ng-model="msglist._info.Title" ng-class="addSalesEnquiry.Title.$touched && !msglist._info.Title.length ? 'mandatoryTextBox' : ''" placeholder="Title" required>
+                                </div>
+                                <div class="clearfix"></div>
+
+                                <div class="pull-left wd48p marL10px" style="width: 43% !important;">
+                                    <select class="form-control marL10px" name="status">
+                                        <option value = ""> --Status-- </option>
+                                    </select>
+                                </div>
+                                <div class="pull-right wd48p marL10px" style="width: 43% !important; margin-right: 32px;">
+                                    <select class="form-control marL10px" name="status">
+                                        <option value = ""> Call To </option>
+                                        <option value = ""> --Next Action-- </option>
+                                    </select>
+                                </div>
+                                <div class="pull-left wd48p marL10px" style="width: 43% !important; padding-top: 2%; text-align: right;">
+                                    <span class="marL10px"> Next Action Date: </span>
+                                </div>
+                                <div class="pull-right wd48p marL10px" style="width: 50% !important; margin-right: -8px; ">
+                                    <date-time-picker  recipient="msglist._info.NextActionDate" style="margin-top:1%; width: 86%;"></date-time-picker>
+                                </div>
+                                <div class="clearfix"></div>
+                                <div class="pull-left wd48p marL10px" style="width: 90% !important;">
+                                    <textarea class="form-control emptyBox marL10px" style="resize: none;" rows="4" cols="50" name="salesMessage" ng-model="msglist._info.salesMessage" placeholder="Type Message here" required></textarea><br/>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="clearfix"></div>
+                    <div class="row quick_butt">
+                        <div class="col-md-12 col-md-offset">
+                            <input type="submit" ng-disabled="!SignInCtrl.LInfo.UserName || !SignInCtrl.LInfo.Password" class="btn btn-primary wdButt1 pull-left marLL10px" value="Save"/>
+                            <input type="button" ng-click="msglist.closeAddNewSalesEnquiryForm()" class="btn btn-primary wdButt1 signin_cancel marL10px" value="Close"/>
+                        </div>
+                    </div>
+                    <div class="clearfix mob_marT15px"></div>
+                </div>
+            </form>
+            <div class="clearfix"></div>
+        </div>
+        <div class="clearfix"></div>
+    </div>
+
+    <div class="container" style="padding-top:90px; position:relative;">
+        <!-- Example row of columns -->
+        <div class="row">
+            <div class="col-sm-8" style="margin: auto; float: none;">
+                <div class="panel panel-default" style="min-height: 510px;">
+                    <div class="panel-body">
+                        <h3><span class="text_color">Manager</span></h3>
+                        <div class="clearfix"></div>
+                        <div class="clearfix"></div>
+                        <div class="panel-group panelTextSize no_select" id="accordion">
+                            <div class="row " style="font-size: 16px;">
+                                <div class="main">
+                                    <ul class="tabs">
+                                        <li>
+                                            <input type="radio" checked name="tabs" id="tab1">
+                                            <label for="tab1">Sales Enquiry</label>
+                                            <div id="tab-content1" class="tab-content animated fadeIn">
+                                                <div class="row " style="font-size: 16px;">
+                                                    <div class="col-md-3 toolbar-right" style="margin-left: 1%; width: 24%; margin-top: 1%;">
+                                                        <a data-tooltip="Add new" ><img id="addNew"  style="cursor:pointer;" ng-click="msglist.openAddNewSalesEnquiryForm()" src="images/newPlus.png" /></a>
+                                                    </div>
+                                                    <div class="col-md-4" style="width: 32.333%; padding-right: 0px;"></div>
+                                                    <div class="col-md-2 textAlignRight" style="margin-top: 1%;">
+                                                        Status Filter:
+                                                    </div>
+                                                    <div class="col-md-3" style="color: black;">
+                                                        <select class="form-control" name="status">
+                                                            <option value = ""> --Status-- </option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+
+                                                <table class="panel panel-default" st-table="rowCollection" class="table table-striped">
+                                                    <tr>
+                                                        <table style="background-color: #F2F2F2; margin-top: 10px; ">
+                                                            <tr>
+                                                                <td style="width: 5%; text-align: center">1</td>
+                                                                <td style="width: 20%; text-align: center">28-Feb-2015 09:57 AM</td>
+                                                                <td style="width: 15%; text-align: center"><u></u><a>KRUcscdsdNAL11</a></u></td>
+                                                                <td style="width: 15%; text-align: center">Titlesjdgsudgxas<u><a>[...]</a></u></td>
+                                                                <td style="width: 15%; text-align: center">48656565748</td>
+                                                                <td style="width: 15%; text-align: center"> <select class="form-control" name="status" >
+                                                                        <option value = ""> --Status-- </option>
+                                                                     </select>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td style="width: 5%; text-align: center"></td>
+                                                                <td style="width: 5%; text-align: center">
+                                                                    <select class="form-control" name="status" >
+                                                                        <option value = ""> Call To </option>
+                                                                        <option value = ""> --Next Action-- </option>
+                                                                    </select>
+                                                                </td>
+                                                                <td style="width: 20%; text-align: center" colspan="2">Next Action Date: 28-Feb-2015 09:57 AM</td>
+                                                                <td style="width: 15%; text-align: center" colspan="2">Note: Sample note message here</td>
+
+                                                            </tr>
+                                                        </table>
+
+                                                        <table style="background-color: #E0F8F7; margin-top: 10px;">
+                                                            <tr>
+                                                                <td style="width: 5%; text-align: center">2</td>
+                                                                <td style="width: 20%; text-align: center">3-Mar-2015 09:57 AM</td>
+                                                                <td style="width: 15%; text-align: center"><u></u><a>Hari</a></u></td>
+                                                                <td style="width: 15%; text-align: center">This title<u><a>[...]</a></u></td>
+                                                                <td style="width: 15%; text-align: center">9956565748</td>
+                                                                <td style="width: 15%; text-align: center"> <select class="form-control" name="status" >
+                                                                    <option value = ""> --Status-- </option>
+                                                                </select>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td style="width: 5%; text-align: center"></td>
+                                                                <td style="width: 5%; text-align: center">
+                                                                    <select class="form-control" name="status" >
+                                                                        <option value = ""> Call To </option>
+                                                                        <option value = ""> --Next Action-- </option>
+                                                                    </select>
+                                                                </td>
+                                                                <td style="width: 20%; text-align: center" colspan="2">Next Action Date: 28-Feb-2015 09:57 AM</td>
+                                                                <td style="width: 15%; text-align: center" colspan="2">Note: Sample note message here</td>
+
+                                                            </tr>
+                                                        </table>
+
+                                                        <table style="background-color: #F2F2F2; margin-top: 10px;">
+                                                            <tr>
+                                                                <td style="width: 5%; text-align: center">3</td>
+                                                                <td style="width: 20%; text-align: center">11-Feb-2015 09:57 AM</td>
+                                                                <td style="width: 15%; text-align: center"><u></u><a>KRUcscdsdNAL11</a></u></td>
+                                                                <td style="width: 15%; text-align: center">Titlesjdgsudgxas<u><a>[...]</a></u></td>
+                                                                <td style="width: 15%; text-align: center">48656565748</td>
+                                                                <td style="width: 15%; text-align: center"> <select class="form-control" name="status" >
+                                                                    <option value = ""> --Status-- </option>
+                                                                </select>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td style="width: 5%; text-align: center"></td>
+                                                                <td style="width: 5%; text-align: center">
+                                                                    <select class="form-control" name="status" >
+                                                                        <option value = ""> Call To </option>
+                                                                        <option value = ""> --Next Action-- </option>
+                                                                    </select>
+                                                                </td>
+                                                                <td style="width: 20%; text-align: center" colspan="2">Next Action Date: 28-Feb-2015 09:57 AM</td>
+                                                                <td style="width: 15%; text-align: center" colspan="2">Note: Sample note message here</td>
+
+                                                            </tr>
+                                                        </table>
+
+                                                        <table style="background-color: #E0F8F7; margin-top: 10px;">
+                                                            <tr>
+                                                                <td style="width: 5%; text-align: center">4</td>
+                                                                <td style="width: 20%; text-align: center">12-Mar-2015 09:57 AM</td>
+                                                                <td style="width: 15%; text-align: center"><u></u><a>Hari Om</a></u></td>
+                                                                <td style="width: 15%; text-align: center">This title<u><a>[...]</a></u></td>
+                                                                <td style="width: 15%; text-align: center">9956565748</td>
+                                                                <td style="width: 15%; text-align: center"> <select class="form-control" name="status" >
+                                                                    <option value = ""> --Status-- </option>
+                                                                </select>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td style="width: 5%; text-align: center"></td>
+                                                                <td style="width: 5%; text-align: center">
+                                                                    <select class="form-control" name="status" >
+                                                                        <option value = ""> Call To </option>
+                                                                        <option value = ""> --Next Action-- </option>
+                                                                    </select>
+                                                                </td>
+                                                                <td style="width: 20%; text-align: center" colspan="2">Next Action Date: 28-Feb-2015 09:57 AM</td>
+                                                                <td style="width: 15%; text-align: center" colspan="2">Note: Sample note message here</td>
+
+                                                            </tr>
+                                                        </table>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <input type="radio" name="tabs" id="tab2">
+                                            <label for="tab2">tab 2</label>
+                                            <div id="tab-content2" class="tab-content animated fadeIn">
+                                                "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <input type="radio" name="tabs" id="tab3">
+                                            <label for="tab3">tab 3</label>
+                                            <div id="tab-content3" class="tab-content animated fadeIn">
+                                                "But I must explain to you how all this mistaken idea of denouncing pleasure and praising pain was born and I will give you a complete account of the system, and expound the actual teachings of the great explorer of the truth, the master-builder of human happiness. No one rejects, dislikes, or avoids pleasure itself, because it is pleasure, but because those who do not know how to pursue pleasure rationally encounter consequences that are extremely painful. Nor again is there anyone who loves or pursues or desires to obtain pain of itself, because it is pain, but because occasionally circumstances occur in which toil and pain can procure him some great pleasure. To take a trivial example, which of us ever undertakes laborious physical exercise, except to obtain some advantage from it? But who has any right to find fault with a man who chooses to enjoy a pleasure that has no annoying consequences, or one who avoids a pain that produces no resultant pleasure?"
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <input type="radio" name="tabs" id="tab4">
+                                            <label for="tab4">tab 4</label>
+                                            <div id="tab-content4" class="tab-content animated fadeIn">
+                                                "krunal Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                         </div>
+                        <div class="clearfix"></div>
+                       <!-- <div ng-show="msgCtrl.showMoreButton">
+                           &lt;!&ndash; <button class="btn btn-primary pull-right" ng-click="blacklist.getNotifications()" type="button">More</button>&ndash;&gt;
+                        </div>-->
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

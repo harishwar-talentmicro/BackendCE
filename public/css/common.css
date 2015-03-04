@@ -203,10 +203,6 @@
     margin-right: -10px;
 }
 
-.bottom-clearfix{
-    margin-bottom:10px;
-}
-
 #map-canvasH{
     height: 360px;
     width: 100%;
@@ -974,5 +970,68 @@ ng\:form {
 
 
 /* css/jquery.datetimepicker.css End hear */
+.textAlignRight
+{
+    text-align: right;
+}
+
+.newMaping_popup {
+    margin-top: -5%;
+    border-radius: 0px !important;
+    background: #eefaff;
+    border: solid 3px #08749e;
+    position: relative;
+}
+span.smallCloselink {
+    width: 50px;
+    height: 50px;
+    border-radius: 50px;
+    text-align: center;
+    top: -19px;
+    cursor: pointer;
+    right: -27px;
+    position: absolute;
+    background: url(../images/small_close.png) no-repeat;
+    text-indent: -999px;
+    overflow: hidden;
+}
 
 
+.ezeid-table th{
+    font-family: inherit;
+    text-shadow: none;
+    color: #0C97D0;
+    font-weight: bold;
+}
+
+.popover{
+    z-index: 5000;
+    border-radius: 0px;
+}
+
+.popover > .popover-content > .list-group >.list-group-item:first-child,
+.popover > .popover-content > .list-group >.list-group-item:last-child{
+    border-radius: 0px;
+}
+.popover > .popover-content > .list-group >.list-group-item:focus,
+.popover > .popover-content > .list-group >.list-group-item:hover{
+    background-color: #E0FECA;
+}
+.popover > .popover-content > .list-group >.list-group-item > .list-group-item-heading{
+    color:#006892
+}
+
+.dropdown-menu > li.active{
+    background-color: #078FC3;
+    color: #fff;
+}
+
+.toggle.ios, .toggle-on.ios, .toggle-off.ios { border-radius: 20px; }
+.toggle.ios .toggle-handle { border-radius: 20px; }
+
+.modal-dialog{
+    margin-top: 100px;
+}
+.modal-dialog > .modal-content{
+    border-radius:0px;
+}
