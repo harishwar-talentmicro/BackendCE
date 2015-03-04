@@ -1008,3 +1008,6 @@ ng\:form {
 .modal-dialog{
     margin-top: 100px;
 }
+.modal-dialog > .modal-content{
+    border-radius:0px;
+}
