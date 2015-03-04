@@ -184,11 +184,13 @@
                             <br>
                             <span ng-show="search.mInfo.EMailID != ''">
                                 <span style="display:block">
-                                    <a style="position:relative;float:left; display:block" href="#" class="email-link">{{search.mInfo.EMailID}}</a>
+                                    <!--<a style="position:relative;float:left; display:block" href="#" class="email-link">{{search.mInfo.EMailID}}</a>-->
+                                     <a href="mailto:{{search.mInfo.EMailID}}" class="email-link">{{search.mInfo.EMailID}}</a>
                                 </span>
                             </span>
                             <span ng-show="search.mInfo.Website != ''">
-                                <a style="position:relative; float:left" href="#" class="web-link">{{search.mInfo.Website}}</a>
+                                <!--<a style="position:relative; float:left"  class="web-link">{{search.mInfo.Website}}</a>-->
+                                 <u> <a style="position:relative; float:left" href="{{search.mInfo.Website}}" class="web-link">{{search.mInfo.Website}}</a></u>
                             </span>
                             <div> </div>
                             <div class="clearfix"></div>
@@ -488,16 +490,14 @@
                                     </div>
                                     <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12">
                                         <div class="row text-left" style="border-bottom: 1px solid #DDD;padding: 5px;margin-top: 0px;">
-                                            
                                             <div class="col-lg-1" style="width: 6.333333%;">
                                                 <img src="images/MSG_24.png" />
                                             </div>
                                             <div class="col-lg-4" style="width: 44.333333%;word-wrap: break-word;">
-                                                {{search.mInfo.EMailID}}
+                                                <a href="mailto:{{search.mInfo.EMailID}}">{{search.mInfo.EMailID}}</a>
                                             </div>
                                             <div class="col-lg-1" style=" margin-left: 1.5%; width: 5.333333%;">
                                                 <div class="row">
-                                                    
                                                     <div class="col-lg-4 text-center">
                                                         <div class="row">
                                                             <div class="col-lg-3"></div>
@@ -505,7 +505,6 @@
                                                                 <img src="images/web_24.png">
                                                             </div>
                                                         </div>
-                                                        
                                                     </div>
                                                 </div>
                                             </div>
@@ -529,8 +528,6 @@
                                         </div>
                                         <div class="col-lg-7">
                                             <div style="margin-top:0px!important;text-align:center;" ng-hide="search.isIndividualUser(1)">
-                                                
-                                                
                                                 <img src="images/Open__48.png" height="38px;" ng-show="search.mInfo.OpenStatus==1"/>
                                                 <img src="images/Closed___48.png" height="38px;" ng-hide="search.mInfo.OpenStatus==1" />
                                             </div>

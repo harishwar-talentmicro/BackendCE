@@ -44,6 +44,7 @@
             .when('/legal',{templateUrl: 'html/legal.html'})
             .when('/congratulations',{templateUrl: 'html/congratulations.html'})
             .when('/blackwhitelist',{templateUrl: 'html/blacklistwhitelist.html'})
+            .when('/salesenquiry',{templateUrl: 'html/salesenquiry.html'})
             .when('/subusers',{templateUrl : 'html/subusers.html'})
             .otherwise({ templateUrl: 'html/home.html' });
         
@@ -156,6 +157,7 @@
             }
         }
     });
+
     ezeid.controller('SampleWizardController', function($scope, $q, $timeout) {
             $scope.user = {};
 
@@ -520,6 +522,12 @@
                                 if (data != 'null') {
                                     $timeout(function () {
                                         SearchSec.mInfo = data[0];
+
+                                        if (!/^(f|ht)tps?:\/\//i.test(data[0].Website)) {
+                                            url = "http://" + data[0].Website;
+                                            SearchSec.mInfo.Website = url;
+                                        }
+
                                         $scope.showInfoTab = true;
                                         $scope.selectTab('info');
 
@@ -633,6 +641,12 @@
                                    }
                                      $timeout(function () {
                                         SearchSec.mInfo = data[0];
+
+                                         if (!/^(f|ht)tps?:\/\//i.test(data[0].Website)) {
+                                             url = "http://" + data[0].Website;
+                                             SearchSec.mInfo.Website = url;
+                                         }
+
                                         //Call for banner
                                         getBanner(1);
                                         $scope.form_rating = data[0].Rating;
@@ -1331,7 +1345,6 @@
                     profile._info.CVButton = profile._info.CVButton == 1 ? true : false;
                     profile._info.DOB = data[0].DOB;
                     // profile._info.DOB = $filter('date')(new Date(data[0].DOB), 'dd-MMM-yyyy');
-                    // console.log(profile._info.DOB);
                     initialize();
              });
         }
@@ -1352,21 +1365,21 @@
         this.CheckisIDAvailable = function () {
 
             $scope.disableAvalabilityButton = true;
-            var sEzeid = profile._info.EZEID;
+           /* var sEzeid = profile._info.EZEID;
             var lastTwo = sEzeid.substr(sEzeid.length - 2);
             if(lastTwo != "ap")
-            {
+            {*/
                $http({
                     method: 'get',
                     url: GURL + 'ewGetEZEID?EZEID=' + profile._info.EZEID
                 }).success(function (data) {
                     profile._info.IsIDAvailable = data.IsIdAvailable;
                 });
-            }
+           /* }
             else
             {
                 profile._info.IsIDAvailable = false;
-            }
+            }*/
         };
 
         this.ezeidBoxClicked = function () {
