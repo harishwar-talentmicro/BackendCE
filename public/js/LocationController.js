@@ -513,7 +513,6 @@ angular.module('ezeidApp').controller('LocationsController', function ($rootScop
                 }
             }
             
-            
             /*____________________________________________________________________________*/
             // Listen for the event fired when the user selects an item from the
             // pick list. Retrieve the matching places for that item.

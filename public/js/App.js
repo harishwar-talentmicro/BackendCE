@@ -956,6 +956,7 @@
 
         //open Reservation form
         SearchSec.openReservationForm = function () {
+            document.getElementById("reservationMessage").className = "form-control fixTextArea emptyBox";
             $('#Reservation_popup').slideDown();
         };
 
@@ -970,11 +971,11 @@
                var currentTaskDate = moment().format('DD-MMM-YYYY hh:mm A');
                $http({ method: 'post', url: GURL + 'ewtSaveMessage', data: { TokenNo: $rootScope._userInfo.Token, ToMasterID: SearchSec.mInfo.TID, MessageType: messageType, Message: SearchSec.ReservationMessage, TaskDateTime: dateTime, LocID :SearchSec.mInfo.LocID,CurrentTaskDate: currentTaskDate } }).success(function (data) {
                     if (data.IsSuccessfull) {
-                        $('#Reservation_popup').slideUp();
+                        document.getElementById("reservationMessage").className = "form-control fixTextArea emptyBox";
                         SearchSec.ReservationMessage = "";
                         SearchSec.ReservationDateTime = "";
                         Notification.success({ message: 'Message send success', delay: MsgDelay });
-                        document.getElementById("reservationMessage").className = "form-control fixTextArea emptyBox";
+                        $('#Reservation_popup').slideUp();
                     }
                     else {
                         Notification.error({ message: 'Sorry..! Message not send ', delay: MsgDelay });

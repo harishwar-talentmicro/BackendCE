@@ -110,9 +110,10 @@
                                      <date-time-picker recipient="search.ReservationDateTime"></date-time-picker>
                                 </span>
                             </p>
-                            <textarea id="reservationMessage" ng-class="reservationForm.reservationMessage.$touched && !search.ReservationMessage.length ? 'mandatoryTextBox' : ''" class="form-control fixTextArea emptyBox" name="reservationMessage" ng-model="search.ReservationMessage"
+                            <textarea id="reservationMessage" name="reservationMessage"
+                                      ng-class="reservationForm.reservationMessage.$touched && !search.ReservationMessage.length ? 'mandatoryTextBox' : ''"
+                                      class="form-control fixTextArea emptyBox" name="reservationMessage" ng-model="search.ReservationMessage"
                                       placeholder="{{search.reservationPlaceHolder}}" required></textarea>
-
                         </div>
                         <div class="form-group">
                             <input type="submit" ng-disabled="!search.ReservationDateTime || !search.ReservationMessage" class="btn btn-primary appoint_marT" value="Send" />
@@ -285,17 +286,16 @@
                                     <div class="bottom-clearfix"></div>
                                     <div class="row row-margin-fix">
 
-                                        <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8" ng-class="search.isEZEIDselected('1') ? 'searchAreaSize' : '' ">
+                                        <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8" ng-class="search.isEZEIDselected('1') ? 'searchAreaSize' : 'searchAreaSizeBig' ">
                                             <input id="inputEmail" class="form-control" ng-model="search.Criteria.Keywords"   ng-click="search.SearchTypeKeyWord()" required autofocus type="text"
-                                                   ng-class="search.Criteria.SearchType == 1 ? 'setUpperChar' : ''">
+                                                   ng-class="search.Criteria.SearchType == 1 ? 'setUpperChar' : ''" >
                                         </div>
 
                                         <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2" ng-hide="search.isEZEIDselected('1')">
                                             <div ng-dropdown-multiselect="" options="ratingData" selected-model="ratingModel"></div>
                                         </div>
 
-                                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
-                                            <!--<button  ng-disabled="!search.Criteria.Keywords" ng-click="search.getSearch()" class="btn btn-block btn-primary pull-left" type="button">Search</button>-->
+                                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2" ng-class="search.isEZEIDselected('1') ? 'searchButtonDiv' : 'setSpaceSearchButton' ">
                                             <button  ng-disabled="!search.Criteria.Keywords" class="btn btn-block btn-primary pull-left" type="submit">Search</button>
                                         </div>
                                     </div>
@@ -344,7 +344,7 @@
                    <div class="window_page Maping_popup" style="margin-top: 0%;border: solid 1px #08749C; min-height: 48px; width: 57.50%;padding: 5px; margin-bottom: 1%;">
                        <span class="closeCVSmall" ng-click="search.closeDownloadForm()">X</span>
 
-                          <div class="col-md-12">
+                            <div class="col-md-12">
                                 Click<a href="/ewtGetSearchDocuments?Token={{_userInfo.Token}}&&Keywords={{search.Criteria.Keywords}}"><b> {{search.downloadData.Filename}} </b></a>to download.
                                 <br/>
                             </div>

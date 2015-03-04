@@ -78,7 +78,6 @@ angular.module('ezeidApp').controller('BlackListWhiteListController', function($
             method: 'get',
             url: GURL + 'ewtGetWhiteBlackList?Token=' + $rootScope._userInfo.Token
         }).success(function (data) {
-                 console.log(data);
                  if (data != 'null')
                  {
                      blacklist.msgs = [];
@@ -95,10 +94,58 @@ angular.module('ezeidApp').controller('BlackListWhiteListController', function($
                  }
             });
     }
+
       //Below code is for getting relation type
       $http({ method: 'get', url: GURL + 'ewmGetRelationType?LangID=1' }).success(function (data) {
          blacklist.Relations = data;
        });
+
+    //Add To Black list / White list
+    /*  function checkEzeidAlradyExistInListOrNot()
+    {
+        $http({ method: 'get', url: GURL + 'ewtGetWhiteListCount?Token='+ $rootScope._userInfo.Token + '&EZEID=' + blacklist._info.EZEID + '&List=' + blacklist._info.List }).success(function (data) {
+
+            console.log(data.WhiteListCount);
+               if(data.WhiteListCount == 0)
+               {
+                   console.log("SAi3");
+                   return false;
+               }
+                else
+               {
+                   console.log("SAi4");
+                   return true;
+               }
+
+            //return data.WhiteListCount != '0' ? true : false;
+        });
+    }*/
+
+    // Add record to list
+    this.addToList=function(){
+        addToWhiteListBlackList();
+    };
+
+    //Add To Black list / White list
+    function addToWhiteListBlackList()
+    {
+        blacklist._info.RelationType = blacklist._info.RelationType == "" || !blacklist._info.RelationType ? 0 : blacklist._info.RelationType;
+        blacklist._info.Tag = blacklist._info.Tag == "" || !blacklist._info.Tag ? 0 : blacklist._info.Tag;
+        blacklist._info.Token = $rootScope._userInfo.Token;
+        $http({ method: 'post', url: GURL + 'ewtSaveWhiteBlackList', data: blacklist._info }).success(function (data) {
+            if (data.IsSuccessfull) {
+                Notification.success({ message: 'Saved...', delay: MsgDelay });
+                blacklist._info.List = "";
+                blacklist._info.RelationType = "";
+                blacklist._info.EZEID = "";
+                blacklist._info.Tag = "";
+                getBlackWhiteListInfo();
+            }
+            else {
+                Notification.error({ message: 'Sorry..! not saved ', delay: MsgDelay });
+            }
+        });
+    }
 
     //Add EZE Id to black/white list
     this.addToBlackWhiteList=function(){
@@ -114,22 +161,38 @@ angular.module('ezeidApp').controller('BlackListWhiteListController', function($
                 }
                 else
                 {
-                    blacklist._info.RelationType = blacklist._info.RelationType == "" || !blacklist._info.RelationType ? 0 : blacklist._info.RelationType;
-                    blacklist._info.Tag = blacklist._info.Tag == "" || !blacklist._info.Tag ? 0 : blacklist._info.Tag;
-                    blacklist._info.Token = $rootScope._userInfo.Token;
-                    $http({ method: 'post', url: GURL + 'ewtSaveWhiteBlackList', data: blacklist._info }).success(function (data) {
-                        if (data.IsSuccessfull) {
-                            Notification.success({ message: 'Saved...', delay: MsgDelay });
-                            blacklist._info.List = "";
-                            blacklist._info.RelationType = "";
-                            blacklist._info.EZEID = "";
-                            blacklist._info.Tag = "";
-                            getBlackWhiteListInfo();
+                    //Check for already in list or not
+                    $http({ method: 'get', url: GURL + 'ewtGetWhiteListCount?Token='+ $rootScope._userInfo.Token + '&EZEID=' + blacklist._info.EZEID + '&List=' + blacklist._info.List }).success(function (data) {
+
+                        console.log(data.WhiteListCount);
+                        if(data.WhiteListCount == 0)
+                        {
+                            //Add To Black list / White list
+                            addToWhiteListBlackList();
                         }
-                        else {
-                            Notification.error({ message: 'Sorry..! not saved ', delay: MsgDelay });
+                        else
+                        {
+                            // Confirm Popup open
+                            $('#confirmChange').slideDown();
                         }
-                   });
+
+                        //return data.WhiteListCount != '0' ? true : false;
+                    });
+
+
+                 /*   if(checkEzeidAlradyExistInListOrNot())
+                    {
+                        console.log("Sai1");
+                        // Confirm Popup open
+                        $('#confirmChange').slideDown();
+                    }
+                    else
+                    {
+                        console.log("Sai2");
+                        //Add To Black list / White list
+                        addToWhiteListBlackList();
+                    }*/
+
                 }
              });
     };
@@ -139,10 +202,20 @@ angular.module('ezeidApp').controller('BlackListWhiteListController', function($
             $scope.recordtoDelete = _TID;
             $('#confirmDelete').slideDown();
     };
+
     //close DeleteConfirmDialog
-    this.closeDeleteConfirmDialog = function (_TID) {
+    this.closeDeleteConfirmDialog = function () {
         $scope.recordtoDelete = "";
         $('#confirmDelete').slideUp();
+    };
+
+    //close addConfirmConfirmDialog
+    this.closeAddConfirmDialog = function () {
+        blacklist._info.List = "";
+        blacklist._info.RelationType = "";
+        blacklist._info.EZEID = "";
+        blacklist._info.Tag = "";
+        $('#confirmChange').slideUp();
     };
 
     // Delete record from list
