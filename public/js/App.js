@@ -2396,6 +2396,7 @@
         $scope.modalBox = {
             title : "Add new subuser",
             ezeidExists : false,
+            availabilityCheck : false,  //If checked the availability of EZEID or not
             subuser : {
                 ezeid : "",
                 userName : "",
@@ -2414,7 +2415,21 @@
                     resume : []
                 },
                 status : 1
-            }
+            },
+            checkAvailability : function(){
+                $http({
+                    url : "/ewGetEZEID",
+                    method : "POST"
+                }).success(function(resp){
+                        $scope.modalBox.availabilityCheck = true;
+                        if(!resp.IsIdAvailable){
+                            $scope.modalBox.ezeidExists = true;
+                        }
+
+                }).error(function(err){
+                        Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
+                });
+            },
         };
 
         //Open Modal box for user
@@ -2467,6 +2482,20 @@
         $scope.addSubUser = function(){};
 
         $scope.editSubUser = function(){};
+
+
+        $scope.loadAllRules = function(){
+            $http({
+                method : "GET",
+                params : {
+                    Token : $rootScope._userInfo.Token
+                }
+            }).success(function(resp){
+                    //@todo Write code for loading all rules and assigning them to some variable
+                }).error(function(err){
+
+                });
+        };
 
         // Getting master user details
         $http({
