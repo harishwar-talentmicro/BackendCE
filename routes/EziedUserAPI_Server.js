@@ -516,51 +516,88 @@ exports.FnLogin = function (req, res) {
             FirstName: '',
             Type: 0,
             Icon: '',
-            Verified: 0
+            Verified: 0,
+            SalesModueTitle: '',
+            AppointmentModueTitle: '',
+            HomeDeliveryModuleTitle : '',
+            ServiceModuleTitle: '',
+            CVModuleTitle: '',
+            SalesFormMsg: '',
+            ReservationFormMsg: '',
+            HomeDeliveryFormMsg: '',
+            ServiceFormMsg: '',
+            CVFormMsg: '',
+            ItemListType: '',
+            RefreshInterval:'',
+            MasterID: 0
         };
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
         if (UserName != null && UserName != '' && Password != null && Password != '') {
             var EncryptPWD = FnEncryptPassword(Password);
             // console.log(EncryptPWD);
-            var Query = 'select TID,FirstName,LastName,EZEID,IDTypeID,Token,Icon, EZEIDVerifiedID from tmaster where StatusID=1 and  EZEID=' + db.escape(UserName) + ' and Password=' + db.escape(EncryptPWD);
-            db.query(Query, function (err, loginResult) {
+            var FindArray = UserName.split('.');
+            var Query
+            //console.log('findarray: ' + FindArray.length);
+          var Query = db.escape(UserName)+','+ db.escape(EncryptPWD);
+            db.query('CALL PLogin(' + Query + ')', function (err, loginResult) {
                 if (!err) {
-                    if (loginResult.length > 0) {
-                        // console.log('loginResult: ' + loginResult);
-                        var Encrypt = FnGenerateToken();
-                        //   console.log('Encrypt: ' + Encrypt);
-                        // console.log('TID ' + loginResult[0].TID);
-                        var Query = 'update tmaster set Token=' + db.escape(Encrypt) + ' where TID=' + db.escape(loginResult[0].TID);
-                        db.query(Query, function (err, TokenResult) {
-                            if (!err) {
-                                //  console.log(TokenResult);
+                    if(loginResult != null) {
+                        if (loginResult[0].length > 0) {
+                            // console.log('loginResult: ' + loginResult);
+                            var Encrypt = FnGenerateToken();
+                            //   console.log('Encrypt: ' + Encrypt);
+                            // console.log('TID ' + loginResult[0].TID);
+                            var loginDetails = loginResult[0];
+                            var Query = 'update tmaster set Token=' + db.escape(Encrypt) + ' where TID=' + db.escape(loginDetails[0].TID);
+                            db.query(Query, function (err, TokenResult) {
+                                if (!err) {
+                                    //  console.log(TokenResult);
 
-                                if (TokenResult.affectedRows > 0) {
-                                    //res.setHeader('Cookie','Token='+Encrypt);
-                                    res.cookie('Token', Encrypt, { maxAge: 900000, httpOnly: true });
-                                    RtnMessage.Token = Encrypt;
-                                    RtnMessage.IsAuthenticate = true;
-                                    RtnMessage.FirstName = loginResult[0].FirstName;
-                                    RtnMessage.Type = loginResult[0].IDTypeID;
-                                    RtnMessage.Icon = loginResult[0].Icon;
-                                    RtnMessage.Verified=loginResult[0].EZEIDVerifiedID;
+                                    if (TokenResult.affectedRows > 0) {
+                                        //res.setHeader('Cookie','Token='+Encrypt);
 
-                                    res.send(RtnMessage);
+                                        res.cookie('Token', Encrypt, { maxAge: 900000, httpOnly: true });
+                                        RtnMessage.Token = Encrypt;
+                                        RtnMessage.IsAuthenticate = true;
+                                        RtnMessage.FirstName = loginDetails[0].FirstName;
+                                        RtnMessage.Type = loginDetails[0].IDTypeID;
+                                        RtnMessage.Icon = loginDetails[0].Icon;
+                                        RtnMessage.Verified = loginDetails[0].EZEIDVerifiedID;
+                                        RtnMessage.SalesModueTitle = loginDetails[0].SalesModueTitle;
+                                            RtnMessage.AppointmentModueTitle = loginDetails[0].AppointmentModueTitle;
+                                            RtnMessage.HomeDeliveryModuleTitle = loginDetails[0].HomeDeliveryModuleTitle;
+                                            RtnMessage.ServiceModuleTitle = loginDetails[0].ServiceModuleTitle;
+                                            RtnMessage.CVModuleTitle = loginDetails[0].CVModuleTitle;
+                                            RtnMessage.SalesFormMsg= loginDetails[0].SalesFormMsg;
+                                            RtnMessage.ReservationFormMsg= loginDetails[0].ReservationFormMsg;
+                                            RtnMessage.HomeDeliveryFormMsg= loginDetails[0].HomeDeliveryFormMsg;
+                                            RtnMessage.ServiceFormMsg= loginDetails[0].ServiceFormMsg;
+                                            RtnMessage.CVFormMsg= loginDetails[0].CVFormMsg;
+                                            RtnMessage.ItemListType= loginDetails[0].ItemListType;
+                                            RtnMessage.RefreshInterval= loginDetails[0].RefreshInterval;
+                                            RtnMessage.MasterID= loginDetails[0].ParentMasterID;
+                                        res.send(RtnMessage);
 
-                                    console.log('FnLogin:tmaster: Login success');
+                                        console.log('FnLogin:tmaster: Login success');
+                                    }
+                                    else {
+
+                                        res.send(RtnMessage);
+                                        console.log('FnLogin:tmaster:Fail to generate Token');
+                                    }
                                 }
                                 else {
-
+                                    res.statusCode = 500;
                                     res.send(RtnMessage);
-                                    console.log('FnLogin:tmaster:Fail to generate Token');
+                                    console.log('FnLogin:tmaster:' + err);
                                 }
-                            }
-                            else {
-                                res.statusCode = 500;
-                                res.send(RtnMessage);
-                                console.log('FnLogin:tmaster:' + err);
-                            }
-                        });
+                            });
+                        }
+
+                        else {
+                            res.send(RtnMessage);
+                            console.log('FnLogin:tmaster: Invalid login credentials');
+                        }
                     }
                     else {
 
