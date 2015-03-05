@@ -33,7 +33,12 @@
             </div>
 
         </div>
-        <table st-table="subusers" class="table table-striped ezeid-table">
+        <!--- Template to be displayed in rules popover -->
+        <script type="text/ng-template" id="rules.html">
+            <h1>Hello this is from template</h1>
+        </script>
+        <!--- Template to be displayed in rules popover ends -->
+        <table  class="table table-striped ezeid-table">
             <thead>
                 <tr>
                     <th>S.No.</th>
@@ -47,31 +52,31 @@
             <tbody>
                 <tr ng-repeat="user in subusers">
                     <td>{{$index+1}}.</td>
-                    <td><a data-index="{{$index}}" ng-click="openModalBox($event)">{{user.userName}}</a></td>
+                    <td><a class="btn-link" data-index="{{$index}}" ng-click="openModalBox($event)">{{user.userName}}</a></td>
                     <td>{{user.ezeid | uppercase}}</td>
                     <td>
-                            <a tabindex="0" role="button" class="btn btn-default link-popover" data-container="body" data-toggle="popover" data-placement="right"
+                            <a tabindex="0" data-trigger="focus" role="button" class="btn btn-default link-popover" data-container="body" data-toggle="popover" data-placement="right"
                                     title="<h4>Access Rights <span class='pull-right glyphicon glyphicon-remove popover-close'></span></h4>" data-content='
                                         <div class="list-group">
                                             <a class="list-group-item" ng-hide="subusers[$index].accessRights.sales == 0">
                                                 <h6 class="list-group-item-heading">Sales</h6>
-                                                <p class="list-group-item-text">{{accessRights[subusers[$index].accessRights.sales]}}</p>
+                                                <p class="list-group-item-text">{{accessRights[subusers[$index].accessRights.sales].title}}</p>
                                             </a>
                                             <a class="list-group-item" ng-hide="user.accessRights.reservation == 0">
                                                 <h6 class="list-group-item-heading">Reservation</h6>
-                                                <p class="list-group-item-text">{{accessRights[subusers[$index].accessRights.reservation]}}</p>
+                                                <p class="list-group-item-text">{{accessRights[subusers[$index].accessRights.reservation].title}}</p>
                                             </a>
                                             <a class="list-group-item" ng-hide="user.accessRights.homeDelivery == 0">
                                                 <h6 class="list-group-item-heading">Home Delivery</h6>
-                                                <p class="list-group-item-text">{{accessRights[subusers[$index].accessRights.homeDelivery]}}</p>
+                                                <p class="list-group-item-text">{{accessRights[subusers[$index].accessRights.homeDelivery].title}}</p>
                                             </a>
                                             <a class="list-group-item" ng-hide="user.accessRights.service == 0">
                                                 <h6 class="list-group-item-heading">Service</h6>
-                                                <p class="list-group-item-text">{{accessRights[subusers[$index].accessRights.service]}}</p>
+                                                <p class="list-group-item-text">{{accessRights[subusers[$index].accessRights.service].title}}</p>
                                             </a>
                                             <a class="list-group-item" ng-hide="user.accessRights.resume == 0">
                                                 <h6 class="list-group-item-heading">Resume</h6>
-                                                <p class="list-group-item-text">{{accessRights[subusers[$index].accessRights.resume]}}</p>
+                                                <p class="list-group-item-text">{{accessRights[subusers[$index].accessRights.resume].title}}</p>
                                             </a>
                                         </div>
                                     '>
@@ -81,7 +86,7 @@
 
                     </td>
                     <td>
-                        <button class="btn btn-success">Open Rules</button>
+                        <a class="btn-link" data-index="{{$index}}" ng-click="openModalBox($event)">See Rules</a>
                     </td>
                     <td>
                         <button class="btn" ng-class="(subusers[$index].status == 2)?'btn-success':'btn-danger'">{{(subusers[$index].status==2)?'Active':'Inactive'}}</button>
@@ -89,6 +94,7 @@
                 </tr>
             </tbody>
         </table>
+
         <!------------- Content region ends here ---------------------->
         <!------------ Modal Box starts here -------------------------->
         <modal mtitle="modalBox.title" visible="showModal">
@@ -102,17 +108,17 @@
                             </div>
                         </div>
                         <div class="col-lg-2 col-md-2 col-sm-2 col-xs-4 bottom-clearfix">
-                            <button ng-hide="modalBox.ezeidExists" class="btn btn-primary btn-block"><span class="glyphicon glyphicon-search"></span> CHECK EZEID</button>
+                            <button ng-hide="modalBox.ezeidExists" ng-click="checkAvailability()" class="btn btn-primary btn-block"><span class="glyphicon glyphicon-search"></span> CHECK EZEID</button>
                         </div>
                         <div class="col-lg-2 col-md-2 col-sm-2 col-xs-4 bottom-clearfix" ng-hide="modalBox.ezeidExists">
                             <div class="form-group" data-toggle="tooltip" data-placement="right" title="Subuser Status">
-                                <p class="text-success center-vertical" ng-show="modalBox.availabilityCheck"><span class="glyphicon glyphicon-ok-circle"></span> Available</p>
-                                <p class="text-danger center-vertical" ng-show="modalBox.availabilityCheck"><span class="glyphicon glyphicon-remove-circle"></span>Not Available</p>
+                                <p class="text-success center-vertical" ng-show="modalBox.availabilityCheck && modalBox.isEzeidAvailable"><span class="glyphicon glyphicon-ok-circle"></span> Available</p>
+                                <p class="text-danger center-vertical" ng-show="modalBox.availabilityCheck && (!modalBox.isEzeidAvailable)"><span class="glyphicon glyphicon-remove-circle"></span> Not Available</p>
                             </div>
                         </div>
 
                     </div>
-                    <div class="row" ng-show="modalBox.ezeidExists">
+                    <div class="row" ng-show="modalBox.isEzeidAvailable">
                         <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 bottom-clearfix">
                             <div class="form-group">
                                 <div class="input-group" data-toggle="tooltip" title="Subuser Username" data-placement="right">
@@ -141,10 +147,10 @@
                         </div>
                     </div>
 
-                    <div class="row bottom-clearfix">
+                    <div class="row bottom-clearfix" ng-show="modalBox.isEzeidAvailable">
                         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12"><hr/></div>
                     </div>
-                    <div class="row" ng-show="modalBox.ezeidExists">
+                    <div class="row" ng-show="modalBox.isEzeidAvailable">
                         <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 bottom-clearfix text-center"></div>
                         <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 bottom-clearfix text-center"><h5>Sales</h5></div>
                         <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 bottom-clearfix text-center"><h5>Reservation</h5></div>
@@ -152,48 +158,48 @@
                         <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 bottom-clearfix text-center"><h5>Service</h5></div>
                         <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 bottom-clearfix text-center"><h5>Resume</h5></div>
                     </div>
-                    <div class="row" ng-show="modalBox.ezeidExists">
+                    <div class="row" ng-show="modalBox.isEzeidAvailable">
                         <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 bottom-clearfix text-center">
                             <div class="text-left"> Access Rights</div>
                         </div>
                         <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 bottom-clearfix text-center">
                             <div class="form-group">
-                                <select class="form-control">
-                                    <option>Hidden</option>
+                                <select class="form-control" ng-model="modalBox.subuser.accessRights.sales">
+                                    <option ng-repeat="right in accessRights" value="{{right.value}}">{{right.title}}</option>
                                 </select>
                             </div>
                         </div>
                         <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 bottom-clearfix text-center">
                             <div class="form-group">
-                                <select class="form-control">
-                                    <option>Hidden</option>
+                                <select class="form-control" ng-model="modalBox.subuser.accessRights.reservation">
+                                    <option ng-repeat="right in accessRights" value="{{right.value}}">{{right.title}}</option>
                                 </select>
                             </div>
                         </div>
                         <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 bottom-clearfix text-center">
                             <div class="form-group">
-                                <select class="form-control">
-                                    <option>Hidden</option>
+                                <select class="form-control" ng-model="modalBox.subuser.accessRights.homeDelivery">
+                                    <option ng-repeat="right in accessRights" value="{{right.value}}">{{right.title}}</option>
                                 </select>
                             </div>
                         </div>
                         <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 bottom-clearfix text-center">
                             <div class="form-group">
-                                <select class="form-control">
-                                    <option>Hidden</option>
+                                <select class="form-control" ng-model="modalBox.subuser.accessRights.service">
+                                    <option ng-repeat="right in accessRights" value="{{right.value}}">{{right.title}}</option>
                                 </select>
                             </div>
                         </div>
                         <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 bottom-clearfix text-center">
                             <div class="form-group">
-                                <select class="form-control">
-                                    <option>Hidden</option>
+                                <select class="form-control"  ng-model="modalBox.subuser.accessRights.resume">
+                                    <option ng-repeat="right in accessRights" value="{{right.value}}">{{right.title}}</option>
                                 </select>
                             </div>
                         </div>
                     </div>
                     <!------------------------- Email Input Row --------------------------------->
-                    <div class="row" ng-show="modalBox.ezeidExists">
+                    <div class="row" ng-show="modalBox.isEzeidAvailable">
                         <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 bottom-clearfix text-center">
                             <div class="text-left"> Email</div>
                         </div>
@@ -201,7 +207,7 @@
                                 <div class="form-group">
                                     <div class="input-group">
                                         <span class="input-group-addon" id="basic-addon4">@</span>
-                                        <input type="text" ng-model="modalBox.subuser.reserveationEmail" class="form-control" placeholder="Email" aria-describedby="basic-addon1">
+                                        <input type="text" ng-model="modalBox.subuser.salesEmail" class="form-control" placeholder="Sales Email" aria-describedby="basic-addon1">
                                     </div>
                                 </div>
                         </div>
@@ -209,7 +215,7 @@
                             <div class="form-group">
                                 <div class="input-group">
                                     <span class="input-group-addon" id="basic-addon5">@</span>
-                                    <input type="text" ng-model="modalBox.subuser.reserveationEmail" class="form-control" placeholder="Email" aria-describedby="basic-addon1">
+                                    <input type="text" ng-model="modalBox.subuser.reservationEmail" class="form-control" placeholder="Reservation Email" aria-describedby="basic-addon1">
                                 </div>
                             </div>
                         </div>
@@ -217,7 +223,7 @@
                             <div class="form-group">
                                 <div class="input-group">
                                     <span class="input-group-addon" id="basic-addon6">@</span>
-                                    <input type="text" ng-model="modalBox.subuser.reserveationEmail" class="form-control" placeholder="Email" aria-describedby="basic-addon1">
+                                    <input type="text" ng-model="modalBox.subuser.homeDelivery" class="form-control" placeholder="Home Delivery Email" aria-describedby="basic-addon1">
                                 </div>
                             </div>
                         </div>
@@ -225,7 +231,7 @@
                             <div class="form-group">
                                 <div class="input-group">
                                     <span class="input-group-addon" id="basic-addon7">@</span>
-                                    <input type="text" ng-model="modalBox.subuser.reserveationEmail" class="form-control" placeholder="Email" aria-describedby="basic-addon1">
+                                    <input type="text" ng-model="modalBox.subuser.serviceEmail" class="form-control" placeholder="Service Email" aria-describedby="basic-addon1">
                                 </div>
                             </div>
                         </div>
@@ -233,7 +239,7 @@
                             <div class="form-group">
                                 <div class="input-group">
                                     <span class="input-group-addon" id="basic-addon8">@</span>
-                                    <input type="text" ng-model="modalBox.subuser.reserveationEmail" class="form-control" placeholder="Email" aria-describedby="basic-addon1">
+                                    <input type="text" ng-model="modalBox.subuser.resumeEmail" class="form-control" placeholder="Resume Email" aria-describedby="basic-addon1">
                                 </div>
                             </div>
                         </div>
@@ -241,7 +247,7 @@
                     <!---------------- Email Input row ends ---------------------->
 
                     <!---------------- Rules row ----------------------------->
-                    <div class="row" ng-show="modalBox.ezeidExists">
+                    <div class="row" ng-show="modalBox.isEzeidAvailable">
                         <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 bottom-clearfix text-left">Rules</div>
 
                         <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 bottom-clearfix text-left">
@@ -329,11 +335,11 @@
                         <!---------------- Rules row ends ----------------------------->
                     </div>
 
-                    <div class="row bottom-clearfix">
+                    <div class="row bottom-clearfix" ng-show="modalBox.isEzeidAvailable">
                         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12"><hr/></div>
                     </div>
-                    <div class="row" ng-show="modalBox.ezeidExists">
-                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12" ng-show="modalBox.">
+                    <div class="row" ng-show="modalBox.isEzeidAvailable">
+                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
                             <button class="btn btn-primary btn-block">Save</button>
                         </div>
                     </div>
