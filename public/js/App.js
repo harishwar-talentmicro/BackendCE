@@ -88,9 +88,10 @@
             template: '<div class="modal fade">' +
                 '<div class="modal-dialog modal-lg">' +
                 '<div class="modal-content">' +
+                '<span class="closelink" data-dismiss="modal" aria-hidden="true">X</span>'+
                 '<div class="modal-header">' +
-                '<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>' +
-                '<h4 class="modal-title">{{ title }}</h4>' +
+//                '<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>' +
+                '<h4 class="modal-title text-center">{{ mtitle }}</h4>' +
                 '</div>' +
                 '<div class="modal-body" ng-transclude></div>' +
                 '</div>' +
@@ -101,15 +102,15 @@
             replace:true,
             scope:true,
             link: function postLink(scope, element, attrs) {
-                scope.title = attrs.title;
+                scope.mtitle = attrs.mtitle;
                 scope.$watch(attrs.visible, function(value){
                     if(value == true)
                         $(element).modal('show');
                     else
                         $(element).modal('hide');
                 });
-                scope.$watch(attrs.title,function(value){
-                    scope.title = value;
+                scope.$watch(attrs.mtitle,function(value){
+                    scope.mtitle = value;
                 });
 
                 $(element).on('shown.bs.modal', function(){
@@ -126,8 +127,6 @@
             }
         };
     });
-
-
 
     // define controller for wizard
     ezeid.directive('dateTimePicker', function() {
@@ -157,6 +156,99 @@
             }
         }
     });
+
+    //Directives for plus/minus control
+    ezeid.directive('counter', function() {
+        return {
+            restrict: 'A',
+            scope: { value: '=value' },
+            template: '<a href="javascript:;" class="counter-minus" ng-click="minus()">-</a>\
+                  <input type="text" class="counter-field" ng-model="value" ng-change="changed()" ng-readonly="readonly">\
+                  <a  href="javascript:;" class="counter-plus" ng-click="plus()">+</a>',
+            link: function( scope , element , attributes ) {
+                // Make sure the value attribute is not missing.
+                if ( angular.isUndefined(scope.value) ) {
+                    throw "Missing the value attribute on the counter directive.";
+                }
+
+                var min = angular.isUndefined(attributes.min) ? null : parseInt(attributes.min);
+                var max = angular.isUndefined(attributes.max) ? null : parseInt(attributes.max);
+                var step = angular.isUndefined(attributes.step) ? 1 : parseInt(attributes.step);
+
+                element.addClass('counter-container');
+
+                // If the 'editable' attribute is set, we will make the field editable.
+                scope.readonly = angular.isUndefined(attributes.editable) ? true : false;
+
+                /**
+                 * Sets the value as an integer.
+                 */
+                var setValue = function( val ) {
+                    scope.value = parseInt( val );
+                }
+
+                // Set the value initially, as an integer.
+                setValue( scope.value );
+
+                /**
+                 * Decrement the value and make sure we stay within the limits, if defined.
+                 */
+                scope.minus = function() {
+                    if ( min && (scope.value <= min || scope.value - step <= min) || min === 0 && scope.value < 1 ) {
+                        setValue( min );
+                        return false;
+                    }
+                    setValue( scope.value - step );
+                };
+
+                /**
+                 * Increment the value and make sure we stay within the limits, if defined.
+                 */
+                scope.plus = function() {
+                    if ( max && (scope.value >= max || scope.value + step >= max) ) {
+                        setValue( max );
+                        return false;
+                    }
+                    setValue( scope.value + step );
+                };
+
+                /**
+                 * This is only triggered when the field is manually edited by the user.
+                 * Where we can perform some validation and make sure that they enter the
+                 * correct values from within the restrictions.
+                 */
+                scope.changed = function() {
+                    // If the user decides to delete the number, we will set it to 0.
+                    if ( !scope.value ) setValue( 0 );
+
+                    // Check if what's typed is numeric or if it has any letters.
+                    if ( /[0-9]/.test(scope.value) ) {
+                        setValue( scope.value );
+                    }
+                    else {
+                        setValue( scope.min );
+                    }
+
+                    // If a minimum is set, let's make sure we're within the limit.
+                    if ( min && (scope.value <= min || scope.value - step <= min) ) {
+                        setValue( min );
+                        return false;
+                    }
+
+                    // If a maximum is set, let's make sure we're within the limit.
+                    if ( max && (scope.value >= max || scope.value + step >= max) ) {
+                        setValue( max );
+                        return false;
+                    }
+
+                    // Re-set the value as an integer.
+                    setValue( scope.value );
+                };
+            }
+        }
+    });
+
+
 
     ezeid.controller('SampleWizardController', function($scope, $q, $timeout) {
             $scope.user = {};
@@ -2331,7 +2423,7 @@
          * Dummy Data
          */
             {
-                userName : 'HIRECRAFT1.INDRA',
+                userName : 'INDRA',
                 ezeid : 'indra',
                 firstName : "Indra Jeet",
                 lastName : "Nagda",
@@ -2359,7 +2451,7 @@
                 status : 2
             },
             {
-                userName : 'HIRECRAFT1.KRUNL',
+                userName : 'KRUNL',
                 ezeid : 'krunal11',
                 firstName : "Krunal",
                 lastName : "Patel",
@@ -2395,6 +2487,7 @@
         $scope.modalBox = {
             title : "Add new subuser",
             ezeidExists : false,
+            availabilityCheck : false,  //If checked the availability of EZEID or not
             subuser : {
                 ezeid : "",
                 userName : "",
@@ -2413,13 +2506,26 @@
                     resume : []
                 },
                 status : 1
-            }
+            },
+            checkAvailability : function(){
+                $http({
+                    url : "/ewGetEZEID",
+                    method : "POST"
+                }).success(function(resp){
+                        $scope.modalBox.availabilityCheck = true;
+                        if(!resp.IsIdAvailable){
+                            $scope.modalBox.ezeidExists = true;
+                        }
+
+                }).error(function(err){
+                        Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
+                });
+            },
         };
 
         //Open Modal box for user
         $scope.showModal = false;
         $scope.openModalBox = function(event){
-            console.log($scope.modalBox.title);
             if(event){
                 var element = event.currentTarget;
                 var userIndex = $(element).data('index');
@@ -2430,7 +2536,6 @@
             else{
                 $scope.resetModalData();
             }
-            console.log($scope.modalBox.title);
             $scope.showModal = !$scope.showModal;
         };
 
@@ -2441,7 +2546,8 @@
         $scope.resetModalData = function(){
             $scope.modalBox = {
                 title : "Add new subuser",
-                ezeidExists : false,
+                ezeidExists : false,        // If subuser creation is new then false else true for updating user
+                availabilityCheck : false,  //If checked the availability of EZEID or not
                 subuser : {
                     ezeid : "",
                     userName : "",
@@ -2468,6 +2574,21 @@
 
         $scope.editSubUser = function(){};
 
+
+        $scope.loadAllRules = function(){
+            $http({
+                method : "GET",
+                params : {
+                    Token : $rootScope._userInfo.Token
+                }
+            }).success(function(resp){
+                    //@todo Write code for loading all rules and assigning them to some variable
+                }).error(function(err){
+
+                });
+        };
+
+        // Getting master user details
         $http({
             url : '/ewtGetUserDetails',
             method : "GET",

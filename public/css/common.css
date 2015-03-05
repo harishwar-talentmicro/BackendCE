@@ -1009,29 +1009,75 @@ span.smallCloselink {
     border-radius: 0px;
 }
 
-.popover > .popover-content > .list-group >.list-group-item:first-child,
-.popover > .popover-content > .list-group >.list-group-item:last-child{
-    border-radius: 0px;
-}
-.popover > .popover-content > .list-group >.list-group-item:focus,
-.popover > .popover-content > .list-group >.list-group-item:hover{
-    background-color: #E0FECA;
-}
-.popover > .popover-content > .list-group >.list-group-item > .list-group-item-heading{
-    color:#006892
-}
-
-.dropdown-menu > li.active{
-    background-color: #078FC3;
-    color: #fff;
-}
-
-.toggle.ios, .toggle-on.ios, .toggle-off.ios { border-radius: 20px; }
-.toggle.ios .toggle-handle { border-radius: 20px; }
 
 .modal-dialog{
     margin-top: 100px;
 }
 .modal-dialog > .modal-content{
     border-radius:0px;
+    border:solid 10px #08749e;
+    background: #eefaff;
+}
+.modal-dialog .input-group-addon{
+    background : url(../images/btn_bg_h.png) repeat;
+    color:#fff;
+    border:1px solid #078FC3;
+}
+
+.popover{
+    background : #3A667E;
+}
+
+.popover > .popover-content,.popover-title{
+    background-color:inherit;
+    color:#fff;
+}
+.popover.right > .arrow{
+    border-right-color:rgba(5, 113, 155, 1);
+}
+.popover.right > .arrow:after{
+    border-right-color:#3A667E;
+}
+.popover > .popover-title > h4{
+    color:#fff;
+}
+
+.popover > .popover-content > .list-group >  .list-group-item{
+    background-color:inherit;
+    color:#fff;
+}
+.list-group-item{
+    border:none;
+}
+
+.popover > .popover-content > .list-group >.list-group-item:first-child,
+.popover > .popover-content > .list-group >.list-group-item:last-child{
+    border-radius: 0px;
+}
+.popover > .popover-content > .list-group >.list-group-item:focus,
+.popover > .popover-content > .list-group >.list-group-item:hover{
+    background-color: inherit;
+}
+.popover > .popover-content > .list-group >.list-group-item > .list-group-item-heading{
+    color:#00BEFF
+}
+
+
+.rateBox
+{
+    float: right;
+    margin-right: 19%;
+    width: 23%;
+    height: 32px;
+    text-align: center;
+}
+.checkbox > label{
+    word-wrap: normal;
+}
+
+.center-vertical{
+    height: 30px;
+    display: table-cell;
+    vertical-align: middle;
+
 }
