@@ -375,7 +375,6 @@
         var AutoRefresh = true;
 
         $('#datetimepicker1').datetimepicker({
-
             format: "d-M-Y  h:m A",
             hours12: false,
             minDate: 0
@@ -1770,7 +1769,7 @@
 
         function updateState(CountryID,isStateFilter)
         {
-            isStateFilter = (isStateFilter == "") ? false : true;
+             isStateFilter = (isStateFilter == "") ? false : true;
              $http({ method: 'get', url: GURL + 'ewmGetState?LangID=1&CountryID=' + CountryID }).success(function (data) {
                 if ($rootScope._userInfo.Token == false) {
                     var _obj = { StateID: 0, StateName: '--State--' };
