@@ -4767,6 +4767,164 @@ exports.FnGetItemList = function (req, res) {
     }
 };
 
+exports.FnSearchForTracker = function (req, res) {
+    try {
+
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        var Token = req.body.Token;
+        var Keyword = req.body.Keyword;
+        var Latitude = req.body.Latitude;
+        var Longitude = req.body.Longitude;
+        var Proximity = req.body.Proximity;
+
+        if (Token != null && Keyword != null && Latitude != null && Longitude != null && Proximity  != null) {
+            FnValidateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+
+                        var query = db.escape(Keyword) + ','  + db.escape(Latitude) + ',' + db.escape(Longitude) + ',' + db.escape(Proximity)+ ',' + db.escape(Token);
+                        db.query('CALL pTrackerSearch(' + query + ')', function (err, GetResult) {
+                            if (!err) {
+                                if (GetResult != null) {
+                                    if (GetResult[0].length > 0) {
+
+                                        console.log('FnSearchForTracker: Search result sent successfully');
+                                        res.send(GetResult[0]);
+                                    }
+                                    else {
+
+                                        console.log('FnSearchForTracker:No Search found');
+                                        res.send('null');
+                                    }
+                                }
+                                else {
+
+                                    console.log('FnSearchForTracker:No Search found');
+                                    res.send('null');
+                                }
+
+                            }
+                            else {
+
+                                console.log('FnSearchForTracker: error in getting search result' + err);
+                                res.statusCode = 500;
+                                res.send('null');
+                            }
+                        });
+                    }
+                    else {
+                        res.statusCode = 401;
+                        res.send('null');
+                        console.log('FnSearchForTracker: Invalid Token');
+                    }
+                } else {
+
+                    res.statusCode = 500;
+                    res.send('null');
+                    console.log('FnSearchForTracker: Error in validating token:  ' + err);
+                }
+            });
+        }
+        else {
+            if (Token == null) {
+                console.log('FnSearchForTracker: Token is empty');
+            }
+            else if (Keyword == null) {
+                console.log('FnSearchForTracker: Keyword is empty');
+            }
+            else if (Latitude == null) {
+                console.log('FnSearchForTracker: Latitude is empty');
+            }
+            else if (Longitude == null) {
+                console.log('FnSearchForTracker: Longitude is empty');
+            }
+            else if (Proximity == null) {
+                console.log('FnSearchForTracker: Proximity is empty');
+            }
+            res.statusCode=400;
+            res.send('null');
+        }
+    }
+    catch (ex) {
+        console.log('FnSearchForTracker error:' + ex.description);
+        throw new Error(ex);
+    }
+};
+
+exports.FnGetFolderList = function (req, res) {
+    try {
+
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        var Token = req.query.Token;
+        var MasterID = req.query.MasterID;
+        if (Token != null && MasterID != null) {
+            FnValidateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+
+                        db.query('CALL pGetFolderList(' + db.escape(MasterID) + ')', function (err, GetResult) {
+                            if (!err) {
+                                if (GetResult != null) {
+                                    if (GetResult[0].length > 0) {
+
+                                        console.log('FnGetRoleList: Role list details Send successfully');
+                                        res.send(GetResult[0]);
+                                    }
+                                    else {
+
+                                        console.log('FnGetRoleList:No Role list details found');
+                                        res.send('null');
+                                    }
+                                }
+                                else {
+
+                                    console.log('FnGetRoleList:No Role list details found');
+                                    res.send('null');
+                                }
+
+                            }
+                            else {
+
+                                console.log('FnGetRoleList: error in getting Role list details' + err);
+                                res.statusCode = 500;
+                                res.send('null');
+                            }
+                        });
+                    }
+                    else {
+                        res.statusCode = 401;
+                        res.send('null');
+                        console.log('FnGetRoleList: Invalid Token');
+                    }
+                } else {
+
+                    res.statusCode = 500;
+                    res.send('null');
+                    console.log('FnGetRoleList: Error in validating token:  ' + err);
+                }
+            });
+        }
+        else {
+            if (Token == null) {
+                console.log('FnGetRoleList: Token is empty');
+            }
+            else if (MasterID == null) {
+                console.log('FnGetRoleList: MasterID is empty');
+            }
+            res.statusCode=400;
+            res.send('null');
+        }
+    }
+    catch (ex) {
+        console.log('FnGetRoleList error:' + ex.description);
+        throw new Error(ex);
+    }
+};
+
+
+
 //EZEIDAP Parts
 
 //app part

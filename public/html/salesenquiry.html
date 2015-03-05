@@ -1,4 +1,34 @@
 <style type="text/css">
+    /* css for angular counter controller  */
+    /* Styles used for the counter. */
+    .counter-container .counter-minus, .counter-plus {
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+
+        background: #333;
+        color: white;
+        margin: 0;
+        padding: 5px 10px;
+        text-decoration: none;
+    }
+
+    .counter-container .counter-field {
+        margin: 0;
+        padding: 5px;
+        text-align: center;
+        width: 40px;
+    }
+    .counter-minus, .counter-plus {
+        -webkit-user-select: none;
+        background: rgb(51, 51, 51);
+        color: white !important;
+        margin: 0px;
+        padding: 5px 10px;
+        text-decoration: none !important;
+    }
+
     /* Some basic styles */
     *,
     *:before,
@@ -175,8 +205,9 @@
                         </div>
 
                         <div class="pull-left marL10px salesEnquiryComboSize">
-                            <select class="form-control marL10px" name="status">
-                                <option value = ""> --Status-- </option>
+                            <select class="form-control marL10px" name="status" ng-model="msglist._info.Status"
+                                    ng-options="status.id as status.label for status in msglist.Status" >
+                                    <option value = ""> --Status-- </option>
                             </select>
                         </div>
                         <div class="pull-left marL10px salesEnquiryComboSize">
@@ -197,115 +228,67 @@
                         </div>
 
                         <ul class="thumbnail-list" style="padding-left: 0;">
+
                             <li> <a href="#" class=""><img src="../images/sample_96.png" class=""></a>
 
                                 <h4 class="" tooltip="Tooltip on left" data-tooltip="Demo descricdkfnjdhfhfheuhf fuefuefguegfegfefgefg duewdge deg gfeygfygeyfge descricdkfnjdhfhfheuhf fuefuefguegfegfefgefg duewdge deg gfeygfygeyfge  ption"> <input type="checkbox" checked>{{ longString | limitTo: 12 }} {{longString.length < 12 ? '' : '...'}} </h4>
                                 <div class="product-price">
-                                    <input type='button' value='-' class='qtyminus' field='quantity' />
-                                    <input type='text' name='quantity' value='0' class='qty' />
-                                    <input type='button' value='+' class='qtyplus' field='quantity' />
-                                    <input type='text' name='rate' value='10' class='qty' readonly/>
+
+                                    <div style="width: 57%; float: left; text-decoration:none;" counter value="quantity1" min="0"></div>
+                                   <!-- <input type='text' name='rate' data-ng-model="msglist._info.Rate" value='msglist._info.Rate' class="rateBox" readonly/>-->
+                                    <span >{{ Rate1}}</span>
+                                   <!-- <span> {{ quantity1 }} </span>-->
 
                                 </div>
-                                <span class="normal-price">Amount: 9999999</span>
-                           </li>
-                            <li> <a href="#" class=""><img src="../images/sample_96.png" class=""></a>
-
-                                <h4 class="" tooltip="Tooltip on left" data-tooltip="Demo descricdkfnjdhfhfheuhf fuefuefguegfegfefgefg duewdge deg gfeygfygeyfge descricdkfnjdhfhfheuhf fuefuefguegfegfefgefg duewdge deg gfeygfygeyfge  ption"> <input type="checkbox" checked>{{ longString | limitTo: 12 }} {{longString.length < 12 ? '' : '...'}} </h4>
-                                <div class="product-price">
-                                    <input type='button' value='-' class='qtyminus' field='quantity2' />
-                                    <input type='text' name='quantity2' ng-model="msglist._info.Quantity" value='0' class='qty' />
-                                    <input type='button' value='+' class='qtyplus' field='quantity2' />
-
-                                    <input type='text' name='rate' data-ng-init="5" value='12' class='qty' readonly/>
-
+                                <div style="padding-top: 20%;">
+                                    <span >Amount: {{ quantity1 * Rate1 }}</span>
                                 </div>
-                                <span class="normal-price">Amount: {{msglist._info.Quantity * 5}}</span>
+
+
                             </li>
+
                             <li> <a href="#" class=""><img src="../images/sample_96.png" class=""></a>
 
                                 <h4 class="" tooltip="Tooltip on left" data-tooltip="Demo descricdkfnjdhfhfheuhf fuefuefguegfegfefgefg duewdge deg gfeygfygeyfge descricdkfnjdhfhfheuhf fuefuefguegfegfefgefg duewdge deg gfeygfygeyfge  ption"> <input type="checkbox" checked>{{ longString | limitTo: 12 }} {{longString.length < 12 ? '' : '...'}} </h4>
                                 <div class="product-price">
-                                    <input type='button' value='-' class='qtyminus' field='quantity' />
-                                    <input type='text' name='quantity' value='0' class='qty' />
-                                    <input type='button' value='+' class='qtyplus' field='quantity' />
-                                    <input type='text' name='rate' value='10' class='qty' readonly/>
+
+                                    <div style="width: 57%; float: left; text-decoration:none;" counter value="quantity1" min="0"></div>
+                                    <!-- <input type='text' name='rate' data-ng-model="msglist._info.Rate" value='msglist._info.Rate' class="rateBox" readonly/>-->
+                                    <span >{{ Rate1}}</span>
+                                    <!-- <span> {{ quantity1 }} </span>-->
 
                                 </div>
-                                <span class="normal-price">Amount: 9999999</span>
+                                <span class="normal-price">Amount: {{ quantity1 * Rate1 }}</span>
                             </li>
+
                             <li> <a href="#" class=""><img src="../images/sample_96.png" class=""></a>
 
                                 <h4 class="" tooltip="Tooltip on left" data-tooltip="Demo descricdkfnjdhfhfheuhf fuefuefguegfegfefgefg duewdge deg gfeygfygeyfge descricdkfnjdhfhfheuhf fuefuefguegfegfefgefg duewdge deg gfeygfygeyfge  ption"> <input type="checkbox" checked>{{ longString | limitTo: 12 }} {{longString.length < 12 ? '' : '...'}} </h4>
                                 <div class="product-price">
-                                    <input type='button' value='-' class='qtyminus' field='quantity' />
-                                    <input type='text' name='quantity' value='0' class='qty' />
-                                    <input type='button' value='+' class='qtyplus' field='quantity' />
-                                    <input type='text' name='rate' value='10' class='qty' readonly/>
+
+                                    <div style="width: 57%; float: left; text-decoration:none;" counter value="quantity1" min="0"></div>
+                                    <!-- <input type='text' name='rate' data-ng-model="msglist._info.Rate" value='msglist._info.Rate' class="rateBox" readonly/>-->
+                                    <span >{{ Rate1}}</span>
+                                    <!-- <span> {{ quantity1 }} </span>-->
 
                                 </div>
-                                <span class="normal-price">Amount: 9999999</span>
+                                <span class="normal-price">Amount: {{ quantity1 * Rate1 }}</span>
                             </li>
+
                             <li> <a href="#" class=""><img src="../images/sample_96.png" class=""></a>
 
                                 <h4 class="" tooltip="Tooltip on left" data-tooltip="Demo descricdkfnjdhfhfheuhf fuefuefguegfegfefgefg duewdge deg gfeygfygeyfge descricdkfnjdhfhfheuhf fuefuefguegfegfefgefg duewdge deg gfeygfygeyfge  ption"> <input type="checkbox" checked>{{ longString | limitTo: 12 }} {{longString.length < 12 ? '' : '...'}} </h4>
                                 <div class="product-price">
-                                    <input type='button' value='-' class='qtyminus' field='quantity' />
-                                    <input type='text' name='quantity' value='0' class='qty' />
-                                    <input type='button' value='+' class='qtyplus' field='quantity' />
-                                    <input type='text' name='rate' value='10' class='qty' readonly/>
+
+                                    <div style="width: 57%; float: left; text-decoration:none;" counter value="quantity1" min="0"></div>
+                                    <!-- <input type='text' name='rate' data-ng-model="msglist._info.Rate" value='msglist._info.Rate' class="rateBox" readonly/>-->
+                                    <span >{{ Rate1}}</span>
+                                    <!-- <span> {{ quantity1 }} </span>-->
 
                                 </div>
-                                <span class="normal-price">Amount: 9999999</span>
+                                <span class="normal-price">Amount: {{ quantity1 * Rate1 }}</span>
                             </li>
-                            <li> <a href="#" class=""><img src="../images/sample_96.png" class=""></a>
 
-                                <h4 class="" tooltip="Tooltip on left" data-tooltip="Demo descricdkfnjdhfhfheuhf fuefuefguegfegfefgefg duewdge deg gfeygfygeyfge descricdkfnjdhfhfheuhf fuefuefguegfegfefgefg duewdge deg gfeygfygeyfge  ption"> <input type="checkbox" checked>{{ longString | limitTo: 12 }} {{longString.length < 12 ? '' : '...'}} </h4>
-                                <div class="product-price">
-                                    <input type='button' value='-' class='qtyminus' field='quantity' />
-                                    <input type='text' name='quantity' value='0' class='qty' />
-                                    <input type='button' value='+' class='qtyplus' field='quantity' />
-                                    <input type='text' name='rate' value='10' class='qty' readonly/>
-
-                                </div>
-                                <span class="normal-price">Amount: 9999999</span>
-                            </li>
-                            <li> <a href="#" class=""><img src="../images/sample_96.png" class=""></a>
-
-                                <h4 class="" tooltip="Tooltip on left" data-tooltip="Demo descricdkfnjdhfhfheuhf fuefuefguegfegfefgefg duewdge deg gfeygfygeyfge descricdkfnjdhfhfheuhf fuefuefguegfegfefgefg duewdge deg gfeygfygeyfge  ption"> <input type="checkbox" checked>{{ longString | limitTo: 12 }} {{longString.length < 12 ? '' : '...'}} </h4>
-                                <div class="product-price">
-                                    <input type='button' value='-' class='qtyminus' field='quantity' />
-                                    <input type='text' name='quantity' value='0' class='qty' />
-                                    <input type='button' value='+' class='qtyplus' field='quantity' />
-                                    <input type='text' name='rate' value='10' class='qty' readonly/>
-
-                                </div>
-                                <span class="normal-price">Amount: 9999999</span>
-                            </li>
-                            <li> <a href="#" class=""><img src="../images/sample_96.png" class=""></a>
-
-                                <h4 class="" tooltip="Tooltip on left" data-tooltip="Demo descricdkfnjdhfhfheuhf fuefuefguegfegfefgefg duewdge deg gfeygfygeyfge descricdkfnjdhfhfheuhf fuefuefguegfegfefgefg duewdge deg gfeygfygeyfge  ption"> <input type="checkbox" checked>{{ longString | limitTo: 12 }} {{longString.length < 12 ? '' : '...'}} </h4>
-                                <div class="product-price">
-                                    <input type='button' value='-' class='qtyminus' field='quantity' />
-                                    <input type='text' name='quantity' value='0' class='qty' />
-                                    <input type='button' value='+' class='qtyplus' field='quantity' />
-                                    <input type='text' name='rate' value='10' class='qty' readonly/>
-
-                                </div>
-                                <span class="normal-price">Amount: 9999999</span>
-                            </li>
-                            <li> <a href="#" class=""><img src="../images/sample_96.png" class=""></a>
-
-                                <h4 class="" tooltip="Tooltip on left" data-tooltip="Demo descricdkfnjdhfhfheuhf fuefuefguegfegfefgefg duewdge deg gfeygfygeyfge descricdkfnjdhfhfheuhf fuefuefguegfegfefgefg duewdge deg gfeygfygeyfge  ption"> <input type="checkbox" checked>{{ longString | limitTo: 12 }} {{longString.length < 12 ? '' : '...'}} </h4>
-                                <div class="product-price">
-                                    <input type='button' value='-' class='qtyminus' field='quantity' />
-                                    <input type='text' name='quantity' value='0' class='qty' />
-                                    <input type='button' value='+' class='qtyplus' field='quantity' />
-                                    <input type='text' name='rate' value='10' class='qty' readonly/>
-
-                                </div>
-                                <span class="normal-price">Amount: 9999999</span>
-                            </li>
 
                         </ul>
                     </li>
@@ -323,7 +306,6 @@
         </div>
     </form>
     </modal>
-
 
     <div class="container" style="padding-top:90px; position:relative;">
         <!-- Example row of columns -->
@@ -351,7 +333,8 @@
                                                         Status Filter:
                                                     </div>
                                                     <div class="col-md-3" style="color: black;">
-                                                        <select class="form-control" name="status">
+                                                       <select class="form-control marL10px" name="status" ng-model="msglist._info.Status"
+                                                                ng-options="status.id as status.label for status in msglist.Status" >
                                                             <option value = ""> --Status-- </option>
                                                         </select>
                                                     </div>
@@ -366,9 +349,11 @@
                                                                 <td style="width: 15%; text-align: center"><u></u><a>KRUcscdsdNAL11</a></u></td>
                                                                 <td style="width: 15%; text-align: center">Titlesjdgsudgxas<u><a>[...]</a></u></td>
                                                                 <td style="width: 15%; text-align: center">48656565748</td>
-                                                                <td style="width: 15%; text-align: center"> <select class="form-control" name="status" >
+                                                                <td style="width: 15%; text-align: center">
+                                                                    <select class="form-control marL10px" name="status" ng-model="msglist._info.Status"
+                                                                            ng-options="status.id as status.label for status in msglist.Status" >
                                                                         <option value = ""> --Status-- </option>
-                                                                     </select>
+                                                                    </select>
                                                                 </td>
                                                             </tr>
                                                             <tr>
