@@ -128,7 +128,27 @@
         };
     });
 
-    // define controller for wizard
+    /**
+     * Filter for grouping Business Rules Based upon thier functions(types: Sales, Reservation,HomeDelivery,Service, Resume)
+     * Usage (ruleList | ruleFilter:2)
+     */
+    ezeid.filter('ruleFilter',function(){
+        return function(rules,ruleType){
+            var filteredRules = [];
+            rules.forEach(function(rule,index){
+                for(var prop in rule){
+                    if(rule.hasOwnProperty(prop) && (prop == 'RuleFunction') && (rule.RuleFunction === ruleType)){
+                        filteredRules.push(rule);
+                        console.log(rule);
+                        console.log('Rule filter executed');
+                    }
+                }
+            });
+
+            return filteredRules;
+        };
+    });
+
     ezeid.directive('dateTimePicker', function() {
             return {
                 restrict: 'E',
@@ -2413,14 +2433,7 @@
             2 : "Active"
         };
 
-        $scope.rules = [
-            {key : 2, value : "Jayangar Rule"},
-            {key : 5, value : "Delhi Rule"},
-            {key : 9, value : "Domlur Rule"},
-            {key : 11, value : "3 km Proximity Rule"},
-            {key : 12, value : "5 km Proximity Rule for Mumbai"},
-            {key : 19, value : "Chennai Rule"}
-        ];
+        $scope.rules = [];
 
 
         /**
@@ -2594,6 +2607,19 @@
                 });
         };
 
+        $scope.addRule = function($event,type){
+            var elem = $($event.currentTarget);
+            if(elem.hasAttribute('checked'))
+            {
+                //@todo Remove from user rule list
+                console.log('I am checked')
+            }
+            else{
+                //@todo add to user rule list
+                console.log('I am unchecked');
+            }
+        };
+
         $scope.addSubUser = function(){};
 
         $scope.editSubUser = function(){};
@@ -2609,11 +2635,12 @@
                     Token : $rootScope._userInfo.Token,
                     MasterID : $scope.masterUser.MasterID
                 }
-            }).success(function(resp){
-                    //@todo Write code for loading all rules and assigning them to some variable
-                    console.log(resp);
+                }).success(function(resp){
+                    if(resp.length > 0){
+                        $scope.rules = resp;
+                    }
                 }).error(function(err){
-
+                    Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
                 });
         };
 
