@@ -2606,12 +2606,13 @@
                 });
         };
 
-        $scope.addRule = function($event,type){
+        $scope.addRule = function($event){
             var elem = $($event.currentTarget);
+            console.log(elem.data('tid'));
             if(elem.hasAttribute('checked'))
             {
                 //@todo Remove from user rule list
-                console.log('I am checked')
+                console.log('I am checked');
             }
             else{
                 //@todo add to user rule list
