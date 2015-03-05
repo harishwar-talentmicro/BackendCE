@@ -1095,10 +1095,11 @@ span.smallCloselink {
     .thumbnail-list li { width: 100%}
 }
 
-.qty {
-    width: 40px;
-    height: 25px;
+.rateBox
+{
+    float: right;
+    margin-right: 19%;
+    width: 23%;
+    height: 32px;
     text-align: center;
 }
-input.qtyplus { width:25px; height:25px;}
-input.qtyminus { width:25px; height:25px;}
