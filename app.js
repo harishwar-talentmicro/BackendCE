@@ -123,7 +123,8 @@ app.get('/ewtGetStatusType',LocationManager.FnGetStatusType);
 app.get('/ewtGetActionType',LocationManager.FnGetActionType);
 app.get('/ewtEZEIDPrimaryDetails',LocationManager.FnEZEIDPrimaryDetails);
 app.get('/ewtGetItemList',LocationManager.FnGetItemList);
-
+app.post('/ewtSearchForTracker', LocationManager.FnSearchForTracker);
+app.get('/ewtGetFolderList',LocationManager.FnGetFolderList);
 //below service are for EZEIDAP
 app.post('/ewLoginAP', LocationManager.FnLoginAP);
 app.get('/ewLogoutAP', LocationManager.FnLogoutAP);
