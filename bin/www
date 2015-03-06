@@ -54,7 +54,7 @@ if (cluster.isMaster) {
 //
 //    }).listen(app.get('port'));
 
-	var sslserv = https.createServer(options, app).listen(443, function() { console.log('Running HTTPS on 443'); });
+	//var sslserv = https.createServer(options, app).listen(443, function() { console.log('Running HTTPS on 443'); });
 
     server.on('error', onError);
     server.on('listening', onListening);
