@@ -254,8 +254,8 @@
                         <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 bottom-clearfix text-left">
                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-cleafix" ng-repeat="rule in (rules | ruleFilter:0)">
                                 <div class="checkbox">
-                                    <label ng-click="addRule($event)" data-tid="{{rule.TID}}">
-                                        <input type="checkbox"> {{rule.FolderTitle}}
+                                    <label>
+                                        <input type="checkbox" ng-click="addRule($event,0)" data-tid="{{rule.TID}}"> {{rule.FolderTitle}}
                                     </label>
                                 </div>
                             </div>
@@ -266,7 +266,7 @@
                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-cleafix" ng-repeat="rule in (rules | ruleFilter:1)">
                                 <div class="checkbox">
                                     <label>
-                                        <input type="checkbox"> {{rule.FolderTitle}}
+                                        <input type="checkbox" ng-click="addRule($event,1)" data-tid="{{rule.TID}}"> {{rule.FolderTitle}}
                                     </label>
                                 </div>
                             </div>
@@ -276,8 +276,8 @@
                         <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 bottom-clearfix text-left">
                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-cleafix" ng-repeat="rule in (rules | ruleFilter:2)">
                                 <div class="checkbox">
-                                    <label>
-                                        <input type="checkbox"> {{rule.FolderTitle}}
+                                    <label >
+                                        <input type="checkbox" ng-click="addRule($event,2)" data-tid="{{rule.TID}}"> {{rule.FolderTitle}}
                                     </label>
                                 </div>
                             </div>
@@ -288,7 +288,7 @@
                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-cleafix" ng-repeat="rule in (rules | ruleFilter:3)">
                                 <div class="checkbox">
                                     <label>
-                                        <input type="checkbox"> {{rule.FolderTitle}}
+                                        <input type="checkbox" ng-click="addRule($event,3)" data-tid="{{rule.TID}}"> {{rule.FolderTitle}}
                                     </label>
                                 </div>
                             </div>
@@ -299,7 +299,7 @@
                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-cleafix" ng-repeat="rule in (rules | ruleFilter:4)">
                                 <div class="checkbox">
                                     <label>
-                                        <input type="checkbox"> {{rule.FolderTitle}}
+                                        <input type="checkbox" ng-click="addRule($event,4)" data-tid="{{rule.TID}}"> {{rule.FolderTitle}}
                                     </label>
                                 </div>
                             </div>
@@ -313,7 +313,7 @@
                     </div>
                     <div class="row" ng-show="modalBox.isEzeidAvailable">
                         <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
-                            <button class="btn btn-primary btn-block">Save</button>
+                            <button class="btn btn-primary btn-block" ng-click="addSubUser()">Save</button>
                         </div>
                     </div>
 

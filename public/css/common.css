@@ -1076,73 +1076,28 @@ span.smallCloselink {
     cursor: pointer;
 }
 
-
-/*
-krunal Changes*/
-.salesEnquiryFieldSize
-{
-    width: 28%;
-}
-.salesModalTopPosition
-{
-    padding-top: 0px;
-}
-.salesEnquiryComboSize
-{
-    width: 19%;
-}
-
-.thumbnail-list li {
-    display:inline-block;
-    vertical-align:top;
-    width:50%;
-    width: 24.33333%;
-    padding:2%;
-    font-size:12px;
-}
-.thumbnail-list img {
-    display:block;
-    width:100%;
-}
-.item { background:green; }
-.cut-price {
-    text-decoration:line-through;
-    color:#ccc;
-}
-.product-price {
-    float:left;
-    width:100%;
-    color:#999;
-}
-.btn-slide { display:none; }
-
-@media (min-width:640px) {
-    .thumbnail-list li { width: 24.33333%; }
-}
-@media (max-width:767px) {
-    .btn-slide {
-        text-align:center;
-        width:100%;
-        padding:10px;
-        margin:0 auto;
-        display:block;
-        font:bold 120%/100% Arial,Helvetica,sans-serif;
-        color:#000;
-        text-decoration:none;
-        border:1px solid #ccc;
-    }
-    #panel { display:none; }
-    .thumbnail-list li { text-align:center; }
-}
-@media (max-width:320px) {
-    .thumbnail-list li { width: 100%}
-}
-
-.rateBox
-{
-    float: right;
-    margin-right: 2%;
-    width: 39%;
-    height: 32px;
+.business-item{
     text-align: center;
+}
+
+.business-item .thumbnail{
+    border-radius: 0px;
+}
+
+.business-item img{
+    height:96px;
+    width: 96px;
+}
+
+.panel .jumbotron{
+    background: none;
+    padding:0px;
+}
+
+.panel .jumbotron .business-item .caption h4{
+    font-size: 18px;
+}
+
+.panel .jumbotron .business-item .caption p{
+    font-size: 14px;
 }
