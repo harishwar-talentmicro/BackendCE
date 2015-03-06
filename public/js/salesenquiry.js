@@ -49,6 +49,11 @@ angular.module('ezeidApp').controller('salesenquiryController', function($http, 
         }
     }
 
+    $scope.Tab1Title = "Sales Enquiry";
+    $scope.Tab2Title = "Sales Enquiry2";
+    $scope.Tab3Title = "Sales Enquiry3";
+    $scope.Tab4Title = "Sales Enquiry4";
+
     //To get Status info
     $http({ method: 'get', url: GURL + 'ewtGetStatusType?Token='+ $rootScope._userInfo.Token + '&MasterID=251&FunctionType=0'}).success(function (data) {
 
