@@ -128,7 +128,27 @@
         };
     });
 
-    // define controller for wizard
+    /**
+     * Filter for grouping Business Rules Based upon thier functions(types: Sales, Reservation,HomeDelivery,Service, Resume)
+     * Usage (ruleList | ruleFilter:2)
+     */
+    ezeid.filter('ruleFilter',function(){
+        return function(rules,ruleType){
+            var filteredRules = [];
+            rules.forEach(function(rule,index){
+                for(var prop in rule){
+                    if(rule.hasOwnProperty(prop) && (prop == 'RuleFunction') && (rule.RuleFunction === ruleType)){
+                        filteredRules.push(rule);
+                        console.log(rule);
+                        console.log('Rule filter executed');
+                    }
+                }
+            });
+
+            return filteredRules;
+        };
+    });
+
     ezeid.directive('dateTimePicker', function() {
             return {
                 restrict: 'E',
@@ -2395,12 +2415,12 @@
          * @type {Array}
          */
         $scope.accessRights = [
-            'Hidden',   //0
-            'Read Only',    //1
-            'Read, Create and Update', //2
-            'Read, Create, Update and Delete', //3
-            'Read and Update',  //4
-            'Read, Update and Delete'   //5
+            {value : 0, title : 'Hidden'},   //0
+            {value : 1, title : 'Read Only'},    //1
+            {value : 2, title : 'Read, Create and Update'}, //2
+            {value : 3, title : 'Read, Create, Update and Delete'}, //3
+            {value : 4, title : 'Read and Update'},  //4
+            {value : 5, title : 'Read, Update and Delete'}   //5
         ];
 
         /**
@@ -2411,6 +2431,9 @@
             1 : "Inactive",
             2 : "Active"
         };
+
+        $scope.rules = [];
+
 
         /**
          * Subuser list (to be replaced with data from server)
@@ -2434,20 +2457,18 @@
                     'resume' : 1
                 },
                 rules : {
-                    sales : [
-                        {'title':'Jayanagar AP Rule','Proximity':'2 km'},
-                        {'title':'Delhi Rule','City':'Delhi','Area':'Dhaula Kuan'}
-                    ],
-                    reservation : [
-                        {'title':'Banashankari AP Rule','Proximity':'2 km'}
-                    ],
-                    homeDelivery : [
-                        {'title':'Mumbai Rule','City':'Delhi','Area':'Dhaula Kuan'}
-                    ],
-                    service : [],
-                    resume : []
+                    sales : [3,0,5],
+                    reservation : [2,1,5],
+                    homeDelivery : [1,4],
+                    service : [3,1],
+                    resume : [2,5]
                 },
-                status : 2
+                status : 2,
+                salesEmail : "indra.sales@hirecraft.in",
+                reservationEmail : "indra.reservation@hirecraft.in",
+                homeDelivery : "indra.hd@hirecraft.in",
+                serviceEmail : "indra.srv@hirecraft.in",
+                resumeEmail : "indra.cv@hirecraft.in"
             },
             {
                 userName : 'KRUNL',
@@ -2462,20 +2483,18 @@
                     'resume' : 1
                 },
                 rules : {
-                    sales : [
-                        {'title':'Jayanagar AP Rule','Proximity':'2 km'},
-                        {'title':'Delhi Rule','City':'Delhi','Area':'Dhaula Kuan'}
-                    ],
-                    reservation : [
-                        {'title':'Banashankari AP Rule','Proximity':'2 km'}
-                    ],
-                    homeDelivery : [
-                        {'title':'Mumbai Rule','City':'Delhi','Area':'Dhaula Kuan'}
-                    ],
-                    service : [],
-                    resume : []
+                    sales : [1,2,5],
+                    reservation : [1,3,5],
+                    homeDelivery : [0,2,5],
+                    service : [1,3],
+                    resume : [0,4]
                 },
-                status : 1
+                status : 1,
+                salesEmail : "kruanl.sales@hirecraft.in",
+                reservationEmail : "krunal.reservation@hirecraft.in",
+                homeDelivery : "krunal.hd@hirecraft.in",
+                serviceEmail : "krunal.srv@hirecraft.in",
+                resumeEmail : "krunal.cv@hirecraft.in"
             }
         ];
 
@@ -2485,8 +2504,9 @@
          */
         $scope.modalBox = {
             title : "Add new subuser",
-            ezeidExists : false,
+            ezeidExists : false,        // If this EZEID is already in subuser list(while editing the subusers)
             availabilityCheck : false,  //If checked the availability of EZEID or not
+            isEzeidAvailable : false,   // Shows that EZEID exists or not
             subuser : {
                 ezeid : "",
                 userName : "",
@@ -2504,22 +2524,13 @@
                     service : [],
                     resume : []
                 },
-                status : 1
-            },
-            checkAvailability : function(){
-                $http({
-                    url : "/ewGetEZEID",
-                    method : "POST"
-                }).success(function(resp){
-                        $scope.modalBox.availabilityCheck = true;
-                        if(!resp.IsIdAvailable){
-                            $scope.modalBox.ezeidExists = true;
-                        }
-
-                }).error(function(err){
-                        Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
-                });
-            },
+                status : 1,
+                salesEmail : "",
+                reservationEmail : "",
+                homeDelivery : "",
+                serviceEmail : "",
+                resumeEmail : ""
+            }
         };
 
         //Open Modal box for user
@@ -2531,6 +2542,7 @@
                 $scope.modalBox.subuser = $scope.subusers[userIndex];
                 $scope.modalBox.title = "Update Subuser";
                 $scope.modalBox.ezeidExists = true;
+                $scope.modalBox.isEzeidAvailable = true;
             }
             else{
                 $scope.resetModalData();
@@ -2547,6 +2559,7 @@
                 title : "Add new subuser",
                 ezeidExists : false,        // If subuser creation is new then false else true for updating user
                 availabilityCheck : false,  //If checked the availability of EZEID or not
+                isEzeidAvailable : false,   // Status of EZEID exists or not after checking availability
                 subuser : {
                     ezeid : "",
                     userName : "",
@@ -2558,7 +2571,7 @@
                         resume : 0
                     },
                     rules : {
-                    sales : [],
+                        sales : [],
                         reservation : [],
                         homeDelivery : [],
                         service : [],
@@ -2569,21 +2582,65 @@
             };
         };
 
+        $scope.checkAvailability = function(){
+            console.log('executing');
+            $scope.modalBox.availabilityCheck = true;
+            $http({
+                url : "/ewGetEZEID",
+                method : "GET",
+                params : {
+                    EZEID : $scope.modalBox.subuser.ezeid
+                }
+            }).success(function(resp){
+                    console.log(JSON.stringify(resp));
+                    $scope.modalBox.availabilityCheck = true;
+                    if(resp.hasOwnProperty('IsIdAvailable') && (!resp.IsIdAvailable)){
+                        $scope.modalBox.isEzeidAvailable = true;
+                    }
+                    else{
+                        $scope.modalBox.isEzeidAvailable = false;
+                    }
+
+                }).error(function(err){
+                    Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
+                });
+        };
+
+        $scope.addRule = function($event){
+            var elem = $($event.currentTarget);
+            console.log(elem.data('tid'));
+            if(elem.hasAttribute('checked'))
+            {
+                //@todo Remove from user rule list
+                console.log('I am checked');
+            }
+            else{
+                //@todo add to user rule list
+                console.log('I am unchecked');
+            }
+        };
+
         $scope.addSubUser = function(){};
 
         $scope.editSubUser = function(){};
 
 
+
+
         $scope.loadAllRules = function(){
             $http({
+                url : '/ewtGetFolderList',
                 method : "GET",
                 params : {
-                    Token : $rootScope._userInfo.Token
+                    Token : $rootScope._userInfo.Token,
+                    MasterID : $scope.masterUser.MasterID
                 }
-            }).success(function(resp){
-                    //@todo Write code for loading all rules and assigning them to some variable
+                }).success(function(resp){
+                    if(resp.length > 0){
+                        $scope.rules = resp;
+                    }
                 }).error(function(err){
-
+                    Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
                 });
         };
 
@@ -2595,7 +2652,10 @@
                 Token : $rootScope._userInfo.Token
             }
         }).success(function(resp){
-            $scope.masterUser = resp[0];
+                if(resp.length>0){
+                    $scope.masterUser = resp[0];
+                    $scope.loadAllRules()
+                }
         }).error(function(err){
                 Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
         });
