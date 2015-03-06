@@ -1076,4 +1076,28 @@ span.smallCloselink {
     cursor: pointer;
 }
 
+.business-item{
+    text-align: center;
+}
 
+.business-item .thumbnail{
+    border-radius: 0px;
+}
+
+.business-item img{
+    height:96px;
+    width: 96px;
+}
+
+.panel .jumbotron{
+    background: none;
+    padding:0px;
+}
+
+.panel .jumbotron .business-item .caption h4{
+    font-size: 18px;
+}
+
+.panel .jumbotron .business-item .caption p{
+    font-size: 14px;
+}

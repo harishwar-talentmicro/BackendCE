@@ -46,6 +46,7 @@
             .when('/blackwhitelist',{templateUrl: 'html/blacklistwhitelist.html'})
             .when('/salesenquiry',{templateUrl: 'html/salesenquiry.html'})
             .when('/subusers',{templateUrl : 'html/subusers.html'})
+            .when('/business-items',{templateUrl : 'html/business-items.html'})
             .otherwise({ templateUrl: 'html/home.html' });
         
         $httpProvider.interceptors.push("ezeidInterceptor");
@@ -72,7 +73,12 @@
                         animation : true
                     });
                 }
-
+                if(attrs.toggle == "tab"){
+                    $(element).on('shown.bs.tab', function (e) {
+                        e.target // newly activated tab
+                        e.relatedTarget // previous active tab
+                    })
+                }
                 $(element).on('show.bs.popover',function(){
                     $('*[data-toggle="popover"]').not(this).popover('hide');
                 });
@@ -139,8 +145,6 @@
                 for(var prop in rule){
                     if(rule.hasOwnProperty(prop) && (prop == 'RuleFunction') && (rule.RuleFunction === ruleType)){
                         filteredRules.push(rule);
-                        console.log(rule);
-                        console.log('Rule filter executed');
                     }
                 }
             });
@@ -1456,7 +1460,10 @@
                     profile._info.CVButton = profile._info.CVButton == 1 ? true : false;
                     profile._info.DOB = data[0].DOB;
                     // profile._info.DOB = $filter('date')(new Date(data[0].DOB), 'dd-MMM-yyyy');
+                    try{
                     initialize();
+                    }
+                    catch(ex){}
              });
         }
 
@@ -2606,12 +2613,13 @@
                 });
         };
 
-        $scope.addRule = function($event){
-            var elem = $($event.currentTarget);
+        $scope.addRule = function(event,type){
+            var elem = $(event.currentTarget);
             console.log(elem.data('tid'));
-            if(elem.hasAttribute('checked'))
+            if(elem[0].checked)
             {
                 //@todo Remove from user rule list
+
                 console.log('I am checked');
             }
             else{
@@ -2620,7 +2628,9 @@
             }
         };
 
-        $scope.addSubUser = function(){};
+        $scope.addSubUser = function(){
+            console.log('I am subuserFn');
+        };
 
         $scope.editSubUser = function(){};
 
@@ -2659,6 +2669,16 @@
         }).error(function(err){
                 Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
         });
+
+    }]);
+
+
+    /**
+     * ItemsController Starts here
+     */
+    ezeid.controller('ItemsController',['$scope','$interval','$http','Notification','$rootScope','$filter',function($scope,$interval,$http,Notification,$rootScope,$filter){
+        //Initially First Tab is selected
+        $scope.selectedTab = 1;
 
     }]);
 
