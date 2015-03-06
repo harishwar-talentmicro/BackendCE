@@ -27,28 +27,30 @@
                 <div class="panel-body" ng-controller="ItemsController">
                     <!------- Page Content go inside ------------------>
                     <div class="row">
-                        <div class="col-lg-3 col-md-3 hidden-sm hidden-xs">
-
+                        <div ng-include="'html/business-preference-navigation.html'">
+                            <!--------- Navigation imported here ------------->
                         </div>
+
+
                         <div class="col-lg-9 col-md-9 col-sm-12 col-xs-12">
                             <div role="tabpanel jumbotron">
 
                                 <!-- Nav tabs -->
                                 <ul class="nav nav-tabs" role="tablist">
                                     <li role="presentation" ng-class="{active: selectedTab == 1}">
-                                        <a class="btn-link" ng-click="selectedTab = 1">Sales</a>
+                                        <a class="btn-link" ng-class="{'tab-active': selectedTab == 1}" ng-click="selectedTab = 1">Sales</a>
                                     </li>
                                     <li role="presentation" ng-class="{active: selectedTab == 2}">
-                                        <a class="btn-link" ng-click="selectedTab = 2">Reservation</a>
+                                        <a class="btn-link" ng-class="{'tab-active': selectedTab == 2}" ng-click="selectedTab = 2">Reservation</a>
                                     </li>
                                     <li role="presentation" ng-class="{active: selectedTab == 3}">
-                                        <a class="btn-link" ng-click="selectedTab = 3">Home Delivery</a>
+                                        <a class="btn-link" ng-class="{'tab-active': selectedTab == 3}" ng-click="selectedTab = 3">Home Delivery</a>
                                     </li>
                                     <li role="presentation" ng-class="{active: selectedTab == 4}">
-                                        <a class="btn-link" ng-click="selectedTab = 4">Service</a>
+                                        <a class="btn-link" ng-class="{'tab-active': selectedTab == 4}" ng-click="selectedTab = 4">Service</a>
                                     </li>
                                     <li role="presentation" ng-class="{active: selectedTab == 5}">
-                                        <a class="btn-link"  ng-click="selectedTab = 5">Resume</a>
+                                        <a class="btn-link"  ng-class="{'tab-active': selectedTab == 5}" ng-click="selectedTab = 5">Resume</a>
                                     </li>
                                 </ul>
 
@@ -60,7 +62,7 @@
                                             <div class="row bottom-clearfix"></div>
                                             <div class="row bottom-clearfix">
                                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                                    <button class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span> Add</button>
+                                                    <button class="btn btn-sm btn-primary"><span class="glyphicon glyphicon-plus"></span> Add</button>
                                                 </div>
                                             </div>
                                             <div class="row">

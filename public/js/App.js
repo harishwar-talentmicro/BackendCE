@@ -307,7 +307,11 @@
                 var encrypted = localStorage.getItem("_token");
                 if (encrypted) {
                     var decrypted = CryptoJS.AES.decrypt(encrypted, "EZEID");
-                    var Jsonstring = decrypted.toString(CryptoJS.enc.Utf8);
+                    var Jsonstring = null;
+                    try{
+                        Jsonstring = decrypted.toString(CryptoJS.enc.Utf8);
+                    }
+                    catch(ex){}
                     if (Jsonstring) {
                         $rootScope._userInfo = JSON.parse(Jsonstring);
                     }
@@ -2444,7 +2448,7 @@
 
         /**
          * Subuser list (to be replaced with data from server)
-         * //@todo load it from server and assign to this model
+         * @todo load it from server and assign to this model
          * @type {Array}
          */
         $scope.subusers = [
@@ -2618,12 +2622,18 @@
             console.log(elem.data('tid'));
             if(elem[0].checked)
             {
-                //@todo Remove from user rule list
+                /**
+                 *  @todo Remove from user rule list
+                 */
+
 
                 console.log('I am checked');
             }
             else{
-                //@todo add to user rule list
+                /**
+                 *  @todo add to user rule list
+                 */
+
                 console.log('I am unchecked');
             }
         };
