@@ -395,7 +395,7 @@
                                     <ul class="tabs">
                                         <li>
                                             <input type="radio" checked name="tabs" id="tab1">
-                                            <label for="tab1">Sales Enquiry</label>
+                                            <label for="tab1">{{Tab1Title}}</label>
                                             <div id="tab-content1" class="tab-content animated fadeIn">
                                                 <div class="row " style="font-size: 16px;">
                                                     <div class="col-md-3 toolbar-right" style="margin-left: 1%; width: 24%; margin-top: 1%;">
@@ -419,24 +419,25 @@
                                                                 <td style="width: 5%; text-align: center">1</td>
                                                                 <td style="width: 20%; text-align: center">28-Feb-2015 09:57 AM</td>
                                                                 <td style="width: 15%; text-align: center"><u><a ng-click="openRequesterPopup()">KRUcscdsdNAL11</a></u></td>
-                                                                <td style="width: 15%; text-align: left;">Titlesjdgsudgxas<u><a ng-click="toggleTitleModal()">[...]</a></u></td>
+                                                                <td style="width: 15%; text-align: center;" colspan="2">Titlesjdgsudgxas<u><a ng-click="toggleTitleModal()">[...]</a></u></td>
                                                                 <td style="width: 15%; text-align: right;">486565657.00</td>
-                                                                <td style="width: 15%; text-align: center;  padding-right: 2%;">
-                                                                   <select class="form-control marL10px" style="margin-top: 5%;" name="status" ng-model="msglist._info.StatusFilter"
-                                                                            ng-options="status.TID as status.StatusTitle for status in msglist.Status" >
-                                                                    </select>
-                                                                </td>
+
                                                             </tr>
                                                             <tr>
                                                                 <td style="width: 5%; text-align: center"></td>
+                                                                <td style="width: 15%; text-align: center;  padding-right: 2%;">
+                                                                    <select class="form-control marL10px" style="margin-bottom: 5%; margin-top: 5%;" name="status" ng-model="msglist._info.StatusFilter"
+                                                                            ng-options="status.TID as status.StatusTitle for status in msglist.Status" >
+                                                                    </select>
+                                                                </td>
                                                                 <td style="width: 5%; text-align: center">
-                                                                  <select class="form-control" style=" margin-bottom: 5%;" name="nextAction" ng-model="msglist._info.NextAction"
+                                                                  <select class="form-control" style=" margin-bottom: 5%;  margin-top: 5%;" name="nextAction" ng-model="msglist._info.NextAction"
                                                                         ng-options="status.TID as status.ActionTitle for status in msglist.NextAction" >
                                                                        <!-- <option value = ""> --Status-- </option>-->
                                                                   </select>
-                                                                </td>
+
                                                                 <td style="width: 20%; text-align: center" colspan="2">Next Action Date: 28-Feb-2015 09:57 AM</td>
-                                                                <td style="width: 15%; text-align: center" colspan="2"><u><a ng-click="toggleTitleModal()">Notes</a></u></td>
+                                                                <td style="width: 15%; text-align: center" ><u><a ng-click="toggleTitleModal()">Notes</a></u></td>
 
                                                             </tr>
                                                         </table>
@@ -525,21 +526,21 @@
                                         </li>
                                         <li>
                                             <input type="radio" name="tabs" id="tab2">
-                                            <label for="tab2">tab 2</label>
+                                            <label for="tab2">{{Tab2Title}}</label>
                                             <div id="tab-content2" class="tab-content animated fadeIn">
                                                 "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?
                                             </div>
                                         </li>
                                         <li>
                                             <input type="radio" name="tabs" id="tab3">
-                                            <label for="tab3">tab 3</label>
+                                            <label for="tab3">{{Tab3Title}}</label>
                                             <div id="tab-content3" class="tab-content animated fadeIn">
                                                 "But I must explain to you how all this mistaken idea of denouncing pleasure and praising pain was born and I will give you a complete account of the system, and expound the actual teachings of the great explorer of the truth, the master-builder of human happiness. No one rejects, dislikes, or avoids pleasure itself, because it is pleasure, but because those who do not know how to pursue pleasure rationally encounter consequences that are extremely painful. Nor again is there anyone who loves or pursues or desires to obtain pain of itself, because it is pain, but because occasionally circumstances occur in which toil and pain can procure him some great pleasure. To take a trivial example, which of us ever undertakes laborious physical exercise, except to obtain some advantage from it? But who has any right to find fault with a man who chooses to enjoy a pleasure that has no annoying consequences, or one who avoids a pain that produces no resultant pleasure?"
                                             </div>
                                         </li>
                                         <li>
                                             <input type="radio" name="tabs" id="tab4">
-                                            <label for="tab4">tab 4</label>
+                                            <label for="tab4">{{Tab4Title}}</label>
                                             <div id="tab-content4" class="tab-content animated fadeIn">
                                                 "krunal Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
                                             </div>
