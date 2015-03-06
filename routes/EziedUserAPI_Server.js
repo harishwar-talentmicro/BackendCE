@@ -4960,6 +4960,500 @@ exports.FnGetFolderList = function (req, res) {
     }
 };
 
+exports.FnSaveItem = function(req, res){
+    try{
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.body.Token;
+        var TID = req.body.TID;
+        var MasterID = req.body.MasterID ;
+        var FunctionType = req.body.FunctionType;
+        var ItemName = req.body.ItemName;
+        var ItemDescription = req.body.ItemDescription;
+        var Pic = req.body.Pic;
+        var Rate = req.body.Rate;
+        var Status = req.body.Status;
+        var ItemDuration = req.body.ItemDuration;
+
+        var RtnMessage = {
+            IsSuccessfull: false
+        };
+
+        if (Token != null && MasterID != null && FunctionType != null && ItemName !=null) {
+            FnValidateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+
+                        var query = db.escape(TID) + ',' + db.escape(MasterID) + ',' + db.escape(FunctionType) + ',' + db.escape(ItemName)
+                            + ',' +db.escape(ItemDescription) + ',' +db.escape(Pic) + ',' +db.escape(Rate) + ',' +db.escape(Status) + ',' +db.escape(ItemDuration);
+                        db.query('CALL pSaveItem(' + query + ')', function (err, InsertResult) {
+                            if (!err){
+                                if (InsertResult.affectedRows > 0) {
+                                    RtnMessage.IsSuccessfull = true;
+                                    res.send(RtnMessage);
+                                    console.log('FnSaveItem: Item details save successfully');
+                                }
+                                else {
+                                    console.log('FnSaveItem:No Save Item details');
+                                    res.send(RtnMessage);
+                                }
+                            }
+
+                            else {
+                                console.log('FnSaveItem: error in saving item detail' + err);
+                                res.statusCode = 500;
+                                res.send(RtnMessage);
+                            }
+                        });
+                    }
+                    else {
+                        console.log('FnSaveItem: Invalid token');
+                        res.statusCode = 401;
+                        res.send(RtnMessage);
+                    }
+                }
+                else {
+                    console.log('FnSaveItem:Error in processing Token' + err);
+                    res.statusCode = 500;
+                    res.send(RtnMessage);
+
+                }
+            });
+
+        }
+
+        else {
+            if (Token == null) {
+                console.log('FnSaveItem: Token is empty');
+            }
+            else if (MasterID == null) {
+                console.log('FnSaveItem: MasterID is empty');
+            }
+            else if (FunctionType == null) {
+                console.log('FnSaveItem: FunctionType is empty');
+            }
+            else if (ItemName == null) {
+                console.log('FnSaveItem: ItemName is empty');
+            }
+
+            res.statusCode=400;
+            res.send(RtnMessage);
+        }
+
+    }
+    catch (ex) {
+        console.log('FnSaveItem:error ' + ex.description);
+        throw new Error(ex);
+    }
+}
+
+exports.FnSearchForTracker = function (req, res) {
+    try {
+
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        var Token = req.body.Token;
+        var Keyword = req.body.Keyword;
+        var Latitude = req.body.Latitude;
+        var Longitude = req.body.Longitude;
+        var Proximity = req.body.Proximity;
+
+        if (Token != null && Keyword != null && Latitude != null && Longitude != null && Proximity  != null) {
+            FnValidateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+
+                        var query = db.escape(Keyword) + ','  + db.escape(Latitude) + ',' + db.escape(Longitude) + ',' + db.escape(Proximity)+ ',' + db.escape(Token);
+                        db.query('CALL ptrackerSearch(' + query + ')', function (err, GetResult) {
+                            if (!err) {
+                                if (GetResult != null) {
+                                    if (GetResult[0].length > 0) {
+
+                                        console.log('FnSearchForTracker: Search result sent successfully');
+                                        res.send(GetResult[0]);
+                                    }
+                                    else {
+
+                                        console.log('FnSearchForTracker:No Search found');
+                                        res.send('null');
+                                    }
+                                }
+                                else {
+
+                                    console.log('FnSearchForTracker:No Search found');
+                                    res.send('null');
+                                }
+
+                            }
+                            else {
+
+                                console.log('FnSearchForTracker: error in getting search result' + err);
+                                res.statusCode = 500;
+                                res.send('null');
+                            }
+                        });
+                    }
+                    else {
+                        res.statusCode = 401;
+                        res.send('null');
+                        console.log('FnSearchForTracker: Invalid Token');
+                    }
+                } else {
+
+                    res.statusCode = 500;
+                    res.send('null');
+                    console.log('FnSearchForTracker: Error in validating token:  ' + err);
+                }
+            });
+        }
+        else {
+            if (Token == null) {
+                console.log('FnSearchForTracker: Token is empty');
+            }
+            else if (Keyword == null) {
+                console.log('FnSearchForTracker: Keyword is empty');
+            }
+            else if (Latitude == null) {
+                console.log('FnSearchForTracker: Latitude is empty');
+            }
+            else if (Longitude == null) {
+                console.log('FnSearchForTracker: Longitude is empty');
+            }
+            else if (Proximity == null) {
+                console.log('FnSearchForTracker: Proximity is empty');
+            }
+            res.statusCode=400;
+            res.send('null');
+        }
+    }
+    catch (ex) {
+        console.log('FnSearchForTracker error:' + ex.description);
+        throw new Error(ex);
+    }
+};
+
+exports.FnCreateSubUser = function(req, res){
+    try{
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.body.Token;
+        var TID = req.body.TID;
+        var UserName = req.body.UserName;
+        var Status  = req.body.Status;
+        var FirstName = req.body.FirstName;
+        var LastName = req.body.LastName;
+        var AccessRights = req.body.AccessRights;
+        var SalesEmail = req.body.SalesEmail;
+        var ReservationEmail = req.body.ReservationEmail;
+        var HomeDeliveryEmail = req.body.HomeDeliveryEmail;
+        var ServiceEmail = req.body.ServiceEmail;
+        var ResumeEmail = req.body.ResumeEmail;
+        var SalesRules = req.body.SalesRules;
+        var ReservationRules = req.body.ReservationRules;
+        var HomeDeliveryRules = req.body.HomeDeliveryRules;
+        var ServiceRules = req.body.ServiceRules;
+        var ResumeRules = req.body.ResumeRules;
+        var MasterID = req.body.MasterID;
+
+        var RtnMessage = {
+            IsSuccessfull: false
+        };
+
+        /*if (Token!= null && TID!= null && UserName!= null  && Status!= null && FirstName != null && LastName !=null && AccessRights !=null && SalesEmail != null
+         && ReservationEmail!= null && HomeDeliveryEmail!= null && ServiceEmail!= null && ResumeEmail !=null  && SalesRules != null
+         && ReservationRules != null && HomeDeliveryRules != null && ServiceRules != null && ResumeRules != null) {*/
+        FnValidateToken(Token, function (err, Result) {
+            if (!err) {
+                if (Result != null) {
+
+                    var query = db.escape(Token) + ',' + db.escape(TID) + ',' + db.escape(UserName) + ',' +db.escape(Status) + ',' +db.escape(FirstName) + ',' +db.escape(LastName)
+                        + ',' + db.escape(AccessRights) + ',' + db.escape(SalesEmail) + ',' + db.escape(ReservationEmail) + ',' +db.escape(HomeDeliveryEmail)
+                        + ',' + db.escape(ServiceEmail) + ',' + db.escape(ResumeEmail) + ',' + db.escape(SalesRules) + ',' +db.escape(ReservationRules)
+                        + ',' + db.escape(HomeDeliveryRules) + ',' + db.escape(ServiceRules) + ',' + db.escape(ResumeRules) + ',' + db.escape(MasterID);
+                    db.query('CALL pCreateSubUser(' + query + ')', function (err, InsertResult) {
+                        if (!err){
+                            if (InsertResult.affectedRows > 0) {
+                                RtnMessage.IsSuccessfull = true;
+                                res.send(RtnMessage);
+                                console.log('FnCreateSubUser: Sub User details save successfully');
+                            }
+                            else {
+                                console.log('FnCreateSubUser:No Save Sub User details');
+                                res.send(RtnMessage);
+                            }
+                        }
+
+                        else {
+                            console.log('FnCreateSubUser: error in saving Sub User details' + err);
+                            res.statusCode = 500;
+                            res.send(RtnMessage);
+                        }
+                    });
+                }
+                else {
+                    console.log('FnCreateSubUser: Invalid token');
+                    res.statusCode = 401;
+                    res.send(RtnMessage);
+                }
+            }
+            else {
+                console.log('FnCreateSubUser:Error in processing Token' + err);
+                res.statusCode = 500;
+                res.send(RtnMessage);
+
+            }
+        });
+    }
+    catch (ex) {
+        console.log('FnCreateSubUser:error ' + ex.description);
+        throw new Error(ex);
+    }
+}
+
+//below method get sub user list
+exports.FnGetSubUserList = function (req, res) {
+    try {
+
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.query.Token;
+        var MasterID = req.query.MasterID;
+
+
+        if (Token != null && MasterID != null) {
+            FnValidateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+
+                        db.query('CALL pGetSubUserList(' + db.escape(MasterID) + ')', function (err, GetResult) {
+                            if (!err) {
+                                if (GetResult != null) {
+                                    if (GetResult[0].length > 0) {
+
+                                        console.log('FnGetSubUserList: Sub user list details Send successfully');
+                                        res.send(GetResult[0]);
+                                    }
+                                    else {
+
+                                        console.log('FnGetSubUserList:No Sub user  list details found');
+                                        res.send('null');
+                                    }
+                                }
+                                else {
+
+                                    console.log('FnGetSubUserList:No Sub user  list details found');
+                                    res.send('null');
+                                }
+
+                            }
+                            else {
+
+                                console.log('FnGetSubUserList: error in getting Sub user  list details' + err);
+                                res.statusCode = 500;
+                                res.send('null');
+                            }
+                        });
+                    }
+                    else {
+                        res.statusCode = 401;
+                        res.send('null');
+                        console.log('FnGetSubUserList: Invalid Token');
+                    }
+                } else {
+
+                    res.statusCode = 500;
+                    res.send('null');
+                    console.log('FnGetSubUserList: Error in validating token:  ' + err);
+                }
+            });
+        }
+        else {
+            if (Token == null) {
+                console.log('FnGetSubUserList: Token is empty');
+            }
+            else if (MasterID == null) {
+                console.log('FnGetSubUserList: MasterID is empty');
+            }
+            res.statusCode=400;
+            res.send('null');
+        }
+    }
+    catch (ex) {
+        console.log('FnGetSubUserList error:' + ex.description);
+        throw new Error(ex);
+    }
+};
+
+//below method get transaction items list
+exports.FnGetTranscationItems = function (req, res) {
+    try {
+
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.query.Token;
+        var MessageID = req.query.MessageID;
+
+        if (Token != null && MessageID != null) {
+            FnValidateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+
+                        db.query('CALL pGetTranscationItems(' + db.escape(MessageID) + ')', function (err, GetResult) {
+                            if (!err) {
+                                if (GetResult != null) {
+                                    if (GetResult[0].length > 0) {
+
+                                        console.log('FnGetTranscationItems: transaction items details Send successfully');
+                                        res.send(GetResult[0]);
+                                    }
+                                    else {
+
+                                        console.log('FnGetTranscationItems:No transaction items details found');
+                                        res.send('null');
+                                    }
+                                }
+                                else {
+
+                                    console.log('FnGetTranscationItems:No transaction items details found');
+                                    res.send('null');
+                                }
+
+                            }
+                            else {
+
+                                console.log('FnGetTranscationItems: error in getting transaction items details' + err);
+                                res.statusCode = 500;
+                                res.send('null');
+                            }
+                        });
+                    }
+                    else {
+                        res.statusCode = 401;
+                        res.send('null');
+                        console.log('FnGetTranscationItems: Invalid Token');
+                    }
+                } else {
+
+                    res.statusCode = 500;
+                    res.send('null');
+                    console.log('FnGetTranscationItems: Error in validating token:  ' + err);
+                }
+            });
+        }
+        else {
+            if (Token == null) {
+                console.log('FnGetTranscationItems: Token is empty');
+            }
+            else if (MessageID == null) {
+                console.log('FnGetTranscationItems: MessageID is empty');
+            }
+            res.statusCode=400;
+            res.send('null');
+        }
+    }
+    catch (ex) {
+        console.log('FnGetTranscationItems error:' + ex.description);
+        throw new Error(ex);
+    }
+};
+
+//below method to save transaction items
+exports.FnSaveTranscationItems = function(req, res){
+    try{
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.body.Token;
+        var MessageID = req.body.MessageID;
+        var ItemID = req.body.ItemID;
+        var Qty = req.body.Qty;
+        var Rate = req.body.Rate;
+        var Amount = req.body.Amount;
+        var Duration = req.body.Duration;
+
+        var RtnMessage = {
+            IsSuccessfull: false
+        };
+
+        if (Token != null && MessageID!= null && ItemID != null && Qty !=null && Rate !=null && Amount != null && Duration !=null) {
+            FnValidateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+
+                        var query = db.escape(MessageID) + ',' + db.escape(ItemID) + ',' + db.escape(Qty) + ',' + db.escape(Rate) + ',' +db.escape(Amount) + ',' +db.escape(Duration);
+                        db.query('CALL pSaveTranscationItems(' + query + ')', function (err, InsertResult) {
+                            if (!err){
+                                if (InsertResult.affectedRows > 0) {
+                                    RtnMessage.IsSuccessfull = true;
+                                    res.send(RtnMessage);
+                                    console.log('FnSaveTranscationItems: Transaction items details save successfully');
+                                }
+                                else {
+                                    console.log('FnSaveTranscationItems:No Save Transaction items details');
+                                    res.send(RtnMessage);
+                                }
+                            }
+
+                            else {
+                                console.log('FnSaveTranscationItems: error in saving Transaction items' + err);
+                                res.statusCode = 500;
+                                res.send(RtnMessage);
+                            }
+                        });
+                    }
+                    else {
+                        console.log('FnSaveTranscationItems: Invalid token');
+                        res.statusCode = 401;
+                        res.send(RtnMessage);
+                    }
+                }
+                else {
+                    console.log('FnSaveTranscationItems:Error in processing Token' + err);
+                    res.statusCode = 500;
+                    res.send(RtnMessage);
+
+                }
+            });
+
+        }
+
+        else {
+            if (Token == null) {
+                console.log('FnSaveTranscationItems: Token is empty');
+            }
+            else if (MessageID == null) {
+                console.log('FnSaveTranscationItems: MessageID is empty');
+            }
+            else if (ItemID == null) {
+                console.log('FnSaveTranscationItems: ItemID is empty');
+            }
+            else if (Qty == null) {
+                console.log('FnSaveTranscationItems: Qty is empty');
+            }
+            else if (Rate == null) {
+                console.log('FnSaveTranscationItems: Rate is empty');
+            }
+            else if (Amount == null) {
+                console.log('FnSaveTranscationItems: Amount is empty');
+            }
+            else if (Duration == null) {
+                console.log('FnSaveTranscationItems: Duration is empty');
+            }
+
+            res.statusCode=400;
+            res.send(RtnMessage);
+        }
+
+    }
+    catch (ex) {
+        console.log('FnSaveTranscationItems:error ' + ex.description);
+        throw new Error(ex);
+    }
+}
 
 
 //EZEIDAP Parts
@@ -5745,80 +6239,84 @@ exports.FnSaveAPEZEIDPicture = function (req, res) {
     }
 };
 
-exports.FnGetAPEZEID = function (req, res) {
-    try {
+exports.FnGetRealStateDataAP = function(req,res){
+    try{
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
-        var TID = parseInt(res.query.TID);
-        var Token = res.query.Token;
+        var TID = req.query.TID;
+        var Token = req.query.Token;
 
-        if (Token != null && TID.toString() != 'NaN') {
+        if(Token != null && TID != null){
             FnValidateTokenAP(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
-                        db.query('CALL pGetRealEstateData(' + db.escape(TID) + ')', function (err, RealStateResult) {
+                        db.query('CALL pGetRealEstateData(' + db.escape(TID)  + ')', function (err, RealStateResult) {
                             if (!err) {
-                                console.log(RealStateResult);
+                                // console.log(PictuerResult);
                                 if (RealStateResult != null) {
                                     if (RealStateResult[0].length > 0) {
                                         res.send(RealStateResult[0]);
-                                        console.log('FnGetAPEZEID: Realstate Data sent successfully');
+                                        console.log('FnGetRealStateDataAP: Realstate Data sent successfully');
                                     }
                                     else {
                                         res.send('null');
-                                        console.log('FnGetAPEZEID:pGetRealEstateData: No real state data found');
+                                        console.log('FnGetRealStateDataAP:pGetRealEstateData: No real state data found');
                                     }
-
                                 }
                                 else {
                                     res.send('null');
-                                    console.log('FnGetAPEZEID:pGetRealEstateData: No real state data found');
+                                    console.log('FnGetRealStateDataAP:pGetRealEstateData: No real state data found');
                                 }
                             }
                             else {
-
+                                res.statusCode=500;
                                 res.send('null');
-                                console.log('FnGetAPEZEID:pGetRealEstateData:' + err);
+                                console.log('FnGetRealStateDataAP:pGetRealEstateData:' + err);
                             }
                         });
-
-                    } else {
-                        res.send('null');
-                        console.log('FnGetAPEZEID: Invalid Token');
                     }
-                } else {
-                    res.send('null');
-                    console.log('FnGetAPEZEID: Error in validating token:  ' + err);
+                    else
+                    {
+                        console.log('FnGetRealStateDataAP: Invalid Token');
+                        res.statusCode=401;
+                        res.send('null');
+                    }
                 }
-            });
+                else
+                {
+                    console.log('FnGetRealStateDataAP: Error in validating token: '+err);
+                    res.statusCode=500;
+                    res.send('null');
+                }
+                    });
         }
-        else {
+        else
+        {
             if (Token == null) {
-                console.log('FnGetAPEZEID: Token is empty');
+                console.log('FnGetRealStateDataAP: Token is empty');
             }
-            else if (TID.toString() == 'NaN') {
-                console.log('FnGetAPEZEID: TID is empty');
+            else if (TID == null) {
+                console.log('FnGetRealStateDataAP: TID is empty');
             }
+            res.statusCode=400;
             res.send('null');
-
         }
-
     }
-    catch (ex) {
-        console.log('FnRegistration error:' + ex.description);
+    catch(ex){
+        console.log('FnGetRealStateDataAP error: ' + ex.description);
         throw new Error(ex);
     }
-};
+}
 
 exports.FnGetAPEZEIDPicture = function (req, res) {
     try {
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
-        var TID = parseInt(res.query.TID);
-        var PicNo = parseInt(res.query.PicNo);
-        var Token = res.query.Token;
+        var TID = parseInt(req.query.TID);
+        var PicNo = parseInt(req.query.PicNo);
+        var Token = req.query.Token;
         if (Token != null && TID.toString() != 'NaN' && PicNo.toString() != 'NaN') {
             FnValidateTokenAP(Token, function (err, Result) {
                 if (!err) {
