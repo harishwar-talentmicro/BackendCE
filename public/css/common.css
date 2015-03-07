@@ -1171,3 +1171,30 @@ span.smallCloselink {
     height: 32px;
     text-align: center;
 }
+.nav-tabs > li.active > a.tab-active, .nav-tabs > li.active > a.tab-active:hover, .nav-tabs > li.active > a.tab-active:focus{
+    color:#fff;
+    border:none;
+}
+.tab-active{
+    color: #fff;
+    background: url(../images/btn_bg_h.png) repeat;
+}
+
+.nav-pills.nav-stacked > li.active > a, .nav-pills.nav-stacked > li.active > a:hover, .nav-pills.nav-stacked > li.active > a:focus,
+.nav-pills.nav-justified > li.active > a, .nav-pills.nav-justified > li.active > a:hover, .nav-pills.nav-justified > li.active > a:focus{
+    background: url(../images/btn_bg_h.png) repeat;
+    border-radius: 0px;
+}
+
+.business-item .glyphicon-edit{
+    text-align: right;
+    position: absolute;
+    color: #FFFFFF;
+    background: url(../images/btn_bg.png) repeat;
+    padding: 5px;
+    border-radius: 5px;
+    font-size: 14px;
+    margin: 5px 10px 0px 0px;
+    right: 0;
+    cursor: pointer;
+}

@@ -498,10 +498,8 @@ angular.module('ezeidApp').controller('LocationsController', function ($rootScop
             map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
 
             var searchBox = new google.maps.places.SearchBox((input));
-
-            /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
-            
             var ClocBtn = (document.getElementById('mapClocl'));
+
             map.controls[google.maps.ControlPosition.TOP_RIGHT].push(ClocBtn);
 
             if (JSON.stringify(SLocCtrl._locInfo) != '{}') {
