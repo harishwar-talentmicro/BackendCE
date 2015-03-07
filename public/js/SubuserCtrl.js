@@ -137,6 +137,7 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$htt
         ezeidExists : false,        // If this EZEID is already in subuser list(while editing the subusers)
         availabilityCheck : false,  //If checked the availability of EZEID or not
         isEzeidAvailable : false,   // Shows that EZEID exists or not
+        PersonalID : 0,
         subuser : {
             ezeid : "",
             userName : "",
@@ -174,6 +175,11 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$htt
             $scope.modalBox.title = "Update Subuser";
             $scope.modalBox.ezeidExists = true;
             $scope.modalBox.isEzeidAvailable = true;
+            var callback = function(){
+                $scope.modalBox.subuser = $scope.subusers[userIndex];
+            };
+            $scope.checkAvailability(callback());
+
         }
         else{
             $scope.resetModalData();
@@ -191,6 +197,7 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$htt
             ezeidExists : false,        // If subuser creation is new then false else true for updating user
             availabilityCheck : false,  //If checked the availability of EZEID or not
             isEzeidAvailable : false,   // Status of EZEID exists or not after checking availability
+            PersonalID : 0,
             subuser : {
                 ezeid : "",
                 userName : "",
@@ -219,29 +226,39 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$htt
         };
     };
 
-    $scope.checkAvailability = function(){
-        console.log('executing');
-        $scope.modalBox.availabilityCheck = true;
+    $scope.checkAvailability = function(callback){
         $http({
-            url : "/ewGetEZEID",
-            method : "GET",
+            url : '/ewtEZEIDPrimaryDetails',
             params : {
-                EZEID : $scope.modalBox.subuser.ezeid
-            }
+                EZEID : $scope.modalBox.subuser.ezeid,
+                Token : $rootScope._userInfo.Token
+            },
+            method : "GET"
         }).success(function(resp){
                 console.log(JSON.stringify(resp));
-                $scope.modalBox.availabilityCheck = true;
-                if(resp.hasOwnProperty('IsIdAvailable') && (!resp.IsIdAvailable)){
-                    $scope.modalBox.isEzeidAvailable = true;
+                if(resp.length > 0){
+                    if(resp[0].hasOwnProperty('TID')){
+                        $scope.modalBox.isEzeidAvailable = true;
+                        $scope.modalBox.PersonalID = resp[0].TID;
+                        $scope.modalBox.subuser.firstName = resp[0].FirstName;
+                        $scope.modalBox.subuser.lastName = resp[0].LastName;
+                        if(typeof(callback) !== "undefined"){
+                            callback();
+                        }
+                    }
+                    else{
+                        $scope.modalBox.isEzeidAvailable = false;
+                    }
                 }
                 else{
                     $scope.modalBox.isEzeidAvailable = false;
                 }
-
-            }).error(function(err){
+                $scope.modalBox.availabilityCheck = true;
+        }).error(function(err){
                 Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
-            });
+        });
     };
+
 
     /**
      * Adding and Removing Rules From model
@@ -300,7 +317,6 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$htt
             }
 
         }
-        console.log($scope.modalBox.subuser.rules);
     };
 
     /**
@@ -308,13 +324,15 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$htt
      */
     $scope.saveSubUser = function(){
         console.log(JSON.stringify($scope.modalBox));
+        console.log($scope.masterUser);
         var data = {
             Token : $rootScope._userInfo.Token,
 
-            MasterID : $scope.masterUser.TID,
+            //@todo Please use master ID of user
+            PersonalID : $scope.modalBox.ezeid,
 
             TID : $scope.modalBox.subuser.TID,
-            UserName  : $scope.modalBox.subuser.userName,
+            UserName  : $scope.masterUser.EZEID+'.'+$scope.modalBox.subuser.userName,
             Status : $scope.modalBox.subuser.status,
             FirstName : $scope.modalBox.subuser.firstName,
             LastName : $scope.modalBox.subuser.lastName,

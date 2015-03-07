@@ -58,6 +58,27 @@
     var MsgDelay = 2000;
 
     /**
+     * Directive to capitalize the input field
+     */
+    ezeid.directive('capitalize', function() {
+        return {
+            require: 'ngModel',
+            link: function(scope, element, attrs, modelCtrl) {
+                var capitalize = function(inputValue) {
+                    if(inputValue == undefined) inputValue = '';
+                    var capitalized = inputValue.toUpperCase();
+                    if(capitalized !== inputValue) {
+                        modelCtrl.$setViewValue(capitalized);
+                        modelCtrl.$render();
+                    }
+                    return capitalized;
+                }
+                modelCtrl.$parsers.push(capitalize);
+                capitalize(scope[attrs.ngModel]);  // capitalize initial value
+            }
+        };
+    });
+    /**
      * Directive for binding of bootstrap javascript popover and tooltip methods
      */
     ezeid.directive('toggle', function(){

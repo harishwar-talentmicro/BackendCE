@@ -1198,3 +1198,14 @@ span.smallCloselink {
     right: 0;
     cursor: pointer;
 }
+
+.thumbnail .btn-icon{
+    position: absolute;
+    background: url(../images/btn_bg.png) repeat;
+    border-radius: 5px;
+    font-size: 14px;
+    margin: 0px 10px 0px 0px;
+    right: 0;
+    cursor: pointer;
+    font-size: 12px;
+}
