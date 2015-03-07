@@ -158,7 +158,7 @@
 
                             <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
                                 <div class="form-group">
-                                    <input class="form-control" placeholder="Item Rate" ng-model="modalBox.item.rate" id="item-rate"/>
+                                    <input class="form-control" numbers-only placeholder="Item Rate" ng-model="modalBox.item.rate" id="item-rate"/>
                                 </div>
                             </div>
                             <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
@@ -192,7 +192,7 @@
                                 <button class="btn btn-primary btn-block" ng-click="saveItem()">Save</button>
                             </div>
                             <div class="col-lg-2 col-md-2 col-sm-4 col-xs-12 bottom-clearfix">
-                                <button class="btn btn-primary btn-block">Close</button>
+                                <button class="btn btn-primary btn-block" ng-click="showModal = !showModal">Close</button>
                             </div>
                         </div>
                     </form>
