@@ -140,7 +140,7 @@ app.post('/ewtForgetPasswordAP', LocationManager.FnForgetPasswordAP);
 app.post('/ewtChangePasswordAP', LocationManager.FnChangePasswordAP);
 app.post('/ewtSaveEZEIDDataAP', LocationManager.FnSaveAPEZEID);
 app.post('/ewtSaveEZEIDPictureAP', LocationManager.FnSaveAPEZEIDPicture);
-app.get('/ewtGetEZEIDDataAP', LocationManager.FnGetRealStateDataAP);
+app.get('/ewtGetEstateDataAP', LocationManager.FnGetRealStateDataAP);
 app.get('/ewtGetEZEIDPictureAP', LocationManager.FnGetAPEZEIDPicture);
 app.post('/ewtSaveBannerPictureAP', LocationManager.FnSaveBannerPictureAP);
 app.get('/ewtGetBannerPictureAP', LocationManager.FnGetBannerPictureAP);
