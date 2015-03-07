@@ -197,11 +197,11 @@
                     <li class="dsp_block">
 
                        <div class="pull-left salesEnquiryFieldSize" style="margin-left: 5px;">
-                            <input type="text" name="Requester" id="Requester" style='text-transform:uppercase' class="form-control user_input mar_leftInp emptyBox" ng-model="msglist._info.Requester" ng-class="addSalesEnquiry.Requester.$touched && !msglist._info.Requester.length ? 'mandatoryTextBox' : ''" placeholder="Requester" required />
+                            <input type="text" name="Requester" id="Requester" style='text-transform:uppercase' class="form-control user_input mar_leftInp " ng-model="msglist._info.Requester" placeholder="Requester"  />
                        </div>
 
                         <div class="pull-left marL10px salesEnquiryFieldSize">
-                            <input type="text" name="Title" class="form-control marL10px emptyBox" ng-model="msglist._info.Title" ng-class="addSalesEnquiry.Title.$touched && !msglist._info.Title.length ? 'mandatoryTextBox' : ''" placeholder="Title" required>
+                            <input type="text" name="Title" class="form-control marL10px" ng-model="msglist._info.Title" placeholder="Title" >
                         </div>
 
                         <div class="pull-left marL10px salesEnquiryComboSize">
@@ -212,16 +212,22 @@
 
                         </div>
                         <div class="pull-left marL10px salesEnquiryComboSize" style="margin-left: 2%;">
+                            <select class="form-control" name="nextAction" ng-model="msglist._info.Rule"
+                                    ng-options="status.TID as status.ActionTitle for status in msglist.Rule" >
+                                <option value = ""> --Rule-- </option>
+                            </select>
+                        </div>
+                        <div class="pull-left marL10px salesEnquiryFieldSize" style="padding-top: 1%; text-align: right; margin-left: 1.7%;">
                             <select class="form-control" name="nextAction" ng-model="msglist._info.NextAction"
                                     ng-options="status.TID as status.ActionTitle for status in msglist.NextAction" >
                                 <option value = ""> --Next Action-- </option>
                             </select>
                         </div>
-                        <div class="pull-left marL10px salesEnquiryFieldSize" style="padding-top: 2%; text-align: right; margin-left: 1.7%;">
+                        <div class="pull-left marL10px salesEnquiryFieldSize" style="padding-top: 2%; text-align: right; margin-left: 1%;">
                             <span class="marL10px"> Next Action Date: </span>
                         </div>
                         <div class="pull-left marL10px salesEnquiryFieldSize">
-                            <date-time-picker  recipient="msglist._info.NextActionDate" style="padding-top: 4%;"></date-time-picker>
+                            <date-time-picker recipient="msglist._info.NextActionDate" style="padding-top: 4%;"></date-time-picker>
                         </div>
                         <div class="clearfix"></div>
                         <div class="pull-left marL10px" style="  width: 98%; padding-top: 2%; padding-bottom: 2%;" ng-show="showAddNoteBox">
@@ -229,18 +235,23 @@
                         </div>
 
                         <ul class="thumbnail-list" style="padding-left: 17px; font-size: 14px;" ng-hide="showAddNoteBox">
-                            <li> <a href="#" class=""><img src="../images/sample_96.png" class=""></a>
+                            <li ng-repeat="_item in msglist.msgs" >
+                                <a href="#" class=""><img src="{{_item.Pic}}" class=""></a>
 
-                                <h4 class="" tooltip="Tooltip on left" data-tooltip="Demo description feygfygeyfge  ption" style="  font-size: 14px;"> <input type="checkbox" checked><span style="margin-left: 1%;"> {{ longString | limitTo: 12 }} {{longString.length < 12 ? '' : '...'}} </span></h4>
+                                <h4 class="" tooltip="Tooltip on left" data-tooltip="_item.Description" style="font-size: 14px;">
+                                    <input type="checkbox" data-ng-model="_item.itemCheckBoxSelected">
+                                    <span style="margin-left: 1%;"> {{ _item.ItemName | limitTo: 12 }} {{_item.ItemName.length < 12 ? '' : '...'}} </span>
+                                </h4>
                                 <div class="product-price">
-
-                                    <div style="width: 57%; float: left; text-decoration:none;" counter value="quantity1" min="0"></div>
-                                    <input type='text' name='rate' data-ng-model="Rate1" value='{{ Rate1}}' class="rateBox" onkeypress="return isNumberKey(event);"/>
-                                   <!-- <span >{{ Rate1}}</span>-->
+                                    <div ng-show=" _item.itemCheckBoxSelected " style="width: 57%; float: left; text-decoration:none;" counter value="quantity1" min="0"></div>
+                                    <div ng-hide=" _item.itemCheckBoxSelected " style="width: 57%; float: left; text-decoration:none;" counter value="quantity0" min="0"></div>
+                                   <!-- <input type='text' name='rate' data-ng-model=" _item.Rate" value='{{ _item.Rate}}' class="rateBox" onkeypress="return isNumberKey(event);"/>-->
+                                    <input type='text' name='rate' value='{{_item.Rate}}' class="rateBox" onkeypress="return isNumberKey(event);"/>
                                 </div>
                                 <div style="padding-top: 20%;">
                                     <span style="width: 31%; float: left;">Amount:</span>
-                                    <span style=" float: right;  width: 68%; text-align: right;">{{ quantity1 * Rate1 }}</span>
+                                    <span  ng-show=" _item.itemCheckBoxSelected " style=" float: right;  width: 68%; text-align: right;">{{ quantity1 * _item.Rate }}</span>
+                                    <span ng-hide=" _item.itemCheckBoxSelected " style=" float: right;  width: 68%; text-align: right;">{{ quantity0 * _item.Rate }}</span>
                                 </div>
                             </li>
                         </ul>
@@ -251,7 +262,7 @@
             <div class="row">
                 <div class="col-md-12 col-md-offset" style="text-align: center; margin-left: 0%;">
                     <input type="submit" class="btn btn-primary marLL10px" value="Save"/>
-                    <input type="button" ng-click="msglist.closeAddNewSalesEnquiryForm()" class="btn btn-primary signin_cancel marL10px" value="Close"/>
+                    <input type="button" data-dismiss="modal" class="btn btn-primary signin_cancel marL10px" value="Close"/>
                 </div>
             </div>
             <div class="clearfix mob_marT15px"></div>
@@ -311,11 +322,12 @@
                             <ul class="thumbnail-list" style="padding-left: 17px;">
                                 <li> <a href="#" class=""><img src="../images/sample_96.png" class=""></a>
 
-                                    <h4 class="" tooltip="Tooltip on left" data-tooltip="Demo descricdkfnjdhfhfheuhf fuefuefguegfegfefgefg duewdge deg gfeygfygeyfge descricdkfnjdhfhfheuhf fuefuefguegfegfefgefg duewdge deg gfeygfygeyfge  ption"> <input type="checkbox" checked>{{ longString | limitTo: 12 }} {{longString.length < 12 ? '' : '...'}} </h4>
+                                    <h4 class="" tooltip="Tooltip on left" data-tooltip="Demo descricdkfnjdhfhfheuhf fuefuefguegfegfefgefg duewdge deg gfeygfygeyfge descricdkfnjdhfhfheuhf fuefuefguegfegfefgefg duewdge deg gfeygfygeyfge  ption">
+                                        <input type="checkbox" >{{ longString | limitTo: 12 }} {{longString.length < 12 ? '' : '...'}} </h4>
                                     <div class="product-price">
 
                                         <div style="width: 57%; float: left; text-decoration:none;" counter value="quantity1" min="0"></div>
-                                        <input type='text' name='rate'  value='{{ Rate1}}' class="rateBox" readonly/>
+                                        <input type='text' name='rate'  value='{{ Rate1}}' class="rateBox"/>
                                         <!-- <span >{{ Rate1}}</span>-->
                                     </div>
                                     <div style="padding-top: 20%;">
@@ -419,7 +431,7 @@
                                                                 <td style="width: 5%; text-align: center">1</td>
                                                                 <td style="width: 20%; text-align: center">28-Feb-2015 09:57 AM</td>
                                                                 <td style="width: 15%; text-align: center"><u><a ng-click="openRequesterPopup()">KRUcscdsdNAL11</a></u></td>
-                                                                <td style="width: 15%; text-align: center;" colspan="2">Titlesjdgsudgxas<u><a ng-click="toggleTitleModal()">[...]</a></u></td>
+                                                                <td style="width: 15%; text-align: left;" colspan="2">Titlesjdgsudgxas<u><a ng-click="toggleTitleModal()">[...]</a></u></td>
                                                                 <td style="width: 15%; text-align: right;">486565657.00</td>
 
                                                             </tr>
