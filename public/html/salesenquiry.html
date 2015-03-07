@@ -190,112 +190,79 @@
 
     <!--popup for add new sales enquiry-->
     <modal title="Sales Enquiry" visible="showModal">
-      <form name="addSalesEnquiry" novalidate>
+      <form name="addSalesEnquiry" ng-submit="msglist.addSalesEnquiry()" novalidate>
         <div class="row">
             <div class="col-lg-12">
                 <ul class="pad0px">
                     <li class="dsp_block">
 
-                       <div class="pull-left salesEnquiryFieldSize">
-                            <input type="text" name="Requester" id="Requester" style='text-transform:uppercase' class="form-control user_input mar_leftInp emptyBox" ng-model="msglist._info.Requester" ng-class="addSalesEnquiry.Requester.$touched && !msglist._info.Requester.length ? 'mandatoryTextBox' : ''" placeholder="Requester" required />
+                       <div class="pull-left salesEnquiryFieldSize" style="margin-left: 5px;">
+                            <input type="text" name="Requester" id="Requester" style='text-transform:uppercase' class="form-control user_input mar_leftInp " ng-model="msglist._info.Requester" placeholder="Requester"  />
                        </div>
 
                         <div class="pull-left marL10px salesEnquiryFieldSize">
-                            <input type="text" name="Title" class="form-control marL10px emptyBox" ng-model="msglist._info.Title" ng-class="addSalesEnquiry.Title.$touched && !msglist._info.Title.length ? 'mandatoryTextBox' : ''" placeholder="Title" required>
+                            <input type="text" name="Title" class="form-control marL10px" ng-model="msglist._info.Title" placeholder="Title" >
                         </div>
 
                         <div class="pull-left marL10px salesEnquiryComboSize">
                             <select class="form-control marL10px" name="status" ng-model="msglist._info.Status"
-                                    ng-options="status.id as status.label for status in msglist.Status" >
+                                    ng-options="status.TID as status.StatusTitle for status in msglist.Status" >
                                     <option value = ""> --Status-- </option>
                             </select>
+
                         </div>
-                        <div class="pull-left marL10px salesEnquiryComboSize">
-                            <select class="form-control" name="nextAction" ng-model="msglist._info.NextAction"
-                                    ng-options="status.TID as status.ActionTitle for status in msglist.NextAction" >
-                                <option value = ""> --Status-- </option>
+                        <div class="pull-left marL10px salesEnquiryComboSize" style="margin-left: 2%;">
+                            <select class="form-control" name="nextAction" ng-model="msglist._info.Rule"
+                                    ng-options="status.TID as status.ActionTitle for status in msglist.Rule" >
+                                <option value = ""> --Rule-- </option>
                             </select>
                         </div>
-                        <div class="pull-left marL10px salesEnquiryFieldSize" style="padding-top: 2%; text-align: left;">
+                        <div class="pull-left marL10px salesEnquiryFieldSize" style="padding-top: 1%; text-align: right; margin-left: 1.7%;">
+                            <select class="form-control" name="nextAction" ng-model="msglist._info.NextAction"
+                                    ng-options="status.TID as status.ActionTitle for status in msglist.NextAction" >
+                                <option value = ""> --Next Action-- </option>
+                            </select>
+                        </div>
+                        <div class="pull-left marL10px salesEnquiryFieldSize" style="padding-top: 2%; text-align: right; margin-left: 1%;">
                             <span class="marL10px"> Next Action Date: </span>
                         </div>
                         <div class="pull-left marL10px salesEnquiryFieldSize">
-                            <date-time-picker  recipient="msglist._info.NextActionDate" style="padding-top: 4%;"></date-time-picker>
+                            <date-time-picker recipient="msglist._info.NextActionDate" style="padding-top: 4%;"></date-time-picker>
                         </div>
                         <div class="clearfix"></div>
-                        <div class="pull-left marL10px" style="width: 57%; padding-top: 2%;" ng-show="false">
+                        <div class="pull-left marL10px" style="  width: 98%; padding-top: 2%; padding-bottom: 2%;" ng-show="showAddNoteBox">
                             <textarea class="form-control emptyBox" style="resize: none;" rows="4" cols="50" name="salesMessage" ng-model="msglist._info.salesMessage" placeholder="If No item than display this message box" required></textarea>
                         </div>
 
-                        <ul class="thumbnail-list" style="padding-left: 0;">
+                        <ul class="thumbnail-list" style="padding-left: 17px; font-size: 14px;" ng-hide="showAddNoteBox">
+                            <li ng-repeat="_item in msglist.msgs" >
+                                <a href="#" class=""><img src="{{_item.Pic}}" class=""></a>
 
-                            <li> <a href="#" class=""><img src="../images/sample_96.png" class=""></a>
-
-                                <h4 class="" tooltip="Tooltip on left" data-tooltip="Demo descricdkfnjdhfhfheuhf fuefuefguegfegfefgefg duewdge deg gfeygfygeyfge descricdkfnjdhfhfheuhf fuefuefguegfegfefgefg duewdge deg gfeygfygeyfge  ption"> <input type="checkbox" checked>{{ longString | limitTo: 12 }} {{longString.length < 12 ? '' : '...'}} </h4>
+                                <h4 class="" tooltip="Tooltip on left" data-tooltip="_item.Description" style="font-size: 14px;">
+                                    <input type="checkbox" data-ng-model="_item.itemCheckBoxSelected">
+                                    <span style="margin-left: 1%;"> {{ _item.ItemName | limitTo: 12 }} {{_item.ItemName.length < 12 ? '' : '...'}} </span>
+                                </h4>
                                 <div class="product-price">
-
-                                    <div style="width: 57%; float: left; text-decoration:none;" counter value="quantity1" min="0"></div>
-                                   <!-- <input type='text' name='rate' data-ng-model="msglist._info.Rate" value='msglist._info.Rate' class="rateBox" readonly/>-->
-                                    <span >{{ Rate1}}</span>
-                                   <!-- <span> {{ quantity1 }} </span>-->
-
+                                    <div ng-show=" _item.itemCheckBoxSelected " style="width: 57%; float: left; text-decoration:none;" counter value="quantity1" min="0"></div>
+                                    <div ng-hide=" _item.itemCheckBoxSelected " style="width: 57%; float: left; text-decoration:none;" counter value="quantity0" min="0"></div>
+                                   <!-- <input type='text' name='rate' data-ng-model=" _item.Rate" value='{{ _item.Rate}}' class="rateBox" onkeypress="return isNumberKey(event);"/>-->
+                                    <input type='text' name='rate' value='{{_item.Rate}}' class="rateBox" onkeypress="return isNumberKey(event);"/>
                                 </div>
                                 <div style="padding-top: 20%;">
-                                    <span >Amount: {{ quantity1 * Rate1 }}</span>
+                                    <span style="width: 31%; float: left;">Amount:</span>
+                                    <span  ng-show=" _item.itemCheckBoxSelected " style=" float: right;  width: 68%; text-align: right;">{{ quantity1 * _item.Rate }}</span>
+                                    <span ng-hide=" _item.itemCheckBoxSelected " style=" float: right;  width: 68%; text-align: right;">{{ quantity0 * _item.Rate }}</span>
                                 </div>
-
-
-                            </li>
-
-                            <li> <a href="#" class=""><img src="../images/sample_96.png" class=""></a>
-
-                                <h4 class="" tooltip="Tooltip on left" data-tooltip="Demo descricdkfnjdhfhfheuhf fuefuefguegfegfefgefg duewdge deg gfeygfygeyfge descricdkfnjdhfhfheuhf fuefuefguegfegfefgefg duewdge deg gfeygfygeyfge  ption"> <input type="checkbox" checked>{{ longString | limitTo: 12 }} {{longString.length < 12 ? '' : '...'}} </h4>
-                                <div class="product-price">
-
-                                    <div style="width: 57%; float: left; text-decoration:none;" counter value="quantity1" min="0"></div>
-                                    <!-- <input type='text' name='rate' data-ng-model="msglist._info.Rate" value='msglist._info.Rate' class="rateBox" readonly/>-->
-                                    <span >{{ Rate1}}</span>
-                                    <!-- <span> {{ quantity1 }} </span>-->
-
-                                </div>
-                                <span class="normal-price">Amount: {{ quantity1 * Rate1 }}</span>
-                            </li>
-
-                            <li> <a href="#" class=""><img src="../images/sample_96.png" class=""></a>
-
-                                <h4 class="" tooltip="Tooltip on left" data-tooltip="Demo descricdkfnjdhfhfheuhf fuefuefguegfegfefgefg duewdge deg gfeygfygeyfge descricdkfnjdhfhfheuhf fuefuefguegfegfefgefg duewdge deg gfeygfygeyfge  ption"> <input type="checkbox" checked>{{ longString | limitTo: 12 }} {{longString.length < 12 ? '' : '...'}} </h4>
-                                <div class="product-price">
-
-                                    <div style="width: 57%; float: left; text-decoration:none;" counter value="quantity1" min="0"></div>
-                                    <!-- <input type='text' name='rate' data-ng-model="msglist._info.Rate" value='msglist._info.Rate' class="rateBox" readonly/>-->
-                                    <span >{{ Rate1}}</span>
-                                    <!-- <span> {{ quantity1 }} </span>-->
-
-                                </div>
-                                <span class="normal-price">Amount: {{ quantity1 * Rate1 }}</span>
-                            </li>
-
-                            <li> <a href="#" class=""><img src="../images/sample_96.png" class=""></a>
-
-                                <h4 class="" tooltip="Tooltip on left" data-tooltip="Demo descricdkfnjdhfhfheuhf fuefuefguegfegfefgefg duewdge deg gfeygfygeyfge descricdkfnjdhfhfheuhf fuefuefguegfegfefgefg duewdge deg gfeygfygeyfge  ption"> <input type="checkbox" checked>{{ longString | limitTo: 12 }} {{longString.length < 12 ? '' : '...'}} </h4>
-                                <div class="product-price">
-                                    <div style="width: 57%; float: left; text-decoration:none;" counter value="quantity1" min="0"></div>
-                                    <!-- <input type='text' name='rate' data-ng-model="msglist._info.Rate" value='msglist._info.Rate' class="rateBox" readonly/>-->
-                                    <span >{{ Rate1}}</span>
-                                    <!-- <span> {{ quantity1 }} </span>-->
-
-                                </div>
-                                <span class="normal-price">Amount: {{ quantity1 * Rate1 }}</span>
                             </li>
                         </ul>
                     </li>
                 </ul>
             </div>
             <div class="clearfix"></div>
-            <div class="row quick_butt">
-                <div class="col-md-12 col-md-offset" style="text-align: center; margin-left: 1%;">
-                    <input type="submit" ng-disabled="!SignInCtrl.LInfo.UserName || !SignInCtrl.LInfo.Password" class="btn btn-primary wdButt1 pull-left marLL10px" value="Save"/>
-                    <input type="button" ng-click="msglist.closeAddNewSalesEnquiryForm()" class="btn btn-primary wdButt1 signin_cancel marL10px" value="Close"/>
+            <div class="row">
+                <div class="col-md-12 col-md-offset" style="text-align: center; margin-left: 0%;">
+                    <input type="submit" class="btn btn-primary marLL10px" value="Save"/>
+                    <input type="button" data-dismiss="modal" class="btn btn-primary signin_cancel marL10px" value="Close"/>
                 </div>
             </div>
             <div class="clearfix mob_marT15px"></div>
@@ -306,13 +273,13 @@
     <!--popup for requester details -->
     <modal title="Requester" visible="showModal2">
         <form name="addSalesEnquiry" novalidate>
-            <div class="row">
+            <div class="row" style="color: #000000; font-size: 12px;">
                 <div class="col-lg-12" style="padding-right: 1px;">
                     <div class="col-lg-5"  style="background-color: #C6E0B4">
                         <div style="text-align: center;">
                             <div class="row" style="padding-top: 10px;">
                                 <img src="../images/PPH_128.png" class="">
-                            </div><br/>
+                            </div>
                             <div class="row">
                                 <span style='text-transform:uppercase'>krunal11</span>
                             </div><br/>
@@ -324,10 +291,10 @@
                             </div><br/>
                             <div class="row">
                                 <span style='text-transform:uppercase'>#146,1st floor, 7th main,6th Block,Padmanabha nagar,Bangalore,India - 560070</span>
-                            </div>
+                            </div><br/>
                         </div>
                     </div>
-                    <div class="col-lg-7" style="background-color: #FFFFFF; height: 301px; width: 58%;">
+                    <div class="col-lg-7" style="background-color: #FFFFFF; margin-left: 2px; height: 301px; width: 58%;">
                         <div class="panel panel-default">
                             <div style="display:block;">
                                <!-- <img id="mapCloc" style="padding-top:8px;cursor:pointer;" ng-click="profile.getMyLocation()" src="images/myloc.png" />
@@ -338,6 +305,89 @@
                         </div>
                     </div>
                 </div>
+                <div class="col-lg-12" style="padding-right: 1px;">
+                    <span>+91-80-25534234 | +91-9427627281 | krunal.patel@hirecraft.in | www.hirecraftwebsite.com</span>
+                </div>
+            </div>
+        </form>
+    </modal>
+
+    <!--popup for Title -->
+    <modal title="Sales Enquiry" visible="showModalTitle">
+        <form name="addSalesEnquiry" novalidate>
+            <div class="row">
+                <div class="col-lg-12">
+                    <ul class="pad0px">
+                        <li class="dsp_block">
+                            <ul class="thumbnail-list" style="padding-left: 17px;">
+                                <li> <a href="#" class=""><img src="../images/sample_96.png" class=""></a>
+
+                                    <h4 class="" tooltip="Tooltip on left" data-tooltip="Demo descricdkfnjdhfhfheuhf fuefuefguegfegfefgefg duewdge deg gfeygfygeyfge descricdkfnjdhfhfheuhf fuefuefguegfegfefgefg duewdge deg gfeygfygeyfge  ption">
+                                        <input type="checkbox" >{{ longString | limitTo: 12 }} {{longString.length < 12 ? '' : '...'}} </h4>
+                                    <div class="product-price">
+
+                                        <div style="width: 57%; float: left; text-decoration:none;" counter value="quantity1" min="0"></div>
+                                        <input type='text' name='rate'  value='{{ Rate1}}' class="rateBox"/>
+                                        <!-- <span >{{ Rate1}}</span>-->
+                                    </div>
+                                    <div style="padding-top: 20%;">
+                                        <span >Amount: {{ quantity1 * Rate1 }}</span>
+                                    </div>
+                                </li>
+
+                                <li> <a href="#" class=""><img src="../images/sample_96.png" class=""></a>
+
+                                    <h4 class="" tooltip="Tooltip on left" data-tooltip="Demo descricdkfnjdhfhfheuhf fuefuefguegfegfefgefg duewdge deg gfeygfygeyfge descricdkfnjdhfhfheuhf fuefuefguegfegfefgefg duewdge deg gfeygfygeyfge  ption"> <input type="checkbox" checked>{{ longString | limitTo: 12 }} {{longString.length < 12 ? '' : '...'}} </h4>
+                                    <div class="product-price">
+
+                                        <div style="width: 57%; float: left; text-decoration:none;" counter value="quantity1" min="0"></div>
+                                        <input type='text' name='rate'  value='{{ Rate1}}' class="rateBox" readonly/>
+                                        <!-- <span >{{ Rate1}}</span>-->
+                                    </div>
+                                    <div style="padding-top: 20%;">
+                                        <span >Amount: {{ quantity1 * Rate1 }}</span>
+                                    </div>
+                                </li>
+
+                                <li> <a href="#" class=""><img src="../images/sample_96.png" class=""></a>
+
+                                    <h4 class="" tooltip="Tooltip on left" data-tooltip="Demo descricdkfnjdhfhfheuhf fuefuefguegfegfefgefg duewdge deg gfeygfygeyfge descricdkfnjdhfhfheuhf fuefuefguegfegfefgefg duewdge deg gfeygfygeyfge  ption"> <input type="checkbox" checked>{{ longString | limitTo: 12 }} {{longString.length < 12 ? '' : '...'}} </h4>
+                                    <div class="product-price">
+
+                                        <div style="width: 57%; float: left; text-decoration:none;" counter value="quantity1" min="0"></div>
+                                        <input type='text' name='rate'  value='{{ Rate1}}' class="rateBox" readonly/>
+                                        <!-- <span >{{ Rate1}}</span>-->
+                                    </div>
+                                    <div style="padding-top: 20%;">
+                                        <span >Amount: {{ quantity1 * Rate1 }}</span>
+                                    </div>
+                                </li>
+
+                                <li> <a href="#" class=""><img src="../images/sample_96.png" class=""></a>
+
+                                    <h4 class="" tooltip="Tooltip on left" data-tooltip="Demo descricdkfnjdhfhfheuhf fuefuefguegfegfefgefg duewdge deg gfeygfygeyfge descricdkfnjdhfhfheuhf fuefuefguegfegfefgefg duewdge deg gfeygfygeyfge  ption"> <input type="checkbox" checked>{{ longString | limitTo: 12 }} {{longString.length < 12 ? '' : '...'}} </h4>
+                                    <div class="product-price">
+
+                                        <div style="width: 57%; float: left; text-decoration:none;" counter value="quantity1" min="0"></div>
+                                        <input type='text' name='rate'  value='{{ Rate1}}' class="rateBox" readonly/>
+                                        <!-- <span >{{ Rate1}}</span>-->
+                                    </div>
+                                    <div style="padding-top: 20%;">
+                                        <span >Amount: {{ quantity1 * Rate1 }}</span>
+                                    </div>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+                <div class="clearfix"></div>
+                <div class="row">
+                    <div class="col-md-12 col-md-offset" style="text-align: center; margin-left: 1%;">
+                        <input type="submit" ng-disabled="!SignInCtrl.LInfo.UserName || !SignInCtrl.LInfo.Password" class="btn btn-primary marLL10px" value="Save"/>
+                        <input type="button" ng-click="msglist.closeAddNewSalesEnquiryForm()" class="btn btn-primary signin_cancel marL10px" value="Close"/>
+                    </div>
+                </div>
+                <div class="clearfix mob_marT15px"></div>
             </div>
         </form>
     </modal>
@@ -357,7 +407,7 @@
                                     <ul class="tabs">
                                         <li>
                                             <input type="radio" checked name="tabs" id="tab1">
-                                            <label for="tab1">Sales Enquiry</label>
+                                            <label for="tab1">{{Tab1Title}}</label>
                                             <div id="tab-content1" class="tab-content animated fadeIn">
                                                 <div class="row " style="font-size: 16px;">
                                                     <div class="col-md-3 toolbar-right" style="margin-left: 1%; width: 24%; margin-top: 1%;">
@@ -368,9 +418,8 @@
                                                         Status Filter:
                                                     </div>
                                                     <div class="col-md-3" style="color: black;">
-                                                       <select class="form-control marL10px" name="status" ng-model="msglist._info.Status"
-                                                                ng-options="status.id as status.label for status in msglist.Status" >
-                                                            <option value = ""> --Status-- </option>
+                                                       <select class="form-control marL10px" name="status" ng-model="msglist._info.StatusFilter"
+                                                            ng-options="status.TID as status.StatusTitle for status in msglist.Status" >
                                                         </select>
                                                     </div>
                                                 </div>
@@ -381,26 +430,26 @@
                                                             <tr>
                                                                 <td style="width: 5%; text-align: center">1</td>
                                                                 <td style="width: 20%; text-align: center">28-Feb-2015 09:57 AM</td>
-                                                                <td style="width: 15%; text-align: center"><u></u><a>KRUcscdsdNAL11</a></u></td>
-                                                                <td style="width: 15%; text-align: center">Titlesjdgsudgxas<u><a>[...]</a></u></td>
-                                                                <td style="width: 15%; text-align: center">48656565748</td>
-                                                                <td style="width: 15%; text-align: center">
-                                                                    <select class="form-control marL10px" name="status" ng-model="msglist._info.Status"
-                                                                            ng-options="status.id as status.label for status in msglist.Status" >
-                                                                        <option value = ""> --Status-- </option>
-                                                                    </select>
-                                                                </td>
+                                                                <td style="width: 15%; text-align: center"><u><a ng-click="openRequesterPopup()">KRUcscdsdNAL11</a></u></td>
+                                                                <td style="width: 15%; text-align: left;" colspan="2">Titlesjdgsudgxas<u><a ng-click="toggleTitleModal()">[...]</a></u></td>
+                                                                <td style="width: 15%; text-align: right;">486565657.00</td>
+
                                                             </tr>
                                                             <tr>
                                                                 <td style="width: 5%; text-align: center"></td>
-                                                                <td style="width: 5%; text-align: center">
-                                                                  <select class="form-control" name="nextAction" ng-model="msglist._info.NextAction"
-                                                                        ng-options="status.TID as status.ActionTitle for status in msglist.NextAction" >
-                                                                        <option value = ""> --Status-- </option>
-                                                                  </select>
+                                                                <td style="width: 15%; text-align: center;  padding-right: 2%;">
+                                                                    <select class="form-control marL10px" style="margin-bottom: 5%; margin-top: 5%;" name="status" ng-model="msglist._info.StatusFilter"
+                                                                            ng-options="status.TID as status.StatusTitle for status in msglist.Status" >
+                                                                    </select>
                                                                 </td>
+                                                                <td style="width: 5%; text-align: center">
+                                                                  <select class="form-control" style=" margin-bottom: 5%;  margin-top: 5%;" name="nextAction" ng-model="msglist._info.NextAction"
+                                                                        ng-options="status.TID as status.ActionTitle for status in msglist.NextAction" >
+                                                                       <!-- <option value = ""> --Status-- </option>-->
+                                                                  </select>
+
                                                                 <td style="width: 20%; text-align: center" colspan="2">Next Action Date: 28-Feb-2015 09:57 AM</td>
-                                                                <td style="width: 15%; text-align: center" colspan="2">Note: Sample note message here</td>
+                                                                <td style="width: 15%; text-align: center" ><u><a ng-click="toggleTitleModal()">Notes</a></u></td>
 
                                                             </tr>
                                                         </table>
@@ -427,7 +476,6 @@
                                                                 </td>
                                                                 <td style="width: 20%; text-align: center" colspan="2">Next Action Date: 28-Feb-2015 09:57 AM</td>
                                                                 <td style="width: 15%; text-align: center" colspan="2">Note: Sample note message here</td>
-
                                                             </tr>
                                                         </table>
 
@@ -490,21 +538,21 @@
                                         </li>
                                         <li>
                                             <input type="radio" name="tabs" id="tab2">
-                                            <label for="tab2">tab 2</label>
+                                            <label for="tab2">{{Tab2Title}}</label>
                                             <div id="tab-content2" class="tab-content animated fadeIn">
                                                 "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?
                                             </div>
                                         </li>
                                         <li>
                                             <input type="radio" name="tabs" id="tab3">
-                                            <label for="tab3">tab 3</label>
+                                            <label for="tab3">{{Tab3Title}}</label>
                                             <div id="tab-content3" class="tab-content animated fadeIn">
                                                 "But I must explain to you how all this mistaken idea of denouncing pleasure and praising pain was born and I will give you a complete account of the system, and expound the actual teachings of the great explorer of the truth, the master-builder of human happiness. No one rejects, dislikes, or avoids pleasure itself, because it is pleasure, but because those who do not know how to pursue pleasure rationally encounter consequences that are extremely painful. Nor again is there anyone who loves or pursues or desires to obtain pain of itself, because it is pain, but because occasionally circumstances occur in which toil and pain can procure him some great pleasure. To take a trivial example, which of us ever undertakes laborious physical exercise, except to obtain some advantage from it? But who has any right to find fault with a man who chooses to enjoy a pleasure that has no annoying consequences, or one who avoids a pain that produces no resultant pleasure?"
                                             </div>
                                         </li>
                                         <li>
                                             <input type="radio" name="tabs" id="tab4">
-                                            <label for="tab4">tab 4</label>
+                                            <label for="tab4">{{Tab4Title}}</label>
                                             <div id="tab-content4" class="tab-content animated fadeIn">
                                                 "krunal Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
                                             </div>

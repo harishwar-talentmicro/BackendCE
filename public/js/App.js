@@ -46,6 +46,7 @@
             .when('/blackwhitelist',{templateUrl: 'html/blacklistwhitelist.html'})
             .when('/salesenquiry',{templateUrl: 'html/salesenquiry.html'})
             .when('/subusers',{templateUrl : 'html/subusers.html'})
+            .when('/business-preference',{templateUrl : 'html/business-preference.html'})
             .otherwise({ templateUrl: 'html/home.html' });
         
         $httpProvider.interceptors.push("ezeidInterceptor");
@@ -57,6 +58,27 @@
     var MsgDelay = 2000;
 
     /**
+     * Directive to capitalize the input field
+     */
+    ezeid.directive('capitalize', function() {
+        return {
+            require: 'ngModel',
+            link: function(scope, element, attrs, modelCtrl) {
+                var capitalize = function(inputValue) {
+                    if(inputValue == undefined) inputValue = '';
+                    var capitalized = inputValue.toUpperCase();
+                    if(capitalized !== inputValue) {
+                        modelCtrl.$setViewValue(capitalized);
+                        modelCtrl.$render();
+                    }
+                    return capitalized;
+                }
+                modelCtrl.$parsers.push(capitalize);
+                capitalize(scope[attrs.ngModel]);  // capitalize initial value
+            }
+        };
+    });
+    /**
      * Directive for binding of bootstrap javascript popover and tooltip methods
      */
     ezeid.directive('toggle', function(){
@@ -64,7 +86,9 @@
             restrict: 'A',
             link: function(scope, element, attrs){
                 if (attrs.toggle=="tooltip"){
-                    $(element).tooltip();
+                    $(element).tooltip({
+                        html : attrs.title
+                    });
                 }
                 if (attrs.toggle=="popover"){
                     $(element).popover({
@@ -72,7 +96,12 @@
                         animation : true
                     });
                 }
-
+                if(attrs.toggle == "tab"){
+                    $(element).on('shown.bs.tab', function (e) {
+                        e.target // newly activated tab
+                        e.relatedTarget // previous active tab
+                    })
+                }
                 $(element).on('show.bs.popover',function(){
                     $('*[data-toggle="popover"]').not(this).popover('hide');
                 });
@@ -139,8 +168,6 @@
                 for(var prop in rule){
                     if(rule.hasOwnProperty(prop) && (prop == 'RuleFunction') && (rule.RuleFunction === ruleType)){
                         filteredRules.push(rule);
-                        console.log(rule);
-                        console.log('Rule filter executed');
                     }
                 }
             });
@@ -303,7 +330,11 @@
                 var encrypted = localStorage.getItem("_token");
                 if (encrypted) {
                     var decrypted = CryptoJS.AES.decrypt(encrypted, "EZEID");
-                    var Jsonstring = decrypted.toString(CryptoJS.enc.Utf8);
+                    var Jsonstring = null;
+                    try{
+                        Jsonstring = decrypted.toString(CryptoJS.enc.Utf8);
+                    }
+                    catch(ex){}
                     if (Jsonstring) {
                         $rootScope._userInfo = JSON.parse(Jsonstring);
                     }
@@ -1456,7 +1487,10 @@
                     profile._info.CVButton = profile._info.CVButton == 1 ? true : false;
                     profile._info.DOB = data[0].DOB;
                     // profile._info.DOB = $filter('date')(new Date(data[0].DOB), 'dd-MMM-yyyy');
+                    try{
                     initialize();
+                    }
+                    catch(ex){}
              });
         }
 
@@ -2395,271 +2429,5 @@
         };
     });
 
-    /***
-     * Sub user controller for displaying, adding and editing subusers
-     */
-    ezeid.controller('SubuserController',['$scope','$rootScope','$http','Notification','$filter',function($scope,$rootScope,$http,Notification,$filter){
-
-        $(document).on('click','.popover-close',function(){
-            $('*[data-toggle="popover"]').popover('hide');
-        });
-
-        /**
-         * Main EZEID logged in as business user and having verified status
-         * @type {null}
-         */
-        $scope.masterUser = null;
-
-        /**
-         * Access Rights mapping
-         * @type {Array}
-         */
-        $scope.accessRights = [
-            {value : 0, title : 'Hidden'},   //0
-            {value : 1, title : 'Read Only'},    //1
-            {value : 2, title : 'Read, Create and Update'}, //2
-            {value : 3, title : 'Read, Create, Update and Delete'}, //3
-            {value : 4, title : 'Read and Update'},  //4
-            {value : 5, title : 'Read, Update and Delete'}   //5
-        ];
-
-        /**
-         * Sub user Status Mapping
-         * @type {{1: string, 2: string}}
-         */
-        $scope.status = {
-            1 : "Inactive",
-            2 : "Active"
-        };
-
-        $scope.rules = [];
-
-
-        /**
-         * Subuser list (to be replaced with data from server)
-         * //@todo load it from server and assign to this model
-         * @type {Array}
-         */
-        $scope.subusers = [
-        /**
-         * Dummy Data
-         */
-            {
-                userName : 'INDRA',
-                ezeid : 'indra',
-                firstName : "Indra Jeet",
-                lastName : "Nagda",
-                accessRights : {
-                    'sales' : 3,
-                    'reservation' : 1,
-                    'homeDelivery' : 3,
-                    'service' : 1,
-                    'resume' : 1
-                },
-                rules : {
-                    sales : [3,0,5],
-                    reservation : [2,1,5],
-                    homeDelivery : [1,4],
-                    service : [3,1],
-                    resume : [2,5]
-                },
-                status : 2,
-                salesEmail : "indra.sales@hirecraft.in",
-                reservationEmail : "indra.reservation@hirecraft.in",
-                homeDelivery : "indra.hd@hirecraft.in",
-                serviceEmail : "indra.srv@hirecraft.in",
-                resumeEmail : "indra.cv@hirecraft.in"
-            },
-            {
-                userName : 'KRUNL',
-                ezeid : 'krunal11',
-                firstName : "Krunal",
-                lastName : "Patel",
-                accessRights : {
-                    'sales' : 3,
-                    'reservation' : 3,
-                    'homeDelivery' : 3,
-                    'service' : 1,
-                    'resume' : 1
-                },
-                rules : {
-                    sales : [1,2,5],
-                    reservation : [1,3,5],
-                    homeDelivery : [0,2,5],
-                    service : [1,3],
-                    resume : [0,4]
-                },
-                status : 1,
-                salesEmail : "kruanl.sales@hirecraft.in",
-                reservationEmail : "krunal.reservation@hirecraft.in",
-                homeDelivery : "krunal.hd@hirecraft.in",
-                serviceEmail : "krunal.srv@hirecraft.in",
-                resumeEmail : "krunal.cv@hirecraft.in"
-            }
-        ];
-
-        /**
-         * Modal Box with empty data
-         * @type {{ezeid: string, userName: string, accessRights: {sales: number, reservation: number, homeDelivery: number, service: number, resume: number}, rules: {sales: Array, reservation: Array, homeDelivery: Array, service: Array, resume: Array}, status: number}}
-         */
-        $scope.modalBox = {
-            title : "Add new subuser",
-            ezeidExists : false,        // If this EZEID is already in subuser list(while editing the subusers)
-            availabilityCheck : false,  //If checked the availability of EZEID or not
-            isEzeidAvailable : false,   // Shows that EZEID exists or not
-            subuser : {
-                ezeid : "",
-                userName : "",
-                accessRights : {
-                    sales: 0,
-                    reservation : 0,
-                    homeDelivery : 0,
-                    service : 0,
-                    resume : 0
-                },
-                rules : {
-                    sales : [],
-                    reservation : [],
-                    homeDelivery : [],
-                    service : [],
-                    resume : []
-                },
-                status : 1,
-                salesEmail : "",
-                reservationEmail : "",
-                homeDelivery : "",
-                serviceEmail : "",
-                resumeEmail : ""
-            }
-        };
-
-        //Open Modal box for user
-        $scope.showModal = false;
-        $scope.openModalBox = function(event){
-            if(event){
-                var element = event.currentTarget;
-                var userIndex = $(element).data('index');
-                $scope.modalBox.subuser = $scope.subusers[userIndex];
-                $scope.modalBox.title = "Update Subuser";
-                $scope.modalBox.ezeidExists = true;
-                $scope.modalBox.isEzeidAvailable = true;
-            }
-            else{
-                $scope.resetModalData();
-            }
-            $scope.showModal = !$scope.showModal;
-        };
-
-
-        /**
-         * Resetting Modal Data to initial state
-         */
-        $scope.resetModalData = function(){
-            $scope.modalBox = {
-                title : "Add new subuser",
-                ezeidExists : false,        // If subuser creation is new then false else true for updating user
-                availabilityCheck : false,  //If checked the availability of EZEID or not
-                isEzeidAvailable : false,   // Status of EZEID exists or not after checking availability
-                subuser : {
-                    ezeid : "",
-                    userName : "",
-                    accessRights : {
-                    sales: 0,
-                        reservation : 0,
-                        homeDelivery : 0,
-                        service : 0,
-                        resume : 0
-                    },
-                    rules : {
-                        sales : [],
-                        reservation : [],
-                        homeDelivery : [],
-                        service : [],
-                        resume : []
-                    },
-                    status : 1
-                }
-            };
-        };
-
-        $scope.checkAvailability = function(){
-            console.log('executing');
-            $scope.modalBox.availabilityCheck = true;
-            $http({
-                url : "/ewGetEZEID",
-                method : "GET",
-                params : {
-                    EZEID : $scope.modalBox.subuser.ezeid
-                }
-            }).success(function(resp){
-                    console.log(JSON.stringify(resp));
-                    $scope.modalBox.availabilityCheck = true;
-                    if(resp.hasOwnProperty('IsIdAvailable') && (!resp.IsIdAvailable)){
-                        $scope.modalBox.isEzeidAvailable = true;
-                    }
-                    else{
-                        $scope.modalBox.isEzeidAvailable = false;
-                    }
-
-                }).error(function(err){
-                    Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
-                });
-        };
-
-        $scope.addRule = function($event){
-            var elem = $($event.currentTarget);
-            console.log(elem.data('tid'));
-            if(elem.hasAttribute('checked'))
-            {
-                //@todo Remove from user rule list
-                console.log('I am checked');
-            }
-            else{
-                //@todo add to user rule list
-                console.log('I am unchecked');
-            }
-        };
-
-        $scope.addSubUser = function(){};
-
-        $scope.editSubUser = function(){};
-
-
-
-
-        $scope.loadAllRules = function(){
-            $http({
-                url : '/ewtGetFolderList',
-                method : "GET",
-                params : {
-                    Token : $rootScope._userInfo.Token,
-                    MasterID : $scope.masterUser.MasterID
-                }
-                }).success(function(resp){
-                    if(resp.length > 0){
-                        $scope.rules = resp;
-                    }
-                }).error(function(err){
-                    Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
-                });
-        };
-
-        // Getting master user details
-        $http({
-            url : '/ewtGetUserDetails',
-            method : "GET",
-            params :{
-                Token : $rootScope._userInfo.Token
-            }
-        }).success(function(resp){
-                if(resp.length>0){
-                    $scope.masterUser = resp[0];
-                    $scope.loadAllRules()
-                }
-        }).error(function(err){
-                Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
-        });
-
-    }]);
 
 })();

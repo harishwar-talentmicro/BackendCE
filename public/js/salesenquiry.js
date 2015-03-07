@@ -4,13 +4,15 @@ angular.module('ezeidApp').controller('salesenquiryController', function($http, 
     msglist._info={};
     msglist.msgs = [];
     var MsgDelay = 2000;
+    msglist._info.StatusFilter = 1;
 
     var map;
     var mapOptions;
     var marker;
     var markers = [];
     var showCurrentLocation = true;
-
+    //$scope.showAddNoteBox = true;
+    msglist._info.StatusFilter = 1;
 
     if ($rootScope._userInfo) {
     }
@@ -47,26 +49,28 @@ angular.module('ezeidApp').controller('salesenquiryController', function($http, 
         }
     }
 
+    $scope.Tab1Title = "Sales Enquiry";
+    $scope.Tab2Title = "Sales Enquiry2";
+    $scope.Tab3Title = "Sales Enquiry3";
+    $scope.Tab4Title = "Sales Enquiry4";
+
     //To get Status info
-    $http({ method: 'get', url: GURL + 'ewtGetStatusType?Token='+ $rootScope._userInfo.Token + '&MasterID=123&FunctionType=1'}).success(function (data) {
+    $http({ method: 'get', url: GURL + 'ewtGetStatusType?Token='+ $rootScope._userInfo.Token + '&MasterID=251&FunctionType=0'}).success(function (data) {
 
-        console.log(data);
-
-        /*if ($rootScope._userInfo.Token == false) {
-            var _obj = { CountryID: 0, CountryName: '--Country--', ISDCode: '####' };
-            data.splice(0, 0, _obj);
-            profile._info.CountryID = _obj.CountryID;
+         if (data != 'null') {
+            // console.log(data);
+            msglist.Status = data;
+             msglist._info.StatusFilter = data[0].TID;
         }
-        profile.countries = data;*/
     });
 
     //To get Next Action info
-    $http({ method: 'get', url: GURL + 'ewtGetActionType?Token='+ $rootScope._userInfo.Token + '&MasterID=251&FunctionType=1'}).success(function (data) {
-
+    $http({ method: 'get', url: GURL + 'ewtGetActionType?Token='+ $rootScope._userInfo.Token + '&MasterID=251&FunctionType=0'}).success(function (data) {
+       // console.log(data);
         if (data != 'null') {
-            console.log(data);
-                msglist.NextAction = data;
-        }
+
+            msglist.NextAction = data;
+          }
     });
 
     $('#datetimepicker1').datetimepicker({
@@ -79,22 +83,24 @@ angular.module('ezeidApp').controller('salesenquiryController', function($http, 
         $('#datetimepicker1').trigger('focus');
     });
 
-    $scope.quantity1 = 0;
-
-    $scope.Rate1 = 5;
+    $scope.quantity0 = 0;
+    $scope.quantity1 = 1;
 
     $scope.toggleModal = function(){
+        getItemList();
         $scope.showModal = !$scope.showModal;
     };
 
     $scope.openRequesterPopup = function(){
         $scope.showModal2 = !$scope.showModal2;
-
         $timeout(function(){initialize(); $scope.val = true}, 1000);
-
     };
 
-    $scope.longString = "01234567890123456789";
+    $scope.toggleTitleModal = function(){
+        $scope.showModalTitle = !$scope.showModalTitle;
+    };
+
+    //$scope.longString = "Item Title";
 
     //open SalesEnquiryForm
     msglist.openAddNewSalesEnquiryForm = function () {
@@ -106,11 +112,55 @@ angular.module('ezeidApp').controller('salesenquiryController', function($http, 
         $('#addNewSalesEnquiryForm_popup').slideUp();
     };
 
-    msglist.Status = [{ id: 0, label: "Read Only" },
-                      { id: 1, label: "Read, Create & Update" },
-                      { id: 2, label: "Read, Create, Update & Delete" },
-                      { id: 3, label: "Read, Update" },
-                      { id: 4, label: "Read, Update & Delete" } ];
+    //To get all Items
+    function getItemList() {
+       $http({
+            method: 'get',
+            url: GURL + 'ewtGetItemList?Token=' + $rootScope._userInfo.Token+ '&MasterID=251&FunctionType=0'
+        }).success(function (data) {
+               console.log(data);
+               if (data != 'null') {
+
+                   for (var i = 0; i < data.length; i++) {
+                       data[i].itemCheckBoxSelected = false;
+                       msglist.msgs.push(data[i]);
+                   }
+                   msglist.msgs = data;
+                   $scope.showAddNoteBox = false;
+               }
+               else
+               {
+                   console.log("Sai2");
+                   //show Add Note text area
+                  //$scope.showAddNoteBox = true;
+                   $scope.showAddNoteBox = false;
+               }
+
+            });
+    }
+
+    //Add Sales Enquiry
+    msglist.addSalesEnquiry = function () {
+        if ($rootScope._userInfo.IsAuthenticate == true) {
+            var currentTaskDate = moment().format('DD-MMM-YYYY hh:mm A');
+            $http({ method: 'post', url: GURL + 'ewtSaveTranscationItems', data: { Token: $rootScope._userInfo.Token, MessageID: 251, ItemID: 1, Qty: 2, Rate: 5, Amount :10,Duration: 2 } }).success(function (data) {
+             //   console.log(data);
+                /*if (data.IsSuccessfull) {
+                    $('#SalesEnquiryRequest_popup').slideUp();
+                    SearchSec.salesMessage = "";
+                    Notification.success({ message: 'Message send success', delay: MsgDelay });
+                }
+                else {
+                    Notification.error({ message: 'Sorry..! Message not send ', delay: MsgDelay });
+                }*/
+            });
+        }
+        else {
+            //Redirect to Login page
+            $('#SignIn_popup').slideDown();
+        }
+    };
+
 
     //Maps
     function initialize() {

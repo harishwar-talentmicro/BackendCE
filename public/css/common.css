@@ -1076,4 +1076,136 @@ span.smallCloselink {
     cursor: pointer;
 }
 
+.business-item{
+    text-align: center;
+}
 
+.business-item .thumbnail{
+    border-radius: 0px;
+}
+
+.business-item img{
+    height:96px;
+    width: 96px;
+}
+
+.panel .jumbotron{
+    background: none;
+    padding:0px;
+}
+
+.panel .jumbotron .business-item .caption h4{
+    font-size: 18px;
+}
+
+.panel .jumbotron .business-item .caption p{
+    font-size: 14px;
+}
+
+
+/******************************** Krunal Changes *****************************/
+.salesEnquiryFieldSize
+{
+    width: 28%;
+}
+.salesModalTopPosition
+{
+    padding-top: 0px;
+}
+.salesEnquiryComboSize
+{
+    width: 19%;
+}
+
+.thumbnail-list li {
+    display:inline-block;
+    vertical-align:top;
+    width:50%;
+    width: 24.33333%;
+    padding:2%;
+    font-size:12px;
+}
+.thumbnail-list img {
+    display:block;
+    width:100%;
+}
+.item { background:green; }
+.cut-price {
+    text-decoration:line-through;
+    color:#ccc;
+}
+.product-price {
+    float:left;
+    width:100%;
+    color:#999;
+}
+.btn-slide { display:none; }
+
+@media (min-width:640px) {
+    .thumbnail-list li { width: 24.33333%; }
+}
+@media (max-width:767px) {
+    .btn-slide {
+        text-align:center;
+        width:100%;
+        padding:10px;
+        margin:0 auto;
+        display:block;
+        font:bold 120%/100% Arial,Helvetica,sans-serif;
+        color:#000;
+        text-decoration:none;
+        border:1px solid #ccc;
+    }
+    #panel { display:none; }
+    .thumbnail-list li { text-align:center; }
+}
+@media (max-width:320px) {
+    .thumbnail-list li { width: 100%}
+}
+
+.rateBox
+{
+    float: right;
+    margin-right: 2%;
+    width: 39%;
+    height: 32px;
+    text-align: center;
+}
+.nav-tabs > li.active > a.tab-active, .nav-tabs > li.active > a.tab-active:hover, .nav-tabs > li.active > a.tab-active:focus{
+    color:#fff;
+    border:none;
+}
+.tab-active{
+    color: #fff;
+    background: url(../images/btn_bg_h.png) repeat;
+}
+
+.nav-pills.nav-stacked > li.active > a, .nav-pills.nav-stacked > li.active > a:hover, .nav-pills.nav-stacked > li.active > a:focus,
+.nav-pills.nav-justified > li.active > a, .nav-pills.nav-justified > li.active > a:hover, .nav-pills.nav-justified > li.active > a:focus{
+    background: url(../images/btn_bg_h.png) repeat;
+    border-radius: 0px;
+}
+
+.business-item .glyphicon-edit{
+    text-align: right;
+    position: absolute;
+    color: #FFFFFF;
+    background: url(../images/btn_bg.png) repeat;
+    padding: 5px;
+    border-radius: 5px;
+    font-size: 14px;
+    margin: 5px 10px 0px 0px;
+    right: 0;
+    cursor: pointer;
+}
+
+.thumbnail .btn-icon{
+    position: absolute;
+    background: url(../images/btn_bg.png) repeat;
+    border-radius: 5px;
+    font-size: 14px;
+    margin: 0px 10px 0px 0px;
+    right: 0;
+    cursor: pointer;
+    font-size: 12px;
+}
