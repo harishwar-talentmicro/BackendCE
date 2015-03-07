@@ -65,8 +65,8 @@ angular.module('ezeidApp').controller('salesenquiryController', function($http, 
     });
 
     //To get Next Action info
-    $http({ method: 'get', url: GURL + 'ewtGetActionType?Token='+ $rootScope._userInfo.Token + '&MasterID=251&FunctionType=1'}).success(function (data) {
-        console.log(data);
+    $http({ method: 'get', url: GURL + 'ewtGetActionType?Token='+ $rootScope._userInfo.Token + '&MasterID=251&FunctionType=0'}).success(function (data) {
+       // console.log(data);
         if (data != 'null') {
 
             msglist.NextAction = data;
@@ -83,13 +83,12 @@ angular.module('ezeidApp').controller('salesenquiryController', function($http, 
         $('#datetimepicker1').trigger('focus');
     });
 
-    $scope.quantity1 = 0;
-
-    $scope.Rate1 = 5;
+    $scope.quantity0 = 0;
+    $scope.quantity1 = 1;
 
     $scope.toggleModal = function(){
-        $scope.showModal = !$scope.showModal;
         getItemList();
+        $scope.showModal = !$scope.showModal;
     };
 
     $scope.openRequesterPopup = function(){
@@ -101,7 +100,7 @@ angular.module('ezeidApp').controller('salesenquiryController', function($http, 
         $scope.showModalTitle = !$scope.showModalTitle;
     };
 
-    $scope.longString = "Item Title";
+    //$scope.longString = "Item Title";
 
     //open SalesEnquiryForm
     msglist.openAddNewSalesEnquiryForm = function () {
@@ -117,13 +116,16 @@ angular.module('ezeidApp').controller('salesenquiryController', function($http, 
     function getItemList() {
        $http({
             method: 'get',
-            url: GURL + 'ewtGetUserDetails?Token=' + $rootScope._userInfo.Token+ '&MasterID=251'
+            url: GURL + 'ewtGetItemList?Token=' + $rootScope._userInfo.Token+ '&MasterID=251&FunctionType=0'
         }).success(function (data) {
                console.log(data);
                if (data != 'null') {
 
-                   console.log("Sai1");
-                   msglist.NextAction = data;
+                   for (var i = 0; i < data.length; i++) {
+                       data[i].itemCheckBoxSelected = false;
+                       msglist.msgs.push(data[i]);
+                   }
+                   msglist.msgs = data;
                    $scope.showAddNoteBox = false;
                }
                else
@@ -142,7 +144,7 @@ angular.module('ezeidApp').controller('salesenquiryController', function($http, 
         if ($rootScope._userInfo.IsAuthenticate == true) {
             var currentTaskDate = moment().format('DD-MMM-YYYY hh:mm A');
             $http({ method: 'post', url: GURL + 'ewtSaveTranscationItems', data: { Token: $rootScope._userInfo.Token, MessageID: 251, ItemID: 1, Qty: 2, Rate: 5, Amount :10,Duration: 2 } }).success(function (data) {
-                console.log(data);
+             //   console.log(data);
                 /*if (data.IsSuccessfull) {
                     $('#SalesEnquiryRequest_popup').slideUp();
                     SearchSec.salesMessage = "";

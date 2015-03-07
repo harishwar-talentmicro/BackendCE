@@ -65,7 +65,9 @@
             restrict: 'A',
             link: function(scope, element, attrs){
                 if (attrs.toggle=="tooltip"){
-                    $(element).tooltip();
+                    $(element).tooltip({
+                        html : attrs.title
+                    });
                 }
                 if (attrs.toggle=="popover"){
                     $(element).popover({
