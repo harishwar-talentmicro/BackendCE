@@ -3,7 +3,7 @@
  */
 
 
-angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$http','Notification','$filter',function($scope,$rootScope,$http,Notification,$filter){
+angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$http','Notification','$filter','MsgDelay',function($scope,$rootScope,$http,Notification,$filter,MsgDelay){
     $(document).on('click','.popover-close',function(){
         $('*[data-toggle="popover"]').popover('hide');
     });
@@ -72,60 +72,60 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$htt
     /**
      * Dummy Data
      */
-        {
-            userName : 'INDRA',
-            TID : 25,
-            ezeid : 'indra',
-            firstName : "Indra Jeet",
-            lastName : "Nagda",
-            accessRights : {
-                'sales' : 3,
-                'reservation' : 1,
-                'homeDelivery' : 3,
-                'service' : 1,
-                'resume' : 1
-            },
-            rules : {
-                sales : [3,0,5],
-                reservation : [2,1,5],
-                homeDelivery : [1,4],
-                service : [3,1],
-                resume : [2,5]
-            },
-            status : 2,
-            salesEmail : "indra.sales@hirecraft.in",
-            reservationEmail : "indra.reservation@hirecraft.in",
-            homeDelivery : "indra.hd@hirecraft.in",
-            serviceEmail : "indra.srv@hirecraft.in",
-            resumeEmail : "indra.cv@hirecraft.in"
-        },
-        {
-            userName : 'KRUNL',
-            ezeid : 'krunal11',
-            TID : 42,
-            firstName : "Krunal",
-            lastName : "Patel",
-            accessRights : {
-                'sales' : 3,
-                'reservation' : 3,
-                'homeDelivery' : 3,
-                'service' : 1,
-                'resume' : 1
-            },
-            rules : {
-                sales : [1,2,5],
-                reservation : [1,3,5],
-                homeDelivery : [0,2,5],
-                service : [1,3],
-                resume : [0,4]
-            },
-            status : 1,
-            salesEmail : "kruanl.sales@hirecraft.in",
-            reservationEmail : "krunal.reservation@hirecraft.in",
-            homeDelivery : "krunal.hd@hirecraft.in",
-            serviceEmail : "krunal.srv@hirecraft.in",
-            resumeEmail : "krunal.cv@hirecraft.in"
-        }
+//        {
+//            userName : 'INDRA',
+//            TID : 25,
+//            ezeid : 'indra',
+//            firstName : "Indra Jeet",
+//            lastName : "Nagda",
+//            accessRights : {
+//                'sales' : 3,
+//                'reservation' : 1,
+//                'homeDelivery' : 3,
+//                'service' : 1,
+//                'resume' : 1
+//            },
+//            rules : {
+//                sales : [3,0,5],
+//                reservation : [2,1,5],
+//                homeDelivery : [1,4],
+//                service : [3,1],
+//                resume : [2,5]
+//            },
+//            status : 2,
+//            salesEmail : "indra.sales@hirecraft.in",
+//            reservationEmail : "indra.reservation@hirecraft.in",
+//            homeDelivery : "indra.hd@hirecraft.in",
+//            serviceEmail : "indra.srv@hirecraft.in",
+//            resumeEmail : "indra.cv@hirecraft.in"
+//        },
+//        {
+//            userName : 'KRUNL',
+//            ezeid : 'krunal11',
+//            TID : 42,
+//            firstName : "Krunal",
+//            lastName : "Patel",
+//            accessRights : {
+//                'sales' : 3,
+//                'reservation' : 3,
+//                'homeDelivery' : 3,
+//                'service' : 1,
+//                'resume' : 1
+//            },
+//            rules : {
+//                sales : [1,2,5],
+//                reservation : [1,3,5],
+//                homeDelivery : [0,2,5],
+//                service : [1,3],
+//                resume : [0,4]
+//            },
+//            status : 1,
+//            salesEmail : "kruanl.sales@hirecraft.in",
+//            reservationEmail : "krunal.reservation@hirecraft.in",
+//            homeDelivery : "krunal.hd@hirecraft.in",
+//            serviceEmail : "krunal.srv@hirecraft.in",
+//            resumeEmail : "krunal.cv@hirecraft.in"
+//        }
     ];
 
     /**
@@ -261,11 +261,11 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$htt
 
 
     /**
-     * Adding and Removing Rules From model
+     * Adding and Removing Rules From a particular user
      * @param event
      * @param type  // Integer 0: Sales, 1 : Reservation, 2 : HomeDelivery, 3 : Service, 4 : Resume
      */
-    $scope.addRule = function(event,type){
+    $scope.toggleRule = function(event,type){
         var elem = $(event.currentTarget);
         console.log(elem.data('tid'));
         var ruleTid = elem.data('tid');
@@ -329,7 +329,7 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$htt
             Token : $rootScope._userInfo.Token,
 
             //@todo Please use master ID of user
-            PersonalID : $scope.modalBox.ezeid,
+            PersonalID : $scope.modalBox.subuser.ezeid,
 
             TID : $scope.modalBox.subuser.TID,
             UserName  : $scope.masterUser.EZEID+'.'+$scope.modalBox.subuser.userName,
@@ -362,17 +362,28 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$htt
             method : "POST",
             data : data
         }).success(function(resp){
-            console.log(resp);
-                //@todo Notification message for saving subuser details
+            console.log(JSON.stringify(resp));
+                if(resp && resp.hasOwnProperty("IsSuccessfull")){
+                    Notification.success({ message : "User saved successfully", delay : MsgDelay});
+                }
+                else{
+                    Notification.error({ message : "An error occured while saving user !", delay : MsgDelay});
+                }
         }).error(function(err){
-            console.log(err);
+                Notification.error({ message : "An error occured while saving user !", delay : MsgDelay});
         });
     };
 
 
-
+    /**
+     * Function type count for loading rules based on functionType
+     * @type {number}
+     */
+    $scope.functionTypeCount = 0;
     /**
      * Load all rules present for the Master EZEID
+     * Recursive calls for fetching all rule types based on FunctionType(Sales : 0, Reservation : 1,..)
+     * Loading SubuserList after loading all types of rules
      */
     $scope.loadAllRules = function(){
         $http({
@@ -380,31 +391,108 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$htt
             method : "GET",
             params : {
                 Token : $rootScope._userInfo.Token,
-                MasterID : $scope.masterUser.MasterID
+                MasterID : $scope.masterUser.MasterID,
+                FunctionType : $scope.functionTypeCount
             }
         }).success(function(resp){
                 if(resp.length > 0){
-                    $scope.rules = resp;
+                    $scope.rules.concat(resp);
+                    $scope.functionTypeCount += 1;
                 }
+                if($scope.functionTypeCount < 5){
+                    $scope.loadAllRules();
+                }
+                else{
+                    $scope.loadSubuserList();
+                }
+
             }).error(function(err){
                 Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
             });
     };
 
-    // Getting master user details
-    $http({
-        url : '/ewtGetUserDetails',
-        method : "GET",
-        params :{
-            Token : $rootScope._userInfo.Token
-        }
-    }).success(function(resp){
-            if(resp.length>0){
-                $scope.masterUser = resp[0];
-                $scope.loadAllRules()
+    /**
+     * Loads list of subusers
+     */
+    $scope.loadSubuserList = function(){
+        $http({
+            url : '/ewtGetSubUserList',
+            method : "GET",
+            params : {
+                Token : $rootScope._userInfo.Token,
+                MasterID : $scope.masterUser.MasterID
+            }
+        }).success(function(resp){
+            if(resp && resp.length > 0)
+            {
+                console.log(resp);
+                for(var i = 0; i < resp.length ; i++){
+                    var subuser = {
+                        userName : (resp[i].EZEID.split(".").pop()),
+                        TID : resp[i].TID,
+                        ezeid : resp[i].PersonalEZEID,
+                        firstName : resp[i].FirstName,
+                        lastName : resp[i].LastName,
+                        accessRights : {
+                            'sales' : (resp[i].UserModuleRights.split(''))[0],
+                            'reservation' : (resp[i].UserModuleRights.split(''))[1],
+                            'homeDelivery' : (resp[i].UserModuleRights.split(''))[2],
+                            'service' : (resp[i].UserModuleRights.split(''))[3],
+                            'resume' : (resp[i].UserModuleRights.split(''))[4]
+                        },
+                        rules : {
+                            sales : resp[i].SalesIDs.split(','),
+                            reservation : resp[i].ReservationIDs.split(','),
+                            homeDelivery : resp[i].HomeDeliveryIDs.split(','),
+                            service : resp[i].ServiceIDs.split(','),
+                            resume : resp[i].ResumeIDs.split(',')
+                        },
+                        status : resp[i].StatusID,
+                        salesEmail : resp[i].SalesMailID,
+                        reservationEmail : resp[i].ReservationMailID,
+                        homeDelivery : resp[i].HomeDeliveryMailID,
+                        serviceEmail : resp[i].ServiceMailID,
+                        resumeEmail : resp[i].CVMailID
+
+                    };
+                    $scope.subusers.push(subuser);
+                }
+            }
+            else{
+                Notification.error({ message: "No subusers added ", delay : MsgDelay});
             }
         }).error(function(err){
-            Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
+                Notification.error({ message: "No subusers added ", delay : MsgDelay});
         });
+    };
+
+    /**
+     * Getting Master User Details
+     * Then calling loadRules Function to load all rules
+     */
+    $scope.getMasterUserDetails = function(){
+        $http({
+            url : '/ewtGetUserDetails',
+            method : "GET",
+            params :{
+                Token : $rootScope._userInfo.Token
+            }
+        }).success(function(resp){
+                if(resp.length>0){
+                    $scope.masterUser = resp[0];
+                    $scope.loadAllRules();
+                }
+            }).error(function(err){
+                Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
+            });
+
+    };
+
+
+    /**
+     * Initial Function call after controller initialization
+     * Will call loadAllRules()
+     */
+    $scope.getMasterUserDetails();
 
 }]);

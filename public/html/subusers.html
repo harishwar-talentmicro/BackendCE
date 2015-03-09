@@ -228,7 +228,7 @@
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-cleafix" ng-repeat="rule in (rules | ruleFilter:0)">
                 <div class="checkbox">
                     <label>
-                        <input type="checkbox" ng-click="addRule($event,0)" data-tid="{{rule.TID}}"> {{rule.FolderTitle}}
+                        <input type="checkbox" ng-click="toggleRule($event,0)" data-tid="{{rule.TID}}"> {{rule.FolderTitle}}
                     </label>
                 </div>
             </div>
@@ -239,7 +239,7 @@
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-cleafix" ng-repeat="rule in (rules | ruleFilter:1)">
                 <div class="checkbox">
                     <label>
-                        <input type="checkbox" ng-click="addRule($event,1)" data-tid="{{rule.TID}}"> {{rule.FolderTitle}}
+                        <input type="checkbox" ng-click="toggleRule($event,1)" data-tid="{{rule.TID}}"> {{rule.FolderTitle}}
                     </label>
                 </div>
             </div>
@@ -250,7 +250,7 @@
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-cleafix" ng-repeat="rule in (rules | ruleFilter:2)">
                 <div class="checkbox">
                     <label >
-                        <input type="checkbox" ng-click="addRule($event,2)" data-tid="{{rule.TID}}"> {{rule.FolderTitle}}
+                        <input type="checkbox" ng-click="toggleRule($event,2)" data-tid="{{rule.TID}}"> {{rule.FolderTitle}}
                     </label>
                 </div>
             </div>
@@ -261,7 +261,7 @@
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-cleafix" ng-repeat="rule in (rules | ruleFilter:3)">
                 <div class="checkbox">
                     <label>
-                        <input type="checkbox" ng-click="addRule($event,3)" data-tid="{{rule.TID}}"> {{rule.FolderTitle}}
+                        <input type="checkbox" ng-click="toggleRule($event,3)" data-tid="{{rule.TID}}"> {{rule.FolderTitle}}
                     </label>
                 </div>
             </div>
@@ -272,7 +272,7 @@
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-cleafix" ng-repeat="rule in (rules | ruleFilter:4)">
                 <div class="checkbox">
                     <label>
-                        <input type="checkbox" ng-click="addRule($event,4)" data-tid="{{rule.TID}}"> {{rule.FolderTitle}}
+                        <input type="checkbox" ng-click="toggleRule($event,4)" data-tid="{{rule.TID}}"> {{rule.FolderTitle}}
                     </label>
                 </div>
             </div>
