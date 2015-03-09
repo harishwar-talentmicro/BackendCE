@@ -10,11 +10,7 @@
         </div>
 
     </div>
-    <!--- Template to be displayed in rules popover -->
-    <script type="text/ng-template" id="rules.html">
-        <h1>Hello this is from template</h1>
-    </script>
-    <!--- Template to be displayed in rules popover ends -->
+    
     <table  class="table table-striped ezeid-table">
         <thead>
         <tr>
@@ -81,7 +77,7 @@
         <div class="col-lg-3 col-md-3 col-sm-4 col-xs-8 bottom-clearfix">
             <div class="input-group">
                 <span class="input-group-addon" id="basic-addon1"><span class="glyphicon glyphicon-user"></span> </span>
-                <input ng-disabled="modalBox.ezeidExists" ng-model="modalBox.subuser.ezeid" type="text" class="form-control" placeholder="Subuser EZEID" aria-describedby="basic-addon1">
+                <input capitalize ng-disabled="modalBox.ezeidExists" ng-model="modalBox.subuser.ezeid" type="text" class="form-control" placeholder="Subuser EZEID" aria-describedby="basic-addon1">
             </div>
         </div>
         <div class="col-lg-2 col-md-2 col-sm-2 col-xs-4 bottom-clearfix">
@@ -100,7 +96,7 @@
             <div class="form-group">
                 <div class="input-group" data-toggle="tooltip" title="Subuser Username" data-placement="right">
                     <span class="input-group-addon" id="basic-addon3">{{masterUser.EZEID}}.</span>
-                    <input type="text" ng-disabled="modalBox.ezeidExists" ng-model="modalBox.subuser.userName" class="form-control" placeholder="Username" aria-describedby="basic-addon1">
+                    <input type="text" capitalize ng-disabled="modalBox.ezeidExists" ng-model="modalBox.subuser.userName" class="form-control" placeholder="Username" aria-describedby="basic-addon1">
                 </div>
             </div>
         </div>
@@ -299,7 +295,7 @@
     </div>
 
     </modal>
-    <!------------ Modal Box starts here -------------------------->
+    <!------------ Modal Box ends here -------------------------->
 
     </div>
 </div>

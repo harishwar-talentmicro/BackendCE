@@ -58,6 +58,50 @@
     var MsgDelay = 2000;
 
     /**
+     * Number only directive (allows only number for input fields)
+     */
+    ezeid.directive('numbersOnly', function(){
+        return {
+            require: 'ngModel',
+            link: function(scope, element, attrs, modelCtrl) {
+                modelCtrl.$parsers.push(function (inputValue) {
+                    // this next if is necessary for when using ng-required on your input.
+                    // In such cases, when a letter is typed first, this parser will be called
+                    // again, and the 2nd time, the value will be undefined
+                    if (inputValue == undefined) return ''
+                    var transformedInput = inputValue.replace(/[^0-9]/g, '');
+                    if (transformedInput!=inputValue) {
+                        modelCtrl.$setViewValue(transformedInput);
+                        modelCtrl.$render();
+                    }
+
+                    return transformedInput;
+                });
+            }
+        };
+    });
+    /**
+     * Directive to capitalize the input field
+     */
+    ezeid.directive('capitalize', function() {
+        return {
+            require: 'ngModel',
+            link: function(scope, element, attrs, modelCtrl) {
+                var capitalize = function(inputValue) {
+                    if(inputValue == undefined) inputValue = '';
+                    var capitalized = inputValue.toUpperCase();
+                    if(capitalized !== inputValue) {
+                        modelCtrl.$setViewValue(capitalized);
+                        modelCtrl.$render();
+                    }
+                    return capitalized;
+                }
+                modelCtrl.$parsers.push(capitalize);
+                capitalize(scope[attrs.ngModel]);  // capitalize initial value
+            }
+        };
+    });
+    /**
      * Directive for binding of bootstrap javascript popover and tooltip methods
      */
     ezeid.directive('toggle', function(){

@@ -130,7 +130,8 @@ app.get('/ewtGetTranscationItems',LocationManager.FnGetTranscationItems);
 app.post('/ewtSaveTranscationItems',LocationManager.FnSaveTranscationItems);
 app.get('/ewtGetSubUserList',LocationManager.FnGetSubUserList);
 app.post('/ewtSaveItem',LocationManager.FnSaveItem);
-
+app.post('/ewmSaveFolderRules',LocationManager.FnSaveFolderRules);
+app.post('/ewmSaveStatusType',LocationManager.FnSaveStatusType);
 //below service are for EZEIDAP
 app.post('/ewLoginAP', LocationManager.FnLoginAP);
 app.get('/ewLogoutAP', LocationManager.FnLogoutAP);
@@ -140,7 +141,7 @@ app.post('/ewtForgetPasswordAP', LocationManager.FnForgetPasswordAP);
 app.post('/ewtChangePasswordAP', LocationManager.FnChangePasswordAP);
 app.post('/ewtSaveEZEIDDataAP', LocationManager.FnSaveAPEZEID);
 app.post('/ewtSaveEZEIDPictureAP', LocationManager.FnSaveAPEZEIDPicture);
-app.get('/ewtGetEZEIDDataAP', LocationManager.FnGetRealStateDataAP);
+app.get('/ewtGetEstateDataAP', LocationManager.FnGetRealStateDataAP);
 app.get('/ewtGetEZEIDPictureAP', LocationManager.FnGetAPEZEIDPicture);
 app.post('/ewtSaveBannerPictureAP', LocationManager.FnSaveBannerPictureAP);
 app.get('/ewtGetBannerPictureAP', LocationManager.FnGetBannerPictureAP);
