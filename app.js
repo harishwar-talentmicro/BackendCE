@@ -127,7 +127,7 @@ app.post('/ewtSearchForTracker', LocationManager.FnSearchForTracker);
 app.get('/ewtGetFolderList',LocationManager.FnGetFolderList);
 app.post('/ewtCreateSubUser',LocationManager.FnCreateSubUser);
 app.get('/ewtGetTranscationItems',LocationManager.FnGetTranscationItems);
-app.post('/ewtSaveTranscationItems',LocationManager.FnSaveTranscation);
+app.post('/ewtSaveTranscationItems',LocationManager.FnSaveTranscationItems);
 app.get('/ewtGetSubUserList',LocationManager.FnGetSubUserList);
 app.post('/ewtSaveItem',LocationManager.FnSaveItem);
 app.post('/ewmSaveFolderRules',LocationManager.FnSaveFolderRules);
