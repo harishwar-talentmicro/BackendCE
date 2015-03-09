@@ -363,6 +363,7 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$htt
             data : data
         }).success(function(resp){
             console.log(resp);
+                //@todo Notification message for saving subuser details
         }).error(function(err){
             console.log(err);
         });
