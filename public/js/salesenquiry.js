@@ -124,28 +124,35 @@ angular.module('ezeidApp').controller('salesenquiryController', function($http, 
             method: 'get',
             url: GURL + 'ewtItemList?Token=' + $rootScope._userInfo.Token+ '&MasterID=251&FunctionType=0'
         }).success(function (data) {
-            //   console.log(data);
-               console.log(data);
-               if (data != 'null') {
-
-
-                  /* for (var i = 0; i < data.length; i++) {
-                       data[i].itemCheckBoxSelected = false;
-                       data[i].itemQty = 0;
-                       msglist.msgs.push(data[i]);
-                   }*/
+              if (data != 'null') {
                    msglist.itemList = data;
                    $scope.showAddNoteBox = false;
                }
                else
                {
-                   //show Add Note text area
-                  //$scope.showAddNoteBox = true;
                    $scope.showAddNoteBox = false;
                }
-
             });
     }
+
+    //To get details of selected item
+    $scope.getItemDetails = function(tId){
+        $scope.itemImage = "";
+        $scope.rate = 0;
+        $http({
+            method: 'get',
+            url: GURL + 'ewtItemDetails?Token=' + $rootScope._userInfo.Token+ '&TID='+tId
+        }).success(function (data) {
+
+                console.log(data);
+               if (data != 'null') {
+
+                    $scope.itemImage =  data[0].Picture;
+                    $scope.rate = data[0].Rate;
+                }
+
+            });
+    };
 
     //add remove item to array on change of check box
     $scope.addToItemList = function(_checked, tID, quantity, rate, amount){
