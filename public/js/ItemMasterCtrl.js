@@ -137,8 +137,39 @@ angular.module('ezeidApp').controller('ItemMasterCtrl',['$q','$scope','$interval
        });
     };
 
+    /**
+     * Count for Loading items based on type(FunctionType)
+     * @type {number}
+     */
+    $scope.count = 0;
 
-    // Getting master user details
+    /**
+     * Loads items from server based on function type
+     * Recursive calls implemented to make requests one after the other
+     */
+    $scope.loadItems = function(){
+        $http({
+            url : '/ewtGetItemList',
+            method : "GET",
+            params : {
+                Token : $rootScope._userInfo.Token,
+                FunctionType : $scope.count,
+                MasterID : $scope.masterUser.MasterID
+            }
+        }).success(function(resp){
+                console.log(resp);
+                $scope.count += 1;
+                if($scope.count < 5){
+                    $scope.loadItems();
+                }
+        }).error(function(err){
+                console.log(err);
+        });
+    };
+
+    /**
+     * Getting master user details
+     */
     $http({
         url : '/ewtGetUserDetails',
         method : "GET",
@@ -148,6 +179,8 @@ angular.module('ezeidApp').controller('ItemMasterCtrl',['$q','$scope','$interval
     }).success(function(resp){
             if(resp.length>0){
                 $scope.masterUser = resp[0];
+                //Loading all function items one by one
+                $scope.loadItems();
             }
         }).error(function(err){
             Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
