@@ -4742,32 +4742,40 @@ exports.FnEZEIDPrimaryDetails = function (req, res) {
 
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-
         var Token = req.query.Token;
         var EZEID = req.query.EZEID;
-
-
         if (Token != null && EZEID != null ) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
-
-                        db.query('CALL pEZEIDPrimaryDetails(' + db.escape(EZEID) + ')', function (err, GetResult) {
+                        var LocSeqNo = 0;
+                        var FindArray =EZEID.split('.');
+                        if (FindArray.length > 0) {
+                            EZEID = FindArray[0];
+                            if (FindArray.length > 1) {
+                                if (FindArray[1] != '') {
+                                    if (FindArray[1].charAt(0).toUpperCase() == 'L') {
+                                        LocSeqNo = FindArray[1].toString().substring(1, FindArray[1].length);
+                                    }
+                                    else {
+                                        LocSeqNo = 0;
+                                    }
+                                }
+                            }
+                        }
+                        db.query('CALL pEZEIDPrimaryDetails(' + db.escape(EZEID) + ',' + db.escape(LocSeqNo) + ')', function (err, GetResult) {
                             if (!err) {
                                 if (GetResult[0] != null) {
                                     if (GetResult[0].length > 0) {
-
                                         console.log('FnEZEIDPrimaryDetails: EZEID Primary deatils Send successfully');
                                         res.send(GetResult[0]);
                                     }
                                     else {
-
                                         console.log('FnEZEIDPrimaryDetails:No EZEID Primary deatils found');
                                         res.send('null');
                                     }
                                 }
                                 else {
-
                                     console.log('FnEZEIDPrimaryDetails:No EZEID Primary deatils found');
                                     res.send('null');
                                 }
@@ -4784,8 +4792,9 @@ exports.FnEZEIDPrimaryDetails = function (req, res) {
                         res.send('null');
                         console.log('FnEZEIDPrimaryDetails: Invalid Token');
                     }
-                } else {
-
+                }
+                else
+                {
                     res.statusCode = 500;
                     res.send('null');
                     console.log('FnEZEIDPrimaryDetails: Error in validating token:  ' + err);
@@ -4793,10 +4802,12 @@ exports.FnEZEIDPrimaryDetails = function (req, res) {
             });
         }
         else {
-            if (Token == null) {
+            if (Token == null)
+            {
                 console.log('FnEZEIDPrimaryDetails: Token is empty');
             }
-            else if (EZEID == null) {
+            else if (EZEID == null)
+            {
                 console.log('FnEZEIDPrimaryDetails: EZEID is empty');
             }
 
@@ -4890,12 +4901,13 @@ exports.FnGetFolderList = function (req, res) {
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         var Token = req.query.Token;
         var MasterID = req.query.MasterID;
-        if (Token != null && MasterID != null) {
+        var FunctionType = req.query.FunctionType;
+        if (Token != null && MasterID != null && FunctionType != null) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
 
-                        db.query('CALL pGetFolderList(' + db.escape(MasterID) + ')', function (err, GetResult) {
+                        db.query('CALL pGetFolderList(' + db.escape(MasterID) + ',' + db.escape(FunctionType) + ')', function (err, GetResult) {
                             if (!err) {
                                 if (GetResult[0] != null) {
                                     if (GetResult[0].length > 0) {
@@ -4939,6 +4951,9 @@ exports.FnGetFolderList = function (req, res) {
             }
             else if (MasterID == null) {
                 console.log('FnGetRoleList: MasterID is empty');
+            }
+            else if (FunctionType = null) {
+                console.log('FnGetRoleList: FunctionType is empty');
             }
             res.statusCode=400;
             res.send('null');
@@ -5527,7 +5542,6 @@ exports.FnSaveFolderRules = function(req, res){
     }
 };
 
-
 exports.FnSaveStatusType = function(req, res){
     try{
         res.setHeader("Access-Control-Allow-Origin", "*");
@@ -5868,15 +5882,13 @@ exports.FnItemDetails = function (req, res) {
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
         var Token = req.query.Token;
-        var MasterID = req.query.MasterID;
-       
+        var TID = req.query.TID;
 
-        if (Token != null && MasterID != null) {
+        if (Token != null && TID != null) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
-
-                        db.query('CALL pItemDetails(' + db.escape(MasterID) + ')', function (err, GetResult) {
+                        db.query('CALL pItemDetails(' + db.escape(TID) + ')', function (err, GetResult) {
                             if (!err) {
                                 if (GetResult != null) {
                                     if (GetResult[0].length > 0) {
@@ -5890,13 +5902,11 @@ exports.FnItemDetails = function (req, res) {
                                     }
                                 }
                                 else {
-
                                     console.log('FnItemDetails:No Item list details found');
                                     res.send('null');
                                 }
                             }
                             else {
-
                                 console.log('FnItemDetails: error in getting Item list details' + err);
                                 res.statusCode = 500;
                                 res.send('null');
@@ -5920,10 +5930,10 @@ exports.FnItemDetails = function (req, res) {
             if (Token == null) {
                 console.log('FnItemDetails: Token is empty');
             }
-            else if (MasterID == null) {
-                console.log('FnItemDetails: MasterID is empty');
+            else if (TID == null) {
+                console.log('FnItemDetails: TID is empty');
             }
-           
+
             res.statusCode=400;
             res.send('null');
         }
@@ -5933,9 +5943,6 @@ exports.FnItemDetails = function (req, res) {
         throw new Error(ex);
     }
 };
-
-
-
 
 //EZEIDAP Parts
 
@@ -6057,8 +6064,6 @@ exports.FnLoginAP = function (req, res) {
         throw new Error(ex);
     }
 };
-
-
 
 exports.FnLogoutAP = function (req, res) {
     try {

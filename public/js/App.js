@@ -2,6 +2,7 @@
     var ezeid = angular.module('ezeidApp',
         ['ngHeader','ngRoute', 'ngFooter', 'ui-notification', 'imageupload','angularjs-dropdown-multiselect','smart-table']);
 
+    ezeid.value('MsgDelay',2000);
     //HTTP Interceptor for detecting token expiry
     //Reloads the whole page in case of Unauthorized response from api
     ezeid.factory('ezeidInterceptor',['$rootScope','$timeout',function($rootScope,$timeout){
