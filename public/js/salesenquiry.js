@@ -15,6 +15,9 @@ angular.module('ezeidApp').controller('salesenquiryController', function($http, 
     //$scope.showAddNoteBox = true;
     msglist._info.StatusFilter = 1;
 
+    var selectedItemData = [];
+    msglist.selectMsgs = [];
+
     if ($rootScope._userInfo) {
     }
     else {
@@ -86,11 +89,6 @@ angular.module('ezeidApp').controller('salesenquiryController', function($http, 
 
     $scope.quantity = 0;
     $scope.rate = 0;
-   /* $scope.amount = $scope.quantity * $scope.rate;*/
-
-
-    /*$scope.quantity0 = 0;
-    $scope.quantity1 = 1;*/
 
     $scope.toggleModal = function(){
         getItemList();
@@ -105,8 +103,6 @@ angular.module('ezeidApp').controller('salesenquiryController', function($http, 
     $scope.toggleTitleModal = function(){
         $scope.showModalTitle = !$scope.showModalTitle;
     };
-
-    //$scope.longString = "Item Title";
 
     //open SalesEnquiryForm
     msglist.openAddNewSalesEnquiryForm = function () {
@@ -137,6 +133,7 @@ angular.module('ezeidApp').controller('salesenquiryController', function($http, 
 
     //To get details of selected item
     $scope.getItemDetails = function(tId){
+        selectedItemData = [];
         $scope.itemImage = "";
         $scope.rate = 0;
         $http({
@@ -144,18 +141,39 @@ angular.module('ezeidApp').controller('salesenquiryController', function($http, 
             url: GURL + 'ewtItemDetails?Token=' + $rootScope._userInfo.Token+ '&TID='+tId
         }).success(function (data) {
 
-                console.log(data);
-               if (data != 'null') {
-
+              if (data != 'null') {
                     $scope.itemImage =  data[0].Picture;
                     $scope.rate = data[0].Rate;
+                    selectedItemData = data;
                 }
-
             });
     };
 
+    $scope.addItemToList = function(){
+
+
+        console.log(selectedItemData);
+        console.log("SAi");
+/*
+        console.log($scope.rate);
+        selectedItemData[0].Rate = $scope.rate;
+        selectedItemData[0].Quantity = $scope.quantity;
+        selectedItemData[0].Amount = $scope.rate;*/
+
+       // msgSen.msgs.push(data[i]);
+        selectedItemData[0].itemQty = 0;
+        msglist.selectMsgs.push(selectedItemData[0]);
+
+        console.log(msglist.selectMsgs);
+
+        selectedItemData = [];
+        $scope.itemImage = "";
+        $scope.rate = 0;
+        $scope.quantity = 0;
+    };
+
     //add remove item to array on change of check box
-    $scope.addToItemList = function(_checked, tID, quantity, rate, amount){
+    $scope.addToItemList = function(quantity, rate, amount){
 
          itemList[tID] = {
             quantity : quantity,
@@ -163,12 +181,12 @@ angular.module('ezeidApp').controller('salesenquiryController', function($http, 
             amount : amount
         };
 
-        console.log(itemList);
+      /*  console.log(itemList);*/
      };
 
     //deacrease Top quantitiy
     $scope.decriesTopQuantity = function(){
-
+        console.log('I am executing decrease');
         if($scope.quantity != 0)
         {
             $scope.quantity = $scope.quantity - 1;
@@ -177,9 +195,9 @@ angular.module('ezeidApp').controller('salesenquiryController', function($http, 
 
     //increase Top quantitiy
     $scope.increaseTopQuantity = function(){
-
+        console.log('I am executing');
         $scope.quantity = $scope.quantity + 1;
-            };
+    };
 
 
 
@@ -203,7 +221,7 @@ angular.module('ezeidApp').controller('salesenquiryController', function($http, 
     msglist.addSalesEnquiry = function (event) {
 
 
-        console.log(msglist._info);
+      /*  console.log(msglist._info);*/
        /* var elem = $(event.currentTarget);
         console.log(elem.data('itemName'));
         console.log(elem.data('itemQty'));
