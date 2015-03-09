@@ -127,10 +127,11 @@ app.post('/ewtSearchForTracker', LocationManager.FnSearchForTracker);
 app.get('/ewtGetFolderList',LocationManager.FnGetFolderList);
 app.post('/ewtCreateSubUser',LocationManager.FnCreateSubUser);
 app.get('/ewtGetTranscationItems',LocationManager.FnGetTranscationItems);
-app.post('/ewtSaveTranscationItems',LocationManager.FnSaveTranscationItems);
+app.post('/ewtSaveTranscationItems',LocationManager.FnSaveTranscation);
 app.get('/ewtGetSubUserList',LocationManager.FnGetSubUserList);
 app.post('/ewtSaveItem',LocationManager.FnSaveItem);
-
+app.post('/ewmSaveFolderRules',LocationManager.FnSaveFolderRules);
+app.post('/ewmSaveStatusType',LocationManager.FnSaveStatusType);
 //below service are for EZEIDAP
 app.post('/ewLoginAP', LocationManager.FnLoginAP);
 app.get('/ewLogoutAP', LocationManager.FnLogoutAP);
