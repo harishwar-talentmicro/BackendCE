@@ -1198,3 +1198,34 @@ span.smallCloselink {
     right: 0;
     cursor: pointer;
 }
+
+.salesItemImage
+{
+    width: 6%;
+    margin-top: 1%;
+    margin-left: 2%;
+}
+.itemCombo
+{
+    width: 36%;
+    margin-top: 1.60%;
+    margin-left: 1%;
+}
+.plusMinusButton
+{
+    margin-left: 0.5%;
+    width: 4%;
+    margin-top: 1.60%;
+}
+.rateTextBox
+{
+    width: 7%;
+    margin-left: 1%;
+    margin-top: 1.60%;
+}
+.amountTextBox
+{
+    margin-left: 1%;
+    width: 22.5%;
+    margin-top: 1.60%;
+}

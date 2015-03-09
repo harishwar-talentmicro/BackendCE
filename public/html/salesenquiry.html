@@ -1,4 +1,4 @@
-<style type="text/css">
+<style type="text/css" xmlns="http://www.w3.org/1999/html">
     /* css for angular counter controller  */
     /* Styles used for the counter. */
     .counter-container .counter-minus, .counter-plus {
@@ -189,13 +189,12 @@
     <header-section></header-section>
 
     <!--popup for add new sales enquiry-->
-    <modal title="Sales Enquiry" visible="showModal">
+    <modal mtitle="modalTitle" visible="showModal">
       <form name="addSalesEnquiry" ng-submit="msglist.addSalesEnquiry()" novalidate>
         <div class="row">
             <div class="col-lg-12">
                 <ul class="pad0px">
                     <li class="dsp_block">
-
                        <div class="pull-left salesEnquiryFieldSize" style="margin-left: 5px;">
                             <input type="text" name="Requester" id="Requester" style='text-transform:uppercase' class="form-control user_input mar_leftInp " ng-model="msglist._info.Requester" placeholder="Requester"  />
                        </div>
@@ -209,8 +208,8 @@
                                     ng-options="status.TID as status.StatusTitle for status in msglist.Status" >
                                     <option value = ""> --Status-- </option>
                             </select>
-
                         </div>
+
                         <div class="pull-left marL10px salesEnquiryComboSize" style="margin-left: 2%;">
                             <select class="form-control" name="nextAction" ng-model="msglist._info.Rule"
                                     ng-options="status.TID as status.ActionTitle for status in msglist.Rule" >
@@ -230,11 +229,54 @@
                             <date-time-picker recipient="msglist._info.NextActionDate" style="padding-top: 4%;"></date-time-picker>
                         </div>
                         <div class="clearfix"></div>
+
+                        <div class="pull-left marL10px salesItemImage">
+                            <img src="../images/PPH_128.png"  height="48" width="48" class="">
+                        </div>
+                        <div class="pull-left marL10px itemCombo">
+                            <select class="form-control" name="nextAction" ng-model="msglist._info.NextAction"
+                                    ng-options="status.TID as status.ActionTitle for status in msglist.NextAction" >
+                                <option value = ""> --Choose item by Name-- </option>
+                            </select>
+                        </div>
+
+
+
+                        <div class="pull-left marL10px itemCombo" style="width: 4%;">
+                            <input type="button" class="btn btn-primary" ng-click="decriesTopQuantity()"  value="-"/>
+                        </div>
+                        <div class="pull-left marL10px plusMinusButton" style="margin-left: 0%;
+                            width: 6%; text-align: center;">
+                           <!-- <input type='text' name='qty' ng-model="quantity" ng-blur="addToItemList(_item.itemCheckBoxSelected, _item.TID, quantity, _item.Rate, quantity * _item.Rate)" style="text-align: center; width: 100%;-->
+                            <input type='text' name='qty' ng-model="quantity" style="text-align: center; width: 100%; height: 32px;" onkeypress="return isNumberKey(event);"/>
+                        </div>
+                        <div class="pull-left marL10px plusMinusButton">
+                             <input type="button" class="btn btn-primary" ng-click="increaseTopQuantity()" value="+"/>
+                        </div>
+                        <div class="pull-left marL10px rateTextBox">
+                            <input type='text' name='topRate' ng-model="rate" style="text-align: center; width: 100%;
+                                height: 32px;" onkeypress="return isNumberKey(event);"/>
+                        </div>
+                        <div class="pull-left marL10px amountTextBox">
+                           <input type='text' name='amount' style="width: 100%; height: 32px; text-align: right;" onkeypress="return isNumberKey(event);"/>
+                            <span>{{ quantity * rate }}</span>
+                        </div>
+                        <div class="pull-left marL10px" style="margin-top: 1.5%;">
+                            <button class="btn btn-sm btn-primary" ng-click="openModalBox(0)"><span class="glyphicon glyphicon-plus"></span> Add</button>
+                        </div>
+
+
+
+
+
+
+                        <div class="clearfix"></div>
                         <div class="pull-left marL10px" style="  width: 98%; padding-top: 2%; padding-bottom: 2%;" ng-show="showAddNoteBox">
                             <textarea class="form-control emptyBox" style="resize: none;" rows="4" cols="50" name="salesMessage" ng-model="msglist._info.salesMessage" placeholder="If No item than display this message box" required></textarea>
                         </div>
 
-                        <ul class="thumbnail-list" style="padding-left: 17px; font-size: 14px;" ng-hide="showAddNoteBox">
+                       <!-- <ul class="thumbnail-list" style="padding-left: 17px; font-size: 14px;" ng-hide="true">
+                       &lt;!&ndash; <ul class="thumbnail-list" style="padding-left: 17px; font-size: 14px;" ng-hide="showAddNoteBox">&ndash;&gt;
                             <li ng-repeat="_item in msglist.msgs" >
                                 <a href="#" class=""><img src="{{_item.Pic}}" class=""></a>
 
@@ -243,18 +285,19 @@
                                     <span style="margin-left: 1%;"> {{ _item.ItemName | limitTo: 12 }} {{_item.ItemName.length < 12 ? '' : '...'}} </span>
                                 </h4>
                                 <div class="product-price">
-                                    <div ng-show=" _item.itemCheckBoxSelected " style="width: 57%; float: left; text-decoration:none;" counter value="quantity1" min="0"></div>
-                                    <div ng-hide=" _item.itemCheckBoxSelected " style="width: 57%; float: left; text-decoration:none;" counter value="quantity0" min="0"></div>
-                                   <!-- <input type='text' name='rate' data-ng-model=" _item.Rate" value='{{ _item.Rate}}' class="rateBox" onkeypress="return isNumberKey(event);"/>-->
-                                    <input type='text' name='rate' value='{{_item.Rate}}' class="rateBox" onkeypress="return isNumberKey(event);"/>
+
+                                    <input type="button" class="btn btn-primary" ng-click="decriesQuantity(_item.itemQty,$index)"  value="-"/>
+                                    <input type='text' name='qty' ng-model="_item.itemQty"  ng-blur="addToItemList(_item.itemCheckBoxSelected, _item.TID, quantity, _item.Rate, quantity * _item.Rate)" class="rateBox" onkeypress="return isNumberKey(event);"/>
+                                    <input type="button" class="btn btn-primary" ng-click="increaseQuantity(_item.itemQty,$index)" value="+"/>
+
+                                    <input type='text' name='rate' ng-model="_item.Rate" value='{{_item.Rate}}' ng-blur="addToItemList(_item.itemCheckBoxSelected, _item.TID, quantity1, _item.Rate, quantity1 * _item.Rate)" class="rateBox" onkeypress="return isNumberKey(event);"/>
                                 </div>
                                 <div style="padding-top: 20%;">
                                     <span style="width: 31%; float: left;">Amount:</span>
-                                    <span  ng-show=" _item.itemCheckBoxSelected " style=" float: right;  width: 68%; text-align: right;">{{ quantity1 * _item.Rate }}</span>
-                                    <span ng-hide=" _item.itemCheckBoxSelected " style=" float: right;  width: 68%; text-align: right;">{{ quantity0 * _item.Rate }}</span>
+                                    <span style=" float: right; width: 68%; text-align: right;">{{ _item.itemQty * _item.Rate }}</span>
                                 </div>
                             </li>
-                        </ul>
+                        </ul>-->
                     </li>
                 </ul>
             </div>
@@ -313,7 +356,7 @@
     </modal>
 
     <!--popup for Title -->
-    <modal title="Sales Enquiry" visible="showModalTitle">
+ <!--   <modal title="Sales Enquiry" visible="showModalTitle">
         <form name="addSalesEnquiry" novalidate>
             <div class="row">
                 <div class="col-lg-12">
@@ -328,7 +371,7 @@
 
                                         <div style="width: 57%; float: left; text-decoration:none;" counter value="quantity1" min="0"></div>
                                         <input type='text' name='rate'  value='{{ Rate1}}' class="rateBox"/>
-                                        <!-- <span >{{ Rate1}}</span>-->
+                                        &lt;!&ndash; <span >{{ Rate1}}</span>&ndash;&gt;
                                     </div>
                                     <div style="padding-top: 20%;">
                                         <span >Amount: {{ quantity1 * Rate1 }}</span>
@@ -342,7 +385,7 @@
 
                                         <div style="width: 57%; float: left; text-decoration:none;" counter value="quantity1" min="0"></div>
                                         <input type='text' name='rate'  value='{{ Rate1}}' class="rateBox" readonly/>
-                                        <!-- <span >{{ Rate1}}</span>-->
+                                        &lt;!&ndash; <span >{{ Rate1}}</span>&ndash;&gt;
                                     </div>
                                     <div style="padding-top: 20%;">
                                         <span >Amount: {{ quantity1 * Rate1 }}</span>
@@ -356,7 +399,7 @@
 
                                         <div style="width: 57%; float: left; text-decoration:none;" counter value="quantity1" min="0"></div>
                                         <input type='text' name='rate'  value='{{ Rate1}}' class="rateBox" readonly/>
-                                        <!-- <span >{{ Rate1}}</span>-->
+                                        &lt;!&ndash; <span >{{ Rate1}}</span>&ndash;&gt;
                                     </div>
                                     <div style="padding-top: 20%;">
                                         <span >Amount: {{ quantity1 * Rate1 }}</span>
@@ -370,7 +413,7 @@
 
                                         <div style="width: 57%; float: left; text-decoration:none;" counter value="quantity1" min="0"></div>
                                         <input type='text' name='rate'  value='{{ Rate1}}' class="rateBox" readonly/>
-                                        <!-- <span >{{ Rate1}}</span>-->
+                                        &lt;!&ndash; <span >{{ Rate1}}</span>&ndash;&gt;
                                     </div>
                                     <div style="padding-top: 20%;">
                                         <span >Amount: {{ quantity1 * Rate1 }}</span>
@@ -391,7 +434,7 @@
             </div>
         </form>
     </modal>
-
+-->
     <div class="container" style="padding-top:90px; position:relative;">
         <!-- Example row of columns -->
         <div class="row">
