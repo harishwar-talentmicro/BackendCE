@@ -5786,6 +5786,157 @@ exports.FnSaveActionType = function(req, res){
     }
 };
 
+exports.FnItemList = function (req, res) {
+    try {
+
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.query.Token;
+        var MasterID = req.query.MasterID;
+        var FunctionType = req.query.FunctionType;
+
+        if (Token != null && MasterID != null && FunctionType != null) {
+            FnValidateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+
+                        db.query('CALL pItemList(' + db.escape(MasterID) + ',' + db.escape(FunctionType) + ')', function (err, GetResult) {
+                            if (!err) {
+                                if (GetResult != null) {
+                                    if (GetResult[0].length > 0) {
+                                        console.log('FnItemList: Item list details Send successfully');
+                                        res.send(GetResult[0]);
+                                    }
+                                    else {
+
+                                        console.log('FnGetItemList:No Item list details found');
+                                        res.send('null');
+                                    }
+                                }
+                                else {
+
+                                    console.log('FnGetItemList:No Item list details found');
+                                    res.send('null');
+                                }
+                            }
+                            else {
+
+                                console.log('FnGetItemList: error in getting Item list details' + err);
+                                res.statusCode = 500;
+                                res.send('null');
+                            }
+                        });
+                    }
+                    else {
+                        res.statusCode = 401;
+                        res.send('null');
+                        console.log('FnGetItemList: Invalid Token');
+                    }
+                } else {
+
+                    res.statusCode = 500;
+                    res.send('null');
+                    console.log('FnGetItemList: Error in validating token:  ' + err);
+                }
+            });
+        }
+        else {
+            if (Token == null) {
+                console.log('FnGetItemList: Token is empty');
+            }
+            else if (MasterID == null) {
+                console.log('FnGetItemList: MasterID is empty');
+            }
+            else if (FunctionType == null) {
+                console.log('FnGetItemList: FunctionType is empty');
+            }
+            res.statusCode=400;
+            res.send('null');
+        }
+    }
+    catch (ex) {
+        console.log('FnGetItemList error:' + ex.description);
+        throw new Error(ex);
+    }
+};
+
+exports.FnItemDetails = function (req, res) {
+    try {
+
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.query.Token;
+        var MasterID = req.query.MasterID;
+       
+
+        if (Token != null && MasterID != null) {
+            FnValidateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+
+                        db.query('CALL pItemDetails(' + db.escape(MasterID) + ')', function (err, GetResult) {
+                            if (!err) {
+                                if (GetResult != null) {
+                                    if (GetResult[0].length > 0) {
+                                        console.log('FnItemDetails: Item list details Send successfully');
+                                        res.send(GetResult[0]);
+                                    }
+                                    else {
+
+                                        console.log('FnItemDetails:No Item list details found');
+                                        res.send('null');
+                                    }
+                                }
+                                else {
+
+                                    console.log('FnItemDetails:No Item list details found');
+                                    res.send('null');
+                                }
+                            }
+                            else {
+
+                                console.log('FnItemDetails: error in getting Item list details' + err);
+                                res.statusCode = 500;
+                                res.send('null');
+                            }
+                        });
+                    }
+                    else {
+                        res.statusCode = 401;
+                        res.send('null');
+                        console.log('FnItemDetails: Invalid Token');
+                    }
+                } else {
+
+                    res.statusCode = 500;
+                    res.send('null');
+                    console.log('FnItemDetails: Error in validating token:  ' + err);
+                }
+            });
+        }
+        else {
+            if (Token == null) {
+                console.log('FnItemDetails: Token is empty');
+            }
+            else if (MasterID == null) {
+                console.log('FnItemDetails: MasterID is empty');
+            }
+           
+            res.statusCode=400;
+            res.send('null');
+        }
+    }
+    catch (ex) {
+        console.log('FnItemDetails error:' + ex.description);
+        throw new Error(ex);
+    }
+};
+
+
+
+
 //EZEIDAP Parts
 
 //app part
