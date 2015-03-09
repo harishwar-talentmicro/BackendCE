@@ -132,6 +132,7 @@ angular.module('ezeidApp').controller('ItemMasterCtrl',['$q','$scope','$interval
            data : data
        }).success(function(resp){
            console.log(resp);
+               //@todo Notification Message for saving Item
        }).error(function(err){
 
        });
