@@ -139,7 +139,6 @@ angular.module('ezeidApp').controller('salesenquiryController', function($http, 
                }
                else
                {
-                   console.log("Sai2");
                    //show Add Note text area
                   //$scope.showAddNoteBox = true;
                    $scope.showAddNoteBox = false;
