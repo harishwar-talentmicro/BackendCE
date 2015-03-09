@@ -3,6 +3,7 @@ angular.module('ezeidApp').controller('salesenquiryController', function($http, 
     var msglist = this;
     msglist._info={};
     msglist.msgs = [];
+    var itemList  = [];
     var MsgDelay = 2000;
     msglist._info.StatusFilter = 1;
 
@@ -83,8 +84,13 @@ angular.module('ezeidApp').controller('salesenquiryController', function($http, 
         $('#datetimepicker1').trigger('focus');
     });
 
-    $scope.quantity0 = 0;
-    $scope.quantity1 = 1;
+    $scope.quantity = 0;
+    $scope.rate = 0;
+   /* $scope.amount = $scope.quantity * $scope.rate;*/
+
+
+    /*$scope.quantity0 = 0;
+    $scope.quantity1 = 1;*/
 
     $scope.toggleModal = function(){
         getItemList();
@@ -116,21 +122,23 @@ angular.module('ezeidApp').controller('salesenquiryController', function($http, 
     function getItemList() {
        $http({
             method: 'get',
-            url: GURL + 'ewtGetItemList?Token=' + $rootScope._userInfo.Token+ '&MasterID=251&FunctionType=0'
+            url: GURL + 'ewtItemList?Token=' + $rootScope._userInfo.Token+ '&MasterID=251&FunctionType=0'
         }).success(function (data) {
+            //   console.log(data);
                console.log(data);
                if (data != 'null') {
 
-                   for (var i = 0; i < data.length; i++) {
+
+                  /* for (var i = 0; i < data.length; i++) {
                        data[i].itemCheckBoxSelected = false;
+                       data[i].itemQty = 0;
                        msglist.msgs.push(data[i]);
-                   }
-                   msglist.msgs = data;
+                   }*/
+                   msglist.itemList = data;
                    $scope.showAddNoteBox = false;
                }
                else
                {
-                   console.log("Sai2");
                    //show Add Note text area
                   //$scope.showAddNoteBox = true;
                    $scope.showAddNoteBox = false;
@@ -139,26 +147,79 @@ angular.module('ezeidApp').controller('salesenquiryController', function($http, 
             });
     }
 
+    //add remove item to array on change of check box
+    $scope.addToItemList = function(_checked, tID, quantity, rate, amount){
+
+         itemList[tID] = {
+            quantity : quantity,
+            rate : rate,
+            amount : amount
+        };
+
+        console.log(itemList);
+     };
+
+    //deacrease Top quantitiy
+    $scope.decriesTopQuantity = function(){
+
+        if($scope.quantity != 0)
+        {
+            $scope.quantity = $scope.quantity - 1;
+        }
+    };
+
+    //increase Top quantitiy
+    $scope.increaseTopQuantity = function(){
+
+        $scope.quantity = $scope.quantity + 1;
+            };
+
+
+
+    //deacrease quantitiy
+    $scope.decriesQuantity = function(qty, index){
+
+        if(qty != 0)
+        {
+            qty = qty - 1;
+            msglist.msgs[index].itemQty = qty;
+        }
+    };
+
+    //increase quantitiy
+    $scope.increaseQuantity = function(qty, index){
+        qty = qty + 1;
+        msglist.msgs[index].itemQty = qty;
+    };
+
     //Add Sales Enquiry
-    msglist.addSalesEnquiry = function () {
-        if ($rootScope._userInfo.IsAuthenticate == true) {
+    msglist.addSalesEnquiry = function (event) {
+
+
+        console.log(msglist._info);
+       /* var elem = $(event.currentTarget);
+        console.log(elem.data('itemName'));
+        console.log(elem.data('itemQty'));
+        console.log(elem.data('itemRate'));*/
+
+       /* if ($rootScope._userInfo.IsAuthenticate == true) {
             var currentTaskDate = moment().format('DD-MMM-YYYY hh:mm A');
             $http({ method: 'post', url: GURL + 'ewtSaveTranscationItems', data: { Token: $rootScope._userInfo.Token, MessageID: 251, ItemID: 1, Qty: 2, Rate: 5, Amount :10,Duration: 2 } }).success(function (data) {
              //   console.log(data);
-                /*if (data.IsSuccessfull) {
+                *//*if (data.IsSuccessfull) {
                     $('#SalesEnquiryRequest_popup').slideUp();
                     SearchSec.salesMessage = "";
                     Notification.success({ message: 'Message send success', delay: MsgDelay });
                 }
                 else {
                     Notification.error({ message: 'Sorry..! Message not send ', delay: MsgDelay });
-                }*/
+                }*//*
             });
         }
         else {
             //Redirect to Login page
             $('#SignIn_popup').slideDown();
-        }
+        }*/
     };
 
 
@@ -329,4 +390,5 @@ angular.module('ezeidApp').controller('salesenquiryController', function($http, 
             navigator.geolocation.getCurrentPosition(FindCurrentLocation);
         }
     };
+    $scope.modalTitle = "Sales Item";
 });
