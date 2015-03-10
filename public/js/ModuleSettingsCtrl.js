@@ -106,7 +106,7 @@ angular.module('ezeidApp').controller('ModuleSettingsCtrl',['$q','$scope','$inte
 
 
     //@todo write method for brochure base64 conversion and upload option( in HTML view also)
-
+    //@todo Separate call is present for File upload(already separate API Service is present for file upload)
 
 
 }]);
