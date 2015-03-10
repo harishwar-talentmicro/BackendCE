@@ -230,45 +230,60 @@
                         </div>
                         <div class="clearfix"></div>
 
+
+
+
+
                         <div class="pull-left marL10px salesItemImage">
-                            <img src="../images/PPH_128.png"  height="48" width="48" class="">
+                            <img ng-hide="itemImage" src="../images/PPH_128.png"  height="32" width="32" class="">
+                            <img ng-show="itemImage" src="{{itemImage}}"  height="48" width="48" class="">
+
                         </div>
                         <div class="pull-left marL10px itemCombo">
-                            <select class="form-control" name="nextAction" ng-model="msglist._info.NextAction"
-                                    ng-options="status.TID as status.ActionTitle for status in msglist.NextAction" >
+                            <select class="form-control" name="selectItem" ng-model="SelectedItemTid"
+                                    ng-change="getItemDetails(SelectedItemTid)"
+                                    ng-options="status.TID as status.ItemName for status in msglist.itemList" >
                                 <option value = ""> --Choose item by Name-- </option>
                             </select>
                         </div>
-
-
-
                         <div class="pull-left marL10px itemCombo" style="width: 4%;">
                             <input type="button" class="btn btn-primary" ng-click="decriesTopQuantity()"  value="-"/>
                         </div>
-                        <div class="pull-left marL10px plusMinusButton" style="margin-left: 0%;
-                            width: 6%; text-align: center;">
-                           <!-- <input type='text' name='qty' ng-model="quantity" ng-blur="addToItemList(_item.itemCheckBoxSelected, _item.TID, quantity, _item.Rate, quantity * _item.Rate)" style="text-align: center; width: 100%;-->
-                            <input type='text' name='qty' ng-model="quantity" style="text-align: center; width: 100%; height: 32px;" onkeypress="return isNumberKey(event);"/>
+                        <div class="pull-left marL10px plusMinusButton" style="margin-left: 0%; width: 6%; text-align: center;">
+                            <input type='text' name='qty' ng-model="quantity" style="text-align: center; width: 100%; height: 32px;"/>
                         </div>
                         <div class="pull-left marL10px plusMinusButton">
                              <input type="button" class="btn btn-primary" ng-click="increaseTopQuantity()" value="+"/>
                         </div>
                         <div class="pull-left marL10px rateTextBox">
                             <input type='text' name='topRate' ng-model="rate" style="text-align: center; width: 100%;
-                                height: 32px;" onkeypress="return isNumberKey(event);"/>
+                                height: 32px;" ng-blur="addToItemList(quantity, rate, quantity * rate)" />
                         </div>
                         <div class="pull-left marL10px amountTextBox">
-                           <input type='text' name='amount' style="width: 100%; height: 32px; text-align: right;" onkeypress="return isNumberKey(event);"/>
-                            <span>{{ quantity * rate }}</span>
+                            <input type='text' name='amount' ng-value="(quantity * rate)+'.00'" style="width: 100%; height: 32px; text-align: right;" />
                         </div>
                         <div class="pull-left marL10px" style="margin-top: 1.5%;">
-                            <button class="btn btn-sm btn-primary" ng-click="openModalBox(0)"><span class="glyphicon glyphicon-plus"></span> Add</button>
+                            <button class="btn btn-sm btn-primary" ng-click="addItemToList()"><span class="glyphicon glyphicon-plus"></span> Add</button>
                         </div>
 
-
-
-
-
+                        <table  class="table table-striped ezeid-table" style="margin-top: 8%;">
+                            <thead>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="_item in msglist.selectMsgs">
+                                    <td> <img src="{{_item.Picture}}"  height="32" width="32"> </td>
+                                    <td> {{ _item.ItemName}}</td>
+                                    <td>
+                                            <input type="button" class="btn btn-primary" ng-click="decriesTopQuantity()"  value="-"/>
+                                            <input type='text' name='qty' ng-model="quantity" style="text-align: center; width: 11%; height: 32px;"/>
+                                            <input type="button" class="btn btn-primary" ng-click="increaseTopQuantity()" value="+"/>
+                                    </td>
+                                    <td><a class="btn-link">{{ _item.Rate}}</a></td>
+                                    <td><a class="btn-link"> {{ quantity * quantity }} </a></td>
+                                    <td> <input type="button" class="btn btn-primary" ng-click="decriesTopQuantity()"  value="Delete"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
 
                         <div class="clearfix"></div>
                         <div class="pull-left marL10px" style="  width: 98%; padding-top: 2%; padding-bottom: 2%;" ng-show="showAddNoteBox">
