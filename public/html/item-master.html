@@ -158,9 +158,9 @@
                                 </div>
                             </div>
 
-                            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+                            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix" ng-show="(globalConfig.itemListType[modalBox.item.type] >= 3)">
                                 <div class="form-group">
-                                    <input class="form-control" numbers-only placeholder="Item Rate" ng-model="modalBox.item.rate" id="item-rate"/>
+                                    <input class="form-control" numbers-only placeholder="Item Quantity" ng-model="modalBox.item.qty" id="item-qty"/>
                                 </div>
                             </div>
                             <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
@@ -175,17 +175,22 @@
                         <div class="row">
 
 
-                            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+                            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix" ng-show="(globalConfig.itemListType[modalBox.item.type] >= 3)">
                                 <div class="form-group">
-                                    <textarea class="form-control" id="item-desc" ng-model="modalBox.item.description" placeholder="Item Description"></textarea>
+                                    <input class="form-control" numbers-only placeholder="Item Rate" ng-model="modalBox.item.rate" id="item-rate"/>
                                 </div>
                             </div>
-                            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-cleafix">
+                            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-cleafix" ng-show="(globalConfig.itemListType[modalBox.item.type] >= 3)">
                                 <div class="thumbnail">
                                     <button class="btn btn-xs btn-primary btn-icon" ng-click="selectPicture()">
                                         <span class="glyphicon glyphicon-paperclip"  data-toggle="tooltip" title="Attach Item Picture" data-placement="right"></span>
                                     </button>
                                     <img ng-src="{{modalBox.item.picture}}" alt="Item Picture"/>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+                                <div class="form-group">
+                                    <textarea class="form-control" id="item-desc" ng-model="modalBox.item.description" placeholder="Item Description"></textarea>
                                 </div>
                             </div>
                         </div>
@@ -203,6 +208,74 @@
         </modal>
         <!------------ Modal Box starts here -------------------------->
 
+        <!-------------------------------- Templates for Item List Types ----------------------------------------->
+        <!---------- Only message template --------------------------->
+        <script type="text/ng-template" id="/only-message-tpl.html">
+            <p class="text-center text-danger">Your list type is only message. Therefore, no item could be added</p>
+        </script>
+        <!---------- Only item template --------------------------->
+        <script type="text/ng-template" id="/only-item-tpl.html">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12 bottom-clearfix">
+                <div class="business-item">
+                    <div class="thumbnail">
+                        <span class="glyphicon glyphicon-edit" data-toggle="tooltip" title="" data-placement="right" data-original-title="Edit Item"></span>
+                        <div class="caption">
+                            <h4 class="text-primary">Item Title <span class="glyphicon glyphicon-ok-circle text-success" data-toggle="tooltip" title="" data-placement="right" data-original-title="Item Status"></span> </h4>
+                            <p>This is item description</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </script>
+        <!---------- Item and picture template --------------------------->
+        <script type="text/ng-template" id="/item-picture-tpl.html">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12 bottom-clearfix">
+                <div class="business-item">
+                    <div class="thumbnail">
+                        <span class="glyphicon glyphicon-edit" data-toggle="tooltip" title="" data-placement="right" data-original-title="Edit Item"></span>
+                        <img ng-src="images/sample_96.png">
+                        <div class="caption">
+                            <h4 class="text-primary">Item Title <span class="glyphicon glyphicon-ok-circle text-success" data-toggle="tooltip" title="" data-placement="right" data-original-title="Item Status"></span> </h4>
+                            <p>This is item description</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </script>
+        <!---------- Item picture quantity template --------------------------->
+        <script type="text/ng-template" id="/item-picture-qty-tpl.html">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12 bottom-clearfix">
+                <div class="business-item">
+                    <div class="thumbnail">
+                        <span class="glyphicon glyphicon-edit" data-toggle="tooltip" title="" data-placement="right" data-original-title="Edit Item"></span>
+                        <img src="images/sample_96.png">
+                        <div class="caption">
+                            <h4 class="text-primary">Item Title <span class="glyphicon glyphicon-ok-circle text-success" data-toggle="tooltip" title="" data-placement="right" data-original-title="Item Status"></span> </h4>
+                            <p class="text-primary">Quantity : 100 pieces</p>
+                            <p>This is item description</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </script>
+        <!---------- Item picture, quantity and rate template --------------------------->
+        <script type="text/ng-template" id="/item-picture-qty-rate-tpl.html">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12 bottom-clearfix">
+                <div class="business-item">
+                    <div class="thumbnail">
+                        <span class="glyphicon glyphicon-edit" data-toggle="tooltip" title="" data-placement="right" data-original-title="Edit Item"></span>
+                        <img src="images/sample_96.png">
+                        <div class="caption">
+                            <h4 class="text-primary">Item Title <span class="glyphicon glyphicon-ok-circle text-success" data-toggle="tooltip" title="" data-placement="right" data-original-title="Item Status"></span> </h4>
+                            <p class="text-primary">Quantity : 100 pieces</p>
+                            <p class="text-primary">Rate : 1000/-</p>
+                            <p>This is item description</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </script>
+        <!--------------------------- Templates for Item List Types ends here ------------------------------------>
 
     </div>
 </div>

@@ -1262,3 +1262,7 @@ span.smallCloselink {
 .ezeid-circle .active{
     background: #37CC35;
 }
+
+.no-radius{
+    border-radius: 0px;
+}

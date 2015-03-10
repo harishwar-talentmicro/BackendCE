@@ -6,6 +6,35 @@ angular.module('ezeidApp').controller('ItemMasterCtrl',['$q','$scope','$interval
     $scope.selectedTab = 1;
     $scope.defaultPicture = 'images/sample_96.png';
 
+    /**
+     * Settings to be fetched from Global Configuration
+     * @todo Fetch from global Configuration
+     * @type {Array}
+     *
+     */
+    $scope.globalConfig = {
+        itemListType : [
+        2,          // Sales itemListType
+        0,          // Reservation DisplayFormat  (Minutes)
+        4,          // HomeDelivery itemListType
+        1,          // Service itemListType (Hardcoded as it will always be an item only with description)
+        1           // Resume itemListType (Hardcoded as resume will always be having Item only with description)
+    ]};
+
+    /**
+     * Templates to select based on list type(HTML Templates using ng-template)
+     * @type {Array}
+     */
+    $scope.listTypeTemplates = [
+        '/only-message-tpl.html',
+        '/only-item-tpl.html',
+        '/item-picture-tpl.html',
+        '/item-picture-qty-tpl.html',
+        '/item-picture-qty-rate-tpl.html'
+    ];
+
+
+
     // Item types (functionTypes) available to the system
     $scope.itemTypes = [
         'Sales',
@@ -13,7 +42,7 @@ angular.module('ezeidApp').controller('ItemMasterCtrl',['$q','$scope','$interval
         'Home Delivery',
         'Service',
         'Resume'
-    ]
+    ];
 
 
     $scope.modalBox = {

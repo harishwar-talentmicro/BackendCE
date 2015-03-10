@@ -1,4 +1,7 @@
 angular.module('ezeidApp').controller('ModuleSettingsCtrl',['$q','$scope','$interval','$http','Notification','$rootScope','$filter',function($q,$scope,$interval,$http,Notification,$rootScope,$filter){
+    $scope.inactiveBrochureImage = 'images/brochure-absent.png';
+    $scope.activeBrochureImage = 'images/brochure-present.png';
+    $scope.brochureImage = 'images/brochure-present.png';
     /**
      * Data Refresh Interval List
      * (Automatic Generation)
@@ -56,29 +59,34 @@ angular.module('ezeidApp').controller('ModuleSettingsCtrl',['$q','$scope','$inte
     $scope.settings = {
         sales : {
             title : '',
+            defaultFormMsg : '',
             accessRight : 0,
             itemListType : 0       // 0: Message, 1: Item, 2: Item+picture, 3: Item+picture+quantity, 4: Item + picture + quantity + rate
 
         },
         reservation : {
             title : '',
+            defaultFormMsg : '',
             accessRight : 0,
             displayFormat : 0 // 0 : Hours (30 min slot), 1 : Days, 2 : Months
         },
         homeDelivery : {
             title : '',
+            defaultFormMsg : '',
             accessRight : 0,
             itemListType : 1
 
         },
         service : {
             title : '',
+            defaultFormMsg : '',
             accessRight : 0,
             itemListType : 1
 
         },
         resume : {
             title : '',
+            defaultFormMsg : '',
             accessRight : 0,
             itemListType : 1,    //Hardcoded, will always be an item only
             keywords : ""
@@ -104,6 +112,32 @@ angular.module('ezeidApp').controller('ModuleSettingsCtrl',['$q','$scope','$inte
         //@todo call service to save settings
     };
 
+    $scope.uploadBrochure = function(){
+        //@todo Write code for brochure upload
+    };
+
+
+    $scope.selectBrochure = function(){
+        $("#brochure-file-upload").trigger('click');
+    };
+
+    $scope.loadCategories = function(){
+        $http({
+            url : '/ewmGetCategory',
+            method : "GET",
+            params : {
+                LangID : 1
+            }
+        }).success(function(resp){
+                if(resp && resp.length>0){
+                    $scope.business.categories = resp;
+                }
+            }).error(function(err){
+
+            });
+    };
+
+    $scope.loadCategories();
 
     //@todo write method for brochure base64 conversion and upload option( in HTML view also)
     //@todo Separate call is present for File upload(already separate API Service is present for file upload)
