@@ -5054,7 +5054,7 @@ exports.FnSaveItem = function(req, res){
         console.log('FnSaveItem:error ' + ex.description);
         throw new Error(ex);
     }
-}
+};
 
 exports.FnCreateSubUser = function(req, res){
     try{
@@ -5091,7 +5091,7 @@ exports.FnCreateSubUser = function(req, res){
         FnValidateToken(Token, function (err, Result) {
             if (!err) {
                 if (Result != null) {
-                console.log(Result);
+                    console.log(Result);
                     var query = db.escape(Token) + ',' + db.escape(TID) + ',' + db.escape(UserName) + ',' +db.escape(Status) + ',' +db.escape(FirstName) + ',' +db.escape(LastName)
                         + ',' + db.escape(AccessRights) + ',' + db.escape(SalesEmail) + ',' + db.escape(ReservationEmail) + ',' +db.escape(HomeDeliveryEmail)
                         + ',' + db.escape(ServiceEmail) + ',' + db.escape(ResumeEmail) + ',' + db.escape(SalesRules) + ',' +db.escape(ReservationRules)
@@ -5152,7 +5152,6 @@ exports.FnCreateSubUser = function(req, res){
         throw new Error(ex);
     }
 }
-
 //below method get sub user list
 exports.FnGetSubUserList = function (req, res) {
     try {

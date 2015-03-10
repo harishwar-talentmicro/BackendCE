@@ -11,8 +11,9 @@ angular.module('ezeidApp').controller('PreferenceNavigationCtrl',['$scope','$roo
     $scope.pageWorkingHours = "html/working-hours.html";
     $scope.pageHolidayCalender = "html/holiday-calender.html";
     $scope.pageBusinessListing = "html/business-listing.html";
+    $scope.pageModuleSettings = "html/module-settings.html";
 
-    $scope.activeTemplate = $scope.pageSubuser;
+    $scope.activeTemplate = $scope.pageModuleSettings;
 
     $scope.changeActive = function(active){
       $scope.activeTemplate = active;
