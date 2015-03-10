@@ -81,14 +81,37 @@ angular.module('ezeidApp').controller('ItemMasterCtrl',['$q','$scope','$interval
 
     //Open Modal box for user
     $scope.showModal = false;
-    $scope.openModalBox = function(type,event){
+    $scope.toggleModalBox = function(type,event){
         if(event){
             //@todo Handle editing and updating of items here
         }
+
+        $scope.resetModalData();
+
         $scope.modalBox.item.type = type;
         $scope.showModal = !$scope.showModal;
     };
 
+    $scope.resetModalData = function(){
+        $scope.modalBox = {
+            title : "Add New Item",
+                item : {
+                TID : 0,
+                    title : "",
+                    rate : "",
+                    status : 2,
+                    description : "",
+                    picture : $scope.defaultPicture,
+                    type : 0,    // Type of Item(Function Type) Sales,Reservation,Home Delivery, Service, Resume
+                    duration : null
+            }
+        }
+    };
+
+    /**
+     * Convert picture to base64 and scales it, after scale assign it to picture
+     * @param el
+     */
     $scope.uploadPicture = function(el){
         var elem = $(el);
         var imageFile = angular.element(elem)[0].files;

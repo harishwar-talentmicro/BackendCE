@@ -5051,7 +5051,7 @@ exports.FnSaveItem = function(req, res){
         console.log('FnSaveItem:error ' + ex.description);
         throw new Error(ex);
     }
-}
+};
 
 exports.FnCreateSubUser = function(req, res){
     try{
@@ -5078,7 +5078,8 @@ exports.FnCreateSubUser = function(req, res){
         var MasterID = req.body.PersonalID;
 
         var RtnMessage = {
-            IsSuccessfull: false
+            IsSuccessfull: false,
+            TID: 0
         };
 
         /*if (Token!= null && TID!= null && UserName!= null  && Status!= null && FirstName != null && LastName !=null && AccessRights !=null && SalesEmail != null
@@ -5087,7 +5088,7 @@ exports.FnCreateSubUser = function(req, res){
         FnValidateToken(Token, function (err, Result) {
             if (!err) {
                 if (Result != null) {
-                console.log(Result);
+                    console.log(Result);
                     var query = db.escape(Token) + ',' + db.escape(TID) + ',' + db.escape(UserName) + ',' +db.escape(Status) + ',' +db.escape(FirstName) + ',' +db.escape(LastName)
                         + ',' + db.escape(AccessRights) + ',' + db.escape(SalesEmail) + ',' + db.escape(ReservationEmail) + ',' +db.escape(HomeDeliveryEmail)
                         + ',' + db.escape(ServiceEmail) + ',' + db.escape(ResumeEmail) + ',' + db.escape(SalesRules) + ',' +db.escape(ReservationRules)
@@ -5095,7 +5096,6 @@ exports.FnCreateSubUser = function(req, res){
                     console.log(query);
                     db.query('CALL pCreateSubUser(' + query + ')', function (err, InsertResult) {
                         if (!err){
-                            console.log(InsertResult);
                             if (InsertResult[0] != null )
                             {
                                 if(InsertResult[0].length > 0)
@@ -5104,6 +5104,7 @@ exports.FnCreateSubUser = function(req, res){
                                     if(Result[0].RowAffected == 1)
                                     {
                                         RtnMessage.IsSuccessfull = true;
+                                        RtnMessage.TID = Result[0].TID;
                                         res.send(RtnMessage);
                                         console.log('FnCreateSubUser: Sub User details save successfully');}
                                     else
@@ -5148,7 +5149,6 @@ exports.FnCreateSubUser = function(req, res){
         throw new Error(ex);
     }
 }
-
 //below method get sub user list
 exports.FnGetSubUserList = function (req, res) {
     try {
