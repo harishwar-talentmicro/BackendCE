@@ -154,6 +154,9 @@
             replace:true,
             scope:true,
             link: function postLink(scope, element, attrs) {
+
+
+
                 scope.mtitle = attrs.mtitle;
                 scope.$watch(attrs.visible, function(value){
                     if(value == true)
