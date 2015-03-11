@@ -3,7 +3,7 @@
  */
 
 
-angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$http','Notification','$filter','MsgDelay',function($scope,$rootScope,$http,Notification,$filter,MsgDelay){
+angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$http','Notification','$filter','MsgDelay','$interval',function($scope,$rootScope,$http,Notification,$filter,MsgDelay,$interval){
     $(document).on('click','.popover-close',function(){
         $('*[data-toggle="popover"]').popover('hide');
     });
@@ -65,68 +65,9 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$htt
 
     /**
      * Subuser list (to be replaced with data from server)
-     * @todo load it from server and assign to this model
      * @type {Array}
      */
-    $scope.subusers = [
-    /**
-     * Dummy Data
-     */
-//        {
-//            userName : 'INDRA',
-//            TID : 25,
-//            ezeid : 'indra',
-//            firstName : "Indra Jeet",
-//            lastName : "Nagda",
-//            accessRights : {
-//                'sales' : 3,
-//                'reservation' : 1,
-//                'homeDelivery' : 3,
-//                'service' : 1,
-//                'resume' : 1
-//            },
-//            rules : {
-//                sales : [3,0,5],
-//                reservation : [2,1,5],
-//                homeDelivery : [1,4],
-//                service : [3,1],
-//                resume : [2,5]
-//            },
-//            status : 2,
-//            salesEmail : "indra.sales@hirecraft.in",
-//            reservationEmail : "indra.reservation@hirecraft.in",
-//            homeDelivery : "indra.hd@hirecraft.in",
-//            serviceEmail : "indra.srv@hirecraft.in",
-//            resumeEmail : "indra.cv@hirecraft.in"
-//        },
-//        {
-//            userName : 'KRUNL',
-//            ezeid : 'krunal11',
-//            TID : 42,
-//            firstName : "Krunal",
-//            lastName : "Patel",
-//            accessRights : {
-//                'sales' : 3,
-//                'reservation' : 3,
-//                'homeDelivery' : 3,
-//                'service' : 1,
-//                'resume' : 1
-//            },
-//            rules : {
-//                sales : [1,2,5],
-//                reservation : [1,3,5],
-//                homeDelivery : [0,2,5],
-//                service : [1,3],
-//                resume : [0,4]
-//            },
-//            status : 1,
-//            salesEmail : "kruanl.sales@hirecraft.in",
-//            reservationEmail : "krunal.reservation@hirecraft.in",
-//            homeDelivery : "krunal.hd@hirecraft.in",
-//            serviceEmail : "krunal.srv@hirecraft.in",
-//            resumeEmail : "krunal.cv@hirecraft.in"
-//        }
-    ];
+    $scope.subusers = [];
 
     /**
      * Modal Box with empty data
@@ -134,6 +75,7 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$htt
      */
     $scope.modalBox = {
         title : "Add new subuser",
+        userIndex : null,
         ezeidExists : false,        // If this EZEID is already in subuser list(while editing the subusers)
         availabilityCheck : false,  //If checked the availability of EZEID or not
         isEzeidAvailable : false,   // Shows that EZEID exists or not
@@ -156,7 +98,7 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$htt
                 service : [],
                 resume : []
             },
-            status : 1,
+            status : 2,
             salesEmail : "",
             reservationEmail : "",
             homeDeliveryEmail : "",
@@ -167,10 +109,11 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$htt
 
     //Open Modal box for user
     $scope.showModal = false;
-    $scope.openModalBox = function(event){
+    $scope.toggleModalBox = function(event){
         if(event){
             var element = event.currentTarget;
             var userIndex = $(element).data('index');
+            $scope.modalBox.userIndex = userIndex;
             $scope.modalBox.subuser = $scope.subusers[userIndex];
             $scope.modalBox.title = "Update Subuser";
             $scope.modalBox.ezeidExists = true;
@@ -178,8 +121,7 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$htt
             var callback = function(){
                 $scope.modalBox.subuser = $scope.subusers[userIndex];
             };
-            $scope.checkAvailability(callback());
-
+            $scope.checkAvailability(callback);
         }
         else{
             $scope.resetModalData();
@@ -194,6 +136,7 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$htt
     $scope.resetModalData = function(){
         $scope.modalBox = {
             title : "Add new subuser",
+            userIndex : null,
             ezeidExists : false,        // If subuser creation is new then false else true for updating user
             availabilityCheck : false,  //If checked the availability of EZEID or not
             isEzeidAvailable : false,   // Status of EZEID exists or not after checking availability
@@ -216,7 +159,7 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$htt
                     service : [],
                     resume : []
                 },
-                status : 1,
+                status : 2,
                 salesEmail : "",
                 reservationEmail : "",
                 homeDeliveryEmail : "",
@@ -235,15 +178,16 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$htt
             },
             method : "GET"
         }).success(function(resp){
-                console.log(JSON.stringify(resp));
                 if(resp.length > 0){
                     if(resp[0].hasOwnProperty('TID')){
                         $scope.modalBox.isEzeidAvailable = true;
-                        $scope.modalBox.PersonalID = resp[0].TID;
-                        $scope.modalBox.subuser.firstName = resp[0].FirstName;
-                        $scope.modalBox.subuser.lastName = resp[0].LastName;
                         if(typeof(callback) !== "undefined"){
                             callback();
+                        }
+                        else{
+                            $scope.modalBox.PersonalID = resp[0].TID;
+                            $scope.modalBox.subuser.firstName = resp[0].FirstName;
+                            $scope.modalBox.subuser.lastName = resp[0].LastName;
                         }
                     }
                     else{
@@ -267,11 +211,9 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$htt
      */
     $scope.toggleRule = function(event,type){
         var elem = $(event.currentTarget);
-        console.log(elem.data('tid'));
         var ruleTid = elem.data('tid');
         if(!elem[0].checked)
         {
-            console.log('unchecked');
             // Will remove from the array list here
             switch(type){
                 case 0:
@@ -295,7 +237,6 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$htt
         }
         else{
             // Will add to array list here
-            console.log('checked');
             switch(type){
                 case 0:
                     $scope.modalBox.subuser.rules.sales.push(ruleTid);
@@ -319,16 +260,22 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$htt
         }
     };
 
+
+    /**
+     * Validates subuser data
+     */
+    $scope.validateSubUser = function(){
+        //@todo Validates subuser data before saving
+    };
+
     /**
      * Add and update subuser to server
      */
     $scope.saveSubUser = function(){
-        console.log(JSON.stringify($scope.modalBox));
-        console.log($scope.masterUser);
+
         var data = {
             Token : $rootScope._userInfo.Token,
 
-            //@todo Please use master ID of user
             PersonalID : $scope.modalBox.subuser.ezeid,
 
             TID : $scope.modalBox.subuser.TID,
@@ -356,15 +303,19 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$htt
             ResumeRules : $scope.modalBox.subuser.rules.resume.join(',')
         };
 
-        console.log(JSON.stringify(data));
         $http({
             url : '/ewtCreateSubUser',
             method : "POST",
             data : data
         }).success(function(resp){
-            console.log(JSON.stringify(resp));
                 if(resp && resp.hasOwnProperty("IsSuccessfull")){
                     Notification.success({ message : "User saved successfully", delay : MsgDelay});
+                    /**
+                     * Reloading all users once again to fetch the TID of newly added user (for updating purposes)
+                     *
+                     */
+                    $scope.toggleModalBox();
+                    $scope.loadSubuserList();
                 }
                 else{
                     Notification.error({ message : "An error occured while saving user !", delay : MsgDelay});
@@ -395,9 +346,9 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$htt
                 FunctionType : $scope.functionTypeCount
             }
         }).success(function(resp){
-                if(resp.length > 0){
-                    $scope.rules.concat(resp);
-                    $scope.functionTypeCount += 1;
+                $scope.functionTypeCount += 1;
+                if(resp && resp.length){
+                        $scope.rules.concat(resp);
                 }
                 if($scope.functionTypeCount < 5){
                     $scope.loadAllRules();
@@ -415,6 +366,7 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$htt
      * Loads list of subusers
      */
     $scope.loadSubuserList = function(){
+        $scope.subusers = [];
         $http({
             url : '/ewtGetSubUserList',
             method : "GET",
@@ -425,7 +377,7 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$htt
         }).success(function(resp){
             if(resp && resp.length > 0)
             {
-                console.log(resp);
+
                 for(var i = 0; i < resp.length ; i++){
                     var subuser = {
                         userName : (resp[i].EZEID.split(".").pop()),
@@ -494,5 +446,6 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$htt
      * Will call loadAllRules()
      */
     $scope.getMasterUserDetails();
+
 
 }]);

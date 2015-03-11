@@ -9,6 +9,7 @@ angular.module('ezeidApp').controller('RulesCtrl',['$scope','$interval','$http',
     $scope.showModal = false;
 
     $scope.openModalBox = function(event){
+        //@todo Add facility to detect new addition or rule editing
         $scope.showModal = !$scope.showModal;
     };
 
@@ -63,4 +64,8 @@ angular.module('ezeidApp').controller('RulesCtrl',['$scope','$interval','$http',
      */
     $scope.rules = [];
 
+    //@todo Add code for master user loading
+    //@todo add code for rule addition and updation
+    //@todo add code for viewing rule
+    //@todo add code for map load
 }]);

@@ -6,7 +6,7 @@
     <!------------- Content goes inside this region ---------------------->
     <div class="row">
         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-            <button class="btn btn-primary marginL10" ng-click="openModalBox()"><span class="glyphicon glyphicon-plus"></span> Add new Sub user</button>
+            <button class="btn btn-primary btn-sm marginL10" ng-click="toggleModalBox()"><span class="glyphicon glyphicon-plus"></span> Add new Sub user</button>
         </div>
 
     </div>
@@ -25,7 +25,7 @@
         <tbody>
         <tr ng-repeat="user in subusers">
             <td>{{$index+1}}.</td>
-            <td><a class="btn-link" data-index="{{$index}}" ng-click="openModalBox($event)">{{user.userName}}</a></td>
+            <td><a class="btn-link" data-index="{{$index}}" ng-click="toggleModalBox($event)">{{user.userName}}</a></td>
             <td>{{user.ezeid | uppercase}}</td>
             <td>
                 <a tabindex="0" data-trigger="focus" role="button" class="btn btn-default link-popover" data-container="body" data-toggle="popover" data-placement="right"
@@ -59,7 +59,7 @@
 
             </td>
             <td>
-                <a class="btn-link" data-index="{{$index}}" ng-click="openModalBox($event)">See Rules</a>
+                <a class="btn-link" data-index="{{$index}}" ng-click="toggleModalBox($event)">See Rules</a>
             </td>
             <td>
                 <button class="btn" ng-class="(subusers[$index].status == 2)?'btn-success':'btn-danger'">{{(subusers[$index].status==2)?'Active':'Inactive'}}</button>
@@ -111,10 +111,10 @@
             </div>
         </div>
         <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6">
-            <div class="form-group" data-toggle="tooltip" title="Subuser Status" data-placement="right">
-                <select class="form-control">
-                    <option>Active</option>
-                    <option>Inactive</option>
+            <div class="form-group" data-toggle="tooltip" title="Subuser Status"  data-placement="right">
+                <select class="form-control" ng-model="modalBox.subuser.status">
+                    <option value="2">Active</option>
+                    <option value="1">Inactive</option>
                 </select>
             </div>
         </div>
@@ -287,6 +287,9 @@
     <div class="row" ng-show="modalBox.isEzeidAvailable">
         <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
             <button class="btn btn-primary btn-block" ng-click="saveSubUser()">Save</button>
+        </div>
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+            <button class="btn btn-primary btn-block" ng-click="toggleModalBox()">Close</button>
         </div>
     </div>
 

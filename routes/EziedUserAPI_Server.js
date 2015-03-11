@@ -19,7 +19,7 @@ var FinalMessage = {
 var FinalMsgJson = JSON.parse(JSON.stringify(FinalMessage));
 
 var path ='D:\\EZEIDBanner\\';
-//ezeid email id: 
+//ezeid email id:
 var EZEIDEmail = 'noreply@ezeid.com';
 //EzeId services will start from here
 //method to generate the token
@@ -517,8 +517,8 @@ exports.FnLogin = function (req, res) {
             Type: 0,
             Icon: '',
             Verified: 0,
-            SalesModueTitle: '',
-            AppointmentModueTitle: '',
+            SalesModuleTitle: '',
+            AppointmentModuleTitle: '',
             HomeDeliveryModuleTitle : '',
             ServiceModuleTitle: '',
             CVModuleTitle: '',
@@ -527,9 +527,10 @@ exports.FnLogin = function (req, res) {
             HomeDeliveryFormMsg: '',
             ServiceFormMsg: '',
             CVFormMsg: '',
-            ItemListType: '',
+            SalesItemListType: '',
             RefreshInterval:'',
-            MasterID: 0
+            MasterID: 0,
+            UserAccessRights: ''
         };
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
         if (UserName != null && UserName != '' && Password != null && Password != '') {
@@ -564,18 +565,20 @@ exports.FnLogin = function (req, res) {
                                         RtnMessage.Icon = loginDetails[0].Icon;
                                         RtnMessage.Verified = loginDetails[0].EZEIDVerifiedID;
                                         RtnMessage.SalesModueTitle = loginDetails[0].SalesModueTitle;
-                                            RtnMessage.AppointmentModueTitle = loginDetails[0].AppointmentModueTitle;
-                                            RtnMessage.HomeDeliveryModuleTitle = loginDetails[0].HomeDeliveryModuleTitle;
-                                            RtnMessage.ServiceModuleTitle = loginDetails[0].ServiceModuleTitle;
-                                            RtnMessage.CVModuleTitle = loginDetails[0].CVModuleTitle;
-                                            RtnMessage.SalesFormMsg= loginDetails[0].SalesFormMsg;
-                                            RtnMessage.ReservationFormMsg= loginDetails[0].ReservationFormMsg;
-                                            RtnMessage.HomeDeliveryFormMsg= loginDetails[0].HomeDeliveryFormMsg;
-                                            RtnMessage.ServiceFormMsg= loginDetails[0].ServiceFormMsg;
-                                            RtnMessage.CVFormMsg= loginDetails[0].CVFormMsg;
-                                            RtnMessage.ItemListType= loginDetails[0].ItemListType;
-                                            RtnMessage.RefreshInterval= loginDetails[0].RefreshInterval;
-                                            RtnMessage.MasterID= loginDetails[0].ParentMasterID;
+                                        RtnMessage.SalesModuleTitle = loginDetails[0].SalesModuleTitle;
+                                        RtnMessage.AppointmentModuleTitle = loginDetails[0].AppointmentModuleTitle;
+                                        RtnMessage.HomeDeliveryModuleTitle = loginDetails[0].HomeDeliveryModuleTitle;
+                                        RtnMessage.ServiceModuleTitle = loginDetails[0].ServiceModuleTitle;
+                                        RtnMessage.CVModuleTitle = loginDetails[0].CVModuleTitle;
+                                        RtnMessage.SalesFormMsg= loginDetails[0].SalesFormMsg;
+                                        RtnMessage.ReservationFormMsg= loginDetails[0].ReservationFormMsg;
+                                        RtnMessage.HomeDeliveryFormMsg= loginDetails[0].HomeDeliveryFormMsg;
+                                        RtnMessage.ServiceFormMsg= loginDetails[0].ServiceFormMsg;
+                                        RtnMessage.CVFormMsg= loginDetails[0].CVFormMsg;
+                                        RtnMessage.SalesItemListType= loginDetails[0].SalesItemListType;
+                                        RtnMessage.RefreshInterval= loginDetails[0].RefreshInterval;
+                                        RtnMessage.UserAccessRights = loginDetails[0].UserAccessRights;
+                                        RtnMessage.MasterID= loginDetails[0].ParentMasterID;
                                         res.send(RtnMessage);
 
                                         console.log('FnLogin:tmaster: Login success');
@@ -985,7 +988,7 @@ exports.FnGetCountry = function (req, res) {
     }
 };
 
-//method to load state 
+//method to load state
 exports.FnGetState = function (req, res) {
     try {
         res.setHeader("Access-Control-Allow-Origin", "*");
@@ -1210,7 +1213,7 @@ exports.FnGetLanguage = function (req, res) {
     }
 };
 
-//method to load relation type 
+//method to load relation type
 exports.FnGetRelationType = function (req, res) {
     try {
         res.setHeader("Access-Control-Allow-Origin", "*");
@@ -1250,7 +1253,7 @@ exports.FnGetRelationType = function (req, res) {
     }
 };
 
-//method to load role type 
+//method to load role type
 exports.FnGetFunctionRoleMapping = function (req, res) {
     try {
         res.setHeader("Access-Control-Allow-Origin", "*");
@@ -1282,7 +1285,7 @@ exports.FnGetFunctionRoleMapping = function (req, res) {
     }
 };
 
-//method to load role type 
+//method to load role type
 exports.FnGetRoleType = function (req, res) {
     try {
         res.setHeader("Access-Control-Allow-Origin", "*");
@@ -1399,7 +1402,7 @@ exports.FnGetProxmity = function (req, res) {
     }
 };
 
-//method to check ezeid exists or not 
+//method to check ezeid exists or not
 exports.FnCheckEzeid = function (req, res) {
     try {
         res.setHeader("Access-Control-Allow-Origin", "*");
@@ -2109,7 +2112,7 @@ exports.FnAddLocation = function (req, res) {
             else if (CountryID.toString() == 'NaN') {
                 console.log('FnAddLocation: CountryID   is empty');
             }
-           
+
             res.statusCode = 400;
             res.send([]);
         }
@@ -2354,7 +2357,7 @@ exports.FnGetAccessHistory = function (req, res) {
     }
 };
 
-//method to save messages 
+//method to save messages
 exports.FnSaveMessage = function (req, res) {
     try {
         res.setHeader("Access-Control-Allow-Origin", "*");
@@ -5051,7 +5054,7 @@ exports.FnSaveItem = function(req, res){
         console.log('FnSaveItem:error ' + ex.description);
         throw new Error(ex);
     }
-}
+};
 
 exports.FnCreateSubUser = function(req, res){
     try{
@@ -5078,7 +5081,8 @@ exports.FnCreateSubUser = function(req, res){
         var MasterID = req.body.PersonalID;
 
         var RtnMessage = {
-            IsSuccessfull: false
+            IsSuccessfull: false,
+            TID: 0
         };
 
         /*if (Token!= null && TID!= null && UserName!= null  && Status!= null && FirstName != null && LastName !=null && AccessRights !=null && SalesEmail != null
@@ -5087,7 +5091,7 @@ exports.FnCreateSubUser = function(req, res){
         FnValidateToken(Token, function (err, Result) {
             if (!err) {
                 if (Result != null) {
-                console.log(Result);
+                    console.log(Result);
                     var query = db.escape(Token) + ',' + db.escape(TID) + ',' + db.escape(UserName) + ',' +db.escape(Status) + ',' +db.escape(FirstName) + ',' +db.escape(LastName)
                         + ',' + db.escape(AccessRights) + ',' + db.escape(SalesEmail) + ',' + db.escape(ReservationEmail) + ',' +db.escape(HomeDeliveryEmail)
                         + ',' + db.escape(ServiceEmail) + ',' + db.escape(ResumeEmail) + ',' + db.escape(SalesRules) + ',' +db.escape(ReservationRules)
@@ -5095,7 +5099,6 @@ exports.FnCreateSubUser = function(req, res){
                     console.log(query);
                     db.query('CALL pCreateSubUser(' + query + ')', function (err, InsertResult) {
                         if (!err){
-                            console.log(InsertResult);
                             if (InsertResult[0] != null )
                             {
                                 if(InsertResult[0].length > 0)
@@ -5104,6 +5107,7 @@ exports.FnCreateSubUser = function(req, res){
                                     if(Result[0].RowAffected == 1)
                                     {
                                         RtnMessage.IsSuccessfull = true;
+                                        RtnMessage.TID = Result[0].TID;
                                         res.send(RtnMessage);
                                         console.log('FnCreateSubUser: Sub User details save successfully');}
                                     else
@@ -5148,7 +5152,6 @@ exports.FnCreateSubUser = function(req, res){
         throw new Error(ex);
     }
 }
-
 //below method get sub user list
 exports.FnGetSubUserList = function (req, res) {
     try {
@@ -5940,6 +5943,331 @@ exports.FnItemDetails = function (req, res) {
     }
     catch (ex) {
         console.log('FnItemDetails error:' + ex.description);
+        throw new Error(ex);
+    }
+};
+
+exports.FnSaveConfig = function(req, res){
+    try{
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.body.Token;
+        var SalesTitle = req.body.SalesTitle;
+        var ReservationTitle = req.body.ReservationTitle;
+        var HomeDeliveryTitle = req.body.HomeDeliveryTitle;
+        var ServiceTitle = req.body.ServiceTitle;
+        var ResumeTitle = req.body.ResumeTitle;
+        var UserAccessRights = req.body.UserAccessRights;
+        var SalesItemListType = req.body.SalesItemListType;
+        var HomeDeliveryItemListType = req.body.HomeDeliveryItemListType;
+        var ResumeKeyword = req.body.ResumeKeyword;
+        var Category = req.body.Category;
+        var Keyword = req.body.Keyword;
+        var ReservationDisplayFormat = req.body.ReservationDisplayFormat;
+        var DataRefreshInterval = req.body.DataRefreshInterval;
+        var SalesFormMsg = req.body.SalesFormMsg;
+        var ReservationFormMsg = req.body.ReservationFormMsg;
+        var HomeDeliveryFormMsg = req.body.HomeDeliveryFormMsg;
+        var ServiceFormMsg = req.body.ServiceFormMsg;
+        var ResumeFormMsg = req.body.ResumeFormMsg;
+
+        var RtnMessage = {
+            IsSuccessfull: false
+        };
+
+        if (Token != null && Keyword != null && Category != null) {
+            FnValidateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+
+                        var query = db.escape(Token) + ',' + db.escape(SalesTitle) + ',' + db.escape(ReservationTitle) + ',' + db.escape(HomeDeliveryTitle) + ',' +db.escape(ServiceTitle)
+                            + ',' +db.escape(ResumeTitle) + ',' +db.escape(UserAccessRights) + ',' +db.escape(SalesItemListType) + ',' +db.escape(HomeDeliveryItemListType)
+                            + ',' +db.escape(ResumeKeyword) + ',' +db.escape(Category) + ',' +db.escape(Keyword) + ',' +db.escape(ReservationDisplayFormat) + ',' +db.escape(DataRefreshInterval)
+                            + ',' + db.escape(SalesFormMsg) + ',' + db.escape(ReservationFormMsg) + ',' + db.escape(HomeDeliveryFormMsg) + ',' +db.escape(ServiceFormMsg) + ',' +db.escape(ResumeFormMsg);
+
+                        db.query('CALL pSaveConfig(' + query + ')', function (err, InsertResult) {
+                            if (!err){
+                                if (InsertResult.affectedRows > 0) {
+                                    RtnMessage.IsSuccessfull = true;
+                                    res.send(RtnMessage);
+                                    console.log('FnSaveConfig:  Config details save successfully');
+                                }
+                                else {
+                                    console.log('FnSaveConfig:No Save Config details');
+                                    res.send(RtnMessage);
+                                }
+                            }
+
+                            else {
+                                console.log('FnSaveConfig: error in saving Config details' + err);
+                                res.statusCode = 500;
+                                res.send(RtnMessage);
+                            }
+                        });
+                    }
+                    else {
+                        console.log('FnSaveConfig: Invalid token');
+                        res.statusCode = 401;
+                        res.send(RtnMessage);
+                    }
+                }
+                else {
+                    console.log('FnSaveConfig:Error in processing Token' + err);
+                    res.statusCode = 500;
+                    res.send(RtnMessage);
+
+                }
+            });
+
+        }
+
+        else {
+            if (Token == null) {
+                console.log('FnSaveConfig: Token is empty');
+            }
+            else if (Category == null) {
+                console.log('FnSaveConfig: Category is empty');
+            }
+            else if (Keyword == null) {
+                console.log('FnSaveConfig: Keyword is empty');
+            }
+
+            res.statusCode=400;
+            res.send(RtnMessage);
+        }
+
+    }
+    catch (ex) {
+        console.log('FnSaveConfig:error ' + ex.description);
+        throw new Error(ex);
+    }
+}
+
+exports.FnGetConfig = function (req, res) {
+    try {
+
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        var Token = req.query.Token;
+
+        if (Token != null) {
+            FnValidateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+
+                        db.query('CALL pGetconfiguration(' + db.escape(Token) + ')', function (err, GetResult) {
+                            if (!err) {
+                                if (GetResult != null) {
+                                    if (GetResult[0].length > 0) {
+
+                                        console.log('FnGetConfig: Details Send successfully');
+                                        res.send(GetResult[0]);
+                                    }
+                                    else {
+
+                                        console.log('FnGetConfig:No Details found');
+                                        res.send('null');
+                                    }
+                                }
+                                else {
+
+                                    console.log('FnGetConfig:No Details found');
+                                    res.send('null');
+                                }
+
+                            }
+                            else {
+
+                                console.log('FnGetConfig: error in getting config details' + err);
+                                res.statusCode = 500;
+                                res.send('null');
+                            }
+                        });
+                    }
+                    else {
+                        res.statusCode = 401;
+                        res.send('null');
+                        console.log('FnGetConfig: Invalid Token');
+                    }
+                } else {
+
+                    res.statusCode = 500;
+                    res.send('null');
+                    console.log('FnGetConfig: Error in validating token:  ' + err);
+                }
+            });
+        }
+        else {
+            if (Token == null) {
+                console.log('FnGetConfig: Token is empty');
+            }
+
+            res.statusCode=400;
+            res.send('null');
+        }
+    }
+    catch (ex) {
+        console.log('FnGetConfig error:' + ex.description);
+        throw new Error(ex);
+    }
+};
+
+exports.FnSaveHolidayCalendar = function(req, res){
+    try{
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.body.Token;
+        var TID = req.body.TID;
+        var MasterID = req.body.MasterID;
+        var HolidayDate = req.body.HolidayDate;
+        var HolidayTitle = req.body.HolidayTitle;
+
+        var RtnMessage = {
+            IsSuccessfull: false
+        };
+
+        if (Token != null && TID != null && HolidayTitle != null && MasterID != null && HolidayDate != null ) {
+            FnValidateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+
+                        var query = db.escape(TID) + ',' + db.escape(MasterID) + ',' + db.escape(HolidayDate) + ',' + db.escape(HolidayTitle);
+                        db.query('CALL pSaveHolidayCalendar(' + query + ')', function (err, InsertResult) {
+                            if (!err){
+                                if (InsertResult.affectedRows > 0) {
+                                    RtnMessage.IsSuccessfull = true;
+                                    res.send(RtnMessage);
+                                    console.log('FnSaveHolidayCalendar: Holiday calander details save successfully');
+                                }
+                                else {
+                                    console.log('FnSaveHolidayCalendar:No Save Holiday calander details');
+                                    res.send(RtnMessage);
+                                }
+                            }
+
+                            else {
+                                console.log('FnSaveHolidayCalendar: error in saving Holiday calander details' + err);
+                                res.statusCode = 500;
+                                res.send(RtnMessage);
+                            }
+                        });
+                    }
+                    else {
+                        console.log('FnSaveHolidayCalendar: Invalid token');
+                        res.statusCode = 401;
+                        res.send(RtnMessage);
+                    }
+                }
+                else {
+                    console.log('FnSaveHolidayCalendar:Error in processing Token' + err);
+                    res.statusCode = 500;
+                    res.send(RtnMessage);
+
+                }
+            });
+
+        }
+
+        else {
+            if (Token == null) {
+                console.log('FnSaveHolidayCalendar: Token is empty');
+            }
+            else if (TID == null) {
+                console.log('FnSaveHolidayCalendar: TID is empty');
+            }
+            else if (MasterID == null) {
+                console.log('FnSaveHolidayCalendar: MasterID is empty');
+            }
+            else if (HolidayTitle == null) {
+                console.log('FnSaveHolidayCalendar: HolidayTitle is empty');
+            }
+            else if (HolidayDate == null) {
+                console.log('FnSaveHolidayCalendar: HolidayDate is empty');
+            }
+
+
+            res.statusCode=400;
+            res.send(RtnMessage);
+        }
+
+    }
+    catch (ex) {
+        console.log('FnSaveHolidayCalendar:error ' + ex.description);
+        throw new Error(ex);
+    }
+};
+
+exports.FnGetHolidayList = function (req, res) {
+    try {
+
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.query.Token;
+        var MasterID = req.query.MasterID;
+
+        if (Token != null && MasterID != null) {
+            FnValidateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+
+                        db.query('CALL pGetHolidayList(' + db.escape(MasterID) + ')', function (err, GetResult) {
+                            if (!err) {
+                                if (GetResult != null) {
+                                    if (GetResult[0].length > 0) {
+
+                                        console.log('FnGetHolidayList: Holiday list Send successfully');
+                                        res.send(GetResult[0]);
+                                    }
+                                    else {
+
+                                        console.log('FnGetHolidayList:No Holiday list found');
+                                        res.send('null');
+                                    }
+                                }
+                                else {
+
+                                    console.log('FnGetHolidayList:No Holiday list found');
+                                    res.send('null');
+                                }
+
+                            }
+                            else {
+
+                                console.log('FnGetHolidayList: error in getting Holiday list' + err);
+                                res.statusCode = 500;
+                                res.send('null');
+                            }
+                        });
+                    }
+                    else {
+                        res.statusCode = 401;
+                        res.send('null');
+                        console.log('FnGetHolidayList: Invalid Token');
+                    }
+                } else {
+
+                    res.statusCode = 500;
+                    res.send('null');
+                    console.log('FnGetHolidayList: Error in validating token:  ' + err);
+                }
+            });
+        }
+        else {
+            if (Token == null) {
+                console.log('FnGetHolidayList: Token is empty');
+            }
+            else if (MasterID == null) {
+                console.log('FnGetHolidayList: MasterID is empty');
+            }
+            res.statusCode=400;
+            res.send('null');
+        }
+    }
+    catch (ex) {
+        console.log('FnGetHolidayList error:' + ex.description);
         throw new Error(ex);
     }
 };
@@ -7476,5 +7804,30 @@ exports.FnSearchRealEstateAP = function(req, res){
     catch (ex) {
         console.log('FnSearchRealEstateAP error:' + ex.description);
         throw new Error(ex);
+    }
+};
+
+
+exports.Base64Data = function (req, res) {
+    try {
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+            var RtnResponse = {
+                IsSent: false
+            };
+            var RtnResponse = JSON.parse(JSON.stringify(RtnResponse));
+            //var path = path + StateTitle+'.jpg' ;
+            var bitmap = fs.readFileSync("D:\\images\\Product1.jpg");
+            // convert binary data to base64 encoded string
+            RtnResponse.Picture = new Buffer(bitmap).toString('base64');
+            res.send(RtnResponse);
+            console.log('Base64Data: Default Banner sent successfully');
+
+    }
+    catch (ex) {
+        console.log('OTP fnCreateFile error:' + ex.description);
+        throw new Error(ex);
+        return 'error'
     }
 };
