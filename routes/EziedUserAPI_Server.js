@@ -1578,6 +1578,10 @@ exports.FnRegistration = function (req, res) {
     try {
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        var OperationType = req.body.OperationType;
+        var ipAddress = req.body.ipAddress;
+        var SelectionType = Req.body.SelectionType;
+
         var IDTypeID = req.body.IDTypeID;
         var EZEID = req.body.EZEID;
         EZEID = EZEID.toUpperCase();
@@ -4987,7 +4991,8 @@ exports.FnSaveItem = function(req, res){
         var RtnMessage = {
             IsSuccessfull: false
         };
-
+        if(Rate == null || Rate =="")
+        Rate=0.00;
         if (Token != null && MasterID != null && FunctionType != null && ItemName !=null) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
@@ -5308,11 +5313,7 @@ exports.FnSaveTranscationItems = function(req, res){
 
         var Token = req.body.Token;
         var MessageID = req.body.MessageID;
-        var ItemID = req.body.ItemID;
-        var Qty = req.body.Qty;
-        var Rate = req.body.Rate;
-        var Amount = req.body.Amount;
-        var Duration = req.body.Duration;
+        var ItemList = req.body.ItemList;
 
         var RtnMessage = {
             IsSuccessfull: false
@@ -6272,6 +6273,212 @@ exports.FnGetHolidayList = function (req, res) {
     }
 };
 
+exports.FnSaveTranscation = function(req, res){
+    try{
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.body.Token;
+        var TID = req.body.TID;
+        var MessageText =req.body.MessageText;
+        var MessageType = req.body.MessageType;
+        var Status = req.body.Status;
+        var TaskDateTime = req.body.TaskDateTime;
+        var Notes = req.body.Notes;
+        var LocID = req.body.LocID;
+        var Country = req.body.Country;    //country short name
+        var State = req.body.State;         //admin level 1
+        var City = req.body.City;       //ADMIN level 2
+        var Area = req.body.Area;       //admin level 3
+        var FunctionType = req.body.FunctionType;
+        var Latitude = req.body.Latitude;
+        var Longitude = req.body.Longitude;
+        var EZEID = req.body.EZEID;
+        var ContactInfo = req.body.ContactInfo;
+        var FolderRuleID = parseInt(req.body.FolderRuleID);
+        var Duration = req.body.Duration;
+        var DurationScales = req.body.DurationScales;
+        var ItemsList = req.body.ItemsList;
+        var NextAction = req.body.NextAction;
+        var NextActionDateTime = req.body.NextActionDateTime;
+        var  TaskDateNew = new Date(TaskDateTime);
+        var NextActionDateTimeNew = new Date(NextActionDateTime);
+        var RtnMessage = {
+            IsSuccessfull: false
+        };
+        if(FolderRuleID == 'NaN')
+            FolderRuleID=0;
+        if (Token != null ) {
+            FnValidateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+
+                        var query = db.escape(Token)+","+db.escape(MessageType)+","+ db.escape(MessageText)+ "," + db.escape(Status) +"," + db.escape(TaskDateNew) + ","  + db.escape(Notes) + "," + db.escape(LocID)  + "," + db.escape(Country)   + "," + db.escape(State) + "," + db.escape(City)   + "," + db.escape(Area)   + ","  + db.escape(Latitude)  + "," + db.escape(Longitude)  +  "," + db.escape(EZEID)  + "," + db.escape(ContactInfo)  + "," + db.escape(FolderRuleID)  + "," + db.escape(Duration)  + "," + db.escape(DurationScales) + "," + db.escape(NextAction) + "," + db.escape(NextActionDateTimeNew) + "," + db.escape(TID);
+                        // db.escape(NextActionDateTime);
+                        db.query('CALL pSaveTrans(' + query + ')', function (err, InsertResult) {
+                            if (!err){
+                                console.log(InsertResult);
+                                if (InsertResult[0] != null) {
+                                    if(InsertResult[0].length > 0){
+                                        RtnMessage.IsSuccessfull = true;
+                                        var Message = InsertResult[0];
+                                        console.log(Message);
+                                        for(var i=0; i < ItemsList.length; i++) {
+                                            var itemsDetails = ItemsList[i];
+                                            var items = {
+                                                MessageID: Message[0].MessageID,
+                                                ItemID: itemsDetails.TID,
+                                                Qty: itemsDetails.Qty,
+                                                Rate: itemsDetails.Rate,
+                                                Amount: itemsDetails.Amount,
+                                                Duration: itemsDetails.Durations
+                                            };
+                                            console.log(items);
+                                            var query = db.query('INSERT INTO titems SET ?', items, function (err, result) {
+                                                // Neat!
+                                                if (!err) {
+                                                    if (result != null) {
+                                                        if (result.affectedRows > 0) {
+                                                            console.log('FnSaveFolderRules: Folder rules saved successfully');
+                                                        }
+                                                        else {
+                                                            console.log('FnSaveFolderRules: Folder rule not saved');
+                                                        }
+                                                    }
+                                                    else {
+                                                        console.log('FnSaveFolderRules: Folder rule not saved');
+                                                    }
+                                                }
+                                                else {
+                                                    console.log('FnSaveFolderRules: error in saving folder rules' + err);
+                                                }
+                                            });
+
+                                        }
+                                        res.send(RtnMessage);
+                                        console.log('FnSaveTranscationItems: Transaction items details save successfully');
+                                    }
+                                    else
+                                    {
+                                        console.log('FnSaveTranscationItems:No Save Transaction items details');
+                                        res.send(RtnMessage);
+                                    }
+                                }
+                                else {
+                                    console.log('FnSaveTranscationItems:No Save Transaction items details');
+                                    res.send(RtnMessage);
+                                }
+                            }
+
+                            else {
+                                console.log('FnSaveTranscationItems: error in saving Transaction items' + err);
+                                res.statusCode = 500;
+                                res.send(RtnMessage);
+                            }
+                        });
+                    }
+                    else {
+                        console.log('FnSaveTranscationItems: Invalid token');
+                        res.statusCode = 401;
+                        res.send(RtnMessage);
+                    }
+                }
+                else {
+                    console.log('FnSaveTranscationItems:Error in processing Token' + err);
+                    res.statusCode = 500;
+                    res.send(RtnMessage);
+                }
+            });
+        }
+        else {
+            if (Token == null) {
+                console.log('FnSaveTranscationItems: Token is empty');
+            }
+
+            res.statusCode=400;
+            res.send(RtnMessage);
+        }
+    }
+    catch (ex) {
+        console.log('FnSaveTranscationItems:error ' + ex.description);
+        throw new Error(ex);
+    }
+};
+
+exports.FnGetUserwiseFolderList = function (req, res) {
+    try {
+
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.query.Token;
+        var RuleFunction = req.query.RuleFunction;
+
+        if (Token != null) {
+            FnValidateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+
+                        db.query('CALL pGetUserWiseFolderList(' + db.escape(Token) + ',' + db.escape(RuleFunction) + ')', function (err, GetResult) {
+                            if (!err) {
+                                if (GetResult != null) {
+                                    if (GetResult[0].length > 0) {
+
+                                        console.log('FnGetUserwiseFolderList: Folder list details Send successfully');
+                                        res.send(GetResult[0]);
+                                    }
+                                    else {
+
+                                        console.log('FnGetUserwiseFolderList:No Folder list details found');
+                                        res.send('null');
+                                    }
+                                }
+                                else {
+
+                                    console.log('FnGetUserwiseFolderList:No Folder list details found');
+                                    res.send('null');
+                                }
+
+                            }
+                            else {
+
+                                console.log('FnGetUserwiseFolderList: error in getting Folder list details' + err);
+                                res.statusCode = 500;
+                                res.send('null');
+                            }
+                        });
+                    }
+                    else {
+                        res.statusCode = 401;
+                        res.send('null');
+                        console.log('FnGetUserwiseFolderList: Invalid Token');
+                    }
+                } else {
+
+                    res.statusCode = 500;
+                    res.send('null');
+                    console.log('FnGetUserwiseFolderList: Error in validating token:  ' + err);
+                }
+            });
+        }
+        else {
+            if (Token == null) {
+                console.log('FnGetUserwiseFolderList: Token is empty');
+            }
+            if (RuleFunction == null) {
+                console.log('FnGetUserwiseFolderList: RuleFunction is empty');
+            }
+
+            res.statusCode=400;
+            res.send('null');
+        }
+    }
+    catch (ex) {
+        console.log('FnGetUserwiseFolderList error:' + ex.description);
+        throw new Error(ex);
+    }
+};
+
 //EZEIDAP Parts
 
 //app part
@@ -6635,7 +6842,6 @@ exports.FnUpdateUserProfileAP = function (req, res) {
         throw new Error(ex);
     }
 };
-
 
 //method to change password
 exports.FnChangePasswordAP = function (req, res) {
@@ -7806,7 +8012,6 @@ exports.FnSearchRealEstateAP = function(req, res){
         throw new Error(ex);
     }
 };
-
 
 exports.Base64Data = function (req, res) {
     try {

@@ -138,6 +138,8 @@ app.post('/ewtSaveHolidayCalendar',LocationManager.FnSaveHolidayCalendar);
 app.get('/ewtGetHolidayList',LocationManager.FnGetHolidayList);
 app.post('/ewtSaveConfig',LocationManager.FnSaveConfig);
 app.get('/ewtGetConfig',LocationManager.FnGetConfig);
+app.post('/ewtSaveTranscation',LocationManager.FnSaveTranscation);
+app.get('/ewtGetUserwiseFolderList',LocationManager.FnGetUserwiseFolderList);
 
 //below service are for EZEIDAP
 app.post('/ewLoginAP', LocationManager.FnLoginAP);
