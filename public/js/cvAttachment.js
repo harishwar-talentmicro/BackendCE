@@ -1,4 +1,4 @@
-angular.module('ezeidApp').controller('CVAttachController', function($http, $rootScope, $scope, $timeout, Notification, $filter,$q, $window){
+angular.module('ezeidApp').controller('CVAttachController', function($http, $rootScope, $scope, $timeout, Notification, $filter,$q, $window,GURL){
 
     var CVAttachCtrl = this;
     CVAttachCtrl._CVInfo={};

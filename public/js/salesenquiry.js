@@ -1,7 +1,7 @@
-angular.module('ezeidApp').controller('salesenquiryController', function($http, $rootScope, $scope, Notification, $filter, $q, $timeout){
+angular.module('ezeidApp').controller('salesenquiryController', function($http, $rootScope, $scope, Notification, $filter, $q, $timeout,GURL){
 
     var msglist = this;
-    msglist._info={};
+    msglist._info = {};
     msglist.msgs = [];
     var itemList  = [];
     var MsgDelay = 2000;
@@ -17,6 +17,7 @@ angular.module('ezeidApp').controller('salesenquiryController', function($http, 
 
     var selectedItemData = [];
     msglist.selectMsgs = [];
+    msglist.selectItemData = [];
 
     if ($rootScope._userInfo) {
     }
@@ -58,25 +59,6 @@ angular.module('ezeidApp').controller('salesenquiryController', function($http, 
     $scope.Tab3Title = "Sales Enquiry3";
     $scope.Tab4Title = "Sales Enquiry4";
 
-    //To get Status info
-    $http({ method: 'get', url: GURL + 'ewtGetStatusType?Token='+ $rootScope._userInfo.Token + '&MasterID=251&FunctionType=0'}).success(function (data) {
-
-         if (data != 'null') {
-            // console.log(data);
-            msglist.Status = data;
-             msglist._info.StatusFilter = data[0].TID;
-        }
-    });
-
-    //To get Next Action info
-    $http({ method: 'get', url: GURL + 'ewtGetActionType?Token='+ $rootScope._userInfo.Token + '&MasterID=251&FunctionType=0'}).success(function (data) {
-       // console.log(data);
-        if (data != 'null') {
-
-            msglist.NextAction = data;
-          }
-    });
-
     $('#datetimepicker1').datetimepicker({
         format: "d-M-Y  h:m A",
         hours12: false,
@@ -87,8 +69,48 @@ angular.module('ezeidApp').controller('salesenquiryController', function($http, 
         $('#datetimepicker1').trigger('focus');
     });
 
-    $scope.quantity = 0;
-    $scope.rate = 0;
+    //To get Status info
+    $http({ method: 'get', url: GURL + 'ewtGetStatusType?Token='+ $rootScope._userInfo.Token + '&MasterID='+ $rootScope._userInfo.MasterID +'&FunctionType=0'}).success(function (data) {
+         if (data != 'null') {
+             msglist.Status = data;
+             msglist._info.StatusFilter = data[0].TID;
+        }
+    });
+
+    //To get Next Action info
+    $http({ method: 'get', url: GURL + 'ewtGetActionType?Token='+ $rootScope._userInfo.Token + '&MasterID='+ $rootScope._userInfo.MasterID +'&FunctionType=1'}).success(function (data) {
+
+       if (data != 'null') {
+
+            msglist.NextAction = data;
+          }
+    });
+
+    //To get Rule/folder info
+    $http({ method: 'get', url: GURL + 'ewtGetFolderList?Token='+ $rootScope._userInfo.Token + '&MasterID='+ $rootScope._userInfo.MasterID +'&FunctionType=1'}).success(function (data) {
+        if (data != 'null') {
+            console.log(data);
+            msglist.Rules = data;
+           // msglist._info.StatusFilter = data[0].TID;
+        }
+    });
+
+    var today = $filter('date')(new Date(), 'MM/dd/yyyy HH:mm:ss');
+    msglist._info.quantity = 0;
+    msglist._info.rate = 0;
+    msglist._info.Amount = .00;
+    $scope.TotalQty = 0;
+
+   /* msglist._info.TID = 0;//first time o, next time what ever get from api...
+    msglist._info.MessageType = 0;
+    msglist._info.TaskDateTime = today;
+    msglist._info.Notes = "  ";
+    msglist._info.LocID = 0;
+    msglist._info.Duration = 0;
+    msglist._info.DurationScales = 0;
+    msglist._info.FunctionType = 0;
+    msglist._info.NextActionDateTime = today;*/
+
 
     $scope.toggleModal = function(){
         getItemList();
@@ -118,7 +140,7 @@ angular.module('ezeidApp').controller('salesenquiryController', function($http, 
     function getItemList() {
        $http({
             method: 'get',
-            url: GURL + 'ewtItemList?Token=' + $rootScope._userInfo.Token+ '&MasterID=251&FunctionType=0'
+            url: GURL + 'ewtItemList?Token=' + $rootScope._userInfo.Token+ '&MasterID='+ $rootScope._userInfo.MasterID +'&FunctionType=0'
         }).success(function (data) {
               if (data != 'null') {
                    msglist.itemList = data;
@@ -131,11 +153,43 @@ angular.module('ezeidApp').controller('salesenquiryController', function($http, 
             });
     }
 
+    //To get user details from EZEID
+    $scope.getUserDetails = function(){
+         $http({
+            method: 'get',
+            url: GURL + 'ewtEZEIDPrimaryDetails?Token=' + $rootScope._userInfo.Token+ '&EZEID='+msglist._info.EZEID
+        }).success(function (data) {
+           if (data != 'null') {
+                    msglist._info.ContactInfo = data[0].FirstName +", "+ data[0].MobileNumber;
+                    msglist._info.Latitude = data[0].Latitude;
+                    msglist._info.Longitude = data[0].Longitude;
+                    initialize();
+            }
+            });
+    };
+
+    //To update Top amount Text Box
+    $scope.updateTopItemAmount = function(){
+
+        var amount = 0, qty = 0, rate = 0;
+        qty = msglist._info.quantity;
+        rate = msglist._info.rate;
+        amount = qty * rate;
+        msglist._info.Amount = amount;
+    };
+
     //To get details of selected item
     $scope.getItemDetails = function(tId){
         selectedItemData = [];
         $scope.itemImage = "";
-        $scope.rate = 0;
+
+        msglist._info.rate = parseInt(msglist._info.rate, 10) ;
+        msglist._info.rate = 0;
+        msglist._info.quantity = parseInt(msglist._info.quantity, 10) ;
+        msglist._info.quantity = 0;
+
+        msglist._info.Amount = parseInt(msglist._info.Amount, 10) ;
+        msglist._info.Amount = .00;
         $http({
             method: 'get',
             url: GURL + 'ewtItemDetails?Token=' + $rootScope._userInfo.Token+ '&TID='+tId
@@ -143,114 +197,182 @@ angular.module('ezeidApp').controller('salesenquiryController', function($http, 
 
               if (data != 'null') {
                     $scope.itemImage =  data[0].Picture;
-                    $scope.rate = data[0].Rate;
+                    msglist._info.rate = data[0].Rate;
                     selectedItemData = data;
                 }
             });
     };
 
     $scope.addItemToList = function(){
+        selectedItemData[0].Rate = msglist._info.rate;
+        selectedItemData[0].Qty = msglist._info.quantity;
+        selectedItemData[0].Amount = msglist._info.Amount;
+        $scope.TotalQty = selectedItemData[0].Qty;
 
-
-        console.log(selectedItemData);
-        console.log("SAi");
-/*
-        console.log($scope.rate);
-        selectedItemData[0].Rate = $scope.rate;
-        selectedItemData[0].Quantity = $scope.quantity;
-        selectedItemData[0].Amount = $scope.rate;*/
-
-       // msgSen.msgs.push(data[i]);
-        selectedItemData[0].itemQty = 0;
+        msglist.selectItemData.push(selectedItemData[0].ItemName +"("+ selectedItemData[0].Qty  +")");
         msglist.selectMsgs.push(selectedItemData[0]);
-
-        console.log(msglist.selectMsgs);
+        msglist._info = [];
 
         selectedItemData = [];
         $scope.itemImage = "";
-        $scope.rate = 0;
-        $scope.quantity = 0;
+        msglist._info.quantity = 0;
+        msglist._info.rate = 0;
+        msglist._info.Amount = 0;
+        msglist._info.SelectedItemTid = "";
     };
 
-    //add remove item to array on change of check box
-    $scope.addToItemList = function(quantity, rate, amount){
+    //update amount Modal
+    $scope.updateAmount = function(index){
 
-         itemList[tID] = {
-            quantity : quantity,
-            rate : rate,
-            amount : amount
-        };
+        var qty = 0, rate = 0;
+        qty = msglist.selectMsgs[index].Qty;
+        rate = msglist.selectMsgs[index].Rate;
+        msglist.selectMsgs[index].Amount =  qty * rate;
 
-      /*  console.log(itemList);*/
-     };
 
+       // msglist.selectItemData.push(selectedItemData[index].ItemName +"("+ selectedItemData[index].Qty  +")");
+   };
+
+    //Below function is called when amount textbox is edited
+   /* $scope.updateItemAmount = function(){
+
+         console.log(msglist._info.Amount);
+    };
+*/
     //deacrease Top quantitiy
     $scope.decriesTopQuantity = function(){
-        console.log('I am executing decrease');
-        if($scope.quantity != 0)
+        if(msglist._info.quantity != 0)
         {
-            $scope.quantity = $scope.quantity - 1;
+            msglist._info.quantity = msglist._info.quantity - 1;
+
+            var qty = 0, rate = 0;
+            qty =  msglist._info.quantity;
+            rate = msglist._info.rate;
+            msglist._info.Amount = qty * rate;
         }
     };
 
     //increase Top quantitiy
     $scope.increaseTopQuantity = function(){
-        console.log('I am executing');
-        $scope.quantity = $scope.quantity + 1;
+
+        var qty = 0, nResult = 0, rate = 0;
+        qty = parseInt(msglist._info.quantity, 10);
+        msglist._info.quantity = 0;
+        nResult = qty + 1;
+        msglist._info.quantity = nResult;
+
+        rate = msglist._info.rate;
+        msglist._info.Amount = nResult * rate;
     };
-
-
 
     //deacrease quantitiy
     $scope.decriesQuantity = function(qty, index){
-
         if(qty != 0)
         {
             qty = qty - 1;
-            msglist.msgs[index].itemQty = qty;
+            msglist.selectMsgs[index].Qty = qty;
+            msglist.selectMsgs[index].Amount = msglist.selectMsgs[index].Qty * msglist.selectMsgs[index].Rate;
+            msglist.selectItemData.push(selectedItemData[index].ItemName +"("+ selectedItemData[index].Qty  +")");
+
+            $scope.TotalQty = $scope.TotalQty - 1;
         }
     };
 
     //increase quantitiy
-    $scope.increaseQuantity = function(qty, index){
-        qty = qty + 1;
-        msglist.msgs[index].itemQty = qty;
+    $scope.increaseQuantity = function(qty1, index){
+
+        var qty = 0, nResult = 0;
+        qty = parseInt(qty1, 10);
+        msglist.selectMsgs[index].Qty = 0;
+        nResult = qty + 1;
+        msglist.selectMsgs[index].Qty = nResult;
+        msglist.selectMsgs[index].Amount = msglist.selectMsgs[index].Qty * msglist.selectMsgs[index].Rate;
+        msglist.selectItemData.push(selectedItemData[index].ItemName +"("+ selectedItemData[index].Qty  +")");
+
+        $scope.TotalQty = $scope.TotalQty + 1;
     };
 
+    //Delete item from list
+    $scope.deleteItemFromList = function(index){
+         msglist.selectMsgs.splice(index, 1);
+         msglist.selectItemData.splice(index, 1);
+      };
+
     //Add Sales Enquiry
-    msglist.addSalesEnquiry = function (event) {
+    msglist.addSalesEnquiry = function () {
+        msglist._info.ItemsList = msglist.selectMsgs;
+        msglist._info.MessageText = msglist.selectItemData.toString();
 
+        msglist._info.TID = 0;//first time o, next time what ever get from api...
+        msglist._info.MessageType = 0;
+        msglist._info.TaskDateTime = today;
+        msglist._info.Notes = "  ";
+        msglist._info.LocID = 0;
+        msglist._info.Duration = 0;
+        msglist._info.DurationScales = 0;
+        msglist._info.FunctionType = 0;
+        msglist._info.NextActionDateTime = today;
+        msglist._info.FolderRuleID = 0;
 
-      /*  console.log(msglist._info);*/
+        console.log(msglist._info);
+
+        /*  console.log(msglist._info);*/
        /* var elem = $(event.currentTarget);
         console.log(elem.data('itemName'));
         console.log(elem.data('itemQty'));
         console.log(elem.data('itemRate'));*/
 
-       /* if ($rootScope._userInfo.IsAuthenticate == true) {
+        if ($rootScope._userInfo.IsAuthenticate == true) {
+
             var currentTaskDate = moment().format('DD-MMM-YYYY hh:mm A');
-            $http({ method: 'post', url: GURL + 'ewtSaveTranscationItems', data: { Token: $rootScope._userInfo.Token, MessageID: 251, ItemID: 1, Qty: 2, Rate: 5, Amount :10,Duration: 2 } }).success(function (data) {
+
+            $http({ method: 'post', url: GURL + 'ewtSaveTranscation', data: {
+                Token: $rootScope._userInfo.Token,
+                TID: msglist._info.TID,
+                MessageText: msglist._info.MessageText,
+                MessageType: msglist._info.MessageType,
+                Status: msglist._info.Status,
+                TaskDateTime :msglist._info.TaskDateTime,
+                Notes: msglist._info.Notes,
+                LocID : msglist._info.LocID,
+                Country : msglist._info.Country,
+                State : msglist._info.State,
+                City : msglist._info.City,
+                Area : msglist._info.Area,
+                FunctionType : msglist._info.FunctionType,
+                Latitude : msglist._info.Latitude,
+                Longitude : msglist._info.Longitude,
+                EZEID : msglist._info.EZEID,
+                ContactInfo : msglist._info.ContactInfo,
+                FolderRuleID : msglist._info.FolderRuleID,
+                Duration : msglist._info.Duration,
+                DurationScales : msglist._info.DurationScales,
+                ItemsList : msglist._info.ItemsList,
+                NextAction  : msglist._info.NextAction,
+                NextActionDateTime  : msglist._info.NextActionDateTime
+
+            } }).success(function (data) {
              //   console.log(data);
-                *//*if (data.IsSuccessfull) {
+               /* if (data.IsSuccessfull) {
                     $('#SalesEnquiryRequest_popup').slideUp();
                     SearchSec.salesMessage = "";
                     Notification.success({ message: 'Message send success', delay: MsgDelay });
                 }
                 else {
                     Notification.error({ message: 'Sorry..! Message not send ', delay: MsgDelay });
-                }*//*
+                }*/
             });
         }
         else {
             //Redirect to Login page
             $('#SignIn_popup').slideDown();
-        }*/
+        }
     };
-
 
     //Maps
     function initialize() {
 
+        console.log("SAi");
         var initialLocation;
         var currentLoc = new google.maps.LatLng(12.295810, 76.639381);
 
@@ -262,11 +384,11 @@ angular.module('ezeidApp').controller('salesenquiryController', function($http, 
         var ClocBtn = (document.getElementById('mapCloc'));
         map.controls[google.maps.ControlPosition.TOP_RIGHT].push(ClocBtn)
 
+
         if ($rootScope._userInfo.IsAuthenticate == true) {
-           /* initialLocation = new google.maps.LatLng(profile._info.Latitude, profile._info.Longitude);*/
+            initialLocation = new google.maps.LatLng(msglist._info.Latitude, msglist._info.Longitude);
             initialLocation = new google.maps.LatLng(12.295810, 76.639381);
             PlaceCurrentLocationMarker(initialLocation);
-
         } else {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(FindCurrentLocation);
@@ -349,11 +471,22 @@ angular.module('ezeidApp').controller('salesenquiryController', function($http, 
         });
     }
     function getAddressForLocation(results) {
-        profile._info.CityTitle = "";
-        profile._info.PostalCode = "";
+     angular.forEach(results, function (mapResultValue, index) {
+           if (mapResultValue.types[0] == 'sublocality_level_1') {
+               msglist._info.Area =  mapResultValue.long_name;
+            }
 
-        angular.forEach(results, function (mapResultValue, index) {
-
+            if (mapResultValue.types[0] == 'locality') {
+                msglist._info.City = mapResultValue.long_name;
+            }
+            if (mapResultValue.types[0] == 'administrative_area_level_1') {
+                msglist._info.State = mapResultValue.long_name;
+            }
+            if (mapResultValue.types[0] == 'country') {
+                msglist._info.Country = mapResultValue.long_name;
+                $scope.$apply();
+                console.log(msglist._info);
+            }
         });
     }
 
@@ -393,8 +526,8 @@ angular.module('ezeidApp').controller('salesenquiryController', function($http, 
             icon: 'images/you_are_here.png'
         });
         google.maps.event.addListener(marker, 'dragend', function (e) {
-           /* profile._info.Latitude = marker.getPosition().k;
-            profile._info.Longitude = marker.getPosition().D;*/
+            msglist._info.Latitude = marker.getPosition().k;
+            msglist._info.Longitude = marker.getPosition().D;
             getReverseGeocodingData(marker.getPosition().k, marker.getPosition().D);
             // myinfowindow.setContent('<h6>You are here</h6>');
             //   myinfowindow.open(map, marker);
@@ -404,9 +537,10 @@ angular.module('ezeidApp').controller('salesenquiryController', function($http, 
         if (showCurrentLocation) {
             initialLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
             PlaceCurrentLocationMarker(initialLocation);
-            /*profile._info.Latitude = position.coords.latitude;
-            profile._info.Longitude = position.coords.longitude;*/
-           // getReverseGeocodingData(profile._info.Latitude, profile._info.Longitude);
+
+            msglist._info.Latitude = position.coords.latitude;
+            msglist._info.Longitude = position.coords.longitude;
+            getReverseGeocodingData(msglist._info.Latitude, msglist._info.Longitude);
         }
     };
     this.getMyLocation = function () {
