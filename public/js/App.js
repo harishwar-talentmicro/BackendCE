@@ -2,6 +2,8 @@
     var ezeid = angular.module('ezeidApp',
         ['ngHeader','ngRoute', 'ngFooter', 'ui-notification', 'imageupload','angularjs-dropdown-multiselect','smart-table']);
 
+    ezeid.value('GURL',"/");
+
     ezeid.value('MsgDelay',2000);
     //HTTP Interceptor for detecting token expiry
     //Reloads the whole page in case of Unauthorized response from api
@@ -340,7 +342,7 @@
         });
 
     //Global Controller
-    ezeid.controller('HomeController', function ($rootScope, $http,$scope) {
+    ezeid.controller('HomeController', function ($rootScope, $http,$scope,GURL) {
            $rootScope.CLoc = {
             CLat: 12.295810,
             CLong: 76.639381
@@ -410,7 +412,7 @@
 
 
     // Search Controller
-    ezeid.controller('SearchController', function ($http, $rootScope, $scope, $compile, $timeout, Notification, $filter, $location, $window, $q, $interval) {
+    ezeid.controller('SearchController', function ($http, $rootScope, $scope, $compile, $timeout, Notification, $filter, $location, $window, $q, $interval,GURL) {
         var map;
         var marker;
         var markers = [];
@@ -1289,7 +1291,7 @@
       }
     });
 
-    ezeid.controller('ProfileController', function ($rootScope, $scope, $http, $q, $timeout, Notification, $filter, $window) {
+    ezeid.controller('ProfileController', function ($rootScope, $scope, $http, $q, $timeout, Notification, $filter, $window,GURL) {
         
         var profile = this;
         profile._info = {};
@@ -2121,7 +2123,7 @@
 
 
 
-    ezeid.controller('NotifyController', function ($scope, $rootScope, $http, Notification, $filter, $interval) {
+    ezeid.controller('NotifyController', function ($scope, $rootScope, $http, Notification, $filter, $interval,GURL) {
         var msgSen = this;
         var _pageValue = 1;
         var MsgDelay = 2000;
@@ -2345,7 +2347,7 @@
     /***
      * HistoryController
      */
-    ezeid.controller('HistoryController', function ($scope, $rootScope, $http, Notification, $filter, $interval) {
+    ezeid.controller('HistoryController', function ($scope, $rootScope, $http, Notification, $filter, $interval,GURL) {
         var msgSen = this;
         var _pageValue = 1;
         var MsgDelay = 2000;

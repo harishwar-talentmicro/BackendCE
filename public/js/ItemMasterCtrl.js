@@ -1,7 +1,69 @@
+angular.module('ezeidApp').directive('contentItem', ['$compile','$templateCache',function ($compile,$templateCache) {
+
+    var getTemplate = function(templateType) {
+        var template = '';
+
+        switch(templateType) {
+            case 0:
+                template = $templateCache.get('/only-message-tpl.html');
+                break;
+            case 1:
+                template = $templateCache.get('/only-item-tpl.html');
+                break;
+            case 2:
+                template = $templateCache.get('/item-picture-tpl.html');
+                break;
+            case 3:
+                template = $templateCache.get('/item-picture-rate-tpl.html');
+                break;
+            case 4 :
+                template = $templateCache.get('/item-picture-rate-tpl.html');
+                break;
+            default :
+                template = "Invalid Template";
+                break;
+        }
+
+        return template;
+    }
+
+    var linker = function(scope, element, attrs) {
+        // scope.rootDirectory = 'images/';
+        console.log(attrs.templateType);
+        var templateType = scope.$eval(attrs.templateType);
+        element.html(getTemplate(templateType)).show();
+        $compile(element.contents())(scope);
+    }
+
+
+    return {
+        restrict: "E",
+        link: linker,
+        scope: {
+            content:'=',
+            index: '=',
+            toggleModalBox : '&'
+        }
+    };
+}]);
 /**
- * Created by admin on 6/3/15.
+ * Filter for Performing Text Stripping for showing description
  */
-angular.module('ezeidApp').controller('ItemMasterCtrl',['$q','$scope','$interval','$http','Notification','$rootScope','$filter',function($q,$scope,$interval,$http,Notification,$rootScope,$filter){
+angular.module('ezeidApp').filter('textLength',function(){
+    return function(text,length){
+        if(typeof(text) !== "string" || text.length < 1 || text.length < length)
+        {
+            return text;
+        }
+        var retText = text.substr(0,length);
+        return retText+" ...";
+    };
+});
+
+/**
+ * Controller : ItemMasterCtrl
+ */
+angular.module('ezeidApp').controller('ItemMasterCtrl',['$q','$scope','$interval','$http','Notification','$rootScope','$filter','GURL',function($q,$scope,$interval,$http,Notification,$rootScope,$filter,GURL){
     //Initially First Tab is selected
     $scope.selectedTab = 1;
     $scope.defaultPicture = 'images/sample_96.png';
@@ -16,7 +78,7 @@ angular.module('ezeidApp').controller('ItemMasterCtrl',['$q','$scope','$interval
         itemListType : [
         2,          // Sales itemListType
         0,          // Reservation DisplayFormat  (Minutes)
-        4,          // HomeDelivery itemListType
+        3,          // HomeDelivery itemListType
         1,          // Service itemListType (Hardcoded as it will always be an item only with description)
         1           // Resume itemListType (Hardcoded as resume will always be having Item only with description)
     ]};
@@ -32,6 +94,18 @@ angular.module('ezeidApp').controller('ItemMasterCtrl',['$q','$scope','$interval
         '/item-picture-qty-tpl.html',
         '/item-picture-qty-rate-tpl.html'
     ];
+
+    /***
+     * All types of items will reside in this model
+     * @type {{sales: Array, reservation: Array, homeDelivery: Array, service: Array, resume: Array}}
+     */
+    $scope.items = {
+        sales : [],
+        reservation : [],
+        homeDelivery : [],
+        service : [],
+        resume : []
+    };
 
 
 
@@ -50,7 +124,7 @@ angular.module('ezeidApp').controller('ItemMasterCtrl',['$q','$scope','$interval
         item : {
             TID : 0,
             title : "",
-            rate : "",
+            rate : 0,
             status : 2,
             description : "",
             picture : $scope.defaultPicture,
@@ -110,14 +184,33 @@ angular.module('ezeidApp').controller('ItemMasterCtrl',['$q','$scope','$interval
 
     //Open Modal box for user
     $scope.showModal = false;
-    $scope.toggleModalBox = function(type,event){
-        if(event){
-            //@todo Handle editing and updating of items here
+    $scope.toggleModalBox = function(type,itemIndex){
+        console.log(type);
+        console.log(itemIndex);
+        if(typeof(type) == "undefined"){
+            type = 0;
+        }
+        if(typeof(itemIndex)!== "undefined"){
+               var functionTypes = ['sales','reservation','homeDelivery','service','resume'];
+//               var type = $(elem).data('functionType');
+//               var itemIndex = $(elem).data('itemIndex');
+               console.log($scope.items[functionTypes[type]][itemIndex]);
+               $scope.modalBox.item = {
+                    TID : $scope.items[functionTypes[type]][itemIndex].TID,
+                    title : $scope.items[functionTypes[type]][itemIndex].ItemName,
+                    description : $scope.items[functionTypes[type]][itemIndex].Description,
+                    rate : $scope.items[functionTypes[type]][itemIndex].Rate,
+                    status : $scope.items[functionTypes[type]][itemIndex].Status,
+                    picture : $scope.items[functionTypes[type]][itemIndex].Pic,
+                    type : type,
+                    duration : ($scope.items[functionTypes[type]][itemIndex].Duration) ? $scope.items[functionTypes[type]][itemIndex].Duration : null
+               };
         }
 
-        $scope.resetModalData();
-
-        $scope.modalBox.item.type = type;
+        else{
+            $scope.resetModalData();
+            $scope.modalBox.item.type = type;
+        }
         $scope.showModal = !$scope.showModal;
     };
 
@@ -125,7 +218,7 @@ angular.module('ezeidApp').controller('ItemMasterCtrl',['$q','$scope','$interval
         $scope.modalBox = {
             title : "Add New Item",
                 item : {
-                TID : 0,
+                    TID : 0,
                     title : "",
                     rate : "",
                     status : 2,
@@ -162,6 +255,38 @@ angular.module('ezeidApp').controller('ItemMasterCtrl',['$q','$scope','$interval
         $("#picture-upload-input").trigger('click');
     };
 
+    /**
+     * Validates the data while adding items
+     * @param item
+     * @returns {boolean}
+     */
+    $scope.validateItem = function(item){
+        var err = [];
+        if(item.title.length < 1){
+            err.push('Item Title is empty');
+        }
+        if(item.description.length < 1 ){
+            err.push('Add description to this item');
+        }
+        if($scope.globalConfig.itemListType[item.type] > 1){
+            if(!item.picture){
+                err.push('Please select a picture for this item');
+            }
+            if($scope.globalConfig.itemListType[item.type] > 2){
+                if(!item.rate){
+                    err.push('Item Rate could not be zero');
+                }
+            }
+        }
+        if(err.length > 1){
+            for(var i = 0; i < err.length; i++){
+                Notification.error({ message : err[i], delay : 5000});
+            }
+            return false;
+        }
+        return true;
+    };
+
     $scope.saveItem = function(){
         var data = {
             Token : $rootScope._userInfo.Token,
@@ -172,22 +297,41 @@ angular.module('ezeidApp').controller('ItemMasterCtrl',['$q','$scope','$interval
             ItemName : $scope.modalBox.item.title,
             ItemDescription : $scope.modalBox.item.description,
             Pic : ($scope.modalBox.item.picture == $scope.defaultPicture) ? null : $scope.modalBox.item.picture,
-            Rate : $scope.modalBox.item.rate,
+            Rate : ($scope.modalBox.item.rate)? $scope.modalBox.item.rate : 0.00,
             Status : $scope.modalBox.item.status,
             ItemDuration : $scope.modalBox.item.duration
 
         };
-       console.log(data);
-       $http({
-           url : '/ewtSaveItem',
-           method : "POST",
-           data : data
-       }).success(function(resp){
-           console.log(resp);
-               //@todo Notification Message for saving Item
-       }).error(function(err){
 
-       });
+        /**
+         * Validates Items and then save it to server
+         */
+       if($scope.validateItem($scope.modalBox.item)){
+           $http({
+               url : GURL + 'ewtSaveItem',
+               method : "POST",
+               data : data
+           }).success(function(resp){
+                   console.log(resp);
+
+                   if(resp && resp.hasOwnProperty("IsSuccessfull")){
+                       if(resp.IsSuccessfull){
+                           $scope.loadItems($scope.modalBox.item.type);
+                           $scope.toggleModalBox();
+                           Notification.success({ message : 'Item added successfully', delay : 5000 });
+                       }
+                       else{
+                           Notification.error({ message : 'An error occured while saving item! Please try again', delay : 5000});
+                       }
+                   }
+                   else{
+                       Notification.error({ message : 'An error occured while saving item! Please try again', delay : 5000});
+                   }
+               }).error(function(err){
+                   Notification.error({ message : 'An error occured while saving item! Please try again', delay : 2000});
+               });
+       }
+
     };
 
     /**
@@ -200,44 +344,95 @@ angular.module('ezeidApp').controller('ItemMasterCtrl',['$q','$scope','$interval
      * Loads items from server based on function type
      * Recursive calls implemented to make requests one after the other
      */
-    $scope.loadItems = function(){
+    $scope.loadItems = function(functionType){
+
+        var fType = (typeof(functionType) !== "undefined") ? functionType : $scope.count;
         $http({
-            url : '/ewtGetItemList',
+            url : GURL + 'ewtGetItemList',
             method : "GET",
             params : {
                 Token : $rootScope._userInfo.Token,
-                FunctionType : $scope.count,
+                FunctionType : fType,
                 MasterID : $scope.masterUser.MasterID
             }
         }).success(function(resp){
-                console.log(resp);
-                $scope.count += 1;
-                if($scope.count < 5){
-                    $scope.loadItems();
+                var functionTypes = ['sales','reservation','homeDelivery','service','resume'];
+                if(resp && resp.length > 0){
+                    /**
+                     * If functionType is set in function, it will be called once only
+                     */
+                    if(typeof(functionType) !== "undefined"){
+                        $scope.items[functionTypes[fType]] = resp;
+                        console.log('Executed once');
+                    }
+                    /**
+                     * It will try to load all items and will increase the counter( loading all types of items initially)
+                     */
+                    else{
+                        console.log('executed multiple '+fType);
+                        $scope.items[functionTypes[fType]] = resp;
+                        $scope.count += 1;
+                        if($scope.count < 5){
+                            console.log('Item load for '+ fType);
+                            $scope.loadItems();
+                        }
+                    }
                 }
+
         }).error(function(err){
                 console.log(err);
         });
     };
 
+
+    /**
+     * Loading Global Configuration Settings for this Business User
+     */
+    $scope.loadGlobalConfig = function(){
+        $http({
+            url : GURL + 'ewtGetConfig',
+            method : "GET",
+            params : {
+                Token : $rootScope._userInfo.Token
+            }
+        }).success(function(resp){
+                if(resp && resp.length > 0){
+                    $scope.globalConfig.itemListType = [];
+                    $scope.globalConfig.itemListType[0] = (resp[0].SalesItemListType !== null) ? resp[0].SalesItemListType : 0;
+                    $scope.globalConfig.itemListType[1] = (resp[0].ReservationDisplayFormat) ? resp[0].ReservationDisplayFormat : 0;
+                    $scope.globalConfig.itemListType[2] = (resp[0].ReservationDisplayFormat) ? resp[0].HomeDeliveryItemListType : 0;
+                    $scope.globalConfig.itemListType[3] = 1;
+                    $scope.globalConfig.itemListType[4] = 1;
+                }
+                console.log(resp);
+            }).error(function(err){
+                console.log(err);
+            });
+    };
+
     /**
      * Getting master user details
      */
-    $http({
-        url : '/ewtGetUserDetails',
-        method : "GET",
-        params :{
-            Token : $rootScope._userInfo.Token
-        }
-    }).success(function(resp){
-            if(resp.length>0){
-                $scope.masterUser = resp[0];
-                //Loading all function items one by one
-                $scope.loadItems();
+    $scope.getMasterUserDetails = function(){
+        $http({
+            url : GURL + 'ewtGetUserDetails',
+            method : "GET",
+            params :{
+                Token : $rootScope._userInfo.Token
             }
-        }).error(function(err){
-            Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
-        });
+        }).success(function(resp){
+                if(resp.length>0){
+                    $scope.masterUser = resp[0];
+                    //Loading all function items one by one
+                    $scope.loadItems();
+                }
+            }).error(function(err){
+                Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
+            });
+    };
 
+
+    $scope.loadGlobalConfig();
+    $scope.getMasterUserDetails();
 
 }]);

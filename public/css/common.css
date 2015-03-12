@@ -1078,6 +1078,13 @@ span.smallCloselink {
 
 .business-item{
     text-align: center;
+    min-height:250px;
+    max-height:250px;
+    font-size: 12px;
+}
+
+.business-item .item-description{
+    word-wrap: normal;
 }
 
 .business-item .thumbnail{

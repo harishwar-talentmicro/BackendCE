@@ -33,49 +33,11 @@
                         <div class="row bottom-clearfix"></div>
                         <div class="row bottom-clearfix">
                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                <button class="btn btn-sm btn-primary" ng-click="toggleModalBox(0)"><span class="glyphicon glyphicon-plus"></span> Add</button>
+                                <button ng-hide="(globalConfig.itemListType[0] < 1)" class="btn btn-sm btn-primary" ng-click="toggleModalBox(0)"><span class="glyphicon glyphicon-plus"></span> Add</button>
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12 bottom-clearfix">
-                                <div class="business-item">
-
-                                    <div class="thumbnail">
-                                        <span class="glyphicon glyphicon-edit"  data-toggle="tooltip" title="Edit Item" data-placement="right"></span>
-                                        <img src="images/sample_96.png">
-                                        <div class="caption">
-                                            <h4 class="text-primary">Item Title <span class="glyphicon glyphicon-ok-circle text-success" data-toggle="tooltip" title="Item Status" data-placement="right"></span> </h4>
-                                            <p class="text-primary">Rate : Rs. 2400/-</p>
-                                            <p>This is item description</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12 bottom-clearfix">
-                                <div class="business-item">
-                                    <div class="thumbnail">
-                                        <img src="images/sample_96.png">
-                                        <div class="caption">
-                                            <h4 class="text-primary">Item Title <span class="glyphicon glyphicon-remove-circle text-danger" data-toggle="tooltip" title="Item Status" data-placement="right"></span> </h4>
-                                            <p class="text-primary">Rate : Rs. 3200/-</p>
-                                            <p>This is item description</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12 bottom-clearfix">
-                                <div class="business-item">
-                                    <div class="thumbnail">
-                                        <img src="images/sample_96.png">
-                                        <div class="caption">
-                                            <h4 class="text-primary">Item Title <span class="glyphicon glyphicon-remove-circle text-danger" data-toggle="tooltip" title="Item Status" data-placement="right"></span> </h4>
-                                            <p class="text-primary">Rate : Rs. 3200/-</p>
-                                            <p>This is item description</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
+                            <content-item ng-repeat="item in items.sales" content="item" index="$index" toggle-modal-box="toggleModalBox(type,itemIndex)" template-type="{{globalConfig.itemListType[0]}}"></content-item>
                         </div>
                     </div>
                 </div>
@@ -87,7 +49,7 @@
                         <div class="row bottom-clearfix"></div>
                         <div class="row bottom-clearfix">
                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                <button class="btn btn-sm btn-primary" ng-click="toggleModalBox(1)"><span class="glyphicon glyphicon-plus"></span> Add</button>
+                                <button ng-hide="(globalConfig.itemListType[1] < 1)" class="btn btn-sm btn-primary" ng-click="toggleModalBox(1)"><span class="glyphicon glyphicon-plus"></span> Add</button>
                             </div>
                         </div>
                     </div>
@@ -100,8 +62,11 @@
                         <div class="row bottom-clearfix"></div>
                         <div class="row bottom-clearfix">
                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                <button class="btn btn-sm btn-primary" ng-click="toggleModalBox(2)"><span class="glyphicon glyphicon-plus"></span> Add</button>
+                                <button ng-hide="(globalConfig.itemListType[2] < 1)" class="btn btn-sm btn-primary" ng-click="toggleModalBox(2)"><span class="glyphicon glyphicon-plus"></span> Add</button>
                             </div>
+                        </div>
+                        <div class="row">
+                            <content-item ng-repeat="item in items.homeDelivery" content="item" index="$index" toggle-modal-box="toggleModalBox(type,itemIndex)"  template-type="{{globalConfig.itemListType[2]}}"></content-item>
                         </div>
                     </div>
                 </div>
@@ -113,8 +78,11 @@
                         <div class="row bottom-clearfix"></div>
                         <div class="row bottom-clearfix">
                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                <button class="btn btn-sm btn-primary" ng-click="toggleModalBox(3)"><span class="glyphicon glyphicon-plus"></span> Add</button>
+                                <button ng-hide="(globalConfig.itemListType[3] < 1)" class="btn btn-sm btn-primary" ng-click="toggleModalBox(3)"><span class="glyphicon glyphicon-plus"></span> Add</button>
                             </div>
+                        </div>
+                        <div class="row">
+                            <content-item ng-repeat="item in items.service" content="item" index="$index" toggle-modal-box="toggleModalBox(type,itemIndex)"  template-type="{{globalConfig.itemListType[3]}}"></content-item>
                         </div>
                     </div>
                 </div>
@@ -126,14 +94,16 @@
                         <div class="row bottom-clearfix"></div>
                         <div class="row bottom-clearfix">
                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                <button class="btn btn-sm btn-primary" ng-click="toggleModalBox(4)" ><span class="glyphicon glyphicon-plus"></span> Add</button>
+                                <button ng-hide="(globalConfig.itemListType[4] < 1)" class="btn btn-sm btn-primary" ng-click="toggleModalBox(4)" ><span class="glyphicon glyphicon-plus"></span> Add</button>
                             </div>
+                        </div>
+                        <div class="row">
+                            <content-item ng-repeat="item in items.resume" content="item" index="$index"toggle-modal-box="toggleModalBox(type,itemIndex)"  template-type="{{globalConfig.itemListType[4]}}"></content-item>
                         </div>
                     </div>
                 </div>
                 <!------- Resume Tab ends ---------------------->
             </div>
-
         </div>
 
 
@@ -158,11 +128,7 @@
                                 </div>
                             </div>
 
-                            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix" ng-show="(globalConfig.itemListType[modalBox.item.type] >= 3)">
-                                <div class="form-group">
-                                    <input class="form-control" numbers-only placeholder="Item Quantity" ng-model="modalBox.item.qty" id="item-qty"/>
-                                </div>
-                            </div>
+
                             <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
                                 <div class="form-group">
                                     <select class="form-control" placeholder="Item Status" ng-model="modalBox.item.status" id="item-status">
@@ -174,13 +140,12 @@
                         </div>
                         <div class="row">
 
-
-                            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix" ng-show="(globalConfig.itemListType[modalBox.item.type] >= 3)">
+                            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix" ng-show="(globalConfig.itemListType[modalBox.item.type] > 2)">
                                 <div class="form-group">
                                     <input class="form-control" numbers-only placeholder="Item Rate" ng-model="modalBox.item.rate" id="item-rate"/>
                                 </div>
                             </div>
-                            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-cleafix" ng-show="(globalConfig.itemListType[modalBox.item.type] >= 3)">
+                            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-cleafix" ng-show="(globalConfig.itemListType[modalBox.item.type] >  1)">
                                 <div class="thumbnail">
                                     <button class="btn btn-xs btn-primary btn-icon" ng-click="selectPicture()">
                                         <span class="glyphicon glyphicon-paperclip"  data-toggle="tooltip" title="Attach Item Picture" data-placement="right"></span>
@@ -199,7 +164,7 @@
                                 <button class="btn btn-primary btn-block" ng-click="saveItem()">Save</button>
                             </div>
                             <div class="col-lg-2 col-md-2 col-sm-4 col-xs-12 bottom-clearfix">
-                                <button class="btn btn-primary btn-block" ng-click="showModal = !showModal">Close</button>
+                                <button class="btn btn-primary btn-block" ng-click="toggleModalBox()">Close</button>
                             </div>
                         </div>
                     </form>
@@ -218,10 +183,12 @@
             <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12 bottom-clearfix">
                 <div class="business-item">
                     <div class="thumbnail">
-                        <span class="glyphicon glyphicon-edit" data-toggle="tooltip" title="" data-placement="right" data-original-title="Edit Item"></span>
+                        <span class="glyphicon glyphicon-edit" data-toggle="tooltip" title="" data-placement="right" data-original-title="Edit Item" ng-click="toggleModalBox({type : content.FunctionType, itemIndex : index})"></span>
                         <div class="caption">
-                            <h4 class="text-primary">Item Title <span class="glyphicon glyphicon-ok-circle text-success" data-toggle="tooltip" title="" data-placement="right" data-original-title="Item Status"></span> </h4>
-                            <p>This is item description</p>
+                            <h4 class="text-primary">{{content.ItemName}}
+                                <span class="glyphicon glyphicon-ok-circle text-success" data-toggle="tooltip" title="" data-placement="right" data-original-title="Item Status"></span>
+                            </h4>
+                            <p class="item-description" data-toggle="tooltip" title="" data-original-title="{{content.Description}}" data-placement="right">{{content.Description | textLength:50}}</p>
                         </div>
                     </div>
                 </div>
@@ -232,44 +199,35 @@
             <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12 bottom-clearfix">
                 <div class="business-item">
                     <div class="thumbnail">
-                        <span class="glyphicon glyphicon-edit" data-toggle="tooltip" title="" data-placement="right" data-original-title="Edit Item"></span>
-                        <img ng-src="images/sample_96.png">
+                        <span class="glyphicon glyphicon-edit" data-toggle="tooltip" title="" data-placement="right" data-original-title="Edit Item"   ng-click="toggleModalBox({type : content.FunctionType, itemIndex : index})"></span>
+                        <img ng-src="{{content.Pic}}" alt="No picture available"/>
                         <div class="caption">
-                            <h4 class="text-primary">Item Title <span class="glyphicon glyphicon-ok-circle text-success" data-toggle="tooltip" title="" data-placement="right" data-original-title="Item Status"></span> </h4>
-                            <p>This is item description</p>
+                            <h4 class="text-primary">{{content.ItemName}}
+                                <span ng-show="content.Status == 2" class="glyphicon glyphicon-ok-circle text-success" data-toggle="tooltip" title="" data-placement="right" data-original-title="Item Status"></span>
+                                <span ng-show="content.Status == 1" class="glyphicon glyphicon-remove-circle text-danger" data-toggle="tooltip" title="" data-placement="right" data-original-title="Item Status"></span>
+                            </h4>
+                            <p class="item-description" data-toggle="tooltip" title="" data-original-title="{{content.Description}}" data-placement="right">{{content.Description | textLength:50}}</p>
                         </div>
                     </div>
                 </div>
             </div>
         </script>
-        <!---------- Item picture quantity template --------------------------->
-        <script type="text/ng-template" id="/item-picture-qty-tpl.html">
+
+
+        <!--------------------------- Templates for Item List Types ends here ------------------------------------>
+        <!---------- Item, picture and rate template --------------------------->
+        <script type="text/ng-template" id="/item-picture-rate-tpl.html">
             <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12 bottom-clearfix">
                 <div class="business-item">
                     <div class="thumbnail">
-                        <span class="glyphicon glyphicon-edit" data-toggle="tooltip" title="" data-placement="right" data-original-title="Edit Item"></span>
-                        <img src="images/sample_96.png">
+                        <span class="glyphicon glyphicon-edit" data-toggle="tooltip" title="" data-placement="right" data-original-title="Edit Item" ng-click="toggleModalBox({type : content.FunctionType, itemIndex : index})"></span>
+                        <img ng-src="{{content.Pic}}" alt="No picture available"/>
                         <div class="caption">
-                            <h4 class="text-primary">Item Title <span class="glyphicon glyphicon-ok-circle text-success" data-toggle="tooltip" title="" data-placement="right" data-original-title="Item Status"></span> </h4>
-                            <p class="text-primary">Quantity : 100 pieces</p>
-                            <p>This is item description</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </script>
-        <!---------- Item picture, quantity and rate template --------------------------->
-        <script type="text/ng-template" id="/item-picture-qty-rate-tpl.html">
-            <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12 bottom-clearfix">
-                <div class="business-item">
-                    <div class="thumbnail">
-                        <span class="glyphicon glyphicon-edit" data-toggle="tooltip" title="" data-placement="right" data-original-title="Edit Item"></span>
-                        <img src="images/sample_96.png">
-                        <div class="caption">
-                            <h4 class="text-primary">Item Title <span class="glyphicon glyphicon-ok-circle text-success" data-toggle="tooltip" title="" data-placement="right" data-original-title="Item Status"></span> </h4>
-                            <p class="text-primary">Quantity : 100 pieces</p>
-                            <p class="text-primary">Rate : 1000/-</p>
-                            <p>This is item description</p>
+                            <h4 class="text-primary">{{content.ItemName}}
+                                <span ng-show="content.Status == 2" class="glyphicon glyphicon-ok-circle text-success" data-toggle="tooltip" title="" data-placement="right" data-original-title="Item Status"></span>
+                                <span ng-show="content.Status == 1" class="glyphicon glyphicon-remove-circle text-danger" data-toggle="tooltip" title="" data-placement="right" data-original-title="Item Status"></span>
+                            <p class="text-primary">Rate : {{content.Rate}}/-</p>
+                            <p class="item-description" data-toggle="tooltip" title="" data-original-title="{{content.Description}}" data-placement="right">{{content.Description | textLength:50}}</p>
                         </div>
                     </div>
                 </div>

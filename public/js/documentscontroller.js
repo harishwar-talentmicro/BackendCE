@@ -1,5 +1,5 @@
 
-angular.module('ezeidApp').controller('DocumentController', function($http, $rootScope, $scope, $timeout, Notification, $filter,$q) {
+angular.module('ezeidApp').controller('DocumentController', function($http, $rootScope, $scope, $timeout, Notification, $filter,$q,GURL) {
   if ($rootScope._userInfo) {
 
     }
@@ -154,7 +154,7 @@ angular.module('ezeidApp').controller('DocumentController', function($http, $roo
         $scope.form = original_form;
 
         if($rootScope._userInfo && $rootScope._userInfo.Token){
-            $http({ method: 'get', url: '/ewtGetDoc?TokenNo=' + $rootScope._userInfo.Token + '&&Type='+ option }).success(function (data) {
+            $http({ method: 'get', url: GURL + 'ewtGetDoc?TokenNo=' + $rootScope._userInfo.Token + '&&Type='+ option }).success(function (data) {
                // if(data && data.length > 0){
                 if(data && data.length > 0 && data[0].No != '' && data !='null'){
                     if($scope.OptionSelected==1){
@@ -267,7 +267,7 @@ angular.module('ezeidApp').controller('DocumentController', function($http, $roo
              formData.append('RefType', $scope.OptionSelected);
              formData.append('TokenNo', $rootScope._userInfo.Token);
 
-             $http({ method: 'POST', url: '/ewTUploadDoc/', data: formData,
+             $http({ method: 'POST', url: GURL + 'ewTUploadDoc/', data: formData,
                      headers: { 'Content-Type': undefined }, transformRequest: angular.identity })
                      .success(function (data, status, headers, config) {
                     // GetUserDetails();
@@ -282,7 +282,7 @@ angular.module('ezeidApp').controller('DocumentController', function($http, $roo
         $scope.form.RefType = $scope.OptionSelected;
         $http({
             method: "POST",
-            url: '/ewtSaveDoc',
+            url: GURL + 'ewtSaveDoc',
             data: JSON.stringify($scope.form),
             headers: { 'Content-Type': 'application/json' }
         }).success(function (data) {

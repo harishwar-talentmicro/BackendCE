@@ -1,5 +1,5 @@
 
-angular.module('ezeidApp').controller('LocationsController', function ($rootScope, $scope, $http, $q, $timeout, Notification, $filter, $interval, $window) {
+angular.module('ezeidApp').controller('LocationsController', function ($rootScope, $scope, $http, $q, $timeout, Notification, $filter, $interval, $window,GURL) {
 
     var SLocCtrl = this;
     var map;

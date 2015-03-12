@@ -1,4 +1,4 @@
-angular.module('ezeidApp').controller('BlackListWhiteListController', function($http, $rootScope, $scope, $timeout, Notification, $filter, $q){
+angular.module('ezeidApp').controller('BlackListWhiteListController', function($http, $rootScope, $scope, $timeout, Notification, $filter, $q,GURL){
 
     var blacklist = this;
     blacklist._info={};

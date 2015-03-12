@@ -1,7 +1,7 @@
 /**
  * Created by admin on 6/3/15.
  */
-angular.module('ezeidApp').controller('PreferenceNavigationCtrl',['$scope','$rootScope','$http','Notification',function($scope,$rootScope,$http,Notification){
+angular.module('ezeidApp').controller('PreferenceNavigationCtrl',['$scope','$rootScope','$http','Notification','GURL',function($scope,$rootScope,$http,Notification,GURL){
 
     $scope.pageSubuser = "html/subusers.html";
     $scope.pageItemMaster = "html/item-master.html";

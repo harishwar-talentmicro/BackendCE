@@ -2,7 +2,7 @@
  * StatusTypesCtrl
  * RuleFilter can be used for Filtering Status too, as both contain FunctionType(Sales,Reservation,HomeDelivery..) Property
  */
-angular.module('ezeidApp').controller('StatusTypesCtrl',['$scope','$rootScope','$http','Notification','$filter','MsgDelay',function($scope,$rootScope,$http,Notification,$filter,MsgDelay){
+angular.module('ezeidApp').controller('StatusTypesCtrl',['$scope','$rootScope','$http','Notification','$filter','MsgDelay','GURL',function($scope,$rootScope,$http,Notification,$filter,MsgDelay,GURL){
 
     /**
      * Main EZEID logged in as business user and having verified status
@@ -64,7 +64,7 @@ angular.module('ezeidApp').controller('StatusTypesCtrl',['$scope','$rootScope','
      */
     $scope.getMasterUserDetails = function(){
         $http({
-            url : '/ewtGetUserDetails',
+            url : GURL + 'ewtGetUserDetails',
             method : "GET",
             params :{
                 Token : $rootScope._userInfo.Token

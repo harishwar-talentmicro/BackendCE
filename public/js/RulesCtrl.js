@@ -1,7 +1,7 @@
 /**
  * Created by admin on 6/3/15.
  */
-angular.module('ezeidApp').controller('RulesCtrl',['$scope','$interval','$http','Notification','$rootScope','$filter',function($scope,$interval,$http,Notification,$rootScope,$filter){
+angular.module('ezeidApp').controller('RulesCtrl',['$scope','$interval','$http','Notification','$rootScope','$filter','GURL',function($scope,$interval,$http,Notification,$rootScope,$filter,GURL){
     //Initially First Tab is selected
     $scope.selectedTab = 1;
 
