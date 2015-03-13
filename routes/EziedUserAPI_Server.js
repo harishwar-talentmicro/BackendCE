@@ -1691,7 +1691,9 @@ exports.FnRegistration = function (req, res) {
         };
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
         if(OperationType = 1){
-            if(FirstName != null && IDTypeID != null && EZEID != null && Password != null ){
+            if( IDTypeID != null && EZEID != null && Password != null ){
+                if(FirstName == null)
+                    FirstName='';
                 if (LastName == null) {
                     LastName = '';
                 }
@@ -1828,7 +1830,7 @@ exports.FnRegistration = function (req, res) {
         }
         else
         {
-            if (IDTypeID != null && EZEID != null && FirstName != null && AddressLine1 != null && Citytitle != null && StateID != null && CountryID != null && PostalCode != null && MobileNumber != null && Gender.toString() != 'NaN') {
+            if (IDTypeID != null && EZEID != null && AddressLine1 != null && Citytitle != null && StateID != null && CountryID != null && PostalCode != null && MobileNumber != null && Gender.toString() != 'NaN') {
                 if (LastName == null) {
                     LastName = '';
                 }
