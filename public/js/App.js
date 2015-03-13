@@ -1209,6 +1209,49 @@
         var showCurrentLocation = true;
         $scope.isCloseButtonClicked = false;
         var isCancelButton = true;
+        
+        $scope.typeInfo = [
+            {PropName:'Unique ID',IsBuFree:'glyphicon glyphicon-ok green',IsBuPaid:'glyphicon glyphicon-ok green',IsIndividual:'glyphicon glyphicon-ok green',IsPublic:'glyphicon glyphicon-ok green'},
+            {PropName:'Store complete Profile',IsBuFree:'glyphicon glyphicon-ok green',IsBuPaid:'glyphicon glyphicon-ok green',IsIndividual:'glyphicon glyphicon-ok green',IsPublic:'glyphicon glyphicon-ok green'},
+            {PropName:'Product Advertising Banners',IsBuFree:'glyphicon glyphicon-remove red',IsBuPaid:'glyphicon glyphicon-ok green',IsIndividual:'glyphicon glyphicon-ban-circle red',IsPublic:'glyphicon glyphicon-remove red'},
+            {PropName:'Store Documents to share',IsBuFree:'glyphicon glyphicon-ok green',IsBuPaid:'glyphicon glyphicon-ok green',IsIndividual:'glyphicon glyphicon-ok green',IsPublic:'glyphicon glyphicon-remove red'},
+            {PropName:'Store Multiple Addresses : Locations',IsBuFree:'glyphicon glyphicon-ok green',IsBuPaid:'glyphicon glyphicon-ok green',IsIndividual:'glyphicon glyphicon-ok green',IsPublic:'glyphicon glyphicon-ok green'},
+            {PropName:'Index your Business on Business Finder',IsBuFree:'glyphicon glyphicon-remove red',IsBuPaid:'glyphicon glyphicon-ok green',IsIndividual:'glyphicon glyphicon-ban-circle red',IsPublic:'glyphicon glyphicon-exclamation-sign yellow'},
+            {PropName:'Business Functions',IsBuFree:'',IsBuPaid:'',IsIndividual:'',IsPublic:''},
+            {PropName:'  - Sales Enquiry / Home Delivery Form',IsBuFree:'glyphicon glyphicon-remove red',IsBuPaid:'glyphicon glyphicon-ok green',IsIndividual:'glyphicon glyphicon-ban-circle red',IsPublic:'glyphicon glyphicon-ban-circle red'},
+            {PropName:'  - Reservation Form',IsBuFree:'glyphicon glyphicon-remove red',IsBuPaid:'glyphicon glyphicon-ok green',IsIndividual:'glyphicon glyphicon-ban-circle red',IsPublic:'glyphicon glyphicon-ban-circle red'},
+            {PropName:'  - Service/Support Request Form',IsBuFree:'glyphicon glyphicon-remove red',IsBuPaid:'glyphicon glyphicon-ok green',IsIndividual:'glyphicon glyphicon-ban-circle red',IsPublic:'glyphicon glyphicon-ban-circle red'},
+            {PropName:'  - Receive Resumes from Jobseekers',IsBuFree:'glyphicon glyphicon-remove red',IsBuPaid:'glyphicon glyphicon-ok green',IsIndividual:'glyphicon glyphicon-ban-circle red',IsPublic:'glyphicon glyphicon-ban-circle red'},
+            {PropName:'  - Send Bulk Sales Enquiries',IsBuFree:'glyphicon glyphicon-remove red',IsBuPaid:'glyphicon glyphicon-ok green',IsIndividual:'glyphicon glyphicon-ban-circle red',IsPublic:'glyphicon glyphicon-ban-circle red'},
+            {PropName:'  - Bulk Mails to Jobseekers',IsBuFree:'glyphicon glyphicon-remove red',IsBuPaid:'glyphicon glyphicon-ok green',IsIndividual:'glyphicon glyphicon-ban-circle red',IsPublic:'glyphicon glyphicon-ban-circle red'},
+            {PropName:'CRM Software - Web & Mobile Apps',IsBuFree:'glyphicon glyphicon-remove red',IsBuPaid:'glyphicon glyphicon-ok green',IsIndividual:'glyphicon glyphicon-ban-circle red',IsPublic:'glyphicon glyphicon-ban-circle red'}
+        ];
+        
+        $scope.isTypeSelected  = false;
+        $scope._selectUserType = function(_type)
+        {
+            $scope.isTypeSelected  = true;
+        if(_type==1)
+        {
+            profile._info.IDTypeID=2;
+            profile._info.SelectionType=1;
+        }
+            else if(_type==2)
+            {
+                profile._info.IDTypeID=2;
+                profile._info.SelectionType=2;
+            }
+            else if(_type==3)
+            {
+                profile._info.IDTypeID=1;
+                profile._info.SelectionType=0;
+            }
+            else if(_type==4)
+            {
+                profile._info.IDTypeID=3;
+                profile._info.SelectionType=0;
+            }
+        }
 
         /**
          * Added for confirmation box while navigating to other
@@ -1366,8 +1409,12 @@
         $scope.$watch('_userInfo.IsAuthenticate', function () {
             if ($rootScope._userInfo.IsAuthenticate == true) {
                 GetUserDetails();
+                $scope.isTypeSelected  = true;
+                $scope.heading = 'Update Profile';
              }
             else {
+                $scope.isTypeSelected  = false;
+                $scope.heading = 'Create New Profile';
                 profile._info = {};
                 profile._info.IDTypeID = 1;
                 profile._info.NameTitleID = 1;
@@ -1765,6 +1812,8 @@
                 }
             }
          }
+        
+        
 
         function isValidate()
         {
@@ -1804,15 +1853,31 @@
                 {
                     errorList.push('Password Mismatch');
                 }
-                if(!profile._info.FirstName)
+                if(profile._info.IDTypeID  == '2')
                 {
-                    notificationMessage += notificationMessage != "" ? ", First Name Required " : "First Name Required";
-                    errorList.push('First Name Required');
+                    if(!profile._info.CompanyName)
+                    {
+                        notificationMessage += notificationMessage != "" ? ", Company Name Required " : "Company Name Required";
+                        errorList.push('Company Name Required');
+                    }
                 }
-                if(!profile._info.LastName)
+                else
                 {
-                    errorList.push(' Last Name Required ');
+                    if(!profile._info.FirstName)
+                    {
+                        notificationMessage += notificationMessage != "" ? ", First Name Required " : "First Name Required";
+                        errorList.push('First Name Required');
+                    }
                 }
+//                if(!profile._info.FirstName)
+//                {
+//                    notificationMessage += notificationMessage != "" ? ", First Name Required " : "First Name Required";
+//                    errorList.push('First Name Required');
+//                }
+//                if(!profile._info.LastName)
+//                {
+//                    errorList.push(' Last Name Required ');
+//                }
                 if(!profile._info.AddressLine1)
                 {
                     errorList.push(' Address1 Required');
@@ -1837,7 +1902,6 @@
                 {
                     errorList.push('Mobile Number Required ');
                 }
-
                 if(profile._info.isWrongEmailPattern)
                 {
                     errorList.push('Not valid email!');
@@ -1880,6 +1944,162 @@
                 //Return false if errorList is greater than zero
                 return (errorList.length>0)? false : true;
           }
+        
+        function isBasicValidate()
+        {
+                var notificationMessage = "";
+                var errorList  = [];
+                // Check validations
+                if(!profile._info.EZEID)
+                {
+                    errorList.push('EZEID is Required');
+                }
+
+                if(profile._info.PIN)
+                {
+                    if(profile._info.PIN != ""){
+                        if(profile._info.PIN<100)
+                        {
+                             errorList.push('Pin should greater or equal 100');
+                        }
+                    }
+                }
+
+                if($scope.disableAvalabilityButton == false)
+                {
+                    errorList.push('First to Check EZE ID availability');
+                }
+
+                if(!profile._info.Password && $rootScope._userInfo.IsAuthenticate == false)
+                {
+                    errorList.push('Password is Required');
+                }
+                if(!profile._info.CPassword && $rootScope._userInfo.IsAuthenticate == false)
+                {
+                    errorList.push('Re-Enter Password is Required');
+                }
+                if(profile._info.Password != profile._info.CPassword && $rootScope._userInfo.IsAuthenticate == false)
+                {
+                    errorList.push('Password Mismatch');
+                }
+                if(profile._info.IDTypeID  == '2')
+                {
+                    if(!profile._info.CompanyName)
+                    {
+                        notificationMessage += notificationMessage != "" ? ", Company Name Required " : "Company Name Required";
+                        errorList.push('Company Name Required');
+                    }
+                }
+                else
+                {
+                    if(!profile._info.FirstName)
+                    {
+                        notificationMessage += notificationMessage != "" ? ", First Name Required " : "First Name Required";
+                        errorList.push('First Name Required');
+                    }
+                }
+//                if(!profile._info.LastName)
+//                {
+//                    errorList.push(' Last Name Required ');
+//                }
+                if(errorList.length>0){
+                    for(var i = errorList.length; i>0;i--)
+                    {
+                        Notification.error({ message: errorList[i-1], delay: MsgDelay });
+                    }
+             };
+                //Return false if errorList is greater than zero
+                return (errorList.length>0)? false : true;
+          }
+        
+        this.saveBasicRegistration = function (UserForm){
+                if(isBasicValidate())
+                {
+                    var sEzeid = profile._info.EZEID;
+                    var lastTwo = sEzeid.substr(sEzeid.length - 2);
+                    if(lastTwo != "ap")
+                    {
+//                        // create/Save profile
+//                        profile._info.SalesEnquiryButton =  profile._info.SalesEnquiryButton == true ? 1 : 0;
+//                        profile._info.HomeDeliveryButton = profile._info.HomeDeliveryButton == true ? 1 : 0;
+//                        profile._info.ReservationButton = profile._info.ReservationButton == true ? 1 : 0;
+//                        profile._info.SupportButton = profile._info.SupportButton == true ? 1 : 0;
+//                        profile._info.CVButton = profile._info.CVButton == true ? 1 : 0;
+//                        profile._info.Gender = (profile._info.Gender == undefined || profile._info.Gender == null )? 2 : profile._info.Gender ;
+                        
+                        profile._info.OperationType = 1;
+                        if(profile._info.IDTypeID == 1)
+                        {
+                            profile._info.Icon = $rootScope.smallImage;
+                        }
+                        else
+                        {
+                            if(isBusinessIcon == 1)
+                            {
+                                profile._info.Icon = $rootScope.smallImage;
+                            }
+                        }
+                        
+                        profile._info.LanguageID = 1;
+                        profile._info.IDTypeID = parseInt(profile._info.IDTypeID, 10);
+                        profile._info.Token = $rootScope._userInfo.Token;
+
+                        var sTokenString = "";
+                        sTokenString = profile._info.Token;
+                        $http({
+                            method: "POST",
+                            url: GURL + 'ewSavePrimaryEZEData',
+                            data: JSON.stringify(profile._info),
+                            headers: { 'Content-Type': 'application/json' }
+                        }).success(function (data) {
+                                if (data.IsAuthenticate) {
+                                    $rootScope._userInfo = data;
+                                    if (typeof (Storage) !== "undefined") {
+                                        var encrypted = CryptoJS.AES.encrypt(JSON.stringify(data), "EZEID");
+                                        localStorage.setItem("_token", encrypted);
+                                    } else {
+                                        alert('Sorry..! Browser does not support');
+                                        window.location.href = "#/home";
+                                    }
+                                    document.getElementById("EZEID").className = "form-control emptyBox";
+                                    document.getElementById("password").className = "form-control emptyBox";
+                                    document.getElementById("re-password").className = "form-control emptyBox";
+                                    document.getElementById("FName").className = "form-control emptyBox";
+                                    document.getElementById("LName").className = "form-control emptyBox";
+                                    document.getElementById("streeName").className = "form-control emptyBox";
+                                    document.getElementById("city").className = "form-control emptyBox";
+                                    document.getElementById("postalCode").className = "form-control emptyBox";
+                                    document.getElementById("mobile_phone").className = "form-control emptyBox";
+
+                                    getISDCode(profile._info.CountryID);
+                                    if (sTokenString == "")
+                                    {
+                                      $scope.isCloseButtonClicked = true;
+                                      window.location.href = "#/congratulations";
+                                    }
+                                    else
+                                    {
+                                        $scope.isCloseButtonClicked = true;
+                                        window.location.href = "#/home";
+                                        Notification.success({ message: "Updated...", delay: MsgDelay });
+                                    }
+                   }
+                    else        {
+                                    if (UserForm.$valid) {
+                                        Notification.error({ message: "Registration failed", delay: MsgDelay });
+                                    }
+                                }
+                            });
+                    }
+                    else
+                    {
+                        Notification.error({ message: "Not available...", delay: MsgDelay });
+                        profile._info.IsIDAvailable = false;
+                    }
+                }
+                }
+        
+        
              //Save and Update Primary Registration
             this.savePrimaryRegistration = function (UserForm) {
                 isCancelButton = false;
@@ -1889,6 +2109,7 @@
                     var lastTwo = sEzeid.substr(sEzeid.length - 2);
                     if(lastTwo != "ap")
                     {
+                        profile._info.OperationType = 2;
                         // create/Save profile
                         profile._info.SalesEnquiryButton =  profile._info.SalesEnquiryButton == true ? 1 : 0;
                         profile._info.HomeDeliveryButton = profile._info.HomeDeliveryButton == true ? 1 : 0;
