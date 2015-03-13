@@ -1735,7 +1735,11 @@ exports.FnRegistration = function (req, res) {
                         if (InsertResult != null) {
                             //  console.log(InsertResult);
                             if (InsertResult.affectedRows > 0) {
+                                if(IDTypeID == 2)
+                                RtnMessage.FirstName=CompanyName;
+                                else
                                 RtnMessage.FirstName = FirstName;
+
                                 RtnMessage.IsAuthenticate = true;
                                 RtnMessage.Token = TokenNo;
                                 RtnMessage.Type = IDTypeID;
