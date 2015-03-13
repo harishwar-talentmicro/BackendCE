@@ -1578,8 +1578,10 @@ exports.FnRegistration = function (req, res) {
     try {
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        //console.log(req._remoteAddress);
+        //console.log('---------------------------');
         var OperationType = req.body.OperationType;
-        var IPAddress = req.body.IPAddress;
+        var IPAddress = req._remoteAddress;
         var SelectionType = parseInt(req.body.SelectionType);
         var IDTypeID = req.body.IDTypeID;
         var EZEID = req.body.EZEID;
