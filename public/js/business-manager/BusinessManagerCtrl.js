@@ -67,32 +67,55 @@ angular.module('ezeidApp').controller('BusinessManagerCtrl',['$scope','$rootScop
         }).success(function(resp){
                 if(resp && resp.length > 0){
 
+                    var moduleVisibilities = resp[0].VisibleModules.split("");
+                    var userAccessRights = resp[0].
+                    if(moduleVisibilities[0] === 1){
+                        var salesModule = new Module(0,resp[0].SalesTitle,true,resp[0].SalesItemListType,0);
+                    }
+                    if(moduleVisibilities[1] === 1){
+                        var salesModule = new Module(0,resp[0].ReservationTitle,true,resp[0].ReservationDisplayFormat,0);
+                    }
+
+                    if(moduleVisibilities[2] === 1){
+                        var salesModule = new Module(0,resp[0].HomeDeliveryTitle,true,resp[0].HomeDeliveryItemListType,0);
+                    }
+
+                    if(moduleVisibilities[3] === 1){
+                        var salesModule = new Module(0,resp[0].ServiceTitle,true,1,0);
+                    }
+
+                    if(moduleVisibilities[4] === 1){
+                        var salesModule = new Module(0,resp[0].ResumeTitle,true,1,0);
+                    }
+
                     $scope.settings.sales.title = resp[0].SalesTitle;
                     $scope.settings.sales.defaultFormMsg = resp[0].SalesFormMsg;
-                    $scope.settings.sales.accessRight = resp[0].UserModuleRights.split("")[0];
+                    $scope.settings.sales.visibility = resp[0].VisibleModules.split("")[0];
                     $scope.settings.sales.itemListType = resp[0].SalesItemListType;
 
 
                     $scope.settings.reservation.title = resp[0].ReservationTitle;
                     $scope.settings.reservation.defaultFormMsg = resp[0].ReservationFormMsg;
-                    $scope.settings.reservation.accessRight = resp[0].UserModuleRights.split("")[1];;
+                    $scope.settings.reservation.visibility = resp[0].VisibleModules.split("")[1];;
                     $scope.settings.reservation.displayFormat = resp[0].ReservationDisplayFormat;
 
 
                     $scope.settings.homeDelivery.title = resp[0].HomeDeliveryTitle;
                     $scope.settings.homeDelivery.defaultFormMsg = resp[0].HomeDeliveryFormMsg;
-                    $scope.settings.homeDelivery.accessRight = resp[0].UserModuleRights.split("")[2];;
+                    $scope.settings.homeDelivery.visibility = resp[0].VisibleModules.split("")[2];;
                     $scope.settings.homeDelivery.itemListType = resp[0].HomeDeliveryItemListType;
 
                     $scope.settings.service.title = resp[0].ServiceTitle;
                     $scope.settings.service.defaultFormMsg = resp[0].ServiceFormMsg;
-                    $scope.settings.service.accessRight= resp[0].UserModuleRights.split("")[3];;
+                    $scope.settings.service.visibility= resp[0].VisibleModules.split("")[3];;
 
 
                     $scope.settings.resume.title = resp[0].ResumeTitle;
                     $scope.settings.resume.defaultFormMsg = resp[0].ResumeFormMsg;
-                    $scope.settings.resume.accessRight = resp[0].UserModuleRights.split("")[4];;
+                    $scope.settings.resume.visibility = resp[0].VisibleModules.split("")[4];;
                     $scope.settings.resume.keywords = resp[0].ResumeKeyword;
+
+
 
                     $scope.settings.business.dataRefreshInterval = resp[0].DataRefreshInterval;
                     $scope.settings.business.brochureFileName = resp[0].BrochureFileName;
@@ -100,7 +123,7 @@ angular.module('ezeidApp').controller('BusinessManagerCtrl',['$scope','$rootScop
                     $scope.settings.business.brochureFileData = "";
                     $scope.settings.business.keywords = "";
                     $scope.settings.business.category = resp[0].BusinessCategoryID;
-
+                    $scope.settings.resume.freshersAccepted = (resp[0].FreshersAccepted === 1) ? true : false;
                 }
                 console.log(resp);
             }).error(function(err){
