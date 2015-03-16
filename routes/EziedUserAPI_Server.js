@@ -530,7 +530,9 @@ exports.FnLogin = function (req, res) {
             SalesItemListType: '',
             RefreshInterval:'',
             MasterID: 0,
-            UserAccessRights: ''
+            UserModuleRights: '',
+            VisibleModules: '',
+            FreshersAccepted: ''
         };
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
         if (UserName != null && UserName != '' && Password != null && Password != '') {
@@ -540,6 +542,7 @@ exports.FnLogin = function (req, res) {
             var Query
             //console.log('findarray: ' + FindArray.length);
           var Query = db.escape(UserName)+','+ db.escape(EncryptPWD);
+           // console.log(Query);
             db.query('CALL PLogin(' + Query + ')', function (err, loginResult) {
                 if (!err) {
                     if(loginResult != null) {
@@ -556,7 +559,7 @@ exports.FnLogin = function (req, res) {
 
                                     if (TokenResult.affectedRows > 0) {
                                         //res.setHeader('Cookie','Token='+Encrypt);
-
+                                       // console.log(loginDetails[0]);
                                         res.cookie('Token', Encrypt, { maxAge: 900000, httpOnly: true });
                                         RtnMessage.Token = Encrypt;
                                         RtnMessage.IsAuthenticate = true;
@@ -577,10 +580,11 @@ exports.FnLogin = function (req, res) {
                                         RtnMessage.CVFormMsg= loginDetails[0].CVFormMsg;
                                         RtnMessage.SalesItemListType= loginDetails[0].SalesItemListType;
                                         RtnMessage.RefreshInterval= loginDetails[0].RefreshInterval;
-                                        RtnMessage.UserAccessRights = loginDetails[0].UserAccessRights;
+                                        RtnMessage.UserModuleRights = loginDetails[0].UserModuleRights;
                                         RtnMessage.MasterID= loginDetails[0].ParentMasterID;
+                                        RtnMessage.VisibleModules= loginDetails[0].VisibleModules;
+                                        RtnMessage.FreshersAccepted= loginDetails[0].FreshersAccepted;
                                         res.send(RtnMessage);
-
                                         console.log('FnLogin:tmaster: Login success');
                                     }
                                     else {
