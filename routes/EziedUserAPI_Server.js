@@ -8182,3 +8182,158 @@ exports.Base64Data = function (req, res) {
         return 'error'
     }
 };
+
+//EZEID VAS
+
+exports.FnLoginVES = function (req, res) {
+    try {
+
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var EZEID = req.query.EZEID;
+        var Password = req.query.Password;
+        if (EZEID != null && EZEID != '' && Password != null && Password != '') {
+            //var EncryptPWD = FnEncryptPassword(Password);
+            //console.log('Encrypt password' +EncryptPWD);
+            db.query('CALL pLoginVES(' + db.escape(EZEID) + ',' + db.escape(Password) + ')', function (err, GetResult) {
+                if (!err) {
+                    if (GetResult != null) {
+                        if (GetResult[0].length > 0) {
+                            console.log('FnLoginVES: LoginVES details Send successfully');
+                            res.send(GetResult[0]);
+                        }
+                        else {
+                            console.log('FnLoginVES:No LoginVES Details found');
+                            res.send('null');
+                        }
+                    }
+                    else {
+                        console.log('FnLoginVES:No LoginVES Details found');
+                        res.send('null');
+                    }
+                }
+                else {
+                    console.log('FnLoginVES: error in getting LoginVES details' + err);
+                    res.statusCode = 500;
+                    res.send('null');
+                }
+            });
+        }
+        else {
+            if (EZEID == null) {
+                console.log('FnLoginVES: EZEID is empty');
+            }
+            if (Password == null) {
+                console.log('FnLoginVES: Password is empty');
+            }
+            res.statusCode=400;
+            res.send('null');
+        }
+    }
+    catch (ex) {
+        console.log('FnLoginVES error:' + ex.description);
+        throw new Error(ex);
+    }
+};
+
+exports.FnSaveContactVES = function(req, res){
+    try{
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.body.Token;
+        var EZEID = req.body.EZEID;
+        var Pic = req.body.Pic;
+        var FirstName = req.body.FirstName;
+        var LastName = req.body.LastName;
+        var PhoneNo = req.body.PhoneNo;
+        var MobileNo = req.body.MobileNo;
+        var EmailID = req.body.EmailID;
+        var CompanyName = req.body.CompanyName;
+        var Address1 = req.body.Address1;
+        var Address2 = req.body.Address2;
+        var CountryID = req.body.CountryID;
+        var StateID = req.body.StateID;
+        var City = req.body.City;
+        var PostalCode = req.body.PostalCode;
+        var Synced = req.body.Synced;
+        var ContactID = req.body.ContactID;
+        var LaptopSLNO = req.body.LaptopSLNO;
+        var VehicalTypeNo = req.body.VehicalTypeNo;
+        var InTime = req.body.InTime;
+        var OutTime = req.body.OutTime;
+        var ContactDeptID = req.body.ContactDeptID;
+        var PassReturned = req.body.PassReturned;
+        var Status = req.body.Status;
+        var GateNo  = req.body.GateNo;
+        var SyncedInout = req.body.SyncedInout;
+
+        var RtnMessage = {
+            IsSuccessfull: false
+        };
+
+        if (Token != null && EZEID != null && ContactID != null) {
+            FnValidateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+                        var query = db.escape(Token) + ',' + db.escape(EZEID) + ',' + db.escape(Pic) + ',' + db.escape(FirstName) + ',' +db.escape(LastName)
+                            + ',' +db.escape(PhoneNo) + ',' +db.escape(MobileNo) + ',' +db.escape(EmailID) + ',' +db.escape(CompanyName)
+                            + ',' +db.escape(Address1) + ',' +db.escape(Address2) + ',' +db.escape(CountryID) + ',' +db.escape(StateID) + ',' +db.escape(City)
+                            + ',' + db.escape(PostalCode) + ',' + db.escape(Synced) + ',' + db.escape(ContactID) + ',' +db.escape(LaptopSLNO) + ',' +db.escape(VehicalTypeNo)
+                            + ',' + db.escape(InTime) + ',' + db.escape(OutTime) + ',' + db.escape(ContactDeptID) + ',' + db.escape(PassReturned) + ',' + db.escape(Status)
+                            + ',' + db.escape(GateNo) + ',' + db.escape(SyncedInout);
+                        db.query('CALL pSaveContactVES(' + query + ')', function (err, InsertResult) {
+                            if (!err){
+                                if (InsertResult.affectedRows > 0) {
+                                    RtnMessage.IsSuccessfull = true;
+                                    res.send(RtnMessage);
+                                    console.log('FnSaveContactVES:  Contact details save successfully');
+                                }
+                                else {
+                                    console.log('FnSaveContactVES:No Save Contact details');
+                                    res.send(RtnMessage);
+                                }
+                            }
+                            else {
+                                console.log('FnSaveContactVES: error in saving Contact details' + err);
+                                res.statusCode = 500;
+                                res.send(RtnMessage);
+                            }
+                        });
+                    }
+                    else {
+                        console.log('FnSaveContactVES: Invalid token');
+                        res.statusCode = 401;
+                        res.send(RtnMessage);
+                    }
+                }
+                else {
+                    console.log('FnSaveContactVES:Error in processing Token' + err);
+                    res.statusCode = 500;
+                    res.send(RtnMessage);
+                }
+            });
+        }
+        else {
+            if (Token == null) {
+                console.log('FnSaveContactVES: Token is empty');
+            }
+            else if (EZEID == null) {
+                console.log('FnSaveContactVES: EZEID is empty');
+            }
+            else if (ContactID == null) {
+                console.log('FnSaveContactVES: ContactID is empty');
+            }
+
+            res.statusCode=400;
+            res.send(RtnMessage);
+        }
+    }
+    catch (ex) {
+        console.log('FnSaveContactVES:error ' + ex.description);
+        throw new Error(ex);
+    }
+};
+
+

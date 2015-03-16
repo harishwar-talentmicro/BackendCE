@@ -160,6 +160,10 @@ app.post('/ewtUpdateSecondaryLocationAP', LocationManager.FnUpdateSecondaryLocat
 app.post('/ewtUpdateIdCardPrintAP', LocationManager.FnUpdateIdCardPrintAP);
 app.get('/ewtGetIdCardPrintAP',LocationManager.FnGetIdCardPrintAP);
 app.post('/ewtSearchRealEstateAP', LocationManager.FnSearchRealEstateAP);
+
+//EZEID VAS
+app.get('/ewtLoginVES',LocationManager.FnLoginVES);
+app.post('/ewtSaveContactVES',LocationManager.FnSaveContactVES);
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
     console.log('404 : Page not found');
