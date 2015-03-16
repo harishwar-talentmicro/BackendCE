@@ -16,13 +16,10 @@ angular.module('ezeidApp').controller('ModuleSettingsCtrl',['$q','$scope','$inte
      * Access Rights mapping
      * @type {Array}
      */
-    $scope.accessRights = [
-        {value : 0, title : 'Hidden'},   //0
-        {value : 1, title : 'Read Only'},    //1
-        {value : 2, title : 'Read, Create and Update'}, //2
-        {value : 3, title : 'Read, Create, Update and Delete'}, //3
-        {value : 4, title : 'Read and Update'},  //4
-        {value : 5, title : 'Read, Update and Delete'}   //5
+    $scope.visibilities = [
+        {value : 1, title : 'Visible'},    //1
+        {value : 2, title : 'Hidden'} //2
+
     ];
 
     /**
@@ -54,40 +51,40 @@ angular.module('ezeidApp').controller('ModuleSettingsCtrl',['$q','$scope','$inte
 
     /**
      * Basic Modal Declaration
-     * @type {{sales: {title: string, accessRight: number}, reservation: {title: string, accessRights: number}, homeDelivery: {title: string, accessRights: number}, service: {title: string, accessRights: number}, resume: {title: string, accessRights: number}}}
+     * @type {{sales: {title: string, visibility: number}, reservation: {title: string, visibilitys: number}, homeDelivery: {title: string, visibilitys: number}, service: {title: string, visibilitys: number}, resume: {title: string, visibilitys: number}}}
      */
     $scope.settings = {
         sales : {
             title : '',
             defaultFormMsg : '',
-            accessRight : 0,
+            visibility : 0,
             itemListType : 0       // 0: Message, 1: Item, 2: Item+picture, 3: Item+picture+quantity, 4: Item + picture + quantity + rate
 
         },
         reservation : {
             title : '',
             defaultFormMsg : '',
-            accessRight : 0,
+            visibility : 0,
             displayFormat : 0 // 0 : Hours (30 min slot), 1 : Days, 2 : Months
         },
         homeDelivery : {
             title : '',
             defaultFormMsg : '',
-            accessRight : 0,
+            visibility : 0,
             itemListType : 1
 
         },
         service : {
             title : '',
             defaultFormMsg : '',
-            accessRight : 0,
+            visibility : 0,
             itemListType : 1
 
         },
         resume : {
             title : '',
             defaultFormMsg : '',
-            accessRight : 0,
+            visibility : 0,
             itemListType : 1,    //Hardcoded, will always be an item only
             keywords : ""
         },
@@ -104,7 +101,6 @@ angular.module('ezeidApp').controller('ModuleSettingsCtrl',['$q','$scope','$inte
 
 
     $scope.loadSettings = function(){
-        //@todo Load business settings from _userInfo
         $http({
             url : GURL + 'ewtGetConfig',
             method : "GET",
@@ -117,29 +113,29 @@ angular.module('ezeidApp').controller('ModuleSettingsCtrl',['$q','$scope','$inte
 
                         $scope.settings.sales.title = resp[0].SalesTitle;
                         $scope.settings.sales.defaultFormMsg = resp[0].SalesFormMsg;
-                        $scope.settings.sales.accessRight = resp[0].UserModuleRights.split("")[0];
+                        $scope.settings.sales.visibility = resp[0].VisibleModules.split("")[0];
                         $scope.settings.sales.itemListType = resp[0].SalesItemListType;
 
 
                         $scope.settings.reservation.title = resp[0].ReservationTitle;
                         $scope.settings.reservation.defaultFormMsg = resp[0].ReservationFormMsg;
-                        $scope.settings.reservation.accessRight = resp[0].UserModuleRights.split("")[1];;
+                        $scope.settings.reservation.visibility = resp[0].VisibleModules.split("")[1];;
                         $scope.settings.reservation.displayFormat = resp[0].ReservationDisplayFormat;
 
 
                         $scope.settings.homeDelivery.title = resp[0].HomeDeliveryTitle;
                         $scope.settings.homeDelivery.defaultFormMsg = resp[0].HomeDeliveryFormMsg;
-                        $scope.settings.homeDelivery.accessRight = resp[0].UserModuleRights.split("")[2];;
+                        $scope.settings.homeDelivery.visibility = resp[0].VisibleModules.split("")[2];;
                         $scope.settings.homeDelivery.itemListType = resp[0].HomeDeliveryItemListType;
 
                         $scope.settings.service.title = resp[0].ServiceTitle;
                         $scope.settings.service.defaultFormMsg = resp[0].ServiceFormMsg;
-                        $scope.settings.service.accessRight= resp[0].UserModuleRights.split("")[3];;
+                        $scope.settings.service.visibility= resp[0].VisibleModules.split("")[3];;
 
 
                         $scope.settings.resume.title = resp[0].ResumeTitle;
                         $scope.settings.resume.defaultFormMsg = resp[0].ResumeFormMsg;
-                        $scope.settings.resume.accessRight = resp[0].UserModuleRights.split("")[4];;
+                        $scope.settings.resume.visibility = resp[0].VisibleModules.split("")[4];;
                         $scope.settings.resume.keywords = resp[0].ResumeKeyword;
 
 
@@ -150,6 +146,7 @@ angular.module('ezeidApp').controller('ModuleSettingsCtrl',['$q','$scope','$inte
                         $scope.settings.business.brochureFileData = "";
                         $scope.settings.business.keywords = "";
                         $scope.settings.business.category = resp[0].BusinessCategoryID;
+                        $scope.settings.resume.freshersAccepted = (resp[0].FreshersAccepted === 1) ? true : false;
 
                 }
                 console.log(resp);
@@ -176,11 +173,11 @@ angular.module('ezeidApp').controller('ModuleSettingsCtrl',['$q','$scope','$inte
             ServiceTitle : $scope.settings.service.title ,
             ResumeTitle : $scope.settings.resume.title ,
 
-            UserAccessRights : $scope.settings.sales.accessRight + "" +
-                $scope.settings.reservation.accessRight + "" +
-                $scope.settings.homeDelivery.accessRight + "" +
-                $scope.settings.service.accessRight + "" +
-                $scope.settings.resume.accessRight,
+            VisibleModules : $scope.settings.sales.visibility + "" +
+                $scope.settings.reservation.visibility + "" +
+                $scope.settings.homeDelivery.visibility + "" +
+                $scope.settings.service.visibility + "" +
+                $scope.settings.resume.visibility,
 
             SalesItemListType : $scope.settings.sales.itemListType ,
             HomeDeliveryItemListType : $scope.settings.homeDelivery.itemListType ,
@@ -193,7 +190,8 @@ angular.module('ezeidApp').controller('ModuleSettingsCtrl',['$q','$scope','$inte
             ReservationFormMsg : $scope.settings.reservation.defaultFormMsg ,
             HomeDeliveryFormMsg : $scope.settings.homeDelivery.defaultFormMsg ,
             ServiceFormMsg : $scope.settings.service.defaultFormMsg ,
-            ResumeFormMsg : $scope.settings.resume.defaultFormMsg
+            ResumeFormMsg : $scope.settings.resume.defaultFormMsg,
+            FreshersAccepted  : ($scope.settings.resume.freshersAccepted === true) ? 1 : 2
         };
 
         if($scope.validateSettings()){
