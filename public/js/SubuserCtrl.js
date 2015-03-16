@@ -56,8 +56,8 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$htt
      * @type {{1: string, 2: string}}
      */
     $scope.status = {
-        1 : "Inactive",
-        2 : "Active"
+        2 : "Inactive",
+        1 : "Active"
     };
 
     $scope.rules = [];
@@ -98,7 +98,7 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$htt
                 service : [],
                 resume : []
             },
-            status : 2,
+            status : 1,
             salesEmail : "",
             reservationEmail : "",
             homeDeliveryEmail : "",

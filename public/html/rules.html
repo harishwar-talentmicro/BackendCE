@@ -99,19 +99,19 @@
 
                     <div class="row">
                         <div class="col-lg-4 col-sm-4 col-sm-4 col-xs-12 bottom-clearfix">
-                            <div class="form-group">
+                            <div class="form-group" data-toggle="tooltip" data-original-title="Rule Title" data-title="" data-placement="right">
                                 <input class="form-control" ng-model="modalBox.rule.folderTitle" placeholder="Rule Title" />
                             </div>
                         </div>
                         <div class="col-lg-4 col-sm-4 col-sm-4 col-xs-12 bottom-clearfix">
-                            <div class="form-group">
+                            <div class="form-group" data-toggle="tooltip" data-original-title="Rule Type" data-title="" data-placement="right">
                                 <select class="form-control" ng-model="modalBox.rule.ruleType">
                                     <option ng-repeat="ruleType in ruleTypes" value="{{$index}}">{{ruleType}}</option>
                                 </select>
                             </div>
                         </div>
                         <div class="col-lg-4 col-sm-4 col-sm-4 col-xs-12 bottom-clearfix">
-                            <div class="form-group">
+                            <div class="form-group" data-toggle="tooltip" data-original-title="Rule Status" data-title="" data-placement="right">
                                 <select class="form-control" ng-model="modalBox.rule.status">
                                     <option value="1">Inactive</option>
                                     <option value="2">Active</option>
@@ -120,7 +120,7 @@
                         </div>
                     </div>
 
-                    <div class="row">
+                    <div class="row" data-toggle="tooltip" data-original-title="Admin Level Match" data-title="" data-placement="right">
                         <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12 bottom-clearfix" ng-repeat="matchAdminLevel in matchAdminLevels">
                             <div class="form-group">
                                 <div class="radio">
@@ -130,6 +130,35 @@
                                     </label>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+
+
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 bottom-clearfix">
+                            <div class="form-group">
+                                <label>Latitude : {{modalBox.rule.coordinates.latitude}}</label>
+                            </div>
+                            <div class="form-group">
+                                <label>Longitude : {{modalBox.rule.coordinates.longitude}}</label>
+                            </div>
+                            <div class="form-group">
+                                <label>Admin Area : {{ modalBox.geoCoderDetails | ruleAdminAreaFilter:modalBox.rule.matchAdminLevel}}</label>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 bottom-clearfix">
+                            <!-------------------------Map Row ------------------------------>
+                            <div class="row map-container bottom-clearfix">
+                                <div>
+                                    <img id="pac-loc" class="link-btn" ng-click="findCurrentLocation()" src="images/myloc.png" data-toggle="tooltip" data-placement="bottom" title="Current Location" />
+                                    <input id="pac-input" class="form-control pull-left" type="text" placeholder="Search Location" autocomplete="on">
+                                    <!--<button class="btn btn-primary pull-left marL10px marT10px" ng-click="search.SearchOnMap(search.MSerText)" ng-disabled="search.MSerText==undefined" type="button">Find</button>-->
+                                </div>
+                                <div id="map-canvas" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
+                                </div>
+
+                            </div>
+                            <!-------------------------Map Row ends ------------------------------>
                         </div>
                     </div>
 

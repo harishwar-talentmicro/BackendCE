@@ -20,7 +20,7 @@ angular.module('ezeidApp').directive('contentItem', ['$compile','$templateCache'
                 template = $templateCache.get('/item-picture-rate-tpl.html');
                 break;
             default :
-                template = "Invalid Template";
+                template = "";
                 break;
         }
 

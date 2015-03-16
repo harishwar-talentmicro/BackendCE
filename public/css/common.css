@@ -1273,3 +1273,38 @@ span.smallCloselink {
 .no-radius{
     border-radius: 0px;
 }
+
+.map-container{
+    padding:10px;
+}
+.map-container #map-canvas{
+    height:200px;
+    width: 100%;
+}
+
+.map-container #pac-input{
+    width: 50%;
+    border-radius: 0px;
+    margin:10px;
+}
+
+.map-container #pac-loc{
+    margin: 15px;
+}
+
+.business-manager .nav > li{
+    margin-right: 10px;
+    padding-right:1px;
+}
+.business-manager .nav > li > a{
+    font-size: 16px;
+    font-family: 'Roboto',sans-serif;
+    color:#fff;
+    background: #44A9D1;
+    border-radius: 0px;
+}
+
+.business-manager .nav > li.active > a{
+    background: #fff;
+    color:#078FC3;
+}

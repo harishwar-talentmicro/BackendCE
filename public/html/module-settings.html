@@ -53,8 +53,8 @@
                 </div>
                 <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix">
                     <div class="form-group">
-                        <select class="form-control" name="sales-access-rights" ng-model="settings.sales.accessRight">
-                            <option ng-repeat="right in accessRights" value="{{right.value}}">{{right.title}}</option>
+                        <select class="form-control" name="sales-access-rights" ng-model="settings.sales.visibility">
+                            <option ng-repeat="right in visibilities" value="{{right.value}}">{{right.title}}</option>
                         </select>
                     </div>
                 </div>
@@ -115,8 +115,8 @@
                 </div>
                 <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix">
                     <div class="form-group">
-                        <select class="form-control" name="reservation-access-rights" ng-model="settings.reservation.accessRight">
-                            <option ng-repeat="right in accessRights" value="{{right.value}}">{{right.title}}</option>
+                        <select class="form-control" name="reservation-access-rights" ng-model="settings.reservation.visibility">
+                            <option ng-repeat="right in visibilities" value="{{right.value}}">{{right.title}}</option>
                         </select>
                     </div>
                 </div>
@@ -177,8 +177,8 @@
                 </div>
                 <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix">
                     <div class="form-group">
-                        <select class="form-control" name="home-delivery-access-rights" ng-model="settings.reservation.accessRight">
-                            <option ng-repeat="right in accessRights" value="{{right.value}}">{{right.title}}</option>
+                        <select class="form-control" name="home-delivery-access-rights" ng-model="settings.reservation.visibility">
+                            <option ng-repeat="right in visibilities" value="{{right.value}}">{{right.title}}</option>
                         </select>
                     </div>
                 </div>
@@ -239,8 +239,8 @@
                 </div>
                 <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix">
                     <div class="form-group">
-                        <select class="form-control" name="service-access-rights" ng-model="settings.service.accessRight">
-                            <option ng-repeat="right in accessRights" value="{{right.value}}">{{right.title}}</option>
+                        <select class="form-control" name="service-access-rights" ng-model="settings.service.visibility">
+                            <option ng-repeat="right in visibilities" value="{{right.value}}">{{right.title}}</option>
                         </select>
                     </div>
                 </div>
@@ -287,12 +287,29 @@
                 </div>
                 <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix">
                     <div class="form-group">
-                        <select class="form-control" name="resume-access-rights" ng-model="settings.resume.accessRight">
-                            <option ng-repeat="right in accessRights" value="{{right.value}}">{{right.title}}</option>
+                        <select class="form-control" name="resume-access-rights" ng-model="settings.resume.visibility">
+                            <option ng-repeat="right in visibilities" value="{{right.value}}">{{right.title}}</option>
                         </select>
                     </div>
                 </div>
             </div>
+
+
+            <div class="row bottom-clearfix">
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+                    <label>Freshers Allowed</label>
+                    <br/>
+                    <small class="text-primary">(Is Organisation accepts resume of freshers)</small>
+                </div>
+                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix">
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="freshers-accepted" ng-model="settings.resume.freshersAccepted" />
+                        </label>
+                    </div>
+                </div>
+            </div>
+
             <div class="row bottom-clearfix">
                 <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
                     <label>Keywords</label>
