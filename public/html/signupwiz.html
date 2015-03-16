@@ -1,4 +1,16 @@
 <style type="text/css">
+    .green
+    {
+        color: green !important;
+    }
+    .red
+    {
+        color: red !important;
+    }
+    .yellow
+    {
+        color: yellow !important;
+    }
     .btn-file {
         position: relative;
         overflow: hidden;
@@ -18,6 +30,24 @@
         cursor: inherit;
         display: block;
     }
+   
+.TypeInfo table,.TypeInfo th,.TypeInfo td {
+/*    border: 1px solid black;*/
+    border-collapse: collapse;
+}
+.TypeInfo th,.TypeInfo td {
+    padding: 5px;
+}
+table#t01 tr:nth-child(even) {
+    background-color: #eee;
+}
+table#t01 tr:nth-child(odd) {
+   background-color:#fff;
+}
+table#t01 th	{
+    background-color: #36A1CB;
+    color: white;
+}   
 </style>
 <script>
 
@@ -114,6 +144,47 @@
                     <div class="panel-body">
                         <div class="well well-lg">
                             <div class="col-lg-12" style="margin: auto; float: none;">
+                                <div class="row"  ng-show="!_userInfo.IsAuthenticate && !isTypeSelected">
+                                <span><label><strong>&nbsp;Choose your Signup type</strong> </label></span><br/>
+                                    <table id="t01" class="TypeInfo" style="width:100%">
+                                    <tr>
+                                        <th></th>
+                                        <th style="text-align:center">
+                                            Business - Free Listing
+                                        </th>
+                                        <th style="text-align:center">
+                                            Business - Paid Listing
+                                        </th>
+                                        <th style="text-align:center">
+                                            Individual
+                                        </th>
+                                         <th style="text-align:center">
+                                             
+                                             Public Place
+                                        </th>
+                                            </tr>
+                                        <tr ng-repeat="_item in typeInfo">
+                                            <td style="text-align:left;width:260px;">{{_item.PropName}}</td>
+                                            <td style="text-align:center"><span class="{{_item.IsBuFree}}"></span></td>
+                                            <td style="text-align:center"><span class="{{_item.IsBuPaid}}"></span></td>
+                                            <td style="text-align:center"><span class="{{_item.IsIndividual}}"></span></td>
+                                            <td style="text-align:center"><span class="{{_item.IsPublic}}"></span></td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td style="text-align:center"><button ng-click="_selectUserType(1)" type="button" class="btn btn-primary">Select</button></td>
+                                            <td style="text-align:center"><button ng-click="_selectUserType(2)" type="button" class="btn btn-primary">Select</button></td>
+                                            <td style="text-align:center"><button ng-click="_selectUserType(3)" type="button" class="btn btn-primary">Select</button></td>
+                                            <td style="text-align:center"><button ng-click="_selectUserType(4)" type="button" class="btn btn-primary">Select</button></td>
+                                        </tr>
+                                    </table>
+                                    <br/>
+                                    <p>
+                                    <span class="glyphicon glyphicon-ok green"></span> : Available <span style="padding-left:10px;" class="glyphicon glyphicon-remove red"></span> : Not Available
+                                     <span style="padding-left:10px;" class="glyphicon glyphicon-ban-circle red"></span> : Not Applicable <span style="padding-left:10px;" class="glyphicon glyphicon-exclamation-sign yellow"></span> : Partial
+                                    </p>
+                                </div>
+<!--
                                    <div class="row"  ng-show="!_userInfo.IsAuthenticate==true" >
                                         <div class="col-lg-2">
                                             <span><label>ID Type</label></span>
@@ -127,16 +198,18 @@
                                             <input type="radio" name="EZType" ng-model="profile._info.IDTypeID" id="Venue" value="3" required> Public Place
                                         </div>
                                      </div>
+-->
                                    <span ng-show="!_userInfo.IsAuthenticate==true">
                                        <br/>
                                    </span>
+                                <div ng-show="isTypeSelected">
                                    <div class="row mar_editTop"  ng-show="!_userInfo.IsAuthenticate==true" >
                                         <div class="col-lg-6">
                                             <div class="form-group" >
                                                 <input  type="text" style='text-transform:uppercase' ng-pattern="/^[a-zA-Z0-9]*$/" ng-change= "profile.ezeidBoxClicked()"
                                                             ng-class="UserForm.EZEID.$touched && !profile._info.EZEID.length ? 'mandatoryTextBox' : ''"
                                                             name="EZEID" id="EZEID" class="form-control emptyBox" maxlength="15" ng-model="profile._info.EZEID" placeholder="Enter EZE ID"
-                                                            style="width: 90px" required >
+                                                            style="width: 90px" required ng-disabled="profile._info.IsIDAvailable" >
 
                                                 <button type="button" name="btnCheckID" ng-click="profile.CheckisIDAvailable()" ng-disabled="!profile._info.EZEID.length || disableAvalabilityButton" class="btn btn-primary" >Check Availability</button>
                                             </div>
@@ -150,7 +223,7 @@
                                                    Available</span>
                                            </span>
                                         </div>
-
+<div ng-show="profile._info.IsIDAvailable">
                                         <div class="col-lg-4" ng-show="!_userInfo.IsAuthenticate==true">
                                                 <input type="password" name="PWD" ng-model="profile._info.Password"
                                                    ng-class="UserForm.PWD.$touched && !profile._info.Password.length ? 'mandatoryTextBox' : ''"
@@ -159,20 +232,29 @@
                                                    ng-class="UserForm.CPWD.$touched && !profile._info.CPassword.length ? 'mandatoryTextBox' : ''"
                                                    class="form-control emptyBox" id="re-password" required maxlength="20" placeholder="Re-Enter Password" style="width: 48%">
                                         </div>
+    </div>
                                     </div>
                                    <span ng-show="!_userInfo.IsAuthenticate==true">
                                        <br/>
                                    </span>
-
-                                    <div class="row mar_editTop">
-                                        <div class="col-lg-6">
+                                    <div ng-show="profile._info.IsIDAvailable || _userInfo.IsAuthenticate">
+                                <div class="row mar_editTop" ng-hide="profile._info.IDTypeID == 2">
+                                    <div class="col-lg-6">
                                              <input type="text" class="form-control emptyBox" name="FName" id="FName" ng-model="profile._info.FirstName"
                                                    ng-class="UserForm.FName.$touched && !profile._info.FirstName.length ? 'mandatoryTextBox' : ''"
                                                    placeholder="First Name" style="width: 48%" required>
-                                            <input type="text" class="form-control emptyBox" name="LName" id="LName" ng-model="profile._info.LastName"
-                                                   ng-class="UserForm.LName.$touched && !profile._info.LastName.length ? 'mandatoryTextBox' : ''"
+                                            <input type="text" class="form-control" name="LName" id="LName" ng-model="profile._info.LastName"
                                                    placeholder="Middle,  Last Name"  style="width: 48%">
                                         </div>
+                                    </div><br/>
+                                    <div class="row mar_editTop">
+                                        <div class="col-lg-6">
+                                                    <input type="text" ng-show=" profile._info.IDTypeID == 2" class="form-control emptyBox" name="CompName" ng-class="profile._info.IDTypeID == 2 && UserForm.CompName.$touched && !profile._info.CompanyName.length ? 'mandatoryTextBox' : ''" ng-model="profile._info.CompanyName" placeholder="Company Name" style="width: 48%">
+                                                    <input type="text" ng-hide=" profile._info.IDTypeID == 2" class="form-control" ng-model="profile._info.CompanyName" placeholder="Company Name" style="width: 48%">
+                                                    <input type="text" ng-show=" profile._info.IDTypeID == 1" class="form-control" maxlength="100" ng-model="profile._info.JobTitle" placeholder="Job Title"  style="width: 48%">
+                                                    <input type="text" ng-show=" profile._info.IDTypeID == 2" class="form-control" maxlength="100" ng-model="profile._info.JobTitle" placeholder="About Company"  style="width: 48%">
+                                                    <input type="text" ng-show=" profile._info.IDTypeID == 3" class="form-control" maxlength="100" ng-model="profile._info.JobTitle" placeholder="About Public Place"  style="width: 48%">
+                                                </div>
                                         <div class="col-lg-6 setPinDiv">
                                             <input type="checkbox" ng-model="profile._info.SecurePin" ng-click="profile.securePinCliked()"> Secure your EZE ID by a PIN
                                             <input ng-disabled="!profile._info.SecurePin" type="text" class="form-control" name="pin" onkeypress="return isNumberKey(event);" id="PIN" ng-model="profile._info.PIN" required maxlength="3" placeholder="PIN"
@@ -180,6 +262,18 @@
                                         </div>
                                     </div>
                                     <br/>
+                                <div ng-show="!_userInfo.IsAuthenticate" class="row mar_editLeft">
+                                        <div class="checkbox">
+                                            <label>
+                                                <input type="checkbox" ng-model="profile._info.Terms">
+                                                <span>I have fully read and understood the <a class="" ng-click="profile.openTermsAndConditionForm()" id="termConditions">terms and condition</a> of EZE ID</span>
+                                            </label>
+                                        </div>
+                                    <br/>
+                                 <button type="submit" ng-hide="_userInfo.IsAuthenticate" ng-disabled="!profile._info.Terms"
+                                            ng-click="profile.saveBasicRegistration(UserForm)" class="btn btn-primary">Generate EZEID</button><br/><p></p><br/></div>
+                                    </div>
+                                    <div ng-hide="!_userInfo.IsAuthenticate">
                                     <div class="row mar_editTop">
                                         <span><label>&nbsp;Choose your location from the Map below by moving the marker on map to the exact location</label></span><br/>
                                         <div class="col-lg-12" style="margin: auto; float: none;">
@@ -252,12 +346,7 @@
                                                     <input type="text" name="website"
                                                            ng-model="profile._info.Website" class="form-control" placeholder="Website" style="width: 48%">
                                                 </div><br/>
-                                                <div class="row mar_editTop mar_editLeft">
-                                                    <input type="text" class="form-control" ng-model="profile._info.CompanyName" placeholder="Company Name" style="width: 48%">
-                                                    <input type="text" ng-show=" profile._info.IDTypeID == 1" class="form-control" maxlength="100" ng-model="profile._info.JobTitle" placeholder="Designation"  style="width: 48%">
-                                                    <input type="text" ng-show=" profile._info.IDTypeID == 2" class="form-control" maxlength="100" ng-model="profile._info.JobTitle" placeholder="About Company"  style="width: 48%">
-                                                    <input type="text" ng-show=" profile._info.IDTypeID == 3" class="form-control" maxlength="100" ng-model="profile._info.JobTitle" placeholder="About Public Place"  style="width: 48%">
-                                                </div><br/>
+                                                
                                             </div>
 
                                             <div class="col-lg-6">
@@ -295,6 +384,7 @@
                                             </div>
                                         </div>
 
+<!--
                                         <div  class="col-lg-12" style="padding-left: 18px;" ng-show=" profile._info.IDTypeID == 2 && profile._info.EZEIDVerifiedID == 2">
                                             <div class="row mar_editTop">
                                                 <span><label><strong>&nbsp;Settings</strong> </label></span><br/>
@@ -338,6 +428,9 @@
                                                     <span ng-show="UserForm.cvMail.$error.email" ng-if="UserForm.cvMail.$error.email == true ? profile._info.isWrongEmailPatternCV = true : profile._info.isWrongEmailPatternCV = false"></span>
                                             </div><br/>
                                         </div>
+-->
+                                        
+                                        
                                         <div  class="col-lg-12" style="padding-left: 10px;" ng-show="profile._info.IDTypeID == '1'">
                                             <div class="row mar_editTop mar_editLeft">
                                                 <span><label><strong>&nbsp;Birth Date and Gender</strong> </label></span><br/>
@@ -354,8 +447,10 @@
                                                         ng-options="status.id as status.label for status in profile.gender" required>
                                                     <option value="">Select Gender </option>
                                                 </select>
+<!--
                                                 <input type="text" id="target" class="form-control" ng-model="profile._info.LaptopSLNO" placeholder="Laptop Sl. No." style="width: 24%">
                                                 <input type="text" class="form-control" ng-model="profile._info.VehicleNumber" placeholder="Car No."  style="width: 24%">
+-->
 
                                             </div><br/>
 
@@ -367,22 +462,16 @@
                                     <br/>
 
                                     <p></p>
-                                    <div ng-show="!_userInfo.IsAuthenticate" class="row mar_editLeft">
-                                        <div class="checkbox">
-                                            <label>
-                                                <input type="checkbox" ng-model="profile._info.Terms">
-                                                <span>I have fully read and understood the <a class="" ng-click="profile.openTermsAndConditionForm()" id="termConditions">terms and condition</a> of EZE ID</span>
-                                            </label>
-                                        </div>
-                                    </div>
+                                    
 
                                     <br/>
-                                   <button type="submit" ng-show="_userInfo.IsAuthenticate" ng-disabled="!profile._info.EZEID || !profile._info.FirstName || !profile._info.LastName || !profile._info.AddressLine1
+                                   <button type="submit" ng-show="_userInfo.IsAuthenticate" ng-disabled="!profile._info.EZEID || !profile._info.AddressLine1
                                            || !profile._info.CityTitle || !profile._info.PostalCode || !profile._info.MobileNumber "
                                            ng-click="profile.savePrimaryRegistration(UserForm)" class="btn btn-primary">Save</button>
-                                    <button type="submit" ng-hide="_userInfo.IsAuthenticate" ng-disabled="!profile._info.Terms"
-                                            ng-click="profile.savePrimaryRegistration(UserForm)" class="btn btn-primary">Generate EZEID</button>
+                                   
                                    <button type="reset" class="btn btn-primary" ng-click="profile.closeRegistrationForm()" >Close</button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

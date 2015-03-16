@@ -20,11 +20,11 @@
             responseError : function(respErr){
                 if(respErr.status == 401 && respErr.statusText == 'Unauthorized'){
                     try{
-                    localStorage.removeItem("_token");
+                        localStorage.removeItem("_token");
                     }
                     catch(ex)
                     {
-                            
+
                     }
                     $rootScope._userInfo = null;
                     $rootScope.IsIdAvailable = false;
@@ -32,7 +32,7 @@
                     $timeout(function(){
                         //Reloading page on token expiry                    
                         window.location.reload(true);
-                        
+
                     },3000);
                 }
             }
@@ -59,7 +59,7 @@
             .when('/business-preference',{templateUrl : 'html/business-preference.html'})
             .when('/business-manager',{templateUrl : 'html/business-manager/business-manager.html'})
             .otherwise({ templateUrl: 'html/home.html' });
-        
+
         $httpProvider.interceptors.push("ezeidInterceptor");
     }]);
 
@@ -67,57 +67,53 @@
      * @ezeid Configuring Route access based on authentication
      */
     ezeid.run(['$location','$rootScope','CLOSED_ROUTES',function($location,$rootScope,CLOSED_ROUTES){
-            /**
-             * Checking login while navigating to different pages
-             */
-            $rootScope.$on("$routeChangeStart",function(event,next,current){
+        /**
+         * Checking login while navigating to different pages
+         */
+        $rootScope.$on("$routeChangeStart",function(event,next,current){
 
-                /**
-                 * @todo Check if user is navigating to Closed Routes( which require authentication)
-                 *       then don't let him navigate to those routes without checking his authenticity
-                 */
-                try{
-                    if(CLOSED_ROUTES.indexOf(next.$$route.originalPath) == -1){
-                        return true;
-                    }
-                }
-                catch(ex){
+            /**
+             * @todo Check if user is navigating to Closed Routes( which require authentication)
+             *       then don't let him navigate to those routes without checking his authenticity
+             */
+            try{
+                if(CLOSED_ROUTES.indexOf(next.$$route.originalPath) == -1){
                     return true;
                 }
+            }
+            catch(ex){
+                return true;
+            }
 
 
+            /**
+             * Checking if the user is authenticated an then routing it to particular url
+             */
+
+            ///////////////////////////////////////////////////////////////////
+
+            if ($rootScope._userInfo) {
                 /**
-                 * Checking if the user is authenticated an then routing it to particular url
+                 * Allow him to access the site as he is already logged in
                  */
-
-                ///////////////////////////////////////////////////////////////////
-
-                if ($rootScope._userInfo) {
-                    /**
-                     * Allow him to access the site as he is already logged in
-                     */
-                }
-                else {
-                    if (typeof (Storage) !== "undefined") {
-                        var encrypted = localStorage.getItem("_token");
-                        if (encrypted) {
-                            var decrypted = CryptoJS.AES.decrypt(encrypted, "EZEID");
-                            var Jsonstring = null;
-                            try{
-                                Jsonstring = decrypted.toString(CryptoJS.enc.Utf8);
-                            }
-                            catch(ex){}
-                            if (Jsonstring) {
-                                $rootScope._userInfo = JSON.parse(Jsonstring);
-                                if($rootScope._userInfo.hasOwnProperty('IsAuthenticate')){
-                                    if($rootScope._userInfo.IsAuthenticate == true || $rootScope._userInfo.IsAuthenticate == "true"){
-                                        /**
-                                         * Allow him to access the site as he is already logged in
-                                         */
-                                    }
-                                    else{
-                                        $location.path('/');
-                                    }
+            }
+            else {
+                if (typeof (Storage) !== "undefined") {
+                    var encrypted = localStorage.getItem("_token");
+                    if (encrypted) {
+                        var decrypted = CryptoJS.AES.decrypt(encrypted, "EZEID");
+                        var Jsonstring = null;
+                        try{
+                            Jsonstring = decrypted.toString(CryptoJS.enc.Utf8);
+                        }
+                        catch(ex){}
+                        if (Jsonstring) {
+                            $rootScope._userInfo = JSON.parse(Jsonstring);
+                            if($rootScope._userInfo.hasOwnProperty('IsAuthenticate')){
+                                if($rootScope._userInfo.IsAuthenticate == true || $rootScope._userInfo.IsAuthenticate == "true"){
+                                    /**
+                                     * Allow him to access the site as he is already logged in
+                                     */
                                 }
                                 else{
                                     $location.path('/');
@@ -127,19 +123,11 @@
                                 $location.path('/');
                             }
                         }
-                        else {
-                            $rootScope._userInfo = {
-                                IsAuthenticate: false,
-                                Token: '',
-                                FirstName: '',
-                                Type: '',
-                                Icon: ''
-                            };
+                        else{
                             $location.path('/');
                         }
                     }
                     else {
-                        // Sorry! No Web Storage support..
                         $rootScope._userInfo = {
                             IsAuthenticate: false,
                             Token: '',
@@ -147,14 +135,26 @@
                             Type: '',
                             Icon: ''
                         };
-                        alert('Sorry..! Your browser is not supported. Upgrade to latest browser');
                         $location.path('/');
                     }
                 }
-                ////////////////////////////////////////////////////////////////////
-            });
+                else {
+                    // Sorry! No Web Storage support..
+                    $rootScope._userInfo = {
+                        IsAuthenticate: false,
+                        Token: '',
+                        FirstName: '',
+                        Type: '',
+                        Icon: ''
+                    };
+                    alert('Sorry..! Your browser is not supported. Upgrade to latest browser');
+                    $location.path('/');
+                }
+            }
+            ////////////////////////////////////////////////////////////////////
+        });
 
-        }]);
+    }]);
     /************************************** Run Configuration ends here ****************************/
 
     var GURL = '/'; //Not required any more because we have already setup a value in angular for GURL
@@ -308,20 +308,20 @@
     });
 
     ezeid.directive('dateTimePicker', function() {
-            return {
-                restrict: 'E',
-                replace: true,
-                require : '?ngModel',
-                scope: {
-                    recipient: '='
-                },
-                template:
-                    '<div class="input-group datetimepicker">'+
-                        '<input type="text" class="form-control" placeholder="Date"  id="datetimepicker1"  name="recipientDateTime" />'+
-                        '<span class="input-group-addon"><span class="glyphicon glyphicon-calendar" >'+
-                        '</span>'+
+        return {
+            restrict: 'E',
+            replace: true,
+            require : '?ngModel',
+            scope: {
+                recipient: '='
+            },
+            template:
+                '<div class="input-group datetimepicker">'+
+                    '<input type="text" class="form-control" placeholder="Date"  id="datetimepicker1"  name="recipientDateTime" />'+
+                    '<span class="input-group-addon"><span class="glyphicon glyphicon-calendar" >'+
+                    '</span>'+
                     '</div>',
-                link: function(scope, element, attrs, ngModel) {
+            link: function(scope, element, attrs, ngModel) {
                 var input = element.find('input');
                 input.bind('blur change keyup keypress',function(){
                     scope.recipient = input.val();
@@ -336,21 +336,21 @@
     });
 
     ezeid.controller('SampleWizardController', function($scope, $q, $timeout) {
-            $scope.user = {};
+        $scope.user = {};
 
-            $scope.saveState = function() {
-                var deferred = $q.defer();
+        $scope.saveState = function() {
+            var deferred = $q.defer();
 
-                $timeout(function() {
-                    deferred.resolve();
-                }, 5000);
+            $timeout(function() {
+                deferred.resolve();
+            }, 5000);
 
-                return deferred.promise;
-            };
+            return deferred.promise;
+        };
 
-            $scope.completeWizard = function() {
-                alert('Completed!');
-            }
-        });
+        $scope.completeWizard = function() {
+            alert('Completed!');
+        }
+    });
 
 })();

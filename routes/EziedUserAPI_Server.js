@@ -1578,9 +1578,19 @@ exports.FnRegistration = function (req, res) {
     try {
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        //console.log(req._remoteAddress);
+        //console.log('---------------------------');
+        var OperationType = req.body.OperationType;
+        var IPAddress = req._remoteAddress;
+        var SelectionTypes = parseInt(req.body.SelectionType);
+        if(SelectionTypes.toString() == 'NaN'){
+            SelectionTypes = 0;
+        }
+            console.log(SelectionTypes);
         var IDTypeID = req.body.IDTypeID;
         var EZEID = req.body.EZEID;
-        EZEID = EZEID.toUpperCase();
+       if(EZEID != null)
+           EZEID = EZEID.toUpperCase();
         var Password = req.body.Password;
         var FirstName = req.body.FirstName;
         var LastName = req.body.LastName;
@@ -1616,6 +1626,7 @@ exports.FnRegistration = function (req, res) {
         if (Altitude == null || Altitude == '') {
             Altitude = 0;
         }
+
         var AddressLine1 = req.body.AddressLine1;
         var AddressLine2 = req.body.AddressLine2;
         var Area = req.body.Area;
@@ -1624,7 +1635,6 @@ exports.FnRegistration = function (req, res) {
         var CountryID = req.body.CountryID;
         var PostalCode = req.body.PostalCode;
         var PIN = req.body.PIN;
-
         var PhoneNumber = req.body.PhoneNumber;
         var MobileNumber = req.body.MobileNumber;
         var EMailID = req.body.EMailID;
@@ -1646,31 +1656,11 @@ exports.FnRegistration = function (req, res) {
         var IconFileName = req.body.IconFileName;
         var ISDPhoneNumber = req.body.ISDPhoneNumber;
         var ISDMobileNumber = req.body.ISDMobileNumber;
-
-        //below lines from parkingstatus to cvmailId is commented bcoz of phase 1
-        var ParkingStatus = parseInt(req.body.ParkingStatus);
-        var OpenStatus = parseInt(req.body.OpenStatus);
-        var WorkingHours = req.body.WorkingHours;
-        var SalesEnquiryMailID = req.body.SalesEnquiryMailID;
-        var HomeDeliveryMailID = req.body.HomeDeliveryMailID;
-        var ReservationMailID = req.body.ReservationMailID;
-        var SupportMailID = req.body.SupportMailID;
-        var CVMailID = req.body.CVMailID;
-        //below parameter is for button enable disable.
-        var SalesEnquiryButton = req.body.SalesEnquiryButton;
-        var HomeDeliveryButton = req.body.HomeDeliveryButton;
-        var ReservationButton = req.body.ReservationButton;
-        var SupportButton = req.body.SupportButton;
-        var CVButton = req.body.CVButton;
         var Gender = parseInt(req.body.Gender);
         var DOB = req.body.DOB;
+        if(Gender.toString() == 'NaN')
+            Gender = 2;
 
-        if (ParkingStatus.toString() == 'NaN') {
-            ParkingStatus = 1;
-        }
-        if (OpenStatus.toString() == 'NaN') {
-            OpenStatus = 1;
-        }
         if (PIN == '') {
             PIN = null;
         }
@@ -1683,162 +1673,320 @@ exports.FnRegistration = function (req, res) {
             Icon: ''
         };
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
-        if (IDTypeID != null && EZEID != null && FirstName != null && AddressLine1 != null && Citytitle != null && StateID != null && CountryID != null && PostalCode != null && MobileNumber != null && Gender.toString() != 'NaN') {
-            if (LastName == null) {
-                LastName = '';
-            }
-            if (StateID == null || StateID == '') {
-                StateID = 0;
-            }
-            if (CountryID == null || CountryID == '') {
-                CountryID = 0;
-            }
+        if(OperationType == 1){
+            if( IDTypeID != null && EZEID != null && Password != null ){
+                if(FirstName == null)
+                    FirstName='';
+                if (LastName == null) {
+                    LastName = '';
+                }
+                if (StateID == null || StateID == '') {
+                    StateID = 0;
+                }
+                if (CountryID == null || CountryID == '') {
+                    CountryID = 0;
+                }
 
-            if (Operation == 'I') {
-                TokenNo = FnGenerateToken();
-            }
-            var EncryptPWD = '';
-            if (Password != null) {
-                EncryptPWD = FnEncryptPassword(Password);
-            }
-            var DOBDate = null;
-            console.log(EZEID.toUpperCase());
-            if (DOB != null && DOB != '') {
-                // datechange = new Date(new Date(TaskDateTime).toUTCString());
-                DOBDate = new Date(DOB);
-                // console.log(TaskDate);
-            }
-            //console.log('FnRegistration: Token: ' + TokenNo);
-            var InsertQuery = db.escape(IDTypeID) + ',' + db.escape(EZEID) + ',' + db.escape(EncryptPWD) + ',' + db.escape(FirstName) + ',' +
-                  db.escape(LastName) + ',' + db.escape(CompanyName) + ',' + db.escape(JobTitle) + ',' + db.escape(FunctionID) + ',' +
-                  db.escape(RoleID) + ',' + db.escape(LanguageID) + ',' + db.escape(NameTitleID) + ',' +
-                  db.escape(TokenNo) + ',' + db.escape(Latitude) + ',' + db.escape(Longitude) + ',' + db.escape(Altitude) + ',' +
-                  db.escape(AddressLine1) + ',' + db.escape(AddressLine2) + ',' + db.escape(Citytitle) + ',' + db.escape(StateID) + ',' + db.escape(CountryID) + ',' +
-                  db.escape(PostalCode) + ',' + db.escape(PIN) + ',' + db.escape(PhoneNumber) + ',' + db.escape(MobileNumber) + ',' + db.escape(EMailID) + ',' +
-                   db.escape(LaptopSLNO) + ',' + db.escape(VehicleNumber) + ',' + db.escape(Picture) + ',' + db.escape(PictureFileName) + ',' + db.escape(WebSite) + ',' + db.escape(Operation) + ',' + db.escape(AboutCompany) + ',' + db.escape(StatusID) + ',' + db.escape(Icon) + ',' + db.escape(IconFileName) + ',' +
-           db.escape(ParkingStatus) + ',' + db.escape(OpenStatus) + ',' + db.escape(WorkingHours) + ',' + db.escape(SalesEnquiryMailID) + ',' + db.escape(HomeDeliveryMailID) + ',' + db.escape(ReservationMailID) + ',' + db.escape(SupportMailID) + ',' + db.escape(CVMailID) + ',' + db.escape(ISDPhoneNumber) + ',' + db.escape(ISDMobileNumber) + ',' +
-           db.escape(SalesEnquiryButton) + ',' + db.escape(HomeDeliveryButton) + ',' + db.escape(ReservationButton) + ',' + db.escape(SupportButton) + ',' + db.escape(CVButton) + ',' + db.escape(Gender) + ',' + db.escape(DOBDate);
-          //  console.log(InsertQuery);
-            db.query('CALL pSaveEZEIDData(' + InsertQuery + ')', function (err, InsertResult) {
-                if (!err) {
-                    // console.log('InsertResult: ' + InsertResult);
-                    if (InsertResult != null) {
-                      //  console.log(InsertResult);
-                        if (InsertResult.affectedRows > 0) {
-                            RtnMessage.FirstName = FirstName;
-                            RtnMessage.IsAuthenticate = true;
-                            RtnMessage.Token = TokenNo;
-                            RtnMessage.Type = IDTypeID;
-                            RtnMessage.Icon = Icon;
-                            if (Operation == 'I') {
-                                console.log('FnRegistration:tmaster: Registration success');
-                                //res.send(RtnMessage);
-                                if (EMailID != '' || EMailID != null) {
-                                    var fs = require('fs');
-                                    fs.readFile("RegTemplate.txt", "utf8", function (err, data) {
-                                        if (err) throw err;
-                                        data = data.replace("[Firstname]", FirstName);
-                                        data = data.replace("[Lastname]", LastName);
-                                        data = data.replace("[EZEID]", EZEID);
-                                        data = data.replace("[EZEID]", EZEID);  //REG Detials
-                                        data = data.replace("[EZEID]", EZEID); //L1
-                                        data = data.replace("[EZEID]", EZEID); //L2
-                                        data = data.replace("[EZEID]", EZEID); //CV
-                                        data = data.replace("[EZEID]", EZEID); //ID
-                                        data = data.replace("[EZEID]", EZEID); //DL
-                                        data = data.replace("[EZEID]", EZEID); //PP
+                if (Operation == 'I') {
+                    TokenNo = FnGenerateToken();
+                }
+                var EncryptPWD = '';
+                if (Password != null) {
+                    EncryptPWD = FnEncryptPassword(Password);
+                }
+                var DOBDate = null;
+                console.log(EZEID.toUpperCase());
+                if (DOB != null && DOB != '') {
+                    // datechange = new Date(new Date(TaskDateTime).toUTCString());
+                    DOBDate = new Date(DOB);
+                    // console.log(TaskDate);
+                }
+                //console.log('FnRegistration: Token: ' + TokenNo);
+                var InsertQuery = db.escape(IDTypeID) + ',' + db.escape(EZEID) + ',' + db.escape(EncryptPWD) + ',' + db.escape(FirstName) + ',' +
+                    db.escape(LastName) + ',' + db.escape(CompanyName) + ',' + db.escape(JobTitle) + ',' + db.escape(FunctionID) + ',' +
+                    db.escape(RoleID) + ',' + db.escape(LanguageID) + ',' + db.escape(NameTitleID) + ',' +
+                    db.escape(TokenNo) + ',' + db.escape(Latitude) + ',' + db.escape(Longitude) + ',' + db.escape(Altitude) + ',' +
+                    db.escape(AddressLine1) + ',' + db.escape(AddressLine2) + ',' + db.escape(Citytitle) + ',' + db.escape(StateID) + ',' + db.escape(CountryID) + ',' +
+                    db.escape(PostalCode) + ',' + db.escape(PIN) + ',' + db.escape(PhoneNumber) + ',' + db.escape(MobileNumber) + ',' + db.escape(EMailID) + ',' +
+                    db.escape(Picture) + ',' + db.escape(PictureFileName) + ',' + db.escape(WebSite) + ',' + db.escape(Operation) + ',' + db.escape(AboutCompany) + ',' + db.escape(StatusID) + ',' + db.escape(Icon) + ',' + db.escape(IconFileName) + ',' + db.escape(ISDPhoneNumber) + ',' + db.escape(ISDMobileNumber) + ',' + db.escape(Gender) + ',' + db.escape(DOBDate) + ',' + db.escape(IPAddress) + ',' + db.escape(SelectionTypes);
+           //     console.log(InsertQuery);
+                db.query('CALL pSaveEZEIDData(' + InsertQuery + ')', function (err, InsertResult) {
+                    if (!err) {
+                        // console.log('InsertResult: ' + InsertResult);
+                        if (InsertResult != null) {
+                            //  console.log(InsertResult);
+                            if (InsertResult.affectedRows > 0) {
+                                if(IDTypeID == 2)
+                                RtnMessage.FirstName=CompanyName;
+                                else
+                                RtnMessage.FirstName = FirstName;
 
-                                        if(PIN == null){
-                                           data = data.replace(".PIN","");
-                                        }
-                                        else
-                                        {
-                                            data = data.replace("PIN",PIN);
-                                        }
+                                RtnMessage.IsAuthenticate = true;
+                                RtnMessage.Token = TokenNo;
+                                RtnMessage.Type = IDTypeID;
+                                RtnMessage.Icon = Icon;
+                                if (Operation == 'I') {
+                                    console.log('FnRegistration:tmaster: Registration success');
+                                    //res.send(RtnMessage);
+                                    if (EMailID != '' && EMailID != null) {
+                                        var fs = require('fs');
+                                        fs.readFile("RegTemplate.txt", "utf8", function (err, data) {
+                                            if (err) throw err;
+                                            data = data.replace("[Firstname]", FirstName);
+                                            data = data.replace("[Lastname]", LastName);
+                                            data = data.replace("[EZEID]", EZEID);
+                                            data = data.replace("[EZEID]", EZEID);  //REG Detials
+                                            data = data.replace("[EZEID]", EZEID); //L1
+                                            data = data.replace("[EZEID]", EZEID); //L2
+                                            data = data.replace("[EZEID]", EZEID); //CV
+                                            data = data.replace("[EZEID]", EZEID); //ID
+                                            data = data.replace("[EZEID]", EZEID); //DL
+                                            data = data.replace("[EZEID]", EZEID); //PP
 
-                                      //  console.log(data);
-                                        var mailOptions = {
-                                            from: 'noreply@ezeid.com',
-                                            to: EMailID,
-                                            subject: 'Welcome to EZEID',
-                                            html: data // html body
-                                        };
-                                        //console.log('Mail Option:' + mailOptions);
-                                        // send mail with defined transport object
-                                        var post = { MessageType: 8, ToMailID: mailOptions.to, Subject: mailOptions.subject, Body: mailOptions.html };
-                                        // console.log(post);
-                                        var query = db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
-                                            // Neat!
-                                            if (!err) {
-                                                console.log('FnRegistration: Mail saved Successfully');
-                                                res.send(RtnMessage);
+                                            if(PIN == null){
+                                                data = data.replace(".PIN","");
                                             }
-                                            else {
-                                                console.log('FnRegistration: Mail not Saved Successfully' + err);
-                                                res.send(RtnMessage);
+                                            else
+                                            {
+                                                data = data.replace("PIN",PIN);
                                             }
+
+                                            //  console.log(data);
+                                            var mailOptions = {
+                                                from: 'noreply@ezeid.com',
+                                                to: EMailID,
+                                                subject: 'Welcome to EZEID',
+                                                html: data // html body
+                                            };
+                                            //console.log('Mail Option:' + mailOptions);
+                                            // send mail with defined transport object
+                                            var post = { MessageType: 8, ToMailID: mailOptions.to, Subject: mailOptions.subject, Body: mailOptions.html };
+                                            // console.log(post);
+                                            var query = db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
+                                                // Neat!
+                                                if (!err) {
+                                                    console.log('FnRegistration: Mail saved Successfully');
+                                                    res.send(RtnMessage);
+                                                }
+                                                else {
+                                                    console.log('FnRegistration: Mail not Saved Successfully' + err);
+                                                    res.send(RtnMessage);
+                                                }
+                                            });
                                         });
-                                    });
+                                    }
+                                    else {
+                                        console.log('FnRegistration: tmaster: registration success but email is empty so mail not sent');
+                                        console.log(RtnMessage);
+                                        res.send(RtnMessage);
+                                    }
                                 }
                                 else {
-                                    console.log('FnRegistration: tmaster: registration success but email is empty so mail not sent');
+                                    console.log('FnRegistration: tmaster: Update operation success');
                                     console.log(RtnMessage);
                                     res.send(RtnMessage);
                                 }
                             }
                             else {
-                                console.log('FnRegistration: tmaster: Update operation success');
                                 console.log(RtnMessage);
                                 res.send(RtnMessage);
+                                console.log('FnRegistration:tmaster: Registration Failed');
                             }
+
                         }
                         else {
                             console.log(RtnMessage);
                             res.send(RtnMessage);
                             console.log('FnRegistration:tmaster: Registration Failed');
                         }
-
                     }
                     else {
-                        console.log(RtnMessage);
+                        res.statusCode = 500;
                         res.send(RtnMessage);
-                        console.log('FnRegistration:tmaster: Registration Failed');
+                        console.log('FnRegistration:tmaster:' + err);
                     }
-                }
-                else {
-                    res.statusCode = 500;
-                    res.send(RtnMessage);
-                    console.log('FnRegistration:tmaster:' + err);
-                }
-            });
-        }
-        else {
-            if (IDTypeID == null) {
-                console.log('FnRegistration: IDTypeID is empty');
-            } else if (EZEID == null) {
-                console.log('FnRegistration: EZEID is empty');
-            } else if (FirstName == null) {
-                console.log('FnRegistration: FirstName is empty');
-            } else if (AddressLine1 == null) {
-                console.log('FnRegistration: AddressLine1 is empty');
-            } else if (Citytitle == null) {
-                console.log('FnRegistration: CityTitle is empty');
-            } else if (StateID == null) {
-                console.log('FnRegistration: StateID is empty');
-            } else if (CountryID == null) {
-                console.log('FnRegistration: CountryID is empty');
-            } else if (PostalCode == null) {
-                console.log('FnRegistration: PostalCode is empty');
-            } else if (MobileNumber == null) {
-                console.log('FnRegistration: MobileNumber is empty');
+                });
+
             }
-            else if (Gender.toString() == 'NaN') {
-                console.log('FnRegistration: Gender is empty')
+            else
+            {
+                console.log('FnRegistration: Wizard Insertion Failed');
+                if(IDTypeID == null ) {
+                    console.log('FnRegistration: IDTypeID is Empty');
+                }
+                else if(EZEID == null){
+                    console.log('FnRegistration: EZEID is Empty');
+                }
+                else if(Password == null) {
+                    console.log('FnRegistration: Password is Empty');
+                }
+
+                console.log('Insert method validation');
+                console.log('Mandatory fields required');
+                res.statusCode = 400;
+                res.send(RtnMessage);
             }
-            res.statusCode = 400;
-            res.send(RtnMessage);
-            console.log('FnRegistration:tmaster: Manditatory field empty');
         }
+        else
+        {
+            if (IDTypeID != null && EZEID != null && AddressLine1 != null && Citytitle != null && StateID != null && CountryID != null && PostalCode != null && MobileNumber != null && Gender.toString() != 'NaN') {
+                if (LastName == null) {
+                    LastName = '';
+                }
+                if (StateID == null || StateID == '') {
+                    StateID = 0;
+                }
+                if (CountryID == null || CountryID == '') {
+                    CountryID = 0;
+                }
+
+                if (Operation == 'I') {
+                    TokenNo = FnGenerateToken();
+                }
+                var EncryptPWD = '';
+                if (Password != null) {
+                    EncryptPWD = FnEncryptPassword(Password);
+                }
+                var DOBDate = null;
+                console.log(EZEID.toUpperCase());
+                if (DOB != null && DOB != '') {
+                    // datechange = new Date(new Date(TaskDateTime).toUTCString());
+                    DOBDate = new Date(DOB);
+                    // console.log(TaskDate);
+                }
+                //console.log('FnRegistration: Token: ' + TokenNo);
+                var InsertQuery = db.escape(IDTypeID) + ',' + db.escape(EZEID) + ',' + db.escape(EncryptPWD) + ',' + db.escape(FirstName) + ',' +
+                    db.escape(LastName) + ',' + db.escape(CompanyName) + ',' + db.escape(JobTitle) + ',' + db.escape(FunctionID) + ',' +
+                    db.escape(RoleID) + ',' + db.escape(LanguageID) + ',' + db.escape(NameTitleID) + ',' +
+                    db.escape(TokenNo) + ',' + db.escape(Latitude) + ',' + db.escape(Longitude) + ',' + db.escape(Altitude) + ',' +
+                    db.escape(AddressLine1) + ',' + db.escape(AddressLine2) + ',' + db.escape(Citytitle) + ',' + db.escape(StateID) + ',' + db.escape(CountryID) + ',' +
+                    db.escape(PostalCode) + ',' + db.escape(PIN) + ',' + db.escape(PhoneNumber) + ',' + db.escape(MobileNumber) + ',' + db.escape(EMailID) + ',' +
+                    db.escape(Picture) + ',' + db.escape(PictureFileName) + ',' + db.escape(WebSite) + ',' + db.escape(Operation) + ',' + db.escape(AboutCompany) + ',' + db.escape(StatusID) + ',' + db.escape(Icon) + ',' + db.escape(IconFileName) + ',' + db.escape(ISDPhoneNumber) + ',' + db.escape(ISDMobileNumber) + ',' + db.escape(Gender) + ',' + db.escape(DOBDate) + ',' + db.escape(IPAddress) + ',' + db.escape(SelectionTypes);
+                 // console.log(InsertQuery);
+                db.query('CALL pSaveEZEIDData(' + InsertQuery + ')', function (err, InsertResult) {
+                    if (!err) {
+                        // console.log('InsertResult: ' + InsertResult);
+                        if (InsertResult != null) {
+                            //  console.log(InsertResult);
+                            if (InsertResult.affectedRows > 0) {
+                                if(IDTypeID == 2)
+                                RtnMessage.FirstName=CompanyName;
+                                else
+                                RtnMessage.FirstName = FirstName;
+                                RtnMessage.IsAuthenticate = true;
+                                RtnMessage.Token = TokenNo;
+                                RtnMessage.Type = IDTypeID;
+                                RtnMessage.Icon = Icon;
+                                if (Operation == 'I') {
+                                    console.log('FnRegistration:tmaster: Registration success');
+                                    //res.send(RtnMessage);
+                                    if (EMailID != '' || EMailID != null) {
+                                        var fs = require('fs');
+                                        fs.readFile("RegTemplate.txt", "utf8", function (err, data) {
+                                            if (err) throw err;
+                                            data = data.replace("[Firstname]", FirstName);
+                                            data = data.replace("[Lastname]", LastName);
+                                            data = data.replace("[EZEID]", EZEID);
+                                            data = data.replace("[EZEID]", EZEID);  //REG Detials
+                                            data = data.replace("[EZEID]", EZEID); //L1
+                                            data = data.replace("[EZEID]", EZEID); //L2
+                                            data = data.replace("[EZEID]", EZEID); //CV
+                                            data = data.replace("[EZEID]", EZEID); //ID
+                                            data = data.replace("[EZEID]", EZEID); //DL
+                                            data = data.replace("[EZEID]", EZEID); //PP
+
+                                            if(PIN == null){
+                                                data = data.replace(".PIN","");
+                                            }
+                                            else
+                                            {
+                                                data = data.replace("PIN",PIN);
+                                            }
+
+                                            //  console.log(data);
+                                            var mailOptions = {
+                                                from: 'noreply@ezeid.com',
+                                                to: EMailID,
+                                                subject: 'Welcome to EZEID',
+                                                html: data // html body
+                                            };
+                                            //console.log('Mail Option:' + mailOptions);
+                                            // send mail with defined transport object
+                                            var post = { MessageType: 8, ToMailID: mailOptions.to, Subject: mailOptions.subject, Body: mailOptions.html };
+                                            // console.log(post);
+                                            var query = db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
+                                                // Neat!
+                                                if (!err) {
+                                                    console.log('FnRegistration: Mail saved Successfully');
+                                                    res.send(RtnMessage);
+                                                }
+                                                else {
+                                                    console.log('FnRegistration: Mail not Saved Successfully' + err);
+                                                    res.send(RtnMessage);
+                                                }
+                                            });
+                                        });
+                                    }
+                                    else {
+                                        console.log('FnRegistration: tmaster: registration success but email is empty so mail not sent');
+                                        console.log(RtnMessage);
+                                        res.send(RtnMessage);
+                                    }
+                                }
+                                else {
+                                    console.log('FnRegistration: tmaster: Update operation success');
+                                    console.log(RtnMessage);
+                                    res.send(RtnMessage);
+                                }
+                            }
+                            else {
+                                console.log(RtnMessage);
+                                res.send(RtnMessage);
+                                console.log('FnRegistration:tmaster: Registration Failed');
+                            }
+
+                        }
+                        else {
+                            console.log(RtnMessage);
+                            res.send(RtnMessage);
+                            console.log('FnRegistration:tmaster: Registration Failed');
+                        }
+                    }
+                    else {
+                        res.statusCode = 500;
+                        res.send(RtnMessage);
+                        console.log('FnRegistration:tmaster:' + err);
+                    }
+                });
+            }
+            else {
+                    console.log('Update method validation');
+                if (IDTypeID == null) {
+                    console.log('FnRegistration: IDTypeID is empty');
+                } else if (EZEID == null) {
+                    console.log('FnRegistration: EZEID is empty');
+                } else if (AddressLine1 == null) {
+                    console.log('FnRegistration: AddressLine1 is empty');
+                } else if (Citytitle == null) {
+                    console.log('FnRegistration: CityTitle is empty');
+                } else if (StateID == null) {
+                    console.log('FnRegistration: StateID is empty');
+                } else if (CountryID == null) {
+                    console.log('FnRegistration: CountryID is empty');
+                } else if (PostalCode == null) {
+                    console.log('FnRegistration: PostalCode is empty');
+                } else if (MobileNumber == null) {
+                    console.log('FnRegistration: MobileNumber is empty');
+                }
+                else if (Gender.toString() == 'NaN') {
+                    console.log('FnRegistration: Gender is empty')
+                }
+                res.statusCode = 400;
+                res.send(RtnMessage);
+                console.log('FnRegistration:tmaster: Manditatory field empty');
+            }
+        }
+
     }
     catch (ex) {
         console.log('FnRegistration error:' + ex.description);
@@ -4987,7 +5135,8 @@ exports.FnSaveItem = function(req, res){
         var RtnMessage = {
             IsSuccessfull: false
         };
-
+        if(Rate == null || Rate =="")
+        Rate=0.00;
         if (Token != null && MasterID != null && FunctionType != null && ItemName !=null) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
@@ -5308,11 +5457,7 @@ exports.FnSaveTranscationItems = function(req, res){
 
         var Token = req.body.Token;
         var MessageID = req.body.MessageID;
-        var ItemID = req.body.ItemID;
-        var Qty = req.body.Qty;
-        var Rate = req.body.Rate;
-        var Amount = req.body.Amount;
-        var Duration = req.body.Duration;
+        var ItemList = req.body.ItemList;
 
         var RtnMessage = {
             IsSuccessfull: false
@@ -5958,7 +6103,7 @@ exports.FnSaveConfig = function(req, res){
         var HomeDeliveryTitle = req.body.HomeDeliveryTitle;
         var ServiceTitle = req.body.ServiceTitle;
         var ResumeTitle = req.body.ResumeTitle;
-        var UserAccessRights = req.body.UserAccessRights;
+        var VisibleModules = req.body.VisibleModules;
         var SalesItemListType = req.body.SalesItemListType;
         var HomeDeliveryItemListType = req.body.HomeDeliveryItemListType;
         var ResumeKeyword = req.body.ResumeKeyword;
@@ -5971,6 +6116,7 @@ exports.FnSaveConfig = function(req, res){
         var HomeDeliveryFormMsg = req.body.HomeDeliveryFormMsg;
         var ServiceFormMsg = req.body.ServiceFormMsg;
         var ResumeFormMsg = req.body.ResumeFormMsg;
+        var FreshersAccepted = req.body.FreshersAccepted;
 
         var RtnMessage = {
             IsSuccessfull: false
@@ -5982,9 +6128,10 @@ exports.FnSaveConfig = function(req, res){
                     if (Result != null) {
 
                         var query = db.escape(Token) + ',' + db.escape(SalesTitle) + ',' + db.escape(ReservationTitle) + ',' + db.escape(HomeDeliveryTitle) + ',' +db.escape(ServiceTitle)
-                            + ',' +db.escape(ResumeTitle) + ',' +db.escape(UserAccessRights) + ',' +db.escape(SalesItemListType) + ',' +db.escape(HomeDeliveryItemListType)
+                            + ',' +db.escape(ResumeTitle) + ',' +db.escape(VisibleModules) + ',' +db.escape(SalesItemListType) + ',' +db.escape(HomeDeliveryItemListType)
                             + ',' +db.escape(ResumeKeyword) + ',' +db.escape(Category) + ',' +db.escape(Keyword) + ',' +db.escape(ReservationDisplayFormat) + ',' +db.escape(DataRefreshInterval)
-                            + ',' + db.escape(SalesFormMsg) + ',' + db.escape(ReservationFormMsg) + ',' + db.escape(HomeDeliveryFormMsg) + ',' +db.escape(ServiceFormMsg) + ',' +db.escape(ResumeFormMsg);
+                            + ',' + db.escape(SalesFormMsg) + ',' + db.escape(ReservationFormMsg) + ',' + db.escape(HomeDeliveryFormMsg) + ',' +db.escape(ServiceFormMsg) + ',' +db.escape(ResumeFormMsg)
+                            + ',' +db.escape(FreshersAccepted);
 
                         db.query('CALL pSaveConfig(' + query + ')', function (err, InsertResult) {
                             if (!err){
@@ -6042,7 +6189,7 @@ exports.FnSaveConfig = function(req, res){
         console.log('FnSaveConfig:error ' + ex.description);
         throw new Error(ex);
     }
-}
+};
 
 exports.FnGetConfig = function (req, res) {
     try {
@@ -6268,6 +6415,212 @@ exports.FnGetHolidayList = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetHolidayList error:' + ex.description);
+        throw new Error(ex);
+    }
+};
+
+exports.FnSaveTranscation = function(req, res){
+    try{
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.body.Token;
+        var TID = req.body.TID;
+        var MessageText =req.body.MessageText;
+        var MessageType = req.body.MessageType;
+        var Status = req.body.Status;
+        var TaskDateTime = req.body.TaskDateTime;
+        var Notes = req.body.Notes;
+        var LocID = req.body.LocID;
+        var Country = req.body.Country;    //country short name
+        var State = req.body.State;         //admin level 1
+        var City = req.body.City;       //ADMIN level 2
+        var Area = req.body.Area;       //admin level 3
+        var FunctionType = req.body.FunctionType;
+        var Latitude = req.body.Latitude;
+        var Longitude = req.body.Longitude;
+        var EZEID = req.body.EZEID;
+        var ContactInfo = req.body.ContactInfo;
+        var FolderRuleID = parseInt(req.body.FolderRuleID);
+        var Duration = req.body.Duration;
+        var DurationScales = req.body.DurationScales;
+        var ItemsList = req.body.ItemsList;
+        var NextAction = req.body.NextAction;
+        var NextActionDateTime = req.body.NextActionDateTime;
+        var  TaskDateNew = new Date(TaskDateTime);
+        var NextActionDateTimeNew = new Date(NextActionDateTime);
+        var RtnMessage = {
+            IsSuccessfull: false
+        };
+        if(FolderRuleID == 'NaN')
+            FolderRuleID=0;
+        if (Token != null ) {
+            FnValidateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+
+                        var query = db.escape(Token)+","+db.escape(MessageType)+","+ db.escape(MessageText)+ "," + db.escape(Status) +"," + db.escape(TaskDateNew) + ","  + db.escape(Notes) + "," + db.escape(LocID)  + "," + db.escape(Country)   + "," + db.escape(State) + "," + db.escape(City)   + "," + db.escape(Area)   + ","  + db.escape(Latitude)  + "," + db.escape(Longitude)  +  "," + db.escape(EZEID)  + "," + db.escape(ContactInfo)  + "," + db.escape(FolderRuleID)  + "," + db.escape(Duration)  + "," + db.escape(DurationScales) + "," + db.escape(NextAction) + "," + db.escape(NextActionDateTimeNew) + "," + db.escape(TID);
+                        // db.escape(NextActionDateTime);
+                        db.query('CALL pSaveTrans(' + query + ')', function (err, InsertResult) {
+                            if (!err){
+                                console.log(InsertResult);
+                                if (InsertResult[0] != null) {
+                                    if(InsertResult[0].length > 0){
+                                        RtnMessage.IsSuccessfull = true;
+                                        var Message = InsertResult[0];
+                                        console.log(Message);
+                                        for(var i=0; i < ItemsList.length; i++) {
+                                            var itemsDetails = ItemsList[i];
+                                            var items = {
+                                                MessageID: Message[0].MessageID,
+                                                ItemID: itemsDetails.TID,
+                                                Qty: itemsDetails.Qty,
+                                                Rate: itemsDetails.Rate,
+                                                Amount: itemsDetails.Amount,
+                                                Duration: itemsDetails.Durations
+                                            };
+                                            console.log(items);
+                                            var query = db.query('INSERT INTO titems SET ?', items, function (err, result) {
+                                                // Neat!
+                                                if (!err) {
+                                                    if (result != null) {
+                                                        if (result.affectedRows > 0) {
+                                                            console.log('FnSaveFolderRules: Folder rules saved successfully');
+                                                        }
+                                                        else {
+                                                            console.log('FnSaveFolderRules: Folder rule not saved');
+                                                        }
+                                                    }
+                                                    else {
+                                                        console.log('FnSaveFolderRules: Folder rule not saved');
+                                                    }
+                                                }
+                                                else {
+                                                    console.log('FnSaveFolderRules: error in saving folder rules' + err);
+                                                }
+                                            });
+
+                                        }
+                                        res.send(RtnMessage);
+                                        console.log('FnSaveTranscationItems: Transaction items details save successfully');
+                                    }
+                                    else
+                                    {
+                                        console.log('FnSaveTranscationItems:No Save Transaction items details');
+                                        res.send(RtnMessage);
+                                    }
+                                }
+                                else {
+                                    console.log('FnSaveTranscationItems:No Save Transaction items details');
+                                    res.send(RtnMessage);
+                                }
+                            }
+
+                            else {
+                                console.log('FnSaveTranscationItems: error in saving Transaction items' + err);
+                                res.statusCode = 500;
+                                res.send(RtnMessage);
+                            }
+                        });
+                    }
+                    else {
+                        console.log('FnSaveTranscationItems: Invalid token');
+                        res.statusCode = 401;
+                        res.send(RtnMessage);
+                    }
+                }
+                else {
+                    console.log('FnSaveTranscationItems:Error in processing Token' + err);
+                    res.statusCode = 500;
+                    res.send(RtnMessage);
+                }
+            });
+        }
+        else {
+            if (Token == null) {
+                console.log('FnSaveTranscationItems: Token is empty');
+            }
+
+            res.statusCode=400;
+            res.send(RtnMessage);
+        }
+    }
+    catch (ex) {
+        console.log('FnSaveTranscationItems:error ' + ex.description);
+        throw new Error(ex);
+    }
+};
+
+exports.FnGetUserwiseFolderList = function (req, res) {
+    try {
+
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.query.Token;
+        var RuleFunction = req.query.RuleFunction;
+
+        if (Token != null) {
+            FnValidateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+
+                        db.query('CALL pGetUserWiseFolderList(' + db.escape(Token) + ',' + db.escape(RuleFunction) + ')', function (err, GetResult) {
+                            if (!err) {
+                                if (GetResult != null) {
+                                    if (GetResult[0].length > 0) {
+
+                                        console.log('FnGetUserwiseFolderList: Folder list details Send successfully');
+                                        res.send(GetResult[0]);
+                                    }
+                                    else {
+
+                                        console.log('FnGetUserwiseFolderList:No Folder list details found');
+                                        res.send('null');
+                                    }
+                                }
+                                else {
+
+                                    console.log('FnGetUserwiseFolderList:No Folder list details found');
+                                    res.send('null');
+                                }
+
+                            }
+                            else {
+
+                                console.log('FnGetUserwiseFolderList: error in getting Folder list details' + err);
+                                res.statusCode = 500;
+                                res.send('null');
+                            }
+                        });
+                    }
+                    else {
+                        res.statusCode = 401;
+                        res.send('null');
+                        console.log('FnGetUserwiseFolderList: Invalid Token');
+                    }
+                } else {
+
+                    res.statusCode = 500;
+                    res.send('null');
+                    console.log('FnGetUserwiseFolderList: Error in validating token:  ' + err);
+                }
+            });
+        }
+        else {
+            if (Token == null) {
+                console.log('FnGetUserwiseFolderList: Token is empty');
+            }
+            if (RuleFunction == null) {
+                console.log('FnGetUserwiseFolderList: RuleFunction is empty');
+            }
+
+            res.statusCode=400;
+            res.send('null');
+        }
+    }
+    catch (ex) {
+        console.log('FnGetUserwiseFolderList error:' + ex.description);
         throw new Error(ex);
     }
 };
@@ -6635,7 +6988,6 @@ exports.FnUpdateUserProfileAP = function (req, res) {
         throw new Error(ex);
     }
 };
-
 
 //method to change password
 exports.FnChangePasswordAP = function (req, res) {
@@ -7140,7 +7492,7 @@ exports.FnGetAPEZEIDPicture = function (req, res) {
                         db.query('CALL pGetRealEstatePicture(' + db.escape(TID) + ',' + db.escape(PicNo) + ')', function (err, PictuerResult) {
                             if (!err) {
                                // console.log(PictuerResult);
-                                if (PictuerResult != null) {
+                                if (PictuerResult[0] != null) {
                                     if (PictuerResult[0].length > 0) {
                                         res.send(PictuerResult[0]);
                                         console.log('FnGetAPEZEIDPicture: Realstate Data sent successfully');
@@ -7807,7 +8159,6 @@ exports.FnSearchRealEstateAP = function(req, res){
     }
 };
 
-
 exports.Base64Data = function (req, res) {
     try {
         res.setHeader("Access-Control-Allow-Origin", "*");
@@ -7831,3 +8182,158 @@ exports.Base64Data = function (req, res) {
         return 'error'
     }
 };
+
+//EZEID VAS
+
+exports.FnLoginVES = function (req, res) {
+    try {
+
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var EZEID = req.query.EZEID;
+        var Password = req.query.Password;
+        if (EZEID != null && EZEID != '' && Password != null && Password != '') {
+            //var EncryptPWD = FnEncryptPassword(Password);
+            //console.log('Encrypt password' +EncryptPWD);
+            db.query('CALL pLoginVES(' + db.escape(EZEID) + ',' + db.escape(Password) + ')', function (err, GetResult) {
+                if (!err) {
+                    if (GetResult != null) {
+                        if (GetResult[0].length > 0) {
+                            console.log('FnLoginVES: LoginVES details Send successfully');
+                            res.send(GetResult[0]);
+                        }
+                        else {
+                            console.log('FnLoginVES:No LoginVES Details found');
+                            res.send('null');
+                        }
+                    }
+                    else {
+                        console.log('FnLoginVES:No LoginVES Details found');
+                        res.send('null');
+                    }
+                }
+                else {
+                    console.log('FnLoginVES: error in getting LoginVES details' + err);
+                    res.statusCode = 500;
+                    res.send('null');
+                }
+            });
+        }
+        else {
+            if (EZEID == null) {
+                console.log('FnLoginVES: EZEID is empty');
+            }
+            if (Password == null) {
+                console.log('FnLoginVES: Password is empty');
+            }
+            res.statusCode=400;
+            res.send('null');
+        }
+    }
+    catch (ex) {
+        console.log('FnLoginVES error:' + ex.description);
+        throw new Error(ex);
+    }
+};
+
+exports.FnSaveContactVES = function(req, res){
+    try{
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.body.Token;
+        var EZEID = req.body.EZEID;
+        var Pic = req.body.Pic;
+        var FirstName = req.body.FirstName;
+        var LastName = req.body.LastName;
+        var PhoneNo = req.body.PhoneNo;
+        var MobileNo = req.body.MobileNo;
+        var EmailID = req.body.EmailID;
+        var CompanyName = req.body.CompanyName;
+        var Address1 = req.body.Address1;
+        var Address2 = req.body.Address2;
+        var CountryID = req.body.CountryID;
+        var StateID = req.body.StateID;
+        var City = req.body.City;
+        var PostalCode = req.body.PostalCode;
+        var Synced = req.body.Synced;
+        var ContactID = req.body.ContactID;
+        var LaptopSLNO = req.body.LaptopSLNO;
+        var VehicalTypeNo = req.body.VehicalTypeNo;
+        var InTime = req.body.InTime;
+        var OutTime = req.body.OutTime;
+        var ContactDeptID = req.body.ContactDeptID;
+        var PassReturned = req.body.PassReturned;
+        var Status = req.body.Status;
+        var GateNo  = req.body.GateNo;
+        var SyncedInout = req.body.SyncedInout;
+
+        var RtnMessage = {
+            IsSuccessfull: false
+        };
+
+        if (Token != null && EZEID != null && ContactID != null) {
+            FnValidateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+                        var query = db.escape(Token) + ',' + db.escape(EZEID) + ',' + db.escape(Pic) + ',' + db.escape(FirstName) + ',' +db.escape(LastName)
+                            + ',' +db.escape(PhoneNo) + ',' +db.escape(MobileNo) + ',' +db.escape(EmailID) + ',' +db.escape(CompanyName)
+                            + ',' +db.escape(Address1) + ',' +db.escape(Address2) + ',' +db.escape(CountryID) + ',' +db.escape(StateID) + ',' +db.escape(City)
+                            + ',' + db.escape(PostalCode) + ',' + db.escape(Synced) + ',' + db.escape(ContactID) + ',' +db.escape(LaptopSLNO) + ',' +db.escape(VehicalTypeNo)
+                            + ',' + db.escape(InTime) + ',' + db.escape(OutTime) + ',' + db.escape(ContactDeptID) + ',' + db.escape(PassReturned) + ',' + db.escape(Status)
+                            + ',' + db.escape(GateNo) + ',' + db.escape(SyncedInout);
+                        db.query('CALL pSaveContactVES(' + query + ')', function (err, InsertResult) {
+                            if (!err){
+                                if (InsertResult.affectedRows > 0) {
+                                    RtnMessage.IsSuccessfull = true;
+                                    res.send(RtnMessage);
+                                    console.log('FnSaveContactVES:  Contact details save successfully');
+                                }
+                                else {
+                                    console.log('FnSaveContactVES:No Save Contact details');
+                                    res.send(RtnMessage);
+                                }
+                            }
+                            else {
+                                console.log('FnSaveContactVES: error in saving Contact details' + err);
+                                res.statusCode = 500;
+                                res.send(RtnMessage);
+                            }
+                        });
+                    }
+                    else {
+                        console.log('FnSaveContactVES: Invalid token');
+                        res.statusCode = 401;
+                        res.send(RtnMessage);
+                    }
+                }
+                else {
+                    console.log('FnSaveContactVES:Error in processing Token' + err);
+                    res.statusCode = 500;
+                    res.send(RtnMessage);
+                }
+            });
+        }
+        else {
+            if (Token == null) {
+                console.log('FnSaveContactVES: Token is empty');
+            }
+            else if (EZEID == null) {
+                console.log('FnSaveContactVES: EZEID is empty');
+            }
+            else if (ContactID == null) {
+                console.log('FnSaveContactVES: ContactID is empty');
+            }
+
+            res.statusCode=400;
+            res.send(RtnMessage);
+        }
+    }
+    catch (ex) {
+        console.log('FnSaveContactVES:error ' + ex.description);
+        throw new Error(ex);
+    }
+};
+
+

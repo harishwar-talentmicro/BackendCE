@@ -138,6 +138,8 @@ app.post('/ewtSaveHolidayCalendar',LocationManager.FnSaveHolidayCalendar);
 app.get('/ewtGetHolidayList',LocationManager.FnGetHolidayList);
 app.post('/ewtSaveConfig',LocationManager.FnSaveConfig);
 app.get('/ewtGetConfig',LocationManager.FnGetConfig);
+app.post('/ewtSaveTranscation',LocationManager.FnSaveTranscation);
+app.get('/ewtGetUserwiseFolderList',LocationManager.FnGetUserwiseFolderList);
 
 //below service are for EZEIDAP
 app.post('/ewLoginAP', LocationManager.FnLoginAP);
@@ -158,6 +160,10 @@ app.post('/ewtUpdateSecondaryLocationAP', LocationManager.FnUpdateSecondaryLocat
 app.post('/ewtUpdateIdCardPrintAP', LocationManager.FnUpdateIdCardPrintAP);
 app.get('/ewtGetIdCardPrintAP',LocationManager.FnGetIdCardPrintAP);
 app.post('/ewtSearchRealEstateAP', LocationManager.FnSearchRealEstateAP);
+
+//EZEID VAS
+app.get('/ewtLoginVES',LocationManager.FnLoginVES);
+app.post('/ewtSaveContactVES',LocationManager.FnSaveContactVES);
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
     console.log('404 : Page not found');
