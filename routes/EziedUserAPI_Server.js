@@ -1582,7 +1582,11 @@ exports.FnRegistration = function (req, res) {
         //console.log('---------------------------');
         var OperationType = req.body.OperationType;
         var IPAddress = req._remoteAddress;
-        var SelectionType = parseInt(req.body.SelectionType);
+        var SelectionTypes = parseInt(req.body.SelectionType);
+        if(SelectionTypes.toString() == 'NaN'){
+            SelectionTypes = 0;
+        }
+            console.log(SelectionTypes);
         var IDTypeID = req.body.IDTypeID;
         var EZEID = req.body.EZEID;
        if(EZEID != null)
@@ -1622,8 +1626,7 @@ exports.FnRegistration = function (req, res) {
         if (Altitude == null || Altitude == '') {
             Altitude = 0;
         }
-        if(SelectionType == 'NaN')
-            SelectionType = 0;
+
         var AddressLine1 = req.body.AddressLine1;
         var AddressLine2 = req.body.AddressLine2;
         var Area = req.body.Area;
@@ -1632,7 +1635,6 @@ exports.FnRegistration = function (req, res) {
         var CountryID = req.body.CountryID;
         var PostalCode = req.body.PostalCode;
         var PIN = req.body.PIN;
-
         var PhoneNumber = req.body.PhoneNumber;
         var MobileNumber = req.body.MobileNumber;
         var EMailID = req.body.EMailID;
@@ -1656,30 +1658,9 @@ exports.FnRegistration = function (req, res) {
         var ISDMobileNumber = req.body.ISDMobileNumber;
         var Gender = parseInt(req.body.Gender);
         var DOB = req.body.DOB;
-        if(Gender = 'NaN')
+        if(Gender.toString() == 'NaN')
             Gender = 2;
-        //below lines from parkingstatus to cvmailId is commented bcoz of phase 1
-        var ParkingStatus = parseInt(req.body.ParkingStatus);
-        var OpenStatus = parseInt(req.body.OpenStatus);
-        var WorkingHours = req.body.WorkingHours;
-        var SalesEnquiryMailID = req.body.SalesEnquiryMailID;
-        var HomeDeliveryMailID = req.body.HomeDeliveryMailID;
-        var ReservationMailID = req.body.ReservationMailID;
-        var SupportMailID = req.body.SupportMailID;
-        var CVMailID = req.body.CVMailID;
-        //below parameter is for button enable disable.
-        var SalesEnquiryButton = req.body.SalesEnquiryButton;
-        var HomeDeliveryButton = req.body.HomeDeliveryButton;
-        var ReservationButton = req.body.ReservationButton;
-        var SupportButton = req.body.SupportButton;
-        var CVButton = req.body.CVButton;
 
-        if (ParkingStatus.toString() == 'NaN') {
-            ParkingStatus = 1;
-        }
-        if (OpenStatus.toString() == 'NaN') {
-            OpenStatus = 1;
-        }
         if (PIN == '') {
             PIN = null;
         }
@@ -1692,7 +1673,7 @@ exports.FnRegistration = function (req, res) {
             Icon: ''
         };
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
-        if(OperationType = 1){
+        if(OperationType == 1){
             if( IDTypeID != null && EZEID != null && Password != null ){
                 if(FirstName == null)
                     FirstName='';
@@ -1727,8 +1708,8 @@ exports.FnRegistration = function (req, res) {
                     db.escape(TokenNo) + ',' + db.escape(Latitude) + ',' + db.escape(Longitude) + ',' + db.escape(Altitude) + ',' +
                     db.escape(AddressLine1) + ',' + db.escape(AddressLine2) + ',' + db.escape(Citytitle) + ',' + db.escape(StateID) + ',' + db.escape(CountryID) + ',' +
                     db.escape(PostalCode) + ',' + db.escape(PIN) + ',' + db.escape(PhoneNumber) + ',' + db.escape(MobileNumber) + ',' + db.escape(EMailID) + ',' +
-                    db.escape(LaptopSLNO) + ',' + db.escape(VehicleNumber) + ',' + db.escape(Picture) + ',' + db.escape(PictureFileName) + ',' + db.escape(WebSite) + ',' + db.escape(Operation) + ',' + db.escape(AboutCompany) + ',' + db.escape(StatusID) + ',' + db.escape(Icon) + ',' + db.escape(IconFileName) + ',' + db.escape(ISDPhoneNumber) + ',' + db.escape(ISDMobileNumber) + ',' + db.escape(Gender) + ',' + db.escape(DOBDate) + ',' + db.escape(IPAddress) + ',' + db.escape(SelectionType);
-                console.log(InsertQuery);
+                    db.escape(Picture) + ',' + db.escape(PictureFileName) + ',' + db.escape(WebSite) + ',' + db.escape(Operation) + ',' + db.escape(AboutCompany) + ',' + db.escape(StatusID) + ',' + db.escape(Icon) + ',' + db.escape(IconFileName) + ',' + db.escape(ISDPhoneNumber) + ',' + db.escape(ISDMobileNumber) + ',' + db.escape(Gender) + ',' + db.escape(DOBDate) + ',' + db.escape(IPAddress) + ',' + db.escape(SelectionTypes);
+           //     console.log(InsertQuery);
                 db.query('CALL pSaveEZEIDData(' + InsertQuery + ')', function (err, InsertResult) {
                     if (!err) {
                         // console.log('InsertResult: ' + InsertResult);
@@ -1829,6 +1810,18 @@ exports.FnRegistration = function (req, res) {
             }
             else
             {
+                console.log('FnRegistration: Wizard Insertion Failed');
+                if(IDTypeID == null ) {
+                    console.log('FnRegistration: IDTypeID is Empty');
+                }
+                else if(EZEID == null){
+                    console.log('FnRegistration: EZEID is Empty');
+                }
+                else if(Password == null) {
+                    console.log('FnRegistration: Password is Empty');
+                }
+
+                console.log('Insert method validation');
                 console.log('Mandatory fields required');
                 res.statusCode = 400;
                 res.send(RtnMessage);
@@ -1868,14 +1861,17 @@ exports.FnRegistration = function (req, res) {
                     db.escape(TokenNo) + ',' + db.escape(Latitude) + ',' + db.escape(Longitude) + ',' + db.escape(Altitude) + ',' +
                     db.escape(AddressLine1) + ',' + db.escape(AddressLine2) + ',' + db.escape(Citytitle) + ',' + db.escape(StateID) + ',' + db.escape(CountryID) + ',' +
                     db.escape(PostalCode) + ',' + db.escape(PIN) + ',' + db.escape(PhoneNumber) + ',' + db.escape(MobileNumber) + ',' + db.escape(EMailID) + ',' +
-                    db.escape(LaptopSLNO) + ',' + db.escape(VehicleNumber) + ',' + db.escape(Picture) + ',' + db.escape(PictureFileName) + ',' + db.escape(WebSite) + ',' + db.escape(Operation) + ',' + db.escape(AboutCompany) + ',' + db.escape(StatusID) + ',' + db.escape(Icon) + ',' + db.escape(IconFileName) + ',' + db.escape(ISDPhoneNumber) + ',' + db.escape(ISDMobileNumber) + ',' + db.escape(Gender) + ',' + db.escape(DOBDate) + ',' + db.escape(IPAddress) + ',' + db.escape(SelectionType);
-                //  console.log(InsertQuery);
+                    db.escape(Picture) + ',' + db.escape(PictureFileName) + ',' + db.escape(WebSite) + ',' + db.escape(Operation) + ',' + db.escape(AboutCompany) + ',' + db.escape(StatusID) + ',' + db.escape(Icon) + ',' + db.escape(IconFileName) + ',' + db.escape(ISDPhoneNumber) + ',' + db.escape(ISDMobileNumber) + ',' + db.escape(Gender) + ',' + db.escape(DOBDate) + ',' + db.escape(IPAddress) + ',' + db.escape(SelectionTypes);
+                 // console.log(InsertQuery);
                 db.query('CALL pSaveEZEIDData(' + InsertQuery + ')', function (err, InsertResult) {
                     if (!err) {
                         // console.log('InsertResult: ' + InsertResult);
                         if (InsertResult != null) {
                             //  console.log(InsertResult);
                             if (InsertResult.affectedRows > 0) {
+                                if(IDTypeID == 2)
+                                RtnMessage.FirstName=CompanyName;
+                                else
                                 RtnMessage.FirstName = FirstName;
                                 RtnMessage.IsAuthenticate = true;
                                 RtnMessage.Token = TokenNo;
@@ -1964,12 +1960,11 @@ exports.FnRegistration = function (req, res) {
                 });
             }
             else {
+                    console.log('Update method validation');
                 if (IDTypeID == null) {
                     console.log('FnRegistration: IDTypeID is empty');
                 } else if (EZEID == null) {
                     console.log('FnRegistration: EZEID is empty');
-                } else if (FirstName == null) {
-                    console.log('FnRegistration: FirstName is empty');
                 } else if (AddressLine1 == null) {
                     console.log('FnRegistration: AddressLine1 is empty');
                 } else if (Citytitle == null) {
@@ -6108,7 +6103,7 @@ exports.FnSaveConfig = function(req, res){
         var HomeDeliveryTitle = req.body.HomeDeliveryTitle;
         var ServiceTitle = req.body.ServiceTitle;
         var ResumeTitle = req.body.ResumeTitle;
-        var UserAccessRights = req.body.UserAccessRights;
+        var VisibleModules = req.body.VisibleModules;
         var SalesItemListType = req.body.SalesItemListType;
         var HomeDeliveryItemListType = req.body.HomeDeliveryItemListType;
         var ResumeKeyword = req.body.ResumeKeyword;
@@ -6121,6 +6116,7 @@ exports.FnSaveConfig = function(req, res){
         var HomeDeliveryFormMsg = req.body.HomeDeliveryFormMsg;
         var ServiceFormMsg = req.body.ServiceFormMsg;
         var ResumeFormMsg = req.body.ResumeFormMsg;
+        var FreshersAccepted = req.body.FreshersAccepted;
 
         var RtnMessage = {
             IsSuccessfull: false
@@ -6132,9 +6128,10 @@ exports.FnSaveConfig = function(req, res){
                     if (Result != null) {
 
                         var query = db.escape(Token) + ',' + db.escape(SalesTitle) + ',' + db.escape(ReservationTitle) + ',' + db.escape(HomeDeliveryTitle) + ',' +db.escape(ServiceTitle)
-                            + ',' +db.escape(ResumeTitle) + ',' +db.escape(UserAccessRights) + ',' +db.escape(SalesItemListType) + ',' +db.escape(HomeDeliveryItemListType)
+                            + ',' +db.escape(ResumeTitle) + ',' +db.escape(VisibleModules) + ',' +db.escape(SalesItemListType) + ',' +db.escape(HomeDeliveryItemListType)
                             + ',' +db.escape(ResumeKeyword) + ',' +db.escape(Category) + ',' +db.escape(Keyword) + ',' +db.escape(ReservationDisplayFormat) + ',' +db.escape(DataRefreshInterval)
-                            + ',' + db.escape(SalesFormMsg) + ',' + db.escape(ReservationFormMsg) + ',' + db.escape(HomeDeliveryFormMsg) + ',' +db.escape(ServiceFormMsg) + ',' +db.escape(ResumeFormMsg);
+                            + ',' + db.escape(SalesFormMsg) + ',' + db.escape(ReservationFormMsg) + ',' + db.escape(HomeDeliveryFormMsg) + ',' +db.escape(ServiceFormMsg) + ',' +db.escape(ResumeFormMsg)
+                            + ',' +db.escape(FreshersAccepted);
 
                         db.query('CALL pSaveConfig(' + query + ')', function (err, InsertResult) {
                             if (!err){
@@ -6192,7 +6189,7 @@ exports.FnSaveConfig = function(req, res){
         console.log('FnSaveConfig:error ' + ex.description);
         throw new Error(ex);
     }
-}
+};
 
 exports.FnGetConfig = function (req, res) {
     try {
