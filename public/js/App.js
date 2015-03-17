@@ -58,7 +58,7 @@
             .when('/subusers',{templateUrl : 'html/subusers.html'})
             .when('/business-preference',{templateUrl : 'html/business-preference.html'})
             .when('/business-manager',{templateUrl : 'html/business-manager/business-manager.html'})
-            .otherwise({ templateUrl: 'html/home.html' });
+            .otherwise({ templateUrl: 'html/home.html'});
 
         $httpProvider.interceptors.push("ezeidInterceptor");
     }]);
