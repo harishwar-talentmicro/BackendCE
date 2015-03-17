@@ -6495,6 +6495,7 @@ exports.FnSaveTranscation = function(req, res){
         var Duration = req.body.Duration;
         var DurationScales = req.body.DurationScales;
         var ItemsList = req.body.ItemsList;
+        ItemsList = JSON.parse(ItemsList);
         var NextAction = req.body.NextAction;
         var NextActionDateTime = req.body.NextActionDateTime;
         var  TaskDateNew = new Date(TaskDateTime);
@@ -6523,7 +6524,7 @@ exports.FnSaveTranscation = function(req, res){
                                             var itemsDetails = ItemsList[i];
                                             var items = {
                                                 MessageID: Message[0].MessageID,
-                                                ItemID: itemsDetails.TID,
+                                                ItemID: itemsDetails.ItemID,
                                                 Qty: itemsDetails.Qty,
                                                 Rate: itemsDetails.Rate,
                                                 Amount: itemsDetails.Amount,
