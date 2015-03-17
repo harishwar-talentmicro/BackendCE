@@ -86,6 +86,50 @@ function FnEncryptPassword(Password) {
     }
 }
 
+function FnDecrypt(EncryptPassword){
+    try {
+        var crypto = require('crypto'),
+            algorithm = 'aes-256-ctr',
+            password = 'ezeid@123';
+        var decipher = crypto.createDecipher(algorithm,password)
+        var dec = decipher.update(EncryptPassword,'hex','utf8')
+        dec += decipher.final('utf8');
+        return dec;
+    }
+    catch(ex){
+        console.log('FnDecrypterror:' + ex.description);
+        throw new Error(ex);
+        return 'error'
+    }
+}
+
+exports.FnDecryptPassword = function(req,res){
+try {
+//res.setHeader("Access-Control-Allow-Origin", "*");
+//res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    res.header('Access-Control-Allow-Credentials', true);
+    res.header('Access-Control-Allow-Origin', "*");
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+    res.header('Access-Control-Allow-Headers', 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept');
+
+    var password = req.query.Password;
+
+    var RtnMessage = {
+        Password : ''
+    };
+    RtnMessage.Password = FnDecrypt(password);
+    console.log(RtnMessage.Password);
+    res.send(RtnMessage);
+
+
+}
+    catch(ex){
+        console.log('FnDecrypterror:' + ex.description);
+        throw new Error(ex);
+        return 'error'
+    }
+}
+
 function FnSendMailEzeid(MailContent, CallBack) {
     try {
 
@@ -324,13 +368,15 @@ function FnMessageMail(MessageContent, CallBack) {
                                 } else if (MessageContent.MessageType == 5) {
                                     fs.readFile("CV.txt", "utf8", function (err, data) {
                                         if (err) throw err;
-                                        //  console.log(MessageContentResult);
+                                        console.log(MessageContentResult);
                                         data = data.replace("[IsVerified]", MessageContentResult[0].EZEIDVerifiedID);
+                                        data = data.replace("[EZEID]", MessageContentResult[0].EZEID);
                                         data = data.replace("[EZEID]", MessageContentResult[0].EZEID);
                                         data = data.replace("[Functions]", MessageContentResult[0].Function);
                                         data = data.replace("[Roles]", MessageContentResult[0].Role);
                                         data = data.replace("[Keyskills]", MessageContentResult[0].KeySkills);
                                         data = data.replace("[https://www.ezeid.com?ID=]", 'https://www.ezeid.com?ID=' + MessageContentResult[0].EZEID);
+                                        console.log(MessageContentResult[0].EZEID);
                                         if (MessageContentResult[0].DocPin = '') {
                                             data = data.replace(".[PIN]", MessageContentResult[0].DocPin);
                                         }
@@ -6449,6 +6495,7 @@ exports.FnSaveTranscation = function(req, res){
         var Duration = req.body.Duration;
         var DurationScales = req.body.DurationScales;
         var ItemsList = req.body.ItemsList;
+        ItemsList = JSON.parse(ItemsList);
         var NextAction = req.body.NextAction;
         var NextActionDateTime = req.body.NextActionDateTime;
         var  TaskDateNew = new Date(TaskDateTime);
@@ -6477,7 +6524,7 @@ exports.FnSaveTranscation = function(req, res){
                                             var itemsDetails = ItemsList[i];
                                             var items = {
                                                 MessageID: Message[0].MessageID,
-                                                ItemID: itemsDetails.TID,
+                                                ItemID: itemsDetails.ItemID,
                                                 Qty: itemsDetails.Qty,
                                                 Rate: itemsDetails.Rate,
                                                 Amount: itemsDetails.Amount,
@@ -6551,6 +6598,76 @@ exports.FnSaveTranscation = function(req, res){
     }
     catch (ex) {
         console.log('FnSaveTranscationItems:error ' + ex.description);
+        throw new Error(ex);
+    }
+};
+
+exports.FnGetTranscation = function (req, res) {
+    try {
+
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.query.Token;
+        var FunctionType = parseInt(req.query.FunctionType);
+        if (Token != null && FunctionType != null) {
+            FnValidateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+                        var query = 'CALL pGetMessagesNew('+ db.escape(Token) + ',' + db.escape(FunctionType) +')';
+                        console.log(query);
+                            //var parameters = db.escape(Token) + ',' + db.escape(FunctionType);;
+                        //console.log(parameters);
+                        db.query(query, function (err, GetResult) {
+                            if (!err) {
+                                if (GetResult != null) {
+                                    if (GetResult[0].length > 0) {
+                                        console.log('FnGetTranscation: Transaction details Send successfully');
+                                        res.send(GetResult[0]);
+                                    }
+                                    else {
+                                        console.log('FnGetTranscation:No Transaction details found');
+                                        res.send('null');
+                                    }
+                                }
+                                else {
+                                    console.log('FnGetTranscation:No transaction details found');
+                                    res.send('null');
+                                }
+                            }
+                            else {
+                                console.log('FnGetTranscation: error in getting transaction details' + err);
+                                res.statusCode = 500;
+                                res.send('null');
+                            }
+                        });
+                    }
+                    else {
+                        res.statusCode = 401;
+                        res.send('null');
+                        console.log('FnGetTranscation: Invalid Token');
+                    }
+                } else {
+
+                    res.statusCode = 500;
+                    res.send('null');
+                    console.log('FnGetTranscation: Error in validating token:  ' + err);
+                }
+            });
+        }
+        else {
+            if (Token == null) {
+                console.log('FnGetTranscation: Token is empty');
+            }
+            else if (FunctionType == null) {
+                console.log('FnGetTranscation: FunctionType is empty');
+            }
+            res.statusCode=400;
+            res.send('null');
+        }
+    }
+    catch (ex) {
+        console.log('FnGetTranscation error:' + ex.description);
         throw new Error(ex);
     }
 };

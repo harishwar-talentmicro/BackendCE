@@ -1,6 +1,18 @@
 (function () {
     var ezeid = angular.module('ezeidApp',
-        ['ngHeader','ngRoute', 'ngFooter', 'ui-notification', 'imageupload','angularjs-dropdown-multiselect','smart-table']);
+        [
+            'ngHeader',
+            'ngRoute',
+            'ngFooter',
+            'ui-notification',
+            'imageupload',
+            'angularjs-dropdown-multiselect',
+            'smart-table',
+            'ui.grid',
+            'ngTouch',
+            'ui.grid', 'ui.grid.expandable', 'ui.grid.selection', 'ui.grid.pinning',
+            'ui.grid.edit', 'ui.grid.rowEdit', 'ui.grid.cellNav','ui.grid.pagination'
+        ]);
 
     ezeid.value('GURL',"/");
     ezeid.value('MsgDelay',2000);
