@@ -1,4 +1,4 @@
-angular.module('ezeidApp').controller('salesenquiryController', function($http, $rootScope, $scope, Notification, $filter, $q, $timeout){
+angular.module('ezeidApp').controller('salesenquiryController', function($http, $rootScope, $scope, Notification, $filter, $q, $timeout,GURL){
 
     var msglist = this;
     msglist._info = {};

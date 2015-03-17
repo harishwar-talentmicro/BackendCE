@@ -3,7 +3,7 @@
  */
 
 
-angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$http','Notification','$filter','MsgDelay','$interval',function($scope,$rootScope,$http,Notification,$filter,MsgDelay,$interval){
+angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$http','Notification','$filter','MsgDelay','$interval','GURL',function($scope,$rootScope,$http,Notification,$filter,MsgDelay,$interval,GURL){
     $(document).on('click','.popover-close',function(){
         $('*[data-toggle="popover"]').popover('hide');
     });
@@ -56,8 +56,8 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$htt
      * @type {{1: string, 2: string}}
      */
     $scope.status = {
-        1 : "Inactive",
-        2 : "Active"
+        2 : "Inactive",
+        1 : "Active"
     };
 
     $scope.rules = [];
@@ -98,7 +98,7 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$htt
                 service : [],
                 resume : []
             },
-            status : 2,
+            status : 1,
             salesEmail : "",
             reservationEmail : "",
             homeDeliveryEmail : "",
@@ -171,7 +171,7 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$htt
 
     $scope.checkAvailability = function(callback){
         $http({
-            url : '/ewtEZEIDPrimaryDetails',
+            url : GURL + 'ewtEZEIDPrimaryDetails',
             params : {
                 EZEID : $scope.modalBox.subuser.ezeid,
                 Token : $rootScope._userInfo.Token
@@ -304,7 +304,7 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$htt
         };
 
         $http({
-            url : '/ewtCreateSubUser',
+            url : GURL + 'ewtCreateSubUser',
             method : "POST",
             data : data
         }).success(function(resp){
@@ -338,7 +338,7 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$htt
      */
     $scope.loadAllRules = function(){
         $http({
-            url : '/ewtGetFolderList',
+            url : GURL + 'ewtGetFolderList',
             method : "GET",
             params : {
                 Token : $rootScope._userInfo.Token,
@@ -368,7 +368,7 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$htt
     $scope.loadSubuserList = function(){
         $scope.subusers = [];
         $http({
-            url : '/ewtGetSubUserList',
+            url : GURL + 'ewtGetSubUserList',
             method : "GET",
             params : {
                 Token : $rootScope._userInfo.Token,
@@ -424,7 +424,7 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$htt
      */
     $scope.getMasterUserDetails = function(){
         $http({
-            url : '/ewtGetUserDetails',
+            url : GURL + 'ewtGetUserDetails',
             method : "GET",
             params :{
                 Token : $rootScope._userInfo.Token

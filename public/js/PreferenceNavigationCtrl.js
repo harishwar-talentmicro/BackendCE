@@ -1,10 +1,14 @@
 /**
  * Created by admin on 6/3/15.
  */
-angular.module('ezeidApp').controller('PreferenceNavigationCtrl',['$scope','$rootScope','$http','Notification',function($scope,$rootScope,$http,Notification){
+angular.module('ezeidApp').controller('PreferenceNavigationCtrl',['$scope','$rootScope','$http','Notification','GURL',function($scope,$rootScope,$http,Notification,GURL){
 
+    /**
+     * @todo Create and add template for resource creation and mapping with reservation items
+     */
     $scope.pageSubuser = "html/subusers.html";
     $scope.pageItemMaster = "html/item-master.html";
+    $scope.pageResources = "html/item-master.html";
     $scope.pageStatusTypes = "html/status-types.html";
     $scope.pageActionTypes = "html/action-types.html";
     $scope.pageRules = "html/rules.html";

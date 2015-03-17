@@ -1,5 +1,5 @@
 
-angular.module('ezeidApp').controller('LegalController', function ($rootScope, $scope, $http) {
+angular.module('ezeidApp').controller('LegalController', function ($rootScope, $scope, $http,GURL) {
 
     var SLocCtrl = this;
 
