@@ -46,18 +46,19 @@
                     <div class="row">
                         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
                             <ul class="nav nav-tabs nav-justified">
-                                <li role="presentation" ng-repeat="module in modules" ng-class="{'active':(module.enabled && module)}" class="active"><a >module.title</a></li>
-                                <li role="presentation"><a>Reservation</a></li>
-                                <li role="presentation"><a>Home Delivery</a></li>
-                                <li role="presentation"><a>Service</a></li>
-                                <li role="presentation"><a>Resume</a></li>
+                                <li role="presentation" ng-repeat="module in modules"  class="{{module.cssClass}}" ng-click="selectModule({moduleIndex : $index})"><a >{{module.title}}</a></li>
                             </ul>
                         </div>
 
                     </div>
                     <div class="row">
                         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
-                            <div ng-include="">
+
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
+                            <div ng-include="currentTemplate">
                                 <!-- Include the template based on user rights and module enabled property -->
                             </div>
                         </div>

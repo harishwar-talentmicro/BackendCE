@@ -1308,3 +1308,59 @@ span.smallCloselink {
     background: #fff;
     color:#078FC3;
 }
+
+/****** UI Grid Style *****/
+.ui-grid-header-cell {
+    background-color: #6E6E6E;
+    border-color: none;
+    color: #fff;
+    font-family: 'Roboto',sans-serif;
+    font-weight: 200;
+}
+.ui-grid-row-header-cell {
+    background-color: #6E6E6E !important;
+    border-bottom: solid 1px #d4d4d4;
+}
+
+.ui-grid-top-panel{
+    background: #6E6E6E;
+}
+.ui-grid-pinned-container{
+    color:#ffffff;
+    font-family:'Roboto',sans-serif;
+}
+
+.ui-grid-cell-focus {
+    outline: 0;
+    background-color: #46849D;
+    color: #FFF;
+}
+
+.ui-grid-row-selected > [ui-grid-row] > .ui-grid-cell{
+    background-color: #50696E !important;
+    color: #2CC4FF;
+}
+.ui-grid-row-selected .ui-grid-cell-contents {
+    background: #46849D;
+}
+
+.ui-grid-row-selected .expandableRow{
+    color:#ffffff;
+    background: #46849D;
+}
+
+.ui-grid-menu .ui-grid-menu-inner ul li {
+    background: #1291CC;
+    color: #fff;
+}
+
+.ui-grid-menu .ui-grid-menu-inner ul li.ui-grid-menu-item-active {
+    -webkit-box-shadow: inset 0 0 14px rgba(0, 0, 0, 0.2);
+    -moz-box-shadow: inset 0 0 14px rgba(0, 0, 0, 0.2);
+    box-shadow: inset 0 0 14px rgba(0, 0, 0, 0.2);
+    background-color: #215D96;
+}
+
+.ui-grid-row-selected .expandableRow .ui-grid-header-cell .ui-grid-cell-contents{
+    background: #6E6E6E;
+}
