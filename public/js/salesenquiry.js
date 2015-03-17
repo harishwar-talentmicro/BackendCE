@@ -211,7 +211,8 @@ angular.module('ezeidApp').controller('salesenquiryController', function($http, 
 
         msglist.selectItemData.push(selectedItemData[0].ItemName +"("+ selectedItemData[0].Qty  +")");
         msglist.selectMsgs.push(selectedItemData[0]);
-        msglist._info = [];
+
+       // msglist._info = [];
 
         selectedItemData = [];
         $scope.itemImage = "";
@@ -352,15 +353,14 @@ angular.module('ezeidApp').controller('salesenquiryController', function($http, 
                 NextActionDateTime  : msglist._info.NextActionDateTime
 
             } }).success(function (data) {
-             //   console.log(data);
-               /* if (data.IsSuccessfull) {
-                    $('#SalesEnquiryRequest_popup').slideUp();
-                    SearchSec.salesMessage = "";
-                    Notification.success({ message: 'Message send success', delay: MsgDelay });
+
+               if (data.IsSuccessfull) {
+                    msglist._info = [];
+                    Notification.success({ message: 'Saved...', delay: MsgDelay });
                 }
                 else {
-                    Notification.error({ message: 'Sorry..! Message not send ', delay: MsgDelay });
-                }*/
+                    Notification.error({ message: 'Sorry..! Not saved ', delay: MsgDelay });
+                }
             });
         }
         else {
