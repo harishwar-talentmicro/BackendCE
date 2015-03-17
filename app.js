@@ -140,6 +140,7 @@ app.post('/ewtSaveConfig',LocationManager.FnSaveConfig);
 app.get('/ewtGetConfig',LocationManager.FnGetConfig);
 app.post('/ewtSaveTranscation',LocationManager.FnSaveTranscation);
 app.get('/ewtGetUserwiseFolderList',LocationManager.FnGetUserwiseFolderList);
+app.get('/ewtGetTranscation',LocationManager.FnGetTranscation);
 
 //below service are for EZEIDAP
 app.post('/ewLoginAP', LocationManager.FnLoginAP);
