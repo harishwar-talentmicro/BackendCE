@@ -1,15 +1,32 @@
 <div class="container top-clearfix" ng-controller="SalesCtrl">
-    <div class="row">
+    <div class="row top-clearfix bottom-clearfix">
         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-            <div ui-grid="gridOptions"
-                 ui-grid-pinning
-                 ui-grid-expandable
-                 ui-grid-selection
-                 ui-grid-edit
-                 ui-grid-row-edit
-                 ui-grid-cellNav
-                 ui-grid-pagination
-                 class="grid"></div>
+            <button class="btn btn-primary btn-sm no-radius" ng-click="addNewRow()">Add New Transaction</button>
+            <!--<button class="btn btn-danger btn-sm no-radius">Remove Selected Transaction</button>-->
         </div>
+    </div>
+    <div class="row">
+
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <!--<div ui-grid="gridOptions"-->
+                 <!--ui-grid-pinning-->
+                 <!--ui-grid-expandable-->
+                 <!--ui-grid-selection-->
+                 <!--ui-grid-edit-->
+                 <!--ui-grid-row-edit-->
+                 <!--ui-grid-cellNav-->
+                 <!--ui-grid-pagination-->
+                 <!--class="grid"></div>-->
+        <!--</div>-->
+        <div ui-grid="gridOptions"
+             ui-grid-pinning
+             ui-grid-selection
+             ui-grid-edit
+             ui-grid-row-edit
+             ui-grid-cellNav
+             ui-grid-pagination
+             ui-grid-exporter
+             class="grid"></div>
+    </div>
     </div>
 </div>

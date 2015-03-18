@@ -11,7 +11,7 @@
             'ui.grid',
             'ngTouch',
             'ui.grid', 'ui.grid.expandable', 'ui.grid.selection', 'ui.grid.pinning',
-            'ui.grid.edit', 'ui.grid.rowEdit', 'ui.grid.cellNav','ui.grid.pagination'
+            'ui.grid.edit', 'ui.grid.rowEdit', 'ui.grid.cellNav','ui.grid.pagination','ui.grid.exporter'
         ]);
 
     ezeid.value('GURL',"/");
