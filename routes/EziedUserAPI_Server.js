@@ -6746,6 +6746,242 @@ exports.FnGetUserwiseFolderList = function (req, res) {
     }
 };
 
+exports.FnSaveResource = function(req, res){
+    try{
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.body.Token;
+        var TID = req.body.TID;
+        var ResourceName = req.body.ResourceName;
+        var Duration = req.body.Duration;
+        var DurationScale = req.body.DurationScale;
+        
+        var RtnMessage = {
+            IsSuccessfull: false
+        };
+       
+        if (Token != null && TID != null && ResourceName != null && Duration != null && DurationScale != null ) {
+            FnValidateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+
+                        var query = db.escape(TID) + ',' + db.escape(ResourceName) + ',' + db.escape(Duration) + ',' + db.escape(DurationScale);
+                        db.query('CALL pSaveResource(' + query + ')', function (err, InsertResult) {
+                            if (!err){
+                                if (InsertResult.affectedRows > 0) {
+                                    RtnMessage.IsSuccessfull = true;
+                                    res.send(RtnMessage);
+                                    console.log('FnSaveResource: Resource details save successfully');
+                                }
+                                else {
+                                    console.log('FnSaveResource:No save Resource details');
+                                    res.send(RtnMessage);
+                                }
+                            }
+
+                            else {
+                                console.log('FnSaveResource: error in saving Resource details' + err);
+                                res.statusCode = 500;
+                                res.send(RtnMessage);
+                            }
+                        });
+                    }
+                    else {
+                        console.log('FnSaveResource: Invalid token');
+                        res.statusCode = 401;
+                        res.send(RtnMessage);
+                    }
+                }
+                else {
+                    console.log('FnSaveResource:Error in processing Token' + err);
+                    res.statusCode = 500;
+                    res.send(RtnMessage);
+
+                }
+            });
+
+        }
+
+        else {
+            if (Token == null) {
+                console.log('FnSaveResource: Token is empty');
+            }
+            else if (TID == null) {
+                console.log('FnSaveResource: TID is empty');
+            }
+            else if (ResourceName == null) {
+                console.log('FnSaveResource: ResourceName is empty');
+            }
+            else if (Duration == null) {
+                console.log('FnSaveResource: Duration is empty');
+            }
+            else if (DurationScale == null) {
+                console.log('FnSaveResource: DurationScale is empty');
+            }
+            res.statusCode=400;
+            res.send(RtnMessage);
+        }
+
+    }
+    catch (ex) {
+        console.log('FnSaveResource:error ' + ex.description);
+        throw new Error(ex);
+    }
+};
+
+exports.FnGetResource = function (req, res) {
+    try {
+
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.query.Token;
+        
+        if (Token != null && MasterID != null) {
+            FnValidateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+
+                        db.query('CALL pGetResource(' + db.escape(Token) + ')', function (err, GetResult) {
+                            if (!err) {
+                                if (GetResult != null) {
+                                    if (GetResult[0].length > 0) {
+
+                                        console.log('FnGetResource: Resource details Send successfully');
+                                        res.send(GetResult[0]);
+                                    }
+                                    else {
+
+                                        console.log('FnGetResource:No Resource details found');
+                                        res.send('null');
+                                    }
+                                }
+                                else {
+
+                                    console.log('FnGetResource:No Resource details found');
+                                    res.send('null');
+                                }
+
+                            }
+                            else {
+
+                                console.log('FnGetResource: error in getting Resource details' + err);
+                                res.statusCode = 500;
+                                res.send('null');
+                            }
+                        });
+                    }
+                    else {
+                        res.statusCode = 401;
+                        res.send('null');
+                        console.log('FnGetResource: Invalid Token');
+                    }
+                } else {
+
+                    res.statusCode = 500;
+                    res.send('null');
+                    console.log('FnGetResource: Error in validating token:  ' + err);
+                }
+            });
+        }
+        else {
+            if (Token == null) {
+                console.log('FnGetResource: Token is empty');
+            }
+            else if (MasterID == null) {
+                console.log('FnGetResource: MasterID is empty');
+            }
+            res.statusCode=400;
+            res.send('null');
+        }
+    }
+    catch (ex) {
+        console.log('FnGetResource error:' + ex.description);
+        throw new Error(ex);
+    }
+};
+
+
+exports.FnSaveResourceItemMap = function(req, res){
+    try{
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.body.Token;
+        var TID = req.body.TID;
+        var ResourceID = req.body.ResourceID;
+        var ItemID = req.body.ItemID;
+               
+        var RtnMessage = {
+            IsSuccessfull: false
+        };
+       
+        if (Token != null && TID != null && ResourceID != null && ItemID != null) {
+            FnValidateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+
+                        var query = db.escape(TID) + ',' + db.escape(ResourceID) + ',' + db.escape(ItemID);
+                        db.query('CALL pSaveResourceItemMap(' + query + ')', function (err, InsertResult) {
+                            if (!err){
+                                if (InsertResult.affectedRows > 0) {
+                                    RtnMessage.IsSuccessfull = true;
+                                    res.send(RtnMessage);
+                                    console.log('FnSaveResourceItemMap: Resource ItemMap details save successfully');
+                                }
+                                else {
+                                    console.log('FnSaveResourceItemMap:No Resource ItemMap details');
+                                    res.send(RtnMessage);
+                                }
+                            }
+
+                            else {
+                                console.log('FnSaveResourceItemMap: error in saving Resource ItemMap details' + err);
+                                res.statusCode = 500;
+                                res.send(RtnMessage);
+                            }
+                        });
+                    }
+                    else {
+                        console.log('FnSaveResourceItemMap: Invalid token');
+                        res.statusCode = 401;
+                        res.send(RtnMessage);
+                    }
+                }
+                else {
+                    console.log('FnSaveResourceItemMap:Error in processing Token' + err);
+                    res.statusCode = 500;
+                    res.send(RtnMessage);
+
+                }
+            });
+        }
+
+        else {
+            if (Token == null) {
+                console.log('FnSaveResourceItemMap: Token is empty');
+            }
+            else if (TID == null) {
+                console.log('FnSaveResourceItemMap: TID is empty');
+            }
+            else if (ResourceID == null) {
+                console.log('FnSaveResourceItemMap: ResourceID is empty');
+            }
+            else if (ItemID == null) {
+                console.log('FnSaveResourceItemMap: ItemID is empty');
+            }
+            res.statusCode=400;
+            res.send(RtnMessage);
+        }
+
+    }
+    catch (ex) {
+        console.log('FnSaveResourceItemMap:error ' + ex.description);
+        throw new Error(ex);
+    }
+};
+
 //EZEIDAP Parts
 
 //app part
@@ -8453,6 +8689,75 @@ exports.FnSaveContactVES = function(req, res){
     }
     catch (ex) {
         console.log('FnSaveContactVES:error ' + ex.description);
+        throw new Error(ex);
+    }
+};
+
+exports.FnGetAllContactsVES = function (req, res) {
+    try {
+
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        var Token = req.query.Token;
+        
+        if (Token != null) {
+            FnValidateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+
+                        db.query('CALL pGetAllContactsVES(' + db.escape(Token) + ')', function (err, GetResult) {
+                            if (!err) {
+                                if (GetResult != null) {
+                                    if (GetResult[0].length > 0) {
+
+                                        console.log('FnGetAllContactsVES: ContactsVES details Send successfully');
+                                        res.send(GetResult[0]);
+                                    }
+                                    else {
+
+                                        console.log('FnGetAllContactsVES:No ContactsVES details found');
+                                        res.send('null');
+                                    }
+                                }
+                                else {
+
+                                    console.log('FnGetAllContactsVES:No ContactsVES details found');
+                                    res.send('null');
+                                }
+
+                            }
+                            else {
+
+                                console.log('FnGetAllContactsVES: error in getting ContactsVES details' + err);
+                                res.statusCode = 500;
+                                res.send('null');
+                            }
+                        });
+                    }
+                    else {
+                        res.statusCode = 401;
+                        res.send('null');
+                        console.log('FnGetAllContactsVES: Invalid Token');
+                    }
+                } else {
+
+                    res.statusCode = 500;
+                    res.send('null');
+                    console.log('FnGetAllContactsVES: Error in validating token:  ' + err);
+                }
+            });
+        }
+        else {
+            if (Token == null) {
+                console.log('FnGetAllContactsVES: Token is empty');
+            }
+            
+            res.statusCode=400;
+            res.send('null');
+        }
+    }
+    catch (ex) {
+        console.log('FnGetAllContactsVES error:' + ex.description);
         throw new Error(ex);
     }
 };
