@@ -1,618 +1,74 @@
-
-<body ng-app="ezeidApp" style="overflow-y:hidden; overflow-x:hidden;">
-
-    <div id="wrapper" ng-controller="HomeController as Home">
-        <header-section></header-section>
-        <div ng-controller="SearchController as search">
-
-        <div class="Popup_window form_style map_popup_iconActions" id="download_popup">
-            <div class="window_page Maping_popup">
-                <span class="closeCV" ng-click="search.closeDownloadForm()">X</span>
-                <form name="downloadRequestForm" novalidate>
-                    <h3 class="marB15px">Download Document</h3>
-                    <div class="col-md-12">
-                        Click<a href="/ewtGetSearchDocuments?Token={{_userInfo.Token}}&&Keywords={{search.Criteria.Keywords}}"><b> {{search.downloadData.Filename}} </b></a>to download.
-                        <br/>
-                    </div><br/><br/>
-
-                    <div class="col-md-12">
-                        <span>File Name: {{search.downloadData.Filename}} | NO: {{search.downloadData.No}} | Expiry Date: {{search.downloadData.date}}</span>
-                        </div>
-                    <br/>
-                </form>
-            </div>
-        </div>
-
-            <div class="Popup_window form_style map_popup_iconActions" id="SalesEnquiryRequest_popup" style="height: 103%;">
-                <div class="window_page Maping_popup">
-                    <span class="closelink" ng-click="search.closeSalesEnquiryForm()">X</span>
-                    <form name="salesEnquiryForm" ng-submit="salesEnquiryForm.$valid && search.sendSalesEnquiry()" novalidate>
-                        <h3 class="marB15px">Sales Enquiry</h3>
-                        <div class="col-md-12">
-                            <p style="margin-top:-7px;">
-                                Enter your Requirement (You do not need to submit your contacts numbers, instead we
-                                will send your EZE ID Card)
-                            </p>
-                        </div>
-                        <div class="form-group" style="float: left;">
-                            <textarea class="form-control fixTextArea emptyBox" name="salesMessage" ng-model="search.salesMessage" placeholder="Type Message here" required></textarea><br />
-                            <!--<input type="text" name="salesMessage" ng-model="search.salesMessage" class="msgBox form-control ng-pristine ng-valid ng-touched" placeholder="Type Message here" required>-->
-                        </div>
-                        <div class="form-group">
-                            <input type="submit" ng-disabled="!search.salesMessage" class="btn btn-primary text_Box" value="Send" />
-                            <input type="reset" class="btn btn-primary marR10px cancelEnq text_Box" ng-click="search.closeSalesEnquiryForm()" value="Close" />
-                        </div>
-                    </form>
-                </div>
-            </div>
-            <div class="Popup_window form_style map_popup_iconActions" id="sendMessage_popup">
-                <div class="window_page Maping_popup">
-                    <span class="closeCV" ng-click="search.closeSendMessageForm()">X</span>
-                    <form name="sendMessageForm" ng-submit="sendMessageForm.$valid && search.sendUserMessage()" novalidate>
-                        <h3 class="marB15px">Message</h3>
-                        <div class="col-md-12">
-                            <p>
-                                Enter your Message (You do not need to submit your contacts numbers, instead we
-                                will send your EZE ID Card)
-                            </p>
-                        </div>
-                        <div class="form-group">
-                            <textarea class="form-control fixTextArea emptyBox" name="sendMessage" ng-model="search.SendMessage" placeholder="Type Message here" required></textarea>
-                        </div>
-                        <div class="form-group">
-                            <input type="submit" ng-disabled="!search.SendMessage" class="btn btn-primary" value="Send" />
-                            <input type="reset" class="btn btn-primary marR10px cancelEnq" ng-click="search.closeSendMessageForm()" value="Close" />
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-            <div class="Popup_window form_style map_popup_iconActions" id="HomeDelivery_popup">
-                <div class="window_page Maping_popup">
-                    <span class="closeHomeDelivery" ng-click="search.closeHomeDeliverForm()">X</span>
-                    <form name="homeDeliverForm" ng-submit="homeDeliverForm.$valid && search.sendHomeDelivery()" novalidate>
-                        <h3 class="marB15px">Home Delivery</h3>
-                        <div class="col-md-12">
-                            <p style="margin-top:-7px;">
-                                Enter your Requirement (You do not need to submit your contacts numbers, instead we
-                                will send your EZE ID Card)
-                            </p>
-                        </div>
-                        <div class="form-group" style="float: left;">
-                            <textarea class="form-control fixTextArea emptyBox" name="homeDeliverMessage" ng-model="search.HomeDeliverMessage" placeholder="Type here" required></textarea>
-                        </div>
-                        <div class="form-group">
-                            <input type="submit" ng-disabled="!search.HomeDeliverMessage" class="btn btn-primary text_BoxHome" value="Send" />
-                            <input type="reset" ng-click="search.closeHomeDeliverForm()" class="btn btn-primary marR10px cancelEnq text_BoxHome" value="Close" />
-                        </div>
-                    </form>
-                </div>
-            </div>
-            <div class="Popup_window form_style map_popup_iconActions" id="Reservation_popup">
-                <div class="window_page Maping_popup">
-                    <span class="closelink" ng-click="search.closeReservationForm()">X</span>
-                    <span style="margin-top:-2px;float:right; border:1px solid #000000;background:#FAA9A3;color:#000000;">
-                        <span>Mandatory</span>
-                    </span>
-                   <!-- <form name="reservationForm" ng-submit="reservationForm.$valid && search.sendReservation(_userInfo.Type==1 ? '6' : '3')" novalidate>-->
-                    <form name="reservationForm" ng-submit="reservationForm.$valid && search.sendReservation(search.mInfo.IDTypeID==1 ? '6' : '3')" novalidate>
-                        <h3 ng-show="search.mInfo.IDTypeID==1" class="marB15px">Appointment</h3>
-                        <h3 ng-show="search.mInfo.IDTypeID==2" class="marB15px">Reservation</h3>
-
-                        <div class="form-group">
-                            <p>
-                                <label>
-                                    <span ng-show="search.mInfo.IDTypeID==2"> Reservation Date & Time:</span>
-                                    <span ng-show="search.mInfo.IDTypeID==1"> Appointment Date & Time:</span>
-                                    <span ng-show="search.mInfo.IDTypeID==3"> Appointment Date & Time:</span>
-                                </label>
-                                <span style="width:60%;display:block;">
-                                     <date-time-picker recipient="search.ReservationDateTime"></date-time-picker>
-                                </span>
-                            </p>
-                            <textarea id="reservationMessage" name="reservationMessage"
-                                      ng-class="reservationForm.reservationMessage.$touched && !search.ReservationMessage.length ? 'mandatoryTextBox' : ''"
-                                      class="form-control fixTextArea emptyBox" name="reservationMessage" ng-model="search.ReservationMessage"
-                                      placeholder="{{search.reservationPlaceHolder}}" required></textarea>
-                        </div>
-                        <div class="form-group">
-                            <input type="submit" ng-disabled="!search.ReservationDateTime || !search.ReservationMessage" class="btn btn-primary appoint_marT" value="Send" />
-                            <input type="reset" ng-click="search.closeReservationForm()" class="btn btn-primary marR10px cancelEnq appoint_marT" value="Close" />
-                        </div>
-                    </form>
-                </div>
-            </div>
-            <div class="Popup_window form_style map_popup_iconActions" id="ServiceRequest_popup">
-                <div class="window_page Maping_popup">
-                    <span class="closelink" ng-click="search.closeServiceRequestForm()">X</span>
-                    <form name="serviceRequestForm" ng-submit="serviceRequestForm.$valid && search.sendServiceRequest()" novalidate>
-                        <h3 class="marB15px">Service Request</h3>
-                        <div class="col-md-12">
-                            <p>
-                                Enter your Requirement (You do not need to submit your contacts numbers, instead we
-                                will send your EZE ID Card)
-                            </p>
-                        </div>
-                        <div class="form-group" style="float: left;">
-                            <textarea class="form-control fixTextArea emptyBox" name="serviceRequestMessage" ng-model="search.ServiceRequestMessage" placeholder="Type here" required></textarea>
-                        </div>
-                        <div class="form-group">
-                            <input type="submit" ng-disabled="!search.ServiceRequestMessage" class="btn btn-primary" value="Send" />
-                            <input type="reset" ng-click="search.closeServiceRequestForm()" class="btn btn-primary marR10px cancelEnq" value="Close" />
-                        </div>
-                    </form>
-                </div>
-            </div>
-            <div class="Popup_window form_style map_popup_iconActions" id="CV_popup">
-                <div class="window_page Maping_popup">
-                    <span class="closeCV" ng-click="search.closeCVForm()">X</span>
-                    <form name="cvRequestForm" ng-submit="cvRequestForm.$valid && search.sendCV()" novalidate>
-                        <h3 class="marB15px">CV Confirm</h3>
-                        <div class="col-md-12">
-                            Are you want to send your CV to {{search.CompanyName}} Company
-                        </div><br /><br />
-
-                        <div class="form-group">
-                            <input type="button" class="btn btn-primary" ng-click="search.checkForCVAvailability()" value="Yes" />
-                            <input type="reset" ng-click="search.closeCVForm()" class="btn btn-primary marR10px cancelEnq" value="Close" />
-                        </div>
-                    </form>
-                </div>
-            </div>
-            <div class="Popup_window form_style" id="Maping_popup" style="display:none;">
-                <div class="window_page Maping_popup">
-                    <span class="closelink" ng-click="search.closeMappingPopup()" >X</span>
-                    <div style="margin-left:0px;" class="row">
-                        <div class="col-md-3">
-                            <img ng-show="search.mInfo.Picture!=''" ng-src="{{search.mInfo.Picture}}" height="120px" width="120px">
-                            <img ng-hide="search.mInfo.Picture!=''" ng-src="images/Map_logo.png" height="120px" width="120px">
-                            <br>
-                            <div class="clearfix"></div>
-                            <span class="name_fontSize">{{search.mInfo.EZEID}}</span>
-                        </div>
-                        <div class="col-md-7">
-                            <span class="heading">{{search.mInfo.FirstName}}{{" "+search.mInfo.LastName}}</span>
-                            <br>
-                            <span>
-                                {{search.mInfo.AddressLine1 + ", "}}{{search.mInfo.AddressLine2+ ", "}}
-                                {{search.mInfo.CityTitle+ ", "}}
-                            </span><br>
-                            <span>{{search.mInfo.StateTitle+ ", "}} {{search.mInfo.CountryTitle +", "}} </span>
-                            <span>Postal Code: {{search.mInfo.PostalCode}} </span>
-                            <br>
-                            <span>P: {{search.mInfo.PhoneNumber == "" ? "--------" : search.mInfo.PhoneNumber}}</span>   | <span> M:  {{search.mInfo.MobileNumber == "" ? "--------" : search.mInfo.MobileNumber}}</span>  <!--<a href="#" class="msg-link">messege</a>-->
-                            <br>
-                            <span ng-show="search.mInfo.EMailID != ''">
-                                <span style="display:block">
-                                    <!--<a style="position:relative;float:left; display:block" href="#" class="email-link">{{search.mInfo.EMailID}}</a>-->
-                                     <a href="mailto:{{search.mInfo.EMailID}}" class="email-link">{{search.mInfo.EMailID}}</a>
-                                </span>
-                            </span>
-                            <span ng-show="search.mInfo.Website != ''">
-                                <!--<a style="position:relative; float:left"  class="web-link">{{search.mInfo.Website}}</a>-->
-                                 <u> <a style="position:relative; float:left" href="{{search.mInfo.Website}}" class="web-link">{{search.mInfo.Website}}</a></u>
-                            </span>
-                            <div> </div>
-                            <div class="clearfix"></div>
-                        </div>
-                        <div class="col-md-2">
-                            <img ng-show="search.mInfo.Icon!=''" width="60" height="60" ng-src="{{search.mInfo.Icon}}" class="img2-marR">
-                            <img ng-hide="search.mInfo.Icon!=''" src="images/user_40.png" height="60" width="60" class="img2-marR" />
-                            <img ng-show="search.mInfo.EZEIDVerifiedID != 2" style="margin-top: 64px; margin-left: -63px;" width="60" height="60" ng-src="images/Question_40.png" class=" icon_img" />
-                            <img ng-show="search.mInfo.EZEIDVerifiedID == 2" width="60" height="60" ng-src="images/correct_40.png" style="margin-top: 64px; margin-left: -63px;" class=" icon_img" />
-                        </div>
-                    </div>
-                    <div class="clearfix"></div>
-                    <div class="clearfix"></div>
-                    <ul ng-show="search.isIndividualUser(1)" style="position:relative;top:-5px">
-                        <button ng-disabled="search.mInfo.EZEIDVerifiedID != '2'" class="noti-icon" ng-click="search.openSendMessageForm()" title="Message">Message</button>
-                        <button ng-disabled="search.mInfo.EZEIDVerifiedID != '2'" class="appoinment-icon" title="Appointment" ng-click="search.openReservationForm()">Appointment</button>
-                        <button class="direction-icon" ng-click="search.getdirections(search.mInfo)" title="Directions">Directions</button>
-                        <div class="clearfix"></div>
-                    </ul>
-                    <div class="clearfix"></div>
-                    <ul ng-hide="search.isIndividualUser(1)" style="position:relative;">
-                        <button class="sales-icon" ng-hide="search.mInfo.SalesEnquiryButton==0" ng-disabled="search.mInfo.SalesEnquiryButton==2 || search.mInfo.EZEIDVerifiedID == '1'" title="Sales Enquiry" ng-click="search.openSalesEnquiryForm()">Sales Enquiry</button>
-                        <button class="home-icon" ng-hide="search.mInfo.HomeDeliveryButton==0" ng-disabled="search.mInfo.HomeDeliveryButton==2 || search.mInfo.EZEIDVerifiedID == '1'" title="Home Delivery" ng-click="search.openHomeDeliverForm()">Home Delivery</button>
-                        <button class="reservation-icon" ng-hide="search.mInfo.ReservationButton==0" ng-disabled="search.mInfo.ReservationButton==2 || search.mInfo.EZEIDVerifiedID == '1'" title="Reservation" ng-click="search.openReservationForm()">Reservation</button>
-                        <button class="support-icon" ng-hide="search.mInfo.SupportButton==0" ng-disabled="search.mInfo.SupportButton==2 || search.mInfo.EZEIDVerifiedID == '1'" title="Support Request" ng-click="search.openServiceRequestForm()">Support Request</button>
-
-                        <button class="sendcv-icon" ng-hide="search.mInfo.CVButton==0" ng-disabled="search.mInfo.CVButton==2 || search.mInfo.EZEIDVerifiedID == '1'" title="Send CV" ng-click="search.openCVForm()">Send CV</button>
-                        <button class="direction-icon" ng-click="search.getdirections(search.mInfo)" title="Directions">Directions</button>
-                        <div class="clearfix"></div>
-                    </ul>
-                    <div class="clearfix"></div>
-                    <div style="position:relative" class="parking pull-left" ng-hide="search.isIndividualUser(1)">
-                        <a class="car-parking active" ng-show="search.mInfo.ParkingStatus==1" title="Parking">Parking</a>
-                        <a class="no-parking active" ng-show="search.mInfo.ParkingStatus==4" title="No Parking">No Parking</a>
-                        <a class="val-parking active" ng-show="search.mInfo.ParkingStatus==3" title="Vallet Parking">Vallet Parking</a>
-                        <a class="road-parking active" ng-show="search.mInfo.ParkingStatus==2" title="Road Parking">Road Parking</a>
-                        <div class="clearfix"></div>
-                    </div>
-                    <div class="search_user" ng-hide="search.isIndividualUser(1)" class="col-md-offset-1" >
-                        <span ng-show="search.mInfo.IDTypeID != 1" style="font-size: 15px;">
-                                <p ng-show="search.mInfo.OpenStatus==1" class="open-close"><i>OPEN</i> Working hours :  {{search.mInfo.WorkingHours}}</p>
-                                <p ng-hide="search.mInfo.OpenStatus==1" ng-click="search.closeHomeDeliverForm()" class="close-close"><i>CLOSE</i> Working hours :  {{search.mInfo.WorkingHours}}</p>
-                         </span>
-                    </div>
-                </div>
-                <div class="clearfix"></div>
-            </div>
-            <div class="Popup_window form_style map_popup_iconTerm" id="Help_popup">
-                <div class="window_page  Maping_popup">
-                    <span class="closelink" ng-click="closeHelpPopup()">X</span>
-                    <div class="clearfix"></div>
-                    <div class="row mar_editTop">
-                        <h3  style="text-align: center"><span class="">Help</span></h3>
-                        <div ng-include="'html/help.html'"  style="width: 98%; height: 350px; overflow-y: scroll; padding: 5px;">
-                            <!-- Terms.html include hear... -->
-                        </div>
-                        <span style="text-align: center">
-                             <input type="button" style="margin-left: 45%; margin-top: 1%;" ng-click="closeHelpPopup()" class="btn btn-primary " value="Close">
-                        </span>
-
-                    </div>
-                </div>
-            </div>
-
-            <div class="container" style="padding-top:80px;">
-                <div class="row">
-                    <div class="col-md-7" style="margin: auto; float: none;">
-                        <div class="panel panel-default">
-                            <form class="form-signin" role="form" novalidate  ng-submit="search.getSearch()">
-                                <!--------------------------------------New Code---------------------------------->
-                                <div class="container-fluid">
-                                    <div class="bottom-clearfix"></div>
-                                    <div class="row row-margin-fix">
-                                        <div class="col-lg-5 col-md-5 col-sm-5 col-xs-12">
-                                            <!-- 1st block--->
-                                                Search by
-                                                <input type="radio" name="searchType" ng-model="search.Criteria.SearchType" id="EZEID" value="1" checked> EZEID
-                                                <input type="radio" name="searchType" ng-model="search.Criteria.SearchType" id="Keywords" value="2"ng-click="search.SearchTypeKeyWord()"> Keywords
-
-
-                                          <!--  <label>
-                                                Search by
-                                                <input type="radio" name="EZType"  ng-model="profile._info.IDTypeID" id="Individual" value="1"  checked required> Individual
-                                                <input type="radio" name="searchType" ng-model="search.Criteria.SearchType" id="EZEID" value="1" checked>
-                                                <label for="EZEID">EZEID</label>
-                                                <input value="2" id="Keywords" ng-model="search.Criteria.SearchType" name="searchType" type="radio" ng-click="search.SearchTypeKeyWord()" >
-                                               <label for="Keywords">Keywords</label>
-
-                                            </label>-->
-                                        </div>
-                                        <div class="col-lg-1 col-md-1 col-sm-1 col-xs-5 col-lg-offset-5 col-md-offset-5 col-sm-offset-5">
-                                            <a ng-click="openHelpPopup()" id="SearchHelp" style="cursor: pointer">Help?</a>
-                                        </div>
-                                    </div>
-                                    <div class="bottom-clearfix"></div>
-                                    <div class="row row-margin-fix">
-
-                                        <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8" ng-class="search.isEZEIDselected('1') ? 'searchAreaSize' : 'searchAreaSizeBig' ">
-                                            <input id="inputEmail" class="form-control" ng-model="search.Criteria.Keywords"   ng-click="search.SearchTypeKeyWord()" required autofocus type="text"
-                                                   ng-class="search.Criteria.SearchType == 1 ? 'setUpperChar' : ''" >
-                                        </div>
-
-                                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2" ng-hide="search.isEZEIDselected('1')">
-                                            <div ng-dropdown-multiselect="" options="ratingData" selected-model="ratingModel"></div>
-                                        </div>
-
-                                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2" ng-class="search.isEZEIDselected('1') ? 'searchButtonDiv' : 'setSpaceSearchButton' ">
-                                            <button  ng-disabled="!search.Criteria.Keywords" class="btn btn-block btn-primary pull-left" type="submit">Search</button>
-                                        </div>
-                                    </div>
-                                    <div class="bottom-clearfix"></div>
-                                    <div class="row row-margin-fix" ng-show="search.IsFilterRowVisible">
-                                            <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3" ng-hide="1">
-                                                <select class="form-control pull-left" ng-init="search.Criteria.OpenStatus = search.OpenStatuses[0]" ng-model="search.Criteria.OpenStatus" ng-disabled="search.isEZEIDselected('1')"
-                                                        ng-options="status.id as status.label for status in search.OpenStatuses">
-                                                    <option value="">Any</option>
-                                                </select>
-                                            </div>
-                                            <div class="col-lg-2 col-md-2 col-sm-12 col-xs-12" style="padding-right:0px; width: 15.666667%;"
-                                                 ng-hide="search.isEZEIDselected('1')">
-                                                <div style="display:table-cell;vertical-align:middle;height:34px;">
-                                                Search within
-                                                </div>
-                                            </div>
-
-                                        <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6" ng-hide="search.isEZEIDselected('1')" style="padding-left: 0px; width: 23%;">
-                                            <select class="form-control pull-left"
-                                                    ng-model="search.Criteria.Proximity" ng-disabled="search.isEZEIDselected('1')"     >
-                                                <option value="{{proximity.MilesValue}}"  ng-selected="{{proximity.MilesValue == 1}}" ng-repeat="proximity in search.proximities">{{proximity.Title}}</option>
-                                                <option value="0">Any</option>
-                                            </select>
-                                        </div>
-
-                                            <div class="col-lg-7 col-md-7 col-sm-7 col-xs-12" ng-hide="search.isEZEIDselected('1')" style="width: 60.333333%;">
-                                                <div style="display:table-cell;vertical-align:middle;height:34px;">
-                                                    <span>proximity from </span>
-                                                    <a ng-click="selectTab('map')" style="cursor:pointer;"><b>map location</b></a>
-                                                    <input type="checkbox" ng-model="search.Criteria.ParkingStatus" name="parking" value="1,2" style="margin-left: 5px;"><span style="margin-left: 4px;"> Show Places with Parking</span>
-                                                </div>
-                                            </div>
-                                    </div>
-                                    <div class="bottom-clearfix"></div>
-                                </div>
-
-                                <!--------------------------------------New Code ends ---------------------------->
-                                <div class="clearfix"></div>
-                                <!--<img src="images/Business-Card_2.gif" width="100%" height="223">-->
-                            </form>
-                        </div>
-                    </div>
-                </div>
-                <div class="row" ng-show="search.IsShowForm">
-                   <div class="window_page Maping_popup" style="margin-top: 0%;border: solid 1px #08749C; min-height: 48px; width: 57.50%;padding: 5px; margin-bottom: 1%;">
-                       <span class="closeCVSmall" ng-click="search.closeDownloadForm()">X</span>
-
-                            <div class="col-md-12">
-                                Click<a href="/ewtGetSearchDocuments?Token={{_userInfo.Token}}&&Keywords={{search.Criteria.Keywords}}"><b> {{search.downloadData.Filename}} </b></a>to download.
-                                <br/>
+<!--<body ng-app="ezeidApp" style="overflow-y:hidden; overflow-x:hidden;">-->
+<div id="wrapper" ng-controller="HomeController as Home">
+    <header-section></header-section>
+    <div ng-controller="SearchController as search">
+         <div class="container-fluid">
+        <div class="row top-clearfix"></div>
+        <div class="row">
+            <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 col-lg-offset-2 col-md-offset-2 col-sm-offset-2 col-xs-offset-0">
+                <div class="panel panel-default">
+                    <div class="panel-body setPanelPadding">
+                        <div class="row" style="margin-left: -31px;">
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin-top: 0px; padding-top:  0px">
+                                <img src="../images/header.gif">
                             </div>
-                            <div class="col-md-12">
-                              <span> NO: {{search.downloadData.No}}  {{search.downloadData.date != "" ? "| Expiry Date:"+search.downloadData.date : ""}}</span>
-                            </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-7" style="margin: auto; float: none;">
-                        <ul class="tabDisplay" role="group">
-                            <li id="btn-ad" ng-show="0" ng-click="selectTab('ad')" class="tab">Home</li>
-                            <li id="btn-info" ng-show="showInfoTab" ng-click="selectTab('info')"  ng-class="{tabActive: infoClass == 'level-1'}" class="tab">Information</li>
-                            <li id="btn-map" ng-click="selectTab('map')" ng-class="{tabActive: mapClass == 'level-1'}" class="tab">Map</li>
-                        </ul>
-
-                        <div class="panel panel-default" style="border-radius: 0px 24px 0px 0px;height:390px;padding-top:29px;overflow: hidden;">
-                            <div class="tab-view {{adClass}}" style="background:url('../images/home_ad.png');background-repeat:no-repeat;"></div>
-                            <!------------------------ New info tab code ------------------------------------------>    
-                            <div class="tab-view {{infoClass}}" style="background:#fff;">
-                                <div class="row" ng-show="search.mInfo.IDTypeID == 2">
-                                    <div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 text-center" style="margin-left: 3%;">
-                                        <div >
-                                            <img src="{{search.mInfo.BannerImage}}" height="90" width="100%"/>
-                                        </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 bottom-clearfix setFontSize" style="margin-top: 1%; margin-bottom: 0px;">
+                                <div class="row" style="  margin-right: 5px;">
+                                    <div class="col-lg1-2 col-md-2 col-sm-2 col-xs-12 searchButtonMarginSet">
+                                        <input type="button" ng-click="msglist.closeAddNewSalesEnquiryForm()" class="btn btn-primary" value="Search"/>
                                     </div>
-
-                                    <div>
-                                        <div class="col-lg-1" style="margin-left: 3%; margin-top: 3%;">
-                                            <img ng-show="search.previousButton == true" ng-click="search.getPreviousBanner()" src="images/arrow_left.png" />
-                                            <img ng-show="search.previousButton == false" src="images/arrow_left_gray.png" />
-                                        </div>
-                                        <div class="col-lg-1" style=" margin-top: 3%;">
-                                             <img ng-show="search.nextButton == true" ng-click="search.getNextBanner()" src="images/arrow_right.png" />
-                                             <img ng-show="search.nextButton == false" src="images/arrow_right_grey.png" />
-                                        </div>
+                                    <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12">
                                     </div>
-
-                                    <div class="starRating" style="margin-top: 3%; margin-left: 1%;">
-                                        <div>
-                                            <div>
-                                                <div>
-                                                    <div>
-                                                        <input id="rating1" disabled type="radio" name="form_rating" ng-model="form_rating" value="1">
-                                                        <label for="rating1"><span>1</span></label>
-                                                    </div>
-                                                    <input id="rating2" disabled type="radio" name="form_rating" ng-model="form_rating" value="2">
-                                                    <label for="rating2"><span>2</span></label>
-                                                </div>
-                                                <input id="rating3" disabled type="radio" name="form_rating" ng-model="form_rating" value="3">
-                                                <label for="rating3"><span>3</span></label>
-                                            </div>
-                                            <input id="rating4" disabled type="radio" name="form_rating" ng-model="form_rating" value="4">
-                                            <label for="rating4"><span>4</span></label>
-                                        </div>
-                                        <input id="rating5" disabled type="radio" name="form_rating" ng-model="form_rating" value="5">
-                                        <label for="rating5"><span>5</span></label>
+                                    <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12">
+                                        <input type="button" ng-click="msglist.closeAddNewSalesEnquiryForm()" class="btn btn-primary" value="Information"/>
                                     </div>
-
-                                </div>
-                                <div class="row">
-
-                                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 text-center">
-                                        <div class="row text-center">
-                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin-top: 3%;">
-                                                <img ng-show="search.mInfo.Picture!=''" ng-src="{{search.mInfo.Picture}}" height="120px" width="120px">
-                                                <img ng-hide="search.mInfo.Picture!=''" ng-src="images/Map_logo.png" height="120px" width="120px">    
-                                            </div>
-                                        </div>
-                                        <!--<div class="row text-center">
-                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                                <h4 style="font-weight:bold;text-transform:uppercase;">{{search.mInfo.EZEID}}</h4>
-                                            </div>
-                                        </div>-->
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 pull-right">
+                                        Help?
                                     </div>
-                                    
-                                    <div class="col-lg-7 col-md-7 col-sm-7 col-xs-12 text-center">
-                                        <div class="row">
-                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                                <h2 class="text-center" ng-show="search.mInfo.IDTypeID == 1"  style="font-size: 27px; line-height:0;padding-bottom:3px;">{{search.mInfo.FirstName}}{{" "+search.mInfo.LastName}}</h2>
-                                                <h2 class="text-center" ng-show="search.mInfo.IDTypeID == 3"  style="font-size: 27px; line-height:0;padding-bottom:3px;">{{search.mInfo.FirstName}}{{" "+search.mInfo.LastName}}</h2>
-                                                <h2 class="text-center" ng-show="search.mInfo.IDTypeID == 2"  style="font-size: 27px; line-height:0;padding-bottom:3px;">{{search.mInfo.CompanyName}}</h2>
-                                            </div>
-                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                                <h4 class="text-center"  style="line-height:2; font-size: 15px; margin-top: 3px; margin-bottom: 4px;">
-                                                    {{search.mInfo.AddressLine1 + ", "}} {{search.mInfo.AddressLine2+ ", "}} {{search.mInfo.CityTitle+ ", "}}
-                                                    {{search.mInfo.StateTitle+ ", "}} {{search.mInfo.CountryTitle +", "}} {{search.mInfo.PostalCode}}
-                                                </h4>
-                                            </div>
-                                        </div>
-
-                                        <div class="row text-left" style="font-size: 15px; border-bottom: 1px solid #DDD;padding: 5px;margin-top: 0px; padding-top: 0px;">
-                                            
-                                            <div class="col-lg-1">
-                                                <img src="images/Telephone_24.png" />
-                                            </div>
-                                            <div class="col-lg-5">
-                                                {{search.mInfo.PhoneNumber == "" ? "--------" :search.mInfo.ISDPhoneNumber}}  {{search.mInfo.PhoneNumber == "" ? "--------" : search.mInfo.PhoneNumber}}
-                                            </div>
-                                            
-                                            <div class="col-lg-1" style="margin-left: 14%;">
-                                                <img src="images/Mobile_24.png" />
-                                            </div>
-                                            <div class="col-lg-5" style="width: 27.666667%;">
-                                                {{search.mInfo.MobileNumber == "" ? "--------" : search.mInfo.MobileNumber}}
-                                            </div>
-                                        </div>
+                                    <div class="row addItemRowUserEzeid1" >
+                                        <!--<img src="../images/default.jpg" wigth="35" height="45" >-->
+                                        <img src="../images/default.jpg" wigth="104px" height="134px" >
                                     </div>
-                                    
-                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 text-center">
-                                        
-                                        <div class="row">
-                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-center">
-                                                <div ng-hide="(search.mInfo.IDTypeID == 1)">
-                                                    <img ng-show="search.mInfo.Icon!=''" width="60" height="60" ng-src="{{search.mInfo.Icon}}" class="">
-                                                    <img ng-hide="search.mInfo.Icon!=''" src="images/user_40.png" height="60" width="60" />
-
-                                                </div>
-                                                <div style="height:10px;width:1%" ng-hide="(search.mInfo.IDTypeId == 1)"></div>
-                                                <div ng-show="(search.mInfo.IDTypeID == 1)" style="height:70px;width:1%;"></div>
-                                            </div>
-                                        </div>
-                                        <div class="bottom-clearfix"></div>
-                                        <div class="row">
-                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-center">
-                                                <img ng-show="(search.mInfo.EZEIDVerifiedID == 2)" src="images/verified_48.png" />
-                                                <img ng-hide="(search.mInfo.EZEIDVerifiedID == 2)" src="images/not_verified_48.png" />
-                                            </div>
-                                        </div>
+                                    <div class="row addItemRowUserEzeid">
+                                        <span class="ezeidTitle"><b> krunnu11 </b></span>
                                     </div>
-                                </div>
-                                
-                                
-                                <div class="row row-margin-clearfix">
-                                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
-                                        <div class="row text-center">
-                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                                <h4 style="font-weight:bold;text-transform:uppercase; margin-top: 6px;">{{search.mInfo.EZEID}}</h4>
-                                            </div>
-                                        </div>
+                                    <hr/>
+                                    <div class="row companyInfo searchButtonMarginSet">
+                                        <span><b> Demo Company Technologies Pvt. Ltd. </b></span>
                                     </div>
-                                    <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12">
-                                        <div class="row text-left" style="border-bottom: 1px solid #DDD;padding: 5px;margin-top: 0px;">
-                                            <div class="col-lg-1" style="width: 6.333333%;">
-                                                <img src="images/MSG_24.png" />
-                                            </div>
-                                            <div class="col-lg-4" style="width: 44.333333%;word-wrap: break-word;">
-                                                <a href="mailto:{{search.mInfo.EMailID}}">{{search.mInfo.EMailID}}</a>
-                                            </div>
-                                            <div class="col-lg-1" style=" margin-left: 1.5%; width: 5.333333%;">
-                                                <div class="row">
-                                                    <div class="col-lg-4 text-center">
-                                                        <div class="row">
-                                                            <div class="col-lg-3"></div>
-                                                            <div class="col-lg-4">
-                                                                <img src="images/web_24.png">
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-5" style="word-wrap: break-word;">
-                                                <u> <a href="{{search.mInfo.Website}}">{{search.mInfo.Website}}</a></u>
-                                            </div>
-                                        </div>
+                                    <div class="row centerAlign searchButtonMarginSet">
+                                        India's largest recruitment software pvy Ltd.
                                     </div>
-                                </div>
-                                
-                                <div class="row row-margin-fix">
-                                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6">
-                                        <div class="col-lg-5">
-                                            <div style="position:relative" class="parking" ng-hide="search.isIndividualUser(1)">
-                                                <a class="car-parking active" ng-show="search.mInfo.ParkingStatus==1" title="Parking">Parking</a>
-                                                <a class="no-parking active" ng-show="search.mInfo.ParkingStatus==4" title="No Parking">No Parking</a>
-                                                <a class="val-parking active" ng-show="search.mInfo.ParkingStatus==3" title="Vallet Parking">Vallet Parking</a>
-                                                <a class="road-parking active" ng-show="search.mInfo.ParkingStatus==2" title="Road Parking">Road Parking</a>
-                                                <div class="clearfix"></div>
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-7">
-                                            <div style="margin-top:0px!important;text-align:center;" ng-hide="search.isIndividualUser(1)">
-                                                <img src="images/Open__48.png" height="38px;" ng-show="search.mInfo.OpenStatus==1"/>
-                                                <img src="images/Closed___48.png" height="38px;" ng-hide="search.mInfo.OpenStatus==1" />
-                                            </div>
-                                        </div>
+                                    <hr/>
+                                    <div class="row centerAlign searchButtonMarginSet">
+                                        #146, 1 st Floor, 7th Main, 6th Block,
+                                        Padamnabha nagar, Banglore, India - 560070
                                     </div>
-                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 col-lg-offset-0 col-md-offset-0 col-sm-offset-0 col-xs-offset-0" style="padding-top:5px;">
-                                        <span ng-show="search.mInfo.IDTypeID != 1">
-                                        <h5 ng-show="search.mInfo.OpenStatus==1"  style="border:none; font-size: 15px;">Working hours :  {{search.mInfo.WorkingHours}}</h5>
-                                        <h5 ng-hide="search.mInfo.OpenStatus==1"  style="border:none; font-size: 15px;" ng-click="search.closeHomeDeliverForm()"> Working hours :  {{search.mInfo.WorkingHours}}</h5>
-                                            </span>
-                                                
+                                    <hr/>
+                                    <div class="row centerAlign searchButtonMarginSet">
+                                        +91-80-2553 4234 | +91-994 523 2397
+                                        salesmaiidhere@hirecraft.com | www.hirecraftwebsite.com
                                     </div>
-                                </div>
-                                <div class="row row-margin-fix" ng-show="search.isIndividualUser(1)">
-                                    <div class="col-lg-10 col-sm-10 col-md-10 col-xs-10">
-                                        <div class="row row-margin-clearfix">
-                                            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 col-lg-offset-2 col-md-offset-2 col-sm-offset-2 col-xs-offset-2" ng-click="search.openSendMessageForm()"  title="Message">
-                                                <button  class="info-icon-btn noti-icon">Message</button>
-                                            </div>
-                                            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2" title="Appointment" ng-click="search.openReservationForm()">
-                                                <button class="info-icon-btn appoinment-icon" >Appointment</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="col-lg-2">
-                                        <div class="row">
-                                            <div class="col-lg-6" ng-click="search.getdirections(search.mInfo)" title="Directions">
-                                                <button class="info-icon-btn direction-icon">Directions</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="row row-margin-fix" ng-hide="(search.mInfo.IDTypeID == 1)">
-                                    
-                                    <!--<div class="col-lg-10 col-md-10 col-sm-10 col-xs-10" ng-disabled="{{_userInfo.Token == 2}}">-->
-                                    <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10" >
-                                        <div class="row">
-
-                                            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 col-lg-offset-2 col-sm-offset-2 col-md-offset-2 col-xs-offset-2" ng-hide="_userInfo.Token == 2 || search.mInfo.SalesEnquiryButton==2 || search.mInfo.EZEIDVerifiedID == '1'" ng-disabled="search.mInfo.SalesEnquiryButton==2 || search.mInfo.EZEIDVerifiedID == '1'" title="Sales Enquiry" ng-click="search.openSalesEnquiryForm()">
-
-                                                <button class="info-icon-btn sales-icon">Sales Enquiry</button>
-                                                
-                                            </div>
-                                            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2" ng-hide="_userInfo.Token == 2 || search.mInfo.HomeDeliveryButton==2 || search.mInfo.EZEIDVerifiedID == '1'" ng-disabled="search.mInfo.HomeDeliveryButton==2 || search.mInfo.EZEIDVerifiedID == '1'" title="Home Delivery" ng-click="search.openHomeDeliverForm()">
-                                                <button class="info-icon-btn home-icon">Home Delivery</button>
-
-                                            </div>
-                                            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2"  ng-hide="_userInfo.Token == 2 || search.mInfo.ReservationButton==2 || search.mInfo.EZEIDVerifiedID == '1'" ng-disabled="search.mInfo.ReservationButton==2 || search.mInfo.EZEIDVerifiedID == '1'" title="Reservation" ng-click="search.openReservationForm()">
-                                                <button class="info-icon-btn reservation-icon"> Reservation</button>
-                                            </div>
-                                            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2" ng-hide="_userInfo.Token == 2 || search.mInfo.SupportButton==2 || search.mInfo.EZEIDVerifiedID == '1'" ng-disabled="search.mInfo.SupportButton==2 || search.mInfo.EZEIDVerifiedID == '1'" title="Support Request" ng-click="search.openServiceRequestForm()">
-                                                <button class="info-icon-btn support-icon" >Support Request</button>
-                                            </div>
-                                            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2"  ng-hide="_userInfo.Token == 2" ng-disabled="search.mInfo.CVButton==2 || search.mInfo.EZEIDVerifiedID == '1'" title="Send CV" ng-click="search.openCVForm()">
-                                                <button class="info-icon-btn sendcv-icon" ng-hide="search.mInfo.CVButton==2 || search.mInfo.EZEIDVerifiedID == '1'">Send CV</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
-                                        <div class="row">
-                                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6"  ng-click="search.getdirections(search.mInfo)" title="Directions">
-                                                <button class="info-icon-btn direction-icon">Directions</button>
-                                            </div>
-                                        </div>                     
-                                    </div>
-                                    
-                                    
                                 </div>
                             </div>
-                            <!------------------------ New info tab code ------------------------------------------>
-                            <div class="tab-view {{mapClass}}" style="background:#FFF;">
-                                <div style="display:block;">
-                                    <img id="mapClocH" style="padding-top:8px;cursor:pointer;" ng-click="search.getMyLocation()" src="images/myloc.png" />
-                                    <input id="txtSearch" class="form-control pull-left marL5px" type="text" placeholder="Search Location" autocomplete="off" style=" z-index: 0; top:0px;margin-top:10px; width: 400px;">
-                                </div>
+                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 bottom-clearfix" style="padding-right: 0px; margin-bottom: 0px;">
                                 <div id="map-canvasH">
                                 </div>
                             </div>
-
+                        </div>
+                        <div class="row" style="margin-left: -31px;">
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                <img src="../images/footer.gif" class="">
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</body>
+    </div>
+</div>
+<!--
+</body>-->

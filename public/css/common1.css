@@ -11,3 +11,80 @@
     background-color:lightgray;
     padding-bottom: 1.5%;
 }
+.searchPageBoxContainer
+{
+    margin-left: 10px;
+    margin-right:10px;
+    border:1px
+}
+
+.top-clearfix{
+    margin-top: 100px;
+}
+.SearchMarginLeft
+{
+    margin-left: 10px;
+}
+.helpAlign
+{
+    text-align: right;
+    margin-right: 5px;
+    margin-rop: 5px;
+    padding-top: 5px;
+}
+.addItemRowUserEzeid1
+{
+    margin-left: 10px;
+    text-align: center;
+    padding-top: 11%;
+    color: #000;
+}
+.addItemRowUserEzeid
+{
+    margin-left: 10px;
+    text-align: center;
+    color: #000;
+}
+.setFontSize
+{
+    font-size: 16px;
+    color:#000;
+}
+.ezeidTitle
+{
+    text-transform:uppercase;
+    font-size: 16px;
+    color: #0866A6;
+}
+hr {
+    display: block;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+    margin-left: auto;
+    margin-right: auto;
+    border-style: inset;
+    border-width: 1px;
+    color: #6d6E70;
+}
+.companyInfo
+{
+    text-align: center;
+    color:#000;
+    font-size: 14px;
+}
+.centerAlign
+{
+    text-align: center;
+    font-size: 14px;
+}
+.setPanelPadding
+{
+    padding-top: 0px;
+    padding-left: 0px;
+    margin-left: 3%;
+    padding-bottom: 0px;
+}
+.searchButtonMarginSet
+{
+    margin-left: 7%;
+}
