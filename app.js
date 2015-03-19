@@ -132,6 +132,7 @@ app.get('/ewtGetSubUserList',LocationManager.FnGetSubUserList);
 app.post('/ewtSaveItem',LocationManager.FnSaveItem);
 app.post('/ewmSaveFolderRules',LocationManager.FnSaveFolderRules);
 app.post('/ewmSaveStatusType',LocationManager.FnSaveStatusType);
+app.post('/ewmSaveActionType',LocationManager.FnSaveActionType);
 app.get('/ewtItemList',LocationManager.FnItemList);
 app.get('/ewtItemDetails',LocationManager.FnItemDetails);
 app.post('/ewtSaveHolidayCalendar',LocationManager.FnSaveHolidayCalendar);
@@ -144,6 +145,7 @@ app.get('/ewtGetTranscation',LocationManager.FnGetTranscation);
 app.post('/ewtSaveResource',LocationManager.FnSaveResource);
 app.get('/ewtGetResource',LocationManager.FnGetResource);
 app.post('/ewtSaveResourceItemMap',LocationManager.FnSaveResourceItemMap);
+app.get('/ewtSearchContactsVES',LocationManager.FnSearchContactsVES);
 
 //below service are for EZEIDAP
 app.post('/ewLoginAP', LocationManager.FnLoginAP);
