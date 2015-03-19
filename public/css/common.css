@@ -1488,3 +1488,7 @@ input[type="text"].ui-grid-filter-input {
     padding-left: 0;
     position: relative;
 }
+
+.top-clearfix-half{
+    margin-top:50px;
+}

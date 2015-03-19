@@ -85,26 +85,31 @@ angular.module('ezeidApp').controller('BusinessManagerCtrl',['$scope','$rootScop
         console.log(resp[0]);
         var moduleVisibilities = resp[0].VisibleModules.split("");
         var userModuleRights = resp[0].UserModuleRights.split("");
-        if(moduleVisibilities[0] == 1 && userModuleRights[0] > 0){
+
+        /**
+         * Module Visibilities are only used for end users(whether owner want to show the module or not to end users)
+         */
+
+        if(userModuleRights[0] > 0){
             var salesModule = new Module(0,resp[0].SalesModuleTitle,true,resp[0].SalesItemListType,userModuleRights[0],resp[0].SalesFormMsg);
             $scope.modules.push(salesModule);
         }
-        if(moduleVisibilities[1] == 1 && userModuleRights[1] > 0){
+        if(userModuleRights[1] > 0){
             var reservationModule = new Module(1,resp[0].AppointmentModuleTitle,true,resp[0].ReservationDisplayFormat,userModuleRights[1],resp[0].ReservationFormMsg);
             $scope.modules.push(reservationModule);
         }
 
-        if(moduleVisibilities[2] == 1 && userModuleRights[2] > 0){
+        if(userModuleRights[2] > 0){
             var homeDeliveryModule = new Module(2,resp[0].HomeDeliveryModuleTitle,true,resp[0].HomeDeliveryItemListType,userModuleRights[2],resp[0].HomeDeliveryFormMsg);
             $scope.modules.push(homeDeliveryModule);
         }
 
-        if(moduleVisibilities[3] == 1 && userModuleRights[3] > 0){
+        if(userModuleRights[3] > 0){
             var serviceModule = new Module(3,resp[0].ServiceModuleTitle,true,1,userModuleRights[3],resp[0].ServiceFormMsg);
             $scope.modules.push(serviceModule);
         }
 
-        if(moduleVisibilities[4] === 1 && userModuleRights[4] > 0){
+        if(userModuleRights[4] > 0){
             var resumeModule = new Module(4,resp[0].CVModuleTitle,true,1,userModuleRights[4], resp[0].ResumeFormMsg);
             $scope.modules.push(resumeModule);
         }

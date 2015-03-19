@@ -132,6 +132,7 @@ app.get('/ewtGetSubUserList',LocationManager.FnGetSubUserList);
 app.post('/ewtSaveItem',LocationManager.FnSaveItem);
 app.post('/ewmSaveFolderRules',LocationManager.FnSaveFolderRules);
 app.post('/ewmSaveStatusType',LocationManager.FnSaveStatusType);
+app.post('/ewmSaveActionType',LocationManager.FnSaveActionType);
 app.get('/ewtItemList',LocationManager.FnItemList);
 app.get('/ewtItemDetails',LocationManager.FnItemDetails);
 app.post('/ewtSaveHolidayCalendar',LocationManager.FnSaveHolidayCalendar);

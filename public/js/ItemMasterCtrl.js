@@ -353,7 +353,7 @@ angular.module('ezeidApp').controller('ItemMasterCtrl',['$q','$scope','$interval
             params : {
                 Token : $rootScope._userInfo.Token,
                 FunctionType : fType,
-                MasterID : $scope.masterUser.MasterID
+                MasterID : $scope._userInfo.MasterID
             }
         }).success(function(resp){
                 var functionTypes = ['sales','reservation','homeDelivery','service','resume'];

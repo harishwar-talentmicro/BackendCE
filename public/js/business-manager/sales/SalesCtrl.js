@@ -41,11 +41,9 @@ angular.module('ezeidApp')
             exporterPdfOrientation: 'landscape',
             exporterPdfPageSize: 'LETTER',
             exporterPdfMaxGridWidth: 500,
-            exporterCsvLinkElement: angular.element(document.querySelectorAll(".custom-csv-link-location")),
+            exporterCsvLinkElement: angular.element(document.querySelectorAll(".custom-csv-link-location"))
             //Options for exporting data ends
         }
-
-
 
 
         /**
@@ -295,6 +293,7 @@ angular.module('ezeidApp')
          */
         $scope.saveTransaction = function(){
             console.log('Save is clicked');
+
         };
 
         /******************************************* Grid Code Ends here **********************************/
@@ -305,11 +304,12 @@ angular.module('ezeidApp')
          */
         $scope.loadAllItems = function(){
             $http({
-                url : GURL + '',
+                url : GURL + 'ewtGetItemList',
                 method : 'GET',
                 params : {
                     Token : $rootScope._userInfo.Token,
-                    FunctionType : 0
+                    FunctionType : 0,
+                    MasterID : $rootScope._userInfo.MasterID
                 }
             }).success(function(resp){
                 console.log(resp);
@@ -323,10 +323,12 @@ angular.module('ezeidApp')
          */
         $scope.loadAllStatus = function(){
             $http({
-                url : GURL + '',
+                url : GURL + 'ewtGetStatusType',
                 method : 'GET',
                 params : {
-                    Token : $rootScope._userInfo.Token
+                    Token : $rootScope._userInfo.Token,
+                    FunctionType : 0,
+                    MasterID : $rootScope._userInfo.MasterID
                 }
             }).success(function(resp){
                 console.log(resp);
@@ -340,10 +342,12 @@ angular.module('ezeidApp')
          */
         $scope.loadAllNextActions = function(){
             $http({
-                url : GURL + '',
+                url : GURL + 'ewtGetActionType',
                 method : 'GET',
                 params : {
-                    Token : $rootScope._userInfo.Token
+                    Token : $rootScope._userInfo.Token,
+                    FunctionType : 0,
+                    MasterID : $rootScope._userInfo.MasterID
                 }
             }).success(function(resp){
                 console.log(resp);
@@ -357,10 +361,12 @@ angular.module('ezeidApp')
          */
         $scope.loadAllFolders = function(){
             $http({
-                url : GURL + '',
+                url : GURL + 'ewtGetFolderList',
                 method : 'GET',
                 params : {
-                    Token : $rootScope._userInfo.Token
+                    Token : $rootScope._userInfo.Token,
+                    FunctionType : 0,
+                    MasterID : $rootScope._userInfo.MasterID
                 }
             }).success(function(resp){
                 console.log(resp);
@@ -368,5 +374,32 @@ angular.module('ezeidApp')
                 console.log(err);
             });
         };
+
+        /**
+         * Load all transactions
+         */
+        $scope.loadAllTransactions = function(){
+            $http({
+                url : GURL + 'ewtGetTranscation',
+                method : "GET",
+                params : {
+                    Token : $rootScope._userInfo.Token,
+                    FunctionType : 0
+                }
+            }).success(function(resp){
+                console.log(resp);
+            }).error(function(err){
+
+            });
+        };
+
+        /**
+         * Loading Data
+         */
+        $scope.loadAllItems();
+        $scope.loadAllFolders();
+        $scope.loadAllStatus();
+        $scope.loadAllNextActions();
+        $scope.loadAllTransactions();
 
 }]);
