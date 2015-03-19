@@ -446,7 +446,6 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$htt
 
     };
 
-
     /**
      * Initial Function call after controller initialization
      * Will call loadAllRules()

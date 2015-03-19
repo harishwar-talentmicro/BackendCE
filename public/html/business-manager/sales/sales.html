@@ -18,15 +18,53 @@
                  <!--ui-grid-pagination-->
                  <!--class="grid"></div>-->
         <!--</div>-->
-        <div ui-grid="gridOptions"
-             ui-grid-pinning
-             ui-grid-selection
-             ui-grid-edit
-             ui-grid-row-edit
-             ui-grid-cellNav
-             ui-grid-pagination
-             ui-grid-exporter
-             class="grid"></div>
+            <!--<div ui-grid="gridOptions"-->
+             <!--ui-grid-pinning-->
+             <!--ui-grid-selection-->
+             <!--ui-grid-edit-->
+             <!--ui-grid-row-edit-->
+             <!--ui-grid-cellNav-->
+             <!--ui-grid-pagination-->
+             <!--ui-grid-exporter-->
+             <!--class="grid">-->
+                <!---->
+             <!--</div>-->
+
+            <div ui-grid="gridOptions"
+                 ui-grid-pinning
+                 ui-grid-selection
+                 ui-grid-edit
+                 ui-grid-cellNav
+                 ui-grid-pagination
+                 ui-grid-exporter
+                 class="grid">
+
+            </div>
+
+        </div>
     </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <!------------ Modal Box starts here -------------------------->
+            <modal mtitle="modalBox.title" visible="showModal">
+                <div class="container-fluid">
+
+                </div>
+            </modal>
+        </div>
     </div>
+
+    <!------------------- Modal Templates based on transaction types ------------------------------------------->
+    <script type="ng/template" id="modal-message-only-tpl.html">
+
+    </script>
+    <script type="ng/template" id="modal-item-only-tpl.html">
+
+    </script>
+
+    <!------------------- Modal Templates based on transaction types ends -------------------------------------->
+
+
 </div>
+
+

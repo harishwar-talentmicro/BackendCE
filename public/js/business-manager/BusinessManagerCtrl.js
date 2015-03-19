@@ -4,6 +4,36 @@
  */
 angular.module('ezeidApp').controller('BusinessManagerCtrl',['$scope','$rootScope','MsgDelay','GURL','$http','$interval','Notification',function($scope,$rootScope,MsgDelay,GURL,$http,$interval,Notification){
 
+    /**
+     * Module (Prototype)
+     * @param type => (Integer) 0: Sales, 1 : Reservation, 2 : Home Delivery, 3 : Service, 4 : Resume
+     * @param title => (String) Custom Title given by user
+     * @param enabled => Boolean
+     * @param listType => (Integer) 0 : Only Message, 1 : Item Only , 2 : Item+Picture, 3 : Item+Picture+Qty, 4 : Item+Picture+Qty+Rate
+     * @param userAccess => (Integer) 0 : Hidden, 1: Read Only, 2 : Read+Create+Update, 3 : Read+Create+Update+Delete, 4 : Read+Update, 5:  Read+Update+Delete
+     * @constructor
+     */
+    function Module(type,title,enabled,listType,userAccess,defaultFormMsg){
+        if(typeof(type) == "undefined" ||
+            typeof(title) == "undefined" ||
+            typeof(enabled) == "undefined" ||
+            typeof(listType) == "undefined" || typeof(userAccess) == "undefined")
+        {
+            console.log("Module object creation unsuccessful ! Missing parameters");
+        }
+        this.type = type;
+        this.title = (title) ? title : 'No title';
+        this.enabled = (enabled) ? true : false;
+        this.listType = (listType == 0 || listType == 1 || listType == 2 || listType == 3 || listType == 4) ? listType : 0;
+        this.userAccess = 0;
+        this.defaultFormMsg = defaultFormMsg;
+        this.cssClass = '';
+    }
+
+    /**
+     * HTML Templates to be loaded based on module
+     * @type {Array}
+     */
     $scope.templates = [
         'html/business-manager/sales/sales.html',
         'html/business-manager/reservation/reservation.html',
@@ -17,6 +47,24 @@ angular.module('ezeidApp').controller('BusinessManagerCtrl',['$scope','$rootScop
      * @type {Array}
      */
     $scope.modules = [];
+    /**
+     * Get a module by its type
+     * @param type
+     * @returns {*}
+     */
+    $scope.getModuleByType = function(type){
+        if($scope.modules.length < 0){
+            return null;
+        }
+        var result = null;
+        for(var i = 0; i < $scope.modules.length; i++){
+            if($scope.modules[i].type == type){
+                result =  $scope.modules[i];
+                break;
+            }
+        }
+        return result;
+    };
 
     /**
      * Index of Current Active Module Selected
@@ -42,32 +90,6 @@ angular.module('ezeidApp').controller('BusinessManagerCtrl',['$scope','$rootScop
             $scope.modules[i].cssClass = '';
         }
     };
-    /**
-     * Module (Prototype)
-     * @param type => (Integer) 0: Sales, 1 : Reservation, 2 : Home Delivery, 3 : Service, 4 : Resume
-     * @param title => (String) Custom Title given by user
-     * @param enabled => Boolean
-     * @param listType => (Integer) 0 : Only Message, 1 : Item Only , 2 : Item+Picture, 3 : Item+Picture+Qty, 4 : Item+Picture+Qty+Rate
-     * @param userAccess => (Integer) 0 : Hidden, 1: Read Only, 2 : Read+Create+Update, 3 : Read+Create+Update+Delete, 4 : Read+Update, 5:  Read+Update+Delete
-     * @constructor
-     */
-    function Module(type,title,enabled,listType,userAccess,defaultFormMsg){
-        if(typeof(type) == "undefined" ||
-            typeof(title) == "undefined" ||
-            typeof(enabled) == "undefined" ||
-            typeof(listType) == "undefined" || typeof(userAccess) == "undefined")
-        {
-            console.log("Module object creation unsuccessful ! Missing parameters");
-        }
-            this.type = type;
-            this.title = (title) ? title : 'No title';
-            this.enabled = (enabled) ? true : false;
-            this.listType = (listType == 0 || listType == 1 || listType == 2 || listType == 3 || listType == 4) ? listType : 0;
-            this.userAccess = 0;
-            this.defaultFormMsg = defaultFormMsg;
-            this.cssClass = '';
-    }
-
 
     $scope.activeModule = null;
     $scope.selectActive = function(moduleType){

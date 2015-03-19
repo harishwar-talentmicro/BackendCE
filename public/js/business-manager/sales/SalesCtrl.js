@@ -1,13 +1,55 @@
+/**
+ * Sales Controller
+ * Depends Upon BusinessManager Controller
+ */
 angular.module('ezeidApp')
     .controller('SalesCtrl',['$scope','$rootScope','$http','GURL','MsgDelay','$interval','$q',function($scope,$rootScope,$http,GURL,MsgDelay,$interval,$q){
 
 
+        /**
+         * Status List (eg. Accepted, In Progress, In Delivery)
+         * @type {Array}
+         */
+        $scope.enquiryStatusList = [];
 
+        /**
+         * Next Action List (eg. Call, Meet, Followup)
+         * @type {Array}
+         */
+        $scope.nextActionList = [];
+
+        /**
+         * Items List for Sales
+         * @type {Array}
+         */
+        $scope.itemList = [];
+
+        /**
+         * Folder List (Sales Rules)
+         * @type {Array}
+         */
+        $scope.folderList = [];
+
+
+        /**
+         *     Open Modal box for user
+         */
+        $scope.showModal = false;
+        $scope.toggleModalBox = function(){
+            $scope.showModal = !$scope.showModal;
+        };
+
+        $scope.modalBox = {
+            title : 'Transaction Details'
+        };
 
         /****************************************************** Controller Code *****************************/
 
-        $scope.showMe = function(){
-            console.log('Clicked');
+        /**
+         * View Transaction Details
+         */
+        $scope.viewDetails = function(){
+            $scope.toggleModalBox();
         };
 
         /**
@@ -43,7 +85,7 @@ angular.module('ezeidApp')
             exporterPdfMaxGridWidth: 500,
             exporterCsvLinkElement: angular.element(document.querySelectorAll(".custom-csv-link-location"))
             //Options for exporting data ends
-        }
+        };
 
 
         /**
@@ -60,7 +102,7 @@ angular.module('ezeidApp')
                 enableFiltering : false,
                 enableCellEditOnFocus:false,
                 enableCellEdit : false,
-                cellTemplate:'<div class="row"><div class="col-lg-12 text-center" style="margin-top:5px;"><button class="btn btn-xs btn-info no-radius ng-scope" ng-click="grid.appScope.showMe()">Save</button></div></div>'
+                cellTemplate:'<div class="row"><div class="col-lg-12 text-center" style="margin-top:5px;"><button class="btn btn-xs btn-info no-radius ng-scope" ng-click="grid.appScope.saveTransaction()">Save</button></div></div>'
             },
             {
                 width : '7%',
@@ -84,7 +126,7 @@ angular.module('ezeidApp')
                 enableCellEditOnFocus:false,
                 enableCellEdit : false,
                 enableFiltering : false,
-                cellTemplate:'<div class="row"><div class="col-lg-12 text-center" style="margin-top:5px;"><button class="btn btn-xs btn-info no-radius ng-scope" ng-click="grid.appScope.showMe()">Details</button></div></div>'
+                cellTemplate:'<div class="row"><div class="col-lg-12 text-center" style="margin-top:5px;"><button class="btn btn-xs btn-info no-radius ng-scope" ng-click="grid.appScope.viewDetails()">Details</button></div></div>'
             },
             {
                 width : '15%',
@@ -110,18 +152,7 @@ angular.module('ezeidApp')
                 displayName: 'Status',
                 editableCellTemplate: 'ui-grid/dropdownEditor',
                 editDropdownValueLabel: 'status',
-                editDropdownOptionsArray: [
-                    {
-                        status : 'Started',
-                        id : 1
-
-                    },
-                    {
-                        status : 'In progress',
-                        id : 2
-
-                    }
-                ],
+                editDropdownOptionsArray: $scope.enquiryStatusList,
                 enableFiltering: false
             },
             {
@@ -130,16 +161,7 @@ angular.module('ezeidApp')
                 displayName: 'Next Action',
                 editableCellTemplate: 'ui-grid/dropdownEditor',
                 editDropdownValueLabel: 'nextAction',
-                editDropdownOptionsArray: [
-                    {
-                        id : 1,
-                        nextAction : 'Call'
-                    },
-                    {
-                        id : 2,
-                        nextAction : 'Followup'
-                    }
-                ],
+                editDropdownOptionsArray: $scope.nextActionList,
                 enableFiltering: true
             },
             {
@@ -154,16 +176,7 @@ angular.module('ezeidApp')
                 displayName : 'Folder',
                 editableCellTemplate : 'ui-grid/dropdownEditor',
                 editDropdownValueLabel : 'folder',
-                editDropdownOptionsArray : [
-                    {
-                        id : 1,
-                        folder : 'Jayanagar'
-                    },
-                    {
-                        id : 2,
-                        folder : 'JP nagar'
-                    }
-                ],
+                editDropdownOptionsArray : $scope.folderList,
                 enableFiltering: true
             },
             {
@@ -209,7 +222,7 @@ angular.module('ezeidApp')
 
         $scope.gridOptions.onRegisterApi = function(gridApi){
             $scope.gridApi = gridApi;
-            gridApi.rowEdit.on.saveRow($scope, $scope.saveRow);
+//            gridApi.rowEdit.on.saveRow($scope, $scope.saveRow);
 //            gridApi.core.on.notifyDataChange($scope,function(type){
 //                console.log(type);
 //                console.log('Data changed');
@@ -217,7 +230,7 @@ angular.module('ezeidApp')
             /**
              * Uncomment code below for afterCellEdit functionality
              */
-//            gridApi.edit.on.afterCellEdit($scope,function(rowEntity, colDef, newValue, oldValue){
+            gridApi.edit.on.afterCellEdit($scope,function(rowEntity, colDef, newValue, oldValue){
 //                if( colDef.name === 'gender' ){
 //                    if( newValue === 1 ){
 //                        rowEntity.sizeOptions = $scope.maleSizeDropdownOptions;
@@ -225,7 +238,11 @@ angular.module('ezeidApp')
 //                        rowEntity.sizeOptions = $scope.femaleSizeDropdownOptions;
 //                    }
 //                }
-//            });
+                alert('row edited');
+//                console.log(gridApi.rowEdit.getDirtyRows());
+                console.log(gridApi);
+
+            });
         };
         ///////////////////////////////////////////////////////////////////////////////////////
 
@@ -262,6 +279,9 @@ angular.module('ezeidApp')
             $scope.gridOpts.data.splice(0,1);
         };
 
+
+        $scope.savePromises = {};
+
         /**
          * Changing row contents will make this function call
          * From API (Copied from original source)
@@ -269,20 +289,20 @@ angular.module('ezeidApp')
          */
         $scope.saveRow = function( rowEntity ) {
             // create a fake promise - normally you'd use the promise returned by $http or $resource
-            var promise = $q.defer();
-            $scope.gridApi.rowEdit.setSavePromise( rowEntity, promise.promise );
+//            var promise = $q.defer();
+//            console.log(rowEntity);
+//            $scope.gridApi.rowEdit.setSavePromise( rowEntity, promise.promise );
 
-            // fake a delay of 3 seconds whilst the save occurs, return error if gender is "male"
-            $interval( function() {
 
-//                if (rowEntity.gender === 'male' ){
-//                    promise.reject();
-//                } else {
-//                    promise.resolve();
-//                }
+            console.log(rowEntity.trnId);
+            $scope.savePromises[rowEntity.trnId] = $q.defer();
+            $scope.gridApi.rowEdit.setSavePromise( rowEntity, $scope.savePromises[rowEntity.trnId].promise );
 
-                promise.resolve();
-            }, 3000, 1);
+//            // fake a delay of 3 seconds whilst the save occurs, return error if gender is "male"
+//            $interval( function() {
+//
+//                promise.resolve();
+//            }, 3000, 1);
         };
 
 
@@ -331,7 +351,14 @@ angular.module('ezeidApp')
                     MasterID : $rootScope._userInfo.MasterID
                 }
             }).success(function(resp){
-                console.log(resp);
+                    if(resp && resp.length > 1){
+                        for(var i = 0; i < resp.length; i++){
+                            $scope.enquiryStatusList.push({
+                                id : resp[i].TID,
+                                status : resp[i].StatusTitle
+                            });
+                        }
+                    }
             }).error(function(err){
                 console.log(err);
             });
@@ -351,6 +378,14 @@ angular.module('ezeidApp')
                 }
             }).success(function(resp){
                 console.log(resp);
+                    if(resp && resp.length > 0){
+                        for(var i = 0; i < resp.length; i++){
+                            $scope.nextActionList.push({
+                                id : resp[i].TID,
+                                nextAction : resp[i].ActionTitle
+                            });
+                        }
+                    }
             }).error(function(err){
                 console.log(err);
             });
@@ -370,6 +405,14 @@ angular.module('ezeidApp')
                 }
             }).success(function(resp){
                 console.log(resp);
+                    if(resp && resp.length > 0){
+                        for(var i = 0; i < resp.length; i++){
+                            $scope.folderList.push({
+                                id : resp[i].TID,
+                                folder : resp[i].FolderTitle
+                            });
+                        }
+                    }
             }).error(function(err){
                 console.log(err);
             });
