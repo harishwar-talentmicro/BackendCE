@@ -122,6 +122,7 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$htt
                 $scope.modalBox.subuser = $scope.subusers[userIndex];
             };
             $scope.checkAvailability(callback);
+            console.log($scope.modalBox.subuser);
         }
         else{
             $scope.resetModalData();
@@ -168,6 +169,36 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$htt
             }
         };
     };
+
+    /**
+     * Finds that rule is present for particular user loaded in modal or not
+     * @param ruleId
+     * @param functionType
+     * @returns {boolean}
+     */
+    $scope.findRuleForSubuser = function(ruleId,functionType){
+        console.log(ruleId);
+        console.log(functionType);
+        var ruleMapping = ['sales','reservation','homeDelivery','service','resume'];
+        var fType = parseInt(functionType);
+        
+        if($scope.modalBox.subuser.rules[ruleMapping[fType]].length < 1){
+            return false;
+
+        }
+        var index = $scope.modalBox.subuser.rules[ruleMapping[fType]].indexOf(ruleId.toString());
+        if(index !== -1){
+            return true;
+        }
+        else{
+            return false;
+        }
+    };
+
+    /**
+     * CheckAvailability
+     * @param callback
+     */
 
     $scope.checkAvailability = function(callback){
         $http({
