@@ -142,6 +142,10 @@ app.get('/ewtGetConfig',LocationManager.FnGetConfig);
 app.post('/ewtSaveTranscation',LocationManager.FnSaveTranscation);
 app.get('/ewtGetUserwiseFolderList',LocationManager.FnGetUserwiseFolderList);
 app.get('/ewtGetTranscation',LocationManager.FnGetTranscation);
+app.post('/ewtSaveResource',LocationManager.FnSaveResource);
+app.get('/ewtGetResource',LocationManager.FnGetResource);
+app.post('/ewtSaveResourceItemMap',LocationManager.FnSaveResourceItemMap);
+app.get('/ewtSearchContactsVES',LocationManager.FnSearchContactsVES);
 
 //below service are for EZEIDAP
 app.post('/ewLoginAP', LocationManager.FnLoginAP);
@@ -166,6 +170,10 @@ app.post('/ewtSearchRealEstateAP', LocationManager.FnSearchRealEstateAP);
 //EZEID VAS
 app.get('/ewtLoginVES',LocationManager.FnLoginVES);
 app.post('/ewtSaveContactVES',LocationManager.FnSaveContactVES);
+app.get('/ewtGetAllContactsVES',LocationManager.FnGetAllContactsVES);
+app.get('/ewmGetDepartmentVES',LocationManager.FnGetDepartmentVES);
+app.get('/ewtGetContactVES',LocationManager.FnGetContactVES);
+app.get('/ewtSearchContactsVES',LocationManager.FnSearchContactsVES);
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
     console.log('404 : Page not found');
