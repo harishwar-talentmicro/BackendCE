@@ -11,7 +11,7 @@
             'ui.grid',
             'ngTouch',
             'ui.grid', 'ui.grid.expandable', 'ui.grid.selection', 'ui.grid.pinning',
-            'ui.grid.edit', 'ui.grid.rowEdit', 'ui.grid.cellNav','ui.grid.pagination'
+            'ui.grid.edit', 'ui.grid.rowEdit', 'ui.grid.cellNav','ui.grid.pagination','ui.grid.exporter'
         ]);
 
     ezeid.value('GURL',"/");
@@ -70,7 +70,7 @@
             .when('/subusers',{templateUrl : 'html/subusers.html'})
             .when('/business-preference',{templateUrl : 'html/business-preference.html'})
             .when('/business-manager',{templateUrl : 'html/business-manager/business-manager.html'})
-            .otherwise({ templateUrl: 'html/home.html' });
+            .otherwise({ templateUrl: 'html/home.html'});
 
         $httpProvider.interceptors.push("ezeidInterceptor");
     }]);

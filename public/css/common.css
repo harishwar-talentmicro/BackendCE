@@ -1312,7 +1312,7 @@ span.smallCloselink {
 /****** UI Grid Style *****/
 .ui-grid-header-cell {
     background-color: #6E6E6E;
-    border-color: none;
+    border-color: transparent;
     color: #fff;
     font-family: 'Roboto',sans-serif;
     font-weight: 200;
@@ -1361,6 +1361,130 @@ span.smallCloselink {
     background-color: #215D96;
 }
 
+.ui-grid-row-selected .expandableRow{
+    height: 182px;
+}
 .ui-grid-row-selected .expandableRow .ui-grid-header-cell .ui-grid-cell-contents{
     background: #6E6E6E;
+}
+
+.ui-grid-pager-control button{
+    background: #0c89ba;
+    color:#fff;
+    border-radius: 0px;
+    border:none;
+}
+
+.ui-grid-pager-control .last-triangle {
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 5px 0 5px 8.7px;
+    border-color: transparent transparent transparent #ffffff;
+    margin-left: -1px;
+}
+
+.ui-grid-pager-control .first-triangle {
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 5px 8.7px 5px 0;
+    border-color: transparent #ffffff transparent transparent;
+    margin-left: 2px;
+}
+
+.ui-grid-pager-control .last-bar {
+    width: 10px;
+    border-left: 2px solid #ffffff;
+    margin-top: -6px;
+    height: 12px;
+    margin-left: 1px;
+}
+
+.ui-grid-pager-control .first-bar {
+    width: 10px;
+    border-left: 2px solid #ffffff;
+    margin-top: -6px;
+    height: 12px;
+    margin-left: -3px;
+}
+
+.ui-grid-pager-control input,.ui-grid-pager-control select {
+    height: 26px;
+    width: 50px;
+    vertical-align: top;
+    border: 0px;
+    border: 1px solid #0c89ba;
+    color:#000;
+}
+
+.ui-grid-pager-row-count-picker select {
+    height: 26px;
+    width: 60px;
+    border-radius: 0px;
+    border: 1px solid #0c89ba;
+    color:#000;
+}
+
+.ui-grid-pager-panel {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    box-shadow: 0px 0px 5px #9F9F9F;
+    background: #2E2E2E;
+    color: #fff;
+}
+
+.ui-grid-filter-input{
+    color:#000;
+}
+
+/** UI Grid Custom CSS **/
+
+.ui-grid-custom-btn{
+    margin:5px 5px 5px 15px;
+}
+.ui-grid-subgrid{
+    overflow: auto;
+    height: 100px;
+}
+
+input[type="text"].ui-grid-filter-input {
+    color: #44A9D1;
+    padding: 0;
+    margin: 0;
+    border: 0;
+    width: 100%;
+    border: 1px solid #808080;
+    background: #393939;
+    -webkit-border-top-right-radius: 0px;
+    -webkit-border-bottom-right-radius: 0;
+    -webkit-border-bottom-left-radius: 0;
+    -webkit-border-top-left-radius: 0;
+    -moz-border-radius-topright: 0px;
+    -moz-border-radius-bottomright: 0;
+    -moz-border-radius-bottomleft: 0;
+    -moz-border-radius-topleft: 0;
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+    border-top-left-radius: 0;
+    -moz-background-clip: padding-box;
+    -webkit-background-clip: padding-box;
+    background-clip: padding-box;
+}
+
+.ui-grid-cell-focus {
+    outline: 0;
+    background-color: transparent;
+    color: #004CA7;
+}
+
+.ui-grid-filter-container {
+    padding: 4px 10px;
+    padding-left: 0;
+    position: relative;
 }

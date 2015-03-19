@@ -11,3 +11,268 @@
     background-color:lightgray;
     padding-bottom: 1.5%;
 }
+.searchPageBoxContainer
+{
+    margin-left: 10px;
+    margin-right:10px;
+    border:1px
+}
+
+.top-clearfix{
+    margin-top: 100px;
+}
+.SearchMarginLeft
+{
+    margin-left: 10px;
+}
+.helpAlign
+{
+    text-align: right;
+    margin-right: 5px;
+    margin-rop: 5px;
+    padding-top: 5px;
+}
+.addItemRowUserEzeid1
+{
+    margin-left: 0px;
+    text-align: center;
+    color: #000;
+    margin-right: 0px;
+}
+.addItemRowUserEzeid
+{
+    margin-left: 0px;
+    margin-right: 0px;
+    text-align: center;
+    color: #000;
+}
+.setFontSize
+{
+    font-size: 16px;
+    color:#000;
+}
+.ezeidTitle
+{
+    text-transform:uppercase;
+    font-size: 16px;
+    color: #0866A6;
+}
+hr {
+    display: block;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+    margin-left: auto;
+    margin-right: auto;
+    border-style: inset;
+    border-width: 1px;
+    color: #6d6E70;
+}
+.companyInfo
+{
+    text-align: center;
+    color:#000;
+    font-size: 14px;
+}
+.centerAlign
+{
+    text-align: center;
+    font-size: 14px;
+}
+.setPanelPadding
+{
+    padding-top: 0px;
+    padding-left: 0px;
+    /*margin-left: 3%;*/
+    margin-left: 0px;
+    padding-bottom: 0px;
+    padding-right: 0px;
+}
+.searchButtonMarginSet
+{
+    margin-left: 0px;
+    margin-right: 0px;
+}
+.searchHeaderAlignment
+{
+    padding-right: 0px;
+    padding-left: 0px;
+    margin-top: 0px;
+    padding-top:  0px;
+}
+.infoContainer
+{
+    padding-left: 0px;
+    padding-right: 0px;
+    margin-bottom: 0px;
+}
+.searchHeaderRow
+{
+    margin-left: 0px;
+}
+.infoMapContainerRow
+{
+    margin-left: 0px;
+    margin-right: 0px;
+}
+.infoContainerRow
+{
+    margin-right: 0px;
+    margin-left: 0px;
+}
+.mapColDiv
+{
+    padding-left: 0px;
+    padding-right: 0px;
+    margin-bottom: 0px;
+}
+.searchFotterRow
+{
+    margin-left: 0px;
+    margin-right: 0px;
+}
+.searchFotterCol
+{
+    padding-left: 0px;
+    padding-right: 0px;
+}
+.helpTextColor
+{
+    color: #0866A6;
+}
+.searchBy
+{
+    width: 20.666667%;
+    padding-right: 0px;
+}
+.normalFontSize
+{
+    font-size: 14px;
+}
+.ezeidRadio
+{
+    width: 19.666667%;
+    padding-left: 0px;
+    padding-right: 0px;
+    font-size: 14px;
+}
+.radioKeyword
+{
+    width: 25.333333%;
+    padding-left: 0px;
+    padding-right: 0px;
+}
+.jobKeyword
+{
+    width: 31%;
+    padding-left: 0px;
+    padding-right: 0px;
+}
+.radioTopMargin
+{
+    margin-top: 4%;
+}
+.searchRadioPadding
+{
+    padding-right: 0px;
+    padding-left: 5px;
+    text-align: left;
+    width: 22%;
+}
+.searchRadioPadding1
+{
+    padding-right: 0px;
+    padding-left: 7px;
+    text-align: left;
+}
+.searchWithin
+{
+    padding-left: 5px;
+    font-size: 14px;
+    margin-right: 0px;
+    margin-left: 0px;
+    color: #808080;
+}
+.searchWithinBottom
+{
+    text-align: left;
+    font-size: 14px;
+    margin-right: 0px;
+    margin-left: 0px;
+    color: #808080;
+    margin-top: 0px;
+}
+.showPlaces
+{
+    color: #808080;
+    text-align: left;
+}
+.searchStarContainer
+{
+    margin-top: 0%;
+    padding-left: 0px;
+    width: 29.333333%;
+    padding-right: 0px;
+}
+.topSearchRow
+{
+    background: #d3d3d3;
+    height: 36px;
+}
+.searchInfoLink
+{
+    border-left: 2px solid #000;
+}
+.searchStripTopMargin
+{
+    margin-top: 2%;
+}
+.showPointer
+{
+    cursor: pointer;
+}
+.setTextAlignment
+{
+    text-align: left;
+}
+.searchWithinText
+{
+    padding-right: 0px;
+    padding-left: 0px;
+    margin-top: 2%;
+}
+.searchProximityRange
+{
+    padding-right: 0px;
+    padding-left: 0px;
+}
+.searchAddress
+{
+    background: #ffff32;
+    color: #000000;
+    height: auto;
+}
+.searchProximityText
+{
+    padding-right: 0px;
+    padding-left: 5px;
+    margin-top: 2%;
+}
+.ratingText
+{
+    margin-top: 0%;
+    padding-right: 0px;
+    padding-left: 10px;
+    margin-left: 4%;
+}
+.setTopMargin
+{
+    margin-top: 3%;
+}
+.chkShowParking
+{
+    margin: 0% !important;
+}
+.setRadioFilterSpace
+{
+    margin-right: 3px;
+}
