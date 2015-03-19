@@ -169,6 +169,8 @@ app.post('/ewtSearchRealEstateAP', LocationManager.FnSearchRealEstateAP);
 app.get('/ewtLoginVES',LocationManager.FnLoginVES);
 app.post('/ewtSaveContactVES',LocationManager.FnSaveContactVES);
 app.get('/ewtGetAllContactsVES',LocationManager.FnGetAllContactsVES);
+app.get('/ewmGetDepartmentVES',LocationManager.FnGetDepartmentVES);
+app.get('/ewtGetContactVES',LocationManager.FnGetContactVES);
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
     console.log('404 : Page not found');

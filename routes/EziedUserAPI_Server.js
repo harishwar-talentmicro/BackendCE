@@ -6475,7 +6475,7 @@ exports.FnSaveTranscation = function(req, res){
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
         var Token = req.body.Token;
-        var TID = req.body.TID;
+        var TID = parseInt(req.body.TID);
         var MessageText =req.body.MessageText;
         var MessageType = req.body.MessageType;
         var Status = req.body.Status;
@@ -6500,10 +6500,13 @@ exports.FnSaveTranscation = function(req, res){
         var NextActionDateTime = req.body.NextActionDateTime;
         var  TaskDateNew = new Date(TaskDateTime);
         var NextActionDateTimeNew = new Date(NextActionDateTime);
+        console.log(ItemsList);
         var RtnMessage = {
             IsSuccessfull: false
         };
-        if(FolderRuleID == 'NaN')
+        if(TID.toString() == 'NaN')
+            TID = 0;
+        if(FolderRuleID.toString() == 'NaN')
             FolderRuleID=0;
         if (Token != null ) {
             FnValidateToken(Token, function (err, Result) {
@@ -6531,6 +6534,8 @@ exports.FnSaveTranscation = function(req, res){
                                                 Duration: itemsDetails.Durations
                                             };
                                             console.log(items);
+                                            console.log('TID:' +itemsDetails.TID);
+                                            if(itemsDetails.TID == 0){
                                             var query = db.query('INSERT INTO titems SET ?', items, function (err, result) {
                                                 // Neat!
                                                 if (!err) {
@@ -6550,8 +6555,179 @@ exports.FnSaveTranscation = function(req, res){
                                                     console.log('FnSaveFolderRules: error in saving folder rules' + err);
                                                 }
                                             });
+     
+                                            }
+                                            
+                                            else{
+                                                var items = {
+                                               
+                                                ItemID: itemsDetails.ItemID,
+                                                Qty: itemsDetails.Qty,
+                                                Rate: itemsDetails.Rate,
+                                                Amount: itemsDetails.Amount,
+                                                Duration: itemsDetails.Durations
+                                            };
+                                              console.log('TID:' +itemsDetails.TID);  
+                                            var query = db.query("UPDATE titems set ? WHERE TID = ? ",[items,itemsDetails.TID], function (err, result) {
+                                            // Neat!
+                                            console.log(result);
+                                            if (!err) {
+                                                if(result != null){
+                                                    if(result.affectedRows > 0){
 
+                                                            console.log('FnSaveFolderRules: Folder rules Updated successfully');
+                                                    }
+                                                    else
+                                                    {
+                                                        console.log('FnSaveFolderRules: Folder rule not updated');
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    console.log('FnSaveFolderRules: Folder rule not updated')
+                                                }
+                                            }
+                                            else 
+                                                {
+                                                    console.log('FnSaveFolderRules: error in saving folder rules' +err);
+                                                }
+                                            });
                                         }
+                                    }
+                                    res.send(RtnMessage);
+                                    console.log('FnSaveTranscationItems: Transaction items details save successfully');
+                                    }
+                                    else
+                                        {
+                                            console.log('FnSaveTranscationItems:No Save Transaction items details');
+                                            res.send(RtnMessage);
+                                        }
+                                }
+                                    else {
+                                            console.log('FnSaveTranscationItems:No Save Transaction items details');
+                                            res.send(RtnMessage);
+                                    }
+                            }
+
+                            else {
+                                console.log('FnSaveTranscationItems: error in saving Transaction items' + err);
+                                res.statusCode = 500;
+                                res.send(RtnMessage);
+                            }
+                        });
+                    }
+                    else {
+                        console.log('FnSaveTranscationItems: Invalid token');
+                        res.statusCode = 401;
+                        res.send(RtnMessage);
+                    }
+                }
+                else {
+                    console.log('FnSaveTranscationItems:Error in processing Token' + err);
+                    res.statusCode = 500;
+                    res.send(RtnMessage);
+                }
+            });
+        }
+        else {
+            if (Token == null) {
+                console.log('FnSaveTranscationItems: Token is empty');
+            }
+
+            res.statusCode=400;
+            res.send(RtnMessage);
+        }
+    }
+    catch (ex) {
+        console.log('FnSaveTranscationItems:error ' + ex.description);
+        throw new Error(ex);
+    }
+};
+
+exports.FnSaveTranscationOld = function(req, res){
+    try{
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.body.Token;
+        var TID = parseInt(req.body.TID);
+        var MessageText =req.body.MessageText;
+        var MessageType = req.body.MessageType;
+        var Status = req.body.Status;
+        var TaskDateTime = req.body.TaskDateTime;
+        var Notes = req.body.Notes;
+        var LocID = req.body.LocID;
+        var Country = req.body.Country;    //country short name
+        var State = req.body.State;         //admin level 1
+        var City = req.body.City;       //ADMIN level 2
+        var Area = req.body.Area;       //admin level 3
+        var FunctionType = req.body.FunctionType;
+        var Latitude = req.body.Latitude;
+        var Longitude = req.body.Longitude;
+        var EZEID = req.body.EZEID;
+        var ContactInfo = req.body.ContactInfo;
+        var FolderRuleID = parseInt(req.body.FolderRuleID);
+        var Duration = req.body.Duration;
+        var DurationScales = req.body.DurationScales;
+        var ItemsList = req.body.ItemsList;
+        ItemsList = JSON.parse(ItemsList);
+        var NextAction = req.body.NextAction;
+        var NextActionDateTime = req.body.NextActionDateTime;
+        var  TaskDateNew = new Date(TaskDateTime);
+        var NextActionDateTimeNew = new Date(NextActionDateTime);
+        var RtnMessage = {
+            IsSuccessfull: false
+        };
+        if(TID.toString() == 'NaN')
+            TID = 0;
+        if(FolderRuleID.toString() == 'NaN')
+            FolderRuleID=0;
+        if (Token != null ) {
+            FnValidateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+
+                        var query = db.escape(Token)+","+db.escape(MessageType)+","+ db.escape(MessageText)+ "," + db.escape(Status) +"," + db.escape(TaskDateNew) + ","  + db.escape(Notes) + "," + db.escape(LocID)  + "," + db.escape(Country)   + "," + db.escape(State) + "," + db.escape(City)   + "," + db.escape(Area)   + ","  + db.escape(Latitude)  + "," + db.escape(Longitude)  +  "," + db.escape(EZEID)  + "," + db.escape(ContactInfo)  + "," + db.escape(FolderRuleID)  + "," + db.escape(Duration)  + "," + db.escape(DurationScales) + "," + db.escape(NextAction) + "," + db.escape(NextActionDateTimeNew) + "," + db.escape(TID);
+                        // db.escape(NextActionDateTime);
+                        db.query('CALL pSaveTrans(' + query + ')', function (err, InsertResult) {
+                            if (!err){
+                                console.log(InsertResult);
+                                if (InsertResult[0] != null) {
+                                    if(InsertResult[0].length > 0){
+                                        RtnMessage.IsSuccessfull = true;
+                                        var Message = InsertResult[0];
+                                        console.log(Message);
+                                        ItemsList.forEach(function(itemsDetails){
+                                             var items = {
+                                                MessageID: Message[0].MessageID,
+                                                ItemID: itemsDetails.ItemID,
+                                                Qty: itemsDetails.Qty,
+                                                Rate: itemsDetails.Rate,
+                                                Amount: itemsDetails.Amount,
+                                                Duration: itemsDetails.Durations
+                                            };
+                                            console.log(items);
+                                            var query = db.query('INSERT INTO titems SET ?', items, function (err, result) {
+                                                // Neat!
+                                                if (!err) {
+                                                    if (result != null) {
+                                                        if (result.affectedRows > 0) {
+                                                            console.log('FnSaveFolderRules: Folder rules saved successfully');
+                                                        }
+                                                        else {
+                                                            console.log('FnSaveFolderRules: Folder rule not saved');
+                                                        }
+                                                    }
+                                                    else {
+                                                        console.log('FnSaveFolderRules: Folder rule not saved');
+                                                    }
+                                                }
+                                                else {
+                                                    console.log('FnSaveFolderRules: error in saving folder rules' + err);
+                                                }
+                                            });
+                                           });
+
                                         res.send(RtnMessage);
                                         console.log('FnSaveTranscationItems: Transaction items details save successfully');
                                     }
@@ -6601,6 +6777,7 @@ exports.FnSaveTranscation = function(req, res){
         throw new Error(ex);
     }
 };
+
 
 exports.FnGetTranscation = function (req, res) {
     try {
@@ -6766,7 +6943,7 @@ exports.FnSaveResource = function(req, res){
                 if (!err) {
                     if (Result != null) {
 
-                        var query = db.escape(TID) + ',' + db.escape(ResourceName) + ',' + db.escape(Duration) + ',' + db.escape(DurationScale);
+                        var query = db.escape(Token) + ', ' +db.escape(TID) + ',' + db.escape(ResourceName) + ',' + db.escape(Duration) + ',' + db.escape(DurationScale);
                         db.query('CALL pSaveResource(' + query + ')', function (err, InsertResult) {
                             if (!err){
                                 if (InsertResult.affectedRows > 0) {
@@ -6838,7 +7015,7 @@ exports.FnGetResource = function (req, res) {
 
         var Token = req.query.Token;
         
-        if (Token != null && MasterID != null) {
+        if (Token != null) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
@@ -6888,9 +7065,6 @@ exports.FnGetResource = function (req, res) {
         else {
             if (Token == null) {
                 console.log('FnGetResource: Token is empty');
-            }
-            else if (MasterID == null) {
-                console.log('FnGetResource: MasterID is empty');
             }
             res.statusCode=400;
             res.send('null');
@@ -8762,4 +8936,115 @@ exports.FnGetAllContactsVES = function (req, res) {
     }
 };
 
+exports.FnGetDepartmentVES = function (req, res) {
+    try {
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        var MasterID = req.query.MasterID;
+        if (MasterID != null) {
+            var Query = 'Select TID,DeptName from mdept where MasterID=' + db.escape(MasterID);
+            db.query(Query, function (err, DeptResult) {
+                if (!err) {
+                    if (DeptResult.length > 0) {
+                        res.send(DeptResult);
+                        console.log('FnGetDepartmentVES: Departments details sent successfully');
+                    }
+                    else {
+                        res.send('null');
+                        res.statusCode = 500;
+                        console.log('FnGetDepartmentVES: No Departments details found');
+                    }
+                }
+                else {
+                    res.send('null');
+                    console.log('FnGetDepartmentVES: ' + err);
+                }
+            });
+        }
+        else {
+            res.send('null');
+            res.statusCode = 400;
+            console.log('FnGetDepartmentVES: MasterID is empty');
+        }
+
+
+    }
+    catch (ex) {
+        console.log('FnGetDepartmentVES error:' + ex.description);
+        throw new Error(ex);
+    }
+};
+
+exports.FnGetContactVES = function (req, res) {
+    try {
+
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        var Token = req.query.Token;
+        var TID = req.query.TID;
+        
+        if (Token != null && TID != null) {
+            FnValidateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+
+                        db.query('CALL pGetContactVES(' + db.escape(Token) + ',' + db.escape(TID) + ')', function (err, GetResult) {
+                            if (!err) {
+                                if (GetResult != null) {
+                                    if (GetResult[0].length > 0) {
+
+                                        console.log('FnGetContactsVES: ContactsVES details Send successfully');
+                                        res.send(GetResult[0]);
+                                    }
+                                    else {
+
+                                        console.log('FnGetContactsVES:No ContactsVES details found');
+                                        res.send('null');
+                                    }
+                                }
+                                else {
+
+                                    console.log('FnGetContactsVES:No ContactsVES details found');
+                                    res.send('null');
+                                }
+
+                            }
+                            else {
+
+                                console.log('FnGetContactsVES: error in getting ContactsVES details' + err);
+                                res.statusCode = 500;
+                                res.send('null');
+                            }
+                        });
+                    }
+                    else {
+                        res.statusCode = 401;
+                        res.send('null');
+                        console.log('FnGetContactsVES: Invalid Token');
+                    }
+                } else {
+
+                    res.statusCode = 500;
+                    res.send('null');
+                    console.log('FnGetContactsVES: Error in validating token:  ' + err);
+                }
+            });
+        }
+        else {
+            if (Token == null) {
+                console.log('FnGetContactsVES: Token is empty');
+            }
+            else if (TID == null) {
+                console.log('FnGetContactsVES: TID is empty');
+            }
+            
+            res.statusCode=400;
+            res.send('null');
+        }
+    }
+    catch (ex) {
+        console.log('FnGetContactsVES error:' + ex.description);
+        throw new Error(ex);
+    }
+};
 
