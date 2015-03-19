@@ -122,14 +122,14 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
     $scope.form_rating = 0;
 
     SearchSec.mInfo = {};
-    SearchSec.Placeholder = 'Type EZEID';
+   // SearchSec.Placeholder = 'Type EZEID';
     var userType = "";
     SearchSec.mInfo.InfoTab = true;
     $scope.showInfoTab = false;
 
     SearchSec.Criteria = {
         Token: '',
-        SearchType: '1',
+        SearchType: '2',
         Keywords: '',
         SCategory: 0,
         Proximity: 1,
@@ -139,6 +139,9 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
 
     $scope.isMapLoaded = false;         //Set to true with map event 'idle'
     $scope.isMapReady = false;          //Set to true when map canvas is drawn and map is fully visible
+
+    SearchSec.Placeholder = 'Type Keywords to locate products or services.';
+
 
     //new multi select
     $scope.ratingModel = [
@@ -200,7 +203,7 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
             var loc = new google.maps.LatLng($rootScope.CLoc.CLat, $rootScope.CLoc.CLong);
             PlaceCurrentLocationMarker(loc);
         });
-        /********** Google Maps autocomplete ends *********/
+     /********** Google Maps autocomplete ends *********/
 
 
 
@@ -225,8 +228,6 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
             PlaceCurrentLocationMarker(initialLocation);
             //PlaceMarker(initialLocation);
         }
-
-
 
         // Listen for the event fired when the user selects an item from the
         // pick list. Retrieve the matching places for that item.
@@ -273,6 +274,48 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
             google.maps.event.trigger(map, "resize");
         });
     }
+
+    function getReverseGeocodingData(lat, lng) {
+        var latlng = new google.maps.LatLng(lat, lng);
+        var geocoder = new google.maps.Geocoder();
+        geocoder.geocode({ 'latLng': latlng }, function (results, status) {
+            if (status !== google.maps.GeocoderStatus.OK) {
+                //  console.log(status);
+            }
+            if (status == google.maps.GeocoderStatus.OK) {
+                //   console.log(JSON.stringify(results));
+                getAddressForLocation(results[0].address_components);
+            }
+        });
+    }
+
+    function getAddressForLocation(results) {
+        console.log(results);
+       angular.forEach(results, function (mapResultValue, index) {
+            // console.log(mapResultValue);
+            if (mapResultValue.types[0] == 'street_number') {
+                $scope.Address = mapResultValue.long_name;
+            }
+            if (mapResultValue.types[0] == 'route') {
+                $scope.Address += ", " + mapResultValue.long_name;
+            }
+            if (mapResultValue.types[0] == 'neighborhood') {
+                $scope.Address += ", " + mapResultValue.long_name;
+            }
+            if (mapResultValue.types[0] == 'sublocality_level_3') {
+                $scope.Address += ", " + mapResultValue.long_name;
+            }
+            if (mapResultValue.types[0] == 'sublocality_level_2') {
+                $scope.Address += ", " + mapResultValue.long_name;
+            }
+            if (mapResultValue.types[0] == 'sublocality_level_1') {
+                $scope.Address += ", " + mapResultValue.long_name;
+            }
+            if (mapResultValue.types[0] == 'locality') {
+                $scope.Address += ", " + mapResultValue.long_name;
+            }
+        });
+    }
     google.maps.event.addDomListener(window, 'load', initialize);
 
     function PlaceCurrentLocationMarker(location) {
@@ -290,7 +333,7 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
         google.maps.event.addListener(marker, 'dragend', function (e) {
             $rootScope.CLoc.CLat = marker.getPosition().k;
             $rootScope.CLoc.CLong = marker.getPosition().D;
-            //getReverseGeocodingData(marker.getPosition().k, marker.getPosition().D);
+            getReverseGeocodingData(marker.getPosition().k, marker.getPosition().D);
 //                myinfowindow.setContent('<h6>You are here</h6>');
             //myinfowindow.open(map, marker);
         });
@@ -399,9 +442,17 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
 
     SearchSec.isEZEIDselected = function (value) {
         if (SearchSec.Criteria.SearchType == 1)
-            SearchSec.Placeholder = 'Type EZEID';
+        {
+            SearchSec.Placeholder = 'Type EZEID here.';
+        }
+        else if(SearchSec.Criteria.SearchType == 2)
+        {
+            SearchSec.Placeholder = 'Type Keywords to locate products or services.';
+        }
         else
-            SearchSec.Placeholder = 'Type Keywords';
+        {
+            SearchSec.Placeholder = 'Type Job skill keywords to locate employers.';
+        }
         $scope.searchType = 2;
 
         return value === SearchSec.Criteria.SearchType;
@@ -920,6 +971,13 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
             $('#SignIn_popup').slideDown();
         }
     };
+
+    //Star Clicked .. add rating
+     SearchSec.addRatting = function (ratingValue,starColor,modal) {
+         SearchSec.modal = true;
+        //alert(ratingValue);
+    };
+
 
     // Close CV Form
     SearchSec.closeCVForm = function () {

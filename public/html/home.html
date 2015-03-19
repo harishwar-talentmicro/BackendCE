@@ -1,66 +1,138 @@
-<!--<body ng-app="ezeidApp" style="overflow-y:hidden; overflow-x:hidden;">-->
+
 <div id="wrapper" ng-controller="HomeController as Home">
     <header-section></header-section>
     <div ng-controller="SearchController as search">
          <div class="container-fluid">
-        <div class="row top-clearfix"></div>
-        <div class="row">
-            <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 col-lg-offset-2 col-md-offset-2 col-sm-offset-2 col-xs-offset-0">
-                <div class="panel panel-default">
-                    <div class="panel-body setPanelPadding">
-                        <div class="row" style="margin-left: -31px;">
-                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin-top: 0px; padding-top:  0px">
-                                <img src="../images/header.gif">
+            <div class="row top-clearfix"></div>
+            <div class="row">
+                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 col-lg-offset-2 col-md-offset-2 col-sm-offset-2 col-xs-offset-0">
+                    <div class="panel panel-default">
+                        <div class="panel-body setPanelPadding">
+
+                            <div class="row searchHeaderRow">
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 searchHeaderAlignment">
+                                    <img src="../images/header.gif">
+                                </div>
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 bottom-clearfix setFontSize" style="margin-top: 1%; margin-bottom: 0px;">
-                                <div class="row" style="  margin-right: 5px;">
-                                    <div class="col-lg1-2 col-md-2 col-sm-2 col-xs-12 searchButtonMarginSet">
-                                        <input type="button" ng-click="msglist.closeAddNewSalesEnquiryForm()" class="btn btn-primary" value="Search"/>
+                            <div class="row infoMapContainerRow">
+                               <div class="col-lg-5 col-md-5 col-sm-5 col-xs-12 bottom-clearfix setFontSize infoContainer">
+                                    <div class="row infoContainerRow">
+                                        <div class="topSearchRow">
+                                            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 searchButtonMarginSet searchStripTopMargin showPointer">
+                                               Search
+                                            </div>
+
+                                           <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 searchInfoLink searchStripTopMargin showPointer">
+                                              Information
+                                            </div>
+                                            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 pull-right helpTextColor searchStripTopMargin showPointer">
+                                              Help ?
+                                            </div>
+                                        </div>
+
+                                        <div ng-hide="true">
+                                            <div class="row addItemRowUserEzeid1" >
+                                                <img src="../images/default.jpg" wigth="104px" height="134px" >
+                                            </div>
+                                            <div class="row addItemRowUserEzeid">
+                                                <span class="ezeidTitle"><b> krunnu11 </b></span>
+                                            </div>
+                                            <hr/>
+                                            <div class="row companyInfo searchButtonMarginSet">
+                                                <span><b> Demo Company Technologies Pvt. Ltd. </b></span>
+                                            </div>
+                                            <div class="row centerAlign searchButtonMarginSet">
+                                                India's largest recruitment software Pvt Ltd.
+                                            </div>
+                                            <hr/>
+                                            <div class="row centerAlign searchButtonMarginSet">
+                                                #146, 1 st Floor, 7th Main, 6th Block,
+                                                Padamnabha nagar, Banglore, India - 560070
+                                            </div>
+                                            <hr/>
+                                            <div class="row centerAlign searchButtonMarginSet">
+                                                +91-80-2553 4234 | +91-994 523 2397
+                                                salesmaiidhere@hirecraft.com | www.hirecraftwebsite.com
+                                            </div>
+                                        </div>
+                                        <div ng-hide="false">
+                                            <div class="row addItemRowUserEzeid1 setTopMargin" >
+                                                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 normalFontSize searchRadioPadding">
+                                                    Search by
+                                                </div>
+                                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 normalFontSize searchRadioPadding1">
+                                                    <input type="radio" class="setRadioFilterSpace" ng-model="search.Criteria.SearchType" id="EZEID" value="1" name="searchBy" ng-change="search.isEZEIDselected('1')" class="radioTopMargin" checked>EZEID
+                                                </div>
+                                                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 normalFontSize searchRadioPadding1">
+                                                    <input type="radio" class="setRadioFilterSpace" ng-model="search.Criteria.SearchType" id="Keywords" value="2" ng-change="search.isEZEIDselected('2')" ng-click="search.SearchTypeKeyWord()" name="searchBy class="radioTopMargin ">Keywords
+                                                </div>
+                                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 normalFontSize searchRadioPadding1">
+                                                    <input type="radio" class="setRadioFilterSpace" ng-model="search.Criteria.SearchType" name="searchBy" value="3" ng-change="search.isEZEIDselected('3')" ng-click="search.SearchTypeKeyWord()" class="radioTopMargin" >Job Keywords
+                                                </div>
+                                            </div>
+                                            <div class="row addItemRowUserEzeid setTextAlignment setTopMargin">
+                                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 normalFontSize">
+                                                    <input id="inputEmail" class="form-control setTextAlignment" ng-model="search.Criteria.Keywords"   ng-click="search.SearchTypeKeyWord()"
+                                                           required autofocus type="text" ng-class="search.Criteria.SearchType == 1 ? 'setUpperChar' : ''"
+                                                           placeholder="{{search.Placeholder}}">
+                                                </div>
+                                            </div>
+                                            <div class="row searchWithin setTopMargin">
+                                                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 normalFontSize searchWithinText">
+                                                    Search within
+                                                </div>
+                                                <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5 normalFontSize searchProximityRange">
+                                                    <select class="form-control" ng-model="search.Criteria.Proximity">
+                                                        <option value="{{proximity.MilesValue}}"  ng-selected="{{proximity.MilesValue == 50}}" ng-repeat="proximity in search.proximities">{{proximity.Title}}</option>
+                                                        <option value="0">Any</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 normalFontSize searchProximityText" >
+                                                    proximity from
+                                                </div>
+                                            </div>
+
+                                            <div class="row centerAlign searchWithinBottom setTopMargin">
+                                               <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 searchAddress">
+                                                   <b> {{ Address }}</b>
+                                                </div>
+                                            </div>
+
+                                            <div class="row centerAlign searchButtonMarginSet showPlaces setTopMargin">
+                                               <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                                                    <input type="checkbox" class="chkShowParking" ng-model="search.Criteria.ParkingStatus" name="parking" value="1,2" checked> Show with parking
+                                                </div>
+                                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 ratingText">
+                                                    Rating:
+                                                </div>
+                                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 normalFontSize searchStarContainer">
+                                                    <img src="../images/stargray16.png" ng-show="search.showStar1"  ng-click="search.addRatting(1,'gray',showStar1)" >
+                                                    <img src="../images/starYellow16.png" ng-hide="search.showStar1" ng-click="search.addRatting(1,'yellow',showStar1)" >
+
+                                                    <img src="../images/starYellow16.png" ng-click="search.addRatting(2)" >
+                                                    <img src="../images/starYellow16.png" ng-click="search.addRatting(3)">
+                                                    <img src="../images/starYellow16.png" ng-click="search.addRatting(4)">
+                                                    <img src="../images/stargray16.png" ng-click="search.addRatting(5)">
+                                                </div>
+                                            </div>
+
+                                            <div class="row centerAlign searchButtonMarginSet setTopMargin">
+                                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 " >
+                                                    <button  ng-disabled="!search.Criteria.Keywords" class="btn btn-primary" type="submit">Search</button>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12">
-                                    </div>
-                                    <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12">
-                                        <input type="button" ng-click="msglist.closeAddNewSalesEnquiryForm()" class="btn btn-primary" value="Information"/>
-                                    </div>
-                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 pull-right">
-                                        Help?
-                                    </div>
-                                    <div class="row addItemRowUserEzeid1" >
-                                        <!--<img src="../images/default.jpg" wigth="35" height="45" >-->
-                                        <img src="../images/default.jpg" wigth="104px" height="134px" >
-                                    </div>
-                                    <div class="row addItemRowUserEzeid">
-                                        <span class="ezeidTitle"><b> krunnu11 </b></span>
-                                    </div>
-                                    <hr/>
-                                    <div class="row companyInfo searchButtonMarginSet">
-                                        <span><b> Demo Company Technologies Pvt. Ltd. </b></span>
-                                    </div>
-                                    <div class="row centerAlign searchButtonMarginSet">
-                                        India's largest recruitment software pvy Ltd.
-                                    </div>
-                                    <hr/>
-                                    <div class="row centerAlign searchButtonMarginSet">
-                                        #146, 1 st Floor, 7th Main, 6th Block,
-                                        Padamnabha nagar, Banglore, India - 560070
-                                    </div>
-                                    <hr/>
-                                    <div class="row centerAlign searchButtonMarginSet">
-                                        +91-80-2553 4234 | +91-994 523 2397
-                                        salesmaiidhere@hirecraft.com | www.hirecraftwebsite.com
+                                </div>
+                                <div class="col-lg-7 col-md-7 col-sm-7 col-xs-12 bottom-clearfix mapColDiv">
+                                    <div id="map-canvasH">
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 bottom-clearfix" style="padding-right: 0px; margin-bottom: 0px;">
-                                <div id="map-canvasH">
+                            <div class="row searchFotterRow">
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 searchFotterCol">
+                                    <img src="../images/footer.gif">
                                 </div>
-                            </div>
-                        </div>
-                        <div class="row" style="margin-left: -31px;">
-                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                <img src="../images/footer.gif" class="">
                             </div>
                         </div>
                     </div>
@@ -68,7 +140,4 @@
             </div>
         </div>
     </div>
-    </div>
 </div>
-<!--
-</body>-->
