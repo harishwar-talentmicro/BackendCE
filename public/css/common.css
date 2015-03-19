@@ -1497,3 +1497,16 @@ input[type="text"].ui-grid-filter-input {
 .ui-grid-row-dirty .ui-grid-cell{
     color: #c67605;
 }
+
+
+
+.preloader{
+    display: table-cell;
+    text-align: center;
+    vertical-align: middle;
+    background-image: url(../images/preloader.GIF);
+    background-repeat: no-repeat;
+    background-size: contain;
+    height:150px;
+    width: 100%;
+}

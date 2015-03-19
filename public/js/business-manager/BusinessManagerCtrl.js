@@ -105,7 +105,6 @@ angular.module('ezeidApp').controller('BusinessManagerCtrl',['$scope','$rootScop
         var resp = [];
         resp[0] = $rootScope._userInfo;
         console.log(resp[0]);
-        var moduleVisibilities = resp[0].VisibleModules.split("");
         var userModuleRights = resp[0].UserModuleRights.split("");
 
         /**
