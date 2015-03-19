@@ -5436,14 +5436,13 @@ exports.FnGetSubUserList = function (req, res) {
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
         var Token = req.query.Token;
-        var MasterID = req.query.MasterID;
 
-        if (Token != null && MasterID != null) {
+        if (Token != null) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
 
-                        db.query('CALL pGetSubUserList(' + db.escape(MasterID) + ')', function (err, GetResult) {
+                        db.query('CALL pGetSubUserList(' + db.escape(Token) + ')', function (err, GetResult) {
                             if (!err) {
                                 if (GetResult != null) {
                                     if (GetResult[0].length > 0) {
@@ -5488,9 +5487,6 @@ exports.FnGetSubUserList = function (req, res) {
         else {
             if (Token == null) {
                 console.log('FnGetSubUserList: Token is empty');
-            }
-            else if (MasterID == null) {
-                console.log('FnGetSubUserList: MasterID is empty');
             }
             res.statusCode=400;
             res.send('null');
@@ -6694,7 +6690,6 @@ exports.FnSaveTranscationOld = function(req, res){
     }
 };
 
-
 exports.FnGetTranscation = function (req, res) {
     try {
 
@@ -6991,7 +6986,6 @@ exports.FnGetResource = function (req, res) {
         throw new Error(ex);
     }
 };
-
 
 exports.FnSaveResourceItemMap = function(req, res){
     try{
@@ -8716,7 +8710,6 @@ exports.FnUpdateRedFlagAP = function(req, res){
         throw new Error(ex);
     }
 }
-
 
 //EZEID VAS
 
