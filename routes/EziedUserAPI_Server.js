@@ -4876,15 +4876,14 @@ exports.FnGetStatusType = function (req, res) {
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
         var Token = req.query.Token;
-        var MasterID = req.query.MasterID;
         var FunctionType = req.query.FunctionType;
 
-        if (Token != null && MasterID != null && FunctionType != null ) {
+        if (Token != null  && FunctionType != null ) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
 
-                        var query = db.escape(MasterID) + ',' + db.escape(FunctionType);
+                        var query = db.escape(Token) + ',' + db.escape(FunctionType);
                         db.query('CALL pGetStatusType(' + query + ')', function (err, StatusResult) {
                             if (!err) {
                                 if (StatusResult != null) {
@@ -4929,9 +4928,6 @@ exports.FnGetStatusType = function (req, res) {
             if (Token == null) {
                 console.log('FnGetStatusType: Token is empty');
             }
-            else if (MasterID == null) {
-                console.log('FnGetStatusType: MasterID is empty');
-            }
             else if (FunctionType == null) {
                 console.log('FnGetStatusType: FunctionType is empty');
             }
@@ -4954,15 +4950,14 @@ exports.FnGetActionType = function (req, res) {
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
         var Token = req.query.Token;
-        var MasterID = req.query.MasterID;
         var FunctionType = req.query.FunctionType;
 
-        if (Token != null && MasterID != null && FunctionType != null ) {
+        if (Token != null && FunctionType != null ) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
 
-                        var query = db.escape(MasterID) + ',' + db.escape(FunctionType);
+                        var query = db.escape(Token) + ',' + db.escape(FunctionType);
 
                         db.query('CALL pGetActionType(' + query + ')', function (err, StatusResult) {
                             if (!err) {
@@ -5009,10 +5004,7 @@ exports.FnGetActionType = function (req, res) {
             if (Token == null) {
                 console.log('FnGetActionType: Token is empty');
             }
-            else if (MasterID == null) {
-                console.log('FnGetActionType: MasterID is empty');
-            }
-            else if (FunctionType == null) {
+           else if (FunctionType == null) {
                 console.log('FnGetActionType: FunctionType is empty');
             }
 
@@ -5190,14 +5182,13 @@ exports.FnGetFolderList = function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         var Token = req.query.Token;
-        var MasterID = req.query.MasterID;
         var FunctionType = req.query.FunctionType;
-        if (Token != null && MasterID != null && FunctionType != null) {
+        if (Token != null && FunctionType != null) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
 
-                        db.query('CALL pGetFolderList(' + db.escape(MasterID) + ',' + db.escape(FunctionType) + ')', function (err, GetResult) {
+                        db.query('CALL pGetFolderList(' + db.escape(Token) + ',' + db.escape(FunctionType) + ')', function (err, GetResult) {
                             if (!err) {
                                 if (GetResult[0] != null) {
                                     if (GetResult[0].length > 0) {
@@ -5238,9 +5229,6 @@ exports.FnGetFolderList = function (req, res) {
         else {
             if (Token == null) {
                 console.log('FnGetRoleList: Token is empty');
-            }
-            else if (MasterID == null) {
-                console.log('FnGetRoleList: MasterID is empty');
             }
             else if (FunctionType = null) {
                 console.log('FnGetRoleList: FunctionType is empty');
@@ -8641,6 +8629,94 @@ exports.Base64Data = function (req, res) {
         return 'error'
     }
 };
+
+exports.FnUpdateRedFlagAP = function(req, res){
+    try{
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        var RedFlag = req.body.RedFlag;
+        var Token = req.body.Token;
+        var FromEZEID =req.body.FromEZEID;
+        var ToEZEID =req.body.ToEZEID;
+        var Message =req.body.Message;
+        
+        
+         var RtnMessage = {
+            IsUpdated: false
+        };
+        
+        var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
+        
+        if (FromEZEID != null && ToEZEID != null && Token != null && RedFlag !=null && Message != null) {
+            FnValidateTokenAP(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+                        
+                var query = db.escape(FromEZEID) + ',' + db.escape(ToEZEID) + ',' + db.escape(Token) + ',' + db.escape(RedFlag) + ',' +db.escape(Message);
+                db.query('CALL pUpdateRedFlagAP(' + query + ')', function (err, UpdateRedflagResult) {
+                       if (!err){
+                           if (UpdateRedflagResult.affectedRows > 0) {
+                                    RtnMessage.IsUpdated = true;
+                                    res.send(RtnMessage);
+                                    console.log('FnUpdateRedFlagAP:Red flag history Update successfully');
+                                }
+                                else {
+                                    console.log('FnUpdateRedFlagAP:Red flag history Update failed');
+                                    res.send(RtnMessage);
+                                }
+                            }
+                             
+                                else {
+                                console.log('FnUpdateRedFlagAP: error in Updating Red FlagAP' + err);
+                                res.statusCode = 500;
+                                res.send(RtnMessage);
+                            }
+                        });
+                    }
+                    else {
+                        console.log('FnUpdateRedFlagAP: Invalid token');
+                        res.statusCode = 401;
+                        res.send(RtnMessage);
+                    }
+                }
+                else {
+                    console.log('FnUpdateRedFlagAP:Error in processing Token' + err);
+                    res.statusCode = 500;
+                    res.send(RtnMessage);
+
+                }
+            });
+
+        }
+                    
+        else {
+            if (RedFlag == null) {
+                console.log('FnUpdateRedFlagAP: Red flag is empty');
+            }
+            else if (Token == null) {
+                console.log('FnUpdateRedFlagAP: Token is empty');
+            }
+            else if (FromEZEID == null) {
+                console.log('FnUpdateRedFlagAP: From_Ezeid is empty');
+            }
+            else if (ToEZEID == null) {
+                console.log('FnUpdateRedFlagAP: To_Ezeid is empty');
+            }
+            else if (Message == null) {
+                console.log('FnUpdateRedFlagAP: Message is empty');
+            }
+            
+            res.statusCode=400;
+            res.send(RtnMessage);
+        }
+
+    }
+    catch (ex) {
+        console.log('FnUpdateRedFlagAP:error ' + ex.description);
+        throw new Error(ex);
+    }
+}
+
 
 //EZEID VAS
 

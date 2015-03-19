@@ -166,6 +166,7 @@ app.post('/ewtUpdateSecondaryLocationAP', LocationManager.FnUpdateSecondaryLocat
 app.post('/ewtUpdateIdCardPrintAP', LocationManager.FnUpdateIdCardPrintAP);
 app.get('/ewtGetIdCardPrintAP',LocationManager.FnGetIdCardPrintAP);
 app.post('/ewtSearchRealEstateAP', LocationManager.FnSearchRealEstateAP);
+app.post('/ewtUpdateRedFlagAP',LocationManager.FnUpdateRedFlagAP);
 
 //EZEID VAS
 app.get('/ewtLoginVES',LocationManager.FnLoginVES);
