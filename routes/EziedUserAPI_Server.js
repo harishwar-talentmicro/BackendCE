@@ -9019,13 +9019,13 @@ exports.FnSearchContactsVES = function (req, res) {
 
                     }
                     else {
-                        console.log('FnGetSearchInformation: Invalid token');
+                        console.log('FnSearchContactsVES: Invalid token');
                         res.statusCode = 401;
                         res.send('null');
                     }
                 }
                 else {
-                    console.log('FnGetSearchInformation: Token error: ' + err);
+                    console.log('FnSearchContactsVES: Token error: ' + err);
                     res.statusCode = 500;
                     res.send('null');
 
@@ -9035,22 +9035,22 @@ exports.FnSearchContactsVES = function (req, res) {
         
         else {
             if (Token == null) {
-                console.log('FnGetContactsVES: Token is empty');
+                console.log('FnSearchContactsVES: Token is empty');
             }
             else if (DateNew1 == null) {
-                console.log('FnGetContactsVES: Date1 is empty');
+                console.log('FnSearchContactsVES: Date1 is empty');
             }
             else if (DateNew2 == null) {
-                console.log('FnGetContactsVES: Date2 is empty');
+                console.log('FnSearchContactsVES: Date2 is empty');
             }
             else if (Status == null) {
-                console.log('FnGetContactsVES: Status is empty');
+                console.log('FnSearchContactsVES: Status is empty');
             }
             else if (Keywords == null) {
-                console.log('FnGetContactsVES: Keywords is empty');
+                console.log('FnSearchContactsVES: Keywords is empty');
             }
             else if (Type == null) {
-                console.log('FnGetContactsVES: Type is empty');
+                console.log('FnSearchContactsVES: Type is empty');
             }
             
             res.statusCode=400;
@@ -9058,7 +9058,7 @@ exports.FnSearchContactsVES = function (req, res) {
         }
     }
     catch (ex) {
-        console.log('FnGetSearchInformation error:' + ex.description);
+        console.log('FnSearchContactsVES error:' + ex.description);
         throw new Error(ex);
     }
 };
