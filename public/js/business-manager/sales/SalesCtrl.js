@@ -3,7 +3,7 @@
  * Depends Upon BusinessManager Controller
  */
 angular.module('ezeidApp')
-    .controller('SalesCtrl',['$scope','$rootScope','$http','GURL','MsgDelay','$interval','$q',function($scope,$rootScope,$http,GURL,MsgDelay,$interval,$q){
+    .controller('SalesCtrl',['$scope','$rootScope','$http','GURL','MsgDelay','$interval','$q','$timeout',function($scope,$rootScope,$http,GURL,MsgDelay,$interval,$q,$timeout){
 
         /**
          * For showing loading Icon
@@ -18,7 +18,12 @@ angular.module('ezeidApp')
             transactionsLoaded : false
         };
 
-        $scope.error = false;
+        /**
+         * IF data is not loaded successfully, there might be server API error or connection
+         * error in sending API Calls
+         * @type {boolean}
+         */
+        $scope.serverApiError = false;
 
 
         /**
@@ -466,11 +471,39 @@ angular.module('ezeidApp')
                             });
                              */
                         }
-                        $scope.readyState.transactionsLoaded = true;
+
                     }
+                    $scope.readyState.transactionsLoaded = true;
             }).error(function(err){
 
             });
+        };
+
+        /**
+         * Try to reload all server data again
+         *
+         */
+
+        $scope.reloadAgain = function(){
+            $scope.readyState = {
+                itemsLoaded : false,
+                statusLoaded : false,
+                nextActionsLoaded : false,
+                foldersLoaded : false,
+                transactionsLoaded : false
+            };
+            $scope.serverApiError = false;
+            $scope.loadAllItems();
+            $scope.loadAllFolders();
+            $scope.loadAllStatus();
+            $scope.loadAllNextActions();
+            $scope.loadAllTransactions();
+            $timeout(function(){
+                if(!($scope.readyState.itemsLoaded && $scope.readyState.statusLoaded && $scope.readyState.nextActionsLoaded
+                    && $scope.readyState.foldersLoaded && $scope.readyState.transactionsLoaded)){
+                    $scope.serverApiError = true;
+                }
+            },15000);
         };
 
         /**
@@ -481,5 +514,18 @@ angular.module('ezeidApp')
         $scope.loadAllStatus();
         $scope.loadAllNextActions();
         $scope.loadAllTransactions();
+
+        /**
+         * Checks that if the data is not loaded in 10s show the error message
+         */
+        $timeout(function(){
+            if(!($scope.readyState.itemsLoaded && $scope.readyState.statusLoaded && $scope.readyState.nextActionsLoaded
+                && $scope.readyState.foldersLoaded && $scope.readyState.transactionsLoaded)){
+                $scope.serverApiError = true;
+            }
+        },10000);
+
+
+
 
 }]);

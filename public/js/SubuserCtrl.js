@@ -181,7 +181,7 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$htt
         console.log(functionType);
         var ruleMapping = ['sales','reservation','homeDelivery','service','resume'];
         var fType = parseInt(functionType);
-        
+
         if($scope.modalBox.subuser.rules[ruleMapping[fType]].length < 1){
             return false;
 
