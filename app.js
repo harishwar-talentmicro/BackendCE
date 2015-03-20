@@ -179,6 +179,9 @@ app.get('/ewtCheckPasswordVES',LocationManager.FnCheckPasswordVES);
 app.get('/ewtGetGatesVES',LocationManager.FnGetGatesVES);
 app.post('/ewtSaveDepartmentsVES',LocationManager.FnSaveDepartmentsVES);
 app.post('/ewtSaveGatesVES',LocationManager.FnSaveGatesVES);
+app.post('/ewtSaveCitysVES',LocationManager.FnSaveCitysVES);
+
+
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
     console.log('404 : Page not found');

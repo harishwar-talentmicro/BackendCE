@@ -8779,6 +8779,8 @@ exports.FnSaveContactVES = function(req, res){
         var Status = req.body.Status;
         var GateNo  = req.body.GateNo;
         var SyncedInout = req.body.SyncedInout;
+        var ContactEZEID = req.body.ContactEZEID;
+         var ContactName = req.body.ContactName;
         var InTimeNew = new Date(InTime);
         var OutTimeNew = new Date(OutTime);
         var RtnMessage = {
@@ -8794,7 +8796,7 @@ exports.FnSaveContactVES = function(req, res){
                             + ',' +db.escape(Address1) + ',' +db.escape(Address2) + ',' +db.escape(CountryID) + ',' +db.escape(StateID) + ',' +db.escape(City)
                             + ',' + db.escape(PostalCode) + ',' + db.escape(Synced) + ',' + db.escape(ContactID) + ',' +db.escape(LaptopSLNO) + ',' +db.escape(VehicalTypeNo)
                             + ',' + db.escape(InTimeNew) + ',' + db.escape(OutTimeNew) + ',' + db.escape(ContactDeptID) + ',' + db.escape(PassReturned) + ',' + db.escape(Status)
-                            + ',' + db.escape(GateNo) + ',' + db.escape(SyncedInout);
+                            + ',' + db.escape(GateNo) + ',' + db.escape(SyncedInout) + ',' + db.escape(ContactEZEID) + ',' + db.escape(ContactName);
                         db.query('CALL pSaveContactVES(' + query + ')', function (err, InsertResult) {
                             if (!err){
                                 if (InsertResult.affectedRows > 0) {
@@ -9324,6 +9326,57 @@ exports.FnSaveGatesVES = function(req, res){
     }
     catch (ex) {
         console.log('FnSaveGatesVES:error ' + ex.description);
+        throw new Error(ex);
+    }
+};
+
+exports.FnSaveCitysVES = function(req, res){
+    try{
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var StateID = req.body.StateID;
+        var CityTitle = req.body.CityTitle;
+        
+         var RtnMessage = {
+            IsSuccessfull: false
+        };
+
+        if (StateID != null && CityTitle != null) {
+            var query = db.escape(StateID) + ',' + db.escape(CityTitle);
+                        db.query('CALL pSaveCitysVES(' + query + ')', function (err, InsertResult) {
+                            if (!err){
+                                if (InsertResult.affectedRows > 0) {
+                                    RtnMessage.IsSuccessfull = true;
+                                    res.send(RtnMessage);
+                                    console.log('FnSaveCitysVES: CitysVES details save successfully');
+                                }
+                                else {
+                                    console.log('FnSaveCitysVES:No Save CitysVES details');
+                                    res.send(RtnMessage);
+                                }
+                            }
+                            else {
+                                console.log('FnSaveCitysVES: error in saving CitysVES details' + err);
+                                res.statusCode = 500;
+                                res.send(RtnMessage);
+                            }
+                        });
+                    }
+                    
+            else {
+            if (StateID == null) {
+                console.log('FnSaveCitysVES: StateID is empty');
+            }
+            else if (CityTitle == null) {
+                console.log('FnSaveCitysVES: CityTitle is empty');
+            }
+            res.statusCode=400;
+            res.send(RtnMessage);
+        }
+    }
+    catch (ex) {
+        console.log('FnSaveCitysVES:error ' + ex.description);
         throw new Error(ex);
     }
 };
