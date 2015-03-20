@@ -8832,6 +8832,8 @@ exports.FnSaveContactVES = function(req, res){
         var Status = req.body.Status;
         var GateNo  = req.body.GateNo;
         var SyncedInout = req.body.SyncedInout;
+        var ContactEZEID = req.body.ContactEZEID;
+         var ContactName = req.body.ContactName;
         var InTimeNew = new Date(InTime);
         var OutTimeNew = new Date(OutTime);
         var RtnMessage = {
@@ -8847,7 +8849,7 @@ exports.FnSaveContactVES = function(req, res){
                             + ',' +db.escape(Address1) + ',' +db.escape(Address2) + ',' +db.escape(CountryID) + ',' +db.escape(StateID) + ',' +db.escape(City)
                             + ',' + db.escape(PostalCode) + ',' + db.escape(Synced) + ',' + db.escape(ContactID) + ',' +db.escape(LaptopSLNO) + ',' +db.escape(VehicalTypeNo)
                             + ',' + db.escape(InTimeNew) + ',' + db.escape(OutTimeNew) + ',' + db.escape(ContactDeptID) + ',' + db.escape(PassReturned) + ',' + db.escape(Status)
-                            + ',' + db.escape(GateNo) + ',' + db.escape(SyncedInout);
+                            + ',' + db.escape(GateNo) + ',' + db.escape(SyncedInout) + ',' + db.escape(ContactEZEID) + ',' + db.escape(ContactName);
                         db.query('CALL pSaveContactVES(' + query + ')', function (err, InsertResult) {
                             if (!err){
                                 if (InsertResult.affectedRows > 0) {
@@ -9167,3 +9169,270 @@ exports.FnSearchContactsVES = function (req, res) {
         throw new Error(ex);
     }
 };
+
+exports.FnCheckPasswordVES  = function (req, res) {
+    try {
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        var Password = req.query.Password;
+        if (Password != null) {
+            var Query = 'Select TID from tmaster where StatusID=1 and VESPassword=' + db.escape(Password);
+            db.query(Query, function (err, PasswordResult) {
+                if (!err) {
+                    if (PasswordResult.length > 0) {
+                        res.send(PasswordResult);
+                        console.log('FnCheckPasswordVES : Password check details sent successfully');
+                    }
+                    else {
+                        res.send('null');
+                        res.statusCode = 500;
+                        console.log('FnCheckPasswordVES : No Password check details found');
+                    }
+                }
+                else {
+                    res.send('null');
+                    console.log('FnCheckPasswordVES : error in getting check password' + err);
+                }
+            });
+        }
+        else {
+            if (Password == null) {
+                console.log('FnCheckPasswordVES: Password is empty');
+            }
+            
+            res.statusCode=400;
+            res.send('null');
+        }
+
+
+    }
+    catch (ex) {
+        console.log('FnCheckPasswordVES : error:' + ex.description);
+        throw new Error(ex);
+    }
+};
+
+exports.FnGetGatesVES = function (req, res) {
+    try {
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        var MasterID = req.query.MasterID;
+        if (MasterID != null) {
+            var Query = 'Select TID,GateNo from mgates where MasterID=' + db.escape(MasterID);
+            db.query(Query, function (err, Result) {
+                if (!err) {
+                    if (Result.length > 0) {
+                        res.send(Result);
+                        console.log('FnGetGatesVES: GatesVES details sent successfully');
+                    }
+                    else {
+                        res.send('null');
+                        res.statusCode = 500;
+                        console.log('FnGetGatesVES: No GatesVES details found');
+                    }
+                }
+                else {
+                    res.send('null');
+                    console.log('FnGetGatesVES: ' + err);
+                }
+            });
+        }
+        else {
+            res.send('null');
+            res.statusCode = 400;
+            console.log('FnGetGatesVES: MasterID is empty');
+        }
+
+
+    }
+    catch (ex) {
+        console.log('FnGetGatesVES error:' + ex.description);
+        throw new Error(ex);
+    }
+};
+
+exports.FnSaveDepartmentsVES = function(req, res){
+    try{
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.body.Token;
+        var Name = req.body.Name;
+        
+         var RtnMessage = {
+            IsSuccessfull: false
+        };
+
+        if (Token != null && Name != null) {
+            FnValidateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+                        var query = db.escape(Token) + ',' + db.escape(Name);
+                        db.query('CALL pSaveDepartments(' + query + ')', function (err, InsertResult) {
+                            if (!err){
+                                if (InsertResult.affectedRows > 0) {
+                                    RtnMessage.IsSuccessfull = true;
+                                    res.send(RtnMessage);
+                                    console.log('FnSaveDepartmentsVES: Departments details save successfully');
+                                }
+                                else {
+                                    console.log('FnSaveDepartmentsVES:No Save Departments details');
+                                    res.send(RtnMessage);
+                                }
+                            }
+                            else {
+                                console.log('FnSaveDepartmentsVES: error in saving Departments details' + err);
+                                res.statusCode = 500;
+                                res.send(RtnMessage);
+                            }
+                        });
+                    }
+                    else {
+                        console.log('FnSaveDepartmentsVES: Invalid token');
+                        res.statusCode = 401;
+                        res.send(RtnMessage);
+                    }
+                }
+                else {
+                    console.log('FnSaveDepartmentsVES:Error in processing Token' + err);
+                    res.statusCode = 500;
+                    res.send(RtnMessage);
+                }
+            });
+        }
+        else {
+            if (Token == null) {
+                console.log('FnSaveDepartmentsVES: Token is empty');
+            }
+            else if (Name == null) {
+                console.log('FnSaveDepartmentsVES: Name is empty');
+            }
+            res.statusCode=400;
+            res.send(RtnMessage);
+        }
+    }
+    catch (ex) {
+        console.log('FnSaveContactVES:error ' + ex.description);
+        throw new Error(ex);
+    }
+};
+
+exports.FnSaveGatesVES = function(req, res){
+    try{
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.body.Token;
+        var Name = req.body.Name;
+        
+         var RtnMessage = {
+            IsSuccessfull: false
+        };
+
+        if (Token != null && Name != null) {
+            FnValidateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+                        var query = db.escape(Token) + ',' + db.escape(Name);
+                        db.query('CALL pSaveGates(' + query + ')', function (err, InsertResult) {
+                            if (!err){
+                                if (InsertResult.affectedRows > 0) {
+                                    RtnMessage.IsSuccessfull = true;
+                                    res.send(RtnMessage);
+                                    console.log('FnSaveGatesVES: GatesVES details save successfully');
+                                }
+                                else {
+                                    console.log('FnSaveGatesVES:No Save GatesVES details');
+                                    res.send(RtnMessage);
+                                }
+                            }
+                            else {
+                                console.log('FnSaveGatesVES: error in saving GatesVES details' + err);
+                                res.statusCode = 500;
+                                res.send(RtnMessage);
+                            }
+                        });
+                    }
+                    else {
+                        console.log('FnSaveGatesVES: Invalid token');
+                        res.statusCode = 401;
+                        res.send(RtnMessage);
+                    }
+                }
+                else {
+                    console.log('FnSaveGatesVES:Error in processing Token' + err);
+                    res.statusCode = 500;
+                    res.send(RtnMessage);
+                }
+            });
+        }
+        else {
+            if (Token == null) {
+                console.log('FnSaveGatesVES: Token is empty');
+            }
+            else if (Name == null) {
+                console.log('FnSaveGatesVES: Name is empty');
+            }
+            res.statusCode=400;
+            res.send(RtnMessage);
+        }
+    }
+    catch (ex) {
+        console.log('FnSaveGatesVES:error ' + ex.description);
+        throw new Error(ex);
+    }
+};
+
+exports.FnSaveCitysVES = function(req, res){
+    try{
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var StateID = req.body.StateID;
+        var CityTitle = req.body.CityTitle;
+        
+         var RtnMessage = {
+            IsSuccessfull: false
+        };
+
+        if (StateID != null && CityTitle != null) {
+            var query = db.escape(StateID) + ',' + db.escape(CityTitle);
+                        db.query('CALL pSaveCitysVES(' + query + ')', function (err, InsertResult) {
+                            if (!err){
+                                if (InsertResult.affectedRows > 0) {
+                                    RtnMessage.IsSuccessfull = true;
+                                    res.send(RtnMessage);
+                                    console.log('FnSaveCitysVES: CitysVES details save successfully');
+                                }
+                                else {
+                                    console.log('FnSaveCitysVES:No Save CitysVES details');
+                                    res.send(RtnMessage);
+                                }
+                            }
+                            else {
+                                console.log('FnSaveCitysVES: error in saving CitysVES details' + err);
+                                res.statusCode = 500;
+                                res.send(RtnMessage);
+                            }
+                        });
+                    }
+                    
+            else {
+            if (StateID == null) {
+                console.log('FnSaveCitysVES: StateID is empty');
+            }
+            else if (CityTitle == null) {
+                console.log('FnSaveCitysVES: CityTitle is empty');
+            }
+            res.statusCode=400;
+            res.send(RtnMessage);
+        }
+    }
+    catch (ex) {
+        console.log('FnSaveCitysVES:error ' + ex.description);
+        throw new Error(ex);
+    }
+};
+
+
+
