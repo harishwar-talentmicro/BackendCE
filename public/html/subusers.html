@@ -62,7 +62,7 @@
                 <a class="btn-link" data-index="{{$index}}" ng-click="toggleModalBox($event)">See Rules</a>
             </td>
             <td>
-                <button class="btn" ng-class="(subusers[$index].status == 2)?'btn-success':'btn-danger'">{{(subusers[$index].status==2)?'Active':'Inactive'}}</button>
+                <button class="btn" ng-class="(subusers[$index].status == 2)?'btn-danger':'btn-success'">{{(subusers[$index].status==2)?'Inactive':'Active'}}</button>
             </td>
         </tr>
         </tbody>
@@ -113,8 +113,8 @@
         <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6">
             <div class="form-group" data-toggle="tooltip" title="Subuser Status"  data-placement="right">
                 <select class="form-control" ng-model="modalBox.subuser.status">
-                    <option value="2">Active</option>
-                    <option value="1">Inactive</option>
+                    <option value="1">Active</option>
+                    <option value="2">Inactive</option>
                 </select>
             </div>
         </div>
@@ -228,7 +228,7 @@
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-cleafix" ng-repeat="rule in (rules | ruleFilter:0)">
                 <div class="checkbox">
                     <label>
-                        <input type="checkbox" ng-click="toggleRule($event,0)" data-tid="{{rule.TID}}"> {{rule.FolderTitle}}
+                        <input type="checkbox" ng-click="toggleRule($event,0)" ng-checked="findRuleForSubuser(rule.TID,0)" data-tid="{{rule.TID}}"> {{rule.FolderTitle}}
                     </label>
                 </div>
             </div>
@@ -239,7 +239,7 @@
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-cleafix" ng-repeat="rule in (rules | ruleFilter:1)">
                 <div class="checkbox">
                     <label>
-                        <input type="checkbox" ng-click="toggleRule($event,1)" data-tid="{{rule.TID}}"> {{rule.FolderTitle}}
+                        <input type="checkbox" ng-click="toggleRule($event,1)" ng-checked="findRuleForSubuser(rule.TID,1)" data-tid="{{rule.TID}}"> {{rule.FolderTitle}}
                     </label>
                 </div>
             </div>
@@ -250,7 +250,7 @@
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-cleafix" ng-repeat="rule in (rules | ruleFilter:2)">
                 <div class="checkbox">
                     <label >
-                        <input type="checkbox" ng-click="toggleRule($event,2)" data-tid="{{rule.TID}}"> {{rule.FolderTitle}}
+                        <input type="checkbox" ng-click="toggleRule($event,2)"  ng-checked="findRuleForSubuser(rule.TID,2)" data-tid="{{rule.TID}}"> {{rule.FolderTitle}}
                     </label>
                 </div>
             </div>
@@ -261,7 +261,7 @@
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-cleafix" ng-repeat="rule in (rules | ruleFilter:3)">
                 <div class="checkbox">
                     <label>
-                        <input type="checkbox" ng-click="toggleRule($event,3)" data-tid="{{rule.TID}}"> {{rule.FolderTitle}}
+                        <input type="checkbox" ng-click="toggleRule($event,3)"  ng-checked="findRuleForSubuser(rule.TID,3)" data-tid="{{rule.TID}}"> {{rule.FolderTitle}}
                     </label>
                 </div>
             </div>
@@ -272,7 +272,7 @@
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-cleafix" ng-repeat="rule in (rules | ruleFilter:4)">
                 <div class="checkbox">
                     <label>
-                        <input type="checkbox" ng-click="toggleRule($event,4)" data-tid="{{rule.TID}}"> {{rule.FolderTitle}}
+                        <input type="checkbox" ng-click="toggleRule($event,4)" ng-checked="findRuleForSubuser(rule.TID,4)" data-tid="{{rule.TID}}"> {{rule.FolderTitle}}
                     </label>
                 </div>
             </div>

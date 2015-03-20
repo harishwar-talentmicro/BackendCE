@@ -8,7 +8,7 @@ angular.module('ezeidApp').controller('PreferenceNavigationCtrl',['$scope','$roo
      */
     $scope.pageSubuser = "html/subusers.html";
     $scope.pageItemMaster = "html/item-master.html";
-    $scope.pageResources = "html/item-master.html";
+    $scope.pageResources = "html/reservation-resource.html";
     $scope.pageStatusTypes = "html/status-types.html";
     $scope.pageActionTypes = "html/action-types.html";
     $scope.pageRules = "html/rules.html";
