@@ -132,6 +132,7 @@ app.get('/ewtGetSubUserList',LocationManager.FnGetSubUserList);
 app.post('/ewtSaveItem',LocationManager.FnSaveItem);
 app.post('/ewmSaveFolderRules',LocationManager.FnSaveFolderRules);
 app.post('/ewmSaveStatusType',LocationManager.FnSaveStatusType);
+app.post('/ewmSaveActionType',LocationManager.FnSaveActionType);
 app.get('/ewtItemList',LocationManager.FnItemList);
 app.get('/ewtItemDetails',LocationManager.FnItemDetails);
 app.post('/ewtSaveHolidayCalendar',LocationManager.FnSaveHolidayCalendar);
@@ -141,6 +142,11 @@ app.get('/ewtGetConfig',LocationManager.FnGetConfig);
 app.post('/ewtSaveTranscation',LocationManager.FnSaveTranscation);
 app.get('/ewtGetUserwiseFolderList',LocationManager.FnGetUserwiseFolderList);
 app.get('/ewtGetTranscation',LocationManager.FnGetTranscation);
+app.post('/ewtSaveResource',LocationManager.FnSaveResource);
+app.get('/ewtGetResource',LocationManager.FnGetResource);
+app.post('/ewtSaveResourceItemMap',LocationManager.FnSaveResourceItemMap);
+app.get('/ewtGetLocationList',LocationManager.FnGetLocationList);
+
 
 //below service are for EZEIDAP
 app.post('/ewLoginAP', LocationManager.FnLoginAP);
@@ -161,10 +167,22 @@ app.post('/ewtUpdateSecondaryLocationAP', LocationManager.FnUpdateSecondaryLocat
 app.post('/ewtUpdateIdCardPrintAP', LocationManager.FnUpdateIdCardPrintAP);
 app.get('/ewtGetIdCardPrintAP',LocationManager.FnGetIdCardPrintAP);
 app.post('/ewtSearchRealEstateAP', LocationManager.FnSearchRealEstateAP);
+app.post('/ewtUpdateRedFlagAP',LocationManager.FnUpdateRedFlagAP);
 
 //EZEID VAS
 app.get('/ewtLoginVES',LocationManager.FnLoginVES);
 app.post('/ewtSaveContactVES',LocationManager.FnSaveContactVES);
+app.get('/ewtGetAllContactsVES',LocationManager.FnGetAllContactsVES);
+app.get('/ewmGetDepartmentVES',LocationManager.FnGetDepartmentVES);
+app.get('/ewtGetContactVES',LocationManager.FnGetContactVES);
+app.get('/ewtSearchContactsVES',LocationManager.FnSearchContactsVES);
+app.get('/ewtCheckPasswordVES',LocationManager.FnCheckPasswordVES);
+app.get('/ewtGetGatesVES',LocationManager.FnGetGatesVES);
+app.post('/ewtSaveDepartmentsVES',LocationManager.FnSaveDepartmentsVES);
+app.post('/ewtSaveGatesVES',LocationManager.FnSaveGatesVES);
+app.post('/ewtSaveCitysVES',LocationManager.FnSaveCitysVES);
+
+
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
     console.log('404 : Page not found');

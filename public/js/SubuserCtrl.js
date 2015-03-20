@@ -122,6 +122,7 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$htt
                 $scope.modalBox.subuser = $scope.subusers[userIndex];
             };
             $scope.checkAvailability(callback);
+            console.log($scope.modalBox.subuser);
         }
         else{
             $scope.resetModalData();
@@ -168,6 +169,36 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$htt
             }
         };
     };
+
+    /**
+     * Finds that rule is present for particular user loaded in modal or not
+     * @param ruleId
+     * @param functionType
+     * @returns {boolean}
+     */
+    $scope.findRuleForSubuser = function(ruleId,functionType){
+        console.log(ruleId);
+        console.log(functionType);
+        var ruleMapping = ['sales','reservation','homeDelivery','service','resume'];
+        var fType = parseInt(functionType);
+
+        if($scope.modalBox.subuser.rules[ruleMapping[fType]].length < 1){
+            return false;
+
+        }
+        var index = $scope.modalBox.subuser.rules[ruleMapping[fType]].indexOf(ruleId.toString());
+        if(index !== -1){
+            return true;
+        }
+        else{
+            return false;
+        }
+    };
+
+    /**
+     * CheckAvailability
+     * @param callback
+     */
 
     $scope.checkAvailability = function(callback){
         $http({
@@ -272,7 +303,7 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$htt
      * Add and update subuser to server
      */
     $scope.saveSubUser = function(){
-
+        console.log($scope.modalBox.subuser.rules.sales);
         var data = {
             Token : $rootScope._userInfo.Token,
 
@@ -302,6 +333,7 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$htt
             ServiceRules : $scope.modalBox.subuser.rules.service.join(','),
             ResumeRules : $scope.modalBox.subuser.rules.resume.join(',')
         };
+        console.log(data);
 
         $http({
             url : GURL + 'ewtCreateSubUser',
@@ -342,13 +374,18 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$htt
             method : "GET",
             params : {
                 Token : $rootScope._userInfo.Token,
-                MasterID : $scope.masterUser.MasterID,
+                MasterID : $rootScope._userInfo.MasterID,
                 FunctionType : $scope.functionTypeCount
             }
         }).success(function(resp){
                 $scope.functionTypeCount += 1;
-                if(resp && resp.length){
-                        $scope.rules.concat(resp);
+                if(resp && resp.length > 0 && resp !== "null"){
+                    console.log(resp);
+                        for(var i = 0; i < resp.length; i++){
+                            console.log(resp[i]);
+                            $scope.rules.push(resp[i]);
+                        }
+
                 }
                 if($scope.functionTypeCount < 5){
                     $scope.loadAllRules();
@@ -377,7 +414,7 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$htt
         }).success(function(resp){
             if(resp && resp.length > 0)
             {
-
+                console.log(resp);
                 for(var i = 0; i < resp.length ; i++){
                     var subuser = {
                         userName : (resp[i].EZEID.split(".").pop()),
@@ -393,11 +430,11 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$htt
                             'resume' : (resp[i].UserModuleRights.split(''))[4]
                         },
                         rules : {
-                            sales : resp[i].SalesIDs.split(','),
-                            reservation : resp[i].ReservationIDs.split(','),
-                            homeDelivery : resp[i].HomeDeliveryIDs.split(','),
-                            service : resp[i].ServiceIDs.split(','),
-                            resume : resp[i].ResumeIDs.split(',')
+                            sales : (resp[i].SalesIDs.length > 0) ? resp[i].SalesIDs.split(',') : [],
+                            reservation : (resp[i].ReservationIDs.length > 0) ? resp[i].ReservationIDs.split(','): [],
+                            homeDelivery : (resp[i].HomeDeliveryIDs.length > 0) ? resp[i].HomeDeliveryIDs.split(',') : [],
+                            service : (resp[i].ServiceIDs.length > 0) ? resp[i].ServiceIDs.split(',') : [],
+                            resume : (resp[i].ResumeIDs.length > 0) ? resp[i].ResumeIDs.split(',') : []
                         },
                         status : resp[i].StatusID,
                         salesEmail : resp[i].SalesMailID,
@@ -440,12 +477,10 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$htt
 
     };
 
-
     /**
      * Initial Function call after controller initialization
      * Will call loadAllRules()
      */
     $scope.getMasterUserDetails();
-
 
 }]);
