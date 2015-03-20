@@ -1,13 +1,77 @@
+/**
+ * Sales Controller
+ * Depends Upon BusinessManager Controller
+ */
 angular.module('ezeidApp')
-    .controller('SalesCtrl',['$scope','$rootScope','$http','GURL','MsgDelay','$interval','$q',function($scope,$rootScope,$http,GURL,MsgDelay,$interval,$q){
+    .controller('SalesCtrl',['$scope','$rootScope','$http','GURL','MsgDelay','$interval','$q','$timeout',function($scope,$rootScope,$http,GURL,MsgDelay,$interval,$q,$timeout){
+
+        /**
+         * For showing loading Icon
+         * IF all values becomes true then only grid will appear else loading will be stopped and error message is shown
+         * @type {{itemsLoaded: boolean, statusLoaded: boolean, nextActionsLoaded: boolean, foldersLoaded: boolean, transactionsLoaded: boolean}}
+         */
+        $scope.readyState = {
+            itemsLoaded : false,
+            statusLoaded : false,
+            nextActionsLoaded : false,
+            foldersLoaded : false,
+            transactionsLoaded : false
+        };
+
+        /**
+         * IF data is not loaded successfully, there might be server API error or connection
+         * error in sending API Calls
+         * @type {boolean}
+         */
+        $scope.serverApiError = false;
 
 
+        /**
+         * Status List (eg. Accepted, In Progress, In Delivery)
+         * @type {Array}
+         */
+        $scope.enquiryStatusList = [];
 
+        /**
+         * Next Action List (eg. Call, Meet, Followup)
+         * @type {Array}
+         */
+        $scope.nextActionList = [];
+
+        /**
+         * Items List for Sales
+         * @type {Array}
+         */
+        $scope.itemList = [];
+
+        /**
+         * Folder List (Sales Rules)
+         * @type {Array}
+         */
+        $scope.folderList = [];
+
+
+        $scope.transactionList = [];
+
+        /**
+         *     Open Modal box for user
+         */
+        $scope.showModal = false;
+        $scope.toggleModalBox = function(){
+            $scope.showModal = !$scope.showModal;
+        };
+
+        $scope.modalBox = {
+            title : 'Transaction Details'
+        };
 
         /****************************************************** Controller Code *****************************/
 
-        $scope.showMe = function(){
-            console.log('Clicked');
+        /**
+         * View Transaction Details
+         */
+        $scope.viewDetails = function(){
+            $scope.toggleModalBox();
         };
 
         /**
@@ -41,11 +105,9 @@ angular.module('ezeidApp')
             exporterPdfOrientation: 'landscape',
             exporterPdfPageSize: 'LETTER',
             exporterPdfMaxGridWidth: 500,
-            exporterCsvLinkElement: angular.element(document.querySelectorAll(".custom-csv-link-location")),
+            exporterCsvLinkElement: angular.element(document.querySelectorAll(".custom-csv-link-location"))
             //Options for exporting data ends
-        }
-
-
+        };
 
 
         /**
@@ -62,7 +124,7 @@ angular.module('ezeidApp')
                 enableFiltering : false,
                 enableCellEditOnFocus:false,
                 enableCellEdit : false,
-                cellTemplate:'<div class="row"><div class="col-lg-12 text-center" style="margin-top:5px;"><button class="btn btn-xs btn-info no-radius ng-scope" ng-click="grid.appScope.showMe()">Save</button></div></div>'
+                cellTemplate:'<div class="row"><div class="col-lg-12 text-center" style="margin-top:5px;"><button class="btn btn-xs btn-info no-radius ng-scope" ng-click="grid.appScope.saveTransaction()">Save</button></div></div>'
             },
             {
                 width : '7%',
@@ -86,7 +148,7 @@ angular.module('ezeidApp')
                 enableCellEditOnFocus:false,
                 enableCellEdit : false,
                 enableFiltering : false,
-                cellTemplate:'<div class="row"><div class="col-lg-12 text-center" style="margin-top:5px;"><button class="btn btn-xs btn-info no-radius ng-scope" ng-click="grid.appScope.showMe()">Details</button></div></div>'
+                cellTemplate:'<div class="row"><div class="col-lg-12 text-center" style="margin-top:5px;"><button class="btn btn-xs btn-info no-radius ng-scope" ng-click="grid.appScope.viewDetails()">Details</button></div></div>'
             },
             {
                 width : '15%',
@@ -112,18 +174,7 @@ angular.module('ezeidApp')
                 displayName: 'Status',
                 editableCellTemplate: 'ui-grid/dropdownEditor',
                 editDropdownValueLabel: 'status',
-                editDropdownOptionsArray: [
-                    {
-                        status : 'Started',
-                        id : 1
-
-                    },
-                    {
-                        status : 'In progress',
-                        id : 2
-
-                    }
-                ],
+                editDropdownOptionsArray: $scope.enquiryStatusList,
                 enableFiltering: false
             },
             {
@@ -132,16 +183,7 @@ angular.module('ezeidApp')
                 displayName: 'Next Action',
                 editableCellTemplate: 'ui-grid/dropdownEditor',
                 editDropdownValueLabel: 'nextAction',
-                editDropdownOptionsArray: [
-                    {
-                        id : 1,
-                        nextAction : 'Call'
-                    },
-                    {
-                        id : 2,
-                        nextAction : 'Followup'
-                    }
-                ],
+                editDropdownOptionsArray: $scope.nextActionList,
                 enableFiltering: true
             },
             {
@@ -156,16 +198,7 @@ angular.module('ezeidApp')
                 displayName : 'Folder',
                 editableCellTemplate : 'ui-grid/dropdownEditor',
                 editDropdownValueLabel : 'folder',
-                editDropdownOptionsArray : [
-                    {
-                        id : 1,
-                        folder : 'Jayanagar'
-                    },
-                    {
-                        id : 2,
-                        folder : 'JP nagar'
-                    }
-                ],
+                editDropdownOptionsArray : $scope.folderList,
                 enableFiltering: true
             },
             {
@@ -220,13 +253,17 @@ angular.module('ezeidApp')
              * Uncomment code below for afterCellEdit functionality
              */
 //            gridApi.edit.on.afterCellEdit($scope,function(rowEntity, colDef, newValue, oldValue){
-//                if( colDef.name === 'gender' ){
-//                    if( newValue === 1 ){
-//                        rowEntity.sizeOptions = $scope.maleSizeDropdownOptions;
-//                    } else {
-//                        rowEntity.sizeOptions = $scope.femaleSizeDropdownOptions;
-//                    }
-//                }
+////                if( colDef.name === 'gender' ){
+////                    if( newValue === 1 ){
+////                        rowEntity.sizeOptions = $scope.maleSizeDropdownOptions;
+////                    } else {
+////                        rowEntity.sizeOptions = $scope.femaleSizeDropdownOptions;
+////                    }
+////                }
+//                alert('row edited');
+////                console.log(gridApi.rowEdit.getDirtyRows());
+//                console.log(gridApi);
+//
 //            });
         };
         ///////////////////////////////////////////////////////////////////////////////////////
@@ -264,6 +301,9 @@ angular.module('ezeidApp')
             $scope.gridOpts.data.splice(0,1);
         };
 
+
+        $scope.savePromises = {};
+
         /**
          * Changing row contents will make this function call
          * From API (Copied from original source)
@@ -271,20 +311,20 @@ angular.module('ezeidApp')
          */
         $scope.saveRow = function( rowEntity ) {
             // create a fake promise - normally you'd use the promise returned by $http or $resource
-            var promise = $q.defer();
-            $scope.gridApi.rowEdit.setSavePromise( rowEntity, promise.promise );
+//            var promise = $q.defer();
+//            console.log(rowEntity);
+//            $scope.gridApi.rowEdit.setSavePromise( rowEntity, promise.promise );
 
-            // fake a delay of 3 seconds whilst the save occurs, return error if gender is "male"
-            $interval( function() {
 
-//                if (rowEntity.gender === 'male' ){
-//                    promise.reject();
-//                } else {
-//                    promise.resolve();
-//                }
+            console.log(rowEntity.trnId);
+            $scope.savePromises[rowEntity.trnId] = $q.defer();
+            $scope.gridApi.rowEdit.setSavePromise( rowEntity, $scope.savePromises[rowEntity.trnId].promise );
 
-                promise.resolve();
-            }, 3000, 1);
+//            // fake a delay of 3 seconds whilst the save occurs, return error if gender is "male"
+//            $interval( function() {
+//
+//                promise.resolve();
+//            }, 3000, 1);
         };
 
 
@@ -295,6 +335,7 @@ angular.module('ezeidApp')
          */
         $scope.saveTransaction = function(){
             console.log('Save is clicked');
+
         };
 
         /******************************************* Grid Code Ends here **********************************/
@@ -305,15 +346,20 @@ angular.module('ezeidApp')
          */
         $scope.loadAllItems = function(){
             $http({
-                url : GURL + '',
+                url : GURL + 'ewtGetItemList',
                 method : 'GET',
                 params : {
                     Token : $rootScope._userInfo.Token,
-                    FunctionType : 0
+                    FunctionType : 0,
+                    MasterID : $rootScope._userInfo.MasterID
                 }
             }).success(function(resp){
                 console.log(resp);
-            }).error(function(err){
+                    if(resp && resp.length > 0){
+                        $scope.itemList = resp;
+                    }
+                    $scope.readyState.itemsLoaded = true;
+                }).error(function(err){
                 console.log(err);
             });
         };
@@ -323,13 +369,23 @@ angular.module('ezeidApp')
          */
         $scope.loadAllStatus = function(){
             $http({
-                url : GURL + '',
+                url : GURL + 'ewtGetStatusType',
                 method : 'GET',
                 params : {
-                    Token : $rootScope._userInfo.Token
+                    Token : $rootScope._userInfo.Token,
+                    FunctionType : 0,
+                    MasterID : $rootScope._userInfo.MasterID
                 }
             }).success(function(resp){
-                console.log(resp);
+                    if(resp && resp.length > 1 && resp !== "null"){
+                        for(var i = 0; i < resp.length; i++){
+                            $scope.enquiryStatusList.push({
+                                id : resp[i].TID,
+                                status : resp[i].StatusTitle
+                            });
+                        }
+                        $scope.readyState.statusLoaded = true;
+                    }
             }).error(function(err){
                 console.log(err);
             });
@@ -340,13 +396,24 @@ angular.module('ezeidApp')
          */
         $scope.loadAllNextActions = function(){
             $http({
-                url : GURL + '',
+                url : GURL + 'ewtGetActionType',
                 method : 'GET',
                 params : {
-                    Token : $rootScope._userInfo.Token
+                    Token : $rootScope._userInfo.Token,
+                    FunctionType : 0,
+                    MasterID : $rootScope._userInfo.MasterID
                 }
             }).success(function(resp){
                 console.log(resp);
+                    if(resp && resp.length > 0 && resp !== "null"){
+                        for(var i = 0; i < resp.length; i++){
+                            $scope.nextActionList.push({
+                                id : resp[i].TID,
+                                nextAction : resp[i].ActionTitle
+                            });
+                        }
+                        $scope.readyState.nextActionsLoaded = true;
+                    }
             }).error(function(err){
                 console.log(err);
             });
@@ -357,16 +424,108 @@ angular.module('ezeidApp')
          */
         $scope.loadAllFolders = function(){
             $http({
-                url : GURL + '',
+                url : GURL + 'ewtGetFolderList',
                 method : 'GET',
                 params : {
-                    Token : $rootScope._userInfo.Token
+                    Token : $rootScope._userInfo.Token,
+                    FunctionType : 0,
+                    MasterID : $rootScope._userInfo.MasterID
                 }
             }).success(function(resp){
                 console.log(resp);
+                    if(resp && resp.length > 0 && resp !== "null"){
+                        for(var i = 0; i < resp.length; i++){
+                            $scope.folderList.push({
+                                id : resp[i].TID,
+                                folder : resp[i].FolderTitle
+                            });
+                        }
+                        $scope.readyState.foldersLoaded = true;
+                    }
             }).error(function(err){
                 console.log(err);
             });
         };
+
+        /**
+         * Load all transactions
+         */
+        $scope.loadAllTransactions = function(){
+            $http({
+                url : GURL + 'ewtGetTranscation',
+                method : "GET",
+                params : {
+                    Token : $rootScope._userInfo.Token,
+                    FunctionType : 0
+                }
+            }).success(function(resp){
+                    console.log(resp);
+                    if(resp && resp.length > 0 && resp !== "null"){
+                        for(var i = 0; i < resp.length; i++){
+                            /**
+                             * @todo Convert data to grid based format (JSON Format that is accepted by grid)
+
+                            $scope.transactionList.push({
+                                trnId : resp[i].TID,
+                                folder : resp[i].FolderTitle
+                            });
+                             */
+                        }
+
+                    }
+                    $scope.readyState.transactionsLoaded = true;
+            }).error(function(err){
+
+            });
+        };
+
+        /**
+         * Try to reload all server data again
+         *
+         */
+
+        $scope.reloadAgain = function(){
+            $scope.readyState = {
+                itemsLoaded : false,
+                statusLoaded : false,
+                nextActionsLoaded : false,
+                foldersLoaded : false,
+                transactionsLoaded : false
+            };
+            $scope.serverApiError = false;
+            $scope.loadAllItems();
+            $scope.loadAllFolders();
+            $scope.loadAllStatus();
+            $scope.loadAllNextActions();
+            $scope.loadAllTransactions();
+            $timeout(function(){
+                if(!($scope.readyState.itemsLoaded && $scope.readyState.statusLoaded && $scope.readyState.nextActionsLoaded
+                    && $scope.readyState.foldersLoaded && $scope.readyState.transactionsLoaded)){
+                    $scope.serverApiError = true;
+                }
+            },15000);
+        };
+
+        /**
+         * Loading Data
+         */
+        $scope.loadAllItems();
+        $scope.loadAllFolders();
+        $scope.loadAllStatus();
+        $scope.loadAllNextActions();
+        $scope.loadAllTransactions();
+
+        /**
+         * Checks that if the data is not loaded in 10s show the error message
+         */
+        $timeout(function(){
+            if(!($scope.readyState.itemsLoaded && $scope.readyState.statusLoaded && $scope.readyState.nextActionsLoaded
+                && $scope.readyState.foldersLoaded && $scope.readyState.transactionsLoaded)){
+                $scope.serverApiError = true;
+            }
+        },10000);
+
+
+
 
 }]);

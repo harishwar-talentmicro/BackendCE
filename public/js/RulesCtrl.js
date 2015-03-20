@@ -501,7 +501,35 @@ angular.module('ezeidApp').controller('RulesCtrl',['$scope','$interval','$http',
 
     };
 
+    $scope.saveRule = function(){
+        var ruleData = {
+            Token : null ,
+            TID : null ,
+            MasterID : null ,
+            FolderTitle : null ,
+            RuleFunction : null ,
+            RuleType : null ,
+            CountryID : null ,
+            MatchAdminLevel : null ,
+            MappedNames : null ,
+            Latitude : null ,
+            Longitude : null ,
+            Proximity : null ,
+            DefaultFolder : null ,
+            FolderStatus : null ,
+            SeqNoFrefix : null
+        };
 
+        $http({
+            url : 'ewmSaveFolderRules',
+            method : "POST",
+            data : ruleData
+        }).success(function(resp){
+            console.log(resp);
+        }).error(function(err){
+
+        });
+    };
 
 }]);
 

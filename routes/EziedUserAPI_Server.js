@@ -5111,16 +5111,15 @@ exports.FnGetItemList = function (req, res) {
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
         var Token = req.query.Token;
-        var MasterID = req.query.MasterID;
         var FunctionType = req.query.FunctionType;
         if(Token == "")
             Token= null;
-        if (Token != null && MasterID != null && FunctionType != null) {
+        if (Token != null && FunctionType != null) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
 
-                        db.query('CALL pGetItemList(' + db.escape(MasterID) + ',' + db.escape(FunctionType) + ')', function (err, GetResult) {
+                        db.query('CALL pGetItemList(' + db.escape(Token) + ',' + db.escape(FunctionType) + ')', function (err, GetResult) {
                             if (!err) {
                                 if (GetResult[0] != null) {
                                     if (GetResult[0].length > 0) {
@@ -5164,8 +5163,8 @@ exports.FnGetItemList = function (req, res) {
             if (Token == null) {
                 console.log('FnGetItemList: Token is empty');
             }
-            else if (MasterID == null) {
-                console.log('FnGetItemList: MasterID is empty');
+            else if (FunctionType == null) {
+                console.log('FnGetItemList: FunctionType is empty');
             }
             res.statusCode=400;
             res.send('null');
@@ -5250,7 +5249,6 @@ exports.FnSaveItem = function(req, res){
 
         var Token = req.body.Token;
         var TID = req.body.TID;
-        var MasterID = req.body.MasterID ;
         var FunctionType = req.body.FunctionType;
         var ItemName = req.body.ItemName;
         var ItemDescription = req.body.ItemDescription;
@@ -5264,12 +5262,12 @@ exports.FnSaveItem = function(req, res){
         };
         if(Rate == null || Rate =="")
         Rate=0.00;
-        if (Token != null && MasterID != null && FunctionType != null && ItemName !=null) {
+        if (Token != null  && FunctionType != null && ItemName !=null) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
 
-                        var query = db.escape(TID) + ',' + db.escape(MasterID) + ',' + db.escape(FunctionType) + ',' + db.escape(ItemName)
+                        var query = db.escape(TID) + ',' + db.escape(Token) + ',' + db.escape(FunctionType) + ',' + db.escape(ItemName)
                             + ',' +db.escape(ItemDescription) + ',' +db.escape(Pic) + ',' +db.escape(Rate) + ',' +db.escape(Status) + ',' +db.escape(ItemDuration);
                         db.query('CALL pSaveItem(' + query + ')', function (err, InsertResult) {
                             if (!err){
@@ -5310,9 +5308,6 @@ exports.FnSaveItem = function(req, res){
         else {
             if (Token == null) {
                 console.log('FnSaveItem: Token is empty');
-            }
-            else if (MasterID == null) {
-                console.log('FnSaveItem: MasterID is empty');
             }
             else if (FunctionType == null) {
                 console.log('FnSaveItem: FunctionType is empty');
@@ -5436,14 +5431,13 @@ exports.FnGetSubUserList = function (req, res) {
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
         var Token = req.query.Token;
-        var MasterID = req.query.MasterID;
 
-        if (Token != null && MasterID != null) {
+        if (Token != null) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
 
-                        db.query('CALL pGetSubUserList(' + db.escape(MasterID) + ')', function (err, GetResult) {
+                        db.query('CALL pGetSubUserList(' + db.escape(Token) + ')', function (err, GetResult) {
                             if (!err) {
                                 if (GetResult != null) {
                                     if (GetResult[0].length > 0) {
@@ -5488,9 +5482,6 @@ exports.FnGetSubUserList = function (req, res) {
         else {
             if (Token == null) {
                 console.log('FnGetSubUserList: Token is empty');
-            }
-            else if (MasterID == null) {
-                console.log('FnGetSubUserList: MasterID is empty');
             }
             res.statusCode=400;
             res.send('null');
@@ -5921,15 +5912,14 @@ exports.FnItemList = function (req, res) {
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
         var Token = req.query.Token;
-        var MasterID = req.query.MasterID;
         var FunctionType = req.query.FunctionType;
 
-        if (Token != null && MasterID != null && FunctionType != null) {
+        if (Token != null && FunctionType != null) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
 
-                        db.query('CALL pItemList(' + db.escape(MasterID) + ',' + db.escape(FunctionType) + ')', function (err, GetResult) {
+                        db.query('CALL pItemList(' + db.escape(Token) + ',' + db.escape(FunctionType) + ')', function (err, GetResult) {
                             if (!err) {
                                 if (GetResult != null) {
                                     if (GetResult[0].length > 0) {
@@ -5972,9 +5962,6 @@ exports.FnItemList = function (req, res) {
         else {
             if (Token == null) {
                 console.log('FnGetItemList: Token is empty');
-            }
-            else if (MasterID == null) {
-                console.log('FnGetItemList: MasterID is empty');
             }
             else if (FunctionType == null) {
                 console.log('FnGetItemList: FunctionType is empty');
@@ -6233,7 +6220,6 @@ exports.FnSaveHolidayCalendar = function(req, res){
 
         var Token = req.body.Token;
         var TID = req.body.TID;
-        var MasterID = req.body.MasterID;
         var HolidayDate = req.body.HolidayDate;
         var HolidayTitle = req.body.HolidayTitle;
 
@@ -6241,12 +6227,12 @@ exports.FnSaveHolidayCalendar = function(req, res){
             IsSuccessfull: false
         };
 
-        if (Token != null && TID != null && HolidayTitle != null && MasterID != null && HolidayDate != null ) {
+        if (Token != null && TID != null && HolidayTitle != null  && HolidayDate != null ) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
 
-                        var query = db.escape(TID) + ',' + db.escape(MasterID) + ',' + db.escape(HolidayDate) + ',' + db.escape(HolidayTitle);
+                        var query = db.escape(TID) + ',' + db.escape(Token) + ',' + db.escape(HolidayDate) + ',' + db.escape(HolidayTitle);
                         db.query('CALL pSaveHolidayCalendar(' + query + ')', function (err, InsertResult) {
                             if (!err){
                                 if (InsertResult.affectedRows > 0) {
@@ -6290,9 +6276,6 @@ exports.FnSaveHolidayCalendar = function(req, res){
             else if (TID == null) {
                 console.log('FnSaveHolidayCalendar: TID is empty');
             }
-            else if (MasterID == null) {
-                console.log('FnSaveHolidayCalendar: MasterID is empty');
-            }
             else if (HolidayTitle == null) {
                 console.log('FnSaveHolidayCalendar: HolidayTitle is empty');
             }
@@ -6319,14 +6302,12 @@ exports.FnGetHolidayList = function (req, res) {
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
         var Token = req.query.Token;
-        var MasterID = req.query.MasterID;
-
-        if (Token != null && MasterID != null) {
+        if (Token != null) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
 
-                        db.query('CALL pGetHolidayList(' + db.escape(MasterID) + ')', function (err, GetResult) {
+                        db.query('CALL pGetHolidayList(' + db.escape(Token) + ')', function (err, GetResult) {
                             if (!err) {
                                 if (GetResult != null) {
                                     if (GetResult[0].length > 0) {
@@ -6372,9 +6353,7 @@ exports.FnGetHolidayList = function (req, res) {
             if (Token == null) {
                 console.log('FnGetHolidayList: Token is empty');
             }
-            else if (MasterID == null) {
-                console.log('FnGetHolidayList: MasterID is empty');
-            }
+
             res.statusCode=400;
             res.send('null');
         }
@@ -6694,7 +6673,6 @@ exports.FnSaveTranscationOld = function(req, res){
     }
 };
 
-
 exports.FnGetTranscation = function (req, res) {
     try {
 
@@ -6991,7 +6969,6 @@ exports.FnGetResource = function (req, res) {
         throw new Error(ex);
     }
 };
-
 
 exports.FnSaveResourceItemMap = function(req, res){
     try{
@@ -8716,7 +8693,6 @@ exports.FnUpdateRedFlagAP = function(req, res){
         throw new Error(ex);
     }
 }
-
 
 //EZEID VAS
 
