@@ -59,12 +59,12 @@ angular.module('ezeidApp').controller('HomeController', function ($rootScope, $h
     /**
      * Opens Help Popup when help link is clicked
      */
-    $scope.openHelpPopup =function(){
+    $scope.openHelpPopup = function(){
         $('#Help_popup').css({'position':'fixed'});
         $('#Help_popup > div').css({'margin-top':'0%'});
         $('#Help_popup').slideDown();
     };
-    $scope.closeHelpPopup =function(){
+    $scope.closeHelpPopup = function(){
         $('#Help_popup').slideUp();
     }
 });
@@ -88,6 +88,8 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
     var Miliseconds = 8000;
     var RefreshTime = Miliseconds;
     var AutoRefresh = true;
+
+    var rating = [];
 
     $('#datetimepicker1').datetimepicker({
         format: "d-M-Y  h:m A",
@@ -141,7 +143,15 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
     $scope.isMapReady = false;          //Set to true when map canvas is drawn and map is fully visible
 
     SearchSec.Placeholder = 'Type Keywords to locate products or services.';
+    $scope.showSmallBanner = false;
+    $scope.ShowInfoWindow = false;
+    $scope.ShowLinks = false;
 
+    $scope.showStar1 = true;
+    $scope.showStar2 = true;
+    $scope.showStar3 = true;
+    $scope.showStar4 = true;
+    $scope.showStar5 = true;
 
     //new multi select
     $scope.ratingModel = [
@@ -174,8 +184,20 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
     $scope.member = {roles: []};
     $scope.selected_items = [];
 
+
+    // show search Tab
+    $scope.showSearchTab = function(){
+        console.log("Show search");
+        $scope.ShowInfoWindow = false;
+    };
+    // show info Tab
+    $scope.showInfoWindowTab = function(){
+        console.log("Show info");
+        $scope.ShowInfoWindow = true;
+    };
+
     function initialize () {
-        //// Create the search box and link it to the UI element.
+        // Create the search box and link it to the UI element.
 
         directionsDisplay = new google.maps.DirectionsRenderer();
         var initialLocation;
@@ -190,7 +212,9 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
         var input = /** @type {HTMLInputElement} */(document.getElementById('txtSearch'));
         map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
 
-        /********** Google Maps autocomplete **************/
+        //getReverseGeocodingData(12.295810, 76.639381);
+
+      /********** Google Maps autocomplete **************/
         var options = {
             types: ['establishment']
         };
@@ -291,13 +315,17 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
 
     function getAddressForLocation(results) {
         console.log(results);
+        $scope.Address = "";
        angular.forEach(results, function (mapResultValue, index) {
             // console.log(mapResultValue);
             if (mapResultValue.types[0] == 'street_number') {
-                $scope.Address = mapResultValue.long_name;
+
+                    $scope.Address = mapResultValue.long_name + ', ';
+
             }
             if (mapResultValue.types[0] == 'route') {
-                $scope.Address += ", " + mapResultValue.long_name;
+                /*$scope.Address += ", " + mapResultValue.long_name;*/
+                $scope.Address += mapResultValue.long_name;
             }
             if (mapResultValue.types[0] == 'neighborhood') {
                 $scope.Address += ", " + mapResultValue.long_name;
@@ -319,7 +347,7 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
     google.maps.event.addDomListener(window, 'load', initialize);
 
     function PlaceCurrentLocationMarker(location) {
-        if (marker != undefined) {
+         if (marker != undefined) {
             marker.setMap(null);
         }
         map.setCenter(location);
@@ -330,6 +358,9 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
             map: map,
             icon: 'images/you_are_here.png'
         });
+
+        getReverseGeocodingData(marker.getPosition().k, marker.getPosition().D);
+
         google.maps.event.addListener(marker, 'dragend', function (e) {
             $rootScope.CLoc.CLat = marker.getPosition().k;
             $rootScope.CLoc.CLong = marker.getPosition().D;
@@ -385,16 +416,24 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
 
                 markers.push(marker);
                 google.maps.event.addListener(marker, 'click', (function (_item) {
+
                     return function () {
+
+                        $scope.ShowInfoWindow = true;
+                        $scope.ShowLinks = true;
+                        $scope.showSmallBanner = true;
+
                         var sen = this;
                         $http({ method: 'get', url: GURL + 'ewtGetSearchInformation?Token=' + $rootScope._userInfo.Token + '&TID=' + _item.TID }).success(function (data) {
                             if (data != 'null') {
+
+                              //  console.log(data);
                                 $timeout(function () {
                                     SearchSec.mInfo = data[0];
 
                                     if (!/^(f|ht)tps?:\/\//i.test(data[0].Website)) {
-                                        url = "http://" + data[0].Website;
-                                        SearchSec.mInfo.Website = url;
+//                                        url = "http://" + data[0].Website;
+                                        SearchSec.mInfo.Website = data[0].Website;
                                     }
 
                                     $scope.showInfoTab = true;
@@ -444,14 +483,17 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
         if (SearchSec.Criteria.SearchType == 1)
         {
             SearchSec.Placeholder = 'Type EZEID here.';
+            //SearchSec.showSmallBanner = false;
         }
         else if(SearchSec.Criteria.SearchType == 2)
         {
             SearchSec.Placeholder = 'Type Keywords to locate products or services.';
+          //  SearchSec.showSmallBanner = true;
         }
         else
         {
             SearchSec.Placeholder = 'Type Job skill keywords to locate employers.';
+          //  SearchSec.showSmallBanner = false;
         }
         $scope.searchType = 2;
 
@@ -463,18 +505,21 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
     };
 
     SearchSec.getSearch = function () {
-        var ratingValues = "";
+        $scope.SearchResultCount= "";
+       // $scope.showSmallBanner = true;
+      //  var ratingValues = "";
 
-        for (var i=0; i<$scope.ratingModel.length; i++)
+      /*  for (var i=0; i<$scope.ratingModel.length; i++)
         {
             ratingValues += $scope.ratingModel[i].id + ',' ;
-        }
+        }*/
 
-        ratingValues = ratingValues.substring(0,ratingValues.length-1);
+      //  ratingValues = ratingValues.substring(0,ratingValues.length-1);
         SearchSec.IsSearchButtonClicked = true;
         SearchSec.IsShowForm = false;
         SearchSec.Criteria.ParkingStatus = SearchSec.Criteria.ParkingStatus == 1 ? '1,2' :0;
-        SearchSec.Criteria.OpenStatus = (SearchSec.Criteria.OpenStatus.id == 1) ? 0 : SearchSec.Criteria.OpenStatus ;
+        /*SearchSec.Criteria.OpenStatus = (SearchSec.Criteria.OpenStatus.id == 1) ? 0 : SearchSec.Criteria.OpenStatus ;*/
+        SearchSec.Criteria.OpenStatus = (SearchSec.Criteria.OpenStatus == 1) ? 0 : SearchSec.Criteria.OpenStatus ;
         if ($rootScope._userInfo.IsAuthenticate == true || SearchSec.Criteria.SearchType == 2 && SearchSec.IsSearchButtonClicked) {
 
             if($rootScope._userInfo.Token == "")
@@ -490,11 +535,15 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
             SearchSec.Criteria.Latitude = $rootScope.CLoc.CLat;
             SearchSec.Criteria.Longitude = $rootScope.CLoc.CLong;
             SearchSec.Criteria.Token = $rootScope._userInfo.Token;
-            SearchSec.Criteria.Rating = ratingValues;
+           // SearchSec.Criteria.Rating = ratingValues;
 
             $http({ method: 'post', url: GURL + 'ewSearchByKeywords', data: SearchSec.Criteria }).success(function (data) {
 
                 if (data != 'null' && data.length>0) {
+
+                    console.log(data.length);
+                    $scope.SearchResultCount = data.length;
+
                     var _item = data[0];
                     if(data[0].Filename)
                     {
@@ -505,6 +554,8 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
                     else
                     {
                         $http({ method: 'get', url: GURL + 'ewtGetSearchInformation?Token=' + $rootScope._userInfo.Token + '&TID=' + _item.TID }).success(function (data) {
+
+                            console.log(data);
 
                             if (data != 'null') {
                                 if(data.length == 1 && SearchSec.Criteria.SearchType == 1)
@@ -973,11 +1024,99 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
     };
 
     //Star Clicked .. add rating
-     SearchSec.addRatting = function (ratingValue,starColor,modal) {
-         SearchSec.modal = true;
-        //alert(ratingValue);
+     SearchSec.addRatting = function (ratingValue,starColor) {
+         if(ratingValue == 1)
+         {
+                if(starColor == 'gray')
+                {
+                    $scope.showStar1 = false;
+                    //Add value in array
+                    rating.push(1);
+                }
+                else
+                {
+                    $scope.showStar1 = true;
+                    //Remove value from array
+                    var index = rating.indexOf(1);
+                    if (index >= 0) {
+                        rating.splice( index, 1 );
+                    }
+                }
+         }
+         if(ratingValue == 2)
+         {
+             if(starColor == 'gray')
+             {
+                 $scope.showStar2 = false;
+                 //Add value in array
+                 rating.push(2);
+             }
+             else
+             {
+                 $scope.showStar2 = true;
+                 //Remove value from array
+                 var index = rating.indexOf(2);
+                 if (index >= 0) {
+                     rating.splice( index, 1);
+                 }
+             }
+         }
+         if(ratingValue == 3)
+         {
+             if(starColor == 'gray')
+             {
+                 $scope.showStar3 = false;
+                 //Add value in array
+                 rating.push(3);
+             }
+             else
+             {
+                 $scope.showStar3 = true;
+                 //Remove value from array
+                 var index = rating.indexOf(3);
+                 if (index >= 0) {
+                     rating.splice( index, 1);
+                 }
+             }
+         }
+         if(ratingValue == 4)
+         {
+             if(starColor == 'gray')
+             {
+                 $scope.showStar4 = false;
+                 //Add value in array
+                 rating.push(4);
+             }
+             else
+             {
+                 $scope.showStar4 = true;
+                 //Remove value from array
+                 var index = rating.indexOf(4);
+                 if (index >= 0) {
+                     rating.splice( index, 1 );
+                 }
+             }
+         }
+         if(ratingValue == 5)
+         {
+             if(starColor == 'gray')
+             {
+                 $scope.showStar5 = false;
+                 //Add value in array
+                 rating.push(5);
+             }
+             else
+             {
+                 $scope.showStar5 = true;
+                 //Remove value from array
+                 var index = rating.indexOf(5);
+                 if (index >= 0) {
+                     rating.splice( index, 1 );
+                 }
+             }
+         }
+         SearchSec.Criteria.Rating = rating.toString();
     };
-
 
     // Close CV Form
     SearchSec.closeCVForm = function () {
@@ -993,6 +1132,7 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
 
     //close download form
     SearchSec.SearchTypeKeyWord = function () {
+
         SearchSec.IsShowForm = false;
         SearchSec.IsFilterRowVisible = true;
     };
