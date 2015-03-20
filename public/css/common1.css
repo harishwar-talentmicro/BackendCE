@@ -104,10 +104,15 @@ hr {
     padding-left: 0px;
     padding-right: 0px;
     margin-bottom: 0px;
+    background-image: url(../images/infoBackground.png);
+   /* height: 360px;*/
+    height: auto;
+    min-height: 360px;
 }
 .searchHeaderRow
 {
     margin-left: 0px;
+    margin-right: 0px;
 }
 .infoMapContainerRow
 {
@@ -221,6 +226,8 @@ hr {
 .searchInfoLink
 {
     border-left: 2px solid #000;
+    border-right: 2px solid #000;
+    width: 27%;
 }
 .searchStripTopMargin
 {
@@ -247,9 +254,11 @@ hr {
 }
 .searchAddress
 {
-    background: #ffff32;
+
     color: #000000;
-    height: auto;
+    height: 18px;
+    white-space: nowrap;
+    height: 30px;
 }
 .searchProximityText
 {
@@ -261,8 +270,9 @@ hr {
 {
     margin-top: 0%;
     padding-right: 0px;
-    padding-left: 10px;
+    padding-left: 0px;
     margin-left: 4%;
+    margin-right: 5%;
 }
 .setTopMargin
 {
@@ -274,5 +284,102 @@ hr {
 }
 .setRadioFilterSpace
 {
-    margin-right: 3px;
+    margin-right: 2px!important;
 }
+body {
+    background-image: url(../images/backgroungImg.png);
+   /* background: url(../images/close_icon.png) no-repeat;*/
+    background-color: #cccccc;
+}
+.panelBottomSpacing
+{
+    margin-bottom: 0px;
+    padding-bottom: 0px;
+}
+.setContainerBottomSpace
+{
+   /* margin-bottom: -84px !important;*/
+}
+.addressTextContainer
+{
+    margin-top: 0%;
+    height: 30px;
+    background: #FFFFFF;
+}
+.headerVerified
+{
+    text-align: center;
+    background: #09a2de;
+}
+.parkingText
+{
+    padding-right: 0px;
+    width: 53.333333%;
+}
+.inerAddText
+{
+    padding-top: 2%;
+    padding-left: 2%;
+}
+
+.innerMapContainer
+{
+    margin-right: 0.5%;
+}
+.setLinkToText
+{
+    color: #0866A6;
+    text-decoration: underline;
+}
+.userImgSpace
+{
+    margin-top: 3%;
+    margin-bottom: 3%;
+}
+.newStarRating{
+    display        : inline-block;
+    position       : relative;
+    height         : 24px;
+    background     : url('../images/starsSmall.png') repeat-x 0 0;
+    vertical-align : bottom;
+}
+.bewareTextContainer
+{
+    background: #ff0000;
+    height: 50px;
+    color: #ffffff;
+    text-align: center;
+}
+.bewareTextInnerContainer
+{
+    margin-top: 1%;
+}
+.boxFotterBanner
+{
+    background: #09a2de;
+}
+.fotterButtonContainer
+{
+    margin-top: 0.5%;
+    margin-right: 7%;
+}
+.msgButtonContainer
+{
+    font-size: 10px;
+    color: #ffffff;
+}
+.innerMsgButtonContainer
+{
+    height: 50px;
+    padding-top: 1.5%;
+}
+.bottomTabButton
+{
+    margin-right: 8%;
+}
+.removePadding
+{
+    padding-left: 0px;
+    padding-right: 0px;
+}
+
