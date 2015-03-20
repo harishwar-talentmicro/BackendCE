@@ -516,7 +516,7 @@ angular.module('ezeidApp')
         $scope.loadAllTransactions();
 
         /**
-         * Checks that if the data is not loaded in 10s show the error message
+         * Checks that if the data is not loaded in 10 sec show the error message
          */
         $timeout(function(){
             if(!($scope.readyState.itemsLoaded && $scope.readyState.statusLoaded && $scope.readyState.nextActionsLoaded
