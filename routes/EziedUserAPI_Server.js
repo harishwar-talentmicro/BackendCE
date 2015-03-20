@@ -7102,6 +7102,75 @@ exports.FnGetItemListForEZEID = function (req, res) {
     }
 };
 
+exports.FnGetLocationList = function (req, res) {
+    try {
+
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.query.Token;
+
+        if (Token != null) {
+            FnValidateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+
+                        db.query('CALL pGetLocationList(' + db.escape(Token) + ')', function (err, GetResult) {
+                            if (!err) {
+                                if (GetResult != null) {
+                                    if (GetResult[0].length > 0) {
+
+                                        console.log('FnGetLocationList: Location List Send successfully');
+                                        res.send(GetResult[0]);
+                                    }
+                                    else {
+
+                                        console.log('FnGetLocationList:No Location List found');
+                                        res.send('null');
+                                    }
+                                }
+                                else {
+
+                                    console.log('FnGetLocationList:No Location List found');
+                                    res.send('null');
+                                }
+
+                            }
+                            else {
+
+                                console.log('FnGetLocationList: error in getting Resource details' + err);
+                                res.statusCode = 500;
+                                res.send('null');
+                            }
+                        });
+                    }
+                    else {
+                        res.statusCode = 401;
+                        res.send('null');
+                        console.log('FnGetLocationList: Invalid Token');
+                    }
+                } else {
+
+                    res.statusCode = 500;
+                    res.send('null');
+                    console.log('FnGetLocationList: Error in validating token:  ' + err);
+                }
+            });
+        }
+        else {
+            if (Token == null) {
+                console.log('FnGetLocationList: Token is empty');
+            }
+            res.statusCode=400;
+            res.send('null');
+        }
+    }
+    catch (ex) {
+        console.log('FnGetLocationList error:' + ex.description);
+        throw new Error(ex);
+    }
+};
+
 //EZEIDAP Parts
 
 //app part
