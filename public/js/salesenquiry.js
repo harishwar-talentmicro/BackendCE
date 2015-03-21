@@ -315,7 +315,7 @@ angular.module('ezeidApp').controller('salesenquiryController', function($http, 
         msglist._info.NextActionDateTime = today;
         msglist._info.FolderRuleID = 0;
 
-        console.log(msglist._info);
+      //  console.log(msglist._info);
 
         /*  console.log(msglist._info);*/
        /* var elem = $(event.currentTarget);
