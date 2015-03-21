@@ -86,6 +86,9 @@ angular.module('ezeidApp')
             enableFiltering: true,
             enableCellEditOnFocus : true,
 
+            // Never allow saving of dirty rows automatically by setting this option to -1
+            rowEditWaitInterval: -1,
+
             //Options for Exporting Data as PDF
             enableGridMenu: true,
             enableSelectAll: true,
@@ -244,7 +247,7 @@ angular.module('ezeidApp')
 
         $scope.gridOptions.onRegisterApi = function(gridApi){
             $scope.gridApi = gridApi;
-            gridApi.rowEdit.on.saveRow($scope, $scope.saveRow);
+//            gridApi.rowEdit.on.saveRow($scope, $scope.saveRow);
 //            gridApi.core.on.notifyDataChange($scope,function(type){
 //                console.log(type);
 //                console.log('Data changed');
@@ -496,9 +499,42 @@ angular.module('ezeidApp')
                     FunctionType : 0
                 }
             }).success(function(resp){
+                    var gridData = [];
                     console.log(resp);
                     if(resp && resp.length > 0 && resp !== "null"){
                         for(var i = 0; i < resp.length; i++){
+                            var transaction = {
+                                trnId : resp[i].TrnNo,
+                                TID : resp[i].TID,          // Message ID to be sent while loading respective items
+                                particulars : resp[i].Message,
+                                ezeid : (resp[i].Requester == "null" || resp[i].Requester == null) ? "" :  resp[i].Requester,
+                                contactInfo : resp[i].ContactInfo,
+                                amount : resp[i].Amount,
+                                status : resp[i].Status,
+                                nextAction : resp[i].NextActionID,
+                                nextActionDate : resp[i].NextActionDate,
+                                folder : resp[i].FolderRuleID,
+                                notes : resp[i].Notes,
+//                                updatedOn : (resp[i].UpdatedDateUser.length > 20) ? resp[i].UpdatedDateUser.substr(0,19) : '',
+//                                updatedBy : (resp[i].UpdatedDateUser.length > 20) ? resp[i].replace(resp[i].UpdatedDateUser.substr(0,19),'') : ''
+                                updatedOn : '',
+                                updatedBy : ''
+                            };
+
+                            try{
+                                console.log(resp[i].UpdatedDateUser.substr(0,19));
+                            }
+                            catch(ex){
+
+                            }
+
+                            try{
+                                console.log(resp[i].replace(resp[i].UpdatedDateUser.substr(0,19),''));
+                            }
+                            catch(ex){
+
+                            }
+                            gridData.push(transaction);
                             /**
                              * @todo Convert data to grid based format (JSON Format that is accepted by grid)
 
@@ -508,6 +544,7 @@ angular.module('ezeidApp')
                             });
                              */
                         }
+                        $scope.gridOptions.data = gridData;
 
                     }
                     $scope.readyState.transactionsLoaded = true;

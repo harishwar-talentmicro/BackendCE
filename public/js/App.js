@@ -82,8 +82,7 @@
         /**
          * Checking login while navigating to different pages
          */
-        console.log('RouteParams from App');
-        ;
+
         $rootScope.$on("$routeChangeStart",function(event,next,current){
 
             /**

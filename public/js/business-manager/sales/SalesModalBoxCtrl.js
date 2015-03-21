@@ -138,9 +138,7 @@ angular.module('ezeidApp').controller('SalesModalBoxCtrl',['$scope','$rootScope'
         }
     };
 
-    $interval(function(){
-        console.log('CurrentModalQuantity : '+$scope.modalCurrentItem.Qty);
-    },5000);
+
 
 
 
