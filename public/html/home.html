@@ -365,18 +365,11 @@
                             <div ng-show="ShowLinks" class="row searchHeaderRow boxFotterBanner">
                                 <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 searchHeaderAlignment fotterButtonContainer">
                                     <div style="padding-top:  4.5%;">
-                                        <div  class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer bottomTabButton">
-                                            <img ng-click="showSearchTab()" src="../images/back_32.png">
-                                        </div>
-                                        <div  class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer bottomTabButton">
-                                            <img ng-click="showInfoWindowTab()" src="../images/next_32.png">
-                                        </div>
-                                        <div  class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer bottomTabButton" ng-hide="search.isIndividualUser(1)">
+                                       <div  class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer bottomTabButton" ng-hide="search.isIndividualUser(1)">
                                             <img src="../images/open_32.png" ng-show="search.mInfo.OpenStatus==1">
                                             <img src="../images/close_32.png" ng-hide="search.mInfo.OpenStatus==1">
                                         </div>
                                         <div  class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer parking" ng-hide="search.isIndividualUser(1)">
-                                           <!-- <img src="../images/parking_32.png">-->
                                             <a class="car-parking active" ng-show="search.mInfo.ParkingStatus==1" title="Parking">Parking</a>
                                             <a class="no-parking active" ng-show="search.mInfo.ParkingStatus==4" title="No Parking">No Parking</a>
                                             <a class="val-parking active" ng-show="search.mInfo.ParkingStatus==3" title="Vallet Parking">Vallet Parking</a>
