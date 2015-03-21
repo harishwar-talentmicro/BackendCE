@@ -2,8 +2,9 @@
  * BusinessManagerCtrl
  * @desc BusinessManager Master Controller : Controls selection of manager based on settings
  */
-angular.module('ezeidApp').controller('BusinessManagerCtrl',['$scope','$rootScope','MsgDelay','GURL','$http','$interval','Notification',function($scope,$rootScope,MsgDelay,GURL,$http,$interval,Notification){
+angular.module('ezeidApp').controller('BusinessManagerCtrl',['$scope','$rootScope','MsgDelay','GURL','$http','$interval','Notification','$routeParams',function($scope,$rootScope,MsgDelay,GURL,$http,$interval,Notification,$routeParams){
 
+    console.log($routeParams);
     /**
      * Module (Prototype)
      * @param type => (Integer) 0: Sales, 1 : Reservation, 2 : Home Delivery, 3 : Service, 4 : Resume
@@ -72,6 +73,7 @@ angular.module('ezeidApp').controller('BusinessManagerCtrl',['$scope','$rootScop
      */
     $scope.selectedModule = 0;
     $scope.currentTemplate = 'html/business-manager/loading.html';
+    $scope.noPermissionTemplate = 'html/business-manager/no-permission.html';
     /**
      * Selecting a module and loading it's view
      * @param moduleIndex
@@ -136,13 +138,22 @@ angular.module('ezeidApp').controller('BusinessManagerCtrl',['$scope','$rootScop
         }
 
         // Setting first module as active
-        if($scope.modules.length > 1){
+        if($scope.modules.length > 0){
             $scope.modules[0].cssClass = 'active';
             $scope.currentTemplate = $scope.templates[$scope.modules[0].type];
+        }
+
+        else{
+            $scope.currentTemplate = $scope.noPermissionTemplate;
         }
         console.log($scope.modules);
     };
 
+    $scope.goBackToPrevPage = function(){
+        window.history.back();
+    };
+
+    console.log($routeParams);
     $scope.loadConfig();
 
 }]);

@@ -125,7 +125,7 @@ angular.module('ezeidApp').controller('ItemMasterCtrl',['$q','$scope','$interval
             TID : 0,
             title : "",
             rate : 0,
-            status : 2,
+            status : 1,
             description : "",
             picture : $scope.defaultPicture,
             type : 0,    // Type of Item(Function Type) Sales,Reservation,Home Delivery, Service, Resume
@@ -221,7 +221,7 @@ angular.module('ezeidApp').controller('ItemMasterCtrl',['$q','$scope','$interval
                     TID : 0,
                     title : "",
                     rate : "",
-                    status : 2,
+                    status : 1,
                     description : "",
                     picture : $scope.defaultPicture,
                     type : 0,    // Type of Item(Function Type) Sales,Reservation,Home Delivery, Service, Resume

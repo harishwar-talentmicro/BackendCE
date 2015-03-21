@@ -429,23 +429,22 @@ html, body {
 .starRating{
     display        : inline-block;
     position       : relative;
-    height         : 16px;
-   /* background     : url('../images/stars.png') repeat-x 0 0;*/
-    background     : url('../images/starsSmall.png') repeat-x 0 0;
+    height         : 24px;
+    background     : url('../images/stars.png') repeat-x 0 0;
     vertical-align : bottom;
 }
 
 .starRating div{
     float    : left;
     position : relative;
-    height   : 18px;
+    height   : 24px;
 }
 
 .starRating input{
     position : relative;
     z-index  : 1;
-    width: 16px;
-    height: 18px;
+    width    : 24px;
+    height   : 24px;
     margin   : 0;
     padding  : 0;
     opacity  : 0;
@@ -456,7 +455,7 @@ html, body {
     top      : 0;
     left     : 0;
     width    : 100%;
-    height   : 18px;
+    height   : 24px;
 }
 
 .starRating span{
@@ -464,7 +463,7 @@ html, body {
 }
 
 .starRating       input:checked       + label{
-    background : url('../images/starsSmall.png') repeat-x 0 -17px;
+    background : url('../images/stars.png') repeat-x 0 -24px;
 }
 
 .sliderExample {
@@ -1510,4 +1509,53 @@ input[type="text"].ui-grid-filter-input {
     background-size: contain;
     height:150px;
     width: 10%;
+}
+
+.panel-shadow{
+    border-color: #CCC;
+    box-shadow: 0px 0px 10px #CCC;
+}
+
+.panel-shadow > .panel-heading{
+    font-size: 16px;
+    color:#003399;
+}
+
+.business-manager-modal-item{
+    background: #FFF;
+    box-shadow: 0px 0px 10px #C9C9C9;
+    border: 1px solid #ccc;
+    padding: 5px;
+    text-align: center;
+    word-wrap: break-word;
+}
+.modalbox-input-group-control > .input-group-addon{
+    font-size: 8px;
+    font-family: 'Roboto', sans-serif;
+    color:#000;
+    background: #FFF;
+    border-color: transparent;
+}
+.modalbox-input-group-control > input{
+    font-size: 14px;
+    font-family: 'Roboto', sans-serif;
+    padding: 2px;
+}
+.modalbox-input-group-control > input{
+    height: 25px;
+}
+
+.modal-sales-item-thumbnail{
+    min-height: 120px;
+}
+
+.modalbox-input-group-control.currency > .input-group-addon{
+    padding: 0px;
+    font-size: 14px;
+    width: 31%;
+}
+
+.modalbox-input-group-control.currency> .form-control{
+    width: 90%;
+    text-align: right;
 }

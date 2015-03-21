@@ -340,6 +340,46 @@ angular.module('ezeidApp')
 
         /******************************************* Grid Code Ends here **********************************/
 
+        /**
+         * Finds an item from ItemList based on TID
+         */
+        $scope.findItemByTid = function(searchTid){
+
+            var result = null;
+            if($scope.itemList.length < 1 || searchTid == 0 || searchTid == null || typeof(searchTid) == "undefined" ){
+                return result;
+            }
+            for(var i = 0; i < $scope.itemList.length; i++){
+                if($scope.itemList[i].TID == searchTid){
+                    var result = $scope.itemList[i];
+                    break;
+                }
+            }
+            return result;
+        };
+
+        /**
+         * Finds an object from array based on it's property
+         */
+        $scope.findItemByProperty = function(searchProperty, searchPropertyValue, searchArray){
+            console.log('searcPropertyValue : '+searchPropertyValue);
+            var result = -1;
+            if(searchArray.length < 1 || (!searchPropertyValue) ){
+                return result;
+            }
+            for(var i = 0; i < searchArray.length; i++){
+                if(searchArray[i].hasOwnProperty(searchProperty)){
+                    console.log(searchArray[i][searchProperty]);
+                    if(searchArray[i][searchProperty] == searchPropertyValue){
+                        result = i;
+                        break;
+                    }
+                }
+            }
+            console.log(result);
+            return result;
+        };
+
 
         /**
          * Load all the items based on function Type
@@ -516,7 +556,7 @@ angular.module('ezeidApp')
         $scope.loadAllTransactions();
 
         /**
-         * Checks that if the data is not loaded in 10s show the error message
+         * Checks that if the data is not loaded in 10 sec show the error message
          */
         $timeout(function(){
             if(!($scope.readyState.itemsLoaded && $scope.readyState.statusLoaded && $scope.readyState.nextActionsLoaded
