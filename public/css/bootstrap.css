@@ -10603,7 +10603,8 @@ a.pr {
     */
 }
 .parking a {
-        background: url(../images/icons_1.png) no-repeat;
+        background: url(../images/new_icons_1.png) no-repeat;
+       /* background: url(../images/icons_1.png) no-repeat;*/
         /*background: url(../images/icons_parking.png) no-repeat;*/
         height: 39px;
         width: 38px;

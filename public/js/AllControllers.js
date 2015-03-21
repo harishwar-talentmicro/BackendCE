@@ -187,12 +187,10 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
 
     // show search Tab
     $scope.showSearchTab = function(){
-        console.log("Show search");
         $scope.ShowInfoWindow = false;
     };
     // show info Tab
     $scope.showInfoWindowTab = function(){
-        console.log("Show info");
         $scope.ShowInfoWindow = true;
     };
 
@@ -314,8 +312,7 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
     }
 
     function getAddressForLocation(results) {
-        console.log(results);
-        $scope.Address = "";
+       $scope.Address = "";
        angular.forEach(results, function (mapResultValue, index) {
             // console.log(mapResultValue);
             if (mapResultValue.types[0] == 'street_number') {
@@ -541,8 +538,7 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
 
                 if (data != 'null' && data.length>0) {
 
-                    console.log(data.length);
-                    $scope.SearchResultCount = data.length;
+                   $scope.SearchResultCount = data.length;
 
                     var _item = data[0];
                     if(data[0].Filename)
@@ -555,9 +551,7 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
                     {
                         $http({ method: 'get', url: GURL + 'ewtGetSearchInformation?Token=' + $rootScope._userInfo.Token + '&TID=' + _item.TID }).success(function (data) {
 
-                            console.log(data);
-
-                            if (data != 'null') {
+                             if (data != 'null') {
                                 if(data.length == 1 && SearchSec.Criteria.SearchType == 1)
                                 {
                                     $scope.showInfoTab = true;
@@ -578,6 +572,7 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
                                     //Call for banner
                                     getBanner(1);
                                     $scope.form_rating = data[0].Rating;
+
                                     SearchSec.mInfo.Banners = data[0].Banners;
 
                                     if(SearchSec.mInfo.IDTypeID == 2)
@@ -1157,6 +1152,7 @@ angular.module('ezeidApp').controller('ProfileController', function ($rootScope,
     var showCurrentLocation = true;
     $scope.isCloseButtonClicked = false;
     var isCancelButton = true;
+    profile._info.ParkingStatus = 0
 
     $scope.typeInfo = [
         {PropName:'Unique ID',IsBuFree:'glyphicon glyphicon-ok green',IsBuPaid:'glyphicon glyphicon-ok green',IsIndividual:'glyphicon glyphicon-ok green',IsPublic:'glyphicon glyphicon-ok green'},
@@ -1366,11 +1362,10 @@ angular.module('ezeidApp').controller('ProfileController', function ($rootScope,
             profile._info = {};
             profile._info.IDTypeID = 1;
             profile._info.NameTitleID = 1;
-            profile._info.ParkingStatus = 1;
+            profile._info.ParkingStatus = 0;
             profile._info.OpenStatus = 1;
         }
     });
-
 
     if($rootScope._userInfo.IsAuthenticate){
         $scope.heading = 'Update Profile';

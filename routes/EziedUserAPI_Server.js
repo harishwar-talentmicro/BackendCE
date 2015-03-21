@@ -1706,6 +1706,7 @@ exports.FnRegistration = function (req, res) {
         var IconFileName = req.body.IconFileName;
         var ISDPhoneNumber = req.body.ISDPhoneNumber;
         var ISDMobileNumber = req.body.ISDMobileNumber;
+        var ParkingStatus = req.body.ParkingStatus;
         var Gender = parseInt(req.body.Gender);
         var DOB = req.body.DOB;
         if(Gender.toString() == 'NaN')
@@ -1758,7 +1759,7 @@ exports.FnRegistration = function (req, res) {
                     db.escape(TokenNo) + ',' + db.escape(Latitude) + ',' + db.escape(Longitude) + ',' + db.escape(Altitude) + ',' +
                     db.escape(AddressLine1) + ',' + db.escape(AddressLine2) + ',' + db.escape(Citytitle) + ',' + db.escape(StateID) + ',' + db.escape(CountryID) + ',' +
                     db.escape(PostalCode) + ',' + db.escape(PIN) + ',' + db.escape(PhoneNumber) + ',' + db.escape(MobileNumber) + ',' + db.escape(EMailID) + ',' +
-                    db.escape(Picture) + ',' + db.escape(PictureFileName) + ',' + db.escape(WebSite) + ',' + db.escape(Operation) + ',' + db.escape(AboutCompany) + ',' + db.escape(StatusID) + ',' + db.escape(Icon) + ',' + db.escape(IconFileName) + ',' + db.escape(ISDPhoneNumber) + ',' + db.escape(ISDMobileNumber) + ',' + db.escape(Gender) + ',' + db.escape(DOBDate) + ',' + db.escape(IPAddress) + ',' + db.escape(SelectionTypes);
+                    db.escape(Picture) + ',' + db.escape(PictureFileName) + ',' + db.escape(WebSite) + ',' + db.escape(Operation) + ',' + db.escape(AboutCompany) + ',' + db.escape(StatusID) + ',' + db.escape(Icon) + ',' + db.escape(IconFileName) + ',' + db.escape(ISDPhoneNumber) + ',' + db.escape(ISDMobileNumber) + ',' + db.escape(Gender) + ',' + db.escape(DOBDate) + ',' + db.escape(IPAddress) + ',' + db.escape(SelectionTypes) + ',' + db.escape(ParkingStatus);
            //     console.log(InsertQuery);
                 db.query('CALL pSaveEZEIDData(' + InsertQuery + ')', function (err, InsertResult) {
                     if (!err) {
@@ -2204,7 +2205,9 @@ exports.FnAddLocation = function (req, res) {
                 if (!err) {
                     if (Result != null) {
                         var InsertQuery = db.escape(TID) + ',' + db.escape(Token) + ',' + db.escape(LocTitle) + ',' + db.escape(Latitude) + ',' + db.escape(Longitude) + ',' + db.escape(Altitude) + ',' + db.escape(AddressLine1) + ',' + db.escape(AddressLine2) + ',' + db.escape(CityName) + ',' + db.escape(StateID) + ',' + db.escape(CountryID) + ',' + db.escape(PostalCode) + ',' + db.escape(PIN) + ',' + db.escape(PhoneNumber) + ',' + db.escape(MobileNumber) + ',' + db.escape(EMailID) + ',' + db.escape(LaptopSLNO) + ',' + db.escape(VehicleNumber) + ',' + db.escape(Picture) + ',' + db.escape(PictureFileName) + ',' + db.escape(Website) + ',' + db.escape(ParkingStatus)  + ',' +   db.escape(ISDPhoneNumber) + ',' + db.escape(ISDMobileNumber);
-                      //  console.log('InsertQuery:' + InsertQuery);
+
+
+                       console.log(InsertQuery);
                         db.query('CALL pInsertLocationData(' + InsertQuery + ')', function (err, InsertResult) {
                             if (!err) {
                                 if (InsertResult != null) {
@@ -6379,7 +6382,8 @@ exports.FnSaveTranscation = function(req, res){
         var NextActionDateTimeNew = new Date(NextActionDateTime);
         console.log(ItemsList);
         var RtnMessage = {
-            IsSuccessfull: false
+            IsSuccessfull: false,
+            MessageID:0
         };
         if(TID.toString() == 'NaN')
             TID = 0;
@@ -6399,6 +6403,7 @@ exports.FnSaveTranscation = function(req, res){
                                     if(InsertResult[0].length > 0){
                                         RtnMessage.IsSuccessfull = true;
                                         var Message = InsertResult[0];
+                                        RtnMessage.MessageID=Message[0].MessageID;
                                         console.log(Message);
                                         for(var i=0; i < ItemsList.length; i++) {
                                             var itemsDetails = ItemsList[i];

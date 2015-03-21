@@ -382,4 +382,13 @@ body {
     padding-left: 0px;
     padding-right: 0px;
 }
-
+.newDownloadBox
+{
+    margin-top: 0%;
+    border: solid 1px #08749C;
+    min-height: 48px;
+    width: 75.50%;
+    padding: 5px;
+    margin-bottom: 1%;
+    font-size: 14px;
+}
