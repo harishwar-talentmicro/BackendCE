@@ -75,7 +75,8 @@
                                     <div class="row">
                                         <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10 col-lg-offset-1 col-md-offset-1 col-sm-offset-1 col-xs-offset-1  bottom-clearfix" data-toggle="tooltip" title="Item" data-placement="right">
                                             <div class="form-group">
-                                                <select class="form-control" ng-model="modalCurrentItem.TID">
+                                                <!--<select class="form-control" ng-model="modalCurrentItem.TID">-->
+                                                <select class="form-control" ng-model="selectedItemTID">
                                                     <option value="0">--Select Item--</option>
                                                     <option ng-repeat="item in (itemList | activeItem)" value="{{item.TID}}">{{item.ItemName}}</option>
                                                 </select>
@@ -101,11 +102,13 @@
                                                                     <p class=""> Rate : <b>{{currency}} {{modalCurrentItem.Rate}}</b></p>
                                                                 </div>
                                                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix" data-toggle="tooltip" title="Quantity" data-placement="left">
-                                                                    <div class="input-group  modalbox-input-group-control">
-                                                                        <span ng-click="subtractValue()"  class="input-group-addon"><span class="glyphicon glyphicon-minus"></span> </span>
-                                                                        <input class="form-control" type="text" ng-model="modalCurrentItem.Qty" numbers-only />
-                                                                        <span ng-click="addValue()" class="input-group-addon"><span class="glyphicon glyphicon-plus"></span> </span>
-                                                                    </div>
+                                                                    <!--<div class="input-group  modalbox-input-group-control">-->
+                                                                        <!--<span ng-click="subtractValue()"  class="input-group-addon"><span class="glyphicon glyphicon-minus"></span> </span>-->
+                                                                        <!--<input class="form-control" type="text" ng-model="modalCurrentItem.Qty" numbers-only />-->
+                                                                        <!--<span ng-click="addValue($event,modalCurrentItem.Qty)" class="input-group-addon"><span class="glyphicon glyphicon-plus"></span> </span>-->
+                                                                    <!--</div>-->
+
+                                                                    <qty-component ng-model="modalCurrentItem.Qty"></qty-component>
                                                                 </div>
                                                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix" data-toggle="tooltip" title="Amount" data-placement="right">
                                                                     <div class="input-group  modalbox-input-group-control currency">
@@ -144,13 +147,18 @@
                         <!-------- Selected Items Display -------------------->
                         <div class="col-lg-8 col-md-8 col-sm-6 col-xs-12">
                             <div class="container-fluid">
-                                <div class="row">
+                                <div class="row" ng-hide="modalItemList.length > 0">
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 jumbotron text-center">
+                                        No Items Added Yet
+                                    </div>
+                                </div>
+                                <div class="row" ng-show="modalItemList.length > 0">
                                     <div class="col-lg-3 bottom-clearfix business-manager-modal-item" ng-repeat="mitem in modalItemList">
                                         <button class="btn btn-xs btn-danger pull-right no-radius" ng-click="modalRemoveItem(mitem.TID)">
                                             <span class="glyphicon glyphicon-remove"></span>
                                         </button>
                                         <h4>{{mitem.ItemName}}</h4>
-                                        <p> Quantity : <b>{{mitem.Qty}}</b></p>
+                                        <p> Quantity : <b>{{mitem.Qty}} </b></p>
                                         <p> Total : {{currency}}{{mitem.Amount}}</p>
                                     </div>
                                 </div>
