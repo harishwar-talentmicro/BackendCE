@@ -1,8 +1,22 @@
 angular.module('ezeidApp').controller('SalesModalBoxCtrl',['$scope','$rootScope','$http','GURL','MsgDelay','$interval','$q','$timeout','Notification',function($scope,$rootScope,$http,GURL,MsgDelay,$interval,$q,$timeout,Notification){
 
     /**
-     * @test Code
-     * @type {string}
+     * Method to clone an object
+     * @param obj
+     * @returns {*}
+     */
+    function clone(obj) {
+        if (null == obj || "object" != typeof obj) return obj;
+        var copy = obj.constructor();
+        for (var attr in obj) {
+            if (obj.hasOwnProperty(attr)) copy[attr] = obj[attr];
+        }
+        return copy;
+    }
+
+    /**
+     * Currently selected item TID (model for selectbox)
+     * @type {number}
      */
     $scope.selectedItemTID = 0;
 
@@ -26,33 +40,34 @@ angular.module('ezeidApp').controller('SalesModalBoxCtrl',['$scope','$rootScope'
         Pic : '/images/default-item-pic.png',
         Rate : 0,
         Qty : 0,
-        Amount : 0
+        Amount : this.Qty * this.Rate
     };
 
     /**
      * Add item if not present in array and updates it if already present
      */
     $scope.modalAddItem = function(){
-        console.log($scope.modalItemList);
         if($scope.modalCurrentItem.TID !== 0 || $scope.modalCurrentItem.TID !== null || typeof($scope.modalCurrentItem.TID) !== undefined){
-            console.log($scope.modalCurrentItem.TID);
             var itemIndex = $scope.findItemByProperty('TID',$scope.modalCurrentItem.TID,$scope.modalItemList);
-            console.log(itemIndex);
             if(itemIndex === -1){
-                console.log('Item index -1');
                 // Add item to list if undefined
-                var x = $scope.modalCurrentItem;
+                var x = clone($scope.modalCurrentItem);
+                if(typeof(x.Qty) == "undefined" || Number.isNaN(x.Qty) || x.Qty < 1)
+                {
+                    x.Qty = 1;
+                }
+                if(typeof(x.Amount) == "undefined" || Number.isNaN(x.Amount))
+                {
+                    x.Amount = x.Rate * x.Qty;
+                }
                 $scope.modalItemList.push(x);
-
                 Notification.success({ message: 'Item added successfully', delay : MsgDelay});
             }
             else{
-                console.log('Item index : '+ itemIndex);
-                $scope.modalItemList[itemIndex].Qty += $scope.modalCurrentItem.Qty;
-                $scope.modalItemList[itemIndex].Amount += $scope.modalCurrentItem.Amount;
+                $scope.modalItemList[itemIndex].Qty = parseFloat($scope.modalItemList[itemIndex].Qty) + parseFloat($scope.modalCurrentItem.Qty);
+                $scope.modalItemList[itemIndex].Amount  = parseFloat($scope.modalItemList[itemIndex].Amount) + parseFloat($scope.modalCurrentItem.Amount);
                 Notification.success({ message: 'Item quantity updated', delay : MsgDelay});
             }
-            console.log($scope.modalItemList);
         }
         else{
             Notification.error({ message : 'Please select a item first', delay : MsgDelay});
@@ -64,9 +79,9 @@ angular.module('ezeidApp').controller('SalesModalBoxCtrl',['$scope','$rootScope'
      * @param itemTid
      */
     $scope.modalRemoveItem = function(itemTid){
-        var itemIndex = $scope.findItemByProperty(itemTid,'TID',$scope.modalItemList);
+        var itemIndex = $scope.findItemByProperty('TID',itemTid,$scope.modalItemList);
         if(itemIndex !== -1){
-            $scope.modalItemList.splice(1,itemIndex);
+            $scope.modalItemList.splice(itemIndex,1);
         }
         Notification.success({ message: 'Item removed successfully', delay : MsgDelay});
     };
@@ -74,16 +89,15 @@ angular.module('ezeidApp').controller('SalesModalBoxCtrl',['$scope','$rootScope'
     /**
      * Watch the value of select box and loads item details according to it
      */
-    $scope.$watch('modalCurrentItem.TID',function(newVal,oldVal){
-        console.log('newVal : '+newVal);
-        console.log('oldVal : '+oldVal);
+
+    $scope.$watch('selectedItemTID',function(newVal,oldVal){
         if(newVal !== oldVal){
-            var a = $scope.findItemByTid(newVal);
-            console.log(a);
-            if(a){
+            var a = $scope.findItemByProperty("TID",newVal,$scope.itemList);
+            if(a !== -1){
                 $scope.isItemAddBlockVisible = true;
-                $scope.modalCurrentItem = a;
+                $scope.modalCurrentItem = $scope.itemList[a];
                 $scope.modalCurrentItem.Qty = 1;
+                $scope.modalCurrentItem.Amount = parseFloat($scope.modalCurrentItem.Qty) * parseFloat($scope.modalCurrentItem.Rate)
             }
             else{
                 $scope.isItemAddBlockVisible = false;
@@ -95,24 +109,17 @@ angular.module('ezeidApp').controller('SalesModalBoxCtrl',['$scope','$rootScope'
     $scope.$watch('modalCurrentItem.Qty',function(newVal,oldVal){
         var qty = parseInt(newVal);
         if(typeof(qty) === "undefined" || qty < 0 || Number.isNaN(qty) || qty == null){
-            $scope.modalCurrentItem.Qty = 0;
+            $scope.modalCurrentItem.Qty = 1;
+            $scope.modalCurrentAmount = $scope.modalCurrentItem.Rate * $scope.modalCurrentItem.Qty;;
         }
         else{
+            if(($scope.modalCurrentItem.Qty) == "undefined" || Number.isNaN($scope.modalCurrentItem.Qty) || $scope.modalCurrentItem.Qty < 1){
+                $scope.modalCurrentItem.Qty = 1;
+            }
            $scope.modalCurrentItem.Amount = $scope.modalCurrentItem.Rate * $scope.modalCurrentItem.Qty;
         }
     });
 
-
-    $scope.addValue = function(){
-        if($scope.modalCurrentItem.Qty == null ||
-            typeof($scope.modalCurrentItem.Qty) == "undefined" ||
-            Number.isNaN($scope.modalCurrentItem.Qty)){
-            $scope.modalCurrentItem.Qty = 0;
-        }
-        else{
-            $scope.modalCurrentItem.Qty += 1;
-        }
-    };
 
     $scope.subtractValue = function(){
         if($scope.modalCurrentItem.Qty == null ||
@@ -130,6 +137,10 @@ angular.module('ezeidApp').controller('SalesModalBoxCtrl',['$scope','$rootScope'
             }
         }
     };
+
+    $interval(function(){
+        console.log('CurrentModalQuantity : '+$scope.modalCurrentItem.Qty);
+    },5000);
 
 
 

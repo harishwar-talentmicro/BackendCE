@@ -362,21 +362,18 @@ angular.module('ezeidApp')
          * Finds an object from array based on it's property
          */
         $scope.findItemByProperty = function(searchProperty, searchPropertyValue, searchArray){
-            console.log('searcPropertyValue : '+searchPropertyValue);
             var result = -1;
             if(searchArray.length < 1 || (!searchPropertyValue) ){
                 return result;
             }
             for(var i = 0; i < searchArray.length; i++){
                 if(searchArray[i].hasOwnProperty(searchProperty)){
-                    console.log(searchArray[i][searchProperty]);
                     if(searchArray[i][searchProperty] == searchPropertyValue){
                         result = i;
                         break;
                     }
                 }
             }
-            console.log(result);
             return result;
         };
 
