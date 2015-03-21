@@ -50,8 +50,15 @@ angular.module('ezeidApp').controller('SalesModalBoxCtrl',['$scope','$rootScope'
         if($scope.modalCurrentItem.TID !== 0 || $scope.modalCurrentItem.TID !== null || typeof($scope.modalCurrentItem.TID) !== undefined){
             var itemIndex = $scope.findItemByProperty('TID',$scope.modalCurrentItem.TID,$scope.modalItemList);
             if(itemIndex === -1){
-                // Add item to list if undefined
+
+                /**
+                 * Cloning is used here as when we pass the model to array it actually passed
+                 * as a reference in array so to prevent changes to data that is already pushed in array
+                 * we are making a new copy of object by cloning it and then pushing it up in modalItemList
+                 */
                 var x = clone($scope.modalCurrentItem);
+
+                // Add item to list if undefined
                 if(typeof(x.Qty) == "undefined" || Number.isNaN(x.Qty) || x.Qty < 1)
                 {
                     x.Qty = 1;

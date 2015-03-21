@@ -276,6 +276,7 @@ angular.module('ezeidApp')
          */
         $scope.addNewRow = function() {
             var n = $scope.gridOptions.data.length + 1;
+            console.log($scope.gridApi.grid.rows);
             $scope.gridOptions.data.unshift({
 
                 trnId : 1+n,
@@ -292,6 +293,7 @@ angular.module('ezeidApp')
                 updatedBy : "User "+n
 
             });
+            console.log($scope.gridApi.grid.rows);
         };
 
         /**
@@ -515,36 +517,20 @@ angular.module('ezeidApp')
                                 nextActionDate : resp[i].NextActionDate,
                                 folder : resp[i].FolderRuleID,
                                 notes : resp[i].Notes,
-//                                updatedOn : (resp[i].UpdatedDateUser.length > 20) ? resp[i].UpdatedDateUser.substr(0,19) : '',
-//                                updatedBy : (resp[i].UpdatedDateUser.length > 20) ? resp[i].replace(resp[i].UpdatedDateUser.substr(0,19),'') : ''
-                                updatedOn : '',
-                                updatedBy : ''
+                                updatedOn : (resp[i].UpdatedDateUser.length > 20) ? resp[i].UpdatedDateUser.substr(0,19) : '',
+                                updatedBy : (resp[i].UpdatedDateUser.length > 20) ? resp[i].UpdatedDateUser.replace(resp[i].UpdatedDateUser.substr(0,19),'') : '',
+                                // This value will tell that the transaction can be removed from grid or not
+                                // If value is true transactions cannot be removed(deleted from grid)
+                                savedOnServer : true
                             };
 
-                            try{
-                                console.log(resp[i].UpdatedDateUser.substr(0,19));
-                            }
-                            catch(ex){
-
-                            }
-
-                            try{
-                                console.log(resp[i].replace(resp[i].UpdatedDateUser.substr(0,19),''));
-                            }
-                            catch(ex){
-
-                            }
                             gridData.push(transaction);
-                            /**
-                             * @todo Convert data to grid based format (JSON Format that is accepted by grid)
-
-                            $scope.transactionList.push({
-                                trnId : resp[i].TID,
-                                folder : resp[i].FolderTitle
-                            });
-                             */
                         }
                         $scope.gridOptions.data = gridData;
+                        console.log('GridRow...................................');
+                        console.log($scope.gridApi.grid);
+                        console.log($scope.gridApi.grid.rows);
+                        console.log('GridRow...................................ends');
 
                     }
                     $scope.readyState.transactionsLoaded = true;
