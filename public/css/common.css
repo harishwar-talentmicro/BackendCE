@@ -1510,3 +1510,52 @@ input[type="text"].ui-grid-filter-input {
     height:150px;
     width: 10%;
 }
+
+.panel-shadow{
+    border-color: #CCC;
+    box-shadow: 0px 0px 10px #CCC;
+}
+
+.panel-shadow > .panel-heading{
+    font-size: 16px;
+    color:#003399;
+}
+
+.business-manager-modal-item{
+    background: #FFF;
+    box-shadow: 0px 0px 10px #C9C9C9;
+    border: 1px solid #ccc;
+    padding: 5px;
+    text-align: center;
+    word-wrap: break-word;
+}
+.modalbox-input-group-control > .input-group-addon{
+    font-size: 8px;
+    font-family: 'Roboto', sans-serif;
+    color:#000;
+    background: #FFF;
+    border-color: transparent;
+}
+.modalbox-input-group-control > input{
+    font-size: 14px;
+    font-family: 'Roboto', sans-serif;
+    padding: 2px;
+}
+.modalbox-input-group-control > input{
+    height: 25px;
+}
+
+.modal-sales-item-thumbnail{
+    min-height: 120px;
+}
+
+.modalbox-input-group-control.currency > .input-group-addon{
+    padding: 0px;
+    font-size: 14px;
+    width: 31%;
+}
+
+.modalbox-input-group-control.currency> .form-control{
+    width: 90%;
+    text-align: right;
+}

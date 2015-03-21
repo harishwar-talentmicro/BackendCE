@@ -310,7 +310,7 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$htt
             PersonalID : $scope.modalBox.subuser.ezeid,
 
             TID : $scope.modalBox.subuser.TID,
-            UserName  : $scope.masterUser.EZEID+'.'+$scope.modalBox.subuser.userName,
+            UserName  : ($rootScope._userInfo.MasterID) ? $scope.masterUser.EZEID+'.'+$scope.modalBox.subuser.userName : $scope.masterUser.EZEID,
             Status : $scope.modalBox.subuser.status,
             FirstName : $scope.modalBox.subuser.firstName,
             LastName : $scope.modalBox.subuser.lastName,
