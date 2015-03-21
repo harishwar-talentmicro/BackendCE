@@ -107,7 +107,7 @@ hr {
     background-image: url(../images/infoBackground.png);
    /* height: 360px;*/
     height: auto;
-    min-height: 360px;
+    min-height: 375px;
 }
 .searchHeaderRow
 {
@@ -217,6 +217,7 @@ hr {
     padding-left: 0px;
     width: 29.333333%;
     padding-right: 0px;
+
 }
 .topSearchRow
 {
@@ -385,10 +386,29 @@ body {
 .newDownloadBox
 {
     margin-top: 0%;
-    border: solid 1px #08749C;
+    border: solid 3px #08749C;
     min-height: 48px;
-    width: 75.50%;
+    width: 83.50%;
     padding: 5px;
     margin-bottom: 1%;
     font-size: 14px;
+}
+.newCloseDownload {
+    width: 61px;
+    height: 41px;
+    border-radius: 50px;
+    text-align: center;
+    top: -19px;
+    cursor: pointer;
+    right: -38px;
+    position: absolute;
+    background: url(../images/small_close.png) no-repeat;
+    text-indent: -999px;
+    overflow: hidden;
+}
+.downloadPopupContainer
+{
+    padding-left: 0px;
+    padding-right: 0px;
+    margin-bottom: 3%;
 }

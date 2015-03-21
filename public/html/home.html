@@ -201,6 +201,13 @@
                                             <input id="rating5" disabled type="radio" name="form_rating" ng-model="form_rating" value="5">
                                             <label for="rating5"><span>5</span></label>
                                         </div>
+                                        <!--Added to make Stars Responsive (On Hold)-->
+                                        <!--<i class="glyphicon glyphicon-star starClass"></i>-->
+                                        <!--<i class="glyphicon glyphicon-star starClass"></i>-->
+                                        <!--<i class="glyphicon glyphicon-star starClass"></i>-->
+                                        <!--<i class="glyphicon glyphicon-star starClass"></i>-->
+                                        <!--<i class="glyphicon glyphicon-star starClass"></i>-->
+
                                     </div>
                                 </div>
                             </div>
@@ -321,7 +328,7 @@
                                                     <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1 ratingText">
                                                         Rating
                                                     </div>
-                                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 normalFontSize searchStarContainer">
+                                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 normalFontSize searchStarContainer showPointer">
                                                         <img src="../images/stargray16.png" ng-show="showStar1"  ng-click="search.addRatting(1,'gray')" >
                                                         <img src="../images/starYellow16.png" ng-hide="showStar1" ng-click="search.addRatting(1,'yellow')" >
 
@@ -348,9 +355,9 @@
                                                         {{ SearchResultCount + " "}}<sapn>Items found...</sapn>
                                                     </div>
                                                 </div>
-                                                <div class="row" ng-show="search.IsShowForm">
+                                                <div class="row setTopMargin downloadPopupContainer" ng-show="search.IsShowForm">
                                                     <div class="window_page Maping_popup newDownloadBox">
-                                                        <span class="closeCVSmall" ng-click="search.closeDownloadForm()">X</span>
+                                                        <span class="newCloseDownload" ng-click="search.closeDownloadForm()">X</span>
 
                                                         <div class="col-md-12">
                                                             Click<a href="/ewtGetSearchDocuments?Token={{_userInfo.Token}}&&Keywords={{search.Criteria.Keywords}}"><b> {{search.downloadData.Filename}} </b></a>to download.
