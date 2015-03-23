@@ -1706,6 +1706,7 @@ exports.FnRegistration = function (req, res) {
         var IconFileName = req.body.IconFileName;
         var ISDPhoneNumber = req.body.ISDPhoneNumber;
         var ISDMobileNumber = req.body.ISDMobileNumber;
+        var ParkingStatus = req.body.ParkingStatus;
         var Gender = parseInt(req.body.Gender);
         var DOB = req.body.DOB;
         if(Gender.toString() == 'NaN')
@@ -1758,9 +1759,13 @@ exports.FnRegistration = function (req, res) {
                     db.escape(TokenNo) + ',' + db.escape(Latitude) + ',' + db.escape(Longitude) + ',' + db.escape(Altitude) + ',' +
                     db.escape(AddressLine1) + ',' + db.escape(AddressLine2) + ',' + db.escape(Citytitle) + ',' + db.escape(StateID) + ',' + db.escape(CountryID) + ',' +
                     db.escape(PostalCode) + ',' + db.escape(PIN) + ',' + db.escape(PhoneNumber) + ',' + db.escape(MobileNumber) + ',' + db.escape(EMailID) + ',' +
+<<<<<<< HEAD
                     db.escape(Picture) + ',' + db.escape(PictureFileName) + ',' + db.escape(WebSite) + ',' + db.escape(Operation) + ',' + db.escape(AboutCompany) + ',' + db.escape(StatusID) 
                     + ',' + db.escape(Icon) + ',' + db.escape(IconFileName) + ',' + db.escape(ISDPhoneNumber) + ',' + db.escape(ISDMobileNumber) 
                     + ',' + db.escape(Gender) + ',' + db.escape(DOBDate) + ',' + db.escape(IPAddress) + ',' + db.escape(SelectionTypes) + ',' + db.escape(ParkingStatus);
+=======
+                    db.escape(Picture) + ',' + db.escape(PictureFileName) + ',' + db.escape(WebSite) + ',' + db.escape(Operation) + ',' + db.escape(AboutCompany) + ',' + db.escape(StatusID) + ',' + db.escape(Icon) + ',' + db.escape(IconFileName) + ',' + db.escape(ISDPhoneNumber) + ',' + db.escape(ISDMobileNumber) + ',' + db.escape(Gender) + ',' + db.escape(DOBDate) + ',' + db.escape(IPAddress) + ',' + db.escape(SelectionTypes) + ',' + db.escape(ParkingStatus);
+>>>>>>> 5eeab1bbe7ea564de021f43d49092432435ac6ad
            //     console.log(InsertQuery);
                 db.query('CALL pSaveEZEIDData(' + InsertQuery + ')', function (err, InsertResult) {
                     if (!err) {
@@ -2194,23 +2199,9 @@ exports.FnAddLocation = function (req, res) {
 
         //below line of code is commented for phase 1
         var ParkingStatus = parseInt(req.body.ParkingStatus);
-        var OpenStatus = parseInt(req.body.OpenStatus);
-        var WorkingHours = req.body.WorkingHours;
-        var SalesEnquiryMailID = req.body.SalesEnquiryMailID;
-        var HomeDeliveryMailID = req.body.HomeDeliveryMailID;
-        var ReservationMailID = req.body.ReservationMailID;
-        var SupportMailID = req.body.SupportMailID;
-        var CVMailID = req.body.CVMailID;
-        var SalesEnquiryButton = req.body.SalesEnquiryButton;
-        var HomeDeliveryButton = req.body.HomeDeliveryButton;
-        var ReservationButton = req.body.ReservationButton;
-        var SupportButton = req.body.SupportButton;
-        var CVButton = req.body.CVButton;
+
         if (ParkingStatus.toString() == 'NaN') {
             ParkingStatus = 0;
-        }
-        if (OpenStatus.toString() == 'NaN') {
-            OpenStatus = 0;
         }
 
         if (PIN == '') {
@@ -2221,13 +2212,10 @@ exports.FnAddLocation = function (req, res) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
-                        var InsertQuery = db.escape(TID) + ',' + db.escape(Token) + ',' + db.escape(LocTitle) + ',' + db.escape(Latitude) + ',' + db.escape(Longitude) + ',' + db.escape(Altitude) + ',' +
-                                        db.escape(AddressLine1) + ',' + db.escape(AddressLine2) + ',' + db.escape(CityName) + ',' + db.escape(StateID) + ',' + db.escape(CountryID) + ',' +
-                                        db.escape(PostalCode) + ',' + db.escape(PIN) + ',' + db.escape(PhoneNumber) + ',' + db.escape(MobileNumber) + ',' + db.escape(EMailID) + ',' + db.escape(LaptopSLNO) + ',' +
-                                        db.escape(VehicleNumber) + ',' + db.escape(Picture) + ',' + db.escape(PictureFileName) + ',' + db.escape(Website) + ',' + db.escape(ParkingStatus) + ',' + db.escape(OpenStatus) + ',' +
-                                        db.escape(WorkingHours) + ',' + db.escape(SalesEnquiryMailID) + ',' + db.escape(HomeDeliveryMailID) + ',' + db.escape(ReservationMailID) + ',' + db.escape(SupportMailID) + ',' + db.escape(CVMailID) + ',' + db.escape(ISDPhoneNumber) + ',' + db.escape(ISDMobileNumber) + ',' +
-                                       db.escape(SalesEnquiryButton) + ',' + db.escape(HomeDeliveryButton) + ',' + db.escape(ReservationButton) + ',' + db.escape(SupportButton) + ',' + db.escape(CVButton);
-                      //  console.log('InsertQuery:' + InsertQuery);
+                        var InsertQuery = db.escape(TID) + ',' + db.escape(Token) + ',' + db.escape(LocTitle) + ',' + db.escape(Latitude) + ',' + db.escape(Longitude) + ',' + db.escape(Altitude) + ',' + db.escape(AddressLine1) + ',' + db.escape(AddressLine2) + ',' + db.escape(CityName) + ',' + db.escape(StateID) + ',' + db.escape(CountryID) + ',' + db.escape(PostalCode) + ',' + db.escape(PIN) + ',' + db.escape(PhoneNumber) + ',' + db.escape(MobileNumber) + ',' + db.escape(EMailID) + ',' + db.escape(LaptopSLNO) + ',' + db.escape(VehicleNumber) + ',' + db.escape(Picture) + ',' + db.escape(PictureFileName) + ',' + db.escape(Website) + ',' + db.escape(ParkingStatus)  + ',' +   db.escape(ISDPhoneNumber) + ',' + db.escape(ISDMobileNumber);
+
+
+                       console.log(InsertQuery);
                         db.query('CALL pInsertLocationData(' + InsertQuery + ')', function (err, InsertResult) {
                             if (!err) {
                                 if (InsertResult != null) {
@@ -2235,7 +2223,7 @@ exports.FnAddLocation = function (req, res) {
                                         //res.send(InsertResult);
                                         // console.log(InsertResult);
                                         console.log('Addlocation: Location added successfully');
-                                        var selectqry = 'Select tlocations.TID,MasterID,EZEID,LocTitle,Latitude,Longitude,Altitude,AddressLine1,AddressLine2,StateID,CountryID,PostalCode,PIN,EMailID,EMailVerifiedID,ifnull(PhoneNumber,"") as PhoneNumber,MobileNumber,ifnull(ISDPhoneNumber,"") as ISDPhoneNumber ,ifnull(ISDMobileNumber,"") as ISDMobileNumber, LaptopSLNO,VehicleNumber,CreatedDate,LUDate,Website,SeqNo,Picture,PictureFileName,locSetting.ParkingStatus,locSetting.OpenStatus,locSetting.WorkingHours,locSetting.SalesEnquiryMailID,locSetting.HomeDeliveryMailID,locSetting.ReservationMailID,locSetting.SupportMailID,locSetting.CVMailID,ifnull((Select CityName from mcity where CityID=tlocations.CityID),"") as CityTitle from tlocations left outer join tlcoationsettings  locSetting on locSetting.LocID= tlocations.TID';
+                                        var selectqry = 'Select tlocations.TID,MasterID,EZEID,LocTitle,Latitude,Longitude,Altitude,AddressLine1,AddressLine2,StateID,CountryID,PostalCode,PIN,EMailID,EMailVerifiedID,ifnull(PhoneNumber,"") as PhoneNumber,MobileNumber,ifnull(ISDPhoneNumber,"") as ISDPhoneNumber ,ifnull(ISDMobileNumber,"") as ISDMobileNumber, LaptopSLNO,VehicleNumber,CreatedDate,LUDate,Website,SeqNo,Picture,PictureFileName,ifnull((Select CityName from mcity where CityID=tlocations.CityID),"") as CityTitle,ifnull(ParkingStatus,0) as ParkingStatus from tlocations';
                                         if (TID == 0) {
                                             selectqry = selectqry + ' order by tlocations.TID desc limit 1';
                                         }
@@ -4006,6 +3994,7 @@ exports.FnSearchByKeywords = function (req, res) {
 
                 var InsertQuery = db.escape(find) + ',' + db.escape(CategoryID) + ',' + db.escape(Proximity) + ',' + db.escape(Latitude) + ',' + db.escape(Longitude) + ',' + db.escape('') + ',' + db.escape(0) + ',' + db.escape(0) + ',' + db.escape(1) + ',' + db.escape('') + ',' + db.escape(ParkingStatus) + ',' + db.escape(OpenCloseStatus) + ',' + db.escape(Rating) + ',' + db.escape(token);
                 //console.log('SearchQuery: ' + InsertQuery);
+                var link = 'CALL pSearchResult(' + InsertQuery + ')';
                 db.query('CALL pSearchResult(' + InsertQuery + ')', function (err, SearchResult) {
                     if (!err) {
                         //console.log(SearchResult);
@@ -6401,7 +6390,8 @@ exports.FnSaveTranscation = function(req, res){
         var NextActionDateTimeNew = new Date(NextActionDateTime);
         console.log(ItemsList);
         var RtnMessage = {
-            IsSuccessfull: false
+            IsSuccessfull: false,
+            MessageID:0
         };
         if(TID.toString() == 'NaN')
             TID = 0;
@@ -6421,6 +6411,7 @@ exports.FnSaveTranscation = function(req, res){
                                     if(InsertResult[0].length > 0){
                                         RtnMessage.IsSuccessfull = true;
                                         var Message = InsertResult[0];
+                                        RtnMessage.MessageID=Message[0].MessageID;
                                         console.log(Message);
                                         for(var i=0; i < ItemsList.length; i++) {
                                             var itemsDetails = ItemsList[i];
@@ -7053,6 +7044,77 @@ exports.FnSaveResourceItemMap = function(req, res){
     }
 };
 
+//below method get item list details based on  ezeid
+exports.FnGetItemListForEZEID = function (req, res) {
+    try {
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.query.Token;
+        var FunctionType = req.query.FunctionType;
+        var EZEID = req.query.EZEID;
+        if(Token == "")
+            Token= null;
+        if (Token != null && FunctionType != null && EZEID != null) {
+            FnValidateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+                        db.query('CALL pItemListforEZEID(' +  db.escape(FunctionType)  + ',' + db.escape(EZEID) + ')', function (err, GetResult) {
+                            if (!err) {
+                                if (GetResult[0] != null) {
+                                    if (GetResult[0].length > 0) {
+                                        console.log('FnGetItemListForEZEID: Item list details Send successfully');
+                                        res.send(GetResult[0]);
+                                    }
+                                    else {
+                                        console.log('FnGetItemListForEZEID:No Item list details found');
+                                        res.send('null');
+                                    }
+                                }
+                                else {
+                                    console.log('FnGetItemListForEZEID:No Item list details found');
+                                    res.send('null');
+                                }
+                            }
+                            else {
+                                console.log('FnGetItemListForEZEID: error in getting Item list details' + err);
+                                res.statusCode = 500;
+                                res.send('null');
+                            }
+                        });
+                    }
+                    else {
+                        res.statusCode = 401;
+                        res.send('null');
+                        console.log('FnGetItemListForEZEID: Invalid Token');
+                    }
+                } else {
+                    res.statusCode = 500;
+                    res.send('null');
+                    console.log('FnGetItemListForEZEID: Error in validating token:  ' + err);
+                }
+            });
+        }
+        else {
+            if (Token == null) {
+                console.log('FnGetItemListForEZEID: Token is empty');
+            }
+            else if (FunctionType == null) {
+                console.log('FnGetItemListForEZEID: FunctionType is empty');
+            }
+            else if (EZEID == null) {
+                console.log('FnGetItemListForEZEID: EZEID is empty');
+            }
+            res.statusCode=400;
+            res.send('null');
+        }
+    }
+    catch (ex) {
+        console.log('FnGetItemListForEZEID error:' + ex.description);
+        throw new Error(ex);
+    }
+};
+
 exports.FnGetLocationList = function (req, res) {
     try {
 
@@ -7060,7 +7122,7 @@ exports.FnGetLocationList = function (req, res) {
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
         var Token = req.query.Token;
-        
+
         if (Token != null) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {

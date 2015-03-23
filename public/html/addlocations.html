@@ -1,4 +1,3 @@
-
 <style type="text/css">
     .btn-file {
         position: relative;
@@ -168,22 +167,22 @@
                                                             <span><label><strong>&nbsp;Settings</strong> </label></span><br/>
                                                             <select class="form-control emptyBox pull-left " style="width:45%;" name="selectParkingStatus" ng-model="SLocCtrl._locInfo.ParkingStatus"
                                                                     ng-options="status.id as status.label for status in SLocCtrl.parkingStatus" required>
-                                                                   </select>
-                                                            <input type="radio" name="OpenStatus" ng-model="SLocCtrl._locInfo.OpenStatus"
+                                                            </select>
+                                                            <!--<input type="radio" name="OpenStatus" ng-model="SLocCtrl._locInfo.OpenStatus"
                                                                    id="Open" class="check-box pull-left mar_addLoc" value="1" checked required/>
                                                             <label for="Open" style="margin-top:7px; margin-left:3px;" class="pull-left under_label ">Open</label>
                                                             <input type="radio" name="OpenStatus" ng-model="SLocCtrl._locInfo.OpenStatus" id="Closed"
                                                                    class="check-box pull-left mar_addLoc" value="2" required/>
-                                                            <label for="Closed" style="margin-top:7px; margin-left:3px;" class="pull-left under_label">Closed</label>
+                                                            <label for="Closed" style="margin-top:7px; margin-left:3px;" class="pull-left under_label">Closed</label>-->
                                                         </div><br/>
-                                                        <div class="row mar_editTop" style="margin-left:0px;margin-right:0px;">
+                                                       <!-- <div class="row mar_editTop" style="margin-left:0px;margin-right:0px;">
                                                             <input type="text" class="form-control" style="width:45%;" ng-model="SLocCtrl._locInfo.WorkingHours" placeholder="Working Hours">
                                                             <input type="checkbox" ng-model="SLocCtrl._locInfo.SalesEnquiryButton">
                                                             <input type="email" name="salesMail" class="form-control wd40p" ng-model="SLocCtrl._locInfo.SalesEnquiryMailID"
                                                                    placeholder="Sales Enquiry Mail ID" ng-pattern="/^[a-z]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5}$/">
                                                             <span ng-show="SecLocForm.salesMail.$error.email" ng-if="SecLocForm.salesMail.$error.email == true ? SLocCtrl._locInfo.isWrongEmailPatternSales = true : SLocCtrl._locInfo.isWrongEmailPatternSales = false"></span>
-                                                        </div><br/>
-                                                        <div class="row mar_editTop" style="margin-left:0px;margin-right:0px;">
+                                                        </div><br/>-->
+                                                        <!--<div class="row mar_editTop" style="margin-left:0px;margin-right:0px;">
                                                             <input type="checkbox" ng-model="SLocCtrl._locInfo.HomeDeliveryButton">
                                                             <input type="email" name="homeMail" class="form-control wd40p" ng-model="SLocCtrl._locInfo.HomeDeliveryMailID"
                                                                    placeholder="Home Delivery Mail ID" ng-pattern="/^[a-z]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5}$/">
@@ -192,8 +191,8 @@
                                                             <input type="email" name="reserveMail" class="form-control wd40p" ng-model="SLocCtrl._locInfo.ReservationMailID"
                                                                    placeholder="Reservation Mail ID" ng-pattern="/^[a-z]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5}$/">
                                                             <span ng-show="SecLocForm.reserveMail.$error.email" ng-if="SecLocForm.reserveMail.$error.email == true ? SLocCtrl._locInfo.isWrongEmailPatternReservation = true : SLocCtrl._locInfo.isWrongEmailPatternReservation = false"></span>
-                                                        </div><br/>
-                                                        <div class="row mar_editTop" style="margin-left:0px;margin-right:0px;">
+                                                        </div><br/>-->
+                                                       <!-- <div class="row mar_editTop" style="margin-left:0px;margin-right:0px;">
                                                             <input type="checkbox" ng-model="SLocCtrl._locInfo.SupportButton">
                                                             <input type="email" name="supportMail" class="form-control wd40p" ng-model="SLocCtrl._locInfo.SupportMailID"
                                                                    placeholder="Support Mail ID"
@@ -204,7 +203,7 @@
                                                                    placeholder="CV Mail ID"
                                                                    ng-pattern="/^[a-z]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5}$/">
                                                             <span ng-show="SecLocForm.cvMail.$error.email" ng-if="SecLocForm.cvMail.$error.email == true ? SLocCtrl._locInfo.isWrongEmailPatternCV = true : SLocCtrl._locInfo.isWrongEmailPatternCV = false"></span>
-                                                        </div><br/>
+                                                        </div><br/>-->
                                                     </div>
 
                                                 </div>
@@ -242,7 +241,6 @@
                                             <input style="margin-top:-30px;" type="button" ng-click="SLocCtrl.closeNewLoc(SecLocForm)" class="btn-primary btn" value="Close"/>
                                         </div>
                                 <!--</form>-->
-
                             </div>
                         </div>
                     </div>
@@ -251,5 +249,4 @@
             </div>
         </div>
     </div>
-
 </div>

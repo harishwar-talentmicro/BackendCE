@@ -104,36 +104,30 @@ hr {
     padding-left: 0px;
     padding-right: 0px;
     margin-bottom: 0px;
+    background-image: url(../images/infoBackground.png);
+   /* height: 360px;*/
+    height: auto;
+    min-height: 375px;
 }
-.searchHeaderRow
-{
-    margin-left: 0px;
-}
-.infoMapContainerRow
+.setRowLeftRightMarginZero
 {
     margin-left: 0px;
     margin-right: 0px;
 }
-.infoContainerRow
+.setLeftRightPaddingZero
 {
-    margin-right: 0px;
-    margin-left: 0px;
+    padding-left: 0px;
+    padding-right: 0px;
+}
+.fourteenFontSize
+{
+    font-size: 14px;
 }
 .mapColDiv
 {
     padding-left: 0px;
     padding-right: 0px;
     margin-bottom: 0px;
-}
-.searchFotterRow
-{
-    margin-left: 0px;
-    margin-right: 0px;
-}
-.searchFotterCol
-{
-    padding-left: 0px;
-    padding-right: 0px;
 }
 .helpTextColor
 {
@@ -212,6 +206,7 @@ hr {
     padding-left: 0px;
     width: 29.333333%;
     padding-right: 0px;
+
 }
 .topSearchRow
 {
@@ -221,6 +216,8 @@ hr {
 .searchInfoLink
 {
     border-left: 2px solid #000;
+    border-right: 2px solid #000;
+    width: 27%;
 }
 .searchStripTopMargin
 {
@@ -247,9 +244,11 @@ hr {
 }
 .searchAddress
 {
-    background: #ffff32;
+
     color: #000000;
-    height: auto;
+    height: 18px;
+    white-space: nowrap;
+    height: 30px;
 }
 .searchProximityText
 {
@@ -261,8 +260,9 @@ hr {
 {
     margin-top: 0%;
     padding-right: 0px;
-    padding-left: 10px;
+    padding-left: 0px;
     margin-left: 4%;
+    margin-right: 5%;
 }
 .setTopMargin
 {
@@ -274,5 +274,157 @@ hr {
 }
 .setRadioFilterSpace
 {
-    margin-right: 3px;
+    margin-right: 2px!important;
+}
+body {
+    background-image: url(../images/backgroungImg.png);
+   /* background: url(../images/close_icon.png) no-repeat;*/
+    background-color: #cccccc;
+}
+.panelBottomSpacing
+{
+    margin-bottom: 0px;
+    padding-bottom: 0px;
+}
+.setContainerBottomSpace
+{
+   /* margin-bottom: -84px !important;*/
+}
+.addressTextContainer
+{
+    margin-top: 0%;
+    height: 30px;
+    background: #FFFFFF;
+}
+.headerVerified
+{
+    text-align: center;
+    background: #09a2de;
+}
+.parkingText
+{
+    padding-right: 0px;
+    width: 53.333333%;
+}
+.inerAddText
+{
+    padding-top: 2%;
+    padding-left: 2%;
+}
+
+.innerMapContainer
+{
+    margin-right: 0.5%;
+}
+.setLinkToText
+{
+    color: #0866A6;
+    text-decoration: underline;
+}
+.userImgSpace
+{
+    margin-top: 3%;
+    margin-bottom: 3%;
+}
+.newStarRating{
+    display        : inline-block;
+    position       : relative;
+    height         : 24px;
+    background     : url('../images/starsSmall.png') repeat-x 0 0;
+    vertical-align : bottom;
+}
+.bewareTextContainer
+{
+    background: #ff0000;
+    height: 50px;
+    color: #ffffff;
+    text-align: center;
+}
+.bewareTextInnerContainer
+{
+    margin-top: 1%;
+}
+.boxFotterBanner
+{
+    background: #09a2de;
+}
+.fotterButtonContainer
+{
+    margin-top: 0.5%;
+    margin-right: 7%;
+}
+.msgButtonContainer
+{
+    font-size: 10px;
+    color: #ffffff;
+}
+.innerMsgButtonContainer
+{
+    height: 50px;
+    padding-top: 1.5%;
+}
+.bottomTabButton
+{
+    margin-right: 8%;
+}
+.removePadding
+{
+    padding-left: 0px;
+    padding-right: 0px;
+}
+.newDownloadBox
+{
+    margin-top: 0%;
+    border: solid 3px #08749C;
+    min-height: 48px;
+    width: 83.50%;
+    padding: 5px;
+    margin-bottom: 1%;
+    font-size: 14px;
+}
+.newCloseDownload {
+    width: 61px;
+    height: 41px;
+    border-radius: 50px;
+    text-align: center;
+    top: -19px;
+    cursor: pointer;
+    right: -38px;
+    position: absolute;
+    background: url(../images/small_close.png) no-repeat;
+    text-indent: -999px;
+    overflow: hidden;
+}
+.downloadPopupContainer
+{
+    padding-left: 0px;
+    padding-right: 0px;
+    margin-bottom: 3%;
+}
+.mapSearchTextBox{
+    z-index: 0;
+    top:0px;
+    margin-top:4px;
+    width: 280px;
+}
+.congratesTextContainer
+{
+    margin: auto;
+    float: none;
+    text-align: center;
+    font-size: 14px;
+    font-family: 'Roboto',sans-serif;
+}
+.nextStepBtn
+{
+    height: 30px;
+    line-height: 30px;
+    background: #FFCD28;
+    color: #fff;
+}
+.nextStepInnerContainer
+{
+    height: 30px;
+    color: #000;
+    background: gainsboro;
 }

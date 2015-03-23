@@ -78,16 +78,28 @@
     /***
      * @ezeid Configuring Route access based on authentication
      */
-    ezeid.run(['$location','$rootScope','CLOSED_ROUTES',function($location,$rootScope,CLOSED_ROUTES){
+    ezeid.run(['$location','$rootScope','CLOSED_ROUTES','$routeParams',function($location,$rootScope,CLOSED_ROUTES,$routeParams){
         /**
          * Checking login while navigating to different pages
          */
+
         $rootScope.$on("$routeChangeStart",function(event,next,current){
 
             /**
              * @todo Check if user is navigating to Closed Routes( which require authentication)
              *       then don't let him navigate to those routes without checking his authenticity
              */
+//            console.log(event);
+//            console.log(next);
+//            console.log(current);
+            console.log(next.params);
+
+            if(next.params &&
+                typeof(next.params.Token) !== "undefined" &&
+                typeof(next.params.FunctionType) !== "undefined" &&
+                typeof(next.params.PersonEZEID)
+                )
+
             try{
                 if(CLOSED_ROUTES.indexOf(next.$$route.originalPath) == -1){
                     return true;

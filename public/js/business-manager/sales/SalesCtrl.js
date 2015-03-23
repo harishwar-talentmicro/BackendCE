@@ -86,6 +86,9 @@ angular.module('ezeidApp')
             enableFiltering: true,
             enableCellEditOnFocus : true,
 
+            // Never allow saving of dirty rows automatically by setting this option to -1
+            rowEditWaitInterval: -1,
+
             //Options for Exporting Data as PDF
             enableGridMenu: true,
             enableSelectAll: true,
@@ -244,7 +247,7 @@ angular.module('ezeidApp')
 
         $scope.gridOptions.onRegisterApi = function(gridApi){
             $scope.gridApi = gridApi;
-            gridApi.rowEdit.on.saveRow($scope, $scope.saveRow);
+//            gridApi.rowEdit.on.saveRow($scope, $scope.saveRow);
 //            gridApi.core.on.notifyDataChange($scope,function(type){
 //                console.log(type);
 //                console.log('Data changed');
@@ -273,6 +276,7 @@ angular.module('ezeidApp')
          */
         $scope.addNewRow = function() {
             var n = $scope.gridOptions.data.length + 1;
+            console.log($scope.gridApi.grid.rows);
             $scope.gridOptions.data.unshift({
 
                 trnId : 1+n,
@@ -289,6 +293,7 @@ angular.module('ezeidApp')
                 updatedBy : "User "+n
 
             });
+            console.log($scope.gridApi.grid.rows);
         };
 
         /**
@@ -339,6 +344,43 @@ angular.module('ezeidApp')
         };
 
         /******************************************* Grid Code Ends here **********************************/
+
+        /**
+         * Finds an item from ItemList based on TID
+         */
+        $scope.findItemByTid = function(searchTid){
+
+            var result = null;
+            if($scope.itemList.length < 1 || searchTid == 0 || searchTid == null || typeof(searchTid) == "undefined" ){
+                return result;
+            }
+            for(var i = 0; i < $scope.itemList.length; i++){
+                if($scope.itemList[i].TID == searchTid){
+                    var result = $scope.itemList[i];
+                    break;
+                }
+            }
+            return result;
+        };
+
+        /**
+         * Finds an object from array based on it's property
+         */
+        $scope.findItemByProperty = function(searchProperty, searchPropertyValue, searchArray){
+            var result = -1;
+            if(searchArray.length < 1 || (!searchPropertyValue) ){
+                return result;
+            }
+            for(var i = 0; i < searchArray.length; i++){
+                if(searchArray[i].hasOwnProperty(searchProperty)){
+                    if(searchArray[i][searchProperty] == searchPropertyValue){
+                        result = i;
+                        break;
+                    }
+                }
+            }
+            return result;
+        };
 
 
         /**
@@ -459,18 +501,36 @@ angular.module('ezeidApp')
                     FunctionType : 0
                 }
             }).success(function(resp){
+                    var gridData = [];
                     console.log(resp);
                     if(resp && resp.length > 0 && resp !== "null"){
                         for(var i = 0; i < resp.length; i++){
-                            /**
-                             * @todo Convert data to grid based format (JSON Format that is accepted by grid)
+                            var transaction = {
+                                trnId : resp[i].TrnNo,
+                                TID : resp[i].TID,          // Message ID to be sent while loading respective items
+                                particulars : resp[i].Message,
+                                ezeid : (resp[i].Requester == "null" || resp[i].Requester == null) ? "" :  resp[i].Requester,
+                                contactInfo : resp[i].ContactInfo,
+                                amount : resp[i].Amount,
+                                status : resp[i].Status,
+                                nextAction : resp[i].NextActionID,
+                                nextActionDate : resp[i].NextActionDate,
+                                folder : resp[i].FolderRuleID,
+                                notes : resp[i].Notes,
+                                updatedOn : (resp[i].UpdatedDateUser.length > 20) ? resp[i].UpdatedDateUser.substr(0,19) : '',
+                                updatedBy : (resp[i].UpdatedDateUser.length > 20) ? resp[i].UpdatedDateUser.replace(resp[i].UpdatedDateUser.substr(0,19),'') : '',
+                                // This value will tell that the transaction can be removed from grid or not
+                                // If value is true transactions cannot be removed(deleted from grid)
+                                savedOnServer : true
+                            };
 
-                            $scope.transactionList.push({
-                                trnId : resp[i].TID,
-                                folder : resp[i].FolderTitle
-                            });
-                             */
+                            gridData.push(transaction);
                         }
+                        $scope.gridOptions.data = gridData;
+                        console.log('GridRow...................................');
+                        console.log($scope.gridApi.grid);
+                        console.log($scope.gridApi.grid.rows);
+                        console.log('GridRow...................................ends');
 
                     }
                     $scope.readyState.transactionsLoaded = true;
@@ -516,7 +576,7 @@ angular.module('ezeidApp')
         $scope.loadAllTransactions();
 
         /**
-         * Checks that if the data is not loaded in 10s show the error message
+         * Checks that if the data is not loaded in 10 sec show the error message
          */
         $timeout(function(){
             if(!($scope.readyState.itemsLoaded && $scope.readyState.statusLoaded && $scope.readyState.nextActionsLoaded
