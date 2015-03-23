@@ -1764,6 +1764,7 @@ exports.FnRegistration = function (req, res) {
 
 
                 console.log(InsertQuery);
+
                 db.query('CALL pSaveEZEIDData(' + InsertQuery + ')', function (err, InsertResult) {
                     if (!err) {
                         // console.log('InsertResult: ' + InsertResult);
@@ -1918,6 +1919,7 @@ exports.FnRegistration = function (req, res) {
                     db.escape(Picture) + ',' + db.escape(PictureFileName) + ',' + db.escape(WebSite) + ',' + db.escape(Operation) + ',' + db.escape(AboutCompany)
                     + ',' + db.escape(StatusID) + ',' + db.escape(Icon) + ',' + db.escape(IconFileName) + ',' + db.escape(ISDPhoneNumber) + ',' + db.escape(ISDMobileNumber)
                     + ',' + db.escape(Gender) + ',' + db.escape(DOBDate) + ',' + db.escape(IPAddress) + ',' + db.escape(SelectionTypes)+ ',' + db.escape(ParkingStatus);
+
                  // console.log(InsertQuery);
                 db.query('CALL pSaveEZEIDData(' + InsertQuery + ')', function (err, InsertResult) {
                     if (!err) {
@@ -7814,6 +7816,9 @@ exports.FnSaveAPEZEID = function (req, res) {
         var NoCarParking =parseInt(req.body.NoCarParking);
         var NoBikeParking =parseInt(req.body.NoBikeParking);
         var OwnerPayment = req.body.OwnerPayment;
+        var AgeOfProperty = req.body.AgeOfProperty;
+        var NoOfBathrooms = req.body.NoOfBathrooms;
+        var Amenities = req.body.Amenities;
         var tAvailableDate = null;
         if (AvailableDate != null) {
             // datechange = new Date(new Date(TaskDateTime).toUTCString());
@@ -7829,11 +7834,13 @@ exports.FnSaveAPEZEID = function (req, res) {
             if (!err) {
                 if (Result != null) {
                     //console.log('FnRegistration: Token: ' + TokenNo);
-                    var InsertQuery = db.escape(Type) + ',' + db.escape(Preffereduser) + ',' + db.escape(AreaSize) + ',' +
-                        db.escape(AreaUOM) + ','  + db.escape(Rate) + ',' + db.escape(Amount) + ',' + db.escape(SpaceQty) + ',' + db.escape(SpaceType)
-                        + ',' + db.escape(FunishedType) + ',' + db.escape(Description) + ',' + db.escape(Preferences) + ',' + db.escape(Rating) + ',' +db.escape
-                    (EZEID) + ',' + db.escape(Status) + ',' + db.escape(Reason) + ',' + db.escape(tAvailableDate) + ',' + db.escape(Token) + ',' + db.escape
-                    (APID) + ',' + db.escape(Latitude) + ',' + db.escape(Longitude) + ',' + db.escape(TID) + ',' + db.escape(Purpose) + ',' + db.escape(NoCarParking) + ',' + db.escape(NoBikeParking) + ',' + db.escape(OwnerPayment);
+                    var InsertQuery = db.escape(Type) + ',' + db.escape(Preffereduser) + ',' + db.escape(AreaSize) + ',' +db.escape(AreaUOM) 
+                        + ','  + db.escape(Rate) + ',' + db.escape(Amount) + ',' + db.escape(SpaceQty) + ',' + db.escape(SpaceType)
+                        + ',' + db.escape(FunishedType) + ',' + db.escape(Description) + ',' + db.escape(Preferences) + ',' + db.escape(Rating) 
+                        + ',' +db.escape(EZEID) + ',' + db.escape(Status) + ',' + db.escape(Reason) + ',' + db.escape(tAvailableDate) + ',' + db.escape(Token) 
+                        + ',' + db.escape(APID) + ',' + db.escape(Latitude) + ',' + db.escape(Longitude) + ',' + db.escape(TID) + ',' + db.escape(Purpose) 
+                        + ',' + db.escape(NoCarParking) + ',' + db.escape(NoBikeParking) + ',' + db.escape(OwnerPayment) + ',' + db.escape(AgeOfProperty)
+                        + ',' + db.escape(NoOfBathrooms) + ',' + db.escape(Amenities);
                    // console.log(InsertQuery);
                     db.query('CALL psaveRealEstateData(' + InsertQuery + ')', function (err, InsertResult) {
                         if (!err) {
@@ -8656,6 +8663,10 @@ exports.FnSearchRealEstateAP = function(req, res){
         var AmountFrom = req.body.AmountFrom;
         var AmountTo = req.body.AmountTo;
         var Token = req.body.Token;
+        var AgeFrom = req.body.AgeFrom;
+        var AgeTO = req.body.AgeTO;
+        var NoOfBathrooms = req.body.NoOfBathrooms;
+        var Amenities = req.body.Amenities;
 
         /*if (Status!=null && Purpose.toString() != 'NaN' && PropertyType!=null && PrefUser!=null && SpaceType !=null && SpaceQtyF !=null && SpaceQtyT !=null && RatingFrom !=null
          && RatingTo !=null && Latitude !=null && Longitude !=null && Proximity !=null && AreaUOM !=null && AreaFrom !=null
@@ -8667,7 +8678,8 @@ exports.FnSearchRealEstateAP = function(req, res){
                     var SearchQuery = db.escape(Status) + ',' + db.escape(Purpose) + ',' + db.escape(PropertyType) + ',' + db.escape(PrefUser) + ',' +
                         db.escape(SpaceType) + ',' + db.escape(SpaceQtyF) + ',' + db.escape(SpaceQtyT) + ',' + db.escape(RatingFrom) + ',' + db.escape(RatingTo) + ',' +
                         db.escape(Latitude) + ',' + db.escape(Longitude) + ',' + db.escape(Proximity) + ',' +db.escape(AreaUOM) + ',' + db.escape(AreaFrom) + ',' +
-                        db.escape(AreaTo) + ',' + db.escape(FunishedType) + ',' + db.escape(AmountFrom) + ',' + db.escape(AmountTo);
+                        db.escape(AreaTo) + ',' + db.escape(FunishedType) + ',' + db.escape(AmountFrom) + ',' + db.escape(AmountTo) + ',' +
+                        db.escape(AgeFrom) + ',' + db.escape(AgeTO) + ',' + db.escape(NoOfBathrooms) + ',' + db.escape(Amenities);
 
                     console.log(SearchQuery);
 
@@ -8988,13 +9000,18 @@ exports.FnGetAllContactsVES = function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         var Token = req.query.Token;
-        
-        if (Token != null) {
+        var Date1 = req.query.Date1;
+        var Date2 = req.query.Date2;
+          var DateNew1 = new Date(Date1);
+            var DateNew2 = new Date(Date2);
+       
+        if (Token != null && DateNew1 !=null && DateNew2 != null) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
-
-                        db.query('CALL pGetAllContactsVES(' + db.escape(Token) + ')', function (err, GetResult) {
+                            var query = db.escape(Token) + ',' + db.escape(DateNew1) + ',' + db.escape(DateNew2);
+                            db.query('CALL pGetAllContactsVES(' + query + ')', function (err, GetResult) {
+                                
                             if (!err) {
                                 if (GetResult != null) {
                                     if (GetResult[0].length > 0) {
@@ -9040,6 +9057,12 @@ exports.FnGetAllContactsVES = function (req, res) {
             if (Token == null) {
                 console.log('FnGetAllContactsVES: Token is empty');
             }
+             else if (DateNew1 == null) {
+                console.log('FnGetAllContactsVES: Date1 is empty');
+            }
+            else if (DateNew2 == null) {
+                console.log('FnGetAllContactsVES: Date2 is empty');
+            }
             
             res.statusCode=400;
             res.send('null');
@@ -9058,6 +9081,8 @@ exports.FnGetDepartmentVES = function (req, res) {
         var MasterID = req.query.MasterID;
         if (MasterID != null) {
             var Query = 'Select TID,DeptName from mdept where MasterID=' + db.escape(MasterID);
+            //var MaxQuery = 'Select max(TID) as ID from  mdept';
+            
             db.query(Query, function (err, DeptResult) {
                 if (!err) {
                     if (DeptResult.length > 0) {
@@ -9469,14 +9494,16 @@ exports.FnSaveCitysVES = function(req, res){
 
         var StateID = req.body.StateID;
         var CityTitle = req.body.CityTitle;
-        
+       
          var RtnMessage = {
             IsSuccessfull: false
         };
+        var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
+
 
         if (StateID != null && CityTitle != null) {
-            var query = db.escape(StateID) + ',' + db.escape(CityTitle);
-                        db.query('CALL pSaveCitysVES(' + query + ')', function (err, InsertResult) {
+            var Insertquery = db.escape(StateID) + ',' + db.escape(CityTitle);
+                        db.query('CALL pSaveCitysVES(' + Insertquery + ')', function (err, InsertResult) {
                             if (!err){
                                 if (InsertResult.affectedRows > 0) {
                                     RtnMessage.IsSuccessfull = true;
@@ -9486,7 +9513,8 @@ exports.FnSaveCitysVES = function(req, res){
                                 else {
                                     console.log('FnSaveCitysVES:No Save CitysVES details');
                                     res.send(RtnMessage);
-                                }
+                                    }
+                                
                             }
                             else {
                                 console.log('FnSaveCitysVES: error in saving CitysVES details' + err);
@@ -9503,6 +9531,7 @@ exports.FnSaveCitysVES = function(req, res){
             else if (CityTitle == null) {
                 console.log('FnSaveCitysVES: CityTitle is empty');
             }
+               
             res.statusCode=400;
             res.send(RtnMessage);
         }

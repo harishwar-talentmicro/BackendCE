@@ -145,10 +145,9 @@ app.get('/ewtGetTranscation',LocationManager.FnGetTranscation);
 app.post('/ewtSaveResource',LocationManager.FnSaveResource);
 app.get('/ewtGetResource',LocationManager.FnGetResource);
 app.post('/ewtSaveResourceItemMap',LocationManager.FnSaveResourceItemMap);
-app.get('/ewtSearchContactsVES',LocationManager.FnSearchContactsVES);
 app.get('/ewtGetItemListForEZEID',LocationManager.FnGetItemListForEZEID);
-
 app.get('/ewtGetLocationList',LocationManager.FnGetLocationList);
+
 //below service are for EZEIDAP
 app.post('/ewLoginAP', LocationManager.FnLoginAP);
 app.get('/ewLogoutAP', LocationManager.FnLogoutAP);
@@ -182,6 +181,7 @@ app.get('/ewtGetGatesVES',LocationManager.FnGetGatesVES);
 app.post('/ewtSaveDepartmentsVES',LocationManager.FnSaveDepartmentsVES);
 app.post('/ewtSaveGatesVES',LocationManager.FnSaveGatesVES);
 app.post('/ewtSaveCitysVES',LocationManager.FnSaveCitysVES);
+app.get('/ewtSearchContactsVES',LocationManager.FnSearchContactsVES);
 
 
 // catch 404 and forward to error handler
