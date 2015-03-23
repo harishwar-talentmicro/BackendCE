@@ -1,0 +1,80 @@
+<div id="wrapper" ng-controller="bulksalesController as bulksalesController">
+    <header-section></header-section>
+       <div class="container-fluid">
+            <div class="row top-clearfix"></div>
+                <div class="row">
+                    <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 col-lg-offset-2 col-md-offset-2 col-sm-offset-2 col-xs-offset-0">
+                        <div class="panel panel-default panelBottomSpacing">
+                            <div class="panel-body setPanelPadding">
+                               <div class="row setRowLeftRightMarginZero">
+                                   <table class="rwd-table setMarginTopBottomZero">
+                                       <tr>
+                                           <th></th>
+                                           <th>Company Name</th>
+                                           <th>Country/City</th>
+                                           <th>Distance(Miles/km)</th>
+                                           <th>Phone No</th>
+                                           <th>Web</th>
+                                       </tr>
+
+                                       <tr>
+                                           <td data-th=" "><input type="checkbox" name="vehicle" value="EZEID"></td>
+                                           <td data-th="Company Name">HireCraft</td>
+                                           <td data-th="Country/City">India, Banglore</td>
+                                           <td data-th="Distance (Miles/km)">50KM</td>
+                                           <td data-th="Phone No">9446093566</td>
+                                           <td data-th="Web" style="color: cornflowerblue;"><a href="www.google.com"><u>www.google.com</u></a></td>
+                                       </tr>
+
+                                       <tr>
+                                           <td data-th=" "><input type="checkbox" name="vehicle" value="EZEID"></td>
+                                           <td data-th="Company Name">HireCraft</td>
+                                           <td data-th="Country/City">India, Banglore</td>
+                                           <td data-th="Distance (Miles/km)">50KM</td>
+                                           <td data-th="Phone No">9446093566</td>
+                                           <td data-th="Web"><a href="www.google.com">www.google.com</a></td>
+                                       </tr>
+
+                                       <tr>
+                                           <td data-th=" "><input type="checkbox" name="vehicle" value="EZEID"></td>
+                                           <td data-th="Company Name">HireCraft</td>
+                                           <td data-th="Country/City">India, Banglore</td>
+                                           <td data-th="Distance (Miles/km)">50KM</td>
+                                           <td data-th="Phone No">9446093566</td>
+                                           <td data-th="Web"><a href="www.google.com">www.google.com</a></td>
+                                       </tr>
+
+                                       <tr>
+                                           <td data-th=" "><input type="checkbox" name="vehicle" value="EZEID"></td>
+                                           <td data-th="Company Name">HireCraft</td>
+                                           <td data-th="Country/City">India, Banglore</td>
+                                           <td data-th="Distance (Miles/km)">50KM</td>
+                                           <td data-th="Phone No">9446093566</td>
+                                           <td data-th="Web"><a href="www.google.com">www.google.com</a></td>
+                                       </tr>
+
+                                   </table>
+                                </div><br/>
+                                <div class="row setRowLeftRightMarginZero centerAlign">
+                                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 searchHeaderAlignment ">
+                                        Template
+                                    </div>
+                                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 searchHeaderAlignment ">
+                                        <select class="form-control emptyBox" style="width: 48%" name="states" ng-model="profile._info.StateID">
+                                            <option value = ""> --State-- </option>
+                                            <option value = ""> Template1 </option>
+                                            <option value = ""> Template2 </option>
+                                            <option value = ""> Template3 </option>
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1 searchHeaderAlignment ">
+                                        <button type="button" class="btn btn-primary" ng-click="profile.closeRegistrationForm()" >...</button>
+                                    </div>
+                                </div>
+                             </div>
+                         </div>
+                    </div>
+                </div>
+            </div>
+       </div>
+</div>
