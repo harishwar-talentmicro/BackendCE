@@ -159,7 +159,7 @@
                 <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 col-lg-offset-2 col-md-offset-2 col-sm-offset-2 col-xs-offset-0">
                     <div class="panel panel-default panelBottomSpacing">
                         <div class="panel-body setPanelPadding">
-                           <div class="row searchHeaderRow" ng-show="showSmallBanner">
+                           <div class="row setRowLeftRightMarginZero" ng-show="showSmallBanner">
 
                                 <div ng-hide="(search.mInfo.Redflagstatus == 1)" class="col-lg-10 col-md-10 col-sm-10 col-xs-10 searchHeaderAlignment">
                                    <!-- <img width="100%" height="50px" src="../images/header.gif">-->
@@ -212,7 +212,7 @@
                                 </div>
                             </div>
 
-                            <div class="row searchHeaderRow" ng-hide="showSmallBanner">
+                            <div class="row setRowLeftRightMarginZero" ng-hide="showSmallBanner">
                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 searchHeaderAlignment">
                                     <!--<img width="100%" height="50px" src="../images/bannerBig.gif">-->
                                     <img width="100%" height="50px" src="../images/businessBanner.gif">
@@ -220,9 +220,9 @@
                             </div>
 
                             <form class="form-signin" role="form" novalidate  ng-submit="search.getSearch()">
-                                <div class="row infoMapContainerRow">
+                                <div class="row setRowLeftRightMarginZero">
                                    <div class="col-lg-5 col-md-5 col-sm-5 col-xs-12 bottom-clearfix setFontSize infoContainer">
-                                        <div class="row infoContainerRow">
+                                        <div class="row setRowLeftRightMarginZero">
                                             <div class="topSearchRow">
                                                <div  class="col-lg-2 col-md-2 col-sm-2 col-xs-12 searchButtonMarginSet searchStripTopMargin showPointer" ng-class="ShowInfoWindow ? 'setLinkToText' : ''" >
                                                    <span ng-click="showSearchTab()">Search</span>
@@ -350,22 +350,18 @@
                                                         <button  ng-disabled="!search.Criteria.Keywords" class="btn btn-primary" type="submit">Search</button>
                                                     </div>
                                                 </div>
-                                                <div class="row centerAlign searchButtonMarginSet setTopMargin">
+                                                <div ng-hide="search.IsShowForm" class="row centerAlign searchButtonMarginSet setTopMargin">
                                                     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 " ng-show="SearchResultCount">
                                                         {{ SearchResultCount + " "}}<sapn>Items found...</sapn>
                                                     </div>
                                                 </div>
-                                                <div class="row setTopMargin downloadPopupContainer" ng-show="search.IsShowForm">
-                                                    <div class="window_page Maping_popup newDownloadBox">
-                                                        <span class="newCloseDownload" ng-click="search.closeDownloadForm()">X</span>
-
-                                                        <div class="col-md-12">
-                                                            Click<a href="/ewtGetSearchDocuments?Token={{_userInfo.Token}}&&Keywords={{search.Criteria.Keywords}}"><b> {{search.downloadData.Filename}} </b></a>to download.
-                                                            <br/>
-                                                        </div>
-                                                        <div class="col-md-12">
-                                                            <span> NO: {{search.downloadData.No}}  {{search.downloadData.date != "" ? "| Expiry Date:"+search.downloadData.date : ""}}</span>
-                                                        </div>
+                                                <div class="row setTopMargin setRowLeftRightMarginZero centerAlign" ng-show="search.IsShowForm">
+                                                     <div class="col-md-12">
+                                                         <a href="/ewtGetSearchDocuments?Token={{_userInfo.Token}}&&Keywords={{search.Criteria.Keywords}}"><u>Click here to download: [<b> {{search.downloadData.Filename}} </b>]</u></a>
+                                                        <br/>
+                                                    </div>
+                                                    <div class="col-md-12">
+                                                        <span> NO: {{search.downloadData.No}}  {{search.downloadData.date != "" ? "| Expiry Date:"+search.downloadData.date : ""}}</span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -375,7 +371,7 @@
                                         <div class="innerMapContainer">
                                             <div style="display:block;">
                                                 <img id="mapClocH" style="padding-top:8px;cursor:pointer;" ng-click="search.getMyLocation()" src="images/myloc.png" />
-                                                <input id="txtSearch" class="form-control pull-left marL5px" type="text" placeholder="Search Location" autocomplete="off" style=" z-index: 0; top:0px;margin-top:4px; width: 337px;">
+                                                <input id="txtSearch" class="form-control pull-left marL5px mapSearchTextBox" type="text" placeholder="Search Location" autocomplete="off">
                                             </div>
                                             <div id="map-canvasH">
                                             </div>
@@ -384,7 +380,7 @@
                                 </div>
 
                             </form>
-                            <div ng-show="ShowLinks" class="row searchHeaderRow boxFotterBanner">
+                            <div ng-show="ShowLinks" class="row setRowLeftRightMarginZero boxFotterBanner">
                                 <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 searchHeaderAlignment fotterButtonContainer">
                                     <div style="padding-top:  4.5%;">
                                        <div  class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer bottomTabButton" ng-hide="search.isIndividualUser(1)">
@@ -453,7 +449,7 @@
                                 </div>
                             </div>
 
-                           <div ng-hide="ShowLinks" class="row searchHeaderRow">
+                           <div ng-hide="ShowLinks" class="row setRowLeftRightMarginZero">
                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 searchHeaderAlignment" style="background: #09a2de;">
                                  <!--  <img width="100%" height="50px" src="../images/bannerBig.gif">-->
                                    <img width="100%" height="50px" src="../images/new_Individuals.gif">

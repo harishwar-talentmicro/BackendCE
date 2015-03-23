@@ -109,36 +109,25 @@ hr {
     height: auto;
     min-height: 375px;
 }
-.searchHeaderRow
+.setRowLeftRightMarginZero
 {
     margin-left: 0px;
     margin-right: 0px;
 }
-.infoMapContainerRow
+.setLeftRightPaddingZero
 {
-    margin-left: 0px;
-    margin-right: 0px;
+    padding-left: 0px;
+    padding-right: 0px;
 }
-.infoContainerRow
+.fourteenFontSize
 {
-    margin-right: 0px;
-    margin-left: 0px;
+    font-size: 14px;
 }
 .mapColDiv
 {
     padding-left: 0px;
     padding-right: 0px;
     margin-bottom: 0px;
-}
-.searchFotterRow
-{
-    margin-left: 0px;
-    margin-right: 0px;
-}
-.searchFotterCol
-{
-    padding-left: 0px;
-    padding-right: 0px;
 }
 .helpTextColor
 {
@@ -411,4 +400,31 @@ body {
     padding-left: 0px;
     padding-right: 0px;
     margin-bottom: 3%;
+}
+.mapSearchTextBox{
+    z-index: 0;
+    top:0px;
+    margin-top:4px;
+    width: 280px;
+}
+.congratesTextContainer
+{
+    margin: auto;
+    float: none;
+    text-align: center;
+    font-size: 14px;
+    font-family: 'Roboto',sans-serif;
+}
+.nextStepBtn
+{
+    height: 30px;
+    line-height: 30px;
+    background: #FFCD28;
+    color: #fff;
+}
+.nextStepInnerContainer
+{
+    height: 30px;
+    color: #000;
+    background: gainsboro;
 }
