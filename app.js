@@ -145,10 +145,9 @@ app.get('/ewtGetTranscation',LocationManager.FnGetTranscation);
 app.post('/ewtSaveResource',LocationManager.FnSaveResource);
 app.get('/ewtGetResource',LocationManager.FnGetResource);
 app.post('/ewtSaveResourceItemMap',LocationManager.FnSaveResourceItemMap);
-app.get('/ewtSearchContactsVES',LocationManager.FnSearchContactsVES);
 app.get('/ewtGetItemListForEZEID',LocationManager.FnGetItemListForEZEID);
-
 app.get('/ewtGetLocationList',LocationManager.FnGetLocationList);
+
 //below service are for EZEIDAP
 app.post('/ewLoginAP', LocationManager.FnLoginAP);
 app.get('/ewLogoutAP', LocationManager.FnLogoutAP);
