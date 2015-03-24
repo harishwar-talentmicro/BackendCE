@@ -419,7 +419,6 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
                     labelStyle: {opacity: 1}
                 });
 
-
                 var currentPos = google.maps.LatLng($rootScope.CLoc.CLat,$rootScope.CLoc.CLong);
                 map.setCenter(currentPos);
 
