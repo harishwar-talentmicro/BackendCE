@@ -400,14 +400,26 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
                 //Pushing position of markers to fit in bounds
                 latLngList.push(pos);
                 var mTitle = (_item.IDTypeID == 2 && _item.CompanyName !== "")? _item.CompanyName : _item.Name;
-                var marker = new google.maps.Marker({
+               /* var marker = new google.maps.Marker({
                     position: pos,
                     map: map,
-//                        icon: (_item.Icon !== "") ? _item.Icon : mapIcon,
                     icon: (_item.IDTypeID == 2) ? businessIcon : individualIcon,
                     title: mTitle
+                });*/
+
+               var marker = new MarkerWithLabel({
+                    position: pos,
+                    draggable: false,
+                    raiseOnDrag: false,
+                    map: map,
+                    icon: (_item.IDTypeID == 2) ? businessIcon : individualIcon,
+                    labelContent: mTitle,
+                    labelAnchor: new google.maps.Point(22, 0),
+                    labelClass: "mapLabels", // the CSS class for the label
+                    labelStyle: {opacity: 1}
                 });
-//                    map.setCenter(pos);
+
+
                 var currentPos = google.maps.LatLng($rootScope.CLoc.CLat,$rootScope.CLoc.CLong);
                 map.setCenter(currentPos);
 

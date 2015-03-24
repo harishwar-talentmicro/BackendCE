@@ -430,7 +430,7 @@ body {
 }
 
 /* ==========Responsive Table===============  */
-.rwd-table {
+/*.rwd-table {
     margin: 1em 0;
     min-width: 300px;
 }
@@ -479,10 +479,10 @@ body {
 
 
 .rwd-table {
-    /*background: #34495E;*/
+    *//*background: #34495E;*//*
     background: #FFFFFF;
     color: #000000;
-   /* border-radius: .4em;*/
+   *//* border-radius: .4em;*//*
     overflow: hidden;
     width: 100%;
 }
@@ -498,13 +498,58 @@ body {
     }
 }
 .rwd-table th, .rwd-table td:before {
-   /* color: #dd5;*/
+   *//* color: #dd5;*//*
     color: #000000;
     font-weight: bold;
     background: #2791BA;
 }
+*//*tr:nth-child(even) {background: #CCC}
+tr:nth-child(odd) {background: #FFF}*//*
+
+.rwd-table tr:nth-child(even) {background: #CCC}
+.rwd-table tr:nth-child(odd) {background: #FFF}
+
 .setMarginTopBottomZero
 {
     margin-top: 0px;
     margin-bottom: 0px;
+}
+.TemplateTextContainer
+{
+    text-align: left;
+    margin-right: 0%;
+}
+.fixTemplateTextArea {
+    width: 600px;
+    min-width: 4%;
+    max-width: 200%;
+    height: 65px;
+    min-height: 65px;
+    max-height: 65px;
+}*/
+/*.tableBodyContainer
+{
+    height: 304px;
+    overflow-y: auto;
+    border-color: #2791BA;
+}*/
+
+.tableBodyContainer {
+    height: 185px;
+    overflow-y: auto;
+    border-color: #2791BA;
+}
+.thWidth
+{
+    width: 16%;
+}
+.mapLabels {
+    color: #000;
+    /*background-color: white;*/
+    font-family: "Roboto", "Arial", sans-serif;
+    font-size: 12px;
+    font-weight: bold;
+    text-align: center;
+    width: 100px;
+    white-space: nowrap;
 }
