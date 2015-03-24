@@ -6,6 +6,40 @@ angular.module('ezeidApp')
     .controller('SalesCtrl',['$scope','$rootScope','$http','GURL','MsgDelay','$interval','$q','$timeout',function($scope,$rootScope,$http,GURL,MsgDelay,$interval,$q,$timeout){
 
         /**
+         * Business Filters Need the all rules, status and folders
+         * Therefore to load all of these froms server everytime is not a good idea
+         * So we are putting them in rootScope and filters can directly access it from here based
+         * on its FunctionType
+         * @type {{}}
+         */
+        $rootScope.businessManager = {
+            sales : {
+                folders : {},
+                enquiryStatus : {},
+                nextActions : {}
+            },
+            reservation : {
+                folders : {},
+                enquiryStatus : {},
+                nextActions : {}
+            },
+            homeDelivery : {
+                folders : {},
+                enquiryStatus : {},
+                nextActions : {}
+            },
+            service : {
+                folders : {},
+                enquiryStatus : {},
+                nextActions : {}
+            },
+            resume : {
+                folders : {},
+                enquiryStatus : {},
+                nextActions : {}
+            }
+        };
+        /**
          * For showing loading Icon
          * IF all values becomes true then only grid will appear else loading will be stopped and error message is shown
          * @type {{itemsLoaded: boolean, statusLoaded: boolean, nextActionsLoaded: boolean, foldersLoaded: boolean, transactionsLoaded: boolean}}
@@ -68,13 +102,6 @@ angular.module('ezeidApp')
         /****************************************************** Controller Code *****************************/
 
         /**
-         * View Transaction Details
-         */
-        $scope.viewDetails = function(){
-            $scope.toggleModalBox();
-        };
-
-        /**
          * Basic Grid Options
          * @type {{enableRowSelection: boolean, paginationPageSizes: Array, paginationPageSize: number, enableFiltering: boolean, enableCellEditOnFocus: boolean}}
          */
@@ -127,7 +154,7 @@ angular.module('ezeidApp')
                 enableFiltering : false,
                 enableCellEditOnFocus:false,
                 enableCellEdit : false,
-                cellTemplate:'<div class="row"><div class="col-lg-12 text-center" style="margin-top:5px;"><button class="btn btn-xs btn-info no-radius ng-scope" ng-click="grid.appScope.saveTransaction()">Save</button></div></div>'
+                cellTemplate:'<div class="row"><div class="col-lg-12 text-center" style="margin-top:5px;"><button class="btn btn-xs btn-info no-radius ng-scope" ng-click="grid.appScope.saveTransaction(row.entity,row)">Save</button></div></div>'
             },
             {
                 width : '7%',
@@ -141,7 +168,8 @@ angular.module('ezeidApp')
                 width : '20%',
                 name: 'particulars',
                 displayName : 'Particulars',
-                enableFiltering: false
+                enableFiltering: false,
+                enableCellEditOnFocus : true
             },
             {
                 enableSorting: false,
@@ -151,19 +179,21 @@ angular.module('ezeidApp')
                 enableCellEditOnFocus:false,
                 enableCellEdit : false,
                 enableFiltering : false,
-                cellTemplate:'<div class="row"><div class="col-lg-12 text-center" style="margin-top:5px;"><button class="btn btn-xs btn-info no-radius ng-scope" ng-click="grid.appScope.viewDetails()">Details</button></div></div>'
+                cellTemplate:'<div class="row"><div class="col-lg-12 text-center" style="margin-top:5px;"><button class="btn btn-xs btn-info no-radius ng-scope" ng-click="grid.appScope.viewDetails(row.entity)">Details</button></div></div>'
             },
             {
                 width : '15%',
                 name: 'ezeid',
                 displayName : 'EZEID',
-                enableFiltering: true
+                enableFiltering: true,
+                enableCellEditOnFocus : true
             },
             {
                 width : '20%',
                 name: 'contactInfo',
                 displayName : 'Contact Info',
-                enableFiltering: true
+                enableFiltering: true,
+                enableCellEditOnFocus : true
             },
             {
                 width : '10%',
@@ -178,7 +208,8 @@ angular.module('ezeidApp')
                 editableCellTemplate: 'ui-grid/dropdownEditor',
                 editDropdownValueLabel: 'status',
                 editDropdownOptionsArray: $scope.enquiryStatusList,
-                enableFiltering: false
+                enableFiltering: false,
+                cellFilter : 'mapEnquiryStatus:0'
             },
             {
                 width : '10%',
@@ -187,7 +218,8 @@ angular.module('ezeidApp')
                 editableCellTemplate: 'ui-grid/dropdownEditor',
                 editDropdownValueLabel: 'nextAction',
                 editDropdownOptionsArray: $scope.nextActionList,
-                enableFiltering: true
+                enableFiltering: true,
+                cellFilter : 'mapNextAction:0'
             },
             {
                 width : '15%',
@@ -202,13 +234,15 @@ angular.module('ezeidApp')
                 editableCellTemplate : 'ui-grid/dropdownEditor',
                 editDropdownValueLabel : 'folder',
                 editDropdownOptionsArray : $scope.folderList,
-                enableFiltering: true
+                enableFiltering: true,
+                cellFilter : 'mapFolder:0'
             },
             {
                 width : '20%',
                 name : 'notes',
                 displayName : 'Notes',
-                enableFiltering: false
+                enableFiltering: false,
+                enableCellEditOnFocus : true
             },
             {
                 width : '15%',
@@ -247,6 +281,14 @@ angular.module('ezeidApp')
 
         $scope.gridOptions.onRegisterApi = function(gridApi){
             $scope.gridApi = gridApi;
+            $scope.gridApi.edit.on.afterCellEdit($scope,function(rowEntity, colDef,x1){
+                console.log(rowEntity);
+                console.log(x1);
+                console.log(gridApi);
+//                console.log(gridApi.GridRow(rowEntity,0,$scope.gridApi.grid));
+                console.log($scope.gridApi.cellNav.getFocusedCell());
+            });
+
 //            gridApi.rowEdit.on.saveRow($scope, $scope.saveRow);
 //            gridApi.core.on.notifyDataChange($scope,function(type){
 //                console.log(type);
@@ -277,22 +319,27 @@ angular.module('ezeidApp')
         $scope.addNewRow = function() {
             var n = $scope.gridOptions.data.length + 1;
             console.log($scope.gridApi.grid.rows);
-            $scope.gridOptions.data.unshift({
+            var newRow = {
 
-                trnId : 1+n,
-                particulars : "This is particulars "+n,
-                ezeid : 'HIRECRAFT.AB'+n,
-                contactInfo : 'Abc Customer ' +n +', 7867627342',
-                amount : 5000,
+                trnId : '',
+                particulars : "Enter particulars here",
+                ezeid : '',
+                contactInfo : ''+'',
+                amount : 0,
                 status : 1,
                 nextAction : 2,
                 nextActionDate : 'Sept 30,14 14:00',
                 folder : 2,
-                notes : "This is notes "+n,
-                updatedOn : "Sept 24,14 11:00 ",
-                updatedBy : "User "+n
+                notes : "Notes here ",
+                updatedOn : "",
+                updatedBy : ""
 
-            });
+            };
+            $scope.gridOptions.data.unshift(newRow);
+            var dirtyRows = [newRow];
+            $interval( function() {
+                $scope.gridApi.rowEdit.setRowsDirty(dirtyRows);
+            }, 0, 1);
             console.log($scope.gridApi.grid.rows);
         };
 
@@ -307,7 +354,6 @@ angular.module('ezeidApp')
         };
 
 
-        $scope.savePromises = {};
 
         /**
          * Changing row contents will make this function call
@@ -338,12 +384,24 @@ angular.module('ezeidApp')
          * Save transaction function
          * @author Indrajeet
          */
-        $scope.saveTransaction = function(){
+        $scope.saveTransaction = function(rowEntity,index){
+            console.log(rowEntity);
+            console.log(index);
             console.log('Save is clicked');
-
+            // Get Dirty rows by calling the line below
+//            console.log($scope.gridApi.rowEdit.getDirtyRows());
         };
 
         /******************************************* Grid Code Ends here **********************************/
+
+        /**
+         * View Transaction Details
+         * Opens Modal Box
+         */
+        $scope.viewDetails = function(rowEntity){
+            console.log(rowEntity);
+            $scope.toggleModalBox();
+        };
 
         /**
          * Finds an item from ItemList based on TID
@@ -408,8 +466,10 @@ angular.module('ezeidApp')
 
         /**
          * Load all available status for transactions
+         * @returns {promise|*}
          */
         $scope.loadAllStatus = function(){
+            var deferred = $q.defer();
             $http({
                 url : GURL + 'ewtGetStatusType',
                 method : 'GET',
@@ -425,18 +485,28 @@ angular.module('ezeidApp')
                                 id : resp[i].TID,
                                 status : resp[i].StatusTitle
                             });
+                            $rootScope.businessManager.sales.enquiryStatus[resp[i].TID] = resp[i].StatusTitle;
                         }
                         $scope.readyState.statusLoaded = true;
+                        deferred.resolve(true);
+                    }
+                    else{
+                        deferred.resolve(false);
                     }
             }).error(function(err){
                 console.log(err);
+                    deferred.resolve(false);
             });
+            return deferred.promise;
         };
+
 
         /**
          * Load All next actions available
+         * @returns {promise|*}
          */
         $scope.loadAllNextActions = function(){
+            var deferred = $q.defer();
             $http({
                 url : GURL + 'ewtGetActionType',
                 method : 'GET',
@@ -453,18 +523,27 @@ angular.module('ezeidApp')
                                 id : resp[i].TID,
                                 nextAction : resp[i].ActionTitle
                             });
+                            $rootScope.businessManager.sales.nextActions[resp[i].TID] = resp[i].ActionTitle;
                         }
+                        deferred.resolve(true);
                         $scope.readyState.nextActionsLoaded = true;
+                    }
+                    else{
+                        deferred.resolve(false);
                     }
             }).error(function(err){
                 console.log(err);
+                    deferred.resolve(false);
             });
+            return deferred.promise;
         };
 
         /**
          * Load all folder lists
+         * @returns {promise|*}
          */
         $scope.loadAllFolders = function(){
+            var deferred = $q.defer();
             $http({
                 url : GURL + 'ewtGetFolderList',
                 method : 'GET',
@@ -481,12 +560,19 @@ angular.module('ezeidApp')
                                 id : resp[i].TID,
                                 folder : resp[i].FolderTitle
                             });
+                            $rootScope.businessManager.sales.folders[resp[i].TID] = resp[i].FolderTitle;
                         }
                         $scope.readyState.foldersLoaded = true;
+                        deferred.resolve(true);
+                    }
+                    else{
+                        deferred.resolve(false);
                     }
             }).error(function(err){
                 console.log(err);
+                deferred.resolve(false);
             });
+            return deferred.promise;
         };
 
         /**
@@ -517,12 +603,23 @@ angular.module('ezeidApp')
                                 nextActionDate : resp[i].NextActionDate,
                                 folder : resp[i].FolderRuleID,
                                 notes : resp[i].Notes,
-                                updatedOn : (resp[i].UpdatedDateUser.length > 20) ? resp[i].UpdatedDateUser.substr(0,19) : '',
-                                updatedBy : (resp[i].UpdatedDateUser.length > 20) ? resp[i].UpdatedDateUser.replace(resp[i].UpdatedDateUser.substr(0,19),'') : '',
+                                updatedBy : (resp[i].UpdatedUser.length > 0) ? resp[i].UpdatedUser : '',
+                                updatedOn : (resp[i].updatedDate.length > 0) ? resp[i].updatedDate : '',
                                 // This value will tell that the transaction can be removed from grid or not
                                 // If value is true transactions cannot be removed(deleted from grid)
                                 savedOnServer : true
                             };
+
+                            /**
+                             * @todo
+                             * 1. Bind Item data when opening details(modalBox)
+                             * 2. Add Items to Transaction
+                             * 3. Save Transaction
+                             * 4. Update Transaction
+                             * 5. Change Numeric Values of Status and Action to Human Readable Titles
+                             * 6. Load Dynamic Templates for ModalBox based on ItemListType
+                             * 7. Load Dynamic GridOptions based on Permissions Type
+                             */
 
                             gridData.push(transaction);
                         }
@@ -540,10 +637,23 @@ angular.module('ezeidApp')
         };
 
         /**
+         * Progressive Loading of StatusList, Folders,NextActions and then Items and Transactions at last
+         */
+        $scope.loadProgressive = function(){
+            $scope.loadAllItems();
+            $scope.loadAllFolders().then(function(fLoadStatus){
+                $scope.loadAllStatus().then(function(sLoadStatus){
+                    $scope.loadAllNextActions().then(function(nALoadStatus){
+                        $scope.loadAllTransactions();
+                    });
+                });
+            });
+        };
+
+        /**
          * Try to reload all server data again
          *
          */
-
         $scope.reloadAgain = function(){
             $scope.readyState = {
                 itemsLoaded : false,
@@ -553,11 +663,7 @@ angular.module('ezeidApp')
                 transactionsLoaded : false
             };
             $scope.serverApiError = false;
-            $scope.loadAllItems();
-            $scope.loadAllFolders();
-            $scope.loadAllStatus();
-            $scope.loadAllNextActions();
-            $scope.loadAllTransactions();
+            $scope.loadProgressive();
             $timeout(function(){
                 if(!($scope.readyState.itemsLoaded && $scope.readyState.statusLoaded && $scope.readyState.nextActionsLoaded
                     && $scope.readyState.foldersLoaded && $scope.readyState.transactionsLoaded)){
@@ -567,23 +673,19 @@ angular.module('ezeidApp')
         };
 
         /**
-         * Loading Data
+         * Loading Data in progressive manner
          */
-        $scope.loadAllItems();
-        $scope.loadAllFolders();
-        $scope.loadAllStatus();
-        $scope.loadAllNextActions();
-        $scope.loadAllTransactions();
+        $scope.loadProgressive();
 
         /**
-         * Checks that if the data is not loaded in 10 sec show the error message
+         * Checks that if the data is not loaded in 15 sec show the error message
          */
         $timeout(function(){
             if(!($scope.readyState.itemsLoaded && $scope.readyState.statusLoaded && $scope.readyState.nextActionsLoaded
                 && $scope.readyState.foldersLoaded && $scope.readyState.transactionsLoaded)){
                 $scope.serverApiError = true;
             }
-        },10000);
+        },15000);
 
 
 
