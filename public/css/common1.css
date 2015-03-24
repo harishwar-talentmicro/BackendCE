@@ -107,38 +107,27 @@ hr {
     background-image: url(../images/infoBackground.png);
    /* height: 360px;*/
     height: auto;
-    min-height: 360px;
+    min-height: 375px;
 }
-.searchHeaderRow
+.setRowLeftRightMarginZero
 {
     margin-left: 0px;
     margin-right: 0px;
 }
-.infoMapContainerRow
+.setLeftRightPaddingZero
 {
-    margin-left: 0px;
-    margin-right: 0px;
+    padding-left: 0px;
+    padding-right: 0px;
 }
-.infoContainerRow
+.fourteenFontSize
 {
-    margin-right: 0px;
-    margin-left: 0px;
+    font-size: 14px;
 }
 .mapColDiv
 {
     padding-left: 0px;
     padding-right: 0px;
     margin-bottom: 0px;
-}
-.searchFotterRow
-{
-    margin-left: 0px;
-    margin-right: 0px;
-}
-.searchFotterCol
-{
-    padding-left: 0px;
-    padding-right: 0px;
 }
 .helpTextColor
 {
@@ -217,6 +206,7 @@ hr {
     padding-left: 0px;
     width: 29.333333%;
     padding-right: 0px;
+
 }
 .topSearchRow
 {
@@ -385,10 +375,181 @@ body {
 .newDownloadBox
 {
     margin-top: 0%;
-    border: solid 1px #08749C;
+    border: solid 3px #08749C;
     min-height: 48px;
-    width: 75.50%;
+    width: 83.50%;
     padding: 5px;
     margin-bottom: 1%;
     font-size: 14px;
+}
+.newCloseDownload {
+    width: 61px;
+    height: 41px;
+    border-radius: 50px;
+    text-align: center;
+    top: -19px;
+    cursor: pointer;
+    right: -38px;
+    position: absolute;
+    background: url(../images/small_close.png) no-repeat;
+    text-indent: -999px;
+    overflow: hidden;
+}
+.downloadPopupContainer
+{
+    padding-left: 0px;
+    padding-right: 0px;
+    margin-bottom: 3%;
+}
+.mapSearchTextBox{
+    z-index: 0;
+    top:0px;
+    margin-top:4px;
+    width: 280px;
+}
+.congratesTextContainer
+{
+    margin: auto;
+    float: none;
+    text-align: center;
+    font-size: 14px;
+    font-family: 'Roboto',sans-serif;
+}
+.nextStepBtn
+{
+    height: 30px;
+    line-height: 30px;
+    background: #FFCD28;
+    color: #fff;
+}
+.nextStepInnerContainer
+{
+    height: 30px;
+    color: #000;
+    background: gainsboro;
+}
+
+/* ==========Responsive Table===============  */
+/*.rwd-table {
+    margin: 1em 0;
+    min-width: 300px;
+}
+.rwd-table tr {
+    border-top: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+}
+.rwd-table th {
+    display: none;
+}
+.rwd-table td {
+    display: block;
+}
+.rwd-table td:first-child {
+    padding-top: .5em;
+}
+.rwd-table td:last-child {
+    padding-bottom: .5em;
+}
+.rwd-table td:before {
+    content: attr(data-th) ": ";
+    font-weight: bold;
+    width: 6.5em;
+    display: inline-block;
+}
+@media (min-width: 480px) {
+    .rwd-table td:before {
+        display: none;
+    }
+}
+.rwd-table th, .rwd-table td {
+    text-align: left;
+}
+@media (min-width: 480px) {
+    .rwd-table th, .rwd-table td {
+        display: table-cell;
+        padding: .25em .5em;
+    }
+    .rwd-table th:first-child, .rwd-table td:first-child {
+        padding-left: 0;
+    }
+    .rwd-table th:last-child, .rwd-table td:last-child {
+        padding-right: 0;
+    }
+}
+
+
+.rwd-table {
+    *//*background: #34495E;*//*
+    background: #FFFFFF;
+    color: #000000;
+   *//* border-radius: .4em;*//*
+    overflow: hidden;
+    width: 100%;
+}
+.rwd-table tr {
+    border-color: #46627f;
+}
+.rwd-table th, .rwd-table td {
+    margin: .5em 1em;
+}
+@media (min-width: 480px) {
+    .rwd-table th, .rwd-table td {
+        padding: 1em !important;
+    }
+}
+.rwd-table th, .rwd-table td:before {
+   *//* color: #dd5;*//*
+    color: #000000;
+    font-weight: bold;
+    background: #2791BA;
+}
+*//*tr:nth-child(even) {background: #CCC}
+tr:nth-child(odd) {background: #FFF}*//*
+
+.rwd-table tr:nth-child(even) {background: #CCC}
+.rwd-table tr:nth-child(odd) {background: #FFF}
+
+.setMarginTopBottomZero
+{
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+.TemplateTextContainer
+{
+    text-align: left;
+    margin-right: 0%;
+}
+.fixTemplateTextArea {
+    width: 600px;
+    min-width: 4%;
+    max-width: 200%;
+    height: 65px;
+    min-height: 65px;
+    max-height: 65px;
+}*/
+/*.tableBodyContainer
+{
+    height: 304px;
+    overflow-y: auto;
+    border-color: #2791BA;
+}*/
+
+.tableBodyContainer {
+    height: 185px;
+    overflow-y: auto;
+    border-color: #2791BA;
+}
+.thWidth
+{
+    width: 16%;
+}
+.mapLabels {
+    color: #000;
+    /*background-color: white;*/
+    font-family: "Roboto", "Arial", sans-serif;
+    font-size: 12px;
+    font-weight: bold;
+    text-align: center;
+    width: 100px;
+    white-space: nowrap;
 }

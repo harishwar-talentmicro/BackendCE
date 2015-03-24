@@ -400,14 +400,25 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
                 //Pushing position of markers to fit in bounds
                 latLngList.push(pos);
                 var mTitle = (_item.IDTypeID == 2 && _item.CompanyName !== "")? _item.CompanyName : _item.Name;
-                var marker = new google.maps.Marker({
+               /* var marker = new google.maps.Marker({
                     position: pos,
                     map: map,
-//                        icon: (_item.Icon !== "") ? _item.Icon : mapIcon,
                     icon: (_item.IDTypeID == 2) ? businessIcon : individualIcon,
                     title: mTitle
+                });*/
+
+               var marker = new MarkerWithLabel({
+                    position: pos,
+                    draggable: false,
+                    raiseOnDrag: false,
+                    map: map,
+                    icon: (_item.IDTypeID == 2) ? businessIcon : individualIcon,
+                    labelContent: mTitle,
+                    labelAnchor: new google.maps.Point(22, 0),
+                    labelClass: "mapLabels", // the CSS class for the label
+                    labelStyle: {opacity: 1}
                 });
-//                    map.setCenter(pos);
+
                 var currentPos = google.maps.LatLng($rootScope.CLoc.CLat,$rootScope.CLoc.CLong);
                 map.setCenter(currentPos);
 
@@ -546,6 +557,11 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
                         SearchSec.downloadData = data[0];
                         SearchSec.IsShowForm = true;
                         SearchSec.IsFilterRowVisible = false;
+
+                        var downloadUrl = "/ewtGetSearchDocuments?Token="+$rootScope._userInfo.Token+"&&Keywords="+SearchSec.Criteria.Keywords;
+                        console.log(downloadUrl);
+                        var win = window.open(downloadUrl, '_blank');
+                        win.focus();
                     }
                     else
                     {
@@ -1152,7 +1168,7 @@ angular.module('ezeidApp').controller('ProfileController', function ($rootScope,
     var showCurrentLocation = true;
     $scope.isCloseButtonClicked = false;
     var isCancelButton = true;
-    profile._info.ParkingStatus = 0
+    profile._info.ParkingStatus = 0;
 
     $scope.typeInfo = [
         {PropName:'Unique ID',IsBuFree:'glyphicon glyphicon-ok green',IsBuPaid:'glyphicon glyphicon-ok green',IsIndividual:'glyphicon glyphicon-ok green',IsPublic:'glyphicon glyphicon-ok green'},
@@ -1377,7 +1393,7 @@ angular.module('ezeidApp').controller('ProfileController', function ($rootScope,
         showCurrentLocation = true;
     }
 
-    //Custom Methods
+     //Custom Methods
     function GetUserDetails() {
         //$rootScope.IsIdAvailable = true;
         $http({
@@ -1776,7 +1792,6 @@ angular.module('ezeidApp').controller('ProfileController', function ($rootScope,
                     errorList.push('Pin should greater or equal 100');
                 }
             }
-
         }
 
         if($scope.disableAvalabilityButton == false)
@@ -1956,6 +1971,8 @@ angular.module('ezeidApp').controller('ProfileController', function ($rootScope,
     }
 
     this.saveBasicRegistration = function (UserForm){
+
+        console.log("Sai 1964");
         if(isBasicValidate())
         {
             var sEzeid = profile._info.EZEID;
@@ -1989,7 +2006,7 @@ angular.module('ezeidApp').controller('ProfileController', function ($rootScope,
 
                 var sTokenString = "";
                 sTokenString = profile._info.Token;
-                $http({
+               $http({
                     method: "POST",
                     url: GURL + 'ewSavePrimaryEZEData',
                     data: JSON.stringify(profile._info),
@@ -2025,9 +2042,10 @@ angular.module('ezeidApp').controller('ProfileController', function ($rootScope,
                                 $scope.isCloseButtonClicked = true;
                                 window.location.href = "#/home";
                                 Notification.success({ message: "Updated...", delay: MsgDelay });
-                            }
+                             }
                         }
-                        else        {
+                        else
+                        {
                             if (UserForm.$valid) {
                                 Notification.error({ message: "Registration failed", delay: MsgDelay });
                             }
@@ -2078,6 +2096,9 @@ angular.module('ezeidApp').controller('ProfileController', function ($rootScope,
 
                 var sTokenString = "";
                 sTokenString = profile._info.Token;
+
+                 $('#CV_popup').slideDown();
+
                 $http({
                     method: "POST",
                     url: GURL + 'ewSavePrimaryEZEData',
@@ -2114,6 +2135,8 @@ angular.module('ezeidApp').controller('ProfileController', function ($rootScope,
                                 $scope.isCloseButtonClicked = true;
                                 window.location.href = "#/home";
                                 Notification.success({ message: "Updated...", delay: MsgDelay });
+                                // Upload CV Dialog with link
+                                // $('#Help_popup').slideDown();
                             }
                         }
                         else {

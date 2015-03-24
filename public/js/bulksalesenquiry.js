@@ -1,5 +1,5 @@
 
-angular.module('ezeidApp').controller('CongratulationsController', function($http, $rootScope, $scope, Notification, GURL){
+angular.module('ezeidApp').controller('bulksalesController', function($http, $rootScope, $scope, Notification, GURL){
 
     var profile = this;
     profile._info = {};
@@ -36,23 +36,6 @@ angular.module('ezeidApp').controller('CongratulationsController', function($htt
             alert('Sorry..! Browser does not support');
             window.location.href = "index.html";
         }
-    }
-
-    $scope.$watch('_userInfo.IsAuthenticate', function () {
-        if ($rootScope._userInfo.IsAuthenticate == true) {
-            GetUserDetails();
-        }
-    });
-
-    //Custom Methods
-    function GetUserDetails() {
-        //$rootScope.IsIdAvailable = true;
-        $http({
-            method: 'get',
-            url: GURL + 'ewtGetUserDetails?Token=' + $rootScope._userInfo.Token
-        }).success(function (data) {
-                 profile._info = data[0];
-            });
     }
 
 });

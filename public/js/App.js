@@ -70,6 +70,7 @@
             .when('/subusers',{templateUrl : 'html/subusers.html'})
             .when('/business-preference',{templateUrl : 'html/business-preference.html'})
             .when('/business-manager',{templateUrl : 'html/business-manager/business-manager.html'})
+            .when('/bulksalesenquiry',{templateUrl : 'html/bulksalesenquiry.html'})
             .otherwise({ templateUrl: 'html/home.html'});
 
         $httpProvider.interceptors.push("ezeidInterceptor");
