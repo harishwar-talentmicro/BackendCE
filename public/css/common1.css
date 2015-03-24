@@ -430,7 +430,7 @@ body {
 }
 
 /* ==========Responsive Table===============  */
-/*.rwd-table {
+.rwd-table {
     margin: 1em 0;
     min-width: 300px;
 }
@@ -476,18 +476,14 @@ body {
         padding-right: 0;
     }
 }
-
-
 .rwd-table {
-    *//*background: #34495E;*//*
+    margin: 0;
     background: #FFFFFF;
-    color: #000000;
-   *//* border-radius: .4em;*//*
     overflow: hidden;
     width: 100%;
 }
 .rwd-table tr {
-    border-color: #46627f;
+    border-color: #ddd;
 }
 .rwd-table th, .rwd-table td {
     margin: .5em 1em;
@@ -498,15 +494,12 @@ body {
     }
 }
 .rwd-table th, .rwd-table td:before {
-   *//* color: #dd5;*//*
-    color: #000000;
+   color: #0C97D0;
     font-weight: bold;
-    background: #2791BA;
+    background: #ffffff;
 }
-*//*tr:nth-child(even) {background: #CCC}
-tr:nth-child(odd) {background: #FFF}*//*
 
-.rwd-table tr:nth-child(even) {background: #CCC}
+.rwd-table tr:nth-child(even) {background: #f9f9f9}
 .rwd-table tr:nth-child(odd) {background: #FFF}
 
 .setMarginTopBottomZero
@@ -526,23 +519,8 @@ tr:nth-child(odd) {background: #FFF}*//*
     height: 65px;
     min-height: 65px;
     max-height: 65px;
-}*/
-/*.tableBodyContainer
-{
-    height: 304px;
-    overflow-y: auto;
-    border-color: #2791BA;
-}*/
+}
 
-.tableBodyContainer {
-    height: 185px;
-    overflow-y: auto;
-    border-color: #2791BA;
-}
-.thWidth
-{
-    width: 16%;
-}
 .mapLabels {
     color: #000;
     /*background-color: white;*/
