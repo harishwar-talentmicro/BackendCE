@@ -3,6 +3,7 @@
         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12"
              ng-show="readyState.itemsLoaded && readyState.statusLoaded && readyState.nextActionsLoaded && readyState.foldersLoaded && readyState.transactionsLoaded && (!serverApiError)">
             <button class="btn btn-primary btn-sm no-radius" ng-click="addNewRow()">Add New Transaction</button>
+            <button class="btn btn-primary btn-sm no-radius" ng-click="removeFirstRow()">Remove Unsaved Transactions</button>
             <!--<button class="btn btn-danger btn-sm no-radius">Remove Selected Transaction</button>-->
         </div>
     </div>

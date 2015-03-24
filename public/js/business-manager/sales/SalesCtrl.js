@@ -140,6 +140,8 @@ angular.module('ezeidApp')
         };
 
 
+
+
         /**
          * Grid Options Column Definitions
          * @todo To be loaded based on user permission and functionType
@@ -281,13 +283,14 @@ angular.module('ezeidApp')
 
         $scope.gridOptions.onRegisterApi = function(gridApi){
             $scope.gridApi = gridApi;
-            $scope.gridApi.edit.on.afterCellEdit($scope,function(rowEntity, colDef,x1){
+            $scope.gridApi.edit.on.afterCellEdit($scope,function(rowEntity, colDef){
                 console.log(rowEntity);
-                console.log(x1);
-                console.log(gridApi);
-//                console.log(gridApi.GridRow(rowEntity,0,$scope.gridApi.grid));
-                console.log($scope.gridApi.cellNav.getFocusedCell());
+                console.log(colDef);
             });
+
+//            $scope.gridApi.edit.on.beginEditCell($scope,function(rowEntity,colDef){
+//                $scope.isSaveBoxVisible = true;
+//            });
 
 //            gridApi.rowEdit.on.saveRow($scope, $scope.saveRow);
 //            gridApi.core.on.notifyDataChange($scope,function(type){
@@ -313,10 +316,54 @@ angular.module('ezeidApp')
         };
         ///////////////////////////////////////////////////////////////////////////////////////
 
+        var cellEditingTemplate = '<div class="ui-grid-cell-contents" title="TOOLTIP">' +
+            '<div class="ng-grid-save-box">' +
+            '<div class="ng-grid-save-box-inner">' +
+            '<button class="btn btn-sm btn-default no-radius" ng-click="saveCell(row)">' +
+            '<span class="glyphicon glyphicon-ok-circle"></span> Save' +
+            '</button> ' +
+            '<button class="btn btn-sm btn-danger no-radius" ng-click="discardCell(row)">' +
+            '<span class="glyphicon glyphicon-remove-circle"></span> Cancel' +
+            '</button> ' +
+            '</div> ' +
+            '</div>' +
+            '</div>';
+
+        /**
+         * Custom Template for rows
+         */
+        $scope.gridOptions.columnDefs[2].cellTemplate = cellEditingTemplate;
+        $scope.gridOptions.columnDefs[4].cellTemplate = cellEditingTemplate;
+        $scope.gridOptions.columnDefs[5].cellTemplate = cellEditingTemplate;
+        $scope.gridOptions.columnDefs[6].cellTemplate = cellEditingTemplate;
+        $scope.gridOptions.columnDefs[11].cellTemplate = cellEditingTemplate;
+
         /**
          * Adds a new row at first in the transaction table
          */
+
+        /**
+         * Saves the cell contents locally afterEdit
+         */
+        $scope.saveCell = function(row){
+            /**
+             * @todo
+             */
+            console.log('saveCell');
+        };
+
+        /**
+         * Discard cell Contents locally after cellEdit
+         */
+        $scope.discardCell = function(row){
+            /**
+             * @todo
+             */
+            console.log('discardCell');
+        };
+
         $scope.addNewRow = function() {
+            console.log($scope.gridOptions.data);
             var n = $scope.gridOptions.data.length + 1;
             console.log($scope.gridApi.grid.rows);
             var newRow = {
@@ -332,15 +379,17 @@ angular.module('ezeidApp')
                 folder : 2,
                 notes : "Notes here ",
                 updatedOn : "",
-                updatedBy : ""
-
+                updatedBy : "",
+                items : [],
+                savedOnServer : false
             };
             $scope.gridOptions.data.unshift(newRow);
             var dirtyRows = [newRow];
             $interval( function() {
                 $scope.gridApi.rowEdit.setRowsDirty(dirtyRows);
             }, 0, 1);
-            console.log($scope.gridApi.grid.rows);
+//            console.log($scope.gridApi.grid.rows);
+            console.log($scope.gridOptions.data);
         };
 
         /**
@@ -350,7 +399,9 @@ angular.module('ezeidApp')
             /**
              * @todo Add condition to check if this is newly created data or old one
              */
-            $scope.gridOpts.data.splice(0,1);
+            console.log($scope.gridOptions.data);
+            $scope.gridOptions.data.splice(0,1);
+//            $scope.gridOpts.data.splice(0,1);
         };
 
 
@@ -384,9 +435,9 @@ angular.module('ezeidApp')
          * Save transaction function
          * @author Indrajeet
          */
-        $scope.saveTransaction = function(rowEntity,index){
+        $scope.saveTransaction = function(rowEntity,GridRow){
             console.log(rowEntity);
-            console.log(index);
+            console.log(GridRow);
             console.log('Save is clicked');
             // Get Dirty rows by calling the line below
 //            console.log($scope.gridApi.rowEdit.getDirtyRows());
@@ -607,7 +658,8 @@ angular.module('ezeidApp')
                                 updatedOn : (resp[i].updatedDate.length > 0) ? resp[i].updatedDate : '',
                                 // This value will tell that the transaction can be removed from grid or not
                                 // If value is true transactions cannot be removed(deleted from grid)
-                                savedOnServer : true
+                                savedOnServer : true,
+                                items : []
                             };
 
                             /**
@@ -616,7 +668,7 @@ angular.module('ezeidApp')
                              * 2. Add Items to Transaction
                              * 3. Save Transaction
                              * 4. Update Transaction
-                             * 5. Change Numeric Values of Status and Action to Human Readable Titles
+                             * 5. Change Numeric Values of Status and Action to Human Readable Titles //Done
                              * 6. Load Dynamic Templates for ModalBox based on ItemListType
                              * 7. Load Dynamic GridOptions based on Permissions Type
                              */
@@ -628,7 +680,7 @@ angular.module('ezeidApp')
                         console.log($scope.gridApi.grid);
                         console.log($scope.gridApi.grid.rows);
                         console.log('GridRow...................................ends');
-
+                        console.log($scope.gridOptions.data);
                     }
                     $scope.readyState.transactionsLoaded = true;
             }).error(function(err){
