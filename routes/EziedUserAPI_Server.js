@@ -1688,8 +1688,8 @@ exports.FnRegistration = function (req, res) {
         var PhoneNumber = req.body.PhoneNumber;
         var MobileNumber = req.body.MobileNumber;
         var EMailID = req.body.EMailID;
-        var LaptopSLNO = req.body.LaptopSLNO;
-        var VehicleNumber = req.body.VehicleNumber;
+        //var LaptopSLNO = req.body.LaptopSLNO;
+        //var VehicleNumber = req.body.VehicleNumber;
         var Picture = req.body.Picture;
         var PictureFileName = req.body.PictureFileName;
         var WebSite = req.body.Website;
@@ -2188,8 +2188,8 @@ exports.FnAddLocation = function (req, res) {
         var PhoneNumber = req.body.PhoneNumber;
         var MobileNumber = req.body.MobileNumber;
         var EMailID = req.body.EMailID;
-        var LaptopSLNO = req.body.LaptopSLNO;
-        var VehicleNumber = req.body.VehicleNumber;
+        //var LaptopSLNO = req.body.LaptopSLNO;
+        //var VehicleNumber = req.body.VehicleNumber;
         var Picture = req.body.Picture;
         var PictureFileName = req.body.PictureFileName;
         var Website = req.body.Website;
@@ -2197,6 +2197,7 @@ exports.FnAddLocation = function (req, res) {
         var ISDMobileNumber = req.body.ISDMobileNumber;
 
         //below line of code is commented for phase 1
+        
         var ParkingStatus = parseInt(req.body.ParkingStatus);
 
         if (ParkingStatus.toString() == 'NaN') {
@@ -2211,7 +2212,12 @@ exports.FnAddLocation = function (req, res) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
-                        var InsertQuery = db.escape(TID) + ',' + db.escape(Token) + ',' + db.escape(LocTitle) + ',' + db.escape(Latitude) + ',' + db.escape(Longitude) + ',' + db.escape(Altitude) + ',' + db.escape(AddressLine1) + ',' + db.escape(AddressLine2) + ',' + db.escape(CityName) + ',' + db.escape(StateID) + ',' + db.escape(CountryID) + ',' + db.escape(PostalCode) + ',' + db.escape(PIN) + ',' + db.escape(PhoneNumber) + ',' + db.escape(MobileNumber) + ',' + db.escape(EMailID) + ',' + db.escape(LaptopSLNO) + ',' + db.escape(VehicleNumber) + ',' + db.escape(Picture) + ',' + db.escape(PictureFileName) + ',' + db.escape(Website) + ',' + db.escape(ParkingStatus)  + ',' +   db.escape(ISDPhoneNumber) + ',' + db.escape(ISDMobileNumber);
+                        var InsertQuery = db.escape(TID) + ',' + db.escape(Token) + ',' + db.escape(LocTitle) + ',' + db.escape(Latitude) 
+                        + ',' + db.escape(Longitude) + ',' + db.escape(Altitude) + ',' + db.escape(AddressLine1) + ',' + db.escape(AddressLine2) 
+                        + ',' + db.escape(CityName) + ',' + db.escape(StateID) + ',' + db.escape(CountryID) + ',' + db.escape(PostalCode) 
+                        + ',' + db.escape(PIN) + ',' + db.escape(PhoneNumber) + ',' + db.escape(MobileNumber) + ',' + db.escape(EMailID) 
+                         + ',' + db.escape(Picture) + ',' + db.escape(PictureFileName) + ',' + db.escape(Website)  
+                        + ',' +   db.escape(ISDPhoneNumber) + ',' + db.escape(ISDMobileNumber) + ',' + db.escape(ParkingStatus);
 
 
                        console.log(InsertQuery);
@@ -2222,7 +2228,7 @@ exports.FnAddLocation = function (req, res) {
                                         //res.send(InsertResult);
                                         // console.log(InsertResult);
                                         console.log('Addlocation: Location added successfully');
-                                        var selectqry = 'Select tlocations.TID,MasterID,EZEID,LocTitle,Latitude,Longitude,Altitude,AddressLine1,AddressLine2,StateID,CountryID,PostalCode,PIN,EMailID,EMailVerifiedID,ifnull(PhoneNumber,"") as PhoneNumber,MobileNumber,ifnull(ISDPhoneNumber,"") as ISDPhoneNumber ,ifnull(ISDMobileNumber,"") as ISDMobileNumber, LaptopSLNO,VehicleNumber,CreatedDate,LUDate,Website,SeqNo,Picture,PictureFileName,ifnull((Select CityName from mcity where CityID=tlocations.CityID),"") as CityTitle,ifnull(ParkingStatus,0) as ParkingStatus from tlocations';
+                                        var selectqry = 'Select tlocations.TID,MasterID,EZEID,LocTitle,Latitude,Longitude,Altitude,AddressLine1,AddressLine2,StateID,CountryID,PostalCode,PIN,EMailID,EMailVerifiedID,ifnull(PhoneNumber,"") as PhoneNumber,MobileNumber,ifnull(ISDPhoneNumber,"") as ISDPhoneNumber ,ifnull(ISDMobileNumber,"") as ISDMobileNumber, CreatedDate,LUDate,Website,SeqNo,Picture,PictureFileName,ifnull((Select CityName from mcity where CityID=tlocations.CityID),"") as CityTitle,ifnull(ParkingStatus,0) as ParkingStatus from tlocations';
                                         if (TID == 0) {
                                             selectqry = selectqry + ' order by tlocations.TID desc limit 1';
                                         }
@@ -9362,47 +9368,63 @@ exports.FnSaveDepartmentsVES = function(req, res){
 
         var Token = req.body.Token;
         var Name = req.body.Name;
+        var TID = parseInt(req.body.TID);
         
-         var RtnMessage = {
-            IsSuccessfull: false
+        var RtnMessage = {
+            IsSuccessfull: false,
+            TID:0
         };
+        if(TID.toString() == 'NaN')
+            TID = 0;
 
         if (Token != null && Name != null) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
-                        var query = db.escape(Token) + ',' + db.escape(Name);
+                        var query = db.escape(Token) + ',' + db.escape(Name) + ',' + db.escape(TID);
                         db.query('CALL pSaveDepartments(' + query + ')', function (err, InsertResult) {
-                            if (!err){
-                                if (InsertResult.affectedRows > 0) {
+                           if (!err) {
+                          //console.log(InsertResult);
+                            if (InsertResult != null) {
+                                if (InsertResult[0].length > 0) {
                                     RtnMessage.IsSuccessfull = true;
-                                    res.send(RtnMessage);
-                                    console.log('FnSaveDepartmentsVES: Departments details save successfully');
+                                        var Insert = InsertResult[0];
+                                        RtnMessage.TID=Insert[0].TID;
+                                        res.send(Insert);
+                                        //res.send(RtnMessage);
+                                    console.log('FnSaveDepartmentsVES: DepartmentsVES details saved successfully');
                                 }
                                 else {
-                                    console.log('FnSaveDepartmentsVES:No Save Departments details');
                                     res.send(RtnMessage);
+                                    console.log('FnSaveDepartmentsVES: DepartmentsVES details Saving Failed');
                                 }
                             }
                             else {
-                                console.log('FnSaveDepartmentsVES: error in saving Departments details' + err);
-                                res.statusCode = 500;
+                                console.log(RtnMessage);
                                 res.send(RtnMessage);
+                                console.log('FnSaveDepartmentsVES: DepartmentsVES details saving Failed');
                             }
-                        });
-                    }
-                    else {
-                        console.log('FnSaveDepartmentsVES: Invalid token');
-                        res.statusCode = 401;
-                        res.send(RtnMessage);
-                    }
+                        }
+                        else {
+                            res.statusCode=500;
+                            res.send(RtnMessage);
+                            console.log('FnSaveDepartmentsVES: Error in getting DepartmentsVES details' + err);
+                        }
+                    });
                 }
                 else {
-                    console.log('FnSaveDepartmentsVES:Error in processing Token' + err);
-                    res.statusCode = 500;
+                    res.statusCode=401;
+                    console.log('FnSaveDepartmentsVES: Invalid Token')
                     res.send(RtnMessage);
                 }
-            });
+            }
+            else {
+                res.statusCode=500;
+                console.log('FnSaveDepartmentsVES: Error in processing Token' + err);
+                res.send(RtnMessage);
+            }
+        });
+
         }
         else {
             if (Token == null) {
@@ -9410,6 +9432,9 @@ exports.FnSaveDepartmentsVES = function(req, res){
             }
             else if (Name == null) {
                 console.log('FnSaveDepartmentsVES: Name is empty');
+            }
+            else if (TID.toString() == 'NaN') {
+                console.log('FnSaveDepartmentsVES: TID is empty');
             }
             res.statusCode=400;
             res.send(RtnMessage);
@@ -9428,47 +9453,63 @@ exports.FnSaveGatesVES = function(req, res){
 
         var Token = req.body.Token;
         var Name = req.body.Name;
+        var TID = parseInt(req.body.TID);
         
-         var RtnMessage = {
-            IsSuccessfull: false
+        var RtnMessage = {
+            IsSuccessfull: false,
+            TID:0
         };
+        if(TID.toString() == 'NaN')
+            TID = 0;
 
         if (Token != null && Name != null) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
-                        var query = db.escape(Token) + ',' + db.escape(Name);
+                        var query = db.escape(Token) + ',' + db.escape(Name) + ',' + db.escape(TID);
                         db.query('CALL pSaveGates(' + query + ')', function (err, InsertResult) {
-                            if (!err){
-                                if (InsertResult.affectedRows > 0) {
+                            if (!err) {
+                          //  console.log(InsertResult);
+                            if (InsertResult != null) {
+                                if (InsertResult[0].length > 0) {
                                     RtnMessage.IsSuccessfull = true;
-                                    res.send(RtnMessage);
-                                    console.log('FnSaveGatesVES: GatesVES details save successfully');
+                                        var Insert = InsertResult[0];
+                                        RtnMessage.TID=Insert[0].TID;
+                                        res.send(Insert);
+                                        //res.send(RtnMessage);
+                                    console.log('FnSaveGatesVES: GatesVES details saved successfully');
                                 }
                                 else {
-                                    console.log('FnSaveGatesVES:No Save GatesVES details');
                                     res.send(RtnMessage);
+                                    console.log('FnSaveGatesVES: GatesVES details Saving Failed');
                                 }
                             }
                             else {
-                                console.log('FnSaveGatesVES: error in saving GatesVES details' + err);
-                                res.statusCode = 500;
+                                console.log(RtnMessage);
                                 res.send(RtnMessage);
+                                console.log('FnSaveGatesVES: GatesVES details saving Failed');
                             }
-                        });
-                    }
-                    else {
-                        console.log('FnSaveGatesVES: Invalid token');
-                        res.statusCode = 401;
-                        res.send(RtnMessage);
-                    }
+                        }
+                        else {
+                            res.statusCode=500;
+                            res.send(RtnMessage);
+                            console.log('FnSaveGatesVES: Error in getting GatesVES etails' + err);
+                        }
+                    });
                 }
                 else {
-                    console.log('FnSaveGatesVES:Error in processing Token' + err);
-                    res.statusCode = 500;
+                    res.statusCode=401;
+                    console.log('FnSaveGatesVES: Invalid Token')
                     res.send(RtnMessage);
                 }
-            });
+            }
+            else {
+                res.statusCode=500;
+                console.log('FnSaveGatesVES: Error in processing Token' + err);
+                res.send(RtnMessage);
+            }
+        });
+
         }
         else {
             if (Token == null) {
@@ -9476,6 +9517,9 @@ exports.FnSaveGatesVES = function(req, res){
             }
             else if (Name == null) {
                 console.log('FnSaveGatesVES: Name is empty');
+            }
+            else if (TID.toString() == 'NaN') {
+                console.log('FnSaveGatesVES: TID is empty');
             }
             res.statusCode=400;
             res.send(RtnMessage);
@@ -9494,44 +9538,61 @@ exports.FnSaveCitysVES = function(req, res){
 
         var StateID = req.body.StateID;
         var CityTitle = req.body.CityTitle;
-       
-         var RtnMessage = {
-            IsSuccessfull: false
+        var TID = parseInt(req.body.TID);
+        
+        var RtnMessage = {
+            IsSuccessfull: false,
+            TID:0
         };
+        if(TID.toString() == 'NaN')
+            TID = 0;
+       
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
 
 
         if (StateID != null && CityTitle != null) {
-            var Insertquery = db.escape(StateID) + ',' + db.escape(CityTitle);
+            var Insertquery = db.escape(StateID) + ',' + db.escape(CityTitle) + ',' + db.escape(TID);
                         db.query('CALL pSaveCitysVES(' + Insertquery + ')', function (err, InsertResult) {
-                            if (!err){
-                                if (InsertResult.affectedRows > 0) {
+                        if (!err) {
+                          //  console.log(InsertResult);
+                            if (InsertResult != null) {
+                                if (InsertResult[0].length > 0) {
                                     RtnMessage.IsSuccessfull = true;
-                                    res.send(RtnMessage);
-                                    console.log('FnSaveCitysVES: CitysVES details save successfully');
+                                        var Insert = InsertResult[0];
+                                        RtnMessage.TID=Insert[0].TID;
+                                        res.send(Insert);
+                                        //res.send(RtnMessage);
+                                    console.log('FnSaveCitysVES: CitysVES details saved successfully');
                                 }
                                 else {
-                                    console.log('FnSaveCitysVES:No Save CitysVES details');
                                     res.send(RtnMessage);
-                                    }
-                                
+                                    console.log('FnSaveCitysVES: CitysVES details Saving Failed');
+                                }
                             }
                             else {
-                                console.log('FnSaveCitysVES: error in saving CitysVES details' + err);
-                                res.statusCode = 500;
+                                console.log(RtnMessage);
                                 res.send(RtnMessage);
+                                console.log('FnSaveCitysVES: CitysVES details saving Failed');
                             }
-                        });
-                    }
-                    
-            else {
+                        }
+                        else {
+                            res.statusCode=500;
+                            res.send(RtnMessage);
+                            console.log('FnSaveCitysVES: Error in getting CitysVES etails' + err);
+                        }
+                    });
+                }
+               
+        else {
             if (StateID == null) {
                 console.log('FnSaveCitysVES: StateID is empty');
             }
             else if (CityTitle == null) {
                 console.log('FnSaveCitysVES: CityTitle is empty');
             }
-               
+            else if (TID.toString() == 'NaN') {
+                console.log('FnSaveCitysVES: TID is empty');
+            }
             res.statusCode=400;
             res.send(RtnMessage);
         }
@@ -9541,6 +9602,3 @@ exports.FnSaveCitysVES = function(req, res){
         throw new Error(ex);
     }
 };
-
-
-
