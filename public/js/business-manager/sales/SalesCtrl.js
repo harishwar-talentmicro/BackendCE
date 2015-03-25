@@ -95,8 +95,43 @@ angular.module('ezeidApp')
             $scope.showModal = !$scope.showModal;
         };
 
+        /**
+         * Modal Box dynamic templates path
+         * @type {string}
+         */
+        var templatesPath = 'html/business-manager/templates/';
+
+        /**
+         * Available Modal Templates (based on ItemList Type)
+         * @type {Array}
+         */
+        $scope.modalTemplates = [
+            'modal-msg-only.tpl.html',
+            'modal-item-only.tpl.html',
+            'modal-item-picture.tpl.html',
+            'modal-item-picture-qty.tpl.html',
+            'modal-item-picture-qty-rate.tpl.html'
+        ];
+
+        /**
+         * ModalBox DataModel
+         * @type {{title: string, template: string, transaction : Object}}
+         */
         $scope.modalBox = {
-            title : 'Transaction Details'
+            title : 'Transaction Details',
+            template : templatesPath + $scope.modalTemplates[$scope.modules[$scope.selectedModule].listType],
+            transaction : {}
+        };
+
+        /**
+         * View Transaction Details
+         * Opens Modal Box
+         */
+        $scope.viewDetails = function(rowEntity){
+            console.log(rowEntity);
+            $scope.modalBox.data = rowEntity;
+            $scope.toggleModalBox();
+            console.log($scope.modalBox);
         };
 
         /****************************************************** Controller Code *****************************/
@@ -284,9 +319,27 @@ angular.module('ezeidApp')
         $scope.gridOptions.onRegisterApi = function(gridApi){
             $scope.gridApi = gridApi;
             $scope.gridApi.edit.on.afterCellEdit($scope,function(rowEntity, colDef){
-                console.log(rowEntity);
-                console.log(colDef);
+//                console.log(rowEntity);
+//                console.log(colDef);
+//                console.log(gridApi);
+
+                console.log('I am from afterCellEdit');
             });
+
+
+            $scope.gridApi.edit.on.beginCellEdit($scope,function(rowEntity,colDef){
+                console.log('I am from beginEditCell');
+                console.log(rowEntity); console.log(colDef);
+
+            });
+
+            $scope.gridApi.edit.on.cancelCellEdit($scope,function(rowEntity){
+                console.log('I am from cancelCellEdit');
+            });
+
+//            $scope.gridOptions.$on('ngGridEventStartCellEdit',function(){
+//                console.log('ngGridEventStartCellEdit');
+//            });
 
 //            $scope.gridApi.edit.on.beginEditCell($scope,function(rowEntity,colDef){
 //                $scope.isSaveBoxVisible = true;
@@ -316,52 +369,10 @@ angular.module('ezeidApp')
         };
         ///////////////////////////////////////////////////////////////////////////////////////
 
-        var cellEditingTemplate = '<div class="ui-grid-cell-contents" title="TOOLTIP">' +
-            '<div class="ng-grid-save-box">' +
-            '<div class="ng-grid-save-box-inner">' +
-            '<button class="btn btn-sm btn-default no-radius" ng-click="saveCell(row)">' +
-            '<span class="glyphicon glyphicon-ok-circle"></span> Save' +
-            '</button> ' +
-            '<button class="btn btn-sm btn-danger no-radius" ng-click="discardCell(row)">' +
-            '<span class="glyphicon glyphicon-remove-circle"></span> Cancel' +
-            '</button> ' +
-            '</div> ' +
-            '</div>' +
-            '</div>';
-
-        /**
-         * Custom Template for rows
-         */
-        $scope.gridOptions.columnDefs[2].cellTemplate = cellEditingTemplate;
-        $scope.gridOptions.columnDefs[4].cellTemplate = cellEditingTemplate;
-        $scope.gridOptions.columnDefs[5].cellTemplate = cellEditingTemplate;
-        $scope.gridOptions.columnDefs[6].cellTemplate = cellEditingTemplate;
-        $scope.gridOptions.columnDefs[11].cellTemplate = cellEditingTemplate;
 
         /**
          * Adds a new row at first in the transaction table
          */
-
-        /**
-         * Saves the cell contents locally afterEdit
-         */
-        $scope.saveCell = function(row){
-            /**
-             * @todo
-             */
-            console.log('saveCell');
-        };
-
-        /**
-         * Discard cell Contents locally after cellEdit
-         */
-        $scope.discardCell = function(row){
-            /**
-             * @todo
-             */
-            console.log('discardCell');
-        };
-
         $scope.addNewRow = function() {
             console.log($scope.gridOptions.data);
             var n = $scope.gridOptions.data.length + 1;
@@ -445,14 +456,7 @@ angular.module('ezeidApp')
 
         /******************************************* Grid Code Ends here **********************************/
 
-        /**
-         * View Transaction Details
-         * Opens Modal Box
-         */
-        $scope.viewDetails = function(rowEntity){
-            console.log(rowEntity);
-            $scope.toggleModalBox();
-        };
+
 
         /**
          * Finds an item from ItemList based on TID

@@ -1589,3 +1589,19 @@ input[type="text"].ui-grid-filter-input {
 .ng-grid-save-box-inner > button{
     margin-right: 10px;
 }
+/** ng cell edit template css **/
+.cell-edit-input{
+    height: 25px;
+    border: none;
+    outline: none;
+}
+
+.item-remove-btn{
+    height: 15px;
+    width: 15px;
+    font-size: 10px;
+    padding: 0px;
+    position: absolute;
+    right: 0;
+    margin-right: 5px;
+}

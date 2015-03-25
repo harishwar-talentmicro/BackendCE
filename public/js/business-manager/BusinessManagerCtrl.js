@@ -4,7 +4,7 @@
  */
 angular.module('ezeidApp').controller('BusinessManagerCtrl',['$scope','$rootScope','MsgDelay','GURL','$http','$interval','Notification','$routeParams',function($scope,$rootScope,MsgDelay,GURL,$http,$interval,Notification,$routeParams){
 
-    console.log($routeParams);
+
     /**
      * Module (Prototype)
      * @param type => (Integer) 0: Sales, 1 : Reservation, 2 : Home Delivery, 3 : Service, 4 : Resume
@@ -100,7 +100,7 @@ angular.module('ezeidApp').controller('BusinessManagerCtrl',['$scope','$rootScop
 
     /**
      * Load master(company) configuration set for this user and create module objects
-     * Only make module objects for those modules which are accessible to him and are enabled for this user
+     * Only make module objects for those modules which are accessible and are enabled for this user
      */
     $scope.loadConfig = function(){
         console.log($rootScope._userInfo);
@@ -153,7 +153,6 @@ angular.module('ezeidApp').controller('BusinessManagerCtrl',['$scope','$rootScop
         window.history.back();
     };
 
-    console.log($routeParams);
     $scope.loadConfig();
 
 }]);
