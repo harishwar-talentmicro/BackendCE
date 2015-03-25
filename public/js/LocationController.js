@@ -2,7 +2,7 @@
 angular.module('ezeidApp').controller('LocationsController', function ($rootScope, $scope, $http, $q, $timeout, Notification, $filter, $interval, $window,GURL) {
 
     var SLocCtrl = this;
-    var map;
+    var map1;
     var mapOptions;
     var isCancelButton = true;
     SLocCtrl.profile = {};
@@ -40,6 +40,7 @@ angular.module('ezeidApp').controller('LocationsController', function ($rootScop
     SLocCtrl.LocationsList = [];
     SLocCtrl._locInfo = {};
     SLocCtrl.mapInit = false;
+
     if ($rootScope._userInfo) {
     }
     else {
@@ -84,7 +85,7 @@ angular.module('ezeidApp').controller('LocationsController', function ($rootScop
             SLocCtrl.profile._info = {};
             SLocCtrl.profile._info.IDTypeID = 1;
             SLocCtrl.profile._info.NameTitleID = 1;
-            SLocCtrl.profile._info.ParkingStatus = 1;
+            SLocCtrl.profile._info.ParkingStatus = 0;
             SLocCtrl.profile._info.OpenStatus = 1;
             window.location.href = "/";
         }
@@ -148,8 +149,9 @@ angular.module('ezeidApp').controller('LocationsController', function ($rootScop
              });
         }
 
-
     this.openNewLocationForm = function (secLocForm) {
+
+        initialize1();
 
         document.getElementById("mobile_phone").className = "form-control emptyBox";
         document.getElementById("Location").className = "form-control emptyBox";
@@ -178,24 +180,25 @@ angular.module('ezeidApp').controller('LocationsController', function ($rootScop
         SLocCtrl._locInfo.SupportButton = 0;
         SLocCtrl._locInfo.CVButton = 0;
 
+            //initialize1();
 
 
-        if(!map){
+        /*if(!map1){
             initialize1();
+
+
         }
         else{
             navigator.geolocation.getCurrentPosition(FindCurrentLocation, function () {
                 handleNoGeolocation();
             });
-        }
+        }*/
+
         //To set by default selected
          SLocCtrl._locInfo.ParkingStatus = 0;
          SLocCtrl._locInfo.OpenStatus = 1;
     };
     this.openEditSecLocForm = function (row,index) {
-
-         //var stateId = SLocCtrl._locInfo.StateID;
-      //  SLocCtrl._locInfo.StateID = stateId;
 
         SLocCtrl._locInfo = SLocCtrl.LocationsList[index];
 
@@ -209,17 +212,19 @@ angular.module('ezeidApp').controller('LocationsController', function ($rootScop
         SLocCtrl._locInfo.ReservationButton = SLocCtrl._locInfo.ReservationButton == 1 ? true : false;
         SLocCtrl._locInfo.SupportButton = SLocCtrl._locInfo.SupportButton == 1 ? true : false;
         SLocCtrl._locInfo.CVButton = SLocCtrl._locInfo.CVButton == 1 ? true : false;
+        SLocCtrl._locInfo.ParkingStatus = SLocCtrl._locInfo.ParkingStatus;
+
         try{
-            if(!map){
+            if(!map1){
                 initialize1();
             }
             else{
                 var pos = new google.maps.LatLng(SLocCtrl._locInfo.Latitude,SLocCtrl._locInfo.Longitude);
                 PlaceCurrentLocationMarker(pos);
-                map.setZoon(15);
+                map1.setZoon(15);
                 var bounds = new google.maps.LatLngBounds();
                 bounds.extend(pos);
-                map.fitBounds(bounds);
+                map1.fitBounds(bounds);
                 
             }
         }
@@ -458,7 +463,7 @@ angular.module('ezeidApp').controller('LocationsController', function ($rootScop
 
         var initialLocation;
         var currentLoc = new google.maps.LatLng(12.295810, 76.639381);
-        map = new google.maps.Map(document.getElementById('map-canvasl'), {
+        map1 = new google.maps.Map(document.getElementById('map-canvasl'), {
             mapTypeId: google.maps.MapTypeId.ROADMAP,
             Zoom: 16
         });
@@ -474,18 +479,18 @@ angular.module('ezeidApp').controller('LocationsController', function ($rootScop
         }
         // Browser doesn't support Geolocation
         else {
-            handleNoGeolocation();
+           handleNoGeolocation();
         }
 
         function handleNoGeolocation() {
-            initialLocation = currentLoc;
-            map.setCenter(initialLocation);
+           initialLocation = currentLoc;
+            map1.setCenter(initialLocation);
             PlaceCurrentLocationMarker(initialLocation);
             //PlaceMarker(initialLocation);
         }
         
         
-        google.maps.event.addListenerOnce(map, 'idle', function () {
+        google.maps.event.addListenerOnce(map1, 'idle', function () {
 
             $scope.isMapLoaded = true;
             
@@ -494,13 +499,12 @@ angular.module('ezeidApp').controller('LocationsController', function ($rootScop
                             //// Create the search box and link it to the UI element.
             var input = (document.getElementById('txtSearch1'));
 
-           // console.log(input);
-            map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
+             map1.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
 
             var searchBox = new google.maps.places.SearchBox((input));
             var ClocBtn = (document.getElementById('mapClocl'));
 
-            map.controls[google.maps.ControlPosition.TOP_RIGHT].push(ClocBtn);
+            map1.controls[google.maps.ControlPosition.TOP_RIGHT].push(ClocBtn);
 
             if (JSON.stringify(SLocCtrl._locInfo) != '{}') {
                 initialLocation = new google.maps.LatLng(SLocCtrl._locInfo.Latitude, SLocCtrl._locInfo.Longitude);
@@ -544,8 +548,8 @@ angular.module('ezeidApp').controller('LocationsController', function ($rootScop
             /*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
             // Bias the SearchBox results towards places that are within the bounds of the
             // current map's viewport.
-            google.maps.event.addListener(map, 'bounds_changed', function () {
-                var bounds = map.getBounds();
+            google.maps.event.addListener(map1, 'bounds_changed', function () {
+                var bounds = map1.getBounds();
                 searchBox.setBounds(bounds);
             });
 
@@ -559,7 +563,7 @@ angular.module('ezeidApp').controller('LocationsController', function ($rootScop
         });
         
         $(window).resize(function() {
-            google.maps.event.trigger(map, "resize");
+            google.maps.event.trigger(map1, "resize");
         });
     }
 
@@ -586,56 +590,6 @@ angular.module('ezeidApp').controller('LocationsController', function ($rootScop
 
         angular.forEach(results, function (mapResultValue, index) {
 
-            /*if (mapResultValue.types[0] == 'street_number') {
-                SLocCtrl._locInfo.AddressLine1 = mapResultValue.long_name;
-               // $scope.$apply();
-            }
-            if (mapResultValue.types[0] == 'route') {
-                if (SLocCtrl._locInfo.AddressLine1 != "") {
-                    SLocCtrl._locInfo.AddressLine1 += "," + mapResultValue.long_name;
-                 //   $scope.$apply();
-                } else {
-                    SLocCtrl._locInfo.AddressLine1 = mapResultValue.long_name;
-                  //  $scope.$apply();
-                }
-            }
-            if (mapResultValue.types[0] == 'neighborhood') {
-                if (SLocCtrl._locInfo.AddressLine1 != "") {
-                    SLocCtrl._locInfo.AddressLine1 += "," + mapResultValue.long_name;
-                  //  $scope.$apply();
-                } else {
-                    SLocCtrl._locInfo.AddressLine1 = mapResultValue.long_name;
-                  //  $scope.$apply();
-                }
-            }
-            if (mapResultValue.types[0] == 'sublocality_level_3') {
-                if (SLocCtrl._locInfo.AddressLine2 != "") {
-                    SLocCtrl._locInfo.AddressLine2 += "," + mapResultValue.long_name;
-                  //  $scope.$apply();
-                } else {
-                    SLocCtrl._locInfo.AddressLine2 = mapResultValue.long_name;
-                  //  $scope.$apply();
-                }
-            }
-            if (mapResultValue.types[0] == 'sublocality_level_2') {
-                if (SLocCtrl._locInfo.AddressLine2 != "") {
-                    SLocCtrl._locInfo.AddressLine2 += "," + mapResultValue.long_name;
-                   // $scope.$apply();
-                } else {
-                    SLocCtrl._locInfo.AddressLine2 = mapResultValue.long_name;
-                  //  $scope.$apply();
-                }
-            }
-            if (mapResultValue.types[0] == 'sublocality_level_1') {
-                if (SLocCtrl._locInfo.AddressLine2 != "") {
-                    SLocCtrl._locInfo.AddressLine2 += "," + mapResultValue.long_name;
-                  //  $scope.$apply();
-                } else {
-                    SLocCtrl._locInfo.AddressLine2 = mapResultValue.long_name;
-                  //  $scope.$apply();
-                }
-            }*/
-
             if (mapResultValue.types[0] == 'locality') {
                 if (SLocCtrl._locInfo.CityTitle  != "") {
                     SLocCtrl._locInfo.CityTitle  += "," + mapResultValue.long_name;
@@ -649,31 +603,24 @@ angular.module('ezeidApp').controller('LocationsController', function ($rootScop
             if (mapResultValue.types[0] == 'administrative_area_level_1') {
                 if (SLocCtrl._locInfo.State!= "") {
                     SLocCtrl._locInfo.State = mapResultValue.long_name;
-                    //  $scope.$apply();
                 } else {
                     SLocCtrl._locInfo.State = mapResultValue.long_name;
-                    //$scope.$apply();
-                }
+               }
             }
 
             if (mapResultValue.types[0] == 'postal_code') {
                 if (SLocCtrl._locInfo.PostalCode != "") {
                     SLocCtrl._locInfo.PostalCode += "," + mapResultValue.long_name;
 
-                   // $scope.$apply();
                 } else {
                     SLocCtrl._locInfo.PostalCode = mapResultValue.long_name;
-                   // $scope.$apply();
                 }
             }
             if (mapResultValue.types[0] == 'country') {
                 if (SLocCtrl._locInfo.Country != "") {
                     SLocCtrl._locInfo.Country = mapResultValue.long_name;
-
-                    //$scope.$apply();
-                } else {
+               } else {
                     SLocCtrl._locInfo.Country = mapResultValue.long_name;
-                    //  $scope.$apply();
                 }
             }
 
@@ -682,7 +629,6 @@ angular.module('ezeidApp').controller('LocationsController', function ($rootScop
        // if( SLocCtrl._locInfo.CountryID == null || SLocCtrl._locInfo.CountryID == "")
        // {
             var countryFileredString = $filter('filter')(SLocCtrl.countries, SLocCtrl._locInfo.Country)
-
 
             for (var key in countryFileredString)
             {
@@ -707,7 +653,7 @@ angular.module('ezeidApp').controller('LocationsController', function ($rootScop
 
     this.isMapInitialized = function () {
          if (SLocCtrl.mapInit == false) {
-             if(!map){
+             if(!map1){
                 initialize1();
             }
             SLocCtrl.mapInit = true;
@@ -717,7 +663,7 @@ angular.module('ezeidApp').controller('LocationsController', function ($rootScop
         var request = {
             query: Query
         };
-        service = new google.maps.places.PlacesService(map);
+        service = new google.maps.places.PlacesService(map1);
         service.textSearch(request, getMapSearchResults);
     };
     function getMapSearchResults(results, status) {
@@ -736,15 +682,15 @@ angular.module('ezeidApp').controller('LocationsController', function ($rootScop
         }
     }
     function PlaceCurrentLocationMarker(location) {
-        if (marker != undefined) {
+       if (marker != undefined) {
             marker.setMap(null);
         }
-        map.setCenter(location);
+        map1.setCenter(location);
         marker = new google.maps.Marker({
             position: location,
             title: "Current Location",
             draggable: true,
-            map: map,
+            map: map1,
             icon: 'images/you_are_here.png'
         });
         google.maps.event.addListener(marker, 'dragend', function (e) {
