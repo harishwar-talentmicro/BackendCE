@@ -3934,7 +3934,7 @@ exports.FnSearchByKeywords = function (req, res) {
                             }
                             var SearchQuery = db.escape('') + ',' + db.escape(CategoryID) + ',' + db.escape(0) + ',' + db.escape(0.00) + ',' + db.escape(0.00) + ',' + db.escape(EZEID) + ',' + db.escape(LocSeqNo) + ',' + db.escape(Pin) + ',' + db.escape(SearchType) + ',' + db.escape(DocType) + ',' + db.escape("0") + ',' + db.escape("0") + ',' + db.escape("0") + ',' + db.escape(token);
                             //console.log('SearchQuery: ' + SearchQuery);
-                            db.query('CALL pSearchResult(' + SearchQuery + ')', function (err, SearchResult) {
+                            db.query('CALL pSearchNew(' + SearchQuery + ')', function (err, SearchResult) {
                                 // db.query(searchQuery, function (err, SearchResult) {
                                 if (!err) {
                                     if (SearchResult[0] != null) {
@@ -3999,8 +3999,8 @@ exports.FnSearchByKeywords = function (req, res) {
 
                 var InsertQuery = db.escape(find) + ',' + db.escape(CategoryID) + ',' + db.escape(Proximity) + ',' + db.escape(Latitude) + ',' + db.escape(Longitude) + ',' + db.escape('') + ',' + db.escape(0) + ',' + db.escape(0) + ',' + db.escape(1) + ',' + db.escape('') + ',' + db.escape(ParkingStatus) + ',' + db.escape(OpenCloseStatus) + ',' + db.escape(Rating) + ',' + db.escape(token);
                 //console.log('SearchQuery: ' + InsertQuery);
-                var link = 'CALL pSearchResult(' + InsertQuery + ')';
-                db.query('CALL pSearchResult(' + InsertQuery + ')', function (err, SearchResult) {
+                //var link = 'CALL pSearchResult(' + InsertQuery + ')';
+                db.query('CALL pSearchNew(' + InsertQuery + ')', function (err, SearchResult) {
                     if (!err) {
                         //console.log(SearchResult);
                         if (SearchResult[0] != null) {
@@ -4009,45 +4009,14 @@ exports.FnSearchByKeywords = function (req, res) {
                                 console.log('FnSearchByKeywords:  tmaster:Search Found');
                             }
                             else {
-                                if (Proximity != 0) {
-                                    var InsertProximityQuery = db.escape(find) + ',' + db.escape(CategoryID) + ',' + db.escape(0) + ',' + db.escape(Latitude) + ',' + db.escape(Longitude) + ',' + db.escape('') + ',' + db.escape(0) + ',' + db.escape(0) + ',' + db.escape(1) + ',' + db.escape('') + ',' + db.escape(ParkingStatus) + ',' + db.escape(OpenCloseStatus) + ',' + db.escape(Rating) + ',' + db.escape(token);
-                                    console.log('SearchQuery without Proximity: ' + InsertProximityQuery);
-                                    db.query('CALL pSearchResult(' + InsertProximityQuery + ')', function (err, SearchProximityResult) {
-                                        if (!err) {
-                                            //console.log(SearchProximityResult);
-                                            if (SearchProximityResult[0] != null) {
-                                                if (SearchProximityResult[0].length > 0) {
-                                                    res.send(SearchProximityResult[0]);
-                                                    console.log('FnSearchByKeywords:pSearchResult:With Proxmity:  tmaster:Search Found');
-                                                }
-                                                else {
-                                                    res.send('null');
-                                                    console.log('FnSearchByKeywords: pSearchResult: no search found without proximity');
-                                                }
-                                            }
-                                            else {
-                                                res.send('null');
-                                                console.log('FnSearchByKeywords: pSearchResult: no search found without proximity');
-                                            }
-                                        }
-                                        else {
-                                            res.statusCode = 500;
-                                            res.send('null');
-                                            console.log('FnSearchByKeywords: pSearchResult: no search found without proximity');
-                                        }
-                                    });
-                                }
-                                else {
                                     res.send('null');
                                     console.log('FnSearchByKeywords: tmaster: no search found');
-                                }
                             }
                         }
                         else {
                             res.send('null');
                             console.log('FnSearchByKeywords:  tmaster: no search found');
                         }
-
                     }
                     else {
                         res.statusCode = 500;
@@ -4096,45 +4065,14 @@ exports.FnSearchByKeywords = function (req, res) {
                                 console.log('FnSearchByKeywords:  tmaster:Search Found');
                             }
                             else {
-                                if (Proximity != 0) {
-                                    var InsertProximityQuery = db.escape(find) + ',' + db.escape(CategoryID) + ',' + db.escape(0) + ',' + db.escape(Latitude) + ',' + db.escape(Longitude) + ',' + db.escape('') + ',' + db.escape(0) + ',' + db.escape(0) + ',' + db.escape(3) + ',' + db.escape('') + ',' + db.escape(ParkingStatus) + ',' + db.escape(OpenCloseStatus) + ',' + db.escape(Rating) + ',' + db.escape(token);
-                                    console.log('SearchQuery without Proximity: ' + InsertProximityQuery);
-                                    db.query('CALL pSearchNew(' + InsertProximityQuery + ')', function (err, SearchProximityResult) {
-                                        if (!err) {
-                                            //console.log(SearchProximityResult);
-                                            if (SearchProximityResult[0] != null) {
-                                                if (SearchProximityResult[0].length > 0) {
-                                                    res.send(SearchProximityResult[0]);
-                                                    console.log('FnSearchByKeywords:pSearchResult:With Proxmity:  tmaster:Search Found');
-                                                }
-                                                else {
-                                                    res.send('null');
-                                                    console.log('FnSearchByKeywords: pSearchResult: no search found without proximity');
-                                                }
-                                            }
-                                            else {
-                                                res.send('null');
-                                                console.log('FnSearchByKeywords: pSearchResult: no search found without proximity');
-                                            }
-                                        }
-                                        else {
-                                            res.statusCode = 500;
-                                            res.send('null');
-                                            console.log('FnSearchByKeywords: pSearchResult: no search found without proximity');
-                                        }
-                                    });
-                                }
-                                else {
                                     res.send('null');
                                     console.log('FnSearchByKeywords: tmaster: no search found');
-                                }
                             }
                         }
                         else {
                             res.send('null');
                             console.log('FnSearchByKeywords:  tmaster: no search found');
                         }
-
                     }
                     else {
                         res.statusCode = 500;
@@ -6743,6 +6681,182 @@ exports.FnGetTranscation = function (req, res) {
     }
 };
 
+exports.FnSaveWorkingHours = function(req, res){
+    try{
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.body.Token;
+        var SpilloverTime = req.body.SpilloverTime;
+        var MO1 = req.body.MO1;
+        var MO2 = req.body.MO2;
+        var MO3 = req.body.MO3;
+        var MO4 = req.body.MO4;
+        var TU1 = req.body.TU1;
+        var TU2 = req.body.TU2;
+        var TU3 = req.body.TU3;
+        var TU4 = req.body.TU4;
+        var WE1 = req.body.WE1;
+        var WE2 = req.body.WE2;
+        var WE3 = req.body.WE3;
+        var WE4 = req.body.WE4;
+        var TH1 = req.body.TH1;
+        var TH2 = req.body.TH2;
+        var TH3 = req.body.TH3;
+        var TH4 = req.body.TH4;
+        var FR1 = req.body.FR1;
+        var FR2 = req.body.FR2;
+        var FR3 = req.body.FR3;
+        var FR4 = req.body.FR4;
+        var SA1 = req.body.SA1;
+        var SA2 = req.body.SA2;
+        var SA3 = req.body.SA3;
+        var SA4 = req.body.SA4;
+        var SU1 = req.body.SU1;
+        var SU2 = req.body.SU2;
+        var SU3 = req.body.SU3;
+        var SU4 = req.body.SU4;
+
+
+        var RtnMessage = {
+            IsSuccessfull: false
+        };
+
+        if (Token != null && SpilloverTime != null ) {
+            FnValidateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+
+                        var query = db.escape(Token) + ',' + db.escape(SpilloverTime) + ',' + db.escape(MO1) + ',' + db.escape(MO2) + ',' + db.escape(MO3) + ',' + db.escape(MO4)
+                        + ',' + db.escape(TU1) + ',' + db.escape(TU2) + ',' + db.escape(TU3) + ',' + db.escape(TU4)
+                        + ',' + db.escape(WE1) + ',' + db.escape(WE2) + ',' + db.escape(WE3) + ',' + db.escape(WE4)
+                        + ',' + db.escape(TH1) + ',' + db.escape(TH2) + ',' + db.escape(TH3) + ',' + db.escape(TH4)
+                        + ',' + db.escape(FR1) + ',' + db.escape(FR2) + ',' + db.escape(FR3) + ',' + db.escape(FR4)
+                        + ',' + db.escape(SA1) + ',' + db.escape(SA2) + ',' + db.escape(SA3) + ',' + db.escape(SA4)
+                        + ',' + db.escape(SU1) + ',' + db.escape(SU2) + ',' + db.escape(SU3) + ',' + db.escape(SU4);
+                        db.query('CALL pSaveWorkingHours(' + query + ')', function (err, InsertResult) {
+                            if (!err){
+                                if (InsertResult.affectedRows > 0) {
+                                    RtnMessage.IsSuccessfull = true;
+                                    res.send(RtnMessage);
+                                    console.log('FnSaveWorkingHours: Working Hours details save successfully');
+                                }
+                                else {
+                                    console.log('FnSaveWorkingHours:No Save Working Hours details');
+                                    res.send(RtnMessage);
+                                }
+                            }
+
+                            else {
+                                console.log('FnSaveWorkingHours: error in saving Working Hours details' + err);
+                                res.statusCode = 500;
+                                res.send(RtnMessage);
+                            }
+                        });
+                    }
+                    else {
+                        console.log('FnSaveWorkingHours: Invalid token');
+                        res.statusCode = 401;
+                        res.send(RtnMessage);
+                    }
+                }
+                else {
+                    console.log('FnSaveWorkingHours:Error in processing Token' + err);
+                    res.statusCode = 500;
+                    res.send(RtnMessage);
+
+                }
+            });
+
+        }
+
+        else {
+            if (Token == null) {
+                console.log('FnSaveWorkingHours: Token is empty');
+            }
+            else if (SpilloverTime == null) {
+                console.log('FnSaveWorkingHours: SpilloverTime is empty');
+            }
+            res.statusCode=400;
+            res.send(RtnMessage);
+        }
+
+    }
+    catch (ex) {
+        console.log('FnSaveWorkingHours:error ' + ex.description);
+        throw new Error(ex);
+    }
+};
+
+exports.FnGetWorkingHours = function (req, res) {
+    try {
+
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.query.Token;
+        if (Token != null) {
+            FnValidateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+
+                        db.query('CALL pGetWorkingHours(' + db.escape(Token) + ')', function (err, GetResult) {
+                            if (!err) {
+                                if (GetResult != null) {
+                                    if (GetResult[0].length > 0) {
+
+                                        console.log('FnGetWorkingHours: Working Hours details Send successfully');
+                                        res.send(GetResult[0]);
+                                    }
+                                    else {
+
+                                        console.log('FnGetWorkingHours:No Working Hours details found');
+                                        res.send('null');
+                                    }
+                                }
+                                else {
+
+                                    console.log('FnGetWorkingHours:No Working Hours details found');
+                                    res.send('null');
+                                }
+
+                            }
+                            else {
+
+                                console.log('FnGetWorkingHours: error in getting Working Hours details' + err);
+                                res.statusCode = 500;
+                                res.send('null');
+                            }
+                        });
+                    }
+                    else {
+                        res.statusCode = 401;
+                        res.send('null');
+                        console.log('FnGetWorkingHours: Invalid Token');
+                    }
+                } else {
+
+                    res.statusCode = 500;
+                    res.send('null');
+                    console.log('FnGetWorkingHours: Error in validating token:  ' + err);
+                }
+            });
+        }
+        else {
+            if (Token == null) {
+                console.log('FnGetWorkingHours: Token is empty');
+            }
+
+            res.statusCode=400;
+            res.send('null');
+        }
+    }
+    catch (ex) {
+        console.log('FnGetWorkingHours error:' + ex.description);
+        throw new Error(ex);
+    }
+};
+
 exports.FnGetUserwiseFolderList = function (req, res) {
     try {
 
@@ -7188,6 +7302,76 @@ exports.FnGetLocationList = function (req, res) {
         throw new Error(ex);
     }
 };
+
+exports.FnGetLoginDetails = function (req, res) {
+    try {
+
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.query.Token;
+        
+        if (Token != null) {
+            FnValidateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+
+                        db.query('CALL pLoginDetails(' + db.escape(Token) + ')', function (err, GetResult) {
+                            if (!err) {
+                                if (GetResult != null) {
+                                    if (GetResult[0].length > 0) {
+
+                                        console.log('FnGetLoginDetails: Login details Send successfully');
+                                        res.send(GetResult[0]);
+                                    }
+                                    else {
+
+                                        console.log('FnGetLoginDetails:No Login details found');
+                                        res.send('null');
+                                    }
+                                }
+                                else {
+
+                                    console.log('FnGetLoginDetails:No Login details found');
+                                    res.send('null');
+                                }
+
+                            }
+                            else {
+
+                                console.log('FnGetLoginDetails: error in getting Login details' + err);
+                                res.statusCode = 500;
+                                res.send('null');
+                            }
+                        });
+                    }
+                    else {
+                        res.statusCode = 401;
+                        res.send('null');
+                        console.log('FnGetLoginDetails: Invalid Token');
+                    }
+                } else {
+
+                    res.statusCode = 500;
+                    res.send('null');
+                    console.log('FnGetLoginDetails: Error in validating token:  ' + err);
+                }
+            });
+        }
+        else {
+            if (Token == null) {
+                console.log('FnGetLoginDetails: Token is empty');
+            }
+            res.statusCode=400;
+            res.send('null');
+        }
+    }
+    catch (ex) {
+        console.log('FnGetLoginDetails error:' + ex.description);
+        throw new Error(ex);
+    }
+};
+
 
 //EZEIDAP Parts
 
@@ -7824,7 +8008,12 @@ exports.FnSaveAPEZEID = function (req, res) {
         var OwnerPayment = req.body.OwnerPayment;
         var AgeOfProperty = req.body.AgeOfProperty;
         var NoOfBathrooms = req.body.NoOfBathrooms;
-        var Amenities = req.body.Amenities;
+        var Gas = req.body.Gas;
+        var Lift = req.body.Lift;
+        var Gym = req.body.Gym;
+        var SwimmingPool = req.body.SwimmingPool;
+        var Security = req.body.Security;
+        var UPS = req.body.UPS;
         var tAvailableDate = null;
         if (AvailableDate != null) {
             // datechange = new Date(new Date(TaskDateTime).toUTCString());
@@ -7846,7 +8035,8 @@ exports.FnSaveAPEZEID = function (req, res) {
                         + ',' +db.escape(EZEID) + ',' + db.escape(Status) + ',' + db.escape(Reason) + ',' + db.escape(tAvailableDate) + ',' + db.escape(Token) 
                         + ',' + db.escape(APID) + ',' + db.escape(Latitude) + ',' + db.escape(Longitude) + ',' + db.escape(TID) + ',' + db.escape(Purpose) 
                         + ',' + db.escape(NoCarParking) + ',' + db.escape(NoBikeParking) + ',' + db.escape(OwnerPayment) + ',' + db.escape(AgeOfProperty)
-                        + ',' + db.escape(NoOfBathrooms) + ',' + db.escape(Amenities);
+                        + ',' + db.escape(NoOfBathrooms) + ',' + db.escape(Gas) + ',' + db.escape(Lift) 
+                        + ',' + db.escape(Gym) + ',' + db.escape(SwimmingPool) + ',' + db.escape(Security) + ',' + db.escape(UPS);
                    // console.log(InsertQuery);
                     db.query('CALL psaveRealEstateData(' + InsertQuery + ')', function (err, InsertResult) {
                         if (!err) {
@@ -8672,7 +8862,14 @@ exports.FnSearchRealEstateAP = function(req, res){
         var AgeFrom = req.body.AgeFrom;
         var AgeTO = req.body.AgeTO;
         var NoOfBathrooms = req.body.NoOfBathrooms;
-        var Amenities = req.body.Amenities;
+        var Gas = req.body.Gas;
+        var Lift = req.body.Lift;
+        var Gym = req.body.Gym;
+        var SwimmingPool = req.body.SwimmingPool;
+        var Security = req.body.Security;
+        var UPS = req.body.UPS;
+                
+
 
         /*if (Status!=null && Purpose.toString() != 'NaN' && PropertyType!=null && PrefUser!=null && SpaceType !=null && SpaceQtyF !=null && SpaceQtyT !=null && RatingFrom !=null
          && RatingTo !=null && Latitude !=null && Longitude !=null && Proximity !=null && AreaUOM !=null && AreaFrom !=null
@@ -8685,7 +8882,9 @@ exports.FnSearchRealEstateAP = function(req, res){
                         db.escape(SpaceType) + ',' + db.escape(SpaceQtyF) + ',' + db.escape(SpaceQtyT) + ',' + db.escape(RatingFrom) + ',' + db.escape(RatingTo) + ',' +
                         db.escape(Latitude) + ',' + db.escape(Longitude) + ',' + db.escape(Proximity) + ',' +db.escape(AreaUOM) + ',' + db.escape(AreaFrom) + ',' +
                         db.escape(AreaTo) + ',' + db.escape(FunishedType) + ',' + db.escape(AmountFrom) + ',' + db.escape(AmountTo) + ',' +
-                        db.escape(AgeFrom) + ',' + db.escape(AgeTO) + ',' + db.escape(NoOfBathrooms) + ',' + db.escape(Amenities);
+                        db.escape(AgeFrom) + ',' + db.escape(AgeTO) + ',' + db.escape(NoOfBathrooms) + ',' +
+                        db.escape(Gas) + ',' + db.escape(Lift) + ',' + db.escape(Gym) + ',' + db.escape(SwimmingPool)
+                        + ',' + db.escape(Security) + ',' + db.escape(UPS);
 
                     console.log(SearchQuery);
 
@@ -9411,6 +9610,7 @@ exports.FnSaveDepartmentsVES = function(req, res){
                             console.log('FnSaveDepartmentsVES: Error in getting DepartmentsVES details' + err);
                         }
                     });
+                        
                 }
                 else {
                     res.statusCode=401;
