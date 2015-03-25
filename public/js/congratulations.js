@@ -3,6 +3,8 @@ angular.module('ezeidApp').controller('CongratulationsController', function($htt
 
     var profile = this;
     profile._info = {};
+    // set default ..public place
+    profile._info.IDTypeID =3;
     if ($rootScope._userInfo) {
     }
     else {

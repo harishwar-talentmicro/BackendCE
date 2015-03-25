@@ -149,16 +149,16 @@ table#t01 th	{
                                     <table id="t01" class="TypeInfo" style="width:100%">
                                     <tr>
                                         <th></th>
-                                        <th style="text-align:center">
+                                        <th style="text-align:center;width: 14%;">
                                             Business - Free Listing
                                         </th>
-                                        <th style="text-align:center">
+                                        <th style="text-align:center;width: 14%;">
                                             Business - Paid Listing
                                         </th>
-                                        <th style="text-align:center">
+                                        <th style="text-align:center;width: 14%;">
                                             Individual
                                         </th>
-                                         <th style="text-align:center">
+                                         <th style="text-align:center;width: 14%;">
                                              
                                              Public Place
                                         </th>
@@ -217,8 +217,9 @@ table#t01 th	{
                                                    ng-class="UserForm.CPWD.$touched && !profile._info.CPassword.length ? 'mandatoryTextBox' : ''"
                                                    class="form-control emptyBox" id="re-password" required maxlength="20" placeholder="Re-Enter Password" style="width: 48%">
                                         </div>
-    </div>
+</div>
                                     </div>
+
                                    <span ng-show="!_userInfo.IsAuthenticate==true">
                                        <br/>
                                    </span>
@@ -349,10 +350,10 @@ table#t01 th	{
                                                         <span ng-show="!profile._info.Picture"> <img ng-show="!image" src="images/user_200.png" width="200"/></span>
 
                                                        <div ng-show="profile._info.IDTypeID == 1" style="text-align: center;">
-                                                           <img ng-show="profile._info.Picture" width="77" height="99" name="Image" src="{{profile._info.Picture}}" required />
+                                                           <img id="pic-individual" ng-show="profile._info.Picture" width="77" height="99" name="Image" ng-src="{{profile._info.Picture}}" required />
                                                        </div>
                                                        <div ng-hide="profile._info.IDTypeID == 1">
-                                                           <img ng-show="profile._info.Picture" width="279" height="99" name="Image" src="{{profile._info.Picture}}" required />
+                                                           <img id="pic-business" ng-show="profile._info.Picture" width="279" height="99" name="Image" src="{{profile._info.Picture}}" required />
                                                        </div>
                                                     </div>
                                                     <div style="border:1px solid #EEEE;text-align:center;" id="camera-container" ng-show="isShowCamera">
@@ -363,11 +364,22 @@ table#t01 th	{
                                                     <div ng-hide="isShowCamera" class="col-lg-12 text-center" style="margin-top: 5px;">
                                                         <button class="btn-camera" style="margin-top: -3px;" title="Take Picture" ng-click="showCamera()"></button>
 
-                                                        <span ng-show="profile._info.IDTypeID == 1" style="margin-left:50px" class="btn btn-primary btn-file">
-                                                           Attach Picture <input type="file" onchange="angular.element(this).scope().uploadImageForEditLocation(this.files)" accept="image/*" image="image" resize-max-height="99" resize-max-width="77" resize-quality="0.7">
+                                                        <span ng-show="profile._info.IDTypeID == 1"  style="margin-left:50px" class="btn btn-primary btn-file">
+                                                           Attach Picture <input image type="file" onchange="angular.element(this).scope().uploadImageForEditLocation(this.files)" accept="image/*"
+                                                                                 business-pic-container-id="pic-business"
+                                                                                 individual-pic-container-id="pic-individual"
+                                                                                 user-type="profile._info.IDTypeID"
+                                                                                 set-picture="profile.setPicture(pic,icon)"
+                                                                                 >
                                                         </span>
                                                         <span ng-hide="profile._info.IDTypeID == 1" style="margin-left:50px" class="btn btn-primary btn-file">
-                                                           Attach Picture <input type="file" onchange="angular.element(this).scope().uploadImageForEditLocation(this.files)" accept="image/*" image="image" resize-max-height="99" resize-max-width="279" resize-quality="0.7">
+                                                           Attach Picture
+                                                            <input image type="file" onchange="angular.element(this).scope().uploadImageForEditLocation(this.files)" accept="image/*"
+                                                                   business-pic-container-id="pic-business"
+                                                                   individual-pic-container-id="pic-individual"
+                                                                   user-type="profile._info.IDTypeID"
+                                                                   set-picture="profile.setPicture(pic,icon)"/>
+
                                                         </span>
                                                     </div>
                                                     <p/>
@@ -400,7 +412,11 @@ table#t01 th	{
                                     </div>
                                 </div>
                             </div>
+                            <div ng-show="showNoteToPaidUser">
+                                Note: EZE ID Area partner will contact soon to enable paid services.
+                            </div>
                         </div>
+
                     </div>
                     </form>
                 </div>
