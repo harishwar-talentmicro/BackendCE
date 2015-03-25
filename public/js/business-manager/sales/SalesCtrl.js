@@ -95,8 +95,43 @@ angular.module('ezeidApp')
             $scope.showModal = !$scope.showModal;
         };
 
+        /**
+         * Modal Box dynamic templates path
+         * @type {string}
+         */
+        var templatesPath = 'html/business-manager/templates/';
+
+        /**
+         * Available Modal Templates (based on ItemList Type)
+         * @type {Array}
+         */
+        $scope.modalTemplates = [
+            'modal-msg-only.tpl.html',
+            'modal-item-only.tpl.html',
+            'modal-item-picture.tpl.html',
+            'modal-item-picture-qty.tpl.html',
+            'modal-item-picture-qty-rate.tpl.html'
+        ];
+
+        /**
+         * ModalBox DataModel
+         * @type {{title: string, template: string, transaction : Object}}
+         */
         $scope.modalBox = {
-            title : 'Transaction Details'
+            title : 'Transaction Details',
+            template : templatesPath + $scope.modalTemplates[$scope.modules[$scope.selectedModule].listType],
+            transaction : {}
+        };
+
+        /**
+         * View Transaction Details
+         * Opens Modal Box
+         */
+        $scope.viewDetails = function(rowEntity){
+            console.log(rowEntity);
+            $scope.modalBox.data = rowEntity;
+            $scope.toggleModalBox();
+            console.log($scope.modalBox);
         };
 
         /****************************************************** Controller Code *****************************/
@@ -138,6 +173,8 @@ angular.module('ezeidApp')
             exporterCsvLinkElement: angular.element(document.querySelectorAll(".custom-csv-link-location"))
             //Options for exporting data ends
         };
+
+
 
 
         /**
@@ -281,13 +318,32 @@ angular.module('ezeidApp')
 
         $scope.gridOptions.onRegisterApi = function(gridApi){
             $scope.gridApi = gridApi;
-            $scope.gridApi.edit.on.afterCellEdit($scope,function(rowEntity, colDef,x1){
-                console.log(rowEntity);
-                console.log(x1);
-                console.log(gridApi);
-//                console.log(gridApi.GridRow(rowEntity,0,$scope.gridApi.grid));
-                console.log($scope.gridApi.cellNav.getFocusedCell());
+            $scope.gridApi.edit.on.afterCellEdit($scope,function(rowEntity, colDef){
+//                console.log(rowEntity);
+//                console.log(colDef);
+//                console.log(gridApi);
+
+                console.log('I am from afterCellEdit');
             });
+
+
+            $scope.gridApi.edit.on.beginCellEdit($scope,function(rowEntity,colDef){
+                console.log('I am from beginEditCell');
+                console.log(rowEntity); console.log(colDef);
+
+            });
+
+            $scope.gridApi.edit.on.cancelCellEdit($scope,function(rowEntity){
+                console.log('I am from cancelCellEdit');
+            });
+
+//            $scope.gridOptions.$on('ngGridEventStartCellEdit',function(){
+//                console.log('ngGridEventStartCellEdit');
+//            });
+
+//            $scope.gridApi.edit.on.beginEditCell($scope,function(rowEntity,colDef){
+//                $scope.isSaveBoxVisible = true;
+//            });
 
 //            gridApi.rowEdit.on.saveRow($scope, $scope.saveRow);
 //            gridApi.core.on.notifyDataChange($scope,function(type){
@@ -313,10 +369,12 @@ angular.module('ezeidApp')
         };
         ///////////////////////////////////////////////////////////////////////////////////////
 
+
         /**
          * Adds a new row at first in the transaction table
          */
         $scope.addNewRow = function() {
+            console.log($scope.gridOptions.data);
             var n = $scope.gridOptions.data.length + 1;
             console.log($scope.gridApi.grid.rows);
             var newRow = {
@@ -332,15 +390,17 @@ angular.module('ezeidApp')
                 folder : 2,
                 notes : "Notes here ",
                 updatedOn : "",
-                updatedBy : ""
-
+                updatedBy : "",
+                items : [],
+                savedOnServer : false
             };
             $scope.gridOptions.data.unshift(newRow);
             var dirtyRows = [newRow];
             $interval( function() {
                 $scope.gridApi.rowEdit.setRowsDirty(dirtyRows);
             }, 0, 1);
-            console.log($scope.gridApi.grid.rows);
+//            console.log($scope.gridApi.grid.rows);
+            console.log($scope.gridOptions.data);
         };
 
         /**
@@ -350,7 +410,9 @@ angular.module('ezeidApp')
             /**
              * @todo Add condition to check if this is newly created data or old one
              */
-            $scope.gridOpts.data.splice(0,1);
+            console.log($scope.gridOptions.data);
+            $scope.gridOptions.data.splice(0,1);
+//            $scope.gridOpts.data.splice(0,1);
         };
 
 
@@ -384,9 +446,9 @@ angular.module('ezeidApp')
          * Save transaction function
          * @author Indrajeet
          */
-        $scope.saveTransaction = function(rowEntity,index){
+        $scope.saveTransaction = function(rowEntity,GridRow){
             console.log(rowEntity);
-            console.log(index);
+            console.log(GridRow);
             console.log('Save is clicked');
             // Get Dirty rows by calling the line below
 //            console.log($scope.gridApi.rowEdit.getDirtyRows());
@@ -394,14 +456,7 @@ angular.module('ezeidApp')
 
         /******************************************* Grid Code Ends here **********************************/
 
-        /**
-         * View Transaction Details
-         * Opens Modal Box
-         */
-        $scope.viewDetails = function(rowEntity){
-            console.log(rowEntity);
-            $scope.toggleModalBox();
-        };
+
 
         /**
          * Finds an item from ItemList based on TID
@@ -607,7 +662,8 @@ angular.module('ezeidApp')
                                 updatedOn : (resp[i].updatedDate.length > 0) ? resp[i].updatedDate : '',
                                 // This value will tell that the transaction can be removed from grid or not
                                 // If value is true transactions cannot be removed(deleted from grid)
-                                savedOnServer : true
+                                savedOnServer : true,
+                                items : []
                             };
 
                             /**
@@ -616,7 +672,7 @@ angular.module('ezeidApp')
                              * 2. Add Items to Transaction
                              * 3. Save Transaction
                              * 4. Update Transaction
-                             * 5. Change Numeric Values of Status and Action to Human Readable Titles
+                             * 5. Change Numeric Values of Status and Action to Human Readable Titles //Done
                              * 6. Load Dynamic Templates for ModalBox based on ItemListType
                              * 7. Load Dynamic GridOptions based on Permissions Type
                              */
@@ -628,7 +684,7 @@ angular.module('ezeidApp')
                         console.log($scope.gridApi.grid);
                         console.log($scope.gridApi.grid.rows);
                         console.log('GridRow...................................ends');
-
+                        console.log($scope.gridOptions.data);
                     }
                     $scope.readyState.transactionsLoaded = true;
             }).error(function(err){

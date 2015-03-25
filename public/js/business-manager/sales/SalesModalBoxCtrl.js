@@ -23,6 +23,7 @@ angular.module('ezeidApp').controller('SalesModalBoxCtrl',['$scope','$rootScope'
     $scope.currency = 'Rs.';
     $scope.isItemAddBlockVisible = false;
     $scope.modalTrnId = 0;
+    $scope.particulars = '';
     $scope.modalItemList = [
 //        {
 //            TID: 21,
@@ -128,25 +129,24 @@ angular.module('ezeidApp').controller('SalesModalBoxCtrl',['$scope','$rootScope'
     });
 
 
-    $scope.subtractValue = function(){
-        if($scope.modalCurrentItem.Qty == null ||
-            typeof($scope.modalCurrentItem.Qty) == "undefined" ||
-            Number.isNaN($scope.modalCurrentItem.Qty)){
-            $scope.modalCurrentItem.Qty = 0;
-        }
-        else{
-            var x = $scope.modalCurrentItem.Qty - 1;
-            if(x >= 0 ){
-                $scope.modalCurrentItem.Qty -= 1;
-            }
-            else{
-                $scope.modalCurrentItem.Qty = 0;
-            }
-        }
+    /**
+     *  When update button is clicked transaction items, particulars are updated based on modal box data
+     */
+    $scope.updateCurrentTransaction = function(){
+
+        /**
+         * @todo Close Modal Box after updating this transaction
+         */
+
     };
 
-
-
-
-
+    /**
+     * Do not update modal box transaction changes to data value in grid
+     * Just closes the modal box
+     */
+    $scope.closeModalWithoutTxUpdate = function(){
+        /**
+         * @todo Close Modal Box
+         */
+    };
 }]);
