@@ -2188,8 +2188,8 @@ exports.FnAddLocation = function (req, res) {
         var PhoneNumber = req.body.PhoneNumber;
         var MobileNumber = req.body.MobileNumber;
         var EMailID = req.body.EMailID;
-        var LaptopSLNO = req.body.LaptopSLNO;
-        var VehicleNumber = req.body.VehicleNumber;
+       // var LaptopSLNO = req.body.LaptopSLNO;
+       // var VehicleNumber = req.body.VehicleNumber;
         var Picture = req.body.Picture;
         var PictureFileName = req.body.PictureFileName;
         var Website = req.body.Website;
@@ -2211,7 +2211,7 @@ exports.FnAddLocation = function (req, res) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
-                        var InsertQuery = db.escape(TID) + ',' + db.escape(Token) + ',' + db.escape(LocTitle) + ',' + db.escape(Latitude) + ',' + db.escape(Longitude) + ',' + db.escape(Altitude) + ',' + db.escape(AddressLine1) + ',' + db.escape(AddressLine2) + ',' + db.escape(CityName) + ',' + db.escape(StateID) + ',' + db.escape(CountryID) + ',' + db.escape(PostalCode) + ',' + db.escape(PIN) + ',' + db.escape(PhoneNumber) + ',' + db.escape(MobileNumber) + ',' + db.escape(EMailID) + ',' + db.escape(LaptopSLNO) + ',' + db.escape(VehicleNumber) + ',' + db.escape(Picture) + ',' + db.escape(PictureFileName) + ',' + db.escape(Website) + ',' + db.escape(ParkingStatus)  + ',' +   db.escape(ISDPhoneNumber) + ',' + db.escape(ISDMobileNumber);
+                        var InsertQuery = db.escape(TID) + ',' + db.escape(Token) + ',' + db.escape(LocTitle) + ',' + db.escape(Latitude) + ',' + db.escape(Longitude) + ',' + db.escape(Altitude) + ',' + db.escape(AddressLine1) + ',' + db.escape(AddressLine2) + ',' + db.escape(CityName) + ',' + db.escape(StateID) + ',' + db.escape(CountryID) + ',' + db.escape(PostalCode) + ',' + db.escape(PIN) + ',' + db.escape(PhoneNumber) + ',' + db.escape(MobileNumber) + ',' + db.escape(EMailID)  + ',' + db.escape(Picture) + ',' + db.escape(PictureFileName) + ',' + db.escape(Website) + ',' + db.escape(ParkingStatus)  + ',' +   db.escape(ISDPhoneNumber) + ',' + db.escape(ISDMobileNumber);
 
 
                        console.log(InsertQuery);
@@ -2222,7 +2222,7 @@ exports.FnAddLocation = function (req, res) {
                                         //res.send(InsertResult);
                                         // console.log(InsertResult);
                                         console.log('Addlocation: Location added successfully');
-                                        var selectqry = 'Select tlocations.TID,MasterID,EZEID,LocTitle,Latitude,Longitude,Altitude,AddressLine1,AddressLine2,StateID,CountryID,PostalCode,PIN,EMailID,EMailVerifiedID,ifnull(PhoneNumber,"") as PhoneNumber,MobileNumber,ifnull(ISDPhoneNumber,"") as ISDPhoneNumber ,ifnull(ISDMobileNumber,"") as ISDMobileNumber, LaptopSLNO,VehicleNumber,CreatedDate,LUDate,Website,SeqNo,Picture,PictureFileName,ifnull((Select CityName from mcity where CityID=tlocations.CityID),"") as CityTitle,ifnull(ParkingStatus,0) as ParkingStatus from tlocations';
+                                        var selectqry = 'Select tlocations.TID,MasterID,EZEID,LocTitle,Latitude,Longitude,Altitude,AddressLine1,AddressLine2,StateID,CountryID,PostalCode,PIN,EMailID,EMailVerifiedID,ifnull(PhoneNumber,"") as PhoneNumber,MobileNumber,ifnull(ISDPhoneNumber,"") as ISDPhoneNumber ,ifnull(ISDMobileNumber,"") as ISDMobileNumber,CreatedDate,LUDate,Website,SeqNo,Picture,PictureFileName,ifnull((Select CityName from mcity where CityID=tlocations.CityID),"") as CityTitle,ifnull(ParkingStatus,0) as ParkingStatus from tlocations';
                                         if (TID == 0) {
                                             selectqry = selectqry + ' order by tlocations.TID desc limit 1';
                                         }

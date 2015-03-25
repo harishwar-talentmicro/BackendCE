@@ -22,17 +22,19 @@
                                          <button  type="reset" class="btn btn-primary" onclick="window.location.href='#/home'">Close</button>
                                     </div><br/>
 
-                                    <div class="col-md-12 setLeftRightPaddingZero">
-                                        <b>
-                                            <div class="nextStepInnerContainer">
-                                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 nextStepBtn">Next Steps</div>
-                                                <div ng-show="profile._info.IDTypeID ==1" class="col-lg-8 col-md-8 col-sm-8 col-xs-12" style="  padding-top: 1%;"><a href="#/attachcv" >Upload your CV</a> | <a href="#/addloc">Add additional Locations</a></div>
-                                                <div ng-show="profile._info.IDTypeID ==2" class="col-lg-8 col-md-8 col-sm-8 col-xs-12" style="  padding-top: 1%;"><a href="#/addloc">Add additional Locations</a> | <a href="#/busslist" >Business List</a> </div>
-                                            </div>
-                                        </b>
-                                    </div><br/>
-                                    <div class="form-group" style="padding-top: 30px; margin-bottom: 0px;">
-                                        Note: You need to have your CV ready on EZE ID if you want to submit your CV to any employer by a click of a button on company profile or portal or through smart phone.
+                                    <div ng-show="profile._info.IDTypeID !=3">
+                                        <div class="col-md-12 setLeftRightPaddingZero">
+                                            <b>
+                                                <div class="nextStepInnerContainer">
+                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 nextStepBtn">Next Steps</div>
+                                                    <div ng-show="profile._info.IDTypeID == 1" class="col-lg-8 col-md-8 col-sm-8 col-xs-12" style="  padding-top: 1%;"><a href="#/attachcv" >Upload your CV</a> | <a href="#/addloc">Add additional Locations</a></div>
+                                                    <div ng-show="profile._info.IDTypeID == 2" class="col-lg-8 col-md-8 col-sm-8 col-xs-12" style="  padding-top: 1%;"><a href="#/addloc">Add additional Locations</a></div>
+                                                </div>
+                                            </b>
+                                        </div><br/>
+                                        <div class="form-group" style="padding-top: 30px; margin-bottom: 0px;">
+                                            Note: You need to have your CV ready on EZE ID if you want to submit your CV to any employer by a click of a button on company profile or portal or through smart phone.
+                                        </div>
                                     </div>
                                 </div>
                             </div>

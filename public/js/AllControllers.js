@@ -184,7 +184,6 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
     $scope.member = {roles: []};
     $scope.selected_items = [];
 
-
     // show search Tab
     $scope.showSearchTab = function(){
         $scope.ShowInfoWindow = false;
@@ -392,6 +391,9 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
         if (positions != null) {
             for (var i = 0; i < positions.length; i++) {
                 var _item = positions[i];
+
+                console.log(_item);
+
                 var mapIcon;
                 mapIcon = '/images/Indi_user.png';
                 var businessIcon = 'images/business-icon_48.png';
@@ -400,14 +402,23 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
                 //Pushing position of markers to fit in bounds
                 latLngList.push(pos);
                 var mTitle = (_item.IDTypeID == 2 && _item.CompanyName !== "")? _item.CompanyName : _item.Name;
-               /* var marker = new google.maps.Marker({
+                var marker = new google.maps.Marker({
                     position: pos,
                     map: map,
                     icon: (_item.IDTypeID == 2) ? businessIcon : individualIcon,
+                    label : mTitle,
                     title: mTitle
-                });*/
+                });
 
-               var marker = new MarkerWithLabel({
+                var label = new Label({
+                    map: map
+                });
+
+                label.bindTo('position', marker, 'position');
+                label.bindTo('text', marker, 'label');
+
+
+              /* var marker = new MarkerWithLabel({
                     position: pos,
                     draggable: false,
                     raiseOnDrag: false,
@@ -417,7 +428,7 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
                     labelAnchor: new google.maps.Point(22, 0),
                     labelClass: "mapLabels", // the CSS class for the label
                     labelStyle: {opacity: 1}
-                });
+                });*/
 
                 var currentPos = google.maps.LatLng($rootScope.CLoc.CLat,$rootScope.CLoc.CLong);
                 map.setCenter(currentPos);
@@ -440,7 +451,7 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
                                     SearchSec.mInfo = data[0];
 
                                     if (!/^(f|ht)tps?:\/\//i.test(data[0].Website)) {
-//                                        url = "http://" + data[0].Website;
+//                                       // url = "http://" + data[0].Website;
                                         SearchSec.mInfo.Website = data[0].Website;
                                     }
 
@@ -559,7 +570,6 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
                         SearchSec.IsFilterRowVisible = false;
 
                         var downloadUrl = "/ewtGetSearchDocuments?Token="+$rootScope._userInfo.Token+"&&Keywords="+SearchSec.Criteria.Keywords;
-                        console.log(downloadUrl);
                         var win = window.open(downloadUrl, '_blank');
                         win.focus();
                     }
@@ -581,8 +591,9 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
                                     SearchSec.mInfo = data[0];
 
                                     if (!/^(f|ht)tps?:\/\//i.test(data[0].Website)) {
-                                        url = "http://" + data[0].Website;
-                                        SearchSec.mInfo.Website = url;
+                                       // url = "http://" + data[0].Website;
+                                      //  SearchSec.mInfo.Website = url;
+                                        SearchSec.mInfo.Website = data[0].Website;
                                     }
 
                                     //Call for banner
@@ -624,7 +635,6 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
                             $scope.$watch('isMapLoaded',function(var1,var2){
                                 if(var2){
                                     PlaceMarker(data);
-
                                 }
                             });
                         }
@@ -1158,7 +1168,8 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
     }
 });
 
-angular.module('ezeidApp').controller('ProfileController', function ($rootScope, $scope, $http, $q, $timeout, Notification, $filter, $window,GURL) {
+angular.module('ezeidApp').controller('ProfileController', function ($rootScope, $scope, $http, $q, $timeout, Notification, $filter, $window,GURL,$interval) {
+
 
     var profile = this;
     profile._info = {};
@@ -1188,6 +1199,8 @@ angular.module('ezeidApp').controller('ProfileController', function ($rootScope,
     ];
 
     $scope.isTypeSelected  = false;
+    $scope.showNoteToPaidUser  = false;
+
     $scope._selectUserType = function(_type)
     {
         $scope.isTypeSelected  = true;
@@ -1198,6 +1211,7 @@ angular.module('ezeidApp').controller('ProfileController', function ($rootScope,
         }
         else if(_type==2)
         {
+            $scope.showNoteToPaidUser  = true;
             profile._info.IDTypeID=2;
             profile._info.SelectionType=2;
         }
@@ -1241,6 +1255,7 @@ angular.module('ezeidApp').controller('ProfileController', function ($rootScope,
         $('#datetimepicker1').trigger('focus');
     });
 
+
     var map;
     var mapOptions;
     var marker;
@@ -1262,9 +1277,20 @@ angular.module('ezeidApp').controller('ProfileController', function ($rootScope,
         dest_height: 200,
 
         // final cropped size
-        crop_width: 200,
-        crop_height: 200,
+        crop_width: ($rootScope._userInfo.UserType == 1) ? 77 : 280,
+        crop_height: ($rootScope._userInfo.UserType == 1) ? 90 : 90,
 
+       /* width: $rootScope._userInfo.Type == 1 ? 77 : 279,
+        height: 90,
+
+        // device capture size
+        dest_width: $rootScope._userInfo.Type == 1 ? 77 : 279,
+        dest_height: 90,
+
+        // final cropped size
+        crop_width: $rootScope._userInfo.Type == 1 ? 77 : 279,
+        crop_height: 90,
+*/
         // format and quality
         image_format: 'jpeg',
         jpeg_quality: 92
@@ -1283,6 +1309,15 @@ angular.module('ezeidApp').controller('ProfileController', function ($rootScope,
         Webcam.reset();
         $scope.isShowCamera = false;
     };
+
+
+    profile.setPicture = function(bigPic,smallPic){
+        profile._info.Picture = bigPic;
+        if(typeof(smallPic) !== "undefined" || null || ""){
+            profile._info.Icon = smallPic;
+        }
+    };
+
     $scope.clickPicture = function(){
         $scope.isShowCamera = false;
         //Webcam.reset();
@@ -1295,11 +1330,26 @@ angular.module('ezeidApp').controller('ProfileController', function ($rootScope,
 
             profile._info.PictureFileName = 'camera-snap-1.jpg'
             if (profile._info.IDTypeID !== 2) {
+                //Big size image
+                var canvas1 = document.createElement('canvas');
+                /******************* Preparing icon file for camera snapshot ***************/
+                var image1 = new Image();
+                image1.src = data_uri;
+                image1.height = 90;
+                image1.width = 77;
+                var ctx1 = canvas1.getContext("2d");
+                ctx1.clearRect(0, 0, canvas1.width, canvas1.height);
+                canvas1.width = image1.width;
+                canvas1.height = image1.height;
+                ctx1.drawImage(image1, 0, 0, image1.width, image1.height);
+                $rootScope.BigImage = canvas1.toDataURL("image/jpeg", 0.7);
+                profile._info.Picture = $rootScope.BigImage;
+
+
                 var canvas = document.createElement('canvas');
                 /******************* Preparing icon file for camera snapshot ***************/
                 var image = new Image();
                 image.src = data_uri;
-                var canvas = document.createElement("canvas");
                 image.height = 40;
                 image.width = 40;
                 var ctx = canvas.getContext("2d");
@@ -1312,6 +1362,24 @@ angular.module('ezeidApp').controller('ProfileController', function ($rootScope,
                 profile._info.Icon = $rootScope.smallImage;
 
             } else {
+
+                var canvas = document.createElement('canvas');
+                /******************* Preparing icon file for camera snapshot ***************/
+                var image = new Image();
+                image.src = data_uri;
+                image.height = 90;
+                image.width = 279;
+                var ctx = canvas.getContext("2d");
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                canvas.width = image.width;
+                canvas.height = image.height;
+                ctx.drawImage(image, 0, 0, image.width, image.height);
+                $rootScope.BigImage = canvas.toDataURL("image/jpeg", 0.7);
+                /******************* Preparing icon file for camera snapshot ends ***************/
+                profile._info.Icon = " ";
+                profile._info.Picture = $rootScope.BigImage;
+
+
                 profile._info.IconFileName = 'camera-snap-1.jpg';
             }
             Webcam.reset();
@@ -1410,6 +1478,8 @@ angular.module('ezeidApp').controller('ProfileController', function ($rootScope,
                 profile._info.Longitude = data[0].Longitude;
                 profile._info.EZEID = data[0].EZEID;
                 profile._info.PIN = data[0].PIN;
+                profile._info.ParkingStatus = data[0].ParkingStatus;
+
 
                 if(!profile._info.PIN)
                 {
@@ -1450,6 +1520,7 @@ angular.module('ezeidApp').controller('ProfileController', function ($rootScope,
     this.CheckisIDAvailable = function () {
 
         $scope.disableAvalabilityButton = true;
+        $scope.showNoteToPaidUser  = false;
         /* var sEzeid = profile._info.EZEID;
          var lastTwo = sEzeid.substr(sEzeid.length - 2);
          if(lastTwo != "ap")
@@ -1971,9 +2042,7 @@ angular.module('ezeidApp').controller('ProfileController', function ($rootScope,
     }
 
     this.saveBasicRegistration = function (UserForm){
-
-        console.log("Sai 1964");
-        if(isBasicValidate())
+     if(isBasicValidate())
         {
             var sEzeid = profile._info.EZEID;
             var lastTwo = sEzeid.substr(sEzeid.length - 2);
@@ -1988,17 +2057,18 @@ angular.module('ezeidApp').controller('ProfileController', function ($rootScope,
 //                        profile._info.Gender = (profile._info.Gender == undefined || profile._info.Gender == null )? 2 : profile._info.Gender ;
 
                 profile._info.OperationType = 1;
-                if(profile._info.IDTypeID == 1)
-                {
-                    profile._info.Icon = $rootScope.smallImage;
-                }
-                else
-                {
-                    if(isBusinessIcon == 1)
-                    {
-                        profile._info.Icon = $rootScope.smallImage;
-                    }
-                }
+
+//                if(profile._info.IDTypeID == 1)
+//                {
+//                    profile._info.Icon = $rootScope.smallImage;
+//                }
+//                else
+//                {
+//                    if(isBusinessIcon == 1)
+//                    {
+//                        profile._info.Icon = $rootScope.smallImage;
+//                    }
+//                }
 
                 profile._info.LanguageID = 1;
                 profile._info.IDTypeID = parseInt(profile._info.IDTypeID, 10);
@@ -2078,6 +2148,9 @@ angular.module('ezeidApp').controller('ProfileController', function ($rootScope,
                 profile._info.SupportButton = profile._info.SupportButton == true ? 1 : 0;
                 profile._info.CVButton = profile._info.CVButton == true ? 1 : 0;
                 profile._info.Gender = (profile._info.Gender == undefined || profile._info.Gender == null )? 2 : profile._info.Gender ;
+               // profile._info.Picture = $rootScope.BigImage;
+
+                console.log(profile._info.Picture);
 
                 if(profile._info.IDTypeID == 1)
                 {
@@ -2167,7 +2240,7 @@ angular.module('ezeidApp').controller('ProfileController', function ($rootScope,
         profile._info.PictureFileName = image[0].name;
         fileToDataURL(image[0]).then(function (dataURL) {
 
-            profile._info.Picture = dataURL;
+          //  profile._info.Picture = dataURL;
             if (!profile._info.IDTypeID == 2) {
                 profile._info.Icon = $rootScope.smallImage;
                 /* profile._info.Icon = "";

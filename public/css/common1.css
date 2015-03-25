@@ -104,7 +104,7 @@ hr {
     padding-left: 0px;
     padding-right: 0px;
     margin-bottom: 0px;
-    background-image: url(../images/infoBackground.png);
+  /*  background-image: url(../images/infoBackground.png);*/
    /* height: 360px;*/
     height: auto;
     min-height: 375px;
@@ -170,12 +170,12 @@ hr {
     padding-right: 0px;
     padding-left: 5px;
     text-align: left;
-    width: 22%;
+    /*width: 22%;*/
 }
 .searchRadioPadding1
 {
     padding-right: 0px;
-    padding-left: 7px;
+    padding-left: 0px;
     text-align: left;
 }
 .searchWithin
@@ -520,14 +520,16 @@ body {
     min-height: 65px;
     max-height: 65px;
 }
-
-.mapLabels {
-    color: #000;
-    /*background-color: white;*/
-    font-family: "Roboto", "Arial", sans-serif;
-    font-size: 12px;
-    font-weight: bold;
+.jobKeywordText
+{
+    text-align: right;
+    padding-right: 2%;
+}
+.searchByText
+{
+    margin-top: 2px;
+}
+.keyWordText
+{
     text-align: center;
-    width: 100px;
-    white-space: nowrap;
 }
