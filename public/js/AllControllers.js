@@ -89,7 +89,7 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
     var RefreshTime = Miliseconds;
     var AutoRefresh = true;
 
-    var rating = [];
+    var rating = [1,2,3,4,5];
 
     $('#datetimepicker1').datetimepicker({
         format: "d-M-Y  h:m A",
@@ -153,33 +153,13 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
     $scope.showStar4 = true;
     $scope.showStar5 = true;
 
-    //new multi select
-    $scope.ratingModel = [
-        {
-            "id": 1
-        },
-        {
-            "id": 2
-        },
-        {
-            "id": 3
-        },
-        {
-            "id": 4
-        },
-        {
-            "id": 5
-        }
-    ];
+   /* $scope.showStar1 = false;
+    $scope.showStar2 = false;
+    $scope.showStar3 = false;
+    $scope.showStar4 = false;
+    $scope.showStar5 = false;*/
 
-    $scope.ratingData = [
-        {id: 1, label: "*", "assignable": true},
-        {id: 2, label: "**", "assignable": true},
-        {id: 3, label: "***", "assignable": true},
-        {id: 4, label: "****", "assignable": true},
-        {id: 5, label: "*****", "assignable": true}
-    ];
-    //================
+
 
     $scope.member = {roles: []};
     $scope.selected_items = [];
@@ -501,7 +481,7 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
     SearchSec.isEZEIDselected = function (value) {
         if (SearchSec.Criteria.SearchType == 1)
         {
-            SearchSec.Placeholder = 'Type EZEID here.';
+            SearchSec.Placeholder = 'Type EZE ID here.';
             //SearchSec.showSmallBanner = false;
         }
         else if(SearchSec.Criteria.SearchType == 2)
@@ -526,7 +506,7 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
     SearchSec.getSearch = function () {
         $scope.SearchResultCount= "";
        // $scope.showSmallBanner = true;
-      //  var ratingValues = "";
+       //  var ratingValues = "";
 
       /*  for (var i=0; i<$scope.ratingModel.length; i++)
         {
@@ -536,7 +516,8 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
       //  ratingValues = ratingValues.substring(0,ratingValues.length-1);
         SearchSec.IsSearchButtonClicked = true;
         SearchSec.IsShowForm = false;
-        SearchSec.Criteria.ParkingStatus = SearchSec.Criteria.ParkingStatus == 1 ? '1,2' :0;
+        SearchSec.Criteria.ParkingStatus = SearchSec.Criteria.ParkingStatus == 1 ? '1' :0;
+
         /*SearchSec.Criteria.OpenStatus = (SearchSec.Criteria.OpenStatus.id == 1) ? 0 : SearchSec.Criteria.OpenStatus ;*/
         SearchSec.Criteria.OpenStatus = (SearchSec.Criteria.OpenStatus == 1) ? 0 : SearchSec.Criteria.OpenStatus ;
         if ($rootScope._userInfo.IsAuthenticate == true || SearchSec.Criteria.SearchType == 2 && SearchSec.IsSearchButtonClicked) {
@@ -614,7 +595,8 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
                             }
                             else {
                                 Notification.error({ message: 'Invalid key or not found…', delay: MsgDelay });
-                            }
+                                SearchSec.Criteria.ParkingStatus = SearchSec.Criteria.ParkingStatus == 1 ? true : false ;
+                             }
                         });
 
 
@@ -643,9 +625,12 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
                         /*********************Code for checking map load and handling it with reload ends ****************/
                     }
                     // PlaceMarker(data);//older one
+                    SearchSec.Criteria.ParkingStatus = SearchSec.Criteria.ParkingStatus == 1 ? true : false ;
                 }
                 else {
                     Notification.error({ message: 'Invalid key or not found…', delay: MsgDelay });
+                    SearchSec.Criteria.ParkingStatus = SearchSec.Criteria.ParkingStatus == 1 ? true : false ;
+
                     try{
                         PlaceMarker(null);
                     }
@@ -1048,95 +1033,103 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
      SearchSec.addRatting = function (ratingValue,starColor) {
          if(ratingValue == 1)
          {
-                if(starColor == 'gray')
+                if(starColor == 'yellow')
                 {
                     $scope.showStar1 = false;
-                    //Add value in array
-                    rating.push(1);
-                }
-                else
-                {
-                    $scope.showStar1 = true;
                     //Remove value from array
                     var index = rating.indexOf(1);
                     if (index >= 0) {
                         rating.splice( index, 1 );
                     }
                 }
+                else
+                {
+                    $scope.showStar1 = true;
+                    //Add value in array
+                    rating.push(1);
+
+
+                }
          }
          if(ratingValue == 2)
          {
-             if(starColor == 'gray')
+             if(starColor == 'yellow')
              {
                  $scope.showStar2 = false;
-                 //Add value in array
-                 rating.push(2);
-             }
-             else
-             {
-                 $scope.showStar2 = true;
+
                  //Remove value from array
                  var index = rating.indexOf(2);
                  if (index >= 0) {
                      rating.splice( index, 1);
                  }
              }
+             else
+             {
+                 $scope.showStar2 = true;
+                 //Add value in array
+                 rating.push(2);
+             }
          }
          if(ratingValue == 3)
          {
-             if(starColor == 'gray')
+             if(starColor == 'yellow')
              {
                  $scope.showStar3 = false;
-                 //Add value in array
-                 rating.push(3);
-             }
-             else
-             {
-                 $scope.showStar3 = true;
+
+
                  //Remove value from array
                  var index = rating.indexOf(3);
                  if (index >= 0) {
                      rating.splice( index, 1);
                  }
              }
+             else
+             {
+                 $scope.showStar3 = true;
+                 //Add value in array
+                 rating.push(3);
+             }
          }
          if(ratingValue == 4)
          {
-             if(starColor == 'gray')
+             if(starColor == 'yellow')
              {
                  $scope.showStar4 = false;
-                 //Add value in array
-                 rating.push(4);
-             }
-             else
-             {
-                 $scope.showStar4 = true;
+
                  //Remove value from array
                  var index = rating.indexOf(4);
                  if (index >= 0) {
                      rating.splice( index, 1 );
                  }
              }
+             else
+             {
+                 $scope.showStar4 = true;
+                 //Add value in array
+                 rating.push(4);
+             }
          }
          if(ratingValue == 5)
          {
-             if(starColor == 'gray')
+             if(starColor == 'yellow')
              {
                  $scope.showStar5 = false;
-                 //Add value in array
-                 rating.push(5);
-             }
-             else
-             {
-                 $scope.showStar5 = true;
+
                  //Remove value from array
                  var index = rating.indexOf(5);
                  if (index >= 0) {
                      rating.splice( index, 1 );
                  }
              }
+             else
+             {
+                 $scope.showStar5 = true;
+                 //Add value in array
+                 rating.push(5);
+             }
          }
          SearchSec.Criteria.Rating = rating.toString();
+         console.log(SearchSec.Criteria.Rating);
     };
 
     // Close CV Form
