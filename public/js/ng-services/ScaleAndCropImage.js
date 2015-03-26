@@ -13,7 +13,7 @@
  */
 angular.module('ezeidApp').service('ScaleAndCropImage',['$q',function($q){
     return {
-         covertToBase64 : function (image,userType){
+         covertToBase64 : function (image){
 
              var deferred = $q.defer();
 
@@ -48,7 +48,25 @@ angular.module('ezeidApp').service('ScaleAndCropImage',['$q',function($q){
             var scaleHeight = 0;
             var scaleWidth = 0;
 
-            if(dHeight > dWidth){
+//            if(dHeight > dWidth){
+//                /**
+//                 * Here Image will be scaled based on width
+//                 * Calculating scale factor
+//                 */
+//                scaleWidth = requiredWidth;
+//                scaleHeight = (img.height * scaleWidth) / img.width;
+//            }
+//
+//            else{
+//                /**
+//                 * Here Image will be scaled based on height
+//                 * Calculating scale factor
+//                 */
+//                scaleHeight = requiredHeight;
+//                scaleWidth = (scaleHeight * img.width) / img.height;
+//            }
+
+            if(dHeight < dWidth){
                 /**
                  * Here Image will be scaled based on width
                  * Calculating scale factor
@@ -67,6 +85,7 @@ angular.module('ezeidApp').service('ScaleAndCropImage',['$q',function($q){
             }
 
             var canvas = document.createElement('canvas');
+            canvas.className = 'sc-canvas';
             canvas.height = scaleHeight;
             canvas.width = scaleWidth;
             var ctx = canvas.getContext('2d');
@@ -74,7 +93,9 @@ angular.module('ezeidApp').service('ScaleAndCropImage',['$q',function($q){
              * Scaling Image Proptionally
              */
             ctx.drawImage(img, 0, 0, scaleWidth,scaleHeight);
-            return canvas.toDataURL("image/jpeg", 1.0);
+            var retVal = canvas.toDataURL("image/jpeg", 1.0);
+            $('.sc-canvas').remove();
+            return retVal;
         },
 
         cropImage : function(imageDataUrl,requiredHeight,requiredWidth){
@@ -82,14 +103,23 @@ angular.module('ezeidApp').service('ScaleAndCropImage',['$q',function($q){
             img.src = imageDataUrl;
 
             var canvas = document.createElement('canvas');
+            canvas.className = 'cr-canvas';
             canvas.height = requiredHeight;
             canvas.width = requiredWidth;
             var ctx = canvas.getContext('2d');
             /**
              * Cropping Image
              */
-            ctx.drawImage(img,0,0,img.width,img.height,0,0,requiredHeight,requiredWidth);
-            return canvas.toDataURL("image/jpeg", 1.0);
+            console.log('requiredHeight  '+requiredHeight + " imgHeight : "+img.height);
+            console.log('requiredwidth  '+requiredWidth+ " imgwidth : "+img.width);
+            ctx.fillStyle = "#ffffff";
+            ctx.fillRect(0,0,canvas.width,canvas.height);
+
+//            ctx.drawImage(img,0,0,img.width,img.height,0,0,requiredWidth,requiredHeight);
+            ctx.drawImage(img,0,0);
+            var retVal = canvas.toDataURL("image/jpeg", 1.0);
+            $('.cr-canvas').remove();
+            return retVal;
         }
 
     };

@@ -365,7 +365,8 @@ table#t01 th	{
                                                         <button class="btn-camera" style="margin-top: -3px;" title="Take Picture" ng-click="showCamera()"></button>
 
                                                         <span ng-show="profile._info.IDTypeID == 1"  style="margin-left:50px" class="btn btn-primary btn-file">
-                                                           Attach Picture <input image type="file" onchange="angular.element(this).scope().uploadImageForEditLocation(this.files)" accept="image/*"
+                                                           <!--Attach Picture <input id="individual-pic" type="file" onchange="angular.element(this).scope().uploadImageForEditLocation(this.files)" accept="image/*"-->
+                                                           Attach Picture <input id="individual-pic" type="file" onchange="angular.element(this).scope().uploadImageFromService(this)" accept="image/*"
                                                                                  business-pic-container-id="pic-business"
                                                                                  individual-pic-container-id="pic-individual"
                                                                                  user-type="profile._info.IDTypeID"
@@ -374,7 +375,8 @@ table#t01 th	{
                                                         </span>
                                                         <span ng-hide="profile._info.IDTypeID == 1" style="margin-left:50px" class="btn btn-primary btn-file">
                                                            Attach Picture
-                                                            <input image type="file" onchange="angular.element(this).scope().uploadImageForEditLocation(this.files)" accept="image/*"
+                                                            <!--<input image type="file" onchange="angular.element(this).scope().uploadImageForEditLocation(this.files)" accept="image/*"-->
+                                                                   <input id="business-pic" type="file" onchange="angular.element(this).scope().uploadImageFromService(this)" accept="image/*"
                                                                    business-pic-container-id="pic-business"
                                                                    individual-pic-container-id="pic-individual"
                                                                    user-type="profile._info.IDTypeID"

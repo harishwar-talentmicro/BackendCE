@@ -1,4 +1,4 @@
-angular.module('ezeidApp').controller('ProfileController', function ($rootScope, $scope, $http, $q, $timeout, Notification, $filter, $window,GURL,$interval) {
+angular.module('ezeidApp').controller('ProfileController', ['$rootScope', '$scope', '$http', '$q', '$timeout', 'Notification', '$filter', '$window','GURL','$interval','ScaleAndCropImage',function ($rootScope, $scope, $http, $q, $timeout, Notification, $filter, $window,GURL,$interval,ScaleAndCropImage) {
 
 
     var profile = this;
@@ -1065,16 +1065,53 @@ angular.module('ezeidApp').controller('ProfileController', function ($rootScope,
         $scope.isCloseButtonClicked = true;
         window.location.href = "#/home";
     }
+
+
+    /**
+     * Upload Image From service
+     * @param image
+     *
+     */
+    $scope.uploadImageFromService = function(elem){
+        var userType = profile._info.IDTypeID;
+        var image = $(elem)[0].files[0];
+        var fileName = image.name;
+
+        console.log(fileName);
+        profile._info.PictureFileName =  fileName;
+
+        var imageHeight = 90;
+        var imageWidth = 280;
+        if(userType == 1){
+            imageWidth = 77;
+        }
+
+        ScaleAndCropImage.covertToBase64(image).then(function(imageUrl){
+            var scaledImageUrl = ScaleAndCropImage.scalePropotional(imageUrl,imageHeight,imageWidth);
+            var finalImage = ScaleAndCropImage.cropImage(scaledImageUrl,imageHeight,imageWidth);
+
+            profile._info.Picture = finalImage;
+            if(userType == 1){
+                profile._info.IconFileName = fileName;
+                var scImageUrl = ScaleAndCropImage.scalePropotional(imageUrl,40,40);
+                var iconImg = ScaleAndCropImage.cropImage(scImageUrl,40,40);
+                profile._info.Icon = iconImg;
+                $rootScope.smallImage = iconImg;
+            }
+        });
+
+
+    };
     //Upload Picture
-    $scope.uploadImageForEditLocation = function (image) {
+   /* $scope.uploadImageForEditLocation = function (image) {
         profile._info.PictureFileName = image[0].name;
         fileToDataURL(image[0]).then(function (dataURL) {
 
             //  profile._info.Picture = dataURL;
             if (!profile._info.IDTypeID == 2) {
                 profile._info.Icon = $rootScope.smallImage;
-                /* profile._info.Icon = "";
-                 profile._info.IconFileName = "";*/
+                *//* profile._info.Icon = "";
+                 profile._info.IconFileName = "";*//*
             } else {
                 profile._info.IconFileName = image[0].name;
             }
@@ -1090,7 +1127,7 @@ angular.module('ezeidApp').controller('ProfileController', function ($rootScope,
         };
         reader.readAsDataURL(file);
         return deferred.promise;
-    };
+    };*/
 
 
     //Upload Icon
@@ -1117,5 +1154,5 @@ angular.module('ezeidApp').controller('ProfileController', function ($rootScope,
 
     profile.parkingStatus = [{ id: 0, label: "Parking Status" },{ id: 1, label: "Public Parking" }, { id: 2, label: "Valet Parking" }, { id: 3, label: "No parking" }];
     profile.gender = [{ id: 0, label: "Male" }, { id: 1, label: "Female" }, { id: 2, label: "Unspecified" }];
-});
+}]);
 

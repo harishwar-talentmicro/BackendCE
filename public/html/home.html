@@ -162,11 +162,7 @@
                            <div class="row setRowLeftRightMarginZero" ng-show="showSmallBanner">
 
                                 <div ng-hide="(search.mInfo.Redflagstatus == 1)" class="col-lg-10 col-md-10 col-sm-10 col-xs-10 searchHeaderAlignment">
-                                   <!-- <img width="100%" height="50px" src="../images/header.gif">-->
-                                   <!-- <img width="100%" height="50px" src="../images/businessBanner.gif">-->
-                                    <!--<img width="100%" height="50px" src="../images/newSmallHeaderBanner.gif">-->
                                     <img width="100%" height="75px" src="../images/new_samll_header.gif">
-
                                 </div>
 
                                <div ng-show="(search.mInfo.Redflagstatus == 1)" class="col-lg-10 col-md-10 col-sm-10 col-xs-10 searchHeaderAlignment bewareTextContainer">
@@ -179,11 +175,11 @@
                                </div>
 
                                 <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 searchHeaderAlignment headerVerified">
-                                    <div class="row">
+                                    <div class="row verifiedImgContainer">
                                        <img ng-show="(search.mInfo.EZEIDVerifiedID == 2)" src="images/verified_32.png" />
                                         <img ng-hide="(search.mInfo.EZEIDVerifiedID == 2)" src="images/not-verified_32.png" />
                                     </div>
-                                    <div class="row ">
+                                    <div class="row verifiedImgContainer">
                                         <div class="starRating">
                                             <div>
                                                 <div>
@@ -217,17 +213,13 @@
 
                             <div class="row setRowLeftRightMarginZero" ng-hide="showSmallBanner">
                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 searchHeaderAlignment">
-                                    <!--<img width="100%" height="50px" src="../images/bannerBig.gif">-->
-                                   <!-- <img width="100%" height="50px" src="../images/businessBanner.gif">-->
-                                    <!--<img width="100%" height="50px" src="../images/bigheaderbanner.gif">-->
-                                    <img width="100%" height="75px" src="../images/new_topheader.gif">
-
+                                  <img width="100%" height="75px" src="../images/new_topheader.gif">
                                 </div>
                             </div>
 
                             <form class="form-signin" role="form" novalidate  ng-submit="search.getSearch()">
                                 <div class="row setRowLeftRightMarginZero">
-                                   <div class="col-lg-5 col-md-5 col-sm-5 col-xs-12 bottom-clearfix setFontSize infoContainer">
+                                   <div class="col-lg-5 col-md-5 col-sm-12 col-xs-12 bottom-clearfix setFontSize infoContainer infoTabRightBorder">
                                         <div class="row setRowLeftRightMarginZero">
                                             <div class="topSearchRow">
                                                <div  class="col-lg-2 col-md-2 col-sm-2 col-xs-12 searchButtonMarginSet searchStripTopMargin showPointer" ng-class="ShowInfoWindow ? 'setLinkToText' : ''" >
@@ -254,13 +246,6 @@
                                                 <div class="row addItemRowUserEzeid1 userImgSpace" >
                                                     <img src="{{search.mInfo.Picture}}" >
                                                 </div>
-                                               <!-- <div ng-show="search.Criteria.SearchType != 2" class="row addItemRowUserEzeid1 userImgSpace" >
-                                                    <img src="{{search.mInfo.Picture}}" width="77px" height="99px" >
-                                                </div>
-
-                                                <div ng-show="search.Criteria.SearchType == 2" class="row addItemRowUserEzeid1 userImgSpace" >
-                                                    <img src="{{search.mInfo.Picture}}" width="297px" height="99px">
-                                                </div>-->
 
                                                 <div class="row addItemRowUserEzeid">
                                                     <span class="ezeidTitle"><b> {{search.mInfo.EZEID}} </b></span>
@@ -291,16 +276,16 @@
                                             </div>
                                             <div ng-hide="ShowInfoWindow">
                                                 <div class="row addItemRowUserEzeid1 setTopMargin" >
-                                                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 normalFontSize searchRadioPadding searchByText">
+                                                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 normalFontSize searchRadioPadding searchByText">
                                                         Search by
                                                     </div>
-                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 normalFontSize searchRadioPadding1">
+                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-3 normalFontSize searchRadioPadding1">
                                                         <input type="radio" class="setRadioFilterSpace" ng-model="search.Criteria.SearchType" id="EZEID" value="1" name="searchBy" ng-change="search.isEZEIDselected('1')" class="radioTopMargin" checked>EZE ID
                                                     </div>
-                                                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 normalFontSize searchRadioPadding1 keyWordText">
+                                                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 normalFontSize searchRadioPadding1 keyWordText">
                                                         <input type="radio" class="setRadioFilterSpace" ng-model="search.Criteria.SearchType" id="Keywords" value="2" ng-change="search.isEZEIDselected('2')" ng-click="search.SearchTypeKeyWord()" name="searchBy" class="radioTopMargin">Keywords
                                                     </div>
-                                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 normalFontSize searchRadioPadding1 jobKeywordText">
+                                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-3 normalFontSize searchRadioPadding1 jobKeywordText">
                                                         <input type="radio" class="setRadioFilterSpace" ng-model="search.Criteria.SearchType" name="searchBy" value="3" ng-change="search.isEZEIDselected('3')" ng-click="search.SearchTypeKeyWord()" class="radioTopMargin" >Job Keywords
                                                     </div>
                                                 </div>
@@ -338,20 +323,20 @@
                                                         Rating
                                                     </div>
                                                     <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 normalFontSize searchStarContainer showPointer">
-                                                        <img src="../images/stargray16.png" ng-hide="showStar1"  ng-click="search.addRatting(1,'gray')" >
-                                                        <img src="../images/starYellow16.png" ng-show="showStar1" ng-click="search.addRatting(1,'yellow')" >
+                                                        <img src="../images/smallGreyStar_16.png" ng-hide="showStar1"  ng-click="search.addRatting(1,'gray')" >
+                                                        <img src="../images/smallStar_16_.png" ng-show="showStar1" ng-click="search.addRatting(1,'yellow')" >
 
-                                                        <img src="../images/stargray16.png" ng-hide="showStar2"  ng-click="search.addRatting(2,'gray')" >
-                                                        <img src="../images/starYellow16.png" ng-show="showStar2" ng-click="search.addRatting(2,'yellow')" >
+                                                        <img src="../images/smallGreyStar_16.png" ng-hide="showStar2"  ng-click="search.addRatting(2,'gray')" >
+                                                        <img src="../images/smallStar_16_.png" ng-show="showStar2" ng-click="search.addRatting(2,'yellow')" >
 
-                                                        <img src="../images/stargray16.png" ng-hide="showStar3"  ng-click="search.addRatting(3,'gray')" >
-                                                        <img src="../images/starYellow16.png" ng-show="showStar3" ng-click="search.addRatting(3,'yellow')" >
+                                                        <img src="../images/smallGreyStar_16.png" ng-hide="showStar3"  ng-click="search.addRatting(3,'gray')" >
+                                                        <img src="../images/smallStar_16_.png" ng-show="showStar3" ng-click="search.addRatting(3,'yellow')" >
 
-                                                        <img src="../images/stargray16.png" ng-hide="showStar4"  ng-click="search.addRatting(4,'gray')" >
-                                                        <img src="../images/starYellow16.png" ng-show="showStar4" ng-click="search.addRatting(4,'yellow')" >
+                                                        <img src="../images/smallGreyStar_16.png" ng-hide="showStar4"  ng-click="search.addRatting(4,'gray')" >
+                                                        <img src="../images/smallStar_16_.png" ng-show="showStar4" ng-click="search.addRatting(4,'yellow')" >
 
-                                                        <img src="../images/stargray16.png" ng-hide="showStar5"  ng-click="search.addRatting(5,'gray')" >
-                                                        <img src="../images/starYellow16.png" ng-show="showStar5" ng-click="search.addRatting(5,'yellow')" >
+                                                        <img src="../images/smallGreyStar_16.png" ng-hide="showStar5"  ng-click="search.addRatting(5,'gray')" >
+                                                        <img src="../images/smallStar_16_.png" ng-show="showStar5" ng-click="search.addRatting(5,'yellow')" >
                                                     </div>
                                                 </div>
                                                 <div class="row centerAlign searchButtonMarginSet setTopMargin">
@@ -376,7 +361,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-lg-7 col-md-7 col-sm-7 col-xs-12 bottom-clearfix mapColDiv">
+                                    <div class="col-lg-7 col-md-7 col-sm-12 col-xs-12 bottom-clearfix mapColDiv">
                                         <div class="innerMapContainer">
                                             <div style="display:block;">
                                                 <img id="mapClocH" style="padding-top:8px;cursor:pointer;" ng-click="search.getMyLocation()" src="images/myloc.png" />
@@ -463,7 +448,7 @@
                                  <!--  <img width="100%" height="50px" src="../images/bannerBig.gif">-->
                                    <!--<img width="100%" height="50px" src="../images/new_Individuals.gif">-->
                                    <!--<img width="100%" height="50px" src="../images/footer_all.gif">-->
-                                   <img width="100%" height="75px" src="../images/sample_business.gif">
+                                   <img width="100%" height="75px" src="../images/new_big_footer.gif">
                                </div>
                            </div>
                         </div>

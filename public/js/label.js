@@ -10,6 +10,7 @@ function Label(opt_options) {
                       'padding: 2px; background-color: white;color:Black';
 
  var div = this.div_ = document.createElement('div');
+    div.className = 'ezeid-map-label';
  div.appendChild(span);
  div.style.cssText = 'position: absolute; display: none';
 };

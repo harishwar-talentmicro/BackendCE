@@ -74,6 +74,7 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
     var map;
     var marker;
     var markers = [];
+    var labels = [];
 
     var directionsDisplay;
     var directionsService = new google.maps.DirectionsService();
@@ -104,6 +105,8 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
         try{
             for (var i = 0; i < markers.length; i++) {
                 markers[i].setMap(null);
+                $(".ezeid-map-label").remove();
+               // labels[i].setMap(null);
             }
         }
         catch(ex){}
@@ -187,6 +190,8 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
         var ClocBtn = (document.getElementById('mapClocH'));
         map.controls[google.maps.ControlPosition.TOP_RIGHT].push(ClocBtn)
         var input = /** @type {HTMLInputElement} */(document.getElementById('txtSearch'));
+        var input1 = $("#txtSearch")[0];
+
         map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
 
         //getReverseGeocodingData(12.295810, 76.639381);
@@ -239,6 +244,7 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
                 return;
             }
             for (var i = 0, marker; marker = markers[i]; i++) {
+               $(".ezeid-map-label").remove();
                 marker.setMap(null);
             }
 
@@ -320,11 +326,12 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
             }
         });
     }
-    google.maps.event.addDomListener(window, 'load', initialize);
+//    google.maps.event.addDomListener(window, 'load', initialize);
 
     function PlaceCurrentLocationMarker(location) {
          if (marker != undefined) {
             marker.setMap(null);
+             $(".ezeid-map-label").remove();
         }
         map.setCenter(location);
         marker = new google.maps.Marker({
@@ -362,6 +369,7 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
         directionsDisplay.setMap(null);
         for (var i = 0, Cmarker; Cmarker = markers[i]; i++) {
             Cmarker.setMap(null);
+            $(".ezeid-map-label").remove();
         }
         markers = [];
 
@@ -371,9 +379,6 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
         if (positions != null) {
             for (var i = 0; i < positions.length; i++) {
                 var _item = positions[i];
-
-                console.log(_item);
-
                 var mapIcon;
                 mapIcon = '/images/Indi_user.png';
                 var businessIcon = 'images/business-icon_48.png';
@@ -394,8 +399,12 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
                     map: map
                 });
 
+                $(".ezeid-map-label").remove();
+
                 label.bindTo('position', marker, 'position');
                 label.bindTo('text', marker, 'label');
+
+                  $(".ezeid-map-label").remove();
 
 
               /* var marker = new MarkerWithLabel({
@@ -412,7 +421,7 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
 
                 var currentPos = google.maps.LatLng($rootScope.CLoc.CLat,$rootScope.CLoc.CLong);
                 map.setCenter(currentPos);
-
+                labels.push(label);
                 markers.push(marker);
                 google.maps.event.addListener(marker, 'click', (function (_item) {
 
@@ -505,13 +514,8 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
 
     SearchSec.getSearch = function () {
         $scope.SearchResultCount= "";
-       // $scope.showSmallBanner = true;
-       //  var ratingValues = "";
 
-      /*  for (var i=0; i<$scope.ratingModel.length; i++)
-        {
-            ratingValues += $scope.ratingModel[i].id + ',' ;
-        }*/
+        SearchSec.Criteria.Rating = rating.toString();
 
       //  ratingValues = ratingValues.substring(0,ratingValues.length-1);
         SearchSec.IsSearchButtonClicked = true;
@@ -535,7 +539,8 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
             SearchSec.Criteria.Latitude = $rootScope.CLoc.CLat;
             SearchSec.Criteria.Longitude = $rootScope.CLoc.CLong;
             SearchSec.Criteria.Token = $rootScope._userInfo.Token;
-           // SearchSec.Criteria.Rating = ratingValues;
+
+
 
             $http({ method: 'post', url: GURL + 'ewSearchByKeywords', data: SearchSec.Criteria }).success(function (data) {
 
@@ -633,6 +638,7 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
 
                     try{
                         PlaceMarker(null);
+                        $(".ezeid-map-label").remove();
                     }
 
                     catch(ex){
@@ -642,6 +648,7 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
                         $scope.$watch('isMapLoaded',function(var1,var2){
                             if(var2){
                                 PlaceMarker(null);
+                                $(".ezeid-map-label").remove();
                             }
                         });
                     }
@@ -1047,8 +1054,6 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
                     $scope.showStar1 = true;
                     //Add value in array
                     rating.push(1);
-
-
                 }
          }
          if(ratingValue == 2)
@@ -1128,8 +1133,8 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
                  rating.push(5);
              }
          }
-         SearchSec.Criteria.Rating = rating.toString();
-         console.log(SearchSec.Criteria.Rating);
+         //SearchSec.Criteria.Rating = rating.toString();
+
     };
 
     // Close CV Form
