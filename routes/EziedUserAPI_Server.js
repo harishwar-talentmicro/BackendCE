@@ -3869,15 +3869,21 @@ exports.FnSearchByKeywords = function (req, res) {
         var ParkingStatus = req.body.ParkingStatus;
         var OpenCloseStatus = req.body.OpenStatus;
         var Rating = req.body.Rating;
+        var HomeDelivery = req.body.HomeDelivery;
+        var CurrentDate = req.body.CurrentDate;
+        if(CurrentDate != null)
+             CurrentDate = new Date(CurrentDate);
          if(type.toString() == 'NaN')
             type = 0;
         //console.log(token);
 
         if (type == "1") {
-            if (find != null && find != '' && CategoryID != null && token != null && token != '') {
+            if (find != null && find != '' && CategoryID != null && token != null && token != '' && CurrentDate != null) {
                 FnValidateToken(token, function (err, Result) {
                     if (!err) {
                         if (Result != null) {
+                            if(CurrentDate != null)
+                                CurrentDate = new Date(CurrentDate);
                             var LocSeqNo = 0;
                             var EZEID, Pin = null;
                             var DocType = '';
@@ -3932,9 +3938,12 @@ exports.FnSearchByKeywords = function (req, res) {
                                     }
                                 }
                             }
-                            var SearchQuery = db.escape('') + ',' + db.escape(CategoryID) + ',' + db.escape(0) + ',' + db.escape(0.00) + ',' + db.escape(0.00) + ',' + db.escape(EZEID) + ',' + db.escape(LocSeqNo) + ',' + db.escape(Pin) + ',' + db.escape(SearchType) + ',' + db.escape(DocType) + ',' + db.escape("0") + ',' + db.escape("0") + ',' + db.escape("0") + ',' + db.escape(token);
+                            var SearchQuery = db.escape('') + ',' + db.escape(CategoryID) + ',' + db.escape(0) + ',' + db.escape(0.00) + ',' + db.escape(0.00) 
+                                + ',' + db.escape(EZEID) + ',' + db.escape(LocSeqNo) + ',' + db.escape(Pin) + ',' + db.escape(SearchType) + ',' + db.escape(DocType) 
+                                + ',' + db.escape("0") + ',' + db.escape("0") + ',' + db.escape("0") + ',' + db.escape(token) 
+                                + ',' + db.escape(HomeDelivery) + ',' + db.escape(CurrentDate);
                             //console.log('SearchQuery: ' + SearchQuery);
-                            db.query('CALL pSearchNew(' + SearchQuery + ')', function (err, SearchResult) {
+                            db.query('CALL pSearchResultNew(' + SearchQuery + ')', function (err, SearchResult) {
                                 // db.query(searchQuery, function (err, SearchResult) {
                                 if (!err) {
                                     if (SearchResult[0] != null) {
@@ -3989,18 +3998,20 @@ exports.FnSearchByKeywords = function (req, res) {
             }
         }
         else if (type == "2") {
-            if (ParkingStatus == 0) {
-                ParkingStatus = "1,2,3";
-            }
-            if (OpenCloseStatus == 0) {
-                OpenCloseStatus = "1,2";
-            }
-            if (find != null && find != '' && Proximity.toString() != 'NaN' && Latitude.toString() != 'NaN' && Longitude.toString() != 'NaN' && CategoryID != null) {
+           
+            if (find != null && find != '' && Proximity.toString() != 'NaN' && Latitude.toString() != 'NaN' && Longitude.toString() != 'NaN' && CategoryID != null && CurrentDate != null) {
+                
+                if (ParkingStatus == 0) {
+                    ParkingStatus = "1,2,3";
+                    }
 
-                var InsertQuery = db.escape(find) + ',' + db.escape(CategoryID) + ',' + db.escape(Proximity) + ',' + db.escape(Latitude) + ',' + db.escape(Longitude) + ',' + db.escape('') + ',' + db.escape(0) + ',' + db.escape(0) + ',' + db.escape(1) + ',' + db.escape('') + ',' + db.escape(ParkingStatus) + ',' + db.escape(OpenCloseStatus) + ',' + db.escape(Rating) + ',' + db.escape(token);
+                var InsertQuery = db.escape(find) + ',' + db.escape(CategoryID) + ',' + db.escape(Proximity) + ',' + db.escape(Latitude) 
+                    + ',' + db.escape(Longitude) + ',' + db.escape('') + ',' + db.escape(0) + ',' + db.escape(0) + ',' + db.escape(1) 
+                    + ',' + db.escape('') + ',' + db.escape(ParkingStatus) + ',' + db.escape(OpenCloseStatus) + ',' + db.escape(Rating) 
+                    + ',' + db.escape(token) + ',' + db.escape(HomeDelivery)+ ',' + db.escape(CurrentDate);
                 //console.log('SearchQuery: ' + InsertQuery);
                 //var link = 'CALL pSearchResult(' + InsertQuery + ')';
-                db.query('CALL pSearchNew(' + InsertQuery + ')', function (err, SearchResult) {
+                db.query('CALL pSearchResultNew(' + InsertQuery + ')', function (err, SearchResult) {
                     if (!err) {
                         //console.log(SearchResult);
                         if (SearchResult[0] != null) {
@@ -4046,17 +4057,17 @@ exports.FnSearchByKeywords = function (req, res) {
             }
         }
         else if (type == "3") {
-            if (ParkingStatus == 0) {
-                ParkingStatus = "1,2,3";
-            }
-            if (OpenCloseStatus == 0) {
-                OpenCloseStatus = "1,2";
-            }
-            if (find != null && find != '' && Proximity.toString() != 'NaN' && Latitude.toString() != 'NaN' && Longitude.toString() != 'NaN' && CategoryID != null) {
-
-                var InsertQuery = db.escape(find) + ',' + db.escape(CategoryID) + ',' + db.escape(Proximity) + ',' + db.escape(Latitude) + ',' + db.escape(Longitude) + ',' + db.escape('') + ',' + db.escape(0) + ',' + db.escape(0) + ',' + db.escape(3) + ',' + db.escape('') + ',' + db.escape(ParkingStatus) + ',' + db.escape(OpenCloseStatus) + ',' + db.escape(Rating) + ',' + db.escape(token);
+           
+            if (find != null && find != '' && Proximity.toString() != 'NaN' && Latitude.toString() != 'NaN' && Longitude.toString() != 'NaN' && CategoryID != null && CurrentDate != null) {
+                     if (ParkingStatus == 0) {
+                        ParkingStatus = "1,2,3";
+                    }
+                var InsertQuery = db.escape(find) + ',' + db.escape(CategoryID) + ',' + db.escape(Proximity) + ',' + db.escape(Latitude) 
+                    + ',' + db.escape(Longitude) + ',' + db.escape('') + ',' + db.escape(0) + ',' + db.escape(0) + ',' + db.escape(3) 
+                    + ',' + db.escape('') + ',' + db.escape(ParkingStatus) + ',' + db.escape(OpenCloseStatus) + ',' + db.escape(Rating) 
+                    + ',' + db.escape(token)  + ',' + db.escape(HomeDelivery)+ ',' + db.escape(CurrentDate);
                 console.log('SearchQuery: ' + InsertQuery);
-                db.query('CALL pSearchNew(' + InsertQuery + ')', function (err, SearchResult) {
+                db.query('CALL pSearchResultNew(' + InsertQuery + ')', function (err, SearchResult) {
                     if (!err) {
                         //console.log(SearchResult);
                         if (SearchResult[0] != null) {
@@ -4325,6 +4336,7 @@ exports.FnGetBannerPicture = function(req, res){
         var SeqNo = parseInt(req.query.SeqNo);
         var StateTitle = req.query.StateTitle;
         var Ezeid = req.query.Ezeid;
+        var LocID = req.query.LocID;
        // var TokenNo = req.query.Token;
 
         RtnMessage = {
@@ -4332,10 +4344,10 @@ exports.FnGetBannerPicture = function(req, res){
         };
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
             Ezeid = Ezeid.split(',').pop();
-        if ( SeqNo.toString() != 'NaN' && Ezeid != null) {
-            var Query = db.escape(Ezeid) + ',' + db.escape(SeqNo);
+        if ( SeqNo.toString() != 'NaN' && Ezeid != null && LocID != null) {
+            var Query = db.escape(Ezeid) + ',' + db.escape(SeqNo) + ',' + db.escape(LocID);
             //console.log(InsertQuery);
-            db.query('CALL PGetBannerPics(' + Query + ')', function (err, BannerResult) {
+            db.query('CALL PGetBannerPicsUsers(' + Query + ')', function (err, BannerResult) {
                 if (!err) {
                     //console.log(InsertResult);
                     if (BannerResult != null) {
@@ -4398,6 +4410,9 @@ exports.FnGetBannerPicture = function(req, res){
             }
             else if(Ezeid == null) {
                 console.log('FnGetBannerPicture: Ezeid is empty');
+            }
+             else if(LocID == null) {
+                console.log('FnGetBannerPicture: LocID is empty');
             }
             res.statusCode=400;
             res.send('null');
