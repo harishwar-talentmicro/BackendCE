@@ -262,7 +262,7 @@ hr {
     margin-top: 0%;
     padding-right: 0px;
     padding-left: 0px;
-    margin-left: 4%;
+    margin-left: 1.5%;
     margin-right: 5%;
 }
 .setTopMargin
@@ -307,7 +307,7 @@ body {
 .parkingText
 {
     padding-right: 0px;
-    width: 53.333333%;
+    /*width: 53.333333%;*/
 }
 .inerAddText
 {
