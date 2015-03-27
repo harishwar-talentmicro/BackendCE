@@ -1611,3 +1611,12 @@ input[type="text"].ui-grid-filter-input {
     border-right-style: solid;
     border-right-color: #2791BA;
 }
+#background-image-container{
+    position: absolute;
+    background-size: cover;
+    top: 0;
+    z-index: -1;
+    height: 100%;
+    width: 100%;
+    background-image: url('../images/background.jpg');
+    }

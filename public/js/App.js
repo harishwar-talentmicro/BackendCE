@@ -79,7 +79,7 @@
     /***
      * @ezeid Configuring Route access based on authentication
      */
-    ezeid.run(['$location','$rootScope','CLOSED_ROUTES','$routeParams',function($location,$rootScope,CLOSED_ROUTES,$routeParams){
+    ezeid.run(['$location','$rootScope','CLOSED_ROUTES','$routeParams','$timeout',function($location,$rootScope,CLOSED_ROUTES,$routeParams,$timeout){
         /**
          * Checking login while navigating to different pages
          */
@@ -90,12 +90,9 @@
              * @todo Check if user is navigating to Closed Routes( which require authentication)
              *       then don't let him navigate to those routes without checking his authenticity
              */
-//            console.log(event);
-//            console.log(next);
-//            console.log(current);
-         //   console.log(next.params);
 
-            if(next.params && typeof(next.params.Token) !== "undefined" && typeof(next.params.FunctionType) !== "undefined" && typeof(next.params.PersonEZEID) )
+
+//            if(next.params && typeof(next.params.Token) !== "undefined" && typeof(next.params.FunctionType) !== "undefined" && typeof(next.params.PersonEZEID) )
 
             try{
                 if(CLOSED_ROUTES.indexOf(next.$$route.originalPath) == -1){
@@ -111,7 +108,6 @@
              * Checking if the user is authenticated an then routing it to particular url
              */
 
-            ///////////////////////////////////////////////////////////////////
 
             if ($rootScope._userInfo) {
                 /**
@@ -172,8 +168,10 @@
                     $location.path('/');
                 }
             }
-            ////////////////////////////////////////////////////////////////////
-        });
+       });
+
+        lazyLoadBackground($timeout);
+
 
     }]);
     /************************************** Run Configuration ends here ****************************/
