@@ -1,4 +1,3 @@
-
 angular.module('ezeidApp').controller('DocumentController', function($http, $rootScope, $scope, $timeout, Notification, $filter,$q,GURL) {
   if ($rootScope._userInfo) {
 
@@ -37,7 +36,7 @@ angular.module('ezeidApp').controller('DocumentController', function($http, $roo
     }
     var DocCtrl = this;
     $scope.fileSeclected = undefined;
-    $scope.IdPlaceHolder = "Enter ID number";
+    $scope.IdPlaceHolder = "Enter ID Card number";
     $scope.Token = $rootScope._userInfo.Token;
 
     var original_form = {
@@ -111,24 +110,7 @@ angular.module('ezeidApp').controller('DocumentController', function($http, $roo
     }
 
     $scope.uploadFile = function (files) {
-
         $scope.DocumentToUpload = files;
-       /* for (var i = 0; i < files.length; i++) {
-            var $file = files[i];
-            var formData = new FormData();
-            formData.append('file', $file);
-            formData.append('RefType', $scope.OptionSelected);
-            formData.append('TokenNo', $rootScope._userInfo.Token);
-
-            $http({ method: 'POST', url: '/ewTUploadDoc/', data: formData,
-                headers: { 'Content-Type': undefined }, transformRequest: angular.identity })
-                .success(function (data, status, headers, config) {
-                    GetUserDetails();
-                    Notification.success({ message: "Saved...", delay: MsgDelay });
-                });
-                error(function(data, status, headers, config) {
-                });
-        }*/
     };
 
     var fileToDataURL = function (file) {
@@ -158,7 +140,7 @@ angular.module('ezeidApp').controller('DocumentController', function($http, $roo
                // if(data && data.length > 0){
                 if(data && data.length > 0 && data[0].No != '' && data !='null'){
                     if($scope.OptionSelected==1){
-                        $scope.IdPlaceHolder = "Enter ID number";
+                        $scope.IdPlaceHolder = "Enter ID Card number";
                          $scope.form.RefNo = data[0].No;
                         $scope.form.RefExpiryDate = $filter('date')(new Date(data[0].ExpiryDate), 'dd-MMM-yyyy');
                         $scope.form.RefDoc = data[0].IDDoc;
@@ -176,7 +158,7 @@ angular.module('ezeidApp').controller('DocumentController', function($http, $roo
 
                     }else if($scope.OptionSelected==3){
 
-                        $scope.IdPlaceHolder = "Enter Driving Licence number";
+                        $scope.IdPlaceHolder = "Enter Driver's Licence number";
 
                         $scope.form.RefNo = data[0].No;
                         $scope.form.RefExpiryDate = $filter('date')(new Date(data[0].ExpiryDate), 'dd-MMM-yyyy');
@@ -185,7 +167,7 @@ angular.module('ezeidApp').controller('DocumentController', function($http, $roo
                         $scope.showDownloadLink = $scope.form.RefFileName == "" ? false : true;
 
                     }else if($scope.OptionSelected==4){
-                        $scope.IdPlaceHolder = "Reference No. for Document £1";
+                        $scope.IdPlaceHolder = "Reference No. for Document #1";
 
                         $scope.form.RefNo = data[0].No;
                         $scope.form.RefExpiryDate = $filter('date')(new Date(data[0].ExpiryDate), 'dd-MMM-yyyy');
@@ -194,7 +176,7 @@ angular.module('ezeidApp').controller('DocumentController', function($http, $roo
                         $scope.showDownloadLink = $scope.form.RefFileName == "" ? false : true;
 
                     }else if($scope.OptionSelected==5){
-                        $scope.IdPlaceHolder = "Reference No. for Document £2";
+                        $scope.IdPlaceHolder = "Reference No. for Document #2";
 
                         $scope.form.RefNo = data[0].No;
                         $scope.form.RefExpiryDate = $filter('date')(new Date(data[0].ExpiryDate), 'dd-MMM-yyyy');
@@ -211,16 +193,16 @@ angular.module('ezeidApp').controller('DocumentController', function($http, $roo
                             $scope.form.RefDoc = "";
                             $scope.showDownloadLink = false;
                             if($scope.OptionSelected==1){
-                                $scope.IdPlaceHolder = "Enter ID number";
+                                $scope.IdPlaceHolder = "Enter ID Card number";
                             }
                             else if($scope.OptionSelected==2){
                                 $scope.IdPlaceHolder = "Enter Passport number";
                             }else if($scope.OptionSelected==3){
-                                $scope.IdPlaceHolder = "Enter Driving Licence number";
+                                $scope.IdPlaceHolder = "Enter Driver's Licence number";
                             }else if($scope.OptionSelected==4){
-                                $scope.IdPlaceHolder = "Reference No. for Document £1";
+                                $scope.IdPlaceHolder = "Reference No. for Document #1";
                             }else if($scope.OptionSelected==5){
-                                $scope.IdPlaceHolder = "Reference No. for Document £2";
+                                $scope.IdPlaceHolder = "Reference No. for Document #2";
                             }
                         }
                         else
@@ -229,7 +211,7 @@ angular.module('ezeidApp').controller('DocumentController', function($http, $roo
                             $scope.form.RefExpiryDate = "";
                             $scope.form.RefDoc = "";
                             if($scope.OptionSelected==1){
-                                $scope.IdPlaceHolder = "Enter ID number";
+                                $scope.IdPlaceHolder = "Enter ID Card number";
                                 $scope.form.RefFileName = data[0].DocFilename;
                                 $scope.showDownloadLink = $scope.form.RefFileName == "" || $scope.form.RefFileName== 'undefined' ? false : true;
                             }
@@ -238,15 +220,15 @@ angular.module('ezeidApp').controller('DocumentController', function($http, $roo
                                 $scope.form.RefFileName = data[0].DocFilename;
                                 $scope.showDownloadLink = $scope.form.RefFileName == "" ? false : true;
                             }else if($scope.OptionSelected==3){
-                                $scope.IdPlaceHolder = "Enter Driving Licence number";
+                                $scope.IdPlaceHolder = "Enter Driver's Licence number";
                                 $scope.form.RefFileName = data[0].DocFilename;
                                 $scope.showDownloadLink = $scope.form.RefFileName == "" ? false : true;
                             }else if($scope.OptionSelected==4){
-                                $scope.IdPlaceHolder = "Reference No. for Document £1";
+                                $scope.IdPlaceHolder = "Reference No. for Document #1";
                                 $scope.form.RefFileName = data[0].DocFilename;
                                 $scope.showDownloadLink = $scope.form.RefFileName == "" ? false : true;
                             }else if($scope.OptionSelected==5){
-                                $scope.IdPlaceHolder = "Reference No. for Document £2";
+                                $scope.IdPlaceHolder = "Reference No. for Document #2";
                                 $scope.form.RefFileName = data[0].DocFilename;
                                 $scope.showDownloadLink = $scope.form.RefFileName == "" ? false : true;
                             }

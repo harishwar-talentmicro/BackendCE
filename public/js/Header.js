@@ -161,7 +161,7 @@ HeaderApp.directive('headerSection', function (Notification) {
                 document.getElementById("OldPassword").className = "form-control wd_oldPass changePass_inpMar emptyBox change_PadLeft";
                 document.getElementById("NewPassword").className = "form-control wd_oldPass changePass_inpMar emptyBox change_PadLeft";
                 document.getElementById("ReEnterPassword").className = "form-control wd_oldPass changePass_inpMar emptyBox change_PadLeft";
-               $('#ChangePassword_popup').slideDown();
+                $('#ChangePassword_popup').slideDown();
             };
 
             //Open Quick SignUp Form

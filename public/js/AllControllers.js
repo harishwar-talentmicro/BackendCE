@@ -513,17 +513,20 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
     };
 
     SearchSec.getSearch = function () {
+
         $scope.SearchResultCount= "";
-
+        $scope.ShowNoDataFound = false;
         SearchSec.Criteria.Rating = rating.toString();
-
-      //  ratingValues = ratingValues.substring(0,ratingValues.length-1);
         SearchSec.IsSearchButtonClicked = true;
         SearchSec.IsShowForm = false;
-        SearchSec.Criteria.ParkingStatus = SearchSec.Criteria.ParkingStatus == 1 ? '1' :0;
+        SearchSec.Criteria.ParkingStatus = SearchSec.Criteria.ParkingStatus1 == true ? 1 : 0;
+        SearchSec.Criteria.HomeDelivery = SearchSec.Criteria.HomeDelivery1 == true ? 1 : 0;
+        SearchSec.Criteria.OpenStatus = SearchSec.Criteria.OpenStatus1 == true ? 1 : 0;
 
-        /*SearchSec.Criteria.OpenStatus = (SearchSec.Criteria.OpenStatus.id == 1) ? 0 : SearchSec.Criteria.OpenStatus ;*/
-        SearchSec.Criteria.OpenStatus = (SearchSec.Criteria.OpenStatus == 1) ? 0 : SearchSec.Criteria.OpenStatus ;
+        var currentDate = moment().format('YYYY-MM-DD hh:mm');
+        console.log(currentDate);
+
+        SearchSec.Criteria.CurrentDate = currentDate;
         if ($rootScope._userInfo.IsAuthenticate == true || SearchSec.Criteria.SearchType == 2 && SearchSec.IsSearchButtonClicked) {
 
             if($rootScope._userInfo.Token == "")
@@ -539,8 +542,6 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
             SearchSec.Criteria.Latitude = $rootScope.CLoc.CLat;
             SearchSec.Criteria.Longitude = $rootScope.CLoc.CLong;
             SearchSec.Criteria.Token = $rootScope._userInfo.Token;
-
-
 
             $http({ method: 'post', url: GURL + 'ewSearchByKeywords', data: SearchSec.Criteria }).success(function (data) {
 
@@ -599,9 +600,9 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
                                 });
                             }
                             else {
-                                Notification.error({ message: 'Invalid key or not found…', delay: MsgDelay });
-                                SearchSec.Criteria.ParkingStatus = SearchSec.Criteria.ParkingStatus == 1 ? true : false ;
-                             }
+                                    // Notification.error({ message: 'Invalid key or not found…', delay: MsgDelay });
+                                    $scope.ShowNoDataFound = true;
+                                 }
                         });
 
 
@@ -630,12 +631,10 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
                         /*********************Code for checking map load and handling it with reload ends ****************/
                     }
                     // PlaceMarker(data);//older one
-                    SearchSec.Criteria.ParkingStatus = SearchSec.Criteria.ParkingStatus == 1 ? true : false ;
                 }
                 else {
-                    Notification.error({ message: 'Invalid key or not found…', delay: MsgDelay });
-                    SearchSec.Criteria.ParkingStatus = SearchSec.Criteria.ParkingStatus == 1 ? true : false ;
-
+                   // Notification.error({ message: 'Invalid key or not found…', delay: MsgDelay });
+                    $scope.ShowNoDataFound = true;
                     try{
                         PlaceMarker(null);
                         $(".ezeid-map-label").remove();

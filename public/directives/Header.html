@@ -101,7 +101,7 @@
     </div>
 </div>
 
-<div class="Popup_window form_style" id="ChangePassword_popup">
+    <div class="Popup_window form_style" id="ChangePassword_popup">
     <div class="changePass_popUp Maping_popup">
         <span class="closelink" ng-click="SignInCtrl.closeChangePasswordForm()">X</span>
 
@@ -161,7 +161,8 @@
                 <!--<img ng-show="$root._userInfo.IsAuthenticate" class="user_icon" style="border-radius: 18px;margin-right:-46px;" src="{{$root._userInfo.Icon}}"/>-->
                 <img ng-show="$root._userInfo.IsAuthenticate && $root._userInfo.Icon.length" class="user_icon" style="border-radius: 18px;margin-right:-46px;" ng-src="{{$root._userInfo.Icon}}"/>
                 <a id="userid" class="btn btn-primary userMarR" ng-show="$root._userInfo.IsAuthenticate">
-                    {{$root._userInfo.FirstName}}
+                   {{$root._userInfo.FirstName}}
+                   <!-- {{$root._userInfo.FirstName > 15 ? '' : $root._userInfo.FirstName}}-->
                     <img style="position:relative; top:-2px;" src="images/drp_arrow.png">
                 </a>
                 <a href="#/home" id="" class="btn btn-primary logOut-hover logMarR" title="Logout" ng-click="SignInCtrl.Logout()" ng-show="$root._userInfo.IsAuthenticate">
@@ -185,7 +186,7 @@
                         <li ng-show="$root._userInfo.Type == 1"><a class="cv-icon" href="#/attachcv">CV Attachment</a></li>
                         <li><a class="history-icon" href="#/acchist">Access History</a></li>
                         <li><a class="blacklist-icon" href="#/blackwhitelist">Whitelist & Blacklist</a></li>
-                        <li><a class="changePass-icon" href="#" ng-click="SignInCtrl.openChangePasswordForm()">Change Password</a></li>
+                        <li><a class="changePass-icon" href ng-click="SignInCtrl.openChangePasswordForm()">Change Password</a></li>
                     </ul>
                 </div>
             </form>
