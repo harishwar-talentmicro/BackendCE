@@ -1068,7 +1068,6 @@ angular.module('ezeidApp').controller('ProfileController', ['$rootScope', '$scop
         var image = $(elem)[0].files[0];
         var fileName = image.name;
 
-        console.log(fileName);
         profile._info.PictureFileName =  fileName;
 
         var imageHeight = 90;
@@ -1076,14 +1075,12 @@ angular.module('ezeidApp').controller('ProfileController', ['$rootScope', '$scop
         if(userType == 1){
             imageWidth = 77;
         }
-        console.log('height : '+imageHeight+'width: '+imageWidth);
         ScaleAndCropImage.covertToBase64(image).then(function(imageUrl){
             var scaledImageUrl = ScaleAndCropImage.scalePropotional(imageUrl,imageHeight,imageWidth);
             var finalImage = ScaleAndCropImage.cropImage(scaledImageUrl,imageHeight,imageWidth);
-            console.log('height : '+imageHeight+'width: '+imageWidth);
 
             profile._info.Picture = finalImage;
-            if(userType == 1){
+            if(userType == 1 && 0){
                 profile._info.IconFileName = fileName;
                 var scImageUrl = ScaleAndCropImage.scalePropotional(imageUrl,40,40);
                 var iconImg = ScaleAndCropImage.cropImage(scImageUrl,40,40);

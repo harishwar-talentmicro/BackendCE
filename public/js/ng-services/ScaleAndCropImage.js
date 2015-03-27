@@ -35,53 +35,37 @@ angular.module('ezeidApp').service('ScaleAndCropImage',['$q',function($q){
             var img = new Image();
             img.src = imageDataUrl;
 
-            /**
-             * Calculating Differences for Height and Width to find out how
-             * the image should be scaled (based on height or based on width
-             */
-            var dHeight = img.height - requiredHeight;
-            var dWidth = img.width - requiredWidth;
-
-            /**
-             * Initially scaled image height and width are zero
-             */
             var scaleHeight = 0;
             var scaleWidth = 0;
 
-//            if(dHeight > dWidth){
-//                /**
-//                 * Here Image will be scaled based on width
-//                 * Calculating scale factor
-//                 */
-//                scaleWidth = requiredWidth;
-//                scaleHeight = (img.height * scaleWidth) / img.width;
-//            }
-//
-//            else{
-//                /**
-//                 * Here Image will be scaled based on height
-//                 * Calculating scale factor
-//                 */
-//                scaleHeight = requiredHeight;
-//                scaleWidth = (scaleHeight * img.width) / img.height;
-//            }
+            if(requiredHeight > requiredWidth){
 
-            if(dHeight < dWidth){
-                /**
-                 * Here Image will be scaled based on width
-                 * Calculating scale factor
-                 */
-                scaleWidth = requiredWidth;
-                scaleHeight = (img.height * scaleWidth) / img.width;
+                if(img.height < img.width){
+                    scaleHeight = requiredHeight;
+                    scaleWidth = (img.width * scaleHeight) / img.height;
+                }
+
+                else{
+                    scaleWidth = requiredWidth;
+                    scaleHeight = (img.height * scaleWidth) / img.width;
+                }
             }
 
             else{
-                /**
-                 * Here Image will be scaled based on height
-                 * Calculating scale factor
-                 */
-                scaleHeight = requiredHeight;
-                scaleWidth = (scaleHeight * img.width) / img.height;
+                if(img.height > img.width){
+                    scaleWidth = requiredWidth;
+                    scaleHeight = (img.height * scaleWidth) / img.width;
+                }
+
+                else{
+
+                    scaleHeight = requiredHeight;
+                    scaleWidth = (img.width * scaleHeight) / img.height;
+                    if(scaleWidth < requiredWidth){
+                        scaleWidth = requiredWidth;
+                        scaleHeight = (img.height * scaleWidth) / img.width;
+                    }
+                }
             }
 
             var canvas = document.createElement('canvas');
@@ -106,19 +90,18 @@ angular.module('ezeidApp').service('ScaleAndCropImage',['$q',function($q){
             canvas.className = 'cr-canvas';
             canvas.height = requiredHeight;
             canvas.width = requiredWidth;
+            ctx.fillStyle = "#ffffff";
+            ctx.fillRect(0,0,canvas.width,canvas.height);
             var ctx = canvas.getContext('2d');
             /**
              * Cropping Image
              */
-            console.log('requiredHeight  '+requiredHeight + " imgHeight : "+img.height);
-            console.log('requiredwidth  '+requiredWidth+ " imgwidth : "+img.width);
-            ctx.fillStyle = "#ffffff";
-            ctx.fillRect(0,0,canvas.width,canvas.height);
 
-//            ctx.drawImage(img,0,0,img.width,img.height,0,0,requiredWidth,requiredHeight);
             ctx.drawImage(img,0,0);
             var retVal = canvas.toDataURL("image/jpeg", 1.0);
             $('.cr-canvas').remove();
+            console.log('Cropped Image');
+            console.log(retVal);
             return retVal;
         }
 
