@@ -74,6 +74,7 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
     var map;
     var marker;
     var markers = [];
+    var labels = [];
 
     var directionsDisplay;
     var directionsService = new google.maps.DirectionsService();
@@ -89,7 +90,7 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
     var RefreshTime = Miliseconds;
     var AutoRefresh = true;
 
-    var rating = [];
+    var rating = [1,2,3,4,5];
 
     $('#datetimepicker1').datetimepicker({
         format: "d-M-Y  h:m A",
@@ -104,6 +105,8 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
         try{
             for (var i = 0; i < markers.length; i++) {
                 markers[i].setMap(null);
+                $(".ezeid-map-label").remove();
+               // labels[i].setMap(null);
             }
         }
         catch(ex){}
@@ -153,33 +156,13 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
     $scope.showStar4 = true;
     $scope.showStar5 = true;
 
-    //new multi select
-    $scope.ratingModel = [
-        {
-            "id": 1
-        },
-        {
-            "id": 2
-        },
-        {
-            "id": 3
-        },
-        {
-            "id": 4
-        },
-        {
-            "id": 5
-        }
-    ];
+   /* $scope.showStar1 = false;
+    $scope.showStar2 = false;
+    $scope.showStar3 = false;
+    $scope.showStar4 = false;
+    $scope.showStar5 = false;*/
 
-    $scope.ratingData = [
-        {id: 1, label: "*", "assignable": true},
-        {id: 2, label: "**", "assignable": true},
-        {id: 3, label: "***", "assignable": true},
-        {id: 4, label: "****", "assignable": true},
-        {id: 5, label: "*****", "assignable": true}
-    ];
-    //================
+
 
     $scope.member = {roles: []};
     $scope.selected_items = [];
@@ -207,6 +190,8 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
         var ClocBtn = (document.getElementById('mapClocH'));
         map.controls[google.maps.ControlPosition.TOP_RIGHT].push(ClocBtn)
         var input = /** @type {HTMLInputElement} */(document.getElementById('txtSearch'));
+        var input1 = $("#txtSearch")[0];
+
         map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
 
         //getReverseGeocodingData(12.295810, 76.639381);
@@ -259,6 +244,7 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
                 return;
             }
             for (var i = 0, marker; marker = markers[i]; i++) {
+               $(".ezeid-map-label").remove();
                 marker.setMap(null);
             }
 
@@ -340,11 +326,12 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
             }
         });
     }
-    google.maps.event.addDomListener(window, 'load', initialize);
+//    google.maps.event.addDomListener(window, 'load', initialize);
 
     function PlaceCurrentLocationMarker(location) {
          if (marker != undefined) {
             marker.setMap(null);
+             $(".ezeid-map-label").remove();
         }
         map.setCenter(location);
         marker = new google.maps.Marker({
@@ -382,6 +369,7 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
         directionsDisplay.setMap(null);
         for (var i = 0, Cmarker; Cmarker = markers[i]; i++) {
             Cmarker.setMap(null);
+            $(".ezeid-map-label").remove();
         }
         markers = [];
 
@@ -391,9 +379,6 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
         if (positions != null) {
             for (var i = 0; i < positions.length; i++) {
                 var _item = positions[i];
-
-                console.log(_item);
-
                 var mapIcon;
                 mapIcon = '/images/Indi_user.png';
                 var businessIcon = 'images/business-icon_48.png';
@@ -414,8 +399,12 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
                     map: map
                 });
 
+                $(".ezeid-map-label").remove();
+
                 label.bindTo('position', marker, 'position');
                 label.bindTo('text', marker, 'label');
+
+                  $(".ezeid-map-label").remove();
 
 
               /* var marker = new MarkerWithLabel({
@@ -432,7 +421,7 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
 
                 var currentPos = google.maps.LatLng($rootScope.CLoc.CLat,$rootScope.CLoc.CLong);
                 map.setCenter(currentPos);
-
+                labels.push(label);
                 markers.push(marker);
                 google.maps.event.addListener(marker, 'click', (function (_item) {
 
@@ -501,7 +490,7 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
     SearchSec.isEZEIDselected = function (value) {
         if (SearchSec.Criteria.SearchType == 1)
         {
-            SearchSec.Placeholder = 'Type EZEID here.';
+            SearchSec.Placeholder = 'Type EZE ID here.';
             //SearchSec.showSmallBanner = false;
         }
         else if(SearchSec.Criteria.SearchType == 2)
@@ -525,18 +514,14 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
 
     SearchSec.getSearch = function () {
         $scope.SearchResultCount= "";
-       // $scope.showSmallBanner = true;
-      //  var ratingValues = "";
 
-      /*  for (var i=0; i<$scope.ratingModel.length; i++)
-        {
-            ratingValues += $scope.ratingModel[i].id + ',' ;
-        }*/
+        SearchSec.Criteria.Rating = rating.toString();
 
       //  ratingValues = ratingValues.substring(0,ratingValues.length-1);
         SearchSec.IsSearchButtonClicked = true;
         SearchSec.IsShowForm = false;
-        SearchSec.Criteria.ParkingStatus = SearchSec.Criteria.ParkingStatus == 1 ? '1,2' :0;
+        SearchSec.Criteria.ParkingStatus = SearchSec.Criteria.ParkingStatus == 1 ? '1' :0;
+
         /*SearchSec.Criteria.OpenStatus = (SearchSec.Criteria.OpenStatus.id == 1) ? 0 : SearchSec.Criteria.OpenStatus ;*/
         SearchSec.Criteria.OpenStatus = (SearchSec.Criteria.OpenStatus == 1) ? 0 : SearchSec.Criteria.OpenStatus ;
         if ($rootScope._userInfo.IsAuthenticate == true || SearchSec.Criteria.SearchType == 2 && SearchSec.IsSearchButtonClicked) {
@@ -554,7 +539,8 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
             SearchSec.Criteria.Latitude = $rootScope.CLoc.CLat;
             SearchSec.Criteria.Longitude = $rootScope.CLoc.CLong;
             SearchSec.Criteria.Token = $rootScope._userInfo.Token;
-           // SearchSec.Criteria.Rating = ratingValues;
+
+
 
             $http({ method: 'post', url: GURL + 'ewSearchByKeywords', data: SearchSec.Criteria }).success(function (data) {
 
@@ -614,7 +600,8 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
                             }
                             else {
                                 Notification.error({ message: 'Invalid key or not found…', delay: MsgDelay });
-                            }
+                                SearchSec.Criteria.ParkingStatus = SearchSec.Criteria.ParkingStatus == 1 ? true : false ;
+                             }
                         });
 
 
@@ -643,11 +630,15 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
                         /*********************Code for checking map load and handling it with reload ends ****************/
                     }
                     // PlaceMarker(data);//older one
+                    SearchSec.Criteria.ParkingStatus = SearchSec.Criteria.ParkingStatus == 1 ? true : false ;
                 }
                 else {
                     Notification.error({ message: 'Invalid key or not found…', delay: MsgDelay });
+                    SearchSec.Criteria.ParkingStatus = SearchSec.Criteria.ParkingStatus == 1 ? true : false ;
+
                     try{
                         PlaceMarker(null);
+                        $(".ezeid-map-label").remove();
                     }
 
                     catch(ex){
@@ -657,6 +648,7 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
                         $scope.$watch('isMapLoaded',function(var1,var2){
                             if(var2){
                                 PlaceMarker(null);
+                                $(".ezeid-map-label").remove();
                             }
                         });
                     }
@@ -1048,95 +1040,101 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
      SearchSec.addRatting = function (ratingValue,starColor) {
          if(ratingValue == 1)
          {
-                if(starColor == 'gray')
+                if(starColor == 'yellow')
                 {
                     $scope.showStar1 = false;
-                    //Add value in array
-                    rating.push(1);
-                }
-                else
-                {
-                    $scope.showStar1 = true;
                     //Remove value from array
                     var index = rating.indexOf(1);
                     if (index >= 0) {
                         rating.splice( index, 1 );
                     }
                 }
+                else
+                {
+                    $scope.showStar1 = true;
+                    //Add value in array
+                    rating.push(1);
+                }
          }
          if(ratingValue == 2)
          {
-             if(starColor == 'gray')
+             if(starColor == 'yellow')
              {
                  $scope.showStar2 = false;
-                 //Add value in array
-                 rating.push(2);
-             }
-             else
-             {
-                 $scope.showStar2 = true;
+
                  //Remove value from array
                  var index = rating.indexOf(2);
                  if (index >= 0) {
                      rating.splice( index, 1);
                  }
              }
+             else
+             {
+                 $scope.showStar2 = true;
+                 //Add value in array
+                 rating.push(2);
+             }
          }
          if(ratingValue == 3)
          {
-             if(starColor == 'gray')
+             if(starColor == 'yellow')
              {
                  $scope.showStar3 = false;
-                 //Add value in array
-                 rating.push(3);
-             }
-             else
-             {
-                 $scope.showStar3 = true;
+
+
                  //Remove value from array
                  var index = rating.indexOf(3);
                  if (index >= 0) {
                      rating.splice( index, 1);
                  }
              }
+             else
+             {
+                 $scope.showStar3 = true;
+                 //Add value in array
+                 rating.push(3);
+             }
          }
          if(ratingValue == 4)
          {
-             if(starColor == 'gray')
+             if(starColor == 'yellow')
              {
                  $scope.showStar4 = false;
-                 //Add value in array
-                 rating.push(4);
-             }
-             else
-             {
-                 $scope.showStar4 = true;
+
                  //Remove value from array
                  var index = rating.indexOf(4);
                  if (index >= 0) {
                      rating.splice( index, 1 );
                  }
              }
+             else
+             {
+                 $scope.showStar4 = true;
+                 //Add value in array
+                 rating.push(4);
+             }
          }
          if(ratingValue == 5)
          {
-             if(starColor == 'gray')
+             if(starColor == 'yellow')
              {
                  $scope.showStar5 = false;
-                 //Add value in array
-                 rating.push(5);
-             }
-             else
-             {
-                 $scope.showStar5 = true;
+
                  //Remove value from array
                  var index = rating.indexOf(5);
                  if (index >= 0) {
                      rating.splice( index, 1 );
                  }
              }
+             else
+             {
+                 $scope.showStar5 = true;
+                 //Add value in array
+                 rating.push(5);
+             }
          }
-         SearchSec.Criteria.Rating = rating.toString();
+         //SearchSec.Criteria.Rating = rating.toString();
+
     };
 
     // Close CV Form

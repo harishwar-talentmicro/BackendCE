@@ -108,6 +108,7 @@ hr {
    /* height: 360px;*/
     height: auto;
     min-height: 375px;
+    background: #e6f9ff;
 }
 .setRowLeftRightMarginZero
 {
@@ -210,7 +211,7 @@ hr {
 }
 .topSearchRow
 {
-    background: #d3d3d3;
+    background: #86d7ea;
     height: 36px;
 }
 .searchInfoLink
@@ -294,12 +295,13 @@ body {
 {
     margin-top: 0%;
     height: 30px;
-    background: #FFFFFF;
+   /* background: #FFFFFF;*/
 }
 .headerVerified
 {
     text-align: center;
     background: #09a2de;
+    height: 75px;
 }
 .parkingText
 {
@@ -532,4 +534,12 @@ body {
 .keyWordText
 {
     text-align: center;
+}
+.verifiedImgContainer
+{
+    margin-top: 6%;
+}
+.cameraContainer
+{
+    margin-bottom: 4%;
 }

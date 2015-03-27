@@ -212,7 +212,15 @@
                                                         <!--<span ng-hide="_locInfo.IsAuthenticate"> <img ng-show="!image" src="images/user_200.png" width="200"/></span>-->
                                                         <div ng-hide="isShowCamera">
                                                             <span ng-show="!SLocCtrl._locInfo.Picture"> <img ng-show="!image" src="images/user_200.png" width="200"/></span>
-                                                            <img ng-show="SLocCtrl._locInfo.Picture" width="200" name="Image" src="{{SLocCtrl._locInfo.Picture}}" required />
+
+                                                            <!--<img ng-show="SLocCtrl._locInfo.Picture" width="200" name="Image" src="{{SLocCtrl._locInfo.Picture}}" required />-->
+
+                                                            <div ng-show="IdUserType == 1" style="text-align: center;">
+                                                                <img id="pic-individual" ng-show="SLocCtrl._locInfo.Picture" width="77" height="99" name="Image" ng-src="{{SLocCtrl._locInfo.Picture}}" required />
+                                                            </div>
+                                                            <div ng-hide="IdUserType == 1">
+                                                                <img id="pic-business" ng-show="SLocCtrl._locInfo.Picture" width="279" height="99" name="Image" src="{{SLocCtrl._locInfo.Picture}}" required />
+                                                            </div>
                                                         </div>
                                                         
                                                         <div style="border:1px solid #EEEE;text-align:center;" id="camera-container" ng-show="isShowCamera">
@@ -224,7 +232,14 @@
                                                         <div ng-hide="isShowCamera" style="margin-top:20px;" class="col-lg-12 text-center">
                                                             <button class="btn-camera" style="margin-left:-45px; margin-top: -3px;" title="Take Picture" ng-click="showCamera()"></button>
                                                              <span class="btn btn-primary btn-file">
-                                                                Attach Picture <input type="file" onchange="angular.element(this).scope().uploadImageForOtherLocation(this.files)" accept="image/*" image="image" resize-max-height="200" resize-max-width="200" resize-quality="0.7">
+                                                                <!--Attach Picture <input type="file" onchange="angular.element(this).scope().uploadImageForOtherLocation(this.files)" accept="image/*" image="image" resize-max-height="200" resize-max-width="200" resize-quality="0.7">-->
+
+                                                                  Attach Picture <input id="individual-pic" type="file" onchange="angular.element(this).scope().uploadImageFromService(this)" accept="image/*"
+                                                                                        business-pic-container-id="pic-business"
+                                                                                        individual-pic-container-id="pic-individual"
+                                                                                        user-type="IdUserType"
+                                                                                        set-picture="profile.setPicture(pic,icon)" >
+
                                                             </span>
                                                          </div>
                                                         <p/>

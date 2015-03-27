@@ -1,5 +1,6 @@
 
-angular.module('ezeidApp').controller('LocationsController', function ($rootScope, $scope, $http, $q, $timeout, Notification, $filter, $interval, $window,GURL) {
+angular.module('ezeidApp').controller('LocationsController',['$rootScope', '$scope', '$http', '$q', '$timeout', 'Notification', '$filter', '$interval', '$window','GURL','ScaleAndCropImage',function ($rootScope, $scope, $http, $q, $timeout, Notification, $filter, $interval, $window,GURL,ScaleAndCropImage) {
+
 
     var SLocCtrl = this;
     var map1;
@@ -76,6 +77,7 @@ angular.module('ezeidApp').controller('LocationsController', function ($rootScop
         }
     }
 
+
     $scope.$watch('_userInfo.IsAuthenticate', function () {
         if ($rootScope._userInfo.IsAuthenticate == true) {
             getSecondaryLoc();
@@ -91,23 +93,24 @@ angular.module('ezeidApp').controller('LocationsController', function ($rootScop
         }
     });
 
-    
+    $scope.IdUserType = $rootScope._userInfo.Type;
+
      /***************************** Camera Code ***************************************/
         $scope.isShowCamera = false;
         
 
         Webcam.set({
 				// live preview size
-				width: 250,
-				height: 200,
-				
-				// device capture size
-				dest_width: 250,
-				dest_height: 200,
-				
-				// final cropped size
-				crop_width: 200,
-				crop_height: 200,
+                width: ($rootScope._userInfo.UserType == 1) ? 77 : 280,
+                height: 90,
+
+                // device capture size
+                dest_width: ($rootScope._userInfo.UserType == 1) ? 77 : 280,
+                dest_height: 90,
+
+                // final cropped size
+                crop_width: ($rootScope._userInfo.UserType == 1) ? 77 : 280,
+                crop_height: 90,
 				
 				// format and quality
 				image_format: 'jpeg',
@@ -785,6 +788,37 @@ angular.module('ezeidApp').controller('LocationsController', function ($rootScop
     SLocCtrl.parkingStatus = [{ id: 0, label: "Parking Status" },
         { id: 1, label: "Public Parking" }, { id: 2, label: "Valet Parking" }, { id: 3, label: "No parking" }];
 
+    /**
+     * Upload Image From service
+     * @param image
+     *
+     */
+    $scope.uploadImageFromService = function(elem){
+        var userType = $rootScope._userInfo.Type;
+        var image = $(elem)[0].files[0];
+        var fileName = image.name;
+
+        console.log($rootScope._userInfo.Type);
+        SLocCtrl._locInfo.PictureFileName =  fileName;
+
+        var imageHeight = 90;
+        var imageWidth = 280;
+        if(userType == 1){
+            imageWidth = 77;
+        }
+
+        ScaleAndCropImage.covertToBase64(image).then(function(imageUrl){
+            var scaledImageUrl = ScaleAndCropImage.scalePropotional(imageUrl,imageHeight,imageWidth);
+            var finalImage = ScaleAndCropImage.cropImage(scaledImageUrl,imageHeight,imageWidth);
+
+            SLocCtrl._locInfo.Picture = finalImage;
+
+            SLocCtrl._locInfo.Icon = "";
+            SLocCtrl._locInfo.IconFileName = "";
+        });
+    };
+
+
     //imageUpload
     $scope.uploadImageForOtherLocation = function (image) {
         SLocCtrl._locInfo.PictureFileName = image[0].name;
@@ -812,4 +846,4 @@ angular.module('ezeidApp').controller('LocationsController', function ($rootScop
             return deferred.promise;
         };
 
-});
+}]);

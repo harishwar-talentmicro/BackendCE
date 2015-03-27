@@ -93,13 +93,9 @@
 //            console.log(event);
 //            console.log(next);
 //            console.log(current);
-            console.log(next.params);
+         //   console.log(next.params);
 
-            if(next.params &&
-                typeof(next.params.Token) !== "undefined" &&
-                typeof(next.params.FunctionType) !== "undefined" &&
-                typeof(next.params.PersonEZEID)
-                )
+            if(next.params && typeof(next.params.Token) !== "undefined" && typeof(next.params.FunctionType) !== "undefined" && typeof(next.params.PersonEZEID) )
 
             try{
                 if(CLOSED_ROUTES.indexOf(next.$$route.originalPath) == -1){
