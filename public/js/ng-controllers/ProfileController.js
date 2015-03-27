@@ -85,7 +85,6 @@ angular.module('ezeidApp').controller('ProfileController', ['$rootScope', '$scop
         $('#datetimepicker1').trigger('focus');
     });
 
-
     var map;
     var mapOptions;
     var marker;
@@ -99,28 +98,20 @@ angular.module('ezeidApp').controller('ProfileController', ['$rootScope', '$scop
     $scope.isShowCamera = false;
     Webcam.set({
         // live preview size
-        width: 250,
-        height: 200,
+        /*width: 250,*/
+        width: ($rootScope._userInfo.UserType == 1) ? 77 : 280,
+        height: 90,
 
         // device capture size
-        dest_width: 250,
-        dest_height: 200,
+        /*dest_width: 250,*/
+        dest_width: ($rootScope._userInfo.UserType == 1) ? 77 : 280,
+        dest_height: 90,
 
         // final cropped size
         crop_width: ($rootScope._userInfo.UserType == 1) ? 77 : 280,
-        crop_height: ($rootScope._userInfo.UserType == 1) ? 90 : 90,
+        crop_height: 90,
 
-        /* width: $rootScope._userInfo.Type == 1 ? 77 : 279,
-         height: 90,
 
-         // device capture size
-         dest_width: $rootScope._userInfo.Type == 1 ? 77 : 279,
-         dest_height: 90,
-
-         // final cropped size
-         crop_width: $rootScope._userInfo.Type == 1 ? 77 : 279,
-         crop_height: 90,
-         */
         // format and quality
         image_format: 'jpeg',
         jpeg_quality: 92
@@ -1085,10 +1076,11 @@ angular.module('ezeidApp').controller('ProfileController', ['$rootScope', '$scop
         if(userType == 1){
             imageWidth = 77;
         }
-
+        console.log('height : '+imageHeight+'width: '+imageWidth);
         ScaleAndCropImage.covertToBase64(image).then(function(imageUrl){
             var scaledImageUrl = ScaleAndCropImage.scalePropotional(imageUrl,imageHeight,imageWidth);
             var finalImage = ScaleAndCropImage.cropImage(scaledImageUrl,imageHeight,imageWidth);
+            console.log('height : '+imageHeight+'width: '+imageWidth);
 
             profile._info.Picture = finalImage;
             if(userType == 1){
@@ -1099,7 +1091,6 @@ angular.module('ezeidApp').controller('ProfileController', ['$rootScope', '$scop
                 $rootScope.smallImage = iconImg;
             }
         });
-
 
     };
     //Upload Picture
