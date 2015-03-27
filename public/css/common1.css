@@ -262,7 +262,7 @@ hr {
     margin-top: 0%;
     padding-right: 0px;
     padding-left: 0px;
-    margin-left: 4%;
+    margin-left: 1.5%;
     margin-right: 5%;
 }
 .setTopMargin
@@ -278,7 +278,8 @@ hr {
     margin-right: 2px!important;
 }
 body {
-    background-image: url(../images/backgroungImg.png);
+  /*  background-image: url(../images/new_background.jpg);*/
+   /* background-image: url(../images/backgroungImg.png);*/
    /* background: url(../images/close_icon.png) no-repeat;*/
     background-color: #cccccc;
 }
@@ -306,7 +307,7 @@ body {
 .parkingText
 {
     padding-right: 0px;
-    width: 53.333333%;
+    /*width: 53.333333%;*/
 }
 .inerAddText
 {
@@ -362,8 +363,7 @@ body {
 }
 .innerMsgButtonContainer
 {
-    height: 50px;
-    padding-top: 1.5%;
+    padding-top: 0.5%;
 }
 .bottomTabButton
 {
@@ -542,4 +542,13 @@ body {
 .cameraContainer
 {
     margin-bottom: 4%;
+}
+.infoMsgText
+{
+    font-size: 12px;
+    font-weight: bold;
+}
+.parkingAlignment
+{
+    padding-left: 100%;
 }

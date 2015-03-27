@@ -243,13 +243,17 @@
                                             </div>
                                             <div ng-show="ShowInfoWindow">
 
-                                                <div class="row addItemRowUserEzeid1 userImgSpace" >
-                                                    <img src="{{search.mInfo.Picture}}" >
+                                                <div ng-show="search.mInfo.IDTypeID == 1" class="row addItemRowUserEzeid1 userImgSpace" >
+                                                    <img width="77" height="90" ng-src="{{search.mInfo.Picture}}" >
+                                                </div>
+                                                <div ng-hide="search.mInfo.IDTypeID == 1" class="row addItemRowUserEzeid1 userImgSpace" >
+                                                    <img  width="279" height="90" ng-src="{{search.mInfo.Picture}}" >
                                                 </div>
 
                                                 <div class="row addItemRowUserEzeid">
                                                     <span class="ezeidTitle"><b> {{search.mInfo.EZEID}} </b></span>
                                                 </div>
+
                                                 <hr/>
                                                 <div ng-show="search.mInfo.CompanyName || search.mInfo.AboutCompany">
                                                     <div class="row companyInfo searchButtonMarginSet">
@@ -310,15 +314,15 @@
                                                         proximity from
                                                     </div>
                                                 </div>
-                                                <div class="row centerAlign searchWithinBottom setTopMargin">
+                                                <div class="row centerAlign searchWithinBottoms">
                                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 searchAddress">
                                                       <div class="addressTextContainer"><div class="inerAddText">{{ Address }} </div></div>
                                                    </div>
                                                 </div>
                                                 <div class="row centerAlign searchButtonMarginSet showPlaces setTopMargin">
-                                                   <div class="col-lg-7 col-md-7 col-sm-7 col-xs-7 parkingText">
-                                                        <input type="checkbox" class="chkShowParking" ng-model="search.Criteria.ParkingStatus" name="parking" value="1,2" checked> Show places with parking
-                                                    </div>
+                                                   <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 parkingText">
+                                                        <input type="checkbox" class="chkShowParking" ng-model="search.Criteria.ParkingStatus1" name="parking" value="1,2" checked> Show places with parking
+                                                   </div>
                                                     <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1 ratingText">
                                                         Rating
                                                     </div>
@@ -339,6 +343,19 @@
                                                         <img src="../images/smallStar_16_.png" ng-show="showStar5" ng-click="search.addRatting(5,'yellow')" >
                                                     </div>
                                                 </div>
+                                                <div class="row centerAlign searchButtonMarginSet showPlaces setTopMargin">
+                                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                                                        <span checked data-toggle="tooltip" data-placement="top" title="Show Business Entities providing Home Delivery.">
+                                                            <input type="checkbox" class="chkShowParking" ng-model="search.Criteria.HomeDelivery1" name="parking" value="1,2"> Home Delivery
+                                                        </span>
+                                                    </div>
+                                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6" >
+                                                        <span checked data-toggle="tooltip" data-placement="top" title="Show Business Entities that are Open(Working) now.">
+                                                            <input type="checkbox" class="chkShowParking" ng-model="search.Criteria.OpenStatus1" name="parking" value="1,2" checked> Open Business only
+                                                        </span>
+                                                    </div>
+                                                </div>
+
                                                 <div class="row centerAlign searchButtonMarginSet setTopMargin">
                                                     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 " >
                                                         <button  ng-disabled="!search.Criteria.Keywords" class="btn btn-primary" type="submit">Search</button>
@@ -346,7 +363,12 @@
                                                 </div>
                                                 <div ng-hide="search.IsShowForm" class="row centerAlign searchButtonMarginSet setTopMargin">
                                                     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 " ng-show="SearchResultCount">
-                                                        {{ SearchResultCount + " "}}<sapn>Items found...</sapn>
+                                                        {{ SearchResultCount + " "}}<sapn>Items Found...</sapn>
+                                                    </div>
+                                                    <div ng-show="ShowNoDataFound" >
+                                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 " ng-hide="SearchResultCount">
+                                                                <sapn>No Items Found...</sapn>
+                                                        </div>
                                                     </div>
                                                 </div>
                                                 <div class="row setTopMargin setRowLeftRightMarginZero centerAlign" ng-show="search.IsShowForm">
@@ -376,56 +398,106 @@
                             </form>
                             <div ng-show="ShowLinks" class="row setRowLeftRightMarginZero boxFotterBanner">
                                 <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 searchHeaderAlignment fotterButtonContainer">
-                                    <div style="padding-top:  4.5%;">
-                                       <div  class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer bottomTabButton" ng-hide="search.isIndividualUser(1)">
-                                            <img src="../images/open_32.png" ng-show="search.mInfo.OpenStatus==1">
-                                            <img src="../images/close_32.png" ng-hide="search.mInfo.OpenStatus==1">
+                                    <div>
+                                       <div  class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer bottomTabButton" style=" margin-top: 5%;" ng-hide="search.isIndividualUser(1)">
+                                            <img src="../images/open_big.png" ng-show="search.mInfo.OpenStatus==1">
+                                            <img src="../images/close_big.png" ng-hide="search.mInfo.OpenStatus==1">
                                         </div>
-                                        <div  class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer parking" ng-hide="search.isIndividualUser(1)">
-                                            <a class="car-parking active" ng-show="search.mInfo.ParkingStatus==1" title="Parking">Parking</a>
+                                        <div  class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer parking" style="padding-left: 30px;" ng-hide="search.isIndividualUser(1)">
+                                            <div class="parkingAlignment" ng-hide="search.mInfo.ParkingStatus==4">
+                                                <img src="../images/parking_new.png" >
+                                            </div>
+                                            <div class="parkingAlignment" ng-show="search.mInfo.ParkingStatus==4">
+                                                <img src="../images/new_no_parking.png" >
+                                            </div>
+
+
+
+
+                                            <!--<a class="car-parking active" ng-show="search.mInfo.ParkingStatus==1" title="Parking">Parking</a>
                                             <a class="no-parking active" ng-show="search.mInfo.ParkingStatus==4" title="No Parking">No Parking</a>
                                             <a class="val-parking active" ng-show="search.mInfo.ParkingStatus==3" title="Vallet Parking">Vallet Parking</a>
-                                            <a class="road-parking active" ng-show="search.mInfo.ParkingStatus==2" title="Road Parking">Road Parking</a>
+                                            <a class="road-parking active" ng-show="search.mInfo.ParkingStatus==2" title="Road Parking">Road Parking</a>-->
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 searchHeaderAlignment msgButtonContainer" ng-hide="(search.mInfo.IDTypeID == 1)">
                                     <div class="innerMsgButtonContainer">
-                                        <div  class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer" style="padding-right: 0px;"
+                                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer keyWordText" style="padding-right: 0px;"
                                               ng-hide="_userInfo.Token == 2 || search.mInfo.SalesEnquiryButton==2 || search.mInfo.EZEIDVerifiedID == '1'" ng-disabled="search.mInfo.SalesEnquiryButton==2 || search.mInfo.EZEIDVerifiedID == '1'" title="Sales Enquiry" ng-click="search.openSalesEnquiryForm()">
-                                            <img src="../images/sales_enquiry_32.png">Sales Enquiry
-                                        </div>
-                                        <div  class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer removePadding"
-                                              ng-hide="_userInfo.Token == 2 || search.mInfo.HomeDeliveryButton==2 || search.mInfo.EZEIDVerifiedID == '1'" ng-disabled="search.mInfo.HomeDeliveryButton==2 || search.mInfo.EZEIDVerifiedID == '1'" title="Home Delivery" ng-click="search.openHomeDeliverForm()">
-                                            <img src="../images/home_delivery_32.png">Home Delivery
-                                        </div>
-                                        <div  class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer removePadding"
-                                              ng-hide="_userInfo.Token == 2 || search.mInfo.ReservationButton==2 || search.mInfo.EZEIDVerifiedID == '1'" ng-disabled="search.mInfo.ReservationButton==2 || search.mInfo.EZEIDVerifiedID == '1'" title="Reservation" ng-click="search.openReservationForm()">
-                                            <img src="../images/reservation_32.png">Reservation
-                                        </div>
-                                        <div  class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer removePadding"
-                                              ng-hide="_userInfo.Token == 2 || search.mInfo.SupportButton==2 || search.mInfo.EZEIDVerifiedID == '1'" ng-disabled="search.mInfo.SupportButton==2 || search.mInfo.EZEIDVerifiedID == '1'" title="Support Request" ng-click="search.openServiceRequestForm()">
-                                            <img src="../images/service_request_32.png">Service Request
-                                        </div>
-                                        <div  class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer removePadding"
-                                              ng-hide="_userInfo.Token == 2" ng-disabled="search.mInfo.CVButton==2 || search.mInfo.EZEIDVerifiedID == '1'" title="Send CV" ng-click="search.openCVForm()">
-                                            <div  ng-hide="search.mInfo.CVButton==2 || search.mInfo.EZEIDVerifiedID == '1'">
-                                                <img src="../images/send_cv_32.png">Send CV
+                                            <div class="row setRowLeftRightMarginZero" >
+                                                <img src="../images/new_sales_icon.png">
+                                            </div>
+                                            <div class="row setRowLeftRightMarginZero infoMsgText" >
+                                                Sales Enquiry
                                             </div>
                                         </div>
-                                        <div  class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer removePadding"
+                                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer removePadding keyWordText"
+                                              ng-hide="_userInfo.Token == 2 || search.mInfo.HomeDeliveryButton==2 || search.mInfo.EZEIDVerifiedID == '1'" ng-disabled="search.mInfo.HomeDeliveryButton==2 || search.mInfo.EZEIDVerifiedID == '1'" title="Home Delivery" ng-click="search.openHomeDeliverForm()">
+                                            <div class="row setRowLeftRightMarginZero" >
+                                                <img src="../images/new_home_delivery.png">
+                                            </div>
+                                            <div class="row setRowLeftRightMarginZero infoMsgText" >
+                                                Home Delivery
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer removePadding keyWordText"
+                                              ng-hide="_userInfo.Token == 2 || search.mInfo.ReservationButton==2 || search.mInfo.EZEIDVerifiedID == '1'" ng-disabled="search.mInfo.ReservationButton==2 || search.mInfo.EZEIDVerifiedID == '1'" title="Reservation" ng-click="search.openReservationForm()">
+                                            <div class="row setRowLeftRightMarginZero" >
+                                                <img src="../images/new_reservations.png">
+                                            </div>
+                                            <div class="row setRowLeftRightMarginZero infoMsgText" >
+                                                Reservation
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer removePadding keyWordText"
+                                              ng-hide="_userInfo.Token == 2 || search.mInfo.SupportButton==2 || search.mInfo.EZEIDVerifiedID == '1'" ng-disabled="search.mInfo.SupportButton==2 || search.mInfo.EZEIDVerifiedID == '1'" title="Support Request" ng-click="search.openServiceRequestForm()">
+                                            <div class="row setRowLeftRightMarginZero" >
+                                                <img src="../images/new_service_request.png">
+                                            </div>
+                                            <div class="row setRowLeftRightMarginZero infoMsgText" >
+                                                Service Request
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer removePadding keyWordText"
+                                              ng-hide="_userInfo.Token == 2" ng-disabled="search.mInfo.CVButton==2 || search.mInfo.EZEIDVerifiedID == '1'" title="Send CV" ng-click="search.openCVForm()">
+                                            <div ng-hide="search.mInfo.CVButton==2 || search.mInfo.EZEIDVerifiedID == '1'">
+                                                <div class="row setRowLeftRightMarginZero" >
+                                                    <img src="../images/new_send_cv.png">
+                                                </div>
+                                                <div class="row setRowLeftRightMarginZero infoMsgText" >
+                                                    Send CV
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer removePadding keyWordText"
                                               ng-click="search.getdirections(search.mInfo)" title="Directions">
-                                            <img src="../images/directions_32.png">Directions
+                                            <div class="row setRowLeftRightMarginZero" >
+                                                <img src="../images/new_directions.png">
+                                            </div>
+                                            <div class="row setRowLeftRightMarginZero infoMsgText" >
+                                                Directions
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 searchHeaderAlignment msgButtonContainer" ng-show="search.isIndividualUser(1)">
                                     <div class="innerMsgButtonContainer">
-                                        <div  class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer" style="padding-right: 0px;" ng-click="search.openSendMessageForm()"  title="Message">
-                                            <img src="../images/sales_enquiry_32.png">Message
+                                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer keyWordText" style="padding-right: 0px;" ng-click="search.openSendMessageForm()"  title="Message">
+                                            <div class="row setRowLeftRightMarginZero" >
+                                                <img src="../images/new_message.png">
+                                            </div>
+                                            <div class="row setRowLeftRightMarginZero infoMsgText" >
+                                                Message
+                                            </div>
                                         </div>
-                                        <div  class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer removePadding" title="Appointment" ng-click="search.openReservationForm()">
-                                            <img src="../images/home_delivery_32.png">Appointment
+                                        <div  class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer removePadding keyWordText" title="Appointment" ng-click="search.openReservationForm()">
+                                            <div class="row setRowLeftRightMarginZero" >
+                                                <img src="../images/new_appointment.png">
+                                            </div>
+                                            <div class="row setRowLeftRightMarginZero infoMsgText" >
+                                                Appointment
+                                            </div>
                                         </div>
                                         <div  class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer removePadding">
                                         </div>
@@ -435,9 +507,14 @@
                                             <div  ng-hide="search.mInfo.CVButton==2 || search.mInfo.EZEIDVerifiedID == '1'">
                                             </div>
                                         </div>
-                                        <div  class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer removePadding"
+                                        <div  class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer removePadding keyWordText"
                                               ng-click="search.getdirections(search.mInfo)" title="Directions">
-                                            <img src="../images/directions_32.png">Directions
+                                            <div class="row setRowLeftRightMarginZero" >
+                                                <img src="../images/new_directions.png">
+                                            </div>
+                                            <div class="row setRowLeftRightMarginZero infoMsgText" >
+                                                Directions
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
