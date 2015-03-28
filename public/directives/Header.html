@@ -161,8 +161,9 @@
                 <!--<img ng-show="$root._userInfo.IsAuthenticate" class="user_icon" style="border-radius: 18px;margin-right:-46px;" src="{{$root._userInfo.Icon}}"/>-->
                 <img ng-show="$root._userInfo.IsAuthenticate && $root._userInfo.Icon.length" class="user_icon" style="border-radius: 18px;margin-right:-46px;" ng-src="{{$root._userInfo.Icon}}"/>
                 <a id="userid" class="btn btn-primary userMarR" ng-show="$root._userInfo.IsAuthenticate">
-                   {{$root._userInfo.FirstName}}
-                   <!-- {{$root._userInfo.FirstName > 15 ? '' : $root._userInfo.FirstName}}-->
+                   {{$root._userInfo.userName}}
+                   <!-- {{$root._userInfo.FirstName}}-->
+
                     <img style="position:relative; top:-2px;" src="images/drp_arrow.png">
                 </a>
                 <a href="#/home" id="" class="btn btn-primary logOut-hover logMarR" title="Logout" ng-click="SignInCtrl.Logout()" ng-show="$root._userInfo.IsAuthenticate">

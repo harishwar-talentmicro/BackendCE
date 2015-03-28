@@ -21,8 +21,14 @@ HeaderApp.directive('headerSection', function (Notification) {
                     }).success(function (data,status,x) {
 
                         $rootScope._userInfo = data;
-                        $rootScope._userInfo.userName = data.FirstName;
-                            console.log($rootScope._userInfo.userName);
+
+                           var userName = data.FirstName;
+                           if(userName.length >= 15)
+                            {
+                                userName = userName.substring(0,12);
+                                userName = userName+ "...";
+                            }
+                            $rootScope._userInfo.userName = userName ;
 
                         if (typeof (Storage) !== "undefined") {
                             var encrypted = CryptoJS.AES.encrypt(JSON.stringify(data), "EZEID");

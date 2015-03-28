@@ -325,6 +325,17 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
                 $scope.Address += ", " + mapResultValue.long_name;
             }
         });
+
+        if($scope.Address.length >= 50)
+        {
+            $scope.Address = $scope.Address.substring(0,47);
+            $scope.Address = $scope.Address+ "...";
+       }
+        else
+        {
+            $scope.Address = $scope.Address;
+        }
+
     }
 //    google.maps.event.addDomListener(window, 'load', initialize);
 
@@ -1386,10 +1397,10 @@ angular.module('ezeidApp').controller('NotifyController', function ($scope, $roo
             }
         });
     };
-});
-/***
+});/*
+*//***
  * HistoryController
- */
+ *//*
 angular.module('ezeidApp').controller('HistoryController', function ($scope, $rootScope, $http, Notification, $filter, $interval,GURL,MsgDelay) {
     var msgSen = this;
     var _pageValue = 1;
@@ -1442,9 +1453,9 @@ angular.module('ezeidApp').controller('HistoryController', function ($scope, $ro
         }
     });
 
-    /**
+    *//**
      * Function for converting UTC time from server to LOCAL timezone
-     */
+     *//*
     var convertTimeToLocal = function(timeFromServer,dateFormat){
         if(!dateFormat){
             dateFormat = 'DD-MMM-YYYY hh:mm A';
@@ -1454,9 +1465,9 @@ angular.module('ezeidApp').controller('HistoryController', function ($scope, $ro
         return ret;
     };
 
-    /**
+    *//**
      * Function for converting LOCAL time (local timezone) to server time
-     */
+     *//*
     var convertTimeToUTC = function(localTime,dateFormat){
         if(!dateFormat){
             dateFormat = 'DD-MMM-YYYY hh:mm A';
@@ -1497,4 +1508,4 @@ angular.module('ezeidApp').controller('HistoryController', function ($scope, $ro
         LoadHistory(_pageValue);
     };
 });
-
+*/

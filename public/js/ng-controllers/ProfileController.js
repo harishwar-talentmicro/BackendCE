@@ -905,6 +905,15 @@ angular.module('ezeidApp').controller('ProfileController', ['$rootScope', '$scop
                 }).success(function (data) {
                         if (data.IsAuthenticate) {
                             $rootScope._userInfo = data;
+
+                            var userName = data.FirstName;
+                            if(userName.length >= 15)
+                            {
+                                userName = userName.substring(0,12);
+                                userName = userName+ "...";
+                            }
+                            $rootScope._userInfo.userName = userName ;
+
                             if (typeof (Storage) !== "undefined") {
                                 var encrypted = CryptoJS.AES.encrypt(JSON.stringify(data), "EZEID");
                                 localStorage.setItem("_token", encrypted);
@@ -1001,6 +1010,15 @@ angular.module('ezeidApp').controller('ProfileController', ['$rootScope', '$scop
                 }).success(function (data) {
                         if (data.IsAuthenticate) {
                             $rootScope._userInfo = data;
+
+                            var userName = data.FirstName;
+                            if(userName.length >= 15)
+                            {
+                                userName = userName.substring(0,12);
+                                userName = userName+ "...";
+                            }
+                            $rootScope._userInfo.userName = userName ;
+
                             if (typeof (Storage) !== "undefined") {
                                 var encrypted = CryptoJS.AES.encrypt(JSON.stringify(data), "EZEID");
                                 localStorage.setItem("_token", encrypted);
