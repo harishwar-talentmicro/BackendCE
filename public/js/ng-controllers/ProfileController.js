@@ -97,44 +97,6 @@ angular.module('ezeidApp').controller('ProfileController', ['$rootScope', '$scop
     var isBusinessIcon = 0; // 1 = icon is for business Type
     var isReSizeImage = false;
 
-    /***************************** Camera Code ***************************************/
-    $scope.isShowCamera = false;
-    console.log($rootScope._userInfo);
-    Webcam.set({
-        // live preview size
-        /*width: 250,*/
-
-        width: ($rootScope._userInfo.UserType == 1) ? 77 : 280,
-        height: 90,
-
-        // device capture size
-        /*dest_width: 250,*/
-        dest_width: ($rootScope._userInfo.UserType == 1) ? 77 : 280,
-        dest_height: 90,
-
-        // final cropped size
-        crop_width: ($rootScope._userInfo.UserType == 1) ? 77 : 280,
-        crop_height: 90,
-
-
-        // format and quality
-        image_format: 'jpeg',
-        jpeg_quality: 92
-    });
-    Webcam.on('error',function(){
-        $scope.isShowCamera = false;
-        Notification.error({message:'Camera not found',delay:MsgDelay});
-    });
-
-    $scope.showCamera = function(){
-        $scope.isShowCamera = true;
-        Webcam.attach( '#camera' );
-    };
-
-    $scope.hideCamera = function(){
-        Webcam.reset();
-        $scope.isShowCamera = false;
-    };
 
 
     profile.setPicture = function(bigPic,smallPic){
@@ -320,6 +282,46 @@ angular.module('ezeidApp').controller('ProfileController', ['$rootScope', '$scop
             profile._info.OpenStatus = 1;
         }
     });
+
+    /***************************** Camera Code ***************************************/
+    $scope.isShowCamera = false;
+    console.log($rootScope._userInfo);
+    Webcam.set({
+        // live preview size
+        /*width: 250,*/
+
+        width: ($rootScope._userInfo.UserType == 1) ? 77 : 280,
+        height: 90,
+
+        // device capture size
+        /*dest_width: 250,*/
+        dest_width: ($rootScope._userInfo.UserType == 1) ? 77 : 280,
+        dest_height: 90,
+
+        // final cropped size
+        crop_width: ($rootScope._userInfo.UserType == 1) ? 77 : 280,
+        crop_height: 90,
+
+
+        // format and quality
+        image_format: 'jpeg',
+        jpeg_quality: 92
+    });
+    Webcam.on('error',function(){
+        $scope.isShowCamera = false;
+        Notification.error({message:'Camera not found',delay:MsgDelay});
+    });
+
+    $scope.showCamera = function(){
+        $scope.isShowCamera = true;
+        Webcam.attach( '#camera' );
+    };
+
+    $scope.hideCamera = function(){
+        Webcam.reset();
+        $scope.isShowCamera = false;
+    };
+
 
     if($rootScope._userInfo.IsAuthenticate){
         $scope.heading = 'Update Profile';
