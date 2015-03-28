@@ -1,5 +1,8 @@
 angular.module('ezeidApp').controller('ProfileController', ['$rootScope', '$scope', '$http', '$q', '$timeout', 'Notification', '$filter', '$window','GURL','$interval','ScaleAndCropImage',function ($rootScope, $scope, $http, $q, $timeout, Notification, $filter, $window,GURL,$interval,ScaleAndCropImage) {
 
+    $scope.showForm = true;
+    $scope.showProgress = false;
+    $scope.showError = false;
 
     var profile = this;
     profile._info = {};
@@ -96,9 +99,11 @@ angular.module('ezeidApp').controller('ProfileController', ['$rootScope', '$scop
 
     /***************************** Camera Code ***************************************/
     $scope.isShowCamera = false;
+    console.log($rootScope._userInfo);
     Webcam.set({
         // live preview size
         /*width: 250,*/
+
         width: ($rootScope._userInfo.UserType == 1) ? 77 : 280,
         height: 90,
 
@@ -255,9 +260,83 @@ angular.module('ezeidApp').controller('ProfileController', ['$rootScope', '$scop
         profile.countries = data;
     });
 
+    $scope.reloadAgain = function(){
+        $scope.showForm = false;
+        $scope.showProgress = true;
+        $scope.showError = false;
+
+        $timeout(function(){
+            var promise = GetUserDetails();
+            promise.then(function(promiseStatus){
+                console.log(promiseStatus);
+                if(promiseStatus){
+                    $scope.showProgress = false;
+                    $scope.showError = true;
+                    $scope.showForm = false;
+                }
+                else{
+                    $scope.showForm = false;
+                    $scope.showProgress = false;
+                    $scope.showError = true;
+                }
+            });
+        },4000);
+//        var promise = GetUserDetails();
+
+//        promise.then(function(promiseStatus){
+//            if(promiseStatus){
+//                $scope.showProgress = false;
+//                $scope.showError = false;
+//                $scope.showForm = true;
+//            }
+//            else{
+//                $scope.showForm = false;
+//                $scope.showProgress = false;
+//                $scope.showError = true;
+//            }
+//        });
+    };
+
     $scope.$watch('_userInfo.IsAuthenticate', function () {
         if ($rootScope._userInfo.IsAuthenticate == true) {
-            GetUserDetails();
+
+            $scope.showForm = false;
+            $scope.showProgress = true;
+            $scope.showError = false;
+
+
+            $timeout(function(){
+                var promise = GetUserDetails();
+                promise.then(function(promiseStatus){
+                    console.log(promiseStatus);
+                    if(promiseStatus){
+                        $scope.showProgress = false;
+                        $scope.showError = true;
+                        $scope.showForm = false;
+                    }
+                    else{
+                        $scope.showForm = false;
+                        $scope.showProgress = false;
+                        $scope.showError = true;
+                    }
+                });
+            },4000);
+
+//            var promise = GetUserDetails();
+//
+//            promise.then(function(promiseStatus){
+//                if(promiseStatus){
+//                    $scope.showProgress = false;
+//                    $scope.showError = false;
+//                    $scope.showForm = true;
+//                }
+//                else{
+//                    $scope.showForm = false;
+//                    $scope.showProgress = false;
+//                    $scope.showError = true;
+//                }
+//            });
+
             $scope.isTypeSelected  = true;
             $scope.heading = 'Update Profile';
         }
@@ -283,46 +362,74 @@ angular.module('ezeidApp').controller('ProfileController', ['$rootScope', '$scop
     }
 
     //Custom Methods
+    /**
+     * Returning promise for Identifying if data is successfully loaded or not
+     * @returns {promise|*}
+     * @constructor
+     */
     function GetUserDetails() {
         //$rootScope.IsIdAvailable = true;
+        var defer = $q.defer();
+        var promiseResolved = false;
+
         $http({
             method: 'get',
             url: GURL + 'ewtGetUserDetails?Token=' + $rootScope._userInfo.Token
         }).success(function (data) {
-                profile.getStates(data[0].CountryID,false);
-                profile._info = data[0];
-                profile._info.StateID = data[0].StateID;
-                profile._info.CountryID = data[0].CountryID;
-                profile._info.ISDMobileNumber = data[0].ISDMobileNumber;
-                profile._info.ISDPhoneNumber = data[0].ISDPhoneNumber;
-                profile._info.Latitude = data[0].Latitude;
-                profile._info.Longitude = data[0].Longitude;
-                profile._info.EZEID = data[0].EZEID;
-                profile._info.PIN = data[0].PIN;
-                profile._info.ParkingStatus = data[0].ParkingStatus;
+                if(data && data.length > 0 && data !== "null"){
+                    profile.getStates(data[0].CountryID,false);
+                    profile._info = data[0];
+                    profile._info.StateID = data[0].StateID;
+                    profile._info.CountryID = data[0].CountryID;
+                    profile._info.ISDMobileNumber = data[0].ISDMobileNumber;
+                    profile._info.ISDPhoneNumber = data[0].ISDPhoneNumber;
+                    profile._info.Latitude = data[0].Latitude;
+                    profile._info.Longitude = data[0].Longitude;
+                    profile._info.EZEID = data[0].EZEID;
+                    profile._info.PIN = data[0].PIN;
+                    profile._info.ParkingStatus = data[0].ParkingStatus;
 
 
-                if(!profile._info.PIN)
-                {
-                    profile._info.SecurePin = false;
-                }
-                else
-                {
-                    profile._info.SecurePin = true;
-                }
+                    if(!profile._info.PIN)
+                    {
+                        profile._info.SecurePin = false;
+                    }
+                    else
+                    {
+                        profile._info.SecurePin = true;
+                    }
 
-                profile._info.SalesEnquiryButton =  profile._info.SalesEnquiryButton == 1 ? true : false;
-                profile._info.HomeDeliveryButton = profile._info.HomeDeliveryButton == 1 ? true : false;
-                profile._info.ReservationButton = profile._info.ReservationButton == 1 ? true : false;
-                profile._info.SupportButton = profile._info.SupportButton == 1 ? true : false;
-                profile._info.CVButton = profile._info.CVButton == 1 ? true : false;
-                profile._info.DOB = data[0].DOB;
-                // profile._info.DOB = $filter('date')(new Date(data[0].DOB), 'dd-MMM-yyyy');
-                try{
-                    initialize();
+                    profile._info.SalesEnquiryButton =  profile._info.SalesEnquiryButton == 1 ? true : false;
+                    profile._info.HomeDeliveryButton = profile._info.HomeDeliveryButton == 1 ? true : false;
+                    profile._info.ReservationButton = profile._info.ReservationButton == 1 ? true : false;
+                    profile._info.SupportButton = profile._info.SupportButton == 1 ? true : false;
+                    profile._info.CVButton = profile._info.CVButton == 1 ? true : false;
+                    profile._info.DOB = data[0].DOB;
+                    // profile._info.DOB = $filter('date')(new Date(data[0].DOB), 'dd-MMM-yyyy');
+                    try{
+                        initialize();
+                    }
+                    catch(ex){}
+                    defer.resolve(true);
                 }
-                catch(ex){}
+                else{
+                    defer.resolve(false);
+                }
+                promiseResolved = true;
+            }).error(function(err){
+                defer.resolve(false);
             });
+        /**
+         * If promise is not resolved in 10 sec. explicitly the promise will be resolved with error and
+         * user will see error message to load data again
+         */
+        $timeout(function(){
+            if(!promiseResolved){
+                defer.resolve(false);
+            }
+        },10000);
+
+        return defer.promise;
     }
 
     if ($rootScope._userInfo.IsAuthenticate == false) {
