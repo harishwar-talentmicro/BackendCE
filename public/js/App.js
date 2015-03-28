@@ -54,7 +54,6 @@
     ezeid.config(['$routeProvider','$httpProvider',function($routeProvider,$httpProvider){
         $routeProvider.when('/index',{templateUrl: 'html/index.html'})
             .when('/home',{templateUrl: 'html/home.html'})
-            .when('/home/:ezeid/')
             .when('/messages',{templateUrl: 'html/messages.html'})
             .when('/acchist',{templateUrl: 'html/accesshistory.html'})
             .when('/editprofile',{templateUrl: 'html/signupwiz.html'})
@@ -172,9 +171,6 @@
             }
        });
 
-        if($location.path() == ''){
-            lazyLoadBackground($timeout);
-        }
         $rootScope.$on('$routeChangeSuccess',function(){
             if($location.path() == '/' || $location.path() == '/home'){
                 lazyLoadBackground($timeout);

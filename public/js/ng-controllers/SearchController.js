@@ -1,8 +1,53 @@
 // Search Controller
 angular.module('ezeidApp').controller('SearchController', function ($http, $rootScope, $scope, $compile, $timeout, Notification, $filter, $location, $window, $q, $interval,GURL,MsgDelay,$routeParams) {
-    if(
-        $routeParams
-        )
+    console.log($routeParams);
+
+    if(Object.keys($routeParams).length > 0){
+        if(typeof($routeParams['SearchType']) !== "undefined" && $routeParams['SearchType'] !== null && $routeParams['SearchType'] !== "")
+        {
+            SearchSec.Criteria.SearchType = $routeParams.SearchType;
+        }
+        if(typeof($routeParams['Keywords']) !== "undefined" && $routeParams['Keywords'] !== null && $routeParams['Keywords'] !== ""){
+            SearchSec.Criteria.Keywords = $routeParams.Keywords;
+        }
+        if(typeof($routeParams['Proximity']) !== "undefined" && $routeParams['Proximity'] !== null && $routeParams['Proximity'] !== ""){
+            SearchSec.Criteria.Proximity = $routeParams.Proximity;
+        }
+        if(typeof($routeParams['Latitude']) !== "undefined" && $routeParams['Latitude'] !== null && $routeParams['Latitude'] !== ""){
+               SearchSec.Criteria.Latitude = $routeParams.Latitude;
+        }
+        if(typeof($routeParams['Longitude']) !== "undefined" && $routeParams['Longitude'] !== null && $routeParams['Longitude'] !== ""){
+            SearchSec.Criteria.Longitude = $routeParams.Longitude;
+        }
+        if(typeof($routeParams['Rating']) !== "undefined" && $routeParams['Rating'] !== null && $routeParams['Rating'] !== ""){
+            SearchSec.Criteria.Rating = $routeParams.Rating;
+        }
+        if(typeof($routeParams['ParkingStatus']) !== "undefined" && $routeParams['ParkingStatus'] !== null && $routeParams['ParakingStatus'] !== ""){
+            SearchSec.Criteria.ParkingStatus = $routeParams.ParkingStatus;
+        }
+        if(typeof($routeParams['HomeDelivery']) !== "undefined" && $routeParams['HomeDelivery'] !== null && $routeParams['HomeDelivery'] !== ""){
+            SearchSec.Criteria.HomeDelivery = $routeParams.HomeDelivery;
+        }
+        if(typeof($routeParams['OpenStatus']) !== "undefined" && $routeParams['OpenStatus'] !== null && $routeParams['OpenStatus'] !== ""){
+            SearchSec.Criteria.OpenStatus = $routeParams.OpenStatus;
+        }
+    }
+
+    var routeP = {
+        "Token":"324b580dca99786fa9f1",
+        "SearchType":"1",
+        "Keywords":"krunal",
+        "SCategory":0,
+        "Proximity":1,
+        "Latitude":12.933687899999999,
+        "Longitude":77.57361209999999,
+        "Rating":"1,2,3,4,5",
+        "ParkingStatus":0,
+        "HomeDelivery":0,
+        "OpenStatus":0,
+        "CurrentDate":"2015-03-28 04:33"
+    };
+
     var map;
     var marker;
     var markers = [];
@@ -482,7 +527,7 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
             SearchSec.Criteria.Token = $rootScope._userInfo.Token;
 
             $http({ method: 'post', url: GURL + 'ewSearchByKeywords', data: SearchSec.Criteria }).success(function (data) {
-
+                console.log(JSON.stringify(SearchSec.Criteria));
                 if (data != 'null' && data.length>0) {
 
                     $scope.SearchResultCount = data.length;
