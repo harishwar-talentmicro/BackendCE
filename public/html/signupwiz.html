@@ -228,9 +228,9 @@ table#t01 th	{
                                     <div class="col-lg-6">
                                              <input type="text" class="form-control emptyBox" name="FName" id="FName" ng-model="profile._info.FirstName"
                                                    ng-class="UserForm.FName.$touched && !profile._info.FirstName.length ? 'mandatoryTextBox' : ''"
-                                                   placeholder="First Name" style="width: 48%" required>
+                                                   placeholder="First Name" maxlength="30" style="width: 48%" required>
                                             <input type="text" class="form-control" name="LName" id="LName" ng-model="profile._info.LastName"
-                                                   placeholder="Middle,  Last Name"  style="width: 48%">
+                                                   placeholder="Middle,  Last Name" maxlength="30" style="width: 48%">
                                         </div>
                                     </div><br/>
                                     <div class="row mar_editTop">
