@@ -2773,7 +2773,7 @@ exports.FnUpdateMessageStatus = function (req, res) {
                 if (!err) {
                     if (Result != null) {
                         //var query = 'update tmessages set Status=' + db.escape(Status) + ' where TID=' + db.escape(TID);
-                        var query = 'update tmessages set Status=' + db.escape(Status) + ', Notes=' + db.escape(Notes) + ' where TID=' + db.escape(TID);
+                        var query = 'update ttrans set Status=' + db.escape(Status) + ', Notes=' + db.escape(Notes) + ' where TID=' + db.escape(TID);
                         // console.log('Update query : ' + query);
                         db.query(query, function (err, UpdateResult) {
                             if (!err) {
