@@ -13,16 +13,16 @@
                              <table class="panel panel-default" border="1" st-table="rowCollection" class="table table-striped">
                                 <thead>
                                     <tr style="background:#2791BA; color:#000000;">
-                                        <th class="panelPd5px eze_idSize">EZE ID</th>
-                                        <th class="panelPd5px name_size">Name</th>
-                                        <th class="panelPd5px msg_pos city_size">City</th>
-                                        <th class="panelPd5px msg_pos dateeze_size">Date</th>
+                                        <th class="panelPd5px eze_idSize leftBlackBorder rightBlackBorder">EZE ID</th>
+                                        <th class="panelPd5px name_size rightBlackBorder">Name</th>
+                                        <th class="panelPd5px city_size rightBlackBorder">City</th>
+                                        <th class="panelPd5px dateeze_size rightBlackBorder">Date</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                 <!--<tr ng-repeat="_item in msgCtrl.msgs | filter: {Status: msgCtrl.status,MessageTypeTitle:msgCtrl.type}">-->
-                                    <tr ng-repeat="_item in historyCtrl.msgs" class="msg_pos">
-                                        <td>{{_item.EZEID}}</td>
+                                    <tr ng-repeat="_item in historyCtrl.msgs" class="">
+                                        <td class="panelPd5px">{{_item.EZEID}}</td>
                                         <td class="panelPd5px">{{_item.Name}}</td>
                                         <td class="panelPd5px">{{_item.City}}</td>
                                         <td class="panelPd5px">{{_item.AccessDate}}</td>
@@ -39,4 +39,5 @@
             </div>
         </div>
     </div>
+    <footer-section></footer-section>
 </div>

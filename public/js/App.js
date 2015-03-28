@@ -71,7 +71,7 @@
             .when('/business-preference',{templateUrl : 'html/business-preference.html'})
             .when('/business-manager',{templateUrl : 'html/business-manager/business-manager.html'})
             .when('/bulksalesenquiry',{templateUrl : 'html/bulksalesenquiry.html'})
-            .otherwise({ templateUrl: 'html/home.html'});
+            .otherwise({redirectTo : '/home'});
 
         $httpProvider.interceptors.push("ezeidInterceptor");
     }]);
@@ -85,6 +85,7 @@
          */
 
         $rootScope.$on("$routeChangeStart",function(event,next,current){
+            $("#background-image-container").remove();
 
             /**
              * @todo Check if user is navigating to Closed Routes( which require authentication)
@@ -170,7 +171,16 @@
             }
        });
 
-        lazyLoadBackground($timeout);
+        if($location.path() == ''){
+            lazyLoadBackground($timeout);
+        }
+        $rootScope.$on('$routeChangeSuccess',function(){
+            if($location.path() == '/' || $location.path() == '/home'){
+                lazyLoadBackground($timeout);
+            }
+        });
+
+
 
 
     }]);

@@ -1,76 +1,8 @@
-/**
- * All controllers from App.js shifted here
- */
-angular.module('ezeidApp').controller('HomeController', function ($rootScope, $http,$scope,GURL,MsgDelay) {
-    $rootScope.CLoc = {
-        CLat: 12.295810,
-        CLong: 76.639381
-    };
-
-    if ($rootScope._userInfo) {
-
-    }
-    else {
-        if (typeof (Storage) !== "undefined") {
-            var encrypted = localStorage.getItem("_token");
-            if (encrypted) {
-                var decrypted = CryptoJS.AES.decrypt(encrypted, "EZEID");
-                var Jsonstring = null;
-                try{
-                    Jsonstring = decrypted.toString(CryptoJS.enc.Utf8);
-                }
-                catch(ex){}
-                if (Jsonstring) {
-                    $rootScope._userInfo = JSON.parse(Jsonstring);
-                }
-            }
-            else {
-                $rootScope._userInfo = {
-                    IsAuthenticate: false,
-                    Token: '',
-                    FirstName: '',
-                    Type: '',
-                    Icon: ''
-                };
-            }
-        } else {
-            // Sorry! No Web Storage support..
-            $rootScope._userInfo = {
-                IsAuthenticate: false,
-                Token: '',
-                FirstName: '',
-                Type: '',
-                Icon: ''
-            };
-            alert('Sorry..! Browser does not support');
-            window.location.href = "#/";
-        }
-    }
-
-    $('#datetimepicker1').datetimepicker({
-        format: "d-M-Y  h:m A",
-        hours12: false
-    });
-    $('#datetimepicker1').siblings('.input-group-addon').on('click',function(){
-        $('#datetimepicker1').trigger('focus');
-    });
-
-
-    /**
-     * Opens Help Popup when help link is clicked
-     */
-    $scope.openHelpPopup = function(){
-        $('#Help_popup').css({'position':'fixed'});
-        $('#Help_popup > div').css({'margin-top':'0%'});
-        $('#Help_popup').slideDown();
-    };
-    $scope.closeHelpPopup = function(){
-        $('#Help_popup').slideUp();
-    }
-});
-
 // Search Controller
-angular.module('ezeidApp').controller('SearchController', function ($http, $rootScope, $scope, $compile, $timeout, Notification, $filter, $location, $window, $q, $interval,GURL,MsgDelay) {
+angular.module('ezeidApp').controller('SearchController', function ($http, $rootScope, $scope, $compile, $timeout, Notification, $filter, $location, $window, $q, $interval,GURL,MsgDelay,$routeParams) {
+    if(
+        $routeParams
+        )
     var map;
     var marker;
     var markers = [];
@@ -106,7 +38,7 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
             for (var i = 0; i < markers.length; i++) {
                 markers[i].setMap(null);
                 $(".ezeid-map-label").remove();
-               // labels[i].setMap(null);
+                // labels[i].setMap(null);
             }
         }
         catch(ex){}
@@ -127,7 +59,7 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
     $scope.form_rating = 0;
 
     SearchSec.mInfo = {};
-   // SearchSec.Placeholder = 'Type EZEID';
+    // SearchSec.Placeholder = 'Type EZEID';
     var userType = "";
     SearchSec.mInfo.InfoTab = true;
     $scope.showInfoTab = false;
@@ -156,11 +88,11 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
     $scope.showStar4 = true;
     $scope.showStar5 = true;
 
-   /* $scope.showStar1 = false;
-    $scope.showStar2 = false;
-    $scope.showStar3 = false;
-    $scope.showStar4 = false;
-    $scope.showStar5 = false;*/
+    /* $scope.showStar1 = false;
+     $scope.showStar2 = false;
+     $scope.showStar3 = false;
+     $scope.showStar4 = false;
+     $scope.showStar5 = false;*/
 
 
 
@@ -196,7 +128,7 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
 
         //getReverseGeocodingData(12.295810, 76.639381);
 
-      /********** Google Maps autocomplete **************/
+        /********** Google Maps autocomplete **************/
         var options = {
             types: ['establishment']
         };
@@ -209,7 +141,7 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
             var loc = new google.maps.LatLng($rootScope.CLoc.CLat, $rootScope.CLoc.CLong);
             PlaceCurrentLocationMarker(loc);
         });
-     /********** Google Maps autocomplete ends *********/
+        /********** Google Maps autocomplete ends *********/
 
 
 
@@ -244,7 +176,7 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
                 return;
             }
             for (var i = 0, marker; marker = markers[i]; i++) {
-               $(".ezeid-map-label").remove();
+                $(".ezeid-map-label").remove();
                 marker.setMap(null);
             }
 
@@ -287,19 +219,19 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
         var geocoder = new google.maps.Geocoder();
         geocoder.geocode({ 'latLng': latlng }, function (results, status) {
             if (status !== google.maps.GeocoderStatus.OK) {
-             }
+            }
             if (status == google.maps.GeocoderStatus.OK) {
-               getAddressForLocation(results[0].address_components);
+                getAddressForLocation(results[0].address_components);
             }
         });
     }
 
     function getAddressForLocation(results) {
-       $scope.Address = "";
-       angular.forEach(results, function (mapResultValue, index) {
+        $scope.Address = "";
+        angular.forEach(results, function (mapResultValue, index) {
             if (mapResultValue.types[0] == 'street_number') {
 
-                    $scope.Address = mapResultValue.long_name + ', ';
+                $scope.Address = mapResultValue.long_name + ', ';
 
             }
             if (mapResultValue.types[0] == 'route') {
@@ -327,7 +259,7 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
         {
             $scope.Address = $scope.Address.substring(0,47);
             $scope.Address = $scope.Address+ "...";
-       }
+        }
         else
         {
             $scope.Address = $scope.Address;
@@ -337,9 +269,9 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
 //    google.maps.event.addDomListener(window, 'load', initialize);
 
     function PlaceCurrentLocationMarker(location) {
-         if (marker != undefined) {
+        if (marker != undefined) {
             marker.setMap(null);
-             $(".ezeid-map-label").remove();
+            $(".ezeid-map-label").remove();
         }
         map.setCenter(location);
         marker = new google.maps.Marker({
@@ -412,20 +344,20 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
                 label.bindTo('position', marker, 'position');
                 label.bindTo('text', marker, 'label');
 
-                  $(".ezeid-map-label").remove();
+                $(".ezeid-map-label").remove();
 
 
-              /* var marker = new MarkerWithLabel({
-                    position: pos,
-                    draggable: false,
-                    raiseOnDrag: false,
-                    map: map,
-                    icon: (_item.IDTypeID == 2) ? businessIcon : individualIcon,
-                    labelContent: mTitle,
-                    labelAnchor: new google.maps.Point(22, 0),
-                    labelClass: "mapLabels", // the CSS class for the label
-                    labelStyle: {opacity: 1}
-                });*/
+                /* var marker = new MarkerWithLabel({
+                 position: pos,
+                 draggable: false,
+                 raiseOnDrag: false,
+                 map: map,
+                 icon: (_item.IDTypeID == 2) ? businessIcon : individualIcon,
+                 labelContent: mTitle,
+                 labelAnchor: new google.maps.Point(22, 0),
+                 labelClass: "mapLabels", // the CSS class for the label
+                 labelStyle: {opacity: 1}
+                 });*/
 
                 var currentPos = google.maps.LatLng($rootScope.CLoc.CLat,$rootScope.CLoc.CLong);
                 map.setCenter(currentPos);
@@ -503,12 +435,12 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
         else if(SearchSec.Criteria.SearchType == 2)
         {
             SearchSec.Placeholder = 'Type Keywords to locate products or services.';
-          //  SearchSec.showSmallBanner = true;
+            //  SearchSec.showSmallBanner = true;
         }
         else
         {
             SearchSec.Placeholder = 'Type Job skill keywords to locate employers.';
-          //  SearchSec.showSmallBanner = false;
+            //  SearchSec.showSmallBanner = false;
         }
         $scope.searchType = 2;
 
@@ -553,7 +485,7 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
 
                 if (data != 'null' && data.length>0) {
 
-                   $scope.SearchResultCount = data.length;
+                    $scope.SearchResultCount = data.length;
 
                     var _item = data[0];
                     if(data[0].Filename)
@@ -570,7 +502,7 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
                     {
                         $http({ method: 'get', url: GURL + 'ewtGetSearchInformation?Token=' + $rootScope._userInfo.Token + '&TID=' + _item.TID }).success(function (data) {
 
-                             if (data != 'null') {
+                            if (data != 'null') {
                                 if(data.length == 1 && SearchSec.Criteria.SearchType == 1)
                                 {
                                     $scope.showInfoTab = true;
@@ -584,8 +516,8 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
                                     SearchSec.mInfo = data[0];
 
                                     if (!/^(f|ht)tps?:\/\//i.test(data[0].Website)) {
-                                       // url = "http://" + data[0].Website;
-                                      //  SearchSec.mInfo.Website = url;
+                                        // url = "http://" + data[0].Website;
+                                        //  SearchSec.mInfo.Website = url;
                                         SearchSec.mInfo.Website = data[0].Website;
                                     }
 
@@ -606,9 +538,9 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
                                 });
                             }
                             else {
-                                    // Notification.error({ message: 'Invalid key or not found…', delay: MsgDelay });
-                                    $scope.ShowNoDataFound = true;
-                                 }
+                                // Notification.error({ message: 'Invalid key or not found…', delay: MsgDelay });
+                                $scope.ShowNoDataFound = true;
+                            }
                         });
 
 
@@ -639,7 +571,7 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
                     // PlaceMarker(data);//older one
                 }
                 else {
-                   // Notification.error({ message: 'Invalid key or not found…', delay: MsgDelay });
+                    // Notification.error({ message: 'Invalid key or not found…', delay: MsgDelay });
                     $scope.ShowNoDataFound = true;
                     try{
                         PlaceMarker(null);
@@ -711,7 +643,7 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
 
         if(AutoRefresh == true && SearchSec.IsSearchButtonClicked && SearchSec.mInfo.EZEID && $scope.showInfoTab && SearchSec.mInfo.Banners != 1)
         {
-             currentBanner = currentBanner + 1;
+            currentBanner = currentBanner + 1;
 
             if(currentBanner <= SearchSec.mInfo.Banners)
             {
@@ -730,25 +662,25 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
         AutoRefresh = false;
     });
 
-   /* //call for previous banner
-    SearchSec.getPreviousBanner = function () {
-        currentBanner = currentBanner - 1;
-        if(currentBanner >= 1)
-        {
-            getBanner(currentBanner);
-            RefreshTime = Miliseconds;
-        }
-    };
+    /* //call for previous banner
+     SearchSec.getPreviousBanner = function () {
+     currentBanner = currentBanner - 1;
+     if(currentBanner >= 1)
+     {
+     getBanner(currentBanner);
+     RefreshTime = Miliseconds;
+     }
+     };
 
-    //call for next banner
-    SearchSec.getNextBanner = function () {
-        currentBanner = currentBanner + 1;
-        if(currentBanner <= SearchSec.mInfo.Banners)
-        {
-            getBanner(currentBanner);
-            RefreshTime = Miliseconds;
-        }
-    };*/
+     //call for next banner
+     SearchSec.getNextBanner = function () {
+     currentBanner = currentBanner + 1;
+     if(currentBanner <= SearchSec.mInfo.Banners)
+     {
+     getBanner(currentBanner);
+     RefreshTime = Miliseconds;
+     }
+     };*/
 
     function getBanner(_requestedBannerValue){
         if(SearchSec.mInfo.EZEID)
@@ -757,26 +689,26 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
 
                 if (data.Picture != 'null') {
                     SearchSec.mInfo.BannerImage = data.Picture;
-                  /* if(currentBanner >= SearchSec.mInfo.Banners)
-                    {
-                        //Disable next button
-                        SearchSec.nextButton = false;
-                    }
-                    else
-                    {
-                        //Enable next button
-                        SearchSec.nextButton = true;
-                    }
+                    /* if(currentBanner >= SearchSec.mInfo.Banners)
+                     {
+                     //Disable next button
+                     SearchSec.nextButton = false;
+                     }
+                     else
+                     {
+                     //Enable next button
+                     SearchSec.nextButton = true;
+                     }
 
-                    if(currentBanner <= 1)
-                    {
-                        //Disabled previous button
-                        SearchSec.previousButton = false;
-                    }
-                    else
-                    {   //Enable previous burron
-                        SearchSec.previousButton = true;
-                    }*/
+                     if(currentBanner <= 1)
+                     {
+                     //Disabled previous button
+                     SearchSec.previousButton = false;
+                     }
+                     else
+                     {   //Enable previous burron
+                     SearchSec.previousButton = true;
+                     }*/
                 }
                 else
                 {
@@ -1042,103 +974,103 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
     };
 
     //Star Clicked .. add rating
-     SearchSec.addRatting = function (ratingValue,starColor) {
-         if(ratingValue == 1)
-         {
-                if(starColor == 'yellow')
-                {
-                    $scope.showStar1 = false;
-                    //Remove value from array
-                    var index = rating.indexOf(1);
-                    if (index >= 0) {
-                        rating.splice( index, 1 );
-                    }
+    SearchSec.addRatting = function (ratingValue,starColor) {
+        if(ratingValue == 1)
+        {
+            if(starColor == 'yellow')
+            {
+                $scope.showStar1 = false;
+                //Remove value from array
+                var index = rating.indexOf(1);
+                if (index >= 0) {
+                    rating.splice( index, 1 );
                 }
-                else
-                {
-                    $scope.showStar1 = true;
-                    //Add value in array
-                    rating.push(1);
+            }
+            else
+            {
+                $scope.showStar1 = true;
+                //Add value in array
+                rating.push(1);
+            }
+        }
+        if(ratingValue == 2)
+        {
+            if(starColor == 'yellow')
+            {
+                $scope.showStar2 = false;
+
+                //Remove value from array
+                var index = rating.indexOf(2);
+                if (index >= 0) {
+                    rating.splice( index, 1);
                 }
-         }
-         if(ratingValue == 2)
-         {
-             if(starColor == 'yellow')
-             {
-                 $scope.showStar2 = false;
-
-                 //Remove value from array
-                 var index = rating.indexOf(2);
-                 if (index >= 0) {
-                     rating.splice( index, 1);
-                 }
-             }
-             else
-             {
-                 $scope.showStar2 = true;
-                 //Add value in array
-                 rating.push(2);
-             }
-         }
-         if(ratingValue == 3)
-         {
-             if(starColor == 'yellow')
-             {
-                 $scope.showStar3 = false;
+            }
+            else
+            {
+                $scope.showStar2 = true;
+                //Add value in array
+                rating.push(2);
+            }
+        }
+        if(ratingValue == 3)
+        {
+            if(starColor == 'yellow')
+            {
+                $scope.showStar3 = false;
 
 
-                 //Remove value from array
-                 var index = rating.indexOf(3);
-                 if (index >= 0) {
-                     rating.splice( index, 1);
-                 }
-             }
-             else
-             {
-                 $scope.showStar3 = true;
-                 //Add value in array
-                 rating.push(3);
-             }
-         }
-         if(ratingValue == 4)
-         {
-             if(starColor == 'yellow')
-             {
-                 $scope.showStar4 = false;
+                //Remove value from array
+                var index = rating.indexOf(3);
+                if (index >= 0) {
+                    rating.splice( index, 1);
+                }
+            }
+            else
+            {
+                $scope.showStar3 = true;
+                //Add value in array
+                rating.push(3);
+            }
+        }
+        if(ratingValue == 4)
+        {
+            if(starColor == 'yellow')
+            {
+                $scope.showStar4 = false;
 
-                 //Remove value from array
-                 var index = rating.indexOf(4);
-                 if (index >= 0) {
-                     rating.splice( index, 1 );
-                 }
-             }
-             else
-             {
-                 $scope.showStar4 = true;
-                 //Add value in array
-                 rating.push(4);
-             }
-         }
-         if(ratingValue == 5)
-         {
-             if(starColor == 'yellow')
-             {
-                 $scope.showStar5 = false;
+                //Remove value from array
+                var index = rating.indexOf(4);
+                if (index >= 0) {
+                    rating.splice( index, 1 );
+                }
+            }
+            else
+            {
+                $scope.showStar4 = true;
+                //Add value in array
+                rating.push(4);
+            }
+        }
+        if(ratingValue == 5)
+        {
+            if(starColor == 'yellow')
+            {
+                $scope.showStar5 = false;
 
-                 //Remove value from array
-                 var index = rating.indexOf(5);
-                 if (index >= 0) {
-                     rating.splice( index, 1 );
-                 }
-             }
-             else
-             {
-                 $scope.showStar5 = true;
-                 //Add value in array
-                 rating.push(5);
-             }
-         }
-         //SearchSec.Criteria.Rating = rating.toString();
+                //Remove value from array
+                var index = rating.indexOf(5);
+                if (index >= 0) {
+                    rating.splice( index, 1 );
+                }
+            }
+            else
+            {
+                $scope.showStar5 = true;
+                //Add value in array
+                rating.push(5);
+            }
+        }
+        //SearchSec.Criteria.Rating = rating.toString();
 
     };
 
@@ -1169,227 +1101,4 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
         SearchSec.IsSearchPending = true;
         SearchSec.Criteria.SearchType = "1";
     }
-});
-
-
-angular.module('ezeidApp').controller('NotifyController', function ($scope, $rootScope, $http, Notification, $filter, $interval,GURL,MsgDelay) {
-    var msgSen = this;
-    var _pageValue = 1;
-    var MsgDelay = 2000;
-    msgSen.Status={id:"0,1",label:'New/Accepted'};
-    msgSen.MessageType={id:"0,1,2,3,4,5,6",label:'All'};
-    msgSen.msgs = [];
-    var showPaging = "N";
-    var Miliseconds = 300000;
-    var RefreshTime = Miliseconds;
-    var AutoRefresh = true;
-
-    $interval(function() {
-        msgSen.msgs = [];
-        if(AutoRefresh == true)
-        {
-            LoadNotifications(_pageValue);
-        }
-
-    },RefreshTime);
-
-    this.refreshNotificationGrid=function(){
-        msgSen.msgs = [];
-        LoadNotifications(_pageValue);
-        RefreshTime = Miliseconds;
-    };
-
-    $scope.$on('$locationChangeStart', function( event ) {
-        AutoRefresh = false;
-    });
-
-    if ($rootScope._userInfo) {
-
-    }
-    else {
-        if (typeof (Storage) !== "undefined") {
-            var encrypted = localStorage.getItem("_token");
-            if (encrypted) {
-                var decrypted = CryptoJS.AES.decrypt(encrypted, "EZEID");
-                var Jsonstring = decrypted.toString(CryptoJS.enc.Utf8);
-                if (Jsonstring) {
-                    $rootScope._userInfo = JSON.parse(Jsonstring);
-                }
-            }
-            else {
-                $rootScope._userInfo = {
-                    IsAuthenticate: false,
-                    Token: '',
-                    FirstName: '',
-                    Type:'',
-                    Icon:''
-                };
-            }
-        } else {
-            // Sorry! No Web Storage support..
-            $rootScope._userInfo = {
-                IsAuthenticate: false,
-                Token: '',
-                FirstName: '',
-                Type:'',
-                Icon:''
-            };
-            alert('Sorry..! Browser does not support');
-            window.location.href = "#/";
-        }
-    }
-
-    $scope.$watch('_userInfo.IsAuthenticate', function () {
-        if ($rootScope._userInfo.IsAuthenticate == true) {
-            LoadNotifications(_pageValue);
-        }
-        else {
-            window.location.href = "#/";
-        }
-    });
-
-    /**
-     * Function for converting UTC time from server to LOCAL timezone
-     */
-    var convertTimeToLocal = function(timeFromServer,dateFormat){
-        if(!dateFormat){
-            dateFormat = 'DD-MMM-YYYY hh:mm A';
-        }
-        var x = new Date(timeFromServer);
-        var mom1 = moment(x);
-        return mom1.add((mom1.utcOffset()),'m').format(dateFormat);
-    };
-
-    /**
-     * Function for converting LOCAL time (local timezone) to server time
-     */
-    var convertTimeToUTC = function(localTime,dateFormat){
-        if(!dateFormat){
-            dateFormat = 'DD-MMM-YYYY hh:mm A';
-        }
-        return moment(localTime,dateFormat).utc().format(dateFormat);
-    };
-
-    function LoadNotifications(_pageValue){
-
-        //_pageValue = _pageValue + 1;
-        $http({ method: 'get', url: GURL + 'ewtGetMessages?TokenNo=' + $rootScope._userInfo.Token +'&Page='+_pageValue+'&Status='+msgSen.Status.id +'&MessageType='+msgSen.MessageType.id}).success(function (data) {
-
-            //if (data.length > 0) {
-            if (data != 'null') {
-                for (var i = 0; i < data.length; i++) {
-                    data[i].TaskDateTime = convertTimeToLocal(data[i].TaskDateTime,'DD-MMM-YYYY hh:mm A');
-                    msgSen.msgs.push(data[i]);
-                    showPaging = data[0]['NextPage'];
-                }
-                if(showPaging == 'Y')
-                {
-                    msgSen.showMoreButton = true;
-                }
-                else
-                {
-                    msgSen.showMoreButton = false;
-                }
-            }
-            else
-            {
-                msgSen.showMoreButton = false;
-                Notification.error({ message: "No Message found..!", delay: MsgDelay });
-            }
-        });
-    }
-
-    this.filterStatus=function(){
-        msgSen.msgs = [];
-        _pageValue = 1;
-        LoadNotifications(_pageValue);
-    };
-
-    this.filterMessageType=function(){
-        msgSen.msgs = [];
-        _pageValue = 1;
-        LoadNotifications(_pageValue);
-    };
-
-    msgSen.statusDrpDwn=[{id:"0,1",label:'New/Accepted'},{id:"0",label:'New'},{id:"1",label:'Accepted'},{id:"2",label:'Completed'},{id:"3",label:'Rejected'},{id:"0,1,2,3",label:'All'}];
-
-    msgSen.typeDrpDwn=[{id:"0",label:'Normal Message'},{id:"1",label:'Sales Enquiry'},
-        {id:"2",label:'Home Delivery'},{id:"3",label:'Reservation'},{id:"4",label:'Support Request'},{id:"5",label:'CV'},{id:"6",label:'Appointment'},{id:"0,1,2,3,4,5,6",label:'All'}];
-
-
-    //More button click
-    this.getNotifications = function (){
-        _pageValue = _pageValue + 1;
-        LoadNotifications(_pageValue);
-    };
-
-    //open Add Note Form
-    this.openAddNoteForm = function (_item){
-        msgSen.item =_item;
-        msgSen.Message =_item.Message;
-        msgSen.NoteMessage =_item.Notes;
-        $('#Notes_popup').slideDown();
-    };
-
-    //Send Add Note
-    this.sendNote = function (_item) {
-        if ($rootScope._userInfo.IsAuthenticate == true)
-        {
-            var sts = {
-                TokenNo: $rootScope._userInfo.Token,
-                Status: _item.Status,
-                TID: _item.TID,
-                Notes:msgSen.NoteMessage
-            };
-            $http({ method: 'post', url: GURL + 'ewtUpdateMessageStatus', data: sts }).success(function (data) {
-
-                if(data.IsUpdated==true){
-                    _item.Notes=msgSen.NoteMessage;
-                    $('#Notes_popup').slideUp();
-                    Notification.success({ message: "Saved...", delay: MsgDelay });
-                }
-                else
-                {
-                    Notification.error({ message: 'Sorry..! not saved', delay: MsgDelay });
-                }
-            });
-        }
-        else
-        {
-            //Redirect to Login page
-            $('#SignIn_popup').slideDown();
-        }
-    };
-
-    // Close Add Note
-    this.closeAddNoteForm = function () {
-        $('#Notes_popup').slideUp();
-    };
-
-    //btn Groups..Below code is for status button
-    $scope.checkModel = {
-        New: false,
-        InProcess: false,
-        Closed: false,
-        Dropped:false
-    };
-
-    this.UpdateStatus = function (item, status) {
-        var sts = {
-            TokenNo: $rootScope._userInfo.Token,
-            Status: status,
-            TID: item.TID
-        };
-        $http({ method: 'post', url: GURL + 'ewtUpdateMessageStatus', data: sts }).success(function (data) {
-            var _obj = data;
-            if(data.IsUpdated==true){
-                item.Status=status;
-                Notification.success({ message: "Status updated...", delay: MsgDelay });
-            }
-            else
-            {
-                Notification.error({ message: 'Sorry..! Status not updated', delay: MsgDelay });
-            }
-        });
-    };
 });

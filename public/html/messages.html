@@ -60,13 +60,13 @@
                             <table class="panel panel-default" border="1" st-table="rowCollection" class="table table-striped">
                                 <thead>
                                 <tr style="background:#2791BA; color:#000000;">
-                                    <th class="panelPd5px msg_pos">Type</th>
-                                    <th class="panelPd5px msg_pos">Msg.No.</th>
-                                    <th class="panelPd5px from_size msg_pos">From</th>
-                                    <th class="panelPd5px date_size msg_pos">Date</th>
-                                    <th class="panelPd5px statusSize msg_pos">Status</th>
-                                    <th class="panelPd5px msg_size msg_pos">Message</th>
-                                    <th class="panelPd5px msg_size msg_pos">Notes</th>
+                                    <th class="panelPd5px leftBlackBorder rightBlackBorder">Type</th>
+                                    <th class="panelPd5px rightBlackBorder">Msg.No.</th>
+                                    <th class="panelPd5px from_size rightBlackBorder">From</th>
+                                    <th class="panelPd5px date_size rightBlackBorder">Date</th>
+                                    <th class="panelPd5px statusSize rightBlackBorder">Status</th>
+                                    <th class="panelPd5px msg_size rightBlackBorder">Message</th>
+                                    <th class="panelPd5px msg_size rightBlackBorder">Notes</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -83,9 +83,9 @@
                                             <a href="" ng-show="_item.MessageType == 6" class="icon-appointment selectedNotification" title="Appointment"></a>
                                         </div>
                                     </td>
-                                    <td class="panelPd5px msg_pos">{{$index + 1}}</td>
-                                    <td class="panelPd5px msg_pos" >{{_item.FromName}}</td>
-                                    <td class="panelPd5px msg_pos" >{{_item.TaskDateTime}}</td>
+                                    <td class="panelPd5px ">{{$index + 1}}</td>
+                                    <td class="panelPd5px " >{{_item.FromName}}</td>
+                                    <td class="panelPd5px " >{{_item.TaskDateTime}}</td>
                                     
                                     <td class="panelPd5px msg_pos">
                                         <div class="btn-group">
@@ -95,10 +95,10 @@
                                             <label ng-show="_item.Status == 3" ng-click="msgCtrl.openAddNoteForm(_item,3)" class="btn btn-primary panelTextSize borLeft">Rejected</label>
                                         </div>
                                     </td>
-                                    <td class="panelPd5px msg_pos">{{_item.Message}}</td>
-                                    <td class="panelPd5px msg_pos"><span ng-model="msgCtrl.Notes"></span>{{_item.Notes}}</td>
+                                    <td class="panelPd5px ">{{_item.Message}}</td>
+                                    <td class="panelPd5px "><span ng-model="msgCtrl.Notes"></span>{{_item.Notes}}</td>
                                     <td>
-                                        <!--<a href="#" class="btn pull-right" ng-click="msgCtrl.openAddNoteForm(_item)" type="button">Add</a>-->
+                                      <!-- <a href="#" class="btn pull-right" ng-click="msgCtrl.openAddNoteForm(_item)" type="button">Add</a>-->
                                     </td>
                                 </tr>
                                 </tbody>
@@ -114,4 +114,5 @@
 
         </div>
     </div>
+    <footer-section></footer-section>
 </div>

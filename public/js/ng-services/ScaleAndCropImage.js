@@ -90,12 +90,13 @@ angular.module('ezeidApp').service('ScaleAndCropImage',['$q',function($q){
             canvas.className = 'cr-canvas';
             canvas.height = requiredHeight;
             canvas.width = requiredWidth;
-            ctx.fillStyle = "#ffffff";
-            ctx.fillRect(0,0,canvas.width,canvas.height);
             var ctx = canvas.getContext('2d');
             /**
              * Cropping Image
              */
+            ctx.fillStyle = "#ffffff";
+            ctx.fillRect(0,0,canvas.width,canvas.height);
+
 
             ctx.drawImage(img,0,0);
             var retVal = canvas.toDataURL("image/jpeg", 1.0);
