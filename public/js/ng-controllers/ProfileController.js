@@ -378,11 +378,15 @@ angular.module('ezeidApp').controller('ProfileController', ['$rootScope', '$scop
                     profile._info.CVButton = profile._info.CVButton == 1 ? true : false;
                     profile._info.DOB = data[0].DOB;
                     // profile._info.DOB = $filter('date')(new Date(data[0].DOB), 'dd-MMM-yyyy');
+                    defer.resolve(true);
                     try{
-                        initialize();
+                        $timeout(function(){
+                            initialize();
+                        },2000)
+
                     }
                     catch(ex){}
-                    defer.resolve(true);
+
                 }
                 else{
                     defer.resolve(false);
@@ -404,7 +408,7 @@ angular.module('ezeidApp').controller('ProfileController', ['$rootScope', '$scop
         return defer.promise;
     }
 
-    if ($rootScope._userInfo.IsAuthenticate == false) {
+    if (!$rootScope._userInfo.IsAuthenticate) {
         initialize();
     }
 
@@ -624,10 +628,10 @@ angular.module('ezeidApp').controller('ProfileController', ['$rootScope', '$scop
 
 
     this.isMapInitialized = function () {
-        if (profile.mapInit == false) {
-            initialize();
-            profile.mapInit = true;
-        }
+//        if (profile.mapInit == false) {
+//            initialize();
+//            profile.mapInit = true;
+//        }
     };
     this.SearchOnMap = function (Query) {
         var request = {
@@ -674,7 +678,7 @@ angular.module('ezeidApp').controller('ProfileController', ['$rootScope', '$scop
     }
     function FindCurrentLocation(position) {
         if (showCurrentLocation) {
-            initialLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+            var initialLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
             PlaceCurrentLocationMarker(initialLocation);
             profile._info.Latitude = position.coords.latitude;
             profile._info.Longitude = position.coords.longitude;
@@ -1239,5 +1243,9 @@ angular.module('ezeidApp').controller('ProfileController', ['$rootScope', '$scop
 
     profile.parkingStatus = [{ id: 0, label: "Parking Status" },{ id: 1, label: "Public Parking" }, { id: 2, label: "Valet Parking" }, { id: 3, label: "No parking" }];
     profile.gender = [{ id: 0, label: "Male" }, { id: 1, label: "Female" }, { id: 2, label: "Unspecified" }];
+
+    $scope.$on("$destroy", function(){
+        delete map;
+    });
 }]);
 
