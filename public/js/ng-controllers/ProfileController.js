@@ -527,8 +527,9 @@ angular.module('ezeidApp').controller('ProfileController', ['$rootScope', '$scop
             if (places.length == 0) {
                 return;
             }
-            for (var i = 0, marker; marker = markers[i]; i++) {
-                marker.setMap(null);
+            for (var i = 0;i < markers.length ;i++) {
+                var marker1 = markers[i];
+                marker1.setMap(null);
             }
 
             // For each place, get the icon, place name, and location.
@@ -536,8 +537,12 @@ angular.module('ezeidApp').controller('ProfileController', ['$rootScope', '$scop
             var bounds = new google.maps.LatLngBounds();
             if (places.length > 0) {
                 var place = places[0];
-                $rootScope.CLoc.CLat = place.geometry.location.k;
-                $rootScope.CLoc.CLong = place.geometry.location.D;
+                $rootScope.CLoc = {
+                    CLat : 0,
+                    CLong : 0
+                };
+                $rootScope.CLoc.CLat = place.geometry.location.lat();
+                $rootScope.CLoc.CLong = place.geometry.location.lng();
                 var loc = new google.maps.LatLng($rootScope.CLoc.CLat, $rootScope.CLoc.CLong);
                 PlaceCurrentLocationMarker(loc);
             }
