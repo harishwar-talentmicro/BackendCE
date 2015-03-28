@@ -19,7 +19,10 @@ HeaderApp.directive('headerSection', function (Notification) {
                     $http({
                         method: 'post', url: GURL + 'ewLogin', data: Logdata
                     }).success(function (data,status,x) {
+
                         $rootScope._userInfo = data;
+                        $rootScope._userInfo.userName = data.FirstName;
+                            console.log($rootScope._userInfo.userName);
 
                         if (typeof (Storage) !== "undefined") {
                             var encrypted = CryptoJS.AES.encrypt(JSON.stringify(data), "EZEID");
