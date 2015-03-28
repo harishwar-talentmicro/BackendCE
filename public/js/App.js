@@ -71,7 +71,7 @@
             .when('/business-preference',{templateUrl : 'html/business-preference.html'})
             .when('/business-manager',{templateUrl : 'html/business-manager/business-manager.html'})
             .when('/bulksalesenquiry',{templateUrl : 'html/bulksalesenquiry.html'})
-            .otherwise({ templateUrl: 'html/home.html'});
+            .otherwise({redirectTo : '/home'});
 
         $httpProvider.interceptors.push("ezeidInterceptor");
     }]);
@@ -84,7 +84,9 @@
          * Checking login while navigating to different pages
          */
 
+
         $rootScope.$on("$routeChangeStart",function(event,next,current){
+
 
             /**
              * @todo Check if user is navigating to Closed Routes( which require authentication)
@@ -170,18 +172,12 @@
             }
        });
 
-        if($location.path() == ''){
-            lazyLoadBackground($timeout);
-        }
         $rootScope.$on('$routeChangeSuccess',function(){
             if($location.path() == '/' || $location.path() == '/home'){
-                lazyLoadBackground($timeout);
+                //lazyLoadBackground($timeout);
+                $("#background-image-container").show();
             }
         });
-
-
-
-
     }]);
     /************************************** Run Configuration ends here ****************************/
 
