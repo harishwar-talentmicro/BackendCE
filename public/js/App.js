@@ -54,6 +54,7 @@
     ezeid.config(['$routeProvider','$httpProvider',function($routeProvider,$httpProvider){
         $routeProvider.when('/index',{templateUrl: 'html/index.html'})
             .when('/home',{templateUrl: 'html/home.html'})
+            .when('/home/:ezeid/')
             .when('/messages',{templateUrl: 'html/messages.html'})
             .when('/acchist',{templateUrl: 'html/accesshistory.html'})
             .when('/editprofile',{templateUrl: 'html/signupwiz.html'})
@@ -71,7 +72,7 @@
             .when('/business-preference',{templateUrl : 'html/business-preference.html'})
             .when('/business-manager',{templateUrl : 'html/business-manager/business-manager.html'})
             .when('/bulksalesenquiry',{templateUrl : 'html/bulksalesenquiry.html'})
-            .otherwise({ templateUrl: 'html/home.html'});
+            .otherwise({redirectTo : '/home'});
 
         $httpProvider.interceptors.push("ezeidInterceptor");
     }]);

@@ -265,36 +265,21 @@ angular.module('ezeidApp').controller('ProfileController', ['$rootScope', '$scop
         $scope.showProgress = true;
         $scope.showError = false;
 
-        $timeout(function(){
-            var promise = GetUserDetails();
-            promise.then(function(promiseStatus){
-                console.log(promiseStatus);
-                if(promiseStatus){
-                    $scope.showProgress = false;
-                    $scope.showError = true;
-                    $scope.showForm = false;
-                }
-                else{
-                    $scope.showForm = false;
-                    $scope.showProgress = false;
-                    $scope.showError = true;
-                }
-            });
-        },4000);
-//        var promise = GetUserDetails();
 
-//        promise.then(function(promiseStatus){
-//            if(promiseStatus){
-//                $scope.showProgress = false;
-//                $scope.showError = false;
-//                $scope.showForm = true;
-//            }
-//            else{
-//                $scope.showForm = false;
-//                $scope.showProgress = false;
-//                $scope.showError = true;
-//            }
-//        });
+        var promise = GetUserDetails();
+
+        promise.then(function(promiseStatus){
+            if(promiseStatus){
+                $scope.showProgress = false;
+                $scope.showError = false;
+                $scope.showForm = true;
+            }
+            else{
+                $scope.showForm = false;
+                $scope.showProgress = false;
+                $scope.showError = true;
+            }
+        });
     };
 
     $scope.$watch('_userInfo.IsAuthenticate', function () {
@@ -305,37 +290,22 @@ angular.module('ezeidApp').controller('ProfileController', ['$rootScope', '$scop
             $scope.showError = false;
 
 
-            $timeout(function(){
-                var promise = GetUserDetails();
-                promise.then(function(promiseStatus){
-                    console.log(promiseStatus);
-                    if(promiseStatus){
-                        $scope.showProgress = false;
-                        $scope.showError = true;
-                        $scope.showForm = false;
-                    }
-                    else{
-                        $scope.showForm = false;
-                        $scope.showProgress = false;
-                        $scope.showError = true;
-                    }
-                });
-            },4000);
 
-//            var promise = GetUserDetails();
-//
-//            promise.then(function(promiseStatus){
-//                if(promiseStatus){
-//                    $scope.showProgress = false;
-//                    $scope.showError = false;
-//                    $scope.showForm = true;
-//                }
-//                else{
-//                    $scope.showForm = false;
-//                    $scope.showProgress = false;
-//                    $scope.showError = true;
-//                }
-//            });
+
+            var promise = GetUserDetails();
+
+            promise.then(function(promiseStatus){
+                if(promiseStatus){
+                    $scope.showProgress = false;
+                    $scope.showError = false;
+                    $scope.showForm = true;
+                }
+                else{
+                    $scope.showForm = false;
+                    $scope.showProgress = false;
+                    $scope.showError = true;
+                }
+            });
 
             $scope.isTypeSelected  = true;
             $scope.heading = 'Update Profile';
