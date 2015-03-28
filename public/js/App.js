@@ -84,8 +84,10 @@
          * Checking login while navigating to different pages
          */
 
+        lazyLoadBackground($timeout);
+        $("#background-image-container").hide();
         $rootScope.$on("$routeChangeStart",function(event,next,current){
-            $("#background-image-container").remove();
+            $("#background-image-container").hide();
 
             /**
              * @todo Check if user is navigating to Closed Routes( which require authentication)
@@ -173,13 +175,10 @@
 
         $rootScope.$on('$routeChangeSuccess',function(){
             if($location.path() == '/' || $location.path() == '/home'){
-                lazyLoadBackground($timeout);
+                //lazyLoadBackground($timeout);
+                $("#background-image-container").show();
             }
         });
-
-
-
-
     }]);
     /************************************** Run Configuration ends here ****************************/
 
