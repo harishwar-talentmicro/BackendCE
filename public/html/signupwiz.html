@@ -128,7 +128,7 @@ table#t01 th	{
     <div class="container" style="padding-top:80px;">
         <div class="row">
             <div class="col-md-8" style="margin: auto; float: none;">
-                <div class="panel panel-default">
+                <div ng-show="showForm" class="panel panel-default">
                 <form name="UserForm" novalidate class="form-inline">
                     <div class="panel-heading">
                         <h4> {{heading}}
@@ -423,6 +423,36 @@ table#t01 th	{
                     </form>
                 </div>
                 </div>
+                <!------------ Error Block Panel -------------------------->
+                <div ng-show="showError" class="panel panel-default">
+                    <div class="panel-body">
+
+                            <div class="row">
+                                <div class="col-lg-2 col-md-2 col-sm-4 col-xs-12 col-lg-offset-5 col-md-offset-5 col-sm-offset-4 col-xs-offset-0">
+                                    <p class="text-danger">An error occured ! <a class="btn-link" ng-click="reloadAgain()"> Try Again</a> </p>
+                                </div>
+                            </div>
+
+                    </div>
+                </div>
+            <!------------ Error Block Panel ends -------------------------->
+
+            <!------------ Progress Block Panel -------------------------->
+            <div ng-show="showProgress" class="panel panel-default">
+                <div class="panel-body">
+                        <div class="row">
+                            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 col-lg-offset-5 col-md-offset-5 col-sm-offset-5 col-xs-offset-5 text-center preloader">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-3 col-md-3 col-sm-3 col-xs-4 col-lg-offset-4 col-md-offset-4 col-sm-offset-4 col-xs-offset-4 text-center">
+                                <p class="text-primary">Profile is loading ! Please wait</p>
+                            </div>
+                        </div>
+
+                </div>
+            </div>
+            <!------------ Progress Block Panel ends -------------------------->
             </div>
             <!--terms and condition template-->
             <div class="Popup_window form_style" id="term-condition">
