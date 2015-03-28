@@ -60,23 +60,7 @@ angular.module('ezeidApp').controller('ProfileController', ['$rootScope', '$scop
         }
     }
 
-    /**
-     * Added for confirmation box while navigating to other
-     */
-    $scope.$on('$locationChangeStart',function(event,next,current){
-        if (!$scope.UserForm.$dirty) return;
-        if(!isCancelButton) return;
-        var confirm = $window.confirm('Are you sure you want to discard the changes without saving?');
-        // Preventing them from navigating away
-        if(!confirm){
-            try{
-                event.defaultPrevented();
-            }
-            catch(ex){
-                event.preventDefault();
-            }
-        }
-    });
+
 
     $('#datetimepicker1').datetimepicker({
         format: 'd-M-Y',
@@ -282,6 +266,37 @@ angular.module('ezeidApp').controller('ProfileController', ['$rootScope', '$scop
             profile._info.OpenStatus = 1;
         }
     });
+
+    /**
+     * Added for confirmation box while navigating to other
+     */
+    $scope.$on('$locationChangeStart',function(event,next,current){
+
+        console.log($rootScope._userInfo.isFirstTime);
+
+        if(!$rootScope._userInfo.isFirstTime)
+        {
+            if (!$scope.UserForm.$dirty) return;
+            if(!isCancelButton) return;
+            var confirm = $window.confirm('Are you sure you want to discard the changes without saving?');
+            // Preventing them from navigating away
+            if(!confirm){
+                try{
+                    event.defaultPrevented();
+                }
+                catch(ex){
+                    event.preventDefault();
+                }
+            }
+        }
+        else
+        {
+            $rootScope._userInfo.isFirstTime = false;
+        }
+
+
+    });
+
 
     /***************************** Camera Code ***************************************/
     $scope.isShowCamera = false;
@@ -996,6 +1011,7 @@ angular.module('ezeidApp').controller('ProfileController', ['$rootScope', '$scop
                                 userName = userName+ "...";
                             }
                             $rootScope._userInfo.userName = userName ;
+                            $rootScope._userInfo.isFirstTime = true;
 
                             if (typeof (Storage) !== "undefined") {
                                 var encrypted = CryptoJS.AES.encrypt(JSON.stringify(data), "EZEID");
