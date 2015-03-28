@@ -287,11 +287,9 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
         var geocoder = new google.maps.Geocoder();
         geocoder.geocode({ 'latLng': latlng }, function (results, status) {
             if (status !== google.maps.GeocoderStatus.OK) {
-                //  console.log(status);
-            }
+             }
             if (status == google.maps.GeocoderStatus.OK) {
-                //   console.log(JSON.stringify(results));
-                getAddressForLocation(results[0].address_components);
+               getAddressForLocation(results[0].address_components);
             }
         });
     }
@@ -299,7 +297,6 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
     function getAddressForLocation(results) {
        $scope.Address = "";
        angular.forEach(results, function (mapResultValue, index) {
-            // console.log(mapResultValue);
             if (mapResultValue.types[0] == 'street_number') {
 
                     $scope.Address = mapResultValue.long_name + ', ';
@@ -446,7 +443,6 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
                         $http({ method: 'get', url: GURL + 'ewtGetSearchInformation?Token=' + $rootScope._userInfo.Token + '&TID=' + _item.TID }).success(function (data) {
                             if (data != 'null') {
 
-                              //  console.log(data);
                                 $timeout(function () {
                                     SearchSec.mInfo = data[0];
 
@@ -535,7 +531,6 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
         SearchSec.Criteria.OpenStatus = SearchSec.Criteria.OpenStatus1 == true ? 1 : 0;
 
         var currentDate = moment().format('YYYY-MM-DD hh:mm');
-        console.log(currentDate);
 
         SearchSec.Criteria.CurrentDate = currentDate;
         if ($rootScope._userInfo.IsAuthenticate == true || SearchSec.Criteria.SearchType == 2 && SearchSec.IsSearchButtonClicked) {
@@ -716,7 +711,7 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
 
         if(AutoRefresh == true && SearchSec.IsSearchButtonClicked && SearchSec.mInfo.EZEID && $scope.showInfoTab && SearchSec.mInfo.Banners != 1)
         {
-            currentBanner = currentBanner + 1;
+             currentBanner = currentBanner + 1;
 
             if(currentBanner <= SearchSec.mInfo.Banners)
             {
@@ -735,7 +730,7 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
         AutoRefresh = false;
     });
 
-    //call for previous banner
+   /* //call for previous banner
     SearchSec.getPreviousBanner = function () {
         currentBanner = currentBanner - 1;
         if(currentBanner >= 1)
@@ -753,16 +748,16 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
             getBanner(currentBanner);
             RefreshTime = Miliseconds;
         }
-    };
+    };*/
 
     function getBanner(_requestedBannerValue){
         if(SearchSec.mInfo.EZEID)
         {
-            $http({ method: 'get', url: GURL + 'ewtGetBannerPicture?Token=' + $rootScope._userInfo.Token +'&SeqNo='+_requestedBannerValue+'&Ezeid='+SearchSec.mInfo.EZEID+'&StateTitle='+ SearchSec.mInfo.StateTitle}).success(function (data) {
+            $http({ method: 'get', url: GURL + 'ewtGetBannerPicture?Token=' + $rootScope._userInfo.Token +'&SeqNo='+_requestedBannerValue+'&Ezeid='+SearchSec.mInfo.EZEID+'&StateTitle='+ SearchSec.mInfo.StateTitle+'&LocID='+SearchSec.mInfo.LocID}).success(function (data) {
 
                 if (data.Picture != 'null') {
                     SearchSec.mInfo.BannerImage = data.Picture;
-                    if(currentBanner >= SearchSec.mInfo.Banners)
+                  /* if(currentBanner >= SearchSec.mInfo.Banners)
                     {
                         //Disable next button
                         SearchSec.nextButton = false;
@@ -781,7 +776,7 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
                     else
                     {   //Enable previous burron
                         SearchSec.previousButton = true;
-                    }
+                    }*/
                 }
                 else
                 {
@@ -1397,115 +1392,4 @@ angular.module('ezeidApp').controller('NotifyController', function ($scope, $roo
             }
         });
     };
-});/*
-*//***
- * HistoryController
- *//*
-angular.module('ezeidApp').controller('HistoryController', function ($scope, $rootScope, $http, Notification, $filter, $interval,GURL,MsgDelay) {
-    var msgSen = this;
-    var _pageValue = 1;
-    var MsgDelay = 2000;
-    msgSen.msgs = [];
-    var showPaging = "N";
-
-    if ($rootScope._userInfo) {
-
-    }
-    else {
-        if (typeof (Storage) !== "undefined") {
-            var encrypted = localStorage.getItem("_token");
-            if (encrypted) {
-                var decrypted = CryptoJS.AES.decrypt(encrypted, "EZEID");
-                var Jsonstring = decrypted.toString(CryptoJS.enc.Utf8);
-                if (Jsonstring) {
-                    $rootScope._userInfo = JSON.parse(Jsonstring);
-                }
-            }
-            else {
-                $rootScope._userInfo = {
-                    IsAuthenticate: false,
-                    Token: '',
-                    FirstName: '',
-                    Type:'',
-                    Icon:''
-                };
-            }
-        } else {
-            // Sorry! No Web Storage support..
-            $rootScope._userInfo = {
-                IsAuthenticate: false,
-                Token: '',
-                FirstName: '',
-                Type:'',
-                Icon:''
-            };
-            alert('Sorry..! Browser does not support');
-            window.location.href = "index.html";
-        }
-    }
-
-    $scope.$watch('_userInfo.IsAuthenticate', function () {
-        if ($rootScope._userInfo.IsAuthenticate == true) {
-            LoadHistory(_pageValue);
-        }
-        else {
-            window.location.href = "#/";
-        }
-    });
-
-    *//**
-     * Function for converting UTC time from server to LOCAL timezone
-     *//*
-    var convertTimeToLocal = function(timeFromServer,dateFormat){
-        if(!dateFormat){
-            dateFormat = 'DD-MMM-YYYY hh:mm A';
-        }
-        var mom1 = moment(timeFromServer,dateFormat);
-        var ret =  mom1.add((mom1.utcOffset()),'m').format(dateFormat);
-        return ret;
-    };
-
-    *//**
-     * Function for converting LOCAL time (local timezone) to server time
-     *//*
-    var convertTimeToUTC = function(localTime,dateFormat){
-        if(!dateFormat){
-            dateFormat = 'DD-MMM-YYYY hh:mm A';
-        }
-        return moment(localTime).utc().format(dateFormat);
-    };
-
-    function LoadHistory(_pageValue){
-
-        $http({ method: 'get', url: GURL + 'ewtGetAccessHistory?TokenNo=' + $rootScope._userInfo.Token + '&Page='+_pageValue }).success(function (data) {
-
-            if (data != 'null') {
-                for (var i = 0; i < data.length; i++) {
-                    data[i].AccessDate = convertTimeToLocal(data[i].AccessDate,'DD-MMM-YYYY hh:mm A');
-                    msgSen.msgs.push(data[i]);
-                    showPaging = data[0]['NextPage'];
-                }
-                if(showPaging == 'Y')
-                {
-                    msgSen.showMoreButton = true;
-                }
-                else
-                {
-                    msgSen.showMoreButton = false;
-                }
-            }
-            else
-            {
-                msgSen.showMoreButton = false;
-                Notification.error({ message: "No History found..!", delay: MsgDelay });
-            }
-        });
-    }
-
-    //More button click
-    this.getMoreHistory = function (){
-        _pageValue = _pageValue + 1;
-        LoadHistory(_pageValue);
-    };
 });
-*/
