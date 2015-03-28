@@ -171,9 +171,6 @@
             }
        });
 
-        if($location.path() == ''){
-            lazyLoadBackground($timeout);
-        }
         $rootScope.$on('$routeChangeSuccess',function(){
             if($location.path() == '/' || $location.path() == '/home'){
                 lazyLoadBackground($timeout);
