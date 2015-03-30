@@ -370,18 +370,17 @@ table#t01 th	{
                                                                                  business-pic-container-id="pic-business"
                                                                                  individual-pic-container-id="pic-individual"
                                                                                  user-type="profile._info.IDTypeID"
-                                                                                 set-picture="profile.setPicture(pic,icon)"
-                                                                                 >
+                                                                                 set-picture="profile.setPicture(pic,icon)"/>
                                                         </span>
+                                                       <!--  <span>90 * 77</span>-->
                                                         <span ng-hide="profile._info.IDTypeID == 1" style="margin-left:50px" class="btn btn-primary btn-file">
                                                            Attach Picture
                                                             <!--<input image type="file" onchange="angular.element(this).scope().uploadImageForEditLocation(this.files)" accept="image/*"-->
-                                                                   <input id="business-pic" type="file" onchange="angular.element(this).scope().uploadImageFromService(this)" accept="image/*"
+                                                               <input id="business-pic" type="file" onchange="angular.element(this).scope().uploadImageFromService(this)" accept="image/*"
                                                                    business-pic-container-id="pic-business"
                                                                    individual-pic-container-id="pic-individual"
                                                                    user-type="profile._info.IDTypeID"
                                                                    set-picture="profile.setPicture(pic,icon)"/>
-
                                                         </span>
                                                     </div>
                                                     <p/>

@@ -1,6 +1,5 @@
 // Search Controller
 angular.module('ezeidApp').controller('SearchController', function ($http, $rootScope, $scope, $compile, $timeout, Notification, $filter, $location, $window, $q, $interval,GURL,MsgDelay,$routeParams) {
-    console.log($routeParams);
 
     if(Object.keys($routeParams).length > 0){
         if(typeof($routeParams['SearchType']) !== "undefined" && $routeParams['SearchType'] !== null && $routeParams['SearchType'] !== "")
@@ -422,7 +421,6 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
 
                                 $timeout(function () {
                                     SearchSec.mInfo = data[0];
-
                                     if (!/^(f|ht)tps?:\/\//i.test(data[0].Website)) {
 //                                       // url = "http://" + data[0].Website;
                                         SearchSec.mInfo.Website = data[0].Website;
@@ -527,8 +525,7 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
             SearchSec.Criteria.Token = $rootScope._userInfo.Token;
 
             $http({ method: 'post', url: GURL + 'ewSearchByKeywords', data: SearchSec.Criteria }).success(function (data) {
-                console.log(JSON.stringify(SearchSec.Criteria));
-                if (data != 'null' && data.length>0) {
+               if (data != 'null' && data.length>0) {
 
                     $scope.SearchResultCount = data.length;
 
@@ -548,7 +545,8 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
                         $http({ method: 'get', url: GURL + 'ewtGetSearchInformation?Token=' + $rootScope._userInfo.Token + '&TID=' + _item.TID }).success(function (data) {
 
                             if (data != 'null') {
-                                if(data.length == 1 && SearchSec.Criteria.SearchType == 1)
+
+                              if(data.length == 1 && SearchSec.Criteria.SearchType == 1)
                                 {
                                     $scope.showInfoTab = true;
                                     $scope.selectTab('info');
