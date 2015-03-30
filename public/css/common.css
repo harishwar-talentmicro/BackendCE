@@ -447,11 +447,11 @@ body{
     min-height: 100%;
     height: 100%;
 }
-body > div{
+body > div.viewport{
     min-height: 100%;
     height: 100%;
 }
-body > div > div#wrapper{
+body > div.viewport > div#wrapper{
     min-height: 91%;
     height: auto;
 }
