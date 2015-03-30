@@ -66,7 +66,7 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
     var RefreshTime = Miliseconds;
     var AutoRefresh = true;
 
-    var rating = [1,2,3,4,5];
+    var rating = [1];
 
     $('#datetimepicker1').datetimepicker({
         format: "d-M-Y  h:m A",
@@ -131,14 +131,6 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
     $scope.showStar3 = true;
     $scope.showStar4 = true;
     $scope.showStar5 = true;
-
-    /* $scope.showStar1 = false;
-     $scope.showStar2 = false;
-     $scope.showStar3 = false;
-     $scope.showStar4 = false;
-     $scope.showStar5 = false;*/
-
-
 
     $scope.member = {roles: []};
     $scope.selected_items = [];
@@ -504,7 +496,6 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
         SearchSec.Criteria.ParkingStatus = SearchSec.Criteria.ParkingStatus1 == true ? 1 : 0;
         SearchSec.Criteria.HomeDelivery = SearchSec.Criteria.HomeDelivery1 == true ? 1 : 0;
         SearchSec.Criteria.OpenStatus = SearchSec.Criteria.OpenStatus1 == true ? 1 : 0;
-
         var currentDate = moment().format('YYYY-MM-DD hh:mm');
 
         SearchSec.Criteria.CurrentDate = currentDate;
@@ -1114,7 +1105,6 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
             }
         }
         //SearchSec.Criteria.Rating = rating.toString();
-
     };
 
     // Close CV Form
