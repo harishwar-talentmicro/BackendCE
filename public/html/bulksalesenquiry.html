@@ -4,87 +4,12 @@
             <div class="row top-clearfix"></div>
                 <div class="row">
                     <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 col-lg-offset-2 col-md-offset-2 col-sm-offset-2 col-xs-offset-0">
-                        <div class="panel panel-default panelBottomSpacing">
+                        <div class="panel panel-default">
                             <div class="panel-heading">
                                 <h4>Bulk Sales Enquiry</h4>
                             </div>
                             <div class="panel-body setPanelPadding">
                                 <div class="row setRowLeftRightMarginZero">
-                                   <!-- <table class="table table-striped ezeid-table" style=" margin-bottom: 2px;/">
-                                        <thead>
-                                        <tr>
-                                            <th style="width:2%"> </th>
-                                            <th style="width: 13%;">Company Name</th>
-                                            <th class="thWidth">Country/City</th>
-                                            <th class="thWidth">Distance(Miles/km)</th>
-                                            <th class="thWidth">Phone No.</th>
-                                            <th class="thWidth">Web Site</th>
-                                        </tr>
-                                        </thead>
-                                    </table>
-                                    <div class="tableBodyContainer" >
-                                        <table class="table table-striped ezeid-table ">
-                                            <tbody>
-                                            <tr>
-                                                <td><input type="checkbox" name="vehicle" value="EZEID"></td>
-                                                <td>HireCraft</td>
-                                                <td>India, Banglore</td>
-                                                <td>50KM </td>
-                                                <td>+91 9446093566 </td>
-                                                <td><a href="www.google.com"><u>www.google.com</u></a></td>
-                                            </tr>
-                                            <tr>
-                                                <td><input type="checkbox" name="vehicle" value="EZEID"></td>
-                                                <td>HireCraft</td>
-                                                <td>India, Banglore</td>
-                                                <td>50KM </td>
-                                                <td>+91 9446093566 </td>
-                                                <td><a href="www.google.com"><u>www.google.com</u></a></td>
-                                            </tr>
-                                            <tr>
-                                                <td><input type="checkbox" name="vehicle" value="EZEID"></td>
-                                                <td>HireCraft</td>
-                                                <td>India, Banglore</td>
-                                                <td>50KM </td>
-                                                <td>+91 9446093566 </td>
-                                                <td><a href="www.google.com"><u>www.google.com</u></a></td>
-                                            </tr>
-                                            <tr>
-                                                <td><input type="checkbox" name="vehicle" value="EZEID"></td>
-                                                <td>HireCraft</td>
-                                                <td>India, Banglore</td>
-                                                <td>50KM </td>
-                                                <td>+91 9446093566 </td>
-                                                <td><a href="www.google.com"><u>www.google.com</u></a></td>
-                                            </tr>
-                                            <tr>
-                                                <td><input type="checkbox" name="vehicle" value="EZEID"></td>
-                                                <td>HireCraft</td>
-                                                <td>India, Banglore</td>
-                                                <td>50KM </td>
-                                                <td>+91 9446093566 </td>
-                                                <td><a href="www.google.com"><u>www.google.com</u></a></td>
-                                            </tr>
-                                            <tr>
-                                                <td><input type="checkbox" name="vehicle" value="EZEID"></td>
-                                                <td>HireCraft</td>
-                                                <td>India, Banglore</td>
-                                                <td>50KM </td>
-                                                <td>+91 9446093566 </td>
-                                                <td><a href="www.google.com"><u>www.google.com</u></a></td>
-                                            </tr>
-                                            <tr>
-                                                <td><input type="checkbox" name="vehicle" value="EZEID"></td>
-                                                <td>HireCraft</td>
-                                                <td>India, Banglore</td>
-                                                <td>50KM </td>
-                                                <td>+91 9446093566 </td>
-                                                <td><a href="www.google.com"><u>www.google.com</u></a></td>
-                                            </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>-->
-
                                     <table class="rwd-table">
                                         <tr>
                                             <th> </th>
@@ -121,9 +46,10 @@
 
                                     </table>
                                 </div><br/>
-                                <div class="well well-lg">
+                                <div style="text-align: center">
+                                  <div class="well well-lg templateBoxContainer">
                                     <div class="row setRowLeftRightMarginZero centerAlign">
-                                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 searchHeaderAlignment TemplateTextContainer">
+                                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 searchHeaderAlignment TemplateTextContainer bewareTextInnerContainer">
                                             Template
                                         </div>
                                         <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 searchHeaderAlignment ">
@@ -135,11 +61,11 @@
                                             </select>
                                         </div>
                                         <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1 searchHeaderAlignment ">
-                                            <button data-toggle="tooltip" data-placement="right" title="Create Template" type="button" class="btn btn-primary" ng-click="profile.closeRegistrationForm()" >...</button>
+                                            <button data-toggle="tooltip" data-placement="right" title="Create Template" type="button" class="btn btn-primary" ng-click="bulksalesController.addNewTemplateForm()" >...</button>
                                         </div>
                                     </div><br/>
                                     <div class="row setRowLeftRightMarginZero centerAlign">
-                                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 searchHeaderAlignment TemplateTextContainer">
+                                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 searchHeaderAlignment TemplateTextContainer bewareTextInnerContainer">
                                             From
                                         </div>
                                         <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 searchHeaderAlignment">
@@ -147,32 +73,50 @@
                                         </div>
                                     </div><br/>
                                     <div class="row setRowLeftRightMarginZero centerAlign">
-                                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 searchHeaderAlignment TemplateTextContainer">
-                                            Subject
+                                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 searchHeaderAlignment TemplateTextContainer bewareTextInnerContainer">
+                                            Cc
                                         </div>
                                         <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 searchHeaderAlignment">
-                                            <input type="text" name="fromEmail" class="form-control" placeholder="Subject" required>
+                                            <input type="text" name="fromEmail" class="form-control" placeholder="Cc" required>
                                         </div>
                                     </div><br/>
+                                      <div class="row setRowLeftRightMarginZero centerAlign">
+                                          <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 searchHeaderAlignment TemplateTextContainer bewareTextInnerContainer">
+                                              Bcc
+                                          </div>
+                                          <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 searchHeaderAlignment">
+                                              <input type="text" name="fromEmail" class="form-control" placeholder="Bcc" required>
+                                          </div>
+                                      </div><br/>
+                                      <div class="row setRowLeftRightMarginZero centerAlign">
+                                          <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 searchHeaderAlignment TemplateTextContainer bewareTextInnerContainer">
+                                              Subject
+                                          </div>
+                                          <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 searchHeaderAlignment">
+                                              <input type="text" name="fromEmail" class="form-control" placeholder="Subject" required>
+                                          </div>
+                                      </div><br/>
                                     <div class="row setRowLeftRightMarginZero centerAlign">
-                                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 searchHeaderAlignment TemplateTextContainer">
+                                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 searchHeaderAlignment TemplateTextContainer TextAreaTopMargin">
                                             Body
                                         </div>
-                                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 searchHeaderAlignment">
-                                            <textarea class="form-control " name="homeDeliverMessage" placeholder="Type here" required></textarea>
+                                        <!--<div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 searchHeaderAlignment">-->
+                                        <div class="col-lg-7 col-md-7 col-sm-7 col-xs-7 searchHeaderAlignment">
+                                            <textarea rows="10" cols="210" class="form-control " name="homeDeliverMessage" placeholder="Type here" required></textarea>
                                         </div>
                                     </div><br/>
                                     <div class="row setRowLeftRightMarginZero centerAlign" >
-                                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 searchHeaderAlignment TemplateTextContainer">
+                                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 searchHeaderAlignment TemplateTextContainer">
 
                                         </div>
-                                        <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 searchHeaderAlignment">
+                                        <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 searchHeaderAlignment" style="text-align: left;">
                                             <button type="button" class="btn btn-primary" ng-click="profile.closeRegistrationForm()" >Send</button>
                                         </div>
-                                        <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 searchHeaderAlignment">
+                                        <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 searchHeaderAlignment" style="text-align: left;">
                                             <button type="button" class="btn btn-primary" ng-click="profile.closeRegistrationForm()" >Close</button>
                                         </div>
-                                    </div><br/>
+                                    </div>
+                                </div>
                                 </div>
                              </div>
                          </div>

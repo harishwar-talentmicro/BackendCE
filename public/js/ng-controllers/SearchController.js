@@ -1,7 +1,7 @@
 // Search Controller
 angular.module('ezeidApp').controller('SearchController', function ($http, $rootScope, $scope, $compile, $timeout, Notification, $filter, $location, $window, $q, $interval,GURL,MsgDelay,$routeParams) {
 
-    if(Object.keys($routeParams).length > 0){
+   /* if(Object.keys($routeParams).length > 0){
         if(typeof($routeParams['SearchType']) !== "undefined" && $routeParams['SearchType'] !== null && $routeParams['SearchType'] !== "")
         {
             SearchSec.Criteria.SearchType = $routeParams.SearchType;
@@ -30,9 +30,9 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
         if(typeof($routeParams['OpenStatus']) !== "undefined" && $routeParams['OpenStatus'] !== null && $routeParams['OpenStatus'] !== ""){
             SearchSec.Criteria.OpenStatus = $routeParams.OpenStatus;
         }
-    }
+    }*/
 
-    var routeP = {
+ /*   var routeP = {
         "Token":"324b580dca99786fa9f1",
         "SearchType":"1",
         "Keywords":"krunal",
@@ -45,7 +45,7 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
         "HomeDelivery":0,
         "OpenStatus":0,
         "CurrentDate":"2015-03-28 04:33"
-    };
+    };*/
 
     var map;
     var marker;
@@ -106,6 +106,7 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
     // SearchSec.Placeholder = 'Type EZEID';
     var userType = "";
     SearchSec.mInfo.InfoTab = true;
+
     $scope.showInfoTab = false;
 
     SearchSec.Criteria = {
@@ -113,7 +114,7 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
         SearchType: '2',
         Keywords: '',
         SCategory: 0,
-        Proximity: 1,
+        Proximity: 50,
         Latitude: $rootScope.CLoc.CLat,
         Longitude: $rootScope.CLoc.CLong
     };
@@ -406,10 +407,18 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
                         $scope.ShowInfoWindow = true;
                         $scope.ShowLinks = true;
                         $scope.showSmallBanner = true;
+                        $scope.AddressForInfoTab = "";
 
                         var sen = this;
                         $http({ method: 'get', url: GURL + 'ewtGetSearchInformation?Token=' + $rootScope._userInfo.Token + '&TID=' + _item.TID }).success(function (data) {
-                            if (data != 'null') {
+
+                               if (data != 'null') {
+                                    //Below lines are to show address in info tab
+                                    $scope.AddressForInfoTab = (SearchSec.mInfo.AddressLine1 != "") ? SearchSec.mInfo.AddressLine1 +', ' : "";
+                                    $scope.AddressForInfoTab += (SearchSec.mInfo.AddressLine2 != "") ? SearchSec.mInfo.AddressLine2 +', ' : "";
+                                    $scope.AddressForInfoTab += (SearchSec.mInfo.CityTitle != "") ? SearchSec.mInfo.CityTitle +', ' : "";
+                                    $scope.AddressForInfoTab += (SearchSec.mInfo.CountryTitle != "") ? SearchSec.mInfo.CountryTitle +', ' : "";
+                                    $scope.AddressForInfoTab += (SearchSec.mInfo.PostalCode != "") ? SearchSec.mInfo.PostalCode : "";
 
                                 $timeout(function () {
                                     SearchSec.mInfo = data[0];
@@ -518,6 +527,7 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
             $http({ method: 'post', url: GURL + 'ewSearchByKeywords', data: SearchSec.Criteria }).success(function (data) {
                if (data != 'null' && data.length>0) {
 
+                    console.log(data);
                     $scope.SearchResultCount = data.length;
 
                     var _item = data[0];
@@ -533,6 +543,7 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
                     }
                     else
                     {
+
                         $http({ method: 'get', url: GURL + 'ewtGetSearchInformation?Token=' + $rootScope._userInfo.Token + '&TID=' + _item.TID }).success(function (data) {
 
                             if (data != 'null') {
@@ -548,6 +559,23 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
                                 }
                                 $timeout(function () {
                                     SearchSec.mInfo = data[0];
+
+                                    if(SearchSec.mInfo.ParkingStatus==1)
+                                    {
+                                        SearchSec.parkingTitle = "Parking";
+                                    }
+                                    if(SearchSec.mInfo.ParkingStatus==2)
+                                    {
+                                        SearchSec.parkingTitle = "Road Parking";
+                                    }
+                                    if(SearchSec.mInfo.ParkingStatus==3)
+                                    {
+                                        SearchSec.parkingTitle = "Vallet Parking";
+                                    }
+                                    if(SearchSec.mInfo.ParkingStatus==4)
+                                    {
+                                        SearchSec.parkingTitle = "No Parking";
+                                    }
 
                                     if (!/^(f|ht)tps?:\/\//i.test(data[0].Website)) {
                                         // url = "http://" + data[0].Website;
@@ -696,14 +724,14 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
         AutoRefresh = false;
     });
 
-    /* //call for previous banner
+    //call for previous banner
      SearchSec.getPreviousBanner = function () {
-     currentBanner = currentBanner - 1;
-     if(currentBanner >= 1)
-     {
-     getBanner(currentBanner);
-     RefreshTime = Miliseconds;
-     }
+         currentBanner = currentBanner - 1;
+         if(currentBanner >= 1)
+         {
+             getBanner(currentBanner);
+             RefreshTime = Miliseconds;
+         }
      };
 
      //call for next banner
@@ -714,16 +742,18 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
      getBanner(currentBanner);
      RefreshTime = Miliseconds;
      }
-     };*/
+     };
 
     function getBanner(_requestedBannerValue){
         if(SearchSec.mInfo.EZEID)
         {
             $http({ method: 'get', url: GURL + 'ewtGetBannerPicture?Token=' + $rootScope._userInfo.Token +'&SeqNo='+_requestedBannerValue+'&Ezeid='+SearchSec.mInfo.EZEID+'&StateTitle='+ SearchSec.mInfo.StateTitle+'&LocID='+SearchSec.mInfo.LocID}).success(function (data) {
 
+                console.log(data);
+
                 if (data.Picture != 'null') {
                     SearchSec.mInfo.BannerImage = data.Picture;
-                    /* if(currentBanner >= SearchSec.mInfo.Banners)
+                     if(currentBanner >= SearchSec.mInfo.Banners)
                      {
                      //Disable next button
                      SearchSec.nextButton = false;
@@ -742,7 +772,7 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
                      else
                      {   //Enable previous burron
                      SearchSec.previousButton = true;
-                     }*/
+                     }
                 }
                 else
                 {

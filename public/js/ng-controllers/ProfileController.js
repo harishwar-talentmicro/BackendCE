@@ -332,7 +332,6 @@ angular.module('ezeidApp').controller('ProfileController', ['$rootScope', '$scop
         $scope.isShowCamera = false;
     };
 
-
     if($rootScope._userInfo.IsAuthenticate){
         $scope.heading = 'Update Profile';
         showCurrentLocation = false;

@@ -180,9 +180,25 @@
                                </div>
 
                                 <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 searchHeaderAlignment headerVerified">
-                                    <div class="row verifiedImgContainer">
-                                       <img ng-show="(search.mInfo.EZEIDVerifiedID == 2)" src="images/verified_32.png" />
-                                        <img ng-hide="(search.mInfo.EZEIDVerifiedID == 2)" src="images/not-verified_32.png" />
+                                    <div class="row verifiedImgContainer searchButtonMarginSet">
+                                        <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8">
+                                            <div class="col-lg-1" style="">
+                                                <img ng-show="search.previousButton == true" ng-click="search.getPreviousBanner()" src="images/arrow_left.png" />
+                                                <img ng-show="search.previousButton == false" src="images/arrow_left_gray.png" />
+                                            </div>
+
+                                            <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3" style="">
+                                            </div>
+
+                                            <div class="col-lg-1" style="">
+                                                <img ng-show="search.nextButton == true" ng-click="search.getNextBanner()" src="images/arrow_right.png" />
+                                                <img ng-show="search.nextButton == false" src="images/arrow_right_grey.png" />
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
+                                            <img ng-show="(search.mInfo.EZEIDVerifiedID == 2)" src="images/verified_32.png" />
+                                            <img ng-hide="(search.mInfo.EZEIDVerifiedID == 2)" src="images/not-verified_32.png" />
+                                        </div>
                                     </div>
                                     <div class="row verifiedImgContainer">
                                         <div class="starRating">
@@ -282,7 +298,8 @@
                                                 </div>
 
                                                 <div class="row centerAlign searchButtonMarginSet">
-                                                    {{search.mInfo.AddressLine1 +', '+search.mInfo.AddressLine2 +', '+search.mInfo.CityTitle +', '+search.mInfo.CountryTitle +', '+search.mInfo.PostalCode}}
+                                                    <!--{{search.mInfo.AddressLine1 +', '+search.mInfo.AddressLine2 +', '+search.mInfo.CityTitle +', '+search.mInfo.CountryTitle +', '+search.mInfo.PostalCode}}-->
+                                                   {{ AddressForInfoTab }}
                                                 </div>
                                                 <hr/>
                                                 <div class="row centerAlign searchButtonMarginSet">
@@ -291,6 +308,7 @@
                                                     </div>
                                                     <div class="row centerAlign searchButtonMarginSet">
                                                         <a href="mailto:{{search.mInfo.EMailID}}" target="_blank">{{search.mInfo.EMailID +' '}}</a>  <span ng-show="search.mInfo.Website"> | <a target="_blank" href="http://{{search.mInfo.Website}}">{{' '+search.mInfo.Website}}</a> </span>
+                                                        <!--<a href="mailto:{{search.mInfo.EMailID}}" target="_blank">{{search.mInfo.EMailID +' '}}</a>  <span ng-show="search.mInfo.Website"> | <a target="_blank" ng-href="//{{search.mInfo.Website}}">{{' '+search.mInfo.Website}}</a> </span>-->
                                                     </div>
                                                 </div>
                                             </div>
@@ -438,14 +456,11 @@
                                         </div>
                                         <div  class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer parking" style="padding-left: 30px;" ng-hide="search.isIndividualUser(1)">
                                             <div class="parkingAlignment" ng-hide="search.mInfo.ParkingStatus==4">
-                                                <img src="../images/parking_new.png" >
+                                                <img title="{{search.parkingTitle}}" src="../images/parking_new.png" >
                                             </div>
                                             <div class="parkingAlignment" ng-show="search.mInfo.ParkingStatus==4">
-                                                <img src="../images/new_no_parking.png" >
+                                                <img title="{{search.parkingTitle}}" src="../images/new_no_parking.png" >
                                             </div>
-
-
-
 
                                             <!--<a class="car-parking active" ng-show="search.mInfo.ParkingStatus==1" title="Parking">Parking</a>
                                             <a class="no-parking active" ng-show="search.mInfo.ParkingStatus==4" title="No Parking">No Parking</a>

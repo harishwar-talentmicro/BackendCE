@@ -301,7 +301,7 @@ body {
 .headerVerified
 {
     text-align: center;
-    background: #09a2de;
+    background: #ffffff;
     height: 75px;
 }
 .parkingText
@@ -572,4 +572,19 @@ body {
 {
     font-size: 14px;
     margin-top: 3%;
+}
+.templateBoxContainer
+{
+    width: 95%;
+    margin-left: 2.5%;
+}
+.addTemplateBtnContainer
+{
+    padding-left: 14px;
+    margin-top: 1%;
+    margin-bottom: 1%;
+}
+.TextAreaTopMargin
+{
+    margin-top: 10%;
 }

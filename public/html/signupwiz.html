@@ -235,7 +235,8 @@ table#t01 th	{
                                         <div class="row mar_editTop">
                                             <div class="col-lg-6">
                                                     <input type="text" ng-show=" profile._info.IDTypeID == 2" class="form-control emptyBox" name="CompName" ng-class="profile._info.IDTypeID == 2 && UserForm.CompName.$touched && !profile._info.CompanyName.length ? 'mandatoryTextBox' : ''" maxlength="100"  ng-model="profile._info.CompanyName" placeholder="Company Name" style="width: 48%">
-                                                    <input type="text" ng-hide=" profile._info.IDTypeID == 2" class="form-control" maxlength="100" ng-model="profile._info.CompanyName" placeholder="Company Name" style="width: 48%">
+                                                    <input type="text" ng-hide=" profile._info.IDTypeID == 2 || profile._info.IDTypeID == 3" class="form-control" maxlength="100" ng-model="profile._info.CompanyName" placeholder="Company Name" style="width: 48%">
+                                                    <input type="text" ng-show=" profile._info.IDTypeID == 3" class="form-control" maxlength="100" ng-model="profile._info.PlaceName" placeholder="Place Name" style="width: 48%">
                                                     <input type="text" ng-show=" profile._info.IDTypeID == 1" class="form-control" maxlength="100" ng-model="profile._info.JobTitle" placeholder="Job Title"  style="width: 48%">
                                                     <input type="text" ng-show=" profile._info.IDTypeID == 2" class="form-control" maxlength="100" ng-model="profile._info.JobTitle" placeholder="About Company"  style="width: 48%">
                                                     <input type="text" ng-show=" profile._info.IDTypeID == 3" class="form-control" maxlength="100" ng-model="profile._info.JobTitle" placeholder="About Public Place"  style="width: 48%">
@@ -262,7 +263,7 @@ table#t01 th	{
                                             </div>
                                            <br/>
 
-                                             <button style="margin-top: 3%;" type="button" ng-hide="_userInfo.IsAuthenticate" ng-disabled="!profile._info.Terms"
+                                             <button style="margin-top: 3%;" type="submit" ng-hide="_userInfo.IsAuthenticate" ng-disabled="!profile._info.Terms"
                                                         ng-click="profile.saveBasicRegistration(UserForm)" class="btn btn-primary">Generate EZEID</button><br/><p></p><br/>
                                         </div>
                                      </div>

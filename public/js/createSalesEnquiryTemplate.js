@@ -1,7 +1,7 @@
 
-angular.module('ezeidApp').controller('bulksalesController', function($http, $rootScope, $scope, Notification, GURL){
+angular.module('ezeidApp').controller('createTemplateController', function($http, $rootScope, $scope, Notification, GURL){
 
-    var salesEnquiry = this;
+    var mailTemplate = this;
    if ($rootScope._userInfo) {
     }
     else {
@@ -37,27 +37,16 @@ angular.module('ezeidApp').controller('bulksalesController', function($http, $ro
         }
     }
 
-    salesEnquiry.addNewTemplateForm = function () {
-        window.location.href = "#/create-template";
-        /*SearchSec.showCVSendButton = "";
-        if ($rootScope._userInfo.IsAuthenticate == true)
-        {
-            $http({ method: 'post', url: GURL + 'ewtCheckCV', data: { Token: $rootScope._userInfo.Token } }).success(function (data) {
-                if (data.IsSuccessfull)
-                {
-                    SearchSec.sendCV();
-                }
-                else
-                {
-                    $('#CV_popup').slideUp();
-                    Notification.error({ message: 'Sorry..! CV is not uploaded... ', delay: MsgDelay });
-                }
-            });
-        }
-        else {
-            //Redirect to Login page
-            $('#SignIn_popup').slideDown();
-        }*/
+    $scope.showAddTemplateFrom = false;
+
+    //Open Add New Mail Template Form
+    mailTemplate.addNewMailTemplateForm = function () {
+        $scope.showAddTemplateFrom = true;
+    };
+
+    //Close Add New Mail Template Form
+    mailTemplate.closeNewMailTemplateForm = function () {
+        $scope.showAddTemplateFrom = false;
     };
 
 });
