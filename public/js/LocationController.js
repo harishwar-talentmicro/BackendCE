@@ -101,15 +101,15 @@ angular.module('ezeidApp').controller('LocationsController',['$rootScope', '$sco
 
         Webcam.set({
 				// live preview size
-                width: ($rootScope._userInfo.UserType == 1) ? 77 : 280,
+                width: ($rootScope._userInfo.UserType == 1) ? 77 : 308,
                 height: 90,
 
                 // device capture size
-                dest_width: ($rootScope._userInfo.UserType == 1) ? 77 : 280,
+                dest_width: ($rootScope._userInfo.UserType == 1) ? 77 : 308,
                 dest_height: 90,
 
                 // final cropped size
-                crop_width: ($rootScope._userInfo.UserType == 1) ? 77 : 280,
+                crop_width: ($rootScope._userInfo.UserType == 1) ? 77 : 308,
                 crop_height: 90,
 				
 				// format and quality
@@ -802,7 +802,7 @@ angular.module('ezeidApp').controller('LocationsController',['$rootScope', '$sco
         SLocCtrl._locInfo.PictureFileName =  fileName;
 
         var imageHeight = 90;
-        var imageWidth = 280;
+        var imageWidth = 308;
         if(userType == 1){
             imageWidth = 77;
         }
