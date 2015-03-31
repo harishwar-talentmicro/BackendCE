@@ -7,7 +7,7 @@
                 </tr>
                 <tr>
                     <td style="text-align: left; padding: 10px; font-size: 18px; background: #EEEEEE; color: #F00;">
-                        <strong>Congratulations, your registration is successful.</strong>
+                        <strong>Congratulations..., your registration is successful.</strong>
                     </td>
                 </tr>
                 <tr>
@@ -23,22 +23,55 @@
                                     <br>
                                     <br>
                                 </td>
+
                             </tr>
                             <tr>
-                                <td>1. To send EZEID  to any of your contact information and primary location , please forward the URL <strong style="text-decoration: underline; color: #156685">www.ezeid.com?ID=[EZEID].PIN</strong><br>
+                                <td>EZE ID is a highly credible portal and hence request you to update all the sections of the profile complete with correct information. Information updated here will reflect your reputation when you share the data.<br />
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td>
+                                    <strong>Following are the sections of information we suggest you to update:
+                                    <br />
+                                        ----------------------------------------------------------------------------------------</strong></strong><br />
+                                    <ol type="1">
+                                        <li>Your correct Full Name (First Name and Middle & Name) and protect your primary information by a PIN Code.</li>
+                                        <li>Map Location precisely pointing to Location of your door step.</li>
+                                        <li>Address, Contact Information and your Picture.</li>
+                                        <li>Create Locations if you have multiple homes or alternate locations like week end home, farm house, guest home etc..</li>
+                                        <li>Attach your latest CV/Resume if you are a Jobseeker and protect it with a PIN Code.</li>
+                                        <li>Upload your ID Proof, Drivers License, Passport Copy and other document you commonly share with others into Tags called D1 and D2. Protect all these documents by a common PIN Code.</li>
+                                    </ol>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>How to share your information:<br />
+                                    ---------------------------------------<br />
+                                    EZE ID is your lifetime short code to share any information. You can quote your EZE ID and PIN if you are sharing information to a person over Telephone, otherwise you can send the Web Link of your EZE ID(Example: <strong style="text-decoration: underline; color: #156685">www.ezeid.com?ID=JOHN.347</strong> if your EZE ID is JOHN and PIN is 347 for the primary information like Name, Address, Contact Numbers & Location). If you want to share any other information, you need to send the respective tag name before the PIN Code as per the following example.<br>
                                     <br>
-                                    2. To send address of your additional location, then please use the following URLs:<br>
-                                    <strong style="text-decoration: underline; color: #156685">www.ezeid.com?ID=[EZEID].L1.PIN</strong> &#45; To share your fist non-primary location<br>
-                                    <strong style="text-decoration: underline; color: #156685">www.ezeid.com?ID=[EZEID].L2.PIN</strong> &#45; To share your second non-primary location<br>
+                                    To Share CV, send the information in the format of EZEID.CV.PIN (Example: JOHN.CV.312 where 312 is the PIN you have set for CV).<br />
+                                    <br />
+
+                                    Following are the Tags supported for your profile:<br />
+                                    --------------------------------------------------------------<br />
+                                    .L1, .L2, .L3 …  - Address of your Alternate Locations<br>
+                                    .CV  - Provides Access to your CV Document<br>
+                                    .ID - Provides Access to your ID Card Document & ID Number<br>
+                                    .PP  -Provides Access to your Passport(PP) Document & Passport Number<br>
+                                    .DL - Provides Access to your Driver’s License(DL) Document & DL Number<br>
                                     <br>
-                                    3. Use the following URLs to share the respective documents,<br>
-                                    <strong style="text-decoration: underline; color: #156685">www.ezeid.com?ID=[EZEID].CV.PIN</strong> &#45; To share your CV<br>
-                                    <strong style="text-decoration: underline; color: #156685">www.ezeid.com?ID=[EZEID].ID.PIN</strong> &#45; To send the copy of your ID Document<br>
-                                    <strong style="text-decoration: underline; color: #156685">www.ezeid.com?ID=[EZEID].DL.PIN</strong> &#45; To send the copy of your Driver&#39;s License Document<br>
-                                    <strong style="text-decoration: underline; color: #156685">www.ezeid.com?ID=[EZEID].PP.PIN</strong> &#45; To send the copy of your Passport Document<br>
+                                    Note: If you have not set PIN Code then leave the PIN Code section while sharing the document (Example: JOHN.CV is sufficient to share the CV of JOHN in case PIN is not set. To share CV through e-mail, send the link in the format, <strong style="text-decoration: underline; color: #156685">www.ezeid.com?ID=JOHN.CV</strong>).<br />
                                     <br>
-                                    or your can just share your EZEID so that the user can access it directly from the web site <strong style="text-decoration: underline; color: #156685">http://www.ezeid.com</strong>
+                                    Enjoy using EZE ID to simplify your life, make it more accurate and say goodbye to Address, Landmark etc. and save your precious time.
+                                    <br />
                                     <br>
+                                    Other Uses:<br />
+                                    --------------<br />
+                                    Locate a Business in your neighbourhood by typing respective keywords of products or services you are looking and perform all business activities like Sending Sales Enquiries, Making a Reservation, Request Home Delivery or contact Helpdesk of a Business Entity if you are their customer.<br />
+                                    <br>
+                                    You can locate any Business by typing its Skill keywords to locate Employers for specific Skill keywords and submit your CV to those matching Employers. This is to ensure you present your CV to only potential employers who have mapped the skills and looking for Jobseekers.<br />
+
                                     <br>
                                     Wishing you all the best,
 

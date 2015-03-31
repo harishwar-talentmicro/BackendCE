@@ -1,34 +1,53 @@
-# Merge Descriptors [![Build Status](https://travis-ci.org/component/merge-descriptors.png)](https://travis-ci.org/component/merge-descriptors)
+# packaged angular-animate
 
-Merge objects using descriptors.
+This repo is for distribution on `npm` and `bower`. The source for this module is in the
+[main AngularJS repo](https://github.com/angular/angular.js/tree/master/src/ngAnimate).
+Please file issues and pull requests against that repo.
 
-```js
-var thing = {
-  get name() {
-    return 'jon'
-  }
-}
+## Install
 
-var animal = {
+You can install this package either with `npm` or with `bower`.
 
-}
+### npm
 
-merge(animal, thing)
-
-animal.name === 'jon'
+```shell
+npm install angular-animate
 ```
 
-## API
+Then add `ngAnimate` as a dependency for your app:
 
-### merge(destination, source)
+```javascript
+angular.module('myApp', [require('angular-animate')]);
+```
 
-Overwrites `destination`'s descriptors with `source`'s.
+### bower
+
+```shell
+bower install angular-animate
+```
+
+Then add a `<script>` to your `index.html`:
+
+```html
+<script src="/bower_components/angular-animate/angular-animate.js"></script>
+```
+
+Then add `ngAnimate` as a dependency for your app:
+
+```javascript
+angular.module('myApp', ['ngAnimate']);
+```
+
+## Documentation
+
+Documentation is available on the
+[AngularJS docs site](http://docs.angularjs.org/api/ngAnimate).
 
 ## License
 
-The MIT License (MIT)
+The MIT License
 
-Copyright (c) 2013 Jonathan Ong me@jongleberry.com
+Copyright (c) 2010-2015 Google, Inc. http://angularjs.org
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

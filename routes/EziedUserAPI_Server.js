@@ -1780,12 +1780,22 @@ exports.FnRegistration = function (req, res) {
                                 RtnMessage.Token = TokenNo;
                                 RtnMessage.Type = IDTypeID;
                                 RtnMessage.Icon = Icon;
+                                if (CompanyName == null)
+                                    CompanyName='';
                                 if (Operation == 'I') {
                                     console.log('FnRegistration:tmaster: Registration success');
                                     //res.send(RtnMessage);
                                     if (EMailID != '' && EMailID != null) {
+                                        var Templatefilename = null;
+                                        if(IDTypeID == 1)
+                                            Templatefilename="RegTemplate.txt";
+                                        else if(IDTypeID == 2)
+                                            Templatefilename = "RegBussinessTemplate.txt";
+                                        else
+                                        Templatefilename = "RegPublicTemplate.txt";
+
                                         var fs = require('fs');
-                                        fs.readFile("RegTemplate.txt", "utf8", function (err, data) {
+                                        fs.readFile(Templatefilename, "utf8", function (err, data) {
                                             if (err) throw err;
                                             data = data.replace("[Firstname]", FirstName);
                                             data = data.replace("[Lastname]", LastName);
@@ -1797,6 +1807,7 @@ exports.FnRegistration = function (req, res) {
                                             data = data.replace("[EZEID]", EZEID); //ID
                                             data = data.replace("[EZEID]", EZEID); //DL
                                             data = data.replace("[EZEID]", EZEID); //PP
+                                            data = data.replace("[CompanyName]",CompanyName);
 
                                             if(PIN == null){
                                                 data = data.replace(".PIN","");
