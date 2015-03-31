@@ -1664,3 +1664,36 @@ input[type="text"].ui-grid-filter-input {
     background-image: url('../images/background.jpg');
 }
 
+/*************** sign-up.html css********************/
+#table-business-features > thead > tr.bg-info{
+    background: #149bdf;
+    color:#ffffff;
+}
+
+#table-business-features > tbody > tr.bg-success{
+    background: #00A000;
+    color:#ffffff;
+}
+#table-business-features > tbody > tr.bg-success > td{
+    padding: 7px;
+}
+
+#table-business-features > tbody > tr.bg-info > td{
+    color:#ffffff;
+}
+
+#table-business-features > thead > tr > th{
+    vertical-align: middle;
+    padding: 5px;
+}
+#table-business-features > tbody > tr > td,
+#table-business-features > thead > tr > td{
+    padding: 5px;
+    line-height: 1;
+    vertical-align: middle;
+}
+
+#table-business-features > thead > tr > th.text-center,
+#table-business-features > tbody > tr > td.text-center{
+    text-align: center;
+}
