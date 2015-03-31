@@ -61,6 +61,7 @@
     <script type="text/javascript" src="js/lodash.min.js"></script>
     <script src="js/angularjs-dropdown-multiselect.js"></script>
     <script src="js/angular-touch/angular-touch.min.js"></script>
+    <script src="js/angular-animate/angular-animate.min.js"></script>
 
     <!-- UI Grid JS --->
     <script src="js/ui-grid/csv.js"></script>
@@ -108,15 +109,13 @@
     <script src="js/bulksalesenquiry.js"></script>
     <script src="js/ng-services/ScaleAndCropImage.js"></script>
     <script src="js/ng-controllers/profile/SignUpCtrl.js"></script>
-
-    <script type="text/javascript" src="//maps.google.com/maps/api/js?v=3.exp&sensor=false&libraries=places,geometry"></script>
-    <script src="js/label.js"></script>
+    <script src="js/ng-pattern-restrict/ng-pattern-restrict.js"></script>
+    <script type='text/javascript' src='//maps.google.com/maps/api/js?v=3.exp&sensor=false&libraries=places,geometry'></script>
     <script>
         // Lazy Loading fonts from Google Font API
-        $(document).ready(function(){
-            $("<link href='http://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'/>").appendTo("head");
+            $("<link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'/>").appendTo("head");
             $("<style>  *{ font-family: 'Roboto', sans-serif; }</style>").appendTo("head");
-        });
+            $("<script src='js/label.js'><\/script>").appendTo("body");
     </script>
 </body>
 </html>

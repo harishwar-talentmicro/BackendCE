@@ -6,6 +6,14 @@
 
 angular.module('ezeidApp').controller('SignUpCtrl', ['$rootScope', '$scope', '$http', '$q', '$timeout', 'Notification', '$filter', '$window','GURL','$interval','ScaleAndCropImage',function ($rootScope, $scope, $http, $q, $timeout, Notification, $filter, $window,GURL,$interval,ScaleAndCropImage) {
 
+    $("#datetimepicker1").datetimepicker({
+        format: 'd-M-Y',
+        timepicker : false,
+        mask: true,
+        hours12: false,
+        maxDate: 0,
+        maxDate : '+1970/01/02'
+    });
     /**
      * Visibility setting for feature list type block
      * (show list of features available based on signup type, it will be visible firstly by default when user in not signed in)
@@ -26,8 +34,64 @@ angular.module('ezeidApp').controller('SignUpCtrl', ['$rootScope', '$scope', '$h
      * (this block is visibile while user is claiming his ezeid and all other blocks will be hidden)
      * @type {boolean}
      */
-    $scope.isEzeidSaveBlockVisible = false;
+    $scope.isEzeidAvailabilityChecked = false;
 
+    /**
+     * EZEID is available to be blocked on not
+     * @type {boolean}
+     */
+    $scope.isEzeidAvailable = false;
+
+    /**
+     * CompanyName will be visible for both Business and Individual as 'CompanyName' Only
+     * But in case of public user it will considered as 'Name of Public Place'
+     * @type {string}
+     */
+    $scope.companyName = "";
+
+    /**
+     * About
+     * @desc
+     * In case of Business User, about will be considered as 'About Company'
+     * In case of Individual User, about will be considered as 'Job Title'
+     * In case of Public Place, about will be considered as 'About Public Place'
+     * @type {string}
+     */
+    $scope.about = "";
+
+    /**
+     * Master Email for this EZEID
+     * @type {string}
+     */
+    $scope.email = "";
+
+    /**
+     * EZEID PIN For user
+     * @type {string}
+     */
+
+    $scope.pin = "";
+
+
+    /**
+     * User has selected the PIN Checkbox to create a pin
+     * @type {boolean}
+     */
+    $scope.isPinApplicable = false;
+
+
+    /**
+     * Date of Birth for Individual
+     * @type {string}
+     */
+    $scope.dateOfBirth = '';
+
+
+    /**
+     * Terms and Conditions Accepted or not
+     * @type {boolean}
+     */
+    $scope.termsAccepted = false;
 
     /**
      * Feature list for feature list type block
@@ -81,5 +145,51 @@ angular.module('ezeidApp').controller('SignUpCtrl', ['$rootScope', '$scope', '$h
 
     };
 
+
+    /**
+     * Status of Terms and Condition box, open : true, close : false
+     * @type {boolean}
+     */
+    $scope.isTermsBoxOpen = false;
+    /**
+     * Terms and Condition Popup Box to be Opened From here
+     */
+    $scope.toggleTermsAndConditions = function(){
+        if($scope.isTermsBoxOpen){
+            $scope.isTermsBoxOpen = false;
+            $('#Terms_popup').slideUp();
+        }
+        else{
+            $scope.isTermsBoxOpen = true;
+            $('#Terms_popup').css({'position':'fixed'});
+            $('#Terms_popup > div').css({'margin-top':'0%'});
+            $('#Terms_popup').slideDown();
+        }
+
+    };
+
+    /**
+     * Reset the form to default values
+     */
+    $scope.resetForm = function(){
+        $scope.userType = 1;
+        $scope.planSelectionType = 0;
+        $scope.email = "";
+        $scope.ezeid = "";
+        $scope.dob = "";
+        $scope.companyName = "";
+        $scope.about = "";
+        $scope.signUpForm.$setPristine();
+    };
+
+
+
+    /**
+     * Go back to select Plan once again
+     */
+    $scope.goBack = function(){
+        $scope.isSignUpTypeBlockVisible = true;
+        $scope.isEzeidCheckBlockVisible = false;
+    }
 
 }]);
