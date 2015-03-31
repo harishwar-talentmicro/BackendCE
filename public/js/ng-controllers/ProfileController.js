@@ -3,6 +3,7 @@ angular.module('ezeidApp').controller('ProfileController', ['$rootScope', '$scop
     $scope.showForm = true;
     $scope.showProgress = false;
     $scope.showError = false;
+    $scope.isRegisterFirstTime = false;
 
     var profile = this;
     profile._info = {};
@@ -140,7 +141,8 @@ angular.module('ezeidApp').controller('ProfileController', ['$rootScope', '$scop
                 var image = new Image();
                 image.src = data_uri;
                 image.height = 90;
-                image.width = 279;
+//                image.width = 279;
+                image.width = 308;
                 var ctx = canvas.getContext("2d");
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 canvas.width = image.width;
@@ -235,9 +237,6 @@ angular.module('ezeidApp').controller('ProfileController', ['$rootScope', '$scop
             $scope.showProgress = true;
             $scope.showError = false;
 
-
-
-
             var promise = GetUserDetails();
 
             promise.then(function(promiseStatus){
@@ -272,8 +271,6 @@ angular.module('ezeidApp').controller('ProfileController', ['$rootScope', '$scop
      */
     $scope.$on('$locationChangeStart',function(event,next,current){
 
-        console.log($rootScope._userInfo.isFirstTime);
-
         if(!$rootScope._userInfo.isFirstTime)
         {
             if (!$scope.UserForm.$dirty) return;
@@ -293,28 +290,26 @@ angular.module('ezeidApp').controller('ProfileController', ['$rootScope', '$scop
         {
             $rootScope._userInfo.isFirstTime = false;
         }
-
-
     });
 
 
     /***************************** Camera Code ***************************************/
     $scope.isShowCamera = false;
-    console.log($rootScope._userInfo);
     Webcam.set({
         // live preview size
         /*width: 250,*/
 
-        width: ($rootScope._userInfo.UserType == 1) ? 77 : 280,
+//        width: ($rootScope._userInfo.UserType == 1) ? 77 : 280,
+        width: ($rootScope._userInfo.UserType == 1) ? 77 : 308,
         height: 90,
 
         // device capture size
         /*dest_width: 250,*/
-        dest_width: ($rootScope._userInfo.UserType == 1) ? 77 : 280,
+        dest_width: ($rootScope._userInfo.UserType == 1) ? 77 : 308,
         dest_height: 90,
 
         // final cropped size
-        crop_width: ($rootScope._userInfo.UserType == 1) ? 77 : 280,
+        crop_width: ($rootScope._userInfo.UserType == 1) ? 77 : 308,
         crop_height: 90,
 
 
@@ -935,6 +930,10 @@ angular.module('ezeidApp').controller('ProfileController', ['$rootScope', '$scop
         {
             errorList.push('Password Mismatch');
         }
+        if(profile._info.isWrongEmailPattern)
+        {
+            errorList.push('Not valid email!');
+        }
         if(profile._info.IDTypeID  == '2')
         {
             if(!profile._info.CompanyName)
@@ -1017,6 +1016,8 @@ angular.module('ezeidApp').controller('ProfileController', ['$rootScope', '$scop
                             }
                             $rootScope._userInfo.userName = userName ;
                             $rootScope._userInfo.isFirstTime = true;
+                            $rootScope._userInfo.showCongratulation = true;
+                            $scope.isRegisterFirstTime = true;
 
                             if (typeof (Storage) !== "undefined") {
                                 var encrypted = CryptoJS.AES.encrypt(JSON.stringify(data), "EZEID");
@@ -1036,10 +1037,11 @@ angular.module('ezeidApp').controller('ProfileController', ['$rootScope', '$scop
                             document.getElementById("mobile_phone").className = "form-control emptyBox";
 
                             getISDCode(profile._info.CountryID);
-                            if (sTokenString == "")
+
+                            if (sTokenString== "")
                             {
-                                $scope.isCloseButtonClicked = true;
-                                window.location.href = "#/congratulations";
+                               // $scope.isCloseButtonClicked = true;
+                               //   window.location.href = "#/congratulations";
                             }
                             else
                             {
@@ -1084,7 +1086,6 @@ angular.module('ezeidApp').controller('ProfileController', ['$rootScope', '$scop
                 profile._info.Gender = (profile._info.Gender == undefined || profile._info.Gender == null )? 2 : profile._info.Gender ;
                 // profile._info.Picture = $rootScope.BigImage;
 
-                console.log(profile._info.Picture);
 
                 if(profile._info.IDTypeID == 1)
                 {
@@ -1141,7 +1142,9 @@ angular.module('ezeidApp').controller('ProfileController', ['$rootScope', '$scop
                             document.getElementById("mobile_phone").className = "form-control emptyBox";
 
                             getISDCode(profile._info.CountryID);
-                            if (sTokenString == "")
+
+                           /* if (sTokenString == "")*/
+                            if ($scope.isRegisterFirstTime == true)
                             {
                                 $scope.isCloseButtonClicked = true;
                                 window.location.href = "#/congratulations";
@@ -1193,7 +1196,7 @@ angular.module('ezeidApp').controller('ProfileController', ['$rootScope', '$scop
         profile._info.PictureFileName =  fileName;
 
         var imageHeight = 90;
-        var imageWidth = 280;
+        var imageWidth = 308;
         if(userType == 1){
             imageWidth = 77;
         }

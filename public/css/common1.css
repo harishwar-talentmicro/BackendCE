@@ -568,3 +568,8 @@ body {
     min-height: 40px;
     height: auto;
 }
+.imgSizeText
+{
+    font-size: 14px;
+    margin-top: 3%;
+}

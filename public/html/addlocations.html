@@ -97,7 +97,7 @@
                                                         <img id="mapClocl" style="padding-top:8px;cursor:pointer;" ng-click="SLocCtrl.getMyLocation()" src="images/myloc.png" />
                                                         <input id="txtSearch1" class="form-control pull-left marL5px" type="text" placeholder="Search Location" autocomplete="off" style="z-index: 1; top: 0px; margin-top: 3px; width: 400px; position: absolute; left: 36px;" >
                                                     </div>
-                                                    <div id="map-canvasl" style="width: 100%; height: 140px; position: relative; overflow: hidden; transform: translateZ(0px); background-color: rgb(229, 227, 223);">
+                                                    <div id="map-canvasl" style="width: 100%; height: 300px; position: relative; overflow: hidden; transform: translateZ(0px); background-color: rgb(229, 227, 223);">
                                                     </div>
                                                         <span ng-hide="true">
                                                             <input type="text" name="LatLong" class="form-control" ng-model="SLocCtrl._locInfo.Latitude" required />
@@ -155,11 +155,7 @@
                                                         <span ng-show="SecLocForm.email.$error.email" ng-if="SecLocForm.email.$error.email == true ? SLocCtrl._locInfo.isWrongEmailPattern = true : SLocCtrl._locInfo.isWrongEmailPattern = false"></span>
                                                         <input type="text" name="website" ng-model="SLocCtrl._locInfo.Website" class="form-control" placeholder="WebSite"  style="width: 48%">
                                                     </div><br/>
-                                                    <div class="row mar_editTop" style="margin-left:0px;margin-right:0px;" ng-show="_userInfo.Type==1">
-                                                        <span><label><strong>&nbsp;Other Information</strong> </label></span><br/>
-                                                        <input type="text" id="target" class="form-control" ng-model="SLocCtrl._locInfo.LaptopSLNO" placeholder="Laptop Model & SL. No" style="width: 48%">
-                                                        <input type="text" class="form-control" ng-model="SLocCtrl._locInfo.VehicleNumber" placeholder="Car Registration Number"  style="width: 48%">
-                                                    </div><br/>
+
 
                                                  <!-- <div class="mar_editTop" ng-show="_userInfo.Type==2 && _userInfo.EZEIDVerifiedID == 2">-->
                                                     <div ng-show="SLocCtrl.profile._info.EZEIDVerifiedID == 2 && SLocCtrl.profile._info.IDTypeID == 2">
@@ -171,11 +167,19 @@
                                                           </div><br/>
                                                     </div>
                                                 </div>
-                                                <div class="col-lg-6">
-                                                    <div class="col-lg-8" style="margin: auto; float: none;">
+                                                <div class="col-lg-6" style="  text-align: center;">
+                                                    <div class="col-lg-12" style="margin: auto; float: none;">
                                                         <!--<span ng-hide="_locInfo.IsAuthenticate"> <img ng-show="!image" src="images/user_200.png" width="200"/></span>-->
                                                         <div ng-hide="isShowCamera">
-                                                            <span ng-show="!SLocCtrl._locInfo.Picture"> <img ng-show="!image" src="images/user_200.png" width="200"/></span>
+
+                                                            <!--<span ng-show="!SLocCtrl._locInfo.Picture"> <img ng-show="!image" src="images/user_200.png" width="200"/></span>-->
+
+                                                            <div  ng-show="IdUserType == 1">
+                                                                <span ng-show="!SLocCtrl._locInfo.Picture"> <img ng-show="!image" src="images/new_individual.png" /></span>
+                                                            </div>
+                                                            <div ng-hide="IdUserType == 1">
+                                                                <span ng-show="!SLocCtrl._locInfo.Picture"> <img ng-show="!image" src="images/business_profile_pic.png" /></span>
+                                                            </div>
 
                                                             <!--<img ng-show="SLocCtrl._locInfo.Picture" width="200" name="Image" src="{{SLocCtrl._locInfo.Picture}}" required />-->
 
@@ -183,7 +187,7 @@
                                                                 <img id="pic-individual" ng-show="SLocCtrl._locInfo.Picture" width="77" height="90" name="Image" ng-src="{{SLocCtrl._locInfo.Picture}}" required />
                                                             </div>
                                                             <div ng-hide="IdUserType == 1">
-                                                                <img id="pic-business" ng-show="SLocCtrl._locInfo.Picture" width="279" height="90" name="Image" src="{{SLocCtrl._locInfo.Picture}}" required />
+                                                                <img id="pic-business" ng-show="SLocCtrl._locInfo.Picture" width="308" height="90" name="Image" src="{{SLocCtrl._locInfo.Picture}}" required />
                                                             </div>
                                                         </div>
                                                         
