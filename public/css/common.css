@@ -1799,3 +1799,10 @@ input[type="text"].ui-grid-filter-input {
 .top-clearfix-padding{
     padding-top:80px;
 }
+
+.label-mandatory{
+    background: #FAA9A3;
+    color: #9E0000;
+    border-radius: 0px;
+    font-weight: 100;
+}

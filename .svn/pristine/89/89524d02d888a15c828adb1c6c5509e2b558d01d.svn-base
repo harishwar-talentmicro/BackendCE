@@ -1,5 +1,0 @@
-﻿<div ng-controller="LegalController as SLocCtrl">
-<h4>
-    Legal text comes hear...
-</h4>
-</div>

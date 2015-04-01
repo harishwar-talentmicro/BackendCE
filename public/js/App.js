@@ -12,8 +12,7 @@
             'ngTouch',
             'ui.grid', 'ui.grid.expandable', 'ui.grid.selection', 'ui.grid.pinning',
             'ui.grid.edit', 'ui.grid.rowEdit', 'ui.grid.cellNav','ui.grid.pagination','ui.grid.exporter',
-            'ngAnimate',
-            'ngPatternRestrict'
+            'ngAnimate'
         ]);
 
     ezeid.value('GURL',"/");
@@ -23,16 +22,16 @@
      * These routes will be password protected, only authenticated users can access these routes
      */
     ezeid.value('CLOSED_ROUTES',[
-        '/business-manager'
-
+        '/business-manager',
+        '/profile'
     ]);
     ezeid.value('MsgDelay',2000);
     //HTTP Interceptor for detecting token expiry
     //Reloads the whole page in case of Unauthorized response from api
-    ezeid.factory('ezeidInterceptor',['$rootScope','$timeout',function($rootScope,$timeout){
+    ezeid.factory('ezeidInterceptor',['$rootScope','$timeout','$q',function($rootScope,$timeout,$q){
         return {
             responseError : function(respErr){
-                if(respErr.status == 401 && respErr.statusText == 'Unauthorized'){
+                if(respErr.status === 401 && respErr.statusText === 'Unauthorized'){
                     try{
                         localStorage.removeItem("_token");
                     }
@@ -49,9 +48,17 @@
 
                     },3000);
                 }
+
+                if(respErr.status === 0 && respErr.statusText === ''){
+                    respErr.statusText = 'Unable to resolve domain';
+                    respErr.data = 'Check your internet connection';
+                }
+                return( $q.reject( respErr ) );
             }
         };
     }]);
+
+
 
     ezeid.config(['$routeProvider','$httpProvider',function($routeProvider,$httpProvider){
         $routeProvider.when('/index',{templateUrl: 'html/index.html'})
@@ -74,7 +81,14 @@
             .when('/business-manager',{templateUrl : 'html/business-manager/business-manager.html'})
             .when('/bulksalesenquiry',{templateUrl : 'html/bulksalesenquiry.html'})
             .when('/create-template',{templateUrl : 'html/createTemplate.html'})
-            .when('/signup',{templateUrl : 'html/profile/sign-up.html'})
+            .when('/signup',{
+                templateUrl : 'html/profile/sign-up.html',
+                controller : 'SignUpCtrl'
+            })
+            .when('/profile',{
+                templateUrl : 'html/profile/edit-profile.html',
+                controller : 'ProfileCtrl'
+            })
             .otherwise({redirectTo : '/home'});
 
         $httpProvider.interceptors.push("ezeidInterceptor");
@@ -385,7 +399,7 @@
                     // In such cases, when a letter is typed first, this parser will be called
                     // again, and the 2nd time, the value will be undefined
                     if (inputValue == undefined) return '';
-                    var transformedInput = inputValue.replace(/[^0-9A-Za-z]/g, '');
+                    var transformedInput = inputValue.replace(/[^0-9A-Za-z]{3,15}/g, '');
                     if (transformedInput!=inputValue) {
                         modelCtrl.$setViewValue(transformedInput);
                         modelCtrl.$render();
