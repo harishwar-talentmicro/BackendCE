@@ -53,13 +53,12 @@
                     respErr.statusText = 'Unable to resolve domain';
                     respErr.data = 'Check your internet connection';
                 }
-
-                console.log(respErr);
-                return respErr;
-//                return respErr;
+                return( $q.reject( respErr ) );
             }
         };
     }]);
+
+
 
     ezeid.config(['$routeProvider','$httpProvider',function($routeProvider,$httpProvider){
         $routeProvider.when('/index',{templateUrl: 'html/index.html'})
