@@ -22,8 +22,8 @@
      * These routes will be password protected, only authenticated users can access these routes
      */
     ezeid.value('CLOSED_ROUTES',[
-        '/business-manager'
-
+        '/business-manager',
+        '/profile'
     ]);
     ezeid.value('MsgDelay',2000);
     //HTTP Interceptor for detecting token expiry
@@ -81,7 +81,14 @@
             .when('/business-manager',{templateUrl : 'html/business-manager/business-manager.html'})
             .when('/bulksalesenquiry',{templateUrl : 'html/bulksalesenquiry.html'})
             .when('/create-template',{templateUrl : 'html/createTemplate.html'})
-            .when('/signup',{templateUrl : 'html/profile/sign-up.html'})
+            .when('/signup',{
+                templateUrl : 'html/profile/sign-up.html',
+                controller : 'SignUpCtrl'
+            })
+            .when('/profile',{
+                templateUrl : 'html/profile/edit-profile.html',
+                controller : 'ProfileCtrl'
+            })
             .otherwise({redirectTo : '/home'});
 
         $httpProvider.interceptors.push("ezeidInterceptor");

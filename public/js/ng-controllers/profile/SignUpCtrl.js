@@ -227,13 +227,43 @@ angular.module('ezeidApp').controller('SignUpCtrl', ['$rootScope', '$scope', '$h
 
 
     /**
+     * Don not allow ezeid with last two characters as AP(ap)
+     * @desc For area partner puposes
+     * @param ezeid
+     * @returns {boolean}
+     */
+    $scope.doNotAllowEzeidAp = function(ezeid){
+        console.log(ezeid.slice(-2));
+        if(ezeid.length > 3)
+        {
+            var ap = ezeid.slice(-2);
+            if(ap === 'AP' || ap === 'ap'){
+                return false;
+            }
+        }
+        return true;
+    };
+
+    /**
      * Checking EZEID Availability Here
      */
     $scope.checkEzeidAvailability = function(){
 
-        var defer = $q.defer();
-
         $scope.isEzeidCheckInProgress = true;
+
+        var defer = $q.defer();
+        var apCheck = $scope.doNotAllowEzeidAp($scope.ezeid);
+        if(!apCheck){
+            $timeout(function(){
+                $scope.isEzeidAvailabilityChecked = true;
+                $scope.isEzeidAvailable = false;
+                $scope.isEzeidCheckInProgress = false;
+                defer.resolve({IsIdAvailable : false});
+            },2000);
+            return defer.promise;
+        }
+
+
         $http({
             method: 'GET',
             url: GURL + 'ewGetEZEID',
@@ -360,7 +390,7 @@ angular.module('ezeidApp').controller('SignUpCtrl', ['$rootScope', '$scope', '$h
     /**
      * Validates the basic signup data before signing in
      */
-    $scope.validateSignUpData = function(){
+    $scope.validateSignUpData = function(data){
 
     };
 
