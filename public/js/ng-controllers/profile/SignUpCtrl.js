@@ -192,4 +192,21 @@ angular.module('ezeidApp').controller('SignUpCtrl', ['$rootScope', '$scope', '$h
         $scope.isEzeidCheckBlockVisible = false;
     }
 
+
+    $scope.checkEzeidAvailability = function(){
+
+        $http({
+            method: 'GET',
+            url: GURL + 'ewGetEZEID',
+            params : {
+                EZEID : $scope.ezeid
+            }
+        }).success(function (resp) {
+            $scope.isEzeidAvailabilityChecked = true;
+            $scope.isEzeidAvailable = resp.IsIdAvailable;
+        }).error(function(err){
+            console.log(err);
+        });
+    };
+
 }]);

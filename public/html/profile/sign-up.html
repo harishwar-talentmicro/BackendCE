@@ -159,11 +159,13 @@
                                                                     -->
                                                                     <button
                                                                         class="form-control btn btn-primary btn-sm"
-                                                                        ng-disabled="(!signUpForm.ezeid.$modelValue) || signUpForm.ezeid.$modelValue == '' || isEzeidAvailabilityChecked">
+                                                                        ng-disabled="(!signUpForm.ezeid.$modelValue) || signUpForm.ezeid.$modelValue == '' || isEzeidAvailabilityChecked"
+                                                                        ng-click="checkEzeidAvailability()">
                                                                         Check Availability
                                                                     </button>
                                                                 </div>
                                                             </div>
+
                                                             <div class="col-lg-3 col-md-3 col-sm-3 col-xs-4 bottom-clearfix" ng-show="isEzeidAvailabilityChecked">
                                                                 <p class="text-success center-vertical" ng-show="isEzeidAvailable">Available</p>
                                                                 <p class="text-danger center-vertical" ng-show="!isEzeidAvailable">Not Available</p>

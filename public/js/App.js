@@ -12,8 +12,7 @@
             'ngTouch',
             'ui.grid', 'ui.grid.expandable', 'ui.grid.selection', 'ui.grid.pinning',
             'ui.grid.edit', 'ui.grid.rowEdit', 'ui.grid.cellNav','ui.grid.pagination','ui.grid.exporter',
-            'ngAnimate',
-            'ngPatternRestrict'
+            'ngAnimate'
         ]);
 
     ezeid.value('GURL',"/");
@@ -29,10 +28,10 @@
     ezeid.value('MsgDelay',2000);
     //HTTP Interceptor for detecting token expiry
     //Reloads the whole page in case of Unauthorized response from api
-    ezeid.factory('ezeidInterceptor',['$rootScope','$timeout',function($rootScope,$timeout){
+    ezeid.factory('ezeidInterceptor',['$rootScope','$timeout','$q',function($rootScope,$timeout,$q){
         return {
             responseError : function(respErr){
-                if(respErr.status == 401 && respErr.statusText == 'Unauthorized'){
+                if(respErr.status === 401 && respErr.statusText === 'Unauthorized'){
                     try{
                         localStorage.removeItem("_token");
                     }
@@ -49,6 +48,14 @@
 
                     },3000);
                 }
+
+                if(respErr.status === 0 && respErr.statusText === ''){
+                    respErr.statusText = 'Check your internet connection';
+                }
+
+                console.log(respErr);
+                return respErr;
+//                return respErr;
             }
         };
     }]);
