@@ -50,7 +50,8 @@
                 }
 
                 if(respErr.status === 0 && respErr.statusText === ''){
-                    respErr.statusText = 'Check your internet connection';
+                    respErr.statusText = 'Unable to resolve domain';
+                    respErr.data = 'Check your internet connection';
                 }
 
                 console.log(respErr);
