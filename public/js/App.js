@@ -392,7 +392,7 @@
                     // In such cases, when a letter is typed first, this parser will be called
                     // again, and the 2nd time, the value will be undefined
                     if (inputValue == undefined) return '';
-                    var transformedInput = inputValue.replace(/[^0-9A-Za-z]/g, '');
+                    var transformedInput = inputValue.replace(/[^0-9A-Za-z]{3,15}/g, '');
                     if (transformedInput!=inputValue) {
                         modelCtrl.$setViewValue(transformedInput);
                         modelCtrl.$render();
