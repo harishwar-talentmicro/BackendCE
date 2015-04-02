@@ -5,13 +5,11 @@
             'ngRoute',
             'ngFooter',
             'ui-notification',
-            'imageupload',
             'angularjs-dropdown-multiselect',
             'smart-table',
             'ui.grid',
             'ngTouch',
             'ui.grid', 'ui.grid.expandable', 'ui.grid.selection', 'ui.grid.pinning',
-
             'ui.grid.edit', 'ui.grid.rowEdit', 'ui.grid.cellNav','ui.grid.pagination','ui.grid.exporter',
             'ngAnimate'
         ]);
@@ -106,16 +104,9 @@
 
         $rootScope.$on("$routeChangeStart",function(event,next,current){
 
-            /**
-             * @todo Check if user is navigating to Closed Routes( which require authentication)
-             *       then don't let him navigate to those routes without checking his authenticity
-             */
-
-
-//            if(next.params && typeof(next.params.Token) !== "undefined" && typeof(next.params.FunctionType) !== "undefined" && typeof(next.params.PersonEZEID) )
-
             try{
-                if(CLOSED_ROUTES.indexOf(next.$$route.originalPath) == -1){
+                if(CLOSED_ROUTES.indexOf(next.$$route.originalPath) === -1){
+                    // If route is not found in closed routes then allow him to navigate to that route
                     return true;
                 }
             }
@@ -198,216 +189,4 @@
         });
     }]);
     /************************************** Run Configuration ends here ****************************/
-
-    var GURL = '/'; //Not required any more because we have already setup a value in angular for GURL
-    //http://10.0.100.103:8084/';
-
-    var MsgDelay = 2000;
-
-    /**
-     * Number only directive (allows only number for input fields)
-     */
-    ezeid.directive('numbersOnly', function(){
-        return {
-            require: 'ngModel',
-            link: function(scope, element, attrs, modelCtrl) {
-                modelCtrl.$parsers.push(function (inputValue) {
-                    // this next if is necessary for when using ng-required on your input.
-                    // In such cases, when a letter is typed first, this parser will be called
-                    // again, and the 2nd time, the value will be undefined
-                    if (inputValue == undefined) return ''
-                    var transformedInput = inputValue.replace(/[^0-9]/g, '');
-                    if (transformedInput!=inputValue) {
-                        modelCtrl.$setViewValue(transformedInput);
-                        modelCtrl.$render();
-                    }
-
-                    return transformedInput;
-                });
-            }
-        };
-    });
-    /**
-     * Directive to capitalize the input field
-     */
-    ezeid.directive('capitalize', function() {
-        return {
-            require: 'ngModel',
-            link: function(scope, element, attrs, modelCtrl) {
-                var capitalize = function(inputValue) {
-                    if(inputValue == undefined) inputValue = '';
-                    var capitalized = inputValue.toUpperCase();
-                    if(capitalized !== inputValue) {
-                        modelCtrl.$setViewValue(capitalized);
-                        modelCtrl.$render();
-                    }
-                    return capitalized;
-                }
-                modelCtrl.$parsers.push(capitalize);
-                capitalize(scope[attrs.ngModel]);  // capitalize initial value
-            }
-        };
-    });
-    /**
-     * Directive for binding of bootstrap javascript popover and tooltip methods
-     */
-    ezeid.directive('toggle', function(){
-        return {
-            restrict: 'A',
-            link: function(scope, element, attrs){
-                if (attrs.toggle=="tooltip"){
-                    $(element).tooltip({
-                        html : attrs.title
-                    });
-                }
-                if (attrs.toggle=="popover"){
-                    $(element).popover({
-                        html : true,
-                        animation : true
-                    });
-                }
-                if(attrs.toggle == "tab"){
-                    $(element).on('shown.bs.tab', function (e) {
-                        e.target // newly activated tab
-                        e.relatedTarget // previous active tab
-                    })
-                }
-                $(element).on('show.bs.popover',function(){
-                    $('*[data-toggle="popover"]').not(this).popover('hide');
-                });
-            }
-        };
-    });
-
-    /**
-     * Directive for using modal box bootstrap
-     */
-    ezeid.directive('modal', function () {
-        return {
-            template: '<div class="modal fade">' +
-                '<div class="modal-dialog modal-lg">' +
-                '<div class="modal-content">' +
-                '<span class="closelink" data-dismiss="modal" aria-hidden="true">X</span>'+
-                '<div class="modal-header">' +
-//                '<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>' +
-                '<h4 class="modal-title text-center">{{ mtitle }}</h4>' +
-                '</div>' +
-                '<div class="modal-body" ng-transclude></div>' +
-                '</div>' +
-                '</div>' +
-                '</div>',
-            restrict: 'E',
-            transclude: true,
-            replace:true,
-            scope:true,
-            link: function postLink(scope, element, attrs) {
-
-
-
-                scope.mtitle = attrs.mtitle;
-                scope.$watch(attrs.visible, function(value){
-                    if(value == true)
-                        $(element).modal('show');
-                    else
-                        $(element).modal('hide');
-                });
-                scope.$watch(attrs.mtitle,function(value){
-                    scope.mtitle = value;
-                });
-
-                $(element).on('shown.bs.modal', function(){
-                    scope.$apply(function(){
-                        scope.$parent[attrs.visible] = true;
-                    });
-                });
-
-                $(element).on('hidden.bs.modal', function(){
-                    scope.$apply(function(){
-                        scope.$parent[attrs.visible] = false;
-                    });
-                });
-            }
-        };
-    });
-
-    /**
-     * Filter for grouping Business Rules Based upon thier functions(types: Sales, Reservation,HomeDelivery,Service, Resume)
-     * Usage (ruleList | ruleFilter:2)
-     */
-    ezeid.filter('ruleFilter',function(){
-        return function(rules,ruleType){
-            var filteredRules = [];
-            rules.forEach(function(rule,index){
-                for(var prop in rule){
-                    if(rule.hasOwnProperty(prop) && (prop == 'RuleFunction') && (rule.RuleFunction === ruleType)){
-                        filteredRules.push(rule);
-                    }
-                }
-            });
-
-            return filteredRules;
-        };
-    });
-
-    ezeid.directive('dateTimePicker', function() {
-        return {
-            restrict: 'E',
-            replace: true,
-            require : '?ngModel',
-            scope: {
-                recipient: '='
-            },
-            template:
-                '<div class="input-group datetimepicker">'+
-                    '<input type="text" class="form-control" placeholder="Date"  id="datetimepicker1"  name="recipientDateTime" />'+
-                    '<span class="input-group-addon"><span class="glyphicon glyphicon-calendar" >'+
-                    '</span>'+
-                    '</div>',
-            link: function(scope, element, attrs, ngModel) {
-                var input = element.find('input');
-                input.bind('blur change keyup keypress',function(){
-                    scope.recipient = input.val();
-                    scope.$apply();
-                });
-
-                scope.$watch('recipient',function(newVal,oldVal){
-                    $(input[0]).val(newVal);
-                });
-            }
-        }
-    });
-
-
-    /**
-     * Validation directive for EZEID
-     * @desc Constraints
-     * 1. Validates length to be max 15
-     * 2. Validates pattern to be containing numbers and alphabets only
-     */
-    ezeid.directive('ezeidOnly', function(){
-        return {
-            require: 'ngModel',
-            link: function(scope, element, attrs, modelCtrl) {
-                modelCtrl.$parsers.push(function (inputValue) {
-                    if(inputValue.length > 15){
-                        modelCtrl.$setViewValue(modelCtrl.$modelValue);
-                        modelCtrl.$render();
-                        return modelCtrl.$modelValue;
-                    }
-                    // this next if is necessary for when using ng-required on your input.
-                    // In such cases, when a letter is typed first, this parser will be called
-                    // again, and the 2nd time, the value will be undefined
-                    if (inputValue == undefined) return '';
-                    var transformedInput = inputValue.replace(/[^0-9A-Za-z]{3,15}/g, '');
-                    if (transformedInput!=inputValue) {
-                        modelCtrl.$setViewValue(transformedInput);
-                        modelCtrl.$render();
-                    }
-                    return transformedInput;
-                });
-            }
-        };
-
-    });
-
 })();

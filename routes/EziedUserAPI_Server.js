@@ -7410,6 +7410,235 @@ exports.FnGetLoginDetails = function (req, res) {
     }
 };
 
+exports.FnSaveMailTemplate = function(req, res){
+    try{
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.body.Token;
+        var Title = req.body.Title;
+        var FromName = req.body.FromName;
+        var FromEmailID = req.body.FromEmailID;
+        var CCMailIDS = req.body.CCMailIDS;
+        var BCCMailIDS = req.body.BCCMailIDS;
+        var Subject  = req.body.Subject;
+        var Body = req.body.Body;
+        
+        var RtnMessage = {
+            IsSuccessfull: false
+        };
+       
+        if (Token != null && Title != null && FromName != null && FromEmailID != null && CCMailIDS != null && BCCMailIDS != null && Subject != null && Body != null ) {
+            FnValidateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+
+                    var query = db.escape(Token) + ', ' +db.escape(Title) + ',' + db.escape(FromName) + ',' + db.escape(FromEmailID) 
+                        + ',' + db.escape(CCMailIDS) + ',' + db.escape(BCCMailIDS) + ',' + db.escape(Subject) + ',' + db.escape(Body);
+                        db.query('CALL pSaveMailTemplate(' + query + ')', function (err, InsertResult) {
+                            if (!err){
+                                if (InsertResult.affectedRows > 0) {
+                                    RtnMessage.IsSuccessfull = true;
+                                    res.send(RtnMessage);
+                                    console.log('FnSaveMailTemplate: Mail Template save successfully');
+                                }
+                                else {
+                                    console.log('FnSaveMailTemplate:No save  Mail Template');
+                                    res.send(RtnMessage);
+                                }
+                            }
+
+                            else {
+                                console.log('FnSaveMailTemplate: error in saving  Mail Template' + err);
+                                res.statusCode = 500;
+                                res.send(RtnMessage);
+                            }
+                        });
+                    }
+                    else {
+                        console.log('FnSaveMailTemplate: Invalid token');
+                        res.statusCode = 401;
+                        res.send(RtnMessage);
+                    }
+                }
+                else {
+                    console.log('FnSaveMailTemplate:Error in processing Token' + err);
+                    res.statusCode = 500;
+                    res.send(RtnMessage);
+
+                }
+            });
+
+        }
+
+        else {
+            if (Token == null) {
+                console.log('FnSaveMailTemplate: Token is empty');
+            }
+            else if (Title == null) {
+                console.log('FnSaveMailTemplate: Title is empty');
+            }
+            else if (FromName == null) {
+                console.log('FnSaveMailTemplate: FromName is empty');
+            }
+            else if (FromEmailID == null) {
+                console.log('FnSaveMailTemplate: FromEmailID is empty');
+            }
+            else if (CCMailIDS == null) {
+                console.log('FnSaveMailTemplate: CCMailIDS is empty');
+            }
+            else if (BCCMailIDS == null) {
+                console.log('FnSaveMailTemplate: BCCMailIDS is empty');
+            }
+            else if (Subject == null) {
+                console.log('FnSaveMailTemplate: Subject is empty');
+            }
+            else if (Body == null) {
+                console.log('FnSaveMailTemplate: Body is empty');
+            }
+            res.statusCode=400;
+            res.send(RtnMessage);
+        }
+
+    }
+    catch (ex) {
+        console.log('FnSaveMailTemplate:error ' + ex.description);
+        throw new Error(ex);
+    }
+};
+
+exports.FnGetTemplateList = function (req, res) {
+    try {
+
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.query.Token;
+        
+        if (Token != null) {
+            FnValidateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+                        
+                        db.query('CALL pgetAllMailtemplate(' + db.escape(Token) + ')', function (err, GetResult) {
+                            if (!err) {
+                                if (GetResult != null) {
+                                    if (GetResult[0].length > 0) {
+
+                                        console.log('FnGetTemplateList: Template list Send successfully');
+                                        res.send(GetResult[0]);
+                                    }
+                                    else {
+                                        console.log('FnGetTemplateList:No Template list found');
+                                        res.send('null');
+                                    }
+                                }
+                                else {
+                                    console.log('FnGetTemplateList:No Template list found');
+                                    res.send('null');
+                                }
+                            }
+                            else {
+                                console.log('FnGetTemplateList: error in getting Template list' + err);
+                                res.statusCode = 500;
+                                res.send('null');
+                            }
+                        });
+                    }
+                    else {
+                        res.statusCode = 401;
+                        res.send('null');
+                        console.log('FnGetTemplateList: Invalid Token');
+                    }
+                } else {
+                    res.statusCode = 500;
+                    res.send('null');
+                    console.log('FnGetTemplateList: Error in validating token:  ' + err);
+                }
+            });
+        }
+        else {
+            if (Token == null) {
+                console.log('FnGetTemplateList: Token is empty');
+            }
+            res.statusCode=400;
+            res.send('null');
+        }
+    }
+    catch (ex) {
+        console.log('FnGetTemplateList error:' + ex.description);
+        throw new Error(ex);
+    }
+};
+
+exports.FnGetTemplateDetails = function (req, res) {
+    try {
+
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.query.Token;
+        var TID = req.query.TID;
+        
+        if (Token != null) {
+            FnValidateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+                        
+                        //var query = db.escape(Token) + ', ' +db.escape(TID);
+                            db.query('CALL pgetMailtemplateDetails(' + db.escape(TID) + ')', function (err, GetResult) {
+                                if (!err) {
+                                    if (GetResult != null) {
+                                        if (GetResult[0].length > 0) {
+                                            console.log('FnGetTemplateDetails: Template Details Send successfully');
+                                            res.send(GetResult[0]);
+                                    }
+                                    else {
+                                        console.log('FnGetTemplateDetails:No Template Details found');
+                                        res.send('null');
+                                    }
+                                }
+                                else {
+                                    console.log('FnGetTemplateDetails:No Template Details found');
+                                    res.send('null');
+                                }
+                            }
+                            else {
+                                console.log('FnGetTemplateDetails: error in getting Template Details' + err);
+                                res.statusCode = 500;
+                                res.send('null');
+                            }
+                        });
+                    }
+                    else {
+                        res.statusCode = 401;
+                        res.send('null');
+                        console.log('FnGetTemplateDetails: Invalid Token');
+                    }
+                } else {
+                    res.statusCode = 500;
+                    res.send('null');
+                    console.log('FnGetTemplateDetails: Error in validating token:  ' + err);
+                }
+            });
+        }
+        else {
+            if (Token == null) {
+                console.log('FnGetTemplateDetails: Token is empty');
+            }
+            else if (TID == null) {
+                console.log('FnGetTemplateDetails: TID is empty');
+            }
+            res.statusCode=400;
+            res.send('null');
+        }
+    }
+    catch (ex) {
+        console.log('FnGetTemplateDetails error:' + ex.description);
+        throw new Error(ex);
+    }
+};
+
 
 //EZEIDAP Parts
 

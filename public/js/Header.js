@@ -221,21 +221,45 @@ HeaderApp.directive('headerSection', function (Notification) {
         },
         controllerAs: 'SignInCtrl',
         link: function () {
-            $('html').click(function () {
-                $('#userid_popup').hide('fast');
+//            $('html').click(function () {
+//                $('#userid_popup').hide('fast');
+//            });
+//
+//            $('#userid').click(function (e) {
+//                e.stopPropagation();
+//            });
+//
+//            $('#userid').click(function () {
+//                $('#userid_popup').toggle();
+//            })
+//
+//            $('#signin').click(function () {
+//                $('#SignIn_popup').slideDown();
+//            })
+
+            /****************** New code ************************/
+
+            $("body").on('click',function(e){
+                if ( $('#userid_popup').is(':visible') ){
+                    $("#userid_popup").hide();
+                }
+
             });
 
-            $('#userid').click(function (e) {
+            $("body").on('click','#userid',function(e){
                 e.stopPropagation();
+                if (! $('#userid_popup').is(':visible') ){
+                    $("#userid_popup").show();
+                }
+
             });
 
-            $('#userid').click(function () {
-                $('#userid_popup').toggle();
-            })
+            $("body").on('click','#signin',function(e){
+                $("#SignIn_popup").slideDown();
+            });
+            /******************end :  New code ************************/
 
-            $('#signin').click(function () {
-                $('#SignIn_popup').slideDown();
-            })
+
 
             $('.closelink').click(function () {
                 $('#ChangePassword_popup').slideUp();
@@ -245,7 +269,7 @@ HeaderApp.directive('headerSection', function (Notification) {
                 document.getElementById("OldPassword").className = "form-control wd_oldPass changePass_inpMar emptyBox change_PadLeft";
                 document.getElementById("NewPassword").className = "form-control wd_oldPass changePass_inpMar emptyBox change_PadLeft";
                 document.getElementById("ReEnterPassword").className = "form-control wd_oldPass changePass_inpMar emptyBox change_PadLeft";
-            })
+            });
         }
     };
 });

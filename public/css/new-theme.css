@@ -40,6 +40,19 @@ body{
     border-color: #FFFFFF;
 }
 
+footer {
+    background: #E9E9E9;
+    border-top: 1px solid #DDD;
+}
+
+footer p {
+    text-align: center;
+    color: #004C66;
+    padding-top: 25px;
+    line-height: 18px;
+    margin: 0px;
+}
+
 /***************************************** end :  Directly over container in currrent ***************************************/
 
 .ezeid-content-container-fluid{

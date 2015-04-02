@@ -150,6 +150,9 @@ app.post('/ewtSaveResourceItemMap',LocationManager.FnSaveResourceItemMap);
 app.get('/ewtGetItemListForEZEID',LocationManager.FnGetItemListForEZEID);
 app.get('/ewtGetLocationList',LocationManager.FnGetLocationList);
 app.get('/ewtGetLoginDetails',LocationManager.FnGetLoginDetails);
+app.post('/ewtSaveMailTemplate',LocationManager.FnSaveMailTemplate);
+app.get('/ewtGetTemplateList',LocationManager.FnGetTemplateList);
+app.get('/ewtGetTemplateDetails',LocationManager.FnGetTemplateDetails);
 
 
 //below service are for EZEIDAP
