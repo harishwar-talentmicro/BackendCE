@@ -240,7 +240,6 @@ HeaderApp.directive('headerSection', function (Notification) {
             /****************** New code ************************/
 
             $("body").on('click',function(e){
-                console.log('Body click');
                 if ( $('#userid_popup').is(':visible') ){
                     $("#userid_popup").hide();
                 }
