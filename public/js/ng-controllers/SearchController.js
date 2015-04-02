@@ -65,8 +65,7 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
     var Miliseconds = 8000;
     var RefreshTime = Miliseconds;
     var AutoRefresh = true;
-
-    var rating = [1];
+    var rating = [1,2,3,4,5];
 
     $('#datetimepicker1').datetimepicker({
         format: "d-M-Y  h:m A",
@@ -103,10 +102,8 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
     $scope.form_rating = 0;
 
     SearchSec.mInfo = {};
-    // SearchSec.Placeholder = 'Type EZEID';
     var userType = "";
     SearchSec.mInfo.InfoTab = true;
-
     $scope.showInfoTab = false;
 
     SearchSec.Criteria = {
@@ -175,12 +172,14 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
             var place = autocomplete.getPlace();
             $rootScope.CLoc.CLat = place.geometry.location.k;
             $rootScope.CLoc.CLong = place.geometry.location.D;
+
+            console.log($rootScope.CLoc.CLat);
+            console.log($rootScope.CLoc.CLong);
+
             var loc = new google.maps.LatLng($rootScope.CLoc.CLat, $rootScope.CLoc.CLong);
             PlaceCurrentLocationMarker(loc);
         });
         /********** Google Maps autocomplete ends *********/
-
-
 
         var searchBox = new google.maps.places.SearchBox(
             /** @type {HTMLInputElement} */(input));
@@ -221,12 +220,28 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
             markers = [];
             var bounds = new google.maps.LatLngBounds();
             if (places.length > 0) {
+
                 var place = places[0];
                 $rootScope.CLoc.CLat = place.geometry.location.k;
                 $rootScope.CLoc.CLong = place.geometry.location.D;
                 var loc = new google.maps.LatLng($rootScope.CLoc.CLat, $rootScope.CLoc.CLong);
                 PlaceCurrentLocationMarker(loc);
             }
+        });
+
+        //Map Right click Listener
+        google.maps.event.addListener(map, 'rightclick', function(event) {
+            $rootScope.CLoc = {
+                CLat : 0,
+                CLong : 0
+            };
+            var lat = event.latLng.lat();
+            var lng = event.latLng.lng();
+
+            $rootScope.CLoc.CLat = lat;
+            $rootScope.CLoc.CLong = lng;
+            var loc = new google.maps.LatLng($rootScope.CLoc.CLat, $rootScope.CLoc.CLong);
+            PlaceCurrentLocationMarker(loc);
         });
 
         // Bias the SearchBox results towards places that are within the bounds of the
@@ -322,6 +337,7 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
         getReverseGeocodingData(marker.getPosition().k, marker.getPosition().D);
 
         google.maps.event.addListener(marker, 'dragend', function (e) {
+
             $rootScope.CLoc.CLat = marker.getPosition().k;
             $rootScope.CLoc.CLong = marker.getPosition().D;
             getReverseGeocodingData(marker.getPosition().k, marker.getPosition().D);
@@ -382,19 +398,6 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
                 label.bindTo('text', marker, 'label');
 
                 $(".ezeid-map-label").remove();
-
-
-                /* var marker = new MarkerWithLabel({
-                 position: pos,
-                 draggable: false,
-                 raiseOnDrag: false,
-                 map: map,
-                 icon: (_item.IDTypeID == 2) ? businessIcon : individualIcon,
-                 labelContent: mTitle,
-                 labelAnchor: new google.maps.Point(22, 0),
-                 labelClass: "mapLabels", // the CSS class for the label
-                 labelStyle: {opacity: 1}
-                 });*/
 
                 var currentPos = google.maps.LatLng($rootScope.CLoc.CLat,$rootScope.CLoc.CLong);
                 map.setCenter(currentPos);
@@ -508,7 +511,7 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
         var currentDate = moment().format('YYYY-MM-DD hh:mm');
 
         SearchSec.Criteria.CurrentDate = currentDate;
-        if ($rootScope._userInfo.IsAuthenticate == true || SearchSec.Criteria.SearchType == 2 && SearchSec.IsSearchButtonClicked) {
+        if ($rootScope._userInfo.IsAuthenticate == true || SearchSec.Criteria.SearchType == 2 && SearchSec.IsSearchButtonClicked || SearchSec.Criteria.SearchType == 3 && SearchSec.IsSearchButtonClicked) {
 
             if($rootScope._userInfo.Token == "")
             {
@@ -527,7 +530,6 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
             $http({ method: 'post', url: GURL + 'ewSearchByKeywords', data: SearchSec.Criteria }).success(function (data) {
                if (data != 'null' && data.length>0) {
 
-                    console.log(data);
                     $scope.SearchResultCount = data.length;
 
                     var _item = data[0];
@@ -544,7 +546,7 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
                     else
                     {
 
-                        $http({ method: 'get', url: GURL + 'ewtGetSearchInformation?Token=' + $rootScope._userInfo.Token + '&TID=' + _item.TID }).success(function (data) {
+                        $http({ method: 'get', url: GURL + 'ewtGetSearchInformation?Token=' + $rootScope._userInfo.Token + '&TID=' + _item.TID + '&CurrentDate=' + SearchSec.Criteria.CurrentDate }).success(function (data) {
 
                             if (data != 'null') {
 
@@ -749,7 +751,6 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
         {
             $http({ method: 'get', url: GURL + 'ewtGetBannerPicture?Token=' + $rootScope._userInfo.Token +'&SeqNo='+_requestedBannerValue+'&Ezeid='+SearchSec.mInfo.EZEID+'&StateTitle='+ SearchSec.mInfo.StateTitle+'&LocID='+SearchSec.mInfo.LocID}).success(function (data) {
 
-                console.log(data);
 
                 if (data.Picture != 'null') {
                     SearchSec.mInfo.BannerImage = data.Picture;

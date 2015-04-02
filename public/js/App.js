@@ -11,6 +11,7 @@
             'ui.grid',
             'ngTouch',
             'ui.grid', 'ui.grid.expandable', 'ui.grid.selection', 'ui.grid.pinning',
+
             'ui.grid.edit', 'ui.grid.rowEdit', 'ui.grid.cellNav','ui.grid.pagination','ui.grid.exporter',
             'ngAnimate'
         ]);
@@ -43,7 +44,7 @@
                     $rootScope.IsIdAvailable = false;
 //                    Notification.error({message:'Your session has expired! Please login to continue',delay:4000});
                     $timeout(function(){
-                        //Reloading page on token expiry                    
+                        //Reloading page on token expiry
                         window.location.reload(true);
 
                     },3000);
@@ -81,6 +82,7 @@
             .when('/business-manager',{templateUrl : 'html/business-manager/business-manager.html'})
             .when('/bulksalesenquiry',{templateUrl : 'html/bulksalesenquiry.html'})
             .when('/create-template',{templateUrl : 'html/createTemplate.html'})
+
             .when('/signup',{
                 templateUrl : 'html/profile/sign-up.html',
                 controller : 'SignUpCtrl'
@@ -101,7 +103,6 @@
         /**
          * Checking login while navigating to different pages
          */
-
 
         $rootScope.$on("$routeChangeStart",function(event,next,current){
 
@@ -180,7 +181,7 @@
                     $location.path('/');
                 }
             }
-       });
+        });
 
         $rootScope.$on('$routeChangeSuccess',function(){
             if($location.path() == '/' || $location.path() == '/home'){
@@ -190,6 +191,11 @@
         });
     }]);
     /************************************** Run Configuration ends here ****************************/
+
+    var GURL = '/'; //Not required any more because we have already setup a value in angular for GURL
+    //http://10.0.100.103:8084/';
+
+    var MsgDelay = 2000;
 
     /**
      * Number only directive (allows only number for input fields)
@@ -214,8 +220,6 @@
             }
         };
     });
-
-
     /**
      * Directive to capitalize the input field
      */
@@ -237,8 +241,6 @@
             }
         };
     });
-
-
     /**
      * Directive for binding of bootstrap javascript popover and tooltip methods
      */
@@ -269,7 +271,6 @@
             }
         };
     });
-
 
     /**
      * Directive for using modal box bootstrap
@@ -322,7 +323,6 @@
         };
     });
 
-
     /**
      * Filter for grouping Business Rules Based upon thier functions(types: Sales, Reservation,HomeDelivery,Service, Resume)
      * Usage (ruleList | ruleFilter:2)
@@ -341,7 +341,6 @@
             return filteredRules;
         };
     });
-
 
     ezeid.directive('dateTimePicker', function() {
         return {
@@ -370,6 +369,7 @@
             }
         }
     });
+
 
     /**
      * Validation directive for EZEID
@@ -407,6 +407,7 @@
                 });
             }
         };
+
     });
 
     /**
