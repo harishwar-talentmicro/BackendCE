@@ -546,6 +546,25 @@ angular.module('ezeidApp').controller('LocationsController',['$rootScope', '$sco
                 }
             });
 
+            //Map Right click Listener
+            google.maps.event.addListener(map1, 'rightclick', function(event) {
+
+                $rootScope.CLoc = {
+                    CLat : 0,
+                    CLong : 0
+                };
+                var lat = event.latLng.lat();
+                var lng = event.latLng.lng();
+
+                SLocCtrl._locInfo.Latitude = lat;
+                SLocCtrl._locInfo.Longitude = lng;
+
+                $rootScope.CLoc.CLat = lat;
+                $rootScope.CLoc.CLong = lng;
+                var loc = new google.maps.LatLng($rootScope.CLoc.CLat, $rootScope.CLoc.CLong);
+                PlaceCurrentLocationMarker(loc);
+            });
+
             /*____________________________________________________________________________*/
             
             /*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
@@ -705,24 +724,29 @@ angular.module('ezeidApp').controller('LocationsController',['$rootScope', '$sco
             //myinfowindow.open(map, marker);
         });
     }
+
     function FindCurrentLocation(position) {
 
-        if(SLocCtrl._locInfo.TID == 0)
-        {
-            initialLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-            PlaceCurrentLocationMarker(initialLocation);
+        /* if(SLocCtrl._locInfo.TID == 0)
+         {*/
+        initialLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+        PlaceCurrentLocationMarker(initialLocation);
 
-            SLocCtrl._locInfo.Latitude = position.coords.latitude;
-            SLocCtrl._locInfo.Longitude = position.coords.longitude;
-            getReverseGeocodingData(SLocCtrl._locInfo.Latitude, SLocCtrl._locInfo.Longitude);
-        }
-
+        SLocCtrl._locInfo.Latitude = position.coords.latitude;
+        SLocCtrl._locInfo.Longitude = position.coords.longitude;
+        getReverseGeocodingData(SLocCtrl._locInfo.Latitude, SLocCtrl._locInfo.Longitude);
+        // }
     };
+
     this.getMyLocation = function () {
+        console.log("sai my location");
         if (navigator.geolocation) {
+
+            console.log("sai my location123");
             navigator.geolocation.getCurrentPosition(FindCurrentLocation);
         }
     };
+
 
 
     $http({ method: 'get', url: GURL + 'ewmGetCountry?LangID=1' }).success(function (data) {

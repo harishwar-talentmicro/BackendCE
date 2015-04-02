@@ -542,6 +542,25 @@ angular.module('ezeidApp').controller('ProfileController', ['$rootScope', '$scop
             }
         });
 
+        //Map Right click Listener
+        google.maps.event.addListener(map, 'rightclick', function(event) {
+
+            $rootScope.CLoc = {
+                CLat : 0,
+                CLong : 0
+            };
+            var lat = event.latLng.lat();
+            var lng = event.latLng.lng();
+
+            profile._info.Latitude = lat;
+            profile._info.Longitude = lng;
+
+            $rootScope.CLoc.CLat = lat;
+            $rootScope.CLoc.CLong = lng;
+            var loc = new google.maps.LatLng($rootScope.CLoc.CLat, $rootScope.CLoc.CLong);
+            PlaceCurrentLocationMarker(loc);
+        });
+
         // Bias the SearchBox results towards places that are within the bounds of the
         // current map's viewport.
         google.maps.event.addListener(map, 'bounds_changed', function () {
@@ -682,6 +701,7 @@ angular.module('ezeidApp').controller('ProfileController', ['$rootScope', '$scop
             map: map,
             icon: 'images/you_are_here.png'
         });
+
         google.maps.event.addListener(marker, 'dragend', function (e) {
             profile._info.Latitude = marker.getPosition().k;
             profile._info.Longitude = marker.getPosition().D;

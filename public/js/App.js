@@ -11,9 +11,7 @@
             'ui.grid',
             'ngTouch',
             'ui.grid', 'ui.grid.expandable', 'ui.grid.selection', 'ui.grid.pinning',
-            'ui.grid.edit', 'ui.grid.rowEdit', 'ui.grid.cellNav','ui.grid.pagination','ui.grid.exporter',
-            'ngAnimate',
-            'ngPatternRestrict'
+            'ui.grid.edit', 'ui.grid.rowEdit', 'ui.grid.cellNav','ui.grid.pagination','ui.grid.exporter'
         ]);
 
     ezeid.value('GURL',"/");
@@ -44,7 +42,7 @@
                     $rootScope.IsIdAvailable = false;
 //                    Notification.error({message:'Your session has expired! Please login to continue',delay:4000});
                     $timeout(function(){
-                        //Reloading page on token expiry                    
+                        //Reloading page on token expiry
                         window.location.reload(true);
 
                     },3000);
@@ -74,7 +72,6 @@
             .when('/business-manager',{templateUrl : 'html/business-manager/business-manager.html'})
             .when('/bulksalesenquiry',{templateUrl : 'html/bulksalesenquiry.html'})
             .when('/create-template',{templateUrl : 'html/createTemplate.html'})
-            .when('/signup',{templateUrl : 'html/profile/sign-up.html'})
             .otherwise({redirectTo : '/home'});
 
         $httpProvider.interceptors.push("ezeidInterceptor");
@@ -88,9 +85,7 @@
          * Checking login while navigating to different pages
          */
 
-
         $rootScope.$on("$routeChangeStart",function(event,next,current){
-
 
             /**
              * @todo Check if user is navigating to Closed Routes( which require authentication)
@@ -174,7 +169,7 @@
                     $location.path('/');
                 }
             }
-       });
+        });
 
         $rootScope.$on('$routeChangeSuccess',function(){
             if($location.path() == '/' || $location.path() == '/home'){
@@ -184,6 +179,11 @@
         });
     }]);
     /************************************** Run Configuration ends here ****************************/
+
+    var GURL = '/'; //Not required any more because we have already setup a value in angular for GURL
+    //http://10.0.100.103:8084/';
+
+    var MsgDelay = 2000;
 
     /**
      * Number only directive (allows only number for input fields)
@@ -208,8 +208,6 @@
             }
         };
     });
-
-
     /**
      * Directive to capitalize the input field
      */
@@ -231,8 +229,6 @@
             }
         };
     });
-
-
     /**
      * Directive for binding of bootstrap javascript popover and tooltip methods
      */
@@ -263,7 +259,6 @@
             }
         };
     });
-
 
     /**
      * Directive for using modal box bootstrap
@@ -316,7 +311,6 @@
         };
     });
 
-
     /**
      * Filter for grouping Business Rules Based upon thier functions(types: Sales, Reservation,HomeDelivery,Service, Resume)
      * Usage (ruleList | ruleFilter:2)
@@ -335,7 +329,6 @@
             return filteredRules;
         };
     });
-
 
     ezeid.directive('dateTimePicker', function() {
         return {
@@ -365,35 +358,22 @@
         }
     });
 
-    /**
-     * Validation directive for EZEID
-     * @desc Constraints
-     * 1. Validates length to be max 15
-     * 2. Validates pattern to be containing numbers and alphabets only
-     */
-    ezeid.directive('ezeidOnly', function(){
-        return {
-            require: 'ngModel',
-            link: function(scope, element, attrs, modelCtrl) {
-                modelCtrl.$parsers.push(function (inputValue) {
-                    if(inputValue.length > 15){
-                        modelCtrl.$setViewValue(modelCtrl.$modelValue);
-                        modelCtrl.$render();
-                        return modelCtrl.$modelValue;
-                    }
-                    // this next if is necessary for when using ng-required on your input.
-                    // In such cases, when a letter is typed first, this parser will be called
-                    // again, and the 2nd time, the value will be undefined
-                    if (inputValue == undefined) return '';
-                    var transformedInput = inputValue.replace(/[^0-9A-Za-z]/g, '');
-                    if (transformedInput!=inputValue) {
-                        modelCtrl.$setViewValue(transformedInput);
-                        modelCtrl.$render();
-                    }
-                    return transformedInput;
-                });
-            }
+    ezeid.controller('SampleWizardController', function($scope, $q, $timeout) {
+        $scope.user = {};
+
+        $scope.saveState = function() {
+            var deferred = $q.defer();
+
+            $timeout(function() {
+                deferred.resolve();
+            }, 5000);
+
+            return deferred.promise;
         };
+
+        $scope.completeWizard = function() {
+            alert('Completed!');
+        }
     });
 
 })();
