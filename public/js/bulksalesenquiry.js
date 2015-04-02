@@ -36,28 +36,19 @@ angular.module('ezeidApp').controller('bulksalesController', function($http, $ro
             window.location.href = "/home";
         }
     }
+    $scope.formTitle = "Bulk Sales Enquiry";
 
+    // Create new mail template
     salesEnquiry.addNewTemplateForm = function () {
-        window.location.href = "#/create-template";
-        /*SearchSec.showCVSendButton = "";
-        if ($rootScope._userInfo.IsAuthenticate == true)
-        {
-            $http({ method: 'post', url: GURL + 'ewtCheckCV', data: { Token: $rootScope._userInfo.Token } }).success(function (data) {
-                if (data.IsSuccessfull)
-                {
-                    SearchSec.sendCV();
-                }
-                else
-                {
-                    $('#CV_popup').slideUp();
-                    Notification.error({ message: 'Sorry..! CV is not uploaded... ', delay: MsgDelay });
-                }
-            });
-        }
-        else {
-            //Redirect to Login page
-            $('#SignIn_popup').slideDown();
-        }*/
+       // window.location.href = "#/create-template";
+        $scope.formTitle = "Create mail template";
+        $scope.showCreateMailTemplate = true;
+
+    };
+
+    // save mail template
+    salesEnquiry.saveMailTemplate = function () {
+        console.log("Sai123");
     };
 
 });

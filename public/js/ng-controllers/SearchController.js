@@ -103,7 +103,7 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
 
     SearchSec.mInfo = {};
     var userType = "";
-    SearchSec.mInfo.InfoTab = true;
+    SearchSec.mInfo.InfoTab = false;
     $scope.showInfoTab = false;
 
     SearchSec.Criteria = {
@@ -121,7 +121,6 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
 
     SearchSec.Placeholder = 'Type Keywords to locate products or services.';
     $scope.showSmallBanner = false;
-    $scope.ShowInfoWindow = false;
     $scope.ShowLinks = false;
 
     $scope.showStar1 = true;
@@ -136,11 +135,15 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
     // show search Tab
     $scope.showSearchTab = function(){
         $scope.ShowInfoWindow = false;
+        /*$scope.ShowLinks = false;*/
     };
     // show info Tab
     $scope.showInfoWindowTab = function(){
         $scope.ShowInfoWindow = true;
+        /*$scope.ShowLinks = true;*/
     };
+
+    $scope.ShowInfoWindow = false;
 
     function initialize () {
         // Create the search box and link it to the UI element.
@@ -172,9 +175,6 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
             var place = autocomplete.getPlace();
             $rootScope.CLoc.CLat = place.geometry.location.k;
             $rootScope.CLoc.CLong = place.geometry.location.D;
-
-            console.log($rootScope.CLoc.CLat);
-            console.log($rootScope.CLoc.CLong);
 
             var loc = new google.maps.LatLng($rootScope.CLoc.CLat, $rootScope.CLoc.CLong);
             PlaceCurrentLocationMarker(loc);
@@ -411,9 +411,10 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
                         $scope.ShowLinks = true;
                         $scope.showSmallBanner = true;
                         $scope.AddressForInfoTab = "";
+                        var currentDate = moment().format('YYYY-MM-DD hh:mm');
 
                         var sen = this;
-                        $http({ method: 'get', url: GURL + 'ewtGetSearchInformation?Token=' + $rootScope._userInfo.Token + '&TID=' + _item.TID }).success(function (data) {
+                        $http({ method: 'get', url: GURL + 'ewtGetSearchInformation?Token=' + $rootScope._userInfo.Token + '&TID=' + _item.TID + '&CurrentDate=' + currentDate}).success(function (data) {
 
                                if (data != 'null') {
                                     //Below lines are to show address in info tab
@@ -474,6 +475,7 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
     SearchSec.OpenStatuses = [ { id: 1, label: "Open" }, { id: 2, label: "Closed" }];
 
     SearchSec.isEZEIDselected = function (value) {
+
         if (SearchSec.Criteria.SearchType == 1)
         {
             SearchSec.Placeholder = 'Type EZE ID here.';
@@ -509,6 +511,7 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
         SearchSec.Criteria.HomeDelivery = SearchSec.Criteria.HomeDelivery1 == true ? 1 : 0;
         SearchSec.Criteria.OpenStatus = SearchSec.Criteria.OpenStatus1 == true ? 1 : 0;
         var currentDate = moment().format('YYYY-MM-DD hh:mm');
+        $scope.AddressForInfoTab = "";
 
         SearchSec.Criteria.CurrentDate = currentDate;
         if ($rootScope._userInfo.IsAuthenticate == true || SearchSec.Criteria.SearchType == 2 && SearchSec.IsSearchButtonClicked || SearchSec.Criteria.SearchType == 3 && SearchSec.IsSearchButtonClicked) {
@@ -545,7 +548,6 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
                     }
                     else
                     {
-
                         $http({ method: 'get', url: GURL + 'ewtGetSearchInformation?Token=' + $rootScope._userInfo.Token + '&TID=' + _item.TID + '&CurrentDate=' + SearchSec.Criteria.CurrentDate }).success(function (data) {
 
                             if (data != 'null') {
@@ -554,6 +556,10 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
                                 {
                                     $scope.showInfoTab = true;
                                     $scope.selectTab('info');
+                                    $scope.ShowInfoWindow = true;
+
+                                    $scope.ShowLinks = true;
+                                    $scope.showSmallBanner = true;
                                 }
                                 else
                                 {
@@ -562,21 +568,28 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
                                 $timeout(function () {
                                     SearchSec.mInfo = data[0];
 
+                                    //Below lines are to show address in info tab
+                                    $scope.AddressForInfoTab = (SearchSec.mInfo.AddressLine1 != "") ? SearchSec.mInfo.AddressLine1 +', ' : "";
+                                    $scope.AddressForInfoTab += (SearchSec.mInfo.AddressLine2 != "") ? SearchSec.mInfo.AddressLine2 +', ' : "";
+                                    $scope.AddressForInfoTab += (SearchSec.mInfo.CityTitle != "") ? SearchSec.mInfo.CityTitle +', ' : "";
+                                    $scope.AddressForInfoTab += (SearchSec.mInfo.CountryTitle != "") ? SearchSec.mInfo.CountryTitle +', ' : "";
+                                    $scope.AddressForInfoTab += (SearchSec.mInfo.PostalCode != "") ? SearchSec.mInfo.PostalCode : "";
+
+                                    if(SearchSec.mInfo.ParkingStatus==0)
+                                    {
+                                        SearchSec.parkingTitle = "Parking Status";
+                                    }
                                     if(SearchSec.mInfo.ParkingStatus==1)
                                     {
-                                        SearchSec.parkingTitle = "Parking";
+                                        SearchSec.parkingTitle = "Public Parking";
                                     }
                                     if(SearchSec.mInfo.ParkingStatus==2)
                                     {
-                                        SearchSec.parkingTitle = "Road Parking";
+                                        SearchSec.parkingTitle = "Vallet Parking";
                                     }
                                     if(SearchSec.mInfo.ParkingStatus==3)
                                     {
-                                        SearchSec.parkingTitle = "Vallet Parking";
-                                    }
-                                    if(SearchSec.mInfo.ParkingStatus==4)
-                                    {
-                                        SearchSec.parkingTitle = "No Parking";
+                                        SearchSec.parkingTitle = "No parking";
                                     }
 
                                     if (!/^(f|ht)tps?:\/\//i.test(data[0].Website)) {
