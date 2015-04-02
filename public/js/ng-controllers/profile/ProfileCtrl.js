@@ -4,6 +4,35 @@
  * @author Hirecraft
  * @since 05/04/2015 05:15 PM
  */
-angular.module('ezeidApp').controller('ProfileCtrl',['$rootScope', '$scope', '$http', '$q', '$timeout', 'Notification', '$filter', '$window','GURL','$interval','ScaleAndCropImage','MsgDelay','$location',function ($rootScope, $scope, $http, $q, $timeout, Notification, $filter, $window,GURL,$interval,ScaleAndCropImage,MsgDelay,$location) {
+angular.module('ezeidApp').controller('ProfileCtrl',[
+    '$rootScope',
+    '$scope',
+    '$http',
+    '$q',
+    '$timeout',
+    'Notification',
+    '$filter',
+    '$window',
+    'GURL',
+    '$interval',
+    'ScaleAndCropImage',
+    'MsgDelay',
+    '$location',
+    function (
+            $rootScope,
+            $scope,
+            $http,
+            $q,
+            $timeout,
+            Notification,
+            $filter,
+            $window,
+            GURL,
+            $interval,
+            ScaleAndCropImage,
+            MsgDelay,
+            $location
+        ) {
+
 
 }]);
