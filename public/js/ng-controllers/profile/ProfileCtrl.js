@@ -35,4 +35,168 @@ angular.module('ezeidApp').controller('ProfileCtrl',[
         ) {
 
 
+        /**
+         * Progress Status Flag for loading data initially
+         * @type {boolean}
+         */
+        $scope.dataLoadInProgress = true;
+
+        /**
+         * Service Call Fails to load data then the flag sets to true
+         * @type {boolean}
+         */
+        $scope.dataLoadError = false;
+
+        /**
+         * Service Call Completed to load data, then this flag set to true
+         * @type {boolean}
+         */
+        $scope.dataLoadComplete = false;
+
+
+
+
+        /**
+         * If user wants the data to be refreshed,
+         * In case it will load data initially from server again
+         */
+        $scope.dataReloadAgain = function(){
+
+            $scope.dataLoadError = false;
+            $scope.dataLoadComplete = false;
+            $scope.dataLoadInProgress = true;
+
+            $scope.loadCountries().then(function(){
+                $scope.loadUserDetails().then(function(){
+                    $scope.loadSecondaryLocations().then(function(){
+                        $scope.dataLoadInProgress = false;
+                        $scope.dataLoadError = false;
+                        $scope.dataLoadComplete = true;
+                    });
+                });
+            });
+        };
+
+
+
+        /**
+         * Loads country list from server
+         * @returns {promise|*}
+         */
+        $scope.loadCountries = function(){
+            var defer = $q.defer();
+            $http({
+                url : GURL + 'ewmGetCountry',
+                method : 'GET',
+                params : {
+                    LangID : 1
+                }
+            }).success(function(resp){
+                    console.log('Country List');
+                    console.log(JSON.stringify(resp));
+                defer.resolve(resp);
+            }).error(function(err){
+                defer.reject(err);
+            });
+
+            return defer.promise;
+        };
+
+        /**
+         * Loads user details initially
+         * @returns {promise|*}
+         */
+        $scope.loadUserDetails = function(){
+            var defer = $q.defer();
+            $http({
+                url : GURL + 'ewtGetUserDetails',
+                method : 'GET',
+                params : {
+                    Token : $rootScope._userInfo.Token
+                }
+            }).success(function(resp){
+                defer.resolve(resp);
+                    console.log('User Details');
+                    console.log(JSON.stringify(resp));
+            }).error(function(err){
+                defer.reject(err);
+            });
+            return defer.promise;
+        };
+
+        /**
+         * Loads list of Secondary Locations from server
+         * @returns {promise|*}
+         */
+        $scope.loadSecondaryLocations = function(){
+            var defer = $q.defer();
+            $http({
+                url : GURL + 'ewtGetSecondaryLoc',
+                method : 'GET',
+                params : {
+                    Token : $rootScope._userInfo.Token
+                }
+            }).success(function(resp){
+                    console.log('Secondary Location List');
+                    console.log(JSON.stringify(resp));
+                defer.resolve(resp);
+            }).error(function(err){
+                defer.reject(err);
+            });
+            return defer.promise;
+        };
+
+
+        /**
+         * Load States based on Country
+         * @param countryId
+         * @returns {promise|*}
+         */
+        $scope.loadStates = function(countryId){
+            var defer = $q.defer();
+            $http({
+                url : GURL + 'ewmGetState',
+                method : 'GET',
+                params : {
+                    LangID : 1,
+                    CountryID : countryId
+                }
+            }).success(function(resp){
+                    console.log('States List based on country');
+                    console.log(JSON.stringify(resp));
+                    defer.resolve(resp);
+                }).error(function(err){
+                    defer.reject(err);
+                });
+            return defer.promise;
+        };
+
+
+        /**
+         * Load Cities based on State
+         * @param stateId
+         * @returns {promise|*}
+         */
+        $scope.loadCities = function(stateId){
+            var defer = $q.defer();
+            $http({
+                url : GURL + 'ewmGetCity',
+                method : 'GET',
+                params : {
+                    LangID : 1,
+                    StateID : stateId
+                }
+            }).success(function(resp){
+                    console.log('Cities List based on state');
+                    console.log(JSON.stringify(resp));
+                    defer.resolve(resp);
+                }).error(function(err){
+                    defer.reject(err);
+                });
+            return defer.promise;
+        };
+
+
+        $scope.dataReloadAgain();
+
 }]);

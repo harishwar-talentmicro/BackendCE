@@ -13,12 +13,28 @@
                     <div class="panel-body">
 
                         <!------------- Content Block ------------------------------->
-
-                        <div class="container-fluid">
-
-
+                        <div class="container-fluid" ng-show="dataLoadInProgress">
                             <div class="row">
+                                <div class="text-center center-vertical col-lg-2 col-md-2 col-sm-2 col-xs-4 col-lg-offset-5 col-md-offset-5 col-sm-offset-5 col-xs-offset-4 preloader">
 
+                                </div>
+                            </div>
+                        </div>
+                        <div class="container-fluid" ng-show="dataLoadError">
+                            <div class="row">
+                                <div class="text-center col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <p class="text-center text-danger">
+                                        An error occured ! <a ng-click="dataReloadAgain()" class="btn-link">Try Again</a>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="container-fluid" ng-show="dataLoadComplete">
+                            <div class="row">
+                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                                    <p class="text-primary"></p>
+                                </div>
+                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6"></div>
                             </div>
 
                         </div>
