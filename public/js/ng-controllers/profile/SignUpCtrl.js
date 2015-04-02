@@ -4,7 +4,7 @@
  * Manages signup functionality
  */
 
-angular.module('ezeidApp').controller('SignUpCtrl', ['$rootScope', '$scope', '$http', '$q', '$timeout', 'Notification', '$filter', '$window','GURL','$interval','ScaleAndCropImage',function ($rootScope, $scope, $http, $q, $timeout, Notification, $filter, $window,GURL,$interval,ScaleAndCropImage) {
+angular.module('ezeidApp').controller('SignUpCtrl', ['$rootScope', '$scope', '$http', '$q', '$timeout', 'Notification', '$filter', '$window','GURL','$interval','ScaleAndCropImage','MsgDelay','$location',function ($rootScope, $scope, $http, $q, $timeout, Notification, $filter, $window,GURL,$interval,ScaleAndCropImage,MsgDelay,$location) {
 
     $("#datetimepicker1").datetimepicker({
         format: 'd-M-Y',
@@ -28,6 +28,12 @@ angular.module('ezeidApp').controller('SignUpCtrl', ['$rootScope', '$scope', '$h
      * @type {boolean}
      */
     $scope.isEzeidCheckBlockVisible = false;
+
+    /**
+     * Progress Indicator for EZEID Availability Check call
+     * @type {boolean}
+     */
+    $scope.isEzeidCheckInProgress = false;
 
     /**
      * Visibility settting for registering ezeid whose availability is already checked
@@ -66,6 +72,18 @@ angular.module('ezeidApp').controller('SignUpCtrl', ['$rootScope', '$scope', '$h
     $scope.email = "";
 
     /**
+     * EZEID Password
+     * @type {string}
+     */
+    $scope.password = "";
+
+    /**
+     * EZEID Reentered Password
+     * @type {string}
+     */
+    $scope.repassword = "";
+
+    /**
      * EZEID PIN For user
      * @type {string}
      */
@@ -94,6 +112,20 @@ angular.module('ezeidApp').controller('SignUpCtrl', ['$rootScope', '$scope', '$h
     $scope.termsAccepted = false;
 
     /**
+     * UserType describes type of user like business, individual or public place
+     * @type {number}
+     */
+    $scope.userType = 1;
+
+    /**
+     * PlanSelectionType describes which typeof plan user has chosen like free : 1, paid : 2, not applicable : 0
+     * @type {number}
+     */
+    $scope.planSelectionType = 0;
+
+
+
+    /**
      * Feature list for feature list type block
      * @type {{primary: Array, functions: Array}}
      */
@@ -116,19 +148,6 @@ angular.module('ezeidApp').controller('SignUpCtrl', ['$rootScope', '$scope', '$h
             {name:'CRM Software - Web & Mobile Apps',businessFree:'glyphicon glyphicon-remove red',businessPaid:'glyphicon glyphicon-ok green',individual:'glyphicon glyphicon-ban-circle red',publicPlace:'glyphicon glyphicon-ban-circle red'}
         ]
     };
-
-
-    /**
-     * UserType describes type of user like business, individual or public place
-     * @type {number}
-     */
-    $scope.userType = 1;
-
-    /**
-     * PlanSelectionType describes which typeof plan user has chosen like free : 1, paid : 2, not applicable : 0
-     * @type {number}
-     */
-    $scope.planSelectionType = 0;
 
 
     /**
@@ -176,9 +195,21 @@ angular.module('ezeidApp').controller('SignUpCtrl', ['$rootScope', '$scope', '$h
         $scope.planSelectionType = 0;
         $scope.email = "";
         $scope.ezeid = "";
-        $scope.dob = "";
+        $scope.dateOfBirth = "";
         $scope.companyName = "";
         $scope.about = "";
+        $scope.password = "";
+        $scope.repassword = "";
+        $scope.firstName = "";
+        $scope.lastName = "";
+        $scope.pin = "";
+        $scope.isEzeidAvailable = false;
+        $scope.isEzeidAvailabilityChecked = false;
+        $scope.isEzeidCheckInProgress = false;
+        $scope.isPinApplicable = false;
+        $scope.dateOfBirth = "";
+        $scope.termsAccepted = false;
+
         $scope.signUpForm.$setPristine();
     };
 
@@ -188,8 +219,187 @@ angular.module('ezeidApp').controller('SignUpCtrl', ['$rootScope', '$scope', '$h
      * Go back to select Plan once again
      */
     $scope.goBack = function(){
+        $scope.resetForm();
+        $scope.signUpForm.$setPristine();
         $scope.isSignUpTypeBlockVisible = true;
         $scope.isEzeidCheckBlockVisible = false;
     }
+
+
+    /**
+     * Don not allow ezeid with last two characters as AP(ap)
+     * @desc For area partner puposes
+     * @param ezeid
+     * @returns {boolean}
+     */
+    $scope.doNotAllowEzeidAp = function(ezeid){
+        console.log(ezeid.slice(-2));
+        if(ezeid.length > 3)
+        {
+            var ap = ezeid.slice(-2);
+            if(ap === 'AP' || ap === 'ap'){
+                return false;
+            }
+        }
+        return true;
+    };
+
+    /**
+     * Checking EZEID Availability Here
+     */
+    $scope.checkEzeidAvailability = function(){
+
+        $scope.isEzeidCheckInProgress = true;
+
+        var defer = $q.defer();
+        var apCheck = $scope.doNotAllowEzeidAp($scope.ezeid);
+        if(!apCheck){
+            $timeout(function(){
+                $scope.isEzeidAvailabilityChecked = true;
+                $scope.isEzeidAvailable = false;
+                $scope.isEzeidCheckInProgress = false;
+                defer.resolve({IsIdAvailable : false});
+            },2000);
+            return defer.promise;
+        }
+
+
+        $http({
+            method: 'GET',
+            url: GURL + 'ewGetEZEID',
+            params : {
+                EZEID : $scope.ezeid
+            }
+        }).success(function (resp) {
+                if(resp  && resp !== 'null' && resp.hasOwnProperty('IsIdAvailable')){
+                    $scope.isEzeidAvailabilityChecked = true;
+                    $scope.isEzeidAvailable = resp.IsIdAvailable;
+                    $scope.isEzeidCheckInProgress = false;
+                    if(!$scope.isEzeidAvailable){
+                        Notification.error({ message: $scope.ezeid + ' is unavailable', delay: MsgDelay });
+                    }
+                    defer.resolve(resp);
+                }
+                else{
+                    Notification.error({ message: 'An error occured ! Please try again later', delay: MsgDelay });
+                }
+
+            }).error(function(err){
+                $scope.isEzeidCheckInProgress = false;
+                Notification.error({ message: err, delay: MsgDelay });
+                defer.reject(err);
+            });
+
+        return defer.promise;
+    };
+
+    /**
+     *  Primary Registration and SignUp Process
+     */
+    $scope.doSignUp = function(){
+        $scope.checkEzeidAvailability().then(function(resp){
+            if(!$scope.isEzeidAvailable){
+                return false;
+            }
+            var signUpData = {
+                IDTypeID : $scope.userType ,
+                EZEID : $scope.ezeid ,
+                Password : $scope.password ,
+                FirstName : $scope.firstName,
+                LastName : $scope.lastName ,
+                CompanyName : $scope.companyName ,
+                JobTitle : ($scope.userType == 1) ? $scope.about : '' ,
+                CategoryID : 0 ,
+                FunctionID : 0 ,
+                RoleID : 0 ,
+                LanguageID : 1 ,
+                NameTitleID : 0 ,
+                Latitude : 0 ,
+                Longitude : 0 ,
+                Altitude : 0 ,
+                AddressLine1 : '' ,
+                AddressLine2 : '' ,
+                Area : '' ,
+                CityTitle : '' ,
+                StateID : '' ,
+                CountryID : '' ,
+                PostalCode : '' ,
+                PIN : $scope.pin ,
+                PhoneNumber : '' ,
+                MobileNumber : '' ,
+                EMailID : $scope.email ,
+                Picture : '' ,
+                PictureFileName : '' ,
+                WebSite : '' ,
+                AboutCompany : ($scope.userType !== 1) ? $scope.about : '' ,
+                Keywords : null ,
+                Token : null ,
+                Icon : null ,
+                IconFileName : null ,
+                ISDPhoneNumber : null ,
+                ISDMobileNumber : null ,
+                Gender : null ,
+                DOB : $scope.dateOfBirth ,
+                OperationType : null ,
+                SelectionType : $scope.planSelectionType ,
+                ParkingStatus : null
+            };
+
+
+            $http({
+                method: "POST",
+                url: GURL + 'ewSavePrimaryEZEData',
+                data: JSON.stringify(signUpData),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }).success(function(sResp){
+                 if(sResp && sResp.hasOwnProperty('IsAuthenticate') && sResp !== 'null'){
+                    if(sResp.IsAuthenticate){
+                        $rootScope._userInfo = sResp;
+                        if (typeof (Storage) !== "undefined") {
+                            var encrypted = CryptoJS.AES.encrypt(JSON.stringify(sResp), "EZEID");
+                            localStorage.setItem("_token", encrypted);
+                            Notification.success({ message : 'Your EZEID - '+$scope.ezeid + ' have been generated successfully ! Please fill up you details to proceed', delay : MsgDelay});
+                            $location.path('/editprofile');
+                        } else {
+                            Notification.error({ message : 'Browser not supported ! Upgrade your browser', delay : MsgDelay});
+                            $location.path('/');
+                        }
+                    }
+                 }
+                 else{
+                     Notification.error({ message : 'An error occured during registration ! Try again', delay : MsgDelay});
+                 }
+            }).error(function(sErr){
+                Notification.error({ message : 'An error occured during registration ! Try again', delay : MsgDelay});
+            });
+        })
+    };
+
+
+    /**
+     * Setting up pin empty if checkbox is unticked
+     */
+    $scope.$watch('isPinApplicable',function(newVal,oldVal){
+        if(!newVal){
+            $scope.pin = '';
+        }
+    })
+
+    /**
+     * Validates the basic signup data before signing in
+     */
+    $scope.validateSignUpData = function(data){
+
+    };
+
+
+    /**
+     * Closes the form and send back user to home page
+     */
+    $scope.closeForm = function(){
+        $location.path('/');
+    };
 
 }]);

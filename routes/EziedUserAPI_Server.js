@@ -4146,11 +4146,14 @@ exports.FnGetSearchInformation = function (req, res) {
 
         var Token = req.query.Token;
         var TID = parseInt(req.query.TID);
+        var CurrentDate = req.query.CurrentDate;
+        if(CurrentDate != null)
+             CurrentDate = new Date(CurrentDate);
 
-        if (Token != null && Token != '' && TID.toString() != 'NaN') {
+        if (Token != null && Token != '' && TID.toString() != 'NaN' && CurrentDate != null) {
             if(Token == 2){
 
-                            var SearchParameter = db.escape(TID) + ',' + db.escape(Token);
+                            var SearchParameter = db.escape(TID) + ',' + db.escape(Token) + ',' + db.escape(CurrentDate);
                             // console.log('Search Information: ' +SearchParameter);
                             db.query('CALL pSearchInformation(' + SearchParameter + ')', function (err, UserInfoResult) {
                                 // db.query(searchQuery, function (err, SearchResult) {
@@ -4178,7 +4181,7 @@ exports.FnGetSearchInformation = function (req, res) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
-                        var SearchParameter = db.escape(TID) + ',' + db.escape(Token);
+                        var SearchParameter = db.escape(TID) + ',' + db.escape(Token) + ',' + db.escape(CurrentDate);
                         // console.log('Search Information: ' +SearchParameter);
                         db.query('CALL pSearchInformation(' + SearchParameter + ')', function (err, UserInfoResult) {
                             // db.query(searchQuery, function (err, SearchResult) {
@@ -4216,12 +4219,21 @@ exports.FnGetSearchInformation = function (req, res) {
             });
         }
         }
-        else {
-            res.statusCode = 400;
-            res.send('null');
-            console.log('FnGetUserDetails :  token is empty');
+            else {
+                if (Token = null) {
+                    console.log('FnGetUserDetails: Token is empty');
+                }
+                else if (TID == 'NaN') {
+                    console.log('FnGetUserDetails: TID is empty');
+                }
+                else if (CurrentDate == null) {
+                    console.log('FnGetUserDetails: CurrentDate is empty');
+                }
+                
+                res.statusCode = 400;
+                res.send('null');
+            }
         }
-    }
     catch (ex) {
         console.log('FnGetUserDetails error:' + ex.description);
         throw new Error(ex);

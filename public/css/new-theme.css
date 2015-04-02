@@ -1,0 +1,73 @@
+.navbar.navbar-inverse.navbar-fixed-top{
+    background-color: #F5F5F5;
+    border-bottom: 1px solid #CCC;
+    box-shadow: 0px 2px 3px -3px #000;
+}
+
+body{
+    background: #ffffff;
+}
+
+#wrapper > div.container-fluid,
+#wrapper > div.container{
+    padding-top: 70px;
+}
+
+#wrapper > div.container-fluid > div.row,
+#wrapper > div.container > div.row{
+    background-color: #FFF;
+    padding-top: 40px;
+    padding-bottom: 40px;
+}
+
+#wrapper > div.container-fluid > div.row > div,
+#wrapper > div.container > div.row > div{
+    background: #FFF;
+    box-shadow: 0px 0px 50px #B0B2B5;
+    padding: 0px;
+}
+
+#wrapper > div.container-fluid > div.row > div > div.panel-default,
+#wrapper > div.container > div.row > div > div.panel-default{
+    border: none;
+    background-color: #ffffff;
+}
+
+#wrapper > div.container-fluid > div.row > div > div.panel-default > div.panel-heading,
+#wrapper > div.container > div.row > div > div.panel-default > div.panel-heading{
+    color: #FFF;
+    background-color: #EFEFEF;
+    border-color: #FFFFFF;
+}
+
+/***************************************** end :  Directly over container in currrent ***************************************/
+
+.ezeid-content-container-fluid{
+    padding-top: 70px;
+}
+
+.ezeid-content-container-fluid > div.row{
+    background-color: #FFF;
+    padding-top: 40px;
+    padding-bottom: 40px;
+}
+
+.ezeid-content-container-fluid > div.row > div{
+    background: #FFF;
+    box-shadow: 0px 0px 50px #B0B2B5;
+    padding: 0px;
+}
+
+.ezeid-content-container-fluid > div.row > div > div.panel-default{
+    background-color: #ffffff;
+    border: none;
+}
+
+.ezeid-content-container-fluid > div.row > div > div.panel-default > div.panel-heading{
+    color: #FFF;
+    background-color: #EFEFEF;
+    border-color: #FFFFFF;
+}
+
+
+/***************************************** end :  Directly over container in currrent ***************************************/
