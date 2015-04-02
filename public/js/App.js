@@ -105,17 +105,9 @@
 
         $rootScope.$on("$routeChangeStart",function(event,next,current){
 
-
-            /**
-             * @todo Check if user is navigating to Closed Routes( which require authentication)
-             *       then don't let him navigate to those routes without checking his authenticity
-             */
-
-
-//            if(next.params && typeof(next.params.Token) !== "undefined" && typeof(next.params.FunctionType) !== "undefined" && typeof(next.params.PersonEZEID) )
-
             try{
-                if(CLOSED_ROUTES.indexOf(next.$$route.originalPath) == -1){
+                if(CLOSED_ROUTES.indexOf(next.$$route.originalPath) === -1){
+                    // If route is not found in closed routes then allow him to navigate to that route
                     return true;
                 }
             }
@@ -390,17 +382,24 @@
             require: 'ngModel',
             link: function(scope, element, attrs, modelCtrl) {
                 modelCtrl.$parsers.push(function (inputValue) {
+
+                    // this next if is necessary for when using ng-required on your input.
+                    // In such cases, when a letter is typed first, this parser will be called
+                    // again, and the 2nd time, the value will be undefined
+                    if (inputValue == undefined) return '';
+
                     if(inputValue.length > 15){
                         modelCtrl.$setViewValue(modelCtrl.$modelValue);
                         modelCtrl.$render();
                         return modelCtrl.$modelValue;
                     }
-                    // this next if is necessary for when using ng-required on your input.
-                    // In such cases, when a letter is typed first, this parser will be called
-                    // again, and the 2nd time, the value will be undefined
-                    if (inputValue == undefined) return '';
-                    var transformedInput = inputValue.replace(/[^0-9A-Za-z]{3,15}/g, '');
-                    if (transformedInput!=inputValue) {
+
+                    var transformedInput = inputValue.replace(/[^0-9A-Za-z]/g, '');
+                    var patternString = '[^0-9A-Za-z]';
+
+                    var pattern = new RegExp(patternString,'g');
+                    var transformedInput = inputValue.replace(pattern,'');
+                    if (transformedInput != inputValue) {
                         modelCtrl.$setViewValue(transformedInput);
                         modelCtrl.$render();
                     }
@@ -408,6 +407,40 @@
                 });
             }
         };
+    });
+
+    /**
+     * Pattern Restrictor for Input Field
+     * @desc Resticts the input field based on pattern passed to it
+     */
+    ezeid.directive('pinOnly',function(){
+        return {
+            require : 'ngModel',
+            link : function(scope,element,attrs,modelCtrl){
+                modelCtrl.$parsers.push(function(inputValue){
+                    if(inputValue.length > 3){
+                        modelCtrl.$setViewValue(modelCtrl.$modelValue);
+                        modelCtrl.$render();
+                        return modelCtrl.$modelValue;
+                    }
+
+                   if(inputValue === undefined) return '';
+
+
+                    var transformedInput =  inputValue.replace(/[^0-9]/g,'');
+
+                    var nTransformedInput = parseInt(transformedInput);
+
+                    if(!(nTransformedInput > 99 && nTransformedInput < 1000)){
+                        modelCtrl.$setViewValue(modelCtrl.$modelValue);
+                        modelCtrl.$render();
+                        return modelCtrl.$modelValue;
+                    }
+
+                    return nTransformedInput.toString();
+                });
+            }
+        }
     });
 
 })();
