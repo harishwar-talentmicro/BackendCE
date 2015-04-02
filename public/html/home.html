@@ -317,7 +317,7 @@
                                                     <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 normalFontSize searchRadioPadding searchByText">
                                                         Search by
                                                     </div>
-                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-3 normalFontSize searchRadioPadding1">
+                                                   <div class="col-lg-2 col-md-2 col-sm-2 col-xs-3 normalFontSize searchRadioPadding1">
                                                         <input type="radio" class="setRadioFilterSpace" ng-model="search.Criteria.SearchType" id="EZEID" value="1" name="searchBy" ng-change="search.isEZEIDselected('1')" class="radioTopMargin" checked>EZE ID
                                                     </div>
                                                     <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 normalFontSize searchRadioPadding1 keyWordText">
@@ -454,11 +454,11 @@
                                             <img src="../images/open_big.png" ng-show="search.mInfo.OpenStatus==1">
                                             <img src="../images/close_big.png" ng-hide="search.mInfo.OpenStatus==1">
                                         </div>
-                                        <div  class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer parking" style="padding-left: 30px;" ng-hide="search.isIndividualUser(1)">
-                                            <div class="parkingAlignment" ng-hide="search.mInfo.ParkingStatus==4">
+                                        <div  class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer " style="padding-left: 30px;" ng-hide="search.isIndividualUser(1)">
+                                            <div class="parkingAlignment" ng-hide="search.mInfo.ParkingStatus==3">
                                                 <img title="{{search.parkingTitle}}" src="../images/parking_new.png" >
                                             </div>
-                                            <div class="parkingAlignment" ng-show="search.mInfo.ParkingStatus==4">
+                                            <div class="parkingAlignment" ng-show="search.mInfo.ParkingStatus==3">
                                                 <img title="{{search.parkingTitle}}" src="../images/new_no_parking.png" >
                                             </div>
 

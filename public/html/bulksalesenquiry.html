@@ -1,12 +1,12 @@
 <div id="wrapper" ng-controller="bulksalesController as bulksalesController">
     <header-section></header-section>
        <div class="container-fluid">
-            <div class="row top-clearfix"></div>
+
                 <div class="row">
                     <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 col-lg-offset-2 col-md-offset-2 col-sm-offset-2 col-xs-offset-0">
                         <div class="panel panel-default">
                             <div class="panel-heading">
-                                <h4>Bulk Sales Enquiry</h4>
+                                <h4>{{formTitle}}</h4>
                             </div>
                             <div class="panel-body setPanelPadding">
                                 <div class="row setRowLeftRightMarginZero">
@@ -52,56 +52,71 @@
                                         <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 searchHeaderAlignment TemplateTextContainer bewareTextInnerContainer">
                                             Template
                                         </div>
-                                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 searchHeaderAlignment ">
-                                            <select class="form-control" name="states" ng-model="profile._info.StateID">
-                                                <option value = ""> --Select Template-- </option>
-                                                <option value = ""> Template1 </option>
-                                                <option value = ""> Template2 </option>
-                                                <option value = ""> Template3 </option>
-                                            </select>
+                                        <div ng-hide="showCreateMailTemplate">
+                                            <div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 searchHeaderAlignment ">
+                                                <select class="form-control" name="states" ng-model="profile._info.StateID">
+                                                    <option value = ""> --Select Template-- </option>
+                                                    <option value = ""> Template1 </option>
+                                                    <option value = ""> Template2 </option>
+                                                    <option value = ""> Template3 </option>
+                                                </select>
+                                            </div>
+                                            <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1 searchHeaderAlignment ">
+                                                <button data-toggle="tooltip" data-placement="right" title="Create Template" type="button" class="btn btn-primary" ng-click="bulksalesController.addNewTemplateForm()" >...</button>
+                                            </div>
                                         </div>
-                                        <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1 searchHeaderAlignment ">
-                                            <button data-toggle="tooltip" data-placement="right" title="Create Template" type="button" class="btn btn-primary" ng-click="bulksalesController.addNewTemplateForm()" >...</button>
+
+                                        <div ng-show="showCreateMailTemplate">
+                                            <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10 searchHeaderAlignment">
+                                                <input type="text" name="templateName" class="form-control" placeholder="Template title" maxlength="100" required>
+                                            </div>
                                         </div>
+
                                     </div><br/>
                                     <div class="row setRowLeftRightMarginZero centerAlign">
                                         <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 searchHeaderAlignment TemplateTextContainer bewareTextInnerContainer">
+                                            Name
+                                        </div>
+                                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 searchHeaderAlignment">
+                                            <input type="text" name="fromName" class="form-control" placeholder="From name" maxlength="100" required>
+                                        </div>
+                                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 searchHeaderAlignment TemplateTextContainer bewareTextInnerContainer keyWordText">
                                             From
                                         </div>
-                                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 searchHeaderAlignment">
-                                            <input type="text" name="fromEmail" class="form-control" placeholder="From email" required>
+                                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 searchHeaderAlignment">
+                                            <input type="text" name="fromEmail" class="form-control" placeholder="From email" maxlength="100" required>
                                         </div>
                                     </div><br/>
                                     <div class="row setRowLeftRightMarginZero centerAlign">
                                         <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 searchHeaderAlignment TemplateTextContainer bewareTextInnerContainer">
                                             Cc
                                         </div>
-                                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 searchHeaderAlignment">
-                                            <input type="text" name="fromEmail" class="form-control" placeholder="Cc" required>
+                                        <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10 searchHeaderAlignment">
+                                            <input type="text" name="fromEmail" class="form-control" placeholder="Cc email" maxlength="100" required>
                                         </div>
                                     </div><br/>
                                       <div class="row setRowLeftRightMarginZero centerAlign">
                                           <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 searchHeaderAlignment TemplateTextContainer bewareTextInnerContainer">
                                               Bcc
                                           </div>
-                                          <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 searchHeaderAlignment">
-                                              <input type="text" name="fromEmail" class="form-control" placeholder="Bcc" required>
+                                          <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10 searchHeaderAlignment">
+                                              <input type="text" name="fromEmail" class="form-control" placeholder="Bcc email" maxlength="100" required>
                                           </div>
                                       </div><br/>
                                       <div class="row setRowLeftRightMarginZero centerAlign">
                                           <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 searchHeaderAlignment TemplateTextContainer bewareTextInnerContainer">
                                               Subject
                                           </div>
-                                          <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 searchHeaderAlignment">
-                                              <input type="text" name="fromEmail" class="form-control" placeholder="Subject" required>
+                                          <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10 searchHeaderAlignment">
+                                              <input type="text" name="fromEmail" class="form-control" placeholder="Subject" maxlength="250" required>
                                           </div>
                                       </div><br/>
                                     <div class="row setRowLeftRightMarginZero centerAlign">
-                                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 searchHeaderAlignment TemplateTextContainer TextAreaTopMargin">
-                                            Body
+                                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 searchHeaderAlignment TemplateTextContainer bewareTextInnerContainer">
+                                            Body <a class="showPointer" ng-click="profile.openTermsAndConditionForm()" id="termConditions"> ( <u>?</u> ) </a>
                                         </div>
                                         <!--<div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 searchHeaderAlignment">-->
-                                        <div class="col-lg-7 col-md-7 col-sm-7 col-xs-7 searchHeaderAlignment">
+                                        <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10 searchHeaderAlignment">
                                             <textarea rows="10" cols="210" class="form-control " name="homeDeliverMessage" placeholder="Type here" required></textarea>
                                         </div>
                                     </div><br/>
@@ -109,14 +124,25 @@
                                         <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 searchHeaderAlignment TemplateTextContainer">
 
                                         </div>
-                                        <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 searchHeaderAlignment" style="text-align: left;">
-                                            <button type="button" class="btn btn-primary" ng-click="profile.closeRegistrationForm()" >Send</button>
+                                        <div ng-hide="showCreateMailTemplate">
+                                            <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 searchHeaderAlignment" style="text-align: left;">
+                                                <button type="button" class="btn btn-primary" ng-click="profile.closeRegistrationForm()" >Send</button>
+                                            </div>
+                                            <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 searchHeaderAlignment" style="text-align: left;">
+                                                <button type="button" class="btn btn-primary" ng-click="profile.closeRegistrationForm()" >Close</button>
+                                            </div>
                                         </div>
-                                        <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 searchHeaderAlignment" style="text-align: left;">
-                                            <button type="button" class="btn btn-primary" ng-click="profile.closeRegistrationForm()" >Close</button>
+
+                                        <div ng-show="showCreateMailTemplate">
+                                            <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 searchHeaderAlignment" style="text-align: left;">
+                                                <button type="button" class="btn btn-primary" ng-click="bulksalesController.saveMailTemplate()" >Save</button>
+                                            </div>
+                                            <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 searchHeaderAlignment" style="text-align: left;">
+                                                <button type="button" class="btn btn-primary" ng-click="profile.closeRegistrationForm()" >Cancel</button>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
+                                  </div>
                                 </div>
                              </div>
                          </div>
