@@ -24,7 +24,26 @@
         '/business-manager',
         '/profile'
     ]);
+
+    /**
+     * These routes will not consider whether user is authenticated or not
+     * and user can navigate to these routes as public routes whether logged in or not
+     */
+    ezeid.value('OPEN_ROUTES',[
+
+    ]);
+
+    /**
+     * These routes will not be navigated when user is logged in
+     * for eg. User cannot open signup page while he is logged in
+     */
+    ezeid.value('UNAUTHORIZED_ROUTES',[
+        '/signup'
+    ]);
+
     ezeid.value('MsgDelay',2000);
+
+
     //HTTP Interceptor for detecting token expiry
     //Reloads the whole page in case of Unauthorized response from api
     ezeid.factory('ezeidInterceptor',['$rootScope','$timeout','$q',function($rootScope,$timeout,$q){
@@ -97,7 +116,8 @@
     /***
      * @ezeid Configuring Route access based on authentication
      */
-    ezeid.run(['$location','$rootScope','CLOSED_ROUTES','$routeParams','$timeout',function($location,$rootScope,CLOSED_ROUTES,$routeParams,$timeout){
+    ezeid.run(['$location','$rootScope','CLOSED_ROUTES','$routeParams','$timeout','UNAUTHORIZED_ROUTES',
+        function($location,$rootScope,CLOSED_ROUTES,$routeParams,$timeout,UNAUTHORIZED_ROUTES){
         /**
          * Checking login while navigating to different pages
          */
@@ -105,16 +125,16 @@
         $rootScope.$on("$routeChangeStart",function(event,next,current){
 
             try{
-                if(CLOSED_ROUTES.indexOf(next.$$route.originalPath) === -1){
-                    // If route is not found in closed routes then allow him to navigate to that route
-                    return true;
+                if(CLOSED_ROUTES.indexOf(next.$$route.originalPath) === -1
+                    &&
+                    UNAUTHORIZED_ROUTES.indexOf(next.$$route.originalPath) === -1){
+
+                    return;
                 }
             }
             catch(ex){
-                return true;
+                return;
             }
-
-
             /**
              * Checking if the user is authenticated an then routing it to particular url
              */
@@ -124,6 +144,28 @@
                 /**
                  * Allow him to access the site as he is already logged in
                  */
+                if(typeof($rootScope._userInfo.IsAuthenticate) == "undefined"){
+                    $location.path('/');
+                    return;
+                }
+
+                if($rootScope._userInfo.IsAuthenticate){
+                    try{
+                        if(UNAUTHORIZED_ROUTES.indexOf(next.$$route.originalPath) !== -1){
+                            /**
+                             * If route is found in unauthorized routes then don't allow him to navigate to that route
+                             * when he is already logged in
+                             */
+                            console.log('UNAUTHORIZED ROUTES');
+                            $location.path('/');
+                        }
+                    }
+                    catch(ex){
+
+                    }
+
+
+                }
             }
             else {
                 if (typeof (Storage) !== "undefined") {
@@ -134,7 +176,10 @@
                         try{
                             Jsonstring = decrypted.toString(CryptoJS.enc.Utf8);
                         }
-                        catch(ex){}
+                        catch(ex){
+
+                        }
+
                         if (Jsonstring) {
                             $rootScope._userInfo = JSON.parse(Jsonstring);
                             if($rootScope._userInfo.hasOwnProperty('IsAuthenticate')){
@@ -142,6 +187,25 @@
                                     /**
                                      * Allow him to access the site as he is already logged in
                                      */
+                                    try{
+                                        if(UNAUTHORIZED_ROUTES.indexOf(next.$$route.originalPath) !== -1){
+                                            /**
+                                             * If route is found in unauthorized routes then don't allow him to navigate to that route
+                                             * when he is already logged in
+                                             */
+                                            console.log('UNAUTHORIZED ROUTES1');
+                                            $location.path('/');
+                                        }
+                                    }
+                                    catch(ex){
+                                        return true;
+                                    }
+
+                                    /**
+                                     * Allow him to access the site as he is already logged in
+                                     */
+
+
                                 }
                                 else{
                                     $location.path('/');

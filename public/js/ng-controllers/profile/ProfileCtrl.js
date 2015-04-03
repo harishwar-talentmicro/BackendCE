@@ -4,6 +4,7 @@
  * @author Hirecraft
  * @since 05/04/2015 05:15 PM
  */
+"use strict";
 angular.module('ezeidApp').controller('ProfileCtrl',[
     '$rootScope',
     '$scope',
@@ -54,7 +55,35 @@ angular.module('ezeidApp').controller('ProfileCtrl',[
         $scope.dataLoadComplete = false;
 
 
+        /**
+         * List of countries
+         * @type {Array}
+         */
+        $scope.countryList = [];
 
+        /**
+         * List of states loaded based on country code
+         * @type {Array}
+         */
+        $scope.stateList = [];
+
+        /**
+         * List of cities loaded based on states
+         * @type {Array}
+         */
+        $scope.cityList = [];
+
+        /**
+         * UserDetails Model
+         * @type {null}
+         */
+        $scope.userDetails = null;
+
+        /**
+         * Secondary Locations Available for this particular user
+         * @type {Array}
+         */
+        $scope.secondaryLocations = [];
 
         /**
          * If user wants the data to be refreshed,
@@ -94,7 +123,13 @@ angular.module('ezeidApp').controller('ProfileCtrl',[
             }).success(function(resp){
                     console.log('Country List');
                     console.log(JSON.stringify(resp));
-                defer.resolve(resp);
+                    if(resp && resp.length > 0 && resp !== 'null'){
+                        $scope.countryList = resp;
+                        defer.resolve(true);
+                    }
+                    else{
+                        defer.resolve(false);
+                    }
             }).error(function(err){
                 defer.reject(err);
             });
@@ -115,9 +150,15 @@ angular.module('ezeidApp').controller('ProfileCtrl',[
                     Token : $rootScope._userInfo.Token
                 }
             }).success(function(resp){
-                defer.resolve(resp);
                     console.log('User Details');
                     console.log(JSON.stringify(resp));
+                    if(resp && resp.length > 0 && resp !== 'null'){
+                        defer.resolve(true);
+                        $scope.userDetails = resp[0];
+                    }
+                    else{
+                        defer.resolve(false);
+                    }
             }).error(function(err){
                 defer.reject(err);
             });
