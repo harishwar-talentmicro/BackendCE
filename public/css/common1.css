@@ -629,3 +629,7 @@ body {
     -webkit-box-shadow: 0px 2px 3px -3px #666;
     transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
 }
+.WhiteTextBox {
+    background-color: #ffffff;
+
+}
