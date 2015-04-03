@@ -76,11 +76,19 @@ angular.module('ezeidApp').controller('bulksalesController',['$http', '$rootScop
                     salesEnquiry._info.Body = "";
                     salesEnquiry._info.TID = "";
 
-                    document.getElementById("FromName").className = "form-control emptyBox";
-                    document.getElementById("FromEmailID").className = "form-control emptyBox";
-                    document.getElementById("Title").className = "form-control emptyBox";
-                    document.getElementById("Subject").className = "form-control emptyBox";
-                    document.getElementById("Body").className = "form-control emptyBox";
+                    /*document.getElementById("FromName").className = "emptyBox";
+                    document.getElementById("FromEmailID").className = "emptyBox";
+                    document.getElementById("Title").className = "emptyBox";
+                    document.getElementById("Subject").className = "emptyBox";
+                    document.getElementById("Body").className = "emptyBox";*/
+
+                    document.getElementById("FromName1").className = "form-control";
+                    document.getElementById("FromEmailID").className = "form-control";
+                    document.getElementById("Title1").className = "form-control";
+                    document.getElementById("Subject").className = "form-control";
+                    document.getElementById("Body").className = "form-control";
+
+                  //  document.getElementById("Subject").removeClass("mandatoryTextBox").addClass("WhiteTextBox form-control emptyBox");
 
                     getTemplateList();
 
