@@ -35,10 +35,6 @@ app.use('/fonts', express.static(path.join(__dirname, 'public/fonts/')));
 app.use('/directives', express.static(path.join(__dirname, 'public/directives/')));
 app.use('/images', express.static(path.join(__dirname, 'public/images/')));
 
-app.get('/:id',function(req,res){
-    res.sendFile(__dirname + '/public/html/index.html');
-});
-
 app.get('/', function(req, res){
     res.sendfile(__dirname + '/public/html/index.html');
 });
@@ -194,7 +190,9 @@ app.post('/ewtSaveGatesVES',LocationManager.FnSaveGatesVES);
 app.post('/ewtSaveCitysVES',LocationManager.FnSaveCitysVES);
 
 
-
+app.get('/:id',function(req,res){
+    res.sendFile(__dirname + '/public/html/index.html');
+});
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
     console.log('404 : Page not found');

@@ -4,7 +4,10 @@
  * @author Hirecraft
  * @since 05/04/2015 05:15 PM
  */
-"use strict";
+/**
+ * "use strict";
+ */
+
 angular.module('ezeidApp').controller('ProfileCtrl',[
     '$rootScope',
     '$scope',

@@ -67,7 +67,7 @@ angular.module('ezeidApp').controller('NotifyController', function ($scope, $roo
                 Icon:''
             };
             alert('Sorry..! Browser does not support');
-            window.location.href = "#/";
+            window.location.href = "/";
         }
     }
 
@@ -76,7 +76,7 @@ angular.module('ezeidApp').controller('NotifyController', function ($scope, $roo
             LoadNotifications(_pageValue);
         }
         else {
-            window.location.href = "#/";
+            window.location.href = "/";
         }
     });
 
