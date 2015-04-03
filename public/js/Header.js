@@ -4,7 +4,7 @@ HeaderApp.directive('headerSection', function (Notification) {
     return {
         restrict: 'EA',
         templateUrl: 'directives/Header.html',
-        controller: function ($http, $rootScope) {
+        controller: function ($http, $rootScope,$location) {
             var MsgDelay = 2000;
             var SignCtrl = this;
             this.LInfo = {};
@@ -40,6 +40,7 @@ HeaderApp.directive('headerSection', function (Notification) {
                         if ($rootScope._userInfo.IsAuthenticate == true) {
                            // Notification.success({ message: "Sign In Success", delay: MsgDelay });
                             $('#SignIn_popup').slideUp();
+                            $location.path('/');
                             if (form) {
                                 form.$setPristine();
                                 form.$setUntouched();
