@@ -7428,7 +7428,7 @@ exports.FnSaveMailTemplate = function(req, res){
             IsSuccessfull: false
         };
        
-        if (Token != null && Title != null && FromName != null && FromEmailID != null && CCMailIDS != null && BCCMailIDS != null && Subject != null && Body != null ) {
+        if (Token != null && Title != null && FromName != null && FromEmailID != null && Subject != null && Body != null ) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
@@ -7483,12 +7483,6 @@ exports.FnSaveMailTemplate = function(req, res){
             }
             else if (FromEmailID == null) {
                 console.log('FnSaveMailTemplate: FromEmailID is empty');
-            }
-            else if (CCMailIDS == null) {
-                console.log('FnSaveMailTemplate: CCMailIDS is empty');
-            }
-            else if (BCCMailIDS == null) {
-                console.log('FnSaveMailTemplate: BCCMailIDS is empty');
             }
             else if (Subject == null) {
                 console.log('FnSaveMailTemplate: Subject is empty');
