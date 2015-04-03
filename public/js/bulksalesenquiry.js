@@ -1,7 +1,11 @@
+/*angular.module('ezeidApp').controller('bulksalesController', function($http, $rootScope, $scope, Notification, GURL){*/
+angular.module('ezeidApp').controller('bulksalesController',['$http', '$rootScope', '$scope', '$q', 'Notification', '$window', 'GURL', function($http, $rootScope, $scope, $q, Notification, $window, GURL){
 
-angular.module('ezeidApp').controller('bulksalesController', function($http, $rootScope, $scope, Notification, GURL){
 
     var salesEnquiry = this;
+    salesEnquiry._info = {};
+    var MsgDelay = 2000;
+
    if ($rootScope._userInfo) {
     }
     else {
@@ -36,11 +40,18 @@ angular.module('ezeidApp').controller('bulksalesController', function($http, $ro
             window.location.href = "/home";
         }
     }
+
+    $scope.$watch('_userInfo.IsAuthenticate', function () {
+
+        getTemplateList();
+    });
+
     $scope.formTitle = "Bulk Sales Enquiry";
 
     // Create new mail template
     salesEnquiry.addNewTemplateForm = function () {
        // window.location.href = "#/create-template";
+        salesEnquiry._info = {};
         $scope.formTitle = "Create mail template";
         $scope.showCreateMailTemplate = true;
 
@@ -48,7 +59,183 @@ angular.module('ezeidApp').controller('bulksalesController', function($http, $ro
 
     // save mail template
     salesEnquiry.saveMailTemplate = function () {
-        console.log("Sai123");
+
+        salesEnquiry._info.Token = $rootScope._userInfo.Token;
+
+        if(isValidate())
+        {
+            $http({ method: 'post', url: GURL + 'ewtSaveMailTemplate', data: salesEnquiry._info }).success(function (data) {
+
+                if (data != 'null') {
+                    //salesEnquiry._info = {};
+
+                    salesEnquiry._info.FromName = "";
+                    salesEnquiry._info.FromEmailID = "";
+                    salesEnquiry._info.Title = "";
+                    salesEnquiry._info.Subject = "";
+                    salesEnquiry._info.Body = "";
+                    salesEnquiry._info.TID = "";
+
+                    document.getElementById("FromName").className = "form-control emptyBox";
+                    document.getElementById("FromEmailID").className = "form-control emptyBox";
+                    document.getElementById("Title").className = "form-control emptyBox";
+                    document.getElementById("Subject").className = "form-control emptyBox";
+                    document.getElementById("Body").className = "form-control emptyBox";
+
+                    getTemplateList();
+
+                    $scope.formTitle = "Bulk Sales Enquiry";
+                    $scope.showCreateMailTemplate = false;
+
+                    //$("input#FromName").removeClass("mandatoryTextBox").addClass("form-control");
+                    //$("input#FromName").attr("class", "newForm-Control");
+
+
+                    /*
+                    document.getElementById("FromName").className = "form-control emptyBox";
+                    document.getElementById("FromEmailID").className = "form-control emptyBox";
+                    document.getElementById("Title").className = "form-control emptyBox";
+                    document.getElementById("Subject").className = "form-control emptyBox";
+                    document.getElementById("Body").className = "form-control emptyBox";
+                    */
+                }
+                else {
+                    // Notification.error({ message: 'Invalid key or not found…', delay: MsgDelay });
+
+                }
+            });
+        }
     };
 
-});
+    // Validation function for creating mail template
+    function isValidate()
+    {
+        var notificationMessage = "";
+        var errorList  = [];
+        // Check validations
+        if(!salesEnquiry._info.Title)
+        {
+            errorList.push('Template title is Required');
+        }
+
+        if(!salesEnquiry._info.FromName)
+        {
+            errorList.push('From name Required');
+        }
+        if(!salesEnquiry._info.FromEmailID)
+        {
+            errorList.push('From email is Required');
+        }
+        if(!salesEnquiry._info.Subject)
+        {
+            errorList.push('Subject is Required');
+        }
+        if(!salesEnquiry._info.Body)
+        {
+            errorList.push('Body is Required');
+        }
+        if(salesEnquiry._info.isWrongEmailPatternFrom)
+        {
+            errorList.push('Not valid email!');
+        }
+        if(salesEnquiry._info.isWrongEmailPatternCc)
+        {
+            errorList.push('Not valid email!');
+        }
+        if(salesEnquiry._info.isWrongEmailPatternBcc)
+        {
+            errorList.push('Not valid email!');
+        }
+        if(errorList.length>0){
+            for(var i = errorList.length; i>0;i--)
+            {
+                Notification.error({ message: errorList[i-1], delay: MsgDelay });
+            }
+        };
+        //Return false if errorList is greater than zero
+        return (errorList.length>0)? false : true;
+    }
+
+    // Api call for getting list of all mail templates, for displaing in dropdown
+    function getTemplateList()
+    {
+        $http({
+            method: 'get',
+            url: GURL + 'ewtGetTemplateList?Token=' + $rootScope._userInfo.Token
+        }).success(function (data) {
+                if(data !== "null")
+                {
+                    if($rootScope._userInfo.Token == false) {
+                        var _obj = { TID: 0, Title: '--Select Template--' };
+                        data.splice(0, 0, _obj);
+                        bulksalesController._info.TID = _obj.TID;
+                    }
+                    salesEnquiry.templates = data;
+                }
+            });
+    }
+
+    // Close Create Mail Template Form
+    salesEnquiry.closeCreateMailTemplateForm = function () {
+        $scope.formTitle = "Bulk Sales Enquiry";
+        $scope.showCreateMailTemplate = false;
+    };
+
+    // get template details
+    salesEnquiry.getTemplateDetails = function (Tid) {
+        if(Tid != undefined)
+        {
+            $http({
+                method: 'get',
+                url: GURL + 'ewtGetTemplateDetails?Token=' + $rootScope._userInfo.Token + '&TID='+Tid
+            }).success(function (data) {
+                    if(data !== "null")
+                    {
+                        salesEnquiry._info = data[0];
+                    }
+                });
+        }
+    };
+
+    // send sales enquiry mail
+    salesEnquiry.SendEnquiryMail = function () {
+
+        salesEnquiry._info.Token = $rootScope._userInfo.Token;
+
+        if(isValidate())
+        {
+            /*$http({ method: 'post', url: GURL + 'ewtSaveMailTemplate', data: salesEnquiry._info }).success(function (data) {
+
+                if (data != 'null') {
+                    salesEnquiry._info = {};
+
+                    $scope.formTitle = "Bulk Sales Enquiry";
+                    $scope.showCreateMailTemplate = false;
+
+                    document.getElementById("FromName").className = "form-control emptyBox";
+                    document.getElementById("FromEmailID").className = "form-control emptyBox";
+                    document.getElementById("Title").className = "form-control emptyBox";
+                    document.getElementById("Subject").className = "form-control emptyBox";
+                    document.getElementById("Body").className = "form-control emptyBox";
+
+                    // success msg
+                    // " Mails are submitted for transmitted "
+                }
+                else {
+                    // Notification.error({ message: 'Invalid key or not found…', delay: MsgDelay });
+
+                }
+            });*/
+        }
+    };
+
+    // Close Create Mail Template Form
+    salesEnquiry.closeSalesEnquiryForm = function () {
+        window.location.href = "#/home";
+    };
+
+
+/*
+  });
+*/
+}]);

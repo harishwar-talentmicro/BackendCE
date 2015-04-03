@@ -208,7 +208,10 @@ angular.module('ezeidApp').controller('ModuleSettingsCtrl',['$q','$scope','$inte
     };
 
     $scope.uploadBrochure = function(){
-        //@todo Write code for brochure upload
+        /**
+         * @todo Write code for brochure upload
+         * @type {files|*|files|FileList|files}
+         */
        var file =  $("#brochure-file-upload")[0].files;
        console.log('I am executing');
         console.log(file);
@@ -275,8 +278,10 @@ angular.module('ezeidApp').controller('ModuleSettingsCtrl',['$q','$scope','$inte
     $scope.loadCategories();
     $scope.loadSettings();
 
-    //@todo write method for brochure base64 conversion and upload option( in HTML view also)
-    //@todo Separate call is present for File upload(already separate API Service is present for file upload)
+    /**
+     * @todo write method for brochure base64 conversion and upload option( in HTML view also)
+     //@todo Separate call is present for File upload(already separate API Service is present for file upload)
+     */
 
 
 }]);
