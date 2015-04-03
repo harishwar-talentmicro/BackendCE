@@ -1,5 +1,6 @@
 // Search Controller
 angular.module('ezeidApp').controller('SearchController', function ($http, $rootScope, $scope, $compile, $timeout, Notification, $filter, $location, $window, $q, $interval,GURL,MsgDelay,$routeParams) {
+        console.log($routeParams);
 
    /* if(Object.keys($routeParams).length > 0){
         if(typeof($routeParams['SearchType']) !== "undefined" && $routeParams['SearchType'] !== null && $routeParams['SearchType'] !== "")
@@ -1177,5 +1178,13 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
         SearchSec.Criteria.Keywords = Qstr;
         SearchSec.IsSearchPending = true;
         SearchSec.Criteria.SearchType = "1";
+    }
+
+    if($routeParams.ezeid){
+
+        SearchSec.Criteria.Keywords = $routeParams.ezeid;
+//        SearchSec.Criteria.SearchType = "1";
+        SearchSec.Criteria.SearchType = 1;
+        SearchSec.getSearch();
     }
 });

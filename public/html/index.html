@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <base href="/">
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -22,7 +23,7 @@
     <div class="viewport" ng-view>
     </div>
 
-
+    <a href="/profile">Profile</a>
     <script src="js/jquery-1.9.1.min.js"></script>
     <script src="js/angular.min.js"></script>
     <script src="js/core-min.js"></script>
@@ -109,6 +110,7 @@
     <script>
         // Lazy Loading fonts from Google Font API
             $("<link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'/>").appendTo("head");
+            $("<link href='https://fonts.googleapis.com/css?family=Open+Sans:300,400' rel='stylesheet' type='text/css'>").appendTo("head");
             $("<style>  *{ font-family: 'Roboto', sans-serif; }</style>").appendTo("head");
     </script>
 </body>
