@@ -7,7 +7,7 @@
 
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        <h4 class="">Manage Profile and Locations <label class="label label-danger pull-right label-mandatory">* Mandatory</label></h4>
+                        <h4 class="">Profile Manager <label class="label label-danger pull-right label-mandatory">* Mandatory</label></h4>
 
                     </div>
                     <div class="panel-body">
@@ -43,7 +43,31 @@
                                         <!---------------------Profile Edit Mode Disabled --------------------->
                                         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 profile-details" ng-hide="profileEditMode">
 
-                                            <!----------------- Visible only in case of Individual User (Company)--- -->
+
+                                        <div class="row">
+                                            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 bottom-clearfix">
+                                                <h5 class="text-primary text-left">EZEID</h5>
+                                            </div>
+                                            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 bottom-clearfix">
+                                                <h5 class="text-primary text-left font-open-sans data">
+                                                    {{userDetails.EZEID}}
+                                                </h5>
+                                            </div>
+                                            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 bottom-clearfix">
+                                                <h5 class="text-primary text-left">PIN Protected</h5>
+                                            </div>
+                                            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 bottom-clearfix">
+                                                <h5 class="text-primary text-left font-open-sans data" ng-show="userDetails.PIN">
+                                                    <span class="text-success">Yes</span>
+                                                </h5>
+                                                <h5 class="text-primary text-left font-open-sans data" ng-hide="userDetails.PIN">
+                                                    <span class="text-danger">No</span>
+                                                </h5>
+                                            </div>
+                                        </div>
+
+                                            <!----------------- Visible only in case of Individual User--- -->
+
                                             <div class="row" ng-show="(userDetails.IDTypeID === 1)">
                                                 <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 bottom-clearfix">
                                                     <h5 class="text-primary text-left">Name</h5>
@@ -114,6 +138,7 @@
 
 
                                             <!----------------- Visible only in case of Business User (Company)--- -->
+
                                             <div class="row" ng-show="(userDetails.IDTypeID === 2)">
                                                 <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 bottom-clearfix label">
                                                     <h5 class="text-primary text-left">Company Name</h5>
@@ -211,27 +236,42 @@
 
 
                                         <!------------------Profile Edit Mode Enabled ------------------->
-                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 profile-details" ng-show="profileEditMode">
+                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 profile-details" ng-show="profileEditMode" ng-controller="ProfileEditCtrl">
 
-                                            <!----------------- Visible only in case of Individual User (Company)--- -->
-                                            <div class="row" ng-show="(userDetails.IDTypeID === 1)">
+                                            <div class="row">
                                                 <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 bottom-clearfix">
                                                     <h5 class="text-primary text-left">EZEID</h5>
                                                 </div>
                                                 <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 bottom-clearfix">
-
+                                                    <h5 class="text-primary text-left font-open-sans data">
+                                                        {{userDetails.EZEID}}
+                                                    </h5>
                                                 </div>
                                                 <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 bottom-clearfix">
                                                     <h5 class="text-primary text-left">PIN Protected</h5>
                                                 </div>
                                                 <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 bottom-clearfix">
-                                                    <h5 class="text-primary text-left font-open-sans data">
-                                                        <span class="glyphicon glyphicon-ok text-success" ng-show="userDetails.PIN"> Yes</span>
-                                                        <span class="glyphicon glyphicon text-danger" ng-hide="userDetails.PIN"> No</span>
-                                                    </h5>
+                                                    <div class="row">
+                                                        <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
+                                                            <div class="form-group">
+                                                                <div class="row">
+                                                                    <div class="col-lg-4">
+                                                                        <input type="checkbox" class="form-control" ng-model="isPinApplicable" />
+                                                                    </div>
+                                                                    <div class="col-lg-8">
+                                                                        <input type="text" ng-disabled="!isPinApplicable" ng-model="editUserDetails.PIN" class="form-control" placeholder="PIN" />
+                                                                    </div>
+                                                                </div>
+
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+
                                                 </div>
                                             </div>
 
+                                            <!----------------- Visible only in case of Individual User --- -->
                                             <div class="row" ng-show="(userDetails.IDTypeID === 1)">
                                                 <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 bottom-clearfix">
                                                     <h5 class="text-primary text-left">First Name</h5>
@@ -240,7 +280,7 @@
                                                     <div class="row">
                                                         <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
                                                             <div class="form-group">
-                                                                <input type="text" class="form-control" placeholder="First Name" />
+                                                                <input type="text" ng-model="editUserDetails.FirstName" class="form-control" placeholder="First Name" />
                                                             </div>
                                                         </div>
                                                     </div>
@@ -254,7 +294,7 @@
                                                     <div class="row">
                                                         <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
                                                             <div class="form-group">
-                                                                <input type="text" class="form-control" placeholder="Last Name" />
+                                                                <input type="text" ng-model="editUserDetails.LastName" class="form-control" placeholder="Last Name" />
                                                             </div>
                                                         </div>
                                                     </div>
@@ -270,7 +310,7 @@
                                                     <div class="row">
                                                         <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
                                                             <div class="form-group">
-                                                                <input type="text" class="form-control" placeholder="admin@example.com" />
+                                                                <input type="text" ng-model="editUserDetails.EMailID" class="form-control" placeholder="admin@example.com" />
                                                             </div>
                                                         </div>
                                                     </div>
@@ -287,7 +327,7 @@
                                                     <div class="row">
                                                         <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
                                                             <div class="form-group">
-                                                                <input type="text" class="form-control" placeholder="Company Name" />
+                                                                <input type="text" ng-model="editUserDetails.CompanyName" class="form-control" placeholder="Company Name" />
                                                             </div>
                                                         </div>
                                                     </div>
@@ -301,7 +341,7 @@
                                                     <div class="row">
                                                         <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
                                                             <div class="form-group">
-                                                                <input type="text" class="form-control" placeholder="Job Title" />
+                                                                <input type="text" ng-model="editUserDetails.JobTitle" class="form-control" placeholder="Job Title" />
                                                             </div>
                                                         </div>
                                                     </div>
@@ -317,7 +357,7 @@
                                                     <div class="row">
                                                         <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
                                                             <div class="form-group">
-                                                                <date-time-picker recipient="dateOfBirth"></date-time-picker>
+                                                                <date-time-picker recipient="editUserDetails.DOB"></date-time-picker>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -331,7 +371,7 @@
                                                     <div class="row">
                                                         <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
                                                             <div class="form-group">
-                                                                <select class="form-control">
+                                                                <select class="form-control" ng-model="editUserDetails.Gender">
                                                                     <option value="2">Unspecified Gender</option>
                                                                     <option value="0">Male</option>
                                                                     <option value="1">Female</option>
@@ -353,7 +393,7 @@
                                                     <div class="row">
                                                         <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
                                                             <div class="form-group">
-                                                                <input type="text" class="form-control" placeholder="Company Name" />
+                                                                <input type="text" ng-model="editUserDetails.CompanyName" class="form-control" placeholder="Company Name" />
                                                             </div>
                                                         </div>
                                                     </div>
@@ -366,7 +406,7 @@
                                                     <div class="row">
                                                         <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
                                                             <div class="form-group">
-                                                                <input type="email" class="form-control" placeholder="Contact Email" />
+                                                                <input type="email" ng-model="editUserDetails.EMailID" class="form-control" placeholder="Contact Email" />
                                                             </div>
                                                         </div>
                                                     </div>
@@ -381,7 +421,7 @@
                                                     <div class="row">
                                                         <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
                                                             <div class="form-group">
-                                                                <input type="text" class="form-control" placeholder="Contact Person First Name" />
+                                                                <input type="text" ng-model="editUserDetails.FirstName" class="form-control" placeholder="Contact Person First Name" />
                                                             </div>
                                                         </div>
                                                     </div>
@@ -395,7 +435,7 @@
                                                     <div class="row">
                                                         <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
                                                             <div class="form-group">
-                                                                <input type="text" class="form-control" placeholder="Contact Person Last Name" />
+                                                                <input type="text" ng-model="editUserDetails.LastName" class="form-control" placeholder="Contact Person Last Name" />
                                                             </div>
                                                         </div>
                                                     </div>
@@ -411,7 +451,7 @@
                                                     <div class="row">
                                                         <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
                                                             <div class="form-group">
-                                                                <textarea class="form-control" row="3" placeholder="About Company"></textarea>
+                                                                <textarea ng-model="editUserDetails.AboutCompany" class="form-control" row="3" placeholder="About Company"></textarea>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -430,7 +470,7 @@
                                                     <div class="row">
                                                         <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
                                                             <div class="form-group">
-                                                                <input type="text" class="form-control" placeholder="Name of Public Place" />
+                                                                <input type="text" ng-model="editUserDetails.CompanyName" class="form-control" placeholder="Name of Public Place" />
                                                             </div>
                                                         </div>
                                                     </div>
@@ -444,7 +484,7 @@
                                                     <div class="row">
                                                         <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
                                                             <div class="form-group">
-                                                                <input type="text" class="form-control" placeholder="Email" />
+                                                                <input type="text" ng-model="editUserDetails.EMailID" class="form-control" placeholder="Email" />
                                                             </div>
                                                         </div>
                                                     </div>
@@ -460,7 +500,7 @@
                                                     <div class="row">
                                                         <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
                                                             <div class="form-group">
-                                                                <input type="text" class="form-control" placeholder="Contact Person First Name" />
+                                                                <input type="text" ng-model="editUserDetails.FirstName" class="form-control" placeholder="Contact Person First Name" />
                                                             </div>
                                                         </div>
                                                     </div>
@@ -474,7 +514,7 @@
                                                     <div class="row">
                                                         <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
                                                             <div class="form-group">
-                                                                <input class="form-control" placeholder="Contact Person Last Name"/>
+                                                                <input class="form-control" ng-model="editUserDetails.LastName" placeholder="Contact Person Last Name"/>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -490,7 +530,7 @@
                                                     <div class="row">
                                                         <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
                                                             <div class="form-group">
-                                                                <textarea class="form-control" row="3" placeholder="About public place"></textarea>
+                                                                <textarea ng-model="editUserDetails.AboutCompany" class="form-control" row="3" placeholder="About public place"></textarea>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -500,7 +540,7 @@
 
                                             <div class="row">
                                                 <div class="col-lg-2 col-md-2 col-sm-2 col-xs-3">
-                                                    <button class="btn btn-block btn-primary">Save</button>
+                                                    <button class="btn btn-block btn-primary" ng-click="saveUserDetails()">Save</button>
                                                 </div>
                                                 <div class="col-lg-2 col-md-2 col-sm-2 col-xs-3">
                                                     <button class="btn btn-block btn-primary" ng-click="toggleProfileEditMode()">Close</button>
