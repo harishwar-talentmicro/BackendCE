@@ -68,10 +68,6 @@ angular.module('ezeidApp').controller('ProfileEditCtrl',[
         });
 
 
-        $scope.verifyUserDetails = function(){
-
-        };
-
         /**
          * Saves userDetails and assign them to ProfielEditCtrl userDetails Model
          * @returns {promise|*}
@@ -83,7 +79,7 @@ angular.module('ezeidApp').controller('ProfileEditCtrl',[
              */
 
             $http({
-                url : GURL + '',
+                url : GURL + 'ewSavePrimaryEZEData',
                 method : 'POST',
                 data : $scope.editUserDetails
             }).success(function(resp){
@@ -99,12 +95,13 @@ angular.module('ezeidApp').controller('ProfileEditCtrl',[
 
 
 
-//        $interval(function(){
+        $interval(function(){
 //            console.log('userDetails');
 //            console.log($scope.userDetails);
 //            console.log('editUserDetails');
 //            console.log($scope.editUserDetails);
-//        },10000,10);
+//            console.log($rootScope._userInfo);
+        },1000,2);
 
 
     }]);

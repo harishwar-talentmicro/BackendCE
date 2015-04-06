@@ -1,4 +1,4 @@
-<div id="wrapper" ng-controller="SignUpCtrl">
+<div id="wrapper">
     <header-section></header-section>
     <div class="container-fluid top-clearfix-padding">
         <div class="row">
@@ -7,10 +7,32 @@
 
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        <h4 class="">Profile Manager <label ng-show="profileEditMode" class="label label-danger pull-right label-mandatory">* Mandatory</label></h4>
+                        <h4 class="text-center">Profile Manager : {{userDetails.EZEID}}
+                            <span ng-show="userDetails.IDTypeID == 1">(Individual)</span>
+                            <span ng-show="userDetails.IDTypeID == 2 && userDetails.SelectionType == 2">(Business Paid Listing)</span>
+                            <span ng-show="userDetails.IDTypeID == 2 && userDetails.SelectionType !== 2">(Business Free Listing)</span>
+                            <span ng-show="userDetails.IDTypeID == 3">(Public Place)</span>
+                            <label ng-show="profileEditMode" class="label label-danger pull-right label-mandatory">* Mandatory</label>
+                        </h4>
 
                     </div>
-                    <div class="panel-body">
+                    <div class="panel-body profile-manager">
+                        <!-------------- Navigation for Profile Manager ------------------------>
+                        <div class="container-fluid">
+                            <div class="row bottom-clearfix">
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-center">
+                                    <ul class="nav nav-pills">
+                                        <li role="presentation" class="active"><a href="/profile">Basic Profile and Locations</a></li>
+                                        <li role="presentation" class="disabled"><a href="/configuration">Configuration</a></li>
+                                        <li role="presentation"><a href="/configuration">Short URLs</a></li>
+                                        <li role="presentation"><a href="/configuration">Configuration</a></li>
+                                        <li role="presentation"><a href="/password">Change Password</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-------------- end : Navigation for Profile Manager ------------------>
 
                         <!------------- Content Block ------------------------------->
                         <div class="container-fluid" ng-show="dataLoadInProgress">
@@ -30,6 +52,7 @@
                             </div>
                         </div>
                         <div class="container-fluid" ng-show="dataLoadComplete">
+
                             <!----------------- Profile Section ---------------->
                             <div class="panel panel-success">
                                 <div class="panel-heading">
@@ -291,7 +314,7 @@
                                                                            type="text"
                                                                            ng-model="editUserDetails.FirstName"
                                                                            class="form-control emptyBox"
-                                                                           ng-class="() ? 'mandatoryTextBox' : ''"
+                                                                           ng-class="(userDetailsForm.FirstName.$dirty && userDetailsForm.FirstName.$modelValue.length < 1) ? 'mandatoryTextBox' : ''"
                                                                            placeholder="First Name" />
                                                                 </div>
                                                             </div>
@@ -316,13 +339,18 @@
 
                                                 <div class="row" ng-show="(userDetails.IDTypeID === 1)">
                                                     <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 bottom-clearfix">
-                                                        <h5 class="text-primary text-left">Email</h5>
+                                                        <h5 class="text-primary text-left">Email *</h5>
                                                     </div>
                                                     <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 bottom-clearfix">
                                                         <div class="row">
                                                             <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
                                                                 <div class="form-group">
-                                                                    <input type="text" ng-model="editUserDetails.EMailID" class="form-control" placeholder="admin@example.com" />
+                                                                    <input type="email"
+                                                                           ng-model="editUserDetails.EMailID"
+                                                                           name="EMailID1"
+                                                                           class="form-control emptyBox"
+                                                                           ng-class="((userDetailsForm.EMailID1.$dirty && userDetailsForm.EMailID1.$invalid) || (userDetailsForm.EMailID1.$dirty && userDetailsForm.EMailID1.$modelValue.length < 1)) ? 'mandatoryTextBox' : ''"
+                                                                           placeholder="admin@example.com" />
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -399,26 +427,37 @@
                                                 <!----------------- Visible only in case of Business User (Company)--- -->
                                                 <div class="row" ng-show="(userDetails.IDTypeID === 2)">
                                                     <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 bottom-clearfix label">
-                                                        <h5 class="text-primary text-left">Company Name</h5>
+                                                        <h5 class="text-primary text-left">Company Name *</h5>
                                                     </div>
                                                     <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
                                                         <div class="row">
                                                             <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
                                                                 <div class="form-group">
-                                                                    <input type="text" ng-model="editUserDetails.CompanyName" class="form-control" placeholder="Company Name" />
+                                                                    <input type="text"
+                                                                           ng-model="editUserDetails.CompanyName"
+                                                                           name="CompanyName2"
+                                                                           class="form-control emptyBox"
+                                                                           ng-class="(userDetailsForm.CompanyName2.$dirty && userDetailsForm.CompanyName2.$modelValue.length < 1) ? 'mandatoryTextBox' : ''"
+                                                                           placeholder="Company Name" />
                                                                 </div>
                                                             </div>
                                                         </div>
                                                     </div>
 
                                                     <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 bottom-clearfix label">
-                                                        <h5 class="text-primary text-left">Email</h5>
+                                                        <h5 class="text-primary text-left">Email *</h5>
                                                     </div>
                                                     <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
                                                         <div class="row">
                                                             <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
                                                                 <div class="form-group">
-                                                                    <input type="email" ng-model="editUserDetails.EMailID" class="form-control" placeholder="Contact Email" />
+                                                                    <input type="email"
+                                                                           ng-model="editUserDetails.EMailID"
+                                                                           name="EMailID2"
+                                                                           class="form-control emptyBox"
+                                                                           ng-class="((userDetailsForm.EMailID2.$dirty && userDetailsForm.EMailID2.$invalid) || (userDetailsForm.EMailID2.$dirty && userDetailsForm.EMailID2.$modelValue.length < 1)) ? 'mandatoryTextBox' : ''"
+                                                                           class="form-control"
+                                                                           placeholder="Contact Email" />
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -475,28 +514,38 @@
                                                 <!----------------- Visible only in case of Public Place (Public place)--- -->
                                                 <div class="row" ng-show="(userDetails.IDTypeID === 3)">
                                                     <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 bottom-clearfix label">
-                                                        <h5 class="text-primary text-left">Public Place</h5>
+                                                        <h5 class="text-primary text-left">Public Place *</h5>
                                                     </div>
                                                     <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
 
                                                         <div class="row">
                                                             <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
                                                                 <div class="form-group">
-                                                                    <input type="text" ng-model="editUserDetails.CompanyName" class="form-control" placeholder="Name of Public Place" />
+                                                                    <input type="text"
+                                                                           name="CompanyName3"
+                                                                           ng-model="editUserDetails.CompanyName"
+                                                                           class="form-control emptyBox"
+                                                                           ng-class="(userDetailsForm.CompanyName3.$dirty && userDetailsForm.CompanyName3.$modelValue.length < 1) ? 'mandatoryTextBox' : ''"
+                                                                           placeholder="Name of Public Place" />
                                                                 </div>
                                                             </div>
                                                         </div>
                                                     </div>
 
                                                     <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 bottom-clearfix label">
-                                                        <h5 class="text-primary text-left">Email</h5>
+                                                        <h5 class="text-primary text-left">Email *</h5>
                                                     </div>
                                                     <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
 
                                                         <div class="row">
                                                             <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
                                                                 <div class="form-group">
-                                                                    <input type="text" ng-model="editUserDetails.EMailID" class="form-control" placeholder="Email" />
+                                                                    <input type="email"
+                                                                           name="EMailID3"
+                                                                           ng-model="editUserDetails.EMailID"
+                                                                           class="form-control"
+                                                                           ng-class="((userDetailsForm.EMailID3.$dirty && userDetailsForm.EMailID3.$invalid) || (userDetailsForm.EMailID3.$dirty && userDetailsForm.EMailID3.$modelValue.length < 1)) ? 'mandatoryTextBox' : ''"
+                                                                           placeholder="Email" />
                                                                 </div>
                                                             </div>
                                                         </div>
