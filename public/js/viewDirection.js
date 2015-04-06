@@ -77,11 +77,25 @@ angular.module('ezeidApp').controller('viewDirectionController',['$http', '$root
       //  $rootScope.endLatLong = new google.maps.LatLng(data.Latitude, data.Longitude);
 
 
-        var request = {
+      /*  var request = {
             origin: '12.94223,77.574838',
             destination: '12.894854,77.60277300000007',
             travelMode: google.maps.TravelMode.DRIVING
-        };
+        };*/
+
+
+
+
+      //  var start = new google.maps.LatLng($rootScope.CLoc.CLat, $rootScope.CLoc.CLong);
+
+        console.log("SAi 222");
+        console.log($rootScope);
+
+      /*  var request = {
+            origin: start,
+            destination: $rootScope.endLatLong,
+            travelMode: google.maps.TravelMode.DRIVING
+        };*/
 
         directionsService.route(request, function(response, status) {
             if (status == google.maps.DirectionsStatus.OK) {

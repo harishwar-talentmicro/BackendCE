@@ -301,7 +301,7 @@ body {
 .headerVerified
 {
     text-align: center;
-    background: #ffffff;
+    background: #0B89BA;
     height: 75px;
 }
 .parkingText
@@ -339,7 +339,7 @@ body {
 .bewareTextContainer
 {
     background: #ff0000;
-    height: 50px;
+    height: 75px;
     color: #ffffff;
     text-align: center;
 }
@@ -354,7 +354,7 @@ body {
 .fotterButtonContainer
 {
     margin-top: 0.5%;
-   /* margin-right: 7%;*/
+    margin-right: 7%;
 }
 .msgButtonContainer
 {

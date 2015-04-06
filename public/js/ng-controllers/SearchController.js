@@ -515,7 +515,7 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
         $scope.AddressForInfoTab = "";
 
         SearchSec.Criteria.CurrentDate = currentDate;
-        if ($rootScope._userInfo.IsAuthenticate == true || SearchSec.Criteria.SearchType == 2 && SearchSec.IsSearchButtonClicked || SearchSec.Criteria.SearchType == 3 && SearchSec.IsSearchButtonClicked) {
+       // if ($rootScope._userInfo.IsAuthenticate == true || SearchSec.Criteria.SearchType == 2 && SearchSec.IsSearchButtonClicked || SearchSec.Criteria.SearchType == 3 && SearchSec.IsSearchButtonClicked) {
 
             if($rootScope._userInfo.Token == "")
             {
@@ -532,9 +532,26 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
             SearchSec.Criteria.Token = $rootScope._userInfo.Token;
 
             $http({ method: 'post', url: GURL + 'ewSearchByKeywords', data: SearchSec.Criteria }).success(function (data) {
-               if (data != 'null' && data.length>0) {
+               if (data != 'null' && data.length>0)
+               {
+                   $scope.SearchResultCount = data.length;
 
-                    $scope.SearchResultCount = data.length;
+                   if($rootScope._userInfo.IsAuthenticate == true || data[0].IDTypeID > 1)
+                   {
+                       try{
+                           PlaceMarker(data);
+                       }
+                       catch(ex){
+                           if(!map){
+                               initialize();
+                           }
+                           $scope.$watch('isMapLoaded',function(var1,var2){
+                               if(var2){
+                                   PlaceMarker(data);
+                               }
+                           });
+                       }
+                   }
 
                     var _item = data[0];
                     if(data[0].Filename)
@@ -550,99 +567,96 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
                     }
                     else
                     {
-                        $http({ method: 'get', url: GURL + 'ewtGetSearchInformation?Token=' + $rootScope._userInfo.Token + '&TID=' + _item.TID + '&CurrentDate=' + SearchSec.Criteria.CurrentDate }).success(function (data) {
+                         if($rootScope._userInfo.IsAuthenticate == true || data[0].IDTypeID == 2 && SearchSec.Criteria.SearchType == 1)
+                         {
+                                $http({ method: 'get', url: GURL + 'ewtGetSearchInformation?Token=' + $rootScope._userInfo.Token + '&TID=' + _item.TID + '&CurrentDate=' + SearchSec.Criteria.CurrentDate }).success(function (data) {
 
-                            if (data != 'null') {
+                                if (data != 'null') {
 
-                              if(data.length == 1 && SearchSec.Criteria.SearchType == 1)
-                                {
-                                    $scope.showInfoTab = true;
-                                    $scope.selectTab('info');
-                                    $scope.ShowInfoWindow = true;
-
-                                    $scope.ShowLinks = true;
-                                    $scope.showSmallBanner = true;
-                                }
-                                else
-                                {
-                                    $scope.selectTab('map');
-                                }
-                                $timeout(function () {
-                                    SearchSec.mInfo = data[0];
-
-                                    //Below lines are to show address in info tab
-                                    $scope.AddressForInfoTab = (SearchSec.mInfo.AddressLine1 != "") ? SearchSec.mInfo.AddressLine1 +', ' : "";
-                                    $scope.AddressForInfoTab += (SearchSec.mInfo.AddressLine2 != "") ? SearchSec.mInfo.AddressLine2 +', ' : "";
-                                    $scope.AddressForInfoTab += (SearchSec.mInfo.CityTitle != "") ? SearchSec.mInfo.CityTitle +', ' : "";
-                                    $scope.AddressForInfoTab += (SearchSec.mInfo.CountryTitle != "") ? SearchSec.mInfo.CountryTitle +', ' : "";
-                                    $scope.AddressForInfoTab += (SearchSec.mInfo.PostalCode != "") ? SearchSec.mInfo.PostalCode : "";
-
-                                    if(SearchSec.mInfo.ParkingStatus==0)
+                                  if(data.length == 1 && SearchSec.Criteria.SearchType == 1)
                                     {
-                                        SearchSec.parkingTitle = "Parking Status";
-                                    }
-                                    if(SearchSec.mInfo.ParkingStatus==1)
-                                    {
-                                        SearchSec.parkingTitle = "Public Parking";
-                                    }
-                                    if(SearchSec.mInfo.ParkingStatus==2)
-                                    {
-                                        SearchSec.parkingTitle = "Vallet Parking";
-                                    }
-                                    if(SearchSec.mInfo.ParkingStatus==3)
-                                    {
-                                        SearchSec.parkingTitle = "No parking";
-                                    }
+                                        $scope.showInfoTab = true;
+                                        $scope.selectTab('info');
+                                        $scope.ShowInfoWindow = true;
 
-                                    if (!/^(f|ht)tps?:\/\//i.test(data[0].Website)) {
-                                        // url = "http://" + data[0].Website;
-                                        //  SearchSec.mInfo.Website = url;
-                                        SearchSec.mInfo.Website = data[0].Website;
-                                    }
-
-                                    //Call for banner
-                                    getBanner(1);
-                                    $scope.form_rating = data[0].Rating;
-
-                                    SearchSec.mInfo.Banners = data[0].Banners;
-
-                                    if(SearchSec.mInfo.IDTypeID == 2)
-                                    {
-                                        SearchSec.reservationPlaceHolder = "Reservation requirement details";
+                                        $scope.ShowLinks = true;
+                                        $scope.showSmallBanner = true;
                                     }
                                     else
                                     {
-                                        SearchSec.reservationPlaceHolder = "Appointment requirement details";
+                                        $scope.selectTab('map');
                                     }
-                                });
-                            }
-                            else {
-                                // Notification.error({ message: 'Invalid key or not found…', delay: MsgDelay });
-                                $scope.ShowNoDataFound = true;
-                            }
-                        });
+                                    $timeout(function () {
+                                        SearchSec.mInfo = data[0];
 
+                                        //Below lines are to show address in info tab
+                                        $scope.AddressForInfoTab = (SearchSec.mInfo.AddressLine1 != "") ? SearchSec.mInfo.AddressLine1 +', ' : "";
+                                        $scope.AddressForInfoTab += (SearchSec.mInfo.AddressLine2 != "") ? SearchSec.mInfo.AddressLine2 +', ' : "";
+                                        $scope.AddressForInfoTab += (SearchSec.mInfo.CityTitle != "") ? SearchSec.mInfo.CityTitle +', ' : "";
+                                        $scope.AddressForInfoTab += (SearchSec.mInfo.CountryTitle != "") ? SearchSec.mInfo.CountryTitle +', ' : "";
+                                        $scope.AddressForInfoTab += (SearchSec.mInfo.PostalCode != "") ? SearchSec.mInfo.PostalCode : "";
 
-                        //PlaceMarker(data);
+                                        if(SearchSec.mInfo.ParkingStatus==0)
+                                        {
+                                            SearchSec.parkingTitle = "Parking Status";
+                                        }
+                                        if(SearchSec.mInfo.ParkingStatus==1)
+                                        {
+                                            SearchSec.parkingTitle = "Public Parking";
+                                        }
+                                        if(SearchSec.mInfo.ParkingStatus==2)
+                                        {
+                                            SearchSec.parkingTitle = "Vallet Parking";
+                                        }
+                                        if(SearchSec.mInfo.ParkingStatus==3)
+                                        {
+                                            SearchSec.parkingTitle = "No parking";
+                                        }
 
-                        /******************** Code for checking map load and handling it with reload ****************/
-                        //MapIsLoaded variable is set by map eventListener idle
+                                        if (!/^(f|ht)tps?:\/\//i.test(data[0].Website)) {
+                                            // url = "http://" + data[0].Website;
+                                            //  SearchSec.mInfo.Website = url;
+                                            SearchSec.mInfo.Website = data[0].Website;
+                                        }
 
+                                        //Call for banner
+                                        getBanner(1);
+                                        $scope.form_rating = data[0].Rating;
 
-                        try{
-                            PlaceMarker(data);
-                        }
+                                        SearchSec.mInfo.Banners = data[0].Banners;
 
-                        catch(ex){
-                            if(!map){
-                                initialize();
-                            }
-                            $scope.$watch('isMapLoaded',function(var1,var2){
-                                if(var2){
-                                    PlaceMarker(data);
+                                        if(SearchSec.mInfo.IDTypeID == 2)
+                                        {
+                                            SearchSec.reservationPlaceHolder = "Reservation requirement details";
+                                        }
+                                        else
+                                        {
+                                            SearchSec.reservationPlaceHolder = "Appointment requirement details";
+                                        }
+                                    });
+                                }
+                                else {
+                                    // Notification.error({ message: 'Invalid key or not found…', delay: MsgDelay });
+                                    $scope.ShowNoDataFound = true;
                                 }
                             });
-                        }
+
+                         }
+                        else
+                         {
+                             if( SearchSec.Criteria.SearchType < 2 )
+                             {
+                                 //Redirect to Login page
+                                 $('#SignIn_popup').slideDown();
+                                 $rootScope.defer = $q.defer();
+                                 var prom = $rootScope.defer.promise;
+                                 prom.then(function(d){
+                                     SearchSec.getSearch();
+                                 });
+                             }
+                         }
+
+
                         //If map is not loaded wait for few seconds and then try to reload it and then place marker
 
                         /*********************Code for checking map load and handling it with reload ends ****************/
@@ -668,19 +682,8 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
                             }
                         });
                     }
-                    //PlaceMarker(null);
                 }
             });
-        }
-        else {
-            //Redirect to Login page
-            $('#SignIn_popup').slideDown();
-            $rootScope.defer = $q.defer();
-            var prom = $rootScope.defer.promise;
-            prom.then(function(d){
-                SearchSec.getSearch();
-            });
-        }
     };
 
     /**
@@ -754,11 +757,11 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
      //call for next banner
      SearchSec.getNextBanner = function () {
      currentBanner = currentBanner + 1;
-     if(currentBanner <= SearchSec.mInfo.Banners)
-     {
-     getBanner(currentBanner);
-     RefreshTime = Miliseconds;
-     }
+         if(currentBanner <= SearchSec.mInfo.Banners)
+         {
+             getBanner(currentBanner);
+             RefreshTime = Miliseconds;
+         }
      };
 
     function getBanner(_requestedBannerValue){
@@ -833,14 +836,23 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
 
     //View Directions
     SearchSec.viewDirections = function (data) {
-        $scope.selectTab('map');
-      //  var start = new google.maps.LatLng($rootScope.CLoc.CLat, $rootScope.CLoc.CLong);
-     //   var end = new google.maps.LatLng(data.Latitude, data.Longitude);
 
-        $rootScope.startLatLong = new google.maps.LatLng($rootScope.CLoc.CLat, $rootScope.CLoc.CLong);
-        $rootScope.endLatLong = new google.maps.LatLng(data.Latitude, data.Longitude);
+      //  $scope.selectTab('map');
+        var start = new google.maps.LatLng($rootScope.CLoc.CLat, $rootScope.CLoc.CLong);
+        var end = new google.maps.LatLng(data.Latitude, data.Longitude);
 
-        window.location.href = "#/viewdirection";
+        $rootScope.starts = start;
+        $rootScope.ends = end;
+
+        console.log($rootScope);
+
+       /* $rootScope.viewDirection.startLat = $rootScope.CLoc.CLat;
+        $rootScope.viewDirection.startLong = $rootScope.CLoc.CLong;
+        $rootScope.viewDirection.endLat = data.Latitude;
+        $rootScope.viewDirection.endLong = data.Longitude;*/
+
+       //window.location.href = "/viewdirection";
+        $location.path("/viewdirection");
        /* directionsDisplay.setMap(map);
         var request = {
             origin: start,
