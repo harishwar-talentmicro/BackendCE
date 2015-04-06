@@ -1814,7 +1814,12 @@ input[type="text"].ui-grid-filter-input {
 .profile-details > div.row > div.col-lg-2 > h5,
 .profile-details > div.row > div.col-md-2 > h5,
 .profile-details > div.row > div.col-sm-2 > h5,
-.profile-details > div.row > div.col-xs-12 > h5{
+.profile-details > div.row > div.col-xs-12 > h5,
+.profile-details > form > div.row > div.col-lg-2 > h5,
+.profile-details > form > div.row > div.col-md-2 > h5,
+.profile-details > form > div.row > div.col-sm-2 > h5,
+.profile-details > form > div.row > div.col-xs-12 > h5{
+
     font-family: 'Roboto', sans-serif!important;
     font-size: 14px !important;
     color: #008FAC!important;
@@ -1823,7 +1828,11 @@ input[type="text"].ui-grid-filter-input {
 .profile-details > div.row > div.col-lg-4 > h5.data,
 .profile-details > div.row > div.col-md-4 > h5.data,
 .profile-details > div.row > div.col-sm-4 > h5.data,
-.profile-details > div.row > div.col-xs-12 > h5.data{
+.profile-details > div.row > div.col-xs-12 > h5.data,
+.profile-details > form >  div.row > div.col-lg-4 > h5.data,
+.profile-details > form >  div.row > div.col-md-4 > h5.data,
+.profile-details > form >  div.row > div.col-sm-4 > h5.data,
+.profile-details > form >  div.row > div.col-xs-12 > h5.data{
     color:#000000!important;
     font-size: 16px!important;
     font-family: 'Roboto', sans-serif!important;
@@ -1832,4 +1841,7 @@ input[type="text"].ui-grid-filter-input {
 .profile-panel-body > div.row{
     margin-left: 0px;
     margin-right: 0px;
+}
+form .row-error{
+    min-height: 20px;
 }

@@ -33,19 +33,7 @@ angular.module('ezeidApp').controller('ProfileEditCtrl',[
         ) {
 
 
-        /**
-         * Method to clone an object
-         * @param obj
-         * @returns {*}
-         */
-        function clone(obj) {
-            if (null == obj || "object" != typeof obj) return obj;
-            var copy = obj.constructor();
-            for (var attr in obj) {
-                if (obj.hasOwnProperty(attr)) copy[attr] = obj[attr];
-            }
-            return copy;
-        }
+        $scope.editUserDetailsError = {};
 
         /**
          * PIN is applicable to this EZEID or not
@@ -67,13 +55,22 @@ angular.module('ezeidApp').controller('ProfileEditCtrl',[
          */
         $scope.$watch('profileEditMode',function(newVal,oldVal){
             if(newVal){
-                $scope.editUserDetails = clone($scope.userDetails);
+                $scope.editUserDetails = angular.copy($scope.userDetails);
+
+//                for(var prop in $scope.userDetails){
+//                    if($scope.userDetails.hasOwnProperty(prop)){
+//                        $scope.userDetailsForm[prop] = $scope.userDetails[prop];
+//                    }
+//                }
+
                 $scope.isPinApplicable = ($scope.editUserDetails.PIN) ? true : false;
             }
         });
 
 
+        $scope.verifyUserDetails = function(){
 
+        };
 
         /**
          * Saves userDetails and assign them to ProfielEditCtrl userDetails Model
@@ -84,8 +81,22 @@ angular.module('ezeidApp').controller('ProfileEditCtrl',[
             /**
              * @todo Save all userDetails to server
              */
+
+            $http({
+                url : GURL + '',
+                method : 'POST',
+                data : $scope.editUserDetails
+            }).success(function(resp){
+                if(resp && resp !== null && resp !== 'null'){
+
+                }
+            }).error(function(err){
+
+            });
+
             return defer.promise;
         };
+
 
 
 //        $interval(function(){

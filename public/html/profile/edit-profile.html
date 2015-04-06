@@ -7,7 +7,7 @@
 
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        <h4 class="">Profile Manager <label class="label label-danger pull-right label-mandatory">* Mandatory</label></h4>
+                        <h4 class="">Profile Manager <label ng-show="profileEditMode" class="label label-danger pull-right label-mandatory">* Mandatory</label></h4>
 
                     </div>
                     <div class="panel-body">
@@ -37,6 +37,7 @@
                                     <p class="text-info pull-right btn-link" ng-hide="profileEditMode" ng-click="toggleProfileEditMode()">
                                         <span class="glyphicon glyphicon-edit"></span> Edit
                                     </p>
+
                                 </div>
                                 <div class="panel-body profile-panel-body">
                                     <div class="row">
@@ -237,315 +238,327 @@
 
                                         <!------------------Profile Edit Mode Enabled ------------------->
                                         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 profile-details" ng-show="profileEditMode" ng-controller="ProfileEditCtrl">
+                                            <form name="userDetailsForm">
+                                                <div class="row">
+                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 bottom-clearfix">
+                                                        <h5 class="text-primary text-left">EZEID</h5>
+                                                    </div>
+                                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 bottom-clearfix">
+                                                        <h5 class="text-primary text-left font-open-sans data">
+                                                            {{userDetails.EZEID}}
+                                                        </h5>
+                                                    </div>
+                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 bottom-clearfix">
+                                                        <h5 class="text-primary text-left">PIN Protected</h5>
+                                                    </div>
+                                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 bottom-clearfix">
+                                                        <div class="row">
+                                                            <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
 
-                                            <div class="row">
-                                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 bottom-clearfix">
-                                                    <h5 class="text-primary text-left">EZEID</h5>
-                                                </div>
-                                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 bottom-clearfix">
-                                                    <h5 class="text-primary text-left font-open-sans data">
-                                                        {{userDetails.EZEID}}
-                                                    </h5>
-                                                </div>
-                                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 bottom-clearfix">
-                                                    <h5 class="text-primary text-left">PIN Protected</h5>
-                                                </div>
-                                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 bottom-clearfix">
-                                                    <div class="row">
-                                                        <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
-                                                            <div class="form-group">
-                                                                <div class="row">
-                                                                    <div class="col-lg-4">
-                                                                        <input type="checkbox" class="form-control" ng-model="isPinApplicable" />
+                                                                    <div class="col-lg-2">
+                                                                        <div class="form-group center-vertical">
+                                                                            <input type="checkbox" ng-model="isPinApplicable" />
+                                                                        </div>
                                                                     </div>
-                                                                    <div class="col-lg-8">
-                                                                        <input type="text" ng-disabled="!isPinApplicable" ng-model="editUserDetails.PIN" class="form-control" placeholder="PIN" />
+                                                                    <div class="col-lg-10">
+                                                                        <div class="form-group">
+                                                                            <input type="text"
+                                                                                   name="PIN"
+                                                                                   ng-disabled="!isPinApplicable"
+                                                                                   ng-model="editUserDetails.PIN"
+                                                                                   ng-pattern="/^[1-9]+[0-9]{2,2}$/"
+                                                                                   pin-only
+                                                                                   class="form-control" placeholder="PIN" />
+                                                                        </div>
+                                                                        <small ng-show="userDetailsForm.PIN.$invalid" class="text-danger">Allowed 100 to 999</small>
                                                                     </div>
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!----------------- Visible only in case of Individual User --- -->
+                                                <div class="row" ng-show="(userDetails.IDTypeID === 1)">
+                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 bottom-clearfix">
+                                                        <h5 class="text-primary text-left">First Name *</h5>
+                                                    </div>
+                                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 bottom-clearfix">
+                                                        <div class="row">
+                                                            <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
+                                                                <div class="form-group">
+                                                                    <input name="FirstName"
+                                                                           type="text"
+                                                                           ng-model="editUserDetails.FirstName"
+                                                                           class="form-control emptyBox"
+                                                                           ng-class="() ? 'mandatoryTextBox' : ''"
+                                                                           placeholder="First Name" />
                                                                 </div>
-
                                                             </div>
-
                                                         </div>
+
                                                     </div>
 
-                                                </div>
-                                            </div>
-
-                                            <!----------------- Visible only in case of Individual User --- -->
-                                            <div class="row" ng-show="(userDetails.IDTypeID === 1)">
-                                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 bottom-clearfix">
-                                                    <h5 class="text-primary text-left">First Name</h5>
-                                                </div>
-                                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 bottom-clearfix">
-                                                    <div class="row">
-                                                        <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
-                                                            <div class="form-group">
-                                                                <input type="text" ng-model="editUserDetails.FirstName" class="form-control" placeholder="First Name" />
-                                                            </div>
-                                                        </div>
+                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 bottom-clearfix label">
+                                                        <h5 class="text-primary text-left">Last Name</h5>
                                                     </div>
-
-                                                </div>
-
-                                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 bottom-clearfix label">
-                                                    <h5 class="text-primary text-left">Last Name</h5>
-                                                </div>
-                                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 bottom-clearfix">
-                                                    <div class="row">
-                                                        <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
-                                                            <div class="form-group">
-                                                                <input type="text" ng-model="editUserDetails.LastName" class="form-control" placeholder="Last Name" />
+                                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 bottom-clearfix">
+                                                        <div class="row">
+                                                            <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
+                                                                <div class="form-group">
+                                                                    <input type="text" ng-model="editUserDetails.LastName" class="form-control" placeholder="Last Name" />
+                                                                </div>
                                                             </div>
                                                         </div>
+
                                                     </div>
-
                                                 </div>
-                                            </div>
 
-                                            <div class="row" ng-show="(userDetails.IDTypeID === 1)">
-                                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 bottom-clearfix">
-                                                    <h5 class="text-primary text-left">Email</h5>
-                                                </div>
-                                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 bottom-clearfix">
-                                                    <div class="row">
-                                                        <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
-                                                            <div class="form-group">
-                                                                <input type="text" ng-model="editUserDetails.EMailID" class="form-control" placeholder="admin@example.com" />
+                                                <div class="row" ng-show="(userDetails.IDTypeID === 1)">
+                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 bottom-clearfix">
+                                                        <h5 class="text-primary text-left">Email</h5>
+                                                    </div>
+                                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 bottom-clearfix">
+                                                        <div class="row">
+                                                            <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
+                                                                <div class="form-group">
+                                                                    <input type="text" ng-model="editUserDetails.EMailID" class="form-control" placeholder="admin@example.com" />
+                                                                </div>
                                                             </div>
                                                         </div>
+
                                                     </div>
 
                                                 </div>
 
-                                            </div>
+                                                <div class="row" ng-show="(userDetails.IDTypeID === 1)">
+                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 bottom-clearfix label">
+                                                        <h5 class="text-primary text-left">Company</h5>
+                                                    </div>
+                                                    <div class="col-lg-4 col-md-2 col-sm-4 col-xs-6 bottom-clearfix">
+                                                        <div class="row">
+                                                            <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
+                                                                <div class="form-group">
+                                                                    <input type="text" ng-model="editUserDetails.CompanyName" class="form-control" placeholder="Company Name" />
+                                                                </div>
+                                                            </div>
+                                                        </div>
 
-                                            <div class="row" ng-show="(userDetails.IDTypeID === 1)">
-                                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 bottom-clearfix label">
-                                                    <h5 class="text-primary text-left">Company</h5>
+                                                    </div>
+
+                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 bottom-clearfix label">
+                                                        <h5 class="text-primary text-left">Job Title</h5>
+                                                    </div>
+                                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 bottom-clearfix">
+                                                        <div class="row">
+                                                            <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
+                                                                <div class="form-group">
+                                                                    <input type="text" ng-model="editUserDetails.JobTitle" class="form-control" placeholder="Job Title" />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
                                                 </div>
-                                                <div class="col-lg-4 col-md-2 col-sm-4 col-xs-6 bottom-clearfix">
-                                                    <div class="row">
-                                                        <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
-                                                            <div class="form-group">
-                                                                <input type="text" ng-model="editUserDetails.CompanyName" class="form-control" placeholder="Company Name" />
+
+                                                <div class="row" ng-show="(userDetails.IDTypeID === 1)">
+                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 bottom-clearfix label">
+                                                        <h5 class="text-primary text-left">Date of Birth</h5>
+                                                    </div>
+                                                    <div class="col-lg-4 col-md-2 col-sm-4 col-xs-6 bottom-clearfix">
+                                                        <div class="row">
+                                                            <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
+                                                                <div class="form-group">
+                                                                    <date-time-picker recipient="editUserDetails.DOB"></date-time-picker>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+
+                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 bottom-clearfix label">
+                                                        <h5 class="text-primary text-left">Gender</h5>
+                                                    </div>
+                                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 bottom-clearfix">
+                                                        <div class="row">
+                                                            <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
+                                                                <div class="form-group">
+                                                                    <select class="form-control" ng-model="editUserDetails.Gender">
+                                                                        <option value="2">Unspecified Gender</option>
+                                                                        <option value="0">Male</option>
+                                                                        <option value="1">Female</option>
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <!-----------------end : Visible only in case of Individual user -- >
+
+
+                                                <!----------------- Visible only in case of Business User (Company)--- -->
+                                                <div class="row" ng-show="(userDetails.IDTypeID === 2)">
+                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 bottom-clearfix label">
+                                                        <h5 class="text-primary text-left">Company Name</h5>
+                                                    </div>
+                                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+                                                        <div class="row">
+                                                            <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
+                                                                <div class="form-group">
+                                                                    <input type="text" ng-model="editUserDetails.CompanyName" class="form-control" placeholder="Company Name" />
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
 
-                                                </div>
-
-                                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 bottom-clearfix label">
-                                                    <h5 class="text-primary text-left">Job Title</h5>
-                                                </div>
-                                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 bottom-clearfix">
-                                                    <div class="row">
-                                                        <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
-                                                            <div class="form-group">
-                                                                <input type="text" ng-model="editUserDetails.JobTitle" class="form-control" placeholder="Job Title" />
-                                                            </div>
-                                                        </div>
+                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 bottom-clearfix label">
+                                                        <h5 class="text-primary text-left">Email</h5>
                                                     </div>
-
-                                                </div>
-                                            </div>
-
-                                            <div class="row" ng-show="(userDetails.IDTypeID === 1)">
-                                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 bottom-clearfix label">
-                                                    <h5 class="text-primary text-left">Date of Birth</h5>
-                                                </div>
-                                                <div class="col-lg-4 col-md-2 col-sm-4 col-xs-6 bottom-clearfix">
-                                                    <div class="row">
-                                                        <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
-                                                            <div class="form-group">
-                                                                <date-time-picker recipient="editUserDetails.DOB"></date-time-picker>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-
-                                                </div>
-
-                                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 bottom-clearfix label">
-                                                    <h5 class="text-primary text-left">Gender</h5>
-                                                </div>
-                                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 bottom-clearfix">
-                                                    <div class="row">
-                                                        <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
-                                                            <div class="form-group">
-                                                                <select class="form-control" ng-model="editUserDetails.Gender">
-                                                                    <option value="2">Unspecified Gender</option>
-                                                                    <option value="0">Male</option>
-                                                                    <option value="1">Female</option>
-                                                                </select>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <!-----------------end : Visible only in case of Individual user -- >
-
-
-                                            <!----------------- Visible only in case of Business User (Company)--- -->
-                                            <div class="row" ng-show="(userDetails.IDTypeID === 2)">
-                                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 bottom-clearfix label">
-                                                    <h5 class="text-primary text-left">Company Name</h5>
-                                                </div>
-                                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
-                                                    <div class="row">
-                                                        <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
-                                                            <div class="form-group">
-                                                                <input type="text" ng-model="editUserDetails.CompanyName" class="form-control" placeholder="Company Name" />
+                                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+                                                        <div class="row">
+                                                            <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
+                                                                <div class="form-group">
+                                                                    <input type="email" ng-model="editUserDetails.EMailID" class="form-control" placeholder="Contact Email" />
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
 
-                                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 bottom-clearfix label">
-                                                    <h5 class="text-primary text-left">Email</h5>
-                                                </div>
-                                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
-                                                    <div class="row">
-                                                        <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
-                                                            <div class="form-group">
-                                                                <input type="email" ng-model="editUserDetails.EMailID" class="form-control" placeholder="Contact Email" />
+                                                <div class="row" ng-show="(userDetails.IDTypeID === 2)">
+                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 bottom-clearfix label">
+                                                        <h5 class="text-primary text-left">First Name</h5>
+                                                    </div>
+                                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+                                                        <div class="row">
+                                                            <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
+                                                                <div class="form-group">
+                                                                    <input type="text" ng-model="editUserDetails.FirstName" class="form-control" placeholder="Contact Person First Name" />
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                            </div>
 
-                                            <div class="row" ng-show="(userDetails.IDTypeID === 2)">
-                                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 bottom-clearfix label">
-                                                    <h5 class="text-primary text-left">First Name</h5>
-                                                </div>
-                                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
-                                                    <div class="row">
-                                                        <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
-                                                            <div class="form-group">
-                                                                <input type="text" ng-model="editUserDetails.FirstName" class="form-control" placeholder="Contact Person First Name" />
-                                                            </div>
-                                                        </div>
+                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 bottom-clearfix label">
+                                                        <h5 class="text-primary text-left">Last Name</h5>
                                                     </div>
-                                                </div>
+                                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
 
-                                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 bottom-clearfix label">
-                                                    <h5 class="text-primary text-left">Last Name</h5>
-                                                </div>
-                                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
-
-                                                    <div class="row">
-                                                        <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
-                                                            <div class="form-group">
-                                                                <input type="text" ng-model="editUserDetails.LastName" class="form-control" placeholder="Contact Person Last Name" />
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div class="row" ng-show="(userDetails.IDTypeID === 2)">
-                                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 bottom-clearfix label">
-                                                    <h5 class="text-primary text-left">About Company</h5>
-                                                </div>
-                                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
-
-                                                    <div class="row">
-                                                        <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
-                                                            <div class="form-group">
-                                                                <textarea ng-model="editUserDetails.AboutCompany" class="form-control" row="3" placeholder="About Company"></textarea>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <!-----------------end : Visible only in case of Business user (Company)-->
-
-
-                                            <!----------------- Visible only in case of Public Place (Public place)--- -->
-                                            <div class="row" ng-show="(userDetails.IDTypeID === 3)">
-                                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 bottom-clearfix label">
-                                                    <h5 class="text-primary text-left">Public Place</h5>
-                                                </div>
-                                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
-
-                                                    <div class="row">
-                                                        <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
-                                                            <div class="form-group">
-                                                                <input type="text" ng-model="editUserDetails.CompanyName" class="form-control" placeholder="Name of Public Place" />
+                                                        <div class="row">
+                                                            <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
+                                                                <div class="form-group">
+                                                                    <input type="text" ng-model="editUserDetails.LastName" class="form-control" placeholder="Contact Person Last Name" />
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
 
-                                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 bottom-clearfix label">
-                                                    <h5 class="text-primary text-left">Email</h5>
-                                                </div>
-                                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+                                                <div class="row" ng-show="(userDetails.IDTypeID === 2)">
+                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 bottom-clearfix label">
+                                                        <h5 class="text-primary text-left">About Company</h5>
+                                                    </div>
+                                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
 
-                                                    <div class="row">
-                                                        <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
-                                                            <div class="form-group">
-                                                                <input type="text" ng-model="editUserDetails.EMailID" class="form-control" placeholder="Email" />
+                                                        <div class="row">
+                                                            <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
+                                                                <div class="form-group">
+                                                                    <textarea ng-model="editUserDetails.AboutCompany" class="form-control" row="3" placeholder="About Company"></textarea>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>
+                                                <!-----------------end : Visible only in case of Business user (Company)-->
 
-                                            <div class="row" ng-show="(userDetails.IDTypeID === 3)">
-                                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 bottom-clearfix label">
-                                                    <h5 class="text-primary text-left"> First Name</h5>
-                                                </div>
-                                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
 
-                                                    <div class="row">
-                                                        <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
-                                                            <div class="form-group">
-                                                                <input type="text" ng-model="editUserDetails.FirstName" class="form-control" placeholder="Contact Person First Name" />
+                                                <!----------------- Visible only in case of Public Place (Public place)--- -->
+                                                <div class="row" ng-show="(userDetails.IDTypeID === 3)">
+                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 bottom-clearfix label">
+                                                        <h5 class="text-primary text-left">Public Place</h5>
+                                                    </div>
+                                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+
+                                                        <div class="row">
+                                                            <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
+                                                                <div class="form-group">
+                                                                    <input type="text" ng-model="editUserDetails.CompanyName" class="form-control" placeholder="Name of Public Place" />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 bottom-clearfix label">
+                                                        <h5 class="text-primary text-left">Email</h5>
+                                                    </div>
+                                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+
+                                                        <div class="row">
+                                                            <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
+                                                                <div class="form-group">
+                                                                    <input type="text" ng-model="editUserDetails.EMailID" class="form-control" placeholder="Email" />
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
 
-                                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 bottom-clearfix label">
-                                                    <h5 class="text-primary text-left"> Last Name</h5>
-                                                </div>
-                                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+                                                <div class="row" ng-show="(userDetails.IDTypeID === 3)">
+                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 bottom-clearfix label">
+                                                        <h5 class="text-primary text-left"> First Name</h5>
+                                                    </div>
+                                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
 
-                                                    <div class="row">
-                                                        <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
-                                                            <div class="form-group">
-                                                                <input class="form-control" ng-model="editUserDetails.LastName" placeholder="Contact Person Last Name"/>
+                                                        <div class="row">
+                                                            <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
+                                                                <div class="form-group">
+                                                                    <input type="text" ng-model="editUserDetails.FirstName" class="form-control" placeholder="Contact Person First Name" />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 bottom-clearfix label">
+                                                        <h5 class="text-primary text-left"> Last Name</h5>
+                                                    </div>
+                                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+
+                                                        <div class="row">
+                                                            <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
+                                                                <div class="form-group">
+                                                                    <input class="form-control" ng-model="editUserDetails.LastName" placeholder="Contact Person Last Name"/>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>
 
-                                            <div class="row" ng-show="(userDetails.IDTypeID === 3)">
-                                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 bottom-clearfix label">
-                                                    <h5 class="text-primary text-left">About Public Place</h5>
-                                                </div>
-                                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+                                                <div class="row" ng-show="(userDetails.IDTypeID === 3)">
+                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 bottom-clearfix label">
+                                                        <h5 class="text-primary text-left">About Public Place</h5>
+                                                    </div>
+                                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
 
-                                                    <div class="row">
-                                                        <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
-                                                            <div class="form-group">
-                                                                <textarea ng-model="editUserDetails.AboutCompany" class="form-control" row="3" placeholder="About public place"></textarea>
+                                                        <div class="row">
+                                                            <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
+                                                                <div class="form-group">
+                                                                    <textarea ng-model="editUserDetails.AboutCompany" class="form-control" row="3" placeholder="About public place"></textarea>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                            <!-----------------end : Visible only in case of Business user (Company)-->
+                                                <!-----------------end : Visible only in case of Business user (Company)-->
 
-                                            <div class="row">
-                                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-3">
-                                                    <button class="btn btn-block btn-primary" ng-click="saveUserDetails()">Save</button>
+                                                <div class="row">
+                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-3">
+                                                        <button class="btn btn-block btn-primary" ng-click="saveUserDetails()">Save</button>
+                                                    </div>
+                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-3">
+                                                        <button class="btn btn-block btn-primary" ng-click="toggleProfileEditMode()">Close</button>
+                                                    </div>
                                                 </div>
-                                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-3">
-                                                    <button class="btn btn-block btn-primary" ng-click="toggleProfileEditMode()">Close</button>
-                                                </div>
-                                            </div>
+                                            </form>
                                         </div>
                                         <!------------------end : Profile Edit Mode Enabled ------------------->
 
