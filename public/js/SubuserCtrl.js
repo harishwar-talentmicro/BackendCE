@@ -296,7 +296,9 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$htt
      * Validates subuser data
      */
     $scope.validateSubUser = function(){
-        //@todo Validates subuser data before saving
+        /**
+         * @todo Validates subuser data before saving
+         */
     };
 
     /**

@@ -78,9 +78,9 @@
 
 
 
-    ezeid.config(['$routeProvider','$httpProvider',function($routeProvider,$httpProvider){
+    ezeid.config(['$routeProvider','$httpProvider','$locationProvider',function($routeProvider,$httpProvider,$locationProvider){
         $routeProvider.when('/index',{templateUrl: 'html/index.html'})
-            .when('/home',{templateUrl: 'html/home.html'})
+            .when('/',{templateUrl: 'html/home.html'})
             .when('/messages',{templateUrl: 'html/messages.html'})
             .when('/acchist',{templateUrl: 'html/accesshistory.html'})
             .when('/editprofile',{templateUrl: 'html/signupwiz.html'})
@@ -99,7 +99,7 @@
             .when('/business-manager',{templateUrl : 'html/business-manager/business-manager.html'})
             .when('/bulksalesenquiry',{templateUrl : 'html/bulksalesenquiry.html'})
             .when('/create-template',{templateUrl : 'html/createTemplate.html'})
-
+/**
             .when('/signup',{
                 templateUrl : 'html/profile/sign-up.html',
                 controller : 'SignUpCtrl'
@@ -108,8 +108,13 @@
                 templateUrl : 'html/profile/edit-profile.html',
                 controller : 'ProfileCtrl'
             })
-            .otherwise({redirectTo : '/home'});
-
+ **/
+            .when('/home',{templateUrl: 'html/home.html'})
+            .when('/:ezeid',{
+                templateUrl : 'html/home.html'
+            })
+            .otherwise({redirectTo : '/'});
+        $locationProvider.html5Mode(true);
         $httpProvider.interceptors.push("ezeidInterceptor");
     }]);
 

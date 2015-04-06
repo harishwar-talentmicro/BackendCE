@@ -31,7 +31,7 @@ angular.module('ezeidApp').controller('DocumentController', function($http, $roo
                 Icon: ''
             };
             alert('Sorry..! Browser does not support');
-            window.location.href = "#/";
+            window.location.href = "/";
         }
     }
     var DocCtrl = this;
@@ -241,6 +241,24 @@ angular.module('ezeidApp').controller('DocumentController', function($http, $roo
 
     $scope.OnSaveDocument = function(){
 
+        $scope.form.TokenNo = $rootScope._userInfo.Token;
+        $scope.form.RefType = $scope.OptionSelected;
+        $http({
+            method: "POST",
+            url: GURL + 'ewtSaveDoc',
+            data: JSON.stringify($scope.form),
+            headers: { 'Content-Type': 'application/json' }
+        }).success(function (data) {
+
+                if(data.IsSuccessfull) {
+                    $scope.OnOptionSelected($scope.OptionSelected);
+                    GetUserDetails();
+                    Notification.success({ message: "Saved... ", delay: MsgDelay });
+                }else{
+                    Notification.error({ message: 'Sorry..! not saved', delay: MsgDelay });
+                }
+            });
+
        //Below code is for upload document
        for (var i = 0; i < $scope.DocumentToUpload.length; i++) {
              var $file = $scope.DocumentToUpload[i];
@@ -260,25 +278,9 @@ angular.module('ezeidApp').controller('DocumentController', function($http, $roo
          }
 
 
-        $scope.form.TokenNo = $rootScope._userInfo.Token;
-        $scope.form.RefType = $scope.OptionSelected;
-        $http({
-            method: "POST",
-            url: GURL + 'ewtSaveDoc',
-            data: JSON.stringify($scope.form),
-            headers: { 'Content-Type': 'application/json' }
-        }).success(function (data) {
 
-            if(data.IsSuccessfull) {
-                $scope.OnOptionSelected($scope.OptionSelected);
-                GetUserDetails();
-                Notification.success({ message: "Saved... ", delay: MsgDelay });
-            }else{
-                Notification.error({ message: 'Sorry..! not saved', delay: MsgDelay });
-            }
-        });
     }
     $scope.closeDocument = function(){
-        window.location.href = "#/home";
+        window.location.href = "/home";
     }
 });

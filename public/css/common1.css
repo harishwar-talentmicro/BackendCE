@@ -588,3 +588,48 @@ body {
 {
     margin-top: 10%;
 }
+.textMailLimit
+{
+    color: #0C97D0;
+}
+
+.resetTextField
+{
+    display: block;
+    width: 100%;
+    height: 34px;
+    padding: 6px 12px;
+    font-size: 13px;
+    line-height: 1.42857143;
+    color: #555;
+    background-color: #fff;
+    background-image: none;
+    border: 1px solid #ff0000
+    border-radius: 2px;
+    box-shadow: 0px 2px 3px -3px #666;
+    -moz-box-shadow: 0px 2px 3px -3px #666;
+    -webkit-box-shadow: 0px 2px 3px -3px #666;
+    -webkit-transition: border-color ease-in-out .15s, -webkit-box-shadow ease-in-out .15s;
+    -o-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+    transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+}
+.newForm-Control
+{
+    display: block;
+    width: 100%;
+    height: 34px;
+    padding: 6px 12px;
+    font-size: 13px;
+    line-height: 1.42857143;
+    color: #555;
+    background-color: #fff;
+    background-image: none;
+    border-radius: 2px;
+    border: 1px solid #ff0000;
+    -webkit-box-shadow: 0px 2px 3px -3px #666;
+    transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+}
+.WhiteTextBox {
+    background-color: #ffffff;
+
+}

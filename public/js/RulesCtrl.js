@@ -55,7 +55,10 @@ angular.module('ezeidApp').controller('RulesCtrl',['$scope','$interval','$http',
             $scope.isMapInitialized = true;
         }
 
-        //@todo Add facility to detect new addition or rule editing
+        /**
+         * @todo Add facility to detect new addition or rule editing
+         * @type {boolean}
+         */
 
         $scope.showModal = !$scope.showModal;
         console.log($scope.showModal);
@@ -145,9 +148,11 @@ angular.module('ezeidApp').controller('RulesCtrl',['$scope','$interval','$http',
     };
 
     $scope.getMasterUserDetails();
-    //@todo add code for rule addition and updation
-    //@todo add code for viewing rule
-    //@todo add code for map load
+    /**
+     * @todo add code for rule addition and updation
+     * @todo add code for viewing rule
+     * @todo add code for map load
+     */
 
     /**
      * Map API wrapped up to make usage simple and automatic error handling

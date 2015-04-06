@@ -371,7 +371,7 @@ angular.module('ezeidApp').controller('LocationsController',['$rootScope', '$sco
                         getSecondaryLoc();
                         GetUserDetails();
 
-                        window.location.href = '#/addloc';
+                        window.location.href = '/addloc';
                         SLocCtrl.IsShowForm = false;
 
 
@@ -457,7 +457,7 @@ angular.module('ezeidApp').controller('LocationsController',['$rootScope', '$sco
     };
 
     this.closeLocationForm = function () {
-        window.location.href = "#/";
+        window.location.href = "/";
 
     }
 

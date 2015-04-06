@@ -43,7 +43,7 @@ angular.module('ezeidApp').controller('HomeController', function ($rootScope, $h
                 Icon: ''
             };
             alert('Sorry..! Browser does not support');
-            window.location.href = "#/";
+            window.location.href = "/";
         }
     }
 

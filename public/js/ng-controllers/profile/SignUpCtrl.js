@@ -2,8 +2,10 @@
  * Sign up Controller
  * @name SignUpCtrl
  * Manages signup functionality
+ *
+ * "use strict";
  */
-"use strict";
+
 angular.module('ezeidApp').
     controller('SignUpCtrl', [
         '$rootScope',

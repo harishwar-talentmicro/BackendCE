@@ -50,7 +50,7 @@ angular.module('ezeidApp').controller('HistoryController', function ($scope, $ro
             LoadHistory(_pageValue);
         }
         else {
-            window.location.href = "#/";
+            window.location.href = "/";
         }
     });
 

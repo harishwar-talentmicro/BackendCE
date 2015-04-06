@@ -35,7 +35,7 @@ HeaderApp.directive('headerSection', function (Notification) {
                             localStorage.setItem("_token", encrypted);
                         } else {
                             alert('Sorry..! Browser does not support');
-                            window.location.href = "#/";
+                            window.location.href = "/";
                         }
                         if ($rootScope._userInfo.IsAuthenticate == true) {
                            // Notification.success({ message: "Sign In Success", delay: MsgDelay });
@@ -99,7 +99,7 @@ HeaderApp.directive('headerSection', function (Notification) {
             //forgot password
             this.openRegistrationForm=function(){
                 $('#SignIn_popup').slideUp();
-                window.location.href = "#/editprofile";
+                window.location.href = "/editprofile";
             };
 
             //Change password
@@ -115,7 +115,7 @@ HeaderApp.directive('headerSection', function (Notification) {
                               SignCtrl.OldPassword="";
                               SignCtrl.NewPassword="";
                               SignCtrl.ReEnterPassword="";
-                              window.location.href='#/home';
+                              window.location.href='/home';
                              /* document.getElementById("OldPassword").className = "form-control wd_oldPass changePass_inpMar emptyBox change_PadLeft";
                               document.getElementById("NewPassword").className = "form-control wd_oldPass changePass_inpMar emptyBox change_PadLeft";
                               document.getElementById("ReEnterPassword").className = "form-control wd_oldPass changePass_inpMar emptyBox change_PadLeft";
@@ -145,7 +145,7 @@ HeaderApp.directive('headerSection', function (Notification) {
                 SignCtrl.NewPassword="";
                 SignCtrl.ReEnterPassword="";*/
 
-                window.location.href='#/home';
+                window.location.href='/home';
 
                 //SignCtrl.showMandatoryBox = "false";
 
@@ -189,7 +189,7 @@ HeaderApp.directive('headerSection', function (Notification) {
                             localStorage.setItem("_token", encrypted);
                         } else {
                             alert('Sorry..! Browser does not support');
-                            window.location.href = "#/";
+                            window.location.href = "/";
                         }
                         if ($rootScope._userInfo.IsAuthenticate == true) {
                             //Notification.success({ message: "SignIn Success", delay: MsgDelay });

@@ -50,7 +50,7 @@ angular.module('ezeidApp').controller('salesenquiryController', function($http, 
                 Icon:''
             };
             alert('Sorry..! Browser does not support');
-            window.location.href = "#/";
+            window.location.href = "/";
         }
     }
 

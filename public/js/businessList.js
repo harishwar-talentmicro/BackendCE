@@ -97,7 +97,7 @@ angular.module('ezeidApp').controller('BusinessListController', function($http, 
             if(data.IsUpdated) {
                 Notification.success({message: "Saved...", delay: MsgDelay});
                 getBusinessInfo();
-                window.location.href = "#/home";
+                window.location.href = "/home";
             }else{
                 Notification.error({message: "Sorry..! not saved", delay: MsgDelay});
             }

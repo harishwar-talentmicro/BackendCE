@@ -4,7 +4,10 @@
  * @author Hirecraft
  * @since 05/04/2015 05:15 PM
  */
-"use strict";
+/**
+ * "use strict";
+ */
+
 angular.module('ezeidApp').controller('ProfileCtrl',[
     '$rootScope',
     '$scope',
@@ -86,6 +89,32 @@ angular.module('ezeidApp').controller('ProfileCtrl',[
         $scope.secondaryLocations = [];
 
         /**
+         * Profile Editing Mode Flag
+         * @type {boolean}
+         */
+        $scope.profileEditMode = false;
+
+
+        /**
+         *
+         * @param saveFlag
+         */
+        $scope.toggleProfileEditMode = function(saveFlag){
+            /**
+             * @todo Fill all models of edit controls with current userDetails before opening
+             */
+            if($scope.profileEditMode){
+                $scope.profileEditMode = false;
+            }
+            else{
+                $scope.profileEditMode = true;
+            }
+            /**
+             * @todo Copy all models of edit controls to main userDetails if saveFlag is true
+             */
+        };
+
+        /**
          * If user wants the data to be refreshed,
          * In case it will load data initially from server again
          */
@@ -97,10 +126,16 @@ angular.module('ezeidApp').controller('ProfileCtrl',[
 
             $scope.loadCountries().then(function(){
                 $scope.loadUserDetails().then(function(){
-                    $scope.loadSecondaryLocations().then(function(){
-                        $scope.dataLoadInProgress = false;
-                        $scope.dataLoadError = false;
-                        $scope.dataLoadComplete = true;
+                    var countryId = ($scope.userDetails.CountryID) ? $scope.userDetails.CountryID : $scope.countryList[0].CountryID;
+                    $scope.loadStates(countryId).then(function(){
+                        var stateId = ($scope.userDetails.StateID) ? $scope.userDetails.StateID : $scope.stateList[0].StateID;
+                        $scope.loadCities($scope.userDetails.StateID).then(function(){
+                            $scope.loadSecondaryLocations().then(function(){
+                                $scope.dataLoadInProgress = false;
+                                $scope.dataLoadError = false;
+                                $scope.dataLoadComplete = true;
+                            });
+                        });
                     });
                 });
             });
@@ -205,7 +240,14 @@ angular.module('ezeidApp').controller('ProfileCtrl',[
             }).success(function(resp){
                     console.log('States List based on country');
                     console.log(JSON.stringify(resp));
-                    defer.resolve(resp);
+
+                    if(resp && resp.length > 0 && resp !== 'null'){
+                        defer.resolve(true);
+                        $scope.stateList = resp;
+                    }
+                    else{
+                        defer.resolve(false);
+                    }
                 }).error(function(err){
                     defer.reject(err);
                 });
@@ -230,7 +272,14 @@ angular.module('ezeidApp').controller('ProfileCtrl',[
             }).success(function(resp){
                     console.log('Cities List based on state');
                     console.log(JSON.stringify(resp));
-                    defer.resolve(resp);
+
+                    if(resp && resp.length > 0 && resp !== 'null'){
+                        defer.resolve(true);
+                        $scope.cityList = resp;
+                    }
+                    else{
+                        defer.resolve(false);
+                    }
                 }).error(function(err){
                     defer.reject(err);
                 });
