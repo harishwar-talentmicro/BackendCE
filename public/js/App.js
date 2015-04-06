@@ -98,7 +98,7 @@
             .when('/business-preference',{templateUrl : 'html/business-preference.html'})
             .when('/business-manager',{templateUrl : 'html/business-manager/business-manager.html'})
             .when('/bulksalesenquiry',{templateUrl : 'html/bulksalesenquiry.html'})
-            .when('/create-template',{templateUrl : 'html/createTemplate.html'})
+            .when('/viewdirection',{templateUrl : 'html/viewdirection.html'})
 
             .when('/signup',{
                 templateUrl : 'html/profile/sign-up.html',
@@ -163,8 +163,6 @@
                     catch(ex){
 
                     }
-
-
                 }
             }
             else {

@@ -5,6 +5,7 @@ angular.module('ezeidApp').controller('bulksalesController',['$http', '$rootScop
     var salesEnquiry = this;
     salesEnquiry._info = {};
     var MsgDelay = 2000;
+    $scope.validationMode = 0;
 
    if ($rootScope._userInfo) {
     }
@@ -49,11 +50,28 @@ angular.module('ezeidApp').controller('bulksalesController',['$http', '$rootScop
     $scope.formTitle = "Bulk Sales Enquiry";
 
     // Create new mail template
-    salesEnquiry.addNewTemplateForm = function () {
-       // window.location.href = "#/create-template";
-        salesEnquiry._info = {};
-        $scope.formTitle = "Create mail template";
-        $scope.showCreateMailTemplate = true;
+    salesEnquiry.addNewTemplateForm = function (_NewEdit) {
+       if(_NewEdit == 'new')
+        {
+            $scope.validationMode = 1;
+            // window.location.href = "#/create-template";
+            salesEnquiry._info.FromName = "";
+            salesEnquiry._info.FromEmailID = "";
+            salesEnquiry._info.Title = "";
+            salesEnquiry._info.Subject = "";
+            salesEnquiry._info.Body = "";
+            salesEnquiry._info.TID = "";
+            salesEnquiry._info.CCMailIDS = "";
+            salesEnquiry._info.BCCMailIDS = "";
+            $scope.formTitle = "Create mail template";
+            $scope.showCreateMailTemplate = true;
+        }
+        else
+        {
+            $scope.validationMode = 2;
+            $scope.formTitle = "Edit mail template";
+            $scope.showCreateMailTemplate = true;
+        }
 
     };
 
@@ -75,25 +93,31 @@ angular.module('ezeidApp').controller('bulksalesController',['$http', '$rootScop
                     salesEnquiry._info.Subject = "";
                     salesEnquiry._info.Body = "";
                     salesEnquiry._info.TID = "";
+                    salesEnquiry._info.CCMailIDS = "";
+                    salesEnquiry._info.BCCMailIDS = "";
 
-                    /*document.getElementById("FromName").className = "emptyBox";
-                    document.getElementById("FromEmailID").className = "emptyBox";
-                    document.getElementById("Title").className = "emptyBox";
-                    document.getElementById("Subject").className = "emptyBox";
-                    document.getElementById("Body").className = "emptyBox";*/
 
-                    document.getElementById("FromName1").className = "form-control";
-                    document.getElementById("FromEmailID").className = "form-control";
-                    document.getElementById("Title1").className = "form-control";
-                    document.getElementById("Subject").className = "form-control";
-                    document.getElementById("Body").className = "form-control";
+                   /* salesEnquiry._info.FromName = "";
+                    salesEnquiry._info.FromEmailID = "";
+                    salesEnquiry._info.Title = "";
+                    salesEnquiry._info.Subject = "";
+                    salesEnquiry._info.Body = "";
+                    salesEnquiry._info.TID = "";
+                    salesEnquiry._info.CCMailIDS = "";
+                    salesEnquiry._info.BCCMailIDS = "";
 
-                  //  document.getElementById("Subject").removeClass("mandatoryTextBox").addClass("WhiteTextBox form-control emptyBox");
+                    document.getElementById("FromName").className = "form-control WhiteTextBox";
+                    document.getElementById("FromEmailID").className = "form-control WhiteTextBox";
+                    document.getElementById("Title").className = "form-control WhiteTextBox";
+                    document.getElementById("Subject").className = "form-control WhiteTextBox";
+                    document.getElementById("Body").className = "form-control WhiteTextBox";*/
+
 
                     getTemplateList();
 
                     $scope.formTitle = "Bulk Sales Enquiry";
                     $scope.showCreateMailTemplate = false;
+                    $scope.validationMode = 0;
 
                     //$("input#FromName").removeClass("mandatoryTextBox").addClass("form-control");
                     //$("input#FromName").attr("class", "newForm-Control");
@@ -106,6 +130,7 @@ angular.module('ezeidApp').controller('bulksalesController',['$http', '$rootScop
                     document.getElementById("Subject").className = "form-control emptyBox";
                     document.getElementById("Body").className = "form-control emptyBox";
                     */
+
                 }
                 else {
                     // Notification.error({ message: 'Invalid key or not found…', delay: MsgDelay });
@@ -173,6 +198,7 @@ angular.module('ezeidApp').controller('bulksalesController',['$http', '$rootScop
         }).success(function (data) {
                 if(data !== "null")
                 {
+                    console.log(data);
                     if($rootScope._userInfo.Token == false) {
                         var _obj = { TID: 0, Title: '--Select Template--' };
                         data.splice(0, 0, _obj);
@@ -187,6 +213,7 @@ angular.module('ezeidApp').controller('bulksalesController',['$http', '$rootScop
     salesEnquiry.closeCreateMailTemplateForm = function () {
         $scope.formTitle = "Bulk Sales Enquiry";
         $scope.showCreateMailTemplate = false;
+        $scope.validationMode = 0;
     };
 
     // get template details
@@ -195,10 +222,10 @@ angular.module('ezeidApp').controller('bulksalesController',['$http', '$rootScop
         {
             $http({
                 method: 'get',
-                url: GURL + 'ewtGetTemplateDetails?Token=' + $rootScope._userInfo.Token + '&TID='+Tid
-            }).success(function (data) {
+                url: GURL + 'ewtGetTemplateDetails?Token=' + $rootScope._userInfo.Token + '&TID='+Tid}).success(function (data) {
                     if(data !== "null")
                     {
+                        console.log(data);
                         salesEnquiry._info = data[0];
                     }
                 });
