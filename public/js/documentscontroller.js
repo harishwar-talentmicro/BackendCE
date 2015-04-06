@@ -31,7 +31,7 @@ angular.module('ezeidApp').controller('DocumentController', function($http, $roo
                 Icon: ''
             };
             alert('Sorry..! Browser does not support');
-            window.location.href = "#/";
+            window.location.href = "/";
         }
     }
     var DocCtrl = this;
@@ -281,6 +281,6 @@ angular.module('ezeidApp').controller('DocumentController', function($http, $roo
 
     }
     $scope.closeDocument = function(){
-        window.location.href = "#/home";
+        window.location.href = "/home";
     }
 });

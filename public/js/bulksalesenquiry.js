@@ -50,6 +50,7 @@ angular.module('ezeidApp').controller('bulksalesController',['$http', '$rootScop
     $scope.formTitle = "Bulk Sales Enquiry";
 
     // Create new mail template
+
     salesEnquiry.addNewTemplateForm = function (_NewEdit) {
        if(_NewEdit == 'new')
         {
@@ -72,7 +73,6 @@ angular.module('ezeidApp').controller('bulksalesController',['$http', '$rootScop
             $scope.formTitle = "Edit mail template";
             $scope.showCreateMailTemplate = true;
         }
-
     };
 
     // save mail template
@@ -266,7 +266,7 @@ angular.module('ezeidApp').controller('bulksalesController',['$http', '$rootScop
 
     // Close Create Mail Template Form
     salesEnquiry.closeSalesEnquiryForm = function () {
-        window.location.href = "#/home";
+        window.location.href = "/home";
     };
 
 

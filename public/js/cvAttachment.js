@@ -160,7 +160,7 @@ angular.module('ezeidApp').controller('CVAttachController', function($http, $roo
                 if(data.IsSuccessfull) {
                     Notification.success({message: "Saved..", delay: MsgDelay});
                     getCVInfo();
-                    window.location.href = "#/home";
+                    window.location.href = "/home";
                 }else{
                     Notification.error({message: "Sorry..! not saved", delay: MsgDelay});
                 }

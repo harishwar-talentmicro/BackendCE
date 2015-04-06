@@ -154,6 +154,7 @@ app.post('/ewtSaveMailTemplate',LocationManager.FnSaveMailTemplate);
 app.get('/ewtGetTemplateList',LocationManager.FnGetTemplateList);
 app.get('/ewtGetTemplateDetails',LocationManager.FnGetTemplateDetails);
 
+app.get('/ewtCropImageSize',LocationManager.FnCropImageSize);
 
 //below service are for EZEIDAP
 app.post('/ewLoginAP', LocationManager.FnLoginAP);
@@ -190,7 +191,9 @@ app.post('/ewtSaveGatesVES',LocationManager.FnSaveGatesVES);
 app.post('/ewtSaveCitysVES',LocationManager.FnSaveCitysVES);
 
 
-
+app.get('/:id',function(req,res){
+    res.sendFile(__dirname + '/public/html/index.html');
+});
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
     console.log('404 : Page not found');

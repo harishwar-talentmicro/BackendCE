@@ -195,7 +195,7 @@ angular.module('ezeidApp').controller('ProfileController', ['$rootScope', '$scop
                 Icon:''
             };
             alert('Sorry..! Browser does not support');
-            window.location.href = "#/home";
+            window.location.href = "/home";
         }
     }
 
@@ -1044,7 +1044,7 @@ angular.module('ezeidApp').controller('ProfileController', ['$rootScope', '$scop
                                 localStorage.setItem("_token", encrypted);
                             } else {
                                 alert('Sorry..! Browser does not support');
-                                window.location.href = "#/home";
+                                window.location.href = "/home";
                             }
                             document.getElementById("EZEID").className = "form-control emptyBox";
                             document.getElementById("password").className = "form-control emptyBox";
@@ -1061,12 +1061,12 @@ angular.module('ezeidApp').controller('ProfileController', ['$rootScope', '$scop
                             if (sTokenString== "")
                             {
                                // $scope.isCloseButtonClicked = true;
-                               //   window.location.href = "#/congratulations";
+                               //   window.location.href = "/congratulations";
                             }
                             else
                             {
                                 $scope.isCloseButtonClicked = true;
-                                window.location.href = "#/home";
+                                window.location.href = "/home";
                                 Notification.success({ message: "Updated...", delay: MsgDelay });
                             }
                         }
@@ -1149,7 +1149,7 @@ angular.module('ezeidApp').controller('ProfileController', ['$rootScope', '$scop
                                 localStorage.setItem("_token", encrypted);
                             } else {
                                 alert('Sorry..! Browser does not support');
-                                window.location.href = "#/home";
+                                window.location.href = "/home";
                             }
                             document.getElementById("EZEID").className = "form-control emptyBox";
                             document.getElementById("password").className = "form-control emptyBox";
@@ -1167,12 +1167,12 @@ angular.module('ezeidApp').controller('ProfileController', ['$rootScope', '$scop
                             if ($scope.isRegisterFirstTime == true)
                             {
                                 $scope.isCloseButtonClicked = true;
-                                window.location.href = "#/congratulations";
+                                window.location.href = "/congratulations";
                             }
                             else
                             {
                                 $scope.isCloseButtonClicked = true;
-                                window.location.href = "#/home";
+                                window.location.href = "/home";
                                 Notification.success({ message: "Updated...", delay: MsgDelay });
                                 // Upload CV Dialog with link
                                 // $('#Help_popup').slideDown();
@@ -1199,7 +1199,7 @@ angular.module('ezeidApp').controller('ProfileController', ['$rootScope', '$scop
 
     this.closeRegistrationForm = function () {
         $scope.isCloseButtonClicked = true;
-        window.location.href = "#/home";
+        window.location.href = "/home";
     }
 
 

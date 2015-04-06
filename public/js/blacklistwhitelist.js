@@ -38,7 +38,7 @@ angular.module('ezeidApp').controller('BlackListWhiteListController', function($
                 Icon:''
             };
             alert('Sorry..! Browser does not support');
-            window.location.href = "#/";
+            window.location.href = "/";
         }
     }
 
@@ -47,7 +47,7 @@ angular.module('ezeidApp').controller('BlackListWhiteListController', function($
             getBlackWhiteListInfo();
 
        } else {
-            window.location.href = "#/";
+            window.location.href = "/";
         }
     });
 

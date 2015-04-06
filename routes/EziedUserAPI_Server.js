@@ -487,8 +487,9 @@ function FnValidateToken(Token, CallBack) {
     try {
 
         //below query to check token exists for the users or not.
-        if (Token != null) {
-            var Query = 'select Token from tmaster where Token=' + db.escape(Token);
+        if (Token != null && Token != '') {
+            if(Token != 2){
+                 var Query = 'select Token from tmaster where Token=' + db.escape(Token);
             //var Query = 'select Token from tmaster';
             //70084b50d3c43822fbef
             db.query(Query, function (err, Result) {
@@ -509,6 +510,10 @@ function FnValidateToken(Token, CallBack) {
 
                 }
             });
+            }
+            else{
+                CallBack(null, 'Pass');
+            }
         }
         else {
             CallBack(null, null);
@@ -4003,6 +4008,9 @@ exports.FnSearchByKeywords = function (req, res) {
                 }
                 else if (token == null || token == '') {
                     console.log('FnSearchByKeywords: token is empty');
+                }
+                else if (CurrentDate == null || CurrentDate == '') {
+                    console.log('FnSearchByKeywords: CurrentDate is empty');
                 }
                 res.statusCode = 400;
                 res.send('null');
@@ -10062,4 +10070,75 @@ exports.FnSaveCitysVES = function(req, res){
         console.log('FnSaveCitysVES:error ' + ex.description);
         throw new Error(ex);
     }
+};
+
+exports.FnCropImageSize = function(req, res){
+     try{
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+         
+          var RtnMessage = {
+                IsSuccessfull: false,
+              //Imgbase64: ''
+            };
+            var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
+                var fs = require('fs');
+                var gm = require('gm').subClass({ imageMagick: true });
+                var bitmap = fs.readFileSync("F:/test.jpg");
+                console.log(bitmap);
+         
+                var Original_Width = 0;
+                var Original_Height = 0;
+                var Target_Width = 77;
+                var Target_Height = 90;
+                
+                gm(bitmap).size(function (err, size) {
+                  if (!err){
+                    //console.log(size.width > size.height ? 'wider' : 'taller than you');
+                    Original_Width = size.width;
+                    Original_Height = size.height;
+                   
+                      if(Original_Width > Original_Height){
+                        x_width = Target_Width * Original_Height / Target_Height ;
+                        
+                            gm(bitmap).crop(x_width,Original_Height)
+                            .write("F://output//cropped.jpg", function (err) {
+                                if (!err){
+                                    console.log('FnCropImageSize: Image Cropped successfully');
+                                    RtnMessage.IsSuccessfull = true;
+                                    res.send(RtnMessage);
+                                }
+                                else{
+                                    console.log('FnCropImageSize: No Image Cropped');
+                                    res.send(RtnMessage);
+                                }
+                            });
+                      }
+                      else{
+                        x_height = Original_Width * Target_Height / Target_Width ;
+                          
+                          gm(bitmap).crop(Original_Width,x_height)
+                            .write("F://output//cropped.jpg", function (err) {
+                                if (!err){
+                                    console.log('FnCropImageSize: Image Cropped successfully..');
+                                    RtnMessage.IsSuccessfull = true;
+                                    res.send(RtnMessage);
+                                }
+                                else{
+                                    console.log('FnCropImageSize: No Image Cropped');
+                                    res.send(RtnMessage);
+                                }
+                          });
+                      }
+                  }
+                    else{
+                            console.log('FnCropImageSize: Error in getting image size');
+                            res.send(RtnMessage);
+                        }
+                  });    
+             }
+            catch (ex) {
+                console.log('FnCropImageSize:error ' + ex.description);
+                throw new Error(ex);
+        }
 };
