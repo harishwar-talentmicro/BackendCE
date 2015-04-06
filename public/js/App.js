@@ -100,15 +100,16 @@
             .when('/bulksalesenquiry',{templateUrl : 'html/bulksalesenquiry.html'})
             .when('/create-template',{templateUrl : 'html/createTemplate.html'})
 /**
+ **/
             .when('/signup',{
                 templateUrl : 'html/profile/sign-up.html',
                 controller : 'SignUpCtrl'
             })
-            .when('/profile',{
+             .when('/profile',{
                 templateUrl : 'html/profile/edit-profile.html',
                 controller : 'ProfileCtrl'
             })
- **/
+
             .when('/home',{templateUrl: 'html/home.html'})
             .when('/:ezeid',{
                 templateUrl : 'html/home.html'
@@ -133,7 +134,7 @@
                 if(CLOSED_ROUTES.indexOf(next.$$route.originalPath) === -1
                     &&
                     UNAUTHORIZED_ROUTES.indexOf(next.$$route.originalPath) === -1){
-
+                    console.log('line 137');
                     return;
                 }
             }
@@ -146,15 +147,8 @@
 
 
             if ($rootScope._userInfo) {
-                /**
-                 * Allow him to access the site as he is already logged in
-                 */
-                if(typeof($rootScope._userInfo.IsAuthenticate) == "undefined"){
-                    $location.path('/');
-                    return;
-                }
-
                 if($rootScope._userInfo.IsAuthenticate){
+                    console.log('line 151');
                     try{
                         if(UNAUTHORIZED_ROUTES.indexOf(next.$$route.originalPath) !== -1){
                             /**
@@ -164,6 +158,7 @@
                             console.log('UNAUTHORIZED ROUTES');
                             $location.path('/');
                         }
+
                     }
                     catch(ex){
 
