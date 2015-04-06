@@ -449,25 +449,20 @@
                             </form>
                             <div ng-show="ShowLinks" class="row setRowLeftRightMarginZero boxFotterBanner">
                                 <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 searchHeaderAlignment fotterButtonContainer">
-                                    <div>
+
                                        <div  class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer bottomTabButton" style=" margin-top: 5%;" ng-hide="search.isIndividualUser(1)">
                                             <img src="../images/open_big.png" ng-show="search.mInfo.OpenStatus==1">
                                             <img src="../images/close_big.png" ng-hide="search.mInfo.OpenStatus==1">
                                         </div>
-                                        <div  class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer " style="padding-left: 30px;" ng-hide="search.isIndividualUser(1)">
+                                        <div  class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer" ng-hide="search.isIndividualUser(1)">
                                             <div class="parkingAlignment" ng-hide="search.mInfo.ParkingStatus==3">
                                                 <img title="{{search.parkingTitle}}" src="../images/parking_new.png" >
                                             </div>
                                             <div class="parkingAlignment" ng-show="search.mInfo.ParkingStatus==3">
                                                 <img title="{{search.parkingTitle}}" src="../images/new_no_parking.png" >
                                             </div>
-
-                                            <!--<a class="car-parking active" ng-show="search.mInfo.ParkingStatus==1" title="Parking">Parking</a>
-                                            <a class="no-parking active" ng-show="search.mInfo.ParkingStatus==4" title="No Parking">No Parking</a>
-                                            <a class="val-parking active" ng-show="search.mInfo.ParkingStatus==3" title="Vallet Parking">Vallet Parking</a>
-                                            <a class="road-parking active" ng-show="search.mInfo.ParkingStatus==2" title="Road Parking">Road Parking</a>-->
                                         </div>
-                                    </div>
+
                                 </div>
                                 <div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 searchHeaderAlignment msgButtonContainer" ng-hide="(search.mInfo.IDTypeID == 1)">
                                     <div class="innerMsgButtonContainer">
@@ -525,6 +520,15 @@
                                             </div>
                                             <div class="row setRowLeftRightMarginZero infoMsgText" >
                                                 Plot Route
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer removePadding keyWordText"
+                                             ng-click="search.viewDirections(search.mInfo)" title="View Directions">
+                                            <div class="row setRowLeftRightMarginZero" >
+                                                <img src="../images/new_directions.png">
+                                            </div>
+                                            <div class="row setRowLeftRightMarginZero infoMsgText" >
+                                                View Directions
                                             </div>
                                         </div>
                                     </div>

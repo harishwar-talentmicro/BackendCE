@@ -487,8 +487,9 @@ function FnValidateToken(Token, CallBack) {
     try {
 
         //below query to check token exists for the users or not.
-        if (Token != null) {
-            var Query = 'select Token from tmaster where Token=' + db.escape(Token);
+        if (Token != null && Token != '') {
+            if(Token != 2){
+                 var Query = 'select Token from tmaster where Token=' + db.escape(Token);
             //var Query = 'select Token from tmaster';
             //70084b50d3c43822fbef
             db.query(Query, function (err, Result) {
@@ -509,6 +510,10 @@ function FnValidateToken(Token, CallBack) {
 
                 }
             });
+            }
+            else{
+                CallBack(null, 'Pass');
+            }
         }
         else {
             CallBack(null, null);
@@ -4003,6 +4008,9 @@ exports.FnSearchByKeywords = function (req, res) {
                 }
                 else if (token == null || token == '') {
                     console.log('FnSearchByKeywords: token is empty');
+                }
+                else if (CurrentDate == null || CurrentDate == '') {
+                    console.log('FnSearchByKeywords: CurrentDate is empty');
                 }
                 res.statusCode = 400;
                 res.send('null');

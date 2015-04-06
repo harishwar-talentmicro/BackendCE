@@ -544,8 +544,9 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
                         SearchSec.IsFilterRowVisible = false;
 
                         var downloadUrl = "/ewtGetSearchDocuments?Token="+$rootScope._userInfo.Token+"&&Keywords="+SearchSec.Criteria.Keywords;
-                        var win = window.open(downloadUrl, '_blank');
-                        win.focus();
+                        $window.open(downloadUrl, '_blank');
+                       /* var win = window.open(downloadUrl, '_blank');
+                        win.focus();*/
                     }
                     else
                     {
@@ -828,6 +829,29 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
                 directionsDisplay.setDirections(response);
             }
         });
+    };
+
+    //View Directions
+    SearchSec.viewDirections = function (data) {
+        $scope.selectTab('map');
+      //  var start = new google.maps.LatLng($rootScope.CLoc.CLat, $rootScope.CLoc.CLong);
+     //   var end = new google.maps.LatLng(data.Latitude, data.Longitude);
+
+        $rootScope.startLatLong = new google.maps.LatLng($rootScope.CLoc.CLat, $rootScope.CLoc.CLong);
+        $rootScope.endLatLong = new google.maps.LatLng(data.Latitude, data.Longitude);
+
+        window.location.href = "#/viewdirection";
+       /* directionsDisplay.setMap(map);
+        var request = {
+            origin: start,
+            destination: end,
+            travelMode: google.maps.TravelMode.DRIVING
+        };
+        directionsService.route(request, function (response, status) {
+            if (status == google.maps.DirectionsStatus.OK) {
+                directionsDisplay.setDirections(response);
+            }
+        });*/
     };
 
     //open Sales Enquiry form

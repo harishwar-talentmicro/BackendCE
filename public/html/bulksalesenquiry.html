@@ -55,15 +55,18 @@
                                                   Template
                                               </div>
                                               <div ng-hide="showCreateMailTemplate">
-                                                  <div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 searchHeaderAlignment ">
-                                                      <select class="form-control" name="Title" ng-model="bulksalesController._info.TID"
+                                                  <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 searchHeaderAlignment ">
+                                                      <select class="form-control" name="TitleSeelect" ng-model="bulksalesController._info.TID"
                                                            ng-change="bulksalesController.getTemplateDetails(bulksalesController._info.TID)"
                                                            ng-options="template.TID as template.Title for template in bulksalesController.templates" required>
                                                           <option value = ""> --Select Template-- </option>
                                                       </select>
                                                   </div>
-                                                  <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1 searchHeaderAlignment ">
-                                                      <button data-toggle="tooltip" data-placement="right" title="Create new template" type="button" class="btn btn-primary" ng-click="bulksalesController.addNewTemplateForm()" >...</button>
+                                                  <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 searchHeaderAlignment setTextToRight">
+                                                      <button data-toggle="tooltip" data-placement="right" title="Create new template" type="button" class="btn btn-primary" ng-click="bulksalesController.addNewTemplateForm('new')" >New</button>
+                                                  </div>
+                                                  <div ng-show="bulksalesController._info.TID" class="col-lg-1 col-md-1 col-sm-1 col-xs-12 searchHeaderAlignment setTextToRight">
+                                                      <button data-toggle="tooltip" data-placement="right" title="Edit template" type="button" class="btn btn-primary" ng-click="bulksalesController.addNewTemplateForm('edit')" >Edit</button>
                                                   </div>
                                               </div>
 
@@ -82,7 +85,7 @@
                                               </div>
                                               <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 searchHeaderAlignment">
                                                   <input type="text" name="FromName" ng-model="bulksalesController._info.FromName"
-                                                         ng-class="MailTemplateForm.FromName.$touched && !bulksalesController._info.FromName.length ? 'mandatoryTextBox' : ''"
+                                                         ng-class="MailTemplateForm.FromName.$touched && !bulksalesController._info.FromName.length && validationMode > 0  ? 'mandatoryTextBox' : ''"
                                                          class="form-control emptyBox" id="FromName" placeholder="From name" maxlength="100" required>
                                               </div>
                                               <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 searchHeaderAlignment TemplateTextContainer bewareTextInnerContainer keyWordText">
@@ -91,7 +94,7 @@
                                               <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 searchHeaderAlignment">
                                                   <input type="text" name="FromEmailID" class="form-control emptyBox"
                                                          id="FromEmailID" ng-model="bulksalesController._info.FromEmailID"
-                                                         ng-class="MailTemplateForm.FromEmailID.$touched && !bulksalesController._info.FromEmailID.length ? 'mandatoryTextBox' : ''"
+                                                         ng-class="MailTemplateForm.FromEmailID.$touched && !bulksalesController._info.FromEmailID.length && validationMode > 0 ? 'mandatoryTextBox' : ''"
                                                          placeholder="From email" maxlength="100"  ng-pattern="/^[a-z]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5}$/" required>
                                                    <span ng-show="MailTemplateForm.FromEmailID.$error.email" ng-if="MailTemplateForm.FromEmailID.$error.email == true ? bulksalesController._info.isWrongEmailPatternFrom = true : bulksalesController._info.isWrongEmailPatternFrom = false"></span>
                                               </div>
@@ -125,7 +128,7 @@
                                               </div>
                                               <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10 searchHeaderAlignment">
                                                   <input type="text" name="Subject" id="Subject" ng-model="bulksalesController._info.Subject"
-                                                         class="form-control emptyBox"  ng-class="MailTemplateForm.Subject.$touched && !bulksalesController._info.Subject.length ? 'mandatoryTextBox' : ''"
+                                                         class="form-control emptyBox"  ng-class="MailTemplateForm.Subject.$touched && !bulksalesController._info.Subject.length && validationMode > 0 ? 'mandatoryTextBox' : ''"
                                                          placeholder="Subject" maxlength="250" required>
                                               </div>
                                           </div><br/>
@@ -136,7 +139,7 @@
                                               <!--<div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 searchHeaderAlignment">-->
                                               <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10 searchHeaderAlignment">
                                                   <textarea rows="10" cols="92" name="Body" id="Body" ng-model="bulksalesController._info.Body"
-                                                            class="form-control emptyBox"  ng-class="MailTemplateForm.Body.$touched && !bulksalesController._info.Body.length ? 'mandatoryTextBox' : ''"
+                                                            class="form-control emptyBox"  ng-class="MailTemplateForm.Body.$touched && !bulksalesController._info.Body.length && validationMode > 0 ? 'mandatoryTextBox' : ''"
                                                             placeholder="Type here" required></textarea>
                                               </div>
                                           </div><br/>

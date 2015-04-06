@@ -354,7 +354,7 @@ body {
 .fotterButtonContainer
 {
     margin-top: 0.5%;
-    margin-right: 7%;
+   /* margin-right: 7%;*/
 }
 .msgButtonContainer
 {
@@ -630,6 +630,14 @@ body {
     transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
 }
 .WhiteTextBox {
-    background-color: #ffffff;
-
+    background-color: #ffffff !important;
+}
+.setTextToRight
+{
+    text-align: right;
+}
+#directions-panel {
+    height: 100%;
+    float: right;
+    width: 100%;
 }
