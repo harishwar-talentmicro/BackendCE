@@ -128,12 +128,13 @@
 
         $rootScope.$on("$routeChangeStart",function(event,next,current){
 
+            console.log(next.$$route.originalPath);
+            console.log(UNAUTHORIZED_ROUTES.indexOf(next.$$route.originalPath));
             try{
                 if(CLOSED_ROUTES.indexOf(next.$$route.originalPath) === -1
                     &&
                     UNAUTHORIZED_ROUTES.indexOf(next.$$route.originalPath) === -1){
-                    console.log('line 137');
-                    return;
+
                 }
             }
             catch(ex){
@@ -204,15 +205,36 @@
 
                                 }
                                 else{
-                                    $location.path('/');
+                                    if(UNAUTHORIZED_ROUTES.indexOf(next.$$route.originalPath) === -1){
+                                        /**
+                                         * If route is found in unauthorized routes then don't allow him to navigate to that route
+                                         * when he is already logged in
+                                         */
+                                        console.log('UNAUTHORIZED ROUTES1');
+                                        $location.path('/');
+                                    }
                                 }
                             }
                             else{
-                                $location.path('/');
+                                if(UNAUTHORIZED_ROUTES.indexOf(next.$$route.originalPath) === -1){
+                                    /**
+                                     * If route is found in unauthorized routes then don't allow him to navigate to that route
+                                     * when he is already logged in
+                                     */
+                                    console.log('UNAUTHORIZED ROUTES1');
+                                    $location.path('/');
+                                }
                             }
                         }
                         else{
-                            $location.path('/');
+                            if(UNAUTHORIZED_ROUTES.indexOf(next.$$route.originalPath) === -1){
+                                /**
+                                 * If route is found in unauthorized routes then don't allow him to navigate to that route
+                                 * when he is already logged in
+                                 */
+                                console.log('UNAUTHORIZED ROUTES1');
+                                $location.path('/');
+                            }
                         }
                     }
                     else {
@@ -223,7 +245,14 @@
                             Type: '',
                             Icon: ''
                         };
-                        $location.path('/');
+                        if(UNAUTHORIZED_ROUTES.indexOf(next.$$route.originalPath) === -1){
+                            /**
+                             * If route is found in unauthorized routes then don't allow him to navigate to that route
+                             * when he is already logged in
+                             */
+                            console.log('UNAUTHORIZED ROUTES1');
+                            $location.path('/');
+                        }
                     }
                 }
                 else {
@@ -242,10 +271,7 @@
         });
 
         $rootScope.$on('$routeChangeSuccess',function(){
-            if($location.path() == '/' || $location.path() == '/home'){
-                //lazyLoadBackground($timeout);
-                $("#background-image-container").show();
-            }
+
         });
     }]);
     /************************************** Run Configuration ends here ****************************/
