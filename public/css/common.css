@@ -1814,7 +1814,12 @@ input[type="text"].ui-grid-filter-input {
 .profile-details > div.row > div.col-lg-2 > h5,
 .profile-details > div.row > div.col-md-2 > h5,
 .profile-details > div.row > div.col-sm-2 > h5,
-.profile-details > div.row > div.col-xs-12 > h5{
+.profile-details > div.row > div.col-xs-12 > h5,
+.profile-details > form > div.row > div.col-lg-2 > h5,
+.profile-details > form > div.row > div.col-md-2 > h5,
+.profile-details > form > div.row > div.col-sm-2 > h5,
+.profile-details > form > div.row > div.col-xs-12 > h5{
+
     font-family: 'Roboto', sans-serif!important;
     font-size: 14px !important;
     color: #008FAC!important;
@@ -1823,7 +1828,11 @@ input[type="text"].ui-grid-filter-input {
 .profile-details > div.row > div.col-lg-4 > h5.data,
 .profile-details > div.row > div.col-md-4 > h5.data,
 .profile-details > div.row > div.col-sm-4 > h5.data,
-.profile-details > div.row > div.col-xs-12 > h5.data{
+.profile-details > div.row > div.col-xs-12 > h5.data,
+.profile-details > form >  div.row > div.col-lg-4 > h5.data,
+.profile-details > form >  div.row > div.col-md-4 > h5.data,
+.profile-details > form >  div.row > div.col-sm-4 > h5.data,
+.profile-details > form >  div.row > div.col-xs-12 > h5.data{
     color:#000000!important;
     font-size: 16px!important;
     font-family: 'Roboto', sans-serif!important;
@@ -1832,4 +1841,42 @@ input[type="text"].ui-grid-filter-input {
 .profile-panel-body > div.row{
     margin-left: 0px;
     margin-right: 0px;
+}
+form .row-error{
+    min-height: 20px;
+}
+
+/************** Profile Manager Navigation ********************/
+.profile-manager .nav{
+    padding: 10px;
+}
+.profile-manager .nav > li > a{
+    border-radius: 0px;
+    background: #D9ECFF;
+    color:#0DA3D8;
+    margin-bottom: 10px;
+}
+
+.profile-manager .nav > li.disabled > a{
+    background: #F0F0F0;
+    color: #939393
+}
+
+.profile-manager .nav > li.disabled > a:hover,
+.profile-manager .nav > li.disabled > a:focus,
+.profile-manager .nav > li.disabled > a:active{
+    background: #f3f3f3;
+    color:#D2D2D2;
+}
+
+.profile-manager .nav > li.active > a{
+    background: #60D560;
+    color:#FFF;
+}
+
+.profile-manager .nav > li > a:hover,
+.profile-manager .nav > li > a:active,
+.profile-manager .nav > li > a:focus{
+    background: #98F098;
+    color: #3295BA;
 }

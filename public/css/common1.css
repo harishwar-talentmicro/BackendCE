@@ -301,7 +301,7 @@ body {
 .headerVerified
 {
     text-align: center;
-    background: #ffffff;
+    background: #0B89BA;
     height: 75px;
 }
 .parkingText
@@ -339,7 +339,7 @@ body {
 .bewareTextContainer
 {
     background: #ff0000;
-    height: 50px;
+    height: 75px;
     color: #ffffff;
     text-align: center;
 }
@@ -630,6 +630,14 @@ body {
     transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
 }
 .WhiteTextBox {
-    background-color: #ffffff;
-
+    background-color: #ffffff !important;
+}
+.setTextToRight
+{
+    text-align: right;
+}
+#directions-panel {
+    height: 100%;
+    float: right;
+    width: 100%;
 }

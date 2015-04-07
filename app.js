@@ -154,6 +154,7 @@ app.post('/ewtSaveMailTemplate',LocationManager.FnSaveMailTemplate);
 app.get('/ewtGetTemplateList',LocationManager.FnGetTemplateList);
 app.get('/ewtGetTemplateDetails',LocationManager.FnGetTemplateDetails);
 
+app.get('/ewtCropImageSize',LocationManager.FnCropImageSize);
 
 //below service are for EZEIDAP
 app.post('/ewLoginAP', LocationManager.FnLoginAP);
