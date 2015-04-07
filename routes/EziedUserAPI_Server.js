@@ -244,7 +244,7 @@ function FnMessageMail(MessageContent, CallBack) {
                                         data = data.replace("[IsVerified]", MessageContentResult[0].EZEIDVerifiedID);
                                         data = data.replace("[EZEID]", MessageContentResult[0].EZEID);
                                         data = data.replace("[Message]", MessageContent.Message);
-                                        data = data.replace("[https://www.ezeid.com?ID=]", 'https://www.ezeid.com?ID=' + MessageContentResult[0].EZEID);
+                                        data = data.replace("[https://www.ezeid.com/]", 'https://www.ezeid.com/' + MessageContentResult[0].EZEID);
                                         // console.log('Body:' + data);
                                         // console.log(MessageContentResult[0].ToMailID);
                                         var mailOptions = {
@@ -273,7 +273,7 @@ function FnMessageMail(MessageContent, CallBack) {
                                         data = data.replace("[IsVerified]", MessageContentResult[0].EZEIDVerifiedID);
                                         data = data.replace("[EZEID]", MessageContentResult[0].EZEID);
                                         data = data.replace("[Message]", MessageContent.Message);
-                                        data = data.replace("[https://www.ezeid.com?ID=]", 'https://www.ezeid.com?ID=' + MessageContentResult[0].EZEID);
+                                        data = data.replace("[https://www.ezeid.com/]", 'https://www.ezeid.com/' + MessageContentResult[0].EZEID);
 
                                         // console.log('Body:' + data);
                                         //  console.log(MessageContentResult[0].ToMailID);
@@ -313,7 +313,7 @@ function FnMessageMail(MessageContent, CallBack) {
                                         }
                                         //  console.log(moment(new Date(MessageContent.TaskDateTime)).format('DD-MMM-YYYY HH:MM a'));
                                         data = data.replace("[ActionDate]", MessageContent.TaskDateTime);
-                                        data = data.replace("[https://www.ezeid.com?ID=]", 'https://www.ezeid.com?ID=' + MessageContentResult[0].EZEID);
+                                        data = data.replace("[https://www.ezeid.com/]", 'https://www.ezeid.com/' + MessageContentResult[0].EZEID);
                                         // console.log('Body:' + data);
                                         // console.log(MessageContentResult[0].ToMailID);
                                         var mailOptions = {
@@ -342,7 +342,7 @@ function FnMessageMail(MessageContent, CallBack) {
                                         data = data.replace("[IsVerified]", MessageContentResult[0].EZEIDVerifiedID);
                                         data = data.replace("[EZEID]", MessageContentResult[0].EZEID);
                                         data = data.replace("[Message]", MessageContent.Message);
-                                        data = data.replace("[https://www.ezeid.com?ID=]", 'https://www.ezeid.com?ID=' + MessageContentResult[0].EZEID);
+                                        data = data.replace("[https://www.ezeid.com/]", 'https://www.ezeid.com/' + MessageContentResult[0].EZEID);
                                         // console.log('Body:' + data);
                                         //  console.log(MessageContentResult[0].ToMailID);
                                         var mailOptions = {
@@ -375,7 +375,7 @@ function FnMessageMail(MessageContent, CallBack) {
                                         data = data.replace("[Functions]", MessageContentResult[0].Function);
                                         data = data.replace("[Roles]", MessageContentResult[0].Role);
                                         data = data.replace("[Keyskills]", MessageContentResult[0].KeySkills);
-                                        data = data.replace("[https://www.ezeid.com?ID=]", 'https://www.ezeid.com?ID=' + MessageContentResult[0].EZEID);
+                                        data = data.replace("[https://www.ezeid.com/]", 'https://www.ezeid.com/' + MessageContentResult[0].EZEID);
                                         console.log(MessageContentResult[0].EZEID);
                                         if (MessageContentResult[0].DocPin = '') {
                                             data = data.replace(".[PIN]", MessageContentResult[0].DocPin);
