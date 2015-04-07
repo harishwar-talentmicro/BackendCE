@@ -41,7 +41,7 @@
         '/signup'
     ]);
 
-    ezeid.value('MsgDelay',2000);
+    ezeid.value('MsgDelay',5000);
 
 
     //HTTP Interceptor for detecting token expiry
@@ -99,14 +99,14 @@
             .when('/business-manager',{templateUrl : 'html/business-manager/business-manager.html'})
             .when('/bulksalesenquiry',{templateUrl : 'html/bulksalesenquiry.html'})
             .when('/viewdirection',{templateUrl : 'html/viewdirection.html'})
-//            .when('/signup',{
-//                templateUrl : 'html/profile/sign-up.html',
-//                controller : 'SignUpCtrl'
-//            })
-//             .when('/profile',{
-//                templateUrl : 'html/profile/edit-profile.html',
-//                controller : 'ProfileCtrl'
-//            })
+            .when('/signup',{
+                templateUrl : 'html/profile/sign-up.html',
+                controller : 'SignUpCtrl'
+            })
+             .when('/profile',{
+                templateUrl : 'html/profile/edit-profile.html',
+                controller : 'ProfileCtrl'
+            })
 
             .when('/home',{templateUrl: 'html/home.html'})
             .when('/:ezeid',{

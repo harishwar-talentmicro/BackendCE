@@ -46,7 +46,7 @@ angular.module('ezeidApp').controller('ProfileEditCtrl',[
          */
         $scope.$watch('isPinApplicable',function(newVal,oldVal){
             if(!newVal){
-                $scope.editUserDetails.PIN == '';
+                $scope.editUserDetails.PIN = '';
             }
         });
 
@@ -56,13 +56,6 @@ angular.module('ezeidApp').controller('ProfileEditCtrl',[
         $scope.$watch('profileEditMode',function(newVal,oldVal){
             if(newVal){
                 $scope.editUserDetails = angular.copy($scope.userDetails);
-
-//                for(var prop in $scope.userDetails){
-//                    if($scope.userDetails.hasOwnProperty(prop)){
-//                        $scope.userDetailsForm[prop] = $scope.userDetails[prop];
-//                    }
-//                }
-
                 $scope.isPinApplicable = ($scope.editUserDetails.PIN) ? true : false;
             }
         });
@@ -73,21 +66,83 @@ angular.module('ezeidApp').controller('ProfileEditCtrl',[
          * @returns {promise|*}
          */
         $scope.saveUserDetails = function(){
-            var defer = $q.defer();
             /**
-             * @todo Save all userDetails to server
+             * @todo Check Validations
              */
+
+
+            var defer = $q.defer();
+            var data = {
+                IDTypeID : $scope.editUserDetails.IDTypeID,
+                EZEID : $scope.editUserDetails.EZEID,
+                Password : '',
+                FirstName : $scope.editUserDetails.FirstName,
+                LastName : $scope.editUserDetails.LastName,
+                CompanyName : $scope.editUserDetails.CompanyName,
+                JobTitle : $scope.editUserDetails.JobTitle,
+                CategoryID : 0,
+                FunctionID : 0,
+                RoleID : 0,
+                LanguageID : 1,
+                NameTitleID : 0,
+                Latitude : ($scope.editUserDetails.Latitude) ? $scope.editUserDetails.Latitude : 0,
+                Longitude : ($scope.editUserDetails.Longitude) ? $scope.editUserDetails.Longitude : 0,
+                Altitude : ($scope.editUserDetails.Altitude) ? $scope.editUserDetails.Altitude : 0,
+                AddressLine1 : $scope.editUserDetails.AddressLine1,
+                AddressLine2 : $scope.editUserDetails.AddressLine2,
+                Area : $scope.editUserDetails.Area,
+                CityTitle : $scope.editUserDetails.CityTitle,
+                StateID : $scope.editUserDetails.StateID,
+                CountryID : $scope.editUserDetails.CountryID,
+                PostalCode : $scope.editUserDetails.PostalCode,
+                PIN : ($scope.editUserDetails.PIN) ? $scope.editUserDetails.PIN : '',
+                PhoneNumber : $scope.editUserDetails.PhoneNumber,
+                MobileNumber : $scope.editUserDetails.MobileNumber,
+                EMailID : $scope.editUserDetails.EMailID,
+                Picture  : $scope.editUserDetails.Picture,
+                PictureFileName : $scope.editUserDetails.PictureFileName,
+                Website : ($scope.editUserDetails.Website) ? $scope.editUserDetails.Website : '',
+                AboutCompany: ($scope.editUserDetails.AboutCompany) ? $scope.editUserDetails.AboutCompany : '',
+                Keywords : ($scope.editUserDetails.Keywords) ? $scope.editUserDetails.Keywords : '',
+                Token : $rootScope._userInfo.Token,
+                Icon : ($scope.editUserDetails.Icon) ? $scope.editUserDetails.Icon :'',
+                IconFileName : ($scope.editUserDetails.IconFileName) ? $scope.editUserDetails.IconFileName :'',
+                ISDPhoneNumber : $scope.editUserDetails.ISDPhoneNumber,
+                ISDMobileNumber : $scope.editUserDetails.ISDMobileNumber,
+                Gender : $scope.editUserDetails.Gender,
+                DOB : $scope.editUserDetails.DOB,
+                OperationType : 'U',
+                SelectionType : ($scope.IDTypeID === 2) ?
+                    (($scope.editUserDetails.SelectionType === 1 || $scope.editUserDetails.SelectionType === 2) ?
+                        $scope.editUserDetails.SelectionType : 1) : 0,
+                ParkingStatus : $scope.editUserDetails.ParkingStatus
+            };
 
             $http({
                 url : GURL + 'ewSavePrimaryEZEData',
                 method : 'POST',
-                data : $scope.editUserDetails
+                data : data
             }).success(function(resp){
                 if(resp && resp !== null && resp !== 'null'){
+                    if(resp.IsAuthenticate){
+                        Notification.success({ message : 'Your profile details are saved successfully', delay : MsgDelay});
+                        $scope.userDetails = angular.copy($scope.editUserDetails);
+                        $scope.toggleProfileEditMode();
+                        defer.resolve(true);
 
+                    }
+                    else{
+                        defer.resolve(false);
+                        Notification.error({ message : 'An unknown error occurred while saving your profile details', delay : MsgDelay});
+                    }
+                }
+                else{
+                    defer.resolve(false);
+                    Notification.error({ message : 'An unknown error occurred while saving your profile details', delay : MsgDelay});
                 }
             }).error(function(err){
-
+                    defer.reject();
+                    Notification.error({ message : 'An unknown error occurred while saving your profile details', delay : MsgDelay});
             });
 
             return defer.promise;
