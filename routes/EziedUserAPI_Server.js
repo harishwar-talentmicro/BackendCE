@@ -4155,14 +4155,20 @@ exports.FnGetSearchInformation = function (req, res) {
         var Token = req.query.Token;
         var TID = parseInt(req.query.TID);
         var CurrentDate = req.query.CurrentDate;
+        var WorkingDate
+        var moment = require('moment');
         if(CurrentDate != null)
-             CurrentDate = new Date(CurrentDate);
+             var WorkingDate =  moment(new Date(CurrentDate)).format('YYYY-MM-DD HH:MM');
+        else
+             var WorkingDate = moment(new Date()).format('YYYY-MM-DD HH:MM');
+        //console.log(WorkingDate);
 
-        if (Token != null && Token != '' && TID.toString() != 'NaN' && CurrentDate != null) {
+        if (Token != null && Token != '' && TID.toString() != 'NaN' && WorkingDate != null) {
             if(Token == 2){
 
-                            var SearchParameter = db.escape(TID) + ',' + db.escape(Token) + ',' + db.escape(CurrentDate);
+                            var SearchParameter = db.escape(TID) + ',' + db.escape(Token) + ',' + db.escape(WorkingDate);
                             // console.log('Search Information: ' +SearchParameter);
+           //     console.log('CALL pSearchInformation(' + SearchParameter + ')');
                             db.query('CALL pSearchInformation(' + SearchParameter + ')', function (err, UserInfoResult) {
                                 // db.query(searchQuery, function (err, SearchResult) {
                                 if (!err) {
@@ -4189,9 +4195,10 @@ exports.FnGetSearchInformation = function (req, res) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
-                        var SearchParameter = db.escape(TID) + ',' + db.escape(Token) + ',' + db.escape(CurrentDate);
+                        var SearchParameter = db.escape(TID) + ',' + db.escape(Token) + ',' + db.escape(WorkingDate);
                         // console.log('Search Information: ' +SearchParameter);
-                        db.query('CALL pSearchInformation(' + SearchParameter + ')', function (err, UserInfoResult) {
+                       // console.log('CALL pSearchInformation(' + SearchParameter + ')');
+                            db.query('CALL pSearchInformation(' + SearchParameter + ')', function (err, UserInfoResult) {
                             // db.query(searchQuery, function (err, SearchResult) {
                             if (!err) {
                                 // console.log(UserInfoResult);
@@ -6353,6 +6360,7 @@ exports.FnSaveTranscation = function(req, res){
 
         var Token = req.body.Token;
         var TID = parseInt(req.body.TID);
+         
         var MessageText =req.body.MessageText;
         var MessageType = req.body.MessageType;
         var Status = req.body.Status;
@@ -6375,24 +6383,37 @@ exports.FnSaveTranscation = function(req, res){
         ItemsList = JSON.parse(ItemsList);
         var NextAction = req.body.NextAction;
         var NextActionDateTime = req.body.NextActionDateTime;
-        var  TaskDateNew = new Date(TaskDateTime);
-        var NextActionDateTimeNew = new Date(NextActionDateTime);
-        console.log(ItemsList);
+            var  TaskDateNew = new Date(TaskDateTime);
+            var NextActionDateTimeNew = new Date(NextActionDateTime);
+        var ItemIDList='';
+       // console.log(ItemsList);
         var RtnMessage = {
             IsSuccessfull: false,
             MessageID:0
         };
+         
         if(TID.toString() == 'NaN')
             TID = 0;
+       
+        if(TID != 0){
+            for(var i=0; i < ItemsList.length; i++) {
+                if(ItemsList[i].TID != 0 )
+                    ItemIDList = ItemsList[i].TID + ',' + ItemIDList  ;
+                   }
+            console.log(ItemIDList);
+            ItemIDList=ItemIDList.slice(0,-1)
+            console.log('TID comma Values:'+ ItemIDList);
+        }
         if(FolderRuleID.toString() == 'NaN')
             FolderRuleID=0;
-        if (Token != null ) {
+        if (Token != null && ItemsList.length != 'undefined' && ItemsList.length != 0 && ItemsList != null) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
 
-                        var query = db.escape(Token)+","+db.escape(MessageType)+","+ db.escape(MessageText)+ "," + db.escape(Status) +"," + db.escape(TaskDateNew) + ","  + db.escape(Notes) + "," + db.escape(LocID)  + "," + db.escape(Country)   + "," + db.escape(State) + "," + db.escape(City)   + "," + db.escape(Area)   + ","  + db.escape(Latitude)  + "," + db.escape(Longitude)  +  "," + db.escape(EZEID)  + "," + db.escape(ContactInfo)  + "," + db.escape(FolderRuleID)  + "," + db.escape(Duration)  + "," + db.escape(DurationScales) + "," + db.escape(NextAction) + "," + db.escape(NextActionDateTimeNew) + "," + db.escape(TID);
+                        var query = db.escape(Token)+","+db.escape(MessageType)+","+ db.escape(MessageText)+ "," + db.escape(Status) +"," + db.escape(TaskDateNew) + ","  + db.escape(Notes) + "," + db.escape(LocID)  + "," + db.escape(Country)   + "," + db.escape(State) + "," + db.escape(City)   + "," + db.escape(Area)   + ","  + db.escape(Latitude)  + "," + db.escape(Longitude)  +  "," + db.escape(EZEID)  + "," + db.escape(ContactInfo)  + "," + db.escape(FolderRuleID)  + "," + db.escape(Duration)  + "," + db.escape(DurationScales) + "," + db.escape(NextAction) + "," + db.escape(NextActionDateTimeNew) + "," + db.escape(TID) + "," + db.escape(((ItemIDList != "") ? ItemIDList : ""));
                         // db.escape(NextActionDateTime);
+                        console.log('CALL pSaveTrans(' + query + ')');
                         db.query('CALL pSaveTrans(' + query + ')', function (err, InsertResult) {
                             if (!err){
                                 console.log(InsertResult);
@@ -6512,6 +6533,8 @@ exports.FnSaveTranscation = function(req, res){
             if (Token == null) {
                 console.log('FnSaveTranscationItems: Token is empty');
             }
+            else 
+                console.log(RtnMessage);
 
             res.statusCode=400;
             res.send(RtnMessage);
@@ -6665,21 +6688,50 @@ exports.FnGetTranscation = function (req, res) {
 
         var Token = req.query.Token;
         var FunctionType = parseInt(req.query.FunctionType);
-        if (Token != null && FunctionType != null) {
+        var Page = parseInt(req.query.Page);
+        var Status = req.query.Status;
+        
+       var RtnMessage = {
+            TotalPage:'',
+            Result:''
+        };
+        var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
+        if (Token != null && FunctionType != null && Page.toString() != 'NaN' && Page.toString() != 0) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
-                        var query = 'CALL pGetMessagesNew('+ db.escape(Token) + ',' + db.escape(FunctionType) +')';
+                        
+                         var ToPage = 10 * Page;
+                        var FromPage = ToPage - 9;
+
+                        if (FromPage <= 1) {
+                            FromPage = 0;
+                        }
+                        var query = 'CALL pGetMessagesNew('+ db.escape(Token) + ',' + db.escape(FunctionType) + ',' + db.escape(Status) + ',' + db.escape(FromPage) + ',' + db.escape(ToPage) +')';
                         console.log(query);
                             //var parameters = db.escape(Token) + ',' + db.escape(FunctionType);;
                         //console.log(parameters);
                         db.query(query, function (err, GetResult) {
                             if (!err) {
                                 if (GetResult != null) {
+                                    
                                     if (GetResult[0].length > 0) {
-                                        console.log('FnGetTranscation: Transaction details Send successfully');
-                                        res.send(GetResult[0]);
+                                        var totalRecord=GetResult[0].length;
+                                        var limit= 10;
+                                        var PageValue = parseInt(totalRecord / limit);
+                                        var PageMod = totalRecord % limit;
+                                        if (PageMod > 0){
+                                            TotalPage = PageValue + 1;
+                                            }
+                                            else{
+                                                TotalPage = PageValue;
+                                            }
+                                            RtnMessage.TotalPage = TotalPage;
+                                            RtnMessage.Result =GetResult[0];
+                                            res.send(RtnMessage);
+                                            console.log('FnGetTranscation: Transaction details Send successfully');
                                     }
+                                    
                                     else {
                                         console.log('FnGetTranscation:No Transaction details found');
                                         res.send('null');
@@ -6716,6 +6768,12 @@ exports.FnGetTranscation = function (req, res) {
             }
             else if (FunctionType == null) {
                 console.log('FnGetTranscation: FunctionType is empty');
+            }
+            else if (Page.toString() == 'NaN') {
+                console.log('FnGetMessages: Page is empty');
+            }
+            else if (Page.toString() == 0) {
+                console.log('FnGetMessages: Sending page 0');
             }
             res.statusCode=400;
             res.send('null');
@@ -7630,6 +7688,143 @@ exports.FnGetTemplateDetails = function (req, res) {
             }
             else if (TID == null) {
                 console.log('FnGetTemplateDetails: TID is empty');
+            }
+            res.statusCode=400;
+            res.send('null');
+        }
+    }
+    catch (ex) {
+        console.log('FnGetTemplateDetails error:' + ex.description);
+        throw new Error(ex);
+    }
+};
+
+//method to send bulk mailer
+exports.FnSendBulkMailer = function (req, res) {
+    try {
+
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.query.Token;
+        var TID = req.query.TID;
+        var TemplateID = req.query.TemplateID;
+        var RtnResponse = {
+                IsSent: false
+            };
+
+        if (Token != null && Token != ' ' && TID != null && TID != ' ' && TemplateID != null && TemplateID != ' ') {
+            FnValidateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+                        //var query = db.escape(Token) + ', ' +db.escape(TID);
+                        var query ='Select FirstName, LastName, CompanyName,ifnull(SalesMailID,"shailesh.singh009@gmail.com") as SalesMailID from tmaster where TID in (' + TID + ')' ;
+                        console.log(query);
+                        db.query(query, function (err, GetResult) {
+                            if (!err) {
+                                if (GetResult != null) {
+                                    console.log(GetResult);
+                                    if (GetResult.length > 0) {
+                                      var templateQuery = 'Select * from mmailtemplate where TID = ' + db.escape(TemplateID);
+                                        db.query(templateQuery, function(err, TemplateResult){
+                                            if(!err){
+                                                if(TemplateResult != null) {
+                                                    if(TemplateResult.length > 0){
+                                                        console.log(TemplateResult);
+                                                         RtnResponse.IsSent = true;
+                                                    for(var i = 0; i < GetResult.length; i++){
+                                                        if(GetResult[i].SalesMailID != null && GetResult[i].SalesMailID != ''){
+                                                            var mailOptions = {
+                                                                replyto: (TemplateResult[0].FromMailID != 'undefined') ? TemplateResult[0].FromMailID : " ",
+                                                                to: GetResult[i].SalesMailID,
+                                                                subject: TemplateResult[0].Subject,
+                                                                html: TemplateResult[0].Body // html body
+                                                            };
+                                                            //console.log(TemplateResult[0].FromMailID);
+                                                            var post = { MessageType: 9, ToMailID: GetResult[i].SalesMailID, Subject: mailOptions.subject, Body: mailOptions.html, Replyto:mailOptions.replyto };
+                                                            
+                                                            //console.log(post);
+                                                            var query = db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
+                                                                // Neat!
+                                                                if (!err) {
+                                                                    console.log(result);
+                                                                    console.log('FnMessageMail: Mail saved Successfully');
+                                                                                                                                     
+                                                                    //CallBack(null, RtnMessage);
+                                                                }
+                                                                else {
+                                                                    console.log('FnMessageMail: Mail not Saved Successfully');
+                                                                   // CallBack(null, null);
+                                                                }
+                                                            });
+                                                            console.log('Mail details sent for processing');
+                                                            console.log(mailOptions);
+                                                        }
+                                                        else
+                                                        {
+                                                            console.log('FnGetTemplateDetails:Sales Mail Id is empty');
+                                                            //res.send('null');
+                                                        }
+                                                    }
+                                                        res.send(RtnResponse);
+                                                    }
+                                                    else
+                                                    {
+                                                        console.log('FnGetTemplateDetails:No Template Details found');
+                                                        res.send('null');
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    console.log('FnGetTemplateDetails:No Template Details found');
+                                                    res.send('null');
+                                                }
+                                            }
+                                            else
+                                            {
+                                                console.log('FnGetTemplateDetails:Error in getting template '+ err);
+                                                res.send('null');
+                                            }
+                                        });
+                                    }
+                                    else {
+                                        console.log('FnGetTemplateDetails:User Details not available');
+                                        res.send('null');
+                                    }
+                                }
+                                else {
+                                    console.log('FnGetTemplateDetails:No User Details not available');
+                                    res.send('null');
+                                }
+                            }
+                            else {
+                                console.log('FnGetTemplateDetails: User Details not available' + err);
+                                res.statusCode = 500;
+                                res.send('null');
+                            }
+                        });
+                    }
+                    else {
+                        res.statusCode = 401;
+                        res.send('null');
+                        console.log('FnGetTemplateDetails: Invalid Token');
+                    }
+                } else {
+                    res.statusCode = 500;
+                    res.send('null');
+                    console.log('FnGetTemplateDetails: Error in validating token:  ' + err);
+                }
+            });
+        }
+        else {
+            if (Token == null && Token == ' ') {
+                console.log('FnGetTemplateDetails: Token is empty');
+            }
+            else if (TID == null && TID == ' ') {
+                console.log('FnGetTemplateDetails: TID is empty');
+            }
+            else if (TemplateID == null && TemplateID == ' ') {
+                console.log('FnGetTemplateDetails: TemplateID is empty');
             }
             res.statusCode=400;
             res.send('null');
@@ -9311,6 +9506,77 @@ exports.FnUpdateRedFlagAP = function(req, res){
         throw new Error(ex);
     }
 }
+
+exports.FnUpdateEZEIDAP = function (req, res) {
+    try {
+
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        var Token = req.body.Token;
+        var OldEZEID = req.body.OldEZEID;
+        var NewEZEID = req.body.NewEZEID;
+        var RtnMessage = {
+            IsChanged: false
+        };
+        var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
+        if (Token != null && OldEZEID != null && OldEZEID != '' && NewEZEID != null && NewEZEID != '') {
+            FnValidateTokenAP(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+                      var Query = db.escape(OldEZEID) + ',' + db.escape(NewEZEID);
+                        db.query('CALL pUpdateEZEIDAP(' + Query + ')', function (err, ChangeEZEIDResult) {
+                            if (!err) {
+                                
+                                if (ChangeEZEIDResult != null) {
+                                    if (ChangeEZEIDResult.affectedRows > 0) {
+                                        RtnMessage.IsChanged = true;
+                                        res.send(RtnMessage);
+                                        console.log('FnUpdateEZEIDAP:EZEID CHANGED SUCCESSFULLY');
+                                    }
+                                    else {
+                                        res.send(RtnMessage);
+                                        console.log('FnUpdateEZEIDAP:EZEID changed failed');
+                                    }
+                                }
+                                else {
+                                    res.send(RtnMessage);
+                                    console.log('FnUpdateEZEIDAP:EZEID Password changed failed ');
+                                }
+                            }
+                            else {
+                                res.send(RtnMessage);
+                                console.log('FnUpdateEZEIDAP:Error in getting change EZEID' + err);
+                            }
+                        });
+                    } else {
+                        res.send(RtnMessage);
+                        console.log('FnUpdateEZEIDAP:Invalid Token');
+                    }
+                } else {
+                    res.send(RtnMessage);
+                    console.log('FnUpdateEZEIDAP:Error in validating token:  ' + err);
+                }
+            });
+        }
+        else {
+            if (Token == null) {
+                console.log('FnUpdateEZEIDAP: Token is empty');
+            }
+            else if (OldEZEID == null && OldEZEID == ' ') {
+                console.log('FnUpdateEZEIDAP: OldEZEID is empty');
+            }
+            else if (NewEZEID == null && NewEZEID == ' ') {
+                console.log('FnUpdateEZEIDAP: NewEZEID is empty');
+            }
+            res.statusCode=400;
+            res.send(RtnMessage);
+        }
+    }
+    catch (ex) {
+        console.log('FnUpdateEZEIDAP error:' + ex.description);
+        throw new Error(ex);
+    }
+};
 
 //EZEID VAS
 
