@@ -25,7 +25,6 @@
                                         <li role="presentation" class="active"><a href="/profile">Basic Profile and Locations</a></li>
                                         <li role="presentation" class="disabled"><a href="/configuration">Configuration</a></li>
                                         <li role="presentation"><a href="/configuration">Short URLs</a></li>
-                                        <li role="presentation"><a href="/configuration">Configuration</a></li>
                                         <li role="presentation"><a href="/password">Change Password</a></li>
                                     </ul>
                                 </div>
@@ -627,7 +626,7 @@
                                     </p>
                                 </div>
 
-                                <div class="panel-body locations-panel-body">
+                                <div class="panel-body locations-panel-body" ng-controller="LocationsCtrl">
                                     <div class="row">
                                         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 location-details">
                                             <div class="row">
@@ -637,16 +636,19 @@
                                                         <span class="pull-right">
                                                             <button
                                                                     class="btn btn-xs btn-default no-radius"
+                                                                    ng-click="locationsToggleIndex[0].editMode = true"
                                                                     ng-show="locationsToggleIndex[0].viewMode">
                                                                 <span class="glyphicon glyphicon-pencil"></span>
                                                             </button>
                                                             <button
                                                                     class="btn btn-xs btn-default no-radius"
+                                                                    ng-click="locationsToggleIndex[0].viewMode = !locationsToggleIndex[0].viewMode"
                                                                     ng-hide="locationsToggleIndex[0].viewMode">
                                                                 <span class="glyphicon glyphicon-chevron-down"></span>
                                                             </button>
                                                             <button
                                                                     class="btn btn-xs btn-default no-radius"
+                                                                    ng-click="locationsToggleIndex[0].viewMode = !locationsToggleIndex[0].viewMode"
                                                                     ng-show="locationsToggleIndex[0].viewMode">
                                                                 <span class="glyphicon glyphicon-chevron-up"></span>
                                                             </button>
@@ -657,20 +659,24 @@
 
                                             <div class="row" ng-show="locationsToggleIndex[0].viewMode">
                                                 <!-------- Fields area --------------------------->
-                                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
                                                     <div class="row">
-                                                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 bottom-clearfix">
+                                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
                                                             <h5 class="text-primary text-left">Address Line 1 </h5>
                                                         </div>
-                                                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 bottom-clearfix">
+                                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
                                                             <h5 class="text-primary text-left font-open-sans data">
                                                                 {{userDetails.AddressLine1}}
                                                             </h5>
                                                         </div>
-                                                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 bottom-clearfix">
+
+                                                    </div>
+
+                                                    <div class="row">
+                                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
                                                             <h5 class="text-primary text-left">Address Line 2 </h5>
                                                         </div>
-                                                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 bottom-clearfix">
+                                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
                                                             <h5 class="text-primary text-left font-open-sans data">
                                                                 {{userDetails.AddressLine2}}
                                                             </h5>
@@ -678,18 +684,22 @@
                                                     </div>
 
                                                     <div class="row">
-                                                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 bottom-clearfix">
+                                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
                                                             <h5 class="text-primary text-left">Country </h5>
                                                         </div>
-                                                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 bottom-clearfix">
+                                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
                                                             <h5 class="text-primary text-left font-open-sans data">
                                                                 {{userDetails.CountryTitle}}
                                                             </h5>
                                                         </div>
-                                                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 bottom-clearfix">
+
+                                                    </div>
+
+                                                    <div class="row">
+                                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
                                                             <h5 class="text-primary text-left">State </h5>
                                                         </div>
-                                                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 bottom-clearfix">
+                                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
                                                             <h5 class="text-primary text-left font-open-sans data">
                                                                 {{userDetails.StateTitle}}
                                                             </h5>
@@ -697,19 +707,23 @@
                                                     </div>
 
                                                     <div class="row">
-                                                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 bottom-clearfix">
+                                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
                                                             <h5 class="text-primary text-left">Phone </h5>
                                                         </div>
-                                                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 bottom-clearfix">
+                                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
                                                             <h5 class="text-primary text-left font-open-sans data">
                                                                 {{((userDetails.PhoneNumber)? userDetails.ISDPhoneNumber : '')}} {{userDetails.PhoneNumber}}
                                                                 <span class="small" ng-hide="userDetails.PhoneNumber">No phone number</span>
                                                             </h5>
                                                         </div>
-                                                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 bottom-clearfix">
+                                                    </div>
+
+                                                    <div class="row">
+
+                                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
                                                             <h5 class="text-primary text-left">Mobile </h5>
                                                         </div>
-                                                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 bottom-clearfix">
+                                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
                                                             <h5 class="text-primary text-left font-open-sans data">
                                                                 {{((userDetails.MobileNumber)? userDetails.ISDMobileNumber : '')}} {{userDetails.MobileNumber}}
                                                                 <span class="small" ng-hide="userDetails.MobileNumber">No Mobile number</span>
@@ -718,19 +732,22 @@
                                                     </div>
 
                                                     <div class="row">
-                                                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 bottom-clearfix">
+                                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
                                                             <h5 class="text-primary text-left">Website </h5>
                                                         </div>
-                                                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 bottom-clearfix">
+                                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
                                                             <h5 class="text-primary text-left font-open-sans data">
                                                                 {{userDetails.Website}}
                                                                 <span class="small" ng-hide="userDetails.Website">No website</span>
                                                             </h5>
                                                         </div>
-                                                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 bottom-clearfix">
+                                                    </div>
+                                                    <div class="row">
+
+                                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
                                                             <h5 class="text-primary text-left">Parking </h5>
                                                         </div>
-                                                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 bottom-clearfix">
+                                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
                                                             <h5 class="text-primary text-left font-open-sans data">
                                                                 {{parkingStatusMap[userDetails.ParkingStatus]}}
                                                                 <span class="small" ng-hide="userDetails.ParkingStatus">Parking Status not available</span>
@@ -740,10 +757,25 @@
 
 
                                                 </div>
+
+
                                                 <!-------- end :Fields area --------------------------->
                                                 <!-------- Map area --------------------------->
-                                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
+                                                    <!-------------------------Map Row ------------------------------>
+                                                    <div id="map-primary-location" class="row locations-map-container bottom-clearfix">
 
+                                                        <!--<div class="col-lg-6 col-md-6">-->
+                                                            <!--<img id="pac-loc" class="link-btn" ng-click="findCurrentLocation()" src="images/myloc.png" data-toggle="tooltip" data-placement="bottom" title="Current Location" />-->
+                                                            <!--<input id="pac-input" class="form-control pull-left" type="text" placeholder="Search Location" autocomplete="on">-->
+
+                                                        <!--</div>-->
+
+                                                            <!--&lt;!&ndash;<button class="btn btn-primary pull-left marL10px marT10px" ng-click="search.SearchOnMap(search.MSerText)" ng-disabled="search.MSerText==undefined" type="button">Find</button>&ndash;&gt;-->
+                                                        <!--<div id="map-canvas" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">-->
+                                                        <!--</div>-->
+
+                                                    </div>
 
                                                 </div>
                                                 <!--------end :Map area --------------------------->

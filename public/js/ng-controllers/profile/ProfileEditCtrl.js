@@ -126,7 +126,17 @@ angular.module('ezeidApp').controller('ProfileEditCtrl',[
                 if(resp && resp !== null && resp !== 'null'){
                     if(resp.IsAuthenticate){
                         Notification.success({ message : 'Your profile details are saved successfully', delay : MsgDelay});
-                        $scope.userDetails = angular.copy($scope.editUserDetails);
+
+                        for(var prop in $scope.editUserDetails){
+                            if($scope.editUserDetails.hasOwnProperty(prop)){
+                                for(var prop1 in $scope.userDetails){
+                                    if(prop1 == prop){
+                                        $scope.userDetails[prop] = $scope.editUserDetails[prop];
+                                    }
+                                }
+                            }
+                        }
+
                         $scope.toggleProfileEditMode();
                         defer.resolve(true);
 
