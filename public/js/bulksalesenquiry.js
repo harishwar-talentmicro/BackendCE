@@ -1,11 +1,12 @@
-/*angular.module('ezeidApp').controller('bulksalesController', function($http, $rootScope, $scope, Notification, GURL){*/
-angular.module('ezeidApp').controller('bulksalesController',['$http', '$rootScope', '$scope', '$q', 'Notification', '$window', 'GURL', function($http, $rootScope, $scope, $q, Notification, $window, GURL){
-
+angular.module('ezeidApp').controller('bulksalesController',['$http', '$rootScope', '$scope', '$q', 'Notification', '$window', '$location', 'GURL', function($http, $rootScope, $scope, $q, Notification, $window, $location, GURL){
 
     var salesEnquiry = this;
     salesEnquiry._info = {};
     var MsgDelay = 2000;
+    salesEnquiry.result = [];
+    $scope.showListing = false;
     $scope.validationMode = 0;
+    $scope.selectedList = [];
 
    if ($rootScope._userInfo) {
     }
@@ -42,8 +43,31 @@ angular.module('ezeidApp').controller('bulksalesController',['$http', '$rootScop
         }
     }
 
-    $scope.$watch('_userInfo.IsAuthenticate', function () {
+    var searchResult = JSON.parse($window.localStorage.getItem("searchResult"));
+    salesEnquiry.result = searchResult;
+    searchResult == null ? $scope.showListing = false : $scope.showListing = true;
 
+    if(searchResult != null)
+    {
+        for (var i = 0; i < searchResult.length; i++) {
+            $scope.selectedList.push(searchResult[i].TID);
+        }
+    }
+
+    // To get and remove value of check box
+    $scope.toggleCheckbox = function(event){
+        var elem = event.currentTarget;
+        var val = $(elem).data('tid');
+        if($(elem).is(":checked")){
+            $scope.selectedList.push(val);
+        }
+        else{
+            var index = $scope.selectedList.indexOf(val);
+            $scope.selectedList.splice(index,1);
+        }
+    };
+
+    $scope.$watch('_userInfo.IsAuthenticate', function () {
         getTemplateList();
     });
 
@@ -198,7 +222,6 @@ angular.module('ezeidApp').controller('bulksalesController',['$http', '$rootScop
         }).success(function (data) {
                 if(data !== "null")
                 {
-                    console.log(data);
                     if($rootScope._userInfo.Token == false) {
                         var _obj = { TID: 0, Title: '--Select Template--' };
                         data.splice(0, 0, _obj);
@@ -214,6 +237,15 @@ angular.module('ezeidApp').controller('bulksalesController',['$http', '$rootScop
         $scope.formTitle = "Bulk Sales Enquiry";
         $scope.showCreateMailTemplate = false;
         $scope.validationMode = 0;
+
+        salesEnquiry._info.FromName = "";
+        salesEnquiry._info.FromEmailID = "";
+        salesEnquiry._info.Title = "";
+        salesEnquiry._info.Subject = "";
+        salesEnquiry._info.Body = "";
+        salesEnquiry._info.TID = "";
+        salesEnquiry._info.CCMailIDS = "";
+        salesEnquiry._info.BCCMailIDS = "";
     };
 
     // get template details
@@ -225,8 +257,7 @@ angular.module('ezeidApp').controller('bulksalesController',['$http', '$rootScop
                 url: GURL + 'ewtGetTemplateDetails?Token=' + $rootScope._userInfo.Token + '&TID='+Tid}).success(function (data) {
                     if(data !== "null")
                     {
-                        console.log(data);
-                        salesEnquiry._info = data[0];
+                       salesEnquiry._info = data[0];
                     }
                 });
         }
@@ -236,37 +267,49 @@ angular.module('ezeidApp').controller('bulksalesController',['$http', '$rootScop
     salesEnquiry.SendEnquiryMail = function () {
 
         salesEnquiry._info.Token = $rootScope._userInfo.Token;
+        console.log($scope.selectedList.length);
+        console.log($scope.selectedList.toString());
+        var Tids = $scope.selectedList.toString();
 
-        if(isValidate())
+        if($scope.selectedList.length > 10)
         {
-            /*$http({ method: 'post', url: GURL + 'ewtSaveMailTemplate', data: salesEnquiry._info }).success(function (data) {
+            Notification.error({ message: 'Maximum Limit: 10 companies…', delay: MsgDelay });
+        }
+        else
+        {
+            $http({ method: 'get', url: GURL + 'ewtSendBulkMailer?Token=' + $rootScope._userInfo.Token + '&TID='+ Tids + '&TemplateID='+ salesEnquiry._info.TID }).success(function (data)
+            {
+                 if (data != 'null')
+                 {
+                     salesEnquiry._info = {};
 
-                if (data != 'null') {
-                    salesEnquiry._info = {};
+                     $scope.formTitle = "Bulk Sales Enquiry";
+                     $scope.showCreateMailTemplate = false;
 
-                    $scope.formTitle = "Bulk Sales Enquiry";
-                    $scope.showCreateMailTemplate = false;
+                     document.getElementById("FromName").className = "form-control emptyBox";
+                     document.getElementById("FromEmailID").className = "form-control emptyBox";
+                     document.getElementById("Title").className = "form-control emptyBox";
+                     document.getElementById("Subject").className = "form-control emptyBox";
+                     document.getElementById("Body").className = "form-control emptyBox";
 
-                    document.getElementById("FromName").className = "form-control emptyBox";
-                    document.getElementById("FromEmailID").className = "form-control emptyBox";
-                    document.getElementById("Title").className = "form-control emptyBox";
-                    document.getElementById("Subject").className = "form-control emptyBox";
-                    document.getElementById("Body").className = "form-control emptyBox";
-
-                    // success msg
-                    // " Mails are submitted for transmitted "
-                }
-                else {
-                    // Notification.error({ message: 'Invalid key or not found…', delay: MsgDelay });
-
-                }
-            });*/
+                     Notification.success({message: "Mails are submitted for transmitted..", delay: MsgDelay});
+                     $window.localStorage.removeItem("searchResult");
+                 }
+                 else
+                 {
+                     // Notification.error({ message: 'Invalid key or not found…', delay: MsgDelay });
+                     $window.localStorage.removeItem("searchResult");
+                 }
+             });
         }
     };
 
     // Close Create Mail Template Form
     salesEnquiry.closeSalesEnquiryForm = function () {
-        window.location.href = "/home";
+        $window.localStorage.removeItem("searchResult");
+        $location.path("/home");
+       // window.location.href = "/home";
+
     };
 
 

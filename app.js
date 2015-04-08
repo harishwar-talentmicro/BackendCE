@@ -153,7 +153,7 @@ app.get('/ewtGetLoginDetails',LocationManager.FnGetLoginDetails);
 app.post('/ewtSaveMailTemplate',LocationManager.FnSaveMailTemplate);
 app.get('/ewtGetTemplateList',LocationManager.FnGetTemplateList);
 app.get('/ewtGetTemplateDetails',LocationManager.FnGetTemplateDetails);
-
+app.get('/ewtSendBulkMailer',LocationManager.FnSendBulkMailer);
 app.get('/ewtCropImageSize',LocationManager.FnCropImageSize);
 
 //below service are for EZEIDAP
@@ -176,6 +176,7 @@ app.post('/ewtUpdateIdCardPrintAP', LocationManager.FnUpdateIdCardPrintAP);
 app.get('/ewtGetIdCardPrintAP',LocationManager.FnGetIdCardPrintAP);
 app.post('/ewtSearchRealEstateAP', LocationManager.FnSearchRealEstateAP);
 app.post('/ewtUpdateRedFlagAP',LocationManager.FnUpdateRedFlagAP);
+app.post('/ewtUpdateEZEIDAP', LocationManager.FnUpdateEZEIDAP);
 
 //EZEID VAS
 app.get('/ewtLoginVES',LocationManager.FnLoginVES);

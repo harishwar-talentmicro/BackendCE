@@ -1,10 +1,10 @@
 var HeaderApp = angular.module('ngHeader', ['ui-notification']);
 var GURL = '/';
-HeaderApp.directive('headerSection', function (Notification) {
+HeaderApp.directive('headerSection', function (Notification,$window) {
     return {
         restrict: 'EA',
         templateUrl: 'directives/Header.html',
-        controller: function ($http, $rootScope,$location) {
+        controller: function ($http, $rootScope,$location,$window) {
             var MsgDelay = 2000;
             var SignCtrl = this;
             this.LInfo = {};
@@ -160,6 +160,7 @@ HeaderApp.directive('headerSection', function (Notification) {
                     localStorage.removeItem("_token");
                     $rootScope._userInfo = data;
                     $rootScope.IsIdAvailable = false;
+                    $window.localStorage.removeItem("searchResult");
                   //  Notification.success({ message: "Sign Out Success", delay: MsgDelay });
                 });
             };

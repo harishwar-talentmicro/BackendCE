@@ -243,22 +243,22 @@
                                    <div class="col-lg-5 col-md-5 col-sm-12 col-xs-12 bottom-clearfix setFontSize infoContainer infoTabRightBorder">
                                         <div class="row setRowLeftRightMarginZero">
                                             <div class="topSearchRow">
-                                               <div  class="col-lg-2 col-md-2 col-sm-2 col-xs-12 searchButtonMarginSet searchStrepTextMarin showPointer" ng-class="ShowInfoWindow ? 'setLinkToText' : ''" >
+                                               <div  class="col-lg-2 col-md-2 col-sm-2 col-xs-2 searchButtonMarginSet searchStrepTextMarin showPointer" ng-class="ShowInfoWindow ? 'setLinkToText' : ''" >
                                                    <span ng-click="showSearchTab()">Search</span>
                                                </div>
                                                 <div ng-show="ShowLinks">
-                                                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 searchInfoLink searchStripTopMargin showPointer" ng-class="!ShowInfoWindow ? 'setLinkToText' : ''">
+                                                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 searchInfoLink searchStripTopMargin showPointer" ng-class="!ShowInfoWindow ? 'setLinkToText' : ''">
                                                          <span ng-click="showInfoWindowTab()">Information</span>
                                                     </div>
-                                                    <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 searchButtonMarginSet searchStripTopMargin showPointer" style="text-align: right; margin-top: 1.5%;">
+                                                    <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1 searchButtonMarginSet searchStripTopMargin showPointer" style="text-align: right; margin-top: 1.5%;">
                                                         <img ng-click="showSearchTab()" src="../images/back_24.png">
                                                     </div>
-                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 searchButtonMarginSet searchStripTopMargin showPointer" style="margin-top: 1.5%;">
+                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 searchButtonMarginSet searchStripTopMargin showPointer" style="margin-top: 1.5%;">
                                                         <img ng-click="showInfoWindowTab()" src="../images/next_24.png">
                                                     </div>
                                                 </div>
 
-                                               <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 pull-right helpTextColor searchStrepTextMarin showPointer" ng-click="openHelpPopup()" style="text-align: right;" id="SearchHelp">
+                                               <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 pull-right helpTextColor searchStrepTextMarin showPointer" ng-click="openHelpPopup()" style="text-align: right;" id="SearchHelp">
                                                   Help ?
                                                </div>
                                             </div>
@@ -457,7 +457,7 @@
                                             <img src="../images/open_big.png" ng-show="search.mInfo.OpenStatus==1">
                                             <img src="../images/close_big.png" ng-hide="search.mInfo.OpenStatus==1">
                                         </div>
-                                        <div  class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer" ng-hide="search.isIndividualUser(1)">
+                                        <div  class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer imgTopMargin" ng-hide="search.isIndividualUser(1)">
                                             <div class="parkingAlignment" ng-hide="search.mInfo.ParkingStatus==3">
                                                 <img title="{{search.parkingTitle}}" src="../images/parking_new.png" >
                                             </div>
@@ -467,10 +467,10 @@
                                         </div>
 
                                 </div>
-                                <div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 searchHeaderAlignment msgButtonContainer" ng-hide="(search.mInfo.IDTypeID == 1)">
+                                <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10 searchHeaderAlignment msgButtonContainer" ng-hide="(search.mInfo.IDTypeID == 1)">
                                     <div class="innerMsgButtonContainer">
                                         <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer keyWordText" style="padding-right: 0px;"
-                                              ng-hide="_userInfo.Token == 2 || search.mInfo.SalesEnquiryButton==2 || search.mInfo.EZEIDVerifiedID == '1'" ng-disabled="search.mInfo.SalesEnquiryButton==2 || search.mInfo.EZEIDVerifiedID == '1'" title="Sales Enquiry" ng-click="search.openSalesEnquiryForm()">
+                                              ng-hide="_userInfo.Token == 2 || search.mInfo.EZEIDVerifiedID == '1'|| showSalesEnquiry == '0' " title="Sales Enquiry" ng-click="search.openSalesEnquiryForm()">
                                             <div class="row setRowLeftRightMarginZero" >
                                                 <img src="../images/new_sales_icon.png">
                                             </div>
@@ -479,7 +479,7 @@
                                             </div>
                                         </div>
                                         <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer removePadding keyWordText"
-                                              ng-hide="_userInfo.Token == 2 || search.mInfo.HomeDeliveryButton==2 || search.mInfo.EZEIDVerifiedID == '1'" ng-disabled="search.mInfo.HomeDeliveryButton==2 || search.mInfo.EZEIDVerifiedID == '1'" title="Home Delivery" ng-click="search.openHomeDeliverForm()">
+                                              ng-hide="_userInfo.Token == 2 || search.mInfo.HomeDeliveryButton==2 || search.mInfo.EZEIDVerifiedID == '1' || showHomeDelivery == '0'" title="Home Delivery" ng-click="search.openHomeDeliverForm()">
                                             <div class="row setRowLeftRightMarginZero" >
                                                 <img src="../images/new_home_delivery.png">
                                             </div>
@@ -487,8 +487,8 @@
                                                 Home Delivery
                                             </div>
                                         </div>
-                                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer removePadding keyWordText"
-                                              ng-hide="_userInfo.Token == 2 || search.mInfo.ReservationButton==2 || search.mInfo.EZEIDVerifiedID == '1'" ng-disabled="search.mInfo.ReservationButton==2 || search.mInfo.EZEIDVerifiedID == '1'" title="Reservation" ng-click="search.openReservationForm()">
+                                        <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 showPointer removePadding keyWordText"
+                                              ng-hide="_userInfo.Token == 2 || search.mInfo.ReservationButton==2 || search.mInfo.EZEIDVerifiedID == '1' || shoReserVation == '0'" title="Reservation" ng-click="search.openReservationForm()">
                                             <div class="row setRowLeftRightMarginZero" >
                                                 <img src="../images/new_reservations.png">
                                             </div>
@@ -497,7 +497,7 @@
                                             </div>
                                         </div>
                                         <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer removePadding keyWordText"
-                                              ng-hide="_userInfo.Token == 2 || search.mInfo.SupportButton==2 || search.mInfo.EZEIDVerifiedID == '1'" ng-disabled="search.mInfo.SupportButton==2 || search.mInfo.EZEIDVerifiedID == '1'" title="Support Request" ng-click="search.openServiceRequestForm()">
+                                              ng-hide="_userInfo.Token == 2 || search.mInfo.SupportButton==2 || search.mInfo.EZEIDVerifiedID == '1' || showServiceRequest == '0'" ng-disabled="search.mInfo.SupportButton==2 || search.mInfo.EZEIDVerifiedID == '1'" title="Support Request" ng-click="search.openServiceRequestForm()">
                                             <div class="row setRowLeftRightMarginZero" >
                                                 <img src="../images/new_service_request.png">
                                             </div>
@@ -505,9 +505,9 @@
                                                 Service Request
                                             </div>
                                         </div>
-                                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer removePadding keyWordText"
-                                              ng-hide="_userInfo.Token == 2" ng-disabled="search.mInfo.CVButton==2 || search.mInfo.EZEIDVerifiedID == '1'" title="Send CV" ng-click="search.openCVForm()">
-                                            <div ng-hide="search.mInfo.CVButton==2 || search.mInfo.EZEIDVerifiedID == '1'">
+                                        <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 showPointer removePadding keyWordText"
+                                              ng-hide="_userInfo.Token == 2" title="Send CV" ng-click="search.openCVForm()">
+                                            <div ng-hide="search.mInfo.CVButton==2 || search.mInfo.EZEIDVerifiedID == '1' || showSendCv == '0'">
                                                 <div class="row setRowLeftRightMarginZero" >
                                                     <img src="../images/new_send_cv.png">
                                                 </div>
@@ -525,15 +525,15 @@
                                                 Plot Route
                                             </div>
                                         </div>
-                                        <!--<div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer removePadding keyWordText"
+                                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer removePadding keyWordText"
                                              ng-click="search.viewDirections(search.mInfo)" title="View Directions">
                                             <div class="row setRowLeftRightMarginZero" >
-                                                <img src="../images/new_directions.png">
+                                                <img src="../images/view_directions.png">
                                             </div>
                                             <div class="row setRowLeftRightMarginZero infoMsgText" >
                                                 View Directions
                                             </div>
-                                        </div>-->
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 searchHeaderAlignment msgButtonContainer" ng-show="search.isIndividualUser(1)">
