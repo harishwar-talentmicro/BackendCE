@@ -1,4 +1,4 @@
-﻿  <table cellpadding="0" cellspacing="0" border="0" style="width: 600px; border: solid 1px #ccc; font-family: 'Trebuchet MS', Arial, Helvetica, sans-serif; font-size: 14px; color: #5d5d5d;">
+﻿   <table cellpadding="0" cellspacing="0" border="0" style="width: 600px; border: solid 1px #ccc; font-family: 'Trebuchet MS', Arial, Helvetica, sans-serif; font-size: 14px; color: #5d5d5d;">
                 <tr>
                     <td style="font-size: 16px; padding: 10px;">Hello <strong style="color: #0b89ba;">Manager of [CompanyName]</strong>,</td>
                 </tr>
@@ -52,9 +52,9 @@
                             <tr>
                                 <td>How to share your information:<br />
                                     ---------------------------------------<br />
-                                    EZE ID is your lifetime short code to share any information or to locate your Business by any user. You can send the link of your Company to any person or print the same in your Marketing Brochures or on your web site. This will help users to locate you by your code (Example: <strong style="text-decoration: underline; color: #156685">www.ezeid.com?ID=ABC</strong> if your EZE ID is ABC.<br>
+                                    EZE ID is your lifetime short code to share any information or to locate your Business by any user. You can send the link of your Company to any person or print the same in your Marketing Brochures or on your web site. This will help users to locate you by your code (Example: <strong style="text-decoration: underline; color: #156685">www.ezeid.com/ABC</strong> if your EZE ID is ABC.<br>
                                     <br>
-                                    Note: If you are interested to be visible to users of EZE ID portal and Mobile Apps, please call your nearest Area Partner or submit your Sales Enquiry to our EZEID named as EZEID itself or TALENTMICRO. You can also access our EZEID by a click on <strong style="text-decoration: underline; color: #156685">www.ezeid.com?ID=ABC</strong>. Our Brand Advisor will call your and take up the design and listing process of our Business.<br />
+                                    Note: If you are interested to be visible to users of EZE ID portal and Mobile Apps, please call your nearest Area Partner or submit your Sales Enquiry to our EZEID named as EZEID itself or TALENTMICRO. You can also access our EZEID by a click on <strong style="text-decoration: underline; color: #156685">www.ezeid.com/ABC</strong>. Our Brand Advisor will call your and take up the design and listing process of our Business.<br />
                                     <br />
                                     Facilities Available for Paid Business users:<br />
                                     -----------------------------------------------------<br />

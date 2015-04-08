@@ -48,7 +48,7 @@
                             <tr>
                                 <td>How to share your information:<br />
                                     ---------------------------------------<br />
-                                    EZE ID is your lifetime short code to share any information. You can quote your EZE ID and PIN if you are sharing information to a person over Telephone, otherwise you can send the Web Link of your EZE ID(Example: <strong style="text-decoration: underline; color: #156685">www.ezeid.com?ID=JOHN.347</strong> if your EZE ID is JOHN and PIN is 347 for the primary information like Name, Address, Contact Numbers & Location). If you want to share any other information, you need to send the respective tag name before the PIN Code as per the following example.<br>
+                                    EZE ID is your lifetime short code to share any information. You can quote your EZE ID and PIN if you are sharing information to a person over Telephone, otherwise you can send the Web Link of your EZE ID(Example: <strong style="text-decoration: underline; color: #156685">www.ezeid.com/JOHN.347</strong> if your EZE ID is JOHN and PIN is 347 for the primary information like Name, Address, Contact Numbers & Location). If you want to share any other information, you need to send the respective tag name before the PIN Code as per the following example.<br>
                                     <br>
                                     To Share CV, send the information in the format of EZEID.CV.PIN (Example: JOHN.CV.312 where 312 is the PIN you have set for CV).<br />
                                     <br />
@@ -61,7 +61,7 @@
                                     .PP  -Provides Access to your Passport(PP) Document & Passport Number<br>
                                     .DL - Provides Access to your Driver’s License(DL) Document & DL Number<br>
                                     <br>
-                                    Note: If you have not set PIN Code then leave the PIN Code section while sharing the document (Example: JOHN.CV is sufficient to share the CV of JOHN in case PIN is not set. To share CV through e-mail, send the link in the format, <strong style="text-decoration: underline; color: #156685">www.ezeid.com?ID=JOHN.CV</strong>).<br />
+                                    Note: If you have not set PIN Code then leave the PIN Code section while sharing the document (Example: JOHN.CV is sufficient to share the CV of JOHN in case PIN is not set. To share CV through e-mail, send the link in the format, <strong style="text-decoration: underline; color: #156685">www.ezeid.com/JOHN.CV</strong>).<br />
                                     <br>
                                     Enjoy using EZE ID to simplify your life, make it more accurate and say goodbye to Address, Landmark etc. and save your precious time.
                                     <br />
