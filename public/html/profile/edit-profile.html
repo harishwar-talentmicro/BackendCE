@@ -37,7 +37,7 @@
                         <div class="container-fluid" ng-show="dataLoadInProgress">
                             <div class="row">
                                 <div class="text-center center-vertical col-lg-2 col-md-2 col-sm-2 col-xs-4 col-lg-offset-5 col-md-offset-5 col-sm-offset-5 col-xs-offset-4 preloader">
-                                    <p class="text-info">Loading</p>
+                                    <p class="text-info"></p>
                                 </div>
                             </div>
                         </div>
@@ -627,39 +627,73 @@
                                 </div>
 
                                 <div class="panel-body locations-panel-body" ng-controller="LocationsCtrl">
-                                    <div class="row">
-                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 location-details">
-                                            <div class="row">
-                                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
-                                                    <h4>
-                                                        Primary Location
-                                                        <span class="pull-right">
-                                                            <button
-                                                                    class="btn btn-xs btn-default no-radius"
-                                                                    ng-click="locationsToggleIndex[0].editMode = true"
-                                                                    ng-show="locationsToggleIndex[0].viewMode">
-                                                                <span class="glyphicon glyphicon-pencil"></span>
-                                                            </button>
-                                                            <button
-                                                                    class="btn btn-xs btn-default no-radius"
-                                                                    ng-click="locationsToggleIndex[0].viewMode = !locationsToggleIndex[0].viewMode"
-                                                                    ng-hide="locationsToggleIndex[0].viewMode">
-                                                                <span class="glyphicon glyphicon-chevron-down"></span>
-                                                            </button>
-                                                            <button
-                                                                    class="btn btn-xs btn-default no-radius"
-                                                                    ng-click="locationsToggleIndex[0].viewMode = !locationsToggleIndex[0].viewMode"
-                                                                    ng-show="locationsToggleIndex[0].viewMode">
-                                                                <span class="glyphicon glyphicon-chevron-up"></span>
-                                                            </button>
-                                                        </span>
-                                                    </h4>
+
+                                    <form name="primaryLocationForm">
+                                        <div class="row">
+                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 location-details">
+                                                <div class="row">
+                                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
+                                                        <h4>
+                                                            1. Primary Location
+                                                                    <span class="pull-right">
+                                                                        <button
+                                                                                data-toggle="tooltip"
+                                                                                title="Save Changes"
+                                                                                class="btn btn-xs btn-success no-radius"
+                                                                                ng-show="locationsToggleIndex[0].editMode"
+                                                                                ng-click="locationsToggleIndex[0].editMode = false">
+                                                                            <span class="glyphicon glyphicon-ok"></span>
+                                                                            Save
+
+                                                                        </button>
+                                                                        <button
+                                                                            data-toggle="tooltip"
+                                                                            title="Go Back"
+                                                                            class="btn btn-xs btn-warning no-radius"
+                                                                            ng-show="locationsToggleIndex[0].editMode"
+                                                                            ng-click="locationsToggleIndex[0].editMode = false">
+                                                                            <span class="glyphicon glyphicon-arrow-left"></span>
+                                                                            Back
+                                                                        </button>
+
+                                                                        <button
+                                                                                data-toggle="tooltip"
+                                                                                title="Edit"
+                                                                                class="btn btn-xs btn-default no-radius"
+                                                                                ng-click="locationsToggleIndex[0].editMode = true"
+                                                                                ng-show="locationsToggleIndex[0].viewMode && !locationsToggleIndex[0].editMode">
+                                                                            <span class="glyphicon glyphicon-pencil"></span>
+                                                                        </button>
+                                                                        <button
+                                                                                data-toggle="tooltip"
+                                                                                title="Show Details"
+                                                                                class="btn btn-xs btn-default no-radius"
+                                                                                ng-click="locationsToggleIndex[0].viewMode = !locationsToggleIndex[0].viewMode"
+                                                                                ng-hide="locationsToggleIndex[0].viewMode">
+                                                                            <span class="glyphicon glyphicon-chevron-down"></span>
+                                                                        </button>
+                                                                        <button
+                                                                                data-toggle="tooltip"
+                                                                                title="Hide Details"
+                                                                                class="btn btn-xs btn-default no-radius"
+                                                                                ng-click="(locationsToggleIndex[0].viewMode = !locationsToggleIndex[0].viewMode) && (locationsToggleIndex[0].editMode = false)"
+                                                                                ng-show="locationsToggleIndex[0].viewMode">
+                                                                            <span class="glyphicon glyphicon-chevron-up"></span>
+                                                                        </button>
+
+
+                                                                    </span>
+                                                        </h4>
+                                                    </div>
                                                 </div>
-                                            </div>
 
                                             <div class="row" ng-show="locationsToggleIndex[0].viewMode">
-                                                <!-------- Fields area --------------------------->
-                                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                                            <!-------- Fields area --------------------------->
+                                            <!---------- edit Mode off --------------------------->
+
+                                                <div
+                                                        ng-hide="locationsToggleIndex[0].editMode"
+                                                        class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
                                                     <div class="row">
                                                         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
                                                             <h5 class="text-primary text-left">Address Line 1 </h5>
@@ -757,33 +791,182 @@
 
 
                                                 </div>
+                                                <!---------- end : edit Mode off --------------------------->
 
 
-                                                <!-------- end :Fields area --------------------------->
-                                                <!-------- Map area --------------------------->
-                                                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
-                                                    <!-------------------------Map Row ------------------------------>
-                                                    <div id="map-primary-location" class="row locations-map-container bottom-clearfix">
+                                                <!---------- edit Mode on --------------------------->
 
-                                                        <!--<div class="col-lg-6 col-md-6">-->
-                                                            <!--<img id="pac-loc" class="link-btn" ng-click="findCurrentLocation()" src="images/myloc.png" data-toggle="tooltip" data-placement="bottom" title="Current Location" />-->
-                                                            <!--<input id="pac-input" class="form-control pull-left" type="text" placeholder="Search Location" autocomplete="on">-->
-
-                                                        <!--</div>-->
-
-                                                            <!--&lt;!&ndash;<button class="btn btn-primary pull-left marL10px marT10px" ng-click="search.SearchOnMap(search.MSerText)" ng-disabled="search.MSerText==undefined" type="button">Find</button>&ndash;&gt;-->
-                                                        <!--<div id="map-canvas" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">-->
-                                                        <!--</div>-->
+                                                <div
+                                                        ng-show="locationsToggleIndex[0].editMode"
+                                                        class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                                                    <div class="row">
+                                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+                                                            <h5 class="text-primary text-left">Address Line 1 </h5>
+                                                        </div>
+                                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+                                                            <div class="form-group">
+                                                                <input type="text" ng-model="editUserDetails.AddressLine1" name="primaryLocationForm.AddressLine1" class="form-control" placeholder="Adress Line 1" />
+                                                            </div>
+                                                        </div>
 
                                                     </div>
 
+                                                    <div class="row">
+                                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+                                                            <h5 class="text-primary text-left">Address Line 2 </h5>
+                                                        </div>
+                                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+                                                            <input type="text" ng-model="editUserDetails.AddressLine2" name="primaryLocationForm.AddressLine2" class="form-control" placeholder="Address Line 2" />
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="row">
+                                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+                                                            <h5 class="text-primary text-left">Country </h5>
+                                                        </div>
+                                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+                                                            <select class="form-control" ng-model="editUserDetails.CountryID" name="primaryLocationForm.CountryID">
+                                                                <option ng-repeat="country in countryList track by country.CountryID" value="{{country.CountryID}}">{{country.CountryName}}</option>
+                                                            </select>
+                                                        </div>
+
+                                                    </div>
+
+                                                    <div class="row">
+                                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+                                                            <h5 class="text-primary text-left">State </h5>
+                                                        </div>
+                                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+                                                            <select class="form-control" ng-model="editUserDetails.StateID" name="primaryLocationForm.StateID">
+                                                                <option ng-repeat="state in stateList track by state.StateID" value="{{state.StateID}}">{{state.StateName}}</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="row">
+                                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+                                                            <h5 class="text-primary text-left">City </h5>
+                                                        </div>
+                                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+                                                            <select class="form-control" ng-model="editUserDetails.CityID" name="primaryLocationForm.CityID">
+                                                                <option ng-repeat="city in cityList track by city.CityID" value="{{city.StateID}}">{{city.CityName}}</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="row">
+                                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+                                                            <h5 class="text-primary text-left">Phone </h5>
+                                                        </div>
+                                                        <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5 ">
+
+                                                            <input type="text" ng-model="editUserDetails.ISDPhoneNumber" name="primaryLocationForm.ISDPhoneNumber" class="form-control" placeholder="ISD Code"/>
+
+                                                        </div>
+                                                        <div class="col-lg-7 col-md-7 col-sm-7 col-xs-7 ">
+
+                                                            <input type="text" numbers-only ng-model="editUserDetails.PhoneNumber" name="primaryLocationForm.PhoneNumber" class="form-control" placeholder="Phone"/>
+
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="row">
+
+                                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+                                                            <h5 class="text-primary text-left">Mobile </h5>
+                                                        </div>
+                                                        <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5 ">
+
+                                                                <input type="text" ng-model="editUserDetails.ISDMobileNumber" name="primaryLocationForm.ISDMobileNumber" class="form-control" placeholder="ISD Code"/>
+
+                                                        </div>
+                                                        <div class="col-lg-7 col-md-7 col-sm-7 col-xs-7 ">
+
+                                                            <input type="text" numbers-only ng-model="editUserDetails.MobileNumber" name="primaryLocationForm.MobileNumber" class="form-control" placeholder="Mobile"/>
+
+                                                        </div>
+
+                                                    </div>
+
+                                                    <div class="row">
+                                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+                                                            <h5 class="text-primary text-left">Website </h5>
+                                                        </div>
+                                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+                                                            <input type="text" numbers-only ng-model="editUserDetails.Website" name="primaryLocationForm.Website" class="form-control" placeholder="http://www.example.com"/>
+                                                            <span class="small" ng-show="primaryLocationForm.Website.$dirty && primaryLocationForm.Website.$invalid"></span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+
+                                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+                                                            <h5 class="text-primary text-left">Parking </h5>
+                                                        </div>
+                                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+                                                            <h5 class="text-primary text-left font-open-sans data">
+                                                                <select class="form-control" ng-model="editUserDetails.ParkingStatus" name="primaryLocationForm.ParkingStatus">
+                                                                    <option ng-repeat="parking in parkingStatusMap" value="{{$index}}">{{((parking) ? parking : '--Select Parking--')}}</option>
+                                                                </select>
+                                                            </h5>
+                                                        </div>
+                                                    </div>
+
                                                 </div>
-                                                <!--------end :Map area --------------------------->
+                                            <!----------end :  edit Mode on --------------------------->
+
+                                            <!-------- end :Fields area --------------------------->
+                                            <!-------- Map area --------------------------->
+                                            <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
+                                                <!-------------------------Map Row ------------------------------>
+                                                <div id="map-primary-location" class="row locations-map-container bottom-clearfix">
+
+                                                    <!--<div class="col-lg-6 col-md-6">-->
+                                                    <!--<img id="pac-loc" class="link-btn" ng-click="findCurrentLocation()" src="images/myloc.png" data-toggle="tooltip" data-placement="bottom" title="Current Location" />-->
+                                                    <!--<input id="pac-input" class="form-control pull-left" type="text" placeholder="Search Location" autocomplete="on">-->
+
+                                                    <!--</div>-->
+
+                                                    <!--&lt;!&ndash;<button class="btn btn-primary pull-left marL10px marT10px" ng-click="search.SearchOnMap(search.MSerText)" ng-disabled="search.MSerText==undefined" type="button">Find</button>&ndash;&gt;-->
+                                                    <!--<div id="map-canvas" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">-->
+                                                    <!--</div>-->
+
+                                                </div>
+
+                                                <div class="row locations-picture-container text-center">
+                                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
+                                                        <img height="90px" width="308" class="hidden-xs"
+                                                             ng-hide="userDetails.IDTypeID == 1"
+                                                             ng-src="{{((userDetails.Picture)? userDetails.Picture : '/images/grey-background.jpg')}}" />
+                                                        <img height="90px" width="70px" class="hidden-xs"
+                                                             ng-show="userDetails.IDTypeID == 1"
+                                                             ng-src="{{((userDetails.Picture)? userDetails.Picture : '/images/grey-background.jpg')}}" />
+
+
+                                                        <img height="45px" width="154" class="hidden-md hidden-sm hidden-lg"
+                                                             ng-hide="userDetails.IDTypeID == 1"
+                                                             ng-src="{{((userDetails.Picture)? userDetails.Picture : '/images/grey-background.jpg')}}" />
+                                                        <img height="45px" width="35px" class="hidden-md hidden-sm hidden-lg"
+                                                             ng-show="userDetails.IDTypeID == 1"
+                                                             ng-src="{{((userDetails.Picture)? userDetails.Picture : '/images/grey-background.jpg')}}" />
+                                                    </div>
+                                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 col-lg-offset-4 col-xs-offset-4 col-sm-offset-4 col-xs-offset-3">
+                                                        <button class="btn btn-primary btn-sm" data-toggle="tooltip" title="Upload Picture">
+                                                            Attach Picture
+                                                        </button>
+                                                        <button class="btn btn-primary btn-sm" data-toggle="tooltip" title="Click Picture using Webcam">
+                                                            <span class="glyphicon glyphicon-camera"></span>
+                                                        </button>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                            <!--------end :Map area --------------------------->
                                             </div>
 
 
+                                            </div>
                                         </div>
-                                    </div>
+                                    </form>
                                 </div>
 
                             </div>
