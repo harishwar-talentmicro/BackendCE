@@ -123,32 +123,10 @@ angular.module('ezeidApp').controller('CVAttachController', function($http, $roo
         return (errorList.length>0)? false : true;
     }
 
-        this.saveCVDocInfo=function(){
-
+    this.saveCVDocInfo=function(){
 
    if(isValidate())
     {
-      if($scope.DocumentToUpload)
-        {
-            CVAttachCtrl._CVInfo.CVDocFile = $scope.DocumentToUpload[0].name;
-            for (var i = 0; i < $scope.DocumentToUpload.length; i++) {
-                var $file = $scope.DocumentToUpload[i];
-                var formData = new FormData();
-                formData.append('file', $file);
-                formData.append('TokenNo', $rootScope._userInfo.Token);
-                formData.append('RefType', 7);
-
-                $http({ method: 'POST', url: '/ewTUploadDoc/', data: formData,
-                    headers: { 'Content-Type': undefined }, transformRequest: angular.identity })
-                    .success(function (data, status, headers, config) {
-                        //getCVInfo();
-                    });
-                /*  error(function(data, status, headers, config) {
-                 });*/
-            }
-        }
-
-
         CVAttachCtrl._CVInfo.TokenNo=$rootScope._userInfo.Token;
         CVAttachCtrl._CVInfo.Status=parseInt(CVAttachCtrl._CVInfo.Status);
         $http({
@@ -160,11 +138,31 @@ angular.module('ezeidApp').controller('CVAttachController', function($http, $roo
                 if(data.IsSuccessfull) {
                     Notification.success({message: "Saved..", delay: MsgDelay});
                     getCVInfo();
-                    window.location.href = "/home";
+                //    window.location.href = "/home";
                 }else{
                     Notification.error({message: "Sorry..! not saved", delay: MsgDelay});
                 }
             });
+
+        if($scope.DocumentToUpload)
+        {
+            CVAttachCtrl._CVInfo.CVDocFile = $scope.DocumentToUpload[0].name;
+           // for (var i = 0; i < $scope.DocumentToUpload.length; i++) {
+                var $file = $scope.DocumentToUpload[0];
+                var formData = new FormData();
+                formData.append('file', $file);
+                formData.append('TokenNo', $rootScope._userInfo.Token);
+                formData.append('RefType', 7);
+
+                $http({ method: 'POST', url: '/ewTUploadDoc/', data: formData,
+                    headers: { 'Content-Type': undefined }, transformRequest: angular.identity })
+                    .success(function (data, status, headers, config) {
+                        window.location.href = "/home";
+                    });
+                /*  error(function(data, status, headers, config) {
+                 });*/
+           // }
+        }
 
         }
     };

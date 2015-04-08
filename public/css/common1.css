@@ -222,7 +222,7 @@ hr {
 }
 .searchStripTopMargin
 {
-    margin-top: 2%;
+    margin-top: 2.5%;
 }
 .showPointer
 {
@@ -301,7 +301,7 @@ body {
 .headerVerified
 {
     text-align: center;
-    background: #ffffff;
+    background: #0B89BA;
     height: 75px;
 }
 .parkingText
@@ -339,13 +339,13 @@ body {
 .bewareTextContainer
 {
     background: #ff0000;
-    height: 50px;
+    height: 75px;
     color: #ffffff;
     text-align: center;
 }
 .bewareTextInnerContainer
 {
-    margin-top: 1%;
+    margin-top: 3%;
 }
 .boxFotterBanner
 {
@@ -354,7 +354,7 @@ body {
 .fotterButtonContainer
 {
     margin-top: 0.5%;
-    margin-right: 7%;
+    /*margin-right: 7%;*/
 }
 .msgButtonContainer
 {
@@ -630,6 +630,35 @@ body {
     transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
 }
 .WhiteTextBox {
-    background-color: #ffffff;
-
+    background-color: #ffffff !important;
+}
+.setTextToRight
+{
+    text-align: right;
+}
+#directions-panel {
+    height: 100%;
+    float: right;
+    width: 100%;
+}
+.emailPannelTopMargin
+{
+    margin-top: 2%;
+}
+.topMarginButton
+{
+    margin-top: 1%;
+}
+.setTableFixHeight
+{
+    height: 300px;
+    overflow-y: auto;
+}
+.leftMargin2
+{
+    margin-left: 2%;
+}
+.imgTopMargin
+{
+    margin-top: 5%;
 }

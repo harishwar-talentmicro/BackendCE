@@ -1,4 +1,4 @@
-   <table cellpadding="0" cellspacing="0" border="0" style="width: 600px; border: solid 1px #ccc; font-family: 'Trebuchet MS', Arial, Helvetica, sans-serif; font-size: 14px; color: #5d5d5d;">
+ <table cellpadding="0" cellspacing="0" border="0" style="width: 600px; border: solid 1px #ccc; font-family: 'Trebuchet MS', Arial, Helvetica, sans-serif; font-size: 14px; color: #5d5d5d;">
                 <tr>
                     <td style=""></td>
                 </tr>
@@ -20,7 +20,7 @@
                                     <br>
                                     Verified Status of Sender: [IsVerified].<br />
                                     <br />
-                                    Click on<strong style="text-decoration: underline; color: #156685"> [https://www.ezeid.com?ID]</strong>  for  the contact information of
+                                    Click on<strong style="text-decoration: underline; color: #156685"> https://www.ezeid.com/[EZEID]</strong>  for  the contact information of
 the re quester.
                                     <br />
                                     <br />
@@ -28,7 +28,7 @@ the re quester.
                                     <br />
                                     EZE ID Team.
                                     <br />
-                                    Reach us at:<strong style="text-decoration: underline; color: #156685">  https://www.ezeid.com?ID=EZEID </strong> 
+                                    Reach us at:<strong style="text-decoration: underline; color: #156685">  https://www.ezeid.com/EZEID </strong> 
                                     <br>
                                     <br>
                                    This is a system generated message, delete in case received in error.<br /><br />

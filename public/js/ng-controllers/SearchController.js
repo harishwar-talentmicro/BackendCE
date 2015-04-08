@@ -1,6 +1,5 @@
 // Search Controller
 angular.module('ezeidApp').controller('SearchController', function ($http, $rootScope, $scope, $compile, $timeout, Notification, $filter, $location, $window, $q, $interval,GURL,MsgDelay,$routeParams) {
-        console.log($routeParams);
 
    /* if(Object.keys($routeParams).length > 0){
         if(typeof($routeParams['SearchType']) !== "undefined" && $routeParams['SearchType'] !== null && $routeParams['SearchType'] !== "")
@@ -116,6 +115,8 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
         Latitude: $rootScope.CLoc.CLat,
         Longitude: $rootScope.CLoc.CLong
     };
+    $rootScope._userLoc = {};
+
 
     $scope.isMapLoaded = false;         //Set to true with map event 'idle'
     $scope.isMapReady = false;          //Set to true when map canvas is drawn and map is fully visible
@@ -418,6 +419,13 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
                         $http({ method: 'get', url: GURL + 'ewtGetSearchInformation?Token=' + $rootScope._userInfo.Token + '&TID=' + _item.TID + '&CurrentDate=' + currentDate}).success(function (data) {
 
                                if (data != 'null') {
+
+                                   $scope.showSalesEnquiry = SearchSec.mInfo.VisibleModules[0];
+                                   $scope.showHomeDelivery = SearchSec.mInfo.VisibleModules[1];
+                                   $scope.shoReserVation = SearchSec.mInfo.VisibleModules[2];
+                                   $scope.showServiceRequest = SearchSec.mInfo.VisibleModules[3];
+                                   $scope.showSendCv = SearchSec.mInfo.VisibleModules[4];
+
                                     //Below lines are to show address in info tab
                                     $scope.AddressForInfoTab = (SearchSec.mInfo.AddressLine1 != "") ? SearchSec.mInfo.AddressLine1 +', ' : "";
                                     $scope.AddressForInfoTab += (SearchSec.mInfo.AddressLine2 != "") ? SearchSec.mInfo.AddressLine2 +', ' : "";
@@ -437,6 +445,7 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
 
                                     //Call for banner
                                     SearchSec.IsSearchButtonClicked = true;
+                                    AutoRefresh = true;
                                     getBanner(1);
                                 });
                             }
@@ -513,9 +522,10 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
         SearchSec.Criteria.OpenStatus = SearchSec.Criteria.OpenStatus1 == true ? 1 : 0;
         var currentDate = moment().format('YYYY-MM-DD hh:mm');
         $scope.AddressForInfoTab = "";
+        AutoRefresh = false;
 
         SearchSec.Criteria.CurrentDate = currentDate;
-        if ($rootScope._userInfo.IsAuthenticate == true || SearchSec.Criteria.SearchType == 2 && SearchSec.IsSearchButtonClicked || SearchSec.Criteria.SearchType == 3 && SearchSec.IsSearchButtonClicked) {
+       // if ($rootScope._userInfo.IsAuthenticate == true || SearchSec.Criteria.SearchType == 2 && SearchSec.IsSearchButtonClicked || SearchSec.Criteria.SearchType == 3 && SearchSec.IsSearchButtonClicked) {
 
             if($rootScope._userInfo.Token == "")
             {
@@ -532,116 +542,163 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
             SearchSec.Criteria.Token = $rootScope._userInfo.Token;
 
             $http({ method: 'post', url: GURL + 'ewSearchByKeywords', data: SearchSec.Criteria }).success(function (data) {
-               if (data != 'null' && data.length>0) {
+               if (data != 'null' && data.length>0)
+               {
+                   $scope.SearchResultCount = data.length;
+                   $window.localStorage.removeItem("searchResult");
+                   $window.localStorage.setItem("searchResult", JSON.stringify(data));
 
-                    $scope.SearchResultCount = data.length;
+                   if(($rootScope._userInfo.IsAuthenticate == true || data[0].IDTypeID > 1) && data[0].Latitude != undefined )
+                   {
+                      try{
+                           PlaceMarker(data);
+                       }
+                       catch(ex){
+                           if(!map){
+                               initialize();
+                           }
+                           $scope.$watch('isMapLoaded',function(var1,var2){
+                               if(var2){
+                                   PlaceMarker(data);
+                               }
+                           });
+                       }
+                   }
 
                     var _item = data[0];
                     if(data[0].Filename)
                     {
-                        SearchSec.downloadData = data[0];
-                        SearchSec.IsShowForm = true;
-                        SearchSec.IsFilterRowVisible = false;
+                        if($rootScope._userInfo.IsAuthenticate == true || data[0].IDTypeID > 1)
+                        {
+                            SearchSec.IsShowForm = true;
+                            SearchSec.downloadData = data[0];
+                            SearchSec.IsFilterRowVisible = false;
 
-                        var downloadUrl = "/ewtGetSearchDocuments?Token="+$rootScope._userInfo.Token+"&&Keywords="+SearchSec.Criteria.Keywords;
-                        var win = window.open(downloadUrl, '_blank');
-                        win.focus();
+                            var downloadUrl = "/ewtGetSearchDocuments?Token="+$rootScope._userInfo.Token+"&&Keywords="+SearchSec.Criteria.Keywords;
+                            $window.open(downloadUrl, '_blank');
+                            /* var win = window.open(downloadUrl, '_blank');
+                             win.focus();*/
+                        }
+                        else
+                        {
+                            //Redirect to Login page
+                            $('#SignIn_popup').slideDown();
+                            $rootScope.defer = $q.defer();
+                            var prom = $rootScope.defer.promise;
+                            prom.then(function(d){
+                                SearchSec.getSearch();
+                            });
+                        }
                     }
                     else
                     {
-                        $http({ method: 'get', url: GURL + 'ewtGetSearchInformation?Token=' + $rootScope._userInfo.Token + '&TID=' + _item.TID + '&CurrentDate=' + SearchSec.Criteria.CurrentDate }).success(function (data) {
+                         if($rootScope._userInfo.IsAuthenticate == true || data[0].IDTypeID == 2 && SearchSec.Criteria.SearchType == 1)
+                         {
+                               $http({ method: 'get', url: GURL + 'ewtGetSearchInformation?Token=' + $rootScope._userInfo.Token + '&TID=' + _item.TID + '&CurrentDate=' + SearchSec.Criteria.CurrentDate }).success(function (data) {
 
-                            if (data != 'null') {
+                                if (data != 'null') {
 
-                              if(data.length == 1 && SearchSec.Criteria.SearchType == 1)
-                                {
-                                    $scope.showInfoTab = true;
-                                    $scope.selectTab('info');
-                                    $scope.ShowInfoWindow = true;
-
-                                    $scope.ShowLinks = true;
-                                    $scope.showSmallBanner = true;
-                                }
-                                else
-                                {
-                                    $scope.selectTab('map');
-                                }
-                                $timeout(function () {
-                                    SearchSec.mInfo = data[0];
-
-                                    //Below lines are to show address in info tab
-                                    $scope.AddressForInfoTab = (SearchSec.mInfo.AddressLine1 != "") ? SearchSec.mInfo.AddressLine1 +', ' : "";
-                                    $scope.AddressForInfoTab += (SearchSec.mInfo.AddressLine2 != "") ? SearchSec.mInfo.AddressLine2 +', ' : "";
-                                    $scope.AddressForInfoTab += (SearchSec.mInfo.CityTitle != "") ? SearchSec.mInfo.CityTitle +', ' : "";
-                                    $scope.AddressForInfoTab += (SearchSec.mInfo.CountryTitle != "") ? SearchSec.mInfo.CountryTitle +', ' : "";
-                                    $scope.AddressForInfoTab += (SearchSec.mInfo.PostalCode != "") ? SearchSec.mInfo.PostalCode : "";
-
-                                    if(SearchSec.mInfo.ParkingStatus==0)
+                                  if(data.length == 1 && SearchSec.Criteria.SearchType == 1)
                                     {
-                                        SearchSec.parkingTitle = "Parking Status";
-                                    }
-                                    if(SearchSec.mInfo.ParkingStatus==1)
-                                    {
-                                        SearchSec.parkingTitle = "Public Parking";
-                                    }
-                                    if(SearchSec.mInfo.ParkingStatus==2)
-                                    {
-                                        SearchSec.parkingTitle = "Vallet Parking";
-                                    }
-                                    if(SearchSec.mInfo.ParkingStatus==3)
-                                    {
-                                        SearchSec.parkingTitle = "No parking";
-                                    }
+                                        $scope.showInfoTab = true;
+                                        $scope.selectTab('info');
+                                        $scope.ShowInfoWindow = true;
 
-                                    if (!/^(f|ht)tps?:\/\//i.test(data[0].Website)) {
-                                        // url = "http://" + data[0].Website;
-                                        //  SearchSec.mInfo.Website = url;
-                                        SearchSec.mInfo.Website = data[0].Website;
-                                    }
-
-                                    //Call for banner
-                                    getBanner(1);
-                                    $scope.form_rating = data[0].Rating;
-
-                                    SearchSec.mInfo.Banners = data[0].Banners;
-
-                                    if(SearchSec.mInfo.IDTypeID == 2)
-                                    {
-                                        SearchSec.reservationPlaceHolder = "Reservation requirement details";
-                                    }
+                                        $scope.ShowLinks = true;
+                                        $scope.showSmallBanner = true;
+                                   }
                                     else
                                     {
-                                        SearchSec.reservationPlaceHolder = "Appointment requirement details";
+                                        $scope.selectTab('map');
                                     }
-                                });
-                            }
-                            else {
-                                // Notification.error({ message: 'Invalid key or not found…', delay: MsgDelay });
-                                $scope.ShowNoDataFound = true;
-                            }
-                        });
+                                    $timeout(function () {
+                                        SearchSec.mInfo = data[0];
+                                       //Below lines are to show address in info tab
+                                        $scope.AddressForInfoTab = (SearchSec.mInfo.AddressLine1 != "") ? SearchSec.mInfo.AddressLine1 +', ' : "";
+                                        $scope.AddressForInfoTab += (SearchSec.mInfo.AddressLine2 != "") ? SearchSec.mInfo.AddressLine2 +', ' : "";
+                                        $scope.AddressForInfoTab += (SearchSec.mInfo.CityTitle != "") ? SearchSec.mInfo.CityTitle +', ' : "";
+                                        $scope.AddressForInfoTab += (SearchSec.mInfo.CountryTitle != "") ? SearchSec.mInfo.CountryTitle +', ' : "";
+                                        $scope.AddressForInfoTab += (SearchSec.mInfo.PostalCode != "") ? SearchSec.mInfo.PostalCode : "";
 
+                                        if(SearchSec.mInfo.ParkingStatus==0)
+                                        {
+                                            SearchSec.parkingTitle = "Parking Status";
+                                        }
+                                        if(SearchSec.mInfo.ParkingStatus==1)
+                                        {
+                                            SearchSec.parkingTitle = "Public Parking";
+                                        }
+                                        if(SearchSec.mInfo.ParkingStatus==2)
+                                        {
+                                            SearchSec.parkingTitle = "Vallet Parking";
+                                        }
+                                        if(SearchSec.mInfo.ParkingStatus==3)
+                                        {
+                                            SearchSec.parkingTitle = "No parking";
+                                        }
 
-                        //PlaceMarker(data);
+                                        if (!/^(f|ht)tps?:\/\//i.test(data[0].Website)) {
+                                            // url = "http://" + data[0].Website;
+                                            //  SearchSec.mInfo.Website = url;
+                                            SearchSec.mInfo.Website = data[0].Website;
+                                        }
 
-                        /******************** Code for checking map load and handling it with reload ****************/
-                        //MapIsLoaded variable is set by map eventListener idle
+                                        //Call for banner
+                                        AutoRefresh = true;
+                                        getBanner(1);
+                                        $scope.form_rating = data[0].Rating;
 
+                                        SearchSec.mInfo.Banners = data[0].Banners;
 
-                        try{
-                            PlaceMarker(data);
-                        }
-
-                        catch(ex){
-                            if(!map){
-                                initialize();
-                            }
-                            $scope.$watch('isMapLoaded',function(var1,var2){
-                                if(var2){
-                                    PlaceMarker(data);
+                                        if(SearchSec.mInfo.IDTypeID == 2)
+                                        {
+                                            SearchSec.reservationPlaceHolder = "Reservation requirement details";
+                                        }
+                                        else
+                                        {
+                                            SearchSec.reservationPlaceHolder = "Appointment requirement details";
+                                        }
+                                    });
+                                }
+                                else {
+                                    // Notification.error({ message: 'Invalid key or not found…', delay: MsgDelay });
+                                    $scope.ShowNoDataFound = true;
                                 }
                             });
-                        }
+
+                                /******************** Code for checking map load and handling it with reload ****************/
+                                //MapIsLoaded variable is set by map eventListener idle
+
+                              /*  try{
+                                    PlaceMarker(data);
+                                }
+                                catch(ex){
+                                    if(!map){
+                                        initialize();
+                                    }
+                                    $scope.$watch('isMapLoaded',function(var1,var2){
+                                        if(var2){
+                                            PlaceMarker(data);
+                                        }
+                                    });
+                                }*/
+
+                         }
+                        else
+                         {
+                                 if( SearchSec.Criteria.SearchType < 2 )
+                                 {
+                                     //Redirect to Login page
+                                     $('#SignIn_popup').slideDown();
+                                     $rootScope.defer = $q.defer();
+                                     var prom = $rootScope.defer.promise;
+                                     prom.then(function(d){
+                                         SearchSec.getSearch();
+                                     });
+                                 }
+                         }
+
+
                         //If map is not loaded wait for few seconds and then try to reload it and then place marker
 
                         /*********************Code for checking map load and handling it with reload ends ****************/
@@ -670,16 +727,6 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
                     //PlaceMarker(null);
                 }
             });
-        }
-        else {
-            //Redirect to Login page
-            $('#SignIn_popup').slideDown();
-            $rootScope.defer = $q.defer();
-            var prom = $rootScope.defer.promise;
-            prom.then(function(d){
-                SearchSec.getSearch();
-            });
-        }
     };
 
     /**
@@ -753,11 +800,11 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
      //call for next banner
      SearchSec.getNextBanner = function () {
      currentBanner = currentBanner + 1;
-     if(currentBanner <= SearchSec.mInfo.Banners)
-     {
-     getBanner(currentBanner);
-     RefreshTime = Miliseconds;
-     }
+         if(currentBanner <= SearchSec.mInfo.Banners)
+         {
+             getBanner(currentBanner);
+             RefreshTime = Miliseconds;
+         }
      };
 
     function getBanner(_requestedBannerValue){
@@ -828,6 +875,24 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
                 directionsDisplay.setDirections(response);
             }
         });
+    };
+
+    //View Directions
+    SearchSec.viewDirections = function (data) {
+      var start = new google.maps.LatLng($rootScope.CLoc.CLat, $rootScope.CLoc.CLong);
+      var end = new google.maps.LatLng(data.Latitude, data.Longitude);
+
+      var userLoc = {
+            startLat: $rootScope.CLoc.CLat,
+            startLong: $rootScope.CLoc.CLong,
+            endLat: data.Latitude,
+            endLong : data.Longitude
+        };
+
+        $window.localStorage.setItem("directionLocation", JSON.stringify(userLoc));
+
+        window.location.href = "/viewdirection";
+        //  $location.path("/viewdirection");
     };
 
     //open Sales Enquiry form
