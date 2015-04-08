@@ -1,6 +1,5 @@
 // Search Controller
 angular.module('ezeidApp').controller('SearchController', function ($http, $rootScope, $scope, $compile, $timeout, Notification, $filter, $location, $window, $q, $interval,GURL,MsgDelay,$routeParams) {
-        console.log($routeParams);
 
    /* if(Object.keys($routeParams).length > 0){
         if(typeof($routeParams['SearchType']) !== "undefined" && $routeParams['SearchType'] !== null && $routeParams['SearchType'] !== "")
@@ -116,6 +115,8 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
         Latitude: $rootScope.CLoc.CLat,
         Longitude: $rootScope.CLoc.CLong
     };
+    $rootScope._userLoc = {};
+
 
     $scope.isMapLoaded = false;         //Set to true with map event 'idle'
     $scope.isMapReady = false;          //Set to true when map canvas is drawn and map is fully visible
@@ -418,6 +419,13 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
                         $http({ method: 'get', url: GURL + 'ewtGetSearchInformation?Token=' + $rootScope._userInfo.Token + '&TID=' + _item.TID + '&CurrentDate=' + currentDate}).success(function (data) {
 
                                if (data != 'null') {
+
+                                   $scope.showSalesEnquiry = SearchSec.mInfo.VisibleModules[0];
+                                   $scope.showHomeDelivery = SearchSec.mInfo.VisibleModules[1];
+                                   $scope.shoReserVation = SearchSec.mInfo.VisibleModules[2];
+                                   $scope.showServiceRequest = SearchSec.mInfo.VisibleModules[3];
+                                   $scope.showSendCv = SearchSec.mInfo.VisibleModules[4];
+
                                     //Below lines are to show address in info tab
                                     $scope.AddressForInfoTab = (SearchSec.mInfo.AddressLine1 != "") ? SearchSec.mInfo.AddressLine1 +', ' : "";
                                     $scope.AddressForInfoTab += (SearchSec.mInfo.AddressLine2 != "") ? SearchSec.mInfo.AddressLine2 +', ' : "";
@@ -437,6 +445,7 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
 
                                     //Call for banner
                                     SearchSec.IsSearchButtonClicked = true;
+                                    AutoRefresh = true;
                                     getBanner(1);
                                 });
                             }
@@ -513,6 +522,7 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
         SearchSec.Criteria.OpenStatus = SearchSec.Criteria.OpenStatus1 == true ? 1 : 0;
         var currentDate = moment().format('YYYY-MM-DD hh:mm');
         $scope.AddressForInfoTab = "";
+        AutoRefresh = false;
 
         SearchSec.Criteria.CurrentDate = currentDate;
        // if ($rootScope._userInfo.IsAuthenticate == true || SearchSec.Criteria.SearchType == 2 && SearchSec.IsSearchButtonClicked || SearchSec.Criteria.SearchType == 3 && SearchSec.IsSearchButtonClicked) {
@@ -535,10 +545,12 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
                if (data != 'null' && data.length>0)
                {
                    $scope.SearchResultCount = data.length;
+                   $window.localStorage.removeItem("searchResult");
+                   $window.localStorage.setItem("searchResult", JSON.stringify(data));
 
-                   if($rootScope._userInfo.IsAuthenticate == true || data[0].IDTypeID > 1)
+                   if(($rootScope._userInfo.IsAuthenticate == true || data[0].IDTypeID > 1) && data[0].Latitude != undefined )
                    {
-                       try{
+                      try{
                            PlaceMarker(data);
                        }
                        catch(ex){
@@ -556,20 +568,33 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
                     var _item = data[0];
                     if(data[0].Filename)
                     {
-                        SearchSec.downloadData = data[0];
-                        SearchSec.IsShowForm = true;
-                        SearchSec.IsFilterRowVisible = false;
+                        if($rootScope._userInfo.IsAuthenticate == true || data[0].IDTypeID > 1)
+                        {
+                            SearchSec.IsShowForm = true;
+                            SearchSec.downloadData = data[0];
+                            SearchSec.IsFilterRowVisible = false;
 
-                        var downloadUrl = "/ewtGetSearchDocuments?Token="+$rootScope._userInfo.Token+"&&Keywords="+SearchSec.Criteria.Keywords;
-                        $window.open(downloadUrl, '_blank');
-                       /* var win = window.open(downloadUrl, '_blank');
-                        win.focus();*/
+                            var downloadUrl = "/ewtGetSearchDocuments?Token="+$rootScope._userInfo.Token+"&&Keywords="+SearchSec.Criteria.Keywords;
+                            $window.open(downloadUrl, '_blank');
+                            /* var win = window.open(downloadUrl, '_blank');
+                             win.focus();*/
+                        }
+                        else
+                        {
+                            //Redirect to Login page
+                            $('#SignIn_popup').slideDown();
+                            $rootScope.defer = $q.defer();
+                            var prom = $rootScope.defer.promise;
+                            prom.then(function(d){
+                                SearchSec.getSearch();
+                            });
+                        }
                     }
                     else
                     {
                          if($rootScope._userInfo.IsAuthenticate == true || data[0].IDTypeID == 2 && SearchSec.Criteria.SearchType == 1)
                          {
-                                $http({ method: 'get', url: GURL + 'ewtGetSearchInformation?Token=' + $rootScope._userInfo.Token + '&TID=' + _item.TID + '&CurrentDate=' + SearchSec.Criteria.CurrentDate }).success(function (data) {
+                               $http({ method: 'get', url: GURL + 'ewtGetSearchInformation?Token=' + $rootScope._userInfo.Token + '&TID=' + _item.TID + '&CurrentDate=' + SearchSec.Criteria.CurrentDate }).success(function (data) {
 
                                 if (data != 'null') {
 
@@ -581,15 +606,14 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
 
                                         $scope.ShowLinks = true;
                                         $scope.showSmallBanner = true;
-                                    }
+                                   }
                                     else
                                     {
                                         $scope.selectTab('map');
                                     }
                                     $timeout(function () {
                                         SearchSec.mInfo = data[0];
-
-                                        //Below lines are to show address in info tab
+                                       //Below lines are to show address in info tab
                                         $scope.AddressForInfoTab = (SearchSec.mInfo.AddressLine1 != "") ? SearchSec.mInfo.AddressLine1 +', ' : "";
                                         $scope.AddressForInfoTab += (SearchSec.mInfo.AddressLine2 != "") ? SearchSec.mInfo.AddressLine2 +', ' : "";
                                         $scope.AddressForInfoTab += (SearchSec.mInfo.CityTitle != "") ? SearchSec.mInfo.CityTitle +', ' : "";
@@ -620,6 +644,7 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
                                         }
 
                                         //Call for banner
+                                        AutoRefresh = true;
                                         getBanner(1);
                                         $scope.form_rating = data[0].Rating;
 
@@ -641,19 +666,36 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
                                 }
                             });
 
+                                /******************** Code for checking map load and handling it with reload ****************/
+                                //MapIsLoaded variable is set by map eventListener idle
+
+                              /*  try{
+                                    PlaceMarker(data);
+                                }
+                                catch(ex){
+                                    if(!map){
+                                        initialize();
+                                    }
+                                    $scope.$watch('isMapLoaded',function(var1,var2){
+                                        if(var2){
+                                            PlaceMarker(data);
+                                        }
+                                    });
+                                }*/
+
                          }
                         else
                          {
-                             if( SearchSec.Criteria.SearchType < 2 )
-                             {
-                                 //Redirect to Login page
-                                 $('#SignIn_popup').slideDown();
-                                 $rootScope.defer = $q.defer();
-                                 var prom = $rootScope.defer.promise;
-                                 prom.then(function(d){
-                                     SearchSec.getSearch();
-                                 });
-                             }
+                                 if( SearchSec.Criteria.SearchType < 2 )
+                                 {
+                                     //Redirect to Login page
+                                     $('#SignIn_popup').slideDown();
+                                     $rootScope.defer = $q.defer();
+                                     var prom = $rootScope.defer.promise;
+                                     prom.then(function(d){
+                                         SearchSec.getSearch();
+                                     });
+                                 }
                          }
 
 
@@ -682,6 +724,7 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
                             }
                         });
                     }
+                    //PlaceMarker(null);
                 }
             });
     };
@@ -836,34 +879,20 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
 
     //View Directions
     SearchSec.viewDirections = function (data) {
+      var start = new google.maps.LatLng($rootScope.CLoc.CLat, $rootScope.CLoc.CLong);
+      var end = new google.maps.LatLng(data.Latitude, data.Longitude);
 
-      //  $scope.selectTab('map');
-        var start = new google.maps.LatLng($rootScope.CLoc.CLat, $rootScope.CLoc.CLong);
-        var end = new google.maps.LatLng(data.Latitude, data.Longitude);
-
-        $rootScope.starts = start;
-        $rootScope.ends = end;
-
-        console.log($rootScope);
-
-       /* $rootScope.viewDirection.startLat = $rootScope.CLoc.CLat;
-        $rootScope.viewDirection.startLong = $rootScope.CLoc.CLong;
-        $rootScope.viewDirection.endLat = data.Latitude;
-        $rootScope.viewDirection.endLong = data.Longitude;*/
-
-       //window.location.href = "/viewdirection";
-        $location.path("/viewdirection");
-       /* directionsDisplay.setMap(map);
-        var request = {
-            origin: start,
-            destination: end,
-            travelMode: google.maps.TravelMode.DRIVING
+      var userLoc = {
+            startLat: $rootScope.CLoc.CLat,
+            startLong: $rootScope.CLoc.CLong,
+            endLat: data.Latitude,
+            endLong : data.Longitude
         };
-        directionsService.route(request, function (response, status) {
-            if (status == google.maps.DirectionsStatus.OK) {
-                directionsDisplay.setDirections(response);
-            }
-        });*/
+
+        $window.localStorage.setItem("directionLocation", JSON.stringify(userLoc));
+
+        window.location.href = "/viewdirection";
+        //  $location.path("/viewdirection");
     };
 
     //open Sales Enquiry form

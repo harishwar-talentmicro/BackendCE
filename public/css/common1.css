@@ -222,7 +222,7 @@ hr {
 }
 .searchStripTopMargin
 {
-    margin-top: 2%;
+    margin-top: 2.5%;
 }
 .showPointer
 {
@@ -345,7 +345,7 @@ body {
 }
 .bewareTextInnerContainer
 {
-    margin-top: 1%;
+    margin-top: 3%;
 }
 .boxFotterBanner
 {
@@ -354,7 +354,7 @@ body {
 .fotterButtonContainer
 {
     margin-top: 0.5%;
-    margin-right: 7%;
+    /*margin-right: 7%;*/
 }
 .msgButtonContainer
 {
@@ -640,4 +640,25 @@ body {
     height: 100%;
     float: right;
     width: 100%;
+}
+.emailPannelTopMargin
+{
+    margin-top: 2%;
+}
+.topMarginButton
+{
+    margin-top: 1%;
+}
+.setTableFixHeight
+{
+    height: 300px;
+    overflow-y: auto;
+}
+.leftMargin2
+{
+    margin-left: 2%;
+}
+.imgTopMargin
+{
+    margin-top: 5%;
 }

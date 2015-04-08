@@ -132,7 +132,6 @@
                 if(CLOSED_ROUTES.indexOf(next.$$route.originalPath) === -1
                     &&
                     UNAUTHORIZED_ROUTES.indexOf(next.$$route.originalPath) === -1){
-                    console.log('line 137');
                     return;
                 }
             }

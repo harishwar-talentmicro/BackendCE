@@ -13,38 +13,31 @@
                            <div  class="well well-lg templateBoxContainer" id="googlemap">
                                 <div class="row setRowLeftRightMarginZero centerAlign">
                                     <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8">
-                                        <div id="map-canvasH" >
-                                        </div>
+                                        <div id="map-canvasH"></div>
                                     </div>
                                     <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
                                         <div id="directions-panel"></div>
                                     </div>
                                 </div><br/>
-
-                               <div class="row setRowLeftRightMarginZero centerAlign" >
-                                  <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 searchHeaderAlignment TemplateTextContainer">
-                                  </div>
-
-                                 <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 searchHeaderAlignment" style="text-align: left;">
-                                       <button type="submit" class="btn btn-primary" ng-click="viewDirection.printHtml()">Print</button>
-                                 </div>
-                                 <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 searchHeaderAlignment" style="text-align: left;">
-                                       <button type="button" class="btn btn-primary" ng-click="viewDirection.emailHtml()" >Email</button>
-                                 </div>
-
-
-                               </div>
-
                            </div>
 
-                           <div id="googlemapimage">
+                           <div class="row setRowLeftRightMarginZero centerAlign leftMargin2">
+                               <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1 searchHeaderAlignment">
+                                   <button type="submit" class="btn btn-primary" ng-click="viewDirection.printHtml()">Print</button>
+                               </div>
+                               <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1 searchHeaderAlignment" style="text-align: left;">
+                                   <button type="button" class="btn btn-primary" ng-click="viewDirection.emailHtml()" >Email</button>
+                               </div>
+                           </div>
+
+                           <div id="googlemapimage" style="display: none;">
                                <img id="googlemapbinary"/>
                            </div>
 
-                           <div ng-show="showEmailForm" class="well well-lg templateBoxContainer">
+                           <div ng-show="showEmailForm" class="well well-lg templateBoxContainer emailPannelTopMargin">
                                 <form name="MailTemplateForm" novalidate >
                                     <div class="row setRowLeftRightMarginZero centerAlign">
-                                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 searchHeaderAlignment TemplateTextContainer bewareTextInnerContainer keyWordText">
+                                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 searchHeaderAlignment TemplateTextContainer topMarginButton keyWordText">
                                             Email
                                         </div>
                                         <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10 searchHeaderAlignment">
@@ -60,10 +53,10 @@
 
                                         </div>
                                        <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 searchHeaderAlignment" style="text-align: left;">
-                                            <button type="submit" class="btn btn-primary" ng-click="viewDirection.emailDirectionImage()" >Send</button>
+                                            <button type="submit" ng-disabled="!viewDirection._info.FromEmailID"  class="btn btn-primary" ng-click="viewDirection.emailDirectionImage()" >Send</button>
                                         </div>
                                         <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 searchHeaderAlignment" style="text-align: left;">
-                                            <button type="button" class="btn btn-primary" ng-click="viewDirection.closeEmailDialougr()" >Close</button>
+                                            <button type="button" class="btn btn-primary" ng-click="viewDirection.closeEmailDialouge()" >Close</button>
                                         </div>
                                     </div>
                                 </form>

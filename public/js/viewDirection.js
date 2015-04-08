@@ -4,9 +4,12 @@ angular.module('ezeidApp').controller('viewDirectionController',['$http', '$root
     viewDirection._info = {};
     var MsgDelay = 2000;
     $scope.showEmailForm = false;
-
+    var map;
     var directionsDisplay;
     var directionsService = new google.maps.DirectionsService();
+    var directtionLatLong;
+
+    var finalImageSrc = "";
 
     initialize();
 
@@ -52,9 +55,7 @@ angular.module('ezeidApp').controller('viewDirectionController',['$http', '$root
             center : new google.maps.LatLng(12.295810, 76.639381)
         };
         /* center: new google.maps.LatLng(41.850033, -87.6500523)*/
-         map = new google.maps.Map(document.getElementById('map-canvasH'),
-            mapOptions);
-
+         map = new google.maps.Map(document.getElementById('map-canvasH'),mapOptions);
 
         directionsDisplay.setMap(map);
         directionsDisplay.setPanel(document.getElementById('directions-panel'));
@@ -64,20 +65,17 @@ angular.module('ezeidApp').controller('viewDirectionController',['$http', '$root
         });
 
         /*------------- Below code is for Drow Direction ------------*/
-        var lat1 = parseFloat('12.94223');
-        var lng1 = parseFloat('17777.574838');
-        var latlng1 = new google.maps.LatLng(lat1, lng1);
-        var latlng1 = new google.maps.LatLng(lat1, lng1);
 
-        var lat2 = parseFloat('12.894854');
-        var lng2 = parseFloat('17777.60277300000007');
-        var latlng2 = new google.maps.LatLng(lat2, lng2);
+        directtionLatLong = JSON.parse($window.localStorage.getItem("directionLocation"));
 
-       // $rootScope.startLatLong = new google.maps.LatLng($rootScope.CLoc.CLat, $rootScope.CLoc.CLong);
-      //  $rootScope.endLatLong = new google.maps.LatLng(data.Latitude, data.Longitude);
+        var request = {
+             origin: directtionLatLong.startLat+","+directtionLatLong.startLong,
+             destination: directtionLatLong.endLat+","+directtionLatLong.endLong,
+             travelMode: google.maps.TravelMode.DRIVING
+         };
 
 
-      /*  var request = {
+       /* var request = {
             origin: '12.94223,77.574838',
             destination: '12.894854,77.60277300000007',
             travelMode: google.maps.TravelMode.DRIVING
@@ -85,30 +83,16 @@ angular.module('ezeidApp').controller('viewDirectionController',['$http', '$root
 
 
 
-
-      //  var start = new google.maps.LatLng($rootScope.CLoc.CLat, $rootScope.CLoc.CLong);
-
-        console.log("SAi 222");
-        console.log($rootScope);
-
-      /*  var request = {
-            origin: start,
-            destination: $rootScope.endLatLong,
-            travelMode: google.maps.TravelMode.DRIVING
-        };*/
-
-        directionsService.route(request, function(response, status) {
+         directionsService.route(request, function(response, status) {
             if (status == google.maps.DirectionsStatus.OK) {
                 directionsDisplay.setDirections(response);
 
                 $timeout(function(){
                     convertasbinaryimage();
-                },4000);
-
+                },8000);
             }
         });
         /*-------------------- Direction Over --------------------------------*/
-
     }
 
 
@@ -120,9 +104,11 @@ angular.module('ezeidApp').controller('viewDirectionController',['$http', '$root
             useCORS: true,
 
             onrendered: function(canvas) {
+
                 var img = canvas.toDataURL("image/png");
                 img = img.replace('data:image/png;base64,', '');
-                var finalImageSrc = 'data:image/png;base64,' + img;
+                finalImageSrc = 'data:image/png;base64,' + img;
+
                 $('#googlemapbinary').attr('src', finalImageSrc);
                 return false;
             }
@@ -143,18 +129,58 @@ angular.module('ezeidApp').controller('viewDirectionController',['$http', '$root
             popupWin.document.open()
             popupWin.document.write('<html><head><link rel="stylesheet" type="text/css" href="style.css" /></head><body onload="window.print()">' + printContents + '</html>');
             popupWin.document.close();
-
-
     };
 
     //  Close EMail direction dialogue
-    viewDirection.closeEmailDialougr = function () {
+    viewDirection.closeEmailDialouge = function () {
         $scope.showEmailForm = false;
+        viewDirection._info.FromEmailID = "";
+        document.getElementById("FromEmailID").className = "form-control emptyBox";
     };
 
     //  EMail direction image
     viewDirection.emailDirectionImage = function () {
-        alert("mailed...");
+        console.log(viewDirection._info);
+
+        $http({ method: 'get', url: GURL + 'ewtSendBulkMailer?Token=' + $rootScope._userInfo.Token + '&TID='+ Tids + '&TemplateID='+ salesEnquiry._info.TID }).success(function (data)
+        {
+            if (data != 'null')
+            {
+                salesEnquiry._info = {};
+
+                $scope.formTitle = "Bulk Sales Enquiry";
+                $scope.showCreateMailTemplate = false;
+
+                document.getElementById("FromName").className = "form-control emptyBox";
+                document.getElementById("FromEmailID").className = "form-control emptyBox";
+                document.getElementById("Title").className = "form-control emptyBox";
+                document.getElementById("Subject").className = "form-control emptyBox";
+                document.getElementById("Body").className = "form-control emptyBox";
+
+                Notification.success({message: "Mails are submitted for transmitted..", delay: MsgDelay});
+                $window.localStorage.removeItem("searchResult");
+            }
+            else
+            {
+                // Notification.error({ message: 'Invalid key or not found…', delay: MsgDelay });
+                $window.localStorage.removeItem("searchResult");
+            }
+        });
+
+       $http({ method: 'post', url: GURL + 'ewtSendBulkMail', data: { TokenNo: $rootScope._userInfo.Token,  Attachement:  finalImageSrc, FromEmail: viewDirection._info.FromEmailID } }).success(function (data)
+       {
+            if (data.IsSuccessfull) {
+
+                viewDirection._info.FromEmailID = "";
+                Notification.success({ message: 'Message send success', delay: MsgDelay });
+                $scope.showEmailForm = false;
+                document.getElementById("FromEmailID").className = "form-control emptyBox";
+            }
+            else {
+                Notification.error({ message: 'Sorry..! Message not send ', delay: MsgDelay });
+            }
+        });
+
     };
 
 }]);
