@@ -38,6 +38,16 @@ angular.module('ezeidApp').controller('ProfileCtrl',[
             $location
         ) {
 
+        /**
+         * Maps parking Status with its string equivalent
+         * @type {Array}
+         */
+        $scope.parkingStatusMap = [
+            '',
+            'Public Parking',
+            'Valet Parking',
+            'No Parking'
+        ];
 
         /**
          * Progress Status Flag for loading data initially
@@ -96,10 +106,12 @@ angular.module('ezeidApp').controller('ProfileCtrl',[
 
 
         /**
-         *
-         * @param saveFlag
+         * Toggles editing mode for profile
          */
-        $scope.toggleProfileEditMode = function(saveFlag){
+        $scope.toggleProfileEditMode = function(){
+//            if(typeof(saveFlag) !== "undefined" && typeof(data)!== "undefined"){
+//
+//            }
             /**
              * @todo Fill all models of edit controls with current userDetails before opening
              */

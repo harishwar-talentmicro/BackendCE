@@ -41,7 +41,7 @@
         '/signup'
     ]);
 
-    ezeid.value('MsgDelay',2000);
+    ezeid.value('MsgDelay',5000);
 
 
     //HTTP Interceptor for detecting token expiry
@@ -92,6 +92,7 @@
             .when('/help',{templateUrl: 'html/help.html'})
             .when('/legal',{templateUrl: 'html/legal.html'})
             .when('/congratulations',{templateUrl: 'html/congratulations.html'})
+//            .when('/business-preference"',{templateUrl: 'html/business-preference.html'})
             .when('/blackwhitelist',{templateUrl: 'html/blacklistwhitelist.html'})
             .when('/salesenquiry',{templateUrl: 'html/salesenquiry.html'})
             .when('/subusers',{templateUrl : 'html/subusers.html'})
@@ -99,14 +100,14 @@
             .when('/business-manager',{templateUrl : 'html/business-manager/business-manager.html'})
             .when('/bulksalesenquiry',{templateUrl : 'html/bulksalesenquiry.html'})
             .when('/viewdirection',{templateUrl : 'html/viewdirection.html'})
-            .when('/signup',{
-                templateUrl : 'html/profile/sign-up.html',
-                controller : 'SignUpCtrl'
-            })
-             .when('/profile',{
-                templateUrl : 'html/profile/edit-profile.html',
-                controller : 'ProfileCtrl'
-            })
+//            .when('/signup',{
+//                templateUrl : 'html/profile/sign-up.html',
+//                controller : 'SignUpCtrl'
+//            })
+//             .when('/profile',{
+//                templateUrl : 'html/profile/edit-profile.html',
+//                controller : 'ProfileCtrl'
+//            })
 
             .when('/home',{templateUrl: 'html/home.html'})
             .when('/:ezeid',{
@@ -128,11 +129,13 @@
 
         $rootScope.$on("$routeChangeStart",function(event,next,current){
 
+            console.log(next.$$route.originalPath);
+            console.log(UNAUTHORIZED_ROUTES.indexOf(next.$$route.originalPath));
             try{
                 if(CLOSED_ROUTES.indexOf(next.$$route.originalPath) === -1
                     &&
                     UNAUTHORIZED_ROUTES.indexOf(next.$$route.originalPath) === -1){
-                    return;
+
                 }
             }
             catch(ex){
@@ -203,15 +206,36 @@
 
                                 }
                                 else{
-                                    $location.path('/');
+                                    if(UNAUTHORIZED_ROUTES.indexOf(next.$$route.originalPath) === -1){
+                                        /**
+                                         * If route is found in unauthorized routes then don't allow him to navigate to that route
+                                         * when he is already logged in
+                                         */
+                                        console.log('UNAUTHORIZED ROUTES1');
+                                        $location.path('/');
+                                    }
                                 }
                             }
                             else{
-                                $location.path('/');
+                                if(UNAUTHORIZED_ROUTES.indexOf(next.$$route.originalPath) === -1){
+                                    /**
+                                     * If route is found in unauthorized routes then don't allow him to navigate to that route
+                                     * when he is already logged in
+                                     */
+                                    console.log('UNAUTHORIZED ROUTES1');
+                                    $location.path('/');
+                                }
                             }
                         }
                         else{
-                            $location.path('/');
+                            if(UNAUTHORIZED_ROUTES.indexOf(next.$$route.originalPath) === -1){
+                                /**
+                                 * If route is found in unauthorized routes then don't allow him to navigate to that route
+                                 * when he is already logged in
+                                 */
+                                console.log('UNAUTHORIZED ROUTES1');
+                                $location.path('/');
+                            }
                         }
                     }
                     else {
@@ -222,7 +246,14 @@
                             Type: '',
                             Icon: ''
                         };
-                        $location.path('/');
+                        if(UNAUTHORIZED_ROUTES.indexOf(next.$$route.originalPath) === -1){
+                            /**
+                             * If route is found in unauthorized routes then don't allow him to navigate to that route
+                             * when he is already logged in
+                             */
+                            console.log('UNAUTHORIZED ROUTES1');
+                            $location.path('/');
+                        }
                     }
                 }
                 else {
@@ -241,10 +272,7 @@
         });
 
         $rootScope.$on('$routeChangeSuccess',function(){
-            if($location.path() == '/' || $location.path() == '/home'){
-                //lazyLoadBackground($timeout);
-                $("#background-image-container").show();
-            }
+
         });
     }]);
     /************************************** Run Configuration ends here ****************************/

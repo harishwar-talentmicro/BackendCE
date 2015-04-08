@@ -1,4 +1,4 @@
-<table cellpadding="0" cellspacing="0" border="0" style="width: 600px; border: solid 1px #ccc; font-family: 'Trebuchet MS', Arial, Helvetica, sans-serif; font-size: 14px; color: #5d5d5d;">
+      <table cellpadding="0" cellspacing="0" border="0" style="width: 600px; border: solid 1px #ccc; font-family: 'Trebuchet MS', Arial, Helvetica, sans-serif; font-size: 14px; color: #5d5d5d;">
                 <tr>
                     <td style=""></td>
                 </tr>
@@ -26,7 +26,7 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td>Click <strong style="text-decoration: underline; color: #156685">&nbsp;https://www.ezeid.com?ID=[EZEID].CV.[PIN]</strong> to download the CV.
+                                <td>Click <strong style="text-decoration: underline; color: #156685">&nbsp;https://www.ezeid.com/[EZEID].CV.[PIN]</strong> to download the CV.
                                     <br />
                                     <br>
                                     Verified Status of Sender: [IsVerified].<br />
@@ -34,7 +34,7 @@
                                     <br />
                                     EZE ID Team.
                                     <br />
-                                    Reach us at:<strong style="text-decoration: underline; color: #156685">  https://www.ezeid.com?ID=EZEID </strong>
+                                    Reach us at:<strong style="text-decoration: underline; color: #156685">  https://www.ezeid.com/EZEID </strong>
                                     <br>
                                     <br>
                                     Disclaimer:<br />
