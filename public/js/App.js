@@ -92,7 +92,7 @@
             .when('/help',{templateUrl: 'html/help.html'})
             .when('/legal',{templateUrl: 'html/legal.html'})
             .when('/congratulations',{templateUrl: 'html/congratulations.html'})
-            .when('/business-preference"',{templateUrl: 'html/business-preference.html'})
+//            .when('/business-preference"',{templateUrl: 'html/business-preference.html'})
             .when('/blackwhitelist',{templateUrl: 'html/blacklistwhitelist.html'})
             .when('/salesenquiry',{templateUrl: 'html/salesenquiry.html'})
             .when('/subusers',{templateUrl : 'html/subusers.html'})
@@ -100,14 +100,14 @@
             .when('/business-manager',{templateUrl : 'html/business-manager/business-manager.html'})
             .when('/bulksalesenquiry',{templateUrl : 'html/bulksalesenquiry.html'})
             .when('/viewdirection',{templateUrl : 'html/viewdirection.html'})
-            .when('/signup',{
-                templateUrl : 'html/profile/sign-up.html',
-                controller : 'SignUpCtrl'
-            })
-             .when('/profile',{
-                templateUrl : 'html/profile/edit-profile.html',
-                controller : 'ProfileCtrl'
-            })
+//            .when('/signup',{
+//                templateUrl : 'html/profile/sign-up.html',
+//                controller : 'SignUpCtrl'
+//            })
+//             .when('/profile',{
+//                templateUrl : 'html/profile/edit-profile.html',
+//                controller : 'ProfileCtrl'
+//            })
 
             .when('/home',{templateUrl: 'html/home.html'})
             .when('/:ezeid',{
