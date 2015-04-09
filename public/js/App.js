@@ -6,7 +6,6 @@
             'ngFooter',
             'ui-notification',
             'angularjs-dropdown-multiselect',
-            'smart-table',
             'ui.grid',
             'ngTouch',
             'ui.grid', 'ui.grid.expandable', 'ui.grid.selection', 'ui.grid.pinning',
