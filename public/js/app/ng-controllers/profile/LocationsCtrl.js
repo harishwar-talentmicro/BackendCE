@@ -15,6 +15,7 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
     'GURL',
     '$interval',
     'MsgDelay',
+    'ScaleAndCropImage',
     '$location',
     '$compile',
     'GoogleMaps',
@@ -30,385 +31,309 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
         GURL,
         $interval,
         MsgDelay,
+        ScaleAndCropImage,
         $location,
         $compile,
         GoogleMaps
         ) {
 
-        $scope.locationsToggleIndex = [
-            { editMode : false, viewMode : false}
+        /**
+         * Returns index of Object from array based on Object Property
+         * @param key
+         * @returns {number}
+         */
+        Array.prototype.indexOfWhere = function(key,value){
+            console.log(this);
+            var resultIndex = -1;
+            var found = false;
+            for(var i = 0; i < this.length; i++){
+                for(var prop in this[i]){
+                    if(this[i].hasOwnProperty(key) && this[i][prop] == value){
+                        resultIndex = i;
+                        found = true;
+                        break;
+                    }
+                }
+                if(found){
+                    break;
+                }
+            }
+            return resultIndex;
+        };
+
+        /**
+         * Maps parking Status with its string equivalent
+         * @type {Array}
+         */
+        $scope.parkingStatusMap = [
+            '',
+            'Public Parking',
+            'Valet Parking',
+            'No Parking'
         ];
 
-        $scope.gMap = {
-            map : null,
-            markerList : [],
-            searchBox : null,
-            currentMarkerPosition:{
-                latitude : -34.392,
-                longitude: -37.921
-            },
-            mapOptions: {
-                center: { lat: -34.397, lng: 150.644},
-                zoom: 14
-            },
-            // Sets to true when map is loaded successfully
-            isMapReady : false,
-            /**
-             * Array of functions which should be executed after map load
-             */
-            deferredTasks: [],
-            /**
-             * Task Status, if they are running true else false
-             */
-            deferTaskStatus : false,
-            deferPromise : null,
-            deferMaxCount : 5,
-            deferCount : 0,
-            /**
-             * Render Map in the DOM
-             * @param mapElementId: id of HTML element
-             */
-            renderMap : function(mapElementId){
-                if(!$scope.gMap.map){
-                    $scope.gMap.map = new google.maps.Map(document.getElementById(mapElementId),$scope.gMap.mapOptions);
-                }
-            },
+        /**
+         * Object holding a list of maps based on mapindex as key
+         * For angular performance reason this value is not assigned to scope
+         * to prevent watcher binding to this variable
+         * @type {{}}
+         */
+        var mapList = {};
 
-            mapIdleListener : function(){
-                var defer = $q.defer();
-                if($scope.gMap.map){
-                    google.maps.event.addListenerOnce($scope.gMap.map, 'idle', function () {
-                        $scope.gMap.isMapReady = true;
-                        defer.resolve(true);
-                    });
-                }
-                return defer.promise;
-            },
+        $scope.editStateList = [];
+        /**
+         * Array Holding information regarding editMode, viewMode and Map initialization of all locations
+         * @type {Array}
+         */
+        $scope.locationsToggleIndex = [
+            {
+                editMode : false,
+                viewMode : false,
+                isMapInitialized : false
+            }
+        ];
 
+        /**
+         * Show and hide map using location index
+         * @param index
+         */
+        $scope.toggleMapControls = function(index){
+            mapList['map'+index].toggleMapControls();
+            mapList['map'+index].clearAllMarkers();
             /**
-             * Pushes map controls over the map and activates them
-             *
+             * Placing unmovable marker back
              */
-            pushMapControls : function(){
-                var deferTask = function(){
-                    var elem = document.getElementById('pac-input');
-                    var ClocBtn = (document.getElementById('pac-loc'));
-                    $scope.gMap.map.controls[google.maps.ControlPosition.TOP_RIGHT].push(ClocBtn)
-                    $scope.gMap.map.controls[google.maps.ControlPosition.TOP_LEFT].push(elem);
-                    $scope.gMap.searchBox = new google.maps.places.SearchBox((elem));
-                };
-                deferTask();
-            },
-            /**
-             * Add listens to map controls added using above function
-             */
-            listenOnMapControls : function(){
-                var deferTask = function(){
-                    google.maps.event.addListener($scope.gMap.searchBox,'places_changed',function(){
-                        var places = $scope.gMap.searchBox.getPlaces();
-                        if (places.length == 0) {
-                            return;
-                        }
+            var pos = null;
+            var title = null;
+            if(index === 0){
+                pos = mapList['map'+index].createGMapPosition(
+                    $scope.userDetails.Latitude,
+                    $scope.userDetails.Longitude
+                );
+                title = 'Primary Location';
+            }
+            else{
+                pos = mapList['map'+index].createGMapPosition(
+                    $scope.secondaryLocations[index-1].Latitude,
+                    $scope.secondaryLocations[index-1].Longitude
+                );
+                title = $scope.secondaryLocations[index-1].LocTitle;
+            }
 
-                        $scope.gMap.clearAllMarkers();
+            var marker = mapList['map'+index].createMarker(pos,title,null,false,null);
+            mapList['map'+index].placeMarker(marker);
+        };
 
-                        var bounds = new google.maps.LatLngBounds();
-                        var place = places[0];
-                        var image = {
-                            url: place.icon,
-                            size: new google.maps.Size(71, 71),
-                            origin: new google.maps.Point(0, 0),
-                            anchor: new google.maps.Point(17, 34),
-                            scaledSize: new google.maps.Size(25, 25)
-                        };
-                        //$scope.triggerLocationChange(place.geometry.location.lat(),place.geometry.location.lng());
-                        var marker = $scope.gMap.createMarker(place.geometry.location,place.name,'images/you_are_here.png',true,$scope.changeLocCoordinates);
-                        $scope.gMap.markerList.push(marker);
-                        $scope.gMap.placeMarker(marker);
-                        bounds.extend(place.geometry.location);
+        /**
+         * Initializes the map only when user view a location first time
+         * @param index
+         */
+        $scope.initializeMap = function(index){
+            if(!$scope.locationsToggleIndex[index].isMapInitialized)
+            {
+                mapList['map'+index] = new GoogleMaps();
+                $scope.locationsToggleIndex[index].isMapInitialized = true;
 
-                        $scope.gMap.map.fitBounds(bounds);
-                        if($scope.gMap.map.getZoom() > 15){ $scope.gMap.map.setZoom(14);}
-                    });
-                    google.maps.event.addListener($scope.gMap.map, 'bounds_changed', function() {
-                        var bounds = $scope.gMap.map.getBounds();
-                        $scope.gMap.searchBox.setBounds(bounds);
-                    });
-                };
-                if($scope.gMap.isMapReady){
-                    deferTask();
+                var pos = null;
+                var title = '';
+                var containerElement = '';
+                if(index == 0){
+                    /**
+                     * If locations is primary then set the coordinates from userDetails
+                     * @type {*|pos}
+                     */
+                    pos = mapList['map'+index].createGMapPosition(
+                        $scope.userDetails.Latitude,
+                        $scope.userDetails.Longitude
+                    );
+                    title = 'Primary Location';
+                    containerElement = 'map-location-0';
                 }
-                else{
-                    $scope.gMap.deferredTasks.push(deferTask);
+                else {
+                    /**
+                     * If location is secondary get coordinates from locationList
+                     */
+                    pos = mapList['map'+index].createGMapPosition(
+                        $scope.secondaryLocations[index-1].Latitude,
+                        $scope.secondaryLocations[index-1].Longitude
+                    );
+                    title = $scope.secondaryLocations[index-1].LocTitle;
+                    containerElement = 'map-location-'+index;
                 }
-            },
-            /**
-             * Finds current location using Browser Geolocation API
-             * Sets currentLocation coordinates in currentMarkerPosition
-             */
-            getCurrentLocation : function(){
-                if(navigator.geolocation){
-                    navigator.geolocation.getCurrentPosition(function(currentLocation){
-                        $scope.gMap.currentMarkerPosition.latitude = currentLocation.coords.latitude;
-                        $scope.gMap.currentMarkerPosition.longitude = currentLocation.coords.longitude;
-                    },this.handleNoGeolocation)
-                } else this.handleNoGeolocation();
-            },
-            /**
-             * Handling Gelocation disabled or not present
-             * Sets currentLocation coordinates in currentMarkerPosition
-             */
-            handleNoGeolocation: function(){
-                var currentLoc = new google.maps.LatLng($scope.gMap.currentMarkerPosition.latitude,$scope.gMap.currentMarkerPosition.longitude);
-                var deferTask = function(){
-                    $scope.gMap.map.setCenter(currentLoc);
-                };
-                if($scope.gMap.isMapReady){
-                    deferTask();
-                }else{
-                    $scope.gMap.deferredTasks(deferTask);
-                }
-            },
-            /**
-             * Places Current Location marker on map
-             */
-            placeCurrentLocationMarker : function(dragListernerCallback){
-                if(typeof(dragListernerCallback) == "undefined"){
-                    dragListernerCallback = null;
-                }
-                var deferTask = function(){
-                    $scope.gMap.clearAllMarkers();
-                    //$scope.triggerLocationChange($scope.gMap.currentMarkerPosition.latitude,$scope.gMap.currentMarkerPosition.longitude);
-                    var currentLocation = new google.maps.LatLng($scope.gMap.currentMarkerPosition.latitude,$scope.gMap.currentMarkerPosition.longitude);
-                    var marker = $scope.gMap.createMarker(currentLocation,'Your current location',null,true,dragListernerCallback);
-                    $scope.gMap.placeMarker(marker);
-                    $scope.gMap.map.setCenter(currentLocation);
-                    $scope.gMap.map.setZoom(14);
-                };
-                if($scope.gMap.isMapReady){
-                    deferTask();
-                }
-                else{
-                    $scope.gMap.deferredTasks.push(deferTask);
-                }
-            },
-            /**
-             * Creates google maps position object using LatLng function
-             * @param latitude
-             * @param longitude
-             * @returns pos: Google Maps position(location) object
-             */
-            createGMapPosition : function(latitude,longitude){
-                var pos =  new google.maps.LatLng(latitude,longitude);
-                return pos;
-            },
-            /**
-             * Creates a marker on the map and add it to marker list simultaneously
-             * @param position: Google LatLng position on which marker should be placed
-             * @param title: Title to appear on tip of marker
-             * @param icon: Marker Icon image
-             * @param draggable: True or false to enable marker dragging on map
-             * @param dragListener: Function callback to trigger when marker is dragged
-             * @return marker: Returns a newly created marker
-             */
-            createMarker : function(position,title,icon,draggable,dragListener){
-                var marker = new google.maps.Marker({
-                    position: position,
-                    title:title,
-                    draggable: (draggable)? draggable: false,
-                    icon: (icon)? icon :  'images/you_are_here.png'
+
+
+                mapList['map'+index].createMap(containerElement,$scope,'findCurrentLocation('+index+')');
+                mapList['map'+index].renderMap();
+                mapList['map'+index].mapIdleListener().then(function(){
+                    mapList['map'+index].pushMapControls();
+                    mapList['map'+index].toggleMapControls();
+                    mapList['map'+index].listenOnMapControls($scope.setEditCurrentLocation);
+                    mapList['map'+index].resizeMap();
+
+                        var marker = mapList['map'+index].createMarker(pos,title,null,false,null);
+                        mapList['map'+index].placeMarker(marker);
+
                 });
-                if(dragListener){
-                    google.maps.event.addListener(marker,'dragend',dragListener);
+            }
+            else{
+                mapList['map'+index].clearAllMarkers();
+                if(index == 0){
+                    /**
+                     * If locations is primary then set the coordinates from userDetails
+                     * @type {*|pos}
+                     */
+                    pos = mapList['map'+index].createGMapPosition(
+                        $scope.userDetails.Latitude,
+                        $scope.userDetails.Longitude
+                    );
+                    title = 'Primary Location';
                 }
-                return marker;
-            },
-
-            /**
-             * Places marker on the map created using createMarker Functions
-             * @param marker
-             */
-            placeMarker: function(marker){
-                var deferTask = function(){
-                    google.maps.event.addListener(marker,'dragend',$scope.changeLocCoordinates);
-                    marker.setMap($scope.gMap.map);
-                    $scope.gMap.markerList.push(marker);
-                    $scope.gMap.setMarkersInBounds();
-                    $scope.gMap.map.setCenter(marker.getPosition());
-                    $scope.gMap.map.setZoom(15);
-                };
-                if($scope.gMap.isMapReady){
-                    deferTask();
+                else {
+                    /**
+                     * If location is secondary get coordinates from locationList
+                     */
+                    pos = mapList['map'+index].createGMapPosition(
+                        $scope.secondaryLocations[index-1].Latitude,
+                        $scope.secondaryLocations[index-1].Longitude
+                    );
+                    title = $scope.secondaryLocations[index-1].LocTitle;
                 }
-                else{
-
-                    $scope.gMap.deferredTasks.push(deferTask);
-                }
-            },
-            /**
-             * Clear all markers from map
-             */
-            clearAllMarkers : function(){
-                var deferTask = function(){
-                    for (var i = 0, marker; marker = $scope.gMap.markerList[i]; i++) {
-                        marker.setMap(null);
-                    }
-                    $scope.gMap.markerList = [];
-                };
-                if($scope.gMap.isMapReady){
-                    deferTask();
-                }
-                else{
-                    $scope.gMap.deferredTasks.push(deferTask);
-                }
-            },
-            /**
-             * Adding listener for map resizing event
-             */
-            resizeMap : function(){
-                var deferTask = function(){
-                    google.maps.event.trigger($scope.gMap.map, "resize");
-                    $scope.gMap.map.setCenter($scope.gMap.markerList[0].getPosition());
-                };
-                if($scope.gMap.isMapReady){
-                    deferTask();
-                }
-                else{
-                    $scope.gMap.deferredTasks.push(deferTask);
-                }
-            },
-
-            /**
-             * Set markers inside the map bounds
-             */
-            setMarkersInBounds : function(){
-                var bounds = new google.maps.LatLngBounds();
-                for(var i = 0; i < $scope.gMap.markerList.length; i++){
-                    bounds.extend($scope.gMap.markerList[i].position);
-                }
-                $scope.gMap.map.fitBounds(bounds);
-            },
-
-            /**
-             * Get Reverse Geolocation Data
-             * @param lat
-             * @param lng
-             */
-
-            getReverseGeolocation : function(lat,lng,callback){
-                var geocoder = new google.maps.Geocoder();
-                if(!geocoder){
-                    console.log('Geocoder API not present (JS missing)');
-                    return;
-                }
-                var geoCoderDetails = [];
-                var latlng = new google.maps.LatLng(lat, lng);
-                geocoder.geocode({'latLng': latlng}, function(results, status) {
-                    if (status == google.maps.GeocoderStatus.OK) {
-//                    console.log(JSON.stringify(results));
-                        if (results[1]) {
-                            $scope.modalBox.geoCoderDetails =  results;
-                        } else {
-
-                        }
-                    } else {
-                    }
-                });
-            },
-
-            /**
-             * Execute the tasks (on regular interval) which doesn't completed instantaneously because map load doesn't finished
-             * Delaying the tasks and then executing them
-             * Max Execution is only 5 times for performance
-             */
-            executeDeferred : function(){
-                $interval(function(){
-                    if(!$scope.gMap.deferTaskStatus){
-                        if($scope.gMap.deferCount < $scope.gMap.deferMaxCount)
-                        {
-                            $interval.cancel($scope.gMap.deferPromise);
-                            $scope.gMap.deferPromise = undefined;
-                        }
-                        var remainingTasks = [];
-                        $scope.gMap.deferTaskStatus = true;
-                        $scope.gMap.deferredTasks.forEach(function(elem,index){
-                            try{
-                                $scope.gMap.deferredTasks[index]();
-                            }
-                            catch(ex){
-                                remainingTasks.push($scope.gMap.deferTaskStatus[index]);
-                            }
-                        });
-                        $scope.gMap.deferredTasks = [];
-                        $scope.gMap.deferTaskStatus = false;
-                        $scope.gMap.deferCount++;
-                    }
-                },1000);
+                var marker = mapList['map'+index].createMarker(pos,title,null,false,null);
+                mapList['map'+index].placeMarker(marker);
             }
         };
 
-//        var mapElem = '<div class="col-lg-6 col-md-6">'+
-//            '<img id="pac-loc" class="link-btn" ng-click="findCurrentLocation()" src="images/myloc.png" data-toggle="tooltip" data-placement="bottom" title="Current Location" />'+
-//            '<input id="pac-input" class="form-control pull-left" type="text" placeholder="Search Location" autocomplete="on">'+
-//            '</div>'+
-//            '<div id="map-canvas" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">'+
-//            '</div>'
-//        $('.locations-map-container').html(mapElem);
-//        $compile($('.locations-map-container'))($scope);
-
-//        $interval(function(){
-//            console.log($('#map-canvas').is(':visible'));
-//            if($('#map-canvas').is(':visible')){
-//                $scope.xMap = new GoogleMaps();
-//                $scope.xMap.setSettings({
-//                    mapElementId : 'map-canvas',
-//                    searchElementId : 'pac-input',
-//                    currentLocationElementId : 'pac-loc'
-//                });
-//
-//                console.log($scope.xMap);
-//                $scope.xMap.renderMap();
-//                $scope.xMap.mapIdleListener().then(function(){
-//                    $scope.xMap.pushMapControls();
-//                    $scope.xMap.listenOnMapControls();
-//                });
-//                console.log($scope.xMap);
-//            }
-//            else{
-//
-//            }
-//
-//        },5000,1);
-
-        $scope.$watch('locationsToggleIndex[0].viewMode',function(newVal,oldVal){
-            if(newVal){
-                console.log('ex');
-                if(!$scope.xMap){
-                    console.log('ex1');
-                    $scope.xMap = new GoogleMaps();
-                    $scope.xMap.createMap("map-primary-location",$scope);
-                    console.log($scope.xMap);
-                    $scope.xMap.renderMap();
-                    $scope.xMap.mapIdleListener().then(function(){
-                        $scope.xMap.pushMapControls();
-                        $scope.xMap.listenOnMapControls();
-                        $scope.xMap.resizeMap();
-                        $scope.xMap.getCurrentLocation().then(function(){
-                            $scope.xMap.placeCurrentLocationMarker();
-                        });
-                    });
-                    console.log($scope.xMap);
-                }
-            }
-        });
-
+        /**
+         * Closes all other locations if open
+         * and opens location which is clicked to view
+         * @param index
+         */
+        $scope.toggleAllLocations = function(index){
+            $scope.locationsToggleIndex.forEach(function(location,index){
+                $scope.locationsToggleIndex[index].editMode = false;
+                $scope.locationsToggleIndex[index].viewMode = false;
+            });
+            $scope.locationsToggleIndex[index].viewMode = true;
+        };
 
         /**
          * Finds and displays current location of user on map
          */
-        $scope.findCurrentLocation = function(){
-            $scope.xMap.getCurrentLocation();
-            $scope.xMap.placeCurrentLocationMarker();
+        $scope.findCurrentLocation = function(index){
+            mapList['map'+index].clearAllMarkers();
+            mapList['map'+index].placeCurrentLocationMarker($scope.setEditCurrentLocation);
         };
+
+        /**
+         * Passed as Callback to all map markers for changing current position
+         * @param lat
+         * @param lng
+         */
+        $scope.setEditCurrentLocation = function(lat,lng){
+            $scope.editLocationDetails.Latitude = lat;
+            $scope.editLocationDetails.Longitude = lng;
+            $scope.$digest();
+            var gMap = new GoogleMaps();
+
+            /**
+             * Reverse Geolocation API call to get city, state, country and PIN code
+             */
+            gMap.getReverseGeolocation(lat,lng).then(function(results){
+                var geolocationAddress = gMap.parseReverseGeolocationData(results.data);
+                var countryIndex = $scope.countryList.indexOfWhere('CountryName',geolocationAddress.country);
+                if($scope.countryList[countryIndex].CountryName !== $scope.editLocationDetails.CountryName){
+
+                }
+
+                /**
+                 * @todo Have to see the logic and do it
+                 * @type {number}
+                 */
+                var stateIndex = $scope.stateList.indexOfWhere('StateTitle',geolocationAddress.state);
+                /**
+                 * If state not found then load new list of state and set state model of editLocationDetails
+                 */
+                if(stateIndex == -1){
+                    if($scope.countryList[countryIndex].CountryName !== $scope.editLocationDetails.CountryName){
+                        $scope.loadStates($scope.countryList[countryIndex].CountryID).then(function(stateList){
+                            $scope.editStateList = stateList;
+                            var stateIndex = $scope.editStateList.indexOfWhere('StateTitle',geolocationAddress.state);
+                            $scope.editLocationDetails.StateID = $scope.editStateList[stateIndex].StateID;
+                        });
+                    }
+                }
+            });
+        };
+
+
+        $scope.editLocationDetails = {
+            LocTitle : '',
+            LocID : '',
+            AddressLine1 : '',
+            AddressLine2 : '',
+            CityID : '',
+            StateID : '',
+            CityTitle : '',
+            StateTitle : '',
+            CountryID : '',
+            CountryName : '',
+            ISDPhoneNumber : '',
+            PhoneNumber: '',
+            ISDMobileNumber : '',
+            MobileNumber : '',
+            ParkingStatus : '',
+            Website : '',
+            Picture : '',
+            PictureFileName : '',
+            PostalCode : '',
+            Latitude : 0,
+            Longitude : 0,
+            Altitude : 0
+        };
+
+        /**
+         * Editing locations and assigning values to edit location form
+         * @param index
+         */
+        $scope.editLocation = function(index){
+            for(var prop in $scope.editLocationDetails){
+                if($scope.editLocationDetails.hasOwnProperty(prop)){
+                    /**
+                     * If location is primary
+                     */
+                    if(index === 0){
+                        for(var prop1 in $scope.userDetails){
+                            if(prop1 === prop){
+                                $scope.editLocationDetails[prop] = $scope.userDetails[prop];
+                            }
+                        }
+                        $scope.editLocationDetails['LocTitle'] = 'Primary';
+                    }
+
+                    else{
+                        for(var prop1 in $scope.userDetails){
+                            if(prop1 === prop){
+                                $scope.editLocationDetails[prop] = $scope.secondaryLocations[index-1][prop];
+                            }
+                        }
+                    }
+
+                }
+            }
+            mapList['map'+index].clearAllMarkers();
+            $scope.locationsToggleIndex[index].editMode = true;
+            var pos = mapList['map'+index].createGMapPosition(
+                $scope.editLocationDetails.Latitude,
+                $scope.editLocationDetails.Longitude
+            );
+
+            var marker = mapList['map'+index].createMarker(pos,$scope.editLocationDetails.LocTitle,null,true,$scope.setEditCurrentLocation);
+
+            mapList['map'+index].placeMarker(marker,$scope.setEditCurrentLocation);
+        };
+
+        /**
+         * @todo saveLocation();
+         */
 
     }]);

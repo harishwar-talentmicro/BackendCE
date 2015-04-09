@@ -51,6 +51,11 @@ angular.module('ezeidApp').factory('GoogleMaps',['$q','$timeout','$compile',func
         return mapHtml;
     }
 
+
+    function getAddressComponents(geocoderResults){
+
+    };
+
     /**
      * Google Map Wrapper Object
      * @constructor
@@ -190,7 +195,10 @@ angular.module('ezeidApp').factory('GoogleMaps',['$q','$timeout','$compile',func
             icon: (icon)? icon :  'images/you_are_here.png'
         });
         if(dragListener){
-            google.maps.event.addListener(marker,'dragend',dragListener);
+            google.maps.event.addListener(marker,'dragend',function(){
+                console.log(marker);
+                dragListener(marker.position.lat(),marker.position.lng());
+            });
         }
         return marker;
     };
@@ -216,15 +224,23 @@ angular.module('ezeidApp').factory('GoogleMaps',['$q','$timeout','$compile',func
         return defer.promise;
     };
 
+    GoogleMap.prototype.toggleMapControls = function(){
+        if($('#'+this.settings.searchElementId).is(':visible')){
+            $('#'+this.settings.searchElementId).hide();
+            $('#'+this.settings.currentLocationElementId).hide();
+        }
+        else{
+            $('#'+this.settings.searchElementId).show();
+            $('#'+this.settings.currentLocationElementId).show();
+        }
+    };
     /**
      * Pushing map controls onto the map
      */
     GoogleMap.prototype.pushMapControls = function(){
         var searchElem = (document.getElementById(this.settings.searchElementId));
         var clocBtn = (document.getElementById(this.settings.currentLocationElementId));
-        console.log(searchElem);
-        console.log(clocBtn);
-        this.map.controls[google.maps.ControlPosition.TOP_RIGHT].push(clocBtn)
+        this.map.controls[google.maps.ControlPosition.TOP_RIGHT].push(clocBtn);
         this.map.controls[google.maps.ControlPosition.TOP_LEFT].push(searchElem);
         this.searchBox = new google.maps.places.SearchBox((searchElem));
     };
@@ -305,7 +321,12 @@ angular.module('ezeidApp').factory('GoogleMaps',['$q','$timeout','$compile',func
 
     GoogleMap.prototype.placeMarker = function(marker,dragendCallback){
 
-        google.maps.event.addListener(marker,'dragend',dragendCallback);
+        if(dragendCallback){
+            google.maps.event.addListener(marker,'dragend',function(){
+                dragendCallback(marker.position.lat(),marker.position.lng());
+            });
+        }
+
         marker.setMap(this.map);
         this.markerList.push(marker);
         this.setMarkersInBounds();
@@ -341,6 +362,74 @@ angular.module('ezeidApp').factory('GoogleMaps',['$q','$timeout','$compile',func
         this.map.fitBounds(bounds);
     };
 
+
+    /**
+     * Get reverse geolocation address components using Google Reverse Geolocation API
+     * @param lat
+     * @param lng
+     */
+    GoogleMap.prototype.getReverseGeolocation = function(lat,lng){
+        var defer = $q.defer();
+        var latLng = new google.maps.LatLng(lat,lng);
+        var geocoder = new google.maps.Geocoder();
+        geocoder.geocode({latLng: latLng},function(results,status){
+            if(status === google.maps.GeocoderStatus.OK){
+                if(results && results.length > 0){
+                    defer.resolve({data : results, message : 'Results found'})
+                }
+                else{
+                    defer.resolve({data : null, message : 'No results found'});
+                }
+            }
+            else{
+                defer.reject();
+            }
+        });
+        return defer.promise;
+    };
+
+    /**
+     * Parses Google Reverse Geolocation API Result
+     * @param geocoderResults
+     * @returns {{city: string, state: string, country: string, postalCode: string}}
+     */
+    GoogleMap.prototype.parseReverseGeolocationData = function(geocoderResults){
+
+        var returnObj = {
+            city : '',
+            state : '',
+            country : '',
+            postalCode : ''
+        };
+
+        if(geocoderResults && geocoderResults.length > 0){
+
+            var results = geocoderResults[0]['address_components'];
+            angular.forEach(results,function(result,index){
+                switch(result.types[0]){
+                    case 'locality':
+                        returnObj.city = (returnObj.city) ? (returnObj.city + ', ' + result.long_name) : result.long_name;
+                        break;
+                    case 'administrative_area_level_1':
+                        returnObj.state =  result.long_name;
+                        break;
+                    case 'postal_code':
+                        returnObj.postalCode = result.long_name;
+                        break;
+                    case 'country':
+                        returnObj.country = result.long_name;
+                        break;
+                    default :
+                        break;
+                }
+
+            });
+        }
+
+        return returnObj;
+    };
+
     return GoogleMap;
+
 
 }]);
