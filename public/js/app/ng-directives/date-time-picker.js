@@ -15,7 +15,6 @@ angular.module('ezeidApp').directive('dateTimePicker', function() {
                 '</div>',
         link: function(scope, element, attrs, ngModel) {
             var input = element.find('input');
-            console.log(attrs.settings);
             if(attrs.settings){
                 try{
                     var dateTimeSettings = JSON.parse(attrs.settings);
