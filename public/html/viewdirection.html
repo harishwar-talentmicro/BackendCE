@@ -38,13 +38,13 @@
                                 <form name="MailTemplateForm" novalidate >
                                     <div class="row setRowLeftRightMarginZero centerAlign">
                                         <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 searchHeaderAlignment TemplateTextContainer topMarginButton keyWordText">
-                                            Email
+                                            To Email
                                         </div>
                                         <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10 searchHeaderAlignment">
                                             <input type="text" name="ToMailID" class="form-control emptyBox"
                                                    id="ToMailID" ng-model="viewDirection._info.ToMailID"
                                                    ng-class="MailTemplateForm.FromEmailID.$touched && !viewDirection._info.ToMailID.length ? 'mandatoryTextBox' : ''"
-                                                   placeholder="Email" maxlength="100"  ng-pattern="/^[a-z]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5}$/" required>
+                                                   placeholder="To Email" maxlength="100"  ng-pattern="/^[a-z]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5}$/" required>
                                             <span ng-show="MailTemplateForm.ToMailID.$error.email" ng-if="MailTemplateForm.ToMailID.$error.email == true ? viewDirection._info.isWrongEmailPatternFrom = true : viewDirection._info.isWrongEmailPatternFrom = false"></span>
                                         </div>
                                     </div><br/>

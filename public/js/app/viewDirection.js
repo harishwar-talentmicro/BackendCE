@@ -141,7 +141,7 @@ angular.module('ezeidApp').controller('viewDirectionController',['$http', '$root
     //  EMail direction image
     viewDirection.emailDirectionImage = function () {
 
-        $http({ method: 'get', url: GURL + 'ewtSendBulkMailer?Token=' + $rootScope._userInfo.Token + '&TID=""&TemplateID=""&ToMailID='+ viewDirection._info.ToMailID +'&Attachment='+finalImageSrc+'&FileName=ViewDirection'}).success(function (data)
+        $http({ method: 'get', url: GURL + 'ewtSendBulkMailer?Token=' + $rootScope._userInfo.Token + '&TID=""&TemplateID=""&ToMailID='+ viewDirection._info.ToMailID +'&Attachment='+finalImageSrc+'&AttachmentFileName=ViewDirection'}).success(function (data)
         {
             if (data != 'null')
             {
