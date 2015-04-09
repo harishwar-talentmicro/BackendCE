@@ -167,8 +167,9 @@
                             <!--<tr ng-repeat="_item in bulksalesController.result">-->
                             <tr>
                                 <td data-th="Mon">Mon</td>
-                                <td data-th="Time slote1">{{Mo1}}{{Mo2}} </td>
-                                <td data-th="Time slote2">4:00 PM - 6:00 PM</td>
+                                <!--<td data-th="Time slote1">{{Mo1 != '' ? Mo1 + ' - '  : ''}}{{Mo2}} </td>-->
+                                <td data-th="Time slote1">{{Mo1}} - {{Mo2}} </td>
+                                <td data-th="Time slote2">{{Mo3}} - {{Mo4}}</td>
                             </tr>
                             <tr>
                                 <td data-th="Mon">Tue</td>
@@ -280,13 +281,6 @@
                                             <input id="rating5" disabled type="radio" name="form_rating" ng-model="form_rating" value="5">
                                             <label for="rating5"><span>5</span></label>
                                         </div>
-                                        <!--Added to make Stars Responsive (On Hold)-->
-                                        <!--<i class="glyphicon glyphicon-star starClass"></i>-->
-                                        <!--<i class="glyphicon glyphicon-star starClass"></i>-->
-                                        <!--<i class="glyphicon glyphicon-star starClass"></i>-->
-                                        <!--<i class="glyphicon glyphicon-star starClass"></i>-->
-                                        <!--<i class="glyphicon glyphicon-star starClass"></i>-->
-
                                     </div>
                                 </div>
                             </div>

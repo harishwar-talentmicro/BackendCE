@@ -41,11 +41,11 @@
                                             Email
                                         </div>
                                         <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10 searchHeaderAlignment">
-                                            <input type="text" name="FromEmailID" class="form-control emptyBox"
-                                                   id="FromEmailID" ng-model="viewDirection._info.FromEmailID"
-                                                   ng-class="MailTemplateForm.FromEmailID.$touched && !viewDirection._info.FromEmailID.length ? 'mandatoryTextBox' : ''"
+                                            <input type="text" name="ToMailID" class="form-control emptyBox"
+                                                   id="ToMailID" ng-model="viewDirection._info.ToMailID"
+                                                   ng-class="MailTemplateForm.FromEmailID.$touched && !viewDirection._info.ToMailID.length ? 'mandatoryTextBox' : ''"
                                                    placeholder="Email" maxlength="100"  ng-pattern="/^[a-z]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5}$/" required>
-                                            <span ng-show="MailTemplateForm.FromEmailID.$error.email" ng-if="MailTemplateForm.FromEmailID.$error.email == true ? viewDirection._info.isWrongEmailPatternFrom = true : viewDirection._info.isWrongEmailPatternFrom = false"></span>
+                                            <span ng-show="MailTemplateForm.ToMailID.$error.email" ng-if="MailTemplateForm.ToMailID.$error.email == true ? viewDirection._info.isWrongEmailPatternFrom = true : viewDirection._info.isWrongEmailPatternFrom = false"></span>
                                         </div>
                                     </div><br/>
                                     <div class="row setRowLeftRightMarginZero centerAlign" >
@@ -53,7 +53,7 @@
 
                                         </div>
                                        <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 searchHeaderAlignment" style="text-align: left;">
-                                            <button type="submit" ng-disabled="!viewDirection._info.FromEmailID" class="btn btn-primary" ng-click="viewDirection.emailDirectionImage()" >Send</button>
+                                            <button type="submit" ng-disabled="!viewDirection._info.ToMailID" class="btn btn-primary" ng-click="viewDirection.emailDirectionImage()" >Send</button>
                                         </div>
                                         <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 searchHeaderAlignment" style="text-align: left;">
                                             <button type="button" class="btn btn-primary" ng-click="viewDirection.closeEmailDialouge()" >Cancel</button>

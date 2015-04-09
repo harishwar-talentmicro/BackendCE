@@ -1313,47 +1313,46 @@ angular.module('ezeidApp').controller('SearchController', [
         {
             $http({ method: 'get', url: GURL + 'ewtGetWorkingHours?Token=' + $rootScope._userInfo.Token + '&MasterID=' + SearchSec.mInfo.TID }).success(function (data)
             {
+                if (data != 'null')
+                {
+                   $scope.Mo1 = tConvertTo12Hours(data[0].MO1);
+                    $scope.Mo2 = tConvertTo12Hours(data[0].MO2);
+                    $scope.Mo3 = tConvertTo12Hours(data[0].MO3);
+                    $scope.Mo4 = tConvertTo12Hours(data[0].MO4);
 
-                if (data != 'null') {
-                    console.log(data[0]);
-                    $scope.Mo1 = data[0].MO1;
-                    $scope.Mo2 = data[0].MO2;
-                    $scope.Mo3 = data[0].MO3;
-                    $scope.Mo4 = data[0].MO4;
+                    $scope.Tu1 = tConvertTo12Hours(data[0].TU1);
+                    $scope.Tu2 = tConvertTo12Hours(data[0].TU2);
+                    $scope.Tu3 = tConvertTo12Hours(data[0].TU3);
+                    $scope.Tu4 = tConvertTo12Hours(data[0].TU4);
 
-                    $scope.Tu1 = data[0].TU1;
-                    $scope.Tu2 = data[0].TU2;
-                    $scope.Tu3 = data[0].TU3;
-                    $scope.Tu4 = data[0].TU4;
+                    $scope.We1 = tConvertTo12Hours(data[0].WE1);
+                    $scope.We2 = tConvertTo12Hours(data[0].WE2);
+                    $scope.We3 = tConvertTo12Hours(data[0].WE3);
+                    $scope.We4 = tConvertTo12Hours(data[0].WE4);
 
-                    $scope.We1 = data[0].WE1;
-                    $scope.We2 = data[0].WE2;
-                    $scope.We3 = data[0].WE3;
-                    $scope.We4 = data[0].WE4;
+                    $scope.Th1 = tConvertTo12Hours(data[0].TH1);
+                    $scope.Th2 = tConvertTo12Hours(data[0].TH2);
+                    $scope.Th3 = tConvertTo12Hours(data[0].TH3);
+                    $scope.Th4 = tConvertTo12Hours(data[0].TH4);
 
-                    $scope.Th1 = data[0].TH1;
-                    $scope.Th2 = data[0].TH2;
-                    $scope.Th3 = data[0].TH3;
-                    $scope.Th4 = data[0].TH4;
+                    $scope.Fr1 = tConvertTo12Hours(data[0].FR1);
+                    $scope.Fr2 = tConvertTo12Hours(data[0].FR2);
+                    $scope.Fr3 = tConvertTo12Hours(data[0].FR3);
+                    $scope.Fr4 = tConvertTo12Hours(data[0].FR4);
 
-                    $scope.Fr1 = data[0].FR1;
-                    $scope.Fr2 = data[0].FR2;
-                    $scope.Fr3 = data[0].FR3;
-                    $scope.Fr4 = data[0].FR4;
+                    $scope.Sa1 = tConvertTo12Hours(data[0].SA1);
+                    $scope.Sa2 = tConvertTo12Hours(data[0].SA2);
+                    $scope.Sa3 = tConvertTo12Hours(data[0].SA3);
+                    $scope.Sa4 = tConvertTo12Hours(data[0].SA4);
 
-                    $scope.Sa1 = data[0].SA1;
-                    $scope.Sa2 = data[0].SA2;
-                    $scope.Sa3 = data[0].SA3;
-                    $scope.Sa4 = data[0].SA4;
-
-                    $scope.Su1 = data[0].SU1;
-                    $scope.Su2 = data[0].SU2;
-                    $scope.Su3 = data[0].SU3;
-                    $scope.Su4 = data[0].SU4;
+                    $scope.Su1 = tConvertTo12Hours(data[0].SU1);
+                    $scope.Su2 = tConvertTo12Hours(data[0].SU2);
+                    $scope.Su3 = tConvertTo12Hours(data[0].SU3);
+                    $scope.Su4 = tConvertTo12Hours(data[0].SU4);
                 }
-                else {
+                else
+                {
                     // Notification.error({ message: 'Invalid key or not found…', delay: MsgDelay });
-                    $scope.ShowNoDataFound = true;
                 }
             });
 
@@ -1365,4 +1364,12 @@ angular.module('ezeidApp').controller('SearchController', [
     SearchSec.closeWorkingHourPopup = function () {
         $('#WorkingHour_popup').slideUp();
     };*/
+
+        //Below function converts 24 hours time to 12 hours time
+        function tConvertTo12Hours (timeString) {
+            var H = +timeString.substr(0, 2);
+            var h = (H % 12) || 12;
+            var ampm = H < 12 ? " AM" : " PM";
+            return timeString = h + timeString.substr(2, 3) + ampm;
+        }
 }]);
