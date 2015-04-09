@@ -6,7 +6,6 @@
             'ngFooter',
             'ui-notification',
             'angularjs-dropdown-multiselect',
-            'smart-table',
             'ui.grid',
             'ngTouch',
             'ui.grid', 'ui.grid.expandable', 'ui.grid.selection', 'ui.grid.pinning',
@@ -44,8 +43,10 @@
     ezeid.value('MsgDelay',5000);
 
 
-    //HTTP Interceptor for detecting token expiry
-    //Reloads the whole page in case of Unauthorized response from api
+    /**
+     * HTTP Interceptor for detecting token expiry
+     * Reloads the whole page in case of Unauthorized response from api
+     */
     ezeid.factory('ezeidInterceptor',['$rootScope','$timeout','$q',function($rootScope,$timeout,$q){
         return {
             responseError : function(respErr){
@@ -100,14 +101,14 @@
             .when('/business-manager',{templateUrl : 'html/business-manager/business-manager.html'})
             .when('/bulksalesenquiry',{templateUrl : 'html/bulksalesenquiry.html'})
             .when('/viewdirection',{templateUrl : 'html/viewdirection.html'})
-//            .when('/signup',{
-//                templateUrl : 'html/profile/sign-up.html',
-//                controller : 'SignUpCtrl'
-//            })
-//             .when('/profile',{
-//                templateUrl : 'html/profile/edit-profile.html',
-//                controller : 'ProfileCtrl'
-//            })
+            .when('/signup',{
+                templateUrl : 'html/profile/sign-up.html',
+                controller : 'SignUpCtrl'
+            })
+             .when('/profile',{
+                templateUrl : 'html/profile/edit-profile.html',
+                controller : 'ProfileCtrl'
+            })
 
             .when('/home',{templateUrl: 'html/home.html'})
             .when('/:ezeid',{
@@ -129,8 +130,6 @@
 
         $rootScope.$on("$routeChangeStart",function(event,next,current){
 
-            console.log(next.$$route.originalPath);
-            console.log(UNAUTHORIZED_ROUTES.indexOf(next.$$route.originalPath));
             try{
                 if(CLOSED_ROUTES.indexOf(next.$$route.originalPath) === -1
                     &&
@@ -148,14 +147,12 @@
 
             if ($rootScope._userInfo) {
                 if($rootScope._userInfo.IsAuthenticate){
-                    console.log('line 151');
                     try{
                         if(UNAUTHORIZED_ROUTES.indexOf(next.$$route.originalPath) !== -1){
                             /**
                              * If route is found in unauthorized routes then don't allow him to navigate to that route
                              * when he is already logged in
                              */
-                            console.log('UNAUTHORIZED ROUTES');
                             $location.path('/');
                         }
 
@@ -170,16 +167,16 @@
                     var encrypted = localStorage.getItem("_token");
                     if (encrypted) {
                         var decrypted = CryptoJS.AES.decrypt(encrypted, "EZEID");
-                        var Jsonstring = null;
+                        var jsonString = null;
                         try{
-                            Jsonstring = decrypted.toString(CryptoJS.enc.Utf8);
+                            jsonString = decrypted.toString(CryptoJS.enc.Utf8);
                         }
                         catch(ex){
 
                         }
 
-                        if (Jsonstring) {
-                            $rootScope._userInfo = JSON.parse(Jsonstring);
+                        if (jsonString) {
+                            $rootScope._userInfo = JSON.parse(jsonString);
                             if($rootScope._userInfo.hasOwnProperty('IsAuthenticate')){
                                 if($rootScope._userInfo.IsAuthenticate == true || $rootScope._userInfo.IsAuthenticate == "true"){
                                     /**
@@ -191,7 +188,6 @@
                                              * If route is found in unauthorized routes then don't allow him to navigate to that route
                                              * when he is already logged in
                                              */
-                                            console.log('UNAUTHORIZED ROUTES1');
                                             $location.path('/');
                                         }
                                     }
@@ -211,7 +207,6 @@
                                          * If route is found in unauthorized routes then don't allow him to navigate to that route
                                          * when he is already logged in
                                          */
-                                        console.log('UNAUTHORIZED ROUTES1');
                                         $location.path('/');
                                     }
                                 }
@@ -222,7 +217,6 @@
                                      * If route is found in unauthorized routes then don't allow him to navigate to that route
                                      * when he is already logged in
                                      */
-                                    console.log('UNAUTHORIZED ROUTES1');
                                     $location.path('/');
                                 }
                             }
@@ -233,7 +227,6 @@
                                  * If route is found in unauthorized routes then don't allow him to navigate to that route
                                  * when he is already logged in
                                  */
-                                console.log('UNAUTHORIZED ROUTES1');
                                 $location.path('/');
                             }
                         }
@@ -251,7 +244,6 @@
                              * If route is found in unauthorized routes then don't allow him to navigate to that route
                              * when he is already logged in
                              */
-                            console.log('UNAUTHORIZED ROUTES1');
                             $location.path('/');
                         }
                     }

@@ -1809,7 +1809,14 @@ input[type="text"].ui-grid-filter-input {
 
 
 /************** New Profile Page CSS *********************/
-
+.location-details > div.row,
+.location-details > div.row > div.col-lg-4 > div.row,
+.location-details > div.row > div.col-lg-4 > div.row,
+.location-details > div.row > div.col-lg-4 > div.row,
+.location-details > div.row > div.col-lg-4 > div.row{
+    margin-left: 0px;
+    margin-right: 0px;
+}
 
 .profile-details > div.row > div.col-lg-2 > h5,
 .profile-details > div.row > div.col-md-2 > h5,
@@ -1820,15 +1827,6 @@ input[type="text"].ui-grid-filter-input {
 .profile-details > form > div.row > div.col-sm-2 > h5,
 .profile-details > form > div.row > div.col-xs-12 > h5,
 
-.location-details > div.row > div.col-lg-6 > div.row > div.col-lg-4 > h5,
-.location-details > div.row > div.col-lg-6 > div.row > div.col-md-4 > h5,
-.location-details > div.row > div.col-lg-6 > div.row > div.col-sm-4 > h5,
-.location-details > div.row > div.col-lg-6 > div.row > div.col-xs-4 > h5,
-.location-details > div.row > div.col-lg-6 > form > div.row > div.col-lg-4 > h5,
-.location-details > div.row > div.col-lg-6 > form > div.row > div.col-md-4 > h5,
-.location-details > div.row > div.col-lg-6 > form > div.row > div.col-sm-4 > h5,
-.location-details > div.row > div.col-lg-6 > form > div.row > div.col-xs-4 > h5,
-
 .location-details > div.row > div.col-lg-4 > div.row > div.col-lg-12 > h5,
 .location-details > div.row > div.col-lg-4 > div.row > div.col-md-12 > h5,
 .location-details > div.row > div.col-lg-4 > div.row > div.col-sm-12 > h5,
@@ -1837,22 +1835,20 @@ input[type="text"].ui-grid-filter-input {
 .location-details > div.row > div.col-lg-4 > form > div.row > div.col-md-12 > h5,
 .location-details > div.row > div.col-lg-4 > form > div.row > div.col-sm-12 > h5,
 .location-details > div.row > div.col-lg-4 > form > div.row > div.col-xs-12 > h5{
-
-
     font-family: 'Roboto', sans-serif!important;
     font-size: 14px !important;
     color: #008FAC!important;
     border-bottom: none!important;
 }
 
-.location-details > div.row > div.col-lg-6 > div.row,
-.location-details > div.row > div.col-lg-6 > div.row,
-.location-details > div.row > div.col-lg-6 > div.row,
-.location-details > div.row > div.col-lg-6 > div.row,
-.location-details > div.row > div.col-lg-6 > form >  div.row,
-.location-details > div.row > div.col-lg-6 > form >  div.row,
-.location-details > div.row > div.col-lg-6 > form >  div.row,
-.location-details > div.row > div.col-lg-6 > form >  div.row{
+.location-details > div.row > div.col-lg-8 > div.row,
+.location-details > div.row > div.col-lg-8 > div.row,
+.location-details > div.row > div.col-lg-8 > div.row,
+.location-details > div.row > div.col-lg-8 > div.row,
+.location-details > div.row > div.col-lg-8 > form >  div.row,
+.location-details > div.row > div.col-lg-8 > form >  div.row,
+.location-details > div.row > div.col-lg-8 > form >  div.row,
+.location-details > div.row > div.col-lg-8 > form >  div.row{
     margin-left: 0px;
     margin-right: 0px;
 }
@@ -1860,11 +1856,7 @@ input[type="text"].ui-grid-filter-input {
 .location-details > div.row > div.col-lg-4 > div.row,
 .location-details > div.row > div.col-lg-4 > div.row,
 .location-details > div.row > div.col-lg-4 > div.row,
-.location-details > div.row > div.col-lg-4 > div.row,
-.location-details > div.row > div.col-lg-4 > form >  div.row,
-.location-details > div.row > div.col-lg-4 > form >  div.row,
-.location-details > div.row > div.col-lg-4 > form >  div.row,
-.location-details > div.row > div.col-lg-4 > form >  div.row{
+.location-details > div.row > div.col-lg-4 > div.row,{
     margin-left: 0px;
     margin-right: 0px;
 }
@@ -1903,10 +1895,16 @@ input[type="text"].ui-grid-filter-input {
     border-bottom: none!important;
 }
 
-.profile-panel-body > div.row,
-.locations-panel-body > div.row{
+.profile-panel-body > div.row{
     margin-left: 0px;
     margin-right: 0px;
+}
+
+.locations-panel-body > form > div.row{
+    margin: 2px 2px 2px 2px;
+    border: 1px solid #CACACA;
+    background: #FFFFEF;
+    padding:10px;
 }
 form .row-error{
     min-height: 20px;
@@ -1948,6 +1946,7 @@ form .row-error{
 }
 
 .locations-map-container > .map-canvas{
+    margin-left: 10%;
     height: 320px;
     width: 90%;
 }
