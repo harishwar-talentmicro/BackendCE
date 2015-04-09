@@ -134,30 +134,20 @@ angular.module('ezeidApp').controller('viewDirectionController',['$http', '$root
     //  Close EMail direction dialogue
     viewDirection.closeEmailDialouge = function () {
         $scope.showEmailForm = false;
-        viewDirection._info.FromEmailID = "";
         document.getElementById("FromEmailID").className = "form-control emptyBox";
+        viewDirection._info.FromEmailID = "";
     };
 
     //  EMail direction image
     viewDirection.emailDirectionImage = function () {
-        console.log(viewDirection._info);
 
-        $http({ method: 'get', url: GURL + 'ewtSendBulkMailer?Token=' + $rootScope._userInfo.Token + '&TID='+ Tids + '&TemplateID='+ salesEnquiry._info.TID }).success(function (data)
+        $http({ method: 'get', url: GURL + 'ewtSendBulkMailer?Token=' + $rootScope._userInfo.Token + '&TID= ""&TemplateID=""&FromEmailID='+ viewDirection._info.FromEmailID +'&MapImage='+finalImageSrc}).success(function (data)
         {
             if (data != 'null')
             {
-                salesEnquiry._info = {};
-
-                $scope.formTitle = "Bulk Sales Enquiry";
-                $scope.showCreateMailTemplate = false;
-
-                document.getElementById("FromName").className = "form-control emptyBox";
+                viewDirection._info.FromEmailID = "";
                 document.getElementById("FromEmailID").className = "form-control emptyBox";
-                document.getElementById("Title").className = "form-control emptyBox";
-                document.getElementById("Subject").className = "form-control emptyBox";
-                document.getElementById("Body").className = "form-control emptyBox";
-
-                Notification.success({message: "Mails are submitted for transmitted..", delay: MsgDelay});
+                Notification.success({message: "Mail are submitted for transmitted..", delay: MsgDelay});
                 $window.localStorage.removeItem("searchResult");
             }
             else

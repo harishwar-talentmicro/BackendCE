@@ -662,3 +662,5 @@ body {
 {
     margin-top: 5%;
 }
+.notification_drp ul li a.bulkMailer-icon{ background-position:-7px -1235px!important;}
+.notification_drp ul li a.bulkMailer-icon:hover{ background-position:-7px -1297px!important;}
