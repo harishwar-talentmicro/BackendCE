@@ -1,5 +1,20 @@
 // Search Controller
-angular.module('ezeidApp').controller('SearchController', function ($http, $rootScope, $scope, $compile, $timeout, Notification, $filter, $location, $window, $q, $interval,GURL,MsgDelay,$routeParams) {
+angular.module('ezeidApp').controller('SearchController', [
+    '$http',
+    '$rootScope',
+    '$scope',
+    '$compile',
+    '$timeout',
+    'Notification',
+    '$filter',
+    '$location',
+    '$window',
+    '$q',
+    '$interval',
+    'GURL',
+    'MsgDelay',
+    '$routeParams',
+    function ($http, $rootScope, $scope, $compile, $timeout, Notification, $filter, $location, $window, $q, $interval,GURL,MsgDelay,$routeParams) {
 
    /* if(Object.keys($routeParams).length > 0){
         if(typeof($routeParams['SearchType']) !== "undefined" && $routeParams['SearchType'] !== null && $routeParams['SearchType'] !== "")
@@ -66,6 +81,7 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
     var RefreshTime = Miliseconds;
     var AutoRefresh = true;
     var rating = [1,2,3,4,5];
+    $scope.showWorkingHourModel = false;
 
     $('#datetimepicker1').datetimepicker({
         format: "d-M-Y  h:m A",
@@ -115,8 +131,6 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
         Latitude: $rootScope.CLoc.CLat,
         Longitude: $rootScope.CLoc.CLong
     };
-    $rootScope._userLoc = {};
-
 
     $scope.isMapLoaded = false;         //Set to true with map event 'idle'
     $scope.isMapReady = false;          //Set to true when map canvas is drawn and map is fully visible
@@ -436,7 +450,7 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
                                 $timeout(function () {
                                     SearchSec.mInfo = data[0];
                                     if (!/^(f|ht)tps?:\/\//i.test(data[0].Website)) {
-//                                       // url = "http://" + data[0].Website;
+                                         // url = "http://" + data[0].Website;
                                         SearchSec.mInfo.Website = data[0].Website;
                                     }
 
@@ -897,7 +911,14 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
 
     //open Sales Enquiry form
     SearchSec.openSalesEnquiryForm = function () {
-        $('#SalesEnquiryRequest_popup').slideDown();
+        if($rootScope._userInfo.Token == 2)
+        {
+            $('#SignIn_popup').slideDown();
+        }
+        else
+        {
+            $('#SalesEnquiryRequest_popup').slideDown();
+        }
     };
 
     SearchSec.sendSalesEnquiry = function () {
@@ -959,7 +980,15 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
 
     //open home delivery form
     SearchSec.openHomeDeliverForm = function () {
-        $('#HomeDelivery_popup').slideDown();
+
+        if($rootScope._userInfo.Token == 2)
+        {
+            $('#SignIn_popup').slideDown();
+        }
+        else
+        {
+            $('#HomeDelivery_popup').slideDown();
+        }
     };
 
     //Send Home Delivery
@@ -993,7 +1022,14 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
     //open Reservation form
     SearchSec.openReservationForm = function () {
         document.getElementById("reservationMessage").className = "form-control fixTextArea emptyBox";
-        $('#Reservation_popup').slideDown();
+        if($rootScope._userInfo.Token == 2)
+        {
+            $('#SignIn_popup').slideDown();
+        }
+        else
+        {
+            $('#Reservation_popup').slideDown();
+        }
     };
 
     //Send Reservation
@@ -1033,7 +1069,14 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
 
     //open Service Request form
     SearchSec.openServiceRequestForm = function () {
-        $('#ServiceRequest_popup').slideDown();
+        if($rootScope._userInfo.Token == 2)
+        {
+            $('#SignIn_popup').slideDown();
+        }
+        else
+        {
+            $('#ServiceRequest_popup').slideDown();
+        }
     };
 
     //Send Service Request
@@ -1065,7 +1108,14 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
 
     //open CV form
     SearchSec.openCVForm = function() {
-        $('#CV_popup').slideDown();
+        if($rootScope._userInfo.Token == 2)
+        {
+            $('#SignIn_popup').slideDown();
+        }
+        else
+        {
+            $('#CV_popup').slideDown();
+        }
     };
 
     SearchSec.closeMappingPopup = function() {
@@ -1252,4 +1302,74 @@ angular.module('ezeidApp').controller('SearchController', function ($http, $root
         SearchSec.Criteria.SearchType = 1;
         SearchSec.getSearch();
     }
-});
+    //open working hour popup
+    SearchSec.openWorkingHourPopup = function () {
+
+        if($rootScope._userInfo.Token == 2)
+        {
+            $('#SignIn_popup').slideDown();
+        }
+        else
+        {
+            $http({ method: 'get', url: GURL + 'ewtGetWorkingHours?Token=' + $rootScope._userInfo.Token + '&MasterID=' + SearchSec.mInfo.TID }).success(function (data)
+            {
+                if (data != 'null')
+                {
+                   $scope.Mo1 = tConvertTo12Hours(data[0].MO1);
+                    $scope.Mo2 = tConvertTo12Hours(data[0].MO2);
+                    $scope.Mo3 = tConvertTo12Hours(data[0].MO3);
+                    $scope.Mo4 = tConvertTo12Hours(data[0].MO4);
+
+                    $scope.Tu1 = tConvertTo12Hours(data[0].TU1);
+                    $scope.Tu2 = tConvertTo12Hours(data[0].TU2);
+                    $scope.Tu3 = tConvertTo12Hours(data[0].TU3);
+                    $scope.Tu4 = tConvertTo12Hours(data[0].TU4);
+
+                    $scope.We1 = tConvertTo12Hours(data[0].WE1);
+                    $scope.We2 = tConvertTo12Hours(data[0].WE2);
+                    $scope.We3 = tConvertTo12Hours(data[0].WE3);
+                    $scope.We4 = tConvertTo12Hours(data[0].WE4);
+
+                    $scope.Th1 = tConvertTo12Hours(data[0].TH1);
+                    $scope.Th2 = tConvertTo12Hours(data[0].TH2);
+                    $scope.Th3 = tConvertTo12Hours(data[0].TH3);
+                    $scope.Th4 = tConvertTo12Hours(data[0].TH4);
+
+                    $scope.Fr1 = tConvertTo12Hours(data[0].FR1);
+                    $scope.Fr2 = tConvertTo12Hours(data[0].FR2);
+                    $scope.Fr3 = tConvertTo12Hours(data[0].FR3);
+                    $scope.Fr4 = tConvertTo12Hours(data[0].FR4);
+
+                    $scope.Sa1 = tConvertTo12Hours(data[0].SA1);
+                    $scope.Sa2 = tConvertTo12Hours(data[0].SA2);
+                    $scope.Sa3 = tConvertTo12Hours(data[0].SA3);
+                    $scope.Sa4 = tConvertTo12Hours(data[0].SA4);
+
+                    $scope.Su1 = tConvertTo12Hours(data[0].SU1);
+                    $scope.Su2 = tConvertTo12Hours(data[0].SU2);
+                    $scope.Su3 = tConvertTo12Hours(data[0].SU3);
+                    $scope.Su4 = tConvertTo12Hours(data[0].SU4);
+                }
+                else
+                {
+                    // Notification.error({ message: 'Invalid key or not found…', delay: MsgDelay });
+                }
+            });
+
+            $scope.showWorkingHourModel = true;
+           // $('#WorkingHour_popup').slideDown();
+        }
+    };
+   /* // Close  working hour popup
+    SearchSec.closeWorkingHourPopup = function () {
+        $('#WorkingHour_popup').slideUp();
+    };*/
+
+        //Below function converts 24 hours time to 12 hours time
+        function tConvertTo12Hours (timeString) {
+            var H = +timeString.substr(0, 2);
+            var h = (H % 12) || 12;
+            var ampm = H < 12 ? " AM" : " PM";
+            return timeString = h + timeString.substr(2, 3) + ampm;
+        }
+}]);

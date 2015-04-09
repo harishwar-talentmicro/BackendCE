@@ -1,4 +1,3 @@
-
 <div id="wrapper" ng-controller="HomeController as Home" class="bottom-clearfix">
     <header-section></header-section>
     <div ng-controller="SearchController as search">
@@ -152,6 +151,67 @@
                 </form>
             </div>
         </div>
+        <modal mtitle="'Working Hours'" visible="showWorkingHourModel">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <table class="rwd-table">
+                            <thead>
+                            <tr>
+                                <th>Days </th>
+                                <th>Time slote1</th>
+                                <th>Time slote2</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <!--<tr ng-repeat="_item in bulksalesController.result">-->
+                            <tr>
+                                <td data-th="Mon">Mon</td>
+                                <!--<td data-th="Time slote1">{{Mo1 != '' ? Mo1 + ' - '  : ''}}{{Mo2}} </td>-->
+                                <td data-th="Time slote1">{{Mo1}} - {{Mo2}} </td>
+                                <td data-th="Time slote2">{{Mo3}} - {{Mo4}}</td>
+                            </tr>
+                            <tr>
+                                <td data-th="Mon">Tue</td>
+                                <td data-th="Time slote1">10:00 AM - 1:00 PM </td>
+                                <td data-th="Time slote2">4:00 PM - 6:00 PM</td>
+                            </tr>
+                            <tr>
+                                <td data-th="Mon">Wed</td>
+                                <td data-th="Time slote1">10:00 AM - 1:00 PM </td>
+                                <td data-th="Time slote2">4:00 PM - 6:00 PM</td>
+                            </tr>
+                            <tr>
+                                <td data-th="Mon">Thu</td>
+                                <td data-th="Time slote1">10:00 AM - 1:00 PM </td>
+                                <td data-th="Time slote2">4:00 PM - 6:00 PM</td>
+                            </tr>
+                            <tr>
+                                <td data-th="Mon">Fri</td>
+                                <td data-th="Time slote1">10:00 AM - 1:00 PM </td>
+                                <td data-th="Time slote2">4:00 PM - 6:00 PM</td>
+                            </tr>
+                            <tr>
+                                <td data-th="Mon">Sat</td>
+                                <td data-th="Time slote1">10:00 AM - 1:00 PM </td>
+                                <td data-th="Time slote2">4:00 PM - 6:00 PM</td>
+                            </tr>
+                            <tr>
+                                <td data-th="Mon">Sun</td>
+                                <td data-th="Time slote1">10:00 AM - 1:00 PM </td>
+                                <td data-th="Time slote2">4:00 PM - 6:00 PM</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        Holiday calender
+                    </div>
+                </div>
+            </div>
+        </modal>
 
          <div class="container-fluid">
             <div class="row top-clearfix"></div>
@@ -221,13 +281,6 @@
                                             <input id="rating5" disabled type="radio" name="form_rating" ng-model="form_rating" value="5">
                                             <label for="rating5"><span>5</span></label>
                                         </div>
-                                        <!--Added to make Stars Responsive (On Hold)-->
-                                        <!--<i class="glyphicon glyphicon-star starClass"></i>-->
-                                        <!--<i class="glyphicon glyphicon-star starClass"></i>-->
-                                        <!--<i class="glyphicon glyphicon-star starClass"></i>-->
-                                        <!--<i class="glyphicon glyphicon-star starClass"></i>-->
-                                        <!--<i class="glyphicon glyphicon-star starClass"></i>-->
-
                                     </div>
                                 </div>
                             </div>
@@ -452,62 +505,64 @@
                             </form>
                             <div ng-show="ShowLinks" class="row setRowLeftRightMarginZero boxFotterBanner">
                                 <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 searchHeaderAlignment fotterButtonContainer">
-
-                                       <div  class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer bottomTabButton" style=" margin-top: 5%;" ng-hide="search.isIndividualUser(1)">
-                                            <img src="../images/open_big.png" ng-show="search.mInfo.OpenStatus==1">
-                                            <img src="../images/close_big.png" ng-hide="search.mInfo.OpenStatus==1">
+                                   <div title="Working hours" class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer bottomTabButton" style=" margin-top: 5%;" ng-hide="search.isIndividualUser(1)">
+                                        <img src="../images/open_big.png" ng-click="search.openWorkingHourPopup()" ng-show="search.mInfo.OpenStatus==1">
+                                        <img src="../images/close_big.png" ng-click="search.openWorkingHourPopup()" ng-hide="search.mInfo.OpenStatus==1">
+                                    </div>
+                                    <div  class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer imgTopMargin" ng-hide="search.isIndividualUser(1)">
+                                        <div class="parkingAlignment" ng-hide="search.mInfo.ParkingStatus==3">
+                                            <img title="{{search.parkingTitle}}" src="../images/parking_new.png" >
                                         </div>
-                                        <div  class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer imgTopMargin" ng-hide="search.isIndividualUser(1)">
-                                            <div class="parkingAlignment" ng-hide="search.mInfo.ParkingStatus==3">
-                                                <img title="{{search.parkingTitle}}" src="../images/parking_new.png" >
-                                            </div>
-                                            <div class="parkingAlignment" ng-show="search.mInfo.ParkingStatus==3">
-                                                <img title="{{search.parkingTitle}}" src="../images/new_no_parking.png" >
-                                            </div>
+                                        <div class="parkingAlignment" ng-show="search.mInfo.ParkingStatus==3">
+                                            <img title="{{search.parkingTitle}}" src="../images/new_no_parking.png" >
                                         </div>
-
+                                    </div>
                                 </div>
                                 <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10 searchHeaderAlignment msgButtonContainer" ng-hide="(search.mInfo.IDTypeID == 1)">
                                     <div class="innerMsgButtonContainer">
-                                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer keyWordText" style="padding-right: 0px;"
-                                              ng-hide="_userInfo.Token == 2 || search.mInfo.EZEIDVerifiedID == '1'|| showSalesEnquiry == '0' " title="Sales Enquiry" ng-click="search.openSalesEnquiryForm()">
-                                            <div class="row setRowLeftRightMarginZero" >
-                                                <img src="../images/new_sales_icon.png">
-                                            </div>
-                                            <div class="row setRowLeftRightMarginZero infoMsgText" >
-                                                Sales Enquiry
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer removePadding keyWordText"
-                                              ng-hide="_userInfo.Token == 2 || search.mInfo.HomeDeliveryButton==2 || search.mInfo.EZEIDVerifiedID == '1' || showHomeDelivery == '0'" title="Home Delivery" ng-click="search.openHomeDeliverForm()">
-                                            <div class="row setRowLeftRightMarginZero" >
-                                                <img src="../images/new_home_delivery.png">
-                                            </div>
-                                            <div class="row setRowLeftRightMarginZero infoMsgText" >
-                                                Home Delivery
+                                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer keyWordText" style="padding-right: 0px;">
+                                            <div ng-hide="search.mInfo.EZEIDVerifiedID == '1'|| showSalesEnquiry == '0' " title="Sales Enquiry" ng-click="search.openSalesEnquiryForm()">
+                                                <div class="row setRowLeftRightMarginZero" >
+                                                    <img src="../images/new_sales_icon.png">
+                                                </div>
+                                                <div class="row setRowLeftRightMarginZero infoMsgText" >
+                                                    Sales Enquiry
+                                                </div>
                                             </div>
                                         </div>
-                                        <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 showPointer removePadding keyWordText"
-                                              ng-hide="_userInfo.Token == 2 || search.mInfo.ReservationButton==2 || search.mInfo.EZEIDVerifiedID == '1' || shoReserVation == '0'" title="Reservation" ng-click="search.openReservationForm()">
-                                            <div class="row setRowLeftRightMarginZero" >
-                                                <img src="../images/new_reservations.png">
-                                            </div>
-                                            <div class="row setRowLeftRightMarginZero infoMsgText" >
-                                                Reservation
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer removePadding keyWordText"
-                                              ng-hide="_userInfo.Token == 2 || search.mInfo.SupportButton==2 || search.mInfo.EZEIDVerifiedID == '1' || showServiceRequest == '0'" ng-disabled="search.mInfo.SupportButton==2 || search.mInfo.EZEIDVerifiedID == '1'" title="Support Request" ng-click="search.openServiceRequestForm()">
-                                            <div class="row setRowLeftRightMarginZero" >
-                                                <img src="../images/new_service_request.png">
-                                            </div>
-                                            <div class="row setRowLeftRightMarginZero infoMsgText" >
-                                                Service Request
+                                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer removePadding keyWordText">
+                                            <div ng-hide="search.mInfo.HomeDeliveryButton==2 || search.mInfo.EZEIDVerifiedID == '1' || showHomeDelivery == '0'" title="Home Delivery" ng-click="search.openHomeDeliverForm()">
+                                                <div class="row setRowLeftRightMarginZero" >
+                                                    <img src="../images/new_home_delivery.png">
+                                                </div>
+                                                <div class="row setRowLeftRightMarginZero infoMsgText" >
+                                                    Home Delivery
+                                                </div>
                                             </div>
                                         </div>
-                                        <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 showPointer removePadding keyWordText"
-                                              ng-hide="_userInfo.Token == 2" title="Send CV" ng-click="search.openCVForm()">
-                                            <div ng-hide="search.mInfo.CVButton==2 || search.mInfo.EZEIDVerifiedID == '1' || showSendCv == '0'">
+                                        <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 showPointer removePadding keyWordText">
+                                            <div ng-hide="search.mInfo.ReservationButton==2 || search.mInfo.EZEIDVerifiedID == '1' || shoReserVation == '0'" title="Reservation" ng-click="search.openReservationForm()">
+                                                <div class="row setRowLeftRightMarginZero" >
+                                                    <img src="../images/new_reservations.png">
+                                                </div>
+                                                <div class="row setRowLeftRightMarginZero infoMsgText" >
+                                                    Reservation
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer removePadding keyWordText">
+                                            <div ng-hide="search.mInfo.SupportButton==2 || search.mInfo.EZEIDVerifiedID == '1' || showServiceRequest == '0'"
+                                                 title="Support Request" ng-click="search.openServiceRequestForm()">
+                                                <div class="row setRowLeftRightMarginZero" >
+                                                    <img src="../images/new_service_request.png">
+                                                </div>
+                                                <div class="row setRowLeftRightMarginZero infoMsgText" >
+                                                    Service Request
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 showPointer removePadding keyWordText">
+                                            <div title="Send CV" ng-click="search.openCVForm()" ng-hide="search.mInfo.CVButton==2 || search.mInfo.EZEIDVerifiedID == '1' || showSendCv == '0'">
                                                 <div class="row setRowLeftRightMarginZero" >
                                                     <img src="../images/new_send_cv.png">
                                                 </div>
@@ -536,7 +591,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 searchHeaderAlignment msgButtonContainer" ng-show="search.isIndividualUser(1)">
+                                <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10 searchHeaderAlignment msgButtonContainer" ng-show="search.isIndividualUser(1)">
                                     <div class="innerMsgButtonContainer">
                                         <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer keyWordText" style="padding-right: 0px;" ng-click="search.openSendMessageForm()"  title="Message">
                                             <div class="row setRowLeftRightMarginZero" >
@@ -558,10 +613,6 @@
                                         </div>
                                         <div  class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer removePadding">
                                         </div>
-                                        <div  class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer removePadding">
-                                            <div  ng-hide="search.mInfo.CVButton==2 || search.mInfo.EZEIDVerifiedID == '1'">
-                                            </div>
-                                        </div>
                                         <div  class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer removePadding keyWordText"
                                               ng-click="search.getdirections(search.mInfo)" title="Directions">
                                             <div class="row setRowLeftRightMarginZero" >
@@ -569,6 +620,15 @@
                                             </div>
                                             <div class="row setRowLeftRightMarginZero infoMsgText" >
                                                 Plot Route
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer removePadding keyWordText"
+                                             ng-click="search.viewDirections(search.mInfo)" title="View Directions">
+                                            <div class="row setRowLeftRightMarginZero" >
+                                                <img src="../images/view_directions.png">
+                                            </div>
+                                            <div class="row setRowLeftRightMarginZero infoMsgText" >
+                                                View Directions
                                             </div>
                                         </div>
                                     </div>
@@ -592,4 +652,3 @@
 
 </div>
 <footer-section></footer-section>
-<!--<div id="background-image-container"></div>-->

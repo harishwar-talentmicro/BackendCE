@@ -6899,12 +6899,15 @@ exports.FnGetWorkingHours = function (req, res) {
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
         var Token = req.query.Token;
+        var MasterID = req.query.MasterID;
+        if(MasterID == null)
+          MasterID= 0;
         if (Token != null) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
 
-                        db.query('CALL pGetWorkingHours(' + db.escape(Token) + ')', function (err, GetResult) {
+                        db.query('CALL pGetWorkingHours(' + db.escape(Token) +',' + db.escape(((MasterID != 0) ? MasterID : 0)) + ')', function (err, GetResult) {
                             if (!err) {
                                 if (GetResult != null) {
                                     if (GetResult[0].length > 0) {
@@ -7709,11 +7712,16 @@ exports.FnSendBulkMailer = function (req, res) {
         var Token = req.query.Token;
         var TID = req.query.TID;
         var TemplateID = req.query.TemplateID;
+        var Attachment = req.query.Attachment;
+        var AttachmentFileName = req.query.AttachmentFileName;
+        var ToMailID = req.query.ToMailID;
+       
         var RtnResponse = {
                 IsSent: false
             };
-
-        if (Token != null && Token != ' ' && TID != null && TID != ' ' && TemplateID != null && TemplateID != ' ') {
+        if(TID != null) {
+            
+          if (Token != null && Token != ' ' && TID != null && TID != ' ' && TemplateID != null && TemplateID != ' ') {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
@@ -7724,7 +7732,7 @@ exports.FnSendBulkMailer = function (req, res) {
                             if (!err) {
                                 if (GetResult != null) {
                                     console.log(GetResult);
-                                    if (GetResult.length > 0) {
+                                    if (GetResult.length > 0)  {
                                       var templateQuery = 'Select * from mmailtemplate where TID = ' + db.escape(TemplateID);
                                         db.query(templateQuery, function(err, TemplateResult){
                                             if(!err){
@@ -7738,8 +7746,8 @@ exports.FnSendBulkMailer = function (req, res) {
                                                                 replyto: (TemplateResult[0].FromMailID != 'undefined') ? TemplateResult[0].FromMailID : " ",
                                                                 to: GetResult[i].SalesMailID,
                                                                 subject: TemplateResult[0].Subject,
-                                                                html: TemplateResult[0].Body // html body
-                                                            };
+                                                                html: TemplateResult[0].Body, // html body
+                                                                };
                                                             //console.log(TemplateResult[0].FromMailID);
                                                             var post = { MessageType: 9, ToMailID: GetResult[i].SalesMailID, Subject: mailOptions.subject, Body: mailOptions.html, Replyto:mailOptions.replyto };
                                                             
@@ -7815,20 +7823,71 @@ exports.FnSendBulkMailer = function (req, res) {
                     console.log('FnGetTemplateDetails: Error in validating token:  ' + err);
                 }
             });
+        }  
+    }
+    else
+        {
+            if (Token != null  && Attachment != null && AttachmentFileName != null && ToMailID != null) {
+                FnValidateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+                                var mailOptions = {
+                                    To: ToMailID,
+                                    subject: 'test subject',
+                                    html: 'test body', // html body
+                                    Attachment:Attachment,
+                                    AttachmentFileName:AttachmentFileName
+                                };
+                               
+                        var post = { MessageType:10,ToMailID: mailOptions.To, Subject: mailOptions.subject, Body: mailOptions.html, Attachment:mailOptions.Attachment,AttachmentFileName:mailOptions.AttachmentFileName  };
+                                                            
+                            console.log(post);
+                            var query = db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
+                                // Neat!
+                                if (!err) {
+                                    console.log(result);
+                                    console.log('FnMessageMail: Mail saved Successfully');
+                                    RtnResponse.IsSent = true;
+                                    res.send(RtnResponse);
+                                }
+                                else {
+                                    console.log('FnMessageMail: Mail not Saved Successfully');
+                                    res.send(RtnResponse);
+                                }
+                            });
+                        console.log('Mail details sent for processing');
+                        console.log(mailOptions);
+                    }
+                    else {
+                        res.statusCode = 401;
+                        res.send('null');
+                        console.log('FnGetTemplateDetails: Invalid Token');
+                    }
+                } else {
+                    res.statusCode = 500;
+                    res.send('null');
+                    console.log('FnGetTemplateDetails: Error in validating token:  ' + err);
+                }
+            });
         }
+                    
         else {
-            if (Token == null && Token == ' ') {
+            if (Token == null) {
                 console.log('FnGetTemplateDetails: Token is empty');
             }
-            else if (TID == null && TID == ' ') {
-                console.log('FnGetTemplateDetails: TID is empty');
+            else if (ToMailID == null) {
+                console.log('FnGetTemplateDetails: ToMailID is empty');
             }
-            else if (TemplateID == null && TemplateID == ' ') {
-                console.log('FnGetTemplateDetails: TemplateID is empty');
+            else if (Attachment == null) {
+                console.log('FnGetTemplateDetails: Attachment is empty');
+            }
+            else if (AttachmentFileName == null) {
+                console.log('FnGetTemplateDetails: AttachmentFileName is empty');
             }
             res.statusCode=400;
             res.send('null');
         }
+    }
     }
     catch (ex) {
         console.log('FnGetTemplateDetails error:' + ex.description);
@@ -9523,7 +9582,7 @@ exports.FnUpdateEZEIDAP = function (req, res) {
             FnValidateTokenAP(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
-                      var Query = db.escape(OldEZEID) + ',' + db.escape(NewEZEID);
+                      var Query = db.escape(OldEZEID) + ',' + db.escape(NewEZEID) + ',' + db.escape(Token);
                         db.query('CALL pUpdateEZEIDAP(' + Query + ')', function (err, ChangeEZEIDResult) {
                             if (!err) {
                                 
@@ -9540,7 +9599,7 @@ exports.FnUpdateEZEIDAP = function (req, res) {
                                 }
                                 else {
                                     res.send(RtnMessage);
-                                    console.log('FnUpdateEZEIDAP:EZEID Password changed failed ');
+                                    console.log('FnUpdateEZEIDAP:EZEID changed failed ');
                                 }
                             }
                             else {
