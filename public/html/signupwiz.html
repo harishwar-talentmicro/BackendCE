@@ -406,7 +406,7 @@ table#t01 th	{
                                         <div  class="col-lg-12" style="padding-left: 10px;" ng-show="profile._info.IDTypeID == '1'">
                                             <div class="row mar_editTop mar_editLeft">
                                                 <span><label><strong>&nbsp;Birth Date and Gender</strong> </label></span><br/>
-                                             <date-time-picker recipient="profile._info.DOB"  style="width:24%; margin-top: 0px;"></date-time-picker>
+                                             <date-time-picker recipient="profile._info.DOB" settings='{"format" : "d-M-Y", "hours12" : false, "maxDate" : 0, "timepicker" : false}'  style="width:24%; margin-top: 0px;"></date-time-picker>
 
                                                 <select class="form-control " style="width:24%; margin-top: 0px;" name="Gender" ng-model="profile._info.Gender"
                                                         ng-options="status.id as status.label for status in profile.gender" required>
