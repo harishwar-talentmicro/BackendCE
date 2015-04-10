@@ -6296,7 +6296,7 @@ exports.FnGetHolidayList = function (req, res) {
                 if (!err) {
                     if (Result != null) {
 
-                        db.query('CALL pGetHolidayList(' + db.escape(Token) + ')', function (err, GetResult) {
+                        db.query('CALL pGetHolidayList(' + db.escape(Token) + ',' + db.escape(0)+ ')', function (err, GetResult) {
                             if (!err) {
                                 if (GetResult != null) {
                                     if (GetResult[0].length > 0) {
@@ -6904,7 +6904,7 @@ exports.FnGetWorkingHours = function (req, res) {
                 if (!err) {
                     if (Result != null) {
 
-                        db.query('CALL pGetWorkingHours(' + db.escape(Token) + ')', function (err, GetResult) {
+                        db.query('CALL pGetWorkingHours(' + db.escape(Token) +',' + db.escape(0)+ ')', function (err, GetResult) {
                             if (!err) {
                                 if (GetResult != null) {
                                     if (GetResult[0].length > 0) {
@@ -6972,7 +6972,8 @@ exports.FnGetWorkingHrsHolidayList = function (req, res) {
         var LocID = req.query.LocID;
         var RtnMessage = {
             WorkingHours: '',
-            HolidayList:''
+            HolidayList:'',
+            Result:'fail'
         };
         
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
@@ -6988,17 +6989,20 @@ exports.FnGetWorkingHrsHolidayList = function (req, res) {
                                             if (WorkingHrsResult != null) {
                                                 console.log(WorkingHrsResult);
                                                 RtnMessage.WorkingHours = WorkingHrsResult;
+                                                RtnMessage.Result = 'pass';
                                                 console.log('FnWorkingHours: Working hours Sent Successfully');
                                                 res.send(RtnMessage);
                                             }
                                             else {
                                                 console.log('FnWorkingHours:No Working hours Sent Successfully');
+                                                RtnMessage.Result = 'pass';
                                                 res.send(RtnMessage);
                                             }
                                         }
                                         else {
                                             res.statusCode= 500;
                                             console.log('FnWorkingHours:Error in getting Workinghours' + err);
+                                            RtnMessage.Result = 'pass';
                                             res.send(RtnMessage);
                                         }
                                     }),
@@ -7039,13 +7043,13 @@ exports.FnGetWorkingHrsHolidayList = function (req, res) {
                     }
                     else {
                         res.statusCode = 401;
-                        res.send('null');
+                        res.send(RtnMessage.Result);
                         console.log('FnGetWorkingHours: Invalid Token');
                     }
                 } else {
 
                     res.statusCode = 500;
-                    res.send('null');
+                    res.send(RtnMessage.Result);
                     console.log('FnGetWorkingHours: Error in validating token:  ' + err);
                 }
             });
