@@ -153,8 +153,9 @@ app.get('/ewtGetLoginDetails',LocationManager.FnGetLoginDetails);
 app.post('/ewtSaveMailTemplate',LocationManager.FnSaveMailTemplate);
 app.get('/ewtGetTemplateList',LocationManager.FnGetTemplateList);
 app.get('/ewtGetTemplateDetails',LocationManager.FnGetTemplateDetails);
-app.get('/ewtSendBulkMailer',LocationManager.FnSendBulkMailer);
+app.post('/ewtSendBulkMailer',LocationManager.FnSendBulkMailer);
 app.get('/ewtCropImageSize',LocationManager.FnCropImageSize);
+app.get('/ewtGetWorkingHrsHolidayList',LocationManager.FnGetWorkingHrsHolidayList);
 
 //below service are for EZEIDAP
 app.post('/ewLoginAP', LocationManager.FnLoginAP);
