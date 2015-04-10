@@ -33,21 +33,9 @@ angular.module('ezeidApp').controller('ProfileCtrl',[
             $window,
             GURL,
             $interval,
-            ScaleAndCropImage,
             MsgDelay,
             $location
         ) {
-
-        /**
-         * Maps parking Status with its string equivalent
-         * @type {Array}
-         */
-        $scope.parkingStatusMap = [
-            '',
-            'Public Parking',
-            'Valet Parking',
-            'No Parking'
-        ];
 
         /**
          * Progress Status Flag for loading data initially
@@ -109,21 +97,12 @@ angular.module('ezeidApp').controller('ProfileCtrl',[
          * Toggles editing mode for profile
          */
         $scope.toggleProfileEditMode = function(){
-//            if(typeof(saveFlag) !== "undefined" && typeof(data)!== "undefined"){
-//
-//            }
-            /**
-             * @todo Fill all models of edit controls with current userDetails before opening
-             */
             if($scope.profileEditMode){
                 $scope.profileEditMode = false;
             }
             else{
                 $scope.profileEditMode = true;
             }
-            /**
-             * @todo Copy all models of edit controls to main userDetails if saveFlag is true
-             */
         };
 
         /**
@@ -139,9 +118,11 @@ angular.module('ezeidApp').controller('ProfileCtrl',[
             $scope.loadCountries().then(function(){
                 $scope.loadUserDetails().then(function(){
                     var countryId = ($scope.userDetails.CountryID) ? $scope.userDetails.CountryID : $scope.countryList[0].CountryID;
-                    $scope.loadStates(countryId).then(function(){
+                    $scope.loadStates(countryId).then(function(stateList){
+                        $scope.stateList = stateList;
                         var stateId = ($scope.userDetails.StateID) ? $scope.userDetails.StateID : $scope.stateList[0].StateID;
-                        $scope.loadCities($scope.userDetails.StateID).then(function(){
+                        $scope.loadCities($scope.userDetails.StateID).then(function(cityList){
+                            $scope.cityList = cityList;
                             $scope.loadSecondaryLocations().then(function(){
                                 $scope.dataLoadInProgress = false;
                                 $scope.dataLoadError = false;
@@ -250,15 +231,12 @@ angular.module('ezeidApp').controller('ProfileCtrl',[
                     CountryID : countryId
                 }
             }).success(function(resp){
-                    console.log('States List based on country');
-                    console.log(JSON.stringify(resp));
-
                     if(resp && resp.length > 0 && resp !== 'null'){
-                        defer.resolve(true);
-                        $scope.stateList = resp;
+                        defer.resolve(resp);
+
                     }
                     else{
-                        defer.resolve(false);
+                        defer.resolve([]);
                     }
                 }).error(function(err){
                     defer.reject(err);
@@ -282,15 +260,11 @@ angular.module('ezeidApp').controller('ProfileCtrl',[
                     StateID : stateId
                 }
             }).success(function(resp){
-                    console.log('Cities List based on state');
-                    console.log(JSON.stringify(resp));
-
                     if(resp && resp.length > 0 && resp !== 'null'){
-                        defer.resolve(true);
-                        $scope.cityList = resp;
+                        defer.resolve(resp);
                     }
                     else{
-                        defer.resolve(false);
+                        defer.resolve([]);
                     }
                 }).error(function(err){
                     defer.reject(err);
