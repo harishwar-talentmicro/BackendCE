@@ -134,7 +134,7 @@
                 if(CLOSED_ROUTES.indexOf(next.$$route.originalPath) === -1
                     &&
                     UNAUTHORIZED_ROUTES.indexOf(next.$$route.originalPath) === -1){
-
+                    return;
                 }
             }
             catch(ex){

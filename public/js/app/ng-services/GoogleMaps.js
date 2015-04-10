@@ -196,7 +196,6 @@ angular.module('ezeidApp').factory('GoogleMaps',['$q','$timeout','$compile',func
         });
         if(dragListener){
             google.maps.event.addListener(marker,'dragend',function(){
-                console.log(marker);
                 dragListener(marker.position.lat(),marker.position.lng());
             });
         }
@@ -427,6 +426,18 @@ angular.module('ezeidApp').factory('GoogleMaps',['$q','$timeout','$compile',func
         }
 
         return returnObj;
+    };
+
+
+    GoogleMap.prototype.addMapEventListener = function(eventListenerArgs){
+        if(!eventListenerArgs){
+            return;
+        }
+        if(eventListenerArgs.length > 0){
+            eventListenerArgs.forEach(function(evntArg,index){
+
+            });
+        }
     };
 
     return GoogleMap;
