@@ -86,6 +86,21 @@ angular.module('ezeidApp').controller('ProfileCtrl',[
          */
         $scope.secondaryLocations = [];
 
+
+        /**
+         * Array Holding information regarding editMode, viewMode and Map initialization of all locations
+         * @desc First element is primary location which is always available on the server
+         * @type {Array}
+         */
+        $scope.locationsToggleIndex = [
+            {
+                editMode : false,
+                viewMode : false,
+                isMapInitialized : false,
+                savedOnServer : true
+            }
+        ];
+
         /**
          * Profile Editing Mode Flag
          * @type {boolean}
@@ -124,6 +139,7 @@ angular.module('ezeidApp').controller('ProfileCtrl',[
                         $scope.loadCities($scope.userDetails.StateID).then(function(cityList){
                             $scope.cityList = cityList;
                             $scope.loadSecondaryLocations().then(function(){
+
                                 $scope.dataLoadInProgress = false;
                                 $scope.dataLoadError = false;
                                 $scope.dataLoadComplete = true;
@@ -208,7 +224,21 @@ angular.module('ezeidApp').controller('ProfileCtrl',[
             }).success(function(resp){
                     console.log('Secondary Location List');
                     console.log(JSON.stringify(resp));
-                defer.resolve(resp);
+                    if(resp && resp.length > 0 && resp !== 'null'){
+                        for(var i = 0; i < resp.length; i++){
+                            $scope.locationsToggleIndex[i+1] = {
+                                viewMode : false,
+                                editMode : false,
+                                isMapInitialized: false,
+                                savedOnServer : true
+                            };
+                        }
+                        $scope.secondaryLocations = resp;
+                        defer.resolve(true);
+                    }
+                    else{
+                        defer.resolve(false);
+                    }
             }).error(function(err){
                 defer.reject(err);
             });

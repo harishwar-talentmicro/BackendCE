@@ -43,7 +43,6 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
          * @returns {number}
          */
         Array.prototype.indexOfWhere = function(key,value){
-            console.log(this);
             var resultIndex = -1;
             var found = false;
             for(var i = 0; i < this.length; i++){
@@ -81,17 +80,7 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
         var mapList = {};
 
         $scope.editStateList = [];
-        /**
-         * Array Holding information regarding editMode, viewMode and Map initialization of all locations
-         * @type {Array}
-         */
-        $scope.locationsToggleIndex = [
-            {
-                editMode : false,
-                viewMode : false,
-                isMapInitialized : false
-            }
-        ];
+
 
         /**
          * Show and hide map using location index
@@ -123,6 +112,7 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
             var marker = mapList['map'+index].createMarker(pos,title,null,false,null);
             mapList['map'+index].placeMarker(marker);
         };
+
 
         /**
          * Initializes the map only when user view a location first time
@@ -165,7 +155,7 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
                 mapList['map'+index].createMap(containerElement,$scope,'findCurrentLocation('+index+')');
                 mapList['map'+index].renderMap();
                 mapList['map'+index].mapIdleListener().then(function(){
-                    mapList['map'+index].pushMapControls();
+                    mapList['map'+index].pushMapControls($scope.setEditCurrentLocation);
                     mapList['map'+index].toggleMapControls();
                     mapList['map'+index].listenOnMapControls($scope.setEditCurrentLocation);
                     mapList['map'+index].resizeMap();
@@ -214,6 +204,11 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
                 $scope.locationsToggleIndex[index].viewMode = false;
             });
             $scope.locationsToggleIndex[index].viewMode = true;
+            var countryId = (index == 0) ? $scope.userDetails.CountryID : $scope.secondaryLocations[index-1].CountryID;
+            $scope.loadStates(countryId).then(function(stateList){
+                $scope.editStateList = stateList;
+            });
+
         };
 
         /**
@@ -241,26 +236,32 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
             gMap.getReverseGeolocation(lat,lng).then(function(results){
                 var geolocationAddress = gMap.parseReverseGeolocationData(results.data);
                 var countryIndex = $scope.countryList.indexOfWhere('CountryName',geolocationAddress.country);
-                if($scope.countryList[countryIndex].CountryName !== $scope.editLocationDetails.CountryName){
-
-                }
-
+                console.log($scope.countryList[countryIndex]);
                 /**
-                 * @todo Have to see the logic and do it
-                 * @type {number}
+                 * If country is changed then load new list of state for the new country
                  */
-                var stateIndex = $scope.stateList.indexOfWhere('StateTitle',geolocationAddress.state);
-                /**
-                 * If state not found then load new list of state and set state model of editLocationDetails
-                 */
-                if(stateIndex == -1){
-                    if($scope.countryList[countryIndex].CountryName !== $scope.editLocationDetails.CountryName){
-                        $scope.loadStates($scope.countryList[countryIndex].CountryID).then(function(stateList){
+                if($scope.countryList[countryIndex].CountryID !== $scope.editLocationDetails.CountryID){
+                    $scope.loadStates($scope.countryList[countryIndex].CountryID).then(function(stateList){
+                        if(stateList.length > 1){
                             $scope.editStateList = stateList;
-                            var stateIndex = $scope.editStateList.indexOfWhere('StateTitle',geolocationAddress.state);
-                            $scope.editLocationDetails.StateID = $scope.editStateList[stateIndex].StateID;
-                        });
+                        }
+                        var stateIndex = $scope.editStateList.indexOfWhere('StateTitle',geolocationAddress.state);
+                        if(stateIndex === -1){
+                            stateIndex = 0;
+                        }
+                        $scope.editLocationDetails.StateID = $scope.editStateList[stateIndex].StateID;
+                        $scope.editLocationDetails.CityTitle = geolocationAddress.city;
+                        $scope.editLocationDetails.PostalCode = geolocationAddress.postalCode;
+                    });
+                }
+                else{
+                    var stateIndex = $scope.editStateList.indexOfWhere('StateName',geolocationAddress.state);
+                    if(stateIndex === -1){
+                        stateIndex = 0;
                     }
+                    $scope.editLocationDetails.StateID = $scope.editStateList[stateIndex].StateID;
+                    $scope.editLocationDetails.CityTitle = geolocationAddress.city;
+                    $scope.editLocationDetails.PostalCode = geolocationAddress.postalCode;
                 }
             });
         };
@@ -295,31 +296,58 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
          * Editing locations and assigning values to edit location form
          * @param index
          */
+
         $scope.editLocation = function(index){
-            for(var prop in $scope.editLocationDetails){
-                if($scope.editLocationDetails.hasOwnProperty(prop)){
-                    /**
-                     * If location is primary
-                     */
-                    if(index === 0){
-                        for(var prop1 in $scope.userDetails){
-                            if(prop1 === prop){
-                                $scope.editLocationDetails[prop] = $scope.userDetails[prop];
-                            }
-                        }
-                        $scope.editLocationDetails['LocTitle'] = 'Primary';
-                    }
 
-                    else{
-                        for(var prop1 in $scope.userDetails){
-                            if(prop1 === prop){
-                                $scope.editLocationDetails[prop] = $scope.secondaryLocations[index-1][prop];
+            /**
+             * On editing mode of location we fetch a new list of state
+             * Assign the new list to $scope.editList variable
+             * and then binds data to the models
+             */
+            if(index == 0){
+                $scope.loadStates($scope.userDetails.CountryID).then(function(stateList){
+                    $scope.editStateList = stateList;
+                    for(var prop in $scope.editLocationDetails){
+                        if($scope.editLocationDetails.hasOwnProperty(prop)){
+                            for(var prop1 in $scope.userDetails){
+                                if(prop === prop1){
+                                    $scope.editLocationDetails[prop] = $scope.userDetails[prop];
+                                }
                             }
                         }
                     }
-
-                }
+                    $scope.placeEditModeMarker(index);
+                });
             }
+            else{
+                $scope.loadStates($scope.secondaryLocations[index-1].CountryID).then(function(stateList){
+                    $scope.editStateList  = stateList;
+
+                    for(var prop in $scope.editLocationDetails){
+                        if($scope.editLocationDetails.hasOwnProperty(prop)){
+                            for(var prop1 in $scope.userDetails){
+                                if(prop === prop1){
+                                    $scope.editLocationDetails[prop] = $scope.secondaryLocations[index-1][prop];
+                                }
+                            }
+                        }
+                    }
+                    $scope.placeEditModeMarker(index);
+
+                });
+            }
+
+
+        };
+
+
+        /**
+         * To be called when stateList for current editing location is loaded successfully
+         * and models are assigned
+         * used in $scope.editLocation()
+         * @param index
+         */
+        $scope.placeEditModeMarker = function(index){
             mapList['map'+index].clearAllMarkers();
             $scope.locationsToggleIndex[index].editMode = true;
             var pos = mapList['map'+index].createGMapPosition(
@@ -336,4 +364,23 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
          * @todo saveLocation();
          */
 
+        $scope.deleteSecondaryLocation = function(){
+            /**
+             * @todo Deleting secondaryLocation
+             */
+        };
+
+        $scope.addSecondaryLocation = function(){
+            var locIndex = $scope.locationsToggleIndex.indexOfWhere('savedOnServer',false);
+            if(locIndex !== -1){
+                $scope.toggleAllLocations(locIndex);
+                $timeout(function(){
+                    $scope.toggleMapControls(locIndex);
+                    $scope.editLocation(locIndex);
+                },4000);
+            }
+            var newLoc = angular.copy($scope.editLocationDetails);
+        };
+
     }]);
+
