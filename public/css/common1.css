@@ -664,3 +664,28 @@ body {
 }
 .notification_drp ul li a.bulkMailer-icon{ background-position:-7px -1235px!important;}
 .notification_drp ul li a.bulkMailer-icon:hover{ background-position:-7px -1297px!important;}
+
+.custom-table table, td {
+    border: 1px solid black;
+    background: #ffffff;
+}
+
+.custom-table > thead > tr > th{
+    border: 1px solid black;
+
+}
+.custom-table th, td
+{
+    text-align: center;
+}
+/*.custom-table tr
+{
+   height: 30px;
+}*/
+.custom-table > tr > td {
+    padding: 4px;
+}
+.emptyCell
+{
+    background: #ddebf7;
+}

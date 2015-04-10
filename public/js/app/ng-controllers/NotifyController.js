@@ -1,8 +1,3 @@
-/**
- * All controllers from App.js shifted here
- */
-
-
 
 angular.module('ezeidApp').controller('NotifyController', function ($scope, $rootScope, $http, Notification, $filter, $interval,GURL,MsgDelay) {
     var msgSen = this;
@@ -15,6 +10,7 @@ angular.module('ezeidApp').controller('NotifyController', function ($scope, $roo
     var Miliseconds = 300000;
     var RefreshTime = Miliseconds;
     var AutoRefresh = true;
+    $scope.showNoMsgFound = false;
 
     $interval(function() {
         msgSen.msgs = [];
@@ -109,6 +105,7 @@ angular.module('ezeidApp').controller('NotifyController', function ($scope, $roo
 
             //if (data.length > 0) {
             if (data != 'null') {
+                $scope.showNoMsgFound = false;
                 for (var i = 0; i < data.length; i++) {
                     data[i].TaskDateTime = convertTimeToLocal(data[i].TaskDateTime,'DD-MMM-YYYY hh:mm A');
                     msgSen.msgs.push(data[i]);
@@ -126,7 +123,8 @@ angular.module('ezeidApp').controller('NotifyController', function ($scope, $roo
             else
             {
                 msgSen.showMoreButton = false;
-                Notification.error({ message: "No Message found..!", delay: MsgDelay });
+              //  Notification.error({ message: "No Message found..!", delay: MsgDelay });
+                $scope.showNoMsgFound = true;
             }
         });
     }

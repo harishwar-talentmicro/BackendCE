@@ -151,63 +151,81 @@
                 </form>
             </div>
         </div>
+        <!--<modal mtitle="'Working Hours'" visible="showWorkingHourModel">-->
         <modal mtitle="'Working Hours'" visible="showWorkingHourModel">
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                        <table class="rwd-table">
-                            <thead>
-                            <tr>
-                                <th>Days </th>
-                                <th>Time slote1</th>
-                                <th>Time slote2</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <!--<tr ng-repeat="_item in bulksalesController.result">-->
-                            <tr>
-                                <td data-th="Mon">Mon</td>
-                                <!--<td data-th="Time slote1">{{Mo1 != '' ? Mo1 + ' - '  : ''}}{{Mo2}} </td>-->
-                                <td data-th="Time slote1">{{Mo1}} - {{Mo2}} </td>
-                                <td data-th="Time slote2">{{Mo3}} - {{Mo4}}</td>
-                            </tr>
-                            <tr>
-                                <td data-th="Mon">Tue</td>
-                                <td data-th="Time slote1">10:00 AM - 1:00 PM </td>
-                                <td data-th="Time slote2">4:00 PM - 6:00 PM</td>
-                            </tr>
-                            <tr>
-                                <td data-th="Mon">Wed</td>
-                                <td data-th="Time slote1">10:00 AM - 1:00 PM </td>
-                                <td data-th="Time slote2">4:00 PM - 6:00 PM</td>
-                            </tr>
-                            <tr>
-                                <td data-th="Mon">Thu</td>
-                                <td data-th="Time slote1">10:00 AM - 1:00 PM </td>
-                                <td data-th="Time slote2">4:00 PM - 6:00 PM</td>
-                            </tr>
-                            <tr>
-                                <td data-th="Mon">Fri</td>
-                                <td data-th="Time slote1">10:00 AM - 1:00 PM </td>
-                                <td data-th="Time slote2">4:00 PM - 6:00 PM</td>
-                            </tr>
-                            <tr>
-                                <td data-th="Mon">Sat</td>
-                                <td data-th="Time slote1">10:00 AM - 1:00 PM </td>
-                                <td data-th="Time slote2">4:00 PM - 6:00 PM</td>
-                            </tr>
-                            <tr>
-                                <td data-th="Mon">Sun</td>
-                                <td data-th="Time slote1">10:00 AM - 1:00 PM </td>
-                                <td data-th="Time slote2">4:00 PM - 6:00 PM</td>
-                            </tr>
-                            </tbody>
-                        </table>
+                        <!--<div class="row keyWordText" >
+                            <h4>Working Hours</h4>
+                        </div>-->
+                        <div class="row keyWordText" >
+                            <table class="table table-striped custom-table" border="1" style="margin-bottom: 0px;">
+                                <thead>
+                                    <tr style="background: #bfbfbf; color: #000000;">
+                                        <th>Mon</th>
+                                        <th>Tue</th>
+                                        <th>Wed</th>
+                                        <th>Thu</th>
+                                        <th>Fri</th>
+                                        <th>Sat</th>
+                                        <th>Sun</th>
+                                    </tr>
+                                </thead>
+                                <tbody ng-hide="showNoWorkingHoursFound">
+                                <tr>
+                                    <td  ng-class=" !Mo1.length ? 'emptyCell' : ''">{{Mo1}}</td>
+                                    <td>{{Tu1}}</td>
+                                    <td>{{We1}}</td>
+                                    <td>{{Th1}}</td>
+                                    <td>{{Fr1}}</td>
+                                    <td>{{Sa1}}</td>
+                                    <td>{{Su1}}</td>
+                                </tr>
+                                <tr>
+                                    <td>{{Mo2}}</td>
+                                    <td>{{Tu2}}</td>
+                                    <td>{{We2}}</td>
+                                    <td>{{Th2}}</td>
+                                    <td>{{Fr2}}</td>
+                                    <td>{{Sa2}}</td>
+                                    <td>{{Su2}}</td>
+                                </tr>
+                                <tr>
+                                    <td style="background: #bfbfbf; color: #000000; height: 33px;" colspan="7">
+
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>{{Mo3}}</td>
+                                    <td>{{Tu3}}</td>
+                                    <td>{{We3}}</td>
+                                    <td>{{Th3}}</td>
+                                    <td>{{Fr3}}</td>
+                                    <td>{{Sa3}}</td>
+                                    <td>{{Su3}}</td>
+                                </tr>
+                                <tr>
+                                    <td>{{Mo4}}</td>
+                                    <td>{{Tu4}}</td>
+                                    <td>{{We4}}</td>
+                                    <td>{{Th4}}</td>
+                                    <td>{{Fr4}}</td>
+                                    <td>{{Sa4}}</td>
+                                    <td>{{Su4}}</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div ng-show="showNoWorkingHoursFound" class="row keyWordText" >No Working hours found!!</div>
+                        <div class="row keyWordText" >
+                            <h4>Holidays</h4>
+                        </div>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                        Holiday calender
+                        <div ui-calendar="uiConfig.calendar" class="span8 calendar" ng-model="eventSources"></div>
                     </div>
                 </div>
             </div>

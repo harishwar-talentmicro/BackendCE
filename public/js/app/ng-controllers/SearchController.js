@@ -82,6 +82,7 @@ angular.module('ezeidApp').controller('SearchController', [
     var AutoRefresh = true;
     var rating = [1,2,3,4,5];
     $scope.showWorkingHourModel = false;
+    $scope.showNoWorkingHoursFound = false;
 
     $('#datetimepicker1').datetimepicker({
         format: "d-M-Y  h:m A",
@@ -893,6 +894,7 @@ angular.module('ezeidApp').controller('SearchController', [
 
     //View Directions
     SearchSec.viewDirections = function (data) {
+
       var start = new google.maps.LatLng($rootScope.CLoc.CLat, $rootScope.CLoc.CLong);
       var end = new google.maps.LatLng(data.Latitude, data.Longitude);
 
@@ -1311,11 +1313,50 @@ angular.module('ezeidApp').controller('SearchController', [
         }
         else
         {
-            $http({ method: 'get', url: GURL + 'ewtGetWorkingHours?Token=' + $rootScope._userInfo.Token + '&MasterID=' + SearchSec.mInfo.TID }).success(function (data)
+            $scope.showWorkingHourModel = true;
+            $http({ method: 'get', url: GURL + 'ewtGetWorkingHours?Token=' + $rootScope._userInfo.Token + '&MasterID=' + SearchSec.mInfo.LocID }).success(function (data)
             {
+                console.log(data);
                 if (data != 'null')
                 {
-                   $scope.Mo1 = tConvertTo12Hours(data[0].MO1);
+                    $scope.showNoWorkingHoursFound = false;
+
+                    $scope.Mo1 = data[0].MO1;
+                    $scope.Mo2 = data[0].MO2;
+                    $scope.Mo3 = data[0].MO3;
+                    $scope.Mo4 = data[0].MO4;
+
+                    $scope.Tu1 = data[0].TU1;
+                    $scope.Tu2 = data[0].TU2;
+                    $scope.Tu3 = data[0].TU3;
+                    $scope.Tu4 = data[0].TU4;
+
+                    $scope.We1 = data[0].WE1;
+                    $scope.We2 = data[0].WE2;
+                    $scope.We3 = data[0].WE3;
+                    $scope.We4 = data[0].WE4;
+
+                    $scope.Th1 = data[0].TH1;
+                    $scope.Th2 = data[0].TH2;
+                    $scope.Th3 = data[0].TH3;
+                    $scope.Th4 = data[0].TH4;
+
+                    $scope.Fr1 = data[0].FR1;
+                    $scope.Fr2 = data[0].FR2;
+                    $scope.Fr3 = data[0].FR3;
+                    $scope.Fr4 = data[0].FR4;
+
+                    $scope.Sa1 = data[0].SA1;
+                    $scope.Sa2 = data[0].SA2;
+                    $scope.Sa3 = data[0].SA3;
+                    $scope.Sa4 = data[0].SA4;
+
+                    $scope.Su1 = data[0].SU1;
+                    $scope.Su2 = data[0].SU2;
+                    $scope.Su3 = data[0].SU3;
+                    $scope.Su4 = data[0].SU4;
+
+                   /* $scope.Mo1 = tConvertTo12Hours(data[0].MO1);
                     $scope.Mo2 = tConvertTo12Hours(data[0].MO2);
                     $scope.Mo3 = tConvertTo12Hours(data[0].MO3);
                     $scope.Mo4 = tConvertTo12Hours(data[0].MO4);
@@ -1348,15 +1389,15 @@ angular.module('ezeidApp').controller('SearchController', [
                     $scope.Su1 = tConvertTo12Hours(data[0].SU1);
                     $scope.Su2 = tConvertTo12Hours(data[0].SU2);
                     $scope.Su3 = tConvertTo12Hours(data[0].SU3);
-                    $scope.Su4 = tConvertTo12Hours(data[0].SU4);
+                    $scope.Su4 = tConvertTo12Hours(data[0].SU4);*/
                 }
                 else
                 {
                     // Notification.error({ message: 'Invalid key or not found…', delay: MsgDelay });
+                    $scope.showNoWorkingHoursFound = true;
                 }
             });
 
-            $scope.showWorkingHourModel = true;
            // $('#WorkingHour_popup').slideDown();
         }
     };
