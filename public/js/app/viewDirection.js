@@ -13,7 +13,7 @@ angular.module('ezeidApp').controller('viewDirectionController',['$http', '$root
 
     initialize();
 
-   if ($rootScope._userInfo) {
+/*   if ($rootScope._userInfo) {
     }
     else {
         if (typeof (Storage) !== "undefined") {
@@ -46,7 +46,7 @@ angular.module('ezeidApp').controller('viewDirectionController',['$http', '$root
             alert('Sorry..! Browser does not support');
             window.location.href = "/home";
         }
-    }
+    }*/
 
     function initialize () {
         directionsDisplay = new google.maps.DirectionsRenderer();
@@ -117,7 +117,18 @@ angular.module('ezeidApp').controller('viewDirectionController',['$http', '$root
 
     // EMail direction Html
     viewDirection.emailHtml = function () {
-        $scope.showEmailForm = true;
+
+        console.log($rootScope);
+
+        if($rootScope._userInfo.IsAuthenticate == false)
+        {
+            $('#SignIn_popup').slideDown();
+        }
+        else
+        {
+            $('#SalesEnquiryRequest_popup').slideDown();
+            $scope.showEmailForm = true;
+        }
     };
 
     // Print direction Html
@@ -134,14 +145,15 @@ angular.module('ezeidApp').controller('viewDirectionController',['$http', '$root
     //  Close EMail direction dialogue
     viewDirection.closeEmailDialouge = function () {
         $scope.showEmailForm = false;
-        document.getElementById("FromEmailID").className = "form-control emptyBox";
+        document.getElementById("ToMailID").className = "form-control emptyBox";
         viewDirection._info.FromEmailID = "";
     };
 
     //  EMail direction image
     viewDirection.emailDirectionImage = function () {
 
-        $http({ method: 'get', url: GURL + 'ewtSendBulkMailer?Token=' + $rootScope._userInfo.Token + '&TID=""&TemplateID=""&ToMailID='+ viewDirection._info.ToMailID +'&Attachment='+finalImageSrc+'&AttachmentFileName=ViewDirection'}).success(function (data)
+    //  $http({ method: 'get', url: GURL + 'ewtSendBulkMailer?Token=' + $rootScope._userInfo.Token + '&TID=""&TemplateID=""&ToMailID='+ viewDirection._info.ToMailID +'&Attachment='+ finalImageSrc +'&AttachmentFileName=ViewDirection'}).success(function (data)
+        $http({ method: 'post', url: GURL + 'ewtSendBulkMailer', data: { TokenNo: $rootScope._userInfo.Token, TID: "", TemplateID: "", ToMailID: viewDirection._info.ToMailID, Attachment: finalImageSrc, AttachmentFileName :'ViewDirection.png'} }).success(function (data)
         {
             if (data != 'null')
             {
@@ -153,24 +165,10 @@ angular.module('ezeidApp').controller('viewDirectionController',['$http', '$root
             else
             {
                 // Notification.error({ message: 'Invalid key or not found…', delay: MsgDelay });
+                Notification.error({ message: 'Sorry..! Message not send ', delay: MsgDelay });
                 $window.localStorage.removeItem("searchResult");
             }
         });
-
-       $http({ method: 'post', url: GURL + 'ewtSendBulkMail', data: { TokenNo: $rootScope._userInfo.Token,  Attachement:  finalImageSrc, FromEmail: viewDirection._info.FromEmailID } }).success(function (data)
-       {
-            if (data.IsSuccessfull) {
-
-                viewDirection._info.FromEmailID = "";
-                Notification.success({ message: 'Message send success', delay: MsgDelay });
-                $scope.showEmailForm = false;
-                document.getElementById("FromEmailID").className = "form-control emptyBox";
-            }
-            else {
-                Notification.error({ message: 'Sorry..! Message not send ', delay: MsgDelay });
-            }
-        });
-
     };
 
 }]);
