@@ -152,14 +152,11 @@
             </div>
         </div>
         <!--<modal mtitle="'Working Hours'" visible="showWorkingHourModel">-->
-        <modal mtitle="'Working Hours'" visible="showWorkingHourModel">
+        <modal mtitle="'Working Hours'" visible="showWorkingHourModel" class="workingHours">
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                        <!--<div class="row keyWordText" >
-                            <h4>Working Hours</h4>
-                        </div>-->
-                        <div class="row keyWordText" >
+                       <div class="row keyWordText" >
                             <table class="table table-striped custom-table" border="1" style="margin-bottom: 0px;">
                                 <thead>
                                     <tr style="background: #bfbfbf; color: #000000;">
@@ -172,54 +169,74 @@
                                         <th>Sun</th>
                                     </tr>
                                 </thead>
-                                <tbody ng-hide="showNoWorkingHoursFound">
+                                <tbody>
                                 <tr>
                                     <td  ng-class=" !Mo1.length ? 'emptyCell' : ''">{{Mo1}}</td>
-                                    <td>{{Tu1}}</td>
-                                    <td>{{We1}}</td>
-                                    <td>{{Th1}}</td>
-                                    <td>{{Fr1}}</td>
-                                    <td>{{Sa1}}</td>
-                                    <td>{{Su1}}</td>
+                                    <td  ng-class=" !Tu1.length ? 'emptyCell' : ''">{{Tu1}}</td>
+                                    <td ng-class=" !We1.length ? 'emptyCell' : ''">{{We1}}</td>
+                                    <td ng-class=" !Th1.length ? 'emptyCell' : ''">{{Th1}}</td>
+                                    <td ng-class=" !Fr1.length ? 'emptyCell' : ''">{{Fr1}}</td>
+                                    <td ng-class=" !Sa1.length ? 'emptyCell' : ''">{{Sa1}}</td>
+                                    <td ng-class=" !Su1.length ? 'emptyCell' : ''">{{Su1}}</td>
                                 </tr>
                                 <tr>
-                                    <td>{{Mo2}}</td>
-                                    <td>{{Tu2}}</td>
-                                    <td>{{We2}}</td>
-                                    <td>{{Th2}}</td>
-                                    <td>{{Fr2}}</td>
-                                    <td>{{Sa2}}</td>
-                                    <td>{{Su2}}</td>
+                                    <td ng-class=" !Mo2.length ? 'emptyCell' : ''">{{Mo2}}</td>
+                                    <td ng-class=" !Tu2.length ? 'emptyCell' : ''">{{Tu2}}</td>
+                                    <td ng-class=" !We2.length ? 'emptyCell' : ''">{{We2}}</td>
+                                    <td ng-class=" !Th2.length ? 'emptyCell' : ''">{{Th2}}</td>
+                                    <td ng-class=" !Fr2.length ? 'emptyCell' : ''">{{Fr2}}</td>
+                                    <td ng-class=" !Sa2.length ? 'emptyCell' : ''">{{Sa2}}</td>
+                                    <td ng-class=" !Su2.length ? 'emptyCell' : ''">{{Su2}}</td>
                                 </tr>
                                 <tr>
-                                    <td style="background: #bfbfbf; color: #000000; height: 33px;" colspan="7">
+                                    <td style="background: #bfbfbf; color: #000000; height: 15px;" colspan="7">
 
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td>{{Mo3}}</td>
-                                    <td>{{Tu3}}</td>
-                                    <td>{{We3}}</td>
-                                    <td>{{Th3}}</td>
-                                    <td>{{Fr3}}</td>
-                                    <td>{{Sa3}}</td>
-                                    <td>{{Su3}}</td>
+                                    <td ng-class=" !Mo3.length ? 'emptyCell' : ''">{{Mo3}}</td>
+                                    <td ng-class=" !Tu3.length ? 'emptyCell' : ''">{{Tu3}}</td>
+                                    <td ng-class=" !We3.length ? 'emptyCell' : ''" >{{We3}}</td>
+                                    <td ng-class=" !Th3.length ? 'emptyCell' : ''" >{{Th3}}</td>
+                                    <td ng-class=" !Fr3.length ? 'emptyCell' : ''" >{{Fr3}}</td>
+                                    <td ng-class=" !Sa3.length ? 'emptyCell' : ''" >{{Sa3}}</td>
+                                    <td ng-class=" !Su3.length ? 'emptyCell' : ''">{{Su3}}</td>
                                 </tr>
                                 <tr>
-                                    <td>{{Mo4}}</td>
-                                    <td>{{Tu4}}</td>
-                                    <td>{{We4}}</td>
-                                    <td>{{Th4}}</td>
-                                    <td>{{Fr4}}</td>
-                                    <td>{{Sa4}}</td>
-                                    <td>{{Su4}}</td>
+                                    <td ng-class=" !Mo4.length ? 'emptyCell' : ''">{{Mo4}}</td>
+                                    <td ng-class=" !Tu4.length ? 'emptyCell' : ''">{{Tu4}}</td>
+                                    <td ng-class=" !We4.length ? 'emptyCell' : ''" >{{We4}}</td>
+                                    <td ng-class=" !Th4.length ? 'emptyCell' : ''">{{Th4}}</td>
+                                    <td ng-class=" !Fr4.length ? 'emptyCell' : ''">{{Fr4}}</td>
+                                    <td ng-class=" !Sa4.length ? 'emptyCell' : ''" >{{Sa4}}</td>
+                                    <td ng-class=" !Su4.length ? 'emptyCell' : ''">{{Su4}}</td>
                                 </tr>
                                 </tbody>
                             </table>
                         </div>
-                        <div ng-show="showNoWorkingHoursFound" class="row keyWordText" >No Working hours found!!</div>
+                       <!-- <div ng-show="showNoWorkingHoursFound" class="row keyWordText" >No Working hours found!!</div>-->
                         <div class="row keyWordText" >
                             <h4>Holidays</h4>
+                        </div>
+                        <div class="row keyWordText" >
+                            <table class="table table-striped custom-table" border="1" style="margin-bottom: 0px;">
+                                <thead>
+                                    <tr style="background: #bfbfbf; color: #000000;">
+                                        <th style="width: 25%;">Date</th>
+                                        <th class="setTextToLeftAligned" style="text-align: left;">Holiday Purpose</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                        <div class="row keyWordText holidayTableContainer">
+                            <table class="table table-striped custom-table" border="1" style="margin-bottom: 0px;">
+                                <tbody>
+                                    <tr ng-repeat="_item in search.holiday">
+                                        <td style="width: 25.5%;">{{_item.HolidayDate}}</td>
+                                        <td class="setTextToLeftAligned">{{_item.HolidayTitle}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -314,27 +331,25 @@
                                    <div class="col-lg-5 col-md-5 col-sm-12 col-xs-12 bottom-clearfix setFontSize infoContainer infoTabRightBorder">
                                         <div class="row setRowLeftRightMarginZero">
                                             <div class="topSearchRow">
-                                               <div  class="col-lg-2 col-md-2 col-sm-2 col-xs-2 searchButtonMarginSet searchStrepTextMarin showPointer" ng-class="ShowInfoWindow ? 'setLinkToText' : ''" >
+                                               <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 searchButtonMarginSet searchStrepTextMarin showPointer"
+                                                    ng-class="search.showInfoWindow || search.showResultWindow ? 'setLinkToText' : ''" >
                                                    <span ng-click="showSearchTab()">Search</span>
                                                </div>
+                                                <div ng-show="search.showResultTab" class="col-lg-2 col-md-2 col-sm-2 col-xs-2 searchStrepTextMarin showPointer searchInfoLink"
+                                                     style="text-align: center;" ng-class="search.showInfoWindow || search.showSearchWindow ? 'setLinkToText' : ''">
+                                                    <span ng-click="showResultWindow()">Result</span>
+                                                </div>
                                                 <div ng-show="ShowLinks">
-                                                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 searchInfoLink searchStripTopMargin showPointer" ng-class="!ShowInfoWindow ? 'setLinkToText' : ''">
-                                                         <span ng-click="showInfoWindowTab()">Information</span>
-                                                    </div>
-                                                    <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1 searchButtonMarginSet searchStripTopMargin showPointer" style="text-align: right; margin-top: 1.5%;">
-                                                        <img ng-click="showSearchTab()" src="../images/back_24.png">
-                                                    </div>
-                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 searchButtonMarginSet searchStripTopMargin showPointer" style="margin-top: 1.5%;">
-                                                        <img ng-click="showInfoWindowTab()" src="../images/next_24.png">
+                                                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 searchInfoLink searchStripTopMargin showPointer"
+                                                         ng-class="search.showResultWindow || search.showSearchWindow ? 'setLinkToText' : ''">
+                                                        <span ng-click="showInfoWindowTab()">Information</span>
                                                     </div>
                                                 </div>
-
                                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 pull-right helpTextColor searchStrepTextMarin showPointer" ng-click="openHelpPopup()" style="text-align: right;" id="SearchHelp">
                                                   Help ?
                                                </div>
                                             </div>
-                                            <div ng-show="ShowInfoWindow">
-
+                                            <div ng-show="search.showInfoWindow">
                                                 <div ng-show="search.mInfo.Picture">
                                                     <div ng-show="search.mInfo.IDTypeID == 1" class="row addItemRowUserEzeid1 userImgSpace" >
                                                         <img width="77" height="90" ng-src="{{search.mInfo.Picture}}" >
@@ -351,8 +366,6 @@
                                                         <img  width="308" height="90" ng-src="../images/business_profile_pic.png" >
                                                     </div>
                                                 </div>
-
-
                                                 <div class="row addItemRowUserEzeid">
                                                     <span class="ezeidTitle"><b> {{search.mInfo.EZEID}} </b></span>
                                                 </div>
@@ -379,11 +392,10 @@
                                                     </div>
                                                     <div class="row centerAlign searchButtonMarginSet">
                                                         <a href="mailto:{{search.mInfo.EMailID}}" target="_blank">{{search.mInfo.EMailID +' '}}</a>  <span ng-show="search.mInfo.Website"> | <a target="_blank" href="http://{{search.mInfo.Website}}">{{' '+search.mInfo.Website}}</a> </span>
-                                                        <!--<a href="mailto:{{search.mInfo.EMailID}}" target="_blank">{{search.mInfo.EMailID +' '}}</a>  <span ng-show="search.mInfo.Website"> | <a target="_blank" ng-href="//{{search.mInfo.Website}}">{{' '+search.mInfo.Website}}</a> </span>-->
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div ng-hide="ShowInfoWindow">
+                                            <div ng-show="search.showSearchWindow">
                                                 <div class="row addItemRowUserEzeid1 setTopMargin" >
                                                     <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 normalFontSize searchRadioPadding searchByText">
                                                         Search by
@@ -433,21 +445,6 @@
                                                             Rating
                                                         </div>
                                                         <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 normalFontSize searchStarContainer showPointer">
-                                                           <!-- <img src="../images/smallGreyStar_16.png" ng-hide="showStar1"  ng-click="search.addRatting(1,'gray')" >
-                                                            <img src="../images/smallStar_16_.png" ng-show="showStar1" ng-click="search.addRatting(1,'yellow')" >
-
-                                                            <img src="../images/smallGreyStar_16.png" ng-hide="showStar2"  ng-click="search.addRatting(2,'gray')" >
-                                                            <img src="../images/smallStar_16_.png" ng-show="showStar2" ng-click="search.addRatting(2,'yellow')" >
-
-                                                            <img src="../images/smallGreyStar_16.png" ng-hide="showStar3"  ng-click="search.addRatting(3,'gray')" >
-                                                            <img src="../images/smallStar_16_.png" ng-show="showStar3" ng-click="search.addRatting(3,'yellow')" >
-
-                                                            <img src="../images/smallGreyStar_16.png" ng-hide="showStar4"  ng-click="search.addRatting(4,'gray')" >
-                                                            <img src="../images/smallStar_16_.png" ng-show="showStar4" ng-click="search.addRatting(4,'yellow')" >
-
-                                                            <img src="../images/smallGreyStar_16.png" ng-hide="showStar5"  ng-click="search.addRatting(5,'gray')" >
-                                                            <img src="../images/smallStar_16_.png" ng-show="showStar5" ng-click="search.addRatting(5,'yellow')" >-->
-
                                                             <img src="../images/smallGreyStar_16.png" ng-hide="showStar1" ng-click="search.addRatting(1,'gray')" >
                                                             <img src="../images/smallStar_16_.png" ng-show="showStar1" ng-click="search.addRatting(1,'yellow')" >
 
@@ -462,7 +459,6 @@
 
                                                             <img src="../images/smallGreyStar_16.png" ng-hide="showStar5" ng-click="search.addRatting(5,'gray')" >
                                                             <img src="../images/smallStar_16_.png" ng-show="showStar5" ng-click="search.addRatting(5,'yellow')" >
-
                                                         </div>
                                                     </div>
                                                     <div class="row centerAlign searchButtonMarginSet showPlaces setTopMargin">
@@ -503,6 +499,42 @@
                                                     </div>
                                                     <div class="col-md-12">
                                                         <span> NO: {{search.downloadData.No}}  {{search.downloadData.date != "" ? "| Expiry Date:"+search.downloadData.date : ""}}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div ng-show="search.showResultWindow" class="resultContainer">
+                                                <div class="row addItemRowUserEzeid1 setTopMargin" >
+                                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                        <!--<div class="row searchButtonMarginSet resultContainerRow" ng-repeat="_item in search.searchResult">-->
+                                                            <!--<div class="col-lg-1 col-md-1 col-sm-1 col-xs-1">-->
+                                                                <!--{{$index + 1}}.-->
+                                                            <!--</div>-->
+                                                            <!--<div class="col-lg-7 col-md-7 col-sm-7 col-xs-7 setTextToLeftAligned " >-->
+                                                                <!--<span class="showPointer" style="color: #0866A6;"-->
+                                                                      <!--ng-click="getSearchInfo(_item)">{{_item.CompanyName | truncate:23}}</span>-->
+                                                            <!--</div>-->
+                                                            <!--<div ng-show="_item.city" class="col-lg-4 col-md-4 col-sm-4 col-xs-4" style="border-left: 2px solid #000;">-->
+                                                                <!--<span>{{_item.city | truncate:7}}</span>-->
+                                                            <!--</div>-->
+                                                        <!--</div>-->
+                                                        <div class="row searchButtonMarginSet resultContainerRow  bottom-clearfix" ng-repeat="_item in search.searchResult">
+
+                                                            <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1">
+                                                                {{$index + 1}}.
+                                                            </div>
+                                                            <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10">
+                                                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setTextToLeftAligned " >
+
+
+                                                                <span class="showPointer" style="color: #0866A6;"
+                                                                      ng-click="getSearchInfo(_item)">{{_item.CompanyName | truncate:40}}</span>
+                                                                </div>
+                                                                <div ng-show="_item.city" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-left">
+                                                                    <small>{{_item.city | truncate:20}}</small>
+                                                                </div>
+                                                            </div>
+
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>

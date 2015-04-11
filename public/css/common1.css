@@ -217,8 +217,7 @@ hr {
 .searchInfoLink
 {
     border-left: 2px solid #000;
-    border-right: 2px solid #000;
-    width: 27%;
+   /* width: 27%;*/
 }
 .searchStripTopMargin
 {
@@ -676,16 +675,63 @@ body {
 }
 .custom-table th, td
 {
-    text-align: center;
+    text-align: left;
 }
-/*.custom-table tr
-{
-   height: 30px;
-}*/
+
 .custom-table > tr > td {
     padding: 4px;
 }
 .emptyCell
 {
     background: #ddebf7;
+}
+.setTextToLeftAligned
+{
+    text-align: left;
+}
+.workingHours
+{
+}
+.workingHours, .modal-body
+{
+    padding-top: 0px;
+}
+.workingHours, .modal-header
+{
+    padding: 7px;
+}
+/*.custom-table > thead > tr > th, td
+{
+    padding: 7px;
+}
+.custom-table > tbody > tr > td
+{
+    padding: 7px;
+}*/
+.holidayTableContainer
+{
+    overflow-y: auto;
+    height:180px;
+}
+/*.custom-table thead, tbody { display: block; }
+
+.custom-table tbody {
+    height: 100px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}*/
+.resultContainerRow
+{
+    margin-top: 2%;
+}
+.resultContainer
+{
+    height: 338px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    width: 100%;
+}
+.setPaddingLeft0
+{
+    padding-left: 0px;
 }
