@@ -173,7 +173,6 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
                 });
             }
             else{
-                console.log('Line 171 no map initialization');
                 mapList['map'+index].clearAllMarkers();
                 if(index == 0){
                     /**
@@ -284,11 +283,11 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
 
         /**
          * Details of Location currently in editing mode
-         * @type {{LocTitle: string, LocID: number, AddressLine1: string, AddressLine2: string, CityID: string, StateID: string, CityTitle: string, StateTitle: string, CountryID: number, CountryName: string, ISDPhoneNumber: string, PhoneNumber: string, ISDMobileNumber: string, MobileNumber: string, ParkingStatus: string, Website: string, Picture: string, PictureFileName: string, PostalCode: string, Latitude: number, Longitude: number, Altitude: number}}
+         * @type {{LocTitle: string, TID: number, AddressLine1: string, AddressLine2: string, CityID: string, StateID: string, CityTitle: string, StateTitle: string, CountryID: number, CountryName: string, ISDPhoneNumber: string, PhoneNumber: string, ISDMobileNumber: string, MobileNumber: string, ParkingStatus: string, Website: string, Picture: string, PictureFileName: string, PostalCode: string, Latitude: number, Longitude: number, Altitude: number}}
          */
         $scope.editLocationDetails = {
             LocTitle : 'New Location',
-            LocID : 0,
+            TID : 0,
             AddressLine1 : '',
             AddressLine2 : '',
             CityID : '',
@@ -317,7 +316,7 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
          */
 
         $scope.editLocation = function(index){
-
+            $scope.toggleAllLocations(index);
             /**
              * On editing mode of location we fetch a new list of state
              * Assign the new list to $scope.editList variable
@@ -341,16 +340,17 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
             else{
                 $scope.loadStates($scope.secondaryLocations[index-1].CountryID).then(function(stateList){
                     $scope.editStateList  = stateList;
-
+                    console.log($scope.editLocationDetails);
                     for(var prop in $scope.editLocationDetails){
                         if($scope.editLocationDetails.hasOwnProperty(prop)){
-                            for(var prop1 in $scope.userDetails){
+                            for(var prop1 in $scope.secondaryLocations[index-1]){
                                 if(prop === prop1){
                                     $scope.editLocationDetails[prop] = $scope.secondaryLocations[index-1][prop];
                                 }
                             }
                         }
                     }
+                    console.log($scope.editLocationDetails);
                     $scope.placeEditModeMarker(index);
 
                 });
@@ -361,9 +361,6 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
 
 
         $scope.saveLocation = function(locIndex){
-            /**
-             * @todo Send a API Call to save the location currently in edit mode
-             */
             if(locIndex === 0 ){
                 var userDetails = angular.copy($scope.userDetails);
                 for(var prop in $scope.editLocationDetails){
@@ -394,7 +391,7 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
                     Altitude : (userDetails.Altitude) ? userDetails.Altitude : 0,
                     AddressLine1 : userDetails.AddressLine1,
                     AddressLine2 : userDetails.AddressLine2,
-                    Area : userDetails.Area,
+                    Area : (userDetails.Area) ? $scope.editUserDetails.Area : '',
                     CityTitle : userDetails.CityTitle,
                     StateID : userDetails.StateID,
                     CountryID : userDetails.CountryID,
@@ -420,6 +417,7 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
                         ((userDetails.SelectionType === 1 || userDetails.SelectionType === 2) ?
                             userDetails.SelectionType : 1) : 0,
                     ParkingStatus : userDetails.ParkingStatus
+
                 };
 
                 $http({
@@ -429,12 +427,43 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
                 }).success(function(resp){
                     if(resp && resp !== null && resp !== 'null'){
                         if(resp.IsAuthenticate){
+
+                            /**
+                             * Updating primaryLocation properties with new primaryLocation details from Edit Mode
+                             */
+                            for(var prop in userDetails){
+                                if(userDetails.hasOwnProperty(prop)){
+                                    for(var prop1 in $scope.userDetails){
+                                        if($scope.userDetails.hasOwnProperty(prop1) && prop1 === prop){
+                                            $scope.userDetails[prop] = userDetails[prop];
+                                        }
+                                    }
+                                }
+                            }
+
+                            Notification.success({
+                                message: 'Primary Location Details saved successfully',
+                                delay : MsgDelay
+                            });
+                            $scope.locationsToggleIndex[locIndex].editMode = false;
+                            /**
+                             * Resetting edit mode data
+                             */
+                            $scope.resetEditLocationDetails();
+                        }
+                        else{
+                            Notification.error({
+                                message: 'An error occured while saving primary location details ! Try again',
+                                delay : MsgDelay
+                            });
                         }
                     }
-                    Notification.success({
-                        message: JSON.stringify(resp),
-                        delay : MsgDelay
-                    });
+                    else{
+                        Notification.error({
+                            message: 'An error occured while saving primary location details ! Try again',
+                            delay : MsgDelay
+                        });
+                    }
                         /**
                          * @todo 1. Add logic to toggleEditMode after the location is successfully saved
                          *  2. Copy the new userDetails to $scope.userDetails Object
@@ -480,8 +509,26 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
                         method : 'POST',
                         data : data
                     }).success(function(resp){
-                            Notification.success({ message : JSON.stringify(resp),delay : MsgDelay});
-                            console.log(resp);
+                            for(var prop in $scope.editLocationDetails){
+                                if($scope.editLocationDetails.hasOwnProperty(prop)){
+                                    for(var prop1 in $scope.secondaryLocations[locIndex-1]){
+                                        if($scope.secondaryLocations[locIndex-1].hasOwnProperty(prop1) && prop1 === prop){
+                                            $scope.secondaryLocations[locIndex-1][prop] = $scope.editLocationDetails[prop];
+                                        }
+                                    }
+                                }
+                            }
+
+                            Notification.success({
+                                message: 'Primary Location Details saved successfully',
+                                delay : MsgDelay
+                            });
+                            $scope.locationsToggleIndex[locIndex].editMode = false;
+                            /**
+                             * Resetting edit mode data
+                             */
+                            $scope.resetEditLocationDetails();
+
                         }).error(function(err){
                             console.log(err);
                         });
@@ -611,6 +658,35 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
              * @todo Validate secondary location data before saving here
              */
             return validateResult;
+        };
+
+
+        $scope.resetEditLocationDetails = function(){
+            $scope.editLocationDetails = {
+                LocTitle : 'New Location',
+                TID : 0,
+                AddressLine1 : '',
+                AddressLine2 : '',
+                CityID : '',
+                StateID : '',
+                CityTitle : '',
+                StateTitle : '',
+                CountryID : 1,
+                CountryName : 'Afghanistan',
+                ISDPhoneNumber : '',
+                PhoneNumber: '',
+                ISDMobileNumber : '',
+                MobileNumber : '',
+                ParkingStatus : 0,
+                Website : '',
+                Picture : '',
+                PictureFileName : '',
+                PostalCode : '',
+                Latitude : 0,
+                Longitude : 0,
+                Altitude : 0
+            };
+
         };
 
     }]);
