@@ -178,6 +178,7 @@ app.get('/ewtGetIdCardPrintAP',LocationManager.FnGetIdCardPrintAP);
 app.post('/ewtSearchRealEstateAP', LocationManager.FnSearchRealEstateAP);
 app.post('/ewtUpdateRedFlagAP',LocationManager.FnUpdateRedFlagAP);
 app.post('/ewtUpdateEZEIDAP', LocationManager.FnUpdateEZEIDAP);
+app.post('/ewtDeleteBannerPicAP', LocationManager.FnDeleteBannerPictureAP);
 
 //EZEID VAS
 app.get('/ewtLoginVES',LocationManager.FnLoginVES);
