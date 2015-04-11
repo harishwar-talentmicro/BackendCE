@@ -97,7 +97,9 @@ angular.module('ezeidApp').controller('ProfileCtrl',[
                 editMode : false,
                 viewMode : false,
                 isMapInitialized : false,
-                savedOnServer : true
+                savedOnServer : true,
+                removeProgress : false,
+                saveProgress : false
             }
         ];
 
@@ -230,7 +232,9 @@ angular.module('ezeidApp').controller('ProfileCtrl',[
                                 viewMode : false,
                                 editMode : false,
                                 isMapInitialized: false,
-                                savedOnServer : true
+                                savedOnServer : true,
+                                removeProgress : false,
+                                saveProgress : false
                             };
                         }
                         $scope.secondaryLocations = resp;

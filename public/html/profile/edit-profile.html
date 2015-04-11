@@ -617,15 +617,15 @@
 
 
                             <!--------------- Location Section -------------------->
-                            <div class="panel panel-warning">
+                            <div class="panel panel-warning"  ng-controller="LocationsCtrl">
                                 <div class="panel-heading">
                                     Locations
-                                    <p class="text-info pull-right btn-link">
+                                    <p class="text-info pull-right btn-link" ng-click="addSecondaryLocation()">
                                         <span class="glyphicon glyphicon-plus"></span> Add
                                     </p>
                                 </div>
 
-                                <div class="panel-body locations-panel-body" ng-controller="LocationsCtrl">
+                                <div class="panel-body locations-panel-body">
                                     <form name="primaryLocationForm">
                                         <div class="row">
                                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 location-details">
@@ -640,21 +640,28 @@
                                                                                 title="Save Changes"
                                                                                 class="btn btn-xs btn-success no-radius"
                                                                                 ng-show="locationsToggleIndex[0].editMode"
-                                                                                ng-click="(locationsToggleIndex[0].editMode = false)(toggleMapControls(0))">
+                                                                                ng-click="saveLocation(0)">
                                                                             <span class="glyphicon glyphicon-ok"></span>
                                                                             Save
 
                                                                         </button>
                                                                         <button
                                                                             data-toggle="tooltip"
-                                                                            title="Go Back"
-                                                                            class="btn btn-xs btn-warning no-radius"
-                                                                            ng-show="locationsToggleIndex[0].editMode"
-                                                                            ng-click="(locationsToggleIndex[0].editMode = false)(toggleMapControls(0))">
+                                                                            title="Delete"
+                                                                            class="btn btn-xs btn-danger no-radius"
+                                                                            ng-disabled="1">
+                                                                            <span class="glyphicon glyphicon-trash"></span>
+
+                                                                        </button>
+                                                                        <button
+                                                                                data-toggle="tooltip"
+                                                                                title="Go Back"
+                                                                                class="btn btn-xs btn-warning no-radius"
+                                                                                ng-show="locationsToggleIndex[0].editMode"
+                                                                                ng-click="(locationsToggleIndex[0].editMode = false)(toggleMapControls(0))">
                                                                             <span class="glyphicon glyphicon-arrow-left"></span>
                                                                             Back
                                                                         </button>
-
                                                                         <button
                                                                                 data-toggle="tooltip"
                                                                                 title="Edit"
@@ -690,74 +697,29 @@
 
                                                 <div
                                                         ng-hide="locationsToggleIndex[0].editMode"
-                                                        class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                                                        class="col-lg-4 col-md-4 col-sm-4 col-xs-12 location-view-mode">
                                                     <div class="row">
                                                         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
-                                                            <h5 class="text-primary text-left">Address Line 1 </h5>
+                                                            <h5 class="text-primary text-left">Address </h5>
                                                         </div>
                                                         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
                                                             <h5 class="text-primary text-left font-open-sans data">
-                                                                {{userDetails.AddressLine1}}
+                                                                {{userDetails.AddressLine1}},
+                                                            </h5>
+                                                            <h5 class="text-primary text-left font-open-sans data">
+                                                                {{userDetails.AddressLine2}},
+                                                            </h5>
+                                                            <h5 class="text-primary text-left font-open-sans data">
+                                                                {{userDetails.CityTitle}}, {{userDetails.StateTitle}}
+                                                            </h5>
+
+                                                            <h5 class="text-primary text-left font-open-sans data">
+                                                                {{userDetails.CountryTitle}} - {{userDetails.PostalCode}}
                                                             </h5>
                                                         </div>
 
                                                     </div>
 
-                                                    <div class="row">
-                                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
-                                                            <h5 class="text-primary text-left">Address Line 2 </h5>
-                                                        </div>
-                                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
-                                                            <h5 class="text-primary text-left font-open-sans data">
-                                                                {{userDetails.AddressLine2}}
-                                                            </h5>
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="row">
-                                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
-                                                            <h5 class="text-primary text-left">Country </h5>
-                                                        </div>
-                                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
-                                                            <h5 class="text-primary text-left font-open-sans data">
-                                                                {{userDetails.CountryTitle}}
-                                                            </h5>
-                                                        </div>
-
-                                                    </div>
-
-                                                    <div class="row">
-                                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
-                                                            <h5 class="text-primary text-left">State </h5>
-                                                        </div>
-                                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
-                                                            <h5 class="text-primary text-left font-open-sans data">
-                                                                {{userDetails.StateTitle}}
-                                                            </h5>
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="row">
-                                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
-                                                            <h5 class="text-primary text-left">City </h5>
-                                                        </div>
-                                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
-                                                            <h5 class="text-primary text-left font-open-sans data">
-                                                                {{userDetails.CityTitle}}
-                                                            </h5>
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="row">
-                                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
-                                                            <h5 class="text-primary text-left">Postal Code </h5>
-                                                        </div>
-                                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
-                                                            <h5 class="text-primary text-left font-open-sans data">
-                                                                {{userDetails.PostalCode}}
-                                                            </h5>
-                                                        </div>
-                                                    </div>
 
                                                     <div class="row">
                                                         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
@@ -820,66 +782,39 @@
                                                         class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
                                                     <div class="row">
                                                         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
-                                                            <h5 class="text-primary text-left">Address Line 1 </h5>
+                                                            <h5 class="text-primary text-left">Address </h5>
                                                         </div>
-                                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
-                                                            <div class="form-group">
+                                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix ">
+
                                                                 <input type="text" ng-model="editLocationDetails.AddressLine1" name="primaryLocationForm.AddressLine1" class="form-control" placeholder="Adress Line 1" />
-                                                            </div>
+
                                                         </div>
 
-                                                    </div>
-
-                                                    <div class="row">
-                                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
-                                                            <h5 class="text-primary text-left">Address Line 2 </h5>
-                                                        </div>
-                                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+                                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
                                                             <input type="text" ng-model="editLocationDetails.AddressLine2" name="primaryLocationForm.AddressLine2" class="form-control" placeholder="Address Line 2" />
                                                         </div>
-                                                    </div>
 
-                                                    <div class="row">
-                                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
-                                                            <h5 class="text-primary text-left">Country </h5>
-                                                        </div>
-                                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+                                                        <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 bottom-clearfix">
                                                             <select class="form-control" ng-model="editLocationDetails.CountryID" name="primaryLocationForm.CountryID">
                                                                 <option ng-repeat="country in countryList track by country.CountryID" value="{{country.CountryID}}">{{country.CountryName}}</option>
                                                             </select>
                                                         </div>
 
-                                                    </div>
-
-                                                    <div class="row">
-                                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
-                                                            <h5 class="text-primary text-left">State </h5>
-                                                        </div>
-                                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+                                                        <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 bottom-clearfix">
                                                             <select class="form-control" ng-model="editLocationDetails.StateID" name="primaryLocationForm.StateID">
                                                                 <option ng-repeat="state in editStateList track by state.StateID" value="{{state.StateID}}">{{state.StateName}}</option>
                                                             </select>
                                                         </div>
-                                                    </div>
 
-                                                    <div class="row">
-                                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
-                                                            <h5 class="text-primary text-left">City </h5>
-                                                        </div>
-
-                                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
-                                                                <input type="text" ng-model="editLocationDetails.CityTitle" name="primaryLocationForm.CityTitle" class="form-control" placeholder="City" />
+                                                        <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 bottom-clearfix">
+                                                            <input type="text" ng-model="editLocationDetails.CityTitle" name="primaryLocationForm.CityTitle" class="form-control" placeholder="City" />
 
                                                         </div>
-                                                    </div>
 
-                                                    <div class="row">
-                                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
-                                                            <h5 class="text-primary text-left">Postal Code </h5>
+                                                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 bottom-clearfix">
+                                                            <input type="text" ng-model="editLocationDetails.PostalCode" name="primaryLocationForm.PostalCode" class="form-control" placeholder="Postal Code" />
                                                         </div>
-                                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
-                                                            <input type="text" numbers-only ng-model="editLocationDetails.PostalCode" name="primaryLocationForm.PostalCode" class="form-control" placeholder="Postal Code" />
-                                                        </div>
+
                                                     </div>
 
                                                     <div class="row">
@@ -961,7 +896,7 @@
                                                 </div>
 
                                                 <div class="row locations-picture-container text-center">
-                                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
+                                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 location-image-container bottom-clearfix">
                                                         <img height="90px" width="308" class="hidden-xs"
                                                              ng-hide="userDetails.IDTypeID == 1"
                                                              ng-src="{{((userDetails.Picture)? userDetails.Picture : '/images/grey-background.jpg')}}" />
@@ -978,10 +913,10 @@
                                                              ng-src="{{((userDetails.Picture)? userDetails.Picture : '/images/grey-background.jpg')}}" />
                                                     </div>
                                                     <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 col-lg-offset-4 col-xs-offset-4 col-sm-offset-4 col-xs-offset-3" ng-show="locationsToggleIndex[0].editMode">
-                                                        <button class="btn btn-primary btn-sm" data-toggle="tooltip" title="Upload Picture">
+                                                        <button class="btn btn-primary btn-sm no-radius" data-toggle="tooltip" title="Upload Picture">
                                                             Attach Picture
                                                         </button>
-                                                        <button class="btn btn-primary btn-sm" data-toggle="tooltip" title="Click Picture using Webcam">
+                                                        <button class="btn btn-primary btn-sm no-radius" data-toggle="tooltip" title="Click Picture using Webcam">
                                                             <span class="glyphicon glyphicon-camera"></span>
                                                         </button>
                                                     </div>
@@ -998,20 +933,35 @@
 
                                     <!----------- Secondary Locations using ng-repeat----------------------------------------->
                                     <form name="secondaryLocation{{locIndex}}Form" ng-repeat="secondaryLocationDetails in secondaryLocations" ng-init="locIndex = $index">
-                                    <div class="row">
+                                    <div class="row" ng-class="(locationsToggleIndex[locIndex+1].editMode) ? 'location-edit-mode' : ''">
                                     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 location-details">
                                     <div class="row">
-                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
-                                            <h4>
+                                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4" ng-hide="locationsToggleIndex[locIndex+1].editMode">
+                                            <h4 class="pull-left">
                                                 {{locIndex+2}}. {{secondaryLocationDetails.LocTitle}}
-                                                                    <span class="pull-right">
+                                            </h4>
+
+                                        </div>
+                                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4" ng-show="locationsToggleIndex[locIndex+1].editMode">
+                                            <input
+                                                    data-toggle="tooltip"
+                                                    title="Location Title"
+                                                    type="text"
+                                                    class="form-control form-inline"
+                                                    ng-model="editLocationDetails.LocTitle"
+                                                    name="secondaryLocation{{locIndex}}Form.LocTitle"
+                                                    />
+                                        </div>
+                                        <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8">
+
+                                                                                                                <span class="pull-right">
                                                                         <!-- @todo Add facility to save and after saving change editMode to false and toggleMapControls after saving successfully -->
                                                                         <button
                                                                                 data-toggle="tooltip"
                                                                                 title="Save Changes"
                                                                                 class="btn btn-xs btn-success no-radius"
                                                                                 ng-show="locationsToggleIndex[locIndex+1].editMode"
-                                                                                ng-click="(locationsToggleIndex[locIndex+1].editMode = false)(toggleMapControls(locIndex+1))">
+                                                                                ng-click="saveLocation(locIndex+1)">
                                                                             <span class="glyphicon glyphicon-ok"></span>
                                                                             Save
 
@@ -1026,6 +976,15 @@
                                                                             Back
                                                                         </button>
 
+
+                                                                        <button
+                                                                                data-toggle="tooltip"
+                                                                                title="Delete Location"
+                                                                                class="btn btn-xs btn-danger no-radius"
+                                                                                ng-click="deleteSecondaryLocation(locIndex+1)"
+                                                                                >
+                                                                            <span class="glyphicon glyphicon-trash"></span>
+                                                                        </button>
                                                                         <button
                                                                                 data-toggle="tooltip"
                                                                                 title="Edit"
@@ -1034,6 +993,7 @@
                                                                                 ng-show="locationsToggleIndex[locIndex+1].viewMode && !locationsToggleIndex[locIndex+1].editMode">
                                                                             <span class="glyphicon glyphicon-pencil"></span>
                                                                         </button>
+
                                                                         <button
                                                                                 data-toggle="tooltip"
                                                                                 title="Show Details"
@@ -1051,7 +1011,11 @@
                                                                             <span class="glyphicon glyphicon-chevron-up"></span>
                                                                         </button>
                                                                     </span>
-                                            </h4>
+
+                                        </div>
+
+                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
+
                                         </div>
                                     </div>
 
@@ -1061,73 +1025,28 @@
 
                                     <div
                                             ng-hide="locationsToggleIndex[locIndex+1].editMode"
-                                            class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                                            class="col-lg-4 col-md-4 col-sm-4 col-xs-12 location-view-mode">
                                         <div class="row">
                                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
-                                                <h5 class="text-primary text-left">Address Line 1 </h5>
+                                                <h5 class="text-primary text-left">Address </h5>
                                             </div>
+
                                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
                                                 <h5 class="text-primary text-left font-open-sans data">
-                                                    {{secondaryLocationDetails.AddressLine1}}
+                                                    {{secondaryLocationDetails.AddressLine1}},
+                                                </h5>
+                                                <h5 class="text-primary text-left font-open-sans data">
+                                                    {{secondaryLocationDetails.AddressLine2}},
+                                                </h5>
+                                                <h5 class="text-primary text-left font-open-sans data">
+                                                    {{secondaryLocationDetails.CityTitle}}, {{secondaryLocationDetails.StateTitle}}
+                                                </h5>
+
+                                                <h5 class="text-primary text-left font-open-sans data">
+                                                    {{secondaryLocationDetails.CountryTitle}} - {{secondaryLocationDetails.PostalCode}}
                                                 </h5>
                                             </div>
 
-                                        </div>
-
-                                        <div class="row">
-                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
-                                                <h5 class="text-primary text-left">Address Line 2 </h5>
-                                            </div>
-                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
-                                                <h5 class="text-primary text-left font-open-sans data">
-                                                    {{secondaryLocationDetails.AddressLine2}}
-                                                </h5>
-                                            </div>
-                                        </div>
-
-                                        <div class="row">
-                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
-                                                <h5 class="text-primary text-left">Country </h5>
-                                            </div>
-                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
-                                                <h5 class="text-primary text-left font-open-sans data">
-                                                    {{secondaryLocationDetails.CountryTitle}}
-                                                </h5>
-                                            </div>
-
-                                        </div>
-
-                                        <div class="row">
-                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
-                                                <h5 class="text-primary text-left">State </h5>
-                                            </div>
-                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
-                                                <h5 class="text-primary text-left font-open-sans data">
-                                                    {{secondaryLocationDetails.StateTitle}}
-                                                </h5>
-                                            </div>
-                                        </div>
-
-                                        <div class="row">
-                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
-                                                <h5 class="text-primary text-left">City </h5>
-                                            </div>
-                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
-                                                <h5 class="text-primary text-left font-open-sans data">
-                                                    {{secondaryLocationDetails.CityTitle}}
-                                                </h5>
-                                            </div>
-                                        </div>
-
-                                        <div class="row">
-                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
-                                                <h5 class="text-primary text-left">Postal Code </h5>
-                                            </div>
-                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
-                                                <h5 class="text-primary text-left font-open-sans data">
-                                                    {{secondaryLocationDetails.PostalCode}}
-                                                </h5>
-                                            </div>
                                         </div>
 
                                         <div class="row">
@@ -1189,68 +1108,42 @@
                                     <div
                                             ng-show="locationsToggleIndex[locIndex+1].editMode"
                                             class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
-                                        <div class="row">
-                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
-                                                <h5 class="text-primary text-left">Address Line 1 </h5>
-                                            </div>
-                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
-                                                <div class="form-group">
-                                                    <input type="text" ng-model="editLocationDetails.AddressLine1" name="secondaryLocation{{locIndex}}Form.AddressLine1" class="form-control" placeholder="Adress Line 1" />
-                                                </div>
-                                            </div>
-
-                                        </div>
 
                                         <div class="row">
                                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
-                                                <h5 class="text-primary text-left">Address Line 2 </h5>
+                                                <h5 class="text-primary text-left">Address </h5>
                                             </div>
-                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix ">
+
+                                                <input type="text" ng-model="editLocationDetails.AddressLine1" name="secondaryLocation{{locIndex}}Form.AddressLine1" class="form-control" placeholder="Adress Line 1" />
+
+                                            </div>
+
+                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
                                                 <input type="text" ng-model="editLocationDetails.AddressLine2" name="secondaryLocation{{locIndex}}Form.AddressLine2" class="form-control" placeholder="Address Line 2" />
                                             </div>
-                                        </div>
 
-                                        <div class="row">
-                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
-                                                <h5 class="text-primary text-left">Country </h5>
-                                            </div>
-                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+                                            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 bottom-clearfix">
                                                 <select class="form-control" ng-model="editLocationDetails.CountryID" name="secondaryLocation{{locIndex}}Form.CountryID">
                                                     <option ng-repeat="country in countryList track by country.CountryID" value="{{country.CountryID}}">{{country.CountryName}}</option>
                                                 </select>
                                             </div>
 
-                                        </div>
-
-                                        <div class="row">
-                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
-                                                <h5 class="text-primary text-left">State </h5>
-                                            </div>
-                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+                                            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 bottom-clearfix">
                                                 <select class="form-control" ng-model="editLocationDetails.StateID" name="secondaryLocation{{locIndex}}Form.StateID">
                                                     <option ng-repeat="state in editStateList track by state.StateID" value="{{state.StateID}}">{{state.StateName}}</option>
                                                 </select>
                                             </div>
-                                        </div>
 
-                                        <div class="row">
-                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
-                                                <h5 class="text-primary text-left">City </h5>
-                                            </div>
-
-                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+                                            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 bottom-clearfix">
                                                 <input type="text" ng-model="editLocationDetails.CityTitle" name="secondaryLocation{{locIndex}}Form.CityTitle" class="form-control" placeholder="City" />
 
                                             </div>
-                                        </div>
 
-                                        <div class="row">
-                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
-                                                <h5 class="text-primary text-left">Postal Code </h5>
+                                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 bottom-clearfix">
+                                                <input type="text" ng-model="editLocationDetails.PostalCode" name="secondaryLocation{{locIndex}}Form.PostalCode" class="form-control" placeholder="Postal Code" />
                                             </div>
-                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
-                                                <input type="text" numbers-only ng-model="editLocationDetails.PostalCode" name="secondaryLocation{{locIndex}}Form.PostalCode" class="form-control" placeholder="Postal Code" />
-                                            </div>
+
                                         </div>
 
                                         <div class="row">
@@ -1332,7 +1225,7 @@
                                         </div>
 
                                         <div class="row locations-picture-container text-center">
-                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
+                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 location-image-container bottom-clearfix">
                                                 <img height="90px" width="308" class="hidden-xs"
                                                      ng-hide="secondaryLocationDetails.IDTypeID == 1"
                                                      ng-src="{{((secondaryLocationDetails.Picture)? secondaryLocationDetails.Picture : '/images/grey-background.jpg')}}" />
@@ -1349,10 +1242,10 @@
                                                      ng-src="{{((secondaryLocationDetails.Picture)? secondaryLocationDetails.Picture : '/images/grey-background.jpg')}}" />
                                             </div>
                                             <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 col-lg-offset-4 col-xs-offset-4 col-sm-offset-4 col-xs-offset-3" ng-show="locationsToggleIndex[locIndex+1].editMode">
-                                                <button class="btn btn-primary btn-sm" data-toggle="tooltip" title="Upload Picture">
+                                                <button class="btn btn-primary btn-sm no-radius" data-toggle="tooltip" title="Upload Picture">
                                                     Attach Picture
                                                 </button>
-                                                <button class="btn btn-primary btn-sm" data-toggle="tooltip" title="Click Picture using Webcam">
+                                                <button class="btn btn-primary btn-sm no-radius" data-toggle="tooltip" title="Click Picture using Webcam">
                                                     <span class="glyphicon glyphicon-camera"></span>
                                                 </button>
                                             </div>
