@@ -509,27 +509,41 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
                         method : 'POST',
                         data : data
                     }).success(function(resp){
-                            for(var prop in $scope.editLocationDetails){
-                                if($scope.editLocationDetails.hasOwnProperty(prop)){
-                                    for(var prop1 in $scope.secondaryLocations[locIndex-1]){
-                                        if($scope.secondaryLocations[locIndex-1].hasOwnProperty(prop1) && prop1 === prop){
-                                            $scope.secondaryLocations[locIndex-1][prop] = $scope.editLocationDetails[prop];
+                            if(resp && resp.length > 0){
+                                for(var prop in $scope.editLocationDetails){
+                                    if($scope.editLocationDetails.hasOwnProperty(prop)){
+                                        for(var prop1 in $scope.secondaryLocations[locIndex-1]){
+                                            if($scope.secondaryLocations[locIndex-1].hasOwnProperty(prop1) && prop1 === prop){
+                                                $scope.secondaryLocations[locIndex-1][prop] = $scope.editLocationDetails[prop];
+                                            }
                                         }
                                     }
                                 }
+
+                                Notification.success({
+                                    message: 'Secondary Location Details saved successfully',
+                                    delay : MsgDelay
+                                });
+                                $scope.locationsToggleIndex[locIndex].editMode = false;
+                                /**
+                                 * Resetting edit mode data
+                                 */
+                                $scope.resetEditLocationDetails();
+
                             }
 
-                            Notification.success({
-                                message: 'Primary Location Details saved successfully',
-                                delay : MsgDelay
-                            });
-                            $scope.locationsToggleIndex[locIndex].editMode = false;
-                            /**
-                             * Resetting edit mode data
-                             */
-                            $scope.resetEditLocationDetails();
+                            else{
+                                Notification.success({
+                                    message: 'An error occurred while saving secondary location ! Please try again',
+                                    delay : MsgDelay
+                                });
+                            }
 
                         }).error(function(err){
+                            Notification.error({
+                                message: 'An error occurred while saving secondary location ! Please try again',
+                                delay : MsgDelay
+                            });
                             console.log(err);
                         });
                 }
