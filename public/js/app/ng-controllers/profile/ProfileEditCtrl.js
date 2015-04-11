@@ -90,7 +90,7 @@ angular.module('ezeidApp').controller('ProfileEditCtrl',[
                 Altitude : ($scope.editUserDetails.Altitude) ? $scope.editUserDetails.Altitude : 0,
                 AddressLine1 : $scope.editUserDetails.AddressLine1,
                 AddressLine2 : $scope.editUserDetails.AddressLine2,
-                Area : $scope.editUserDetails.Area,
+                Area : ($scope.editUserDetails.Area) ? $scope.editUserDetails.Area : '',
                 CityTitle : $scope.editUserDetails.CityTitle,
                 StateID : $scope.editUserDetails.StateID,
                 CountryID : $scope.editUserDetails.CountryID,
