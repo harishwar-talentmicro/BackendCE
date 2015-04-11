@@ -933,20 +933,35 @@
 
                                     <!----------- Secondary Locations using ng-repeat----------------------------------------->
                                     <form name="secondaryLocation{{locIndex}}Form" ng-repeat="secondaryLocationDetails in secondaryLocations" ng-init="locIndex = $index">
-                                    <div class="row">
+                                    <div class="row" ng-class="(locationsToggleIndex[locIndex+1].editMode) ? 'location-edit-mode' : ''">
                                     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 location-details">
                                     <div class="row">
-                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
-                                            <h4>
+                                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4" ng-hide="locationsToggleIndex[locIndex+1].editMode">
+                                            <h4 class="pull-left">
                                                 {{locIndex+2}}. {{secondaryLocationDetails.LocTitle}}
-                                                                    <span class="pull-right">
+                                            </h4>
+
+                                        </div>
+                                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4" ng-show="locationsToggleIndex[locIndex+1].editMode">
+                                            <input
+                                                    data-toggle="tooltip"
+                                                    title="Location Title"
+                                                    type="text"
+                                                    class="form-control form-inline"
+                                                    ng-model="editLocationDetails.LocTitle"
+                                                    name="secondaryLocation{{locIndex}}Form.LocTitle"
+                                                    />
+                                        </div>
+                                        <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8">
+
+                                                                                                                <span class="pull-right">
                                                                         <!-- @todo Add facility to save and after saving change editMode to false and toggleMapControls after saving successfully -->
                                                                         <button
                                                                                 data-toggle="tooltip"
                                                                                 title="Save Changes"
                                                                                 class="btn btn-xs btn-success no-radius"
                                                                                 ng-show="locationsToggleIndex[locIndex+1].editMode"
-                                                                                ng-click="(locationsToggleIndex[locIndex+1].editMode = false)(toggleMapControls(locIndex+1))">
+                                                                                ng-click="saveLocation(locIndex+1)">
                                                                             <span class="glyphicon glyphicon-ok"></span>
                                                                             Save
 
@@ -996,7 +1011,11 @@
                                                                             <span class="glyphicon glyphicon-chevron-up"></span>
                                                                         </button>
                                                                     </span>
-                                            </h4>
+
+                                        </div>
+
+                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
+
                                         </div>
                                     </div>
 
@@ -1123,19 +1142,6 @@
 
                                             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 bottom-clearfix">
                                                 <input type="text" ng-model="editLocationDetails.PostalCode" name="secondaryLocation{{locIndex}}Form.PostalCode" class="form-control" placeholder="Postal Code" />
-                                            </div>
-
-                                        </div>
-
-
-                                        <div class="row">
-                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
-                                                <h5 class="text-primary text-left">Address Line 1 </h5>
-                                            </div>
-                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
-                                                <div class="form-group">
-                                                    <input type="text" ng-model="editLocationDetails.AddressLine1" name="secondaryLocation{{locIndex}}Form.AddressLine1" class="form-control" placeholder="Adress Line 1" />
-                                                </div>
                                             </div>
 
                                         </div>

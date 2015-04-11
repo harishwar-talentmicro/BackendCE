@@ -1984,3 +1984,7 @@ form .row-error{
     box-shadow: 0px 0px 10px #989898;
     border: 1px solid #FFF;
 }
+
+.location-edit-mode{
+    background : #E2FFDA!important;
+}

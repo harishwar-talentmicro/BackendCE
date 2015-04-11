@@ -224,7 +224,9 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
          */
         $scope.findCurrentLocation = function(index){
             mapList['map'+index].clearAllMarkers();
-            mapList['map'+index].placeCurrentLocationMarker($scope.setEditCurrentLocation);
+            mapList['map'+index].getCurrentLocation().then(function(){
+                mapList['map'+index].placeCurrentLocationMarker($scope.setEditCurrentLocation);
+            });
         };
 
         /**
@@ -244,11 +246,13 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
             gMap.getReverseGeolocation(lat,lng).then(function(results){
                 var geolocationAddress = gMap.parseReverseGeolocationData(results.data);
                 var countryIndex = $scope.countryList.indexOfWhere('CountryName',geolocationAddress.country);
-                console.log($scope.countryList[countryIndex]);
                 /**
                  * If country is changed then load new list of state for the new country
                  */
+
                 if($scope.countryList[countryIndex].CountryID !== $scope.editLocationDetails.CountryID){
+                    $scope.editLocationDetails.CountryID = $scope.countryList[countryIndex].CountryID;
+                    $scope.editLocationDetails.CountryName = $scope.countryList[countryIndex].CountryName;
                     $scope.loadStates($scope.countryList[countryIndex].CountryID).then(function(stateList){
                         if(stateList.length > 1){
                             $scope.editStateList = stateList;
@@ -257,9 +261,11 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
                         if(stateIndex === -1){
                             stateIndex = 0;
                         }
+                        $scope.editLocationDetails.CountryID = $scope.countryList[countryIndex].CountryID;
                         $scope.editLocationDetails.StateID = $scope.editStateList[stateIndex].StateID;
                         $scope.editLocationDetails.CityTitle = geolocationAddress.city;
                         $scope.editLocationDetails.PostalCode = geolocationAddress.postalCode;
+
                     });
                 }
                 else{
@@ -270,6 +276,7 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
                     $scope.editLocationDetails.StateID = $scope.editStateList[stateIndex].StateID;
                     $scope.editLocationDetails.CityTitle = geolocationAddress.city;
                     $scope.editLocationDetails.PostalCode = geolocationAddress.postalCode;
+                    $scope.editLocationDetails.CountryName = $scope.countryList[countryIndex].CountryName;
                 }
             });
         };
@@ -288,13 +295,13 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
             StateID : '',
             CityTitle : '',
             StateTitle : '',
-            CountryID : 98,
-            CountryName : '',
+            CountryID : 1,
+            CountryName : 'Afghanistan',
             ISDPhoneNumber : '',
             PhoneNumber: '',
             ISDMobileNumber : '',
             MobileNumber : '',
-            ParkingStatus : '',
+            ParkingStatus : 0,
             Website : '',
             Picture : '',
             PictureFileName : '',
@@ -353,10 +360,133 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
         };
 
 
-        $scope.saveLocation = function(index){
+        $scope.saveLocation = function(locIndex){
             /**
              * @todo Send a API Call to save the location currently in edit mode
              */
+            if(locIndex === 0 ){
+                var userDetails = angular.copy($scope.userDetails);
+                for(var prop in $scope.editLocationDetails){
+                    if($scope.editLocationDetails.hasOwnProperty(prop)){
+                        for(var prop1 in userDetails){
+                            if(userDetails.hasOwnProperty(prop1) && prop1 === prop){
+                                userDetails[prop] = $scope.editLocationDetails[prop];
+                            }
+                        }
+                    }
+                }
+
+                var data = {
+                    IDTypeID : userDetails.IDTypeID,
+                    EZEID : userDetails.EZEID,
+                    Password : '',
+                    FirstName : userDetails.FirstName,
+                    LastName : userDetails.LastName,
+                    CompanyName : userDetails.CompanyName,
+                    JobTitle : userDetails.JobTitle,
+                    CategoryID : 0,
+                    FunctionID : 0,
+                    RoleID : 0,
+                    LanguageID : 1,
+                    NameTitleID : 0,
+                    Latitude : (userDetails.Latitude) ? userDetails.Latitude : 0,
+                    Longitude : (userDetails.Longitude) ? userDetails.Longitude : 0,
+                    Altitude : (userDetails.Altitude) ? userDetails.Altitude : 0,
+                    AddressLine1 : userDetails.AddressLine1,
+                    AddressLine2 : userDetails.AddressLine2,
+                    Area : userDetails.Area,
+                    CityTitle : userDetails.CityTitle,
+                    StateID : userDetails.StateID,
+                    CountryID : userDetails.CountryID,
+                    PostalCode : userDetails.PostalCode,
+                    PIN : (userDetails.PIN) ? userDetails.PIN : '',
+                    PhoneNumber : userDetails.PhoneNumber,
+                    MobileNumber : userDetails.MobileNumber,
+                    EMailID : userDetails.EMailID,
+                    Picture  : userDetails.Picture,
+                    PictureFileName : userDetails.PictureFileName,
+                    Website : (userDetails.Website) ? userDetails.Website : '',
+                    AboutCompany: (userDetails.AboutCompany) ? userDetails.AboutCompany : '',
+                    Keywords : (userDetails.Keywords) ? userDetails.Keywords : '',
+                    Token : $rootScope._userInfo.Token,
+                    Icon : (userDetails.Icon) ? userDetails.Icon :'',
+                    IconFileName : (userDetails.IconFileName) ? userDetails.IconFileName :'',
+                    ISDPhoneNumber : userDetails.ISDPhoneNumber,
+                    ISDMobileNumber : userDetails.ISDMobileNumber,
+                    Gender : userDetails.Gender,
+                    DOB : userDetails.DOB,
+                    OperationType : 'U',
+                    SelectionType : ($scope.IDTypeID === 2) ?
+                        ((userDetails.SelectionType === 1 || userDetails.SelectionType === 2) ?
+                            userDetails.SelectionType : 1) : 0,
+                    ParkingStatus : userDetails.ParkingStatus
+                };
+
+                $http({
+                    url : GURL + 'ewSavePrimaryEZEData',
+                    method : 'POST',
+                    data : data
+                }).success(function(resp){
+                    if(resp && resp !== null && resp !== 'null'){
+                        if(resp.IsAuthenticate){
+                        }
+                    }
+                    Notification.success({
+                        message: JSON.stringify(resp),
+                        delay : MsgDelay
+                    });
+                        /**
+                         * @todo 1. Add logic to toggleEditMode after the location is successfully saved
+                         *  2. Copy the new userDetails to $scope.userDetails Object
+                         */
+                }).error(function(err){
+                    Notification.error({
+                        message: 'An error occured while saving primary location details ! Try again',
+                        delay : MsgDelay
+                    });
+                });
+
+            }
+
+            /**
+             * If location is secondary
+             */
+            else{
+                    var data  = {
+                        Token : $rootScope._userInfo.Token,
+                        TID : ($scope.editLocationDetails.TID) ? $scope.editLocationDetails.TID : 0,
+                        LocTitle : $scope.editLocationDetails.LocTitle,
+                        Latitude : $scope.editLocationDetails.Latitude,
+                        Longitude : $scope.editLocationDetails.Longitude,
+                        Altitude : 0,
+                        AddressLine1 : $scope.editLocationDetails.AddressLine1,
+                        AddressLine2 : $scope.editLocationDetails.AddressLine2,
+                        CityTitle : $scope.editLocationDetails.CityTitle,
+                        StateID : $scope.editLocationDetails.StateID,
+                        CountryID : $scope.editLocationDetails.CountryID,
+                        PostalCode : $scope.editLocationDetails.PostalCode,
+                        PIN : '',
+                        PhoneNumber : $scope.editLocationDetails.PhoneNumber,
+                        MobileNumber : $scope.editLocationDetails.MobileNumber,
+                        Picture : $scope.editLocationDetails.Picture,
+                        PictureFileName : ($scope.editLocationDetails.PictureFileName) ? $scope.editLocationDetails.PictureFileName : 'default.jpg' ,
+                        Website : $scope.editLocationDetails.Website,
+                        ISDPhoneNumber : $scope.editLocationDetails.ISDPhoneNumber,
+                        ISDMobileNumber : $scope.editLocationDetails.ISDMobileNumber,
+                        ParkingStatus : $scope.editLocationDetails.ParkingStatus
+                    }
+                    $http({
+                        url : GURL + 'ewmAddLocation',
+                        method : 'POST',
+                        data : data
+                    }).success(function(resp){
+                            Notification.success({ message : JSON.stringify(resp),delay : MsgDelay});
+                            console.log(resp);
+                        }).error(function(err){
+                            console.log(err);
+                        });
+                }
+
         };
 
         /**
@@ -384,7 +514,6 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
          * to be saved on server
          */
         $scope.addSecondaryLocation = function(){
-            console.log('I am clicked');
             var locIndex = $scope.locationsToggleIndex.indexOfWhere('savedOnServer',false);
 
             if(locIndex !== -1){
@@ -405,7 +534,9 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
                 viewMode : false,
                 editMode : false,
                 isMapInitialized : false,
-                savedOnServer: false
+                savedOnServer: false,
+                removeProgress : false,
+                saveProgress : false
             };
             $scope.secondaryLocations[initialLength-1] =  newLoc;
 
@@ -427,7 +558,59 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
          * @param locIndex
          */
         $scope.deleteSecondaryLocation = function(locIndex){
+            if(locIndex < 1){
+                return 0;
+            }
 
+            if(!$scope.locationsToggleIndex[locIndex].savedOnServer){
+                $scope.locationsToggleIndex[locIndex].removeProgress = true;
+                $timeout(function(){
+                    delete mapList['map'+locIndex];
+                    $scope.locationsToggleIndex.splice(locIndex,1);
+                    $scope.secondaryLocations.splice(locIndex - 1,1);
+                },2000);
+            }
+
+            else{
+                $scope.locationsToggleIndex[locIndex].removeProgress = true;
+                $http({
+                    url : GURL + 'ewDeleteLocation',
+                    method : 'POST',
+                    data : {
+                        Token : $rootScope._userInfo.Token,
+                        TID : $scope.secondaryLocations[locIndex-1].TID
+                    }
+                }).success(function(resp){
+                    if(resp && resp !== 'null' && resp.hasOwnProperty('IsDeleted')){
+                        if(resp.IsDeleted){
+                            delete mapList['map'+locIndex];
+                            $scope.locationsToggleIndex.splice(locIndex,1);
+                            $scope.secondaryLocations.splice(locIndex - 1,1);
+                            Notification.success({ message : 'Location removed successfully', delay : MsgDelay});
+                        }
+                        else{
+                            Notification.error({ message : 'Error occured while removing location! Try again', delay : MsgDelay});
+                        }
+                    }
+                    else{
+                        Notification.error({ message : 'Error occured while removing location! Try again', delay : MsgDelay});
+                    }
+                }).error(function(err){
+                        Notification.error({ message : 'Error occured while removing location! Try again', delay : MsgDelay});
+                });
+            }
+        };
+
+        /**
+         * Validates secondary location data before saving
+         * @param locIndex
+         */
+        $scope.validateSecondaryLocation = function(locIndex){
+            var validateResult = true;
+            /**
+             * @todo Validate secondary location data before saving here
+             */
+            return validateResult;
         };
 
     }]);
