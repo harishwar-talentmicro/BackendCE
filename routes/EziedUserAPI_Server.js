@@ -1722,7 +1722,10 @@ exports.FnRegistration = function (req, res) {
         if (PIN == '') {
             PIN = null;
         }
-      //  console.log('PIN: ' + PIN);
+        var TemplateID = parseInt(req.body.TemplateID);
+        if(TemplateID.toString() == 'NaN')
+            TemplateID =0;          
+        
         var RtnMessage = {
             Token: '',
             IsAuthenticate: false,
@@ -1767,7 +1770,7 @@ exports.FnRegistration = function (req, res) {
                     db.escape(PostalCode) + ',' + db.escape(PIN) + ',' + db.escape(PhoneNumber) + ',' + db.escape(MobileNumber) + ',' + db.escape(EMailID) + ',' +
                     db.escape(Picture) + ',' + db.escape(PictureFileName) + ',' + db.escape(WebSite) + ',' + db.escape(Operation) + ',' + db.escape(AboutCompany) + ','
                     + db.escape(StatusID) + ',' + db.escape(Icon) + ',' + db.escape(IconFileName) + ',' + db.escape(ISDPhoneNumber) + ',' + db.escape(ISDMobileNumber) + ','
-                    + db.escape(Gender) + ',' + db.escape(DOBDate) + ',' + db.escape(IPAddress) + ',' + db.escape(SelectionTypes) + ',' + db.escape(ParkingStatus);
+                    + db.escape(Gender) + ',' + db.escape(DOBDate) + ',' + db.escape(IPAddress) + ',' + db.escape(SelectionTypes) + ',' + db.escape(ParkingStatus) + ',' + db.escape(TemplateID);
 
                  
                 //console.log(InsertQuery);
@@ -1947,7 +1950,7 @@ exports.FnRegistration = function (req, res) {
                     db.escape(PostalCode) + ',' + db.escape(PIN) + ',' + db.escape(PhoneNumber) + ',' + db.escape(MobileNumber) + ',' + db.escape(EMailID) + ',' +
                     db.escape(Picture) + ',' + db.escape(PictureFileName) + ',' + db.escape(WebSite) + ',' + db.escape(Operation) + ',' + db.escape(AboutCompany)
                     + ',' + db.escape(StatusID) + ',' + db.escape(Icon) + ',' + db.escape(IconFileName) + ',' + db.escape(ISDPhoneNumber) + ',' + db.escape(ISDMobileNumber)
-                    + ',' + db.escape(Gender) + ',' + db.escape(DOBDate) + ',' + db.escape(IPAddress) + ',' + db.escape(SelectionTypes)+ ',' + db.escape(ParkingStatus);
+                    + ',' + db.escape(Gender) + ',' + db.escape(DOBDate) + ',' + db.escape(IPAddress) + ',' + db.escape(SelectionTypes)+ ',' + db.escape(ParkingStatus) + ',' + db.escape(TemplateID);
 
                  // console.log(InsertQuery);
                 db.query('CALL pSaveEZEIDData(' + InsertQuery + ')', function (err, InsertResult) {
@@ -2237,7 +2240,8 @@ exports.FnAddLocation = function (req, res) {
         if (PIN == '') {
             PIN = null;
         }
-
+        var TemplateID = req.body.TemplateID;
+        
         if (TID.toString() != 'NaN' && Token != null && CityName != null && StateID.toString() != 'NaN' && CountryID.toString() != 'NaN' && LocTitle != null && AddressLine1 != null && Longitude.toString() != 'NaN' && Latitude.toString() != 'NaN') {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
@@ -2247,7 +2251,7 @@ exports.FnAddLocation = function (req, res) {
                         + ',' + db.escape(Longitude) + ',' + db.escape(Altitude) + ',' + db.escape(AddressLine1) + ',' + db.escape(AddressLine2) 
                         + ',' + db.escape(CityName) + ',' + db.escape(StateID) + ',' + db.escape(CountryID) + ',' + db.escape(PostalCode) 
                         + ',' + db.escape(PIN) + ',' + db.escape(PhoneNumber) + ',' + db.escape(MobileNumber)  + ',' + db.escape(Picture)
-                        + ',' + db.escape(PictureFileName) + ',' + db.escape(Website) + ',' +   db.escape(ISDPhoneNumber) + ',' + db.escape(ISDMobileNumber) + ',' + db.escape(ParkingStatus);
+                        + ',' + db.escape(PictureFileName) + ',' + db.escape(Website) + ',' +   db.escape(ISDPhoneNumber) + ',' + db.escape(ISDMobileNumber) + ',' + db.escape(ParkingStatus) + ',' + db.escape(TemplateID);
 
                         db.query('CALL pInsertLocationData(' + InsertQuery + ')', function (err, InsertResult) {
                             if (!err) {
@@ -2257,7 +2261,7 @@ exports.FnAddLocation = function (req, res) {
                                         // console.log(InsertResult);
                                         console.log('Addlocation: Location added successfully');
 
-                                        var selectqry = 'Select tlocations.TID,MasterID,EZEID,LocTitle,Latitude,Longitude,Altitude,AddressLine1,AddressLine2,StateID,CountryID,PostalCode,PIN,EMailVerifiedID,ifnull(PhoneNumber,"") as PhoneNumber,MobileNumber,ifnull(ISDPhoneNumber,"") as ISDPhoneNumber ,ifnull(ISDMobileNumber,"") as ISDMobileNumber,CreatedDate,LUDate,Website,SeqNo,Picture,PictureFileName,ifnull((Select CityName from mcity where CityID=tlocations.CityID),"") as CityTitle,ifnull(ParkingStatus,0) as ParkingStatus from tlocations';
+                                        var selectqry = 'Select tlocations.TID,MasterID,EZEID,LocTitle,Latitude,Longitude,Altitude,AddressLine1,AddressLine2,StateID,CountryID,PostalCode,PIN,EMailVerifiedID,ifnull(PhoneNumber,"") as PhoneNumber,MobileNumber,ifnull(ISDPhoneNumber,"") as ISDPhoneNumber ,ifnull(ISDMobileNumber,"") as ISDMobileNumber,CreatedDate,LUDate,Website,SeqNo,Picture,PictureFileName,ifnull((Select CityName from mcity where CityID=tlocations.CityID),"") as CityTitle,ifnull(ParkingStatus,0) as ParkingStatus,HcalID from tlocations';
 
                                         if (TID == 0) {
                                             selectqry = selectqry + ' order by tlocations.TID desc limit 1';
@@ -6228,17 +6232,18 @@ exports.FnSaveHolidayCalendar = function(req, res){
         var TID = req.body.TID;
         var HolidayDate = req.body.HolidayDate;
         var HolidayTitle = req.body.HolidayTitle;
-
+        var TemplateID = req.body.TemplateID;
+        
         var RtnMessage = {
             IsSuccessfull: false
         };
 
-        if (Token != null && TID != null && HolidayTitle != null  && HolidayDate != null ) {
+        if (Token != null && TID != null && HolidayTitle != null  && HolidayDate != null && TemplateID != null ) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
 
-                        var query = db.escape(TID) + ',' + db.escape(Token) + ',' + db.escape(HolidayDate) + ',' + db.escape(HolidayTitle);
+                        var query = db.escape(TID) + ',' + db.escape(Token) + ',' + db.escape(HolidayDate) + ',' + db.escape(HolidayTitle) + ',' + db.escape(TemplateID);
                         db.query('CALL pSaveHolidayCalendar(' + query + ')', function (err, InsertResult) {
                             if (!err){
                                 if (InsertResult.affectedRows > 0) {
@@ -6287,6 +6292,9 @@ exports.FnSaveHolidayCalendar = function(req, res){
             }
             else if (HolidayDate == null) {
                 console.log('FnSaveHolidayCalendar: HolidayDate is empty');
+            }
+             else if (TemplateID == null) {
+                console.log('FnSaveHolidayCalendar: TemplateID is empty');
             }
 
 
@@ -6837,13 +6845,14 @@ exports.FnSaveWorkingHours = function(req, res){
         var SU2 = req.body.SU2;
         var SU3 = req.body.SU3;
         var SU4 = req.body.SU4;
+        var WorkingHrsTemplate = req.body.WorkingHrsTemplate;
 
 
         var RtnMessage = {
             IsSuccessfull: false
         };
 
-        if (Token != null && SpilloverTime != null ) {
+        if (Token != null && SpilloverTime != null && WorkingHrsTemplate != null ) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
@@ -6854,7 +6863,7 @@ exports.FnSaveWorkingHours = function(req, res){
                         + ',' + db.escape(TH1) + ',' + db.escape(TH2) + ',' + db.escape(TH3) + ',' + db.escape(TH4)
                         + ',' + db.escape(FR1) + ',' + db.escape(FR2) + ',' + db.escape(FR3) + ',' + db.escape(FR4)
                         + ',' + db.escape(SA1) + ',' + db.escape(SA2) + ',' + db.escape(SA3) + ',' + db.escape(SA4)
-                        + ',' + db.escape(SU1) + ',' + db.escape(SU2) + ',' + db.escape(SU3) + ',' + db.escape(SU4);
+                        + ',' + db.escape(SU1) + ',' + db.escape(SU2) + ',' + db.escape(SU3) + ',' + db.escape(SU4) + ',' + db.escape(WorkingHrsTemplate);
                         db.query('CALL pSaveWorkingHours(' + query + ')', function (err, InsertResult) {
                             if (!err){
                                 if (InsertResult.affectedRows > 0) {
@@ -6897,6 +6906,9 @@ exports.FnSaveWorkingHours = function(req, res){
             }
             else if (SpilloverTime == null) {
                 console.log('FnSaveWorkingHours: SpilloverTime is empty');
+            }
+            else if (WorkingHrsTemplate == null) {
+                console.log('FnSaveWorkingHours: WorkingHrsTemplate is empty');
             }
             res.statusCode=400;
             res.send(RtnMessage);
