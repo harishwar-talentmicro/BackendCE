@@ -751,3 +751,28 @@ body {
 {
     margin-bottom: 0px;
 }
+.preloader1{
+    display: table-cell;
+    text-align: center;
+    vertical-align: middle;
+    background-image: url(../images/preloader.GIF);
+    background-repeat: no-repeat;
+    background-size: contain;
+    height:150px;
+    width: 1%;
+}
+.lodingImgContainer
+{
+    margin-top: 20%;
+    text-align: right;
+    margin-left: 35%;
+}
+
+.setFontFourty
+{
+    font-size: 14px;
+}
+.setLineHeight
+{
+    line-height: 3%;
+}

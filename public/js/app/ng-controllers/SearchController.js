@@ -82,6 +82,7 @@ angular.module('ezeidApp').controller('SearchController', [
     var AutoRefresh = true;
     var rating = [1,2,3,4,5];
     $scope.showWorkingHourModel = false;
+    $scope.showLoadingImage = false;
 
     $('#datetimepicker1').datetimepicker({
         format: "d-M-Y  h:m A",
@@ -440,6 +441,7 @@ angular.module('ezeidApp').controller('SearchController', [
 
                     return function () {
 
+                        $scope.showLoadingImage = true;
                         SearchSec.showSearchWindow = false;
                         SearchSec.showInfoWindow = true;
                         SearchSec.showResultWindow = false;
@@ -451,6 +453,7 @@ angular.module('ezeidApp').controller('SearchController', [
                         var sen = this;
 
                         getSearchInformation(_item);
+
                     }
                 })(_item));
             }
@@ -1399,6 +1402,7 @@ angular.module('ezeidApp').controller('SearchController', [
 
             if (data != 'null') {
                 $timeout(function () {
+                    $scope.showLoadingImage = false;
                     SearchSec.mInfo = data[0];
 
                     $scope.showSalesEnquiry = SearchSec.mInfo.VisibleModules[0];
