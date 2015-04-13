@@ -173,6 +173,19 @@ angular.module('ezeidApp').
             ]
         };
 
+            /**
+             * Error Text Messages
+             * @type {{}}
+             */
+            $scope.error = {
+                firstName : '',
+                lastName : '',
+                companyName : '',
+                about : '',
+                dateOfBirth : '',
+                email : '',
+                password : ''
+            };
 
         /**
          * Selects a plan (signup business type)
@@ -349,13 +362,13 @@ angular.module('ezeidApp').
 
             var emailPattern = /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
             var emailRegEx = new RegExp(emailPattern);
-            if(!emailRegEx.test($scope.email)){
+            if(!(emailRegEx.test($scope.email))){
                 $scope.error.email = 'Email ID is invalid';
                 validationStatus *= false;
             }
 
             if($scope.password.length < 4){
-                $scope.error.email = 'Password should be minimum 4 characters';
+                $scope.error.password = 'Password should be minimum 4 characters';
                 validationStatus *= false;
             }
 
@@ -434,7 +447,6 @@ angular.module('ezeidApp').
                 }
 
             }
-
             return validationStatus;
 
         };
@@ -448,6 +460,17 @@ angular.module('ezeidApp').
                 if(!$scope.isEzeidAvailable){
                     return false;
                 }
+
+                var validation = $scope.validateSignUpData();
+                if(!validation){
+                    console.log($scope.error);
+                    Notification.error({
+                        message : 'Please check all the errors before registration',
+                        delay : MsgDelay
+                    });
+                    return false;
+                }
+
                 var signUpData = {
                     IDTypeID : $scope.userType ,
                     EZEID : $scope.ezeid ,
@@ -491,15 +514,8 @@ angular.module('ezeidApp').
                     SelectionType : $scope.planSelectionType ,
                     ParkingStatus : null
                 };
+                console.log($scope.error);
 
-                $scope.validateFlag = $scope.validateSignUpData();
-                if(!$scope.validateFlag){
-                    Notification.error({
-                        message : 'Please check all the errors before registration',
-                        delay : MsgDelay
-                    });
-                    return false;
-                }
 
 
                 $http({
@@ -542,13 +558,6 @@ angular.module('ezeidApp').
                 $scope.pin = '';
             }
         });
-
-        /**
-         * Validates the basic signup data before signing in
-         */
-        $scope.validateSignUpData = function(data){
-
-        };
 
 
         /**
