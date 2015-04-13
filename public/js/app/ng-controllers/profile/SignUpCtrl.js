@@ -38,13 +38,6 @@ angular.module('ezeidApp').
             )
         {
 
-        $("#datetimepicker1").datetimepicker({
-            format: 'd-M-Y',
-            timepicker : false,
-            mask: true,
-            hours12: false,
-            maxDate : '+1970/01/02'
-        });
         /**
          * Visibility setting for feature list type block
          * (show list of features available based on signup type, it will be visible firstly by default when user in not signed in)
@@ -264,7 +257,6 @@ angular.module('ezeidApp').
          * @returns {boolean}
          */
         $scope.doNotAllowEzeidAp = function(ezeid){
-            console.log(ezeid.slice(-2));
             if(ezeid.length > 3)
             {
                 var ap = ezeid.slice(-2);
@@ -275,6 +267,33 @@ angular.module('ezeidApp').
             return true;
         };
 
+            /**
+             * Function to check if user has entered ezeid according to free listing constraints
+             * Free listing EZEID should have a digit as last character of EZEID
+             * @param ezeid
+             * @returns {boolean}
+             */
+        $scope.doNotAllowPremiumEzeid = function(ezeid){
+            console.log($scope.userType);
+            console.log($scope.planSelectionType);
+            if($scope.userType === 2 && $scope.planSelectionType === 2){
+                return true;
+            }
+            else{
+                var lastCh = ezeid.slice(-1);
+                var lastDigit = parseInt(lastCh);
+                if(!isNaN(lastDigit)){
+                    return true;
+                }
+                else{
+                    return false;
+                }
+            }
+
+        };
+
+
+
         /**
          * Checking EZEID Availability Here
          */
@@ -284,7 +303,8 @@ angular.module('ezeidApp').
 
             var defer = $q.defer();
             var apCheck = $scope.doNotAllowEzeidAp($scope.ezeid);
-            if(!apCheck){
+            var premiumCheck = $scope.doNotAllowPremiumEzeid($scope.ezeid);
+            if(!(apCheck && premiumCheck)){
                 $timeout(function(){
                     $scope.isEzeidAvailabilityChecked = true;
                     $scope.isEzeidAvailable = false;
