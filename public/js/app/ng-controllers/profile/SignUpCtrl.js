@@ -147,7 +147,7 @@ angular.module('ezeidApp').
          */
         $scope.planSelectionType = 0;
 
-
+        $scope.validateFlag = true;
 
         /**
          * Feature list for feature list type block
@@ -344,6 +344,102 @@ angular.module('ezeidApp').
             return defer.promise;
         };
 
+        $scope.validateSignUpData = function(){
+            var validationStatus = true;
+
+            var emailPattern = /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+            var emailRegEx = new RegExp(emailPattern);
+            if(!emailRegEx.test($scope.email)){
+                $scope.error.email = 'Email ID is invalid';
+                validationStatus *= false;
+            }
+
+            if($scope.password.length < 4){
+                $scope.error.email = 'Password should be minimum 4 characters';
+                validationStatus *= false;
+            }
+
+            if($scope.password !== $scope.repassword){
+                $scope.error.password = 'Passwords didn\'t matched';
+                validationStatus *= false;
+            }
+
+
+            if(!$scope.companyName){
+                $scope.error.companyName = 'Company Name cannot be empty';
+                validationStatus *= false;
+            }
+
+            if(typeof($scope.companyName) !== "undefined"){
+                if($scope.companyName.length < 1){
+                    $scope.error.companyName = "Company Name cannot be empty";
+                    validationStatus *= false;
+                }
+            }
+
+            if(!$scope.firstName){
+                $scope.error.firstName = 'First Name cannot be empty';
+                validationStatus *= false;
+            }
+
+            if(typeof($scope.firstName) !== "undefined"){
+                if($scope.firstName.length < 1){
+                    $scope.error.firstName = "Last Name cannot be empty";
+                    validationStatus *= false;
+                }
+            }
+
+            if(!$scope.lastName){
+                $scope.error.lastName = 'Last Name cannot be empty';
+                validationStatus *= false;
+            }
+
+            if(typeof($scope.lastName) !== "undefined"){
+                if($scope.lastName.length < 1){
+                    $scope.error.lastName = "First Name cannot be empty";
+                    validationStatus *= false;
+                }
+            }
+
+            if(!$scope.about){
+                $scope.error.about = ($scope.userType === 1 || $scope.userType === 2) ?
+                    'Please enter a description about your company' : 'Please enter a description about public place';
+                validationStatus *= false;
+            }
+
+            if(typeof($scope.about) !== "undefined"){
+                if($scope.about.length < 1){
+                    $scope.error.about = ($scope.userType === 1 || $scope.userType === 2) ?
+                        'Please enter a description about your company' : 'Please enter a description about public place';
+                    validationStatus *= false;
+                }
+            }
+
+            if($scope.userType === 1 && typeof($scope.dateOfBirth) === "undefined"){
+                $scope.error.dateOfBirth = 'Please enter your date of Birth'
+                validationStatus *= false;
+            }
+
+            if($scope.isPinApplicable){
+                var parsePin = parseInt($scope.pin);
+                if(isNaN(parsePin)){
+                    $scope.error.pin = "PIN should be between 100 to 999";
+                    validationStatus *= false;
+                }
+                else{
+                    if(!(parsePin > 99 && parsePin < 1000)){
+                        validationStatus *= false;
+                        $scope.error.pin = "PIN should be between 100 to 999";
+                    }
+                }
+
+            }
+
+            return validationStatus;
+
+        };
+
+
         /**
          *  Primary Registration and SignUp Process
          */
@@ -395,6 +491,15 @@ angular.module('ezeidApp').
                     SelectionType : $scope.planSelectionType ,
                     ParkingStatus : null
                 };
+
+                $scope.validateFlag = $scope.validateSignUpData();
+                if(!$scope.validateFlag){
+                    Notification.error({
+                        message : 'Please check all the errors before registration',
+                        delay : MsgDelay
+                    });
+                    return false;
+                }
 
 
                 $http({

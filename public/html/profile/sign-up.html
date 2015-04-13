@@ -195,6 +195,7 @@
                                                                             ng-class="(signUpForm.password.$dirty && signUpForm.password.$modelValue.length < 1) ? 'mandatoryTextBox' : ''"
                                                                             class="form-control emptyBox" />
                                                                 </div>
+                                                                <small class="text-danger" ng-hide="validateFlag">{{error.password}}</small>
                                                             </div>
                                                             <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
                                                                 <div class="form-group">
@@ -238,6 +239,7 @@
                                                                             ng-change="signUpForm.companyName.$setDirty()"
                                                                             class="form-control emptyBox" />
                                                                 </div>
+                                                                <small class="text-danger" ng-hide="validateFlag">{{error.companyName}}</small>
 
                                                             </div>
 
@@ -254,6 +256,7 @@
                                                                             ng-change="signUpForm.about.$setDirty()"
                                                                             class="form-control emptyBox" />
                                                                 </div>
+                                                                <small class="text-danger" ng-hide="validateFlag">{{error.about}}</small>
                                                             </div>
                                                         </div>
                                                         <!--------------end :  This will be visible in case of Public Place and Business User  Only ---->
@@ -271,6 +274,7 @@
                                                                            ng-class="(signUpForm.firstName.$dirty && signUpForm.firstName.$modelValue.length < 1) ? 'mandatoryTextBox' : ''"
                                                                    class="form-control emptyBox" />
                                                                </div>
+                                                               <small class="text-danger" ng-hide="validateFlag">{{error.firstName}}</small>
                                                            </div>
 
                                                            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
@@ -285,6 +289,7 @@
                                                                            ng-class="(signUpForm.lastName.$dirty && signUpForm.lastName.$modelValue.length < 1) ? 'mandatoryTextBox' : ''"
                                                                            class="form-control emptyBox" />
                                                                </div>
+                                                               <small class="text-danger" ng-hide="validateFlag">{{error.lastName}}</small>
                                                            </div>
 
                                                        </div>
@@ -306,6 +311,7 @@
                                                                             ng-class="(signUpForm.companyName.$dirty && signUpForm.companyName.$modelValue.length < 1) ? 'mandatoryTextBox' : ''"
                                                                             class="form-control emptyBox" />
                                                                 </div>
+                                                                <small class="text-danger" ng-hide="validateFlag">{{error.companyName}}</small>
                                                             </div>
 
                                                             <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
@@ -321,6 +327,7 @@
                                                                             ng-class="(signUpForm.about.$dirty && signUpForm.about.$modelValue.length < 1) ? 'mandatoryTextBox' : ''"
                                                                             class="form-control emptyBox" />
                                                                 </div>
+                                                                <small class="text-danger" ng-hide="validateFlag">{{error.about}}</small>
                                                             </div>
 
                                                         </div>
@@ -340,6 +347,7 @@
                                                                             ng-class="(signUpForm.email.$dirty && signUpForm.email.$modelValue.length < 1) ? 'mandatoryTextBox' : ''"
                                                                             class="form-control emptyBox" />
                                                                 </div>
+                                                                <small class="text-danger" ng-hide="validateFlag">{{error.email}}</small>
                                                             </div>
                                                         </div>
 
@@ -366,6 +374,8 @@
                                                                     "maxDate" : "+1970/01/02"
                                                                     }'></date-time-picker>
                                                                 </div>
+
+                                                                <small class="text-danger" ng-hide="validateFlag">{{error.dateOfBirth}}</small>
                                                             </div>
                                                         </div>
 
@@ -394,6 +404,7 @@
                                                                                 pin-only
                                                                                 class="form-control" />
                                                                     </div>
+                                                                    <small class="text-danger" ng-hide="validateFlag">{{error.pin}}</small>
                                                                 </div>
 
                                                         </div>
