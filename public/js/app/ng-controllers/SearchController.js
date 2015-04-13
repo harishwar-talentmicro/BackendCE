@@ -82,7 +82,6 @@ angular.module('ezeidApp').controller('SearchController', [
     var AutoRefresh = true;
     var rating = [1,2,3,4,5];
     $scope.showWorkingHourModel = false;
-    $scope.showNoWorkingHoursFound = false;
 
     $('#datetimepicker1').datetimepicker({
         format: "d-M-Y  h:m A",
@@ -116,12 +115,20 @@ angular.module('ezeidApp').controller('SearchController', [
     SearchSec.previousButton =  true;
     SearchSec.categories = [];
     SearchSec.proximities = [];
+    SearchSec.holiday = [];
     $scope.form_rating = 0;
 
     SearchSec.mInfo = {};
     var userType = "";
     SearchSec.mInfo.InfoTab = false;
     $scope.showInfoTab = false;
+
+    SearchSec.showSearchWindow = true;
+    SearchSec.showInfoWindow = false;
+    SearchSec.showResultWindow = false;
+
+    SearchSec.showResultTab = false;
+    SearchSec.searchResult = [];
 
     SearchSec.Criteria = {
         Token: '',
@@ -151,16 +158,25 @@ angular.module('ezeidApp').controller('SearchController', [
 
     // show search Tab
     $scope.showSearchTab = function(){
-        $scope.ShowInfoWindow = false;
-        /*$scope.ShowLinks = false;*/
+        SearchSec.showSearchWindow = true;
+        SearchSec.showInfoWindow = false;
+        SearchSec.showResultWindow = false;
     };
     // show info Tab
     $scope.showInfoWindowTab = function(){
-        $scope.ShowInfoWindow = true;
-        /*$scope.ShowLinks = true;*/
+        SearchSec.showSearchWindow = false;
+        SearchSec.showInfoWindow = true;
+        SearchSec.showResultWindow = false;
     };
 
-    $scope.ShowInfoWindow = false;
+    // show result Tab Window
+    $scope.showResultWindow = function(){
+        SearchSec.showSearchWindow = false;
+        SearchSec.showInfoWindow = false;
+        SearchSec.showResultWindow = true;
+    };
+
+  //  $scope.ShowInfoWindow = false;
 
     function initialize () {
         // Create the search box and link it to the UI element.
@@ -424,50 +440,17 @@ angular.module('ezeidApp').controller('SearchController', [
 
                     return function () {
 
+                        SearchSec.showSearchWindow = false;
+                        SearchSec.showInfoWindow = true;
+                        SearchSec.showResultWindow = false;
+
                         $scope.ShowInfoWindow = true;
                         $scope.ShowLinks = true;
                         $scope.showSmallBanner = true;
                         $scope.AddressForInfoTab = "";
-                        var currentDate = moment().format('YYYY-MM-DD hh:mm');
-
                         var sen = this;
-                        $http({ method: 'get', url: GURL + 'ewtGetSearchInformation?Token=' + $rootScope._userInfo.Token + '&TID=' + _item.TID + '&CurrentDate=' + currentDate}).success(function (data) {
 
-                               if (data != 'null') {
-
-                                   $scope.showSalesEnquiry = SearchSec.mInfo.VisibleModules[0];
-                                   $scope.showHomeDelivery = SearchSec.mInfo.VisibleModules[1];
-                                   $scope.shoReserVation = SearchSec.mInfo.VisibleModules[2];
-                                   $scope.showServiceRequest = SearchSec.mInfo.VisibleModules[3];
-                                   $scope.showSendCv = SearchSec.mInfo.VisibleModules[4];
-
-                                    //Below lines are to show address in info tab
-                                    $scope.AddressForInfoTab = (SearchSec.mInfo.AddressLine1 != "") ? SearchSec.mInfo.AddressLine1 +', ' : "";
-                                    $scope.AddressForInfoTab += (SearchSec.mInfo.AddressLine2 != "") ? SearchSec.mInfo.AddressLine2 +', ' : "";
-                                    $scope.AddressForInfoTab += (SearchSec.mInfo.CityTitle != "") ? SearchSec.mInfo.CityTitle +', ' : "";
-                                    $scope.AddressForInfoTab += (SearchSec.mInfo.CountryTitle != "") ? SearchSec.mInfo.CountryTitle +', ' : "";
-                                    $scope.AddressForInfoTab += (SearchSec.mInfo.PostalCode != "") ? SearchSec.mInfo.PostalCode : "";
-
-                                $timeout(function () {
-                                    SearchSec.mInfo = data[0];
-                                    if (!/^(f|ht)tps?:\/\//i.test(data[0].Website)) {
-                                         // url = "http://" + data[0].Website;
-                                        SearchSec.mInfo.Website = data[0].Website;
-                                    }
-
-                                    $scope.showInfoTab = true;
-                                    $scope.selectTab('info');
-
-                                    //Call for banner
-                                    SearchSec.IsSearchButtonClicked = true;
-                                    AutoRefresh = true;
-                                    getBanner(1);
-                                });
-                            }
-                            else {
-                                Notification.error({ message: 'No Results found..!', delay: MsgDelay });
-                            }
-                        });
+                        getSearchInformation(_item);
                     }
                 })(_item));
             }
@@ -504,7 +487,11 @@ angular.module('ezeidApp').controller('SearchController', [
         if (SearchSec.Criteria.SearchType == 1)
         {
             SearchSec.Placeholder = 'Type EZE ID here.';
-            //SearchSec.showSmallBanner = false;
+
+            SearchSec.showResultTab = false;
+            SearchSec.showSearchWindow = true;
+            SearchSec.showInfoWindow = false;
+            SearchSec.showResultTab = false;
         }
         else if(SearchSec.Criteria.SearchType == 2)
         {
@@ -563,8 +550,16 @@ angular.module('ezeidApp').controller('SearchController', [
                    $window.localStorage.removeItem("searchResult");
                    $window.localStorage.setItem("searchResult", JSON.stringify(data));
 
+                   if(SearchSec.Criteria.SearchType == 2 || SearchSec.Criteria.SearchType == 3)
+                   {
+                       SearchSec.showResultTab = true;
+                       SearchSec.searchResult = data;
+                   }
+
                    if(($rootScope._userInfo.IsAuthenticate == true || data[0].IDTypeID > 1) && data[0].Latitude != undefined )
                    {
+
+
                       try{
                            PlaceMarker(data);
                        }
@@ -609,7 +604,13 @@ angular.module('ezeidApp').controller('SearchController', [
                     {
                          if($rootScope._userInfo.IsAuthenticate == true || data[0].IDTypeID == 2 && SearchSec.Criteria.SearchType == 1)
                          {
-                               $http({ method: 'get', url: GURL + 'ewtGetSearchInformation?Token=' + $rootScope._userInfo.Token + '&TID=' + _item.TID + '&CurrentDate=' + SearchSec.Criteria.CurrentDate }).success(function (data) {
+                               $http({ method: 'get', url: GURL + 'ewtGetSearchInformation',
+                                   params : {
+                                       Token : $rootScope._userInfo.Token,
+                                       TID : _item.TID,
+                                       CurrentDate : SearchSec.Criteria.CurrentDate
+                                   }
+                                   }).success(function (data) {
 
                                 if (data != 'null') {
 
@@ -618,7 +619,9 @@ angular.module('ezeidApp').controller('SearchController', [
                                         $scope.showInfoTab = true;
                                         $scope.selectTab('info');
                                         $scope.ShowInfoWindow = true;
-
+                                        SearchSec.showSearchWindow = false;
+                                        SearchSec.showInfoWindow = true;
+                                        SearchSec.showResultWindow = false;
                                         $scope.ShowLinks = true;
                                         $scope.showSmallBanner = true;
                                    }
@@ -1314,87 +1317,60 @@ angular.module('ezeidApp').controller('SearchController', [
         else
         {
             $scope.showWorkingHourModel = true;
-            $http({ method: 'get', url: GURL + 'ewtGetWorkingHours?Token=' + $rootScope._userInfo.Token + '&MasterID=' + SearchSec.mInfo.LocID }).success(function (data)
+            $http({ method: 'get', url: GURL + 'ewtGetWorkingHrsHolidayList?Token=' + $rootScope._userInfo.Token + '&LocID=' + SearchSec.mInfo.LocID }).success(function (data)
             {
                 console.log(data);
                 if (data != 'null')
                 {
-                    $scope.showNoWorkingHoursFound = false;
 
-                    $scope.Mo1 = data[0].MO1;
-                    $scope.Mo2 = data[0].MO2;
-                    $scope.Mo3 = data[0].MO3;
-                    $scope.Mo4 = data[0].MO4;
+                    if(data.WorkingHours != "")
+                    {
+                        $scope.Mo1 = data.WorkingHours[0].MO1;
+                        $scope.Mo2 = data.WorkingHours[0].MO2;
+                        $scope.Mo3 = data.WorkingHours[0].MO3;
+                        $scope.Mo4 = data.WorkingHours[0].MO4;
 
-                    $scope.Tu1 = data[0].TU1;
-                    $scope.Tu2 = data[0].TU2;
-                    $scope.Tu3 = data[0].TU3;
-                    $scope.Tu4 = data[0].TU4;
+                        $scope.Tu1 = data.WorkingHours[0].TU1;
+                        $scope.Tu2 = data.WorkingHours[0].TU2;
+                        $scope.Tu3 = data.WorkingHours[0].TU3;
+                        $scope.Tu4 = data.WorkingHours[0].TU4;
 
-                    $scope.We1 = data[0].WE1;
-                    $scope.We2 = data[0].WE2;
-                    $scope.We3 = data[0].WE3;
-                    $scope.We4 = data[0].WE4;
+                        $scope.We1 = data.WorkingHours[0].WE1;
+                        $scope.We2 = data.WorkingHours[0].WE2;
+                        $scope.We3 = data.WorkingHours[0].WE3;
+                        $scope.We4 = data.WorkingHours[0].WE4;
 
-                    $scope.Th1 = data[0].TH1;
-                    $scope.Th2 = data[0].TH2;
-                    $scope.Th3 = data[0].TH3;
-                    $scope.Th4 = data[0].TH4;
+                        $scope.Th1 = data.WorkingHours[0].TH1;
+                        $scope.Th2 = data.WorkingHours[0].TH2;
+                        $scope.Th3 = data.WorkingHours[0].TH3;
+                        $scope.Th4 = data.WorkingHours[0].TH4;
 
-                    $scope.Fr1 = data[0].FR1;
-                    $scope.Fr2 = data[0].FR2;
-                    $scope.Fr3 = data[0].FR3;
-                    $scope.Fr4 = data[0].FR4;
+                        $scope.Fr1 = data.WorkingHours[0].FR1;
+                        $scope.Fr2 = data.WorkingHours[0].FR2;
+                        $scope.Fr3 = data.WorkingHours[0].FR3;
+                        $scope.Fr4 = data.WorkingHours[0].FR4;
 
-                    $scope.Sa1 = data[0].SA1;
-                    $scope.Sa2 = data[0].SA2;
-                    $scope.Sa3 = data[0].SA3;
-                    $scope.Sa4 = data[0].SA4;
+                        $scope.Sa1 = data.WorkingHours[0].SA1;
+                        $scope.Sa2 = data.WorkingHours[0].SA2;
+                        $scope.Sa3 = data.WorkingHours[0].SA3;
+                        $scope.Sa4 = data.WorkingHours[0].SA4;
 
-                    $scope.Su1 = data[0].SU1;
-                    $scope.Su2 = data[0].SU2;
-                    $scope.Su3 = data[0].SU3;
-                    $scope.Su4 = data[0].SU4;
+                        $scope.Su1 = data.WorkingHours[0].SU1;
+                        $scope.Su2 = data.WorkingHours[0].SU2;
+                        $scope.Su3 = data.WorkingHours[0].SU3;
+                        $scope.Su4 = data.WorkingHours[0].SU4;
+                    }
 
-                   /* $scope.Mo1 = tConvertTo12Hours(data[0].MO1);
-                    $scope.Mo2 = tConvertTo12Hours(data[0].MO2);
-                    $scope.Mo3 = tConvertTo12Hours(data[0].MO3);
-                    $scope.Mo4 = tConvertTo12Hours(data[0].MO4);
+                    if(data.HolidayList != "")
+                    {
+                        SearchSec.holiday = data.HolidayList;
+                    }
 
-                    $scope.Tu1 = tConvertTo12Hours(data[0].TU1);
-                    $scope.Tu2 = tConvertTo12Hours(data[0].TU2);
-                    $scope.Tu3 = tConvertTo12Hours(data[0].TU3);
-                    $scope.Tu4 = tConvertTo12Hours(data[0].TU4);
-
-                    $scope.We1 = tConvertTo12Hours(data[0].WE1);
-                    $scope.We2 = tConvertTo12Hours(data[0].WE2);
-                    $scope.We3 = tConvertTo12Hours(data[0].WE3);
-                    $scope.We4 = tConvertTo12Hours(data[0].WE4);
-
-                    $scope.Th1 = tConvertTo12Hours(data[0].TH1);
-                    $scope.Th2 = tConvertTo12Hours(data[0].TH2);
-                    $scope.Th3 = tConvertTo12Hours(data[0].TH3);
-                    $scope.Th4 = tConvertTo12Hours(data[0].TH4);
-
-                    $scope.Fr1 = tConvertTo12Hours(data[0].FR1);
-                    $scope.Fr2 = tConvertTo12Hours(data[0].FR2);
-                    $scope.Fr3 = tConvertTo12Hours(data[0].FR3);
-                    $scope.Fr4 = tConvertTo12Hours(data[0].FR4);
-
-                    $scope.Sa1 = tConvertTo12Hours(data[0].SA1);
-                    $scope.Sa2 = tConvertTo12Hours(data[0].SA2);
-                    $scope.Sa3 = tConvertTo12Hours(data[0].SA3);
-                    $scope.Sa4 = tConvertTo12Hours(data[0].SA4);
-
-                    $scope.Su1 = tConvertTo12Hours(data[0].SU1);
-                    $scope.Su2 = tConvertTo12Hours(data[0].SU2);
-                    $scope.Su3 = tConvertTo12Hours(data[0].SU3);
-                    $scope.Su4 = tConvertTo12Hours(data[0].SU4);*/
                 }
                 else
                 {
                     // Notification.error({ message: 'Invalid key or not found…', delay: MsgDelay });
-                    $scope.showNoWorkingHoursFound = true;
+
                 }
             });
 
@@ -1406,11 +1382,55 @@ angular.module('ezeidApp').controller('SearchController', [
         $('#WorkingHour_popup').slideUp();
     };*/
 
-        //Below function converts 24 hours time to 12 hours time
-        function tConvertTo12Hours (timeString) {
-            var H = +timeString.substr(0, 2);
-            var h = (H % 12) || 12;
-            var ampm = H < 12 ? " AM" : " PM";
-            return timeString = h + timeString.substr(2, 3) + ampm;
-        }
+    // show result Tab Window
+    $scope.getSearchInfo = function(_item){
+        SearchSec.showSearchWindow = false;
+        SearchSec.showInfoWindow = true;
+        SearchSec.showResultWindow = false;
+
+        $scope.ShowLinks = true;
+        console.log(_item);
+        getSearchInformation(_item);
+    };
+    function getSearchInformation(_item)
+    {
+        var currentDate = moment().format('YYYY-MM-DD hh:mm');
+        $http({ method: 'get', url: GURL + 'ewtGetSearchInformation?Token=' + $rootScope._userInfo.Token + '&TID=' + _item.TID + '&CurrentDate=' + currentDate}).success(function (data) {
+
+            if (data != 'null') {
+                $timeout(function () {
+                    SearchSec.mInfo = data[0];
+
+                    $scope.showSalesEnquiry = SearchSec.mInfo.VisibleModules[0];
+                    $scope.showHomeDelivery = SearchSec.mInfo.VisibleModules[1];
+                    $scope.shoReserVation = SearchSec.mInfo.VisibleModules[2];
+                    $scope.showServiceRequest = SearchSec.mInfo.VisibleModules[3];
+                    $scope.showSendCv = SearchSec.mInfo.VisibleModules[4];
+
+                    //Below lines are to show address in info tab
+                    $scope.AddressForInfoTab = (SearchSec.mInfo.AddressLine1 != "") ? SearchSec.mInfo.AddressLine1 +', ' : "";
+                    $scope.AddressForInfoTab += (SearchSec.mInfo.AddressLine2 != "") ? SearchSec.mInfo.AddressLine2 +', ' : "";
+                    $scope.AddressForInfoTab += (SearchSec.mInfo.CityTitle != "") ? SearchSec.mInfo.CityTitle +', ' : "";
+                    $scope.AddressForInfoTab += (SearchSec.mInfo.CountryTitle != "") ? SearchSec.mInfo.CountryTitle +', ' : "";
+                    $scope.AddressForInfoTab += (SearchSec.mInfo.PostalCode != "") ? SearchSec.mInfo.PostalCode : "";
+
+                    if (!/^(f|ht)tps?:\/\//i.test(data[0].Website)) {
+                        // url = "http://" + data[0].Website;
+                        SearchSec.mInfo.Website = data[0].Website;
+                    }
+
+                    $scope.showInfoTab = true;
+                    $scope.selectTab('info');
+
+                    //Call for banner
+                    SearchSec.IsSearchButtonClicked = true;
+                    AutoRefresh = true;
+                    getBanner(1);
+                });
+            }
+            else {
+                Notification.error({ message: 'No Results found..!', delay: MsgDelay });
+            }
+        });
+    }
 }]);
