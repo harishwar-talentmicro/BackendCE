@@ -10,9 +10,9 @@
                     <h3  style="text-align: center"><span class="">Help</span></h3>
                     <div ng-include="'html/help.html'"  style="width: 98%; height: 350px; overflow-y: scroll; padding: 5px;">
                     </div>
-                        <span style="text-align: center">
-                             <input type="button" style="margin-left: 45%; margin-top: 1%;" ng-click="closeHelpPopup()" class="btn btn-primary " value="Close">
-                        </span>
+                    <span style="text-align: center">
+                         <input type="button" style="margin-left: 45%; margin-top: 1%;" ng-click="closeHelpPopup()" class="btn btn-primary " value="Close">
+                    </span>
                 </div>
             </div>
         </div>
@@ -156,7 +156,7 @@
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                       <div class="row keyWordText" >
+                       <div class="row">
                             <table class="table table-striped custom-table" border="1" style="margin-bottom: 0px;">
                                 <thead>
                                     <tr style="background: #bfbfbf; color: #000000;">
@@ -171,8 +171,8 @@
                                 </thead>
                                 <tbody>
                                 <tr>
-                                    <td  ng-class=" !Mo1.length ? 'emptyCell' : ''">{{Mo1}}</td>
-                                    <td  ng-class=" !Tu1.length ? 'emptyCell' : ''">{{Tu1}}</td>
+                                    <td ng-class=" !Mo1.length ? 'emptyCell' : ''">{{Mo1}}</td>
+                                    <td ng-class=" !Tu1.length ? 'emptyCell' : ''">{{Tu1}}</td>
                                     <td ng-class=" !We1.length ? 'emptyCell' : ''">{{We1}}</td>
                                     <td ng-class=" !Th1.length ? 'emptyCell' : ''">{{Th1}}</td>
                                     <td ng-class=" !Fr1.length ? 'emptyCell' : ''">{{Fr1}}</td>
@@ -330,8 +330,8 @@
                                 <div class="row setRowLeftRightMarginZero">
                                    <div class="col-lg-5 col-md-5 col-sm-12 col-xs-12 bottom-clearfix setFontSize infoContainer infoTabRightBorder">
                                         <div class="row setRowLeftRightMarginZero">
-                                            <div class="topSearchRow">
-                                               <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 searchButtonMarginSet searchStrepTextMarin showPointer"
+                                            <div class="topSearchRow bottom-clearfix ezeid-nav-tab setBottomMargin0" >
+                                               <!--<div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 searchButtonMarginSet searchStrepTextMarin showPointer"
                                                     ng-class="search.showInfoWindow || search.showResultWindow ? 'setLinkToText' : ''" >
                                                    <span ng-click="showSearchTab()">Search</span>
                                                </div>
@@ -344,8 +344,17 @@
                                                          ng-class="search.showResultWindow || search.showSearchWindow ? 'setLinkToText' : ''">
                                                         <span ng-click="showInfoWindowTab()">Information</span>
                                                     </div>
+                                                </div>-->
+                                                <div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 text-center setLeftRightPaddingZero">
+                                                    <ul class="nav nav-pills">
+                                                        <li role="presentation" ng-class="search.showInfoWindow || search.showResultWindow ? 'active' : ''"><a class="setBottomMargin0" ng-click="showSearchTab()">Search</a></li>
+                                                        <li ng-show="search.showResultTab" ng-class="search.showInfoWindow || search.showSearchWindow ? 'active' : ''"><a class="setBottomMargin0" ng-click="showResultWindow()">Result</a></li>
+                                                        <li ng-show="ShowLinks" ng-class="search.showResultWindow || search.showSearchWindow ? 'active' : ''"><a class="setBottomMargin0" ng-click="showInfoWindowTab()">Information</a></li>
+                                                        <!--<li><a href="/">Chat</a></li>-->
+                                                    </ul>
                                                 </div>
-                                               <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 pull-right helpTextColor searchStrepTextMarin showPointer" ng-click="openHelpPopup()" style="text-align: right;" id="SearchHelp">
+
+                                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 pull-right helpTextColor searchStrepTextMarin showPointer" ng-click="openHelpPopup()" style="text-align: right;" id="SearchHelp">
                                                   Help ?
                                                </div>
                                             </div>
@@ -503,8 +512,8 @@
                                                 </div>
                                             </div>
                                             <div ng-show="search.showResultWindow" class="resultContainer">
-                                                <div class="row addItemRowUserEzeid1 setTopMargin" >
-                                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                <div class="row addItemRowUserEzeid1" >
+                                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setPaddingLeftRight0">
                                                         <!--<div class="row searchButtonMarginSet resultContainerRow" ng-repeat="_item in search.searchResult">-->
                                                             <!--<div class="col-lg-1 col-md-1 col-sm-1 col-xs-1">-->
                                                                 <!--{{$index + 1}}.-->
@@ -517,8 +526,9 @@
                                                                 <!--<span>{{_item.city | truncate:7}}</span>-->
                                                             <!--</div>-->
                                                         <!--</div>-->
-                                                        <div class="row searchButtonMarginSet resultContainerRow  bottom-clearfix" ng-repeat="_item in search.searchResult">
 
+
+                                                        <!--<div class="row searchButtonMarginSet resultContainerRow  bottom-clearfix" ng-repeat="_item in search.searchResult">
                                                             <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1">
                                                                 {{$index + 1}}.
                                                             </div>
@@ -533,8 +543,18 @@
                                                                     <small>{{_item.city | truncate:20}}</small>
                                                                 </div>
                                                             </div>
+                                                        </div>-->
 
-                                                        </div>
+                                                        <table class="rwd-table">
+                                                            <tbody>
+                                                                <tr ng-repeat="_item in search.searchResult">
+                                                                   <td data-th="Company Name" style="color: #0866A6;" class="showPointer resultTableCellBorder">
+                                                                       <span ng-click="getSearchInfo(_item)">{{_item.CompanyName | truncate:26}}</span>
+                                                                   </td>
+                                                                   <td data-th="Distance (Miles/km)" class="resultTableCellBorder">{{_item.city | truncate:9}}</td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
                                                     </div>
                                                 </div>
                                             </div>
@@ -665,7 +685,7 @@
                                         </div>
                                         <div  class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer removePadding keyWordText"
                                               ng-click="search.getdirections(search.mInfo)" title="Directions">
-                                            <div class="row setRowLeftRightMarginZero" >
+                                            <div class="row setRowLeftRightMarginZero">
                                                 <img src="../images/new_directions.png">
                                             </div>
                                             <div class="row setRowLeftRightMarginZero infoMsgText" >
@@ -687,10 +707,7 @@
 
                            <div ng-hide="ShowLinks" class="row setRowLeftRightMarginZero">
                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 searchHeaderAlignment" style="background: #09a2de;">
-                                 <!--  <img width="100%" height="50px" src="../images/bannerBig.gif">-->
-                                   <!--<img width="100%" height="50px" src="../images/new_Individuals.gif">-->
-                                   <!--<img width="100%" height="50px" src="../images/footer_all.gif">-->
-                                   <img width="100%" height="75px" src="../images/new_big_footer.gif">
+                                  <img width="100%" height="75px" src="../images/new_big_footer.gif">
                                </div>
                            </div>
                         </div>
@@ -699,6 +716,5 @@
             </div>
         </div>
     </div>
-
 </div>
 <footer-section></footer-section>
