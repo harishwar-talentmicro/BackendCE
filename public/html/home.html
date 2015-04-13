@@ -358,7 +358,12 @@
                                                   Help ?
                                                </div>
                                             </div>
-                                            <div ng-show="search.showInfoWindow">
+
+                                            <div ng-show="showLoadingImage" class="lodingImgContainer">
+                                               <div class="preloader1">
+                                               </div>
+                                            </div>
+                                           <div ng-show="search.showInfoWindow && showLoadingImage == false">
                                                 <div ng-show="search.mInfo.Picture">
                                                     <div ng-show="search.mInfo.IDTypeID == 1" class="row addItemRowUserEzeid1 userImgSpace" >
                                                         <img width="77" height="90" ng-src="{{search.mInfo.Picture}}" >
@@ -545,7 +550,7 @@
                                                             </div>
                                                         </div>-->
 
-                                                        <table class="rwd-table">
+                                                        <table class="rwd-table setFontFourty setLineHeight">
                                                             <tbody>
                                                                 <tr ng-repeat="_item in search.searchResult">
                                                                    <td data-th="Company Name" style="color: #0866A6;" class="showPointer resultTableCellBorder">
