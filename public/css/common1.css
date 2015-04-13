@@ -217,8 +217,7 @@ hr {
 .searchInfoLink
 {
     border-left: 2px solid #000;
-    border-right: 2px solid #000;
-    width: 27%;
+   /* width: 27%;*/
 }
 .searchStripTopMargin
 {
@@ -665,7 +664,7 @@ body {
 .notification_drp ul li a.bulkMailer-icon{ background-position:-7px -1235px!important;}
 .notification_drp ul li a.bulkMailer-icon:hover{ background-position:-7px -1297px!important;}
 
-.custom-table table, td {
+/*.custom-table table, td {
     border: 1px solid black;
     background: #ffffff;
 }
@@ -676,16 +675,104 @@ body {
 }
 .custom-table th, td
 {
-    text-align: center;
+    text-align: left;
 }
-/*.custom-table tr
-{
-   height: 30px;
-}*/
+
 .custom-table > tr > td {
     padding: 4px;
-}
+}*/
 .emptyCell
 {
     background: #ddebf7;
+}
+.setTextToLeftAligned
+{
+    text-align: left;
+}
+.workingHours
+{
+}
+.workingHours, .modal-body
+{
+    padding-top: 0px;
+}
+.workingHours, .modal-header
+{
+    padding: 7px;
+}
+/*.custom-table > thead > tr > th, td
+{
+    padding: 7px;
+}
+.custom-table > tbody > tr > td
+{
+    padding: 7px;
+}*/
+.holidayTableContainer
+{
+    overflow-y: auto;
+    height:180px;
+}
+/*.custom-table thead, tbody { display: block; }
+
+.custom-table tbody {
+    height: 100px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}*/
+.resultContainerRow
+{
+    margin-top: 2%;
+}
+.resultContainer
+{
+    height: 338px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    width: 100%;
+}
+.setPaddingLeftRight0
+{
+    padding-left: 0px;
+    padding-right: 0px;
+}
+.resultTableCellBorder
+{
+    border: 1px solid gainsboro;
+}
+
+
+.ezeid-nav-tab > div > ul > li > a {
+    padding: 9px;
+    font-size: 14px;
+    margin-bottom: 0px;
+}
+.setBottomMargin0
+{
+    margin-bottom: 0px;
+}
+.preloader1{
+    display: table-cell;
+    text-align: center;
+    vertical-align: middle;
+    background-image: url(../images/preloader.GIF);
+    background-repeat: no-repeat;
+    background-size: contain;
+    height:150px;
+    width: 1%;
+}
+.lodingImgContainer
+{
+    margin-top: 20%;
+    text-align: right;
+    margin-left: 35%;
+}
+
+.setFontFourty
+{
+    font-size: 14px;
+}
+.setLineHeight
+{
+    line-height: 3%;
 }

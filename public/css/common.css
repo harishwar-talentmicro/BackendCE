@@ -454,6 +454,7 @@ body > div.viewport{
 body > div.viewport > div#wrapper{
     min-height: 91%;
     height: auto;
+    padding-bottom: 20px;
 }
 
 footer{
@@ -1914,33 +1915,43 @@ form .row-error{
 .profile-manager .nav{
     padding: 10px;
 }
-.profile-manager .nav > li > a{
+.profile-manager .nav > li > a,
+.ezeid-nav-tab > div  > ul > li > a{
     border-radius: 0px;
     background: #D9ECFF;
     color:#0DA3D8;
     margin-bottom: 10px;
 }
 
-.profile-manager .nav > li.disabled > a{
+.profile-manager .nav > li.disabled > a,
+.ezeid-nav-tab > div >  ul > li > a{
     background: #F0F0F0;
     color: #939393
 }
 
 .profile-manager .nav > li.disabled > a:hover,
 .profile-manager .nav > li.disabled > a:focus,
-.profile-manager .nav > li.disabled > a:active{
+.profile-manager .nav > li.disabled > a:active
+.ezeid-nav-tab > div >  ul > li.disabled > a:hover,
+.ezeid-nav-tab > div >  ul > li.disabled > a:focus,
+.ezeid-nav-tab > div >  ul > li.disabled > a:active{
     background: #f3f3f3;
     color:#D2D2D2;
 }
 
-.profile-manager .nav > li.active > a{
+.profile-manager .nav > li.active > a,
+.ezeid-nav-tab > div > ul > li.active > a{
     background: #60D560;
     color:#FFF;
+    margin-bottom: 0px;
 }
 
 .profile-manager .nav > li > a:hover,
 .profile-manager .nav > li > a:active,
-.profile-manager .nav > li > a:focus{
+.profile-manager .nav > li > a:focus,
+.ezeid-nav-tab > div > ul > li > a:hover,
+.ezeid-nav-tab > div > ul > li > a:focus,
+.ezeid-nav-tab > div > ul > li > a:active{
     background: #98F098;
     color: #3295BA;
 }

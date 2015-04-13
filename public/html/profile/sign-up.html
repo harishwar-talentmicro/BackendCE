@@ -173,6 +173,10 @@
                                                                 <p class="text-danger center-vertical" ng-show="!isEzeidAvailable">Not Available</p>
                                                             </div>
 
+                                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
+                                                                <small>*Note : End the EZEID with atleast 1 numerical digit (Not applicable for paid business listing)</small>
+                                                            </div>
+
                                                         </div>
 
 
@@ -185,11 +189,13 @@
                                                                             name="password"
                                                                             ng-model="password"
                                                                             type="password"
-                                                                            min-length="1"
+                                                                            min-length="4"
+                                                                            max-length="20"
                                                                             placeholder="{{'Password'}}"
                                                                             ng-class="(signUpForm.password.$dirty && signUpForm.password.$modelValue.length < 1) ? 'mandatoryTextBox' : ''"
                                                                             class="form-control emptyBox" />
                                                                 </div>
+                                                                <small class="text-danger">{{error.password}}</small>
                                                             </div>
                                                             <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
                                                                 <div class="form-group">
@@ -197,7 +203,8 @@
                                                                             name="repassword"
                                                                             ng-model="repassword"
                                                                             type="password"
-                                                                            min-length="1"
+                                                                            min-length="4"
+                                                                            max-length="20"
                                                                             placeholder="{{'Re-enter Password'}}"
                                                                             ng-class="(signUpForm.repassword.$dirty && signUpForm.repassword.$modelValue.length < 1) ? 'mandatoryTextBox' : ''"
                                                                             class="form-control emptyBox" />
@@ -226,11 +233,13 @@
                                                                             ng-model="companyName"
                                                                             type="text"
                                                                             min-length="1"
+                                                                            max-length="150"
                                                                             placeholder="{{(userType == 2) ? 'Company Name': 'Name of Public Place'}}"
                                                                             ng-class="(signUpForm.companyName.$dirty && signUpForm.companyName.$modelValue.length < 1) ? 'mandatoryTextBox' : ''"
                                                                             ng-change="signUpForm.companyName.$setDirty()"
                                                                             class="form-control emptyBox" />
                                                                 </div>
+                                                                <small class="text-danger">{{error.companyName}}</small>
 
                                                             </div>
 
@@ -241,11 +250,13 @@
                                                                             ng-model="about"
                                                                             type="text"
                                                                             min-length="1"
+                                                                            max-length="100"
                                                                             placeholder="{{(userType == 2) ? 'About Company': 'About Public Place'}}"
                                                                             ng-class="(signUpForm.about.$dirty && signUpForm.about.$modelValue.length < 1) ? 'mandatoryTextBox' : ''"
                                                                             ng-change="signUpForm.about.$setDirty()"
                                                                             class="form-control emptyBox" />
                                                                 </div>
+                                                                <small class="text-danger">{{error.about}}</small>
                                                             </div>
                                                         </div>
                                                         <!--------------end :  This will be visible in case of Public Place and Business User  Only ---->
@@ -258,10 +269,12 @@
                                                                            ng-model="firstName"
                                                                            type="text"
                                                                            min-length="1"
+                                                                           max-length="30"
                                                                            placeholder="{{(userType == 2 || userType == 3) ? 'Contact First Name': 'First Name'}}"
                                                                            ng-class="(signUpForm.firstName.$dirty && signUpForm.firstName.$modelValue.length < 1) ? 'mandatoryTextBox' : ''"
                                                                    class="form-control emptyBox" />
                                                                </div>
+                                                               <small class="text-danger">{{error.firstName}}</small>
                                                            </div>
 
                                                            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
@@ -271,10 +284,12 @@
                                                                            ng-model="lastName"
                                                                            type="text"
                                                                            min-length="1"
+                                                                           max-length="30"
                                                                            placeholder="{{(userType == 2 || userType == 3) ? 'Contact Last Name': 'Last Name'}}"
                                                                            ng-class="(signUpForm.lastName.$dirty && signUpForm.lastName.$modelValue.length < 1) ? 'mandatoryTextBox' : ''"
                                                                            class="form-control emptyBox" />
                                                                </div>
+                                                               <small class="text-danger">{{error.lastName}}</small>
                                                            </div>
 
                                                        </div>
@@ -290,11 +305,13 @@
                                                                             ng-model="companyName"
                                                                             type="text"
                                                                             min-length="1"
+                                                                            max-length="150"
                                                                             placeholder="{{'Company Name'}}"
                                                                             ng-change="signUpForm.companyName.$setDirty()"
                                                                             ng-class="(signUpForm.companyName.$dirty && signUpForm.companyName.$modelValue.length < 1) ? 'mandatoryTextBox' : ''"
                                                                             class="form-control emptyBox" />
                                                                 </div>
+                                                                <small class="text-danger">{{error.companyName}}</small>
                                                             </div>
 
                                                             <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
@@ -304,11 +321,13 @@
                                                                             ng-model="about"
                                                                             type="text"
                                                                             min-length="1"
+                                                                            max-length="100"
                                                                             placeholder="{{'Job Title'}}"
                                                                             ng-change="signUpForm.about.$setDirty()"
                                                                             ng-class="(signUpForm.about.$dirty && signUpForm.about.$modelValue.length < 1) ? 'mandatoryTextBox' : ''"
                                                                             class="form-control emptyBox" />
                                                                 </div>
+                                                                <small class="text-danger">{{error.about}}</small>
                                                             </div>
 
                                                         </div>
@@ -323,10 +342,12 @@
                                                                             ng-model="email"
                                                                             type="email"
                                                                             min-length="1"
+                                                                            max-length="50"
                                                                             placeholder="{{'Email'}}"
                                                                             ng-class="(signUpForm.email.$dirty && signUpForm.email.$modelValue.length < 1) ? 'mandatoryTextBox' : ''"
                                                                             class="form-control emptyBox" />
                                                                 </div>
+                                                                <small class="text-danger">{{error.email}}</small>
                                                             </div>
                                                         </div>
 
@@ -345,8 +366,16 @@
                                                             </div>
                                                             <div class="col-lg-3 col-md-3 col-sm-3 col-xs-4">
                                                                 <div class="form-group">
-                                                                    <date-time-picker recipient="dateOfBirth"></date-time-picker>
+                                                                    <date-time-picker recipient="dateOfBirth" settings='{
+                                                                    "format" : "d-M-Y",
+                                                                    "timepicker" : false,
+                                                                    "mask" : true,
+                                                                    "hours12" : false,
+                                                                    "maxDate" : "+1970/01/02"
+                                                                    }'></date-time-picker>
                                                                 </div>
+
+                                                                <small class="text-danger">{{error.dateOfBirth}}</small>
                                                             </div>
                                                         </div>
 
@@ -375,6 +404,7 @@
                                                                                 pin-only
                                                                                 class="form-control" />
                                                                     </div>
+                                                                    <small class="text-danger">{{error.pin}}</small>
                                                                 </div>
 
                                                         </div>
