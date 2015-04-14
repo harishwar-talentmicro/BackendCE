@@ -48,7 +48,6 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
             for(var i = 0; i < this.length; i++){
                 for(var prop in this[i]){
                     if(this[i].hasOwnProperty(key) && this[i][key] === value){
-                        console.log('prop '+prop + '  value : '+value);
                         resultIndex = i;
                         found = true;
                         break;
@@ -181,7 +180,6 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
         $scope.initializeMap = function(index){
             if(!$scope.locationsToggleIndex[index].isMapInitialized)
             {
-                console.log('Line 125 map initialization in progress');
                 mapList['map'+index] = new GoogleMaps();
                 $scope.locationsToggleIndex[index].isMapInitialized = true;
 
@@ -212,8 +210,6 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
                     containerElement = 'map-location-'+index;
                 }
 
-                console.log('container-element');
-                console.log(containerElement);
                 mapList['map'+index].createMap(containerElement,$scope,'findCurrentLocation('+index+')');
                 mapList['map'+index].renderMap();
                 mapList['map'+index].mapIdleListener().then(function(){
@@ -265,12 +261,14 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
                 $scope.locationsToggleIndex[index].editMode = false;
                 $scope.locationsToggleIndex[index].viewMode = false;
             });
-            $scope.locationsToggleIndex[index].viewMode = true;
-            var countryId = (index == 0) ? $scope.userDetails.CountryID : $scope.secondaryLocations[index-1].CountryID;
-            $scope.loadStates(countryId).then(function(stateList){
-                $scope.editStateList = stateList;
-            });
 
+            if(typeof(index) !== "undefined"){
+                $scope.locationsToggleIndex[index].viewMode = true;
+                var countryId = (index == 0) ? $scope.userDetails.CountryID : $scope.secondaryLocations[index-1].CountryID;
+                $scope.loadStates(countryId).then(function(stateList){
+                    $scope.editStateList = stateList;
+                });
+            }
         };
 
         /**
@@ -300,7 +298,6 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
              */
             gMap.getReverseGeolocation(lat,lng).then(function(results){
                 var geolocationAddress = gMap.parseReverseGeolocationData(results.data);
-                console.log(geolocationAddress);
                 var countryIndex = $scope.countryList.indexOfWhere('CountryName',geolocationAddress.country);
                 /**
                  * If country is changed then load new list of state for the new country
@@ -310,7 +307,6 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
                 $scope.editLocationDetails.ISDMobileNumber = $scope.countryList[countryIndex].ISDCode;
                 $scope.editLocationDetails.ISDPhoneNumber = $scope.countryList[countryIndex].ISDCode;
 
-                console.log($scope.editStateList);
                 /**
                  * If country is changed then only load states
                  */
@@ -318,13 +314,10 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
                     $scope.editLocationDetails.CountryID = $scope.countryList[countryIndex].CountryID;
 
                     $scope.loadStates($scope.countryList[countryIndex].CountryID).then(function(stateList){
-                        console.log(stateList);
-                        console.log(stateList.length);
                         if(stateList.length > 0){
                             $scope.editStateList = stateList;
 
                         }
-                        console.log($scope.editStateList);
                         var stateIndex = $scope.editStateList.indexOfWhere('StateName',geolocationAddress.state);
                         var xIndex = stateList.indexOfWhere('StateName',geolocationAddress.state);
                         if(stateIndex === -1){
@@ -346,7 +339,6 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
                     if(stateIndex === -1){
                         stateIndex = 0;
                     }
-                    console.log('stateIndex : '+stateIndex);
 
                     $timeout(function(){
                         $scope.editLocationDetails.StateID = $scope.editStateList[stateIndex].StateID;
@@ -390,7 +382,6 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
             else{
                 $scope.loadStates($scope.secondaryLocations[index-1].CountryID).then(function(stateList){
                     $scope.editStateList  = stateList;
-                    console.log($scope.editLocationDetails);
                     for(var prop in $scope.editLocationDetails){
                         if($scope.editLocationDetails.hasOwnProperty(prop)){
                             for(var prop1 in $scope.secondaryLocations[index-1]){
@@ -400,7 +391,6 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
                             }
                         }
                     }
-                    console.log($scope.editLocationDetails);
                     $scope.placeEditModeMarker(index);
 
                 });
@@ -593,7 +583,7 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
                                 message: 'An error occurred while saving secondary location ! Please try again',
                                 delay : MsgDelay
                             });
-                            console.log(err);
+
                         });
                 }
 
