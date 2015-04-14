@@ -86,6 +86,61 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
          */
         $scope.editStateList = [];
 
+        /**
+         * Details of Location currently in editing mode
+         * @type {{LocTitle: string, TID: number, AddressLine1: string, AddressLine2: string, CityID: string, StateID: string, CityTitle: string, StateTitle: string, CountryID: number, CountryName: string, ISDPhoneNumber: string, PhoneNumber: string, ISDMobileNumber: string, MobileNumber: string, ParkingStatus: string, Website: string, Picture: string, PictureFileName: string, PostalCode: string, Latitude: number, Longitude: number, Altitude: number}}
+         */
+        $scope.editLocationDetails = {
+            LocTitle : 'New Location',
+            TID : 0,
+            AddressLine1 : '',
+            AddressLine2 : '',
+            CityID : '',
+            StateID : '',
+            CityTitle : '',
+            StateTitle : '',
+            CountryID : 1,
+            CountryName : 'Afghanistan',
+            ISDPhoneNumber : '',
+            PhoneNumber: '',
+            ISDMobileNumber : '',
+            MobileNumber : '',
+            ParkingStatus : 0,
+            Website : '',
+            Picture : '',
+            PictureFileName : '',
+            PostalCode : '',
+            Latitude : 0,
+            Longitude : 0,
+            Altitude : 0
+        };
+
+
+        /**
+         * Loads list of states on country change manually by selecting a country from list
+         */
+        $scope.loadEditStateList = function(){
+            $scope.loadStates($scope.editLocationDetails.CountryID).then(function(stateList){
+                if(stateList && stateList.length > 0 && stateList !== 'null'){
+                    $scope.editStateList = stateList;
+                    $timeout(function(){
+                        $scope.editLocationDetails.StateID = stateList[0].StateID;
+                    },500);
+                }
+                else{
+                    Notification.error({
+                        message : 'Unable to load list of states/provinces',
+                        delay : MsgDelay
+                    });
+                }
+            }, function(){
+                Notification.error({
+                    message : 'Unable to load list of states/provinces',
+                    delay : MsgDelay
+                });
+            });
+
+        };
 
         /**
          * Show and hide map using location index
@@ -275,23 +330,27 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
                         if(stateIndex === -1){
                             stateIndex = 0;
                         }
-                        console.log('stateIndex : '+stateIndex);
-                        console.log('stateIndex X : '+xIndex);
 
-                        $scope.editLocationDetails.StateID = $scope.editStateList[stateIndex].StateID;
+                        $timeout(function(){
+                            $scope.editLocationDetails.StateID = $scope.editStateList[stateIndex].StateID;
+                        },500);
                         $scope.editLocationDetails.CityTitle = geolocationAddress.city;
                         $scope.editLocationDetails.PostalCode = geolocationAddress.postalCode;
 
                     });
                 }
                 else{
+                    $scope.editLocationDetails.CountryID = $scope.countryList[countryIndex].CountryID;
+
                     var stateIndex = $scope.editStateList.indexOfWhere('StateName',geolocationAddress.state);
                     if(stateIndex === -1){
                         stateIndex = 0;
                     }
                     console.log('stateIndex : '+stateIndex);
 
-                    $scope.editLocationDetails.StateID = $scope.editStateList[stateIndex].StateID;
+                    $timeout(function(){
+                        $scope.editLocationDetails.StateID = $scope.editStateList[stateIndex].StateID;
+                    },500);
                     $scope.editLocationDetails.StateTitle = $scope.editStateList[stateIndex].StateName;
                     $scope.editLocationDetails.CityTitle = geolocationAddress.city;
                     $scope.editLocationDetails.PostalCode = geolocationAddress.postalCode;
@@ -300,35 +359,6 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
             });
         };
 
-
-        /**
-         * Details of Location currently in editing mode
-         * @type {{LocTitle: string, TID: number, AddressLine1: string, AddressLine2: string, CityID: string, StateID: string, CityTitle: string, StateTitle: string, CountryID: number, CountryName: string, ISDPhoneNumber: string, PhoneNumber: string, ISDMobileNumber: string, MobileNumber: string, ParkingStatus: string, Website: string, Picture: string, PictureFileName: string, PostalCode: string, Latitude: number, Longitude: number, Altitude: number}}
-         */
-        $scope.editLocationDetails = {
-            LocTitle : 'New Location',
-            TID : 0,
-            AddressLine1 : '',
-            AddressLine2 : '',
-            CityID : '',
-            StateID : '',
-            CityTitle : '',
-            StateTitle : '',
-            CountryID : 1,
-            CountryName : 'Afghanistan',
-            ISDPhoneNumber : '',
-            PhoneNumber: '',
-            ISDMobileNumber : '',
-            MobileNumber : '',
-            ParkingStatus : 0,
-            Website : '',
-            Picture : '',
-            PictureFileName : '',
-            PostalCode : '',
-            Latitude : 0,
-            Longitude : 0,
-            Altitude : 0
-        };
 
         /**
          * Editing locations and assigning values to edit location form
@@ -378,7 +408,6 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
 
 
         };
-
 
         $scope.saveLocation = function(locIndex){
             if(locIndex === 0 ){
