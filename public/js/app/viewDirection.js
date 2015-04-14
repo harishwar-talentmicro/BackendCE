@@ -105,9 +105,9 @@ angular.module('ezeidApp').controller('viewDirectionController',['$http', '$root
 
             onrendered: function(canvas) {
 
-                var img = canvas.toDataURL("image/png");
-                img = img.replace('data:image/png;base64,', '');
-                finalImageSrc = 'data:image/png;base64,' + img;
+                var img = canvas.toDataURL("image/jpg");
+                img = img.replace('data:image/jpg;base64,', '');
+                finalImageSrc = 'data:image/jpg;base64,' + img;
 
                 $('#googlemapbinary').attr('src', finalImageSrc);
                 return false;
@@ -117,8 +117,6 @@ angular.module('ezeidApp').controller('viewDirectionController',['$http', '$root
 
     // EMail direction Html
     viewDirection.emailHtml = function () {
-
-        console.log($rootScope);
 
         if($rootScope._userInfo.IsAuthenticate == false)
         {
@@ -153,7 +151,7 @@ angular.module('ezeidApp').controller('viewDirectionController',['$http', '$root
     viewDirection.emailDirectionImage = function () {
 
     //  $http({ method: 'get', url: GURL + 'ewtSendBulkMailer?Token=' + $rootScope._userInfo.Token + '&TID=""&TemplateID=""&ToMailID='+ viewDirection._info.ToMailID +'&Attachment='+ finalImageSrc +'&AttachmentFileName=ViewDirection'}).success(function (data)
-        $http({ method: 'post', url: GURL + 'ewtSendBulkMailer', data: { TokenNo: $rootScope._userInfo.Token, TID: "", TemplateID: "", ToMailID: viewDirection._info.ToMailID, Attachment: finalImageSrc, AttachmentFileName :'ViewDirection.png'} }).success(function (data)
+        $http({ method: 'post', url: GURL + 'ewtSendBulkMailer', data: { TokenNo: $rootScope._userInfo.Token, TID: "", TemplateID: "", ToMailID: viewDirection._info.ToMailID, Attachment: finalImageSrc, AttachmentFileName :'ViewDirection.jpg'} }).success(function (data)
         {
             if (data != 'null')
             {
