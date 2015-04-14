@@ -2,13 +2,13 @@
 angular.module('ezeidApp').controller('WorkingHourCtrl',['$scope','$rootScope','$http','Notification','$filter','MsgDelay','$interval','GURL',function($scope,$rootScope,$http,Notification,$filter,MsgDelay,$interval,GURL){
 
     var workingHours = this;
-    workingHours.result = [];
+    $scope.result = [];
     $scope.mInfo = {};
     getWorkingHours();
 
     function getWorkingHours()
     {
-        $http({ method: 'get', url: GURL + 'ewtGetWorkingHours',
+        $http({ method: 'get', url: GURL + 'ewtWorkingHours',
             params : {
                 Token : $rootScope._userInfo.Token
             }
@@ -20,7 +20,7 @@ angular.module('ezeidApp').controller('WorkingHourCtrl',['$scope','$rootScope','
                 {
                     console.log("SAi12");
 
-                    workingHours.result = JSON.parse(data);
+                    workingHours.result = data;
                     console.log(workingHours.result);
                 }
             });
@@ -31,7 +31,7 @@ angular.module('ezeidApp').controller('WorkingHourCtrl',['$scope','$rootScope','
 
           $http({
                 method: "POST",
-                url: GURL + 'ewtSaveWorkingHours',
+                url: GURL + 'ewtWorkingHours',
                 data:$scope.mInfo
               }).success(function (data) {
                   console.log(data);
