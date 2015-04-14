@@ -1,6 +1,6 @@
 
 
-angular.module('ezeidApp').controller('ProfileManagerCtrl',[
+angular.module('ezeidApp').controller('PasswordCtrl',[
     '$rootScope',
     '$scope',
     '$http',
@@ -31,6 +31,11 @@ angular.module('ezeidApp').controller('ProfileManagerCtrl',[
         $location,
         $routeParams
         ) {
+
+
+        $scope.dataProgressLoader.dataLoadInProgress = false;
+        $scope.dataProgressLoader.dataLoadError = false;
+        $scope.dataProgressLoader.dataLoadComplete = true;
 
 
 

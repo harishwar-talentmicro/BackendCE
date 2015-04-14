@@ -1469,8 +1469,8 @@
         <div class="panel panel-success">
             <div class="panel-heading">
                 Change Password
-                <p class="text-info pull-right btn-link" ng-click="toggleProfileEditMode()">
-                    <span class="glyphicon glyphicon-edit"></span>
+                <p class="text-info pull-right btn-link">
+
                 </p>
 
             </div>
@@ -1479,17 +1479,37 @@
                     <!---------------------Profile Edit Mode Disabled --------------------->
                     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 profile-details" ng-hide="profileEditMode">
 
+                        <form name="passwordForm">
+                            <div class="row">
+                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+                                    <input type="password"
+                                           ng-minlength="4"
+                                           name="currentPassword"
+                                           placeholder="Current Password"
+                                           class="form-control"
+                                           ng-model="currentPassword" />
 
-                        <div class="row">
-                            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 bottom-clearfix">
-                                <h5 class="text-primary text-left">Current Password</h5>
+                                </div>
+                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+                                    <input type="password"
+                                           ng-minlength="4"
+                                           name="newPassword"
+                                           class="form-control"
+                                           placeholder="New Password"
+                                           ng-model="newPassword" />
+                                    <small class="text-danger" ng-show="passwordForm.newPassword.$invalid">Password should be atleast 4 characters</small>
+                                </div>
+                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+                                    <input type="password"
+                                           name="renewPassword"
+                                           class="form-control"
+                                           placeholder="Re-enter new password"
+                                           ng-model="renewPassword" />
+                                    <small class="text-danger" ng-show="(passwordForm.newPassword !== passwordForm.renewPassword) && password.newPassword && passwordForm.">Password didn't matched</small>
+                                </div>
                             </div>
-                            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 bottom-clearfix">
-                                <h5 class="text-primary text-left font-open-sans data">
-                                    {{userDetails.EZEID}}
-                                </h5>
-                            </div>
-                        </div>
+                        </form>
+
                     </div>
                 </div>
             </div>
@@ -1497,7 +1517,15 @@
 </script>
 
 <script type="text/ng-template" id="/tpl/weblinks-template.html">
+    <section>
+        This is section
+    </section>
+</script>
 
+<script type="text/ng-template" id="/tpl/configuration-template.html">
+    <section>
+        This is section
+    </section>
 </script>
 
 <div id="wrapper">
@@ -1523,14 +1551,23 @@
                             <div class="row bottom-clearfix">
                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-center">
                                     <ul class="nav nav-pills">
-                                        <li role="presentation" class="bottom-clearfix" ng-class="{(activeTemplate === '/tpl/profile-template.html') ? 'active' : ''}">
-                                            <a href="/profile-manager/profile">Basic Profile and Locations</a></li>
-                                        <li role="presentation" class="bottom-clearfix" ng-class="{(userDetails.SelectionType === 2 && userDetails.IDTypeID === 2) ? '' : 'disabled'}">
-                                            <a {{(userDetails.SelectionType === 2 && userDetails.IDTypeID === 2) ? 'href="/profile/configuration"' : ''}}>Configuration</a>
+                                        <li role="presentation" class="bottom-clearfix" ng-class="{'active' : (activeTemplate === '/tpl/profile-template.html')}">
+                                            <a href="/profile-manager/profile">Basic Profile and Locations</a>
                                         </li>
-                                        <li role="presentation" class=" bottom-clearfix" ng-class="{(activeTemplate === '/tpl/weblinks-template.html') ? 'active' : ''}">
+
+                                        <li role="presentation" ng-show="(userDetails.SelectionType === 2 && userDetails.IDTypeID === 2)"
+                                            ng-class="{'active' : (activeTemplate === '/tpl/weblinks-template.html')}"
+                                            class="bottom-clearfix disabled">
+                                            <a href="/profile-manager/configuration">Configuration</a>
+                                        </li>
+                                        <li role="presentation" ng-hide="(userDetails.SelectionType === 2 && userDetails.IDTypeID === 2)" class="bottom-clearfix">
+                                            <a>Configuration</a>
+                                        </li>
+                                        <li role="presentation" class=" bottom-clearfix"
+                                            ng-class="{'active' :(activeTemplate === '/tpl/weblinks-template.html')}">
                                             <a href="/profile-manager/weblinks">Short URLs</a></li>
-                                        <li role="presentation" class=" bottom-clearfix">
+                                        <li role="presentation" class=" bottom-clearfix"
+                                            ng-class="{'active' : (activeTemplate === '/tpl/password-template.html')}">
                                             <a href="/profile-manager/password">Password</a>
                                         </li>
                                     </ul>
