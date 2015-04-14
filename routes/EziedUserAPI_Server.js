@@ -6991,6 +6991,67 @@ exports.FnGetWorkingHours = function (req, res) {
     }
 };
 
+exports.FnDeleteWorkingHours = function(req, res){
+    try{
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.query.Token;
+        var TID = req.query.TID;
+        var RtnMessage = {
+            IsSuccessfull: false
+        };
+        var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
+
+        if (Token !=null && TID != null) {
+            FnValidateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+                        //console.log('CALL pDeleteWorkinghours(' + db.escape(TID) + ')');
+                        db.query('CALL pDeleteWorkinghours(' + db.escape(TID) + ')', function (err, deleteResult) {
+                            if (!err){
+                                //console.log(deleteResult);
+                                    RtnMessage.IsSuccessfull = true;
+                                    res.send(RtnMessage);
+                                    console.log('FnDeleteWorkingHours:Working Hours delete successfully');
+                            }
+                            else {
+                                console.log('FnDeleteWorkingHours: error in deleting Working Hours' + err);
+                                res.statusCode = 500;
+                                res.send(RtnMessage);
+                            }
+                        });
+                    }
+                    else {
+                        console.log('FnDeleteWorkingHours: Invalid token');
+                        res.statusCode = 401;
+                        res.send(RtnMessage);
+                    }
+                }
+                else {
+                    console.log('FnDeleteWorkingHours:Error in processing Token' + err);
+                    res.statusCode = 500;
+                    res.send(RtnMessage);
+                }
+            });
+        }
+        else {
+            if (Token == null) {
+                console.log('FnDeleteWorkingHours: Token is empty');
+            }
+            else if (TID == null) {
+                console.log('FnDeleteWorkingHours: TID is empty');
+            }
+            res.statusCode=400;
+            res.send(RtnMessage);
+        }
+    }
+    catch (ex) {
+        console.log('FnDeleteWorkingHours:error ' + ex.description);
+        throw new Error(ex);
+    }
+}
+
 //method to get working hours and holiday list
 exports.FnGetWorkingHrsHolidayList = function (req, res) {
     try {
@@ -8044,21 +8105,21 @@ exports.FnSendBulkMailer = function (req, res) {
                                                                 // Neat!
                                                                 if (!err) {
                                                                     console.log(result);
-                                                                    console.log('FnMessageMail: Mail saved Successfully');
+                                                                    console.log('FnSendBulkMailer: Mail saved Successfully');
                                                                                                                                      
                                                                     //CallBack(null, RtnMessage);
                                                                 }
                                                                 else {
-                                                                    console.log('FnMessageMail: Mail not Saved Successfully');
+                                                                    console.log('FnSendBulkMailer: Mail not Saved Successfully');
                                                                    // CallBack(null, null);
                                                                 }
                                                             });
-                                                            console.log('Mail details sent for processing');
+                                                            console.log('FnSendBulkMailer:Mail details sent for processing');
                                                             console.log(mailOptions);
                                                             }
                                                         else
                                                         {
-                                                            console.log('FnGetTemplateDetails:Sales Mail Id is empty');
+                                                            console.log('FnSendBulkMailer:Sales Mail Id is empty');
                                                             //res.send('null');
                                                         }
                                                     }
@@ -8104,12 +8165,12 @@ exports.FnSendBulkMailer = function (req, res) {
                     else {
                         res.statusCode = 401;
                         res.send('null');
-                        console.log('FnGetTemplateDetails: Invalid Token');
+                        console.log('FnSendBulkMailer: Invalid Token');
                     }
                 } else {
                     res.statusCode = 500;
                     res.send('null');
-                    console.log('FnGetTemplateDetails: Error in validating token:  ' + err);
+                    console.log('FnSendBulkMailer: Error in validating token:  ' + err);
                 }
             });
         }  
@@ -8135,43 +8196,43 @@ exports.FnSendBulkMailer = function (req, res) {
                                 // Neat!
                                 if (!err) {
                                     console.log(result);
-                                    console.log('FnMessageMail: Mail saved Successfully');
+                                    console.log('FnSendBulkMailer: Mail saved Successfully');
                                     RtnResponse.IsSent = true;
                                     res.send(RtnResponse);
                                 }
                                 else {
-                                    console.log('FnMessageMail: Mail not Saved Successfully');
+                                    console.log('FnSendBulkMailer: Mail not Saved Successfully');
                                     res.send(RtnResponse);
                                 }
                             });
-                        console.log('Mail details sent for processing');
+                        console.log('FnSendBulkMailer:Mail details sent for processing');
                         console.log(mailOptions);
                     }
                     else {
                         res.statusCode = 401;
                         res.send('null');
-                        console.log('FnGetTemplateDetails: Invalid Token');
+                        console.log('FnSendBulkMailer: Invalid Token');
                     }
                 } else {
                     res.statusCode = 500;
                     res.send('null');
-                    console.log('FnGetTemplateDetails: Error in validating token:  ' + err);
+                    console.log('FnSendBulkMailer: Error in validating token:  ' + err);
                 }
             });
         }
                     
         else {
             if (Token == null) {
-                console.log('FnGetTemplateDetails: Token is empty');
+                console.log('FnSendBulkMailer: Token is empty');
             }
             else if (ToMailID == null) {
-                console.log('FnGetTemplateDetails: ToMailID is empty');
+                console.log('FnSendBulkMailer: ToMailID is empty');
             }
             else if (Attachment == null) {
-                console.log('FnGetTemplateDetails: Attachment is empty');
+                console.log('FnSendBulkMailer: Attachment is empty');
             }
             else if (AttachmentFileName == null) {
-                console.log('FnGetTemplateDetails: AttachmentFileName is empty');
+                console.log('FnSendBulkMailer: AttachmentFileName is empty');
             }
             res.statusCode=400;
             res.send('null');
@@ -8182,6 +8243,103 @@ exports.FnSendBulkMailer = function (req, res) {
         console.log('FnGetTemplateDetails error:' + ex.description);
         throw new Error(ex);
     }
+};
+
+//below method to crop the image
+exports.FnCropImage = function(req, res){
+try{
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+     
+     var Token = req.body.Token;
+     var Image = req.body.Image;
+     var Target_Width = req.body.Width;
+     var Target_Height = req.body.Height;
+     
+      var RtnMessage = {
+            IsSuccessfull: false,
+            Picture: ''
+        };
+        var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
+     
+        if (Token != null && Image != null && Target_Width != null && Target_Height != null ) {
+        FnValidateToken(Token, function (err, Result) {
+            if (!err) {
+                if (Result != null) {
+                    var fs = require('fs');
+                    var gm = require('gm').subClass({ imageMagick: true });
+                    //var bitmap = Image;
+                    var bitmap = fs.readFileSync(Image);
+                    var Original_Width = 0;
+                    var Original_Height = 0;
+                    console.log(bitmap);
+                   
+                    gm(bitmap).size(function (err, size) {
+                    if (!err){
+                        console.log(size.width > size.height ? 'wider' : 'taller');
+                        Original_Width = size.width;
+                        Original_Height = size.height;
+
+                        if(Original_Width > Original_Height){
+                                x_width = Target_Width * Original_Height / Target_Height ;
+
+                                    gm(bitmap).crop(x_width,Original_Height)
+                                        RtnMessage.Picture = new Buffer(bitmap).toString('base64');
+                                        RtnMessage.IsSuccessfull = true;
+                                        console.log('FnCropImage: Image Cropped successfully');                            
+                                        res.send(RtnMessage);
+                            }
+                            else{
+                                x_height = Original_Width * Target_Height / Target_Width;
+                                
+                                gm(bitmap).crop(Original_Width,x_height)
+                                    RtnMessage.Picture = new Buffer(bitmap).toString('base64');
+                                    RtnMessage.IsSuccessfull = true;
+                                    console.log('FnCropImage: Image Cropped successfully');                            
+                                    res.send(RtnMessage);
+                            }
+                    }
+                        else{
+                            console.log('FnCropImage: Error in getting image size');
+                            res.send(RtnMessage);
+                        }
+                    });
+                }
+                else {
+                        res.statusCode = 401;
+                        res.send(RtnMessage);
+                        console.log('FnCropImage: Invalid Token');
+                    }
+                } else {
+
+                    res.statusCode = 500;
+                    res.send(RtnMessage);
+                    console.log('FnCropImage: Error in validating token:  ' + err);
+                }
+            });
+        }
+        else {
+            if (Token == null) {
+                console.log('FnCropImage: Token is empty');
+            }
+            else if (Image == null) {
+                console.log('FnCropImage: Image is empty');
+            }
+            else if (Target_Width == null) {
+                console.log('FnCropImage: Width is empty');
+            }
+            else if (Target_Height == null) {
+                console.log('FnCropImage: Height is empty');
+            }
+            
+            res.statusCode=400;
+            res.send(RtnMessage);
+        }
+             }
+            catch (ex) {
+                console.log('FnCropImage:error ' + ex.description);
+                throw new Error(ex);
+        }
 };
 
 
@@ -10763,75 +10921,3 @@ exports.FnSaveCitysVES = function(req, res){
         throw new Error(ex);
     }
 };
-
-exports.FnCropImageSize = function(req, res){
-     try{
-        res.setHeader("Access-Control-Allow-Origin", "*");
-        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-         
-          var RtnMessage = {
-                IsSuccessfull: false,
-              //Imgbase64: ''
-            };
-            var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
-                var fs = require('fs');
-                var gm = require('gm').subClass({ imageMagick: true });
-                var bitmap = fs.readFileSync("F:/test.jpg");
-                console.log(bitmap);
-         
-                var Original_Width = 0;
-                var Original_Height = 0;
-                var Target_Width = 77;
-                var Target_Height = 90;
-                
-                gm(bitmap).size(function (err, size) {
-                  if (!err){
-                    //console.log(size.width > size.height ? 'wider' : 'taller than you');
-                    Original_Width = size.width;
-                    Original_Height = size.height;
-                   
-                      if(Original_Width > Original_Height){
-                        x_width = Target_Width * Original_Height / Target_Height ;
-                        
-                            gm(bitmap).crop(x_width,Original_Height)
-                            .write("F://output//cropped.jpg", function (err) {
-                                if (!err){
-                                    console.log('FnCropImageSize: Image Cropped successfully');
-                                    RtnMessage.IsSuccessfull = true;
-                                    res.send(RtnMessage);
-                                }
-                                else{
-                                    console.log('FnCropImageSize: No Image Cropped');
-                                    res.send(RtnMessage);
-                                }
-                            });
-                      }
-                      else{
-                        x_height = Original_Width * Target_Height / Target_Width ;
-                          
-                          gm(bitmap).crop(Original_Width,x_height)
-                            .write("F://output//cropped.jpg", function (err) {
-                                if (!err){
-                                    console.log('FnCropImageSize: Image Cropped successfully..');
-                                    RtnMessage.IsSuccessfull = true;
-                                    res.send(RtnMessage);
-                                }
-                                else{
-                                    console.log('FnCropImageSize: No Image Cropped');
-                                    res.send(RtnMessage);
-                                }
-                          });
-                      }
-                  }
-                    else{
-                            console.log('FnCropImageSize: Error in getting image size');
-                            res.send(RtnMessage);
-                        }
-                  });    
-             }
-            catch (ex) {
-                console.log('FnCropImageSize:error ' + ex.description);
-                throw new Error(ex);
-        }
-};
-
