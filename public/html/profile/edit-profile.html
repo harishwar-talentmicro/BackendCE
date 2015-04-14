@@ -1225,7 +1225,7 @@
                                         </div>
 
                                         <div class="row locations-picture-container text-center">
-                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 location-image-container bottom-clearfix">
+                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 location-image-container bottom-clearfix"  ng-hide="locationsToggleIndex[locIndex+1].editMode">
                                                 <img height="90px" width="308" class="hidden-xs"
                                                      ng-hide="secondaryLocationDetails.IDTypeID == 1"
                                                      ng-src="{{((secondaryLocationDetails.Picture)? secondaryLocationDetails.Picture : '/images/grey-background.jpg')}}" />
@@ -1241,8 +1241,28 @@
                                                      ng-show="secondaryLocationDetails.IDTypeID == 1"
                                                      ng-src="{{((secondaryLocationDetails.Picture)? secondaryLocationDetails.Picture : '/images/grey-background.jpg')}}" />
                                             </div>
+
+                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 location-image-container bottom-clearfix"  ng-show="locationsToggleIndex[locIndex+1].editMode">
+                                                <img height="90px" width="308" class="hidden-xs"
+                                                     ng-hide="editLocationDetails.IDTypeID == 1"
+                                                     ng-src="{{((editLocationDetails.Picture)? editLocationDetails.Picture : '/images/grey-background.jpg')}}" />
+                                                <img height="90px" width="70px" class="hidden-xs"
+                                                     ng-show="editLocationDetails.IDTypeID == 1"
+                                                     ng-src="{{((secondaryLocationDetails.Picture)? editLocationDetails.Picture : '/images/grey-background.jpg')}}" />
+
+
+                                                <img height="45px" width="154" class="hidden-md hidden-sm hidden-lg"
+                                                     ng-hide="editLocationDetails.IDTypeID == 1"
+                                                     ng-src="{{((editLocationDetails.Picture)? editLocationDetails.Picture : '/images/grey-background.jpg')}}" />
+                                                <img height="45px" width="35px" class="hidden-md hidden-sm hidden-lg"
+                                                     ng-show="editLocationDetails.IDTypeID == 1"
+                                                     ng-src="{{((secondaryLocationDetails.Picture)? editLocationDetails.Picture : '/images/grey-background.jpg')}}" />
+                                            </div>
                                             <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 col-lg-offset-4 col-xs-offset-4 col-sm-offset-4 col-xs-offset-3" ng-show="locationsToggleIndex[locIndex+1].editMode">
-                                                <button class="btn btn-primary btn-sm no-radius" data-toggle="tooltip" title="Upload Picture">
+                                                <div class="hidden">
+                                                    <input type="file" id="picture-input-{{locIndex+1}}" name="secondaryLocation{{locIndex}}Form.Picture" onchange="angular.element(this).scope().onChangePicture(this)" />
+                                                </div>
+                                                <button class="btn btn-primary btn-sm no-radius" data-toggle="tooltip" title="Upload Picture" ng-click="changePicture(locIndex+1,$event)">
                                                     Attach Picture
                                                 </button>
                                                 <button class="btn btn-primary btn-sm no-radius" data-toggle="tooltip" title="Click Picture using Webcam">
