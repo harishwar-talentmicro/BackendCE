@@ -137,8 +137,9 @@ app.get('/ewtItemList',LocationManager.FnItemList);
 app.get('/ewtItemDetails',LocationManager.FnItemDetails);
 app.post('/ewtSaveHolidayCalendar',LocationManager.FnSaveHolidayCalendar);
 app.get('/ewtGetHolidayList',LocationManager.FnGetHolidayList);
-app.post('/ewtSaveWorkingHours',LocationManager.FnSaveWorkingHours);
-app.get('/ewtGetWorkingHours',LocationManager.FnGetWorkingHours);
+app.post('/ewtWorkingHours',LocationManager.FnSaveWorkingHours);
+app.get('/ewtWorkingHours',LocationManager.FnGetWorkingHours);
+app.delete('/ewtWorkingHours',LocationManager.FnDeleteWorkingHours);
 app.post('/ewtSaveConfig',LocationManager.FnSaveConfig);
 app.get('/ewtGetConfig',LocationManager.FnGetConfig);
 app.post('/ewtSaveTranscation',LocationManager.FnSaveTranscation);
@@ -154,7 +155,7 @@ app.post('/ewtSaveMailTemplate',LocationManager.FnSaveMailTemplate);
 app.get('/ewtGetTemplateList',LocationManager.FnGetTemplateList);
 app.get('/ewtGetTemplateDetails',LocationManager.FnGetTemplateDetails);
 app.post('/ewtSendBulkMailer',LocationManager.FnSendBulkMailer);
-app.get('/ewtCropImageSize',LocationManager.FnCropImageSize);
+app.post('/ewtCropImage',LocationManager.FnCropImage);
 app.get('/ewtGetWorkingHrsHolidayList',LocationManager.FnGetWorkingHrsHolidayList);
 
 //below service are for EZEIDAP
