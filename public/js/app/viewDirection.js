@@ -13,41 +13,6 @@ angular.module('ezeidApp').controller('viewDirectionController',['$http', '$root
 
     initialize();
 
-/*   if ($rootScope._userInfo) {
-    }
-    else {
-        if (typeof (Storage) !== "undefined") {
-            var encrypted = localStorage.getItem("_token");
-            if (encrypted) {
-                var decrypted = CryptoJS.AES.decrypt(encrypted, "EZEID");
-                var Jsonstring = decrypted.toString(CryptoJS.enc.Utf8);
-                if (Jsonstring) {
-                    $rootScope._userInfo = JSON.parse(Jsonstring);
-                }
-            }
-            else {
-                $rootScope._userInfo = {
-                    IsAuthenticate: false,
-                    Token: '',
-                    FirstName: '',
-                    Type:'',
-                    Icon:''
-                };
-            }
-        } else {
-            // Sorry! No Web Storage support..
-            $rootScope._userInfo = {
-                IsAuthenticate: false,
-                Token: '',
-                FirstName: '',
-                Type:'',
-                Icon:''
-            };
-            alert('Sorry..! Browser does not support');
-            window.location.href = "/home";
-        }
-    }*/
-
     function initialize () {
         directionsDisplay = new google.maps.DirectionsRenderer();
         var mapOptions = {
@@ -74,15 +39,6 @@ angular.module('ezeidApp').controller('viewDirectionController',['$http', '$root
              travelMode: google.maps.TravelMode.DRIVING
          };
 
-
-       /* var request = {
-            origin: '12.94223,77.574838',
-            destination: '12.894854,77.60277300000007',
-            travelMode: google.maps.TravelMode.DRIVING
-        };*/
-
-
-
          directionsService.route(request, function(response, status) {
             if (status == google.maps.DirectionsStatus.OK) {
                 directionsDisplay.setDirections(response);
@@ -106,8 +62,10 @@ angular.module('ezeidApp').controller('viewDirectionController',['$http', '$root
             onrendered: function(canvas) {
 
                 var img = canvas.toDataURL("image/jpg");
-                img = img.replace('data:image/jpg;base64,', '');
+                img = img.replace('data:image/png;base64,', '');
                 finalImageSrc = 'data:image/jpg;base64,' + img;
+
+                console.log(img);
 
                 $('#googlemapbinary').attr('src', finalImageSrc);
                 return false;

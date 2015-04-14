@@ -14,10 +14,14 @@ angular.module('ezeidApp').controller('WorkingHourCtrl',['$scope','$rootScope','
             }
         }).success(function (data) {
 
+                console.log("SAi1234");
                 console.log(data);
                 if (data != 'null')
                 {
-                    workingHours.result = data;
+                    console.log("SAi12");
+
+                    workingHours.result = JSON.parse(data);
+                    console.log(workingHours.result);
                 }
             });
     }
