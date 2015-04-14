@@ -102,6 +102,7 @@
             .when('/business-manager',{templateUrl : 'html/business-manager/business-manager.html'})
             .when('/bulksalesenquiry',{templateUrl : 'html/bulksalesenquiry.html'})
             .when('/viewdirection',{templateUrl : 'html/viewdirection.html'})
+            .when('/addworkinghours',{templateUrl : 'html/working-hours.html'})
             .when('/signup',{
                 templateUrl : 'html/profile/sign-up.html',
                 controller : 'SignUpCtrl'
