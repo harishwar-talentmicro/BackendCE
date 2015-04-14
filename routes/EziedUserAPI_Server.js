@@ -6316,12 +6316,13 @@ exports.FnGetHolidayList = function (req, res) {
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
         var Token = req.query.Token;
+        var LocID = req.query.LocID;
         if (Token != null) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
 
-                        db.query('CALL pGetHolidayList(' + db.escape(Token) + ',' + db.escape(0)+ ')', function (err, GetResult) {
+                        db.query('CALL pGetHolidayList(' + db.escape(LocID) + ',' + db.escape(0)+ ')', function (err, GetResult) {
                             if (!err) {
                                 if (GetResult != null) {
                                     if (GetResult[0].length > 0) {
@@ -7002,7 +7003,7 @@ exports.FnGetWorkingHrsHolidayList = function (req, res) {
         var RtnMessage = {
             WorkingHours: '',
             HolidayList:'',
-            Result:'fail'
+            Result: false
         };
         
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
@@ -7013,57 +7014,97 @@ exports.FnGetWorkingHrsHolidayList = function (req, res) {
                 if (!err) {
                     if (Result != null) {
                         var async = require('async');
-                        async.parallel([ FnWorkingHours(req.query, function (err, WorkingHrsResult) {
-                                        if (!err) {
-                                            if (WorkingHrsResult != null) {
-                                                //console.log(WorkingHrsResult);
-                                                RtnMessage.WorkingHours = WorkingHrsResult;
-                                                RtnMessage.Result = 'pass';
-                                                console.log('FnWorkingHours: Working hours Sent Successfully');
-                                                res.send(RtnMessage);
-                                            }
-                                            else {
-                                                console.log('FnWorkingHours:No Working hours Sent Successfully');
-                                                RtnMessage.Result = 'pass';
-                                                res.send(RtnMessage);
-                                            }
-                                        }
-                                        else {
-                                            res.statusCode= 500;
-                                            console.log('FnWorkingHours:Error in getting Workinghours' + err);
-                                            RtnMessage.Result = 'fail';
-                                            res.send(RtnMessage);
-                                        }
-                                    }),
+                        async.parallel([ function FnWorkingHours(CallBack) {
+    try {
+
+             var query = db.escape(Token) + ',' + db.escape(LocID);
+                db.query('CALL pGetWorkingHours(' + query + ')', function (err, WorkingResult) {
+                    console.log('CALL pGetWorkingHours(' + query + ')');
+                     
+                     if (!err) {
                         
-                        FnHolidayList(req.query, function (err, HolidaylistResult) {
-                                        if (!err) {
-                                            if (HolidaylistResult != null) {
-                                                //console.log(HolidaylistResult);
-                                                RtnMessage.HolidayList = HolidaylistResult;
-                                                RtnMessage.Result = 'pass';
-                                                console.log('FnWorkingHours: Working hours Sent Successfully');
-                                               //res.send(RtnMessage);
-                                            }
-                                            else {
-                                                console.log('FnWorkingHours:No Working hours Sent Successfully');
-                                                RtnMessage.Result = 'pass';
-                                               //res.send(RtnMessage);
-                                            }
-                                        }
-                                        else {
-                                            res.statusCode= 500;
-                                            console.log('FnWorkingHours:Error in getting Workinghours' + err);
-                                            //res.send(RtnMessage);
-                                        }
-                                    })],function(err, resultData){
-                            console.log(resultData);
-                            if(!err){
+                        if(WorkingResult != null)
+                        {
+                            if(WorkingResult[0].length > 0 )
+                            {
+                            console.log('FnWorkingHours: Working Hours are available');
+                                RtnMessage.WorkingHours = WorkingResult[0];
+                                RtnMessage.Result = true;
+                                CallBack();
+                            }
+                            else
+                            {
+                            console.log('Fnworkinghours: no working hours avaiable');
+                                RtnMessage.Result = true;
+                   CallBack();
+                            }
+                        }
+                        else{
+                            console.log('Fnworkinghours: no working hours avaiable');
+                            RtnMessage.Result = true;
+                          CallBack();
+                        }
+                }
+                else {
+                    console.log('FnWorkingHours: sending workinghours error ' + error);
+                    CallBack();             
+                }
+            });
+    }
+    catch (ex) {
+        console.log('FnWorkingHours error:' + ex.description);
+        throw new Error(ex);
+        return 'error'
+    }
+} ,function FnHolidayList(CallBack) {
+    try {
+         var query = db.escape(LocID) + ',' + db.escape(0);
+                db.query('CALL pGetHolidayList(' + query + ')', function (err, HolidayResult) {
+                    console.log('CALL pGetHolidayList(' + query + ')');
+                     
+                     if (!err) {
+                        if(HolidayResult != null)
+                        {
+                            if(HolidayResult[0].length > 0 )
+                            {
+                            console.log('FnHolidayList: Holiday List are available');
+                               RtnMessage.HolidayList = HolidayResult[0]
+                               RtnMessage.Result = true;
+                            CallBack();
+                            }
+                            else
+                            {
+                            console.log('FnHolidayList: No Holiday List avaiable');
+                                RtnMessage.Result = true;
+                           CallBack();
+                            }
+                        }
+                        else{
+                            console.log('FnHolidayList: No Holiday List avaiable');
+                            RtnMessage.Result = true;
+                            CallBack();
+                        }
+                }
+                else {
+                    console.log('FnHolidayList: sending holiday list error ' + error);
+                   CallBack();                  
+                }
+            });
+    }
+    catch (ex) {
+        console.log('FnHolidayList error:' + ex.description);
+        throw new Error(ex);
+        return 'error'
+    }
+} 
+],function(err){
+                             if(!err){
                                 console.log('GnGetWorkingHrs : data sent successfully');
-                               res.send(resultData);
+                                 res.send(RtnMessage);
                                }
                                else
                                {
+                                   res.statusCode = 500;
                                res.send(RtnMessage);
                                console.log('error in parellel async callling' + err);
                                }
@@ -7101,6 +7142,8 @@ exports.FnGetWorkingHrsHolidayList = function (req, res) {
         throw new Error(ex);
     }
 };
+
+
 
 function FnWorkingHours(WorkingContent, CallBack) {
     try {
@@ -7980,16 +8023,21 @@ exports.FnSendBulkMailer = function (req, res) {
                                                     if(TemplateResult.length > 0){
                                                         console.log(TemplateResult);
                                                          RtnResponse.IsSent = true;
-                                                    for(var i = 0; i < GetResult.length; i++){
+                                                        for(var i = 0; i < GetResult.length; i++){
                                                         if(GetResult[i].SalesMailID != null && GetResult[i].SalesMailID != ''){
+                                                                                                                       
                                                             var mailOptions = {
-                                                                replyto: (TemplateResult[0].FromMailID != 'undefined') ? TemplateResult[0].FromMailID : " ",
+                                                                replyto: (TemplateResult[0].FromMailID != 'undefined') ?TemplateResult[0].FromMailID : " ",
                                                                 to: GetResult[i].SalesMailID,
                                                                 subject: TemplateResult[0].Subject,
                                                                 html: TemplateResult[0].Body, // html body
                                                                 };
-                                                            //console.log(TemplateResult[0].FromMailID);
-                                                            var post = { MessageType: 9, Priority: 5, ToMailID: GetResult[i].SalesMailID, Subject: mailOptions.subject, Body: mailOptions.html, Replyto:mailOptions.replyto };
+                                                            mailOptions.html = mailOptions.html.replace("[FirstName]", GetResult[0].FirstName);
+                                                            mailOptions.html = mailOptions.html.replace("[LastName]", GetResult[0].LastName);
+                                                            mailOptions.html = mailOptions.html.replace("[CompanyName]",GetResult[0].CompanyName);
+                                                           
+                                                            console.log(mailOptions.html);
+                                                            var post = { MessageType: 9, Priority: 5, ToMailID: GetResult[i].SalesMailID, Subject: mailOptions.subject, Body:mailOptions.html, Replyto:mailOptions.replyto };
                                                             
                                                             //console.log(post);
                                                             var query = db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
@@ -8007,7 +8055,7 @@ exports.FnSendBulkMailer = function (req, res) {
                                                             });
                                                             console.log('Mail details sent for processing');
                                                             console.log(mailOptions);
-                                                        }
+                                                            }
                                                         else
                                                         {
                                                             console.log('FnGetTemplateDetails:Sales Mail Id is empty');
@@ -8015,6 +8063,7 @@ exports.FnSendBulkMailer = function (req, res) {
                                                         }
                                                     }
                                                         res.send(RtnResponse);
+                                                
                                                     }
                                                     else
                                                     {
@@ -8079,7 +8128,7 @@ exports.FnSendBulkMailer = function (req, res) {
                                     AttachmentFileName:AttachmentFileName
                                 };
                                
-                        var post = { MessageType:10, Priority: 5,ToMailID: mailOptions.To, Subject: mailOptions.subject, Body: mailOptions.html, Attachment:mailOptions.Attachment,AttachmentFileName:mailOptions.AttachmentFileName  };
+                        var post = { MessageType:10, Priority: 5,ToMailID: mailOptions.To, Subject: mailOptions.subject, Body: mailOptions.html, Attachment:mailOptions.Attachment,AttachmentFileName:mailOptions.AttachmentFileName};
                                                             
                             console.log(post);
                             var query = db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
@@ -10035,9 +10084,15 @@ exports.FnSaveContactVES = function(req, res){
         var GateNo  = req.body.GateNo;
         var SyncedInout = req.body.SyncedInout;
         var ContactEZEID = req.body.ContactEZEID;
-         var ContactName = req.body.ContactName;
-        var InTimeNew = new Date(InTime);
-        var OutTimeNew = new Date(OutTime);
+        var ContactName = req.body.ContactName;
+            var InTimeNew = new Date(InTime);
+            
+        if(OutTime != null){
+            var OutTimeNew = new Date(OutTime);
+		   }
+		   else{
+			var OutTimeNew=null;
+		   }
         var RtnMessage = {
             IsSuccessfull: false
         };
@@ -10779,3 +10834,4 @@ exports.FnCropImageSize = function(req, res){
                 throw new Error(ex);
         }
 };
+
