@@ -1225,7 +1225,7 @@ angular.module('ezeidApp').controller('ProfileController', ['$rootScope', '$scop
             var finalImage = ScaleAndCropImage.cropImage(scaledImageUrl,imageHeight,imageWidth);
 
             profile._info.Picture = finalImage;
-            if(userType == 1 && 0){
+            if(userType == 1){
                 profile._info.IconFileName = fileName;
                 var scImageUrl = ScaleAndCropImage.scalePropotional(imageUrl,40,40);
                 var iconImg = ScaleAndCropImage.cropImage(scImageUrl,40,40);

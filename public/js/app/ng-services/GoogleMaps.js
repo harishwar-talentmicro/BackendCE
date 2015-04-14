@@ -51,11 +51,6 @@ angular.module('ezeidApp').factory('GoogleMaps',['$q','$timeout','$compile',func
         return mapHtml;
     }
 
-
-    function getAddressComponents(geocoderResults){
-
-    };
-
     /**
      * Google Map Wrapper Object
      * @constructor
@@ -244,7 +239,7 @@ angular.module('ezeidApp').factory('GoogleMaps',['$q','$timeout','$compile',func
         this.searchBox = new google.maps.places.SearchBox((searchElem));
     };
 
-    GoogleMap.prototype.listenOnMapControls = function(locationChangeCallback){
+    GoogleMap.prototype.listenOnMapControls = function(locationChangeCallback,callback){
         var _this = this;
         if(typeof(locationChangeCallback) == "undefined"){
             locationChangeCallback = null;
@@ -274,6 +269,9 @@ angular.module('ezeidApp').factory('GoogleMaps',['$q','$timeout','$compile',func
 
             _this.map.fitBounds(bounds);
             if(_this.map.getZoom() > 15){ _this.map.setZoom(14);}
+            if(callback){
+                callback(marker.position.lat(),marker.position.lng());
+            }
         });
 
 
@@ -299,10 +297,7 @@ angular.module('ezeidApp').factory('GoogleMaps',['$q','$timeout','$compile',func
                 defer.resolve(true);
             },this.handleNoGeolocation(defer))
         } else{
-            this.handleNoGeolocation();
-            $timeout(function(){
-                defer.resolve(false);
-            },1000);
+            this.handleNoGeolocation(defer);
         };
         return defer.promise;
     };
@@ -318,11 +313,11 @@ angular.module('ezeidApp').factory('GoogleMaps',['$q','$timeout','$compile',func
         return pos;
     };
 
-    GoogleMap.prototype.placeMarker = function(marker,dragendCallback){
+    GoogleMap.prototype.placeMarker = function(marker,dragCallback,callback){
 
-        if(dragendCallback){
+        if(dragCallback){
             google.maps.event.addListener(marker,'dragend',function(){
-                dragendCallback(marker.position.lat(),marker.position.lng());
+                dragCallback(marker.position.lat(),marker.position.lng());
             });
         }
 
@@ -331,18 +326,27 @@ angular.module('ezeidApp').factory('GoogleMaps',['$q','$timeout','$compile',func
         this.setMarkersInBounds();
         this.map.setCenter(marker.getPosition());
         this.map.setZoom(15);
+        if(callback){
+            callback(marker.position.lat(),marker.position.lng());
+        }
     };
 
-    GoogleMap.prototype.placeCurrentLocationMarker = function(dragendCallback){
-        if(typeof(dragendCallback) == "undefined"){
-            dragendCallback = null;
+    GoogleMap.prototype.placeCurrentLocationMarker = function(dragCallback,callback){
+        if(typeof(dragCallback) == "undefined"){
+            dragCallback = null;
         }
         this.clearAllMarkers();
         var currentLocation = new google.maps.LatLng(this.currentMarkerPosition.latitude,this.currentMarkerPosition.longitude);
-        var marker = this.createMarker(currentLocation,'Your current location',null,true,dragendCallback);
+        var marker = this.createMarker(currentLocation,'Your current location',null,true,dragCallback);
         this.placeMarker(marker);
         this.map.setCenter(currentLocation);
         this.map.setZoom(14);
+        if(callback){
+            console.log(marker);
+            $timeout(function(){
+                callback(marker.position.lat(),marker.position.lng());
+            },2000);
+        }
     };
 
     GoogleMap.prototype.resizeMap = function(){

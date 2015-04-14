@@ -146,9 +146,25 @@ angular.module('ezeidApp').controller('ProfileCtrl',[
                                 $scope.dataLoadError = false;
                                 $scope.dataLoadComplete = true;
                             });
+                        },function(){
+                            $scope.dataLoadComplete = false;
+                            $scope.dataLoadInProgress = false;
+                            $scope.dataLoadError = true;
                         });
+                    },function(){
+                        $scope.dataLoadComplete = false;
+                        $scope.dataLoadInProgress = false;
+                        $scope.dataLoadError = true;
                     });
+                },function(){
+                    $scope.dataLoadComplete = false;
+                    $scope.dataLoadInProgress = false;
+                    $scope.dataLoadError = true;
                 });
+            },function(){
+                $scope.dataLoadComplete = false;
+                $scope.dataLoadInProgress = false;
+                $scope.dataLoadError = true;
             });
         };
 
@@ -159,6 +175,7 @@ angular.module('ezeidApp').controller('ProfileCtrl',[
          * @returns {promise|*}
          */
         $scope.loadCountries = function(){
+            var promiseResolved = false;
             var defer = $q.defer();
             $http({
                 url : GURL + 'ewmGetCountry',
@@ -169,16 +186,25 @@ angular.module('ezeidApp').controller('ProfileCtrl',[
             }).success(function(resp){
                     console.log('Country List');
                     console.log(JSON.stringify(resp));
+                    promiseResolved = true;
                     if(resp && resp.length > 0 && resp !== 'null'){
                         $scope.countryList = resp;
+
                         defer.resolve(true);
                     }
                     else{
                         defer.resolve(false);
                     }
             }).error(function(err){
+                promiseResolved = true;
                 defer.reject(err);
             });
+
+            $timeout(function(){
+                if(!promiseResolved){
+                    defer.reject();
+                }
+            },10000);
 
             return defer.promise;
         };
@@ -188,6 +214,7 @@ angular.module('ezeidApp').controller('ProfileCtrl',[
          * @returns {promise|*}
          */
         $scope.loadUserDetails = function(){
+            var promiseResolved = false;
             var defer = $q.defer();
             $http({
                 url : GURL + 'ewtGetUserDetails',
@@ -198,6 +225,7 @@ angular.module('ezeidApp').controller('ProfileCtrl',[
             }).success(function(resp){
                     console.log('User Details');
                     console.log(JSON.stringify(resp));
+                    promiseResolved = true;
                     if(resp && resp.length > 0 && resp !== 'null'){
                         defer.resolve(true);
                         $scope.userDetails = resp[0];
@@ -206,8 +234,15 @@ angular.module('ezeidApp').controller('ProfileCtrl',[
                         defer.resolve(false);
                     }
             }).error(function(err){
+                promiseResolved = true;
                 defer.reject(err);
             });
+            $timeout(function(){
+                if(!promiseResolved){
+                    defer.reject();
+                }
+            },10000);
+
             return defer.promise;
         };
 
@@ -216,6 +251,7 @@ angular.module('ezeidApp').controller('ProfileCtrl',[
          * @returns {promise|*}
          */
         $scope.loadSecondaryLocations = function(){
+            var promiseResolved = false;
             var defer = $q.defer();
             $http({
                 url : GURL + 'ewtGetSecondaryLoc',
@@ -226,6 +262,7 @@ angular.module('ezeidApp').controller('ProfileCtrl',[
             }).success(function(resp){
                     console.log('Secondary Location List');
                     console.log(JSON.stringify(resp));
+                    promiseResolved = true;
                     if(resp && resp.length > 0 && resp !== 'null'){
                         for(var i = 0; i < resp.length; i++){
                             $scope.locationsToggleIndex[i+1] = {
@@ -244,8 +281,14 @@ angular.module('ezeidApp').controller('ProfileCtrl',[
                         defer.resolve(false);
                     }
             }).error(function(err){
+                promiseResolved = true;
                 defer.reject(err);
             });
+            $timeout(function(){
+                if(!promiseResolved){
+                    defer.reject();
+                }
+            },10000);
             return defer.promise;
         };
 
@@ -256,6 +299,7 @@ angular.module('ezeidApp').controller('ProfileCtrl',[
          * @returns {promise|*}
          */
         $scope.loadStates = function(countryId){
+            var promiseResolved = false;
             var defer = $q.defer();
             $http({
                 url : GURL + 'ewmGetState',
@@ -265,6 +309,7 @@ angular.module('ezeidApp').controller('ProfileCtrl',[
                     CountryID : countryId
                 }
             }).success(function(resp){
+                    promiseResolved = true;
                     if(resp && resp.length > 0 && resp !== 'null'){
                         defer.resolve(resp);
 
@@ -273,8 +318,14 @@ angular.module('ezeidApp').controller('ProfileCtrl',[
                         defer.resolve([]);
                     }
                 }).error(function(err){
+                    promiseResolved = true;
                     defer.reject(err);
                 });
+            $timeout(function(){
+                if(!promiseResolved){
+                    defer.reject();
+                }
+            },10000);
             return defer.promise;
         };
 
@@ -285,6 +336,7 @@ angular.module('ezeidApp').controller('ProfileCtrl',[
          * @returns {promise|*}
          */
         $scope.loadCities = function(stateId){
+            var promiseResolved = false;
             var defer = $q.defer();
             $http({
                 url : GURL + 'ewmGetCity',
@@ -294,6 +346,7 @@ angular.module('ezeidApp').controller('ProfileCtrl',[
                     StateID : stateId
                 }
             }).success(function(resp){
+                    promiseResolved = true;
                     if(resp && resp.length > 0 && resp !== 'null'){
                         defer.resolve(resp);
                     }
@@ -303,6 +356,12 @@ angular.module('ezeidApp').controller('ProfileCtrl',[
                 }).error(function(err){
                     defer.reject(err);
                 });
+            $timeout(function(){
+                promiseResolved = true;
+                if(!promiseResolved){
+                    defer.reject();
+                }
+            },10000);
             return defer.promise;
         };
 

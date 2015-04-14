@@ -2240,8 +2240,8 @@ exports.FnAddLocation = function (req, res) {
         if (PIN == '') {
             PIN = null;
         }
-        var TemplateID = req.body.TemplateID;
-        
+        var TemplateID = (req.body.TemplateID) ? req.body.TemplateID : 0;
+
         if (TID.toString() != 'NaN' && Token != null && CityName != null && StateID.toString() != 'NaN' && CountryID.toString() != 'NaN' && LocTitle != null && AddressLine1 != null && Longitude.toString() != 'NaN' && Latitude.toString() != 'NaN') {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {

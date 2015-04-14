@@ -1,23 +1,39 @@
 
 angular.module('ezeidApp').directive('dateTimePicker', function() {
+
+
+
     return {
         restrict: 'E',
         replace: true,
         require : '?ngModel',
         scope: {
-            recipient: '='
+            recipient: '=',
+            minTime : '=',
+            maxTime : '=',
+            placeholder : '@'
         },
         template:
             '<div class="input-group datetimepicker">'+
-                '<input type="text" class="form-control" placeholder="Date"  id="datetimepicker1"  name="recipientDateTime" />'+
+                '<input type="text" class="form-control" placeholder="{{(placeholder) ? placeholder : \'Date\'}}"  id="datetimepicker1"  name="recipientDateTime" />'+
                 '<span class="input-group-addon"><span class="glyphicon glyphicon-calendar" >'+
                 '</span>'+
                 '</div>',
         link: function(scope, element, attrs, ngModel) {
             var input = element.find('input');
             if(attrs.settings){
-                try{
+               try{
                     var dateTimeSettings = JSON.parse(attrs.settings);
+                    dateTimeSettings._this = this;
+                    dateTimeSettings.onShow = function(){
+                        console.log('executing');
+                        console.log(this);
+                        console.log('minTime : ' + scope.minTime + ' maxTime : ' + scope.maxTime);
+                        this.setOptions({
+                            minTime : (scope.minTime) ? scope.minTime : 0,
+                            maxTime : (scope.maxTime) ? scope.maxTime : '23:59'
+                        });
+                    };
                     $(input).datetimepicker(dateTimeSettings);
                 }
                 catch(ex){
@@ -39,5 +55,6 @@ angular.module('ezeidApp').directive('dateTimePicker', function() {
                 $(input[0]).val(newVal);
             });
         }
+
     }
 });
