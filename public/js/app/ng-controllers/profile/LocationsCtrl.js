@@ -164,7 +164,7 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
                 mapList['map'+index].mapIdleListener().then(function(){
                     mapList['map'+index].pushMapControls($scope.setEditCurrentLocation);
                     mapList['map'+index].toggleMapControls();
-                    mapList['map'+index].listenOnMapControls($scope.setEditCurrentLocation);
+                    mapList['map'+index].listenOnMapControls($scope.setEditCurrentLocation,$scope.setEditCurrentLocation);
                     mapList['map'+index].resizeMap();
 
                         var marker = mapList['map'+index].createMarker(pos,title,null,false,null);
@@ -224,7 +224,8 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
         $scope.findCurrentLocation = function(index){
             mapList['map'+index].clearAllMarkers();
             mapList['map'+index].getCurrentLocation().then(function(){
-                mapList['map'+index].placeCurrentLocationMarker($scope.setEditCurrentLocation);
+                mapList['map'+index].placeCurrentLocationMarker($scope.setEditCurrentLocation,$scope.setEditCurrentLocation);
+
             });
         };
 
@@ -236,7 +237,7 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
         $scope.setEditCurrentLocation = function(lat,lng){
             $scope.editLocationDetails.Latitude = lat;
             $scope.editLocationDetails.Longitude = lng;
-            $scope.$digest();
+            //$scope.$digest();
             var gMap = new GoogleMaps();
 
             /**
@@ -244,23 +245,39 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
              */
             gMap.getReverseGeolocation(lat,lng).then(function(results){
                 var geolocationAddress = gMap.parseReverseGeolocationData(results.data);
+                console.log(geolocationAddress);
                 var countryIndex = $scope.countryList.indexOfWhere('CountryName',geolocationAddress.country);
                 /**
                  * If country is changed then load new list of state for the new country
                  */
 
+                $scope.editLocationDetails.CountryName = $scope.countryList[countryIndex].CountryName;
+                $scope.editLocationDetails.ISDMobileNumber = $scope.countryList[countryIndex].ISDCode;
+                $scope.editLocationDetails.ISDPhoneNumber = $scope.countryList[countryIndex].ISDCode;
+
+                console.log($scope.editStateList);
+                /**
+                 * If country is changed then only load states
+                 */
                 if($scope.countryList[countryIndex].CountryID !== $scope.editLocationDetails.CountryID){
                     $scope.editLocationDetails.CountryID = $scope.countryList[countryIndex].CountryID;
-                    $scope.editLocationDetails.CountryName = $scope.countryList[countryIndex].CountryName;
+
                     $scope.loadStates($scope.countryList[countryIndex].CountryID).then(function(stateList){
-                        if(stateList.length > 1){
+                        console.log(stateList);
+                        console.log(stateList.length);
+                        if(stateList.length > 0){
                             $scope.editStateList = stateList;
+
                         }
-                        var stateIndex = $scope.editStateList.indexOfWhere('StateTitle',geolocationAddress.state);
+                        console.log($scope.editStateList);
+                        var stateIndex = $scope.editStateList.indexOfWhere('StateName',geolocationAddress.state);
+                        var xIndex = stateList.indexOfWhere('StateName',geolocationAddress.state);
                         if(stateIndex === -1){
                             stateIndex = 0;
                         }
-                        $scope.editLocationDetails.CountryID = $scope.countryList[countryIndex].CountryID;
+                        console.log('stateIndex : '+stateIndex);
+                        console.log('stateIndex X : '+xIndex);
+
                         $scope.editLocationDetails.StateID = $scope.editStateList[stateIndex].StateID;
                         $scope.editLocationDetails.CityTitle = geolocationAddress.city;
                         $scope.editLocationDetails.PostalCode = geolocationAddress.postalCode;
@@ -272,7 +289,10 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
                     if(stateIndex === -1){
                         stateIndex = 0;
                     }
+                    console.log('stateIndex : '+stateIndex);
+
                     $scope.editLocationDetails.StateID = $scope.editStateList[stateIndex].StateID;
+                    $scope.editLocationDetails.StateTitle = $scope.editStateList[stateIndex].StateName;
                     $scope.editLocationDetails.CityTitle = geolocationAddress.city;
                     $scope.editLocationDetails.PostalCode = geolocationAddress.postalCode;
                     $scope.editLocationDetails.CountryName = $scope.countryList[countryIndex].CountryName;
@@ -566,7 +586,7 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
 
             var marker = mapList['map'+index].createMarker(pos,$scope.editLocationDetails.LocTitle,null,true,$scope.setEditCurrentLocation);
 
-            mapList['map'+index].placeMarker(marker,$scope.setEditCurrentLocation);
+            mapList['map'+index].placeMarker(marker,$scope.setEditCurrentLocation,$scope.setEditCurrentLocation);
         };
 
 
@@ -674,7 +694,35 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
             return validateResult;
         };
 
+        $scope.changePicture = function(locIndex,event){
+            $('#picture-input-'+locIndex).trigger('click');
+        };
 
+        $scope.onChangePicture = function(elem){
+            var image = $(elem)[0].files[0];
+            var fileName = image.name;
+
+            var imageHeight = 90;
+            var imageWidth = 308;
+            if($scope.userDetails.IDTypeID == 1){
+                imageWidth = 77;
+            }
+            ScaleAndCropImage.covertToBase64(image).then(function(imageUrl){
+                var scaledImageUrl = ScaleAndCropImage.scalePropotional(imageUrl,imageHeight,imageWidth);
+                var finalImage = ScaleAndCropImage.cropImage(scaledImageUrl,imageHeight,imageWidth);
+                $scope.editLocationDetails.Picture = finalImage;
+                if($scope.userDetails.IDTypeID == 1){
+                    $scope.editLocationDetails.IconFileName = fileName;
+                    var scImageUrl = ScaleAndCropImage.scalePropotional(imageUrl,40,40);
+                    var iconImg = ScaleAndCropImage.cropImage(scImageUrl,40,40);
+                    $scope.editLocationDetails.Icon = iconImg;
+                }
+            });
+        };
+
+        /**
+         * Resets edit location data
+         */
         $scope.resetEditLocationDetails = function(){
             $scope.editLocationDetails = {
                 LocTitle : 'New Location',

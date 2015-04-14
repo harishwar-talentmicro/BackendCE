@@ -458,7 +458,7 @@ body > div.viewport > div#wrapper{
 }
 
 footer{
-    margin-top: -16px;
+    margin-top: 0px;
     position: static;
 }
 /** Fix for google maps autocomplete not appearing **/
