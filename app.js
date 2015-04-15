@@ -194,10 +194,10 @@ app.post('/ewtSaveDepartmentsVES',LocationManager.FnSaveDepartmentsVES);
 app.post('/ewtSaveGatesVES',LocationManager.FnSaveGatesVES);
 app.post('/ewtSaveCitysVES',LocationManager.FnSaveCitysVES);
 
-
-app.get('/:id',function(req,res){
+app.get('/:page/:subpage',function(req,res){
     res.sendFile(__dirname + '/public/html/index.html');
 });
+
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
     console.log('404 : Page not found');

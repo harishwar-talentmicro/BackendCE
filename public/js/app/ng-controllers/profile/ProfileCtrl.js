@@ -37,23 +37,9 @@ angular.module('ezeidApp').controller('ProfileCtrl',[
             $location
         ) {
 
-        /**
-         * Progress Status Flag for loading data initially
-         * @type {boolean}
-         */
-        $scope.dataLoadInProgress = true;
-
-        /**
-         * Service Call Fails to load data then the flag sets to true
-         * @type {boolean}
-         */
-        $scope.dataLoadError = false;
-
-        /**
-         * Service Call Completed to load data, then this flag set to true
-         * @type {boolean}
-         */
-        $scope.dataLoadComplete = false;
+        console.log($scope.dataProgressLoader.dataLoadInProgress);
+        console.log($scope.dataProgressLoader.dataLoadError);
+        console.log($scope.dataProgressLoader.dataLoadComplete);
 
 
         /**
@@ -73,12 +59,6 @@ angular.module('ezeidApp').controller('ProfileCtrl',[
          * @type {Array}
          */
         $scope.cityList = [];
-
-        /**
-         * UserDetails Model
-         * @type {null}
-         */
-        $scope.userDetails = null;
 
         /**
          * Secondary Locations Available for this particular user
@@ -128,9 +108,9 @@ angular.module('ezeidApp').controller('ProfileCtrl',[
          */
         $scope.dataReloadAgain = function(){
 
-            $scope.dataLoadError = false;
-            $scope.dataLoadComplete = false;
-            $scope.dataLoadInProgress = true;
+//            $scope.dataProgressLoader.dataLoadError = false;
+//            $scope.dataProgressLoader.dataLoadComplete = false;
+//            $scope.dataProgressLoader.dataLoadInProgress = true;
 
             $scope.loadCountries().then(function(){
                 $scope.loadUserDetails().then(function(){
@@ -142,29 +122,29 @@ angular.module('ezeidApp').controller('ProfileCtrl',[
                             $scope.cityList = cityList;
                             $scope.loadSecondaryLocations().then(function(){
 
-                                $scope.dataLoadInProgress = false;
-                                $scope.dataLoadError = false;
-                                $scope.dataLoadComplete = true;
+                                $scope.dataProgressLoader.dataLoadInProgress = false;
+                                $scope.dataProgressLoader.dataLoadError = false;
+                                $scope.dataProgressLoader.dataLoadComplete = true;
                             });
                         },function(){
-                            $scope.dataLoadComplete = false;
-                            $scope.dataLoadInProgress = false;
-                            $scope.dataLoadError = true;
+                            $scope.dataProgressLoader.dataLoadComplete = false;
+                            $scope.dataProgressLoader.dataLoadInProgress = false;
+                            $scope.dataProgressLoader.dataLoadError = true;
                         });
                     },function(){
-                        $scope.dataLoadComplete = false;
-                        $scope.dataLoadInProgress = false;
-                        $scope.dataLoadError = true;
+                        $scope.dataProgressLoader.dataLoadComplete = false;
+                        $scope.dataProgressLoader.dataLoadInProgress = false;
+                        $scope.dataProgressLoader.dataLoadError = true;
                     });
                 },function(){
-                    $scope.dataLoadComplete = false;
-                    $scope.dataLoadInProgress = false;
-                    $scope.dataLoadError = true;
+                    $scope.dataProgressLoader.dataLoadComplete = false;
+                    $scope.dataProgressLoader.dataLoadInProgress = false;
+                    $scope.dataProgressLoader.dataLoadError = true;
                 });
             },function(){
-                $scope.dataLoadComplete = false;
-                $scope.dataLoadInProgress = false;
-                $scope.dataLoadError = true;
+                $scope.dataProgressLoader.dataLoadComplete = false;
+                $scope.dataProgressLoader.dataLoadInProgress = false;
+                $scope.dataProgressLoader.dataLoadError = true;
             });
         };
 
@@ -200,43 +180,6 @@ angular.module('ezeidApp').controller('ProfileCtrl',[
                 defer.reject(err);
             });
 
-            $timeout(function(){
-                if(!promiseResolved){
-                    defer.reject();
-                }
-            },10000);
-
-            return defer.promise;
-        };
-
-        /**
-         * Loads user details initially
-         * @returns {promise|*}
-         */
-        $scope.loadUserDetails = function(){
-            var promiseResolved = false;
-            var defer = $q.defer();
-            $http({
-                url : GURL + 'ewtGetUserDetails',
-                method : 'GET',
-                params : {
-                    Token : $rootScope._userInfo.Token
-                }
-            }).success(function(resp){
-                    console.log('User Details');
-                    console.log(JSON.stringify(resp));
-                    promiseResolved = true;
-                    if(resp && resp.length > 0 && resp !== 'null'){
-                        defer.resolve(true);
-                        $scope.userDetails = resp[0];
-                    }
-                    else{
-                        defer.resolve(false);
-                    }
-            }).error(function(err){
-                promiseResolved = true;
-                defer.reject(err);
-            });
             $timeout(function(){
                 if(!promiseResolved){
                     defer.reject();

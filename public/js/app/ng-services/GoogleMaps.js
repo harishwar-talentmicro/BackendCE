@@ -201,7 +201,6 @@ angular.module('ezeidApp').factory('GoogleMaps',['$q','$timeout','$compile',func
      * Creates google map instance
      */
     GoogleMap.prototype.renderMap = function(){
-        console.log(this.settings.mapElementId);
         this.map = new google.maps.Map(document.getElementById(this.settings.mapElementId),this.mapOptions);
     };
 
@@ -342,7 +341,6 @@ angular.module('ezeidApp').factory('GoogleMaps',['$q','$timeout','$compile',func
         this.map.setCenter(currentLocation);
         this.map.setZoom(14);
         if(callback){
-            console.log(marker);
             $timeout(function(){
                 callback(marker.position.lat(),marker.position.lng());
             },2000);

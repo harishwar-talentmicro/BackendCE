@@ -21,7 +21,8 @@
      */
     ezeid.value('CLOSED_ROUTES',[
         '/business-manager',
-        '/profile'
+        '/profile-manager',
+        '/profile-manager/:subview'
     ]);
 
     /**
@@ -106,11 +107,13 @@
                 templateUrl : 'html/profile/sign-up.html',
                 controller : 'SignUpCtrl'
             })
-             .when('/profile',{
+            .when('/profile-manager/:subview',{
                 templateUrl : 'html/profile/edit-profile.html',
-                controller : 'ProfileCtrl'
+                controller : 'ProfileManagerCtrl'
             })
-
+            .when('/profile-manager',{
+                redirectTo : '/profile-manager/user'
+            })
             .when('/home',{templateUrl: 'html/home.html'})
             .when('/:ezeid',{
                 templateUrl : 'html/home.html'
@@ -130,6 +133,7 @@
          */
 
         $rootScope.$on("$routeChangeStart",function(event,next,current){
+            console.log(next.$$route.originalPath);
 
             try{
                 if(CLOSED_ROUTES.indexOf(next.$$route.originalPath) === -1
