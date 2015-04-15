@@ -115,7 +115,8 @@ angular.module('ezeidApp').controller('ProfileEditCtrl',[
                 SelectionType : ($scope.IDTypeID === 2) ?
                     (($scope.editUserDetails.SelectionType === 1 || $scope.editUserDetails.SelectionType === 2) ?
                         $scope.editUserDetails.SelectionType : 1) : 0,
-                ParkingStatus : $scope.editUserDetails.ParkingStatus
+                ParkingStatus : $scope.editUserDetails.ParkingStatus,
+                TemplateID : ($scope.editUserDetails.TemplateID) ? $scope.editUserDetails.TemplateID : 0
             };
 
             $http({

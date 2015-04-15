@@ -811,6 +811,17 @@
         </div>
     </div>
 
+    <div class="row" ng-show="userDetails.IDTypeID === 2 && userDetails.SelectionType === 2">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+            <h5 class="text-primary text-left">Working Hours Template </h5>
+        </div>
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+            <h5 class="text-primary text-left font-open-sans data">
+                {{workingHoursTemplates[userDetails.TemplateID]}}
+                <span class="small" ng-hide="userDetails.TemplateID">No working hours template added</span>
+            </h5>
+        </div>
+    </div>
 
 </div>
 <!---------- end : edit Mode off --------------------------->
@@ -961,6 +972,22 @@
             </h5>
         </div>
     </div>
+
+
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+            <h5 class="text-primary text-left">Working Hours Template </h5>
+        </div>
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+            <h5 class="text-primary text-left font-open-sans data">
+                <select class="form-control" ng-model="editLocationDetails.TemplateID" name="primaryLocationForm.TemplateID">
+                    <option ng-repeat="template in workingHoursTemplateMap" value="0">--Select Working Hours Template--</option>
+                    <option ng-repeat="template in workingHoursTemplateMap" value="{{template.TID}}">{{template.TemplateName}}</option>
+                </select>
+            </h5>
+        </div>
+    </div>
+
 
 </div>
 <!----------end :  edit Mode on --------------------------->
@@ -1224,6 +1251,20 @@
     </div>
 
 
+    <div class="row" ng-show="userDetails.IDTypeID === 2 && userDetails.SelectionType === 2">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+            <h5 class="text-primary text-left">Working Hours Template </h5>
+        </div>
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+            <h5 class="text-primary text-left font-open-sans data">
+                {{workingHoursTemplates[secondaryLocationDetails.TemplateID]}}
+                <span class="small" ng-hide="secondaryLocationDetails.TemplateID">No working hours template added</span>
+            </h5>
+        </div>
+    </div>
+
+
+
 </div>
 <!---------- end : edit Mode off --------------------------->
 
@@ -1376,6 +1417,22 @@
             </h5>
         </div>
     </div>
+
+
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+            <h5 class="text-primary text-left">Working Hours Template </h5>
+        </div>
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+            <h5 class="text-primary text-left font-open-sans data">
+                <select class="form-control" ng-model="editLocationDetails.TemplateID" name="secondaryLocation{{locIndex}}Form.TemplateID">
+                    <option ng-repeat="template in workingHoursTemplateMap" value="0">--Select Working Hours Template--</option>
+                    <option ng-repeat="template in workingHoursTemplateMap" value="{{template.TID}}">{{template.TemplateName}}</option>
+                </select>
+            </h5>
+        </div>
+    </div>
+
 
 </div>
 <!----------end :  edit Mode on --------------------------->
@@ -1560,24 +1617,37 @@
                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-center">
                                     <ul class="nav nav-pills">
                                         <li role="presentation" class="bottom-clearfix" ng-class="{'active' : (activeTemplate === '/tpl/profile-template.html')}">
-                                            <a href="/profile-manager/profile">Basic Profile and Locations</a>
+                                            <a href="/profile-manager/profile"><span class="glyphicon glyphicon-user"></span> Basic Profile and Locations</a>
                                         </li>
+
 
                                         <li role="presentation" ng-show="(userDetails.SelectionType === 2 && userDetails.IDTypeID === 2)"
                                             ng-class="{'active' : (activeTemplate === '/tpl/weblinks-template.html')}"
-                                            class="bottom-clearfix disabled">
-                                            <a href="/profile-manager/configuration">Configuration</a>
+                                            class="bottom-clearfix">
+                                            <a href="/profile-manager/configuration"><span class="glyphicon glyphicon-cog"></span> Configuration</a>
                                         </li>
-                                        <li role="presentation" ng-hide="(userDetails.SelectionType === 2 && userDetails.IDTypeID === 2)" class="bottom-clearfix">
-                                            <a>Configuration</a>
+
+
+                                        <li role="presentation" ng-show="(userDetails.SelectionType !== 2 && userDetails.IDTypeID === 2)" class="bottom-clearfix disabled">
+                                            <a href="/profile-manager/configuration"><span class="glyphicon glyphicon-cog"></span> Configuration</a>
                                         </li>
+
+
                                         <li role="presentation" class=" bottom-clearfix"
                                             ng-class="{'active' :(activeTemplate === '/tpl/weblinks-template.html')}">
-                                            <a href="/profile-manager/weblinks">Short URLs</a></li>
+                                            <a href="/profile-manager/weblinks"><span class="glyphicon glyphicon-link"></span> Short URLs</a></li>
+
                                         <li role="presentation" class=" bottom-clearfix"
                                             ng-class="{'active' : (activeTemplate === '/tpl/password-template.html')}">
-                                            <a href="/profile-manager/password">Password</a>
+                                            <a href="/profile-manager/password"><span class="glyphicon glyphicon-lock"></span> Password</a>
                                         </li>
+
+                                        <li ng-show="userDetails.IDTypeID === 1" role="presentation" class=" bottom-clearfix"
+                                            ng-class="{'active' : (activeTemplate === '/tpl/documents.html')}">
+                                            <a href="/profile-manager/password"><span class="glyphicon glyphicon-file"></span> Personal Documents</a>
+                                        </li>
+
+
                                     </ul>
                                 </div>
                             </div>
