@@ -1563,14 +1563,19 @@
                                             <a href="/profile-manager/profile">Basic Profile and Locations</a>
                                         </li>
 
+
                                         <li role="presentation" ng-show="(userDetails.SelectionType === 2 && userDetails.IDTypeID === 2)"
                                             ng-class="{'active' : (activeTemplate === '/tpl/weblinks-template.html')}"
-                                            class="bottom-clearfix disabled">
+                                            class="bottom-clearfix">
                                             <a href="/profile-manager/configuration">Configuration</a>
                                         </li>
-                                        <li role="presentation" ng-hide="(userDetails.SelectionType === 2 && userDetails.IDTypeID === 2)" class="bottom-clearfix">
-                                            <a>Configuration</a>
+
+
+                                        <li role="presentation" ng-show="(userDetails.SelectionType !== 2 && userDetails.IDTypeID === 2)" class="bottom-clearfix disabled">
+                                            <a href="/profile-manager/configuration">Configuration</a>
                                         </li>
+
+
                                         <li role="presentation" class=" bottom-clearfix"
                                             ng-class="{'active' :(activeTemplate === '/tpl/weblinks-template.html')}">
                                             <a href="/profile-manager/weblinks">Short URLs</a></li>

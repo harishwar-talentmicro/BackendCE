@@ -1,0 +1,56 @@
+<script type="text/ng-template" id="/tpl/configuration/navigation.html">
+    <div class="col-sm-12 col-xs-12 hidden-lg hidden-md navbar-collapse">
+        <hr/>
+        <ul class="nav nav-pills nav-justified">
+            <li role="presentation" ng-class="{'active':pageModuleSettings === activeSubTemplate}"><a ng-click="changeActive(pageModuleSettings)">Module and Settings</a></li>
+            <li role="presentation" ng-class="{'active':pageSubuser === activeSubTemplate}"><a ng-click="changeActive(pageSubuser)">Subusers</a></li>
+            <li role="presentation" ng-class="{'active':pageItemMaster === activeSubTemplate}"><a  ng-click="changeActive(pageItemMaster)">Item Master</a></li>
+            <li role="presentation" ng-class="{'active':pageResources === activeSubTemplate}"><a  ng-click="changeActive(pageResources)">Reservation Resources</a></li>
+            <li role="presentation" ng-class="{'active':pageStatusTypes === activeSubTemplate}"><a  ng-click="changeActive(pageStatusTypes)">Status Types</a></li>
+            <li role="presentation" ng-class="{'active':pageActionTypes === activeSubTemplate}"><a  ng-click="changeActive(pageActionTypes)">Action Types</a></li>
+            <li role="presentation" ng-class="{'active':pageRules === activeSubTemplate}"><a ng-click="changeActive(pageRules)">Rules</a></li>
+            <li role="presentation" ng-class="{'active':pageWorkingHours === activeSubTemplate}"><a ng-click="changeActive(pageWorkingHours)">Working Hours</a></li>
+            <li role="presentation" ng-class="{'active':pageHolidayCalender === activeSubTemplate}"><a ng-click="changeActive(pageHolidayCalender)">Holiday Calender</a></li>
+            <li role="presentation" ng-class="{'active':pageBusinessListing === activeSubTemplate}"><a ng-click="changeActive(pageBusinessListing)">Business Listing</a></li>
+        </ul>
+        <hr/>
+    </div>
+    <!------ Only on Desktop ------------------------------------>
+    <div class="col-lg-3 col-md-3 hidden-sm hidden-xs">
+        <ul class="nav nav-pills nav-stacked">
+            <li role="presentation" ng-class="{'active':pageModuleSettings === activeSubTemplate}"><a ng-click="changeActive(pageModuleSettings)">Module and Settings</a></li>
+            <li role="presentation" ng-class="{'active':pageSubuser === activeSubTemplate}"><a ng-click="changeActive(pageSubuser)">Subusers</a></li>
+            <li role="presentation" ng-class="{'active':pageItemMaster === activeSubTemplate}"><a  ng-click="changeActive(pageItemMaster)">Item Master</a></li>
+            <li role="presentation" ng-class="{'active':pageResources === activeSubTemplate}"><a  ng-click="changeActive(pageResources)">Reservation Resources</a></li>
+            <li role="presentation" ng-class="{'active':pageStatusTypes === activeSubTemplate}"><a  ng-click="changeActive(pageStatusTypes)">Status Types</a></li>
+            <li role="presentation" ng-class="{'active':pageActionTypes === activeSubTemplate}"><a  ng-click="changeActive(pageActionTypes)">Action Types</a></li>
+            <li role="presentation" ng-class="{'active':pageRules === activeSubTemplate}"><a ng-click="changeActive(pageRules)">Rules</a></li>
+            <li role="presentation" ng-class="{'active':pageWorkingHours === activeSubTemplate}"><a ng-click="changeActive(pageWorkingHours)">Working Hours</a></li>
+            <li role="presentation" ng-class="{'active':pageHolidayCalender === activeSubTemplate}"><a ng-click="changeActive(pageHolidayCalender)">Holiday Calender</a></li>
+            <li role="presentation" ng-class="{'active':pageBusinessListing === activeSubTemplate}"><a ng-click="changeActive(pageBusinessListing)">Business Listing</a></li>
+        </ul>
+    </div>
+</script>
+
+<div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="text-uppercase">Configuration</h4>
+                    </div>
+                    <div class="panel-body" ng-controller="ConfigurationNavigationCtrl">
+                        <!------- Page Content go inside ------------------>
+                        <div class="row">
+                            <div ng-include="'/tpl/configuration/navigation.html'">
+                                <!--------- Navigation imported here ------------->
+                            </div>
+
+
+                            <div class="col-lg-9 col-md-9 col-sm-12 col-xs-12">
+                                <div class="jumbotron" ng-include="activeSubTemplate">
+                                    <!---- Sub Pages will go here ----------->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!------- Page Content ends ------------------>
+                    </div>
+                </div>
