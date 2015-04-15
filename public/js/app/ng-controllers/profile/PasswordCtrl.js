@@ -33,11 +33,62 @@ angular.module('ezeidApp').controller('PasswordCtrl',[
         ) {
 
 
-        $scope.dataProgressLoader.dataLoadInProgress = false;
-        $scope.dataProgressLoader.dataLoadError = false;
-        $scope.dataProgressLoader.dataLoadComplete = true;
+        /**
+         * Hiding progress loader when userDetails are loaded successfully
+         */
+        $scope.$watch('userDetails',function(newVal,oldVal){
+           if(newVal.MasterID){
+               $scope.dataProgressLoader.dataLoadInProgress = false;
+               $scope.dataProgressLoader.dataLoadError = false;
+               $scope.dataProgressLoader.dataLoadComplete = true;
+           }
+        });
 
 
+        $scope.currentPassword = '';
+        $scope.newPassword = '';
 
+        /**
+         * Changes Password of current user
+         */
+        $scope.changePassword = function(){
+            $http({
+                method : "POST",
+                url : GURL + 'ewtChangePassword',
+                data : {
+                    Token : $rootScope._userInfo.Token,
+                    OldPassword : $scope.currentPassword,
+                    NewPassword : $scope.newPassword
+                }
 
+            }).success(function(resp){
+                    if(resp && resp !== 'null' && resp.hasOwnProperty('IsChanged')){
+                        if(resp.IsChanged){
+                            Notification.success({
+                               message : 'Your password is changed successfully',
+                                delay : MsgDelay
+                            });
+                        }
+                        else{
+                            Notification.error({
+                                message : 'You current password doesn\'t matched',
+                                delay : MsgDelay
+                            })
+                        }
+
+                    }
+                    else{
+                        Notification.error({
+                            message : 'An error occured ! Please try again',
+                            delay : MsgDelay
+                        });
+                    }
+                console.log(resp);
+            }).error(function(err){
+                Notification.error({
+                    message : 'An error occured ! Please try again',
+                    delay : MsgDelay
+                });
+            });
+        };
     }]);

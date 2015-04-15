@@ -94,7 +94,7 @@
             .when('/help',{templateUrl: 'html/help.html'})
             .when('/legal',{templateUrl: 'html/legal.html'})
             .when('/congratulations',{templateUrl: 'html/congratulations.html'})
-//            .when('/business-preference"',{templateUrl: 'html/business-preference.html'})
+            .when('/business-preference"',{templateUrl: 'html/business-preference.html'})
             .when('/blackwhitelist',{templateUrl: 'html/blacklistwhitelist.html'})
             .when('/salesenquiry',{templateUrl: 'html/salesenquiry.html'})
             .when('/subusers',{templateUrl : 'html/subusers.html'})
@@ -108,7 +108,7 @@
                 controller : 'SignUpCtrl'
             })
             .when('/profile-manager/:subview',{
-                templateUrl : 'html/profile/edit-profile.html',
+                templateUrl : 'html/profile/profile-manager.html',
                 controller : 'ProfileManagerCtrl'
             })
             .when('/profile-manager',{
