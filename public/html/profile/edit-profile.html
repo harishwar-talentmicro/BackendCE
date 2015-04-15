@@ -1483,18 +1483,17 @@
                             <div class="row">
                                 <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
                                     <input type="password"
-                                           ng-minlength="4"
                                            name="currentPassword"
                                            placeholder="Current Password"
-                                           class="form-control"
+                                           class="form-control emptyBox"
                                            ng-model="currentPassword" />
-
+                                    <small>&nbsp;</small>
                                 </div>
                                 <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
                                     <input type="password"
                                            ng-minlength="4"
                                            name="newPassword"
-                                           class="form-control"
+                                           class="form-control emptyBox"
                                            placeholder="New Password"
                                            ng-model="newPassword" />
                                     <small class="text-danger" ng-show="passwordForm.newPassword.$invalid">Password should be atleast 4 characters</small>
@@ -1502,11 +1501,20 @@
                                 <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
                                     <input type="password"
                                            name="renewPassword"
-                                           class="form-control"
+                                           class="form-control emptyBox"
                                            placeholder="Re-enter new password"
                                            ng-model="renewPassword" />
-                                    <small class="text-danger" ng-show="(passwordForm.newPassword !== passwordForm.renewPassword) && password.newPassword && passwordForm.">Password didn't matched</small>
+                                    <small class="text-danger" ng-show="(passwordForm.newPassword.$viewValue !== passwordForm.renewPassword.$viewValue) && passwordForm.newPassword.$viewValue &&(passwordForm.newPassword.$viewValue.length > 0)">Passwords didn't matched</small>
                                 </div>
+
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-2 col-md-2 col-sm-3 col-xs-6">
+                                    <button class="btn btn-primary btn-sm"
+                                            ng-disabled="(!currentPassword)  || (!passwordForm.newPassword.$viewValue) || (passwordForm.newPassword.$invalid)  || (passwordForm.renewPassword.$viewValue !== passwordForm.newPassword.$viewValue)"
+                                            ng-click="changePassword()">Change Password</button>
+                                </div>
+
                             </div>
                         </form>
 
