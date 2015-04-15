@@ -79,23 +79,29 @@ angular.module('ezeidApp').controller('NotifyController', function ($scope, $roo
     /**
      * Function for converting UTC time from server to LOCAL timezone
      */
-    var convertTimeToLocal = function(timeFromServer,dateFormat){
+    var convertTimeToLocal = function(timeFromServer,dateFormat,returnFormat){
         if(!dateFormat){
             dateFormat = 'DD-MMM-YYYY hh:mm A';
         }
+        if(!returnFormat){
+            returnFormat = dateFormat;
+        }
         var x = new Date(timeFromServer);
         var mom1 = moment(x);
-        return mom1.add((mom1.utcOffset()),'m').format(dateFormat);
+        return mom1.add((mom1.utcOffset()),'m').format(returnFormat);
     };
 
     /**
      * Function for converting LOCAL time (local timezone) to server time
      */
-    var convertTimeToUTC = function(localTime,dateFormat){
+    var convertTimeToUTC = function(localTime,dateFormat,returnFormat){
         if(!dateFormat){
             dateFormat = 'DD-MMM-YYYY hh:mm A';
         }
-        return moment(localTime,dateFormat).utc().format(dateFormat);
+        if(!returnFormat){
+            returnFormat = dateFormat;
+        }
+        return moment(localTime,dateFormat).utc().format(returnFormat);
     };
 
     function LoadNotifications(_pageValue){
