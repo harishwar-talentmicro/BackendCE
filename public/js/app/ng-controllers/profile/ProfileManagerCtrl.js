@@ -31,6 +31,29 @@ angular.module('ezeidApp').controller('ProfileManagerCtrl',[
         ) {
 
 
+        /**
+         * Returns index of Object from array based on Object Property
+         * @param key
+         * @returns {number}
+         */
+        Array.prototype.indexOfWhere = function(key,value){
+            var resultIndex = -1;
+            var found = false;
+            for(var i = 0; i < this.length; i++){
+                for(var prop in this[i]){
+                    if(this[i].hasOwnProperty(key) && this[i][key] === value){
+                        resultIndex = i;
+                        found = true;
+                        break;
+                    }
+                }
+                if(found){
+                    break;
+                }
+            }
+            return resultIndex;
+        };
+
         $scope.dataProgressLoader = {
             dataLoadInProgress : true,
             dataLoadError : false,

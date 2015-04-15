@@ -36,12 +36,6 @@ angular.module('ezeidApp').controller('ProfileCtrl',[
             MsgDelay,
             $location
         ) {
-
-        console.log($scope.dataProgressLoader.dataLoadInProgress);
-        console.log($scope.dataProgressLoader.dataLoadError);
-        console.log($scope.dataProgressLoader.dataLoadComplete);
-
-
         /**
          * List of countries
          * @type {Array}
@@ -65,6 +59,12 @@ angular.module('ezeidApp').controller('ProfileCtrl',[
          * @type {Array}
          */
         $scope.secondaryLocations = [];
+
+
+        $scope.workingHoursTemplateMap = [];
+
+
+        $scope.workingHoursTemplates = [];
 
 
         /**
@@ -113,18 +113,24 @@ angular.module('ezeidApp').controller('ProfileCtrl',[
 //            $scope.dataProgressLoader.dataLoadInProgress = true;
 
             $scope.loadCountries().then(function(){
-                $scope.loadUserDetails().then(function(){
-                    var countryId = ($scope.userDetails.CountryID) ? $scope.userDetails.CountryID : $scope.countryList[0].CountryID;
-                    $scope.loadStates(countryId).then(function(stateList){
-                        $scope.stateList = stateList;
-                        var stateId = ($scope.userDetails.StateID) ? $scope.userDetails.StateID : $scope.stateList[0].StateID;
-                        $scope.loadCities($scope.userDetails.StateID).then(function(cityList){
-                            $scope.cityList = cityList;
-                            $scope.loadSecondaryLocations().then(function(){
+                $scope.loadWorkingHourTemplates().then(function(workingHourTemplates){
+                    $scope.loadUserDetails().then(function(){
+                        var countryId = ($scope.userDetails.CountryID) ? $scope.userDetails.CountryID : $scope.countryList[0].CountryID;
+                        $scope.loadStates(countryId).then(function(stateList){
+                            $scope.stateList = stateList;
+                            var stateId = ($scope.userDetails.StateID) ? $scope.userDetails.StateID : $scope.stateList[0].StateID;
+                            $scope.loadCities($scope.userDetails.StateID).then(function(cityList){
+                                $scope.cityList = cityList;
+                                $scope.loadSecondaryLocations().then(function(){
 
+                                    $scope.dataProgressLoader.dataLoadInProgress = false;
+                                    $scope.dataProgressLoader.dataLoadError = false;
+                                    $scope.dataProgressLoader.dataLoadComplete = true;
+                                });
+                            },function(){
+                                $scope.dataProgressLoader.dataLoadComplete = false;
                                 $scope.dataProgressLoader.dataLoadInProgress = false;
-                                $scope.dataProgressLoader.dataLoadError = false;
-                                $scope.dataProgressLoader.dataLoadComplete = true;
+                                $scope.dataProgressLoader.dataLoadError = true;
                             });
                         },function(){
                             $scope.dataProgressLoader.dataLoadComplete = false;
@@ -141,6 +147,7 @@ angular.module('ezeidApp').controller('ProfileCtrl',[
                     $scope.dataProgressLoader.dataLoadInProgress = false;
                     $scope.dataProgressLoader.dataLoadError = true;
                 });
+
             },function(){
                 $scope.dataProgressLoader.dataLoadComplete = false;
                 $scope.dataProgressLoader.dataLoadInProgress = false;
@@ -308,6 +315,35 @@ angular.module('ezeidApp').controller('ProfileCtrl',[
             return defer.promise;
         };
 
+        $scope.loadWorkingHourTemplates =  function(){
+            var defer = $q.defer();
+
+            $http({
+                method : "GET",
+                url : GURL + "ewtWorkingHours",
+                params : {
+                    Token : $rootScope._userInfo.Token
+                }
+            }).success(function(resp){
+                if(resp && resp.length > 0 && resp !== 'null'){
+                    $scope.workingHoursTemplateMap = resp;
+                    for(var i in resp){
+                        $scope.workingHoursTemplates[resp[i].TID] = resp[i].TemplateName;
+                    }
+                    defer.resolve(resp);
+
+                }
+                    else{
+                    defer.resolve([]);
+                }
+            }).error(function(err){
+                defer.reject();
+            });
+            return defer.promise;
+        };
+
+
+        $scope.loadWorkingHourTemplates();
 
         $scope.dataReloadAgain();
 

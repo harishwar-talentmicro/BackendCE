@@ -68,6 +68,9 @@ angular.module('ezeidApp').controller('PasswordCtrl',[
                                message : 'Your password is changed successfully',
                                 delay : MsgDelay
                             });
+                            $scope.currentPassword = '';
+                            $scope.newPassword = '';
+                            $scope.renewPassword = '';
                         }
                         else{
                             Notification.error({
