@@ -1,8 +1,5 @@
 
 angular.module('ezeidApp').directive('dateTimePicker', function() {
-
-
-
     return {
         restrict: 'E',
         replace: true,
@@ -26,9 +23,7 @@ angular.module('ezeidApp').directive('dateTimePicker', function() {
                     var dateTimeSettings = JSON.parse(attrs.settings);
                     dateTimeSettings._this = this;
                     dateTimeSettings.onShow = function(){
-                        console.log('executing');
-                        console.log(this);
-                        console.log('minTime : ' + scope.minTime + ' maxTime : ' + scope.maxTime);
+
                         this.setOptions({
                             minTime : (scope.minTime) ? scope.minTime : 0,
                             maxTime : (scope.maxTime) ? scope.maxTime : '23:59'
@@ -37,7 +32,7 @@ angular.module('ezeidApp').directive('dateTimePicker', function() {
                     $(input).datetimepicker(dateTimeSettings);
                 }
                 catch(ex){
-                    console.error('Date Time pickers settings not passed correctly');
+                  //  console.error('Date Time pickers settings not passed correctly');
                     $(input).datetimepicker();
                 }
             }
