@@ -59,13 +59,24 @@ angular.module('ezeidApp').controller('WorkingHourCtrl',['$scope','$rootScope','
     };
 
     $scope.addWorkingHours = function(){
+        console.log($scope.mInfo);
           $scope.mInfo.Token = $rootScope._userInfo.Token;
-         // $scope.mInfo.Mo1 = moment($scope.mInfo.Mo1,"H:i").utc().format('H:i');
 
-        var currentTaskDate = moment().format('DD-MMM-YYYY hh:mm A');
+        var x = new Date();
+        var today = moment(x.toISOString()).utc().format('DD-MMM-YYYY');
+
+        console.log("today date",today);
+        console.log("selected time",$scope.mInfo.MO1);
+
+        var currentTaskDate = moment(today+' '+$scope.mInfo.MO1).format('DD-MMM-YYYY H:mm');
         console.log("current local date time",currentTaskDate);
 
-        console.log("utc time",convertTimeToUTC(currentTaskDate,'DD-MMM-YYYY hh:mm A','H:I'));
+       // console.log("utc time",convertTimeToUTC(currentTaskDate,'DD-MMM-YYYY H:mm',"H:mm"));
+
+      /*  var currentTaskDate = moment().format('DD-MMM-YYYY H:mm');
+        console.log("current local date time",currentTaskDate);
+
+        console.log("utc time",convertTimeToUTC(currentTaskDate,'DD-MMM-YYYY H:mm',"H:mm"));*/
 
        // $scope.mInfo.Mo1 = convertTimeToUTC(currentTaskDate,'DD-MMM-YYYY hh:mm A','H:HH');
 
