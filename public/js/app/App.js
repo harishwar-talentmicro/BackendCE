@@ -108,7 +108,7 @@
                 controller : 'SignUpCtrl'
             })
             .when('/profile-manager/:subview',{
-                templateUrl : 'html/profile/edit-profile.html',
+                templateUrl : 'html/profile/profile-manager.html',
                 controller : 'ProfileManagerCtrl'
             })
             .when('/profile-manager',{
