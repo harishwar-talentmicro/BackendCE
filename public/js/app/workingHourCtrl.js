@@ -58,20 +58,34 @@ angular.module('ezeidApp').controller('WorkingHourCtrl',['$scope','$rootScope','
         $scope.showAddWorkingHourForm = false;
     };
 
+    function selectedTimeToUtc(selectedTime)
+    {
+        var x = new Date();
+        var today = moment(x.toISOString()).utc().format('DD-MMM-YYYY');
+
+        var currentTaskDate = moment(today+' '+selectedTime).format('DD-MMM-YYYY H:mm');
+        console.log("current local date time",currentTaskDate);
+        console.log("utc time",convertTimeToUTC(currentTaskDate,'DD-MMM-YYYY H:mm',"H:mm"));
+
+        return convertTimeToUTC(currentTaskDate,'DD-MMM-YYYY H:mm',"H:mm");
+    }
+
     $scope.addWorkingHours = function(){
-        console.log($scope.mInfo);
-          $scope.mInfo.Token = $rootScope._userInfo.Token;
+        $scope.mInfo.Token = $rootScope._userInfo.Token;
 
         var x = new Date();
         var today = moment(x.toISOString()).utc().format('DD-MMM-YYYY');
 
-        console.log("today date",today);
-        console.log("selected time",$scope.mInfo.MO1);
-
         var currentTaskDate = moment(today+' '+$scope.mInfo.MO1).format('DD-MMM-YYYY H:mm');
         console.log("current local date time",currentTaskDate);
 
-       // console.log("utc time",convertTimeToUTC(currentTaskDate,'DD-MMM-YYYY H:mm',"H:mm"));
+        console.log("utc time",convertTimeToUTC(currentTaskDate,'DD-MMM-YYYY H:mm',"H:mm"));
+
+        $scope.mInfo.MO1 = convertTimeToUTC(currentTaskDate,'DD-MMM-YYYY H:mm',"H:mm");
+
+        $scope.mInfo.MO1 = selectedTimeToUtc($scope.mInfo.MO1);
+
+        console.log($scope.mInfo.MO1);
 
       /*  var currentTaskDate = moment().format('DD-MMM-YYYY H:mm');
         console.log("current local date time",currentTaskDate);
