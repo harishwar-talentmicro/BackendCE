@@ -27,7 +27,7 @@ angular.module('ezeidApp').controller('ConfigurationNavigationCtrl',[
             $scope.dataProgressLoader.dataLoadComplete = true;
 
             if(newVal.IDTypeID !== 2 && newVal.SelectionType !== 2){
-                $location.path('/profile-manager/profile');
+                $location.path('/profile-manager/user');
             }
         }
     });
@@ -47,10 +47,23 @@ angular.module('ezeidApp').controller('ConfigurationNavigationCtrl',[
         $scope.pageBusinessListing = "html/profile/configuration/subviews/business-listing.html";
         $scope.pageModuleSettings = "html/profile/configuration/subviews/module-settings.html";
 
-    $scope.activeSubTemplate = $scope.pageModuleSettings;
+        $scope.activeSubTemplate = $scope.pageModuleSettings;
 
-    $scope.changeActive = function(active){
-        $scope.activeSubTemplate = active;
-    };
+        $scope.changeActive = function(active){
+            $scope.activeSubTemplate = active;
+        };
+
+
+        $scope.$on('$includeContentRequested',function(){
+            console.info('NG INCLUDE Content Requested');
+        });
+
+        $scope.$on('$includeContentLoaded',function(){
+            console.info('NG INCLUDE Content Loaded Successfully');
+        });
+
+        $scope.$on('$includeContentError',function(){
+            console.info('NG INCLUDE Content Error');
+        });
 
 }]);

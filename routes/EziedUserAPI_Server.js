@@ -2261,7 +2261,7 @@ exports.FnAddLocation = function (req, res) {
                                         // console.log(InsertResult);
                                         console.log('Addlocation: Location added successfully');
 
-                                        var selectqry = 'Select tlocations.TID,MasterID,EZEID,LocTitle,Latitude,Longitude,Altitude,AddressLine1,AddressLine2,StateID,CountryID,PostalCode,PIN,EMailVerifiedID,ifnull(PhoneNumber,"") as PhoneNumber,MobileNumber,ifnull(ISDPhoneNumber,"") as ISDPhoneNumber ,ifnull(ISDMobileNumber,"") as ISDMobileNumber,CreatedDate,LUDate,Website,SeqNo,Picture,PictureFileName,ifnull((Select CityName from mcity where CityID=tlocations.CityID),"") as CityTitle,ifnull(ParkingStatus,0) as ParkingStatus,HcalID from tlocations';
+                                        var selectqry = 'Select tlocations.TID,MasterID,EZEID,LocTitle,Latitude,Longitude,Altitude,AddressLine1,AddressLine2,StateID,CountryID,PostalCode,PIN,EMailVerifiedID,ifnull(PhoneNumber,"") as PhoneNumber,MobileNumber,ifnull(ISDPhoneNumber,"") as ISDPhoneNumber ,ifnull(ISDMobileNumber,"") as ISDMobileNumber,CreatedDate,LUDate,Website,SeqNo,Picture,PictureFileName,ifnull((Select CityName from mcity where CityID=tlocations.CityID),"") as CityTitle,ifnull(ParkingStatus,0) as ParkingStatus,ifnull(HcalID,0) as TemplateID from tlocations';
 
                                         if (TID == 0) {
                                             selectqry = selectqry + ' order by tlocations.TID desc limit 1';
@@ -6847,13 +6847,14 @@ exports.FnSaveWorkingHours = function(req, res){
         var SU3 = req.body.SU3;
         var SU4 = req.body.SU4;
         var WorkingHrsTemplate = req.body.WorkingHrsTemplate;
+        var TID = req.body.TID;
 
 
         var RtnMessage = {
             IsSuccessfull: false
         };
 
-        if (Token != null && SpilloverTime != null && WorkingHrsTemplate != null ) {
+        if (Token != null && SpilloverTime != null && WorkingHrsTemplate != null && TID != null ) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
@@ -6864,7 +6865,8 @@ exports.FnSaveWorkingHours = function(req, res){
                         + ',' + db.escape(TH1) + ',' + db.escape(TH2) + ',' + db.escape(TH3) + ',' + db.escape(TH4)
                         + ',' + db.escape(FR1) + ',' + db.escape(FR2) + ',' + db.escape(FR3) + ',' + db.escape(FR4)
                         + ',' + db.escape(SA1) + ',' + db.escape(SA2) + ',' + db.escape(SA3) + ',' + db.escape(SA4)
-                        + ',' + db.escape(SU1) + ',' + db.escape(SU2) + ',' + db.escape(SU3) + ',' + db.escape(SU4) + ',' + db.escape(WorkingHrsTemplate);
+                        + ',' + db.escape(SU1) + ',' + db.escape(SU2) + ',' + db.escape(SU3) + ',' + db.escape(SU4) 
+                        + ',' + db.escape(WorkingHrsTemplate) + ',' + db.escape(TID);
                         db.query('CALL pSaveWorkingHours(' + query + ')', function (err, InsertResult) {
                             if (!err){
                                 if (InsertResult.affectedRows > 0) {
@@ -6910,6 +6912,9 @@ exports.FnSaveWorkingHours = function(req, res){
             }
             else if (WorkingHrsTemplate == null) {
                 console.log('FnSaveWorkingHours: WorkingHrsTemplate is empty');
+            }
+            else if (TID == null) {
+                console.log('FnSaveWorkingHours: TID is empty');
             }
             res.statusCode=400;
             res.send(RtnMessage);

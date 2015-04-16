@@ -37,28 +37,6 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
         GoogleMaps
         ) {
 
-        /**
-         * Returns index of Object from array based on Object Property
-         * @param key
-         * @returns {number}
-         */
-        Array.prototype.indexOfWhere = function(key,value){
-            var resultIndex = -1;
-            var found = false;
-            for(var i = 0; i < this.length; i++){
-                for(var prop in this[i]){
-                    if(this[i].hasOwnProperty(key) && this[i][key] === value){
-                        resultIndex = i;
-                        found = true;
-                        break;
-                    }
-                }
-                if(found){
-                    break;
-                }
-            }
-            return resultIndex;
-        };
 
         /**
          * Maps parking Status with its string equivalent
@@ -111,7 +89,8 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
             PostalCode : '',
             Latitude : 0,
             Longitude : 0,
-            Altitude : 0
+            Altitude : 0,
+            TemplateID : 0
         };
 
 
@@ -455,7 +434,8 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
                     SelectionType : ($scope.IDTypeID === 2) ?
                         ((userDetails.SelectionType === 1 || userDetails.SelectionType === 2) ?
                             userDetails.SelectionType : 1) : 0,
-                    ParkingStatus : userDetails.ParkingStatus
+                    ParkingStatus : userDetails.ParkingStatus,
+                    TemplateID : (userDetails.TemplateID) ? userDetails.TemplateID : 0
 
                 };
 
@@ -541,7 +521,8 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
                         Website : $scope.editLocationDetails.Website,
                         ISDPhoneNumber : $scope.editLocationDetails.ISDPhoneNumber,
                         ISDMobileNumber : $scope.editLocationDetails.ISDMobileNumber,
-                        ParkingStatus : $scope.editLocationDetails.ParkingStatus
+                        ParkingStatus : $scope.editLocationDetails.ParkingStatus,
+                        TemplateID : ($scope.editLocationDetails.TemplateID) ? $scope.editLocationDetails.TemplateID : 0
                     }
                     $http({
                         url : GURL + 'ewmAddLocation',
