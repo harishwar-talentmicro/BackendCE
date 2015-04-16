@@ -7101,20 +7101,12 @@ exports.FnDeleteWorkingHours = function(req, res){
                         //console.log('CALL pDeleteWorkinghours(' + db.escape(TID) + ')');
                         db.query('CALL pDeleteWorkinghours(' + db.escape(TID) + ')', function (err, deleteResult) {
                             if (!err){
-                                console.log(deleteResult);
-                                if (deleteResult.affectedRows > 0) {
-                                    
+                                                                                    
                                     RtnMessage.IsSuccessfull = true;
                                     RtnMessage.Message = 'delete successfully';
                                     res.send(RtnMessage);
                                     console.log('FnDeleteWorkingHours:Working Hours delete successfully');
-                            }
-                                else {
-                                    console.log('FnDeleteWorkingHours:No delete Working Hours');
-                                    RtnMessage.Message = 'No delete';
-                                    res.send(RtnMessage);
-                                }
-                            }
+                            }                               
                             else {
                                 console.log('FnDeleteWorkingHours: error in deleting Working Hours' + err);
                                 res.statusCode = 500;
