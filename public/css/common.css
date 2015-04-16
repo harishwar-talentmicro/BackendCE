@@ -1999,3 +1999,39 @@ form .row-error{
 .location-edit-mode{
     background : #E2FFDA!important;
 }
+
+.nav-pills.nav-stacked > li.active{
+    margin-top: 2px;
+}
+
+.nav-pills.nav-stacked > li.active > a{
+    margin-bottom: 10px;
+}
+.nav-pills.nav-stacked.nav-configuration > li.active > a:hover,
+.nav-pills.nav-stacked.nav-configuration > li.active > a:focus,
+.nav-pills.nav-stacked.nav-configuration > li.active > a:active{
+    background: #98F098;
+}
+
+.nav-pills.nav-stacked.nav-configuration > li > a:hover,
+.nav-pills.nav-stacked.nav-configuration > li > a:focus,
+.nav-pills.nav-stacked.nav-configuration > li > a:active{
+    background: #98F098;
+}
+
+.profile-manager .nav-pills.nav-stacked.nav-configuration > li > a{
+    font-size: 12px;
+    font-family: 'Open Sans',sans-serif;
+    background: #E7E7E7;
+    color: #0DA3D8;
+}
+
+.profile-manager .nav-pills.nav-stacked.nav-configuration > li > a:active,
+.profile-manager .nav-pills.nav-stacked.nav-configuration > li > a:focus,
+.profile-manager .nav-pills.nav-stacked.nav-configuration > li > a:hover{
+    background: #C7E1FF;
+}
+.profile-manager .nav-pills.nav-stacked.nav-configuration > li.active > a{
+    background: #60BFD5;
+    color: #FFF;
+}
