@@ -137,6 +137,7 @@ app.get('/ewtItemList',LocationManager.FnItemList);
 app.get('/ewtItemDetails',LocationManager.FnItemDetails);
 app.post('/ewtHolidayList',LocationManager.FnSaveHolidayCalendar);
 app.get('/ewtHolidayList',LocationManager.FnGetHolidayList);
+app.delete('/ewtHolidayList',LocationManager.FnDeleteHolidayList);
 app.post('/ewtWorkingHours',LocationManager.FnSaveWorkingHours);
 app.get('/ewtWorkingHours',LocationManager.FnGetWorkingHours);
 app.delete('/ewtWorkingHours',LocationManager.FnDeleteWorkingHours);
