@@ -13,7 +13,7 @@ angular.module('ezeidApp').controller('HolidayCalenderCtrl',['$scope','$rootScop
      */
     $scope.getHolidayList = function(TemplateId)
     {
-        $scope.result = [];
+       // $scope.result = [];
         $http({ method: 'get', url: GURL + 'ewtHolidayList',
             params : {
                 Token : $rootScope._userInfo.Token,
@@ -51,7 +51,11 @@ angular.module('ezeidApp').controller('HolidayCalenderCtrl',['$scope','$rootScop
     }
 
     $scope.openAddHolidayForm = function(){
+        $scope.showNoDataFound = false;
         $scope.mInfo.TemplateID = "";
+        $scope.mInfo.HolidayTitle = "";
+        $scope.mInfo.HolidayDate = "";
+
         $scope.result = [];
         $scope.showAddHolidayForm = true;
         getTemplateList();
@@ -59,6 +63,7 @@ angular.module('ezeidApp').controller('HolidayCalenderCtrl',['$scope','$rootScop
 
     $scope.cancleAddHoliday = function(){
         $scope.showAddHolidayForm = false;
+        $scope.result = [];
     };
 
     $scope.addWorkingHours = function(){
@@ -72,11 +77,10 @@ angular.module('ezeidApp').controller('HolidayCalenderCtrl',['$scope','$rootScop
                 data:$scope.saveInfo
               }).success(function (data) {
 
-                console.log(data);
-                if (data.IsSuccessfull) {
+               if (data.IsSuccessfull) {
                     $scope.getHolidayList($scope.mInfo.TemplateID);
                     $scope.mInfo = {}
-                   //
+                    $scope.mInfo.TemplateID = $scope.saveInfo.TemplateID;
                     $scope.showAddHolidayForm = false;
                     Notification.success({message: "Saved...", delay: MsgDelay});
                 }

@@ -34,7 +34,7 @@
                 </div>
             </div>
 
-            <div ng-hide="showAddHolidayForm">
+            <div ng-hide="showAddHolidayForm" class="holidayConfigListing">
               <table class="rwd-table">
                     <tbody>
                          <tr ng-repeat="_item in result">
@@ -66,7 +66,7 @@
                                     ng-options="template.TID as template.TemplateName for template in TemplateData" required>
                                 <option value = ""> --Select Template-- </option>
                             </select>
-                            <small ng-show="HolidayForm.template.$touched && !mInfo.TemplateID.length" class="text-danger">Select Template</small>
+                            <small ng-show="HolidayForm.template.$touched && !mInfo.TemplateID" class="text-danger">Select Template</small>
                         </div>
                     </div>
 
@@ -90,9 +90,8 @@
                             <span>Holiday Date</span>
                         </div>
                         <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
-                            <date-time-picker name="holidayDate" recipient="mInfo.HolidayDate" settings='{"format" : "d-M-Y", "hours12" : false, "timepicker" : false}' ></date-time-picker>
-                            <small ng-show="HolidayForm.holidayDate.$touched && !mInfo.HolidayDate.length" class="text-danger">Select Date</small>
-                        </div>
+                            <date-time-picker recipient="mInfo.HolidayDate" settings='{"format" : "d-M-Y", "hours12" : false, "timepicker" : false}' ></date-time-picker>
+                         </div>
                     </div>
 
                     <div class="row">
