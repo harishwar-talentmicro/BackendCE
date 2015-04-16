@@ -780,3 +780,13 @@ body {
 {
     margin-top: 1.5%;
 }
+.holidayConfigListing
+{
+    max-height: 300px;
+    overflow-y : auto;
+}
+.workingHourConfigListing
+{
+    max-height: 350px;
+    overflow-y : auto;
+}

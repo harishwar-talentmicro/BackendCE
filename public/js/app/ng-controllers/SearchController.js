@@ -1306,7 +1306,7 @@ angular.module('ezeidApp').controller('SearchController', [
     if($routeParams.ezeid){
 
         SearchSec.Criteria.Keywords = $routeParams.ezeid;
-//        SearchSec.Criteria.SearchType = "1";
+//      SearchSec.Criteria.SearchType = "1";
         SearchSec.Criteria.SearchType = 1;
         SearchSec.getSearch();
     }

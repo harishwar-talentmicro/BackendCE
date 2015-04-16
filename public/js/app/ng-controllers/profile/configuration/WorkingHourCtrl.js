@@ -52,10 +52,7 @@ angular.module('ezeidApp').controller('WorkingHourCtrl',['$scope','$rootScope','
         }).success(function (data) {
                if (data != 'null')
                 {
-                   console.log(data);
                    $scope.result = data;
-                    console.log("Sai12333");
-                    console.log($scope.result);
                 }
                 else
                 {
@@ -142,16 +139,12 @@ angular.module('ezeidApp').controller('WorkingHourCtrl',['$scope','$rootScope','
          };
 
         $scope.deleteWorkingHourTemplate = function(_TID){
-
-            console.log(_TID);
-
-            $http({ method: 'delete', url: GURL + 'ewtWorkingHours',
+        $http({ method: 'delete', url: GURL + 'ewtWorkingHours',
                 params : {
                     Token : $rootScope._userInfo.Token,
                     TID: _TID
                 }
             }).success(function (data) {
-                    console.log(data);
                     if(data.IsSuccessfull)
                     {
                         getWorkingHours();

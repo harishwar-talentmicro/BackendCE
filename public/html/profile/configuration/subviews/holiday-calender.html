@@ -12,16 +12,39 @@
                 </div>
             </div>
 
-            <div ng-hide="showAddHolidayForm">
+            <div ng-hide="showAddHolidayForm" class="row bottom-clearfix">
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 setTopMarginOneNhalf">
+                    <span>Template</span>
+                </div>
+                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8">
+                    <select class="form-control"name="template" ng-model="mInfo.TemplateID"
+                            ng-change="getHolidayList(mInfo.TemplateID)"
+                            ng-options="template.TID as template.TemplateName for template in TemplateData" required>
+                        <option value = ""> --Select Template-- </option>
+                    </select>
+                </div>
+            </div>
+
+            <div ng-show="showNoDataFound" class="row bottom-clearfix">
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 setTopMarginOneNhalf">
+
+                </div>
+                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8">
+                    <span> No holiday found. </span>
+                </div>
+            </div>
+
+            <div ng-hide="showAddHolidayForm" class="holidayConfigListing">
               <table class="rwd-table">
                     <tbody>
                          <tr ng-repeat="_item in result">
-                               <td>{{_item.TemplateName}}</td>
+                               <td>{{_item.HolidayTitle}}</td>
+                               <td>{{_item.HolidayDate}}</td>
                                <td>
                                     <button
                                             data-toggle="tooltip"
                                             title="Delete"
-                                            ng-click="deleteWorkingHourTemplate(_item.TID)"
+                                            ng-click="deleteHoliday(_item.TID)"
                                             class="btn btn-xs btn-danger no-radius">
                                         <span class="glyphicon glyphicon-trash"></span>
                                     </button>
@@ -39,10 +62,11 @@
                             <span>Template</span>
                         </div>
                         <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8">
-                            <select class="form-control emptyBox"name="template" ng-model="mInfo.TemplateID"
+                            <select class="form-control emptyBox" name="template" ng-model="mInfo.TemplateID"
                                     ng-options="template.TID as template.TemplateName for template in TemplateData" required>
                                 <option value = ""> --Select Template-- </option>
                             </select>
+                            <small ng-show="HolidayForm.template.$touched && !mInfo.TemplateID" class="text-danger">Select Template</small>
                         </div>
                     </div>
 
@@ -61,19 +85,19 @@
                         </div>
                     </div>
 
-                    <div class="row">
+                    <div class="row bottom-clearfix">
                         <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 setTopMarginOneNhalf">
                             <span>Holiday Date</span>
                         </div>
                         <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
                             <date-time-picker recipient="mInfo.HolidayDate" settings='{"format" : "d-M-Y", "hours12" : false, "timepicker" : false}' ></date-time-picker>
-                        </div>
+                         </div>
                     </div>
 
                     <div class="row">
                         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                             <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
-                                <button class="btn btn-sm btn-primary" ng-disabled="!mInfo.TemplateID.length && !mInfo.HolidayTitle.length && !mInfo.HolidayDate.length" ng-click="addWorkingHours()"><span class="glyphicon glyphicon-ok"></span> Save</button>
+                                <button class="btn btn-sm btn-primary" ng-disabled="!mInfo.TemplateID || !mInfo.HolidayTitle.length || !mInfo.HolidayDate.length" ng-click="addWorkingHours()"><span class="glyphicon glyphicon-ok"></span> Save</button>
                             </div>
                             <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
                                 <button class="btn btn-sm btn-primary" ng-click="cancleAddHoliday()"><span class="glyphicon glyphicon-remove"></span> Cancel</button>

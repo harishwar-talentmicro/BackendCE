@@ -7101,20 +7101,12 @@ exports.FnDeleteWorkingHours = function(req, res){
                         //console.log('CALL pDeleteWorkinghours(' + db.escape(TID) + ')');
                         db.query('CALL pDeleteWorkinghours(' + db.escape(TID) + ')', function (err, deleteResult) {
                             if (!err){
-                                console.log(deleteResult);
-                                if (deleteResult.affectedRows > 0) {
-                                    
+                                                                                    
                                     RtnMessage.IsSuccessfull = true;
                                     RtnMessage.Message = 'delete successfully';
                                     res.send(RtnMessage);
                                     console.log('FnDeleteWorkingHours:Working Hours delete successfully');
-                            }
-                                else {
-                                    console.log('FnDeleteWorkingHours:No delete Working Hours');
-                                    RtnMessage.Message = 'No delete';
-                                    res.send(RtnMessage);
-                                }
-                            }
+                            }                               
                             else {
                                 console.log('FnDeleteWorkingHours: error in deleting Working Hours' + err);
                                 res.statusCode = 500;
@@ -7162,6 +7154,7 @@ exports.FnGetWorkingHrsHolidayList = function (req, res) {
 
         var Token = req.query.Token;
         var LocID = req.query.LocID;
+        var TemplateID = req.query.TemplateID;
         var RtnMessage = {
             WorkingHours: '',
             HolidayList:'',
@@ -7171,7 +7164,7 @@ exports.FnGetWorkingHrsHolidayList = function (req, res) {
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
         if(LocID == null)
           LocID = 0;
-        if (Token != null && LocID != 0) {
+        if (Token != null && LocID != null) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
@@ -7220,7 +7213,7 @@ exports.FnGetWorkingHrsHolidayList = function (req, res) {
     }
 } ,function FnHolidayList(CallBack) {
     try {
-         var query = db.escape(LocID) + ',' + db.escape(0);
+         var query = db.escape(LocID) + ',' + db.escape(TemplateID);
                 db.query('CALL pGetHolidayList(' + query + ')', function (err, HolidayResult) {
                     console.log('CALL pGetHolidayList(' + query + ')');
                      
@@ -8481,26 +8474,23 @@ exports.FnSendBulkMailer = function (req, res) {
         }
         else {
             if (Token != null && Attachment != null && AttachmentFileName != null && ToMailID != null) {
-                
                 FnValidateToken(Token, function (err, Result) {
                     if (!err) {
                         if (Result != null) {
                             var pdfDocument = require('pdfkit');
                             var doc = new pdfDocument();
                             var bufferData = new Buffer(Attachment.replace(/^data:image\/(png|gif|jpeg|jpg);base64,/, ''), 'base64');
-                            console.log(bufferData);
                             var pdfdoc = doc.image(bufferData);
                             // doc.write("test.pdf");
                             var fs = require('fs');
                             var ws = fs.createWriteStream('TempMapLocationFile/ViewDirection.pdf');
                             var stream = doc.pipe(ws);
                             doc.end();
-                             
                             fs.exists('TempMapLocationFile//ViewDirection.pdf', function (exists) {
                                 if (exists) {
-                                    var bufferPdfDoc = fs.readFileSync('TempMapLocationFile/ViewDirection.pdf');
+                                    var bufferPdfDoc = fs.readFileSync('TempMapLocationFile//ViewDirection.pdf');
                                     console.log(bufferPdfDoc);
-                                    //convert binary data to base64 encoded string
+                                    // convert binary data to base64 encoded string
                                     var Base64PdfData = new Buffer(bufferPdfDoc).toString('base64');
                                     console.log(Base64PdfData);
                                     //fs.unlinkSync('TempMapLocationFile/ViewDirection.pdf');
