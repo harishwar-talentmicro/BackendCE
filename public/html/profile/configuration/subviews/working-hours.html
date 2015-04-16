@@ -16,32 +16,18 @@
 <div ng-hide="showAddWorkingHourForm">
     <table class="rwd-table">
         <tbody>
-        <!--<tr ng-repeat="_item in result">-->
-        <tr>
-            <td>{{result.TemplateName}}</td>
+       <tr ng-repeat="_item in result">
+        <!--<tr>-->
+            <td>{{_item.TemplateName}}</td>
             <td>
                 <button
                         data-toggle="tooltip"
                         title="Delete"
-                        ng-click="deleteWorkingHourTemplate(result.TID)"
+                        ng-click="deleteWorkingHourTemplate(_item.TID)"
                         class="btn btn-xs btn-danger no-radius">
                     <span class="glyphicon glyphicon-trash"></span>
                 </button>
             </td>
-            <!--<td>
-                <p class="text-info pull-right btn-link" ng-click="toggleProfileEditMode()">
-                    <span class="glyphicon glyphicon-edit"></span> Edit
-                </p>
-            </td>
-            <td>
-                <button
-                    data-toggle="tooltip"
-                    title="Delete"
-                    class="btn btn-xs btn-danger no-radius">
-                    <span class="glyphicon glyphicon-trash"></span>
-
-                </button>
-            </td>-->
         </tr>
         </tbody>
     </table>
@@ -55,7 +41,7 @@
         <span>Working Hours Template</span>
     </div>
     <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8">
-        <input type="text" class="form-control emptyBox" name="templateName" ng-model="mInfo.WorkingHrsTemplate"  placeholder="Template Title" maxlength="100" required>
+        <input type="text" class="form-control emptyBox" name="templateName" ng-model="mInfo.WorkingHrsTemplate"  placeholder="Template Title" maxlength="200" required>
         <small ng-show="workingHoursForm.templateName.$touched && !mInfo.WorkingHrsTemplate.length" class="text-danger">Template title can't be empty</small>
     </div>
 </div>
