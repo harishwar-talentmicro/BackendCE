@@ -37,8 +37,6 @@ angular.module('ezeidApp').controller('WorkingHourCtrl',['$scope','$rootScope','
     };
 
     $scope.numbersOnly = function(evt){
-        console.log(evt.keyCode);
-        //alert(evt.keyCode);
         if(evt.keyCode < 48 || evt.keyCode > 57){
             evt.preventDefault();
             return;
@@ -54,8 +52,10 @@ angular.module('ezeidApp').controller('WorkingHourCtrl',['$scope','$rootScope','
         }).success(function (data) {
                if (data != 'null')
                 {
-                    console.log(data);
-                   $scope.result = data[0];
+                   console.log(data);
+                   $scope.result = data;
+                    console.log("Sai12333");
+                    console.log($scope.result);
                 }
                 else
                 {
@@ -82,6 +82,7 @@ angular.module('ezeidApp').controller('WorkingHourCtrl',['$scope','$rootScope','
     }
 
     $scope.addWorkingHours = function(){
+
         $scope.saveInfo.MO1 = ($scope.mInfo.MO1 != undefined) ? selectedTimeToUtc($scope.mInfo.MO1) : "";
         $scope.saveInfo.MO2 = ($scope.mInfo.MO2 != undefined) ? selectedTimeToUtc($scope.mInfo.MO2) : "";
         $scope.saveInfo.MO3 = ($scope.mInfo.MO3 != undefined) ? selectedTimeToUtc($scope.mInfo.MO3) : "";
