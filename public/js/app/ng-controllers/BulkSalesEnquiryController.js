@@ -106,7 +106,7 @@ angular.module('ezeidApp').controller('bulksalesController',['$http', '$rootScop
 
         if(isValidate())
         {
-            $http({ method: 'post', url: GURL + 'ewtSaveMailTemplate', data: salesEnquiry._info }).success(function (data) {
+            $http({ method: 'post', url: GURL + 'ewtTemplateDetails', data: salesEnquiry._info }).success(function (data) {
 
                 if (data != 'null') {
                     //salesEnquiry._info = {};
@@ -218,7 +218,7 @@ angular.module('ezeidApp').controller('bulksalesController',['$http', '$rootScop
     {
         $http({
             method: 'get',
-            url: GURL + 'ewtGetTemplateList?Token=' + $rootScope._userInfo.Token
+            url: GURL + 'ewtTemplateList?Token=' + $rootScope._userInfo.Token
         }).success(function (data) {
                 if(data !== "null")
                 {
@@ -254,7 +254,7 @@ angular.module('ezeidApp').controller('bulksalesController',['$http', '$rootScop
         {
             $http({
                 method: 'get',
-                url: GURL + 'ewtGetTemplateDetails?Token=' + $rootScope._userInfo.Token + '&TID='+Tid}).success(function (data) {
+                url: GURL + 'ewtTemplateDetails?Token=' + $rootScope._userInfo.Token + '&TID='+Tid}).success(function (data) {
                     if(data !== "null")
                     {
                        salesEnquiry._info = data[0];
