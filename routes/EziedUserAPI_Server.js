@@ -6242,8 +6242,7 @@ exports.FnSaveHolidayCalendar = function(req, res){
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
-
-                        var query = db.escape(TID) + ',' + db.escape(Token) + ',' + db.escape(HolidayDate) + ',' + db.escape(HolidayTitle) + ',' + db.escape(TemplateID);
+                        var query = db.escape(TID) + ',' + db.escape(Token) + ',' + db.escape(new Date(HolidayDate)) + ',' + db.escape(HolidayTitle) + ',' + db.escape(TemplateID);
                         db.query('CALL pSaveHolidayCalendar(' + query + ')', function (err, InsertResult) {
                             if (!err){
                                 if (InsertResult.affectedRows > 0) {
@@ -6317,12 +6316,15 @@ exports.FnGetHolidayList = function (req, res) {
 
         var Token = req.query.Token;
         var LocID = req.query.LocID;
+        var TemplateID = req.query.TemplateID;
+        if(LocID == null && LocID == '')
+            LocID=0;
         if (Token != null) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
 
-                        db.query('CALL pGetHolidayList(' + db.escape(LocID) + ',' + db.escape(0)+ ')', function (err, GetResult) {
+                        db.query('CALL pGetHolidayList(' + db.escape(LocID) + ',' + db.escape(TemplateID)+ ')', function (err, GetResult) {
                             if (!err) {
                                 if (GetResult != null) {
                                     if (GetResult[0].length > 0) {
@@ -6847,13 +6849,14 @@ exports.FnSaveWorkingHours = function(req, res){
         var SU3 = req.body.SU3;
         var SU4 = req.body.SU4;
         var WorkingHrsTemplate = req.body.WorkingHrsTemplate;
+        var TID = req.body.TID;
 
 
         var RtnMessage = {
             IsSuccessfull: false
         };
 
-        if (Token != null && SpilloverTime != null && WorkingHrsTemplate != null ) {
+        if (Token != null && SpilloverTime != null && WorkingHrsTemplate != null && TID != null ) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
@@ -6864,7 +6867,8 @@ exports.FnSaveWorkingHours = function(req, res){
                         + ',' + db.escape(TH1) + ',' + db.escape(TH2) + ',' + db.escape(TH3) + ',' + db.escape(TH4)
                         + ',' + db.escape(FR1) + ',' + db.escape(FR2) + ',' + db.escape(FR3) + ',' + db.escape(FR4)
                         + ',' + db.escape(SA1) + ',' + db.escape(SA2) + ',' + db.escape(SA3) + ',' + db.escape(SA4)
-                        + ',' + db.escape(SU1) + ',' + db.escape(SU2) + ',' + db.escape(SU3) + ',' + db.escape(SU4) + ',' + db.escape(WorkingHrsTemplate);
+                        + ',' + db.escape(SU1) + ',' + db.escape(SU2) + ',' + db.escape(SU3) + ',' + db.escape(SU4) 
+                        + ',' + db.escape(WorkingHrsTemplate) + ',' + db.escape(TID);
                         db.query('CALL pSaveWorkingHours(' + query + ')', function (err, InsertResult) {
                             if (!err){
                                 if (InsertResult.affectedRows > 0) {
@@ -6910,6 +6914,9 @@ exports.FnSaveWorkingHours = function(req, res){
             }
             else if (WorkingHrsTemplate == null) {
                 console.log('FnSaveWorkingHours: WorkingHrsTemplate is empty');
+            }
+            else if (TID == null) {
+                console.log('FnSaveWorkingHours: TID is empty');
             }
             res.statusCode=400;
             res.send(RtnMessage);
@@ -8047,7 +8054,7 @@ exports.FnGetTemplateDetails = function (req, res) {
 };
 
 //method to send bulk mailer
-exports.FnSendBulkMailer = function (req, res) {
+exports.FnSendBulkMailerOld = function (req, res) {
     try {
 
         res.setHeader("Access-Control-Allow-Origin", "*");
@@ -8244,6 +8251,247 @@ exports.FnSendBulkMailer = function (req, res) {
         throw new Error(ex);
     }
 };
+
+exports.FnSendBulkMailer = function (req, res) {
+    try {
+
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.body.TokenNo;
+        var TID = req.body.TID;
+        var TemplateID = req.body.TemplateID;
+        var Attachment = req.body.Attachment;
+        var AttachmentFileName = req.body.AttachmentFileName;
+        var ToMailID = req.body.ToMailID;
+        if (TID == '')
+            TID = null;
+
+        var RtnResponse = {
+            IsSent: false
+        };
+        if (TID != null) {
+
+            if (Token != null && Token != ' ' && TID != null && TID != ' ' && TemplateID != null && TemplateID != ' ') {
+                FnValidateToken(Token, function (err, Result) {
+                    if (!err) {
+                        if (Result != null) {
+                            //var query = db.escape(Token) + ', ' +db.escape(TID);
+                            var query = 'Select FirstName, LastName, CompanyName,ifnull(SalesMailID,"shailesh.singh009@gmail.com") as SalesMailID from tmaster where TID in (' + TID + ')';
+                            console.log(query);
+                            db.query(query, function (err, GetResult) {
+                                if (!err) {
+                                    if (GetResult != null) {
+                                        console.log(GetResult);
+                                        if (GetResult.length > 0) {
+                                            var templateQuery = 'Select * from mmailtemplate where TID = ' + db.escape(TemplateID);
+                                            db.query(templateQuery, function (err, TemplateResult) {
+                                                if (!err) {
+                                                    if (TemplateResult != null) {
+                                                        if (TemplateResult.length > 0) {
+                                                            console.log(TemplateResult);
+                                                            RtnResponse.IsSent = true;
+                                                            for (var i = 0; i < GetResult.length; i++) {
+                                                                if (GetResult[i].SalesMailID != null && GetResult[i].SalesMailID != '') {
+
+                                                                    var mailOptions = {
+                                                                        replyto: (TemplateResult[0].FromMailID != 'undefined') ? TemplateResult[0].FromMailID : " ",
+                                                                        to: GetResult[i].SalesMailID,
+                                                                        subject: TemplateResult[0].Subject,
+                                                                        html: TemplateResult[0].Body, // html body
+                                                                    };
+                                                                    mailOptions.html = mailOptions.html.replace("[FirstName]", GetResult[0].FirstName);
+                                                                    mailOptions.html = mailOptions.html.replace("[LastName]", GetResult[0].LastName);
+                                                                    mailOptions.html = mailOptions.html.replace("[CompanyName]", GetResult[0].CompanyName);
+
+                                                                    console.log(mailOptions.html);
+                                                                    var post = {
+                                                                        MessageType: 9,
+                                                                        Priority: 5,
+                                                                        ToMailID: GetResult[i].SalesMailID,
+                                                                        Subject: mailOptions.subject,
+                                                                        Body: mailOptions.html,
+                                                                        Replyto: mailOptions.replyto
+                                                                    };
+
+                                                                    //console.log(post);
+                                                                    var query = db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
+                                                                        // Neat!
+                                                                        if (!err) {
+                                                                            console.log(result);
+                                                                            console.log('FnSendBulkMailer: Mail saved Successfully');
+
+                                                                            //CallBack(null, RtnMessage);
+                                                                        }
+                                                                        else {
+                                                                            console.log('FnSendBulkMailer: Mail not Saved Successfully');
+                                                                            // CallBack(null, null);
+                                                                        }
+                                                                    });
+                                                                    console.log('FnSendBulkMailer:Mail details sent for processing');
+                                                                    console.log(mailOptions);
+                                                                }
+                                                                else {
+                                                                    console.log('FnSendBulkMailer:Sales Mail Id is empty');
+                                                                    //res.send('null');
+                                                                }
+                                                            }
+                                                            res.send(RtnResponse);
+
+                                                        }
+                                                        else {
+                                                            console.log('FnGetTemplateDetails:No Template Details found');
+                                                            res.send('null');
+                                                        }
+                                                    }
+                                                    else {
+                                                        console.log('FnGetTemplateDetails:No Template Details found');
+                                                        res.send('null');
+                                                    }
+                                                }
+                                                else {
+                                                    console.log('FnGetTemplateDetails:Error in getting template ' + err);
+                                                    res.send('null');
+                                                }
+                                            });
+                                        }
+                                        else {
+                                            console.log('FnGetTemplateDetails:User Details not available');
+                                            res.send('null');
+                                        }
+                                    }
+                                    else {
+                                        console.log('FnGetTemplateDetails:No User Details not available');
+                                        res.send('null');
+                                    }
+                                }
+                                else {
+                                    console.log('FnGetTemplateDetails: User Details not available' + err);
+                                    res.statusCode = 500;
+                                    res.send('null');
+                                }
+                            });
+                        }
+                        else {
+                            res.statusCode = 401;
+                            res.send('null');
+                            console.log('FnSendBulkMailer: Invalid Token');
+                        }
+                    } else {
+                        res.statusCode = 500;
+                        res.send('null');
+                        console.log('FnSendBulkMailer: Error in validating token:  ' + err);
+                    }
+                });
+            }
+        }
+        else {
+            if (Token != null && Attachment != null && AttachmentFileName != null && ToMailID != null) {
+                
+                FnValidateToken(Token, function (err, Result) {
+                    if (!err) {
+                        if (Result != null) {
+                            var pdfDocument = require('pdfkit');
+                            var doc = new pdfDocument();
+                            var bufferData = new Buffer(Attachment.replace(/^data:image\/(png|gif|jpeg|jpg);base64,/, ''), 'base64');
+                            console.log(bufferData);
+                            var pdfdoc = doc.image(bufferData);
+                            // doc.write("test.pdf");
+                            var fs = require('fs');
+                            var ws = fs.createWriteStream('TempMapLocationFile/ViewDirection.pdf');
+                            var stream = doc.pipe(ws);
+                            doc.end();
+                             
+                            fs.exists('TempMapLocationFile//ViewDirection.pdf', function (exists) {
+                                if (exists) {
+                                    var bufferPdfDoc = fs.readFileSync('TempMapLocationFile/ViewDirection.pdf');
+                                    console.log(bufferPdfDoc);
+                                    //convert binary data to base64 encoded string
+                                    var Base64PdfData = new Buffer(bufferPdfDoc).toString('base64');
+                                    console.log(Base64PdfData);
+                                    //fs.unlinkSync('TempMapLocationFile/ViewDirection.pdf');
+                                    console.log('successfully deleted TempMapLocationFile/ViewDirection.pdf');
+
+                                    //fs.writeFileSync('E:\\shailesh\\test.pdf', pdfdoc);
+                                    var mailOptions = {
+                                        To: ToMailID,
+                                        subject: 'test subject',
+                                        html: 'test body', // html body
+                                        Attachment: Base64PdfData,
+                                        AttachmentFileName: 'ViewDirection.pdf'
+                                    };
+
+                                    var post = {
+                                        MessageType: 10,
+                                        Priority: 5,
+                                        ToMailID: mailOptions.To,
+                                        Subject: mailOptions.subject,
+                                        Body: mailOptions.html,
+                                        Attachment: mailOptions.Attachment,
+                                        AttachmentFileName: mailOptions.AttachmentFileName
+                                    };
+
+                                    //console.log(post);
+                                    var query = db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
+                                        // Neat!
+                                        if (!err) {
+                                            //console.log(result);
+                                            console.log('FnSendBulkMailer: Mail saved Successfully');
+                                            RtnResponse.IsSent = true;
+                                            res.send(RtnResponse);
+                                        }
+                                        else {
+                                            console.log('FnSendBulkMailer: Mail not Saved Successfully');
+                                            res.send(RtnResponse);
+                                        }
+                                    });
+                                    console.log('FnSendBulkMailer:Mail details sent for processing');
+                                }
+                                else {
+                                    res.send('null');
+                                }
+                            });
+
+                            // console.log(mailOptions);
+                        }
+                        else {
+                            res.statusCode = 401;
+                            res.send('null');
+                            console.log('FnSendBulkMailer: Invalid Token');
+                        }
+                    } else {
+                        res.statusCode = 500;
+                        res.send('null');
+                        console.log('FnSendBulkMailer: Error in validating token:  ' + err);
+
+                    }
+                });
+            }
+
+            else {
+                if (Token == null) {
+                    console.log('FnSendBulkMailer: Token is empty');
+                }
+                else if (ToMailID == null) {
+                    console.log('FnSendBulkMailer: ToMailID is empty');
+                }
+                else if (Attachment == null) {
+                    console.log('FnSendBulkMailer: Attachment is empty');
+                }
+                else if (AttachmentFileName == null) {
+                    console.log('FnSendBulkMailer: AttachmentFileName is empty');
+                }
+                res.statusCode = 400;
+                res.send('null');
+            }
+        }
+    }
+    catch (ex) {
+        console.log('FnGetTemplateDetails error:' + ex.description);
+        throw new Error(ex);
+    }
+};
+
 
 //below method to crop the image
 exports.FnCropImage = function(req, res){

@@ -1,6 +1,13 @@
 
 angular.module('ezeidApp').controller('WorkingHourCtrl',['$scope','$rootScope','$http','Notification','$filter','MsgDelay','$interval','GURL',function($scope,$rootScope,$http,Notification,$filter,MsgDelay,$interval,GURL){
 
+    var workingHours = this;
+    $scope.result = [];
+    $scope.mInfo = {};
+    $scope.saveInfo = {};
+    $scope.showAddWorkingHourForm = false;
+    getWorkingHours();
+
     /**
      * Function for converting UTC time from server to LOCAL timezone
      */
@@ -29,11 +36,12 @@ angular.module('ezeidApp').controller('WorkingHourCtrl',['$scope','$rootScope','
         return moment(localTime,dateFormat).utc().format(returnFormat);
     };
 
-    var workingHours = this;
-    $scope.result = [];
-    $scope.mInfo = {};
-    $scope.showAddWorkingHourForm = false;
-    getWorkingHours();
+    $scope.numbersOnly = function(evt){
+        if(evt.keyCode < 48 || evt.keyCode > 57){
+            evt.preventDefault();
+            return;
+        }
+    };
 
     function getWorkingHours()
     {
@@ -44,8 +52,14 @@ angular.module('ezeidApp').controller('WorkingHourCtrl',['$scope','$rootScope','
         }).success(function (data) {
                if (data != 'null')
                 {
-                    console.log(data);
-                   $scope.result = data[0];
+                   console.log(data);
+                   $scope.result = data;
+                    console.log("Sai12333");
+                    console.log($scope.result);
+                }
+                else
+                {
+                   $scope.result = [];
                 }
             });
     }
@@ -64,44 +78,60 @@ angular.module('ezeidApp').controller('WorkingHourCtrl',['$scope','$rootScope','
         var today = moment(x.toISOString()).utc().format('DD-MMM-YYYY');
 
         var currentTaskDate = moment(today+' '+selectedTime).format('DD-MMM-YYYY H:mm');
-        console.log("current local date time",currentTaskDate);
-        console.log("utc time",convertTimeToUTC(currentTaskDate,'DD-MMM-YYYY H:mm',"H:mm"));
-
         return convertTimeToUTC(currentTaskDate,'DD-MMM-YYYY H:mm',"H:mm");
     }
 
     $scope.addWorkingHours = function(){
-        $scope.mInfo.Token = $rootScope._userInfo.Token;
 
-        var x = new Date();
-        var today = moment(x.toISOString()).utc().format('DD-MMM-YYYY');
+        $scope.saveInfo.MO1 = ($scope.mInfo.MO1 != undefined) ? selectedTimeToUtc($scope.mInfo.MO1) : "";
+        $scope.saveInfo.MO2 = ($scope.mInfo.MO2 != undefined) ? selectedTimeToUtc($scope.mInfo.MO2) : "";
+        $scope.saveInfo.MO3 = ($scope.mInfo.MO3 != undefined) ? selectedTimeToUtc($scope.mInfo.MO3) : "";
+        $scope.saveInfo.MO4 = ($scope.mInfo.MO4 != undefined) ? selectedTimeToUtc($scope.mInfo.MO4) : "";
 
-        var currentTaskDate = moment(today+' '+$scope.mInfo.MO1).format('DD-MMM-YYYY H:mm');
-        console.log("current local date time",currentTaskDate);
+        $scope.saveInfo.TU1 = ($scope.mInfo.TU1 != undefined) ? selectedTimeToUtc($scope.mInfo.TU1) : "";
+        $scope.saveInfo.TU2 = ($scope.mInfo.TU2 != undefined) ? selectedTimeToUtc($scope.mInfo.TU2) : "";
+        $scope.saveInfo.TU3 = ($scope.mInfo.TU3 != undefined) ? selectedTimeToUtc($scope.mInfo.TU3) : "";
+        $scope.saveInfo.TU4 = ($scope.mInfo.TU4 != undefined) ? selectedTimeToUtc($scope.mInfo.TU4) : "";
 
-        console.log("utc time",convertTimeToUTC(currentTaskDate,'DD-MMM-YYYY H:mm',"H:mm"));
+        $scope.saveInfo.WE1 = ($scope.mInfo.WE1 != undefined) ? selectedTimeToUtc($scope.mInfo.WE1) : "";
+        $scope.saveInfo.WE2 = ($scope.mInfo.WE2 != undefined) ? selectedTimeToUtc($scope.mInfo.WE2) : "";
+        $scope.saveInfo.WE3 = ($scope.mInfo.WE3 != undefined) ? selectedTimeToUtc($scope.mInfo.WE3) : "";
+        $scope.saveInfo.WE4 = ($scope.mInfo.WE4 != undefined) ? selectedTimeToUtc($scope.mInfo.WE4) : "";
 
-        $scope.mInfo.MO1 = convertTimeToUTC(currentTaskDate,'DD-MMM-YYYY H:mm',"H:mm");
+        $scope.saveInfo.TH1 = ($scope.mInfo.TH1 != undefined) ? selectedTimeToUtc($scope.mInfo.TH1) : "";
+        $scope.saveInfo.TH2 = ($scope.mInfo.TH2 != undefined) ? selectedTimeToUtc($scope.mInfo.TH2) : "";
+        $scope.saveInfo.TH3 = ($scope.mInfo.TH3 != undefined) ? selectedTimeToUtc($scope.mInfo.TH3) : "";
+        $scope.saveInfo.TH4 = ($scope.mInfo.TH4 != undefined) ? selectedTimeToUtc($scope.mInfo.TH4) : "";
 
-        $scope.mInfo.MO1 = selectedTimeToUtc($scope.mInfo.MO1);
+        $scope.saveInfo.FR1 = ($scope.mInfo.FR1 != undefined) ? selectedTimeToUtc($scope.mInfo.FR1) : "";
+        $scope.saveInfo.FR2 = ($scope.mInfo.FR2 != undefined) ? selectedTimeToUtc($scope.mInfo.FR2) : "";
+        $scope.saveInfo.FR3 = ($scope.mInfo.FR3 != undefined) ? selectedTimeToUtc($scope.mInfo.FR3) : "";
+        $scope.saveInfo.FR4 = ($scope.mInfo.FR4 != undefined) ? selectedTimeToUtc($scope.mInfo.FR4) : "";
 
-        console.log($scope.mInfo.MO1);
+        $scope.saveInfo.SA1 = ($scope.mInfo.SA1 != undefined) ? selectedTimeToUtc($scope.mInfo.SA1) : "";
+        $scope.saveInfo.SA2 = ($scope.mInfo.SA2 != undefined) ? selectedTimeToUtc($scope.mInfo.SA2) : "";
+        $scope.saveInfo.SA3 = ($scope.mInfo.SA3 != undefined) ? selectedTimeToUtc($scope.mInfo.SA3) : "";
+        $scope.saveInfo.SA4 = ($scope.mInfo.SA4 != undefined) ? selectedTimeToUtc($scope.mInfo.SA4) : "";
 
-      /*  var currentTaskDate = moment().format('DD-MMM-YYYY H:mm');
-        console.log("current local date time",currentTaskDate);
+        $scope.saveInfo.SU1 = ($scope.mInfo.SU1 != undefined) ? selectedTimeToUtc($scope.mInfo.SU1) : "";
+        $scope.saveInfo.SU2 = ($scope.mInfo.SU2 != undefined) ? selectedTimeToUtc($scope.mInfo.SU2) : "";
+        $scope.saveInfo.SU3 = ($scope.mInfo.SU3 != undefined) ? selectedTimeToUtc($scope.mInfo.SU3) : "";
+        $scope.saveInfo.SU4 = ($scope.mInfo.SU4 != undefined) ? selectedTimeToUtc($scope.mInfo.SU4) : "";
 
-        console.log("utc time",convertTimeToUTC(currentTaskDate,'DD-MMM-YYYY H:mm',"H:mm"));*/
+        $scope.saveInfo.WorkingHrsTemplate = $scope.mInfo.WorkingHrsTemplate;
+        $scope.saveInfo.SpilloverTime = ($scope.mInfo.SpilloverTime == undefined) ? 0 : $scope.mInfo.SpilloverTime;
+        $scope.saveInfo.Token = $rootScope._userInfo.Token;
+        $scope.saveInfo.TID = 0;
 
-       // $scope.mInfo.Mo1 = convertTimeToUTC(currentTaskDate,'DD-MMM-YYYY hh:mm A','H:HH');
-
-          $http({
+        $http({
                 method: "POST",
                 url: GURL + 'ewtWorkingHours',
-                data:$scope.mInfo
+                data:$scope.saveInfo
               }).success(function (data) {
-                  console.log(data);
                 if (data.IsSuccessfull) {
+                    $scope.mInfo = {}
                     getWorkingHours();
+                    $scope.showAddWorkingHourForm = false;
                     Notification.success({message: "Saved...", delay: MsgDelay});
                 }
                 else
@@ -110,5 +140,23 @@ angular.module('ezeidApp').controller('WorkingHourCtrl',['$scope','$rootScope','
                 }
             });
          };
+
+        $scope.deleteWorkingHourTemplate = function(_TID){
+
+            console.log(_TID);
+
+            $http({ method: 'delete', url: GURL + 'ewtWorkingHours',
+                params : {
+                    Token : $rootScope._userInfo.Token,
+                    TID: _TID
+                }
+            }).success(function (data) {
+                    console.log(data);
+                    if(data.IsSuccessfull)
+                    {
+                        getWorkingHours();
+                    }
+                });
+        };
 
 }]);
