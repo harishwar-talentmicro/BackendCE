@@ -6080,6 +6080,11 @@ exports.FnSaveConfig = function(req, res){
         var ServiceFormMsg = req.body.ServiceFormMsg;
         var ResumeFormMsg = req.body.ResumeFormMsg;
         var FreshersAccepted = req.body.FreshersAccepted;
+        var SalesURL = req.body.SalesURL;
+        var ReservationURL = req.body.ReservationURL;
+        var HomeDeliveryURL = req.body.HomeDeliveryURL;
+        var ServiceURL = req.body.ServiceURL;
+        var ResumeURL = req.body.ResumeURL;
 
         var RtnMessage = {
             IsSuccessfull: false
@@ -6094,7 +6099,8 @@ exports.FnSaveConfig = function(req, res){
                             + ',' +db.escape(ResumeTitle) + ',' +db.escape(VisibleModules) + ',' +db.escape(SalesItemListType) + ',' +db.escape(HomeDeliveryItemListType)
                             + ',' +db.escape(ResumeKeyword) + ',' +db.escape(Category) + ',' +db.escape(Keyword) + ',' +db.escape(ReservationDisplayFormat) + ',' +db.escape(DataRefreshInterval)
                             + ',' + db.escape(SalesFormMsg) + ',' + db.escape(ReservationFormMsg) + ',' + db.escape(HomeDeliveryFormMsg) + ',' +db.escape(ServiceFormMsg) + ',' +db.escape(ResumeFormMsg)
-                            + ',' +db.escape(FreshersAccepted);
+                            + ',' +db.escape(FreshersAccepted) + ',' +db.escape(SalesURL) + ',' +db.escape(ReservationURL)
+                            + ',' +db.escape(HomeDeliveryURL) + ',' +db.escape(ServiceURL) + ',' +db.escape(ResumeURL);
 
                         db.query('CALL pSaveConfig(' + query + ')', function (err, InsertResult) {
                             if (!err){
@@ -6380,6 +6386,83 @@ exports.FnGetHolidayList = function (req, res) {
         throw new Error(ex);
     }
 }; 
+
+exports.FnDeleteHolidayList = function(req, res){
+    try{
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+
+        var Token = req.query.Token;
+        var TID = req.query.TID;
+
+        var RtnMessage = {
+            IsSuccessfull: false
+        };
+
+        var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
+
+        if (Token !=null && TID != null) {
+            FnValidateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+
+                        //var query = db.escape(Token) + ',' + db.escape(TID);
+                        db.query('CALL pDeleteHolidayList(' + db.escape(TID) + ')', function (err, InsertResult) {
+                            if (!err){
+                                if (InsertResult.affectedRows > 0) {
+                                    RtnMessage.IsSuccessfull = true;
+                                    res.send(RtnMessage);
+                                    console.log('FnDeleteHolidayList: Holiday list delete successfully');
+                                }
+                                else {
+                                    console.log('FnDeleteHolidayList:No delete Holiday list');
+                                    res.send(RtnMessage);
+                                }
+                            }
+
+                            else {
+                                console.log('FnDeleteHolidayList: error in deleting Holiday list' + err);
+                                res.statusCode = 500;
+                                res.send(RtnMessage);
+                            }
+                        });
+                    }
+                    else {
+                        console.log('FnDeleteHolidayList: Invalid token');
+                        res.statusCode = 401;
+                        res.send(RtnMessage);
+                    }
+                }
+                else {
+                    console.log('FnDeleteHolidayList:Error in processing Token' + err);
+                    res.statusCode = 500;
+                    res.send(RtnMessage);
+
+                }
+            });
+
+        }
+
+        else {
+            if (Token == null) {
+                console.log('FnDeleteHolidayList: Token is empty');
+            }
+            else if (TID == null) {
+                console.log('FnDeleteHolidayList: TID is empty');
+            }
+
+
+            res.statusCode=400;
+            res.send(RtnMessage);
+        }
+
+    }
+    catch (ex) {
+        console.log('FnDeleteHolidayList:error ' + ex.description);
+        throw new Error(ex);
+    }
+}
 
 exports.FnSaveTranscation = function(req, res){
     try{
@@ -7006,7 +7089,8 @@ exports.FnDeleteWorkingHours = function(req, res){
         var Token = req.query.Token;
         var TID = req.query.TID;
         var RtnMessage = {
-            IsSuccessfull: false
+            IsSuccessfull: false,
+            Message:''
         };
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
 
@@ -7017,14 +7101,24 @@ exports.FnDeleteWorkingHours = function(req, res){
                         //console.log('CALL pDeleteWorkinghours(' + db.escape(TID) + ')');
                         db.query('CALL pDeleteWorkinghours(' + db.escape(TID) + ')', function (err, deleteResult) {
                             if (!err){
-                                //console.log(deleteResult);
+                                console.log(deleteResult);
+                                if (deleteResult.affectedRows > 0) {
+                                    
                                     RtnMessage.IsSuccessfull = true;
+                                    RtnMessage.Message = 'delete successfully';
                                     res.send(RtnMessage);
                                     console.log('FnDeleteWorkingHours:Working Hours delete successfully');
+                            }
+                                else {
+                                    console.log('FnDeleteWorkingHours:No delete Working Hours');
+                                    RtnMessage.Message = 'No delete';
+                                    res.send(RtnMessage);
+                                }
                             }
                             else {
                                 console.log('FnDeleteWorkingHours: error in deleting Working Hours' + err);
                                 res.statusCode = 500;
+                                RtnMessage.Message = deleteResult[0];
                                 res.send(RtnMessage);
                             }
                         });
