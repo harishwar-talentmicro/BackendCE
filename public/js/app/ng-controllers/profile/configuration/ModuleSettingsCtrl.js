@@ -78,27 +78,31 @@ angular.module('ezeidApp').controller('ModuleSettingsCtrl',[
             title : '',
             defaultFormMsg : '',
             visibility : 0,
-            itemListType : 0       // 0: Message, 1: Item, 2: Item+picture, 3: Item+picture+quantity, 4: Item + picture + quantity + rate
+            itemListType : 0 ,      // 0: Message, 1: Item, 2: Item+picture, 3: Item+picture+quantity, 4: Item + picture + quantity + rate,
+            url : ''
 
         },
         reservation : {
             title : '',
             defaultFormMsg : '',
             visibility : 0,
-            displayFormat : 0 // 0 : Hours (30 min slot), 1 : Days, 2 : Months
+            displayFormat : 0, // 0 : Hours (30 min slot), 1 : Days, 2 : Months
+            url : ''
         },
         homeDelivery : {
             title : '',
             defaultFormMsg : '',
             visibility : 0,
-            itemListType : 1
+            itemListType : 1,
+            url : ''
 
         },
         service : {
             title : '',
             defaultFormMsg : '',
             visibility : 0,
-            itemListType : 1
+            itemListType : 1,
+            url : ''
 
         },
         resume : {
@@ -106,7 +110,8 @@ angular.module('ezeidApp').controller('ModuleSettingsCtrl',[
             defaultFormMsg : '',
             visibility : 0,
             itemListType : 1,    //Hardcoded, will always be an item only
-            keywords : ""
+            keywords : "",
+            url : ''
         },
 
         business : {
@@ -128,35 +133,38 @@ angular.module('ezeidApp').controller('ModuleSettingsCtrl',[
                 Token : $rootScope._userInfo.Token
             }
         }).success(function(resp){
-                console.log(resp);
                 if(resp && resp.length > 0){
                         $scope.settings.sales.title = (resp[0].SalesTitle) ? resp[0].SalesTitle : '';
                         $scope.settings.sales.defaultFormMsg = (resp[0].SalesFormMsg) ?  resp[0].SalesFormMsg :'';
                         $scope.settings.sales.visibility = (resp[0].VisibleModules) ? resp[0].VisibleModules.split("")[0] : 1;
                         $scope.settings.sales.itemListType = (resp[0].SalesItemListType) ? resp[0].SalesItemListType : 0;
+                        $scope.settings.sales.url = (resp[0].SalesURL) ? resp[0].SalesURL : '';
 
 
                         $scope.settings.reservation.title = (resp[0].ReservationTitle) ? resp[0].ReservationTitle : '';
                         $scope.settings.reservation.defaultFormMsg = (resp[0].ReservationFormMsg) ? resp[0].ReservationFormMsg : '';
                         $scope.settings.reservation.visibility = (resp[0].VisibleModules) ? resp[0].VisibleModules.split("")[1] : 1;
                         $scope.settings.reservation.displayFormat = (resp[0].ReservationDisplayFormat) ? resp[0].ReservationDisplayFormat : 0;
+                        $scope.settings.reservation.url = (resp[0].ReservationURL) ? resp[0].ReservationURL : '';
 
 
                         $scope.settings.homeDelivery.title = (resp[0].HomeDeliveryTitle) ? resp[0].HomeDeliveryTitle : '';
                         $scope.settings.homeDelivery.defaultFormMsg = (resp[0].HomeDeliveryFormMsg) ? resp[0].HomeDeliveryFormMsg : '';
                         $scope.settings.homeDelivery.visibility = (resp[0].VisibleModules) ? resp[0].VisibleModules.split("")[2] : 1;
                         $scope.settings.homeDelivery.itemListType = (resp[0].HomeDeliveryItemListType) ? resp[0].HomeDeliveryItemListType : 0;
+                        $scope.settings.homeDelivery.url = (resp[0].HomeDeliveryURL) ? resp[0].HomeDeliveryURL : '';
 
                         $scope.settings.service.title = (resp[0].ServiceTitle) ? resp[0].ServiceTitle : '';
                         $scope.settings.service.defaultFormMsg = (resp[0].ServiceFormMsg) ? resp[0].ServiceFormMsg : '';
                         $scope.settings.service.visibility= (resp[0].VisibleModules) ? resp[0].VisibleModules.split("")[3] : 1;
+                        $scope.settings.service.url = (resp[0].ServiceURL) ? resp[0].ServiceURL : '';
 
 
                         $scope.settings.resume.title = (resp[0].ResumeTitle) ? resp[0].ResumeTitle : '';
                         $scope.settings.resume.defaultFormMsg = (resp[0].ResumeFormMsg) ? resp[0].ResumeFormMsg : '';
                         $scope.settings.resume.visibility = (resp[0].VisibleModules) ? resp[0].VisibleModules.split("")[4] : 1;
                         $scope.settings.resume.keywords = (resp[0].ResumeKeyword) ? resp[0].ResumeKeyword : '';
-
+                        $scope.settings.resume.url = (resp[0].ResumeURL) ? resp[0].ResumeURL : '';
 
 
                         $scope.settings.business.dataRefreshInterval = (resp[0].DataRefreshInterval) ? resp[0].DataRefreshInterval : 0;
@@ -207,7 +215,13 @@ angular.module('ezeidApp').controller('ModuleSettingsCtrl',[
             HomeDeliveryFormMsg : $scope.settings.homeDelivery.defaultFormMsg ,
             ServiceFormMsg : $scope.settings.service.defaultFormMsg ,
             ResumeFormMsg : $scope.settings.resume.defaultFormMsg,
-            FreshersAccepted  : ($scope.settings.resume.freshersAccepted === true) ? 1 : 2
+            FreshersAccepted  : ($scope.settings.resume.freshersAccepted === true) ? 1 : 2,
+
+            SalesURL : ($scope.settings.sales.url) ?  $scope.settings.sales.url : '',
+            ReservationURL : ($scope.settings.reservation.url) ? $scope.settings.reservation.url : '',
+            HomeDeliveryURL : ($scope.settings.homeDelivery.url) ? $scope.settings.homeDelivery.url : '',
+            ServiceURL : ($scope.settings.service.url) ? $scope.settings.service.url : '',
+            ResumeURL : ($scope.settings.resume.url) ? $scope.settings.resume.url : ''
         };
 
         if($scope.validateSettings()){
