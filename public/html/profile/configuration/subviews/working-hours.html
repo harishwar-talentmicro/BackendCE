@@ -1,413 +1,411 @@
 <div class="panel panel-default" ng-controller="WorkingHourCtrl">
-    <div class="panel-heading">
-        <h4>Working Hours</h4>
-    </div>
-    <div class="panel-body">
+<div class="panel-heading">
+    <h4>Working Hours</h4>
+</div>
+<div class="panel-body">
 
 
 <!------------- Content goes inside this region ---------------------->
-       <div class="container-fluid">
-           <div ng-hide="showAddWorkingHourForm" class="row bottom-clearfix">
-               <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                   <button class="btn btn-primary btn-sm marginL10" ng-click="openAddWorkingHourForm()"><span class="glyphicon glyphicon-plus"></span> Add new working hours</button>
-               </div>
-           </div>
-
-           <div ng-hide="showAddWorkingHourForm">
-               <table class="rwd-table">
-                   <tbody>
-                   <!--<tr ng-repeat="_item in result">-->
-                   <tr>
-                       <td>{{result.TemplateName}}</td>
-
-                       <td>
-                           <button
-                                   data-toggle="tooltip"
-                                   title="Delete"
-                                   class="btn btn-xs btn-danger no-radius">
-                               <span class="glyphicon glyphicon-trash"></span>
-
-                           </button>
-                       </td>
-                       <!--<td>
-                           <p class="text-info pull-right btn-link" ng-click="toggleProfileEditMode()">
-                               <span class="glyphicon glyphicon-edit"></span> Edit
-                           </p>
-                       </td>
-                       <td>
-                           <button
-                               data-toggle="tooltip"
-                               title="Delete"
-                               class="btn btn-xs btn-danger no-radius">
-                               <span class="glyphicon glyphicon-trash"></span>
-
-                           </button>
-                       </td>-->
-                   </tr>
-                   </tbody>
-               </table>
-           </div>
-
-           <div ng-show="showAddWorkingHourForm">
-                <form name="workingHoursForm">
-                 <div class="row bottom-clearfix">
-
-                   <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 setTopMarginOneNhalf">
-                       <span>Working Hours Template</span>
-                   </div>
-                   <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8">
-                       <input type="text" class="form-control" name="templateName" ng-model="mInfo.WorkingHrsTemplate"  placeholder="Template Title" maxlength="100" required>
-                   </div>
-
-                   <div class="row bottom-clearfix">
-                       <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-
-                       </div>
-                   </div>
-
-                   <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 setTopMarginOneNhalf">
-                       <span>Spill over Time (between 1 and 59)</span>
-                   </div>
-
-                   <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8">
-
-
-                       <!-- {{workingHoursForm.spt}}-->
-                       <!-- <input type="number"
-                               numbers-only
-                               class="form-control"
-                               name="spt"
-                               ng-model="mInfo.SpilloverTime"
-                               placeholder="Spill over time"
-                               maxlength="2"
-                               min="1"
-                               max="59"
-                               required>-->
-
-                       <input type="text"
-                              numbers-only
-                              class="form-control"
-                              name="spt"
-                              ng-model="mInfo.SpilloverTime"
-                              placeholder="Spill over time"
-                              maxlength="2"
-                              required>
-
-                       <small class="text-danger" ng-show="workingHoursForm.spt.$invalid">Minutes should be in range of 1 to 59</small>
-                   </div>
-
-                   <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                       <h4>Monday</h4>
-                   </div>
-                   <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
-                       <date-time-picker
-                               placeholder="From"
-                               recipient="mInfo.MO1"
-                               settings='{"format" : "H:i", "datepicker": false}'
-                               min-time="'00:00'" max-time="'23:59'">
-                       </date-time-picker>
-                   </div>
-                   <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
-                       <date-time-picker
-                               placeholder="To"
-                               recipient="mInfo.MO2"
-                               settings='{"format" : "H:i", "datepicker": false}'
-                               min-time="mInfo.MO1" max-time="'23:59'">
-                       </date-time-picker>
-                       <!--settings='{"format" : "H:i", "datepicker": false, "minTime" : "{{mInfo.MO1}}" }'-->
-                   </div>
-                   <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
-                       <date-time-picker
-                               placeholder="From"
-                               recipient="mInfo.MO3"
-                               settings='{"format" : "H:i", "datepicker": false}'
-                               min-time="'00:00'" max-time="'23:59'">
-                       </date-time-picker>
-                   </div>
-                   <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
-                       <date-time-picker
-                               placeholder="To"
-                               recipient="mInfo.MO4"
-                               settings='{"format" : "H:i", "datepicker": false }'
-                               min-time="mInfo.MO3" max-time="'23:59'">
-                       </date-time-picker>
-                   </div>
-               </div>
-                         <div class="row">
-                   <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                       <hr/>
-                   </div>
-               </div>
-
-                         <div class="row bottom-clearfix">
-                   <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                       <h4>Tuesday</h4>
-                   </div>
-                   <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
-                       <date-time-picker
-                               placeholder="From"
-                               recipient="mInfo.TU1"
-                               settings='{"format" : "H:i", "datepicker": false}'
-                               min-time="'00:00'" max-time="'23:59'">
-                       </date-time-picker>
-                   </div>
-                   <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
-                       <date-time-picker
-                               recipient="mInfo.TU2"
-                               placeholder="To"
-                               settings='{"format" : "H:i", "datepicker": false }'
-                               min-time="mInfo.TU1" max-time="'23:59'">
-                       </date-time-picker>
-                   </div>
-                   <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
-                       <date-time-picker
-                               recipient="mInfo.TU3"
-                               placeholder="From"
-                               settings='{"format" : "H:i", "datepicker": false}'
-                               min-time="'00:00'" max-time="'23:59'">
-                       </date-time-picker>
-                   </div>
-                   <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
-                       <date-time-picker
-                               recipient="mInfo.TU4"
-                               placeholder="To"
-                               settings='{"format" : "H:i", "datepicker": false }'
-                               min-time="mInfo.TU3" max-time="'23:59'">
-                       </date-time-picker>
-                   </div>
-               </div>
-                         <div class="row">
-                   <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                       <hr/>
-                   </div>
-               </div>
-
-                         <div class="row bottom-clearfix">
-                   <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                       <h4>Wednesday</h4>
-                   </div>
-                   <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
-                       <date-time-picker
-                               recipient="mInfo.WE1"
-                               placeholder="From"
-                               settings='{"format" : "H:i", "datepicker": false}'
-                               min-time="'00:00'" max-time="'23:59'">
-                       </date-time-picker>
-                   </div>
-                   <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
-                       <date-time-picker
-                               recipient="mInfo.WE2"
-                               placeholder="To"
-                               settings='{"format" : "H:i", "datepicker": false }'
-                               min-time="mInfo.WE1" max-time="'23:59'">
-                       </date-time-picker>
-                   </div>
-                   <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
-                       <date-time-picker
-                               recipient="mInfo.WE3"
-                               placeholder="From"
-                               settings='{"format" : "H:i", "datepicker": false}'
-                               min-time="'00:00'" max-time="'23:59'">
-                       </date-time-picker>
-                   </div>
-                   <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
-                       <date-time-picker
-                               recipient="mInfo.WE4"
-                               placeholder="To"
-                               settings='{"format" : "H:i", "datepicker": false }'
-                               min-time="mInfo.WE3" max-time="'23:59'">
-                       </date-time-picker>
-                   </div>
-               </div>
-                         <div class="row">
-                   <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                       <hr/>
-                   </div>
-               </div>
-
-                         <div class="row bottom-clearfix">
-                   <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                       <h4>Thursday</h4>
-                   </div>
-                   <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
-                       <date-time-picker
-                               recipient="mInfo.TH1"
-                               placeholder="From"
-                               settings='{"format" : "H:i", "datepicker": false}'
-                               min-time="'00:00'" max-time="'23:59'">
-                       </date-time-picker>
-                   </div>
-                   <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
-                       <date-time-picker
-                               recipient="mInfo.TH2"
-                               placeholder="To"
-                               settings='{"format" : "H:i", "datepicker": false }'
-                               min-time="mInfo.TH1" max-time="'23:59'">
-                       </date-time-picker>
-                   </div>
-                   <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
-                       <date-time-picker
-                               recipient="mInfo.TH3"
-                               placeholder="From"
-                               settings='{"format" : "H:i", "datepicker": false}'
-                               min-time="'00:00'" max-time="'23:59'">
-                       </date-time-picker>
-                   </div>
-                   <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
-                       <date-time-picker
-                               recipient="mInfo.TH4"
-                               placeholder="To"
-                               settings='{"format" : "H:i", "datepicker": false }'
-                               min-time="mInfo.TH3" max-time="'23:59'">
-                       </date-time-picker>
-                   </div>
-               </div>
-                         <div class="row">
-                   <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                       <hr/>
-                   </div>
-               </div>
-
-                         <div class="row bottom-clearfix">
-                   <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                       <h4>Friday</h4>
-                   </div>
-                   <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
-                       <date-time-picker
-                               recipient="mInfo.FR1"
-                               placeholder="From"
-                               settings='{"format" : "H:i", "datepicker": false}'
-                               min-time="'00:00'" max-time="'23:59'">
-                       </date-time-picker>
-                   </div>
-                   <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
-                       <date-time-picker
-                               recipient="mInfo.FR2"
-                               placeholder="To"
-                               settings='{"format" : "H:i", "datepicker": false }'
-                               min-time="mInfo.FR1" max-time="'23:59'">
-                       </date-time-picker>
-                   </div>
-                   <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
-                       <date-time-picker
-                               recipient="mInfo.FR3"
-                               placeholder="From"
-                               settings='{"format" : "H:i", "datepicker": false}'
-                               min-time="'00:00'" max-time="'23:59'">
-                       </date-time-picker>
-                   </div>
-                   <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
-                       <date-time-picker
-                               recipient="mInfo.FR4"
-                               placeholder="To"
-                               settings='{"format" : "H:i", "datepicker": false }'
-                               min-time="mInfo.FR3" max-time="'23:59'">
-                       </date-time-picker>
-                   </div>
-               </div>
-                         <div class="row">
-                   <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                       <hr/>
-                   </div>
-               </div>
-
-                         <div class="row bottom-clearfix">
-                   <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                       <h4>Saturday</h4>
-                   </div>
-                   <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
-                       <date-time-picker
-                               recipient="mInfo.SA1"
-                               placeholder="From"
-                               settings='{"format" : "H:i", "datepicker": false}'
-                               min-time="'00:00'" max-time="'23:59'">
-                       </date-time-picker>
-                   </div>
-                   <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
-                       <date-time-picker
-                               recipient="mInfo.SA2"
-                               placeholder="To"
-                               settings='{"format" : "H:i", "datepicker": false }'
-                               min-time="mInfo.SA1" max-time="'23:59'">
-                       </date-time-picker>
-                   </div>
-                   <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
-                       <date-time-picker
-                               recipient="mInfo.SA3"
-                               placeholder="From"
-                               settings='{"format" : "H:i", "datepicker": false}'
-                               min-time="'00:00'" max-time="'23:59'">
-                       </date-time-picker>
-                   </div>
-                   <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
-                       <date-time-picker
-                               recipient="mInfo.SA4"
-                               placeholder="To"
-                               settings='{"format" : "H:i", "datepicker": false }'
-                               min-time="mInfo.SA3" max-time="'23:59'">
-                       </date-time-picker>
-                   </div>
-               </div>
-                         <div class="row">
-                   <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                       <hr/>
-                   </div>
-               </div>
-
-                        <div class="row bottom-clearfix">
-                   <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                       <h4>Sun</h4>
-                   </div>
-                   <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
-                       <date-time-picker
-                               recipient="mInfo.SU1"
-                               placeholder="From"
-                               settings='{"format" : "H:i", "datepicker": false}'
-                               min-time="'00:00'" max-time="'23:59'">
-                       </date-time-picker>
-                   </div>
-                   <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
-                       <date-time-picker
-                               recipient="mInfo.SU2"
-                               placeholder="To"
-                               settings='{"format" : "H:i", "datepicker": false }'
-                               min-time="mInfo.SU1" max-time="'23:59'">
-                       </date-time-picker>
-                   </div>
-                   <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
-                       <date-time-picker
-                               recipient="mInfo.SU3"
-                               placeholder="From"
-                               settings='{"format" : "H:i", "datepicker": false}'
-                               min-time="'00:00'" max-time="'23:59'">
-                       </date-time-picker>
-                   </div>
-                   <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
-                       <date-time-picker
-                               recipient="workingHourCtrl.mInfo.SU3"
-                               placeholder="To"
-                               settings='{"format" : "H:i", "datepicker": false }'
-                               min-time="mInfo.SU3" max-time="'23:59'">
-                       </date-time-picker>
-                   </div>
-               </div>
-                        <div class="row">
-                   <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                       <hr/>
-                   </div>
-               </div>
-
-               <div class="row">
-                   <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
-                       <button class="btn btn-sm btn-primary" ng-click="addWorkingHours()"><span class="glyphicon glyphicon-plus"></span> Add</button>
-                   </div>
-                   <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
-                       <button class="btn btn-sm btn-primary" ng-click="cancleAddWorkingHours()"><span class="glyphicon glyphicon-remove"></span> Cancel</button>
-                   </div>
-               </div>
-               </form>
-           </div>
-       </div>
-<!------------- Content region ends here ---------------------->
+<div class="container-fluid">
+<div ng-hide="showAddWorkingHourForm" class="row bottom-clearfix">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <button class="btn btn-primary btn-sm marginL10" ng-click="openAddWorkingHourForm()"><span class="glyphicon glyphicon-plus"></span> Add new working hours</button>
     </div>
+</div>
+
+<div ng-hide="showAddWorkingHourForm">
+    <table class="rwd-table">
+        <tbody>
+        <!--<tr ng-repeat="_item in result">-->
+        <tr>
+            <td>{{result.TemplateName}}</td>
+            <td>
+                <button
+                        data-toggle="tooltip"
+                        title="Delete"
+                        ng-click="deleteWorkingHourTemplate(result.TID)"
+                        class="btn btn-xs btn-danger no-radius">
+                    <span class="glyphicon glyphicon-trash"></span>
+                </button>
+            </td>
+            <!--<td>
+                <p class="text-info pull-right btn-link" ng-click="toggleProfileEditMode()">
+                    <span class="glyphicon glyphicon-edit"></span> Edit
+                </p>
+            </td>
+            <td>
+                <button
+                    data-toggle="tooltip"
+                    title="Delete"
+                    class="btn btn-xs btn-danger no-radius">
+                    <span class="glyphicon glyphicon-trash"></span>
+
+                </button>
+            </td>-->
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<div ng-show="showAddWorkingHourForm">
+<form name="workingHoursForm" novalidate>
+
+<div class="row">
+    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 setTopMarginOneNhalf">
+        <span>Working Hours Template</span>
+    </div>
+    <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8">
+        <input type="text" class="form-control emptyBox" name="templateName" ng-model="mInfo.WorkingHrsTemplate"  placeholder="Template Title" maxlength="100" required>
+        <small ng-show="workingHoursForm.templateName.$touched && !mInfo.WorkingHrsTemplate.length" class="text-danger">Template title can't be empty</small>
+    </div>
+</div>
+
+<div class="row bottom-clearfix">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 setTopMarginOneNhalf">
+        <span>Spill over Time</span>
+    </div>
+    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
+        <input type="number"
+               class="form-control"
+               name="spt"
+               ng-model="mInfo.SpilloverTime"
+               placeholder="time"
+               ng-maxlength="2"
+               ng-max="59"
+               ng-min="1"
+               ng-keypress="numbersOnly($event)"
+               required>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 setTopMarginOneNhalf">
+    </div>
+    <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8">
+        <small class="text-danger" ng-show="workingHoursForm.spt.$invalid">Minutes should be in range of 1 to 59</small>
+    </div>
+</div>
+
+<div class="row bottom-clearfix">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <h4>Monday</h4>
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+        <date-time-picker
+                placeholder="From"
+                recipient="mInfo.MO1"
+                settings='{"format" : "H:i", "datepicker": false}'
+                min-time="'00:00'" max-time="'23:59'">
+        </date-time-picker>
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+        <date-time-picker
+                placeholder="To"
+                recipient="mInfo.MO2"
+                settings='{"format" : "H:i", "datepicker": false}'
+                min-time="mInfo.MO1" max-time="'23:59'">
+        </date-time-picker>
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+        <date-time-picker
+                placeholder="From"
+                recipient="mInfo.MO3"
+                settings='{"format" : "H:i", "datepicker": false}'
+                min-time="'00:00'" max-time="'23:59'">
+        </date-time-picker>
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+        <date-time-picker
+                placeholder="To"
+                recipient="mInfo.MO4"
+                settings='{"format" : "H:i", "datepicker": false }'
+                min-time="mInfo.MO3" max-time="'23:59'">
+        </date-time-picker>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <hr/>
+    </div>
+</div>
+
+<div class="row bottom-clearfix">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <h4>Tuesday</h4>
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+        <date-time-picker
+                placeholder="From"
+                recipient="mInfo.TU1"
+                settings='{"format" : "H:i", "datepicker": false}'
+                min-time="'00:00'" max-time="'23:59'">
+        </date-time-picker>
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+        <date-time-picker
+                recipient="mInfo.TU2"
+                placeholder="To"
+                settings='{"format" : "H:i", "datepicker": false }'
+                min-time="mInfo.TU1" max-time="'23:59'">
+        </date-time-picker>
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+        <date-time-picker
+                recipient="mInfo.TU3"
+                placeholder="From"
+                settings='{"format" : "H:i", "datepicker": false}'
+                min-time="'00:00'" max-time="'23:59'">
+        </date-time-picker>
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+        <date-time-picker
+                recipient="mInfo.TU4"
+                placeholder="To"
+                settings='{"format" : "H:i", "datepicker": false }'
+                min-time="mInfo.TU3" max-time="'23:59'">
+        </date-time-picker>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <hr/>
+    </div>
+</div>
+
+<div class="row bottom-clearfix">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <h4>Wednesday</h4>
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+        <date-time-picker
+                recipient="mInfo.WE1"
+                placeholder="From"
+                settings='{"format" : "H:i", "datepicker": false}'
+                min-time="'00:00'" max-time="'23:59'">
+        </date-time-picker>
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+        <date-time-picker
+                recipient="mInfo.WE2"
+                placeholder="To"
+                settings='{"format" : "H:i", "datepicker": false }'
+                min-time="mInfo.WE1" max-time="'23:59'">
+        </date-time-picker>
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+        <date-time-picker
+                recipient="mInfo.WE3"
+                placeholder="From"
+                settings='{"format" : "H:i", "datepicker": false}'
+                min-time="'00:00'" max-time="'23:59'">
+        </date-time-picker>
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+        <date-time-picker
+                recipient="mInfo.WE4"
+                placeholder="To"
+                settings='{"format" : "H:i", "datepicker": false }'
+                min-time="mInfo.WE3" max-time="'23:59'">
+        </date-time-picker>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <hr/>
+    </div>
+</div>
+
+<div class="row bottom-clearfix">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <h4>Thursday</h4>
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+        <date-time-picker
+                recipient="mInfo.TH1"
+                placeholder="From"
+                settings='{"format" : "H:i", "datepicker": false}'
+                min-time="'00:00'" max-time="'23:59'">
+        </date-time-picker>
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+        <date-time-picker
+                recipient="mInfo.TH2"
+                placeholder="To"
+                settings='{"format" : "H:i", "datepicker": false }'
+                min-time="mInfo.TH1" max-time="'23:59'">
+        </date-time-picker>
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+        <date-time-picker
+                recipient="mInfo.TH3"
+                placeholder="From"
+                settings='{"format" : "H:i", "datepicker": false}'
+                min-time="'00:00'" max-time="'23:59'">
+        </date-time-picker>
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+        <date-time-picker
+                recipient="mInfo.TH4"
+                placeholder="To"
+                settings='{"format" : "H:i", "datepicker": false }'
+                min-time="mInfo.TH3" max-time="'23:59'">
+        </date-time-picker>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <hr/>
+    </div>
+</div>
+
+<div class="row bottom-clearfix">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <h4>Friday</h4>
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+        <date-time-picker
+                recipient="mInfo.FR1"
+                placeholder="From"
+                settings='{"format" : "H:i", "datepicker": false}'
+                min-time="'00:00'" max-time="'23:59'">
+        </date-time-picker>
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+        <date-time-picker
+                recipient="mInfo.FR2"
+                placeholder="To"
+                settings='{"format" : "H:i", "datepicker": false }'
+                min-time="mInfo.FR1" max-time="'23:59'">
+        </date-time-picker>
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+        <date-time-picker
+                recipient="mInfo.FR3"
+                placeholder="From"
+                settings='{"format" : "H:i", "datepicker": false}'
+                min-time="'00:00'" max-time="'23:59'">
+        </date-time-picker>
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+        <date-time-picker
+                recipient="mInfo.FR4"
+                placeholder="To"
+                settings='{"format" : "H:i", "datepicker": false }'
+                min-time="mInfo.FR3" max-time="'23:59'">
+        </date-time-picker>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <hr/>
+    </div>
+</div>
+
+<div class="row bottom-clearfix">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <h4>Saturday</h4>
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+        <date-time-picker
+                recipient="mInfo.SA1"
+                placeholder="From"
+                settings='{"format" : "H:i", "datepicker": false}'
+                min-time="'00:00'" max-time="'23:59'">
+        </date-time-picker>
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+        <date-time-picker
+                recipient="mInfo.SA2"
+                placeholder="To"
+                settings='{"format" : "H:i", "datepicker": false }'
+                min-time="mInfo.SA1" max-time="'23:59'">
+        </date-time-picker>
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+        <date-time-picker
+                recipient="mInfo.SA3"
+                placeholder="From"
+                settings='{"format" : "H:i", "datepicker": false}'
+                min-time="'00:00'" max-time="'23:59'">
+        </date-time-picker>
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+        <date-time-picker
+                recipient="mInfo.SA4"
+                placeholder="To"
+                settings='{"format" : "H:i", "datepicker": false }'
+                min-time="mInfo.SA3" max-time="'23:59'">
+        </date-time-picker>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <hr/>
+    </div>
+</div>
+
+<div class="row bottom-clearfix">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <h4>Sun</h4>
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+        <date-time-picker
+                recipient="mInfo.SU1"
+                placeholder="From"
+                settings='{"format" : "H:i", "datepicker": false}'
+                min-time="'00:00'" max-time="'23:59'">
+        </date-time-picker>
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+        <date-time-picker
+                recipient="mInfo.SU2"
+                placeholder="To"
+                settings='{"format" : "H:i", "datepicker": false }'
+                min-time="mInfo.SU1" max-time="'23:59'">
+        </date-time-picker>
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+        <date-time-picker
+                recipient="mInfo.SU3"
+                placeholder="From"
+                settings='{"format" : "H:i", "datepicker": false}'
+                min-time="'00:00'" max-time="'23:59'">
+        </date-time-picker>
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+        <date-time-picker
+                recipient="mInfo.SU4"
+                placeholder="To"
+                settings='{"format" : "H:i", "datepicker": false }'
+                min-time="mInfo.SU3" max-time="'23:59'">
+        </date-time-picker>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <hr/>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+            <button class="btn btn-sm btn-primary" ng-disabled="!mInfo.WorkingHrsTemplate.length"  ng-click="addWorkingHours()"><span class="glyphicon glyphicon-ok"></span> Save</button>
+        </div>
+        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+            <button class="btn btn-sm btn-primary" ng-click="cancleAddWorkingHours()"><span class="glyphicon glyphicon-remove"></span> Cancel</button>
+        </div>
+    </div>
+</div>
+</form>
+</div>
+</div>
+<!------------- Content region ends here ---------------------->
+</div>
 </div>
