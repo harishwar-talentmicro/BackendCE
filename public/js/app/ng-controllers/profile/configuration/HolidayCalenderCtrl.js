@@ -1,31 +1,38 @@
 
 angular.module('ezeidApp').controller('HolidayCalenderCtrl',['$scope','$rootScope','$http','Notification','$filter','MsgDelay','$interval','GURL',function($scope,$rootScope,$http,Notification,$filter,MsgDelay,$interval,GURL){
 
-   // var workingHours = this;
     $scope.result = [];
     $scope.mInfo = {};
     $scope.saveInfo = {};
     $scope.showAddHolidayForm = false;
-    //getWorkingHours();
+    $scope.showNoDataFound = false;
+    getTemplateList();
 
-    function getHolidayList(TemplateId)
+    /**
+     * To get holiday list of particular template
+     */
+    $scope.getHolidayList = function(TemplateId)
     {
+        $scope.result = [];
         $http({ method: 'get', url: GURL + 'ewtHolidayList',
             params : {
                 Token : $rootScope._userInfo.Token,
-                TemplateID : TemplateId
+                TemplateID : TemplateId,
+                LocID : 0
             }
         }).success(function (data) {
-               if (data != 'null')
+                if (data != 'null')
                 {
+                   $scope.showNoDataFound = false;
                    $scope.result = data;
                 }
                 else
                 {
                    $scope.result = [];
+                   $scope.showNoDataFound = true;
                 }
             });
-    }
+    };
 
     //To get All working hours template
     function getTemplateList()
@@ -44,6 +51,8 @@ angular.module('ezeidApp').controller('HolidayCalenderCtrl',['$scope','$rootScop
     }
 
     $scope.openAddHolidayForm = function(){
+        $scope.mInfo.TemplateID = "";
+        $scope.result = [];
         $scope.showAddHolidayForm = true;
         getTemplateList();
     };
@@ -53,8 +62,6 @@ angular.module('ezeidApp').controller('HolidayCalenderCtrl',['$scope','$rootScop
     };
 
     $scope.addWorkingHours = function(){
-
-        console.log("SAi12211");
         $scope.saveInfo = $scope.mInfo;
         $scope.saveInfo.Token = $rootScope._userInfo.Token;
         $scope.saveInfo.TID = 0;
@@ -67,8 +74,9 @@ angular.module('ezeidApp').controller('HolidayCalenderCtrl',['$scope','$rootScop
 
                 console.log(data);
                 if (data.IsSuccessfull) {
+                    $scope.getHolidayList($scope.mInfo.TemplateID);
                     $scope.mInfo = {}
-                   // getWorkingHours();
+                   //
                     $scope.showAddHolidayForm = false;
                     Notification.success({message: "Saved...", delay: MsgDelay});
                 }
@@ -79,22 +87,17 @@ angular.module('ezeidApp').controller('HolidayCalenderCtrl',['$scope','$rootScop
             });
          };
 
-        $scope.deleteWorkingHourTemplate = function(_TID){
-
-            console.log(_TID);
-
-            $http({ method: 'delete', url: GURL + 'ewtWorkingHours',
+        $scope.deleteHoliday = function(_TID){
+            $http({ method: 'delete', url: GURL + 'ewtHolidayList',
                 params : {
                     Token : $rootScope._userInfo.Token,
                     TID: _TID
                 }
             }).success(function (data) {
-                    console.log(data);
                     if(data.IsSuccessfull)
                     {
-                        getWorkingHours();
+                        $scope.getHolidayList($scope.mInfo.TemplateID);
                     }
                 });
         };
-
 }]);
