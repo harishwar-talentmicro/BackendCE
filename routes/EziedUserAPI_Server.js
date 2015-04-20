@@ -7110,7 +7110,7 @@ exports.FnDeleteWorkingHours = function(req, res){
                             else {
                                 console.log('FnDeleteWorkingHours: error in deleting Working Hours' + err);
                                 res.statusCode = 500;
-                                RtnMessage.Message = deleteResult[0];
+                                RtnMessage.Message = 'Error in deleting';
                                 res.send(RtnMessage);
                             }
                         });
@@ -7154,7 +7154,6 @@ exports.FnGetWorkingHrsHolidayList = function (req, res) {
 
         var Token = req.query.Token;
         var LocID = req.query.LocID;
-        var TemplateID = req.query.TemplateID;
         var RtnMessage = {
             WorkingHours: '',
             HolidayList:'',
@@ -7213,7 +7212,7 @@ exports.FnGetWorkingHrsHolidayList = function (req, res) {
     }
 } ,function FnHolidayList(CallBack) {
     try {
-         var query = db.escape(LocID) + ',' + db.escape(TemplateID);
+         var query = db.escape(LocID) + ',' + db.escape(0);
                 db.query('CALL pGetHolidayList(' + query + ')', function (err, HolidayResult) {
                     console.log('CALL pGetHolidayList(' + query + ')');
                      
@@ -8478,22 +8477,39 @@ exports.FnSendBulkMailer = function (req, res) {
                     if (!err) {
                         if (Result != null) {
                             var pdfDocument = require('pdfkit');
-                            var doc = new pdfDocument();
-                            var bufferData = new Buffer(Attachment.replace(/^data:image\/(png|gif|jpeg|jpg);base64,/, ''), 'base64');
+                            //var doc = new pdfDocument();
+                            var doc = new pdfDocument({
+                                        size: 'A1',
+                                        layout: 'portrait'
+                                    });
+                            
+                            var bufferData = new Buffer(Attachment.replace(/^data:image\/(png|gif|jpeg|jpg);base64,/, ''), 'base64');							
                             var pdfdoc = doc.image(bufferData);
-                            // doc.write("test.pdf");
-                            var fs = require('fs');
-                            var ws = fs.createWriteStream('TempMapLocationFile/ViewDirection.pdf');
+                            //console.log(bufferData);
+							var fs = require('fs');
+                            var ws = fs.createWriteStream('./TempMapLocationFile/ViewDirection.pdf');
                             var stream = doc.pipe(ws);
                             doc.end();
-                            fs.exists('TempMapLocationFile//ViewDirection.pdf', function (exists) {
+                            
+							doc.on('end',function(){
+								stream.end();
+							});
+							
+							stream.on('end',function(){
+								stream.close();
+							});
+							
+							stream.on('close',function(){
+								fs.exists('./TempMapLocationFile/ViewDirection.pdf', function (exists) {
+                                
                                 if (exists) {
-                                    var bufferPdfDoc = fs.readFileSync('TempMapLocationFile//ViewDirection.pdf');
-                                    console.log(bufferPdfDoc);
-                                    // convert binary data to base64 encoded string
+                                    var bufferPdfDoc = fs.readFileSync('./TempMapLocationFile/ViewDirection.pdf');
+									console.log(bufferPdfDoc);
+									// convert binary data to base64 encoded string                                   
                                     var Base64PdfData = new Buffer(bufferPdfDoc).toString('base64');
                                     console.log(Base64PdfData);
-                                    //fs.unlinkSync('TempMapLocationFile/ViewDirection.pdf');
+                                    fs.writeFileSync('base64.txt', Base64PdfData);
+									//fs.unlinkSync('TempMapLocationFile/ViewDirection.pdf');
                                     console.log('successfully deleted TempMapLocationFile/ViewDirection.pdf');
 
                                     //fs.writeFileSync('E:\\shailesh\\test.pdf', pdfdoc);
@@ -8536,6 +8552,8 @@ exports.FnSendBulkMailer = function (req, res) {
                                 }
                             });
 
+							});
+
                             // console.log(mailOptions);
                         }
                         else {
@@ -8576,50 +8594,51 @@ exports.FnSendBulkMailer = function (req, res) {
     }
 };
 
-
 //below method to crop the image
 exports.FnCropImage = function(req, res){
 try{
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-     
-     var Token = req.body.Token;
-     var Image = req.body.Image;
-     var Target_Width = req.body.Width;
-     var Target_Height = req.body.Height;
-     
-      var RtnMessage = {
+    var fs = require('fs');
+    var Token = req.body.Token;
+    var Image = req.body.Image;
+    var Target_Width = req.body.Width;
+    var Target_Height = req.body.Height;
+    
+    var RtnMessage = {
             IsSuccessfull: false,
             Picture: ''
         };
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
      
-        if (Token != null && Image != null && Target_Width != null && Target_Height != null ) {
+        if (Token != null && Target_Width != null && Target_Height != null ) {
         FnValidateToken(Token, function (err, Result) {
             if (!err) {
                 if (Result != null) {
                     var fs = require('fs');
                     var gm = require('gm').subClass({ imageMagick: true });
-                    //var bitmap = Image;
-                    var bitmap = fs.readFileSync(Image);
+                    
+                    var bitmap = fs.readFileSync('../bin/'+req.files.Image.path);
+                    console.log(bitmap);
                     var Original_Width = 0;
                     var Original_Height = 0;
-                    console.log(bitmap);
-                   
+                                       
                     gm(bitmap).size(function (err, size) {
                     if (!err){
                         console.log(size.width > size.height ? 'wider' : 'taller');
                         Original_Width = size.width;
                         Original_Height = size.height;
-
+                        
                         if(Original_Width > Original_Height){
                                 x_width = Target_Width * Original_Height / Target_Height ;
-
+                                  
                                     gm(bitmap).crop(x_width,Original_Height)
-                                        RtnMessage.Picture = new Buffer(bitmap).toString('base64');
+                                    .write("F://output//cropped.jpg")
+                                        RtnMessage.Picture = 'data:image/jpg;base64,' + new Buffer(bitmap).toString('base64');
                                         RtnMessage.IsSuccessfull = true;
                                         console.log('FnCropImage: Image Cropped successfully');                            
                                         res.send(RtnMessage);
+                            
                             }
                             else{
                                 x_height = Original_Width * Target_Height / Target_Width;
@@ -8673,6 +8692,222 @@ try{
                 throw new Error(ex);
         }
 };
+
+exports.FnSaveWebLink = function(req, res){
+    try{
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.body.Token;
+        var URL = req.body.URL;
+        var URLNo = req.body.URLNo;
+            
+        var RtnMessage = {
+            IsSuccessfull: false
+        };
+       
+        if (Token != null && URL != null && URLNo != null) {
+            FnValidateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+
+                        var query = db.escape(Token) + ',' + db.escape(URL) + ',' + db.escape(URLNo) ;
+                        db.query('CALL pSaveWebLinks(' + query + ')', function (err, InsertResult) {
+                            if (!err){
+                                if (InsertResult.affectedRows > 0) {
+                                    RtnMessage.IsSuccessfull = true;
+                                    res.send(RtnMessage);
+                                    console.log('FnSaveWebLink: Web links save successfully');
+                                }
+                                else {
+                                    console.log('FnSaveWebLink:No save Web links');
+                                    res.send(RtnMessage);
+                                }
+                            }
+
+                            else {
+                                console.log('FnSaveWebLink: error in saving Web links' + err);
+                                res.statusCode = 500;
+                                res.send(RtnMessage);
+                            }
+                        });
+                    }
+                    else {
+                        console.log('FnSaveWebLink: Invalid token');
+                        res.statusCode = 401;
+                        res.send(RtnMessage);
+                    }
+                }
+                else {
+                    console.log('FnSaveWebLink:Error in processing Token' + err);
+                    res.statusCode = 500;
+                    res.send(RtnMessage);
+
+                }
+            });
+
+        }
+
+        else {
+            if (Token == null) {
+                console.log('FnSaveWebLink: Token is empty');
+            }
+            else if (URL == null) {
+                console.log('FnSaveWebLink: URL is empty');
+            }
+            else if (URLNo == null) {
+                console.log('FnSaveWebLink: URLNo is empty');
+            }
+            
+            res.statusCode=400;
+            res.send(RtnMessage);
+        }
+
+    }
+    catch (ex) {
+        console.log('FnSaveWebLink:error ' + ex.description);
+        throw new Error(ex);
+    }
+};
+
+exports.FnGetWebLink = function (req, res) {
+    try {
+
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.query.Token;
+                
+        if (Token != null) {
+            FnValidateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+
+                        db.query('CALL pGetWebLink(' + db.escape(Token) + ')', function (err, GetResult) {
+                            if (!err) {
+                                if (GetResult != null) {
+                                    if (GetResult[0].length > 0) {
+                                        console.log('FnGetWebLink: Web Links Send successfully');
+                                        res.send(GetResult[0]);
+                                    }
+                                    else {
+
+                                        console.log('FnGetWebLink:No Web Links found');
+                                        res.send('null');
+                                    }
+                                }
+                                else {
+
+                                    console.log('FnGetWebLink:No Web Links found');
+                                    res.send('null');
+                                }
+
+                            }
+                            else {
+
+                                console.log('FnGetWebLink: error in getting Web Links' + err);
+                                res.statusCode = 500;
+                                res.send('null');
+                            }
+                        });
+                    }
+                    else {
+                        res.statusCode = 401;
+                        res.send('null');
+                        console.log('FnGetWebLink: Invalid Token');
+                    }
+                } else {
+
+                    res.statusCode = 500;
+                    res.send('null');
+                    console.log('FnGetWebLink: Error in validating token:  ' + err);
+                }
+            });
+        }
+        else {
+            if (Token == null) {
+                console.log('FnGetWebLink: Token is empty');
+            }
+            
+            res.statusCode=400;
+            res.send('null');
+        }
+    }
+    catch (ex) {
+        console.log('FnGetResource error:' + ex.description);
+        throw new Error(ex);
+    }
+};
+
+exports.FnDeleteWebLink = function(req, res){
+    try{
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.query.Token;
+        var TID = req.query.TID;
+        var RtnMessage = {
+            IsSuccessfull: false,
+            Message:''
+        };
+        var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
+
+        if (Token !=null && TID != null) {
+            FnValidateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+                        //console.log('CALL pDeleteWorkinghours(' + db.escape(TID) + ')');
+                        db.query('CALL pDeleteWebLink(' + db.escape(TID) + ')', function (err, deleteResult) {
+                            if (!err){
+                                   if (deleteResult.affectedRows > 0) {
+                                    RtnMessage.IsSuccessfull = true;
+                                    RtnMessage.Message = 'Delete Successfully';
+                                    res.send(RtnMessage);
+                                    console.log('FnDeleteWebLink: Web Links delete successfully');
+                                }
+                                else {
+                                    console.log('FnDeleteWebLink:No delete Web Links');
+                                    RtnMessage.Message = 'No Deleted';
+                                    res.send(RtnMessage);
+                                }
+                            }                   
+                            else {
+                                console.log('FnDeleteWebLink: error in deleting Web Links' + err);
+                                res.statusCode = 500;
+                                res.send(RtnMessage);
+                            }
+                        });
+                    }
+                    else {
+                        console.log('FnDeleteWebLink: Invalid token');
+                        res.statusCode = 401;
+                        res.send(RtnMessage);
+                    }
+                }
+                else {
+                    console.log('FnDeleteWebLink:Error in processing Token' + err);
+                    res.statusCode = 500;
+                    res.send(RtnMessage);
+                }
+            });
+        }
+        else {
+            if (Token == null) {
+                console.log('FnDeleteWebLink: Token is empty');
+            }
+            else if (TID == null) {
+                console.log('FnDeleteWebLink: TID is empty');
+            }
+            res.statusCode=400;
+            res.send(RtnMessage);
+        }
+    }
+    catch (ex) {
+        console.log('FnDeleteWebLink:error ' + ex.description);
+        throw new Error(ex);
+    }
+}
+
 
 
 //EZEIDAP Parts
