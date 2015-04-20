@@ -211,7 +211,8 @@
 
 .apple{
     background: url('../images/logo-app_store.png');
-    height: 50px;
+    /*height: 50px;*/
+    height: 48px;
     display: block;
     width: 100px;
     background-size: contain;
@@ -221,7 +222,8 @@
 
 .google-play{
     background: url('../images/icon-google-play.png');
-    height: 50px;
+    /*height: 50px;*/
+    height: 48px;
     display: block;
     width: 100px;
     background-size: contain;

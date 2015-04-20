@@ -93,7 +93,7 @@ angular.module('ezeidApp').controller('viewDirectionController',['$http', '$root
 
             var printContents = document.getElementById("googlemapimage").innerHTML;
             var popupWin = window.open('', '_blank', 'width=300,height=300');
-            popupWin.document.open()
+            popupWin.document.open();
             popupWin.document.write('<html><head><link rel="stylesheet" type="text/css" href="style.css" /></head><body onload="window.print()">' + printContents + '</html>');
             popupWin.document.close();
     };
@@ -114,9 +114,10 @@ angular.module('ezeidApp').controller('viewDirectionController',['$http', '$root
             if (data != 'null')
             {
                 viewDirection._info.FromEmailID = "";
-                document.getElementById("FromEmailID").className = "form-control emptyBox";
+               // document.getElementById("FromEmailID").className = "form-control emptyBox";
                 Notification.success({message: "Mail are submitted for transmitted..", delay: MsgDelay});
                 $window.localStorage.removeItem("searchResult");
+                $scope.showEmailForm = false;
             }
             else
             {
