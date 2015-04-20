@@ -83,6 +83,7 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$htt
         subuser : {
             ezeid : "",
             userName : "",
+            masterEzeid : "",
             TID : 0,
             accessRights : {
                 sales: 0,
@@ -127,7 +128,9 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$htt
         else{
             $scope.resetModalData();
         }
+        console.log($scope.showModal);
         $scope.showModal = !$scope.showModal;
+        console.log($scope.showModal);
     };
 
 
@@ -145,6 +148,7 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$htt
             subuser : {
                 ezeid : "",
                 userName : "",
+                masterEzeid : "",
                 TID : 0,
                 accessRights : {
                     sales: 0,
@@ -177,8 +181,6 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$htt
      * @returns {boolean}
      */
     $scope.findRuleForSubuser = function(ruleId,functionType){
-        console.log(ruleId);
-        console.log(functionType);
         var ruleMapping = ['sales','reservation','homeDelivery','service','resume'];
         var fType = parseInt(functionType);
 
@@ -305,14 +307,14 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$htt
      * Add and update subuser to server
      */
     $scope.saveSubUser = function(){
-        console.log($scope.modalBox.subuser.rules.sales);
+        console.log($scope.modalBox.subuser);
         var data = {
             Token : $rootScope._userInfo.Token,
 
             PersonalID : $scope.modalBox.subuser.ezeid,
 
             TID : $scope.modalBox.subuser.TID,
-            UserName  : ($rootScope._userInfo.MasterID) ? $scope.masterUser.EZEID+'.'+$scope.modalBox.subuser.userName : $scope.masterUser.EZEID,
+            UserName  : ($rootScope.PersonalID !== $scope.modalBox.subuser.userName) ? ($scope.masterUser.EZEID+'.'+$scope.modalBox.subuser.userName) : $scope.masterUser.EZEID,
             Status : $scope.modalBox.subuser.status,
             FirstName : $scope.modalBox.subuser.firstName,
             LastName : $scope.modalBox.subuser.lastName,
@@ -414,22 +416,23 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$htt
                 MasterID : $scope.masterUser.MasterID
             }
         }).success(function(resp){
-            if(resp && resp.length > 0)
+            if(resp && resp.length > 0 && resp !== 'null')
             {
-                console.log(resp);
                 for(var i = 0; i < resp.length ; i++){
                     var subuser = {
-                        userName : (resp[i].EZEID.split(".").pop()),
+                        userName : (resp[i].EZEID) ?
+                           ((resp[i].EZEID.split(".").length > 1) ? (resp[i].EZEID.split(".").pop()) : '') : '',
                         TID : resp[i].TID,
-                        ezeid : resp[i].PersonalEZEID,
+                        masterEzeid : (resp[i].EZEID) ? resp[i].EZEID.split(".")[0] : '',
+                        ezeid : (resp[i].PersonalEZEID) ? resp[i].PersonalEZEID : resp[i].EZEID,
                         firstName : resp[i].FirstName,
                         lastName : resp[i].LastName,
                         accessRights : {
-                            'sales' : (resp[i].UserModuleRights.split(''))[0],
-                            'reservation' : (resp[i].UserModuleRights.split(''))[1],
-                            'homeDelivery' : (resp[i].UserModuleRights.split(''))[2],
-                            'service' : (resp[i].UserModuleRights.split(''))[3],
-                            'resume' : (resp[i].UserModuleRights.split(''))[4]
+                            'sales' : (resp[i].UserModuleRights) ? (resp[i].UserModuleRights.split(''))[0] : 0,
+                            'reservation' : (resp[i].UserModuleRights)  ? (resp[i].UserModuleRights.split(''))[1] : 0,
+                            'homeDelivery' : (resp[i].UserModuleRights) ? (resp[i].UserModuleRights.split(''))[2] : 0,
+                            'service' : (resp[i].UserModuleRights) ? (resp[i].UserModuleRights.split(''))[3] : 0,
+                            'resume' : (resp[i].UserModuleRights) ? (resp[i].UserModuleRights.split(''))[4] : 0
                         },
                         rules : {
                             sales : (resp[i].SalesIDs.length > 0) ? resp[i].SalesIDs.split(',') : [],

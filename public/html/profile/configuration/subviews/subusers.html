@@ -25,7 +25,7 @@
         <tbody>
         <tr ng-repeat="user in subusers">
             <td>{{$index+1}}.</td>
-            <td><a class="btn-link" data-index="{{$index}}" ng-click="toggleModalBox($event)">{{user.userName}}</a></td>
+            <td><a class="btn-link" data-index="{{$index}}" ng-click="toggleModalBox($event)">{{(user.userName) ? user.masterEzeid+'.'+user.userName : user.masterEzeid}}</a></td>
             <td>{{user.ezeid | uppercase}}</td>
             <td>
                 <a tabindex="0" data-trigger="focus" role="button" class="btn btn-default link-popover" data-container="body" data-toggle="popover" data-placement="right"
@@ -70,7 +70,7 @@
 
     <!------------- Content region ends here ---------------------->
     <!------------ Modal Box starts here -------------------------->
-    <modal mtitle="modalBox.title" visible="showWorkingHourModel">
+    <modal mtitle="modalBox.title" visible="showModal">
     <div class="container-fluid">
     <form role="form">
     <div class="row">
