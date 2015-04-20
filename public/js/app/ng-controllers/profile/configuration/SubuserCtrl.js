@@ -307,14 +307,14 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$htt
      * Add and update subuser to server
      */
     $scope.saveSubUser = function(){
-        console.log($scope.modalBox.subuser.rules.sales);
+        console.log($scope.modalBox.subuser);
         var data = {
             Token : $rootScope._userInfo.Token,
 
             PersonalID : $scope.modalBox.subuser.ezeid,
 
             TID : $scope.modalBox.subuser.TID,
-            UserName  : ($rootScope.PersonalID !== $scope.modalBox.subuser.UserName) ? ($scope.masterUser.EZEID+'.'+$scope.modalBox.subuser.userName) : $scope.masterUser.EZEID,
+            UserName  : ($rootScope.PersonalID !== $scope.modalBox.subuser.userName) ? ($scope.masterUser.EZEID+'.'+$scope.modalBox.subuser.userName) : $scope.masterUser.EZEID,
             Status : $scope.modalBox.subuser.status,
             FirstName : $scope.modalBox.subuser.firstName,
             LastName : $scope.modalBox.subuser.lastName,
