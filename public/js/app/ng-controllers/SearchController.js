@@ -349,6 +349,7 @@ angular.module('ezeidApp').controller('SearchController', [
         else
         {
             $scope.Address = $scope.Address;
+
         }
 
     }

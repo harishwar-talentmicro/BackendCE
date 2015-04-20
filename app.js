@@ -158,6 +158,9 @@ app.get('/ewtTemplateDetails',LocationManager.FnGetTemplateDetails);
 app.post('/ewtSendBulkMailer',LocationManager.FnSendBulkMailer);
 app.post('/ewtCropImage',LocationManager.FnCropImage);
 app.get('/ewtGetWorkingHrsHolidayList',LocationManager.FnGetWorkingHrsHolidayList);
+app.post('/ewtWebLink',LocationManager.FnSaveWebLink);
+app.get('/ewtWebLink',LocationManager.FnGetWebLink);
+app.delete('/ewtwebLink',LocationManager.FnDeleteWebLink);
 
 //below service are for EZEIDAP
 app.post('/ewLoginAP', LocationManager.FnLoginAP);
