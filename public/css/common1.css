@@ -253,8 +253,8 @@ hr {
 .searchProximityText
 {
     padding-right: 0px;
-    padding-left: 5px;
     margin-top: 2%;
+    padding-left: 5%;
 }
 .ratingText
 {
@@ -294,7 +294,7 @@ body {
 .addressTextContainer
 {
     margin-top: 0%;
-    height: 30px;
+   /* height: 30px;*/
    /* background: #FFFFFF;*/
 }
 .headerVerified
@@ -789,4 +789,36 @@ body {
 {
     max-height: 350px;
     overflow-y : auto;
+}
+.chatArea
+{
+    height: 630px;
+}
+.bannerHeaderTopMargin
+{
+    margin-top: 60px;
+}
+.WraperBottomPadding
+{
+    padding-bottom: 0px;
+}
+.BewareTextMainContainer
+{
+    height: 215px;
+    background: #ff0000;
+    text-align: center;
+    color: #ffffff;
+}
+.bewareTextSize
+{
+    padding-top: 8%;
+    font-size: 18px;
+}
+.bewareTextMessage
+{
+    font-size: 17px;
+}
+.setInfoEzeId
+{
+    padding-right: 12%;
 }
