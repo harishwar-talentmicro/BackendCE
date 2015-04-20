@@ -1247,17 +1247,18 @@ span.smallCloselink {
     border-radius: 0px;
 }
 
-.business-item .glyphicon-edit{
+.business-item .glyphicon-edit, .picture-attach.glyphicon-paperclip{
     text-align: right;
     position: absolute;
-    color: #FFFFFF;
-    background: url(../images/btn_bg.png) repeat;
+    color: #252525;
     padding: 5px;
-    border-radius: 5px;
+    border-radius: 0px;
     font-size: 14px;
     margin: 5px 10px 0px 0px;
     right: 0;
     cursor: pointer;
+    background: #EEE;
+    border: 1px solid #9B9B9B;
 }
 
 .salesItemImage
