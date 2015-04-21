@@ -533,7 +533,7 @@ angular.module('ezeidApp').
                                 var encrypted = CryptoJS.AES.encrypt(JSON.stringify(sResp), "EZEID");
                                 localStorage.setItem("_token", encrypted);
                                 Notification.success({ message : 'Your EZEID - '+$scope.ezeid + ' have been generated successfully ! Please fill up you details to proceed', delay : MsgDelay});
-                                $location.path('/editprofile');
+                                $location.path('/profile-manager/user');
                             } else {
                                 Notification.error({ message : 'Browser not supported ! Upgrade your browser', delay : MsgDelay});
                                 $location.path('/');
