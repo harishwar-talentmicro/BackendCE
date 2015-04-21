@@ -63,10 +63,30 @@ angular.module('ezeidApp').filter('textLength',function(){
 /**
  * Controller : ItemMasterCtrl
  */
-angular.module('ezeidApp').controller('ItemMasterCtrl',['$q','$scope','$interval','$http','Notification','$rootScope','$filter','GURL',function($q,$scope,$interval,$http,Notification,$rootScope,$filter,GURL){
+angular.module('ezeidApp').controller('ItemMasterCtrl',[
+    '$q',
+    '$scope',
+    '$interval',
+    '$http',
+    'Notification',
+    '$rootScope',
+    '$filter',
+    'GURL',
+    'ScaleAndCropImage',
+    function(
+        $q,
+        $scope,
+        $interval,
+        $http,
+        Notification,
+        $rootScope,
+        $filter,
+        GURL,
+        ScaleAndCropImage
+        ){
     //Initially First Tab is selected
     $scope.selectedTab = 1;
-    $scope.defaultPicture = 'images/sample_96.png';
+//    $scope.defaultPicture = 'images/sample_96.png';
 
     /**
      * Settings to be fetched from Global Configuration
@@ -127,7 +147,7 @@ angular.module('ezeidApp').controller('ItemMasterCtrl',['$q','$scope','$interval
             rate : 0,
             status : 1,
             description : "",
-            picture : $scope.defaultPicture,
+            picture : "",
             type : 0,    // Type of Item(Function Type) Sales,Reservation,Home Delivery, Service, Resume
             duration : null
         }
@@ -223,32 +243,32 @@ angular.module('ezeidApp').controller('ItemMasterCtrl',['$q','$scope','$interval
                     rate : "",
                     status : 1,
                     description : "",
-                    picture : $scope.defaultPicture,
+                    picture : "",
                     type : 0,    // Type of Item(Function Type) Sales,Reservation,Home Delivery, Service, Resume
                     duration : null
             }
         }
     };
 
-    /**
-     * Convert picture to base64 and scales it, after scale assign it to picture
-     * @param el
-     */
-    $scope.uploadPicture = function(el){
-        var elem = $(el);
-        var imageFile = angular.element(elem)[0].files;
-        $scope.fileToBase64(imageFile).then(function(data){
-            $scope.scaleImage(data,96).then(function(image){
-                $scope.modalBox.item.picture = image;
-            },function(){
-                //Error Handling for Promise
-                Notification.error({ message: "An error occured", delay: MsgDelay });
-            });
-        },function(){
-            //Error Handling for Promise
-            Notification.error({ message: "An error occured", delay: MsgDelay });
-        });
-    };
+//    /**
+//     * Convert picture to base64 and scales it, after scale assign it to picture
+//     * @param el
+//     */
+//    $scope.uploadPicture = function(el){
+//        var elem = $(el);
+//        var imageFile = angular.element(elem)[0].files;
+//        $scope.fileToBase64(imageFile).then(function(data){
+//            $scope.scaleImage(data,96).then(function(image){
+//                $scope.modalBox.item.picture = image;
+//            },function(){
+//                //Error Handling for Promise
+//                Notification.error({ message: "An error occured", delay: MsgDelay });
+//            });
+//        },function(){
+//            //Error Handling for Promise
+//            Notification.error({ message: "An error occured", delay: MsgDelay });
+//        });
+//    };
 
     $scope.selectPicture = function(){
         console.log($rootScope._userInfo);
@@ -353,32 +373,35 @@ angular.module('ezeidApp').controller('ItemMasterCtrl',['$q','$scope','$interval
             params : {
                 Token : $rootScope._userInfo.Token,
                 FunctionType : fType,
-                MasterID : $scope._userInfo.MasterID
+                MasterID : ($scope._userInfo.MasterID) ? $scope._userInfo.MasterID : $scope.masterUser.MasterID
             }
         }).success(function(resp){
                 var functionTypes = ['sales','reservation','homeDelivery','service','resume'];
-                if(resp && resp.length > 0){
-                    /**
-                     * If functionType is set in function, it will be called once only
-                     */
-                    if(typeof(functionType) !== "undefined"){
+
+                /**
+                 * If functionType is set in function, it will be called once only
+                 */
+
+                if(typeof(functionType) !== "undefined"){
+                    if(resp && resp.length > 0 && resp !== 'null'){
                         $scope.items[functionTypes[fType]] = resp;
-                        console.log('Executed once');
-                    }
-                    /**
-                     * It will try to load all items and will increase the counter( loading all types of items initially)
-                     */
-                    else{
-                        console.log('executed multiple '+fType);
-                        $scope.items[functionTypes[fType]] = resp;
-                        $scope.count += 1;
-                        if($scope.count < 5){
-                            console.log('Item load for '+ fType);
-                            $scope.loadItems();
-                        }
                     }
                 }
 
+                /**
+                 * It will try to load all items and will increase the counter( loading all types of items initially)
+                 */
+                else{
+                    if(resp && resp.length > 0 && resp.length !== 'null'){
+                        $scope.items[functionTypes[fType]] = resp;
+                    }
+
+                    $scope.count += 1;
+                    if($scope.count < 5){
+                        console.log('Item load for '+ fType);
+                        $scope.loadItems();
+                    }
+                }
         }).error(function(err){
                 console.log(err);
         });
@@ -390,21 +413,20 @@ angular.module('ezeidApp').controller('ItemMasterCtrl',['$q','$scope','$interval
      */
     $scope.loadGlobalConfig = function(){
         $http({
-            url : GURL + 'ewtGetConfig',
+            url : GURL + 'ewtConfig',
             method : "GET",
             params : {
                 Token : $rootScope._userInfo.Token
             }
         }).success(function(resp){
-                if(resp && resp.length > 0){
+                if(resp && resp.length > 0 && resp !== 'null'){
                     $scope.globalConfig.itemListType = [];
-                    $scope.globalConfig.itemListType[0] = (resp[0].SalesItemListType !== null) ? resp[0].SalesItemListType : 0;
+                    $scope.globalConfig.itemListType[0] = (resp[0].SalesItemListType) ? resp[0].SalesItemListType : 0;
                     $scope.globalConfig.itemListType[1] = (resp[0].ReservationDisplayFormat) ? resp[0].ReservationDisplayFormat : 0;
                     $scope.globalConfig.itemListType[2] = (resp[0].ReservationDisplayFormat) ? resp[0].HomeDeliveryItemListType : 0;
                     $scope.globalConfig.itemListType[3] = 1;
                     $scope.globalConfig.itemListType[4] = 1;
                 }
-                console.log(resp);
             }).error(function(err){
                 console.log(err);
             });
@@ -434,5 +456,20 @@ angular.module('ezeidApp').controller('ItemMasterCtrl',['$q','$scope','$interval
 
     $scope.loadGlobalConfig();
     $scope.getMasterUserDetails();
+
+    $scope.selectItemImage = function(){
+        $("#modal-box-item-image").trigger('click');
+    };
+
+    $scope.uploadItemImage = function(){
+        var image = $("#modal-box-item-image")[0].files[0];
+        var fileName = image.name;
+
+        ScaleAndCropImage.covertToBase64(image).then(function(imageUrl){
+            var scaledImageUrl = ScaleAndCropImage.scalePropotional(imageUrl,128,128);
+            $scope.modalBox.item.picture = ScaleAndCropImage.cropImage(scaledImageUrl,128,128);
+        });
+    };
+
 
 }]);

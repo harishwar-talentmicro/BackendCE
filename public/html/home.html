@@ -1,4 +1,5 @@
-<div id="" ng-controller="HomeController as Home" class="WraperBottomPadding">
+<!--<div id="" ng-controller="HomeController as Home" class="WraperBottomPadding">-->
+<div id="wrapper" ng-controller="HomeController as Home">
     <header-section></header-section>
     <div ng-controller="SearchController as search">
 
@@ -265,10 +266,60 @@
 
                                        <div ng-hide="(search.mInfo.Redflagstatus == 1)">
                                             <div ng-show="search.mInfo.BannerImage">
-                                                <img width="100%" height="215px" ng-src="{{search.mInfo.BannerImage}}">
+                                               <!-- <img width="100%" height="215px" ng-src="{{search.mInfo.BannerImage}}">-->
+                                               <section id="carousel">
+                                                    <div id="carousel-handstrips" class="carousel slide" data-ride="carousel">
+                                                        <!-- Indicators -->
+                                                        <ol class="carousel-indicators search-carousel">
+                                                            <!--<li data-target="#carousel-handstrips" data-slide-to="0" class="active"></li>
+                                                            <li data-target="#carousel-handstrips" data-slide-to="1"></li>
+                                                            <li data-target="#carousel-handstrips" data-slide-to="2"></li>
+                                                            <li data-target="#carousel-handstrips" data-slide-to="3"></li>-->
+                                                            <li data-target="#carousel-handstrips"  ng-repeat="_item in allBanners" data-slide-to="{{$index}}" ng-class="{{($index == 1)  ? 'active'    : ''}}"></li>
+                                                        </ol>
+
+                                                        <!-- Wrapper for slides -->
+                                                        <div class="carousel-inner" role="listbox">
+                                                            <!-- <div class="item active">
+                                                                 <img src="../images/sample1350_246.png" alt="Speed with Accuracy">
+
+                                                             </div>
+                                                             <div class="item">
+                                                                 <img src="../images/sample1350_246.png" alt="Rapid Development">
+
+                                                             </div>
+                                                             <div class="item">
+                                                                 <img src="../images/sample1350_246.png" alt="Simple Interface and Easy to plug">
+
+                                                             </div>
+
+                                                             <div class="item">
+                                                                 <img src="../images/sample1350_246.png" alt="Efficient Algorithm">
+
+                                                             </div>-->
+
+                                                            <div ng-repeat="_item in allBanners track by $index" ng-class="{{($index == 1) ? 'item active' : ''}}">
+                                                                <img ng-src="{{_item.Picture}}" alt="Efficient Algorithm">
+
+                                                            </div>
+                                                        </div>
+
+                                                        <!-- Controls -->
+                                                        <a class="left carousel-control" href="#carousel-handstrips" role="button" data-slide="prev">
+                                                            <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+                                                            <span class="sr-only">Previous</span>
+                                                        </a>
+                                                        <a class="right carousel-control" href="#carousel-handstrips" role="button" data-slide="next">
+                                                            <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+                                                            <span class="sr-only">Next</span>
+                                                        </a>
+                                                    </div>
+                                                </section>
                                             </div>
                                             <div ng-hide="search.mInfo.BannerImage">
-                                                <img width="100%" height="215px" src="../images/sample1350_246.png">
+
+                                               <img width="100%" height="215px" src="../images/sample1350_246.png">
+
                                             </div>
                                         </div>
 
@@ -289,15 +340,24 @@
                                                         <div class="row setRowLeftRightMarginZero ">
                                                             <div class="topSearchRow bottom-clearfix ezeid-nav-tab setBottomMargin0">
                                                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                                                    <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12 text-center setLeftRightPaddingZero">
-                                                                        <ul class="nav nav-pills">
+                                                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-center setLeftRightPaddingZero">
+                                                                        <ul class="nav nav-pills hidden-xs">
                                                                             <li role="presentation" ng-class="search.showInfoWindow || search.showResultWindow ? 'active' : ''"><a class="setBottomMargin0" ng-click="showSearchTab()">Search</a></li>
                                                                             <li ng-show="search.showResultTab" ng-class="search.showInfoWindow || search.showSearchWindow ? 'active' : ''"><a class="setBottomMargin0" ng-click="showResultWindow()">Result</a></li>
                                                                             <li ng-show="ShowLinks" ng-class="search.showResultWindow || search.showSearchWindow ? 'active' : ''"><a class="setBottomMargin0" ng-click="showInfoWindowTab()">Information</a></li>
+                                                                            <li class="pull-right" ng-class="search.showResultWindow || search.showSearchWindow ? 'active' : ''">
+                                                                                <a class="setBottomMargin0 btn-link" ng-click="openHelpPopup()" style="text-align: right;" id="SearchHelp">Help</a>
+                                                                            </li>
                                                                         </ul>
-                                                                    </div>
-                                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 pull-right helpTextColor searchStrepTextMarin showPointer" ng-click="openHelpPopup()" style="text-align: right;" id="SearchHelp">
-                                                                        Help ?
+
+                                                                        <ul class="nav nav-pills nav-stacked hidden-lg hidden-md hidden-sm">
+                                                                            <li role="presentation" ng-class="search.showInfoWindow || search.showResultWindow ? 'active' : ''"><a class="setBottomMargin0" ng-click="showSearchTab()">Search</a></li>
+                                                                            <li ng-show="search.showResultTab" ng-class="search.showInfoWindow || search.showSearchWindow ? 'active' : ''"><a class="setBottomMargin0" ng-click="showResultWindow()">Result</a></li>
+                                                                            <li ng-show="ShowLinks" ng-class="search.showResultWindow || search.showSearchWindow ? 'active' : ''"><a class="setBottomMargin0" ng-click="showInfoWindowTab()">Information</a></li>
+                                                                            <li class="pull-right hidden-xs" ng-class="search.showResultWindow || search.showSearchWindow ? 'active' : ''">
+                                                                                <a class="setBottomMargin0 btn-link" ng-click="openHelpPopup()" style="text-align: right;" id="SearchHelp1">Help</a>
+                                                                            </li>
+                                                                        </ul>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -508,6 +568,7 @@
                                                                 <table class="rwd-table setFontFourty setLineHeight">
                                                                     <tbody>
                                                                     <tr ng-repeat="_item in search.searchResult">
+                                                                        <td ><input type="checkbox" data-tid="{{_item.TID}}" name="companyID" ng-click="toggleCheckbox($event)"></td>
                                                                         <td data-th="Company Name" style="color: #0866A6;" class="showPointer resultTableCellBorder">
                                                                             <span ng-click="getSearchInfo(_item)">{{_item.CompanyName | truncate:26}}</span>
                                                                         </td>

@@ -49,10 +49,10 @@ footer {
 footer p {
     text-align: center;
     color: #004C66;
-    /*padding-top: 25px;*/
+    padding-top: 25px;
     line-height: 18px;
     margin: 0px;
-    padding-top: 13px;
+   /* padding-top: 13px;*/
 }
 
 .font-open-sans-light{
