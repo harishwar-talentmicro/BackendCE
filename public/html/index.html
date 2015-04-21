@@ -123,9 +123,11 @@
     <script src="js/app/label.js"></script>
     <script>
         // Lazy Loading fonts from Google Font API
+        window.setTimeout(function(){
             $("<link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'/>").appendTo("head");
             $("<link href='https://fonts.googleapis.com/css?family=Open+Sans:300,400' rel='stylesheet' type='text/css'>").appendTo("head");
             $("<style>  *{ font-family: 'Roboto', sans-serif; }</style>").appendTo("head");
+        },10000);
     </script>
 
 </body>

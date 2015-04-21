@@ -45,8 +45,11 @@ angular.module('ezeidApp').controller('bulksalesController',['$http', '$rootScop
     }
 
     $scope.selectedTID = JSON.parse($window.localStorage.getItem("selectedTids"));
+    if($scope.selectedTID == null)
+    {
+        $scope.selectedTID = [];
+    }
     $scope.searchResult = JSON.parse($window.localStorage.getItem("searchResult"));
-
     salesEnquiry.result = $scope.searchResult;
     $scope.searchResult == null ? $scope.showListing = false : $scope.showListing = true;
 

@@ -2037,6 +2037,10 @@ form .row-error{
     background: #C7E1FF;
 }
 
+.profile-manager .nav-pills.nav-stacked.nav-configuration > li.disabled > a,
+.profile-manager .nav-pills.nav-justified.nav-configuration > li.disabled > a{
+    color:#BBBBBB;
+}
 
 .profile-manager .nav-pills.nav-stacked.nav-configuration > li.active > a,
 .profile-manager .nav-pills.nav-justified.nav-configuration > li.active > a{
