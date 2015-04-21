@@ -49,7 +49,7 @@ angular.module('ezeidApp').controller('WebLinksCtrl',[
             TID : 0,
             CreatedDate : '',
             MasterID : '',
-            URLNo : null,
+            URLNo : 0,
             URL : ''
         };
 
@@ -132,38 +132,21 @@ angular.module('ezeidApp').controller('WebLinksCtrl',[
         });
 
 
-        /**
-         * Reloads web links data
-         */
-        $scope.reload  = function(){
-            $scope.dataProgressLoader.dataLoadInProgress = true;
-            $scope.dataProgressLoader.dataLoadError = false;
-            $scope.dataProgressLoader.dataLoadComplete = false;
 
-            isUserDetailsLoaded = false;
-            isWebLinksLoaded = false;
 
-            $scope.loadUserDetails();
-
-            $scope.loadWebLinks().then(function(){
-                isWebLinksLoaded = true;
-                if(isUserDetailsLoaded && isWebLinksLoaded){
-                    $scope.dataProgressLoader.dataLoadInProgress = false;
-                    $scope.dataProgressLoader.dataLoadError = false;
-                    $scope.dataProgressLoader.dataLoadComplete = true;
-                }
-            });
-
-        };
-
-        $scope.addWebLinkMode = function(){
+        $scope.saveWebLink = function(){
+            $scope.addWebLink.URLNo = ($scope.webLinks.length) ? $scope.webLinks.length + 1 : 1;
             $http({
                 url : GURL + 'ewtWebLink',
                 method : 'POST',
-                data : $scope.addWebLink
+                data : {
+                    Token : $rootScope._userInfo.Token,
+                    URL : $scope.addWebLink.URL,
+                    URLNo : $scope.addWebLink.URLNo
+                }
             }).success(function(resp){
                 if(resp && resp !== 'null' && resp.hasOwnProperty('IsSuccessfull')){
-                    if(resp.IsSuccessful){
+                    if(resp.IsSuccessfull){
                         Notification.success({ message : 'Web link added successfully', delay : MsgDelay});
                     }
                     else{
@@ -173,11 +156,68 @@ angular.module('ezeidApp').controller('WebLinksCtrl',[
                 else{
                     Notification.error({ message : 'An error occurred !', delay : MsgDelay});
                 }
+
+                $scope.resetWebLink();
+                $scope.webLinkAddMode = false;
+
+                    /**
+                     * Refreshing list of weblinks after addition
+                     */
+                $scope.loadWebLinks().then(function(){
+                    isWebLinksLoaded = true;
+                    if(isUserDetailsLoaded && isWebLinksLoaded){
+                        $scope.dataProgressLoader.dataLoadInProgress = false;
+                        $scope.dataProgressLoader.dataLoadError = false;
+                        $scope.dataProgressLoader.dataLoadComplete = true;
+                    }
+                });
             }).error(function(err){
                 Notification.error({ message : 'An error occurred !', delay : MsgDelay});
+
+                    /**
+                     * Refreshing list of weblinks
+                     */
+                $scope.loadWebLinks().then(function(){
+                    isWebLinksLoaded = true;
+                    if(isUserDetailsLoaded && isWebLinksLoaded){
+                        $scope.dataProgressLoader.dataLoadInProgress = false;
+                        $scope.dataProgressLoader.dataLoadError = false;
+                        $scope.dataProgressLoader.dataLoadComplete = true;
+                    }
+                });
             });
+
+
         };
 
+
+        $scope.deleteWebLink = function(index){
+            $http({
+                url : GURL + 'ewtWebLink',
+                method : 'DELETE',
+                params: {
+                    Token : $rootScope._userInfo.Token,
+                    TID : $scope.webLinks[index].TID
+                }
+            }).success(function(resp){
+                if(resp && resp !== 'null' && resp.hasOwnProperty('IsSuccessfull')){
+                    if(resp.IsSuccessfull){
+                        Notification.success({ message : 'Weblink is deleted successfully', delay : MsgDelay});
+
+                        $scope.loadWebLinks();
+
+                    }
+                    else{
+                        Notification.error({ message : 'An error occurred while deleting web link', delay : MsgDelay});
+                    }
+                }
+                else{
+                    Notification.error({ message : 'An error occurred while deleting web link', delay : MsgDelay});
+                }
+            }).error(function(err){
+                Notification.error({ message : 'An error occurred while deleting web link', delay : MsgDelay});
+            });
+        };
 
         /**
          * Validates URL pattern

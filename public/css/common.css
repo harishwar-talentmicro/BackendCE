@@ -2045,8 +2045,11 @@ form .row-error{
 }
 
 .profile-manager .weblink.row{
-    margin-left: 0px;
-    margin-right: 0px;
+    background: #ffffff;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    box-shadow: 0px 0px 4px #CACACA;
+    padding: 5px;
 }
 
 .form-weblink > .row{
