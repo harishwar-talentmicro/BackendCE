@@ -557,13 +557,10 @@ angular.module('ezeidApp').controller('SearchController', [
                    {
                        SearchSec.showResultTab = true;
                        SearchSec.searchResult = data;
-                     //  console.log(SearchSec.searchResult);
                    }
 
                    if(($rootScope._userInfo.IsAuthenticate == true || data[0].IDTypeID > 1) && data[0].Latitude != undefined )
                    {
-
-
                       try{
                            PlaceMarker(data);
                        }
@@ -667,11 +664,14 @@ angular.module('ezeidApp').controller('SearchController', [
 
                                         //Call for banner
                                         AutoRefresh = true;
-                                      //  getBanner(1);
-                                        getAllBanners();
+                                        //  getBanner(1);
+                                        if (SearchSec.Criteria.SearchType == 1)
+                                        {
+                                            getAllBanners();
+                                            console.log(SearchSec.mInfo);
+                                        }
 
                                         $scope.form_rating = data[0].Rating;
-
                                         SearchSec.mInfo.Banners = data[0].Banners;
 
                                         if(SearchSec.mInfo.IDTypeID == 2)
@@ -788,7 +788,7 @@ angular.module('ezeidApp').controller('SearchController', [
     };
 
     //Auto refresh Banner
-    $interval(function() {
+  /*  $interval(function() {
 
         if(AutoRefresh == true && SearchSec.IsSearchButtonClicked && SearchSec.mInfo.EZEID && $scope.showInfoTab && SearchSec.mInfo.Banners != 1)
         {
@@ -804,13 +804,13 @@ angular.module('ezeidApp').controller('SearchController', [
                 getBanner(currentBanner);
             }
         }
-    },RefreshTime);
+    },RefreshTime);*/
 
     //False when navigate to other page
-    $scope.$on('$locationChangeStart', function( event ) {
+   /* $scope.$on('$locationChangeStart', function( event ) {
         AutoRefresh = false;
     });
-
+*/
     //call for previous banner
      SearchSec.getPreviousBanner = function () {
          currentBanner = currentBanner - 1;
@@ -838,8 +838,7 @@ angular.module('ezeidApp').controller('SearchController', [
 
                   if (data.Picture != 'null') {
                       SearchSec.mInfo.BannerImage = data.Picture;
-                     $scope.allBanners.push(data);
-                     console.log(data.Picture);
+                      $scope.allBanners.push(data);
                   }
                   else
                   {
@@ -854,28 +853,27 @@ angular.module('ezeidApp').controller('SearchController', [
         {
             $http({ method: 'get', url: GURL + 'ewtGetBannerPicture?Token=' + $rootScope._userInfo.Token +'&SeqNo='+_requestedBannerValue+'&Ezeid='+SearchSec.mInfo.EZEID+'&StateTitle='+ SearchSec.mInfo.StateTitle+'&LocID='+SearchSec.mInfo.LocID}).success(function (data) {
 
-
                 if (data.Picture != 'null') {
-                    SearchSec.mInfo.BannerImage = data.Picture;
+                     SearchSec.mInfo.BannerImage = data.Picture;
                      if(currentBanner >= SearchSec.mInfo.Banners)
                      {
-                     //Disable next button
-                     SearchSec.nextButton = false;
+                         //Disable next button
+                         SearchSec.nextButton = false;
                      }
                      else
                      {
-                     //Enable next button
-                     SearchSec.nextButton = true;
+                         //Enable next button
+                         SearchSec.nextButton = true;
                      }
 
                      if(currentBanner <= 1)
                      {
-                     //Disabled previous button
-                     SearchSec.previousButton = false;
+                         //Disabled previous button
+                         SearchSec.previousButton = false;
                      }
                      else
                      {   //Enable previous burron
-                     SearchSec.previousButton = true;
+                         SearchSec.previousButton = true;
                      }
                 }
                 else
@@ -1343,10 +1341,8 @@ angular.module('ezeidApp').controller('SearchController', [
             $scope.showWorkingHourModel = true;
             $http({ method: 'get', url: GURL + 'ewtGetWorkingHrsHolidayList?Token=' + $rootScope._userInfo.Token + '&LocID=' + SearchSec.mInfo.LocID }).success(function (data)
             {
-              //  console.log(data);
                 if (data != 'null')
                 {
-
                     if(data.WorkingHours != "")
                     {
                         $scope.Mo1 = data.WorkingHours[0].MO1;
@@ -1389,7 +1385,6 @@ angular.module('ezeidApp').controller('SearchController', [
                     {
                         SearchSec.holiday = data.HolidayList;
                     }
-
                 }
                 else
                 {
@@ -1413,9 +1408,9 @@ angular.module('ezeidApp').controller('SearchController', [
         SearchSec.showResultWindow = false;
 
         $scope.ShowLinks = true;
-      //  console.log(_item);
         getSearchInformation(_item);
     };
+
     function getSearchInformation(_item)
     {
         var currentDate = moment().format('YYYY-MM-DD hh:mm');
@@ -1450,7 +1445,8 @@ angular.module('ezeidApp').controller('SearchController', [
                     //Call for banner
                     SearchSec.IsSearchButtonClicked = true;
                     AutoRefresh = true;
-                    getBanner(1);
+                   // getBanner(1);
+                    getAllBanners();
                 });
             }
             else {
@@ -1469,7 +1465,6 @@ angular.module('ezeidApp').controller('SearchController', [
                 var index = $scope.selectedList.indexOf(val);
                 $scope.selectedList.splice(index,1);
            }
-            console.log($scope.selectedList);
             $window.localStorage.setItem("selectedTids", JSON.stringify($scope.selectedList));
         };
 }]);
