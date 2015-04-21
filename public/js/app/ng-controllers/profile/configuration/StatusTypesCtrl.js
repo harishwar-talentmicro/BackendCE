@@ -107,10 +107,7 @@ angular.module('ezeidApp').controller('StatusTypesCtrl',['$scope','$rootScope','
         }).success(function(resp){
                 if(resp.length>0){
                     $scope.masterUser = resp[0];
-                    //$scope.loadAllStatuses();
-                    /**
-                     * @todo Load all TxStatus
-                     */
+                    $scope.loadTxStatusTypes();
                 }
             }).error(function(err){
                 Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
@@ -142,6 +139,7 @@ angular.module('ezeidApp').controller('StatusTypesCtrl',['$scope','$rootScope','
             var data = {
                 Token : $rootScope._userInfo.Token,
                 TID : $scope.modalBox.txStatus.TID,
+                Title : $scope.modalBox.txStatus.title,
                 MasterID : $scope.masterUser.MasterID,
                 FunctionType : $scope.modalBox.txStatus.type,
                 Progress : $scope.modalBox.txStatus.progress,
@@ -151,21 +149,75 @@ angular.module('ezeidApp').controller('StatusTypesCtrl',['$scope','$rootScope','
                 StatusValue : $scope.modalBox.txStatus.statusValue
             };
 
-            console.log(data);
-
             $http({
                 url : GURL + 'ewmSaveStatusType',
                 data : data,
                 method : 'POST'
             }).success(function(resp){
-                console.log(resp);
+                if(resp && resp !== 'null' && resp.hasOwnProperty('IsSuccessfull')){
+                    if(resp.IsSuccessfull){
+                        Notification.success({ message : 'Status added successfully', delay : MsgDelay});
+                    }
+                    else{
+                        Notification.error({ message : 'An error occured while adding status', delay : MsgDelay});
+                    }
+                }
+                else{
+                    Notification.error({ message : 'An error occured while adding status', delay : MsgDelay});
+                }
             }).error(function(err){
-                console.log(err);
+                    Notification.error({ message : 'An error occured while adding status', delay : MsgDelay});
             });
         }
         else{
             return;
         }
     };
+
+
+    $scope.loadTxStatusTypes = function(functionType){
+
+        var fType = (typeof(functionType) !== "undefined") ? functionType : $scope.functionTypeCount;
+        $http({
+            url : GURL + 'ewtGetStatusType',
+            method : "GET",
+            params : {
+                Token : $rootScope._userInfo.Token,
+                FunctionType : fType,
+                MasterID : ($scope._userInfo.MasterID) ? $scope._userInfo.MasterID : $scope.masterUser.MasterID
+            }
+        }).success(function(resp){
+                var functionTypes = ['sales','reservation','homeDelivery','service','resume'];
+
+                /**
+                 * If functionType is set in function, it will be called once only
+                 */
+
+                if(typeof(functionType) !== "undefined"){
+                    if(resp && resp.length > 0 && resp !== 'null'){
+                        $scope.txStatuses[functionTypes[fType]] = resp;
+                    }
+                }
+
+                /**
+                 * It will try to load all items and will increase the counter( loading all types of items initially)
+                 */
+                else{
+                    if(resp && resp.length > 0 && resp.length !== 'null'){
+                        $scope.txStatuses[functionTypes[fType]] = resp;
+                    }
+
+                    $scope.count += 1;
+                    if($scope.count < 5){
+                        $scope.loadItems();
+                    }
+                }
+            }).error(function(err){
+                console.log(err);
+            });
+    };
+
+
+    $scope.getMasterUserDetails();
 
 }]);

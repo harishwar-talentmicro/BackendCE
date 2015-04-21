@@ -37,7 +37,7 @@
                             </div>
                         </div>
                         <div class="row">
-                            <content-item ng-repeat="item in txStatuses.sales" content="item" index="$index" toggle-modal-box="toggleModalBox(type,itemIndex)" template-type="/status-types-tpl.html"></content-item>
+                            <content-item ng-repeat="item in txStatuses.sales track by $index" content="item" index="$index" toggle-modal-box="toggleModalBox(type,itemIndex)" template-type="'/status-types-tpl.html'"></content-item>
                         </div>
                     </div>
                 </div>
@@ -53,7 +53,7 @@
                             </div>
                         </div>
                         <div class="row">
-                            <content-item ng-repeat="item in txStatuses.reservation" content="item" index="$index" toggle-modal-box="toggleModalBox(type,itemIndex)" template-type="{{globalConfig.itemListType[1]}}"></content-item>
+                            <content-item ng-repeat="item in txStatuses.reservation track by $index" content="item" index="$index" toggle-modal-box="toggleModalBox(type,itemIndex)" template-type="/status-types-tpl.html}"></content-item>
                         </div>
                     </div>
                 </div>
@@ -68,7 +68,7 @@
                             </div>
                         </div>
                         <div class="row">
-                            <content-item ng-repeat="item in txStatuses.homeDelivery" content="item" index="$index" toggle-modal-box="toggleModalBox(type,itemIndex)" template-type="{{globalConfig.itemListType[2]}}"></content-item>
+                            <content-item ng-repeat="item in txStatuses.homeDelivery track by $index" content="item" index="$index" toggle-modal-box="toggleModalBox(type,itemIndex)" template-type="/status-types-tpl.html"></content-item>
                         </div>
                     </div>
                 </div>
@@ -83,7 +83,7 @@
                             </div>
                         </div>
                         <div class="row">
-                            <content-item ng-repeat="item in txStatuses.service" content="item" index="$index" toggle-modal-box="toggleModalBox(type,itemIndex)" template-type="{{globalConfig.itemListType[3]}}"></content-item>
+                            <content-item ng-repeat="item in txStatuses.service track by $index" content="item" index="$index" toggle-modal-box="toggleModalBox(type,itemIndex)" template-type="/status-types-tpl.html"></content-item>
                         </div>
                     </div>
                 </div>
@@ -98,7 +98,7 @@
                             </div>
                         </div>
                         <div class="row">
-                            <content-item ng-repeat="item in txStatuses.resume" content="item" index="$index" toggle-modal-box="toggleModalBox(type,itemIndex)" template-type="{{globalConfig.itemListType[4]}}"></content-item>
+                            <content-item ng-repeat="item in txStatuses.resume track by $index" content="item" index="$index" toggle-modal-box="toggleModalBox(type,itemIndex)" template-type="/status-types-tpl.html"></content-item>
                         </div>
                     </div>
                 </div>
@@ -124,14 +124,14 @@
                     <div class="row">
                         <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
                             <div class="form-group">
-                                <input class="form-control" placeholder="Item Title" ng-model="modalBox.txStatus.title" id="item-title"/>
+                                <input class="form-control" placeholder="Status Title" ng-model="modalBox.txStatus.title" id="item-title"/>
                             </div>
                         </div>
 
 
                         <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
                             <div class="form-group">
-                                <select class="form-control" placeholder="Item Status" ng-model="modalBox.txStatus.status" id="item-status">
+                                <select class="form-control" placeholder="Status" ng-model="modalBox.txStatus.status" id="item-status">
                                     <option value="2">Active</option>
                                     <option value="1">Inactive</option>
                                 </select>
@@ -149,7 +149,7 @@
 
                         <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
                             <div class="form-group">
-                                <select class="form-control" ng-model="modalBox.txStatus.statusValue">
+                                <select class="form-control" ng-model="modalBox.txStatus.statusValue" data-toggle="tooltip" title="Status Value(Completion Index)">
                                     <option ng-repeat="i in getNumber(statusValueLimit) track by $index" value="{{$index+1}}">{{$index+1}}</option>
                                 </select>
                             </div>

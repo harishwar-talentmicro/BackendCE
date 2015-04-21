@@ -1582,8 +1582,95 @@
 </script>
 
 <script type="text/ng-template" id="/tpl/weblinks-template.html">
-    <section>
-        This is section
+    <section ng-controller="WebLinksCtrl">
+        <div class="panel panel-success">
+            <div class="panel-heading">
+                WebLinks
+                <p ng-hide="webLinkAddMode" class="text-info pull-right btn-link" ng-click="webLinkAddMode = !webLinkAddMode">
+                   <span class="glyphicon glyphicon-plus"></span> Add
+                </p>
+
+            </div>
+            <div class="panel-body profile-panel-body">
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <form name="webLinkForm" class="form-weblink">
+                            <div class="row bottom-clearfix row-weblink-add" ng-show="webLinkAddMode">
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <div class="row bottom-clearfix">
+                                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 bottom-clearfix">
+                                            <h5 class="text-primary text-left">URL Sequence</h5>
+                                        </div>
+                                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 bottom-clearfix">
+                                            <h5 class="text-primary text-left font-open-sans data">U{{(webLinks.length + 1)}}</h5>
+                                        </div>
+                                    </div>
+
+                                    <div class="row bottom-clearfix">
+                                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 bottom-clearfix">
+                                            <h5 class="text-primary text-left">URL</h5>
+                                        </div>
+                                        <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12 bottom-clearfix">
+                                            <div class="form-group">
+                                                <input type="url" class="form-control"
+                                                       name="url"
+                                                       maxlength="1000"
+                                                       ng-pattern="/^(?:(?:https?|ftp):\/\/)(?:\S+(?::\S*)?@)?(?:(?!10(?:\.\d{1,3}){3})(?!127(?:\.\d{1,3}){3})(?!169\.254(?:\.\d{1,3}){2})(?!192\.168(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:\/[^\s]*)?$/i"
+                                                       ng-model="addWebLink.URL"
+                                                       placeholder="http://www.example.com" />
+                                                <small class="text-danger" ng-hide="webLinkForm.url.$invalid">&nbsp;</small>
+                                                <small class="text-danger" ng-show="webLinkForm.url.$invalid">URL is Invalid</small>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row bottom-clearfix">
+                                        <div class="col-lg-2 col-md-2 col-sm-3 col-xs-6">
+                                            <button class="btn btn-primary btn-block btn-sm"
+                                                    ng-click="saveWebLink()"
+                                                    ng-disabled="webLinkForm.url.$invalid || (!addWebLink.URL)">Save
+                                            </button>
+                                        </div>
+                                        <div class="col-lg-2 col-md-2 col-sm-3 col-xs-6">
+                                            <button class="btn btn-primary btn-block btn-sm" ng-click="resetWebLink() (webLinkAddMode = !webLinkAddMode)">Close</button>
+                                        </div>
+                                    </div>
+
+
+                                </div>
+
+                            </div>
+
+                            <div class="row bottom-clearfix" ng-show="webLinks.length > 0">
+                               <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                   <div class="row bottom-clearfix weblink" ng-repeat="link in webLinks track by link.TID">
+                                       <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1">
+                                          U{{$index + 1}}
+                                       </div>
+                                       <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10">
+
+                                               <a ng-href="{{link.URL}}" target="_blank">{{link.URL}}</a>
+
+                                       </div>
+                                       <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1 text-right">
+                                           <button class="btn btn-xs btn-danger no-radius"
+                                                   ng-click="deleteWebLink($index)"
+                                                   ng-show="($index+1) === webLinks.length">
+                                               <span class="glyphicon glyphicon-trash"></span>
+                                           </button>
+                                       </div>
+                                   </div>
+                               </div>
+                            </div>
+
+                        </form>
+                    </div>
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-center top-clearfix-padding-half bottom-clearfix" ng-hide="webLinks.length > 0">
+                        <small>No weblinks added </small>
+                    </div>
+                </div>
+            </div>
+        </div>
     </section>
 </script>
 
@@ -1607,7 +1694,7 @@
                             <span ng-show="userDetails.IDTypeID == 2 && userDetails.SelectionType == 2">(Business Paid Listing)</span>
                             <span ng-show="userDetails.IDTypeID == 2 && userDetails.SelectionType !== 2">(Business Free Listing)</span>
                             <span ng-show="userDetails.IDTypeID == 3">(Public Place)</span>
-                            <label ng-show="profileEditMode" class="label label-danger pull-right label-mandatory">* Mandatory</label>
+                            <label class="label label-danger pull-right label-mandatory">* Mandatory</label>
                         </h4>
                     </div>
                     <div class="panel-body profile-manager">
@@ -1622,20 +1709,23 @@
 
 
                                         <li role="presentation" ng-show="(userDetails.SelectionType === 2 && userDetails.IDTypeID === 2)"
-                                            ng-class="{'active' : (activeTemplate === '/tpl/weblinks-template.html')}"
+                                            ng-class="{'active' : (activeTemplate === 'html/profile/configuration/configuration.html')}"
                                             class="bottom-clearfix">
                                             <a href="/profile-manager/configuration"><span class="glyphicon glyphicon-cog"></span> Configuration</a>
                                         </li>
 
 
+                                        <!--- Disabled in case of business user free listing ----------->
                                         <li role="presentation" ng-show="(userDetails.SelectionType !== 2 && userDetails.IDTypeID === 2)" class="bottom-clearfix disabled">
-                                            <a href="/profile-manager/configuration"><span class="glyphicon glyphicon-cog"></span> Configuration</a>
+                                            <a><span class="glyphicon glyphicon-cog"></span> Configuration</a>
                                         </li>
 
 
                                         <li role="presentation" class=" bottom-clearfix"
+                                            ng-show="(userDetails.SelectionType === 2 && userDetails.IDTypeID === 2)"
                                             ng-class="{'active' :(activeTemplate === '/tpl/weblinks-template.html')}">
-                                            <a href="/profile-manager/weblinks"><span class="glyphicon glyphicon-link"></span> Short URLs</a></li>
+                                            <a href="/profile-manager/weblinks"><span class="glyphicon glyphicon-link"></span> Web Links</a>
+                                        </li>
 
                                         <li role="presentation" class=" bottom-clearfix"
                                             ng-class="{'active' : (activeTemplate === '/tpl/password-template.html')}">

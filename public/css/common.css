@@ -1804,6 +1804,10 @@ input[type="text"].ui-grid-filter-input {
     padding-top:80px;
 }
 
+.top-clearfix-padding-half{
+    padding-top:40px;
+}
+
 .label-mandatory{
     background: #FAA9A3;
     color: #9E0000;
@@ -2033,9 +2037,40 @@ form .row-error{
     background: #C7E1FF;
 }
 
+.profile-manager .nav-pills.nav-stacked.nav-configuration > li.disabled > a,
+.profile-manager .nav-pills.nav-justified.nav-configuration > li.disabled > a{
+    color:#BBBBBB;
+}
 
 .profile-manager .nav-pills.nav-stacked.nav-configuration > li.active > a,
 .profile-manager .nav-pills.nav-justified.nav-configuration > li.active > a{
     background: #60BFD5;
     color: #FFF;
+}
+
+.profile-manager .weblink.row{
+    background: #ffffff;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    box-shadow: 0px 0px 4px #CACACA;
+    padding: 5px;
+}
+
+.form-weblink > .row{
+    margin-left: 0px;
+    margin-right: 0px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    background: #F0F0F0;
+    border: 1px solid #949494;
+}
+
+.form-weblink > .row > div > div.row{
+    margin-left:0px;
+    margin-right:0px;
+}
+
+.form-weblink > .row.row-weblink-add{
+    background: #B8FFAD;
+    border: 1px solid #2ED52A;
 }

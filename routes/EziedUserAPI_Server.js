@@ -8507,12 +8507,11 @@ exports.FnSendBulkMailer = function (req, res) {
 									console.log(bufferPdfDoc);
 									// convert binary data to base64 encoded string                                   
                                     var Base64PdfData = new Buffer(bufferPdfDoc).toString('base64');
-                                    console.log(Base64PdfData);
+                                    //console.log(Base64PdfData);
                                     fs.writeFileSync('base64.txt', Base64PdfData);
-									//fs.unlinkSync('TempMapLocationFile/ViewDirection.pdf');
+									fs.unlinkSync('TempMapLocationFile/ViewDirection.pdf');
                                     console.log('successfully deleted TempMapLocationFile/ViewDirection.pdf');
 
-                                    //fs.writeFileSync('E:\\shailesh\\test.pdf', pdfdoc);
                                     var mailOptions = {
                                         To: ToMailID,
                                         subject: 'test subject',
@@ -8703,30 +8702,34 @@ exports.FnSaveWebLink = function(req, res){
         var URLNo = req.body.URLNo;
             
         var RtnMessage = {
-            IsSuccessfull: false
+            IsSuccessfull: false,
+            Message:''
         };
        
         if (Token != null && URL != null && URLNo != null) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
-
+                        
                         var query = db.escape(Token) + ',' + db.escape(URL) + ',' + db.escape(URLNo) ;
                         db.query('CALL pSaveWebLinks(' + query + ')', function (err, InsertResult) {
                             if (!err){
                                 if (InsertResult.affectedRows > 0) {
-                                    RtnMessage.IsSuccessfull = true;
+                                    RtnMessage.IsSuccessfull = true;                                                                
+                                    RtnMessage.Message ='Save Successfully';
                                     res.send(RtnMessage);
                                     console.log('FnSaveWebLink: Web links save successfully');
                                 }
                                 else {
                                     console.log('FnSaveWebLink:No save Web links');
+                                    RtnMessage.Message ='URLNo is already exists';
                                     res.send(RtnMessage);
                                 }
                             }
 
                             else {
                                 console.log('FnSaveWebLink: error in saving Web links' + err);
+                                RtnMessage.Message ='Error in saving' ;
                                 res.statusCode = 500;
                                 res.send(RtnMessage);
                             }
