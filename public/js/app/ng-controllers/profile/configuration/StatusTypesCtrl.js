@@ -3,6 +3,8 @@
  * RuleFilter can be used for Filtering Status too, as both contain FunctionType(Sales,Reservation,HomeDelivery..) Property
  */
 angular.module('ezeidApp').controller('StatusTypesCtrl',['$scope','$rootScope','$http','Notification','$filter','MsgDelay','GURL',function($scope,$rootScope,$http,Notification,$filter,MsgDelay,GURL){
+    var functionTypes = ['sales','reservation','homeDelivery','service','resume'];
+
     //Initially First Tab is selected
     $scope.selectedTab = 1;
     /**
@@ -44,30 +46,47 @@ angular.module('ezeidApp').controller('StatusTypesCtrl',['$scope','$rootScope','
         'Resume'
     ];
 
+    $scope.modalBox = {
+        title : "Add new Status Type",
+        txStatus : {
+            TID : 0,
+            type : 0,           // Function Type
+            title : "",
+            progress : 0,       // Progress % for this title
+            status : 1,         // 1 : Active
+            notificationMsg : "",   // Notification Message
+            notificationMailMsg : "",   // Notification Mail Message
+            statusValue : 0
+        }
+    };
+
     /**
      *     Open Modal box for user
      */
     $scope.showModal = false;
-    $scope.toggleModalBox = function(event){
-        if(event){
-            var element = event.currentTarget;
-            var userIndex = $(element).data('index');
-            $scope.modalBox.subuser = $scope.subusers[userIndex];
-            $scope.modalBox.title = "Update Status Type";
-            $scope.modalBox.txStatus = {
-                TID : 0,
-                type : 0,           // Function Type
-                title : "",
-                progress : 0,       // Progress % for this title
-                status : 1,         // 1 : Active
-                notificationMsg : "",   // Notification Message
-                notificationMailMsg : "",   // Notification Mail Message
-                statusValue : 0
-            }
+    $scope.toggleModalBox = function(type,index){
 
+        if(typeof(index) !== "undefined" && typeof(type) !== "undefined"){
+            console.log(index+'   '+type);
+            $scope.modalBox.txStatus = angular.copy($scope.txStatuses[functionTypes[type]][index]);
+            $scope.modalBox.title = "Update Status Type";
         }
         else{
+
             $scope.resetModalData();
+            $scope.modalBox = {
+                title : "Add new Status Type",
+                txStatus : {
+                    TID : 0,
+                    type : type,           // Function Type
+                    title : "",
+                    progress : 0,       // Progress % for this title
+                    status : 1,         // 1 : Active
+                    notificationMsg : "",   // Notification Message
+                    notificationMailMsg : "",   // Notification Mail Message
+                    statusValue : 0
+                }
+            };
         }
         $scope.showModal = !$scope.showModal;
     };
@@ -139,10 +158,10 @@ angular.module('ezeidApp').controller('StatusTypesCtrl',['$scope','$rootScope','
             var data = {
                 Token : $rootScope._userInfo.Token,
                 TID : $scope.modalBox.txStatus.TID,
-                Title : $scope.modalBox.txStatus.title,
+                StatusTitle : $scope.modalBox.txStatus.title,
                 MasterID : $scope.masterUser.MasterID,
                 FunctionType : $scope.modalBox.txStatus.type,
-                Progress : $scope.modalBox.txStatus.progress,
+                ProgressPercent : $scope.modalBox.txStatus.progress,
                 Status : $scope.modalBox.txStatus.status,
                 NotificationMsg : $scope.modalBox.txStatus.notificationMsg,
                 NotificationMailMsg: $scope.modalBox.txStatus.notificationMailMsg,
@@ -157,6 +176,25 @@ angular.module('ezeidApp').controller('StatusTypesCtrl',['$scope','$rootScope','
                 if(resp && resp !== 'null' && resp.hasOwnProperty('IsSuccessfull')){
                     if(resp.IsSuccessfull){
                         Notification.success({ message : 'Status added successfully', delay : MsgDelay});
+                        if($scope.modalBox.txStatus.TID)
+                        {
+                            var salesArr = $scope.txStatuses[functionTypes[$scope.modalBox.txStatus.type]];
+                            var index  = salesArr.indexOfWhere('TID',$scope.modalBox.txStatus.TID);
+                            for(var prop in salesArr[index]){
+                                if(salesArr[index].hasOwnProperty(prop)){
+                                    console.log(prop);
+                                    $scope.txStatuses[functionTypes[$scope.modalBox.txStatus.type]][index][prop] = $scope.modalBox.txStatus[prop];
+                                }
+                            }
+
+                        }
+                        else{
+                            var txStatus = angular.copy($scope.modalBox.txStatus);
+                            $scope.txStatuses[functionTypes[$scope.modalBox.txStatus.type]].push(txStatus);
+                        }
+
+                        $scope.resetModalData();
+                        $scope.toggleModalBox();
                     }
                     else{
                         Notification.error({ message : 'An error occured while adding status', delay : MsgDelay});
@@ -187,7 +225,7 @@ angular.module('ezeidApp').controller('StatusTypesCtrl',['$scope','$rootScope','
                 MasterID : ($scope._userInfo.MasterID) ? $scope._userInfo.MasterID : $scope.masterUser.MasterID
             }
         }).success(function(resp){
-                var functionTypes = ['sales','reservation','homeDelivery','service','resume'];
+
 
                 /**
                  * If functionType is set in function, it will be called once only
@@ -195,7 +233,22 @@ angular.module('ezeidApp').controller('StatusTypesCtrl',['$scope','$rootScope','
 
                 if(typeof(functionType) !== "undefined"){
                     if(resp && resp.length > 0 && resp !== 'null'){
-                        $scope.txStatuses[functionTypes[fType]] = resp;
+                        for(var i = 0 ; i < resp.length ; i++){
+                            var txStatus = {
+                                TID : resp[i].TID,
+                                type : fType,           // Function Type
+                                title : resp[i].StatusTitle,
+                                progress : (resp[i].ProgressPercent) ? resp[i].ProgressPercent : 0,       // Progress % for this title
+                                status : resp[i].Status,         // 1 : Active
+                                notificationMsg : resp[i].NotificationMsg,   // Notification Message
+                                notificationMailMsg : resp[i].NotificationMailMsg,   // Notification Mail Message
+                                statusValue : (resp[i].StatusValue) ? resp[i].StatusValue : 0
+                            }
+                            $scope.txStatuses[functionTypes[fType]].push(txStatus);
+
+                        }
+
+                        console.log($scope.txStatuses);
                     }
                 }
 
@@ -204,7 +257,20 @@ angular.module('ezeidApp').controller('StatusTypesCtrl',['$scope','$rootScope','
                  */
                 else{
                     if(resp && resp.length > 0 && resp.length !== 'null'){
-                        $scope.txStatuses[functionTypes[fType]] = resp;
+                        for(var i = 0 ; i < resp.length ; i++){
+                            var txStatus = {
+                                TID : resp[i].TID,
+                                type : fType,           // Function Type
+                                title : resp[i].StatusTitle,
+                                progress : (resp[i].ProgressPercent) ? resp[i].ProgressPercent : 0,       // Progress % for this title
+                                status : resp[i].Status,         // 1 : Active
+                                notificationMsg : resp[i].NotificationMsg,   // Notification Message
+                                notificationMailMsg : resp[i].NotificationMailMsg,   // Notification Mail Message
+                                statusValue : (resp[i].StatusValue) ? resp[i].StatusValue : 0
+                            }
+                            $scope.txStatuses[functionTypes[fType]].push(txStatus);
+                        }
+                        console.log($scope.txStatuses);
                     }
 
                     $scope.count += 1;
