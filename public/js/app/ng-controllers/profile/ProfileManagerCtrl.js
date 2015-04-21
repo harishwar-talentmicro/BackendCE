@@ -123,7 +123,6 @@ angular.module('ezeidApp').controller('ProfileManagerCtrl',[
 
         $scope.loadUserDetails();
 
-        console.log($routeParams);
         if(!$routeParams['subview']){
             $location.path('/profile-manager/user');
         }
