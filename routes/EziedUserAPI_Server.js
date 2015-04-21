@@ -8350,6 +8350,7 @@ exports.FnSendBulkMailer = function (req, res) {
         var Attachment = req.body.Attachment;
         var AttachmentFileName = req.body.AttachmentFileName;
         var ToMailID = req.body.ToMailID;
+        var OutputFileName='';
         if (TID == '')
             TID = null;
 
@@ -8476,6 +8477,15 @@ exports.FnSendBulkMailer = function (req, res) {
                 FnValidateToken(Token, function (err, Result) {
                     if (!err) {
                         if (Result != null) {
+                            var query = 'select EZEID from tmaster where Token='+db.escape(Token);
+                            db.query(query, function (err, Result) {
+                            if (!err) {
+                            if (Result.length > 0) {
+                                OutputFileName = Result[0].EZEID;
+                                console.log(OutputFileName+'.pdf');
+                            }
+                            }
+                          
                             var pdfDocument = require('pdfkit');
                             //var doc = new pdfDocument();
                             var doc = new pdfDocument({
@@ -8487,7 +8497,7 @@ exports.FnSendBulkMailer = function (req, res) {
                             var pdfdoc = doc.image(bufferData);
                             //console.log(bufferData);
 							var fs = require('fs');
-                            var ws = fs.createWriteStream('./TempMapLocationFile/ViewDirection.pdf');
+                            var ws = fs.createWriteStream('./TempMapLocationFile/'+OutputFileName+'.pdf');
                             var stream = doc.pipe(ws);
                             doc.end();
                             
@@ -8500,24 +8510,24 @@ exports.FnSendBulkMailer = function (req, res) {
 							});
 							
 							stream.on('close',function(){
-								fs.exists('./TempMapLocationFile/ViewDirection.pdf', function (exists) {
+								fs.exists('./TempMapLocationFile/'+OutputFileName+'.pdf', function (exists) {
                                 
                                 if (exists) {
-                                    var bufferPdfDoc = fs.readFileSync('./TempMapLocationFile/ViewDirection.pdf');
+                                    var bufferPdfDoc = fs.readFileSync('./TempMapLocationFile/'+OutputFileName+'.pdf');
 									console.log(bufferPdfDoc);
 									// convert binary data to base64 encoded string                                   
                                     var Base64PdfData = new Buffer(bufferPdfDoc).toString('base64');
                                     //console.log(Base64PdfData);
-                                    fs.writeFileSync('base64.txt', Base64PdfData);
-									fs.unlinkSync('TempMapLocationFile/ViewDirection.pdf');
-                                    console.log('successfully deleted TempMapLocationFile/ViewDirection.pdf');
+                                    //fs.writeFileSync('base64.txt', Base64PdfData);
+									fs.unlinkSync('TempMapLocationFile/'+OutputFileName+'.pdf');
+                                    console.log('successfully deleted TempMapLocationFile/'+OutputFileName+'.pdf');
 
                                     var mailOptions = {
                                         To: ToMailID,
                                         subject: 'test subject',
                                         html: 'test body', // html body
                                         Attachment: Base64PdfData,
-                                        AttachmentFileName: 'ViewDirection.pdf'
+                                        AttachmentFileName: OutputFileName+'.pdf'
                                     };
 
                                     var post = {
@@ -8552,7 +8562,7 @@ exports.FnSendBulkMailer = function (req, res) {
                             });
 
 							});
-
+                        });
                             // console.log(mailOptions);
                         }
                         else {
