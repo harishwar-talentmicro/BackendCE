@@ -212,9 +212,7 @@ angular.module('ezeidApp').controller('ItemMasterCtrl',[
         }
         if(typeof(itemIndex)!== "undefined"){
                var functionTypes = ['sales','reservation','homeDelivery','service','resume'];
-//               var type = $(elem).data('functionType');
-//               var itemIndex = $(elem).data('itemIndex');
-               console.log($scope.items[functionTypes[type]][itemIndex]);
+
                $scope.modalBox.item = {
                     TID : $scope.items[functionTypes[type]][itemIndex].TID,
                     title : $scope.items[functionTypes[type]][itemIndex].ItemName,
@@ -332,8 +330,6 @@ angular.module('ezeidApp').controller('ItemMasterCtrl',[
                method : "POST",
                data : data
            }).success(function(resp){
-                   console.log(resp);
-
                    if(resp && resp.hasOwnProperty("IsSuccessfull")){
                        if(resp.IsSuccessfull){
                            $scope.loadItems($scope.modalBox.item.type);
