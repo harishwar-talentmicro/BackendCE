@@ -932,3 +932,18 @@ body {
 
 .imgA1 { position:absolute; top: 25px; left: 25px; z-index: 1; }
 .imgB1 { position:absolute; top: 16%; left: 25px; z-index: 3; }
+
+.imgRight {
+    position: absolute;
+    top: 16%;
+    /* left: 48px; */
+    z-index: 3;
+    right: 35px;
+}
+.imgLeft {
+    position: absolute;
+    top: 16%;
+    left: 35px;
+    z-index: 3;
+}
+
