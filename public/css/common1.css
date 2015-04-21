@@ -212,6 +212,7 @@ hr {
 .topSearchRow
 {
     background: #86d7ea;
+    /*background: #ffffff;*/
     height: 36px;
 }
 .searchInfoLink
@@ -824,3 +825,110 @@ body {
 .search-carousel.carousel-indicators {
     bottom: 0px;
 }
+.setWidthHundred
+{
+    width: 100%;
+}
+.tableHeaderBackground
+{
+    background:#2791BA;
+    color:#000000;
+}
+.holidayDateCol
+{
+    width: 25%;
+    text-align: left;
+}
+.holidayCalender
+{
+    width: 75%;
+    text-align: left;
+}
+
+.topSearchRow .profile-manager  .nav {
+    padding: 0px;
+}
+.topSearchRow .nav > li > a
+{
+    margin-bottom: 0px;
+    padding-bottom: 8px;
+}
+
+/************** Profile Manager Navigation ********************/
+
+.topSearchRow .nav > li > a,
+.ezeid-nav-tab > div  > ul > li > a{
+    border-radius: 0px;
+    /*background: #D9ECFF;
+      color:#0DA3D8;
+    */
+    background: #60D560;
+    color:#FFF;
+    margin-bottom: 10px;
+}
+
+.topSearchRow .nav > li.disabled > a,
+.ezeid-nav-tab > div >  ul > li > a{
+    background: #F0F0F0;
+    color: #939393
+}
+
+.topSearchRow .nav > li.disabled > a:hover,
+.topSearchRow .nav > li.disabled > a:focus,
+.topSearchRow .nav > li.disabled > a:active
+.ezeid-nav-tab > div >  ul > li.disabled > a:hover,
+.ezeid-nav-tab > div >  ul > li.disabled > a:focus,
+.ezeid-nav-tab > div >  ul > li.disabled > a:active{
+    background: #f3f3f3;
+    color:#D2D2D2;
+}
+
+.topSearchRow .nav > li.active > a,
+.ezeid-nav-tab > div > ul > li.active > a{
+    /*background: #60D560;
+      color:#FFF;
+    */
+    background: #D9ECFF;
+    color:#0DA3D8;
+    margin-bottom: 0px;
+}
+
+.topSearchRow .nav > li > a:hover,
+.topSearchRow .nav > li > a:active,
+.topSearchRow .nav > li > a:focus,
+.ezeid-nav-tab > div > ul > li > a:hover,
+.ezeid-nav-tab > div > ul > li > a:focus,
+.ezeid-nav-tab > div > ul > li > a:active{
+    background: #98F098;
+    color: #3295BA;
+}
+
+.topSearchRow > ul > li > a:active {
+      background: none repeat scroll 0 0 #98f098;
+      color: #3295ba;
+  }
+
+.topSearchRow > div > ul > li > a:active {
+    margin-bottom: 0px;
+    padding-bottom: 0px;
+   }
+
+/*
+.topSearchRow .nav-pills.nav-stacked > li.active > a,
+.topSearchRow .nav-pills.nav-stacked > li.active > a:hover,
+.topSearchRow .nav-pills.nav-stacked > li.active > a:focus,
+.topSearchRow .nav-pills.nav-justified > li.active > a,
+.topSearchRow .nav-pills.nav-justified > li.active > a:hover,
+.topSearchRow .nav-pills.nav-justified > li.active > a:focus {
+    background: #98F098;
+    border-radius: 0;
+}*/
+
+.helpTextContainerDiv
+{
+    text-align: right;
+    margin-top: 2.5%;
+}
+
+.imgA1 { position:absolute; top: 25px; left: 25px; z-index: 1; }
+.imgB1 { position:absolute; top: 16%; left: 25px; z-index: 3; }
