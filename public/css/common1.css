@@ -903,6 +903,16 @@ body {
     color: #3295BA;
 }
 
+.topSearchRow > ul > li > a:active {
+      background: none repeat scroll 0 0 #98f098;
+      color: #3295ba;
+  }
+
+.topSearchRow > div > ul > li > a:active {
+    margin-bottom: 0px;
+    padding-bottom: 0px;
+   }
+
 /*
 .topSearchRow .nav-pills.nav-stacked > li.active > a,
 .topSearchRow .nav-pills.nav-stacked > li.active > a:hover,
@@ -913,3 +923,12 @@ body {
     background: #98F098;
     border-radius: 0;
 }*/
+
+.helpTextContainerDiv
+{
+    text-align: right;
+    margin-top: 2.5%;
+}
+
+.imgA1 { position:absolute; top: 25px; left: 25px; z-index: 1; }
+.imgB1 { position:absolute; top: 16%; left: 25px; z-index: 3; }

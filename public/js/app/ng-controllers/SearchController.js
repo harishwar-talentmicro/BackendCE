@@ -667,8 +667,9 @@ angular.module('ezeidApp').controller('SearchController', [
                                         //  getBanner(1);
                                         if (SearchSec.Criteria.SearchType == 1)
                                         {
-                                            getAllBanners();
-                                            console.log(SearchSec.mInfo);
+                                            getBanner(1);
+                                            //getAllBanners();
+                                           // console.log(SearchSec.mInfo);
                                         }
 
                                         $scope.form_rating = data[0].Rating;
@@ -788,7 +789,7 @@ angular.module('ezeidApp').controller('SearchController', [
     };
 
     //Auto refresh Banner
-  /*  $interval(function() {
+    $interval(function() {
 
         if(AutoRefresh == true && SearchSec.IsSearchButtonClicked && SearchSec.mInfo.EZEID && $scope.showInfoTab && SearchSec.mInfo.Banners != 1)
         {
@@ -804,13 +805,13 @@ angular.module('ezeidApp').controller('SearchController', [
                 getBanner(currentBanner);
             }
         }
-    },RefreshTime);*/
+    },RefreshTime);
 
     //False when navigate to other page
-   /* $scope.$on('$locationChangeStart', function( event ) {
+    $scope.$on('$locationChangeStart', function( event ) {
         AutoRefresh = false;
     });
-*/
+
     //call for previous banner
      SearchSec.getPreviousBanner = function () {
          currentBanner = currentBanner - 1;
@@ -833,6 +834,7 @@ angular.module('ezeidApp').controller('SearchController', [
 
       function getAllBanners()
       {
+          $scope.allBanners = [];
           for (var i = 1; i <= SearchSec.mInfo.Banners; i++) {
               $http({ method: 'get', url: GURL + 'ewtGetBannerPicture?Token=' + $rootScope._userInfo.Token +'&SeqNo='+i+'&Ezeid='+SearchSec.mInfo.EZEID+'&StateTitle='+ SearchSec.mInfo.StateTitle+'&LocID='+SearchSec.mInfo.LocID}).success(function (data) {
 
@@ -1445,8 +1447,8 @@ angular.module('ezeidApp').controller('SearchController', [
                     //Call for banner
                     SearchSec.IsSearchButtonClicked = true;
                     AutoRefresh = true;
-                   // getBanner(1);
-                    getAllBanners();
+                    getBanner(1);
+                   // getAllBanners();
                 });
             }
             else {
