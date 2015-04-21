@@ -28,7 +28,7 @@
             <!-- Tab panes -->
             <div class="tab-content">
                 <!------- Sales Tab ---------------------->
-                <div role="tabpanel" class="tab-pane" id="sales-tb" ng-show="selectedTab === 1" ng-class="{'active':selectedTab ===1}">
+                <div role="tabpanel" class="tab-pane" id="sales-tb" ng-show="selectedTab === 1" ng-class="{'active':selectedTab === 1}">
                     <div class="container-fluid">
                         <div class="row bottom-clearfix"></div>
                         <div class="row bottom-clearfix">
@@ -37,7 +37,24 @@
                             </div>
                         </div>
                         <div class="row">
-                            <content-item ng-repeat="item in txStatuses.sales track by $index" content="item" index="$index" toggle-modal-box="toggleModalBox(type,itemIndex)" template-type="'/status-types-tpl.html'"></content-item>
+                            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix" ng-repeat="item in txStatuses.sales track by $index">
+                                <div class="business-item">
+                                    <div class="thumbnail">
+                                        <span class="glyphicon glyphicon-edit" data-toggle="tooltip" title="" data-placement="right" data-original-title="Edit Item" data-index="{{$index}}" ng-click="toggleModalBox(0,$index)"></span>
+                                        <div class="caption">
+                                            <h4 class="text-primary">{{item.title}}
+                                                <span ng-show="item.status == 1" class="glyphicon glyphicon-ok-circle text-success" data-toggle="tooltip" title="" data-placement="right" data-original-title="Item Status"></span>
+                                                <span ng-show="item.status == 2" class="glyphicon glyphicon-remove-circle text-danger" data-toggle="tooltip" title="" data-placement="right" data-original-title="Item Status"></span>
+                                            </h4>
+                                                <p class="text-primary">Progress : {{item.progress}}</p>
+                                                <p>Status Value : {{item.statusValue}}</p>
+
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -53,7 +70,21 @@
                             </div>
                         </div>
                         <div class="row">
-                            <content-item ng-repeat="item in txStatuses.reservation track by $index" content="item" index="$index" toggle-modal-box="toggleModalBox(type,itemIndex)" template-type="/status-types-tpl.html}"></content-item>
+                            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix" ng-repeat="item in txStatuses.reservation track by $index">
+                                <div class="business-item">
+                                    <div class="thumbnail">
+                                        <span class="glyphicon glyphicon-edit" data-toggle="tooltip" title="" data-placement="right" data-original-title="Edit Item"  data-index="{{$index}}" ng-click="toggleModalBox(1,$index)"></span>
+                                        <div class="caption">
+                                            <h4 class="text-primary">{{item.title}}
+                                                <span ng-show="item.status == 1" class="glyphicon glyphicon-ok-circle text-success" data-toggle="tooltip" title="" data-placement="right" data-original-title="Item Status"></span>
+                                                <span ng-show="item.status == 2" class="glyphicon glyphicon-remove-circle text-danger" data-toggle="tooltip" title="" data-placement="right" data-original-title="Item Status"></span>
+                                            </h4>
+                                            <p class="text-primary">Progress : {{item.progress}}</p>
+                                            <p>Status Value : {{item.statusValue}}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -68,7 +99,21 @@
                             </div>
                         </div>
                         <div class="row">
-                            <content-item ng-repeat="item in txStatuses.homeDelivery track by $index" content="item" index="$index" toggle-modal-box="toggleModalBox(type,itemIndex)" template-type="/status-types-tpl.html"></content-item>
+                            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix" ng-repeat="item in txStatuses.homeDelivery track by $index">
+                                <div class="business-item">
+                                    <div class="thumbnail">
+                                        <span class="glyphicon glyphicon-edit" data-toggle="tooltip" title="" data-placement="right" data-original-title="Edit Item"  data-index="{{$index}}" ng-click="toggleModalBox(2,$index)"></span>
+                                        <div class="caption">
+                                            <h4 class="text-primary">{{item.title}}
+                                                <span ng-show="item.status == 1" class="glyphicon glyphicon-ok-circle text-success" data-toggle="tooltip" title="" data-placement="right" data-original-title="Item Status"></span>
+                                                <span ng-show="item.status == 2" class="glyphicon glyphicon-remove-circle text-danger" data-toggle="tooltip" title="" data-placement="right" data-original-title="Item Status"></span>
+                                            </h4>
+                                            <p class="text-primary">Progress : {{item.progress}}</p>
+                                            <p>Status Value : {{item.statusValue}}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -83,7 +128,21 @@
                             </div>
                         </div>
                         <div class="row">
-                            <content-item ng-repeat="item in txStatuses.service track by $index" content="item" index="$index" toggle-modal-box="toggleModalBox(type,itemIndex)" template-type="/status-types-tpl.html"></content-item>
+                            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix" ng-repeat="item in txStatuses.service track by $index">
+                                <div class="business-item">
+                                    <div class="thumbnail">
+                                        <span class="glyphicon glyphicon-edit" data-toggle="tooltip" title="" data-placement="right" data-original-title="Edit Item"  data-index="{{$index}}" ng-click="toggleModalBox(3,$index)"></span>
+                                        <div class="caption">
+                                            <h4 class="text-primary">{{item.title}}
+                                                <span ng-show="item.status == 1" class="glyphicon glyphicon-ok-circle text-success" data-toggle="tooltip" title="" data-placement="right" data-original-title="Item Status"></span>
+                                                <span ng-show="item.status == 2" class="glyphicon glyphicon-remove-circle text-danger" data-toggle="tooltip" title="" data-placement="right" data-original-title="Item Status"></span>
+                                            </h4>
+                                            <p class="text-primary">Progress : {{item.progress}}</p>
+                                            <p>Status Value : {{item.statusValue}}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -98,7 +157,21 @@
                             </div>
                         </div>
                         <div class="row">
-                            <content-item ng-repeat="item in txStatuses.resume track by $index" content="item" index="$index" toggle-modal-box="toggleModalBox(type,itemIndex)" template-type="/status-types-tpl.html"></content-item>
+                            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix" ng-repeat="item in txStatuses.resume track by $index">
+                                <div class="business-item">
+                                    <div class="thumbnail">
+                                        <span class="glyphicon glyphicon-edit" data-toggle="tooltip" title="" data-placement="right" data-original-title="Edit Item"  data-index="{{$index}}" ng-click="toggleModalBox(4,$index)"></span>
+                                        <div class="caption">
+                                            <h4 class="text-primary">{{item.title}}
+                                                <span ng-show="item.status == 1" class="glyphicon glyphicon-ok-circle text-success" data-toggle="tooltip" title="" data-placement="right" data-original-title="Item Status"></span>
+                                                <span ng-show="item.status == 2" class="glyphicon glyphicon-remove-circle text-danger" data-toggle="tooltip" title="" data-placement="right" data-original-title="Item Status"></span>
+                                            </h4>
+                                            <p class="text-primary">Progress : {{item.progress}}</p>
+                                            <p>Status Value : {{item.statusValue}}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -132,14 +205,18 @@
                         <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
                             <div class="form-group">
                                 <select class="form-control" placeholder="Status" ng-model="modalBox.txStatus.status" id="item-status">
-                                    <option value="2">Active</option>
-                                    <option value="1">Inactive</option>
+                                    <option value="1">Active</option>
+                                    <option value="2">Inactive</option>
                                 </select>
                             </div>
                         </div>
 
                         <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
                             <div class="form-group">
+                                <select class="form-control" ng-model="modalBox.txStatus.progress">
+                                    <option value="">--Select Progress--</option>
+                                    <option ng-repeat="i in getNumber(101) track by $index" value="{{$index}}">{{$index}}</option>
+                                </select>
                                 <!--------- Integrate Progress bar here with 0-100 value ng-model="modalBox.txStatus.progress" -------------------->
                             </div>
                         </div>
@@ -184,10 +261,5 @@
 
     </div>
 
-    <script type="text/ng-template" id="/status-types-tpl.html">
-        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
-
-        </div>
-    </script>
 
 </div>
