@@ -83,6 +83,7 @@ angular.module('ezeidApp').controller('SearchController', [
     var rating = [1,2,3,4,5];
     $scope.showWorkingHourModel = false;
     $scope.showLoadingImage = false;
+    $scope.allBanners = [];
 
     $('#datetimepicker1').datetimepicker({
         format: "d-M-Y  h:m A",
@@ -117,6 +118,7 @@ angular.module('ezeidApp').controller('SearchController', [
     SearchSec.categories = [];
     SearchSec.proximities = [];
     SearchSec.holiday = [];
+    $scope.selectedList = [];
     $scope.form_rating = 0;
 
     SearchSec.mInfo = {};
@@ -313,12 +315,10 @@ angular.module('ezeidApp').controller('SearchController', [
     }
 
     function getAddressForLocation(results) {
-        $scope.Address = "";
+       $scope.Address = "";
         angular.forEach(results, function (mapResultValue, index) {
             if (mapResultValue.types[0] == 'street_number') {
-
                 $scope.Address = mapResultValue.long_name + ', ';
-
             }
             if (mapResultValue.types[0] == 'route') {
                 /*$scope.Address += ", " + mapResultValue.long_name;*/
@@ -349,9 +349,7 @@ angular.module('ezeidApp').controller('SearchController', [
         else
         {
             $scope.Address = $scope.Address;
-
         }
-
     }
 //    google.maps.event.addDomListener(window, 'load', initialize);
 
@@ -552,12 +550,14 @@ angular.module('ezeidApp').controller('SearchController', [
                {
                    $scope.SearchResultCount = data.length;
                    $window.localStorage.removeItem("searchResult");
+                   $window.localStorage.removeItem("selectedTids");
                    $window.localStorage.setItem("searchResult", JSON.stringify(data));
 
                    if(SearchSec.Criteria.SearchType == 2 || SearchSec.Criteria.SearchType == 3)
                    {
                        SearchSec.showResultTab = true;
                        SearchSec.searchResult = data;
+                     //  console.log(SearchSec.searchResult);
                    }
 
                    if(($rootScope._userInfo.IsAuthenticate == true || data[0].IDTypeID > 1) && data[0].Latitude != undefined )
@@ -667,7 +667,9 @@ angular.module('ezeidApp').controller('SearchController', [
 
                                         //Call for banner
                                         AutoRefresh = true;
-                                        getBanner(1);
+                                      //  getBanner(1);
+                                        getAllBanners();
+
                                         $scope.form_rating = data[0].Rating;
 
                                         SearchSec.mInfo.Banners = data[0].Banners;
@@ -828,6 +830,24 @@ angular.module('ezeidApp').controller('SearchController', [
              RefreshTime = Miliseconds;
          }
      };
+
+      function getAllBanners()
+      {
+          for (var i = 1; i <= SearchSec.mInfo.Banners; i++) {
+              $http({ method: 'get', url: GURL + 'ewtGetBannerPicture?Token=' + $rootScope._userInfo.Token +'&SeqNo='+i+'&Ezeid='+SearchSec.mInfo.EZEID+'&StateTitle='+ SearchSec.mInfo.StateTitle+'&LocID='+SearchSec.mInfo.LocID}).success(function (data) {
+
+                  if (data.Picture != 'null') {
+                      SearchSec.mInfo.BannerImage = data.Picture;
+                     $scope.allBanners.push(data);
+                     console.log(data.Picture);
+                  }
+                  else
+                  {
+                    // Notification.error({ message: "No Message found..!", delay: MsgDelay });
+                  }
+              });
+          }
+      }
 
     function getBanner(_requestedBannerValue){
         if(SearchSec.mInfo.EZEID)
@@ -1323,7 +1343,7 @@ angular.module('ezeidApp').controller('SearchController', [
             $scope.showWorkingHourModel = true;
             $http({ method: 'get', url: GURL + 'ewtGetWorkingHrsHolidayList?Token=' + $rootScope._userInfo.Token + '&LocID=' + SearchSec.mInfo.LocID }).success(function (data)
             {
-                console.log(data);
+              //  console.log(data);
                 if (data != 'null')
                 {
 
@@ -1393,7 +1413,7 @@ angular.module('ezeidApp').controller('SearchController', [
         SearchSec.showResultWindow = false;
 
         $scope.ShowLinks = true;
-        console.log(_item);
+      //  console.log(_item);
         getSearchInformation(_item);
     };
     function getSearchInformation(_item)
@@ -1438,4 +1458,18 @@ angular.module('ezeidApp').controller('SearchController', [
             }
         });
     }
+        // To get and remove value of check box
+        $scope.toggleCheckbox = function(event){
+            var elem = event.currentTarget;
+            var val = $(elem).data('tid');
+            if($(elem).is(":checked")){
+               $scope.selectedList.push(val);
+            }
+            else{
+                var index = $scope.selectedList.indexOf(val);
+                $scope.selectedList.splice(index,1);
+           }
+            console.log($scope.selectedList);
+            $window.localStorage.setItem("selectedTids", JSON.stringify($scope.selectedList));
+        };
 }]);

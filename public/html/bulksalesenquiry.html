@@ -26,12 +26,16 @@
                                             <tbody ng-show="showListing">
                                                 <!--<tr ng-repeat="_item in bulksalesController.result">-->
                                                 <tr ng-repeat="_item in bulksalesController.result">
-                                                    <td ><input type="checkbox" name="vehicle" data-tid="{{_item.TID}}" ng-click="toggleCheckbox($event)" checked></td>
+                                                    <!--<td ><input type="checkbox" name="companyID" data-tid="{{_item.TID}}" ng-click="toggleCheckbox($event)" checked></td>-->
+                                                    <td><input type="checkbox"
+                                                               name="companyID"
+                                                               data-tid="{{_item.TID}}"
+                                                               ng-checked="selectedTID.indexOf(_item.TID)!=-1"/>
+                                                        <!--ng-class="{'checked':isExist(_item.TID)!=-1}"-->
+                                                    </td>
                                                     <td data-th="Company Name">{{_item.CompanyName}}</td>
-                                                   <!-- <td data-th="Country/City">India, Banglore</td>-->
                                                     <td data-th="Country/City">{{_item.city}}</td>
                                                     <td data-th="Distance (Miles/km)">{{_item.distance}}</td>
-                                                    <!--<td data-th="Phone No.">+91 9446093566 </td>-->
                                                     <td data-th="Phone No.">{{ _item.PhoneNumber != "" ? _item.CountryCode +' ' : ""}} {{_item.PhoneNumber}}</td>
                                                     <td data-th="Web Site"><a target="_blank" href="http:\\{{_item.Website}}"><u>{{_item.Website}}</u></a></td>
                                                 </tr>

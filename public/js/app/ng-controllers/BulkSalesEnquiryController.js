@@ -4,6 +4,7 @@ angular.module('ezeidApp').controller('bulksalesController',['$http', '$rootScop
     salesEnquiry._info = {};
     var MsgDelay = 2000;
     salesEnquiry.result = [];
+    $scope.selectedTID = [];
     $scope.showListing = false;
     $scope.validationMode = 0;
     $scope.selectedList = [];
@@ -43,14 +44,16 @@ angular.module('ezeidApp').controller('bulksalesController',['$http', '$rootScop
         }
     }
 
-    var searchResult = JSON.parse($window.localStorage.getItem("searchResult"));
-    salesEnquiry.result = searchResult;
-    searchResult == null ? $scope.showListing = false : $scope.showListing = true;
+    $scope.selectedTID = JSON.parse($window.localStorage.getItem("selectedTids"));
+    $scope.searchResult = JSON.parse($window.localStorage.getItem("searchResult"));
 
-    if(searchResult != null)
+    salesEnquiry.result = $scope.searchResult;
+    $scope.searchResult == null ? $scope.showListing = false : $scope.showListing = true;
+
+    if($scope.searchResult != null)
     {
-        for (var i = 0; i < searchResult.length; i++) {
-            $scope.selectedList.push(searchResult[i].TID);
+        for (var i = 0; i < $scope.searchResult.length; i++) {
+            $scope.selectedList.push($scope.searchResult[i].TID);
         }
     }
 
@@ -290,11 +293,13 @@ angular.module('ezeidApp').controller('bulksalesController',['$http', '$rootScop
 
                      Notification.success({message: "Mails are submitted for transmitted..", delay: MsgDelay});
                      $window.localStorage.removeItem("searchResult");
+                     $window.localStorage.removeItem("selectedTids");
                  }
                  else
                  {
                      // Notification.error({ message: 'Invalid key or not found…', delay: MsgDelay });
                      $window.localStorage.removeItem("searchResult");
+                     $window.localStorage.removeItem("selectedTids");
                  }
              });
         }
@@ -303,6 +308,7 @@ angular.module('ezeidApp').controller('bulksalesController',['$http', '$rootScop
     // Close Create Mail Template Form
     salesEnquiry.closeSalesEnquiryForm = function () {
         $window.localStorage.removeItem("searchResult");
+        $window.localStorage.removeItem("selectedTids");
         $location.path("/home");
        // window.location.href = "/home";
 

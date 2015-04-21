@@ -741,7 +741,6 @@ body {
     border: 1px solid gainsboro;
 }
 
-
 .ezeid-nav-tab > div > ul > li > a {
     padding: 9px;
     font-size: 14px;
@@ -821,4 +820,7 @@ body {
 .setInfoEzeId
 {
     padding-right: 12%;
+}
+.search-carousel.carousel-indicators {
+    bottom: 0px;
 }
