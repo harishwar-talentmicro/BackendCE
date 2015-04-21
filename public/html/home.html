@@ -289,7 +289,15 @@
                                        <div ng-hide="(search.mInfo.Redflagstatus == 1)">
                                             <div ng-show="search.mInfo.BannerImage">
                                                <img width="100%" height="215px" ng-src="{{search.mInfo.BannerImage}}">
-                                                <img class="imgB1" src="http://full.path.to/imageB.jpg">
+
+                                                <img class="imgLeft" ng-show="search.previousButton == true" ng-click="search.getPreviousBanner()" src="images/arrow_left.png" />
+                                                <img class="imgLeft" ng-show="search.previousButton == false" src="images/arrow_left_gray.png" />
+
+
+                                                <img class="imgRight" ng-show="search.nextButton == true" ng-click="search.getNextBanner()" src="images/arrow_right.png" />
+                                                <img class="imgRight" ng-show="search.nextButton == false" src="images/arrow_right_grey.png" />
+
+                                                <!--<img class="imgB1" src="http://full.path.to/imageB.jpg">-->
                                               <!-- <section id="carousel">
                                                     <div id="carousel-handstrips" class="carousel slide" data-ride="carousel">
                                                         &lt;!&ndash; Indicators &ndash;&gt;
