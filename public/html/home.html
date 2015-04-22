@@ -79,13 +79,21 @@
                                 <span ng-show="search.mInfo.IDTypeID==3"> Appointment Date & Time:</span>
                             </label>
                             <span style="width:60%;display:block;">
-                                 <date-time-picker recipient="search.ReservationDateTime"></date-time-picker>
+                                 <!--<date-time-picker recipient="search.ReservationDateTime"></date-time-picker>-->
+                                <date-time-picker recipient="search.ReservationDateTime" settings='{
+                                                                    "format" : "d-M-Y",
+                                                                    "timepicker" : false,
+                                                                    "mask" : true,
+                                                                    "hours12" : false,
+                                                                    "minDate" : "+1970/01/01"
+                                                                    }'></date-time-picker>
                             </span>
                         </p>
                         <textarea id="reservationMessage" name="reservationMessage"
                                   ng-class="reservationForm.reservationMessage.$touched && !search.ReservationMessage.length ? 'mandatoryTextBox' : ''"
                                   class="form-control fixTextArea emptyBox" name="reservationMessage" ng-model="search.ReservationMessage"
-                                  placeholder="{{search.reservationPlaceHolder}}" required></textarea>
+                                  placeholder="{{search.reservationPlaceHolder}}" required>
+                        </textarea>
                     </div>
                     <div class="form-group">
                         <input type="submit" ng-disabled="!search.ReservationDateTime || !search.ReservationMessage" class="btn btn-primary appoint_marT" value="Send" />
@@ -272,7 +280,7 @@
             </div>
         </modal>
 
-         <div class="container-fluid">
+         <div class="container-fluid maxWidthEzeid">
             <div class="row bannerHeaderTopMargin"></div>
             <div class="row">
               <!-- <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 col-lg-offset-2 col-md-offset-2 col-sm-offset-2 col-xs-offset-0">-->
@@ -284,7 +292,7 @@
                         <div class="row setRowLeftRightMarginZero">
                             <div class="row setRowLeftRightMarginZero">
                                 <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12 setLeftRightPaddingZero">
-                                    <div class="row setRowLeftRightMarginZero">
+                                    <div class="row setRowLeftRightMarginZero setRowRightMarginTwo setRowLeftMarginTwo">
 
                                        <div ng-hide="(search.mInfo.Redflagstatus == 1)">
                                             <div ng-show="search.mInfo.BannerImage">
@@ -363,7 +371,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="row setRowLeftRightMarginZero">
+                                    <div class="row setRowLeftRightMarginZero middleContentainerTopSpace ">
                                         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setLeftRightPaddingZero">
                                             <div class="col-lg-5 col-md-5 col-sm-5 col-xs-12 infoContainer">
                                                 <form class="form-signin" role="form" novalidate  ng-submit="search.getSearch()">
@@ -374,13 +382,13 @@
                                                                     <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10 text-center setLeftRightPaddingZero">
                                                                         <ul class="nav nav-pills ">
                                                                             <li role="presentation" ng-class="search.showInfoWindow || search.showResultWindow ? 'active' : ''">
-                                                                                <a class="setBottomMargin0" ng-click="showSearchTab()">Search</a>
+                                                                                <a class="setBottomMargin0 btn-link" ng-click="showSearchTab()">Search</a>
                                                                             </li>
                                                                             <li ng-show="search.showResultTab" ng-class="search.showInfoWindow || search.showSearchWindow ? 'active' : ''">
-                                                                                <a class="setBottomMargin0" style="margin-bottom: 0px;" ng-click="showResultWindow()">Result</a>
+                                                                                <a class="setBottomMargin0 btn-link" style="margin-bottom: 0px;" ng-click="showResultWindow()">Result</a>
                                                                             </li>
                                                                             <li ng-show="ShowLinks" ng-class="search.showResultWindow || search.showSearchWindow ? 'active' : ''">
-                                                                                <a class="setBottomMargin0" ng-click="showInfoWindowTab()">Information</a>
+                                                                                <a class="setBottomMargin0 btn-link" ng-click="showInfoWindowTab()">Information</a>
                                                                             </li>
                                                                             <!--<li class="pull-right" ng-class="search.showResultWindow || search.showSearchWindow ? 'active' : ''">-->
                                                                             <!-- <li class="pull-right" class="">
@@ -615,7 +623,7 @@
                                                 </div>
                                                 </form>
                                             </div>
-                                            <div class="col-lg-7 col-md-7 col-sm-7 col-xs-12 setLeftRightPaddingZero">
+                                            <div class="col-lg-7 col-md-7 col-sm-7 col-xs-12 setLeftRightPaddingZero mapBorder">
                                                 <div class="innerMapContainer">
                                                     <div style="display:block;">
                                                         <img id="mapClocH" style="padding-top:8px;cursor:pointer;" ng-click="search.getMyLocation()" src="images/myloc.png" />
@@ -627,282 +635,116 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="row setRowLeftRightMarginZero">
-                                        <div ng-show="ShowLinks" class="row setRowLeftRightMarginZero boxFotterBanner">
-                                            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 searchHeaderAlignment fotterButtonContainer">
-                                                <div title="Working hours" class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer bottomTabButton" style=" margin-top: 5%;" ng-hide="search.isIndividualUser(1)">
-                                                    <img src="../images/open_big.png" ng-click="search.openWorkingHourPopup()" ng-show="search.mInfo.OpenStatus==1">
-                                                    <img src="../images/close_big.png" ng-click="search.openWorkingHourPopup()" ng-hide="search.mInfo.OpenStatus==1">
-                                                </div>
-                                                <div  class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer imgTopMargin" ng-hide="search.isIndividualUser(1)">
-                                                    <div class="parkingAlignment" ng-hide="search.mInfo.ParkingStatus==3">
-                                                        <img title="{{search.parkingTitle}}" src="../images/parking_new.png" >
-                                                    </div>
-                                                    <div class="parkingAlignment" ng-show="search.mInfo.ParkingStatus==3">
-                                                        <img title="{{search.parkingTitle}}" src="../images/new_no_parking.png" >
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10 searchHeaderAlignment msgButtonContainer" ng-hide="(search.mInfo.IDTypeID == 1)">
+                                    <div class="row setRowLeftRightMarginZero boxFotterBanner">
+                                        <div ng-show="ShowLinks" class="row setRowLeftRightMarginZero ">
+                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 searchHeaderAlignment msgButtonContainer" ng-hide="(search.mInfo.IDTypeID == 1)">
                                                 <div class="innerMsgButtonContainer">
-                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer keyWordText" style="padding-right: 0px;">
+                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer keyWordText boxMessaageBackgroun" style="padding-right: 0px;">
                                                         <div ng-hide="search.mInfo.EZEIDVerifiedID == '1'|| showSalesEnquiry == '0' " title="Sales Enquiry" ng-click="search.openSalesEnquiryForm()">
-                                                            <div class="row setRowLeftRightMarginZero" >
+                                                            <!--<div class="row setRowLeftRightMarginZero" >-->
                                                                 <img src="../images/new_sales_icon.png">
-                                                            </div>
-                                                            <div class="row setRowLeftRightMarginZero infoMsgText" >
+                                                           <!-- </div>
+                                                            <div class="row setRowLeftRightMarginZero infoMsgText" >-->
                                                                 Sales Enquiry
-                                                            </div>
+                                                            <!--</div>-->
                                                         </div>
                                                     </div>
-                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer removePadding keyWordText">
+                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer removePadding keyWordText boxMessaageBackgroun">
                                                         <div ng-hide="search.mInfo.HomeDeliveryButton==2 || search.mInfo.EZEIDVerifiedID == '1' || showHomeDelivery == '0'" title="Home Delivery" ng-click="search.openHomeDeliverForm()">
-                                                            <div class="row setRowLeftRightMarginZero" >
+                                                            <!--<div class="row setRowLeftRightMarginZero" >-->
                                                                 <img src="../images/new_home_delivery.png">
-                                                            </div>
-                                                            <div class="row setRowLeftRightMarginZero infoMsgText" >
+                                                            <!--</div>
+                                                            <div class="row setRowLeftRightMarginZero infoMsgText" >-->
                                                                 Home Delivery
-                                                            </div>
+                                                            <!--</div>-->
                                                         </div>
                                                     </div>
-                                                    <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 showPointer removePadding keyWordText">
+                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer removePadding keyWordText boxMessaageBackgroun">
                                                         <div ng-hide="search.mInfo.ReservationButton==2 || search.mInfo.EZEIDVerifiedID == '1' || shoReserVation == '0'" title="Reservation" ng-click="search.openReservationForm()">
-                                                            <div class="row setRowLeftRightMarginZero" >
+                                                            <!--<div class="row setRowLeftRightMarginZero" >-->
                                                                 <img src="../images/new_reservations.png">
-                                                            </div>
-                                                            <div class="row setRowLeftRightMarginZero infoMsgText" >
+                                                            <!--</div>
+                                                            <div class="row setRowLeftRightMarginZero infoMsgText" >-->
                                                                 Reservation
-                                                            </div>
+                                                            <!--</div>-->
                                                         </div>
                                                     </div>
-                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer removePadding keyWordText">
+                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer removePadding keyWordText boxMessaageBackgroun">
                                                         <div ng-hide="search.mInfo.SupportButton==2 || search.mInfo.EZEIDVerifiedID == '1' || showServiceRequest == '0'"
                                                              title="Support Request" ng-click="search.openServiceRequestForm()">
-                                                            <div class="row setRowLeftRightMarginZero" >
+                                                            <!--<div class="row setRowLeftRightMarginZero" >-->
                                                                 <img src="../images/new_service_request.png">
-                                                            </div>
-                                                            <div class="row setRowLeftRightMarginZero infoMsgText" >
+                                                            <!--</div>
+                                                            <div class="row setRowLeftRightMarginZero infoMsgText" >-->
                                                                 Service Request
-                                                            </div>
+                                                            <!--</div>-->
                                                         </div>
                                                     </div>
-                                                    <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 showPointer removePadding keyWordText">
+                                                    <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 showPointer removePadding keyWordText boxMessaageBackgroun">
                                                         <div title="Send CV" ng-click="search.openCVForm()" ng-hide="search.mInfo.CVButton==2 || search.mInfo.EZEIDVerifiedID == '1' || showSendCv == '0'">
-                                                            <div class="row setRowLeftRightMarginZero" >
+                                                            <!--<div class="row setRowLeftRightMarginZero" >-->
                                                                 <img src="../images/new_send_cv.png">
-                                                            </div>
-                                                            <div class="row setRowLeftRightMarginZero infoMsgText" >
+                                                            <!--</div>
+                                                            <div class="row setRowLeftRightMarginZero infoMsgText" >-->
                                                                 Send CV
-                                                            </div>
+                                                            <!--</div>-->
                                                         </div>
                                                     </div>
-                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer removePadding keyWordText"
+                                                    <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 showPointer removePadding keyWordText boxMessaageBackgroun"
                                                          ng-click="search.getdirections(search.mInfo)" title="Directions">
-                                                        <div class="row setRowLeftRightMarginZero" >
+                                                        <!--<div class="row setRowLeftRightMarginZero" >-->
                                                             <img src="../images/new_directions.png">
-                                                        </div>
-                                                        <div class="row setRowLeftRightMarginZero infoMsgText" >
-                                                            Plot Route
-                                                        </div>
+                                                       <!-- </div>
+                                                        <div class="row setRowLeftRightMarginZero infoMsgText" >-->
+                                                            <span>Plot Route</span>
+                                                        <!--</div>-->
                                                     </div>
-                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer removePadding keyWordText"
+                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer removePadding keyWordText boxMessaageBackgroun"
                                                          ng-click="search.viewDirections(search.mInfo)" title="View Directions">
-                                                        <div class="row setRowLeftRightMarginZero" >
+                                                        <!--<div class="row setRowLeftRightMarginZero" >-->
                                                             <img src="../images/view_directions.png">
-                                                        </div>
-                                                        <div class="row setRowLeftRightMarginZero infoMsgText" >
+                                                        <!--</div>
+                                                        <div class="row setRowLeftRightMarginZero infoMsgText" >-->
                                                             View Directions
-                                                        </div>
+                                                        <!--</div>-->
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10 searchHeaderAlignment msgButtonContainer" ng-show="search.isIndividualUser(1)">
+                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 searchHeaderAlignment msgButtonContainer" ng-show="search.isIndividualUser(1)">
                                                 <div class="innerMsgButtonContainer">
-                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer keyWordText" style="padding-right: 0px;" ng-click="search.openSendMessageForm()"  title="Message">
-                                                        <!--<div class="row setRowLeftRightMarginZero" >
-                                                            <img src="../images/new_message.png">
-                                                        </div>
-                                                        <div class="row setRowLeftRightMarginZero infoMsgText" >
-                                                            Message
-                                                        </div>-->
+                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer keyWordText boxMessaageBackgroun" style="padding-right: 0px;">
+
                                                     </div>
-                                                    <div  class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer removePadding keyWordText" title="Appointment" ng-click="search.openReservationForm()">
-                                                        <!-- <div class="row setRowLeftRightMarginZero" >
-                                                             <img src="../images/new_appointment.png">
-                                                         </div>
-                                                         <div class="row setRowLeftRightMarginZero infoMsgText" >
-                                                             Appointment
-                                                         </div>-->
+                                                    <div  class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer removePadding keyWordText boxMessaageBackgroun ">
+
                                                     </div>
-                                                    <div  class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer removePadding">
+                                                    <div  class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer removePadding boxMessaageBackgroun">
                                                     </div>
-                                                    <div  class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer removePadding">
+                                                    <div  class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer removePadding boxMessaageBackgroun">
                                                     </div>
-                                                    <div  class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer removePadding keyWordText"
-                                                          ng-click="search.getdirections(search.mInfo)" title="Directions">
-                                                        <div class="row setRowLeftRightMarginZero">
+                                                    <div  class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer removePadding keyWordText boxMessaageBackgroun"
+                                                          ng-click="search.getdirections(search.mInfo)" title="Directions boxMessaageBackgroun">
                                                             <img src="../images/new_directions.png">
-                                                        </div>
-                                                        <div class="row setRowLeftRightMarginZero infoMsgText" >
                                                             Plot Route
-                                                        </div>
                                                     </div>
-                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer removePadding keyWordText"
+                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer removePadding keyWordText boxMessaageBackgroun"
                                                          ng-click="search.viewDirections(search.mInfo)" title="View Directions">
-                                                        <div class="row setRowLeftRightMarginZero" >
                                                             <img src="../images/view_directions.png">
-                                                        </div>
-                                                        <div class="row setRowLeftRightMarginZero infoMsgText" >
                                                             View Directions
-                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
 
+
+
                                         <div ng-hide="ShowLinks" class="row setRowLeftRightMarginZero">
                                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 searchHeaderAlignment" style="background: #09a2de;">
-                                               <!-- <img width="100%" height="75px" src="../images/new_big_footer.gif">-->
-
-                                                <div ng-show="ShowLinks" class="row setRowLeftRightMarginZero boxFotterBanner">
-                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 searchHeaderAlignment fotterButtonContainer">
-                                                        <div title="Working hours" class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer bottomTabButton" style=" margin-top: 5%;" ng-hide="search.isIndividualUser(1)">
-                                                            <img src="../images/open_big.png" ng-click="search.openWorkingHourPopup()" ng-show="search.mInfo.OpenStatus==1">
-                                                            <img src="../images/close_big.png" ng-click="search.openWorkingHourPopup()" ng-hide="search.mInfo.OpenStatus==1">
-                                                        </div>
-                                                        <div  class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer imgTopMargin" ng-hide="search.isIndividualUser(1)">
-                                                            <div class="parkingAlignment" ng-hide="search.mInfo.ParkingStatus==3">
-                                                                <img title="{{search.parkingTitle}}" src="../images/parking_new.png" >
-                                                            </div>
-                                                            <div class="parkingAlignment" ng-show="search.mInfo.ParkingStatus==3">
-                                                                <img title="{{search.parkingTitle}}" src="../images/new_no_parking.png" >
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10 searchHeaderAlignment msgButtonContainer" ng-hide="(search.mInfo.IDTypeID == 1)">
-                                                        <div class="innerMsgButtonContainer">
-                                                            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer keyWordText" style="padding-right: 0px;">
-                                                                <div ng-hide="search.mInfo.EZEIDVerifiedID == '1'|| showSalesEnquiry == '0' " title="Sales Enquiry" ng-click="search.openSalesEnquiryForm()">
-                                                                    <div class="row setRowLeftRightMarginZero" >
-                                                                        <img src="../images/new_sales_icon.png">
-                                                                    </div>
-                                                                    <div class="row setRowLeftRightMarginZero infoMsgText" >
-                                                                        Sales Enquiry
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer removePadding keyWordText">
-                                                                <div ng-hide="search.mInfo.HomeDeliveryButton==2 || search.mInfo.EZEIDVerifiedID == '1' || showHomeDelivery == '0'" title="Home Delivery" ng-click="search.openHomeDeliverForm()">
-                                                                    <div class="row setRowLeftRightMarginZero" >
-                                                                        <img src="../images/new_home_delivery.png">
-                                                                    </div>
-                                                                    <div class="row setRowLeftRightMarginZero infoMsgText" >
-                                                                        Home Delivery
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 showPointer removePadding keyWordText">
-                                                                <div ng-hide="search.mInfo.ReservationButton==2 || search.mInfo.EZEIDVerifiedID == '1' || shoReserVation == '0'" title="Reservation" ng-click="search.openReservationForm()">
-                                                                    <div class="row setRowLeftRightMarginZero" >
-                                                                        <img src="../images/new_reservations.png">
-                                                                    </div>
-                                                                    <div class="row setRowLeftRightMarginZero infoMsgText" >
-                                                                        Reservation
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer removePadding keyWordText">
-                                                                <div ng-hide="search.mInfo.SupportButton==2 || search.mInfo.EZEIDVerifiedID == '1' || showServiceRequest == '0'"
-                                                                     title="Support Request" ng-click="search.openServiceRequestForm()">
-                                                                    <div class="row setRowLeftRightMarginZero" >
-                                                                        <img src="../images/new_service_request.png">
-                                                                    </div>
-                                                                    <div class="row setRowLeftRightMarginZero infoMsgText" >
-                                                                        Service Request
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 showPointer removePadding keyWordText">
-                                                                <div title="Send CV" ng-click="search.openCVForm()" ng-hide="search.mInfo.CVButton==2 || search.mInfo.EZEIDVerifiedID == '1' || showSendCv == '0'">
-                                                                    <div class="row setRowLeftRightMarginZero" >
-                                                                        <img src="../images/new_send_cv.png">
-                                                                    </div>
-                                                                    <div class="row setRowLeftRightMarginZero infoMsgText" >
-                                                                        Send CV
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer removePadding keyWordText"
-                                                                 ng-click="search.getdirections(search.mInfo)" title="Directions">
-                                                                <div class="row setRowLeftRightMarginZero" >
-                                                                    <img src="../images/new_directions.png">
-                                                                </div>
-                                                                <div class="row setRowLeftRightMarginZero infoMsgText" >
-                                                                    Plot Route
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer removePadding keyWordText"
-                                                                 ng-click="search.viewDirections(search.mInfo)" title="View Directions">
-                                                                <div class="row setRowLeftRightMarginZero" >
-                                                                    <img src="../images/view_directions.png">
-                                                                </div>
-                                                                <div class="row setRowLeftRightMarginZero infoMsgText" >
-                                                                    View Directions
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10 searchHeaderAlignment msgButtonContainer" ng-show="search.isIndividualUser(1)">
-                                                        <div class="innerMsgButtonContainer">
-                                                            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer keyWordText" style="padding-right: 0px;" ng-click="search.openSendMessageForm()"  title="Message">
-                                                                <!--<div class="row setRowLeftRightMarginZero" >
-                                                                    <img src="../images/new_message.png">
-                                                                </div>
-                                                                <div class="row setRowLeftRightMarginZero infoMsgText" >
-                                                                    Message
-                                                                </div>-->
-                                                            </div>
-                                                            <div  class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer removePadding keyWordText" title="Appointment" ng-click="search.openReservationForm()">
-                                                                <!-- <div class="row setRowLeftRightMarginZero" >
-                                                                     <img src="../images/new_appointment.png">
-                                                                 </div>
-                                                                 <div class="row setRowLeftRightMarginZero infoMsgText" >
-                                                                     Appointment
-                                                                 </div>-->
-                                                            </div>
-                                                            <div  class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer removePadding">
-                                                            </div>
-                                                            <div  class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer removePadding">
-                                                            </div>
-                                                            <div  class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer removePadding keyWordText"
-                                                                  ng-click="search.getdirections(search.mInfo)" title="Directions">
-                                                                <div class="row setRowLeftRightMarginZero">
-                                                                    <img src="../images/new_directions.png">
-                                                                </div>
-                                                                <div class="row setRowLeftRightMarginZero infoMsgText" >
-                                                                    Plot Route
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer removePadding keyWordText"
-                                                                 ng-click="search.viewDirections(search.mInfo)" title="View Directions">
-                                                                <div class="row setRowLeftRightMarginZero" >
-                                                                    <img src="../images/view_directions.png">
-                                                                </div>
-                                                                <div class="row setRowLeftRightMarginZero infoMsgText" >
-                                                                    View Directions
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
                                                 <div ng-hide="ShowLinks" class="row setRowLeftRightMarginZero">
                                                     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 searchHeaderAlignment" style="background: #09a2de;">
-                                                        <img width="100%" height="40px" src="../images/new_big_footer.gif">
+                                                        <img width="100%" height="40px" src="../images/new_big_footer.png">
                                                     </div>
                                                 </div>
-
-
                                             </div>
                                         </div>
                                     </div>

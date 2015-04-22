@@ -61,7 +61,14 @@
                                                 </a>-->
                                             </div>
 
-                                            <date-time-picker  recipient="form.RefExpiryDate" style="margin-top:1%; width: 86%;"></date-time-picker>
+                                            <!--<date-time-picker  recipient="form.RefExpiryDate" style="margin-top:1%; width: 86%;"></date-time-picker>-->
+                                            <date-time-picker  style="margin-top:1%; width: 86%;" recipient="form.RefExpiryDate" settings='{
+                                                                    "format" : "d-M-Y",
+                                                                    "timepicker" : false,
+                                                                    "mask" : true,
+                                                                    "hours12" : false,
+                                                                    "maxDate" : "+1970/01/01"
+                                                                    }'></date-time-picker>
 
                                             <div class="form-group" >
                                                <span class="btn btn-primary btn-file" style="width: 72%; float:left; margin-top: 15px;">
