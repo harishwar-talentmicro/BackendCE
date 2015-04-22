@@ -1,4 +1,6 @@
-angular.module('ezeidApp').controller('CVAttachController', function($http, $rootScope, $scope, $timeout, Notification, $filter,$q, $window,GURL){
+angular.module('ezeidApp').controller('CVAttachController',[
+    '$http', '$rootScope', '$scope', '$timeout', 'Notification', '$filter','$q', '$window','GURL',
+    function($http, $rootScope, $scope, $timeout, Notification, $filter,$q, $window,GURL){
 
     var CVAttachCtrl = this;
     CVAttachCtrl._CVInfo={};
@@ -223,4 +225,4 @@ angular.module('ezeidApp').controller('CVAttachController', function($http, $roo
     var content = 'file content';
     var blob = new Blob([ CVAttachCtrl._CVInfo.CVDoc ], { type : 'text/plain' });
     $scope.url = (window.URL || window.webkitURL).createObjectURL( blob );
-});
+}]);

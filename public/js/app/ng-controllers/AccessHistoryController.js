@@ -2,7 +2,9 @@
 /***
  * HistoryController
  */
-angular.module('ezeidApp').controller('HistoryController', function ($scope, $rootScope, $http, Notification, $filter, $interval,GURL,MsgDelay) {
+angular.module('ezeidApp').controller('HistoryController',[
+    '$scope', '$rootScope', '$http', 'Notification', '$filter', '$interval','GURL','MsgDelay',
+    function ($scope, $rootScope, $http, Notification, $filter, $interval,GURL,MsgDelay) {
     var msgSen = this;
     var _pageValue = 1;
     var MsgDelay = 2000;
@@ -108,4 +110,4 @@ angular.module('ezeidApp').controller('HistoryController', function ($scope, $ro
         _pageValue = _pageValue + 1;
         LoadHistory(_pageValue);
     };
-});
+}]);

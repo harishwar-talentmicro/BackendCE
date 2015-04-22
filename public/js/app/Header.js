@@ -1,10 +1,10 @@
 var HeaderApp = angular.module('ngHeader', ['ui-notification']);
-var GURL = '/';
-HeaderApp.directive('headerSection', function (Notification,$window) {
+HeaderApp.directive('headerSection',['Notification','$window' ,function (Notification,$window) {
+    var GURL = '/';
     return {
         restrict: 'EA',
         templateUrl: 'directives/Header.html',
-        controller: function ($http, $rootScope,$location,$window) {
+        controller: ['$http', '$rootScope','$location','$window','GURL',function ($http, $rootScope,$location,$window,GURL) {
             var MsgDelay = 2000;
             var SignCtrl = this;
             this.LInfo = {};
@@ -71,6 +71,7 @@ HeaderApp.directive('headerSection', function (Notification,$window) {
             this.openForgotPasswordForm=function(){
                 SignCtrl.EzeId="";
                 $('#forgot-password').slideDown();
+                $(".wd_forgot").focus();
             };
             this.forgotPassword=function(){
                 $http({
@@ -99,7 +100,7 @@ HeaderApp.directive('headerSection', function (Notification,$window) {
             //forgot password
             this.openRegistrationForm=function(){
                 $('#SignIn_popup').slideUp();
-                window.location.href = "/editprofile";
+                window.location.href = "/signup";
             };
 
             //Change password
@@ -173,6 +174,7 @@ HeaderApp.directive('headerSection', function (Notification,$window) {
                 document.getElementById("NewPassword").className = "form-control wd_oldPass changePass_inpMar emptyBox change_PadLeft";
                 document.getElementById("ReEnterPassword").className = "form-control wd_oldPass changePass_inpMar emptyBox change_PadLeft";
                 $('#ChangePassword_popup').slideDown();
+
             };
 
             //Open Quick SignUp Form
@@ -220,7 +222,7 @@ HeaderApp.directive('headerSection', function (Notification,$window) {
                         form.$setUntouched();
                     }
                 };
-        },
+        }],
         controllerAs: 'SignInCtrl',
         link: function () {
 //            $('html').click(function () {
@@ -258,6 +260,7 @@ HeaderApp.directive('headerSection', function (Notification,$window) {
 
             $("body").on('click','#signin',function(e){
                 $("#SignIn_popup").slideDown();
+                $("#UserName").focus();
             });
             /******************end :  New code ************************/
 
@@ -274,4 +277,4 @@ HeaderApp.directive('headerSection', function (Notification,$window) {
             });
         }
     };
-});
+}]);

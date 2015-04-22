@@ -1,4 +1,6 @@
-angular.module('ezeidApp').controller('bulksalesController',['$http', '$rootScope', '$scope', '$q', 'Notification', '$window', '$location', 'GURL', function($http, $rootScope, $scope, $q, Notification, $window, $location, GURL){
+angular.module('ezeidApp').controller('bulksalesController',[
+    '$http', '$rootScope', '$scope', '$q', 'Notification', '$window', '$location', 'GURL',
+    function($http, $rootScope, $scope, $q, Notification, $window, $location, GURL){
 
     var salesEnquiry = this;
     salesEnquiry._info = {};

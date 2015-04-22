@@ -90,7 +90,8 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
             Latitude : 0,
             Longitude : 0,
             Altitude : 0,
-            TemplateID : 0
+            TemplateID : 0,
+            IDTypeID : 2
         };
 
 
@@ -337,6 +338,7 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
          */
 
         $scope.editLocation = function(index){
+            $scope.resetEditLocationDetails();
             $scope.toggleAllLocations(index);
             /**
              * On editing mode of location we fetch a new list of state
@@ -483,10 +485,7 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
                             delay : MsgDelay
                         });
                     }
-                        /**
-                         * @todo 1. Add logic to toggleEditMode after the location is successfully saved
-                         *  2. Copy the new userDetails to $scope.userDetails Object
-                         */
+
                 }).error(function(err){
                     Notification.error({
                         message: 'An error occured while saving primary location details ! Try again',
@@ -595,6 +594,7 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
          * to be saved on server
          */
         $scope.addSecondaryLocation = function(){
+            $scope.resetEditLocationDetails();
             var locIndex = $scope.locationsToggleIndex.indexOfWhere('savedOnServer',false);
 
             if(locIndex !== -1){
@@ -602,7 +602,7 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
                 $timeout(function(){
                     $scope.toggleMapControls(locIndex);
                     $scope.editLocation(locIndex);
-                },4000);
+                },2000);
                 return;
             }
             var newLoc = angular.copy($scope.editLocationDetails);
@@ -746,7 +746,8 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
                 PostalCode : '',
                 Latitude : 0,
                 Longitude : 0,
-                Altitude : 0
+                Altitude : 0,
+                IDTypeID: ($scope.userDetails.IDTypeID) ? $scope.userDetails.IDTypeID : 2,
             };
 
         };

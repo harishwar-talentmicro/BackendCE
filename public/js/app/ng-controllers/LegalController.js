@@ -1,5 +1,5 @@
 
-angular.module('ezeidApp').controller('LegalController', function ($rootScope, $scope, $http,GURL) {
+angular.module('ezeidApp').controller('LegalController',['$rootScope','$scope','$http','GURL',function ($rootScope, $scope, $http,GURL) {
 
     var SLocCtrl = this;
 
@@ -41,4 +41,4 @@ angular.module('ezeidApp').controller('LegalController', function ($rootScope, $
         }
     }
 
-});
+}]);

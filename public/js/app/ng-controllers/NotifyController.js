@@ -1,5 +1,7 @@
 
-angular.module('ezeidApp').controller('NotifyController', function ($scope, $rootScope, $http, Notification, $filter, $interval,GURL,MsgDelay) {
+angular.module('ezeidApp').controller('NotifyController',[
+    '$scope', '$rootScope', '$http', 'Notification', '$filter', '$interval','GURL','MsgDelay',
+    function ($scope, $rootScope, $http, Notification, $filter, $interval,GURL,MsgDelay) {
     var msgSen = this;
     var _pageValue = 1;
     var MsgDelay = 2000;
@@ -228,4 +230,4 @@ angular.module('ezeidApp').controller('NotifyController', function ($scope, $roo
             }
         });
     };
-});
+}]);

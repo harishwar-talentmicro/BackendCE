@@ -231,8 +231,7 @@ angular.module('ezeidApp').controller('ModuleSettingsCtrl',[
                 method : "POST",
                 data : data
             }).success(function(resp){
-                console.log(resp);
-                    Notification.success({message : 'Configuration Saved '+ JSON.stringify(resp), delay : MsgDelay})
+                Notification.success({message : 'Configuration Saved Successfully', delay : MsgDelay})
             }).error(function(err){
                 console.log(err);
             });

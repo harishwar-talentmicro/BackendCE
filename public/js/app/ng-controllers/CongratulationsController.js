@@ -1,5 +1,6 @@
 
-angular.module('ezeidApp').controller('CongratulationsController', function($http, $rootScope, $scope, Notification, GURL){
+angular.module('ezeidApp').controller('CongratulationsController',['$http', '$rootScope', '$scope', 'Notification', 'GURL',
+    function($http, $rootScope, $scope, Notification, GURL){
 
     var profile = this;
     profile._info = {};
@@ -57,4 +58,4 @@ angular.module('ezeidApp').controller('CongratulationsController', function($htt
             });
     }
 
-});
+}]);
