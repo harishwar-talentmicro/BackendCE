@@ -1,4 +1,6 @@
-angular.module('ezeidApp').controller('BlackListWhiteListController', function($http, $rootScope, $scope, $timeout, Notification, $filter, $q,GURL){
+angular.module('ezeidApp').controller('BlackListWhiteListController',[
+    '$http', '$rootScope', '$scope', '$timeout', 'Notification', '$filter', '$q','GURL' ,
+    function($http, $rootScope, $scope, $timeout, Notification, $filter, $q,GURL){
 
     var blacklist = this;
     blacklist._info={};
@@ -195,4 +197,4 @@ angular.module('ezeidApp').controller('BlackListWhiteListController', function($
     };
     blacklist.listType = [{ id: 2, label: "Black List" }, { id: 1, label: "White List" }];
     blacklist.Tags = [{ id: 1, label: "ID" }, { id: 2, label: "PP" }, { id: 3, label: "DL" }, { id: 4, label: "D1" }, { id: 5, label: "D2" }, { id: 6, label: "CV" }];
-});
+}]);

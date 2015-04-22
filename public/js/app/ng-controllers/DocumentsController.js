@@ -1,4 +1,6 @@
-angular.module('ezeidApp').controller('DocumentController', function($http, $rootScope, $scope, $timeout, Notification, $filter,$q,GURL) {
+angular.module('ezeidApp').controller('DocumentController',[
+    '$http', '$rootScope', '$scope', '$timeout', 'Notification', '$filter','$q','GURL',
+    function($http, $rootScope, $scope, $timeout, Notification, $filter,$q,GURL) {
   if ($rootScope._userInfo) {
 
     }
@@ -283,4 +285,4 @@ angular.module('ezeidApp').controller('DocumentController', function($http, $roo
     $scope.closeDocument = function(){
         window.location.href = "/home";
     }
-});
+}]);

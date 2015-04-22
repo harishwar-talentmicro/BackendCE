@@ -1,4 +1,6 @@
-angular.module('ezeidApp').controller('salesenquiryController', function($http, $rootScope, $scope, Notification, $filter, $q, $timeout,GURL){
+angular.module('ezeidApp').controller('salesenquiryController',[
+    '$http','$rootScope','$scope','Notification','$filter','$q','$timeout','GURL',
+    function($http, $rootScope, $scope, Notification, $filter, $q, $timeout,GURL){
 
     var msglist = this;
     msglist._info = {};
@@ -550,4 +552,4 @@ angular.module('ezeidApp').controller('salesenquiryController', function($http, 
         }
     };
     $scope.modalTitle = "Sales Item";
-});
+}]);

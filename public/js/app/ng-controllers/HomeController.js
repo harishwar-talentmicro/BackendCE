@@ -1,7 +1,7 @@
 /**
  * HomeController (for HomePage)
  */
-angular.module('ezeidApp').controller('HomeController', function ($rootScope, $http,$scope,GURL,MsgDelay) {
+angular.module('ezeidApp').controller('HomeController',['$rootScope', '$http','$scope','GURL','MsgDelay', function ($rootScope, $http,$scope,GURL,MsgDelay) {
     $rootScope.CLoc = {
         CLat: 12.295810,
         CLong: 76.639381
@@ -67,4 +67,4 @@ angular.module('ezeidApp').controller('HomeController', function ($rootScope, $h
     $scope.closeHelpPopup = function(){
         $('#Help_popup').slideUp();
     }
-});
+}]);

@@ -1,4 +1,6 @@
-angular.module('ezeidApp').controller('BusinessListController', function($http, $rootScope, $scope, $timeout, Notification, $filter, $q,GURL){
+angular.module('ezeidApp').controller('BusinessListController',[
+    '$http', '$rootScope', '$scope', '$timeout', 'Notification', '$filter', '$q','GURL',
+    function($http, $rootScope, $scope, $timeout, Notification, $filter, $q,GURL){
 
     var BusinessListCtrl = this;
     BusinessListCtrl._businessInfo={};
@@ -124,4 +126,4 @@ angular.module('ezeidApp').controller('BusinessListController', function($http, 
      };
 
 
-});
+}]);
