@@ -1,10 +1,10 @@
 var HeaderApp = angular.module('ngHeader', ['ui-notification']);
-var GURL = '/';
-HeaderApp.directive('headerSection', function (Notification,$window) {
+HeaderApp.directive('headerSection',['Notification','$window' ,function (Notification,$window) {
+    var GURL = '/';
     return {
         restrict: 'EA',
         templateUrl: 'directives/Header.html',
-        controller: function ($http, $rootScope,$location,$window) {
+        controller: ['$http', '$rootScope','$location','$window','GURL',function ($http, $rootScope,$location,$window,GURL) {
             var MsgDelay = 2000;
             var SignCtrl = this;
             this.LInfo = {};
@@ -222,7 +222,7 @@ HeaderApp.directive('headerSection', function (Notification,$window) {
                         form.$setUntouched();
                     }
                 };
-        },
+        }],
         controllerAs: 'SignInCtrl',
         link: function () {
 //            $('html').click(function () {
@@ -277,4 +277,4 @@ HeaderApp.directive('headerSection', function (Notification,$window) {
             });
         }
     };
-});
+}]);
