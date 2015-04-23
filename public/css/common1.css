@@ -349,6 +349,7 @@ body {
 }
 .boxFotterBanner
 {
+    height: 40px;
     background: #09a2de;
 }
 .fotterButtonContainer
@@ -899,8 +900,9 @@ body {
 .ezeid-nav-tab > div > ul > li > a:hover,
 .ezeid-nav-tab > div > ul > li > a:focus,
 .ezeid-nav-tab > div > ul > li > a:active{
-    background: #98F098;
-    color: #3295BA;
+   /* background: #98F098;
+    color: #3295BA;*/
+    color: #000000;
 }
 
 .topSearchRow > ul > li > a:active {
@@ -946,4 +948,31 @@ body {
     left: 35px;
     z-index: 3;
 }
+.boxMessaageBackgroun {
+    background: #09a2de;
+}
+.middleContentainerTopSpace
+{
+    border: 2px solid #ffffff;
+}
+.setRowRightMarginTwo
+{
+    margin-right: 2px;
+}
+.setRowLeftMarginTwo
+{
+    margin-left: 2px;
+}
+.mapBorder
+{
+    border: 1px solid #2791BA;
+}
+.middleContentainerBottom
+{
+    border-bottom:1px solid #2791BA;
 
+}
+.maxWidthEzeid
+{
+    max-width: 1024px;
+}

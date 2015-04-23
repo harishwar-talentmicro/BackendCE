@@ -632,7 +632,17 @@ angular.module('ezeidApp').controller('SearchController', [
                                     }
                                     $timeout(function () {
                                         SearchSec.mInfo = data[0];
-                                       //Below lines are to show address in info tab
+
+                                        //Set Visibal module
+                                        $scope.showSalesEnquiry = SearchSec.mInfo.VisibleModules[0];
+                                        $scope.showHomeDelivery = SearchSec.mInfo.VisibleModules[1];
+                                        $scope.shoReserVation = SearchSec.mInfo.VisibleModules[2];
+                                        $scope.showServiceRequest = SearchSec.mInfo.VisibleModules[3];
+                                        $scope.showSendCv = SearchSec.mInfo.VisibleModules[4];
+
+
+
+                                        //Below lines are to show address in info tab
                                         $scope.AddressForInfoTab = (SearchSec.mInfo.AddressLine1 != "") ? SearchSec.mInfo.AddressLine1 +', ' : "";
                                         $scope.AddressForInfoTab += (SearchSec.mInfo.AddressLine2 != "") ? SearchSec.mInfo.AddressLine2 +', ' : "";
                                         $scope.AddressForInfoTab += (SearchSec.mInfo.CityTitle != "") ? SearchSec.mInfo.CityTitle +', ' : "";
