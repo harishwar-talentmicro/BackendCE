@@ -55,23 +55,25 @@ angular.module('ezeidApp').controller('bulksalesController',[
     salesEnquiry.result = $scope.searchResult;
     $scope.searchResult == null ? $scope.showListing = false : $scope.showListing = true;
 
-    if($scope.searchResult != null)
+   /* if($scope.searchResult != null)
     {
         for (var i = 0; i < $scope.searchResult.length; i++) {
             $scope.selectedList.push($scope.searchResult[i].TID);
         }
-    }
+    }*/
+
+
 
     // To get and remove value of check box
     $scope.toggleCheckbox = function(event){
         var elem = event.currentTarget;
         var val = $(elem).data('tid');
         if($(elem).is(":checked")){
-            $scope.selectedList.push(val);
+            $scope.selectedTID.push(val);
         }
         else{
-            var index = $scope.selectedList.indexOf(val);
-            $scope.selectedList.splice(index,1);
+            var index = $scope.selectedTID.indexOf(val);
+            $scope.selectedTID.splice(index,1);
         }
     };
 
@@ -275,13 +277,14 @@ angular.module('ezeidApp').controller('bulksalesController',[
     salesEnquiry.SendEnquiryMail = function () {
 
         salesEnquiry._info.Token = $rootScope._userInfo.Token;
+       
         if($scope.selectedList.length > 10)
         {
             Notification.error({ message: 'Maximum Limit: 10 companies…', delay: MsgDelay });
         }
         else
         {
-            $http({ method: 'get', url: GURL + 'ewtSendBulkMailer?Token=' + $rootScope._userInfo.Token + '&TID='+ Tids + '&TemplateID='+ salesEnquiry._info.TID }).success(function (data)
+            $http({ method: 'get', url: GURL + 'ewtSendBulkMailer?Token=' + $rootScope._userInfo.Token + '&TID='+ $scope.selectedTID + '&TemplateID='+ salesEnquiry._info.TID }).success(function (data)
             {
                  if (data != 'null')
                  {
@@ -319,7 +322,10 @@ angular.module('ezeidApp').controller('bulksalesController',[
 
     };
 
-
+        $rootScope.$on('$locationChangeStart',function(){
+            $window.localStorage.removeItem("searchResult");
+            $window.localStorage.removeItem("selectedTids");
+        });
 /*
   });
 */

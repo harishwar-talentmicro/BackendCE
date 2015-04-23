@@ -20,15 +20,40 @@ HeaderApp.directive('headerSection',['Notification','$window' ,function (Notific
                         method: 'post', url: GURL + 'ewLogin', data: Logdata
                     }).success(function (data,status,x) {
 
+
                         $rootScope._userInfo = data;
 
-                           var userName = data.FirstName;
-                           if(userName.length >= 15)
-                            {
-                                userName = userName.substring(0,12);
-                                userName = userName+ "...";
+                            if ($rootScope._userInfo.IsAuthenticate == true) {
+                                // Notification.success({ message: "Sign In Success", delay: MsgDelay });
+
+                                $('#SignIn_popup').slideUp();
+                                $location.path('/');
+                                if (form) {
+                                    form.$setPristine();
+                                    form.$setUntouched();
+                                }
+                                if($rootScope.defer){
+                                    $rootScope.defer.resolve({message:'Search Done'});
+                                }
+                                SignCtrl.LInfo = {};
                             }
-                            $rootScope._userInfo.userName = userName ;
+                            else{
+                                SignCtrl.FMessage = 'Invalid Credentials';
+                                return;
+                            }
+
+                            var userName = data.FirstName;
+                            if(userName != null)
+                            {
+                                if(userName.length >= 15)
+                                {
+                                    userName = userName.substring(0,12);
+                                    userName = userName+ "...";
+                                }
+                                $rootScope._userInfo.userName = userName ;
+                            }
+
+
 
                         if (typeof (Storage) !== "undefined") {
                             var encrypted = CryptoJS.AES.encrypt(JSON.stringify(data), "EZEID");
@@ -37,21 +62,6 @@ HeaderApp.directive('headerSection',['Notification','$window' ,function (Notific
                             alert('Sorry..! Browser does not support');
                             window.location.href = "/";
                         }
-                        if ($rootScope._userInfo.IsAuthenticate == true) {
-                           // Notification.success({ message: "Sign In Success", delay: MsgDelay });
-                            $('#SignIn_popup').slideUp();
-                            $location.path('/');
-                            if (form) {
-                                form.$setPristine();
-                                form.$setUntouched();
-                            }
-                            if($rootScope.defer){
-                                $rootScope.defer.resolve({message:'Search Done'});
-                            }
-                            SignCtrl.LInfo = {};
-                        }
-                        else
-                            SignCtrl.FMessage = 'Invalid Credentials';
                     });
                 }
                 else {

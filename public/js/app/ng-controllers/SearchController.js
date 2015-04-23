@@ -1479,6 +1479,11 @@ angular.module('ezeidApp').controller('SearchController', [
                 var index = $scope.selectedList.indexOf(val);
                 $scope.selectedList.splice(index,1);
            }
-            $window.localStorage.setItem("selectedTids", JSON.stringify($scope.selectedList));
         };
+
+        $rootScope.$on('$locationChangeStart',function(){
+
+            $window.localStorage.setItem("selectedTids", JSON.stringify($scope.selectedList));
+        });
+
 }]);
