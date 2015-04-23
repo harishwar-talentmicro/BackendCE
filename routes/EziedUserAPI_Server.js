@@ -6496,6 +6496,10 @@ exports.FnSaveTranscation = function(req, res){
         var NextActionDateTime = req.body.NextActionDateTime;
             var  TaskDateNew = new Date(TaskDateTime);
             var NextActionDateTimeNew = new Date(NextActionDateTime);
+        var DeliveryAddress = req.body.DeliveryAddress;
+            if(DeliveryAddress == '')
+                DeliveryAddress = '';
+                
         var ItemIDList='';
        // console.log(ItemsList);
         var RtnMessage = {
@@ -6522,7 +6526,7 @@ exports.FnSaveTranscation = function(req, res){
                 if (!err) {
                     if (Result != null) {
 
-                        var query = db.escape(Token)+","+db.escape(MessageType)+","+ db.escape(MessageText)+ "," + db.escape(Status) +"," + db.escape(TaskDateNew) + ","  + db.escape(Notes) + "," + db.escape(LocID)  + "," + db.escape(Country)   + "," + db.escape(State) + "," + db.escape(City)   + "," + db.escape(Area)   + ","  + db.escape(Latitude)  + "," + db.escape(Longitude)  +  "," + db.escape(EZEID)  + "," + db.escape(ContactInfo)  + "," + db.escape(FolderRuleID)  + "," + db.escape(Duration)  + "," + db.escape(DurationScales) + "," + db.escape(NextAction) + "," + db.escape(NextActionDateTimeNew) + "," + db.escape(TID) + "," + db.escape(((ItemIDList != "") ? ItemIDList : ""));
+                        var query = db.escape(Token)+","+db.escape(MessageType)+","+ db.escape(MessageText)+ "," + db.escape(Status) +"," + db.escape(TaskDateNew) + ","  + db.escape(Notes) + "," + db.escape(LocID)  + "," + db.escape(Country)   + "," + db.escape(State) + "," + db.escape(City)   + "," + db.escape(Area)   + ","  + db.escape(Latitude)  + "," + db.escape(Longitude)  +  "," + db.escape(EZEID)  + "," + db.escape(ContactInfo)  + "," + db.escape(FolderRuleID)  + "," + db.escape(Duration)  + "," + db.escape(DurationScales) + "," + db.escape(NextAction) + "," + db.escape(NextActionDateTimeNew) + "," + db.escape(TID) + "," + db.escape(((ItemIDList != "") ? ItemIDList : "")) + "," + db.escape(DeliveryAddress) ;
                         // db.escape(NextActionDateTime);
                         console.log('CALL pSaveTrans(' + query + ')');
                         db.query('CALL pSaveTrans(' + query + ')', function (err, InsertResult) {
@@ -8924,6 +8928,30 @@ exports.FnDeleteWebLink = function(req, res){
 }
 
 //method to redirect the weblink
+
+var FnGetRedirectLink = function(ezeid,urlSeqNumber,redirectCallback){
+    var Insertquery = db.escape(ezeid) + ',' + db.escape(urlSeqNumber);
+    db.query('CALL pRedirectWebLink(' + Insertquery + ')', function (err, results) {
+        if(err){
+            console.log(err);
+            redirectCallback(null);
+        }
+        else{
+            if(results.length > 0){
+                if(results[0].length > 0){
+                    redirectCallback(results[0][0].URL);
+                }
+                else{
+                    redirectCallback(null);
+                }
+            }
+            else{
+                redirectCallback(null);
+            }
+        }
+    });
+};
+
 exports.FnWebLinkRedirect = function(req,res,next){
     if(req.params.id){
         var link = req.params.id;
@@ -8942,11 +8970,13 @@ exports.FnWebLinkRedirect = function(req,res,next){
                     var urlSeqNumber = parseInt(urlBreaker.join(''));
                     if(!isNaN(urlSeqNumber)){
                         if(urlSeqNumber > 0 && urlSeqNumber < 100){
-                            LocationManager.FnGetRedirectLink(ezeid,urlSeqNumber,function(url){
-                               if(url){
+                            FnGetRedirectLink(ezeid,urlSeqNumber,function(url){
+                                
+                                if(url){
                                     res.redirect(url);
                                 }
                                 else{
+                                    
                                     next();
                                 }
                             });
@@ -8969,29 +8999,6 @@ exports.FnWebLinkRedirect = function(req,res,next){
         }
     }
 }
-
-exports.FnGetRedirectLink = function(ezeid,urlSeqNumber,redirectCallback){
-    var Insertquery = db.escape(ezeid) + ',' + db.escape(urlSeqNumber);
-    db.query('CALL pRedirectWebLink(' + Insertquery + ')', function (err, results) {
-        if(err){
-            console.log(err);
-            redirectCallback(null);
-        }
-        else{
-            if(results.length > 0){
-                if(results[0].length > 0){
-                    redirectCallback(results[0][0].URL);
-                }
-                else{
-                    redirectCallback(null);
-                }
-            }
-            else{
-                redirectCallback(null);
-            }
-        }
-    });
-};
 
 
 
@@ -11573,79 +11580,3 @@ exports.FnSaveCitysVES = function(req, res){
         throw new Error(ex);
     }
 };
-
-
-
-
-var FnGetRedirectLink = function(ezeid,urlSeqNumber,redirectCallback){
-    var Insertquery = db.escape(ezeid) + ',' + db.escape(urlSeqNumber);
-    db.query('CALL pRedirectWebLink(' + Insertquery + ')', function (err, results) {
-        if(err){
-            console.log(err);
-            redirectCallback(null);
-        }
-        else{
-            if(results.length > 0){
-                if(results[0].length > 0){
-                    redirectCallback(results[0][0].URL);
-                }
-                else{
-                    redirectCallback(null);
-                }
-            }
-            else{
-                redirectCallback(null);
-            }
-        }
-    });
-};
-
-exports.FnWebLinkRedirect = function(req,res,next){
-    if(req.params.id){
-        var link = req.params.id;
-        var arr = link.split('.');
-        if(arr.length > 1){
-            var lastItem = arr[arr.length - 1];
-
-            arr.splice(arr.length - 1,1);
-
-            var ezeid = arr.join('.');
-
-            var urlBreaker = lastItem.split('');
-            if(urlBreaker.length > 1){
-                if(urlBreaker[0] === 'U'){
-                    urlBreaker.splice(0,1);
-                    var urlSeqNumber = parseInt(urlBreaker.join(''));
-                    if(!isNaN(urlSeqNumber)){
-                        if(urlSeqNumber > 0 && urlSeqNumber < 100){
-                            FnGetRedirectLink(ezeid,urlSeqNumber,function(url){
-                                console.log(url);
-                                if(url){
-                                    res.redirect(url);
-                                }
-                                else{
-                                    console.log('I am null');
-                                    next();
-                                }
-                            });
-                        }
-                        else{
-                            next();
-                        }
-                    }
-                    else{
-                        next();
-                    }
-                }
-            }
-            else{
-                next();
-            }
-        }
-        else{
-            next();
-        }
-    }
-}
-
-
