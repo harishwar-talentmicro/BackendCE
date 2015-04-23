@@ -524,11 +524,13 @@ angular.module('ezeidApp').controller('SearchController', [
         SearchSec.Criteria.ParkingStatus = SearchSec.Criteria.ParkingStatus1 == true ? 1 : 0;
         SearchSec.Criteria.HomeDelivery = SearchSec.Criteria.HomeDelivery1 == true ? 1 : 0;
         SearchSec.Criteria.OpenStatus = SearchSec.Criteria.OpenStatus1 == true ? 1 : 0;
-        var currentDate = moment().format('YYYY-MM-DD hh:mm');
+        var currentDate = moment().format('YYYY-MM-DD HH:mm:ss');
         $scope.AddressForInfoTab = "";
         AutoRefresh = false;
 
         SearchSec.Criteria.CurrentDate = currentDate;
+
+
        // if ($rootScope._userInfo.IsAuthenticate == true || SearchSec.Criteria.SearchType == 2 && SearchSec.IsSearchButtonClicked || SearchSec.Criteria.SearchType == 3 && SearchSec.IsSearchButtonClicked) {
 
             if($rootScope._userInfo.Token == "")
@@ -1425,7 +1427,7 @@ angular.module('ezeidApp').controller('SearchController', [
 
     function getSearchInformation(_item)
     {
-        var currentDate = moment().format('YYYY-MM-DD hh:mm');
+        var currentDate = moment().format('YYYY-MM-DD HH:mm:ss');
         $http({ method: 'get', url: GURL + 'ewtGetSearchInformation?Token=' + $rootScope._userInfo.Token + '&TID=' + _item.TID + '&CurrentDate=' + currentDate}).success(function (data) {
 
             if (data != 'null') {
