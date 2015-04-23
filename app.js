@@ -206,53 +206,7 @@ app.get('/:page/:subpage',function(req,res){
  * Used for WebLinks
  * eg. http://www.ezeid.com/TALENTMICRO.U12
  */
-app.get('/:id',function(req,res,next){
-    if(req.params.id){
-        var link = req.params.id;
-        var arr = link.split('.');
-        if(arr.length > 1){
-            var lastItem = arr[arr.length - 1];
-
-            arr.splice(arr.length - 1,1);
-
-            var ezeid = arr.join('.');
-
-            var urlBreaker = lastItem.split('');
-            if(urlBreaker.length > 1){
-                if(urlBreaker[0] === 'U'){
-                    urlBreaker.splice(0,1);
-                    var urlSeqNumber = parseInt(urlBreaker.join(''));
-                    if(!isNaN(urlSeqNumber)){
-                        if(urlSeqNumber > 0 && urlSeqNumber < 100){
-                            LocationManager.FnGetRedirectLink(ezeid,urlSeqNumber,function(url){
-                                console.log(url);
-                                if(url){
-                                    res.redirect(url);
-                                }
-                                else{
-                                    console.log('I am null');
-                                    next();
-                                }
-                            });
-                        }
-                        else{
-                            next();
-                        }
-                    }
-                    else{
-                        next();
-                    }
-                }
-            }
-            else{
-                next();
-            }
-        }
-        else{
-            next();
-        }
-    }
-});
+app.get('/:id',LocationManager.FnWebLinkRedirect);
 
 app.get('/:page',function(req,res){
     res.sendFile(__dirname + '/public/html/index.html');
