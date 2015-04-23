@@ -14,12 +14,11 @@
 }
 .navbar-right {
     float: right!important;
-    margin-right: -39px;
 }
 .maxWidthEzeid
 {
-    /*max-width: 1200px;*/
-    max-width: 1024px;
+    max-width: 1200px;
+   /* max-width: 1024px;*/
 }
 .fontColorType
 {
@@ -48,9 +47,10 @@
     border-color: #078FC3;
 }
 
-.middalContainerHeight{
+/*.middalContainerHeight{
     height: 355px;
-}
+    border: 1px solid #ff0000;
+}*/
 
 
 .hSeparaterLine{
@@ -154,16 +154,14 @@ hr {
     margin-top: 0px;
     padding-top:  0px;
 }
-.infoContainer
-{
+.infoContainer {
     padding-left: 0px;
     padding-right: 0px;
     margin-bottom: 0px;
-  /*  background-image: url(../images/infoBackground.png);*/
-   /* height: 360px;*/
     height: auto;
-    min-height: 375px;
-    background: #e6f9ff;
+    min-height: 368px;
+    background: #FFFFFF;
+    border-right: 2px dashed #717171;
 }
 
 .fourteenFontSize
@@ -254,7 +252,6 @@ hr {
 }
 .topSearchRow
 {
-    background: #86d7ea;
     /*background: #ffffff;*/
     height: 36px;
 }
@@ -393,6 +390,9 @@ body {
 {
     height: 40px;
     background: #09a2de;
+    border-right: 1px solid #7B7B7B;
+    border-left: 1px solid #7B7B7B;
+    border-bottom: 1px solid #7B7B7B;
 }
 .fotterButtonContainer
 {
@@ -839,7 +839,7 @@ body {
 }
 .bannerHeaderTopMargin
 {
-    margin-top: 60px;
+    margin-top: 58px;
 }
 .WraperBottomPadding
 {
@@ -847,14 +847,17 @@ body {
 }
 .BewareTextMainContainer
 {
-    height: 150px;
+    height: 120px;
     background: #ff0000;
     text-align: center;
     color: #ffffff;
+    width: 1024px;
+}
+.banner-container{
+    border:1px solid #000000;
 }
 .bewareTextSize
 {
-    padding-top: 7%;
     font-size: 18px;
 }
 .bewareTextMessage
@@ -996,7 +999,8 @@ body {
 }
 .middleContentainerTopSpace
 {
-    border: 2px solid #ffffff;
+    border: 2px solid #ff0000;
+    height: 355px;
 }
 .setRowRightMarginTwo
 {
@@ -1016,8 +1020,8 @@ body {
 }
 .setPaddingLeftRight4
 {
-    padding-right: 4px;
-    padding-left: 4px;
+    padding-right: 3%;
+    padding-left: 3%;
 }
 .leftPadding4
 {
@@ -1028,4 +1032,35 @@ body {
     text-align: center;
     padding-right: 7px;
     margin-top: 0.7%;
+}
+.setpadding12
+{
+    padding-right: 12px;
+    padding-left: 12px;
+}
+.setMarginTop2
+{
+    margin-top: 2px;
+}
+
+.input-box-height{
+    height:34px;
+}
+
+.row-search-criteria label{
+    font-weight: normal;
+    color:#000;
+}
+
+.row-search-criteria label:hover,
+.row-search-criteria label:focus,
+.row-search-criteria label:active{
+    text-decoration: none;
+    color:#000;
+}
+
+.search-map-container{
+    border-right: 1px solid #7B7B7B;
+    border-left: 1px solid #7B7B7B;
+    border-top: 1px solid #7B7B7B;
 }

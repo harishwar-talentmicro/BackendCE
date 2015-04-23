@@ -192,7 +192,7 @@
 }
 
 #map-canvasH{
-    height: 375px;
+    height: 366px;
     width: 100%;
 }
 
@@ -456,7 +456,7 @@ body > div.viewport{
 body > div.viewport > div#wrapper{
     min-height: 91%;
     height: auto;
-    padding-bottom: 20px;
+    padding-bottom: 2px;
 }
 
 footer{
