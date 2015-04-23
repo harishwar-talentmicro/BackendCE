@@ -8710,18 +8710,22 @@ exports.FnSaveWebLink = function(req, res){
         var Token = req.body.Token;
         var URL = req.body.URL;
         var URLNo = req.body.URLNo;
-            
+        
         var RtnMessage = {
             IsSuccessfull: false,
             Message:''
         };
-       
-        if (Token != null && URL != null && URLNo != null) {
+       if(URLNo > 0 && URLNo < 100)
+           var URLNumber = URLNo;
+        else
+            RtnMessage.Message = 'Please Enter a URLNumber 1 t0 99';
+        
+        if (Token != null && URL != null && URL != '' && URLNumber != null) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
-                        
-                        var query = db.escape(Token) + ',' + db.escape(URL) + ',' + db.escape(URLNo) ;
+                        console.log(Token,URL,URLNumber);
+                        var query = db.escape(Token) + ',' + db.escape(URL) + ',' + db.escape(URLNumber) ;
                         db.query('CALL pSaveWebLinks(' + query + ')', function (err, InsertResult) {
                             if (!err){
                                 if (InsertResult.affectedRows > 0) {
@@ -8762,14 +8766,14 @@ exports.FnSaveWebLink = function(req, res){
         }
 
         else {
-            if (Token == null) {
+            if(Token == null) {
                 console.log('FnSaveWebLink: Token is empty');
             }
-            else if (URL == null) {
+            else if(URL == null && URL == '') {
                 console.log('FnSaveWebLink: URL is empty');
             }
-            else if (URLNo == null) {
-                console.log('FnSaveWebLink: URLNo is empty');
+            else if (URLNumber == null) {
+                console.log('FnSaveWebLink: URLNumber is empty');
             }
             
             res.statusCode=400;

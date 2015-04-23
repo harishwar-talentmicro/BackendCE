@@ -225,12 +225,10 @@ app.get('/:id',function(req,res,next){
                     if(!isNaN(urlSeqNumber)){
                         if(urlSeqNumber > 0 && urlSeqNumber < 100){
                             LocationManager.FnGetRedirectLink(ezeid,urlSeqNumber,function(url){
-                                console.log(url);
                                 if(url){
                                     res.redirect(url);
                                 }
                                 else{
-                                    console.log('I am null');
                                     next();
                                 }
                             });
