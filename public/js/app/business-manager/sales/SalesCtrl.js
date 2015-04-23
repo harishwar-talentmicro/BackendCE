@@ -639,7 +639,9 @@ angular.module('ezeidApp')
                 method : "GET",
                 params : {
                     Token : $rootScope._userInfo.Token,
-                    FunctionType : 0
+                    FunctionType : 0,
+                    Page : 1,
+                    Status : 0
                 }
             }).success(function(resp){
                     var gridData = [];
