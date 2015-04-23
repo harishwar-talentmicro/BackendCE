@@ -47,7 +47,6 @@ angular.module('ezeidApp').controller('ConfigurationNavigationCtrl',[
         $scope.pageRules = "html/profile/configuration/subviews/rules.html";
         $scope.pageWorkingHours = "html/profile/configuration/subviews/working-hours.html";
         $scope.pageHolidayCalender = "html/profile/configuration/subviews/holiday-calender.html";
-        $scope.pageBusinessListing = "html/profile/configuration/subviews/business-listing.html";
         $scope.pageModuleSettings = "html/profile/configuration/subviews/module-settings.html";
 
         $scope.activeSubTemplate = $scope.pageModuleSettings;

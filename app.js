@@ -202,6 +202,12 @@ app.get('/:page/:subpage',function(req,res){
     res.sendFile(__dirname + '/public/html/index.html');
 });
 
+/**
+ * Used for WebLinks
+ * eg. http://www.ezeid.com/TALENTMICRO.U12
+ */
+app.get('/:id',LocationManager.FnWebLinkRedirect);
+
 app.get('/:page',function(req,res){
     res.sendFile(__dirname + '/public/html/index.html');
 });

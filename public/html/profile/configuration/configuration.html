@@ -16,14 +16,9 @@
             <li role="presentation" ng-class="{'active':pageStatusTypes === activeSubTemplate}">
                 <a  ng-click="changeActive(pageStatusTypes)" class="btn-link"><span class="glyphicon glyphicon-transfer"></span> Status Types</a>
             </li>
-            <!--<li role="presentation" ng-class="{'active':pageActionTypes === activeSubTemplate}">-->
-                <!--<a  ng-click="changeActive(pageActionTypes)" class="btn-link"><span class="glyphicon glyphicon-pushpin"></span> Action Types</a>-->
-            <!--</li>-->
-
-            <li role="presentation" ng-class="{'active':pageActionTypes === activeSubTemplate}" class="disabled">
-                <a  class="btn-link"><span class="glyphicon glyphicon-pushpin"></span> Action Types</a>
+            <li role="presentation" ng-class="{'active':pageActionTypes === activeSubTemplate}">
+                <a  ng-click="changeActive(pageActionTypes)" class="btn-link"><span class="glyphicon glyphicon-pushpin"></span> Action Types</a>
             </li>
-
             <li role="presentation" ng-class="{'active':pageRules === activeSubTemplate}" ng-hide="1">
                 <a ng-click="changeActive(pageRules)" class="btn-link"><span class="glyphicon glyphicon-filter"></span> Rules</a>
             </li>
@@ -32,9 +27,6 @@
             </li>
             <li role="presentation" ng-class="{'active':pageHolidayCalender === activeSubTemplate}">
                 <a ng-click="changeActive(pageHolidayCalender)" class="btn-link"><span class="glyphicon glyphicon-calendar"></span> Holiday Calender</a>
-            </li>
-            <li role="presentation" ng-class="{'active':pageBusinessListing === activeSubTemplate}" ng-hide="1">
-                <a ng-click="changeActive(pageBusinessListing)" class="btn-link"><span class="glyphicon glyphicon-briefcase"></span> Business Listing</a>
             </li>
         </ul>
     </div>
@@ -72,9 +64,6 @@
             </li>
             <li role="presentation" ng-class="{'active':pageHolidayCalender === activeSubTemplate}">
                 <a ng-click="changeActive(pageHolidayCalender)" class="btn-link"><span class="glyphicon glyphicon-calendar"></span> Holiday Calender</a>
-            </li>
-            <li role="presentation" ng-class="{'active':pageBusinessListing === activeSubTemplate}">
-                <a ng-click="changeActive(pageBusinessListing)" class="btn-link"><span class="glyphicon glyphicon-briefcase"></span> Business Listing</a>
             </li>
         </ul>
     </div>
