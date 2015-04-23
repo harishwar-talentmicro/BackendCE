@@ -1,5 +1,5 @@
 <!--<div id="" ng-controller="HomeController as Home" class="WraperBottomPadding">-->
-<div id="wrapper" ng-controller="HomeController as Home">
+<div id="wrapper" ng-controller="HomeController as Home" xmlns="http://www.w3.org/1999/html">
     <header-section></header-section>
     <div ng-controller="SearchController as search">
 
@@ -284,19 +284,19 @@
             <div class="row bannerHeaderTopMargin"></div>
             <div class="row">
               <!-- <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 col-lg-offset-2 col-md-offset-2 col-sm-offset-2 col-xs-offset-0">-->
-              <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+              <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setpadding12">
                     <div class="panel panel-default panelBottomSpacing">
                         <div class="panel-body setPanelPadding">
 
                         <!--New design starts from hear-->
                         <div class="row setRowLeftRightMarginZero">
                             <div class="row setRowLeftRightMarginZero">
-                                <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12 setLeftRightPaddingZero">
-                                    <div class="row setRowLeftRightMarginZero setRowRightMarginTwo setRowLeftMarginTwo">
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setLeftRightPaddingZero">
+                                    <div class="row setRowLeftRightMarginZero banner-container">
 
                                        <div ng-hide="(search.mInfo.Redflagstatus == 1)">
                                             <div ng-show="search.mInfo.BannerImage">
-                                                <img width="100%" height="150px" ng-src="{{search.mInfo.BannerImage}}" />
+                                                <img width="100%" height="120px" ng-src="{{search.mInfo.BannerImage}}" />
                                                 <img class="imgLeft showPointer" ng-show="search.previousButton == true" ng-click="search.getPreviousBanner()" src="images/arrow_left.png" />
                                                <!-- <img class="imgLeft showPointer" ng-show="search.previousButton == false" src="images/arrow_left_gray.png" /> -->
 
@@ -304,11 +304,12 @@
                                                <!-- <img class="imgRight showPointer" ng-show="search.nextButton == false" src="images/arrow_right_grey.png" /> -->
                                             </div>
                                             <div ng-hide="search.mInfo.BannerImage">
-                                               <img width="100%" height="150px" src="../images/top-banner.gif"/>
+                                               <img width="100%" height="120px" src="../images/top-banner.gif"/>
                                             </div>
                                         </div>
 
                                        <div class="BewareTextMainContainer" ng-show="(search.mInfo.Redflagstatus == 1)">
+
                                             <div class="row setRowLeftRightMarginZero searchProximityRange bewareTextSize">
                                                <b> BEWARE !!! </b>
                                             </div>
@@ -317,16 +318,32 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="row setRowLeftRightMarginZero middleContentainerTopSpace middalContainerHeight">
+                                    <div class="row setRowLeftRightMarginZero setMarginTop2 search-map-container">
                                         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setLeftRightPaddingZero">
-                                            <div class="col-lg-5 col-md-5 col-sm-5 col-xs-12 infoContainer">
+                                            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 infoContainer">
                                                 <form class="form-signin" role="form" novalidate  ng-submit="search.getSearch()">
                                                     <div class="row setRowLeftRightMarginZero">
                                                         <div class="row setRowLeftRightMarginZero ">
                                                             <div class="topSearchRow bottom-clearfix ezeid-nav-tab setBottomMargin0">
                                                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setLeftRightPaddingZero">
                                                                     <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10 text-center setLeftRightPaddingZero">
-                                                                        <ul class="nav nav-pills ">
+                                                                        <ul class="nav nav-pills hidden-xs">
+                                                                            <li role="presentation" ng-class="search.showInfoWindow || search.showResultWindow ? 'active' : ''">
+                                                                                <a class="setBottomMargin0 btn-link" ng-click="showSearchTab()">Search</a>
+                                                                            </li>
+                                                                            <li ng-show="search.showResultTab" ng-class="search.showInfoWindow || search.showSearchWindow ? 'active' : ''">
+                                                                                <a class="setBottomMargin0 btn-link" style="margin-bottom: 0px;" ng-click="showResultWindow()">Result</a>
+                                                                            </li>
+                                                                            <li ng-show="ShowLinks" ng-class="search.showResultWindow || search.showSearchWindow ? 'active' : ''">
+                                                                                <a class="setBottomMargin0 btn-link" ng-click="showInfoWindowTab()">Information</a>
+                                                                            </li>
+                                                                            <!--<li class="pull-right" ng-class="search.showResultWindow || search.showSearchWindow ? 'active' : ''">-->
+                                                                            <!-- <li class="pull-right" class="">
+                                                                                <a class="setBottomMargin0 btn-link setItAsTab" ng-click="openHelpPopup()" style="text-align: right;" id="SearchHelp">Help ?</a>
+                                                                            </li>-->
+                                                                        </ul>
+
+                                                                        <ul class="nav nav-pills nav-stacked hidden-lg hidden-md hidden-sm">
                                                                             <li role="presentation" ng-class="search.showInfoWindow || search.showResultWindow ? 'active' : ''">
                                                                                 <a class="setBottomMargin0 btn-link" ng-click="showSearchTab()">Search</a>
                                                                             </li>
@@ -440,52 +457,68 @@
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div ng-show="search.showSearchWindow">
-                                                        <div class="row addItemRowUserEzeid1 setTopMargin" >
-                                                            <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 normalFontSize searchRadioPadding searchByText">
+                                                    <div ng-show="search.showSearchWindow ">
+                                                        <div class="row addItemRowUserEzeid1 setTopMargin setPaddingLeftRight4 row-search-criteria" >
+                                                            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 normalFontSize searchRadioPadding searchByTex ">
+                                                                <label>Search by</label>
+                                                            </div>
+                                                            <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 normalFontSize text-left">
+
+                                                                <input type="radio" class="setRadioFilterSpace" ng-model="search.Criteria.SearchType" id="EZEID" value="1" name="searchBy" ng-change="search.isEZEIDselected('1')" class="radioTopMargin" checked>
+                                                                <label class="btn-link" for="EZEID"> EZEID</label>
+                                                            </div>
+
+                                                            <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 normalFontSize text-left">
+                                                                <input type="radio" class="setRadioFilterSpace" ng-model="search.Criteria.SearchType" id="Keywords" value="2" ng-change="search.isEZEIDselected('2')" ng-click="search.SearchTypeKeyWord()" name="searchBy" class="radioTopMargin">
+                                                                <label class="btn-link" for="Keywords"> Keywords</label>
+                                                            </div>
+                                                            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 normalFontSize text-left">
+                                                                <input type="radio" class="setRadioFilterSpace" ng-model="search.Criteria.SearchType" id="JobKeywords" name="searchBy" value="3" ng-change="search.isEZEIDselected('3')" ng-click="search.SearchTypeKeyWord()" class="radioTopMargin" >
+                                                                <label class="btn-link" for="JobKeywords"> Job Keywords</label>
+                                                            </div>
+                                                           <!-- <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                                                 Search by
-                                                            </div>
-                                                            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-3 normalFontSize searchRadioPadding1">
                                                                 <input type="radio" class="setRadioFilterSpace" ng-model="search.Criteria.SearchType" id="EZEID" value="1" name="searchBy" ng-change="search.isEZEIDselected('1')" class="radioTopMargin" checked>EZE ID
-                                                            </div>
-                                                            <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 normalFontSize searchRadioPadding1 keyWordText">
-                                                                <input type="radio" class="setRadioFilterSpace" ng-model="search.Criteria.SearchType" id="Keywords" value="2" ng-change="search.isEZEIDselected('2')" ng-click="search.SearchTypeKeyWord()" name="searchBy" class="radioTopMargin">Keywords
-                                                            </div>
-                                                            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-3 normalFontSize searchRadioPadding1 jobKeywordText">
+                                                                 <input type="radio" class="setRadioFilterSpace" ng-model="search.Criteria.SearchType" id="Keywords" value="2" ng-change="search.isEZEIDselected('2')" ng-click="search.SearchTypeKeyWord()" name="searchBy" class="radioTopMargin">Keywords
                                                                 <input type="radio" class="setRadioFilterSpace" ng-model="search.Criteria.SearchType" name="searchBy" value="3" ng-change="search.isEZEIDselected('3')" ng-click="search.SearchTypeKeyWord()" class="radioTopMargin" >Job Keywords
-                                                            </div>
+                                                            </div>-->
                                                         </div>
                                                         <div class="row addItemRowUserEzeid setTextAlignment setTopMargin">
-                                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 normalFontSize setPaddingLeftRight4">
-                                                                <input id="inputEmail" class="form-control setTextAlignment" ng-model="search.Criteria.Keywords" ng-click="search.SearchTypeKeyWord()"
-                                                                       required autofocus type="text" ng-class="search.Criteria.SearchType == 1 ? 'setUpperChar' : ''"
-                                                                       placeholder="{{search.Placeholder}}">
+
+                                                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 normalFontSize setPaddingLeftRight4">
+                                                                    <div class="form-group">
+                                                                    <input id="inputEmail" class="form-control setTextAlignment" ng-model="search.Criteria.Keywords" ng-click="search.SearchTypeKeyWord()"
+                                                                           required autofocus type="text" ng-class="search.Criteria.SearchType == 1 ? 'setUpperChar' : ''"
+                                                                           placeholder="{{search.Placeholder}}">
+                                                                    </div>
                                                             </div>
+
                                                         </div>
                                                         <div ng-hide="search.Criteria.SearchType == 1">
-                                                            <div class="row searchWithin setTopMargin fontColorType">
-                                                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 normalFontSize searchWithinText">
-                                                                    Proximity of
+                                                            <div class="row searchWithin setTopMargin fontColorType setPaddingLeftRight4">
+                                                                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 normalFontSize removePadding input-box-height center-vertical">
+                                                                    <span class="center-vertical">Proximity of</span>
                                                                 </div>
-                                                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 normalFontSize searchProximityRange">
+                                                                <div class="col-lg-7 col-md-7 col-sm-7 col-xs-7 normalFontSize">
+
                                                                     <select class="form-control" ng-model="search.Criteria.Proximity">
                                                                         <option value="{{proximity.MilesValue}}"  ng-selected="{{proximity.MilesValue == 50}}" ng-repeat="proximity in search.proximities">{{proximity.Title}}</option>
                                                                         <option value="0">Any</option>
                                                                     </select>
                                                                 </div>
-                                                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 normalFontSize searchProximityText" >
-                                                                    from
+                                                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 normalFontSize text-right input-box-height center-vertical" >
+                                                                    <span class="center-vertical">from</span>
                                                                 </div>
                                                             </div>
-                                                            <div class="row centerAlign searchButtonMarginSet">
+                                                            <div class="row centerAlign searchButtonMarginSet setPaddingLeftRight4">
                                                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 searchAddress setPaddingLeftRight4">
                                                                     <div class="addressTextContainer"><div class="inerAddText">{{ Address }} </div></div>
                                                                 </div>
                                                             </div>
-                                                            <div class="row centerAlign searchButtonMarginSet showPlaces setTopMargin fontColorType">
-                                                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setPaddingLeftRight4">
+                                                            <div class="row centerAlign searchButtonMarginSet showPlaces setTopMargin fontColorType setPaddingLeftRight4 row-search-criteria">
                                                                     <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 parkingText setLeftRightPaddingZero">
-                                                                        <input type="checkbox" class="chkShowParking" ng-model="search.Criteria.ParkingStatus1" name="parking" value="1,2" checked> Parking Required
+                                                                        <input type="checkbox" id="ezeidChkShowParking" class="chkShowParking" ng-model="search.Criteria.ParkingStatus1" name="parking" value="1,2" checked>
+                                                                        <label class="btn-link" for="ezeidChkShowParking">Parking Required</label>
                                                                     </div>
                                                                     <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 ratingText setRowLeftRightMarginZero">
                                                                         Rating
@@ -506,20 +539,22 @@
                                                                         <img src="../images/smallGreyStar_16.png" ng-hide="showStar5" ng-click="search.addRatting(5,'gray')" >
                                                                         <img src="../images/smallStar_16_.png" ng-show="showStar5" ng-click="search.addRatting(5,'yellow')" >
                                                                     </div>
-                                                                </div>
 
                                                             </div>
-                                                            <div class="row centerAlign searchButtonMarginSet showPlaces setTopMargin">
-                                                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 setLeftRightPaddingZero leftPadding4">
+                                                            <div class="row centerAlign searchButtonMarginSet showPlaces setTopMargin setPaddingLeftRight4 row-search-criteria">
+                                                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 setLeftRightPaddingZero">
                                                                     <span checked data-toggle="tooltip" data-placement="top" title="Show Business Entities providing Home Delivery.">
-                                                                        <input type="checkbox" class="chkShowParking" ng-model="search.Criteria.HomeDelivery1" name="parking" value="1,2"> Need Home Delivery
+                                                                        <input type="checkbox" id="ezeidHomeDelivery" class="chkShowParking" ng-model="search.Criteria.HomeDelivery1" name="parking" value="1,2">
+                                                                        <label for="ezeidHomeDelivery" class="btn-link">Need Home Delivery</label>
                                                                     </span>
-                                                                </div>
-                                                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 setLeftRightPaddingZero" >
+                                                                    </div>
+                                                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 setLeftRightPaddingZero" >
                                                                     <span checked data-toggle="tooltip" data-placement="top" title="Show Business Entities that are Open(Working) now.">
-                                                                        <input type="checkbox" class="chkShowParking" ng-model="search.Criteria.OpenStatus1" name="parking" value="1,2" checked> Open Business only
+                                                                        <input type="checkbox" id="ezeidChkParking" class="chkShowParking" ng-model="search.Criteria.OpenStatus1" name="parking" value="1,2" checked>
+                                                                        <label for="ezeidChkParking" class="btn-link">Open Business only</label>
                                                                     </span>
-                                                                </div>
+                                                                    </div>
+
                                                             </div>
                                                         </div>
                                                         <div class="row centerAlign searchButtonMarginSet setTopMargin">
@@ -570,7 +605,7 @@
                                                 </div>
                                                 </form>
                                             </div>
-                                            <div class="col-lg-7 col-md-7 col-sm-7 col-xs-12 setLeftRightPaddingZero mapBorder">
+                                            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 setLeftRightPaddingZero">
                                                 <div class="innerMapContainer">
                                                     <div style="display:block;">
                                                         <img id="mapClocH" style="padding-top:8px;cursor:pointer;" ng-click="search.getMyLocation()" src="images/myloc.png" />
@@ -696,10 +731,10 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 chatArea setLeftRightPaddingZero">
+                               <!-- <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 chatArea setLeftRightPaddingZero">
                                     chat banner..
-                                    <!--<img width="100%" height="100%" src="../images/chat_banner.png">-->
-                                </div>
+                                    &lt;!&ndash;<img width="100%" height="100%" src="../images/chat_banner.png">&ndash;&gt;
+                                </div>-->
                             </div>
                         </div>
 
