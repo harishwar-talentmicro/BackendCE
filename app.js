@@ -224,18 +224,16 @@ app.get('/:id',function(req,res,next){
                     var urlSeqNumber = parseInt(urlBreaker.join(''));
                     if(!isNaN(urlSeqNumber)){
                         if(urlSeqNumber > 0 && urlSeqNumber < 100){
-
-                            /**
-                             * @todo Call stored procedures and fetch the value of particular url
-                             */
-                            /**
-                             * Eg. redirection
-                             */
-                            var results =  [{
-                                url : 'http://www.google.com'
-                            }];
-
-                            res.redirect(results[0].url);
+                            LocationManager.FnGetRedirectLink(ezeid,urlSeqNumber,function(url){
+                                console.log(url);
+                                if(url){
+                                    res.redirect(url);
+                                }
+                                else{
+                                    console.log('I am null');
+                                    next();
+                                }
+                            });
                         }
                         else{
                             next();

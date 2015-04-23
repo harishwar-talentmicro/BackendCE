@@ -11501,3 +11501,26 @@ exports.FnSaveCitysVES = function(req, res){
         throw new Error(ex);
     }
 };
+
+exports.FnGetRedirectLink = function(ezeid,urlSeqNumber,redirectCallback){
+    var Insertquery = db.escape(ezeid) + ',' + db.escape(urlSeqNumber);
+    db.query('CALL pRedirectWebLink(' + Insertquery + ')', function (err, results) {
+        if(err){
+            console.log(err);
+            redirectCallback(null);
+        }
+        else{
+            if(results.length > 0){
+                if(results[0].length > 0){
+                    redirectCallback(results[0][0].URL);
+                }
+                else{
+                    redirectCallback(null);
+                }
+            }
+            else{
+                redirectCallback(null);
+            }
+        }
+    });
+};
