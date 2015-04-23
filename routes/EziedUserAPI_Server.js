@@ -8710,18 +8710,22 @@ exports.FnSaveWebLink = function(req, res){
         var Token = req.body.Token;
         var URL = req.body.URL;
         var URLNo = req.body.URLNo;
-            
+        
         var RtnMessage = {
             IsSuccessfull: false,
             Message:''
         };
-       
-        if (Token != null && URL != null && URLNo != null) {
+       if(URLNo > 0 && URLNo < 100)
+           var URLNumber = URLNo;
+        else
+            RtnMessage.Message = 'Please Enter a URLNumber 1 t0 99';
+        
+        if (Token != null && URL != null && URL != '' && URLNumber != null) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
-                        
-                        var query = db.escape(Token) + ',' + db.escape(URL) + ',' + db.escape(URLNo) ;
+                        console.log(Token,URL,URLNumber);
+                        var query = db.escape(Token) + ',' + db.escape(URL) + ',' + db.escape(URLNumber) ;
                         db.query('CALL pSaveWebLinks(' + query + ')', function (err, InsertResult) {
                             if (!err){
                                 if (InsertResult.affectedRows > 0) {
@@ -8762,14 +8766,14 @@ exports.FnSaveWebLink = function(req, res){
         }
 
         else {
-            if (Token == null) {
+            if(Token == null) {
                 console.log('FnSaveWebLink: Token is empty');
             }
-            else if (URL == null) {
+            else if(URL == null && URL == '') {
                 console.log('FnSaveWebLink: URL is empty');
             }
-            else if (URLNo == null) {
-                console.log('FnSaveWebLink: URLNo is empty');
+            else if (URLNumber == null) {
+                console.log('FnSaveWebLink: URLNumber is empty');
             }
             
             res.statusCode=400;
@@ -8920,6 +8924,77 @@ exports.FnDeleteWebLink = function(req, res){
         throw new Error(ex);
     }
 }
+
+//method to redirect the weblink
+exports.FnWebLinkRedirect = function(req,res,next){
+    if(req.params.id){
+        var link = req.params.id;
+        var arr = link.split('.');
+        if(arr.length > 1){
+            var lastItem = arr[arr.length - 1];
+
+            arr.splice(arr.length - 1,1);
+
+            var ezeid = arr.join('.');
+
+            var urlBreaker = lastItem.split('');
+            if(urlBreaker.length > 1){
+                if(urlBreaker[0] === 'U'){
+                    urlBreaker.splice(0,1);
+                    var urlSeqNumber = parseInt(urlBreaker.join(''));
+                    if(!isNaN(urlSeqNumber)){
+                        if(urlSeqNumber > 0 && urlSeqNumber < 100){
+                            LocationManager.FnGetRedirectLink(ezeid,urlSeqNumber,function(url){
+                               if(url){
+                                    res.redirect(url);
+                                }
+                                else{
+                                    next();
+                                }
+                            });
+                        }
+                        else{
+                            next();
+                        }
+                    }
+                    else{
+                        next();
+                    }
+                }
+            }
+            else{
+                next();
+            }
+        }
+        else{
+            next();
+        }
+    }
+}
+
+exports.FnGetRedirectLink = function(ezeid,urlSeqNumber,redirectCallback){
+    var Insertquery = db.escape(ezeid) + ',' + db.escape(urlSeqNumber);
+    db.query('CALL pRedirectWebLink(' + Insertquery + ')', function (err, results) {
+        if(err){
+            console.log(err);
+            redirectCallback(null);
+        }
+        else{
+            if(results.length > 0){
+                if(results[0].length > 0){
+                    redirectCallback(results[0][0].URL);
+                }
+                else{
+                    redirectCallback(null);
+                }
+            }
+            else{
+                redirectCallback(null);
+            }
+        }
+    });
+};
+
 
 
 
@@ -11501,6 +11576,7 @@ exports.FnSaveCitysVES = function(req, res){
         throw new Error(ex);
     }
 };
+
 
 
 
