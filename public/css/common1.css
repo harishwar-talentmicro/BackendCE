@@ -1,3 +1,14 @@
+.maxWidthEzeid
+{
+    /*max-width: 1200px;*/
+    max-width: 1024px;
+}
+.fontColorType
+{
+    font-family: 'Roboto', sans-serif;
+    color: #000000;
+}
+
 .hSeparaterLine{
     width: 100%;
     height: 1px;
@@ -185,7 +196,7 @@ hr {
     font-size: 14px;
     margin-right: 0px;
     margin-left: 0px;
-    color: #808080;
+    color: #000000;
 }
 .searchWithinBottom
 {
@@ -236,7 +247,7 @@ hr {
 {
     padding-right: 0px;
     padding-left: 0px;
-    margin-top: 2%;
+    margin-top: 2.5%;
 }
 .searchProximityRange
 {
@@ -254,7 +265,7 @@ hr {
 .searchProximityText
 {
     padding-right: 0px;
-    margin-top: 2%;
+    margin-top: 2.5%;
     padding-left: 5%;
 }
 .ratingText
@@ -312,7 +323,6 @@ body {
 .inerAddText
 {
     padding-top: 2%;
-    padding-left: 2%;
 }
 
 .innerMapContainer
@@ -805,14 +815,14 @@ body {
 }
 .BewareTextMainContainer
 {
-    height: 215px;
+    height: 150px;
     background: #ff0000;
     text-align: center;
     color: #ffffff;
 }
 .bewareTextSize
 {
-    padding-top: 8%;
+    padding-top: 7%;
     font-size: 18px;
 }
 .bewareTextMessage
@@ -852,7 +862,7 @@ body {
 .topSearchRow .nav > li > a
 {
     margin-bottom: 0px;
-    padding-bottom: 8px;
+    padding-bottom: 6px;
 }
 
 /************** Profile Manager Navigation ********************/
@@ -864,7 +874,7 @@ body {
       color:#0DA3D8;
     */
     background: #60D560;
-    color:#FFF;
+    color:#000000;
     margin-bottom: 10px;
 }
 
@@ -890,7 +900,8 @@ body {
       color:#FFF;
     */
     background: #D9ECFF;
-    color:#0DA3D8;
+    /*color:#0DA3D8;*/
+    color:#000000;
     margin-bottom: 0px;
 }
 
@@ -928,7 +939,7 @@ body {
 
 .helpTextContainerDiv
 {
-    text-align: right;
+    text-align: center;
     margin-top: 2.5%;
 }
 
@@ -937,14 +948,14 @@ body {
 
 .imgRight {
     position: absolute;
-    top: 16%;
+    top: 7.5%;
     /* left: 48px; */
     z-index: 3;
     right: 35px;
 }
 .imgLeft {
     position: absolute;
-    top: 16%;
+    top: 7.5%;
     left: 35px;
     z-index: 3;
 }
@@ -970,9 +981,9 @@ body {
 .middleContentainerBottom
 {
     border-bottom:1px solid #2791BA;
-
 }
-.maxWidthEzeid
+.setPaddingLeftRight4
 {
-    max-width: 1024px;
+    padding-right: 4px;
+    padding-left: 4px;
 }
