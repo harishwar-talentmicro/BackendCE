@@ -2073,3 +2073,7 @@ form .row-error{
     background: #B8FFAD;
     border: 1px solid #2ED52A;
 }
+
+.modal-dialog{
+    z-index: 10000;
+}
