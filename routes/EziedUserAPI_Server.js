@@ -11502,6 +11502,31 @@ exports.FnSaveCitysVES = function(req, res){
     }
 };
 
+
+
+var FnGetRedirectLink = function(ezeid,urlSeqNumber,redirectCallback){
+    var Insertquery = db.escape(ezeid) + ',' + db.escape(urlSeqNumber);
+    db.query('CALL pRedirectWebLink(' + Insertquery + ')', function (err, results) {
+        if(err){
+            console.log(err);
+            redirectCallback(null);
+        }
+        else{
+            if(results.length > 0){
+                if(results[0].length > 0){
+                    redirectCallback(results[0][0].URL);
+                }
+                else{
+                    redirectCallback(null);
+                }
+            }
+            else{
+                redirectCallback(null);
+            }
+        }
+    });
+};
+
 exports.FnWebLinkRedirect = function(req,res,next){
     if(req.params.id){
         var link = req.params.id;
@@ -11520,7 +11545,7 @@ exports.FnWebLinkRedirect = function(req,res,next){
                     var urlSeqNumber = parseInt(urlBreaker.join(''));
                     if(!isNaN(urlSeqNumber)){
                         if(urlSeqNumber > 0 && urlSeqNumber < 100){
-                            LocationManager.FnGetRedirectLink(ezeid,urlSeqNumber,function(url){
+                            FnGetRedirectLink(ezeid,urlSeqNumber,function(url){
                                 console.log(url);
                                 if(url){
                                     res.redirect(url);
@@ -11550,25 +11575,4 @@ exports.FnWebLinkRedirect = function(req,res,next){
     }
 }
 
-exports.FnGetRedirectLink = function(ezeid,urlSeqNumber,redirectCallback){
-    var Insertquery = db.escape(ezeid) + ',' + db.escape(urlSeqNumber);
-    db.query('CALL pRedirectWebLink(' + Insertquery + ')', function (err, results) {
-        if(err){
-            console.log(err);
-            redirectCallback(null);
-        }
-        else{
-            if(results.length > 0){
-                if(results[0].length > 0){
-                    redirectCallback(results[0][0].URL);
-                }
-                else{
-                    redirectCallback(null);
-                }
-            }
-            else{
-                redirectCallback(null);
-            }
-        }
-    });
-};
+
