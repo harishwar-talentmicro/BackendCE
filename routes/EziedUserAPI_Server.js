@@ -8925,6 +8925,77 @@ exports.FnDeleteWebLink = function(req, res){
     }
 }
 
+//method to redirect the weblink
+exports.FnWebLinkRedirect = function(req,res,next){
+    if(req.params.id){
+        var link = req.params.id;
+        var arr = link.split('.');
+        if(arr.length > 1){
+            var lastItem = arr[arr.length - 1];
+
+            arr.splice(arr.length - 1,1);
+
+            var ezeid = arr.join('.');
+
+            var urlBreaker = lastItem.split('');
+            if(urlBreaker.length > 1){
+                if(urlBreaker[0] === 'U'){
+                    urlBreaker.splice(0,1);
+                    var urlSeqNumber = parseInt(urlBreaker.join(''));
+                    if(!isNaN(urlSeqNumber)){
+                        if(urlSeqNumber > 0 && urlSeqNumber < 100){
+                            LocationManager.FnGetRedirectLink(ezeid,urlSeqNumber,function(url){
+                               if(url){
+                                    res.redirect(url);
+                                }
+                                else{
+                                    next();
+                                }
+                            });
+                        }
+                        else{
+                            next();
+                        }
+                    }
+                    else{
+                        next();
+                    }
+                }
+            }
+            else{
+                next();
+            }
+        }
+        else{
+            next();
+        }
+    }
+}
+
+exports.FnGetRedirectLink = function(ezeid,urlSeqNumber,redirectCallback){
+    var Insertquery = db.escape(ezeid) + ',' + db.escape(urlSeqNumber);
+    db.query('CALL pRedirectWebLink(' + Insertquery + ')', function (err, results) {
+        if(err){
+            console.log(err);
+            redirectCallback(null);
+        }
+        else{
+            if(results.length > 0){
+                if(results[0].length > 0){
+                    redirectCallback(results[0][0].URL);
+                }
+                else{
+                    redirectCallback(null);
+                }
+            }
+            else{
+                redirectCallback(null);
+            }
+        }
+    });
+};
+
+
 
 
 //EZEIDAP Parts
@@ -11504,75 +11575,4 @@ exports.FnSaveCitysVES = function(req, res){
         console.log('FnSaveCitysVES:error ' + ex.description);
         throw new Error(ex);
     }
-};
-
-exports.FnWebLinkRedirect = function(req,res,next){
-    if(req.params.id){
-        var link = req.params.id;
-        var arr = link.split('.');
-        if(arr.length > 1){
-            var lastItem = arr[arr.length - 1];
-
-            arr.splice(arr.length - 1,1);
-
-            var ezeid = arr.join('.');
-
-            var urlBreaker = lastItem.split('');
-            if(urlBreaker.length > 1){
-                if(urlBreaker[0] === 'U'){
-                    urlBreaker.splice(0,1);
-                    var urlSeqNumber = parseInt(urlBreaker.join(''));
-                    if(!isNaN(urlSeqNumber)){
-                        if(urlSeqNumber > 0 && urlSeqNumber < 100){
-                            LocationManager.FnGetRedirectLink(ezeid,urlSeqNumber,function(url){
-                                console.log(url);
-                                if(url){
-                                    res.redirect(url);
-                                }
-                                else{
-                                    console.log('I am null');
-                                    next();
-                                }
-                            });
-                        }
-                        else{
-                            next();
-                        }
-                    }
-                    else{
-                        next();
-                    }
-                }
-            }
-            else{
-                next();
-            }
-        }
-        else{
-            next();
-        }
-    }
-}
-
-exports.FnGetRedirectLink = function(ezeid,urlSeqNumber,redirectCallback){
-    var Insertquery = db.escape(ezeid) + ',' + db.escape(urlSeqNumber);
-    db.query('CALL pRedirectWebLink(' + Insertquery + ')', function (err, results) {
-        if(err){
-            console.log(err);
-            redirectCallback(null);
-        }
-        else{
-            if(results.length > 0){
-                if(results[0].length > 0){
-                    redirectCallback(results[0][0].URL);
-                }
-                else{
-                    redirectCallback(null);
-                }
-            }
-            else{
-                redirectCallback(null);
-            }
-        }
-    });
 };
