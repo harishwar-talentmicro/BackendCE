@@ -1,6 +1,34 @@
+# bower-ui-grid
+
+This repo is for distribution on `bower`. The source for this module is in the
+[main UI Grid repo](https://github.com/angular-ui/ng-grid).
+Please file issues and pull requests against that repo.
+
+## Install
+
+Install with `bower`:
+
+```shell
+bower install angular-ui-grid
+```
+
+Add `<script>` and `<link>` tags to your `index.html`:
+
+```html
+<link rel="stylesheet" href="/bower_components/ui-grid/ui-grid.css" />
+<script src="/bower_components/ui-grid/ui-grid.js"></script>
+```
+
+## Documentation
+
+Documentation is available on the
+[UI Grid site](http://ui-grid.info/).
+
+## License
+
 The MIT License
 
-Copyright (c) 2012 the AngularUI Team, http://angular-ui.github.com
+Copyright (c) 2010-2014 the AngularUI Team http://angular-ui.github.com
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
