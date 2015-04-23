@@ -470,23 +470,22 @@ footer{
 .starRating{
     display        : inline-block;
     position       : relative;
-    height         : 17px;
-   /* background     : url('../images/stars.png') repeat-x 0 0;*/
-    background     : url('../images/starsSmall.png') repeat-x 0 0;
+    height         : 24px;
+    background     : url('../images/stars.png') repeat-x 0 0;
+    /*background     : url('../images/starsSmall.png') repeat-x 0 0;*/
     vertical-align : bottom;
 }
 
 .starRating div{
     float    : left;
     position : relative;
-    height   : 18px;
+    height   : 23px;
 }
-
 .starRating input{
     position : relative;
     z-index  : 1;
-    width: 16px;
-    height: 18px;
+    width : 24px;
+    height : 27px;
     margin   : 0;
     padding  : 0;
     opacity  : 0;
@@ -497,7 +496,7 @@ footer{
     top      : 0;
     left     : 0;
     width    : 100%;
-    height   : 18px;
+    height   : 23px;
 }
 
 .starRating span{
@@ -505,8 +504,8 @@ footer{
 }
 
 .starRating       input:checked       + label{
-   /* background : url('../images/stars.png') repeat-x 0 -24px;*/
-    background : url('../images/starsSmall.png') repeat-x 0 -15px;
+    background : url('../images/stars.png') repeat-x 0 -24px;
+    /*background : url('../images/starsSmall.png') repeat-x 0 -15px;*/
 }
 
 .sliderExample {

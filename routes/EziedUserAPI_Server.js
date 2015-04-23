@@ -7297,8 +7297,6 @@ exports.FnGetWorkingHrsHolidayList = function (req, res) {
     }
 };
 
-
-
 function FnWorkingHours(WorkingContent, CallBack) {
     try {
 
@@ -8994,7 +8992,6 @@ exports.FnGetRedirectLink = function(ezeid,urlSeqNumber,redirectCallback){
         }
     });
 };
-
 
 
 
