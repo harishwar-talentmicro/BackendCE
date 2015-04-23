@@ -297,17 +297,14 @@
                                        <div ng-hide="(search.mInfo.Redflagstatus == 1)">
                                             <div ng-show="search.mInfo.BannerImage">
                                                 <img width="100%" height="150px" ng-src="{{search.mInfo.BannerImage}}" />
+                                                <img class="imgLeft showPointer" ng-show="search.previousButton == true" ng-click="search.getPreviousBanner()" src="images/arrow_left.png" />
+                                               <!-- <img class="imgLeft showPointer" ng-show="search.previousButton == false" src="images/arrow_left_gray.png" /> -->
 
-                                                <img class="imgLeft" ng-show="search.previousButton == true" ng-click="search.getPreviousBanner()" src="images/arrow_left.png" />
-                                                <img class="imgLeft" ng-show="search.previousButton == false" src="images/arrow_left_gray.png" />
-
-
-                                                <img class="imgRight" ng-show="search.nextButton == true" ng-click="search.getNextBanner()" src="images/arrow_right.png" />
-                                                <img class="imgRight" ng-show="search.nextButton == false" src="images/arrow_right_grey.png" />
+                                                <img class="imgRight showPointer" ng-show="search.nextButton == true" ng-click="search.getNextBanner()" src="images/arrow_right.png" />
+                                               <!-- <img class="imgRight showPointer" ng-show="search.nextButton == false" src="images/arrow_right_grey.png" /> -->
                                             </div>
                                             <div ng-hide="search.mInfo.BannerImage">
                                                <img width="100%" height="150px" src="../images/top-banner.gif"/>
-
                                             </div>
                                         </div>
 
@@ -320,7 +317,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="row setRowLeftRightMarginZero middleContentainerTopSpace ">
+                                    <div class="row setRowLeftRightMarginZero middleContentainerTopSpace middalContainerHeight">
                                         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setLeftRightPaddingZero">
                                             <div class="col-lg-5 col-md-5 col-sm-5 col-xs-12 infoContainer">
                                                 <form class="form-signin" role="form" novalidate  ng-submit="search.getSearch()">
@@ -348,7 +345,6 @@
                                                                     <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 helpTextContainerDiv setLeftRightPaddingZero">
                                                                         <a class="setBottomMargin0 btn-link setItAsTab" ng-click="openHelpPopup()" style="text-align: right;" id="SearchHelp">Help ?</a>
                                                                     </div>
-
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -374,13 +370,7 @@
                                                             </div>
                                                         </div>
                                                         <div class="row addItemRowUserEzeid">
-                                                            <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1">
-                                                            </div>
-                                                            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
-                                                                <img ng-show="(search.mInfo.EZEIDVerifiedID == 2)" src="images/verified_32.png" />
-                                                                <img ng-hide="(search.mInfo.EZEIDVerifiedID == 2)" src="images/not-verified_32.png" />
-                                                            </div>
-                                                            <div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 setInfoEzeId">
+                                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setInfoEzeId">
                                                                 <span class="ezeidTitle"><b> {{search.mInfo.EZEID}} </b></span>
                                                             </div>
                                                         </div>
@@ -397,8 +387,7 @@
                                                         </div>
 
                                                         <div class="row centerAlign searchButtonMarginSet">
-                                                            <!--{{search.mInfo.AddressLine1 +', '+search.mInfo.AddressLine2 +', '+search.mInfo.CityTitle +', '+search.mInfo.CountryTitle +', '+search.mInfo.PostalCode}}-->
-                                                            {{ AddressForInfoTab }}
+                                                           {{ AddressForInfoTab }}
                                                         </div>
                                                         <hr/>
                                                         <div class="row centerAlign searchButtonMarginSet">
@@ -411,25 +400,43 @@
                                                         </div>
                                                         <hr/>
                                                         <div class="row centerAlign searchButtonMarginSet">
-                                                            <div class="starRating">
-                                                                <div>
+                                                            <div title="Working hours" class="col-lg-2 col-md-2 col-sm-2 col-xs-2 showPointer setLeftRightPaddingZero" ng-hide="search.isIndividualUser(1)">
+                                                                <img src="../images/open_big.png" ng-click="search.openWorkingHourPopup()" ng-show="search.mInfo.OpenStatus==1">
+                                                                <img src="../images/close_big.png" ng-click="search.openWorkingHourPopup()" ng-hide="search.mInfo.OpenStatus==1">
+                                                            </div>
+                                                            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 showPointer setLeftRightPaddingZero" ng-hide="search.isIndividualUser(1)">
+                                                                <div class="" ng-hide="search.mInfo.ParkingStatus==3">
+                                                                    <img title="{{search.parkingTitle}}" src="../images/parking_new.png" >
+                                                                </div>
+                                                                <div class="" ng-show="search.mInfo.ParkingStatus==3">
+                                                                    <img title="{{search.parkingTitle}}" src="../images/new_no_parking.png" >
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 setLeftRightPaddingZero">
+                                                                <img ng-show="(search.mInfo.EZEIDVerifiedID == 2)" src="images/verified_32.png" />
+                                                                <img ng-hide="(search.mInfo.EZEIDVerifiedID == 2)" src="images/not-verified_32.png" />
+                                                            </div>
+                                                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 setLeftRightPaddingZero defaultRatingBox">
+                                                                <div class="starRating">
                                                                     <div>
                                                                         <div>
                                                                             <div>
-                                                                                <input id="rating1" disabled type="radio" name="form_rating" ng-model="form_rating" value="1">
-                                                                                <label for="rating1"><span>1</span></label>
+                                                                                <div>
+                                                                                    <input id="rating1" disabled type="radio" name="form_rating" ng-model="form_rating" value="1">
+                                                                                    <label for="rating1"><span>1</span></label>
+                                                                                </div>
+                                                                                <input id="rating2" disabled type="radio" name="form_rating" ng-model="form_rating" value="2">
+                                                                                <label for="rating2"><span>2</span></label>
                                                                             </div>
-                                                                            <input id="rating2" disabled type="radio" name="form_rating" ng-model="form_rating" value="2">
-                                                                            <label for="rating2"><span>2</span></label>
+                                                                            <input id="rating3" disabled type="radio" name="form_rating" ng-model="form_rating" value="3">
+                                                                            <label for="rating3"><span>3</span></label>
                                                                         </div>
-                                                                        <input id="rating3" disabled type="radio" name="form_rating" ng-model="form_rating" value="3">
-                                                                        <label for="rating3"><span>3</span></label>
+                                                                        <input id="rating4" disabled type="radio" name="form_rating" ng-model="form_rating" value="4">
+                                                                        <label for="rating4"><span>4</span></label>
                                                                     </div>
-                                                                    <input id="rating4" disabled type="radio" name="form_rating" ng-model="form_rating" value="4">
-                                                                    <label for="rating4"><span>4</span></label>
+                                                                    <input id="rating5" disabled type="radio" name="form_rating" ng-model="form_rating" value="5">
+                                                                    <label for="rating5"><span>5</span></label>
                                                                 </div>
-                                                                <input id="rating5" disabled type="radio" name="form_rating" ng-model="form_rating" value="5">
-                                                                <label for="rating5"><span>5</span></label>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -475,37 +482,40 @@
                                                                     <div class="addressTextContainer"><div class="inerAddText">{{ Address }} </div></div>
                                                                 </div>
                                                             </div>
-                                                            <div class="row centerAlign searchButtonMarginSet showPlaces setTopMargin">
-                                                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 parkingText">
-                                                                    <input type="checkbox" class="chkShowParking" ng-model="search.Criteria.ParkingStatus1" name="parking" value="1,2" checked> Parking Required
+                                                            <div class="row centerAlign searchButtonMarginSet showPlaces setTopMargin fontColorType">
+                                                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setPaddingLeftRight4">
+                                                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 parkingText setLeftRightPaddingZero">
+                                                                        <input type="checkbox" class="chkShowParking" ng-model="search.Criteria.ParkingStatus1" name="parking" value="1,2" checked> Parking Required
+                                                                    </div>
+                                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 ratingText setRowLeftRightMarginZero">
+                                                                        Rating
+                                                                    </div>
+                                                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 normalFontSize searchStarContainer showPointer">
+                                                                        <img src="../images/smallGreyStar_16.png" ng-hide="showStar1" ng-click="search.addRatting(1,'gray')" >
+                                                                        <img src="../images/smallStar_16_.png" ng-show="showStar1" ng-click="search.addRatting(1,'yellow')" >
+
+                                                                        <img src="../images/smallGreyStar_16.png" ng-hide="showStar2" ng-click="search.addRatting(2,'gray')" >
+                                                                        <img src="../images/smallStar_16_.png" ng-show="showStar2" ng-click="search.addRatting(2,'yellow')" >
+
+                                                                        <img src="../images/smallGreyStar_16.png" ng-hide="showStar3" ng-click="search.addRatting(3,'gray')" >
+                                                                        <img src="../images/smallStar_16_.png" ng-show="showStar3" ng-click="search.addRatting(3,'yellow')" >
+
+                                                                        <img src="../images/smallGreyStar_16.png" ng-hide="showStar4" ng-click="search.addRatting(4,'gray')" >
+                                                                        <img src="../images/smallStar_16_.png" ng-show="showStar4" ng-click="search.addRatting(4,'yellow')" >
+
+                                                                        <img src="../images/smallGreyStar_16.png" ng-hide="showStar5" ng-click="search.addRatting(5,'gray')" >
+                                                                        <img src="../images/smallStar_16_.png" ng-show="showStar5" ng-click="search.addRatting(5,'yellow')" >
+                                                                    </div>
                                                                 </div>
-                                                                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1 ratingText">
-                                                                    Rating
-                                                                </div>
-                                                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 normalFontSize searchStarContainer showPointer">
-                                                                    <img src="../images/smallGreyStar_16.png" ng-hide="showStar1" ng-click="search.addRatting(1,'gray')" >
-                                                                    <img src="../images/smallStar_16_.png" ng-show="showStar1" ng-click="search.addRatting(1,'yellow')" >
 
-                                                                    <img src="../images/smallGreyStar_16.png" ng-hide="showStar2" ng-click="search.addRatting(2,'gray')" >
-                                                                    <img src="../images/smallStar_16_.png" ng-show="showStar2" ng-click="search.addRatting(2,'yellow')" >
-
-                                                                    <img src="../images/smallGreyStar_16.png" ng-hide="showStar3" ng-click="search.addRatting(3,'gray')" >
-                                                                    <img src="../images/smallStar_16_.png" ng-show="showStar3" ng-click="search.addRatting(3,'yellow')" >
-
-                                                                    <img src="../images/smallGreyStar_16.png" ng-hide="showStar4" ng-click="search.addRatting(4,'gray')" >
-                                                                    <img src="../images/smallStar_16_.png" ng-show="showStar4" ng-click="search.addRatting(4,'yellow')" >
-
-                                                                    <img src="../images/smallGreyStar_16.png" ng-hide="showStar5" ng-click="search.addRatting(5,'gray')" >
-                                                                    <img src="../images/smallStar_16_.png" ng-show="showStar5" ng-click="search.addRatting(5,'yellow')" >
-                                                                </div>
                                                             </div>
                                                             <div class="row centerAlign searchButtonMarginSet showPlaces setTopMargin">
-                                                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                                                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 setLeftRightPaddingZero leftPadding4">
                                                                     <span checked data-toggle="tooltip" data-placement="top" title="Show Business Entities providing Home Delivery.">
                                                                         <input type="checkbox" class="chkShowParking" ng-model="search.Criteria.HomeDelivery1" name="parking" value="1,2"> Need Home Delivery
                                                                     </span>
                                                                 </div>
-                                                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6" >
+                                                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 setLeftRightPaddingZero" >
                                                                     <span checked data-toggle="tooltip" data-placement="top" title="Show Business Entities that are Open(Working) now.">
                                                                         <input type="checkbox" class="chkShowParking" ng-model="search.Criteria.OpenStatus1" name="parking" value="1,2" checked> Open Business only
                                                                     </span>
@@ -514,7 +524,7 @@
                                                         </div>
                                                         <div class="row centerAlign searchButtonMarginSet setTopMargin">
                                                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 " >
-                                                                <button  ng-disabled="!search.Criteria.Keywords" class="btn btn-primary" type="submit">Search</button>
+                                                                <button  ng-disabled="!search.Criteria.Keywords" class="btn btn-primary btn-md btn-block" type="submit">Search</button>
                                                             </div>
                                                         </div>
 
@@ -548,7 +558,7 @@
                                                                     <tr ng-repeat="_item in search.searchResult">
                                                                         <td ><input type="checkbox" data-tid="{{_item.TID}}" name="companyID" ng-click="toggleCheckbox($event)"></td>
                                                                         <td data-th="Company Name" style="color: #0866A6;" class="showPointer resultTableCellBorder">
-                                                                            <span ng-click="getSearchInfo(_item)">{{_item.CompanyName | truncate:26}}</span>
+                                                                            <span ng-click="getSearchInfo(_item)">{{_item.CompanyName | truncate:18}}</span>
                                                                         </td>
                                                                         <td data-th="Distance (Miles/km)" class="resultTableCellBorder">{{_item.city | truncate:9}}</td>
                                                                     </tr>
@@ -576,7 +586,7 @@
                                         <div ng-show="ShowLinks" class="row setRowLeftRightMarginZero ">
                                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 searchHeaderAlignment msgButtonContainer" ng-hide="(search.mInfo.IDTypeID == 1)">
                                                 <div class="innerMsgButtonContainer">
-                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer keyWordText boxMessaageBackgroun" style="padding-right: 0px;">
+                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer keyWordText boxMessaageBackgroun setLeftRightPaddingZero">
                                                         <div ng-hide="search.mInfo.EZEIDVerifiedID == '1'|| showSalesEnquiry == '0' " title="Sales Enquiry" ng-click="search.openSalesEnquiryForm()">
                                                             <!--<div class="row setRowLeftRightMarginZero" >-->
                                                                 <img src="../images/new_sales_icon.png">
@@ -687,7 +697,8 @@
                                     </div>
                                 </div>
                                 <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 chatArea setLeftRightPaddingZero">
-                                    <img width="100%" height="100%" src="../images/chat_banner.png">
+                                    chat banner..
+                                    <!--<img width="100%" height="100%" src="../images/chat_banner.png">-->
                                 </div>
                             </div>
                         </div>

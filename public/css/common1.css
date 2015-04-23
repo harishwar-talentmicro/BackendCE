@@ -1,3 +1,21 @@
+.navbar-brand
+{
+    height: 35px;
+    float: left;
+    padding: 0px 0px;
+    font-size: 18px;
+    line-height: 20px;
+    width: 136px;
+    overflow: hidden;
+    background: url(../images/logo.png) no-repeat right;
+}
+.navbar>.container .navbar-brand, .navbar>.container-fluid .navbar-brand {
+    margin-left: -30px;
+}
+.navbar-right {
+    float: right!important;
+    margin-right: -39px;
+}
 .maxWidthEzeid
 {
     /*max-width: 1200px;*/
@@ -5,9 +23,35 @@
 }
 .fontColorType
 {
-    font-family: 'Roboto', sans-serif;
     color: #000000;
 }
+.setRowLeftRightMarginZero
+{
+    margin-left: 0px;
+    margin-right: 0px;
+}
+.setLeftRightPaddingZero
+{
+    padding-left: 0px;
+    padding-right: 0px;
+}
+
+.btn-primary {
+    background: url(../images/btn_bg.png) repeat;
+    color: #ffffff;
+    border-color: #078FC3;
+    box-shadow: 0px 2px 6px -3px #666;
+}
+
+.btn-primary:hover, .btn-primary:focus, .btn-primary:active, .btn-primary.active, .open > .dropdown-toggle.btn-primary {
+    background: url(../images/btn_bg_h.png) repeat;
+    border-color: #078FC3;
+}
+
+.middalContainerHeight{
+    height: 355px;
+}
+
 
 .hSeparaterLine{
     width: 100%;
@@ -121,16 +165,7 @@ hr {
     min-height: 375px;
     background: #e6f9ff;
 }
-.setRowLeftRightMarginZero
-{
-    margin-left: 0px;
-    margin-right: 0px;
-}
-.setLeftRightPaddingZero
-{
-    padding-left: 0px;
-    padding-right: 0px;
-}
+
 .fourteenFontSize
 {
     font-size: 14px;
@@ -209,16 +244,13 @@ hr {
 }
 .showPlaces
 {
-    color: #808080;
     text-align: left;
 }
 .searchStarContainer
 {
     margin-top: 0%;
     padding-left: 0px;
-    width: 29.333333%;
     padding-right: 0px;
-
 }
 .topSearchRow
 {
@@ -273,8 +305,8 @@ hr {
     margin-top: 0%;
     padding-right: 0px;
     padding-left: 0px;
-    margin-left: 1.5%;
-    margin-right: 5%;
+    /*margin-left: 1.5%;
+    margin-right: 5%;*/
 }
 .setTopMargin
 {
@@ -951,12 +983,12 @@ body {
     top: 7.5%;
     /* left: 48px; */
     z-index: 3;
-    right: 35px;
+    right: 10px;
 }
 .imgLeft {
     position: absolute;
     top: 7.5%;
-    left: 35px;
+    left: 10px;
     z-index: 3;
 }
 .boxMessaageBackgroun {
@@ -986,4 +1018,14 @@ body {
 {
     padding-right: 4px;
     padding-left: 4px;
+}
+.leftPadding4
+{
+    padding-left: 4px;
+}
+.defaultRatingBox
+{
+    text-align: center;
+    padding-right: 7px;
+    margin-top: 0.7%;
 }

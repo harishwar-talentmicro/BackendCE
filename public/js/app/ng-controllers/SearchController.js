@@ -341,9 +341,9 @@ angular.module('ezeidApp').controller('SearchController', [
             }
         });
 
-        if($scope.Address.length >= 50)
+        if($scope.Address.length >= 48)
         {
-            $scope.Address = $scope.Address.substring(0,47);
+            $scope.Address = $scope.Address.substring(0,45);
             $scope.Address = $scope.Address+ "...";
         }
         else

@@ -542,12 +542,12 @@ angular.module('ezeidApp')
                             });
                             $rootScope.businessManager.sales.enquiryStatus[resp[i].TID] = resp[i].StatusTitle;
                         }
-                        $scope.readyState.statusLoaded = true;
                         deferred.resolve(true);
                     }
                     else{
                         deferred.resolve(false);
                     }
+                    $scope.readyState.statusLoaded = true;
             }).error(function(err){
                 console.log(err);
                     deferred.resolve(false);
@@ -581,11 +581,12 @@ angular.module('ezeidApp')
                             $rootScope.businessManager.sales.nextActions[resp[i].TID] = resp[i].ActionTitle;
                         }
                         deferred.resolve(true);
-                        $scope.readyState.nextActionsLoaded = true;
+
                     }
                     else{
                         deferred.resolve(false);
                     }
+                    $scope.readyState.nextActionsLoaded = true;
             }).error(function(err){
                 console.log(err);
                     deferred.resolve(false);
@@ -617,12 +618,12 @@ angular.module('ezeidApp')
                             });
                             $rootScope.businessManager.sales.folders[resp[i].TID] = resp[i].FolderTitle;
                         }
-                        $scope.readyState.foldersLoaded = true;
                         deferred.resolve(true);
                     }
                     else{
                         deferred.resolve(false);
                     }
+                    $scope.readyState.foldersLoaded = true;
             }).error(function(err){
                 console.log(err);
                 deferred.resolve(false);
