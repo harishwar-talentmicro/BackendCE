@@ -318,7 +318,7 @@ angular.module('ezeidApp').controller('bulksalesController',[
                  });
             }
            else {
-               
+
                 Notification.error({message: "Please select a company !", delay: MsgDelay});
             }
         }
