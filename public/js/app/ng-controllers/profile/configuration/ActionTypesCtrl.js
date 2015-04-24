@@ -136,8 +136,8 @@ angular.module('ezeidApp').controller('ActionTypesCtrl',['$scope','$rootScope','
                 Token : $rootScope._userInfo.Token,
                 TID : $scope.modalBox.txActionType.TID,
                 ActionTitle : $scope.modalBox.txActionType.title,
-                Status : $scope.modalBox.txActionType.status
-
+                Status : $scope.modalBox.txActionType.status,
+                FunctionType : $scope.modalBox.txActionType.type
             };
 
             $http({

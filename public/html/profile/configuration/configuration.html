@@ -19,8 +19,11 @@
             <li role="presentation" ng-class="{'active':pageActionTypes === activeSubTemplate}">
                 <a  ng-click="changeActive(pageActionTypes)" class="btn-link"><span class="glyphicon glyphicon-pushpin"></span> Action Types</a>
             </li>
-            <li role="presentation" ng-class="{'active':pageRules === activeSubTemplate}" ng-hide="1">
-                <a ng-click="changeActive(pageRules)" class="btn-link"><span class="glyphicon glyphicon-filter"></span> Rules</a>
+            <!--<li role="presentation" ng-class="{'active':pageRules === activeSubTemplate}" ng-hide="1">-->
+                <!--<a ng-click="changeActive(pageRules)" class="btn-link"><span class="glyphicon glyphicon-filter"></span> Rules</a>-->
+            <!--</li>-->
+            <li role="presentation" ng-class="{'active':pageRules === activeSubTemplate}" class="disabled">
+                <a class="btn-link"><span class="glyphicon glyphicon-filter"></span> Rules</a>
             </li>
             <li role="presentation" ng-class="{'active':pageWorkingHours === activeSubTemplate}">
                 <a ng-click="changeActive(pageWorkingHours)" class="btn-link"><span class="glyphicon glyphicon-time"></span> Working Hours</a>
@@ -56,8 +59,11 @@
             <li role="presentation" ng-class="{'active':pageActionTypes === activeSubTemplate}">
                 <a  ng-click="changeActive(pageActionTypes)" class="btn-link"><span class="glyphicon glyphicon-pushpin"></span> Action Types</a>
             </li>
-            <li role="presentation" ng-class="{'active':pageRules === activeSubTemplate}">
-                <a ng-click="changeActive(pageRules)" class="btn-link"><span class="glyphicon glyphicon-filter"></span> Rules</a>
+            <!--<li role="presentation" ng-class="{'active':pageRules === activeSubTemplate}">-->
+                <!--<a ng-click="changeActive(pageRules)" class="btn-link"><span class="glyphicon glyphicon-filter"></span> Rules</a>-->
+            <!--</li>-->
+            <li role="presentation" ng-class="{'active':pageRules === activeSubTemplate}" class="disabled">
+                <a class="btn-link"><span class="glyphicon glyphicon-filter"></span> Rules</a>
             </li>
             <li role="presentation" ng-class="{'active':pageWorkingHours === activeSubTemplate}">
                 <a ng-click="changeActive(pageWorkingHours)" class="btn-link"><span class="glyphicon glyphicon-time"></span> Working Hours</a>
