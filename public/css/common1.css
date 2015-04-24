@@ -47,6 +47,12 @@
     border-color: #078FC3;
 }
 
+.btn-primary> .orangeSearchButton{
+    color: #ffffff;
+    background: #FF9B00;
+    border: none;
+}
+
 /*.middalContainerHeight{
     height: 355px;
     border: 1px solid #ff0000;
@@ -159,7 +165,7 @@ hr {
     padding-right: 0px;
     margin-bottom: 0px;
     height: auto;
-    min-height: 368px;
+    min-height: 419px;
     background: #FFFFFF;
     border-right: 2px dashed #717171;
 }
@@ -485,9 +491,11 @@ body {
 }
 .rwd-table th {
     display: none;
+    padding: 22px;
 }
 .rwd-table td {
     display: block;
+    padding: 22px;
 }
 .rwd-table td:first-child {
     padding-top: .5em;
@@ -770,7 +778,7 @@ body {
 }
 .resultContainer
 {
-    height: 338px;
+    height: 378px;
     overflow-y: auto;
     overflow-x: hidden;
     width: 100%;
@@ -908,8 +916,9 @@ body {
     /*background: #D9ECFF;
       color:#0DA3D8;
     */
-    background: #60D560;
-    color:#000000;
+    background: transparent;
+    color: #13B3E2;
+    border-bottom: 2px solid #13B3E2;
     margin-bottom: 10px;
 }
 
@@ -961,16 +970,62 @@ body {
     padding-bottom: 0px;
    }
 
-/*
-.topSearchRow .nav-pills.nav-stacked > li.active > a,
-.topSearchRow .nav-pills.nav-stacked > li.active > a:hover,
-.topSearchRow .nav-pills.nav-stacked > li.active > a:focus,
-.topSearchRow .nav-pills.nav-justified > li.active > a,
-.topSearchRow .nav-pills.nav-justified > li.active > a:hover,
-.topSearchRow .nav-pills.nav-justified > li.active > a:focus {
-    background: #98F098;
-    border-radius: 0;
-}*/
+div.topSearchRow > div > div > .nav-pills.nav-stacked > li,
+div.topSearchRow > div > div > .nav-pills.nav-justified > li {
+    padding:1px;
+
+}
+div.topSearchRow > div > div > .nav-pills.nav-stacked > li > a,
+div.topSearchRow > div > div > .nav-pills.nav-justified > li > a {
+    background: #fff;
+    color: #13B3E2;
+    border-bottom: 2px solid #13B3E2;
+}
+
+
+
+div.topSearchRow > div > div > .nav-pills.nav-stacked > li.active > a,
+div.topSearchRow > div > div > .nav-pills.nav-justified > li.active > a{
+    background: #FFFFFF;
+    color: #3F3F3F;
+    border-bottom: 2px solid #797979;
+}
+
+div.topSearchRow > div > div > .nav-pills.nav-stacked > li.active > a:hover,
+div.topSearchRow > div > div > .nav-pills.nav-stacked > li.active > a:focus,
+div.topSearchRow > div > div > .nav-pills.nav-justified > li.active > a:hover,
+div.topSearchRow > div > div > .nav-pills.nav-justified > li.active > a:focus{
+    color:#000;
+}
+
+div.topSearchRow > div > div > .nav-pills.nav-stacked > li > a.disabled,
+div.topSearchRow > div > div > .nav-pills.nav-justified > li > a.disabled{
+    background: #FFFFFF;
+    color: #BEBEBE;
+    border-bottom: 2px solid #C5C5C5;
+}
+
+div.topSearchRow > div > div > .nav-pills.nav-stacked > li > a.disabled:hover,
+div.topSearchRow > div > div > .nav-pills.nav-stacked > li > a.disabled:focus,
+div.topSearchRow > div > div > .nav-pills.nav-stacked > li > a.disabled:active,
+div.topSearchRow > div > div > .nav-pills.nav-justified > li > a.disabled:hover,
+div.topSearchRow > div > div > .nav-pills.nav-justified > li > a.disabled:focus,
+div.topSearchRow > div > div > .nav-pills.nav-justified > li > a.disabled:active{
+    cursor: no-drop;
+    color: #C5C5C5;
+}
+
+button.btn.btn-primary.btn-md.btn-block.orangeSearchButton {
+    background: #FFAE00;
+    border: none;
+}
+.wordwrap {
+    white-space: pre-wrap;      /* CSS3 */
+    white-space: -moz-pre-wrap; /* Firefox */
+    white-space: -pre-wrap;     /* Opera <7 */
+    white-space: -o-pre-wrap;   /* Opera 7 */
+    word-wrap: break-word;      /* IE */
+}
 
 .helpTextContainerDiv
 {
@@ -1063,4 +1118,20 @@ body {
     border-right: 1px solid #7B7B7B;
     border-left: 1px solid #7B7B7B;
     border-top: 1px solid #7B7B7B;
+}
+/*
+.orangeSearchButton
+{
+    background: #FF9B00;
+    border: none;
+}*/
+
+.msgButtonContainer > div{
+   float: left;
+   width: 14%;
+}
+.messageButtonContainer
+{
+    margin-top: 0.5%;
+    padding-left: 25px;
 }

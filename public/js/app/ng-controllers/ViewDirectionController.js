@@ -109,7 +109,7 @@ angular.module('ezeidApp').controller('viewDirectionController',['$http', '$root
     viewDirection.emailDirectionImage = function () {
 
     //  $http({ method: 'get', url: GURL + 'ewtSendBulkMailer?Token=' + $rootScope._userInfo.Token + '&TID=""&TemplateID=""&ToMailID='+ viewDirection._info.ToMailID +'&Attachment='+ finalImageSrc +'&AttachmentFileName=ViewDirection'}).success(function (data)
-        $http({ method: 'post', url: GURL + 'ewtSendBulkMailer', data: { TokenNo: $rootScope._userInfo.Token, TID: "", TemplateID: "", ToMailID: viewDirection._info.ToMailID, Attachment: finalImageSrc, AttachmentFileName :'ViewDirection.jpg'} }).success(function (data)
+        $http({ method: 'post', url: GURL + 'ewtSendBulkMailer', data: { Token: $rootScope._userInfo.Token, TID: "", TemplateID: "", ToMailID: viewDirection._info.ToMailID, Attachment: finalImageSrc, AttachmentFileName :'ViewDirection.jpg'} }).success(function (data)
         {
             if (data != 'null')
             {

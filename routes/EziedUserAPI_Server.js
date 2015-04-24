@@ -6443,7 +6443,6 @@ exports.FnDeleteHolidayList = function(req, res){
             });
 
         }
-
         else {
             if (Token == null) {
                 console.log('FnDeleteHolidayList: Token is empty');
@@ -6451,8 +6450,6 @@ exports.FnDeleteHolidayList = function(req, res){
             else if (TID == null) {
                 console.log('FnDeleteHolidayList: TID is empty');
             }
-
-
             res.statusCode=400;
             res.send(RtnMessage);
         }
@@ -6899,6 +6896,73 @@ exports.FnGetTranscation = function (req, res) {
         throw new Error(ex);
     }
 };
+
+exports.FnDeleteTranscation = function(req,res){
+try{
+    
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    
+    var Token = req.query.Token;
+    var ItemTID = req.query.ItemTID;
+    
+    var RtnMessage = {
+        IsSuccessfull:false
+    };
+    if (Token != null && ItemTID != null){
+        FnValidateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+                        
+                        db.query('CALL pDeleteTransactionItems(' + db.escape(ItemTID) + ')', function (err, deleteResult) {
+                            if (!err) {
+                                if (deleteResult.affectedRows > 0) {
+                                    RtnMessage.IsSuccessfull = true;
+                                    res.send(RtnMessage);
+                                    console.log('FnDeleteTranscation: transaction items delete successfully');
+                                }
+                                else {
+                                    console.log('FnDeleteTranscation:No delete transaction items');
+                                    res.send(RtnMessage);
+                                }
+                            }
+                            else {
+                                console.log('FnDeleteTranscation: error in deleting transaction items' + err);
+                                res.statusCode = 500;
+                                res.send(RtnMessage);
+                            }
+                        });
+                    }
+                    else {
+                        console.log('FnDeleteTranscation: Invalid token');
+                        res.statusCode = 401;
+                        res.send(RtnMessage);
+                    }
+                }
+                else {
+                    console.log('FnDeleteTranscation:Error in processing Token' + err);
+                    res.statusCode = 500;
+                    res.send(RtnMessage);
+
+                }
+        });
+    }
+    else {
+            if (Token == null) {
+                console.log('FnDeleteTranscation: Token is empty');
+            }
+            else if (ItemTID == null) {
+                console.log('FnDeleteTranscation: ItemTID is empty');
+            }
+            res.statusCode=400;
+            res.send(RtnMessage);
+        }
+}
+catch (ex) {
+        console.log('FnDeleteTranscation:error ' + ex.description);
+        throw new Error(ex);
+    }
+}
 
 exports.FnSaveWorkingHours = function(req, res){
     try{
