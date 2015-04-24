@@ -1,0 +1,87 @@
+<div class="container top-clearfix-half" ng-controller="SalesCtrl">
+    <div class="row bottom-clearfix">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12"
+             ng-show="readyState.itemsLoaded && readyState.statusLoaded && readyState.nextActionsLoaded && readyState.foldersLoaded && readyState.transactionsLoaded && (!serverApiError)">
+            <button class="btn btn-primary btn-sm no-radius" ng-click="addNewRow()">Add New Transaction</button>
+            <button class="btn btn-primary btn-sm no-radius" ng-click="removeFirstRow()">Remove Unsaved Transactions</button>
+            <!--<button class="btn btn-danger btn-sm no-radius">Remove Selected Transaction</button>-->
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-2 col-md-2 col-sm-4 col-xs-12 col-lg-offset-5 col-md-offset-5 col-sm-offset-4 col-xs-offset-0" ng-show="serverApiError">
+            <p class="text-danger">An error occured ! <a class="btn-link" ng-click="reloadAgain()"> Try Again</a> </p>
+        </div>
+    </div>
+    <div class="row" ng-hide="serverApiError">
+        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 col-lg-offset-5 col-md-offset-5 col-sm-offset-5 col-xs-offset-5 text-center preloader"
+             ng-hide="readyState.itemsLoaded && readyState.statusLoaded && readyState.nextActionsLoaded && readyState.foldersLoaded && readyState.transactionsLoaded && (!serverApiError)">
+
+        </div>
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12"
+             ng-show="readyState.itemsLoaded && readyState.statusLoaded && readyState.nextActionsLoaded && readyState.foldersLoaded && readyState.transactionsLoaded && (!serverApiError)">
+            <!--<div ui-grid="gridOptions"-->
+                 <!--ui-grid-pinning-->
+                 <!--ui-grid-expandable-->
+                 <!--ui-grid-selection-->
+                 <!--ui-grid-edit-->
+                 <!--ui-grid-row-edit-->
+                 <!--ui-grid-cellNav-->
+                 <!--ui-grid-pagination-->
+                 <!--class="grid"></div>-->
+        <!--</div>-->
+            <!--<div ui-grid="gridOptions"-->
+             <!--ui-grid-pinning-->
+             <!--ui-grid-selection-->
+             <!--ui-grid-edit-->
+             <!--ui-grid-row-edit-->
+             <!--ui-grid-cellNav-->
+             <!--ui-grid-pagination-->
+             <!--ui-grid-exporter-->
+             <!--class="grid">-->
+                <!---->
+             <!--</div>-->
+
+            <div ui-grid="gridOptions"
+                 ui-grid-pinning
+                 ui-grid-selection
+                 ui-grid-edit
+                 ui-grid-row-edit
+                 ui-grid-cellNav
+                 ui-grid-pagination
+                 ui-grid-exporter
+                 class="grid">
+
+            </div>
+
+        </div>
+
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <!------------ Modal Box starts here -------------------------->
+            <modal mtitle="modalBox.title" visible="showModal">
+                <!--<div class="container-fluid" ng-include="'html/business-manager/templates/modal-item-picture-qty-rate.tpl.html'">-->
+                <div class="container-fluid" ng-include="modalBox.template">
+                    <!--- Modal Content ---------------------------->
+
+                <!--- Modal Content ends ----------------------->
+
+                </div>
+            </modal>
+        </div>
+    </div>
+
+    <!------------------- Modal Templates based on transaction types ------------------------------------------->
+    <script type="ng/template" id="modal-message-only-tpl.html">
+
+    </script>
+    <script type="ng/template" id="modal-item-only-tpl.html">
+
+    </script>
+
+    <!------------------- Modal Templates based on transaction types ends -------------------------------------->
+
+
+</div>
+
+

@@ -161,6 +161,8 @@ app.get('/ewtGetWorkingHrsHolidayList',LocationManager.FnGetWorkingHrsHolidayLis
 app.post('/ewtWebLink',LocationManager.FnSaveWebLink);
 app.get('/ewtWebLink',LocationManager.FnGetWebLink);
 app.delete('/ewtwebLink',LocationManager.FnDeleteWebLink);
+app.delete('/ewtDeleteTranscation',LocationManager.FnDeleteTranscation);
+
 
 //below service are for EZEIDAP
 app.post('/ewLoginAP', LocationManager.FnLoginAP);

@@ -1255,10 +1255,10 @@ span.smallCloselink {
     padding: 5px;
     border-radius: 0px;
     font-size: 14px;
-    margin: 5px 10px 0px 0px;
+    margin: 0px 17px 0px 0px;
     right: 0;
     cursor: pointer;
-    background: #EEE;
+    background: #FFF;
     border: 1px solid #9B9B9B;
 }
 
@@ -1824,6 +1824,17 @@ input[type="text"].ui-grid-filter-input {
     margin-left: 0px;
     margin-right: 0px;
 }
+.profile-details .row{
+    padding-left: 0px;
+    padding-right: 0px;
+}
+.profile-details .label{
+    padding:0px;
+}
+
+.profile-details.password-details .row > div{
+    padding: 2%;
+}
 
 .profile-details > div.row > div.col-lg-2 > h5,
 .profile-details > div.row > div.col-md-2 > h5,
@@ -1843,9 +1854,10 @@ input[type="text"].ui-grid-filter-input {
 .location-details > div.row > div.col-lg-4 > form > div.row > div.col-sm-12 > h5,
 .location-details > div.row > div.col-lg-4 > form > div.row > div.col-xs-12 > h5{
     font-family: 'Roboto', sans-serif!important;
-    font-size: 14px !important;
+    font-size: 12px !important;
     color: #008FAC!important;
     border-bottom: none!important;
+    font-weight: normal;
 }
 
 .location-details > div.row > div.col-lg-8 > div.row,
@@ -1897,7 +1909,7 @@ input[type="text"].ui-grid-filter-input {
 .location-details > div.row > div.col-lg-6 > form >  div.row > div.col-sm-8 > h5.data,
 .location-details > div.row > div.col-lg-6 > form >  div.row > div.col-xs-8 > h5.data{
     color:#000000!important;
-    font-size: 16px!important;
+    font-size: 14px!important;
     font-family: 'Roboto', sans-serif!important;
     border-bottom: none!important;
 }
@@ -2082,3 +2094,6 @@ form .row-error{
     color:#0072C3;
 }
 
+.location-edit-mode > div.row > div{
+    padding: 0px;
+}

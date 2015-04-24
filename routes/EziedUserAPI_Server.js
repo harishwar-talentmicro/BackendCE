@@ -6443,7 +6443,6 @@ exports.FnDeleteHolidayList = function(req, res){
             });
 
         }
-
         else {
             if (Token == null) {
                 console.log('FnDeleteHolidayList: Token is empty');
@@ -6451,8 +6450,6 @@ exports.FnDeleteHolidayList = function(req, res){
             else if (TID == null) {
                 console.log('FnDeleteHolidayList: TID is empty');
             }
-
-
             res.statusCode=400;
             res.send(RtnMessage);
         }
@@ -6899,6 +6896,73 @@ exports.FnGetTranscation = function (req, res) {
         throw new Error(ex);
     }
 };
+
+exports.FnDeleteTranscation = function(req,res){
+try{
+    
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    
+    var Token = req.query.Token;
+    var ItemTID = req.query.ItemTID;
+    
+    var RtnMessage = {
+        IsSuccessfull:false
+    };
+    if (Token != null && ItemTID != null){
+        FnValidateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+                        
+                        db.query('CALL pDeleteTransactionItems(' + db.escape(ItemTID) + ')', function (err, deleteResult) {
+                            if (!err) {
+                                if (deleteResult.affectedRows > 0) {
+                                    RtnMessage.IsSuccessfull = true;
+                                    res.send(RtnMessage);
+                                    console.log('FnDeleteTranscation: transaction items delete successfully');
+                                }
+                                else {
+                                    console.log('FnDeleteTranscation:No delete transaction items');
+                                    res.send(RtnMessage);
+                                }
+                            }
+                            else {
+                                console.log('FnDeleteTranscation: error in deleting transaction items' + err);
+                                res.statusCode = 500;
+                                res.send(RtnMessage);
+                            }
+                        });
+                    }
+                    else {
+                        console.log('FnDeleteTranscation: Invalid token');
+                        res.statusCode = 401;
+                        res.send(RtnMessage);
+                    }
+                }
+                else {
+                    console.log('FnDeleteTranscation:Error in processing Token' + err);
+                    res.statusCode = 500;
+                    res.send(RtnMessage);
+
+                }
+        });
+    }
+    else {
+            if (Token == null) {
+                console.log('FnDeleteTranscation: Token is empty');
+            }
+            else if (ItemTID == null) {
+                console.log('FnDeleteTranscation: ItemTID is empty');
+            }
+            res.statusCode=400;
+            res.send(RtnMessage);
+        }
+}
+catch (ex) {
+        console.log('FnDeleteTranscation:error ' + ex.description);
+        throw new Error(ex);
+    }
+}
 
 exports.FnSaveWorkingHours = function(req, res){
     try{
@@ -8346,7 +8410,7 @@ exports.FnSendBulkMailer = function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
-        var Token = req.body.TokenNo;
+        var Token = req.body.Token;
         var TID = req.body.TID;
         var TemplateID = req.body.TemplateID;
         var Attachment = req.body.Attachment;
@@ -8355,13 +8419,13 @@ exports.FnSendBulkMailer = function (req, res) {
         var OutputFileName='';
         if (TID == '')
             TID = null;
-
+        
         var RtnResponse = {
             IsSent: false
         };
         if (TID != null) {
 
-            if (Token != null && Token != ' ' && TID != null && TID != ' ' && TemplateID != null && TemplateID != ' ') {
+            if (Token != null && Token != '' && TID != null && TID != '' && TemplateID != null && TemplateID != '') {
                 FnValidateToken(Token, function (err, Result) {
                     if (!err) {
                         if (Result != null) {
@@ -8473,8 +8537,20 @@ exports.FnSendBulkMailer = function (req, res) {
                     }
                 });
             }
+            else{
+                 if (Token == null) {
+                    console.log('FnSendBulkMailer: Token is empty');
+                }
+                else if (TID == null) {
+                    console.log('FnSendBulkMailer: TID is empty');
+                }
+                else if (TemplateID == null) {
+                    console.log('FnSendBulkMailer: TemplateID is empty');
+                }
+            }
         }
         else {
+            
             if (Token != null && Attachment != null && AttachmentFileName != null && ToMailID != null) {
                 FnValidateToken(Token, function (err, Result) {
                     if (!err) {
@@ -8486,7 +8562,13 @@ exports.FnSendBulkMailer = function (req, res) {
                                 OutputFileName = Result[0].EZEID;
                                 console.log(OutputFileName+'.pdf');
                             }
+                            else{
+                                    console.log('FnSendBulkMailer:No EZEID found..');
+                                }
                             }
+                            else{
+                                    console.log('FnSendBulkMailer:Error in finding EZEID');
+                                }
                           
                             var pdfDocument = require('pdfkit');
                             //var doc = new pdfDocument();
@@ -8644,7 +8726,6 @@ try{
                                 x_width = Target_Width * Original_Height / Target_Height ;
                                   
                                     gm(bitmap).crop(x_width,Original_Height)
-                                    .write("F://output//cropped.jpg")
                                         RtnMessage.Picture = 'data:image/jpg;base64,' + new Buffer(bitmap).toString('base64');
                                         RtnMessage.IsSuccessfull = true;
                                         console.log('FnCropImage: Image Cropped successfully');                            
@@ -8928,7 +9009,6 @@ exports.FnDeleteWebLink = function(req, res){
 }
 
 //method to redirect the weblink
-
 var FnGetRedirectLink = function(ezeid,urlSeqNumber,redirectCallback){
     var Insertquery = db.escape(ezeid) + ',' + db.escape(urlSeqNumber);
     db.query('CALL pRedirectWebLink(' + Insertquery + ')', function (err, results) {
