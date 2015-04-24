@@ -102,5 +102,27 @@ footer p {
     border-color: #FFFFFF;
 }
 
+@font-face {
+    font-family: 'Roboto',sans-serif;
+    src: url('../fonts/Roboto-Regular.ttf');
+    font-weight: normal;
+}
+
+@font-face {
+    font-family: 'Robot',sans-serif;
+    src: url('../fonts/Roboto-Bold.ttf');
+    font-weight: bold;
+}
+
+@font-face {
+    font-family: 'Open Sans',sans-serif;
+    src: url('../fonts/opensans-condlight-webfont.ttf');
+}
+
+input[type='text'],select.form-control,textarea{
+    border-radius: 2px;
+}
+
+
 
 /***************************************** end :  Directly over container in currrent ***************************************/

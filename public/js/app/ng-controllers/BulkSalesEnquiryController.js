@@ -277,7 +277,7 @@ angular.module('ezeidApp').controller('bulksalesController',[
     salesEnquiry.SendEnquiryMail = function () {
 
         salesEnquiry._info.Token = $rootScope._userInfo.Token;
-       
+
         if($scope.selectedList.length > 10)
         {
             Notification.error({ message: 'Maximum Limit: 10 companies…', delay: MsgDelay });
