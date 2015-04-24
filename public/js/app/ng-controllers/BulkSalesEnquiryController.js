@@ -260,6 +260,7 @@ angular.module('ezeidApp').controller('bulksalesController',[
 
     // get template details
     salesEnquiry.getTemplateDetails = function (Tid) {
+
         if(Tid != undefined)
         {
             $http({
@@ -273,43 +274,53 @@ angular.module('ezeidApp').controller('bulksalesController',[
         }
     };
 
+
     // send sales enquiry mail
     salesEnquiry.SendEnquiryMail = function () {
 
-        salesEnquiry._info.Token = $rootScope._userInfo.Token;
-
-        if($scope.selectedList.length > 10)
+       salesEnquiry._info.Token = $rootScope._userInfo.Token;
+        if($scope.selectedTID.length > 10)
         {
-            Notification.error({ message: 'Maximum Limit: 10 companies…', delay: MsgDelay });
+          Notification.error({ message: 'Maximum Limit: 10 companies…', delay: MsgDelay });
         }
         else
         {
-            $http({ method: 'get', url: GURL + 'ewtSendBulkMailer?Token=' + $rootScope._userInfo.Token + '&TID='+ $scope.selectedTID + '&TemplateID='+ salesEnquiry._info.TID }).success(function (data)
+
+            if($scope.selectedTID.length > 0)
             {
-                 if (data != 'null')
-                 {
-                     salesEnquiry._info = {};
 
-                     $scope.formTitle = "Bulk Sales Enquiry";
-                     $scope.showCreateMailTemplate = false;
+               /* $http({ method: 'get', url: GURL + 'ewtSendBulkMailer?Token=' + $rootScope._userInfo.Token + '&TID='+ $scope.selectedTID + '&TemplateID='+ salesEnquiry._info.TID }).success(function (data)*/
+                $http({ method: 'post', url: GURL + 'ewtSendBulkMailer', data: { Token: $rootScope._userInfo.Token, TID: $scope.selectedTID, TemplateID: salesEnquiry._info.TID }}).success(function (data)
+                {
+                     if (data != 'null')
+                     {
+                         salesEnquiry._info = {};
 
-                     document.getElementById("FromName").className = "form-control emptyBox";
-                     document.getElementById("FromEmailID").className = "form-control emptyBox";
-                     document.getElementById("Title").className = "form-control emptyBox";
-                     document.getElementById("Subject").className = "form-control emptyBox";
-                     document.getElementById("Body").className = "form-control emptyBox";
+                         $scope.formTitle = "Bulk Sales Enquiry";
+                         $scope.showCreateMailTemplate = false;
 
-                     Notification.success({message: "Mails are submitted for transmitted..", delay: MsgDelay});
-                     $window.localStorage.removeItem("searchResult");
-                     $window.localStorage.removeItem("selectedTids");
-                 }
-                 else
-                 {
-                     // Notification.error({ message: 'Invalid key or not found…', delay: MsgDelay });
-                     $window.localStorage.removeItem("searchResult");
-                     $window.localStorage.removeItem("selectedTids");
-                 }
-             });
+                         document.getElementById("FromName").className = "form-control emptyBox";
+                         document.getElementById("FromEmailID").className = "form-control emptyBox";
+                         document.getElementById("Title").className = "form-control emptyBox";
+                         document.getElementById("Subject").className = "form-control emptyBox";
+                         document.getElementById("Body").className = "form-control emptyBox";
+
+                         Notification.success({message: "Mails are submitted for transmitted..", delay: MsgDelay});
+                         $window.localStorage.removeItem("searchResult");
+                         $window.localStorage.removeItem("selectedTids");
+                     }
+                     else
+                     {
+                         // Notification.error({ message: 'Invalid key or not found…', delay: MsgDelay });
+                         $window.localStorage.removeItem("searchResult");
+                         $window.localStorage.removeItem("selectedTids");
+                     }
+                 });
+            }
+           else {
+               
+                Notification.error({message: "Please select a company !", delay: MsgDelay});
+            }
         }
     };
 

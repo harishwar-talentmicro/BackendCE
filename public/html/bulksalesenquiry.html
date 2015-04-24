@@ -30,6 +30,7 @@
                                                     <td><input type="checkbox"
                                                                name="companyID"
                                                                data-tid="{{_item.TID}}"
+                                                               ng-click="toggleCheckbox($event)"
                                                                ng-checked="selectedTID.indexOf(_item.TID)!=-1"/>
                                                         <!--ng-class="{'checked':isExist(_item.TID)!=-1}"-->
                                                     </td>
