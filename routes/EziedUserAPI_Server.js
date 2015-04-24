@@ -8346,7 +8346,7 @@ exports.FnSendBulkMailer = function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
-        var Token = req.body.TokenNo;
+        var Token = req.body.Token;
         var TID = req.body.TID;
         var TemplateID = req.body.TemplateID;
         var Attachment = req.body.Attachment;
@@ -8355,13 +8355,13 @@ exports.FnSendBulkMailer = function (req, res) {
         var OutputFileName='';
         if (TID == '')
             TID = null;
-
+        
         var RtnResponse = {
             IsSent: false
         };
         if (TID != null) {
 
-            if (Token != null && Token != ' ' && TID != null && TID != ' ' && TemplateID != null && TemplateID != ' ') {
+            if (Token != null && Token != '' && TID != null && TID != '' && TemplateID != null && TemplateID != '') {
                 FnValidateToken(Token, function (err, Result) {
                     if (!err) {
                         if (Result != null) {
@@ -8473,8 +8473,20 @@ exports.FnSendBulkMailer = function (req, res) {
                     }
                 });
             }
+            else{
+                 if (Token == null) {
+                    console.log('FnSendBulkMailer: Token is empty');
+                }
+                else if (TID == null) {
+                    console.log('FnSendBulkMailer: TID is empty');
+                }
+                else if (TemplateID == null) {
+                    console.log('FnSendBulkMailer: TemplateID is empty');
+                }
+            }
         }
         else {
+            
             if (Token != null && Attachment != null && AttachmentFileName != null && ToMailID != null) {
                 FnValidateToken(Token, function (err, Result) {
                     if (!err) {
@@ -8486,7 +8498,13 @@ exports.FnSendBulkMailer = function (req, res) {
                                 OutputFileName = Result[0].EZEID;
                                 console.log(OutputFileName+'.pdf');
                             }
+                            else{
+                                    console.log('FnSendBulkMailer:No EZEID found..');
+                                }
                             }
+                            else{
+                                    console.log('FnSendBulkMailer:Error in finding EZEID');
+                                }
                           
                             var pdfDocument = require('pdfkit');
                             //var doc = new pdfDocument();
