@@ -103,20 +103,27 @@ footer p {
 }
 
 @font-face {
-    font-family: 'Roboto',sans-serif;
+    font-family: 'Roboto';
     src: url('../fonts/Roboto-Regular.ttf');
     font-weight: normal;
 }
 
 @font-face {
-    font-family: 'Robot',sans-serif;
+    font-family: 'Roboto';
     src: url('../fonts/Roboto-Bold.ttf');
     font-weight: bold;
 }
 
 @font-face {
-    font-family: 'Open Sans',sans-serif;
+    font-family: 'Open Sans Light';
     src: url('../fonts/opensans-condlight-webfont.ttf');
+    font-stretch : normal;
+}
+
+@font-face {
+    font-family: 'Open Sans';
+    src: url('../fonts/opensans-regular-webfont.ttf');
+    font-stretch : condensed;
 }
 
 input[type='text'],select.form-control,textarea{
