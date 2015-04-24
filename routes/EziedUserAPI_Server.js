@@ -8644,7 +8644,6 @@ try{
                                 x_width = Target_Width * Original_Height / Target_Height ;
                                   
                                     gm(bitmap).crop(x_width,Original_Height)
-                                    .write("F://output//cropped.jpg")
                                         RtnMessage.Picture = 'data:image/jpg;base64,' + new Buffer(bitmap).toString('base64');
                                         RtnMessage.IsSuccessfull = true;
                                         console.log('FnCropImage: Image Cropped successfully');                            
@@ -8928,7 +8927,6 @@ exports.FnDeleteWebLink = function(req, res){
 }
 
 //method to redirect the weblink
-
 var FnGetRedirectLink = function(ezeid,urlSeqNumber,redirectCallback){
     var Insertquery = db.escape(ezeid) + ',' + db.escape(urlSeqNumber);
     db.query('CALL pRedirectWebLink(' + Insertquery + ')', function (err, results) {
