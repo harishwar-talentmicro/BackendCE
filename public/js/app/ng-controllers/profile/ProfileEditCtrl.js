@@ -46,7 +46,10 @@ angular.module('ezeidApp').controller('ProfileEditCtrl',[
          */
         $scope.$watch('isPinApplicable',function(newVal,oldVal){
             if(!newVal){
-                $scope.editUserDetails.PIN = '';
+                if($scope.editUserDetails){
+
+                    $scope.editUserDetails.PIN = '';
+                }
             }
         });
 
@@ -162,11 +165,11 @@ angular.module('ezeidApp').controller('ProfileEditCtrl',[
 
 
         $interval(function(){
-//            console.log('userDetails');
-//            console.log($scope.userDetails);
-//            console.log('editUserDetails');
-//            console.log($scope.editUserDetails);
-//            console.log($rootScope._userInfo);
+//            // console.log('userDetails');
+//            // console.log($scope.userDetails);
+//            // console.log('editUserDetails');
+//            // console.log($scope.editUserDetails);
+//            // console.log($rootScope._userInfo);
         },1000,2);
 
 

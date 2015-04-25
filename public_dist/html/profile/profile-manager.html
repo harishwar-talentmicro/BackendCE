@@ -1,0 +1,1784 @@
+<script type="text/ng-template" id="/tpl/profile-template.html">
+<section ng-controller="ProfileCtrl">
+<!----------------- Profile Section ---------------->
+<div class="panel panel-success">
+<div class="panel-heading">
+    Profile Details
+    <p class="text-info pull-right btn-link" ng-hide="profileEditMode" ng-click="toggleProfileEditMode()">
+        <span class="glyphicon glyphicon-edit"></span> Edit
+    </p>
+
+</div>
+<div class="panel-body profile-panel-body">
+<div class="row">
+<!---------------------Profile Edit Mode Disabled --------------------->
+<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 profile-details" ng-hide="profileEditMode">
+
+
+    <div class="row">
+        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 bottom-clearfix label">
+            <h5 class="text-primary text-left">EZEID</h5>
+        </div>
+        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 bottom-clearfix">
+            <h5 class="text-primary text-left font-open-sans data">
+                {{userDetails.EZEID}}
+            </h5>
+        </div>
+        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 bottom-clearfix label">
+            <h5 class="text-primary text-left">PIN Protected</h5>
+        </div>
+        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 bottom-clearfix">
+            <h5 class="text-primary text-left font-open-sans data" ng-show="userDetails.PIN">
+                <span class="text-success">Yes</span>
+            </h5>
+            <h5 class="text-primary text-left font-open-sans data" ng-hide="userDetails.PIN">
+                <span class="text-danger">No</span>
+            </h5>
+        </div>
+    </div>
+
+    <!----------------- Visible only in case of Individual User--- -->
+
+    <div class="row" ng-show="(userDetails.IDTypeID === 1)">
+        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 bottom-clearfix label">
+            <h5 class="text-primary text-left">Name</h5>
+        </div>
+        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 bottom-clearfix">
+            <h5 class="text-primary text-left font-open-sans data">
+                {{userDetails.FirstName}} {{userDetails.LastName}}
+                <span class="small" ng-hide="userDetails.FirstName || userDetails.LastName">No Name </span>
+            </h5>
+        </div>
+
+        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 bottom-clearfix label">
+            <h5 class="text-primary text-left">Email</h5>
+        </div>
+        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 bottom-clearfix">
+            <h5 class="text-primary text-left font-open-sans data">
+                {{userDetails.EMailID}}
+                <span class="small" ng-hide="userDetails.EMailID">No Email added</span>
+            </h5>
+        </div>
+    </div>
+    <div class="row" ng-show="(userDetails.IDTypeID === 1)">
+        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 bottom-clearfix label">
+            <h5 class="text-primary text-left">Company</h5>
+        </div>
+        <div class="col-lg-4 col-md-2 col-sm-4 col-xs-6 bottom-clearfix">
+            <h5 class="text-primary text-left font-open-sans data">
+                {{userDetails.CompanyName}}
+                <span class="small" ng-hide="userDetails.CompanyName">No Company added</span>
+            </h5>
+        </div>
+
+        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 bottom-clearfix label">
+            <h5 class="text-primary text-left">Job Title</h5>
+        </div>
+        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 bottom-clearfix">
+            <h5 class="text-primary text-left font-open-sans data">
+                {{userDetails.JobTitle}}
+                <span class="small" ng-hide="userDetails.JobTitle">No Job added</span>
+            </h5>
+        </div>
+    </div>
+
+    <div class="row" ng-show="(userDetails.IDTypeID === 1)">
+        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 bottom-clearfix label">
+            <h5 class="text-primary text-left">Date of Birth</h5>
+        </div>
+        <div class="col-lg-4 col-md-2 col-sm-4 col-xs-6 bottom-clearfix">
+            <h5 class="text-primary text-left font-open-sans data">
+                {{userDetails.DOB}}
+                <span class="small" ng-hide="userDetails.DOB">No Date of Birth added</span>
+            </h5>
+        </div>
+
+        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 bottom-clearfix label">
+            <h5 class="text-primary text-left">Gender</h5>
+        </div>
+        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 bottom-clearfix">
+            <h5 class="text-primary text-left font-open-sans data">
+                <span ng-show="userDetails.Gender == 0">Male</span>
+                <span ng-show="userDetails.Gender == 1">Female</span>
+                <span class="small" ng-hide="userDetails.Gender == 0 || userDetails.Gender == 1">Gender Unspecified</span>
+            </h5>
+        </div>
+    </div>
+    <!-----------------end : Visible only in case of Individual user -- >
+
+
+    <!----------------- Visible only in case of Business User (Company)--- -->
+
+    <div class="row" ng-show="(userDetails.IDTypeID === 2)">
+        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 bottom-clearfix label">
+            <h5 class="text-primary text-left">Company Name</h5>
+        </div>
+        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+            <h5 class="text-primary text-left font-open-sans data">
+                {{userDetails.CompanyName}}
+                <span class="small" ng-hide="userDetails.CompanyName">No Company name added</span>
+            </h5>
+        </div>
+
+        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 bottom-clearfix label">
+            <h5 class="text-primary text-left">Email</h5>
+        </div>
+        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+            <h5 class="text-primary text-left font-open-sans data">
+                {{userDetails.EMailID}}
+                <span class="small" ng-hide="userDetails.EMailID">No Email added</span>
+            </h5>
+        </div>
+    </div>
+
+    <div class="row" ng-show="(userDetails.IDTypeID === 2)">
+        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 bottom-clearfix label">
+            <h5 class="text-primary text-left">Contact Person</h5>
+        </div>
+        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+            <h5 class="text-primary text-left font-open-sans data">
+                {{userDetails.FirstName}} {{userDetails.LastName}}
+                <span class="small" ng-hide="userDetails.FirstName || userDetails.LastName">No Contact Person </span>
+            </h5>
+        </div>
+
+        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 bottom-clearfix label">
+            <h5 class="text-primary text-left">About</h5>
+        </div>
+        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+            <h5 class="text-primary text-left font-open-sans data">
+                {{userDetails.AboutCompany}}
+                <span class="small" ng-hide="userDetails.AboutCompany">No Description added</span>
+            </h5>
+        </div>
+    </div>
+    <!-----------------end : Visible only in case of Business user (Company)-->
+
+
+    <!----------------- Visible only in case of Public Place (Public place)--- -->
+    <div class="row" ng-show="(userDetails.IDTypeID === 3)">
+        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 bottom-clearfix label">
+            <h5 class="text-primary text-left">Public Place</h5>
+        </div>
+        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+            <h5 class="text-primary text-left font-open-sans data">
+                {{userDetails.CompanyName}}
+                <span class="small" ng-hide="userDetails.CompanyName">No name added</span>
+            </h5>
+        </div>
+
+        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 bottom-clearfix label">
+            <h5 class="text-primary text-left">Email</h5>
+        </div>
+        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+            <h5 class="text-primary text-left font-open-sans data">
+                {{userDetails.EMailID}}
+                <span class="small" ng-hide="userDetails.EMailID">No Email added</span>
+            </h5>
+        </div>
+    </div>
+
+    <div class="row" ng-show="(userDetails.IDTypeID === 3)">
+        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 bottom-clearfix label">
+            <h5 class="text-primary text-left">Contact Person</h5>
+        </div>
+        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+            <h5 class="text-primary text-left font-open-sans data">
+                {{userDetails.FirstName}} {{userDetails.LastName}}
+                <span class="small" ng-hide="userDetails.FirstName || userDetails.LastName">No Contact Person </span>
+            </h5>
+        </div>
+
+        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 bottom-clearfix label">
+            <h5 class="text-primary text-left">About</h5>
+        </div>
+        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+            <h5 class="text-primary text-left font-open-sans data">
+                {{userDetails.AboutCompany}}
+                <span class="small" ng-hide="userDetails.JobTitle">No Description added</span>
+            </h5>
+        </div>
+    </div>
+    <!-----------------end : Visible only in case of Business user (Company)-->
+
+</div>
+<!------------------end : Profile Edit Mode Disabled ------------------->
+
+
+<!------------------Profile Edit Mode Enabled ------------------->
+<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 profile-details" ng-show="profileEditMode" ng-controller="ProfileEditCtrl">
+<form name="userDetailsForm">
+<div class="row">
+    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 bottom-clearfix label">
+        <h5 class="text-primary text-left">EZEID</h5>
+    </div>
+    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 bottom-clearfix">
+        <h5 class="text-primary text-left font-open-sans data">
+            {{userDetails.EZEID}}
+        </h5>
+    </div>
+    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 bottom-clearfix label">
+        <h5 class="text-primary text-left">PIN Protected</h5>
+    </div>
+    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 bottom-clearfix">
+        <div class="row">
+            <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12">
+                <div class="row">
+                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
+                        <div class="form-group center-vertical">
+                            <input type="checkbox" ng-model="isPinApplicable" />
+                        </div>
+                    </div>
+                    <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10">
+                        <div class="form-group">
+                            <input type="text"
+                                   name="PIN"
+                                   ng-disabled="!isPinApplicable"
+                                   ng-model="editUserDetails.PIN"
+                                   ng-pattern="/^[1-9]+[0-9]{2,2}$/"
+                                   pin-only
+                                   class="form-control" placeholder="PIN" />
+                        </div>
+                        <small ng-show="userDetailsForm.PIN.$invalid" class="text-danger">Allowed 100 to 999</small>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!----------------- Visible only in case of Individual User --- -->
+<div class="row" ng-show="(userDetails.IDTypeID === 1)">
+    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 bottom-clearfix label">
+        <h5 class="text-primary text-left">First Name *</h5>
+    </div>
+    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 bottom-clearfix">
+        <div class="row">
+            <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12">
+                <div class="form-group">
+                    <input name="FirstName"
+                           maxlength="30"
+                           type="text"
+                           ng-model="editUserDetails.FirstName"
+                           class="form-control emptyBox"
+                           ng-class="(userDetailsForm.FirstName.$dirty && userDetailsForm.FirstName.$modelValue.length < 1) ? 'mandatoryTextBox' : ''"
+                           placeholder="First Name" />
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 bottom-clearfix label">
+        <h5 class="text-primary text-left">Last Name</h5>
+    </div>
+    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 bottom-clearfix">
+        <div class="row">
+            <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12">
+                <div class="form-group">
+                    <input type="text"
+                           maxlength="30"
+                           ng-model="editUserDetails.LastName"
+                           class="form-control"
+                           placeholder="Last Name" />
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div class="row" ng-show="(userDetails.IDTypeID === 1)">
+    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 bottom-clearfix label">
+        <h5 class="text-primary text-left">Email *</h5>
+    </div>
+    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 bottom-clearfix">
+        <div class="row">
+            <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12">
+                <div class="form-group">
+                    <input type="email"
+                           ng-model="editUserDetails.EMailID"
+                           maxlength="50"
+                           name="EMailID1"
+                           class="form-control emptyBox"
+                           ng-class="((userDetailsForm.EMailID1.$dirty && userDetailsForm.EMailID1.$invalid) || (userDetailsForm.EMailID1.$dirty && userDetailsForm.EMailID1.$modelValue.length < 1)) ? 'mandatoryTextBox' : ''"
+                           placeholder="admin@example.com" />
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<div class="row" ng-show="(userDetails.IDTypeID === 1)">
+    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 bottom-clearfix label">
+        <h5 class="text-primary text-left">Company</h5>
+    </div>
+    <div class="col-lg-4 col-md-2 col-sm-4 col-xs-6 bottom-clearfix">
+        <div class="row">
+            <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12">
+                <div class="form-group">
+                    <input type="text"
+                           maxlength="150"
+                           ng-model="editUserDetails.CompanyName"
+                           class="form-control"
+                           placeholder="Company Name" />
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 bottom-clearfix label">
+        <h5 class="text-primary text-left">Job Title</h5>
+    </div>
+    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 bottom-clearfix">
+        <div class="row">
+            <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12">
+                <div class="form-group">
+                    <input type="text" ng-model="editUserDetails.JobTitle" maxlength="100" class="form-control" placeholder="Job Title" />
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div class="row" ng-show="(userDetails.IDTypeID === 1)">
+    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 bottom-clearfix label">
+        <h5 class="text-primary text-left">Date of Birth</h5>
+    </div>
+    <div class="col-lg-4 col-md-2 col-sm-4 col-xs-6 bottom-clearfix">
+        <div class="row">
+            <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12">
+                <div class="form-group">
+                    <date-time-picker recipient="editUserDetails.DOB" settings='{"format" : "d-M-Y", "hours12" : false, "maxDate" : 0, "timepicker" : false}'></date-time-picker>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 bottom-clearfix label">
+        <h5 class="text-primary text-left">Gender</h5>
+    </div>
+    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 bottom-clearfix">
+        <div class="row">
+            <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12">
+                <div class="form-group">
+                    <select class="form-control" ng-model="editUserDetails.Gender">
+                        <option value="2">Unspecified Gender</option>
+                        <option value="0">Male</option>
+                        <option value="1">Female</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-----------------end : Visible only in case of Individual user -- >
+
+
+<!----------------- Visible only in case of Business User (Company)--- -->
+<div class="row" ng-show="(userDetails.IDTypeID === 2)">
+    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 bottom-clearfix label">
+        <h5 class="text-primary text-left">Company Name *</h5>
+    </div>
+    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+        <div class="row">
+            <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12">
+                <div class="form-group">
+                    <input type="text"
+                           maxlength="150"
+                           ng-model="editUserDetails.CompanyName"
+                           name="CompanyName2"
+                           class="form-control emptyBox"
+                           ng-class="(userDetailsForm.CompanyName2.$dirty && userDetailsForm.CompanyName2.$modelValue.length < 1) ? 'mandatoryTextBox' : ''"
+                           placeholder="Company Name" />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 bottom-clearfix label">
+        <h5 class="text-primary text-left">Email *</h5>
+    </div>
+    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+        <div class="row">
+            <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12">
+                <div class="form-group">
+                    <input type="email"
+                           ng-model="editUserDetails.EMailID"
+                           maxlength="50"
+                           name="EMailID2"
+                           class="form-control emptyBox"
+                           ng-class="((userDetailsForm.EMailID2.$dirty && userDetailsForm.EMailID2.$invalid) || (userDetailsForm.EMailID2.$dirty && userDetailsForm.EMailID2.$modelValue.length < 1)) ? 'mandatoryTextBox' : ''"
+                           class="form-control"
+                           placeholder="Contact Email" />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="(userDetails.IDTypeID === 2)">
+    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 bottom-clearfix label">
+        <h5 class="text-primary text-left">First Name</h5>
+    </div>
+    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+        <div class="row">
+            <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12">
+                <div class="form-group">
+                    <input type="text"
+                           maxlength="30"
+                           ng-model="editUserDetails.FirstName"
+                           class="form-control"
+                           placeholder="Contact Person First Name" />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 bottom-clearfix label">
+        <h5 class="text-primary text-left">Last Name</h5>
+    </div>
+    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+
+        <div class="row">
+            <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12">
+                <div class="form-group">
+                    <input type="text"
+                           maxlength="30"
+                           ng-model="editUserDetails.LastName"
+                           class="form-control"
+                           placeholder="Contact Person Last Name" />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="(userDetails.IDTypeID === 2)">
+    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 bottom-clearfix label">
+        <h5 class="text-primary text-left">About Company</h5>
+    </div>
+    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+
+        <div class="row">
+            <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12">
+                <div class="form-group">
+                    <textarea ng-model="editUserDetails.AboutCompany"
+                              maxlength="100"
+                              class="form-control"
+                              row="3"
+                              placeholder="About Company"></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-----------------end : Visible only in case of Business user (Company)-->
+
+
+<!----------------- Visible only in case of Public Place (Public place)--- -->
+<div class="row" ng-show="(userDetails.IDTypeID === 3)">
+    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 bottom-clearfix label">
+        <h5 class="text-primary text-left">Public Place *</h5>
+    </div>
+    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+
+        <div class="row">
+            <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12">
+                <div class="form-group">
+                    <input type="text"
+                           maxlength="150"
+                           name="CompanyName3"
+                           ng-model="editUserDetails.CompanyName"
+                           class="form-control emptyBox"
+                           ng-class="(userDetailsForm.CompanyName3.$dirty && userDetailsForm.CompanyName3.$modelValue.length < 1) ? 'mandatoryTextBox' : ''"
+                           placeholder="Name of Public Place" />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 bottom-clearfix label">
+        <h5 class="text-primary text-left">Email *</h5>
+    </div>
+    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+
+        <div class="row">
+            <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12">
+                <div class="form-group">
+                    <input type="email"
+                           maxlength="50"
+                           name="EMailID3"
+                           ng-model="editUserDetails.EMailID"
+                           class="form-control"
+                           ng-class="((userDetailsForm.EMailID3.$dirty && userDetailsForm.EMailID3.$invalid) || (userDetailsForm.EMailID3.$dirty && userDetailsForm.EMailID3.$modelValue.length < 1)) ? 'mandatoryTextBox' : ''"
+                           placeholder="Email" />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="(userDetails.IDTypeID === 3)">
+    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 bottom-clearfix label">
+        <h5 class="text-primary text-left"> First Name</h5>
+    </div>
+    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+
+        <div class="row">
+            <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12">
+                <div class="form-group">
+                    <input type="text"
+                           maxlength="30"
+                           ng-model="editUserDetails.FirstName"
+                           class="form-control"
+                           placeholder="Contact Person First Name" />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 bottom-clearfix label">
+        <h5 class="text-primary text-left"> Last Name</h5>
+    </div>
+    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+
+        <div class="row">
+            <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12">
+                <div class="form-group">
+                    <input class="form-control"
+                           maxlength="30"
+                           ng-model="editUserDetails.LastName"
+                           placeholder="Contact Person Last Name"/>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="(userDetails.IDTypeID === 3)">
+    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 bottom-clearfix label">
+        <h5 class="text-primary text-left">About Public Place</h5>
+    </div>
+    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+
+        <div class="row">
+            <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12">
+                <div class="form-group">
+                    <textarea ng-model="editUserDetails.AboutCompany"
+                              maxlength="100"
+                              class="form-control" row="3"
+                              placeholder="About public place"></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-----------------end : Visible only in case of Business user (Company)-->
+
+<div class="row">
+    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-3">
+        <button class="btn btn-block btn-primary" ng-click="saveUserDetails()">Save</button>
+    </div>
+    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-3 col-lg-offset-1 col-md-offset-1 col-sm-offset-1 col-xs-offset-1">
+        <button class="btn btn-block btn-primary" ng-click="toggleProfileEditMode()">Close</button>
+    </div>
+</div>
+</form>
+</div>
+<!------------------end : Profile Edit Mode Enabled ------------------->
+
+
+</div>
+</div>
+</div>
+<!----------------- end : Profile Section ---------------->
+
+
+<!--------------- Location Section -------------------->
+<div class="panel panel-warning"  ng-controller="LocationsCtrl">
+<div class="panel-heading">
+    Locations
+    <p class="text-info pull-right btn-link" ng-click="addSecondaryLocation()">
+        <span class="glyphicon glyphicon-plus"></span> Add
+    </p>
+</div>
+
+<div class="panel-body locations-panel-body">
+<form name="primaryLocationForm">
+<div class="row">
+<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 location-details">
+<div class="row">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
+        <h4>
+            1. Primary Location
+                                                                            <span class="pull-right">
+                                                                                <!-- @todo Add facility to save and after saving change editMode to false and toggleMapControls after saving successfully -->
+                                                                                <button
+                                                                                        data-toggle="tooltip"
+                                                                                        title="Save Changes"
+                                                                                        class="btn btn-xs btn-success no-radius"
+                                                                                        ng-show="locationsToggleIndex[0].editMode"
+                                                                                        ng-click="saveLocation(0)">
+                                                                                    <span class="glyphicon glyphicon-ok"></span>
+                                                                                    Save
+
+                                                                                </button>
+                                                                                <button
+                                                                                        data-toggle="tooltip"
+                                                                                        title="Delete"
+                                                                                        class="btn btn-xs btn-danger no-radius"
+                                                                                        ng-disabled="1">
+                                                                                    <span class="glyphicon glyphicon-trash"></span>
+
+                                                                                </button>
+                                                                                <button
+                                                                                        data-toggle="tooltip"
+                                                                                        title="Go Back"
+                                                                                        class="btn btn-xs btn-warning no-radius"
+                                                                                        ng-show="locationsToggleIndex[0].editMode"
+                                                                                        ng-click="(locationsToggleIndex[0].editMode = false)(toggleMapControls(0))">
+                                                                                    <span class="glyphicon glyphicon-arrow-left"></span>
+                                                                                    Back
+                                                                                </button>
+                                                                                <button
+                                                                                        data-toggle="tooltip"
+                                                                                        title="Edit"
+                                                                                        class="btn btn-xs btn-default no-radius"
+                                                                                        ng-click="(toggleMapControls(0))(editLocation(0))"
+                                                                                        ng-show="locationsToggleIndex[0].viewMode && !locationsToggleIndex[0].editMode">
+                                                                                    <span class="glyphicon glyphicon-pencil"></span>
+                                                                                </button>
+                                                                                <button
+                                                                                        data-toggle="tooltip"
+                                                                                        title="Show Details"
+                                                                                        class="btn btn-xs btn-default no-radius"
+                                                                                        ng-click="(initializeMap(0)(toggleAllLocations(0)))"
+                                                                                        ng-hide="locationsToggleIndex[0].viewMode">
+                                                                                    <span class="glyphicon glyphicon-chevron-down"></span>
+                                                                                </button>
+                                                                                <button
+                                                                                        data-toggle="tooltip"
+                                                                                        title="Hide Details"
+                                                                                        class="btn btn-xs btn-default no-radius"
+                                                                                        ng-click="(locationsToggleIndex[0].viewMode = !locationsToggleIndex[0].viewMode) (locationsToggleIndex[0].editMode = false)"
+                                                                                        ng-show="locationsToggleIndex[0].viewMode">
+                                                                                    <span class="glyphicon glyphicon-chevron-up"></span>
+                                                                                </button>
+                                                                            </span>
+        </h4>
+    </div>
+</div>
+
+<div class="row" ng-show="locationsToggleIndex[0].viewMode">
+<!-------- Fields area --------------------------->
+<!---------- edit Mode off --------------------------->
+
+<div
+        ng-hide="locationsToggleIndex[0].editMode"
+        class="col-lg-4 col-md-4 col-sm-4 col-xs-12 location-view-mode">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+            <h5 class="text-primary text-left">Address </h5>
+        </div>
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 "
+             ng-show="userDetails.AddressLine1 ||
+                                                                    userDetails.AddressLine2 ||
+                                                                    userDetails.CityTitle ||
+                                                                    userDetails.StateTitle ||
+                                                                    userDetails.PostalCode ||
+                                                                    userDetails.CountryTitle">
+            <h5 class="text-primary text-left font-open-sans data">
+                {{userDetails.AddressLine1}}{{(userDetails.AddressLine1) ? ', ' : ''}}
+            </h5>
+            <h5 class="text-primary text-left font-open-sans data">
+                {{userDetails.AddressLine2}}{{(userDetails.AddressLine2) ? ', ' : ''}}
+
+            </h5>
+            <h5 class="text-primary text-left font-open-sans data">
+                {{userDetails.CityTitle}}{{(userDetails.CityTitle) ? ', ' : ''}}
+                {{userDetails.StateTitle}}{{(userDetails.StateTitle) ? ', ': ''}}
+            </h5>
+
+            <h5 class="text-primary text-left font-open-sans data">
+                {{userDetails.CountryTitle}}{{(userDetails.CountryTitle) ? ', -' : '' }}
+                {{userDetails.PostalCode}}
+            </h5>
+        </div>
+
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12"
+             ng-hide="userDetails.AddressLine1 ||
+                                                                        userDetails.AddressLine2 ||
+                                                                        userDetails.CityTitle ||
+                                                                        userDetails.StateTitle ||
+                                                                        userDetails.PostalCode ||
+                                                                        userDetails.CountryTitle">
+            <small>No Address </small>
+        </div>
+
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+            <h5 class="text-primary text-left">Address </h5>
+        </div>
+
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 " ng-show="secondaryLocationDetails.AddressLine1 ||
+                                                    secondaryLocationDetails.AddressLine2 ||
+                                                    secondaryLocationDetails.CityTitle ||
+                                                    secondaryLocationDetails.StateTitle ||
+                                                    secondaryLocationDetails.PostalCode ||
+                                                    secondaryLocationDetails.CountryTitle">
+            <h5 class="text-primary text-left font-open-sans data">
+                {{secondaryLocationDetails.AddressLine1}}{{(secondaryLocationDetails.AddressLine1) ? ', ' : ''}}
+            </h5>
+            <h5 class="text-primary text-left font-open-sans data">
+                {{secondaryLocationDetails.AddressLine2}},
+            </h5>
+            <h5 class="text-primary text-left font-open-sans data">
+                {{secondaryLocationDetails.CityTitle}}{{(secondaryLocationDetails.CityTitle) ? ', ' : ''}}
+                {{secondaryLocationDetails.StateTitle}}{{(secondaryLocationDetails.StateTitle) ? ', ': ''}}
+            </h5>
+
+            <h5 class="text-primary text-left font-open-sans data">
+                {{secondaryLocationDetails.CountryTitle}}{{(secondaryLocationDetails.CountryTitle) ? ', -' : '' }}
+                {{secondaryLocationDetails.PostalCode}}
+            </h5>
+        </div>
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-hide="secondaryLocationDetails.AddressLine1 ||
+                                                    secondaryLocationDetails.AddressLine2 ||
+                                                    secondaryLocationDetails.CityTitle ||
+                                                    secondaryLocationDetails.StateTitle ||
+                                                    secondaryLocationDetails.PostalCode ||
+                                                    secondaryLocationDetails.CountryTitle">
+            <small>No Address </small>
+        </div>
+
+    </div>
+
+
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+            <h5 class="text-primary text-left">Phone </h5>
+        </div>
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+            <h5 class="text-primary text-left font-open-sans data">
+                {{((userDetails.PhoneNumber)? userDetails.ISDPhoneNumber : '')}} {{userDetails.PhoneNumber}}
+                <span class="small" ng-hide="userDetails.PhoneNumber">No phone number</span>
+            </h5>
+        </div>
+    </div>
+
+    <div class="row">
+
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+            <h5 class="text-primary text-left">Mobile </h5>
+        </div>
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+            <h5 class="text-primary text-left font-open-sans data">
+                {{((userDetails.MobileNumber)? userDetails.ISDMobileNumber : '')}} {{userDetails.MobileNumber}}
+                <span class="small" ng-hide="userDetails.MobileNumber">No Mobile number</span>
+            </h5>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+            <h5 class="text-primary text-left">Website </h5>
+        </div>
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+            <h5 class="text-primary text-left font-open-sans data">
+                {{userDetails.Website}}
+                <span class="small" ng-hide="userDetails.Website">No website</span>
+            </h5>
+        </div>
+    </div>
+    <div class="row">
+
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+            <h5 class="text-primary text-left">Parking </h5>
+        </div>
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+            <h5 class="text-primary text-left font-open-sans data">
+                {{parkingStatusMap[userDetails.ParkingStatus]}}
+                <span class="small" ng-hide="userDetails.ParkingStatus">Parking Status not available</span>
+            </h5>
+        </div>
+    </div>
+
+    <div class="row" ng-show="userDetails.IDTypeID === 2 && userDetails.SelectionType === 2">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+            <h5 class="text-primary text-left">Working Hours Template </h5>
+        </div>
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+            <h5 class="text-primary text-left font-open-sans data">
+                {{workingHoursTemplates[userDetails.TemplateID]}}
+                <span class="small" ng-hide="userDetails.TemplateID">No working hours template added</span>
+            </h5>
+        </div>
+    </div>
+
+</div>
+<!---------- end : edit Mode off --------------------------->
+
+
+<!---------- edit Mode on --------------------------->
+
+<div
+        ng-show="locationsToggleIndex[0].editMode"
+        class="col-lg-4 col-md-4 col-sm-4 col-xs-12 location-edit-mode">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+            <h5 class="text-primary text-left">Address </h5>
+        </div>
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix ">
+
+            <input type="text"
+                   maxlength="45"
+                   ng-model="editLocationDetails.AddressLine1"
+                   name="primaryLocationForm.AddressLine1"
+                   class="form-control"
+                   placeholder="Adress Line 1" />
+
+        </div>
+
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
+            <input type="text"
+                   maxlength="45"
+                   ng-model="editLocationDetails.AddressLine2"
+                   name="primaryLocationForm.AddressLine2"
+                   class="form-control"
+                   placeholder="Address Line 2" />
+        </div>
+
+        <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 bottom-clearfix">
+            <select class="form-control" ng-model="editLocationDetails.CountryID" name="primaryLocationForm.CountryID" ng-change="loadEditStateList()">
+                <option ng-repeat="country in countryList track by country.CountryID" value="{{country.CountryID}}">{{country.CountryName}}</option>
+            </select>
+        </div>
+
+        <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 bottom-clearfix">
+            <select class="form-control" ng-model="editLocationDetails.StateID" name="primaryLocationForm.StateID">
+                <option ng-repeat="state in editStateList track by state.StateID" value="{{state.StateID}}">{{state.StateName}}</option>
+            </select>
+        </div>
+
+        <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 bottom-clearfix">
+            <input type="text"
+                   maxlength="45"
+                   ng-model="editLocationDetails.CityTitle"
+                   name="primaryLocationForm.CityTitle"
+                   class="form-control"
+                   placeholder="City" />
+
+        </div>
+
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 bottom-clearfix">
+            <input type="text"
+                   maxlength="15"
+                   ng-model="editLocationDetails.PostalCode"
+                   name="primaryLocationForm.PostalCode"
+                   class="form-control"
+                   placeholder="Postal Code" />
+        </div>
+
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+            <h5 class="text-primary text-left">Phone </h5>
+        </div>
+        <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5 ">
+
+            <input type="text"
+                   maxlength="10"
+                   ng-model="editLocationDetails.ISDPhoneNumber"
+                   name="primaryLocationForm.ISDPhoneNumber"
+                   class="form-control"
+                   placeholder="ISD Code"/>
+
+        </div>
+        <div class="col-lg-7 col-md-7 col-sm-7 col-xs-7 ">
+
+            <input type="text"
+                   maxlength="12"
+                   numbers-only
+                   ng-model="editLocationDetails.PhoneNumber"
+                   name="primaryLocationForm.PhoneNumber"
+                   class="form-control"
+                   placeholder="Phone"/>
+
+        </div>
+    </div>
+
+    <div class="row">
+
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+            <h5 class="text-primary text-left">Mobile </h5>
+        </div>
+        <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5 ">
+
+            <input type="text"
+                   maxlength="10"
+                   ng-model="editLocationDetails.ISDMobileNumber"
+                   name="primaryLocationForm.ISDMobileNumber"
+                   class="form-control"
+                   placeholder="ISD Code"/>
+
+        </div>
+        <div class="col-lg-7 col-md-7 col-sm-7 col-xs-7 ">
+
+            <input type="text"
+                   maxlength="12"
+                   numbers-only
+                   ng-model="editLocationDetails.MobileNumber"
+                   name="primaryLocationForm.MobileNumber"
+                   class="form-control"
+                   placeholder="Mobile"/>
+
+        </div>
+
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+            <h5 class="text-primary text-left">Website </h5>
+        </div>
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+            <input type="text"
+                   maxlength="50"
+                   ng-model="editLocationDetails.Website"
+                   name="primaryLocationForm.Website"
+                   class="form-control"
+                   placeholder="http://www.example.com"/>
+            <span class="small" ng-show="primaryLocationForm.Website.$dirty && primaryLocationForm.Website.$invalid"></span>
+        </div>
+    </div>
+    <div class="row">
+
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+            <h5 class="text-primary text-left">Parking </h5>
+        </div>
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+            <h5 class="text-primary text-left font-open-sans data">
+                <select class="form-control" ng-model="editLocationDetails.ParkingStatus" name="primaryLocationForm.ParkingStatus">
+                    <option ng-repeat="parking in parkingStatusMap" value="{{$index}}">{{((parking) ? parking : '--Select Parking--')}}</option>
+                </select>
+            </h5>
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+            <h5 class="text-primary text-left">Working Hours Template </h5>
+        </div>
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+            <h5 class="text-primary text-left font-open-sans data">
+                <select class="form-control" ng-model="editLocationDetails.TemplateID" name="primaryLocationForm.TemplateID">
+                    <option ng-repeat="template in workingHoursTemplateMap" value="0">--Select Working Hours Template--</option>
+                    <option ng-repeat="template in workingHoursTemplateMap" value="{{template.TID}}">{{template.TemplateName}}</option>
+                </select>
+            </h5>
+        </div>
+    </div>
+
+
+</div>
+<!----------end :  edit Mode on --------------------------->
+
+<!-------- end :Fields area --------------------------->
+<!-------- Map area --------------------------->
+<div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
+    <!-------------------------Map Row ------------------------------>
+    <div id="map-location-0" class="row locations-map-container bottom-clearfix">
+
+        <!--<div class="col-lg-6 col-md-6">-->
+        <!--<img id="pac-loc" class="link-btn" ng-click="findCurrentLocation()" src="images/myloc.png" data-toggle="tooltip" data-placement="bottom" title="Current Location" />-->
+        <!--<input id="pac-input" class="form-control pull-left" type="text" placeholder="Search Location" autocomplete="on">-->
+
+        <!--</div>-->
+
+        <!--&lt;!&ndash;<button class="btn btn-primary pull-left marL10px marT10px" ng-click="search.SearchOnMap(search.MSerText)" ng-disabled="search.MSerText==undefined" type="button">Find</button>&ndash;&gt;-->
+        <!--<div id="map-canvas" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">-->
+        <!--</div>-->
+
+    </div>
+
+    <div class="row locations-picture-container text-center">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 location-image-container bottom-clearfix"   ng-hide="locationsToggleIndex[0].editMode">
+            <img height="90px" width="308" class="hidden-xs"
+                 ng-hide="userDetails.IDTypeID == 1"
+                 ng-src="{{((userDetails.Picture)? userDetails.Picture : '/images/grey-background.jpg')}}" />
+            <img height="90px" width="70px" class="hidden-xs"
+                 ng-show="userDetails.IDTypeID == 1"
+                 ng-src="{{((userDetails.Picture)? userDetails.Picture : '/images/grey-background.jpg')}}" />
+
+
+            <img height="45px" width="154" class="hidden-md hidden-sm hidden-lg"
+                 ng-hide="userDetails.IDTypeID == 1"
+                 ng-src="{{((userDetails.Picture)? userDetails.Picture : '/images/grey-background.jpg')}}" />
+            <img height="45px" width="35px" class="hidden-md hidden-sm hidden-lg"
+                 ng-show="userDetails.IDTypeID == 1"
+                 ng-src="{{((userDetails.Picture)? userDetails.Picture : '/images/grey-background.jpg')}}" />
+        </div>
+
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 location-image-container bottom-clearfix"  ng-show="locationsToggleIndex[0].editMode">
+            <img height="90px" width="308" class="hidden-xs"
+                 ng-hide="editLocationDetails.IDTypeID == 1"
+                 ng-src="{{((editLocationDetails.Picture)? editLocationDetails.Picture : '/images/grey-background.jpg')}}" />
+            <img height="90px" width="70px" class="hidden-xs"
+                 ng-show="editLocationDetails.IDTypeID == 1"
+                 ng-src="{{((editLocationDetails.Picture)? editLocationDetails.Picture : '/images/grey-background.jpg')}}" />
+
+
+            <img height="45px" width="154" class="hidden-md hidden-sm hidden-lg"
+                 ng-hide="editLocationDetails.IDTypeID == 1"
+                 ng-src="{{((editLocationDetails.Picture)? editLocationDetails.Picture : '/images/grey-background.jpg')}}" />
+            <img height="45px" width="35px" class="hidden-md hidden-sm hidden-lg"
+                 ng-show="editLocationDetails.IDTypeID == 1"
+                 ng-src="{{((secondaryLocationDetails.Picture)? editLocationDetails.Picture : '/images/grey-background.jpg')}}" />
+        </div>
+
+
+        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 col-lg-offset-4 col-xs-offset-4 col-sm-offset-4 col-xs-offset-3" ng-show="locationsToggleIndex[0].editMode">
+            <div class="hidden">
+                <input type="file" id="picture-input-0" name="primaryLocationForm.Picture" onchange="angular.element(this).scope().onChangePicture(this)" />
+            </div>
+            <button class="btn btn-primary btn-sm no-radius" data-toggle="tooltip" title="Upload Picture" ng-click="changePicture(0,$event)">
+                Attach Picture
+            </button>
+            <!--<button class="btn btn-primary btn-sm no-radius" data-toggle="tooltip" title="Click Picture using Webcam">-->
+                <!--<span class="glyphicon glyphicon-camera"></span>-->
+            <!--</button>-->
+        </div>
+    </div>
+
+</div>
+<!--------end :Map area --------------------------->
+</div>
+
+
+</div>
+</div>
+</form>
+
+<!----------- Secondary Locations using ng-repeat----------------------------------------->
+<form name="secondaryLocation{{locIndex}}Form" ng-repeat="secondaryLocationDetails in secondaryLocations" ng-init="locIndex = $index">
+<div class="row" ng-class="(locationsToggleIndex[locIndex+1].editMode) ? 'location-edit-mode' : ''">
+<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 location-details">
+<div class="row">
+    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4" ng-hide="locationsToggleIndex[locIndex+1].editMode">
+        <h4 class="pull-left">
+            {{locIndex+2}}. {{secondaryLocationDetails.LocTitle}}
+        </h4>
+
+    </div>
+    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4" ng-show="locationsToggleIndex[locIndex+1].editMode">
+        <input
+                data-toggle="tooltip"
+                title="Location Title"
+                type="text"
+                class="form-control form-inline"
+                ng-model="editLocationDetails.LocTitle"
+                name="secondaryLocation{{locIndex}}Form.LocTitle"
+                />
+    </div>
+    <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8">
+
+                                                                                                                        <span class="pull-right">
+                                                                                <!-- @todo Add facility to save and after saving change editMode to false and toggleMapControls after saving successfully -->
+                                                                                <button
+                                                                                        data-toggle="tooltip"
+                                                                                        title="Save Changes"
+                                                                                        class="btn btn-xs btn-success no-radius"
+                                                                                        ng-show="locationsToggleIndex[locIndex+1].editMode"
+                                                                                        ng-click="saveLocation(locIndex+1)">
+                                                                                    <span class="glyphicon glyphicon-ok"></span>
+                                                                                    Save
+
+                                                                                </button>
+                                                                                <button
+                                                                                        data-toggle="tooltip"
+                                                                                        title="Go Back"
+                                                                                        class="btn btn-xs btn-warning no-radius"
+                                                                                        ng-show="locationsToggleIndex[locIndex+1].editMode"
+                                                                                        ng-click="(locationsToggleIndex[locIndex+1].editMode = false)(toggleMapControls(locIndex+1))">
+                                                                                    <span class="glyphicon glyphicon-arrow-left"></span>
+                                                                                    Back
+                                                                                </button>
+
+
+                                                                                <button
+                                                                                        data-toggle="tooltip"
+                                                                                        title="Delete Location"
+                                                                                        class="btn btn-xs btn-danger no-radius"
+                                                                                        ng-click="deleteSecondaryLocation(locIndex+1)"
+                                                                                        >
+                                                                                    <span class="glyphicon glyphicon-trash"></span>
+                                                                                </button>
+                                                                                <button
+                                                                                        data-toggle="tooltip"
+                                                                                        title="Edit"
+                                                                                        class="btn btn-xs btn-default no-radius"
+                                                                                        ng-click="(toggleMapControls(locIndex+1))(editLocation(locIndex+1))"
+                                                                                        ng-show="locationsToggleIndex[locIndex+1].viewMode && !locationsToggleIndex[locIndex+1].editMode">
+                                                                                    <span class="glyphicon glyphicon-pencil"></span>
+                                                                                </button>
+
+                                                                                <button
+                                                                                        data-toggle="tooltip"
+                                                                                        title="Show Details"
+                                                                                        class="btn btn-xs btn-default no-radius"
+                                                                                        ng-click="(initializeMap(locIndex+1)(toggleAllLocations(locIndex+1)))"
+                                                                                        ng-hide="locationsToggleIndex[locIndex+1].viewMode">
+                                                                                    <span class="glyphicon glyphicon-chevron-down"></span>
+                                                                                </button>
+                                                                                <button
+                                                                                        data-toggle="tooltip"
+                                                                                        title="Hide Details"
+                                                                                        class="btn btn-xs btn-default no-radius"
+                                                                                        ng-click="(locationsToggleIndex[locIndex+1].viewMode = !locationsToggleIndex[locIndex+1].viewMode) (locationsToggleIndex[locIndex+1].editMode = false)"
+                                                                                        ng-show="locationsToggleIndex[locIndex+1].viewMode">
+                                                                                    <span class="glyphicon glyphicon-chevron-up"></span>
+                                                                                </button>
+                                                                            </span>
+
+    </div>
+
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
+
+    </div>
+</div>
+
+<div class="row" ng-show="locationsToggleIndex[locIndex+1].viewMode">
+<!-------- Fields area --------------------------->
+<!---------- edit Mode off --------------------------->
+
+<div
+        ng-hide="locationsToggleIndex[locIndex+1].editMode"
+        class="col-lg-4 col-md-4 col-sm-4 col-xs-12 location-view-mode">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+            <h5 class="text-primary text-left">Address </h5>
+        </div>
+
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 " ng-show="secondaryLocationDetails.AddressLine1 ||
+                                                    secondaryLocationDetails.AddressLine2 ||
+                                                    secondaryLocationDetails.CityTitle ||
+                                                    secondaryLocationDetails.StateTitle ||
+                                                    secondaryLocationDetails.PostalCode ||
+                                                    secondaryLocationDetails.CountryTitle">
+            <h5 class="text-primary text-left font-open-sans data">
+                {{secondaryLocationDetails.AddressLine1}}{{(secondaryLocationDetails.AddressLine1) ? ', ' : ''}}
+            </h5>
+            <h5 class="text-primary text-left font-open-sans data">
+                {{secondaryLocationDetails.AddressLine2}},
+            </h5>
+            <h5 class="text-primary text-left font-open-sans data">
+                {{secondaryLocationDetails.CityTitle}}{{(secondaryLocationDetails.CityTitle) ? ', ' : ''}}
+                {{secondaryLocationDetails.StateTitle}}{{(secondaryLocationDetails.StateTitle) ? ', ': ''}}
+            </h5>
+
+            <h5 class="text-primary text-left font-open-sans data">
+                {{secondaryLocationDetails.CountryTitle}}{{(secondaryLocationDetails.CountryTitle) ? ', -' : '' }}
+                {{secondaryLocationDetails.PostalCode}}
+            </h5>
+        </div>
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-hide="secondaryLocationDetails.AddressLine1 ||
+                                                    secondaryLocationDetails.AddressLine2 ||
+                                                    secondaryLocationDetails.CityTitle ||
+                                                    secondaryLocationDetails.StateTitle ||
+                                                    secondaryLocationDetails.PostalCode ||
+                                                    secondaryLocationDetails.CountryTitle">
+            <small>No Address </small>
+        </div>
+
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+            <h5 class="text-primary text-left">Phone </h5>
+        </div>
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+            <h5 class="text-primary text-left font-open-sans data">
+                {{((secondaryLocationDetails.PhoneNumber)? secondaryLocationDetails.ISDPhoneNumber : '')}} {{secondaryLocationDetails.PhoneNumber}}
+                <span class="small" ng-hide="secondaryLocationDetails.PhoneNumber">No phone number</span>
+            </h5>
+        </div>
+    </div>
+
+    <div class="row">
+
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+            <h5 class="text-primary text-left">Mobile </h5>
+        </div>
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+            <h5 class="text-primary text-left font-open-sans data">
+                {{((secondaryLocationDetails.MobileNumber)? secondaryLocationDetails.ISDMobileNumber : '')}} {{secondaryLocationDetails.MobileNumber}}
+                <span class="small" ng-hide="secondaryLocationDetails.MobileNumber">No Mobile number</span>
+            </h5>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+            <h5 class="text-primary text-left">Website </h5>
+        </div>
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+            <h5 class="text-primary text-left font-open-sans data">
+                {{secondaryLocationDetails.Website}}
+                <span class="small" ng-hide="secondaryLocationDetails.Website">No website</span>
+            </h5>
+        </div>
+    </div>
+    <div class="row">
+
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+            <h5 class="text-primary text-left">Parking </h5>
+        </div>
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+            <h5 class="text-primary text-left font-open-sans data">
+                {{parkingStatusMap[secondaryLocationDetails.ParkingStatus]}}
+                <span class="small" ng-hide="secondaryLocationDetails.ParkingStatus">Parking Status not available</span>
+            </h5>
+        </div>
+    </div>
+
+
+    <div class="row" ng-show="userDetails.IDTypeID === 2 && userDetails.SelectionType === 2">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+            <h5 class="text-primary text-left">Working Hours Template </h5>
+        </div>
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+            <h5 class="text-primary text-left font-open-sans data">
+                {{workingHoursTemplates[secondaryLocationDetails.TemplateID]}}
+                <span class="small" ng-hide="secondaryLocationDetails.TemplateID">No working hours template added</span>
+            </h5>
+        </div>
+    </div>
+
+
+
+</div>
+<!---------- end : edit Mode off --------------------------->
+
+
+<!---------- edit Mode on --------------------------->
+
+<div
+        ng-show="locationsToggleIndex[locIndex+1].editMode"
+        class="col-lg-4 col-md-4 col-sm-4 col-xs-12 location-edit-mode">
+
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+            <h5 class="text-primary text-left">Address </h5>
+        </div>
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix ">
+
+            <input type="text"
+                   maxlength="45"
+                   ng-model="editLocationDetails.AddressLine1"
+                   name="secondaryLocation{{locIndex}}Form.AddressLine1"
+                   class="form-control"
+                   placeholder="Adress Line 1" />
+
+        </div>
+
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
+            <input type="text"
+                   maxlength="45"
+                   ng-model="editLocationDetails.AddressLine2"
+                   name="secondaryLocation{{locIndex}}Form.AddressLine2"
+                   class="form-control"
+                   placeholder="Address Line 2" />
+        </div>
+
+        <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 bottom-clearfix">
+            <select class="form-control" ng-model="editLocationDetails.CountryID"
+                    ng-change="loadEditStateList()"
+                    name="secondaryLocation{{locIndex}}Form.CountryID">
+                <option ng-repeat="country in countryList track by country.CountryID" value="{{country.CountryID}}">{{country.CountryName}}</option>
+            </select>
+        </div>
+
+        <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 bottom-clearfix">
+            <select class="form-control" ng-model="editLocationDetails.StateID" name="secondaryLocation{{locIndex}}Form.StateID">
+                <option ng-repeat="state in editStateList track by state.StateID" value="{{state.StateID}}">{{state.StateName}}</option>
+            </select>
+        </div>
+
+        <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 bottom-clearfix">
+            <input type="text"
+                   maxlength="45"
+                   ng-model="editLocationDetails.CityTitle"
+                   name="secondaryLocation{{locIndex}}Form.CityTitle"
+                   class="form-control"
+                   placeholder="City" />
+
+        </div>
+
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 bottom-clearfix">
+            <input type="text"
+                   maxlength="15"
+                   ng-model="editLocationDetails.PostalCode"
+                   name="secondaryLocation{{locIndex}}Form.PostalCode"
+                   class="form-control"
+                   placeholder="Postal Code" />
+        </div>
+
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+            <h5 class="text-primary text-left">Phone </h5>
+        </div>
+        <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5 ">
+
+            <input type="text"
+                   maxlength="10"
+                   ng-model="editLocationDetails.ISDPhoneNumber"
+                   name="secondaryLocation{{locIndex}}Form.ISDPhoneNumber"
+                   class="form-control"
+                   placeholder="ISD Code"/>
+
+        </div>
+        <div class="col-lg-7 col-md-7 col-sm-7 col-xs-7 ">
+
+            <input type="text"
+                   maxlength="12"
+                   numbers-only
+                   ng-model="editLocationDetails.PhoneNumber"
+                   name="secondaryLocation{{locIndex}}Form.PhoneNumber"
+                   class="form-control"
+                   placeholder="Phone"/>
+
+        </div>
+    </div>
+
+    <div class="row">
+
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+            <h5 class="text-primary text-left">Mobile </h5>
+        </div>
+        <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5 ">
+
+            <input type="text"
+                   maxlength="10"
+                   ng-model="editLocationDetails.ISDMobileNumber"
+                   name="secondaryLocation{{locIndex}}Form.ISDMobileNumber"
+                   class="form-control"
+                   placeholder="ISD Code"/>
+
+        </div>
+        <div class="col-lg-7 col-md-7 col-sm-7 col-xs-7 ">
+
+            <input type="text"
+                   maxlength="12"
+                   numbers-only
+                   ng-model="editLocationDetails.MobileNumber"
+                   name="secondaryLocation{{locIndex}}Form.MobileNumber"
+                   class="form-control"
+                   placeholder="Mobile"/>
+
+        </div>
+
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+            <h5 class="text-primary text-left">Website </h5>
+        </div>
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+            <input type="text"
+                   maxlength="50"
+                   ng-model="editLocationDetails.Website"
+                   name="secondaryLocation{{locIndex}}Form.Website"
+                   class="form-control"
+                   placeholder="http://www.example.com"/>
+            <span class="small" ng-show="secondaryLocation{{locIndex}}Form.Website.$dirty && secondaryLocation{{locIndex}}Form.Website.$invalid"></span>
+        </div>
+    </div>
+    <div class="row">
+
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+            <h5 class="text-primary text-left">Parking </h5>
+        </div>
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+            <h5 class="text-primary text-left font-open-sans data">
+                <select class="form-control" ng-model="editLocationDetails.ParkingStatus" name="secondaryLocation{{locIndex}}Form.ParkingStatus">
+                    <option ng-repeat="parking in parkingStatusMap track by parking" value="{{$index}}">{{((parking) ? parking : '--Select Parking--')}}</option>
+                </select>
+            </h5>
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+            <h5 class="text-primary text-left">Working Hours Template </h5>
+        </div>
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+            <h5 class="text-primary text-left font-open-sans data">
+                <select class="form-control" ng-model="editLocationDetails.TemplateID" name="secondaryLocation{{locIndex}}Form.TemplateID">
+                    <option ng-repeat="template in workingHoursTemplateMap" value="0">--Select Working Hours Template--</option>
+                    <option ng-repeat="template in workingHoursTemplateMap" value="{{template.TID}}">{{template.TemplateName}}</option>
+                </select>
+            </h5>
+        </div>
+    </div>
+
+
+</div>
+<!----------end :  edit Mode on --------------------------->
+
+<!-------- end :Fields area --------------------------->
+<!-------- Map area --------------------------->
+<div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
+    <!-------------------------Map Row ------------------------------>
+    <div id="map-location-{{(locIndex+1)}}" class="row locations-map-container bottom-clearfix">
+
+        <!--<div class="col-lg-6 col-md-6">-->
+        <!--<img id="pac-loc" class="link-btn" ng-click="findCurrentLocation()" src="images/myloc.png" data-toggle="tooltip" data-placement="bottom" title="Current Location" />-->
+        <!--<input id="pac-input" class="form-control pull-left" type="text" placeholder="Search Location" autocomplete="on">-->
+
+        <!--</div>-->
+
+        <!--&lt;!&ndash;<button class="btn btn-primary pull-left marL10px marT10px" ng-click="search.SearchOnMap(search.MSerText)" ng-disabled="search.MSerText==undefined" type="button">Find</button>&ndash;&gt;-->
+        <!--<div id="map-canvas" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">-->
+        <!--</div>-->
+
+    </div>
+
+    <div class="row locations-picture-container text-center">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 location-image-container bottom-clearfix"  ng-hide="locationsToggleIndex[locIndex+1].editMode">
+            <img height="90px" width="308" class="hidden-xs"
+                 ng-hide="secondaryLocationDetails.IDTypeID == 1"
+                 ng-src="{{((secondaryLocationDetails.Picture)? secondaryLocationDetails.Picture : '/images/grey-background.jpg')}}" />
+            <img height="90px" width="70px" class="hidden-xs"
+                 ng-show="secondaryLocationDetails.IDTypeID == 1"
+                 ng-src="{{((secondaryLocationDetails.Picture)? secondaryLocationDetails.Picture : '/images/grey-background.jpg')}}" />
+
+
+            <img height="45px" width="154" class="hidden-md hidden-sm hidden-lg"
+                 ng-hide="secondaryLocationDetails.IDTypeID == 1"
+                 ng-src="{{((secondaryLocationDetails.Picture)? secondaryLocationDetails.Picture : '/images/grey-background.jpg')}}" />
+            <img height="45px" width="35px" class="hidden-md hidden-sm hidden-lg"
+                 ng-show="secondaryLocationDetails.IDTypeID == 1"
+                 ng-src="{{((secondaryLocationDetails.Picture)? secondaryLocationDetails.Picture : '/images/grey-background.jpg')}}" />
+        </div>
+
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 location-image-container bottom-clearfix"  ng-show="locationsToggleIndex[locIndex+1].editMode">
+            <img height="90px" width="308" class="hidden-xs"
+                 ng-hide="editLocationDetails.IDTypeID == 1"
+                 ng-src="{{((editLocationDetails.Picture)? editLocationDetails.Picture : '/images/grey-background.jpg')}}" />
+            <img height="90px" width="70px" class="hidden-xs"
+                 ng-show="editLocationDetails.IDTypeID == 1"
+                 ng-src="{{((editLocationDetails.Picture)? editLocationDetails.Picture : '/images/grey-background.jpg')}}" />
+
+
+            <img height="45px" width="154" class="hidden-md hidden-sm hidden-lg"
+                 ng-hide="editLocationDetails.IDTypeID == 1"
+                 ng-src="{{((editLocationDetails.Picture)? editLocationDetails.Picture : '/images/grey-background.jpg')}}" />
+            <img height="45px" width="35px" class="hidden-md hidden-sm hidden-lg"
+                 ng-show="editLocationDetails.IDTypeID == 1"
+                 ng-src="{{((secondaryLocationDetails.Picture)? editLocationDetails.Picture : '/images/grey-background.jpg')}}" />
+        </div>
+        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 col-lg-offset-4 col-xs-offset-4 col-sm-offset-4 col-xs-offset-3" ng-show="locationsToggleIndex[locIndex+1].editMode">
+            <div class="hidden">
+                <input type="file" id="picture-input-{{locIndex+1}}" name="secondaryLocation{{locIndex}}Form.Picture" onchange="angular.element(this).scope().onChangePicture(this)" />
+            </div>
+            <button class="btn btn-primary btn-sm no-radius" data-toggle="tooltip" title="Upload Picture" ng-click="changePicture(locIndex+1,$event)">
+                Attach Picture
+            </button>
+            <!--<button class="btn btn-primary btn-sm no-radius" data-toggle="tooltip" title="Click Picture using Webcam">-->
+                <!--<span class="glyphicon glyphicon-camera"></span>-->
+            <!--</button>-->
+        </div>
+    </div>
+
+</div>
+<!--------end :Map area --------------------------->
+</div>
+
+
+</div>
+</div>
+</form>
+<!----------- end : Secondary Locations using ng-repeat----------------------------------->
+
+</div>
+
+</div>
+
+<!--------------- end : Location Section -------------->
+</section>
+
+</script>
+
+<script type="text/ng-template" id="/tpl/password-template.html">
+    <section ng-controller="PasswordCtrl">
+        <div class="panel panel-success">
+            <div class="panel-heading">
+                Change Password
+                <p class="text-info pull-right btn-link">
+
+                </p>
+
+            </div>
+            <div class="panel-body profile-panel-body">
+                <div class="row">
+                    <!---------------------Profile Edit Mode Disabled --------------------->
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 profile-details password-details" ng-hide="profileEditMode">
+
+                        <form name="passwordForm">
+                            <div class="row">
+                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+                                    <input type="password"
+                                           name="currentPassword"
+                                           placeholder="Current Password"
+                                           class="form-control emptyBox"
+                                           ng-model="currentPassword" />
+                                    <small>&nbsp;</small>
+                                </div>
+                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+                                    <input type="password"
+                                           ng-minlength="4"
+                                           name="newPassword"
+                                           class="form-control emptyBox"
+                                           placeholder="New Password"
+                                           ng-model="newPassword" />
+                                    <small class="text-danger" ng-show="passwordForm.newPassword.$invalid">Password should be atleast 4 characters</small>
+                                </div>
+                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+                                    <input type="password"
+                                           name="renewPassword"
+                                           class="form-control emptyBox"
+                                           placeholder="Re-enter new password"
+                                           ng-model="renewPassword" />
+                                    <small class="text-danger" ng-show="(passwordForm.newPassword.$viewValue !== passwordForm.renewPassword.$viewValue) && passwordForm.newPassword.$viewValue &&(passwordForm.newPassword.$viewValue.length > 0)">Passwords didn't matched</small>
+                                </div>
+
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-2 col-md-2 col-sm-3 col-xs-6">
+                                    <button class="btn btn-primary btn-sm"
+                                            ng-disabled="(!currentPassword)  || (!passwordForm.newPassword.$viewValue) || (passwordForm.newPassword.$invalid)  || (passwordForm.renewPassword.$viewValue !== passwordForm.newPassword.$viewValue)"
+                                            ng-click="changePassword()">Change Password</button>
+                                </div>
+
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+    </section>
+</script>
+
+<script type="text/ng-template" id="/tpl/weblinks-template.html">
+    <section ng-controller="WebLinksCtrl">
+        <div class="panel panel-success">
+            <div class="panel-heading">
+                WebLinks
+                <p ng-hide="webLinkAddMode" class="text-info pull-right btn-link" ng-click="webLinkAddMode = !webLinkAddMode">
+                   <span class="glyphicon glyphicon-plus"></span> Add
+                </p>
+
+            </div>
+            <div class="panel-body profile-panel-body">
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <form name="webLinkForm" class="form-weblink">
+                            <div class="row bottom-clearfix row-weblink-add" ng-show="webLinkAddMode">
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <div class="row bottom-clearfix">
+                                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 bottom-clearfix">
+                                            <h5 class="text-primary text-left">URL Sequence</h5>
+                                        </div>
+                                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 bottom-clearfix">
+                                            <h5 class="text-primary text-left font-open-sans data">U{{(webLinks.length + 1)}}</h5>
+                                        </div>
+                                    </div>
+
+                                    <div class="row bottom-clearfix">
+                                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 bottom-clearfix">
+                                            <h5 class="text-primary text-left">URL</h5>
+                                        </div>
+                                        <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12 bottom-clearfix">
+                                            <div class="form-group">
+                                                <input type="url" class="form-control"
+                                                       name="url"
+                                                       maxlength="1000"
+                                                       ng-pattern="/^(?:(?:https?|ftp):\/\/)(?:\S+(?::\S*)?@)?(?:(?!10(?:\.\d{1,3}){3})(?!127(?:\.\d{1,3}){3})(?!169\.254(?:\.\d{1,3}){2})(?!192\.168(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:\/[^\s]*)?$/i"
+                                                       ng-model="addWebLink.URL"
+                                                       placeholder="http://www.example.com" />
+                                                <small class="text-danger" ng-hide="webLinkForm.url.$invalid">&nbsp;</small>
+                                                <small class="text-danger" ng-show="webLinkForm.url.$invalid">URL is Invalid</small>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row bottom-clearfix">
+                                        <div class="col-lg-2 col-md-2 col-sm-3 col-xs-6">
+                                            <button class="btn btn-primary btn-block btn-sm"
+                                                    ng-click="saveWebLink()"
+                                                    ng-disabled="webLinkForm.url.$invalid || (!addWebLink.URL)">Save
+                                            </button>
+                                        </div>
+                                        <div class="col-lg-2 col-md-2 col-sm-3 col-xs-6">
+                                            <button class="btn btn-primary btn-block btn-sm" ng-click="resetWebLink() (webLinkAddMode = !webLinkAddMode)">Close</button>
+                                        </div>
+                                    </div>
+
+
+                                </div>
+
+                            </div>
+
+                            <div class="row bottom-clearfix" ng-show="webLinks.length > 0">
+                               <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                   <div class="row bottom-clearfix weblink" ng-repeat="link in webLinks track by link.TID">
+                                       <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1">
+                                          U{{$index + 1}}
+                                       </div>
+                                       <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10">
+
+                                               <a ng-href="{{link.URL}}" target="_blank">{{link.URL}}</a>
+
+                                       </div>
+                                       <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1 text-right">
+                                           <button class="btn btn-xs btn-danger no-radius"
+                                                   ng-click="deleteWebLink($index)"
+                                                   ng-show="($index+1) === webLinks.length">
+                                               <span class="glyphicon glyphicon-trash"></span>
+                                           </button>
+                                       </div>
+                                   </div>
+                               </div>
+                            </div>
+
+                        </form>
+                    </div>
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-center top-clearfix-padding-half bottom-clearfix" ng-hide="webLinks.length > 0">
+                        <small>No weblinks added </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</script>
+
+<script type="text/ng-template" id="/tpl/configuration-template.html">
+    <section>
+        This is section
+    </section>
+</script>
+
+<div id="wrapper">
+    <header-section></header-section>
+    <div class="container-fluid top-clearfix-padding">
+        <div class="row">
+            <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12 col-lg-offset-2 col-md-offset-2 col-xs-offset-0 col-sm-offset-0">
+                <!----------- Panel starts -------------------------------------------->
+
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="text-center">Profile Manager : {{userDetails.EZEID}}
+                            <span ng-show="userDetails.IDTypeID == 1">(Individual)</span>
+                            <span ng-show="userDetails.IDTypeID == 2 && userDetails.SelectionType == 2">(Business Paid Listing)</span>
+                            <span ng-show="userDetails.IDTypeID == 2 && userDetails.SelectionType !== 2">(Business Free Listing)</span>
+                            <span ng-show="userDetails.IDTypeID == 3">(Public Place)</span>
+                            <label class="label label-danger pull-right label-mandatory">* Mandatory</label>
+                        </h4>
+                    </div>
+                    <div class="panel-body profile-manager">
+                        <!-------------- Navigation for Profile Manager ------------------------>
+                        <div class="container-fluid">
+                            <div class="row bottom-clearfix">
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-center">
+                                    <ul class="nav nav-pills">
+                                        <li role="presentation" class="bottom-clearfix" ng-class="{'active' : (activeTemplate === '/tpl/profile-template.html')}">
+                                            <a href="/profile-manager/profile"><span class="glyphicon glyphicon-user"></span> Basic Profile and Locations</a>
+                                        </li>
+
+
+                                        <li role="presentation" ng-show="(userDetails.SelectionType === 2 && userDetails.IDTypeID === 2)"
+                                            ng-class="{'active' : (activeTemplate === 'html/profile/configuration/configuration.html')}"
+                                            class="bottom-clearfix">
+                                            <a href="/profile-manager/configuration"><span class="glyphicon glyphicon-cog"></span> Configuration</a>
+                                        </li>
+
+
+                                        <!--- Disabled in case of business user free listing ----------->
+                                        <li role="presentation" ng-show="(userDetails.SelectionType !== 2 && userDetails.IDTypeID === 2)" class="bottom-clearfix disabled">
+                                            <a><span class="glyphicon glyphicon-cog"></span> Configuration</a>
+                                        </li>
+
+
+                                        <li role="presentation" class=" bottom-clearfix"
+                                            ng-show="(userDetails.SelectionType === 2 && userDetails.IDTypeID === 2)"
+                                            ng-class="{'active' :(activeTemplate === '/tpl/weblinks-template.html')}">
+                                            <a href="/profile-manager/weblinks"><span class="glyphicon glyphicon-link"></span> Web Links</a>
+                                        </li>
+
+                                        <li role="presentation" class=" bottom-clearfix"
+                                            ng-class="{'active' : (activeTemplate === '/tpl/password-template.html')}">
+                                            <a href="/profile-manager/password"><span class="glyphicon glyphicon-lock"></span> Change Password</a>
+                                        </li>
+
+                                        <!--<li ng-show="userDetails.IDTypeID === 1" role="presentation" class=" bottom-clearfix"-->
+                                            <!--ng-class="{'active' : (activeTemplate === '/tpl/documents.html')}">-->
+                                            <!--<a href="/profile-manager/password"><span class="glyphicon glyphicon-file"></span> Personal Documents</a>-->
+                                        <!--</li>-->
+
+
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-------------- end : Navigation for Profile Manager ------------------>
+
+                        <!------------- Content Block ------------------------------->
+                        <div class="container-fluid" ng-show="dataProgressLoader.dataLoadInProgress">
+                            <div class="row">
+                                <div class="text-center center-vertical col-lg-2 col-md-2 col-sm-2 col-xs-4 col-lg-offset-5 col-md-offset-5 col-sm-offset-5 col-xs-offset-4 preloader">
+                                    <p class="text-info"></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="container-fluid" ng-show="dataProgressLoader.dataLoadError">
+                            <div class="row">
+                                <div class="text-center col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <p class="text-center text-danger">
+                                        An error occured ! <a ng-click="dataReloadAgain()" class="btn-link">Try Again</a>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="container-fluid" ng-show="dataProgressLoader.dataLoadComplete">
+                            <section ng-include="activeTemplate">
+
+                            </section>
+                        </div>
+                        <!--  -->
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<footer-section></footer-section>
+
+
+
+

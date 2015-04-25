@@ -177,7 +177,7 @@ angular.module('ezeidApp').controller('ModuleSettingsCtrl',[
 
                 }
             }).error(function(err){
-                console.log(err);
+                // console.log(err);
             });
     };
 
@@ -225,7 +225,7 @@ angular.module('ezeidApp').controller('ModuleSettingsCtrl',[
         };
 
         if($scope.validateSettings()){
-            console.log(data);
+            // console.log(data);
             $http({
                 url : GURL + "ewtConfig",
                 method : "POST",
@@ -233,7 +233,7 @@ angular.module('ezeidApp').controller('ModuleSettingsCtrl',[
             }).success(function(resp){
                 Notification.success({message : 'Configuration Saved Successfully', delay : MsgDelay})
             }).error(function(err){
-                console.log(err);
+                // console.log(err);
             });
         }
     };
@@ -244,9 +244,9 @@ angular.module('ezeidApp').controller('ModuleSettingsCtrl',[
          * @type {files|*|files|FileList|files}
          */
        var file =  $("#brochure-file-upload")[0].files;
-       console.log('I am executing');
-        console.log(file);
-            console.log('Then executing');
+       // console.log('I am executing');
+        // console.log(file);
+            // console.log('Then executing');
             var formData = new FormData();
             formData.append('file', file);
             formData.append('Token',$rootScope._userInfo.Token);
@@ -257,7 +257,7 @@ angular.module('ezeidApp').controller('ModuleSettingsCtrl',[
                method : "POST",
                data : formData
            }).success(function(resp){
-                console.log(resp);
+                // console.log(resp);
            }).error(function(err){
 
            });

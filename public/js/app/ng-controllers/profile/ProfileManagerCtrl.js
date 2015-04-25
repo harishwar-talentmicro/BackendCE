@@ -98,8 +98,8 @@ angular.module('ezeidApp').controller('ProfileManagerCtrl',[
                     Token : $rootScope._userInfo.Token
                 }
             }).success(function(resp){
-                    console.log('User Details');
-                    console.log(JSON.stringify(resp));
+                    // console.log('User Details');
+                    // console.log(JSON.stringify(resp));
                     promiseResolved = true;
                     if(resp && resp.length > 0 && resp !== 'null'){
                         defer.resolve(true);
@@ -142,6 +142,9 @@ angular.module('ezeidApp').controller('ProfileManagerCtrl',[
                     break;
                 case 'configuration' :
                     $scope.activeTemplate = 'html/profile/configuration/configuration.html';
+                    break;
+                case 'documents' :
+                    $scope.activeTemplate = 'html/documents.html';
                     break;
                 default:
                     $location.path('/profile-manager/user');

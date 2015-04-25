@@ -128,7 +128,7 @@
                                                     <form name="signUpForm">
                                                         <div class="row">
 
-                                                            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-4 bottom-clearfix min-form-height">
+                                                            <div class="col-lg-3 col-md-3 col-sm-3 col-xs-4 bottom-clearfix min-form-height">
                                                                 <div class="form-group">
                                                                     <!---
                                                                     Validation Added for ezeid input
@@ -151,7 +151,7 @@
                                                                 </div>
                                                             </div>
 
-                                                            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 bottom-clearfix">
+                                                            <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6 bottom-clearfix">
                                                                 <div class="form-group">
                                                                     <!---
                                                                         Validation Added for SignUp form
@@ -355,7 +355,7 @@
 
                                                         <!---------------------- Visible only in case of Individual ------------------------->
                                                         <div class="row" ng-show="(userType == 1) && isEzeidAvailabilityChecked && isEzeidAvailable">
-                                                            <div class="col-lg-3 col-md-3 col-sm-3 col-xs-4">
+                                                            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
                                                                 <div class="form-group">
                                                                     <select class="form-control">
                                                                         <option value="2">Unspecified Gender</option>
@@ -369,7 +369,7 @@
                                                                     <date-time-picker recipient="dateOfBirth" settings='{
                                                                     "format" : "d-M-Y",
                                                                     "timepicker" : false,
-                                                                    "mask" : true,
+                                                                    "mask" : false,
                                                                     "hours12" : false,
                                                                     "maxDate" : "+1970/01/01"
                                                                     }'></date-time-picker>
@@ -382,7 +382,7 @@
                                                         <!-------------------- PIN Block ----------------------------------------------------->
                                                         <div class="row bottom-clearfix" ng-show="isEzeidAvailabilityChecked && isEzeidAvailable">
 
-                                                                <div class="col-lg-3 col-md-3 col-sm-4 col-xs-4">
+                                                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
                                                                     <div class="form-group center-vertical">
                                                                         <input type="checkbox" id="pin-applicable" ng-model="isPinApplicable" name="isPinApplicable" ng-click="pinApplicable = (isPinApplicable == true) ? false : true" />
                                                                         <label for="pin-applicable">
@@ -423,7 +423,7 @@
                                                         </div>
 
                                                         <div class="row bottom-clearfix" ng-show="isEzeidAvailabilityChecked && isEzeidAvailable">
-                                                            <div class="col-lg-2 col-md-2 col-sm-3 col-xs-4">
+                                                            <div class="col-lg-3 col-md-3 col-sm-3 col-xs-4">
                                                                 <div class="form-group">
                                                                     <button class="btn btn-primary" ng-click="doSignUp()" ng-disabled="(!isEzeidAvailable) || (!termsAccepted)">Generate EZEID</button>
                                                                 </div>

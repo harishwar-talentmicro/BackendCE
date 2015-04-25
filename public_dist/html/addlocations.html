@@ -1,0 +1,237 @@
+<style type="text/css">
+    .btn-file {
+        position: relative;
+        overflow: hidden;
+    }
+    .btn-file input[type=file] {
+        position: absolute;
+        top: 0;
+        right: 0;
+        min-width: 100%;
+        min-height: 100%;
+        font-size: 100px;
+        text-align: right;
+        filter: alpha(opacity=0);
+        opacity: 0;
+        outline: none;
+        background: white;
+        cursor: inherit;
+        display: block;
+    }
+</style>
+
+<div id="wrapper" ng-controller="LocationsController as SLocCtrl">
+    <header-section></header-section>
+    <div class="container" style="padding-top:80px;">
+        <div class="row">
+            <div class="col-md-8" style="margin: auto; float: none;">
+                <div class="panel panel-default">
+                    <form name="SecLocForm" novalidate class="form-inline">
+                        <div class="panel-heading">
+                             <h4>Other Locations
+                                <span class="col-md-offset-3 small" style="color:#FF0000; float: right;">
+                                    <span style="border:1px solid #000000;background:#FAA9A3;color:#000000;">Mandatory </span>
+                                </span>
+                               </h4>
+
+                         </div>
+                        <div class="panel-body" style="padding:15px;padding-bottom:0px;">
+                        <div class="well well-lg" style="background:#f5f5f5;padding: 15px;overflow:auto;" ng-class="SLocCtrl.IsShowForm ? 'height-600':'height-400'" >
+                            <div class="col-lg-12" style="margin: auto; float: none;">
+                                <!--<form name="SecLocForm" novalidate class="form-inline">-->
+                                    <!--Location Listing-->
+                                    <div class="loc-tab" ng-class="SLocCtrl.IsShowForm ? 'roll-up':'loc-level-1'">
+                                        <div class="pull-left wd48p">
+                                            <button type="button" class="btn btn-primary" ng-click="SLocCtrl.openNewLocationForm()">+ Add new
+                                                Location
+                                            </button>
+                                            <button type="button" class="btn btn-primary" ng-click="SLocCtrl.closeLocationForm()">Close
+                                            </button>
+                                             <div ng-show="SLocCtrl.LocationsList==null || SLocCtrl.LocationsList==undefined || SLocCtrl.LocationsList.length==0">
+                                                <span class="col-grey">No Locations...</span>
+                                            </div>
+                                        </div>
+                                        <table class="table table-striped" width="50%"
+                                               ng-hide="SLocCtrl.LocationsList==null || SLocCtrl.LocationsList==undefined || SLocCtrl.LocationsList.length==0">
+                                            <thead>
+                                            <tr>
+                                                <th>Location Title</th>
+                                                <th>Edit / Delete</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr ng-repeat="row in SLocCtrl.LocationsList">
+                                                <td>{{row.LocTitle}}</td>
+                                                <td>
+                                                    <button type="button" class="btn btn-sm btn-danger" ng-click="SLocCtrl.openEditSecLocForm(row,$index)">edit
+                                                    </button>
+                                                    <button type="button" class="btn btn-sm btn-danger" ng-click="SLocCtrl.deleteSecLoc(row)">delete
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                        <div class="clearfix"></div>
+                                    </div>
+
+                                    <!--Add new location form-->
+                                    <div class="loc-tab" ng-class="SLocCtrl.IsShowForm ? 'loc-level-1':'roll-up'"  style="overflow:auto;">
+
+                                        <div class="row"  style="margin-left:0px;margin-right:0px;">
+                                            <div class="col-lg-6">
+                                                <input type="text" id="Location" class="form-control emptyBox" name="Location" ng-model="SLocCtrl._locInfo.LocTitle"
+                                                       placeholder="Location Title" style="width: 48%;margin-left:-5px;" ng-class="SecLocForm.Location.$touched && !SLocCtrl._locInfo.LocTitle.length ? 'mandatoryTextBox' : ''" required />
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <input type="checkbox" ng-model="SLocCtrl._locInfo.SecurePin"> Secure your EZE ID by a PIN
+                                                <input ng-disabled="!SLocCtrl._locInfo.SecurePin" type="text" class="form-control" name="pin" onkeypress="return isNumberKey(event);" id="PIN" ng-model="SLocCtrl._locInfo.PIN" required maxlength="3" placeholder="PIN"
+                                                       style="width: 50px">
+                                            </div>
+                                        </div>
+                                        <br/>
+                                        <div class="row mar_editTop" style="margin-left:0px;margin-right:0px;">
+                                            <span><label>&nbsp;Choose your location from the Map below by moving the marker on map to the exact location</label></span><br/>
+                                            <div class="col-lg-12" style="margin-left:-5px; float: none;">
+                                                <div class="panel panel-default">
+                                                    <div style="display:block;">
+                                                        <img id="mapClocl" style="padding-top:8px;cursor:pointer;" ng-click="SLocCtrl.getMyLocation()" src="images/myloc.png" />
+                                                        <input id="txtSearch1" class="form-control pull-left marL5px" type="text" placeholder="Search Location" autocomplete="off" style="z-index: 1; top: 0px; margin-top: 3px; width: 400px; position: absolute; left: 36px;" >
+                                                    </div>
+                                                    <div id="map-canvasl" style="width: 100%; height: 300px; position: relative; overflow: hidden; transform: translateZ(0px); background-color: rgb(229, 227, 223);">
+                                                    </div>
+                                                        <span ng-hide="true">
+                                                            <input type="text" name="LatLong" class="form-control" ng-model="SLocCtrl._locInfo.Latitude" required />
+                                                            <input type="text" name="LatLong" class="form-control" ng-model="SLocCtrl._locInfo.Longitude" required />
+                                                        </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <br/>
+                                        <div class="row mar_editTop" style="margin-left:0px;margin-right:0px;">
+                                            <div class="col-lg-12">
+                                                <div class="col-lg-6">
+                                                    <div class="row mar_editTop" style="margin-left:0px;margin-right:0px;">
+                                                        <span><label><strong>&nbsp;Primary Address</strong> </label></span><br/>
+                                                        <input type="text" name="streeName" class="form-control emptyBox" maxlength="45" id="streeName" ng-model="SLocCtrl._locInfo.AddressLine1"
+                                                               ng-class="SecLocForm.streeName.$touched && !SLocCtrl._locInfo.AddressLine1.length ? 'mandatoryTextBox' : ''"
+                                                               placeholder="No., Building Name, Street Name" style="width: 48%" required>
+
+                                                        <input type="text" name="Add2" class="form-control" maxlength="45" id="block" ng-model="SLocCtrl._locInfo.AddressLine2" placeholder="Block, Area, Sector"  style="width: 48%" >
+                                                    </div>
+                                                    <br/>
+                                                    <div class="row mar_editTop" style="margin-left:0px;margin-right:0px;">
+                                                        <!-- <input type="text" class="form-control"  data-ng-model="form.RefNo" placeholder="Country" style="width: 48%">-->
+                                                        <select class="form-control emptyBox" style="width: 48%" id="countries"  name="countries" ng-model="SLocCtrl._locInfo.CountryID"
+                                                                ng-change="SLocCtrl.getStates(SLocCtrl._locInfo.CountryID)"
+                                                                ng-options="country.CountryID as country.CountryName for country in SLocCtrl.countries" required>
+                                                        </select>
+
+                                                        <select class="form-control emptyBox" style="width: 48%" id="states" name="states" ng-model="SLocCtrl._locInfo.StateID"
+                                                                ng-options="state.StateID as state.StateName for state in SLocCtrl.states" required>
+                                                                <option value="">-- Select State --</option>
+                                                        </select>
+                                                    </div>
+                                                    <br/>
+                                                    <div class="row mar_editTop" style="margin-left:0px;margin-right:0px;">
+                                                        <input type="text" id="cities" name="cities" class="form-control emptyBox" ng-class="SecLocForm.cities.$touched && !SLocCtrl._locInfo.CityTitle.length ? 'mandatoryTextBox' : ''" ng-model="SLocCtrl._locInfo.CityTitle" placeholder="City" style="width: 48%" />
+                                                        <input type="text" id="postalCode" name="postalCode" class="form-control emptyBox" ng-class="SecLocForm.postalCode.$touched && !SLocCtrl._locInfo.PostalCode.length ? 'mandatoryTextBox' : ''" ng-model="SLocCtrl._locInfo.PostalCode" placeholder="Postal Code" onkeypress="return isNumberKey(event);" style="width: 48%" required />
+                                                    </div>
+                                                    <br/>
+                                                    <div class="row mar_editTop" style="margin-left:0px;margin-right:0px;">
+                                                        <span><label><strong>&nbsp;Contact Information</strong> </label></span><br/>
+
+                                                        <span class="form-control" style="padding-left:0px;width:13%;border: 1px solid #CCCCCC; text-align: right">{{SLocCtrl._locInfo.ISDPhoneNumber}}</span>
+                                                        <input type="text" style="width: 34%;" id="phone" class="form-control" ng-model="SLocCtrl._locInfo.PhoneNumber" name="phoneNo"
+                                                               onkeypress="return isNumberKey(event);" maxlength="10" placeholder="Phone Number" style="width: 48%"
+                                                               required>
+
+                                                        <span class="form-control" style="padding-left:0px;width:13%;border: 1px solid #CCCCCC;text-align: right ">{{SLocCtrl._locInfo.ISDMobileNumber}}</span>
+                                                        <input type="text" style="width: 34%;" id="mobile_phone"class="form-control emptyBox" ng-class="SecLocForm.MobileNumber.$touched && !SLocCtrl._locInfo.MobileNumber.length ? 'mandatoryTextBox' : ''" ng-model="SLocCtrl._locInfo.MobileNumber"
+                                                               onkeypress="return isNumberKey(event);" name="MobileNumber" placeholder="Mobile Number" maxlength="10"  style="width: 48%" required>
+                                                    </div>
+                                                    <br/>
+                                                    <div class="row mar_editTop" style="margin-left:0px;margin-right:0px;">
+                                                        <input type="email" name="email" class="form-control" ng-model="SLocCtrl._locInfo.EMailID" ng-pattern="/^[a-z]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5}$/" placeholder="E-mail ID" style="width: 48%">
+                                                        <span ng-show="SecLocForm.email.$error.email" ng-if="SecLocForm.email.$error.email == true ? SLocCtrl._locInfo.isWrongEmailPattern = true : SLocCtrl._locInfo.isWrongEmailPattern = false"></span>
+                                                        <input type="text" name="website" ng-model="SLocCtrl._locInfo.Website" class="form-control" placeholder="WebSite"  style="width: 48%">
+                                                    </div><br/>
+
+
+                                                 <!-- <div class="mar_editTop" ng-show="_userInfo.Type==2 && _userInfo.EZEIDVerifiedID == 2">-->
+                                                    <div ng-show="SLocCtrl.profile._info.EZEIDVerifiedID == 2 && SLocCtrl.profile._info.IDTypeID == 2">
+                                                         <div class="row " style="margin-left:0px;margin-right:0px;">
+                                                            <span><label><strong>&nbsp;Settings</strong> </label></span><br/>
+                                                            <select class="form-control emptyBox pull-left " style="width:45%;" name="selectParkingStatus" ng-model="SLocCtrl._locInfo.ParkingStatus"
+                                                                    ng-options="status.id as status.label for status in SLocCtrl.parkingStatus" required>
+                                                            </select>
+                                                          </div><br/>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-6" style="  text-align: center;">
+                                                    <div class="col-lg-12" style="margin: auto; float: none;">
+                                                        <!--<span ng-hide="_locInfo.IsAuthenticate"> <img ng-show="!image" src="images/user_200.png" width="200"/></span>-->
+                                                        <div ng-hide="isShowCamera">
+
+                                                            <!--<span ng-show="!SLocCtrl._locInfo.Picture"> <img ng-show="!image" src="images/user_200.png" width="200"/></span>-->
+
+                                                            <div  ng-show="IdUserType == 1">
+                                                                <span ng-show="!SLocCtrl._locInfo.Picture"> <img ng-show="!image" src="images/new_individual.png" /></span>
+                                                            </div>
+                                                            <div ng-hide="IdUserType == 1">
+                                                                <span ng-show="!SLocCtrl._locInfo.Picture"> <img ng-show="!image" src="images/business_profile_pic.png" /></span>
+                                                            </div>
+
+                                                            <!--<img ng-show="SLocCtrl._locInfo.Picture" width="200" name="Image" src="{{SLocCtrl._locInfo.Picture}}" required />-->
+
+                                                            <div ng-show="IdUserType == 1" style="text-align: center;">
+                                                                <img id="pic-individual" ng-show="SLocCtrl._locInfo.Picture" width="77" height="90" name="Image" ng-src="{{SLocCtrl._locInfo.Picture}}" required />
+                                                            </div>
+                                                            <div ng-hide="IdUserType == 1">
+                                                                <img id="pic-business" ng-show="SLocCtrl._locInfo.Picture" width="308" height="90" name="Image" src="{{SLocCtrl._locInfo.Picture}}" required />
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        <div style="border:1px solid #EEEE;text-align:center;" id="camera-container" ng-show="isShowCamera">
+                                                            <div id="camera"></div>
+                                                            <button class="btn-nocamera" style="margin-left:-42%; margin-top:-2px;" title="Close camera" ng-click="hideCamera()"></button>
+                                                            <button class="btn btn-primary" title="Click picture" ng-click="clickPicture()">Click Picture</button>
+                                                        </div>
+
+                                                        <div ng-hide="isShowCamera" style="margin-top:20px;" class="col-lg-12 text-center">
+                                                            <button class="btn-camera" style="margin-left:-45px; margin-top: -3px;" title="Take Picture" ng-click="showCamera()"></button>
+                                                             <span class="btn btn-primary btn-file">
+                                                                <!--Attach Picture <input type="file" onchange="angular.element(this).scope().uploadImageForOtherLocation(this.files)" accept="image/*" image="image" resize-max-height="200" resize-max-width="200" resize-quality="0.7">-->
+
+                                                                  Attach Picture <input id="individual-pic" type="file" onchange="angular.element(this).scope().uploadImageFromService(this)" accept="image/*"
+                                                                                        business-pic-container-id="pic-business"
+                                                                                        individual-pic-container-id="pic-individual"
+                                                                                        user-type="IdUserType"
+                                                                                        set-picture="profile.setPicture(pic,icon)" >
+
+                                                            </span>
+                                                         </div>
+                                                        <p/>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                            <br/>
+                                            <input style="margin-top:-30px;" ng-hide="SLocCtrl.editSecLocEnb" type="submit" ng-click="SLocCtrl.saveNewLoc(SecLocForm)"
+                                                   ng-disabled="!SLocCtrl._locInfo.LocTitle || !SLocCtrl._locInfo.AddressLine1 || !SLocCtrl._locInfo.CityTitle || !SLocCtrl._locInfo.PostalCode || !SLocCtrl._locInfo.MobileNumber" class="btn-primary btn" value="Save"/>
+                                            <input style="margin-top:-30px;" ng-show="SLocCtrl.editSecLocEnb" type="submit" ng-click="SLocCtrl.updateNewLoc(SecLocForm)"
+                                                   class="btn-primary btn" value="Update"/>
+                                            <input style="margin-top:-30px;" type="button" ng-click="SLocCtrl.closeNewLoc(SecLocForm)" class="btn-primary btn" value="Close"/>
+                                        </div>
+                                <!--</form>-->
+                            </div>
+                        </div>
+                    </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+<footer-section></footer-section>

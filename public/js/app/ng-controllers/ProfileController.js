@@ -1018,7 +1018,7 @@ angular.module('ezeidApp').controller('ProfileController', ['$rootScope', '$scop
 
                 var sTokenString = "";
                 sTokenString = profile._info.Token;
-                console.log(JSON.stringify(profile._info));
+                // // console.log(JSON.stringify(profile._info));
                 $http({
                     method: "POST",
                     url: GURL + 'ewSavePrimaryEZEData',

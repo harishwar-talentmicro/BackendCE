@@ -287,8 +287,8 @@ angular.module('ezeidApp').
              * @returns {boolean}
              */
         $scope.doNotAllowPremiumEzeid = function(ezeid){
-            console.log($scope.userType);
-            console.log($scope.planSelectionType);
+            // console.log($scope.userType);
+            // console.log($scope.planSelectionType);
             if($scope.userType === 2 && $scope.planSelectionType === 2){
                 return true;
             }
@@ -463,7 +463,7 @@ angular.module('ezeidApp').
 
                 var validation = $scope.validateSignUpData();
                 if(!validation){
-                    console.log($scope.error);
+                    // console.log($scope.error);
                     Notification.error({
                         message : 'Please check all the errors before registration',
                         delay : MsgDelay
@@ -514,7 +514,7 @@ angular.module('ezeidApp').
                     SelectionType : $scope.planSelectionType ,
                     ParkingStatus : null
                 };
-                console.log($scope.error);
+                // console.log($scope.error);
 
 
 

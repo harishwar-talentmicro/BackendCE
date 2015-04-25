@@ -44,6 +44,7 @@ body{
 footer {
     background: #E9E9E9;
     border-top: 1px solid #DDD;
+    margin-top: 0.8%;
 }
 
 footer p {
@@ -126,7 +127,7 @@ footer p {
     font-stretch : condensed;
 }
 
-input[type='text'],select.form-control,textarea{
+input[type='text'],input[type='email'],input[type='url'],input[type='number'],input[type='password'],select.form-control,textarea.form-control{
     border-radius: 2px;
 }
 

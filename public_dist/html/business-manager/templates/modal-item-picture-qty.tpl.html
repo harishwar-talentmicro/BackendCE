@@ -1,0 +1,101 @@
+<div class="row"  ng-controller="SalesModalBoxCtrl">
+    <!---------- Form For Item Addition ----------------->
+
+    <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+        <!-------- Form ----------->
+        <div class="panel panel-default panel-shadow">
+            <div class="panel-heading">
+                Select Items to Add
+            </div>
+            <div class="panel-body">
+                <!------------------- Panel Body ------------------------>
+                <div class="row">
+                    <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10 col-lg-offset-1 col-md-offset-1 col-sm-offset-1 col-xs-offset-1  bottom-clearfix" data-toggle="tooltip" title="Item" data-placement="right">
+                        <div class="form-group">
+                            <!--<select class="form-control" ng-model="modalCurrentItem.TID">-->
+                            <select class="form-control" ng-model="selectedItemTID">
+                                <option value="0">--Select Item--</option>
+                                <option ng-repeat="item in (itemList | activeItem)" value="{{item.TID}}">{{item.ItemName}}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix text-center" ng-show="isItemAddBlockVisible">
+                        <div class="container-fluid">
+                            <div class="row">
+                                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                    <div class="thumbnail no-radius modal-sales-item-thumbnail">
+                                        <img style="width: 64px;height: 64px" ng-src="{{modalCurrentItem.Pic}}" alt="Image" />
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                    <div class="container-fluid">
+                                        <div class="row">
+                                            <!--------- Rate, Amount and qty controls --------------------->
+
+                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix" data-toggle="tooltip" title="Quantity" data-placement="left">
+                                                <!--<div class="input-group  modalbox-input-group-control">-->
+                                                <!--<span ng-click="subtractValue()"  class="input-group-addon"><span class="glyphicon glyphicon-minus"></span> </span>-->
+                                                <!--<input class="form-control" type="text" ng-model="modalCurrentItem.Qty" numbers-only />-->
+                                                <!--<span ng-click="addValue($event,modalCurrentItem.Qty)" class="input-group-addon"><span class="glyphicon glyphicon-plus"></span> </span>-->
+                                                <!--</div>-->
+
+                                                <qty-component ng-model="modalCurrentItem.Qty"></qty-component>
+                                            </div>
+
+                                            <!--------- Rate, Amount and qty controls ends ---------------->
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div ng-show="isItemAddBlockVisible" class="col-lg-6 col-md-6 col-sm-4 col-xs-6 col-lg-offset-3 col-md-offset-3 col-sm-offset-4 col-xs-offset-3 bottom-clearfix">
+                        <button ng-click="modalAddItem()" class="btn btn-primary btn-block" data-toggle="tooltip" title="Add Item" data-placement="bottom">
+                            <span class="glyphicon glyphicon-plus"></span> Add Item
+                        </button>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-12 col-sm-12 col-xs-12 col-md-12">
+                        <button class="btn btn-primary" ng-click="updateCurrentTransaction()">Update</button>
+                        <button class="btn btn-primary" ng-click="closeModalWithoutTxUpdate()">Cancel</button>
+                    </div>
+                </div>
+                <!------------------- Panel Body ends ------------------->
+            </div>
+        </div>
+
+
+        <!-------- Form ends ------>
+    </div>
+    <!---------- Form For Item Addition ends -------------->
+
+
+    <!-------- Selected Items Display -------------------->
+    <div class="col-lg-8 col-md-8 col-sm-6 col-xs-12">
+        <div class="container-fluid">
+            <div class="row" ng-hide="modalItemList.length > 0">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 jumbotron text-center">
+                    No Items Added Yet
+                </div>
+            </div>
+            <div class="row" ng-show="modalItemList.length > 0">
+                <div class="col-lg-3 bottom-clearfix business-manager-modal-item" ng-repeat="mitem in modalItemList">
+                    <button class="btn btn-xs btn-danger pull-right no-radius item-remove-btn" ng-click="modalRemoveItem(mitem.TID)">
+                        <span class="glyphicon glyphicon-remove"></span>
+                    </button>
+                    <h4>{{mitem.ItemName}}</h4>
+                    <p> Quantity : <b>{{mitem.Qty}} </b>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <!-------- Selected Items Display ends --------------->
+</div>
