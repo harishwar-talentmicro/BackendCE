@@ -1135,7 +1135,7 @@ button.btn.btn-primary.btn-md.btn-block.orangeSearchButton {
     margin-top: 0.5%;
     padding-left: 25px;
 }
-table.rwd-table.setFontFourty.setLineHeight.result-list-tbl > tbody > tr > td {
+table.rwd-table > tbody > tr > td {
     padding: 3px!important;
     text-align: center;
     margin: 0px;

@@ -499,12 +499,14 @@ angular.module('ezeidApp').controller('SearchController', [
             SearchSec.Criteria.Token = $rootScope._userInfo.Token;
 
             $http({ method: 'post', url: GURL + 'ewSearchByKeywords', data: SearchSec.Criteria }).success(function (data) {
+
                if (data != 'null' && data.length>0)
                {
                    $scope.SearchResultCount = data.length;
                    $window.localStorage.removeItem("searchResult");
                    $window.localStorage.removeItem("selectedTids");
                    $window.localStorage.setItem("searchResult", JSON.stringify(data));
+
 
                    if(SearchSec.Criteria.SearchType == 2 || SearchSec.Criteria.SearchType == 3)
                    {
@@ -1423,10 +1425,11 @@ angular.module('ezeidApp').controller('SearchController', [
             var elem = event.currentTarget;
             if($(elem).is(":checked"))
             {
+                console.log(localStorage["searchResult"]);
                 $scope.searchResult = JSON.parse($window.localStorage.getItem("searchResult"));
-                if($scope.searchResult == null)
+                if(!$scope.searchResult)
                 {
-                    $scope.searchResult = [];
+                    $scope.selectedList = [];
                 }
                 else
                 {
@@ -1434,13 +1437,24 @@ angular.module('ezeidApp').controller('SearchController', [
                         $scope.selectedList.push($scope.searchResult[i].TID);
                     }
 
-                    //$("input:checkbox[class=chk]");
 
                     console.log($scope.selectedList);
                 }
+
+                $('.result-checkbox').each(function( index ) {
+                    $(this).prop('checked',true);
+                });
             }
             else{
                     $scope.selectedList = [];
+
+
+
+
+                $('.result-checkbox').each(function( index ) {
+                    $(this).prop('checked',false);
+                });
+
                     console.log($scope.selectedList);
                 }
         };
@@ -1449,6 +1463,16 @@ angular.module('ezeidApp').controller('SearchController', [
         $scope.toggleCheckbox = function(event){
             var elem = event.currentTarget;
             var val = $(elem).data('tid');
+//            console.log($scope.selectedList);
+//            console.log($scope.searchResult);
+//            if($scope.selectedList.length === $scope.searchResult.length){
+//                $scope._selectAll = false;
+//            }
+//
+//            else{
+//                $scope._selectAll = true;
+//            }
+
             if($(elem).is(":checked")){
                $scope.selectedList.push(val);
                 console.log($scope.selectedList);
