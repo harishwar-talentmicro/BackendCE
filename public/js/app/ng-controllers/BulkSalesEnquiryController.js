@@ -130,40 +130,11 @@ angular.module('ezeidApp').controller('bulksalesController',[
                     salesEnquiry._info.CCMailIDS = "";
                     salesEnquiry._info.BCCMailIDS = "";
 
-
-                   /* salesEnquiry._info.FromName = "";
-                    salesEnquiry._info.FromEmailID = "";
-                    salesEnquiry._info.Title = "";
-                    salesEnquiry._info.Subject = "";
-                    salesEnquiry._info.Body = "";
-                    salesEnquiry._info.TID = "";
-                    salesEnquiry._info.CCMailIDS = "";
-                    salesEnquiry._info.BCCMailIDS = "";
-
-                    document.getElementById("FromName").className = "form-control WhiteTextBox";
-                    document.getElementById("FromEmailID").className = "form-control WhiteTextBox";
-                    document.getElementById("Title").className = "form-control WhiteTextBox";
-                    document.getElementById("Subject").className = "form-control WhiteTextBox";
-                    document.getElementById("Body").className = "form-control WhiteTextBox";*/
-
-
                     getTemplateList();
-
+                    Notification.success({ message: 'Template save success...', delay: MsgDelay });
                     $scope.formTitle = "Bulk Sales Enquiry";
                     $scope.showCreateMailTemplate = false;
                     $scope.validationMode = 0;
-
-                    //$("input#FromName").removeClass("mandatoryTextBox").addClass("form-control");
-                    //$("input#FromName").attr("class", "newForm-Control");
-
-
-                    /*
-                    document.getElementById("FromName").className = "form-control emptyBox";
-                    document.getElementById("FromEmailID").className = "form-control emptyBox";
-                    document.getElementById("Title").className = "form-control emptyBox";
-                    document.getElementById("Subject").className = "form-control emptyBox";
-                    document.getElementById("Body").className = "form-control emptyBox";
-                    */
 
                 }
                 else {
@@ -288,7 +259,6 @@ angular.module('ezeidApp').controller('bulksalesController',[
 
             if($scope.selectedTID.length > 0)
             {
-
                /* $http({ method: 'get', url: GURL + 'ewtSendBulkMailer?Token=' + $rootScope._userInfo.Token + '&TID='+ $scope.selectedTID + '&TemplateID='+ salesEnquiry._info.TID }).success(function (data)*/
                 $http({ method: 'post', url: GURL + 'ewtSendBulkMailer', data: { Token: $rootScope._userInfo.Token, TID: $scope.selectedTID, TemplateID: salesEnquiry._info.TID }}).success(function (data)
                 {

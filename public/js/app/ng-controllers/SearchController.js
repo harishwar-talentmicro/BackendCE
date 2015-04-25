@@ -16,52 +16,6 @@ angular.module('ezeidApp').controller('SearchController', [
     '$routeParams',
     function ($http, $rootScope, $scope, $compile, $timeout, Notification, $filter, $location, $window, $q, $interval,GURL,MsgDelay,$routeParams) {
 
-   /* if(Object.keys($routeParams).length > 0){
-        if(typeof($routeParams['SearchType']) !== "undefined" && $routeParams['SearchType'] !== null && $routeParams['SearchType'] !== "")
-        {
-            SearchSec.Criteria.SearchType = $routeParams.SearchType;
-        }
-        if(typeof($routeParams['Keywords']) !== "undefined" && $routeParams['Keywords'] !== null && $routeParams['Keywords'] !== ""){
-            SearchSec.Criteria.Keywords = $routeParams.Keywords;
-        }
-        if(typeof($routeParams['Proximity']) !== "undefined" && $routeParams['Proximity'] !== null && $routeParams['Proximity'] !== ""){
-            SearchSec.Criteria.Proximity = $routeParams.Proximity;
-        }
-        if(typeof($routeParams['Latitude']) !== "undefined" && $routeParams['Latitude'] !== null && $routeParams['Latitude'] !== ""){
-               SearchSec.Criteria.Latitude = $routeParams.Latitude;
-        }
-        if(typeof($routeParams['Longitude']) !== "undefined" && $routeParams['Longitude'] !== null && $routeParams['Longitude'] !== ""){
-            SearchSec.Criteria.Longitude = $routeParams.Longitude;
-        }
-        if(typeof($routeParams['Rating']) !== "undefined" && $routeParams['Rating'] !== null && $routeParams['Rating'] !== ""){
-            SearchSec.Criteria.Rating = $routeParams.Rating;
-        }
-        if(typeof($routeParams['ParkingStatus']) !== "undefined" && $routeParams['ParkingStatus'] !== null && $routeParams['ParakingStatus'] !== ""){
-            SearchSec.Criteria.ParkingStatus = $routeParams.ParkingStatus;
-        }
-        if(typeof($routeParams['HomeDelivery']) !== "undefined" && $routeParams['HomeDelivery'] !== null && $routeParams['HomeDelivery'] !== ""){
-            SearchSec.Criteria.HomeDelivery = $routeParams.HomeDelivery;
-        }
-        if(typeof($routeParams['OpenStatus']) !== "undefined" && $routeParams['OpenStatus'] !== null && $routeParams['OpenStatus'] !== ""){
-            SearchSec.Criteria.OpenStatus = $routeParams.OpenStatus;
-        }
-    }*/
-
- /*   var routeP = {
-        "Token":"324b580dca99786fa9f1",
-        "SearchType":"1",
-        "Keywords":"krunal",
-        "SCategory":0,
-        "Proximity":1,
-        "Latitude":12.933687899999999,
-        "Longitude":77.57361209999999,
-        "Rating":"1,2,3,4,5",
-        "ParkingStatus":0,
-        "HomeDelivery":0,
-        "OpenStatus":0,
-        "CurrentDate":"2015-03-28 04:33"
-    };*/
-
     var map;
     var marker;
     var markers = [];
@@ -132,6 +86,7 @@ angular.module('ezeidApp').controller('SearchController', [
 
     SearchSec.showResultTab = false;
     SearchSec.searchResult = [];
+    $scope.selectedTID = [];
 
     SearchSec.Criteria = {
         Token: '',
@@ -150,7 +105,7 @@ angular.module('ezeidApp').controller('SearchController', [
     $scope.showSmallBanner = false;
     $scope.ShowLinks = false;
 
-    $scope.showStar1 = true;
+    $scope.showrr1 = true;
     $scope.showStar2 = true;
     $scope.showStar3 = true;
     $scope.showStar4 = true;
@@ -529,10 +484,6 @@ angular.module('ezeidApp').controller('SearchController', [
         AutoRefresh = false;
 
         SearchSec.Criteria.CurrentDate = currentDate;
-
-
-       // if ($rootScope._userInfo.IsAuthenticate == true || SearchSec.Criteria.SearchType == 2 && SearchSec.IsSearchButtonClicked || SearchSec.Criteria.SearchType == 3 && SearchSec.IsSearchButtonClicked) {
-
             if($rootScope._userInfo.Token == "")
             {
                 $rootScope._userInfo.Token = 2;
@@ -605,7 +556,7 @@ angular.module('ezeidApp').controller('SearchController', [
                     }
                     else
                     {
-                         if($rootScope._userInfo.IsAuthenticate == true || data[0].IDTypeID == 2 && SearchSec.Criteria.SearchType == 1)
+                         if($rootScope._userInfo.IsAuthenticate == true || data[0].IDTypeID == 2 && (SearchSec.Criteria.SearchType == 1))
                          {
                                $http({ method: 'get', url: GURL + 'ewtGetSearchInformation',
                                    params : {
@@ -676,12 +627,9 @@ angular.module('ezeidApp').controller('SearchController', [
 
                                         //Call for banner
                                         AutoRefresh = true;
-                                        //  getBanner(1);
                                         if (SearchSec.Criteria.SearchType == 1)
                                         {
                                             getBanner(1);
-                                            //getAllBanners();
-                                           // console.log(SearchSec.mInfo);
                                         }
 
                                         $scope.form_rating = data[0].Rating;
@@ -1470,16 +1418,45 @@ angular.module('ezeidApp').controller('SearchController', [
             }
         });
     }
+        // To check and uncheck All check box
+        $scope.toggleCheckboxAll = function(event){
+            var elem = event.currentTarget;
+            if($(elem).is(":checked"))
+            {
+                $scope.searchResult = JSON.parse($window.localStorage.getItem("searchResult"));
+                if($scope.searchResult == null)
+                {
+                    $scope.searchResult = [];
+                }
+                else
+                {
+                    for (var i = 0; i < $scope.searchResult.length; i++) {
+                        $scope.selectedList.push($scope.searchResult[i].TID);
+                    }
+
+                    //$("input:checkbox[class=chk]");
+
+                    console.log($scope.selectedList);
+                }
+            }
+            else{
+                    $scope.selectedList = [];
+                    console.log($scope.selectedList);
+                }
+        };
+
         // To get and remove value of check box
         $scope.toggleCheckbox = function(event){
             var elem = event.currentTarget;
             var val = $(elem).data('tid');
             if($(elem).is(":checked")){
                $scope.selectedList.push(val);
+                console.log($scope.selectedList);
             }
             else{
                 var index = $scope.selectedList.indexOf(val);
                 $scope.selectedList.splice(index,1);
+                console.log($scope.selectedList);
            }
         };
 
