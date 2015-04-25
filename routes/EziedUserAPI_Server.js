@@ -3822,7 +3822,7 @@ exports.FnGetSearchDocuments = function (req, res) {
                                 }
                             }
                         }
-                        var SearchQuery = db.escape(EZEID) + ',' + db.escape(Pin) + ',' + db.escape(DocType);
+                        var SearchQuery = db.escape(EZEID) + ',' + db.escape(Pin) + ',' + db.escape(DocType)+ ',' + db.escape(token); 
                         //console.log('SearchQuery: ' + SearchQuery);
                         db.query('CALL  PGetSearchDocuments(' + SearchQuery + ')', function (err, SearchResult) {
                             // db.query(searchQuery, function (err, SearchResult) {
