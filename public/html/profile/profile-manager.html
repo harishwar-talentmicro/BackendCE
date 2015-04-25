@@ -636,7 +636,7 @@
                                                                                         title="Delete"
                                                                                         class="btn btn-xs btn-danger no-radius"
                                                                                         ng-disabled="1">
-                                                                                    <span class="glyphicon glyphicon-trash"></span>
+                                                                                    <span class="glyphicon glyphicon-trash"></span> Delete
 
                                                                                 </button>
                                                                                 <button
@@ -654,7 +654,7 @@
                                                                                         class="btn btn-xs btn-default no-radius"
                                                                                         ng-click="(toggleMapControls(0))(editLocation(0))"
                                                                                         ng-show="locationsToggleIndex[0].viewMode && !locationsToggleIndex[0].editMode">
-                                                                                    <span class="glyphicon glyphicon-pencil"></span>
+                                                                                    <span class="glyphicon glyphicon-pencil"></span> Edit
                                                                                 </button>
                                                                                 <button
                                                                                         data-toggle="tooltip"
@@ -662,7 +662,7 @@
                                                                                         class="btn btn-xs btn-default no-radius"
                                                                                         ng-click="(initializeMap(0)(toggleAllLocations(0)))"
                                                                                         ng-hide="locationsToggleIndex[0].viewMode">
-                                                                                    <span class="glyphicon glyphicon-chevron-down"></span>
+                                                                                    <span class="glyphicon glyphicon-chevron-down"></span> Show
                                                                                 </button>
                                                                                 <button
                                                                                         data-toggle="tooltip"
@@ -670,7 +670,7 @@
                                                                                         class="btn btn-xs btn-default no-radius"
                                                                                         ng-click="(locationsToggleIndex[0].viewMode = !locationsToggleIndex[0].viewMode) (locationsToggleIndex[0].editMode = false)"
                                                                                         ng-show="locationsToggleIndex[0].viewMode">
-                                                                                    <span class="glyphicon glyphicon-chevron-up"></span>
+                                                                                    <span class="glyphicon glyphicon-chevron-up"></span> Hide
                                                                                 </button>
                                                                             </span>
         </h4>
@@ -1122,7 +1122,7 @@
                                                                                         class="btn btn-xs btn-danger no-radius"
                                                                                         ng-click="deleteSecondaryLocation(locIndex+1)"
                                                                                         >
-                                                                                    <span class="glyphicon glyphicon-trash"></span>
+                                                                                    <span class="glyphicon glyphicon-trash"></span> Delete
                                                                                 </button>
                                                                                 <button
                                                                                         data-toggle="tooltip"
@@ -1130,7 +1130,7 @@
                                                                                         class="btn btn-xs btn-default no-radius"
                                                                                         ng-click="(toggleMapControls(locIndex+1))(editLocation(locIndex+1))"
                                                                                         ng-show="locationsToggleIndex[locIndex+1].viewMode && !locationsToggleIndex[locIndex+1].editMode">
-                                                                                    <span class="glyphicon glyphicon-pencil"></span>
+                                                                                    <span class="glyphicon glyphicon-pencil"></span> Edit
                                                                                 </button>
 
                                                                                 <button
@@ -1139,7 +1139,7 @@
                                                                                         class="btn btn-xs btn-default no-radius"
                                                                                         ng-click="(initializeMap(locIndex+1)(toggleAllLocations(locIndex+1)))"
                                                                                         ng-hide="locationsToggleIndex[locIndex+1].viewMode">
-                                                                                    <span class="glyphicon glyphicon-chevron-down"></span>
+                                                                                    <span class="glyphicon glyphicon-chevron-down"></span> Show
                                                                                 </button>
                                                                                 <button
                                                                                         data-toggle="tooltip"
@@ -1147,7 +1147,7 @@
                                                                                         class="btn btn-xs btn-default no-radius"
                                                                                         ng-click="(locationsToggleIndex[locIndex+1].viewMode = !locationsToggleIndex[locIndex+1].viewMode) (locationsToggleIndex[locIndex+1].editMode = false)"
                                                                                         ng-show="locationsToggleIndex[locIndex+1].viewMode">
-                                                                                    <span class="glyphicon glyphicon-chevron-up"></span>
+                                                                                    <span class="glyphicon glyphicon-chevron-up"></span> Hide
                                                                                 </button>
                                                                             </span>
 
@@ -1710,7 +1710,7 @@
                                         </li>
 
 
-                                        <li role="presentation" ng-show="(userDetails.SelectionType === 2 && userDetails.IDTypeID === 2)"
+                                        <li role="presentation" ng-show="(userDetails.SelectionType === 2 && userDetails.IDTypeID === 2 && userDetails.EZEIDVerifiedID == 2)"
                                             ng-class="{'active' : (activeTemplate === 'html/profile/configuration/configuration.html')}"
                                             class="bottom-clearfix">
                                             <a href="/profile-manager/configuration"><span class="glyphicon glyphicon-cog"></span> Configuration</a>
@@ -1718,7 +1718,7 @@
 
 
                                         <!--- Disabled in case of business user free listing ----------->
-                                        <li role="presentation" ng-show="(userDetails.SelectionType !== 2 && userDetails.IDTypeID === 2)" class="bottom-clearfix disabled">
+                                        <li role="presentation" ng-show="(userDetails.EZEIDVerifiedID !== 2 && userDetails.IDTypeID === 2 )" class="bottom-clearfix disabled">
                                             <a><span class="glyphicon glyphicon-cog"></span> Configuration</a>
                                         </li>
 
