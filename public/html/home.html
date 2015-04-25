@@ -618,107 +618,51 @@
                                     <div class="row setRowLeftRightMarginZero boxFotterBanner">
                                         <div ng-show="ShowLinks" class="row setRowLeftRightMarginZero ">
                                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 searchHeaderAlignment msgButtonContainer messageButtonContainer" ng-hide="(search.mInfo.IDTypeID == 1)">
-                                                <!--<div class="innerMsgButtonContainer">-->
-                                                  <!-- <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer keyWordText boxMessaageBackgroun setLeftRightPaddingZero">
-                                                        <div ng-hide="search.mInfo.EZEIDVerifiedID == '1'|| showSalesEnquiry == '0' " title="Sales Enquiry" ng-click="search.openSalesEnquiryForm()">
-                                                              <img src="../images/new_sales_icon.png">
-                                                              Sales Enquiry
-                                                        </div>
+                                                   <div ng-show="search.mInfo.EZEIDVerifiedID == '2' && showSalesEnquiry == 1" title="Sales Enquiry" ng-click="search.openSalesEnquiryForm()">
+                                                       <img src="../images/new_sales_icon.png">
+                                                       Sales Enquiry
+                                                   </div>
+                                                   <div class="showPointer removePadding keyWordText boxMessaageBackgroun" ng-show="search.mInfo.EZEIDVerifiedID == '2' && showHomeDelivery == 1" title="Home Delivery" ng-click="search.openHomeDeliverForm()">
+                                                        <img src="../images/new_home_delivery.png">
+                                                        Home Delivery
                                                     </div>
-                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer removePadding keyWordText boxMessaageBackgroun">
-                                                        <div ng-hide="search.mInfo.HomeDeliveryButton==2 || search.mInfo.EZEIDVerifiedID == '1' || showHomeDelivery == '0'" title="Home Delivery" ng-click="search.openHomeDeliverForm()">
-                                                            <img src="../images/new_home_delivery.png">
-                                                            Home Delivery
-                                                        </div>
+                                                   <div class="showPointer removePadding keyWordText boxMessaageBackgroun" ng-show="search.mInfo.EZEIDVerifiedID == '2' && shoReserVation == 1" title="Reservation" ng-click="search.openReservationForm()">
+                                                        <img src="../images/new_reservations.png">
+                                                        Reservation
                                                     </div>
-                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer removePadding keyWordText boxMessaageBackgroun">
-                                                        <div ng-hide="search.mInfo.ReservationButton==2 || search.mInfo.EZEIDVerifiedID == '1' || shoReserVation == '0'" title="Reservation" ng-click="search.openReservationForm()">
-                                                            <img src="../images/new_reservations.png">
-                                                            Reservation
-                                                        </div>
+                                                   <div class="showPointer removePadding keyWordText boxMessaageBackgroun" ng-show="search.mInfo.EZEIDVerifiedID == '2' && showServiceRequest == 1"
+                                                         title="Support Request" ng-click="search.openServiceRequestForm()">
+                                                        <img src="../images/new_service_request.png">
+                                                        Service Request
                                                     </div>
-                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer removePadding keyWordText boxMessaageBackgroun">
-                                                        <div ng-hide="search.mInfo.SupportButton==2 || search.mInfo.EZEIDVerifiedID == '1' || showServiceRequest == '0'"
-                                                             title="Support Request" ng-click="search.openServiceRequestForm()">
-                                                            <img src="../images/new_service_request.png">
-                                                            Service Request
-                                                        </div>
+                                                   <div class="showPointer removePadding keyWordText boxMessaageBackgroun" title="Send CV" ng-click="search.openCVForm()" ng-show="search.mInfo.EZEIDVerifiedID == '2' && showSendCv == 1">
+                                                        <img src="../images/new_send_cv.png">
+                                                        Send CV
                                                     </div>
-                                                    <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 showPointer removePadding keyWordText boxMessaageBackgroun">
-                                                        <div title="Send CV" ng-click="search.openCVForm()" ng-hide="search.mInfo.CVButton==2 || search.mInfo.EZEIDVerifiedID == '1' || showSendCv == '0'">
-                                                            <img src="../images/new_send_cv.png">
-                                                            Send CV
-                                                        </div>
+                                                    <div class="showPointer removePadding keyWordText boxMessaageBackgroun pull-right"
+                                                         ng-click="search.viewDirections(search.mInfo)" title="View Directions">
+                                                        <img src="../images/view_directions.png">
+                                                        View Directions
                                                     </div>
-                                                    <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 showPointer removePadding keyWordText boxMessaageBackgroun"
+                                                    <div class="showPointer removePadding keyWordText boxMessaageBackgroun pull-right"
                                                          ng-click="search.getdirections(search.mInfo)" title="Directions">
-                                                            <img src="../images/new_directions.png">
-                                                            <span>Plot Route</span>
+                                                        <img src="../images/new_directions.png">
+                                                        <span>Plot Route</span>
                                                     </div>
-                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer removePadding keyWordText boxMessaageBackgroun"
-                                                         ng-click="search.viewDirections(search.mInfo)" title="View Directions">
-                                                            <img src="../images/view_directions.png">
-                                                            View Directions
-                                                    </div>-->
-
-                                                       <div ng-hide="search.mInfo.EZEIDVerifiedID == '1'|| showSalesEnquiry == '0' " title="Sales Enquiry" ng-click="search.openSalesEnquiryForm()">
-                                                            <img src="../images/new_sales_icon.png">
-                                                            Sales Enquiry
-                                                        </div>
-                                                       <div class="showPointer removePadding keyWordText boxMessaageBackgroun" ng-hide="search.mInfo.HomeDeliveryButton==2 || search.mInfo.EZEIDVerifiedID == '1' || showHomeDelivery == '0'" title="Home Delivery" ng-click="search.openHomeDeliverForm()">
-                                                            <img src="../images/new_home_delivery.png">
-                                                            Home Delivery
-                                                        </div>
-                                                      <div class="showPointer removePadding keyWordText boxMessaageBackgroun" ng-hide="search.mInfo.ReservationButton==2 || search.mInfo.EZEIDVerifiedID == '1' || shoReserVation == '0'" title="Reservation" ng-click="search.openReservationForm()">
-                                                            <img src="../images/new_reservations.png">
-                                                            Reservation
-                                                        </div>
-                                                      <div class="showPointer removePadding keyWordText boxMessaageBackgroun" ng-hide="search.mInfo.SupportButton==2 || search.mInfo.EZEIDVerifiedID == '1' || showServiceRequest == '0'"
-                                                             title="Support Request" ng-click="search.openServiceRequestForm()">
-                                                            <img src="../images/new_service_request.png">
-                                                            Service Request
-                                                        </div>
-                                                       <div class="showPointer removePadding keyWordText boxMessaageBackgroun" title="Send CV" ng-click="search.openCVForm()" ng-hide="search.mInfo.CVButton==2 || search.mInfo.EZEIDVerifiedID == '1' || showSendCv == '0'">
-                                                            <img src="../images/new_send_cv.png">
-                                                            Send CV
-                                                        </div>
-                                                        <div class="showPointer removePadding keyWordText boxMessaageBackgroun"
-                                                             ng-click="search.getdirections(search.mInfo)" title="Directions">
-                                                            <img src="../images/new_directions.png">
-                                                            <span>Plot Route</span>
-                                                        </div>
-                                                        <div class="showPointer removePadding keyWordText boxMessaageBackgroun"
-                                                             ng-click="search.viewDirections(search.mInfo)" title="View Directions">
-                                                            <img src="../images/view_directions.png">
-                                                            View Directions
-                                                        </div>
-
-                                                <!--</div>-->
-                                            </div>
-                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 searchHeaderAlignment msgButtonContainer" ng-show="search.isIndividualUser(1)">
-                                                <div class="innerMsgButtonContainer">
-                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer keyWordText boxMessaageBackgroun" style="padding-right: 0px;">
-                                                    </div>
-                                                    <div  class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer removePadding keyWordText boxMessaageBackgroun ">
-                                                    </div>
-                                                    <div  class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer removePadding boxMessaageBackgroun">
-                                                    </div>
-                                                    <div  class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer removePadding boxMessaageBackgroun">
-                                                    </div>
-                                                    <div  class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer removePadding keyWordText boxMessaageBackgroun"
-                                                          ng-click="search.getdirections(search.mInfo)" title="Directions boxMessaageBackgroun">
-                                                            <img src="../images/new_directions.png">
-                                                            Plot Route
-                                                    </div>
-                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer removePadding keyWordText boxMessaageBackgroun"
-                                                         ng-click="search.viewDirections(search.mInfo)" title="View Directions">
-                                                            <img src="../images/view_directions.png">
-                                                            View Directions
-                                                    </div>
+                                                </div>
+                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 searchHeaderAlignment msgButtonContainer messageButtonContainer" ng-show="search.isIndividualUser(1)">
+                                                <div class="showPointer removePadding keyWordText boxMessaageBackgroun pull-right"
+                                                     ng-click="search.viewDirections(search.mInfo)" title="View Directions">
+                                                    <img src="../images/view_directions.png">
+                                                    View Directions
+                                                </div>
+                                                <div class="showPointer removePadding keyWordText boxMessaageBackgroun pull-right"
+                                                      ng-click="search.getdirections(search.mInfo)" title="Directions boxMessaageBackgroun">
+                                                    <img src="../images/new_directions.png">
+                                                    Plot Route
                                                 </div>
                                             </div>
                                         </div>
-
                                         <div ng-hide="ShowLinks" class="row setRowLeftRightMarginZero">
                                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 searchHeaderAlignment" style="background: #09a2de;">
                                                 <div ng-hide="ShowLinks" class="row setRowLeftRightMarginZero">
