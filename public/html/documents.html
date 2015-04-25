@@ -19,19 +19,13 @@
         display: block;
     }
 </style>
-
-    <div id="wrapper" ng-controller="DocumentController as DocCtrl">
-        <header-section></header-section>
-        <div class="container" style="padding-top:80px;">
-            <div class="row">
-                <div class="col-md-8" style="margin: auto; float: none;">
-                    <div class="panel panel-default">
+                    <div class="panel panel-info" ng-controller="DocumentController">
                         <div class="panel-heading">
-                            <h4>Personal Documents</h4>
+                            Personal Documents
                         </div>
                         <div class="panel-body">
                             <div class="col-lg-4">
-                                        <ul class="nav nav-pills nav-stacked">
+                                        <ul class="nav nav-pills nav-stacked nav-configuration">
                                             <li role="presentation" ng-class="{ 'active' : OptionSelected===1}" ng-click="OnOptionSelected(1)"><a href="" >ID Card</a></li>
                                             <li role="presentation" ng-class="{ 'active' : OptionSelected===2}"><a href="" ng-click="OnOptionSelected(2)">Passport</a></li>
                                             <li role="presentation" ng-class="{ 'active' : OptionSelected===3}"><a href="" ng-click="OnOptionSelected(3)">Driver's License</a></li>
@@ -62,7 +56,7 @@
                                             </div>
 
                                             <!--<date-time-picker  recipient="form.RefExpiryDate" style="margin-top:1%; width: 86%;"></date-time-picker>-->
-                                            <date-time-picker  style="margin-top:1%; width: 86%;" recipient="form.RefExpiryDate" settings='{
+                                            <date-time-picker placeholder="d-M-Y"  style="margin-top:1%; width: 86%;" recipient="form.RefExpiryDate" settings='{
                                                                     "format" : "d-M-Y",
                                                                     "timepicker" : false,
                                                                     "mask" : false,
@@ -109,8 +103,3 @@
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
-    </div>
-<footer-section></footer-section>

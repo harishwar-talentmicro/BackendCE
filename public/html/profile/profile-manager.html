@@ -1703,7 +1703,7 @@
                         <!-------------- Navigation for Profile Manager ------------------------>
                         <div class="container-fluid">
                             <div class="row bottom-clearfix">
-                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-center">
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-center" style="padding-left: 0.7%; padding-right: 0.7%;">
                                     <ul class="nav nav-pills">
                                         <li role="presentation" class="bottom-clearfix" ng-class="{'active' : (activeTemplate === '/tpl/profile-template.html')}">
                                             <a href="/profile-manager/profile"><span class="glyphicon glyphicon-user"></span> Basic Profile and Locations</a>
@@ -1729,15 +1729,15 @@
                                             <a href="/profile-manager/weblinks"><span class="glyphicon glyphicon-link"></span> Web Links</a>
                                         </li>
 
+                                        <li ng-show="userDetails.IDTypeID === 1" role="presentation" class=" bottom-clearfix"
+                                            ng-class="{'active' : (activeTemplate === 'html/documents.html')}">
+                                            <a href="/profile-manager/documents"><span class="glyphicon glyphicon-file"></span> Personal Documents</a>
+                                        </li>
+                                        <!--- Hidden in case of business and public place ----------->
                                         <li role="presentation" class=" bottom-clearfix"
                                             ng-class="{'active' : (activeTemplate === '/tpl/password-template.html')}">
                                             <a href="/profile-manager/password"><span class="glyphicon glyphicon-lock"></span> Change Password</a>
                                         </li>
-
-                                        <!--<li ng-show="userDetails.IDTypeID === 1" role="presentation" class=" bottom-clearfix"-->
-                                            <!--ng-class="{'active' : (activeTemplate === '/tpl/documents.html')}">-->
-                                            <!--<a href="/profile-manager/password"><span class="glyphicon glyphicon-file"></span> Personal Documents</a>-->
-                                        <!--</li>-->
 
 
                                     </ul>

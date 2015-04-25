@@ -41,7 +41,27 @@ angular.module('ezeidApp').controller('DocumentController',[
     $scope.IdPlaceHolder = "Enter ID Card number";
     $scope.Token = $rootScope._userInfo.Token;
 
-    var original_form = {
+        var isUserDetailsLoaded = false;
+        /**
+         * Hiding progress loader when userDetails are loaded successfully
+         */
+        $scope.$watch('userDetails',function(newVal,oldVal){
+            if(newVal){
+                if(newVal.MasterID){
+                    isUserDetailsLoaded = true;
+                    if(isUserDetailsLoaded){
+                        $scope.dataProgressLoader.dataLoadInProgress = false;
+                        $scope.dataProgressLoader.dataLoadError = false;
+                        $scope.dataProgressLoader.dataLoadComplete = true;
+                    }
+                }
+            }
+        });
+
+
+
+
+        var original_form = {
         RefNo:'',
         RefExpiryDate:'',
         RefType:1,
