@@ -634,13 +634,13 @@ angular.module('ezeidApp').controller('SearchController', [
                                     }
                                     $timeout(function () {
                                         SearchSec.mInfo = data[0];
-
                                         //Set Visibal module
-                                        $scope.showSalesEnquiry = SearchSec.mInfo.VisibleModules[0];
-                                        $scope.showHomeDelivery = SearchSec.mInfo.VisibleModules[1];
-                                        $scope.shoReserVation = SearchSec.mInfo.VisibleModules[2];
-                                        $scope.showServiceRequest = SearchSec.mInfo.VisibleModules[3];
-                                        $scope.showSendCv = SearchSec.mInfo.VisibleModules[4];
+                                        SearchSec.mInfo.VisibleModules = (SearchSec.mInfo.VisibleModules.length === 5) ? SearchSec.mInfo.VisibleModules : '00000';
+                                        $scope.showSalesEnquiry = parseInt(SearchSec.mInfo.VisibleModules[0]);
+                                        $scope.showHomeDelivery = parseInt(SearchSec.mInfo.VisibleModules[1]);
+                                        $scope.shoReserVation = parseInt(SearchSec.mInfo.VisibleModules[2]);
+                                        $scope.showServiceRequest = parseInt(SearchSec.mInfo.VisibleModules[3]);
+                                        $scope.showSendCv = parseInt(SearchSec.mInfo.VisibleModules[4]);
 
 
 
@@ -945,8 +945,10 @@ angular.module('ezeidApp').controller('SearchController', [
         };
 
         $window.localStorage.setItem("directionLocation", JSON.stringify(userLoc));
+        $window.open(GURL+"viewdirection", '_blank');
 
-        window.location.href = "/viewdirection";
+
+        //window.location.href = "/viewdirection";
         //  $location.path("/viewdirection");
     };
 
