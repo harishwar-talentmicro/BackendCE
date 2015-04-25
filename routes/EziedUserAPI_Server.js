@@ -9044,7 +9044,7 @@ exports.FnWebLinkRedirect = function(req,res,next){
             var ezeid = arr.join('.');
 
             var urlBreaker = lastItem.split('');
-            if(urlBreaker.length > 1){
+            if(urlBreaker.length > 1 && urlBreaker.length < 4){
                 if(urlBreaker[0] === 'U'){
                     urlBreaker.splice(0,1);
                     var urlSeqNumber = parseInt(urlBreaker.join(''));
@@ -9069,6 +9069,9 @@ exports.FnWebLinkRedirect = function(req,res,next){
                         next();
                     }
                 }
+                else{
+                    next();
+                }
             }
             else{
                 next();
@@ -9077,6 +9080,9 @@ exports.FnWebLinkRedirect = function(req,res,next){
         else{
             next();
         }
+    }
+    else{
+        next();
     }
 }
 
