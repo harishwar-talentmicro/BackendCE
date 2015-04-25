@@ -1,41 +1,7 @@
 angular.module('ezeidApp').controller('DocumentController',[
-    '$http', '$rootScope', '$scope', '$timeout', 'Notification', '$filter','$q','GURL',
-    function($http, $rootScope, $scope, $timeout, Notification, $filter,$q,GURL) {
-  if ($rootScope._userInfo) {
+    '$http', '$rootScope', '$scope', '$timeout', 'Notification', '$filter','$q','GURL','$location',
+    function($http, $rootScope, $scope, $timeout, Notification, $filter,$q,GURL,$location) {
 
-    }
-    else {
-        if (typeof (Storage) !== "undefined") {
-            var encrypted = localStorage.getItem("_token");
-            if (encrypted) {
-                var decrypted = CryptoJS.AES.decrypt(encrypted, "EZEID");
-                var Jsonstring = decrypted.toString(CryptoJS.enc.Utf8);
-                if (Jsonstring) {
-                    $rootScope._userInfo = JSON.parse(Jsonstring);
-                }
-            }
-            else {
-                $rootScope._userInfo = {
-                    IsAuthenticate: false,
-                    Token: '',
-                    FirstName: '',
-                    Type: '',
-                    Icon: ''
-                };
-            }
-        } else {
-            // Sorry! No Web Storage support..
-            $rootScope._userInfo = {
-                IsAuthenticate: false,
-                Token: '',
-                FirstName: '',
-                Type: '',
-                Icon: ''
-            };
-            alert('Sorry..! Browser does not support');
-            window.location.href = "/";
-        }
-    }
     var DocCtrl = this;
     $scope.fileSeclected = undefined;
     $scope.IdPlaceHolder = "Enter ID Card number";
@@ -50,9 +16,15 @@ angular.module('ezeidApp').controller('DocumentController',[
                 if(newVal.MasterID){
                     isUserDetailsLoaded = true;
                     if(isUserDetailsLoaded){
-                        $scope.dataProgressLoader.dataLoadInProgress = false;
-                        $scope.dataProgressLoader.dataLoadError = false;
-                        $scope.dataProgressLoader.dataLoadComplete = true;
+
+                        if($scope.userDetails.IDTypeID !== 1){
+                            $location.path('/');
+                        }
+                        else{
+                            $scope.dataProgressLoader.dataLoadInProgress = false;
+                            $scope.dataProgressLoader.dataLoadError = false;
+                            $scope.dataProgressLoader.dataLoadComplete = true;
+                        }
                     }
                 }
             }

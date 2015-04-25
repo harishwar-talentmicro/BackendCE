@@ -46,7 +46,10 @@ angular.module('ezeidApp').controller('ProfileEditCtrl',[
          */
         $scope.$watch('isPinApplicable',function(newVal,oldVal){
             if(!newVal){
-                $scope.editUserDetails.PIN = '';
+                if($scope.editUserDetails){
+
+                    $scope.editUserDetails.PIN = '';
+                }
             }
         });
 

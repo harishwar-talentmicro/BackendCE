@@ -110,7 +110,7 @@ HeaderApp.directive('headerSection',['Notification','$window' ,function (Notific
             //forgot password
             this.openRegistrationForm=function(){
                 $('#SignIn_popup').slideUp();
-                window.location.href = "/signup";
+                $location.path('/signup');
             };
 
             //Change password
@@ -126,7 +126,7 @@ HeaderApp.directive('headerSection',['Notification','$window' ,function (Notific
                               SignCtrl.OldPassword="";
                               SignCtrl.NewPassword="";
                               SignCtrl.ReEnterPassword="";
-                              window.location.href='/home';
+                              $location.path('/');
                              /* document.getElementById("OldPassword").className = "form-control wd_oldPass changePass_inpMar emptyBox change_PadLeft";
                               document.getElementById("NewPassword").className = "form-control wd_oldPass changePass_inpMar emptyBox change_PadLeft";
                               document.getElementById("ReEnterPassword").className = "form-control wd_oldPass changePass_inpMar emptyBox change_PadLeft";
@@ -155,9 +155,6 @@ HeaderApp.directive('headerSection',['Notification','$window' ,function (Notific
                /* SignCtrl.OldPassword="";
                 SignCtrl.NewPassword="";
                 SignCtrl.ReEnterPassword="";*/
-
-                window.location.href='/home';
-
                 //SignCtrl.showMandatoryBox = "false";
 
                 /*document.getElementById("OldPassword").className = "form-control wd_oldPass changePass_inpMar emptyBox change_PadLeft";
@@ -235,23 +232,6 @@ HeaderApp.directive('headerSection',['Notification','$window' ,function (Notific
         }],
         controllerAs: 'SignInCtrl',
         link: function () {
-//            $('html').click(function () {
-//                $('#userid_popup').hide('fast');
-//            });
-//
-//            $('#userid').click(function (e) {
-//                e.stopPropagation();
-//            });
-//
-//            $('#userid').click(function () {
-//                $('#userid_popup').toggle();
-//            })
-//
-//            $('#signin').click(function () {
-//                $('#SignIn_popup').slideDown();
-//            })
-
-            /****************** New code ************************/
 
             $("body").on('click',function(e){
                 if ( $('#userid_popup').is(':visible') ){
@@ -278,9 +258,6 @@ HeaderApp.directive('headerSection',['Notification','$window' ,function (Notific
 
             $('.closelink').click(function () {
                 $('#ChangePassword_popup').slideUp();
-               /* SignCtrl.OldPassword="";
-                SignCtrl.NewPassword="";
-                SignCtrl.ReEnterPassword="";*/
                 document.getElementById("OldPassword").className = "form-control wd_oldPass changePass_inpMar emptyBox change_PadLeft";
                 document.getElementById("NewPassword").className = "form-control wd_oldPass changePass_inpMar emptyBox change_PadLeft";
                 document.getElementById("ReEnterPassword").className = "form-control wd_oldPass changePass_inpMar emptyBox change_PadLeft";
