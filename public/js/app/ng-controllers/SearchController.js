@@ -491,7 +491,7 @@ angular.module('ezeidApp').controller('SearchController', [
             }
             else
             {
-                // console.log($rootScope._userInfo.Token);
+                // //console.log($rootScope._userInfo.Token);
             }
 
             SearchSec.Criteria.Latitude = $rootScope.CLoc.CLat;
@@ -1425,7 +1425,7 @@ angular.module('ezeidApp').controller('SearchController', [
             var elem = event.currentTarget;
             if($(elem).is(":checked"))
             {
-                console.log(localStorage["searchResult"]);
+                //console.log(localStorage["searchResult"]);
                 $scope.searchResult = JSON.parse($window.localStorage.getItem("searchResult"));
                 if(!$scope.searchResult)
                 {
@@ -1438,7 +1438,7 @@ angular.module('ezeidApp').controller('SearchController', [
                     }
 
 
-                    console.log($scope.selectedList);
+                    //console.log($scope.selectedList);
                 }
 
                 $('.result-checkbox').each(function( index ) {
@@ -1455,7 +1455,7 @@ angular.module('ezeidApp').controller('SearchController', [
                     $(this).prop('checked',false);
                 });
 
-                    console.log($scope.selectedList);
+                    //console.log($scope.selectedList);
                 }
         };
 
@@ -1463,8 +1463,8 @@ angular.module('ezeidApp').controller('SearchController', [
         $scope.toggleCheckbox = function(event){
             var elem = event.currentTarget;
             var val = $(elem).data('tid');
-//            console.log($scope.selectedList);
-//            console.log($scope.searchResult);
+//            //console.log($scope.selectedList);
+//            //console.log($scope.searchResult);
 //            if($scope.selectedList.length === $scope.searchResult.length){
 //                $scope._selectAll = false;
 //            }
@@ -1475,12 +1475,12 @@ angular.module('ezeidApp').controller('SearchController', [
 
             if($(elem).is(":checked")){
                $scope.selectedList.push(val);
-                console.log($scope.selectedList);
+                //console.log($scope.selectedList);
             }
             else{
                 var index = $scope.selectedList.indexOf(val);
                 $scope.selectedList.splice(index,1);
-                console.log($scope.selectedList);
+                //console.log($scope.selectedList);
            }
         };
 
