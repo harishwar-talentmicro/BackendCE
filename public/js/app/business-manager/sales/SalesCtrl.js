@@ -128,10 +128,10 @@ angular.module('ezeidApp')
          * Opens Modal Box
          */
         $scope.viewDetails = function(rowEntity){
-            console.log(rowEntity);
+            // // console.log(rowEntity);
             $scope.modalBox.data = rowEntity;
             $scope.toggleModalBox();
-            console.log($scope.modalBox);
+            // // console.log($scope.modalBox);
         };
 
         /****************************************************** Controller Code *****************************/
@@ -319,26 +319,26 @@ angular.module('ezeidApp')
         $scope.gridOptions.onRegisterApi = function(gridApi){
             $scope.gridApi = gridApi;
             $scope.gridApi.edit.on.afterCellEdit($scope,function(rowEntity, colDef){
-//                console.log(rowEntity);
-//                console.log(colDef);
-//                console.log(gridApi);
+//                // // console.log(rowEntity);
+//                // // console.log(colDef);
+//                // // console.log(gridApi);
 
-                console.log('I am from afterCellEdit');
+                // // console.log('I am from afterCellEdit');
             });
 
 
             $scope.gridApi.edit.on.beginCellEdit($scope,function(rowEntity,colDef){
-                console.log('I am from beginEditCell');
-                console.log(rowEntity); console.log(colDef);
+                // // console.log('I am from beginEditCell');
+                // // console.log(rowEntity); // // console.log(colDef);
 
             });
 
             $scope.gridApi.edit.on.cancelCellEdit($scope,function(rowEntity){
-                console.log('I am from cancelCellEdit');
+                // // console.log('I am from cancelCellEdit');
             });
 
 //            $scope.gridOptions.$on('ngGridEventStartCellEdit',function(){
-//                console.log('ngGridEventStartCellEdit');
+//                // // console.log('ngGridEventStartCellEdit');
 //            });
 
 //            $scope.gridApi.edit.on.beginEditCell($scope,function(rowEntity,colDef){
@@ -347,8 +347,8 @@ angular.module('ezeidApp')
 
 //            gridApi.rowEdit.on.saveRow($scope, $scope.saveRow);
 //            gridApi.core.on.notifyDataChange($scope,function(type){
-//                console.log(type);
-//                console.log('Data changed');
+//                // // console.log(type);
+//                // // console.log('Data changed');
 //            });
             /**
              * Uncomment code below for afterCellEdit functionality
@@ -362,8 +362,8 @@ angular.module('ezeidApp')
 ////                    }
 ////                }
 //                alert('row edited');
-////                console.log(gridApi.rowEdit.getDirtyRows());
-//                console.log(gridApi);
+////                // // console.log(gridApi.rowEdit.getDirtyRows());
+//                // // console.log(gridApi);
 //
 //            });
         };
@@ -374,9 +374,9 @@ angular.module('ezeidApp')
          * Adds a new row at first in the transaction table
          */
         $scope.addNewRow = function() {
-            console.log($scope.gridOptions.data);
+            // // console.log($scope.gridOptions.data);
             var n = $scope.gridOptions.data.length + 1;
-            console.log($scope.gridApi.grid.rows);
+            // // console.log($scope.gridApi.grid.rows);
             var newRow = {
 
                 trnId : '',
@@ -399,8 +399,8 @@ angular.module('ezeidApp')
             $interval( function() {
                 $scope.gridApi.rowEdit.setRowsDirty(dirtyRows);
             }, 0, 1);
-//            console.log($scope.gridApi.grid.rows);
-            console.log($scope.gridOptions.data);
+//            // // console.log($scope.gridApi.grid.rows);
+            // // console.log($scope.gridOptions.data);
         };
 
         /**
@@ -410,7 +410,7 @@ angular.module('ezeidApp')
             /**
              * @todo Add condition to check if this is newly created data or old one
              */
-            console.log($scope.gridOptions.data);
+            // // console.log($scope.gridOptions.data);
             $scope.gridOptions.data.splice(0,1);
 //            $scope.gridOpts.data.splice(0,1);
         };
@@ -425,11 +425,11 @@ angular.module('ezeidApp')
         $scope.saveRow = function( rowEntity ) {
             // create a fake promise - normally you'd use the promise returned by $http or $resource
 //            var promise = $q.defer();
-//            console.log(rowEntity);
+//            // // console.log(rowEntity);
 //            $scope.gridApi.rowEdit.setSavePromise( rowEntity, promise.promise );
 
 
-            console.log(rowEntity.trnId);
+            // // console.log(rowEntity.trnId);
             $scope.savePromises[rowEntity.trnId] = $q.defer();
             $scope.gridApi.rowEdit.setSavePromise( rowEntity, $scope.savePromises[rowEntity.trnId].promise );
 
@@ -447,11 +447,11 @@ angular.module('ezeidApp')
          * @author Indrajeet
          */
         $scope.saveTransaction = function(rowEntity,GridRow){
-            console.log(rowEntity);
-            console.log(GridRow);
-            console.log('Save is clicked');
+            // // console.log(rowEntity);
+            // // console.log(GridRow);
+            // // console.log('Save is clicked');
             // Get Dirty rows by calling the line below
-//            console.log($scope.gridApi.rowEdit.getDirtyRows());
+//            // // console.log($scope.gridApi.rowEdit.getDirtyRows());
         };
 
         /******************************************* Grid Code Ends here **********************************/
@@ -509,13 +509,13 @@ angular.module('ezeidApp')
                     MasterID : $rootScope._userInfo.MasterID
                 }
             }).success(function(resp){
-                console.log(resp);
+                // // console.log(resp);
                     if(resp && resp.length > 0){
                         $scope.itemList = resp;
                     }
                     $scope.readyState.itemsLoaded = true;
                 }).error(function(err){
-                console.log(err);
+                // // console.log(err);
             });
         };
 
@@ -549,7 +549,7 @@ angular.module('ezeidApp')
                     }
                     $scope.readyState.statusLoaded = true;
             }).error(function(err){
-                console.log(err);
+                // // console.log(err);
                     deferred.resolve(false);
             });
             return deferred.promise;
@@ -571,7 +571,7 @@ angular.module('ezeidApp')
                     MasterID : $rootScope._userInfo.MasterID
                 }
             }).success(function(resp){
-                console.log(resp);
+                // // console.log(resp);
                     if(resp && resp.length > 0 && resp !== "null"){
                         for(var i = 0; i < resp.length; i++){
                             $scope.nextActionList.push({
@@ -588,7 +588,7 @@ angular.module('ezeidApp')
                     }
                     $scope.readyState.nextActionsLoaded = true;
             }).error(function(err){
-                console.log(err);
+                // // console.log(err);
                     deferred.resolve(false);
             });
             return deferred.promise;
@@ -609,7 +609,7 @@ angular.module('ezeidApp')
                     MasterID : $rootScope._userInfo.MasterID
                 }
             }).success(function(resp){
-                console.log(resp);
+                // // console.log(resp);
                     if(resp && resp.length > 0 && resp !== "null"){
                         for(var i = 0; i < resp.length; i++){
                             $scope.folderList.push({
@@ -625,7 +625,7 @@ angular.module('ezeidApp')
                     }
                     $scope.readyState.foldersLoaded = true;
             }).error(function(err){
-                console.log(err);
+                // // console.log(err);
                 deferred.resolve(false);
             });
             return deferred.promise;
@@ -646,7 +646,7 @@ angular.module('ezeidApp')
                 }
             }).success(function(resp){
                     var gridData = [];
-                    console.log(resp);
+                    // // console.log(resp);
                     if(resp && resp.length > 0 && resp !== "null"){
                         for(var i = 0; i < resp.length; i++){
                             var transaction = {
@@ -683,11 +683,11 @@ angular.module('ezeidApp')
                             gridData.push(transaction);
                         }
                         $scope.gridOptions.data = gridData;
-                        console.log('GridRow...................................');
-                        console.log($scope.gridApi.grid);
-                        console.log($scope.gridApi.grid.rows);
-                        console.log('GridRow...................................ends');
-                        console.log($scope.gridOptions.data);
+                        // // console.log('GridRow...................................');
+                        // // console.log($scope.gridApi.grid);
+                        // // console.log($scope.gridApi.grid.rows);
+                        // // console.log('GridRow...................................ends');
+                        // // console.log($scope.gridOptions.data);
                     }
                     $scope.readyState.transactionsLoaded = true;
             }).error(function(err){

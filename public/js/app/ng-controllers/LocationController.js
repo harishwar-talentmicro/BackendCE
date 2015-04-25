@@ -578,7 +578,7 @@ angular.module('ezeidApp').controller('LocationsController',['$rootScope', '$sco
             /*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
             
             /************************************ Added ends ********************************/
-            //   console.log("IDLE ONCE");
+            //   // // console.log("IDLE ONCE");
             if(SLocCtrl.IsSearchPending){
                 SLocCtrl.getSearch();
             }
@@ -594,7 +594,7 @@ angular.module('ezeidApp').controller('LocationsController',['$rootScope', '$sco
         var geocoder = new google.maps.Geocoder();
         geocoder.geocode({ 'latLng': latlng }, function (results, status) {
             if (status !== google.maps.GeocoderStatus.OK) {
-                //console.log(status);
+                //// // console.log(status);
             }
             if (status == google.maps.GeocoderStatus.OK) {
                 getAddressForLocation(results[0].address_components);
@@ -739,10 +739,10 @@ angular.module('ezeidApp').controller('LocationsController',['$rootScope', '$sco
     };
 
     this.getMyLocation = function () {
-        console.log("sai my location");
+        // // console.log("sai my location");
         if (navigator.geolocation) {
 
-            console.log("sai my location123");
+            // // console.log("sai my location123");
             navigator.geolocation.getCurrentPosition(FindCurrentLocation);
         }
     };
@@ -822,7 +822,7 @@ angular.module('ezeidApp').controller('LocationsController',['$rootScope', '$sco
         var image = $(elem)[0].files[0];
         var fileName = image.name;
 
-        console.log($rootScope._userInfo.Type);
+        // // console.log($rootScope._userInfo.Type);
         SLocCtrl._locInfo.PictureFileName =  fileName;
 
         var imageHeight = 90;

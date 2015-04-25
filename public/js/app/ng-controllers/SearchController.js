@@ -540,7 +540,7 @@ angular.module('ezeidApp').controller('SearchController', [
             }
             else
             {
-                // console.log($rootScope._userInfo.Token);
+                // // // console.log($rootScope._userInfo.Token);
             }
 
             SearchSec.Criteria.Latitude = $rootScope.CLoc.CLat;
@@ -681,7 +681,7 @@ angular.module('ezeidApp').controller('SearchController', [
                                         {
                                             getBanner(1);
                                             //getAllBanners();
-                                           // console.log(SearchSec.mInfo);
+                                           // // // console.log(SearchSec.mInfo);
                                         }
 
                                         $scope.form_rating = data[0].Rating;

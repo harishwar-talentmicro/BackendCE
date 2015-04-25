@@ -65,7 +65,7 @@ angular.module('ezeidApp').controller('viewDirectionController',['$http', '$root
                 img = img.replace('data:image/png;base64,', '');
                 finalImageSrc = 'data:image/jpg;base64,' + img;
 
-                console.log(img);
+                // // console.log(img);
 
                 $('#googlemapbinary').attr('src', finalImageSrc);
                 return false;

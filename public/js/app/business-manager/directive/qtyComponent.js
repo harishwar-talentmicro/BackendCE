@@ -47,11 +47,11 @@ angular.module('ezeidApp').directive('qtyComponent',['$compile',function($compil
                    }
                });
 //              setInterval(function(){
-//                  console.log('..........................');
-//                  console.log('scope.qty : '+scope.qty);
-//                  console.log('ngModel value : '+ngModelCtrl.$modelValue);
-//                  console.log('ngModel viewValue : '+ ngModelCtrl.$viewValue);
-//                  console.log('..........................');
+//                  // // console.log('..........................');
+//                  // // console.log('scope.qty : '+scope.qty);
+//                  // // console.log('ngModel value : '+ngModelCtrl.$modelValue);
+//                  // // console.log('ngModel viewValue : '+ ngModelCtrl.$viewValue);
+//                  // // console.log('..........................');
 //              },3000);
                 $compile(elem.contents())(scope);
           },

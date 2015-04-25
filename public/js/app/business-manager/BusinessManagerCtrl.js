@@ -20,7 +20,7 @@ angular.module('ezeidApp').controller('BusinessManagerCtrl',['$scope','$rootScop
             typeof(enabled) == "undefined" ||
             typeof(listType) == "undefined" || typeof(userAccess) == "undefined")
         {
-            console.log("Module object creation unsuccessful ! Missing parameters");
+            // // console.log("Module object creation unsuccessful ! Missing parameters");
         }
         this.type = type;
         this.title = (title) ? title : 'No title';
@@ -84,7 +84,7 @@ angular.module('ezeidApp').controller('BusinessManagerCtrl',['$scope','$rootScop
         $scope.resetSelectedModules();
         $scope.modules[index].cssClass = 'active';
         $scope.currentTemplate = $scope.templates[$scope.modules[index].type];
-        console.log($scope.currentTemplate);
+        // // console.log($scope.currentTemplate);
     };
 
     $scope.resetSelectedModules = function(){
@@ -103,10 +103,10 @@ angular.module('ezeidApp').controller('BusinessManagerCtrl',['$scope','$rootScop
      * Only make module objects for those modules which are accessible and are enabled for this user
      */
     $scope.loadConfig = function(){
-        console.log($rootScope._userInfo);
+        // // console.log($rootScope._userInfo);
         var resp = [];
         resp[0] = $rootScope._userInfo;
-        console.log(resp[0]);
+        // // console.log(resp[0]);
         var userModuleRights = resp[0].UserModuleRights.split("");
 
         /**
@@ -146,7 +146,7 @@ angular.module('ezeidApp').controller('BusinessManagerCtrl',['$scope','$rootScop
         else{
             $scope.currentTemplate = $scope.noPermissionTemplate;
         }
-        console.log($scope.modules);
+        // // console.log($scope.modules);
     };
 
     $scope.goBackToPrevPage = function(){

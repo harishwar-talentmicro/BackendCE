@@ -101,8 +101,8 @@ angular.module('ezeidApp').service('ScaleAndCropImage',['$q',function($q){
             ctx.drawImage(img,0,0);
             var retVal = canvas.toDataURL("image/jpeg", 1.0);
             $('.cr-canvas').remove();
-            console.log('Cropped Image');
-            console.log(retVal);
+            // console.log('Cropped Image');
+            // console.log(retVal);
             return retVal;
         }
 
