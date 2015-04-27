@@ -87,6 +87,7 @@ angular.module('ezeidApp').controller('SearchController', [
     SearchSec.showResultTab = false;
     SearchSec.searchResult = [];
     $scope.selectedTID = [];
+    var selectedAllResult = 0;
 
     SearchSec.Criteria = {
         Token: '',
@@ -105,7 +106,7 @@ angular.module('ezeidApp').controller('SearchController', [
     $scope.showSmallBanner = false;
     $scope.ShowLinks = false;
 
-    $scope.showrr1 = true;
+    $scope.showStar1 = true;
     $scope.showStar2 = true;
     $scope.showStar3 = true;
     $scope.showStar4 = true;
@@ -296,9 +297,9 @@ angular.module('ezeidApp').controller('SearchController', [
             }
         });
 
-        if($scope.Address.length >= 55)
+        if($scope.Address.length >= 67)
         {
-            $scope.Address = $scope.Address.substring(0,52);
+            $scope.Address = $scope.Address.substring(0,64);
             $scope.Address = $scope.Address+ "...";
         }
         else
@@ -391,6 +392,9 @@ angular.module('ezeidApp').controller('SearchController', [
                 map.setCenter(currentPos);
                 labels.push(label);
                 markers.push(marker);
+
+
+
                 google.maps.event.addListener(marker, 'click', (function (_item) {
 
                     return function () {
@@ -503,8 +507,8 @@ angular.module('ezeidApp').controller('SearchController', [
                if (data != 'null' && data.length>0)
                {
                    $scope.SearchResultCount = data.length;
-                   $window.localStorage.removeItem("searchResult");
-                   $window.localStorage.removeItem("selectedTids");
+                   /*$window.localStorage.removeItem("searchResult");
+                   $window.localStorage.removeItem("selectedTids");*/
                    $window.localStorage.setItem("searchResult", JSON.stringify(data));
 
 
@@ -793,24 +797,6 @@ angular.module('ezeidApp').controller('SearchController', [
              RefreshTime = Miliseconds;
          }
      };
-
-      function getAllBanners()
-      {
-          $scope.allBanners = [];
-          for (var i = 1; i <= SearchSec.mInfo.Banners; i++) {
-              $http({ method: 'get', url: GURL + 'ewtGetBannerPicture?Token=' + $rootScope._userInfo.Token +'&SeqNo='+i+'&Ezeid='+SearchSec.mInfo.EZEID+'&StateTitle='+ SearchSec.mInfo.StateTitle+'&LocID='+SearchSec.mInfo.LocID}).success(function (data) {
-
-                  if (data.Picture != 'null') {
-                      SearchSec.mInfo.BannerImage = data.Picture;
-                      $scope.allBanners.push(data);
-                  }
-                  else
-                  {
-                    // Notification.error({ message: "No Message found..!", delay: MsgDelay });
-                  }
-              });
-          }
-      }
 
     function getBanner(_requestedBannerValue){
         if(SearchSec.mInfo.EZEID)
@@ -1362,10 +1348,6 @@ angular.module('ezeidApp').controller('SearchController', [
            // $('#WorkingHour_popup').slideDown();
         }
     };
-   /* // Close  working hour popup
-    SearchSec.closeWorkingHourPopup = function () {
-        $('#WorkingHour_popup').slideUp();
-    };*/
 
     // show result Tab Window
     $scope.getSearchInfo = function(_item){
@@ -1412,7 +1394,6 @@ angular.module('ezeidApp').controller('SearchController', [
                     SearchSec.IsSearchButtonClicked = true;
                     AutoRefresh = true;
                     getBanner(1);
-                   // getAllBanners();
                 });
             }
             else {
@@ -1425,7 +1406,9 @@ angular.module('ezeidApp').controller('SearchController', [
             var elem = event.currentTarget;
             if($(elem).is(":checked"))
             {
-                //console.log(localStorage["searchResult"]);
+                $scope.selectedList = [];
+                selectedAllResult = 1;
+
                 $scope.searchResult = JSON.parse($window.localStorage.getItem("searchResult"));
                 if(!$scope.searchResult)
                 {
@@ -1437,56 +1420,54 @@ angular.module('ezeidApp').controller('SearchController', [
                         $scope.selectedList.push($scope.searchResult[i].TID);
                     }
 
-
-                    //console.log($scope.selectedList);
+                    $('.result-checkbox').each(function( index ) {
+                        $(this).prop('checked',true);
+                    });
                 }
-
-                $('.result-checkbox').each(function( index ) {
-                    $(this).prop('checked',true);
-                });
             }
             else{
+                    selectedAllResult = 0;
                     $scope.selectedList = [];
 
-
-
-
-                $('.result-checkbox').each(function( index ) {
-                    $(this).prop('checked',false);
-                });
-
-                    //console.log($scope.selectedList);
-                }
+                    $('.result-checkbox').each(function( index ) {
+                        $(this).prop('checked',false);
+                    });
+                  }
         };
 
         // To get and remove value of check box
         $scope.toggleCheckbox = function(event){
             var elem = event.currentTarget;
             var val = $(elem).data('tid');
-//            //console.log($scope.selectedList);
-//            //console.log($scope.searchResult);
-//            if($scope.selectedList.length === $scope.searchResult.length){
-//                $scope._selectAll = false;
-//            }
-//
-//            else{
-//                $scope._selectAll = true;
-//            }
 
             if($(elem).is(":checked")){
                $scope.selectedList.push(val);
-                //console.log($scope.selectedList);
+
+                if($scope.selectedList.length === $scope.searchResult.length)
+                {
+                    $scope._selectAll = true;
+                }
+                else
+                {
+                    $scope._selectAll = false;
+                }
             }
             else{
-                var index = $scope.selectedList.indexOf(val);
-                $scope.selectedList.splice(index,1);
-                //console.log($scope.selectedList);
+                    var index = $scope.selectedList.indexOf(val);
+                    $scope.selectedList.splice(index,1);
+
+                    if($scope.selectedList.length === $scope.searchResult.length)
+                    {
+                        $scope._selectAll = true;
+                    }
+                    else
+                    {
+                        $scope._selectAll = false;
+                    }
            }
         };
 
         $rootScope.$on('$locationChangeStart',function(){
-
             $window.localStorage.setItem("selectedTids", JSON.stringify($scope.selectedList));
         });
-
 }]);

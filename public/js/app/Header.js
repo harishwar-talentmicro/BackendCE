@@ -152,15 +152,7 @@ HeaderApp.directive('headerSection',['Notification','$window' ,function (Notific
                 }
             };
             this.closeChangePasswordForm=function(){
-               /* SignCtrl.OldPassword="";
-                SignCtrl.NewPassword="";
-                SignCtrl.ReEnterPassword="";*/
-                //SignCtrl.showMandatoryBox = "false";
-
-                /*document.getElementById("OldPassword").className = "form-control wd_oldPass changePass_inpMar emptyBox change_PadLeft";
-                document.getElementById("NewPassword").className = "form-control wd_oldPass changePass_inpMar emptyBox change_PadLeft";
-                document.getElementById("ReEnterPassword").className = "form-control wd_oldPass changePass_inpMar emptyBox change_PadLeft";*/
-                $('#ChangePassword_popup').slideUp();
+                  $('#ChangePassword_popup').slideUp();
             };
 
             this.Logout = function () {
@@ -237,7 +229,6 @@ HeaderApp.directive('headerSection',['Notification','$window' ,function (Notific
                 if ( $('#userid_popup').is(':visible') ){
                     $("#userid_popup").hide();
                 }
-
             });
 
             $("body").on('click','#userid',function(e){
@@ -245,7 +236,6 @@ HeaderApp.directive('headerSection',['Notification','$window' ,function (Notific
                 if (! $('#userid_popup').is(':visible') ){
                     $("#userid_popup").show();
                 }
-
             });
 
             $("body").on('click','#signin',function(e){

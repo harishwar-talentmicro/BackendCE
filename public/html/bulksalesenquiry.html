@@ -3,7 +3,9 @@
        <div class="container-fluid">
 
                 <div class="row">
-                    <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 col-lg-offset-2 col-md-offset-2 col-sm-offset-2 col-xs-offset-0">
+                    <!--<div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 col-lg-offset-2 col-md-offset-2 col-sm-offset-2 col-xs-offset-0">-->
+                    <div class="col-sm-10" style="margin: auto; float: none;">
+                        <!--<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setpadding12">-->
                         <div class="panel panel-default">
                             <div class="panel-heading">
                                 <h4>{{formTitle}}</h4>
@@ -11,33 +13,30 @@
                             </div>
                             <div class="panel-body setPanelPadding">
                                 <div ng-hide="validationMode > 0" class="setTableFixHeight">
-                                    <div ng-hide="showCreateMailTemplate" class="row setRowLeftRightMarginZero">
-                                        <table class="rwd-table">
+                                    <div ng-hide="showCreateMailTemplate" class="row setRowLeftRightMarginZero" style="padding-left: 2.5%;padding-right: 2.5%;">
+                                        <table class="rwd-table bulkmailTable">
                                             <thead>
                                                 <tr>
                                                     <th> </th>
-                                                    <th>Company Name</th>
-                                                    <th>Country/City</th>
-                                                    <th>Distance(Miles/km)</th>
-                                                    <th>Phone No.</th>
-                                                    <th>Web Site</th>
+                                                    <th class="setBulkMailHeaderText">Company Name</th>
+                                                    <th class="setBulkMailHeaderText">Country/City</th>
+                                                    <th class="setBulkMailHeaderText">Distance(km)</th>
+                                                    <th class="setBulkMailHeaderText">Phone No.</th>
+                                                    <th class="setBulkMailHeaderText">Web Site</th>
                                                 </tr>
                                             </thead>
                                             <tbody ng-show="showListing">
-                                                <!--<tr ng-repeat="_item in bulksalesController.result">-->
-                                                <tr ng-repeat="_item in bulksalesController.result">
-                                                    <!--<td ><input type="checkbox" name="companyID" data-tid="{{_item.TID}}" ng-click="toggleCheckbox($event)" checked></td>-->
-                                                    <td><input type="checkbox"
+                                               <tr ng-repeat="_item in bulksalesController.result">
+                                                   <td><input type="checkbox"
                                                                name="companyID"
                                                                data-tid="{{_item.TID}}"
                                                                ng-click="toggleCheckbox($event)"
                                                                ng-checked="selectedTID.indexOf(_item.TID)!=-1"/>
-                                                        <!--ng-class="{'checked':isExist(_item.TID)!=-1}"-->
-                                                    </td>
-                                                    <td data-th="Company Name">{{_item.CompanyName}}</td>
-                                                    <td data-th="Country/City">{{_item.city}}</td>
-                                                    <td data-th="Distance (Miles/km)">{{_item.distance}}</td>
-                                                    <td data-th="Phone No.">{{ _item.PhoneNumber != "" ? _item.CountryCode +' ' : ""}} {{_item.PhoneNumber}}</td>
+                                                   </td>
+                                                    <td title="{{_item.CompanyName}}" data-th="Company Name">{{_item.CompanyName | truncate:21}}</td>
+                                                    <td title="{{_item.city}}" data-th="Country/City">{{_item.city | truncate:9}}</td>
+                                                    <td data-th="Distance (km)">{{_item.distance}}</td>
+                                                    <td data-th="Phone No.">{{ (_item.PhoneNumber) ? _item.CountryCode +' ' : ""}} {{_item.PhoneNumber}}</td>
                                                     <td data-th="Web Site"><a target="_blank" href="http:\\{{_item.Website}}"><u>{{_item.Website}}</u></a></td>
                                                 </tr>
                                             </tbody>

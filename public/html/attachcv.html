@@ -42,19 +42,13 @@
                                                 <option value="" default selected> --Select Function-- </option>
                                                 <!--<option value="" default selected>{{CVAttachCtrl.Functions[0].FunctionName}}</option>-->
                                             </select>
-                                            <!-- <span style="color:red" ng-show="cvForm.$submitted || cvForm.function.$touched">
-                                                 <span ng-show="cvForm.function.$error.required">* mandatory</span>
-                                             </span>-->
-                                        </div>
+                                       </div>
                                         <div class="pull-right wd48p">
                                             <select class="form-control emptyBox" name="role" ng-model="CVAttachCtrl._CVInfo.RoleID"
                                                     ng-options="Role.RoleID as Role.RoleName for Role in CVAttachCtrl.RoleTypes">
                                                 <option value="" default selected> --Select Role-- </option>
                                             </select>
-                                            <!-- <span style="color:red" ng-show="cvForm.$submitted || cvForm.role.$touched">
-                                                 <span ng-show="cvForm.role.$error.required">* mandatory</span>
-                                             </span>-->
-                                        </div>
+                                       </div>
                                         <div class="clearfix"></div>
                                     </li>
 
@@ -95,9 +89,7 @@
                                     <li class="dsp_block">
                                         <!-- <div class="pull-left wd48p check-box-style emptyBox" ng-init="CVAttachCtrl._CVInfo.Status=1;">-->
                                         <div class="pull-left wd48p check-box-style emptyBox">
-                                            <!--<input type="radio" name="CVStatus" ng-model="CVAttachCtrl._CVInfo.Status" checked ng-checked="CVAttachCtrl._CVInfo.Status != 2 ? true : false "
-                                                   id="Visible" class="check-box pull-left"  value="1" style="margin-left: 10px; margin-top: 10px;"/>-->
-                                            <input type="radio" name="CVStatus" ng-model="CVAttachCtrl._CVInfo.Status" id="Visible" class="check-box pull-left"  value="1"
+                                           <input type="radio" name="CVStatus" ng-model="CVAttachCtrl._CVInfo.Status" id="Visible" class="check-box pull-left"  value="1"
                                                    style="margin-left: 10px; margin-top: 10px;"/>
                                             <label for="Visible" class="pull-left under_label" style="margin-top: 8px;">Visible</label>
                                             <input type="radio" name="CVStatus" style="margin-top: 10px;" ng-model="CVAttachCtrl._CVInfo.Status"

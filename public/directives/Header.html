@@ -166,9 +166,14 @@
 
                     <img style="position:relative; top:-2px;" src="images/drp_arrow.png">
                 </a>
-                <a href="/home" id="" class="btn btn-primary logOut-hover logMarR" title="Logout" ng-click="SignInCtrl.Logout()" ng-show="$root._userInfo.IsAuthenticate">
+               <!-- <a href="/home" id="" class="btn btn-primary logOut-hover logMarR orangeSearchButton" title="Logout" ng-click="SignInCtrl.Logout()" ng-show="$root._userInfo.IsAuthenticate">
+                    &lt;!&ndash;<button  ng-disabled="!search.Criteria.Keywords" class="btn btn-primary btn-md btn-block orangeSearchButton" type="submit">Search</button>&ndash;&gt;
                     <img style="position:relative; top:-2px;" src="images/logout_241.PNG" height="20">
-                </a>
+                </a>-->
+                <button type="submit" href="/home" id="" class="btn btn-primary logOut-hover logMarR orangeSearchButton" title="Logout" ng-click="SignInCtrl.Logout()" ng-show="$root._userInfo.IsAuthenticate">
+                    <!--<button  ng-disabled="!search.Criteria.Keywords" class="btn btn-primary btn-md btn-block orangeSearchButton" type="submit">Search</button>-->
+                    <img style="position:relative; top:-2px;" src="images/logout_241.PNG" height="20">
+                </button>
                 <div class="clearfix"></div>
 
                 <div class="notification_drp" id="userid_popup">
