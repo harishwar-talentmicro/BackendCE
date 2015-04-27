@@ -59,7 +59,7 @@ HeaderApp.directive('headerSection',['Notification','$window' ,function (Notific
                             var encrypted = CryptoJS.AES.encrypt(JSON.stringify(data), "EZEID");
                             localStorage.setItem("_token", encrypted);
                         } else {
-                            alert('Sorry..! Browser does not support');
+                            alert('Sorry..! Browser is not supported');
                             window.location.href = "/";
                         }
                     });
