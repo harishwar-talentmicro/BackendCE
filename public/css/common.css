@@ -2154,3 +2154,44 @@ form .row-error{
     font-family: 'Open Sans',sans-serif;
 }
 
+#progress-overlay{
+    position: fixed;
+    height: inherit;
+    width: 100%;
+    top: 0;
+    left: 0;
+    background: transparent;
+    z-index: 1200;
+}
+
+#progress-overlay.hidden{
+    display:none;
+}
+
+#progress-overlay #progress-overlay-background{
+    position: fixed;
+    height: inherit;
+    width: 100%;
+    top:0;
+    left:0;
+    background: #FFFFFF;
+    z-index: 1201;
+    opacity: 0.8;
+}
+
+#progress-overlay #progress-overlay-content{
+    position: absolute;
+    height: inherit;
+    width: inherit;
+    margin: 0px auto;
+    z-index: 1202;
+}
+
+#progress-overlay-content h1{
+    color: #1CB6E4;
+    font-family: 'Open Sans Light',sans-serif;
+}
+
+.font-open-sans{
+    font-family: 'Open Sans',sans-serif;
+}

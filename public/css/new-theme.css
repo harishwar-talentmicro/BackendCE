@@ -118,7 +118,7 @@ footer p {
 @font-face {
     font-family: 'Open Sans Light';
     src: url('../fonts/opensans-condlight-webfont.ttf');
-    font-stretch : normal;
+    font-stretch : semi-expanded;
 }
 
 @font-face {

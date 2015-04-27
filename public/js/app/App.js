@@ -125,6 +125,32 @@
      */
     ezeid.run(['$location','$rootScope','CLOSED_ROUTES','$routeParams','$timeout','UNAUTHORIZED_ROUTES',
         function($location,$rootScope,CLOSED_ROUTES,$routeParams,$timeout,UNAUTHORIZED_ROUTES){
+
+            $rootScope.$on('$includeContentRequested',function(){
+                $rootScope.$broadcast('$preLoaderStart');
+            });
+
+            $rootScope.$on('$includeContentLoaded',function(){
+                $rootScope.$broadcast('$preLoaderStop');
+            });
+
+
+
+            $rootScope.$on('$preLoaderStart',function(){
+                if($('#progress-overlay').hasClass('hidden')){
+                    $('#progress-overlay').removeClass('hidden');
+                }
+            });
+
+            $rootScope.$on('$preLoaderStop',function(){
+                $timeout(function(){
+                    if(!$('#progress-overlay').hasClass('hidden')){
+
+                        $('#progress-overlay').addClass('hidden');
+                    }
+                },2000);
+            });
+
         /**
          * Checking login while navigating to different pages
          */
