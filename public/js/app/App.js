@@ -6,10 +6,7 @@
             'ngFooter',
             'ui-notification',
             'angularjs-dropdown-multiselect',
-            'ui.grid',
             'ngTouch',
-            'ui.grid', 'ui.grid.expandable', 'ui.grid.selection', 'ui.grid.pinning',
-            'ui.grid.edit', 'ui.grid.rowEdit', 'ui.grid.cellNav','ui.grid.pagination','ui.grid.exporter',
             'ngAnimate'
         ]);
 
@@ -20,7 +17,7 @@
      * These routes will be password protected, only authenticated users can access these routes
      */
     ezeid.value('CLOSED_ROUTES',[
-        '/business-manager',
+        '/business-manager/:subview',
         '/profile-manager',
         '/profile-manager/:subview'
     ]);

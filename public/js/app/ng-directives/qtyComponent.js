@@ -1,10 +1,7 @@
 angular.module('ezeidApp').directive('qtyComponent',['$compile',function($compile){
     var template = '<div class="input-group  modalbox-input-group-control">'+
-//        '<span ng-click="subValue()"  class="input-group-addon"><span class="glyphicon glyphicon-minus"></span> </span>'+
         '<span class="input-group-addon minus"><span class="glyphicon glyphicon-minus"></span> </span>'+
-//        '<input class="form-control" type="text" ng-model="qty" />'+
         '<input class="form-control" type="text" ng-model="qty" />'+
-//    '<span ng-click="addValue()" class="input-group-addon"><span class="glyphicon glyphicon-plus"></span> </span>'+
     '<span class="input-group-addon plus"><span class="glyphicon glyphicon-plus"></span> </span>'+
     '</div>';
 
@@ -46,13 +43,6 @@ angular.module('ezeidApp').directive('qtyComponent',['$compile',function($compil
                        ngModelCtrl.$setViewValue(1);
                    }
                });
-//              setInterval(function(){
-//                  // // console.log('..........................');
-//                  // // console.log('scope.qty : '+scope.qty);
-//                  // // console.log('ngModel value : '+ngModelCtrl.$modelValue);
-//                  // // console.log('ngModel viewValue : '+ ngModelCtrl.$viewValue);
-//                  // // console.log('..........................');
-//              },3000);
                 $compile(elem.contents())(scope);
           },
           scope : {
