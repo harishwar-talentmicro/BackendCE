@@ -40,7 +40,7 @@
     <div class="container" style="padding-top:90px; position:relative;">
         <!-- Example row of columns -->
         <div class="row">
-            <div class="col-sm-8" style="margin: auto; float: none;">
+            <div class="col-sm-10" style="margin: auto; float: none;">
                 <div class="panel panel-default" style="min-height: 367px">
                     <div class="panel-body">
                         <h3><span class="text_color">White List & Black List</span></h3>
@@ -49,7 +49,43 @@
                         <div class="panel-group panelTextSize no_select" id="accordion">
                             <form class="form-signin" role="form" novalidate  ng-submit="blacklist.addToBlackWhiteList()">
                                 <div class="row " style="font-size: 16px;">
-                                    <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1" style="margin-top: 1%; margin-left: 1%; width: 5.333333%;">
+
+                                    <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1" style="margin-top: 1%;" >
+                                        <span>Type</span>
+                                    </div>
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2" style="padding-left: 0px;">
+                                        <select class="form-control " name="listType" ng-model="blacklist._info.List"
+                                                ng-options="status.id as status.label for status in blacklist.listType" >
+                                            <option value=""> --List Type-- </option>
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2" style="padding-left: 0px;" ng-show="blacklist._info.List == 1">
+                                        <select class="form-control" style="padding-left: 0px;" name="relation" ng-model="blacklist._info.RelationType"
+                                                ng-options="relation.RelationID as relation.RelationshipTitle for relation in  blacklist.Relations" >
+                                            <option value="">Relationship</option>
+                                        </select>
+
+                                    </div>
+                                    <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1 setLeftRightPaddingZero" style="margin-top: 1%;">
+                                        <span>EZE ID</span>
+                                    </div>
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
+                                        <input id="EZEID" style='text-transform:uppercase' class="form-control" type="text" placeholder="EZEID"  ng-model="blacklist._info.EZEID" />
+                                    </div>
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2" ng-show="blacklist._info.List == 1">
+                                        <select class="form-control " name="tags" ng-model="blacklist._info.Tag"
+                                                ng-options="tags.id as tags.label for tags in blacklist.Tags" >
+                                            <option value="">Tags</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2" >
+                                        <!--<button  ng-disabled="!blacklist._info.EZEID || !blacklist._info.List" ng-click="blacklist.addToBlackWhiteList()" class="btn btn-block btn-primary pull-left" type="button">Add</button>-->
+                                        <button  ng-disabled="!blacklist._info.EZEID || !blacklist._info.List" class="btn btn-block btn-primary pull-left" type="submit">Add</button>
+                                    </div>
+
+
+
+                                   <!-- <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1" style="margin-top: 1%; margin-left: 1%; width: 5.333333%;">
                                         <span>Type</span>
                                     </div>
 
@@ -66,7 +102,7 @@
                                         </select>
 
                                     </div>
-                                    <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1" style="margin-top: 1%;">
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2" style="margin-top: 1%;">
                                         <span>EZE ID</span>
                                     </div>
                                     <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3" style="width: 20%; padding-left: 0px;">
@@ -79,9 +115,9 @@
                                         </select>
                                     </div>
                                     <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2" style="width: 14.406667%; padding-right: 0px;">
-                                        <!--<button  ng-disabled="!blacklist._info.EZEID || !blacklist._info.List" ng-click="blacklist.addToBlackWhiteList()" class="btn btn-block btn-primary pull-left" type="button">Add</button>-->
+                                        &lt;!&ndash;<button  ng-disabled="!blacklist._info.EZEID || !blacklist._info.List" ng-click="blacklist.addToBlackWhiteList()" class="btn btn-block btn-primary pull-left" type="button">Add</button>&ndash;&gt;
                                         <button  ng-disabled="!blacklist._info.EZEID || !blacklist._info.List" class="btn btn-block btn-primary pull-left" type="submit">Add</button>
-                                    </div>
+                                    </div>-->
                                 </div>
                             </form>
                             <table class="panel panel-default" border="1" st-table="rowCollection" class="table table-striped" style="margin-top: 1%">

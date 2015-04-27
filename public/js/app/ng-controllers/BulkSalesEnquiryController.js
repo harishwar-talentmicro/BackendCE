@@ -303,11 +303,9 @@ angular.module('ezeidApp').controller('bulksalesController',[
 
     };
 
-        $rootScope.$on('$locationChangeStart',function(){
-            $window.localStorage.removeItem("searchResult");
-            $window.localStorage.removeItem("selectedTids");
-        });
-/*
-  });
-*/
+    $scope.$on('$locationChangeStart', function( event ) {
+        $window.localStorage.removeItem("searchResult");
+        $window.localStorage.removeItem("selectedTids");
+    });
+
 }]);

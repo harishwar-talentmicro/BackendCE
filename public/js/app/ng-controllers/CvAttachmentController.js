@@ -170,18 +170,22 @@ angular.module('ezeidApp').controller('CVAttachController',[
     };
 
     this.download = function(){
-        window.location.assign(CVAttachCtrl._CVInfo.CVDoc);
+        //window.location.assign(CVAttachCtrl._CVInfo.CVDoc);
         $window.open(CVAttachCtrl._CVInfo.CVDoc);
-    }
+    };
 
     function getCVInfo(){
        $http({
             method: 'get',
-            url: GURL + 'ewtGetCVInfo?TokenNo=' + $rootScope._userInfo.Token
+//            url: GURL + 'ewtGetCVInfo?TokenNo=' + $rootScope._userInfo.Token
+            url : GURL + 'ewtGetCVInfo',
+            params : {
+                TokenNo : $rootScope._userInfo.Token
+            }
         }).success(function (data) {
-              if(data != 'null')
+              if(data && data !== 'null' && data.length > 0)
                 {
-                    CVAttachCtrl._CVInfo=data[0];
+                    CVAttachCtrl._CVInfo = data[0];
                     CVAttachCtrl.getRoleForFunction(data[0].FunctionID);
 
                     if(CVAttachCtrl._CVInfo.Pin)
@@ -204,14 +208,7 @@ angular.module('ezeidApp').controller('CVAttachController',[
                 else
                 {   CVAttachCtrl._CVInfo.Status= 1;
                     $scope.showLink = false;
-                    if(data[0].CVDocFile != "" && data[0] != "n" )
-                    {
-                        $scope.showLink = true;
-                    }
-                    else
-                    {
-                        $scope.showLink = false;
-                    }
+
                 }
             });
     };
@@ -222,7 +219,4 @@ angular.module('ezeidApp').controller('CVAttachController',[
         }
     };
 
-    var content = 'file content';
-    var blob = new Blob([ CVAttachCtrl._CVInfo.CVDoc ], { type : 'text/plain' });
-    $scope.url = (window.URL || window.webkitURL).createObjectURL( blob );
 }]);
