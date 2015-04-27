@@ -6801,7 +6801,7 @@ exports.FnGetTranscation = function (req, res) {
         var Token = req.query.Token;
         var FunctionType = parseInt(req.query.FunctionType);
         var Page = parseInt(req.query.Page);
-        var Status = (req.query.Status) ? req.query.Status ? null;
+        var Status = (req.query.Status) ? req.query.Status : null;
         
        var RtnMessage = {
             TotalPage:'',
