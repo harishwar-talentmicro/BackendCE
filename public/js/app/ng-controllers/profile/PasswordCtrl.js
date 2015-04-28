@@ -36,17 +36,19 @@ angular.module('ezeidApp').controller('PasswordCtrl',[
         /**
          * Hiding progress loader when userDetails are loaded successfully
          */
-        $scope.$watch('userDetails',function(newVal,oldVal){
-           if(newVal){
-               if(newVal.MasterID){
-                   $scope.dataProgressLoader.dataLoadInProgress = false;
-                   $scope.dataProgressLoader.dataLoadError = false;
-                   $scope.dataProgressLoader.dataLoadComplete = true;
-               }
-           }
+        if(!$scope.userDetails){
+            $scope.loadUserDetails();
+            $scope.$watch('userDetails',function(newVal,oldVal){
+                if(newVal){
+                    if(newVal.MasterID){
+                        $scope.dataProgressLoader.dataLoadInProgress = false;
+                        $scope.dataProgressLoader.dataLoadError = false;
+                        $scope.dataProgressLoader.dataLoadComplete = true;
+                    }
+                }
 
-        });
-
+            });
+        }
 
         $scope.currentPassword = '';
         $scope.newPassword = '';

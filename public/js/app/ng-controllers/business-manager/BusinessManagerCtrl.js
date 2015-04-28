@@ -72,4 +72,5 @@ angular.module('ezeidApp').controller('BusinessManager',[
 
 
 
+
     }]);

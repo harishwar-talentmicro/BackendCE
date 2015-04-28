@@ -69,18 +69,24 @@ angular.module('ezeidApp').controller('WebLinksCtrl',[
         /**
          * Hiding progress loader when userDetails are loaded successfully
          */
-        $scope.$watch('userDetails',function(newVal,oldVal){
-            if(newVal){
-                if(newVal.MasterID){
-                    isUserDetailsLoaded = true;
-                    if(isUserDetailsLoaded && isWebLinksLoaded){
+        if(!$scope.userDetails){
+            $scope.loadUserDetails().then(function(){
+                isUserDetailsLoaded = true;
+            });
+            $scope.$watch('userDetails',function(newVal,oldVal){
+                if(newVal){
+                    if(newVal.MasterID){
                         $scope.dataProgressLoader.dataLoadInProgress = false;
                         $scope.dataProgressLoader.dataLoadError = false;
                         $scope.dataProgressLoader.dataLoadComplete = true;
                     }
                 }
-            }
-        });
+
+            });
+        }
+        else{
+            isUserDetailsLoaded  = true;
+        }
 
 
         /**

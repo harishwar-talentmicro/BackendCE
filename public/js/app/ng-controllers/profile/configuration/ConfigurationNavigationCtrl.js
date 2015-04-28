@@ -20,20 +20,23 @@ angular.module('ezeidApp').controller('ConfigurationNavigationCtrl',[
     /**
      * Hiding progress loader when userDetails are loaded successfully
      */
-    $scope.$watch('userDetails',function(newVal,oldVal){
-        if(newVal){
-            if(newVal.MasterID){
-                $scope.dataProgressLoader.dataLoadInProgress = false;
-                $scope.dataProgressLoader.dataLoadError = false;
-                $scope.dataProgressLoader.dataLoadComplete = true;
+    if(!$scope.userDetails){
+        $scope.loadUserDetails();
+        $scope.$watch('userDetails',function(newVal,oldVal){
+            if(newVal){
+                if(newVal.MasterID){
+                    $scope.dataProgressLoader.dataLoadInProgress = false;
+                    $scope.dataProgressLoader.dataLoadError = false;
+                    $scope.dataProgressLoader.dataLoadComplete = true;
 
-                if(newVal.IDTypeID !== 2 && newVal.SelectionType !== 2){
-                    $location.path('/profile-manager/user');
+                    if(newVal.IDTypeID !== 2 && newVal.SelectionType !== 2){
+                        $location.path('/profile-manager/user');
+                    }
                 }
             }
-        }
 
-    });
+        });
+    };
 
     /**
      * @todo Create and add template for resource creation and mapping with reservation items

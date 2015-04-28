@@ -91,6 +91,14 @@ angular.module('ezeidApp').controller('ProfileManagerCtrl',[
         $scope.loadUserDetails = function(){
             var promiseResolved = false;
             var defer = $q.defer();
+            if($rootScope._userInfo.MasterID){
+                Notification.error({ message : 'Login with your main profile to access profile manager!', delay : MsgDelay});
+                $location.path('/');
+                $timeout(function(){
+                    defer.reject();
+                },500);
+                return defer.promise;
+            }
             $http({
                 url : GURL + 'ewtGetUserDetails',
                 method : 'GET',
@@ -102,11 +110,13 @@ angular.module('ezeidApp').controller('ProfileManagerCtrl',[
                     // console.log(JSON.stringify(resp));
                     promiseResolved = true;
                     if(resp && resp.length > 0 && resp !== 'null'){
-                        defer.resolve(true);
                         $scope.userDetails = resp[0];
+                        defer.resolve(true);
                     }
                     else{
-                        defer.resolve(false);
+                        Notification.error({ message : 'Login with your main profile to access profile manager!', delay : MsgDelay});
+                        $location.path('/');
+                        defer.reject();
                     }
                 }).error(function(err){
                     promiseResolved = true;
@@ -121,7 +131,7 @@ angular.module('ezeidApp').controller('ProfileManagerCtrl',[
             return defer.promise;
         };
 
-        $scope.loadUserDetails();
+        //$scope.loadUserDetails();
 
         if(!$routeParams['subview']){
             $location.path('/profile-manager/user');
