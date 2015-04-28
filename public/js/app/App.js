@@ -17,6 +17,7 @@
      * These routes will be password protected, only authenticated users can access these routes
      */
     ezeid.value('CLOSED_ROUTES',[
+        '/business-manager',
         '/business-manager/:subview',
         '/profile-manager',
         '/profile-manager/:subview'
@@ -82,27 +83,27 @@
             .when('/',{templateUrl: 'html/home.html'})
             .when('/messages',{templateUrl: 'html/messages.html'})
             .when('/acchist',{templateUrl: 'html/accesshistory.html'})
-            .when('/editprofile',{templateUrl: 'html/signupwiz.html'})
-            .when('/addloc',{templateUrl: 'html/addlocations.html'})
             .when('/attachcv',{templateUrl: 'html/attachcv.html'})
             .when('/busslist',{templateUrl: 'html/businesslist.html'})
-            .when('/documents',{templateUrl: 'html/documents.html'})
             .when('/terms',{templateUrl: 'html/terms.html'})
             .when('/help',{templateUrl: 'html/help.html'})
             .when('/legal',{templateUrl: 'html/legal.html'})
-            .when('/congratulations',{templateUrl: 'html/congratulations.html'})
-            .when('/business-preference"',{templateUrl: 'html/business-preference.html'})
             .when('/blackwhitelist',{templateUrl: 'html/blacklistwhitelist.html'})
             .when('/salesenquiry',{templateUrl: 'html/salesenquiry.html'})
-            .when('/subusers',{templateUrl : 'html/subusers.html'})
-            .when('/business-preference',{templateUrl : 'html/business-preference.html'})
-            .when('/business-manager',{templateUrl : 'html/business-manager/business-manager.html'})
             .when('/bulksalesenquiry',{templateUrl : 'html/bulksalesenquiry.html'})
             .when('/viewdirection',{templateUrl : 'html/viewdirection.html'})
             .when('/addworkinghours',{templateUrl : 'html/working-hours.html'})
             .when('/signup',{
                 templateUrl : 'html/profile/sign-up.html',
                 controller : 'SignUpCtrl'
+            })
+            .when('/business-manager/:subview',{
+                templateUrl : 'html/business-manager/business-manager.html',
+                controller : 'BusinessManagerCtrl'
+            })
+            .when('/business-manager',{
+                templateUrl : 'html/business-manager/business-manager.html',
+                controller : 'BusinessManagerCtrl'
             })
             .when('/profile-manager/:subview',{
                 templateUrl : 'html/profile/profile-manager.html',

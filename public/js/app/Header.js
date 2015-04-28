@@ -52,6 +52,14 @@ HeaderApp.directive('headerSection',['Notification','$window' ,function (Notific
                                 }
                                 $rootScope._userInfo.userName = userName ;
                             }
+                            if($rootScope._userInfo.hasOwnProperty('MasterID')){
+                                if($rootScope._userInfo.MasterID > 0){
+                                    userName = Logdata.UserName;
+                                }
+                            }
+
+                            console.log(userName);
+                            $rootScope._userInfo.userName = userName.toUpperCase();
 
 
 

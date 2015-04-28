@@ -532,9 +532,13 @@ angular.module('ezeidApp').
                             if (typeof (Storage) !== "undefined") {
                                 sResp.userName = (sResp.IDTypeID == 1) ? sResp.FirstName : sResp.CompanyName;
                                 if(sResp.userName.length > 15){
-                                    sResp.userName = sResp.userName.substring(0,12);
+                                    sResp.userName = sResp.userName.substring(0,12)+'...';
+                                }
+                                if(!sResp.userName){
+                                    sResp.userName = $scope.ezeid;
                                 }
                                 var encrypted = CryptoJS.AES.encrypt(JSON.stringify(sResp), "EZEID");
+
                                 localStorage.setItem("_token", encrypted);
                                 Notification.success({ message : 'Your EZEID - '+$scope.ezeid + ' have been generated successfully ! Please fill up you details to proceed', delay : MsgDelay});
                                 $location.path('/profile-manager/user');

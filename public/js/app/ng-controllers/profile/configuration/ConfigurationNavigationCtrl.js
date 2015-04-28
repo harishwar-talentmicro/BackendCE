@@ -59,16 +59,4 @@ angular.module('ezeidApp').controller('ConfigurationNavigationCtrl',[
         };
 
 
-        $scope.$on('$includeContentRequested',function(){
-            console.info('NG INCLUDE Content Requested');
-        });
-
-        $scope.$on('$includeContentLoaded',function(){
-            console.info('NG INCLUDE Content Loaded Successfully');
-        });
-
-        $scope.$on('$includeContentError',function(){
-            console.info('NG INCLUDE Content Error');
-        });
-
 }]);
