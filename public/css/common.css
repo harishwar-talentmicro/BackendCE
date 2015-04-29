@@ -1355,9 +1355,27 @@ span.smallCloselink {
 .business-manager .nav > li > a{
     font-size: 16px;
     font-family: 'Roboto',sans-serif;
-    color:#fff;
+    color: #fff;
     background: #44A9D1;
     border-radius: 0px;
+    border: 1px solid #2D94BD;
+    cursor: pointer;
+}
+
+.business-manager .nav > li > a.disabled{
+    background: #EEEEEE;
+    color: #B5B5B5;
+    border: 1px solid #DDD;
+    cursor: not-allowed;
+}
+
+.business-manager .nav > li > a.disabled:hover,
+.business-manager .nav > li > a.disabled:focus,
+.business-manager .nav > li > a.disabled:active{
+    background: #EEEEEE;
+    color: #B5B5B5;
+    border: 1px solid #DDD;
+    cursor: not-allowed;
 }
 
 .business-manager .nav > li.active > a{
@@ -1365,184 +1383,56 @@ span.smallCloselink {
     color:#078FC3;
 }
 
-/****** UI Grid Style *****/
-.ui-grid-header-cell {
-    background-color: #6E6E6E;
-    border-color: transparent;
-    color: #fff;
-    font-family: 'Roboto',sans-serif;
-    font-weight: 200;
-}
-.ui-grid-row-header-cell {
-    background-color: #6E6E6E !important;
-    border-bottom: solid 1px #d4d4d4;
+
+.business-manager .nav > li > a:hover, .business-manager .nav > li > a:focus, .business-manager .nav > li > a:active {
+    background: #007fff;
 }
 
-.ui-grid-top-panel{
-    background: #6E6E6E;
-}
-.ui-grid-pinned-container{
-    color:#ffffff;
-    font-family:'Roboto',sans-serif;
-}
-
-.ui-grid-cell-focus {
-    outline: 0;
-    background-color: #46849D;
-    color: #FFF;
+.business-manager .well{
+    background: #9A08CB;
+    color: #00D8FF;
+    border: 1px solid #DB16AC;
+    box-shadow: 0px 0px 30px #DDD;
 }
 
-.ui-grid-row-selected > [ui-grid-row] > .ui-grid-cell{
-    background-color: #50696E !important;
-    color: #2CC4FF;
-}
-.ui-grid-row-selected .ui-grid-cell-contents {
-    background: #46849D;
+.business-manager .well h2,
+.business-manager .well h2,
+.business-manager .well h2{
+    color: #FFFFFF;
 }
 
-.ui-grid-row-selected .expandableRow{
-    color:#ffffff;
-    background: #46849D;
-}
 
-.ui-grid-menu .ui-grid-menu-inner ul li {
-    background: #1291CC;
-    color: #fff;
-}
-
-.ui-grid-menu .ui-grid-menu-inner ul li.ui-grid-menu-item-active {
-    -webkit-box-shadow: inset 0 0 14px rgba(0, 0, 0, 0.2);
-    -moz-box-shadow: inset 0 0 14px rgba(0, 0, 0, 0.2);
-    box-shadow: inset 0 0 14px rgba(0, 0, 0, 0.2);
-    background-color: #215D96;
-}
-
-.ui-grid-row-selected .expandableRow{
-    height: 182px;
-}
-.ui-grid-row-selected .expandableRow .ui-grid-header-cell .ui-grid-cell-contents{
-    background: #6E6E6E;
-}
-
-.ui-grid-pager-control button{
-    background: #0c89ba;
+.business-manager .well:focus,
+.business-manager .well:active,
+.business-manager .well:hover{
+    background: #007fff;
     color:#fff;
-    border-radius: 0px;
-    border:none;
+    cursor: pointer;
 }
 
-.ui-grid-pager-control .last-triangle {
-    width: 0;
-    height: 0;
-    border-style: solid;
-    border-width: 5px 0 5px 8.7px;
-    border-color: transparent transparent transparent #ffffff;
-    margin-left: -1px;
+
+.business-manager .well:focus h2,
+.business-manager .well:active h2,
+.business-manager .well:hover h2{
+    color: #440044;
 }
 
-.ui-grid-pager-control .first-triangle {
-    width: 0;
-    height: 0;
-    border-style: solid;
-    border-width: 5px 8.7px 5px 0;
-    border-color: transparent #ffffff transparent transparent;
-    margin-left: 2px;
+.business-manager > div.row > div > div.row > div > div.row > div > div.well.disabled{
+    background: #F5F5F5;
+    color: #D7D7D7;
+    box-shadow: none;
+    border: 1px solid #DDD;
 }
 
-.ui-grid-pager-control .last-bar {
-    width: 10px;
-    border-left: 2px solid #ffffff;
-    margin-top: -6px;
-    height: 12px;
-    margin-left: 1px;
+.business-manager > div.row > div > div.row > div > div.row > div > div.well.disabled h2{
+    color:#CCCCCC;
 }
 
-.ui-grid-pager-control .first-bar {
-    width: 10px;
-    border-left: 2px solid #ffffff;
-    margin-top: -6px;
-    height: 12px;
-    margin-left: -3px;
-}
-
-.ui-grid-pager-control input,.ui-grid-pager-control select {
-    height: 26px;
-    width: 50px;
-    vertical-align: top;
-    border: 0px;
-    border: 1px solid #0c89ba;
-    color:#000;
-}
-
-.ui-grid-pager-row-count-picker select {
-    height: 26px;
-    width: 60px;
-    border-radius: 0px;
-    border: 1px solid #0c89ba;
-    color:#000;
-}
-
-.ui-grid-pager-panel {
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    width: 100%;
-    padding-top: 3px;
-    padding-bottom: 3px;
-    box-shadow: 0px 0px 5px #9F9F9F;
-    background: #2E2E2E;
-    color: #fff;
-}
-
-.ui-grid-filter-input{
-    color:#000;
-}
-
-/** UI Grid Custom CSS **/
-
-.ui-grid-custom-btn{
-    margin:5px 5px 5px 15px;
-}
-.ui-grid-subgrid{
-    overflow: auto;
-    height: 100px;
-}
-
-input[type="text"].ui-grid-filter-input {
-    color: #44A9D1;
-    padding: 0;
-    margin: 0;
-    border: 0;
-    width: 100%;
-    border: 1px solid #808080;
-    background: #393939;
-    -webkit-border-top-right-radius: 0px;
-    -webkit-border-bottom-right-radius: 0;
-    -webkit-border-bottom-left-radius: 0;
-    -webkit-border-top-left-radius: 0;
-    -moz-border-radius-topright: 0px;
-    -moz-border-radius-bottomright: 0;
-    -moz-border-radius-bottomleft: 0;
-    -moz-border-radius-topleft: 0;
-    border-top-right-radius: 0px;
-    border-bottom-right-radius: 0;
-    border-bottom-left-radius: 0;
-    border-top-left-radius: 0;
-    -moz-background-clip: padding-box;
-    -webkit-background-clip: padding-box;
-    background-clip: padding-box;
-}
-
-.ui-grid-cell-focus {
-    outline: 0;
-    background-color: transparent;
-    color: #004CA7;
-}
-
-.ui-grid-filter-container {
-    padding: 4px 10px;
-    padding-left: 0;
-    position: relative;
+.business-manager > div.row > div > div.row > div > div.row > div > div.well.disabled:focus,
+.business-manager > div.row > div > div.row > div > div.row > div > div.well.disabled:active,
+.business-manager > div.row > div > div.row > div > div.row > div > div.well.disabled:hover{
+    background: #e3e3e3;
+    cursor: not-allowed;
 }
 
 .top-clearfix-half{
@@ -2195,4 +2085,12 @@ form .row-error{
 
 .font-open-sans{
     font-family: 'Open Sans',sans-serif;
+}
+
+.font-open-sans-light{
+    font-family: 'Open Sans Light',sans-serif;
+}
+
+.font-roboto{
+    font-family: 'Roboto',sans-serif;
 }

@@ -114,7 +114,7 @@ angular.module('ezeidApp').controller('ProfileCtrl',[
 
             $scope.loadCountries().then(function(){
                 $scope.loadWorkingHourTemplates().then(function(workingHourTemplates){
-                    $scope.loadUserDetails().then(function(){
+                    $scope.loadUserDetails().then(function(userDetails){
                         var countryId = ($scope.userDetails.CountryID) ? $scope.userDetails.CountryID : $scope.countryList[0].CountryID;
                         $scope.loadStates(countryId).then(function(stateList){
                             $scope.stateList = stateList;
@@ -262,7 +262,6 @@ angular.module('ezeidApp').controller('ProfileCtrl',[
                     promiseResolved = true;
                     if(resp && resp.length > 0 && resp !== 'null'){
                         defer.resolve(resp);
-
                     }
                     else{
                         defer.resolve([]);

@@ -31,6 +31,34 @@ angular.module('ezeidApp').controller('DocumentController',[
         });
 
 
+        /**
+         * Hiding progress loader when userDetails are loaded successfully
+         */
+        if(!$scope.userDetails){
+            $scope.loadUserDetails().then(function(){
+                isUserDetailsLoaded = true;
+            });
+            $scope.$watch('userDetails',function(newVal,oldVal){
+                if(newVal){
+                    if(newVal.MasterID){
+                        if(isUserDetailsLoaded){
+
+                            if($scope.userDetails.IDTypeID !== 1){
+                                $location.path('/');
+                            }
+                            else{
+                                $scope.dataProgressLoader.dataLoadInProgress = false;
+                                $scope.dataProgressLoader.dataLoadError = false;
+                                $scope.dataProgressLoader.dataLoadComplete = true;
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        else{
+            isUserDetailsLoaded  = true;
+        }
 
 
         var original_form = {

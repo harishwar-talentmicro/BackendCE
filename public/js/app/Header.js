@@ -1,6 +1,6 @@
 var HeaderApp = angular.module('ngHeader', ['ui-notification']);
 HeaderApp.directive('headerSection',['Notification','$window' ,function (Notification,$window) {
-    var GURL = '/';
+    //var GURL = 'https://www.ezeid.com/';
     return {
         restrict: 'EA',
         templateUrl: 'directives/Header.html',
@@ -52,6 +52,14 @@ HeaderApp.directive('headerSection',['Notification','$window' ,function (Notific
                                 }
                                 $rootScope._userInfo.userName = userName ;
                             }
+                            if($rootScope._userInfo.hasOwnProperty('MasterID')){
+                                if($rootScope._userInfo.MasterID > 0){
+                                    userName = Logdata.UserName;
+                                }
+                            }
+
+                            console.log(userName);
+                            $rootScope._userInfo.userName = userName.toUpperCase();
 
 
 
@@ -161,6 +169,7 @@ HeaderApp.directive('headerSection',['Notification','$window' ,function (Notific
                     $rootScope._userInfo = data;
                     $rootScope.IsIdAvailable = false;
                     $window.localStorage.removeItem("searchResult");
+                    $location.path('/');
                   //  Notification.success({ message: "Sign Out Success", delay: MsgDelay });
                 });
             };
