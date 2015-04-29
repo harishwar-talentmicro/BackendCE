@@ -94,10 +94,11 @@ angular.module('ezeidApp').controller('SearchController', [
         SearchType: '2',
         Keywords: '',
         SCategory: 0,
-        Proximity: 50,
+        Proximity: 0,
         Latitude: $rootScope.CLoc.CLat,
         Longitude: $rootScope.CLoc.CLong
     };
+        //Proximity: 50,
 
     $scope.isMapLoaded = false;         //Set to true with map event 'idle'
     $scope.isMapReady = false;          //Set to true when map canvas is drawn and map is fully visible
@@ -502,8 +503,9 @@ angular.module('ezeidApp').controller('SearchController', [
             SearchSec.Criteria.Longitude = $rootScope.CLoc.CLong;
             SearchSec.Criteria.Token = $rootScope._userInfo.Token;
 
+            $rootScope.$broadcast('$preLoaderStart');
             $http({ method: 'post', url: GURL + 'ewSearchByKeywords', data: SearchSec.Criteria }).success(function (data) {
-
+               $rootScope.$broadcast('$preLoaderStop');
                if (data != 'null' && data.length>0)
                {
                    $scope.SearchResultCount = data.length;
@@ -564,6 +566,7 @@ angular.module('ezeidApp').controller('SearchController', [
                     {
                          if($rootScope._userInfo.IsAuthenticate == true || data[0].IDTypeID == 2 && (SearchSec.Criteria.SearchType == 1))
                          {
+                             $rootScope.$broadcast('$preLoaderStart');
                                $http({ method: 'get', url: GURL + 'ewtGetSearchInformation',
                                    params : {
                                        Token : $rootScope._userInfo.Token,
@@ -572,6 +575,7 @@ angular.module('ezeidApp').controller('SearchController', [
                                    }
                                    }).success(function (data) {
 
+                                       $rootScope.$broadcast('$preLoaderStop');
                                 if (data != 'null') {
 
                                   if(data.length == 1 && SearchSec.Criteria.SearchType == 1)
@@ -1362,8 +1366,9 @@ angular.module('ezeidApp').controller('SearchController', [
     function getSearchInformation(_item)
     {
         var currentDate = moment().format('YYYY-MM-DD HH:mm:ss');
+        $rootScope.$broadcast('$preLoaderStart');
         $http({ method: 'get', url: GURL + 'ewtGetSearchInformation?Token=' + $rootScope._userInfo.Token + '&TID=' + _item.TID + '&CurrentDate=' + currentDate}).success(function (data) {
-
+            $rootScope.$broadcast('$preLoaderStop');
             if (data != 'null') {
                 $timeout(function () {
                     $scope.showLoadingImage = false;

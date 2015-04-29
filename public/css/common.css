@@ -2146,7 +2146,8 @@ form .row-error{
 }
 
 .chat-toggle-box.active{
-    right: 15%;
+    /*right: 15%;*/
+    right: 23%
 }
 
 .chat-box >  h1{

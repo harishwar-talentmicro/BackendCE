@@ -31,9 +31,25 @@ angular.module('ezeidApp').controller('ChatBoxCtrl',[
         ) {
 
         $scope.isChatBoxVisible = false;
+        $scope.chatArrow = true;
 
         $scope.toggleChatBox = function(){
-            $scope.isChatBoxVisible = !$scope.isChatBoxVisible;
+
+           $scope.isChatBoxVisible = !$scope.isChatBoxVisible;
+           if($scope.isChatBoxVisible){
+                console.log("visibal");
+                $(".chat-box").addClass('active');
+                $scope.chatArrow = false;
+            }
+            else
+            {
+                $scope.chatArrow = true;
+                console.log("In-visibal");
+                $(".chat-box").removeClass('active');
+            }
+
+
+            /*$scope.isChatBoxVisible = !$scope.isChatBoxVisible;
             if($scope.isChatBoxVisible){
                 $(".chat-box-container").addClass('active');
                 $(".chat-toggle-box").addClass('active');
@@ -41,8 +57,7 @@ angular.module('ezeidApp').controller('ChatBoxCtrl',[
             else{
                 $(".chat-box-container").removeClass('active');
                 $(".chat-toggle-box").removeClass('active');
-            }
+            }*/
 
         };
-
     }]);
