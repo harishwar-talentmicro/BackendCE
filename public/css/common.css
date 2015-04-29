@@ -1448,6 +1448,25 @@ span.smallCloselink {
     padding: 0;
 }
 
+.business-manager .popover{
+    min-width: 200px;
+    background : #FFFFFF;
+}
+
+.business-manager .popover > .popover-content,.popover-title{
+    background-color:inherit;
+    color:#fff;
+}
+.business-manager .popover.right > .arrow{
+    border-right-color: #B6B6B6;
+}
+.business-manager .popover.right > .arrow:after{
+    border-right-color: #ffffff;
+}
+.business-manager .popover > .popover-title > h4{
+    color:#000;
+}
+
 .tiny{
     font-size: 80%;
 }

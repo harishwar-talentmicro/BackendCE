@@ -57,8 +57,56 @@ angular.module('ezeidApp').controller('BusinessManagerCtrl',[
         $scope.activeModule = null;
 
 
+        var modules = [
+            {
+                title : ($rootScope._userInfo.SalesModuleTitle) ? $rootScope._userInfo.SalesModuleTitle : 'Sales',
+                permission : ($rootScope._userInfo.UserModuleRights) ? $rootScope._userInfo.UserModuleRights[0] : 0,
+                listType : ($rootScope._userInfo.SalesItemListType) ? $rootScope._userInfo.SalesItemListType : 0,
+                message : ($rootScope._userInfo.SalesFormMsg) ? $rootScope._userInfo.SalesFormMsg : '',
+                icon : 'glyphicon glyphicon-stats',
+                type : 'sales'
+            },
+            {
+                title : ($rootScope._userInfo.AppointmentModuleTitle) ? $rootScope._userInfo.AppointmentModuleTitle :'Reservation',
+                permission : ($rootScope._userInfo.UserModuleRights) ? $rootScope._userInfo.UserModuleRights[1] : 0,
+                listType : ($rootScope._userInfo.ReservationItemListType) ? $rootScope._userInfo.ReservationItemListType : 0,
+                message : ($rootScope._userInfo.ReservationFormMsg) ? $rootScope._userInfo.ReservationFormMsg : '',
+                icon : 'glyphicon glyphicon-calendar',
+                type : 'reservation'
+            },
+            {
+                title : ($rootScope._userInfo.HomeDeliveryModuleTitle) ? $rootScope._userInfo.HomeDeliveryModuleTitle : 'Home Delivery',
+                permission : ($rootScope._userInfo.UserModuleRights) ? $rootScope._userInfo.UserModuleRights[2] : 0,
+                listType : ($rootScope._userInfo.HomeDeliveryItemListType) ? $rootScope._userInfo.HomeDeliveryItemListType : 0,
+                message : ($rootScope._userInfo.HomeDeliveryFormMsg) ? $rootScope._userInfo.HomeDeliveryFormMsg : '',
+                icon : 'glyphicon glyphicon-cutlery',
+                type : 'home-delivery'
+            },
+            {
+                title : ($rootScope._userInfo.ServiceModuleTitle) ? $rootScope._userInfo.ServiceModuleTitle : 'Service',
+                permission : ($rootScope._userInfo.UserModuleRights) ? $rootScope._userInfo.UserModuleRights[3] : 0,
+                listType : 1,
+                message : ($rootScope._userInfo.ServiceFormMsg) ? $rootScope._userInfo.ServiceFormMsg : '',
+                icon : 'glyphicon glyphicon-dashboard',
+                type : 'service'
+            },
+            {
+                title : ($rootScope._userInfo.CVModuleTitle) ? $rootScope._userInfo.CVModuleTitle :'Resume',
+                permission : ($rootScope._userInfo.UserModuleRights) ? $rootScope._userInfo.UserModuleRights[4] : 0,
+                listType : 1,
+                message : ($rootScope._userInfo.CVFormMsg) ? $rootScope._userInfo.CVFormMsg : '',
+                freshers : ($rootScope._userInfo.FreshersAccepted) ? true : false,
+                icon : 'glyphicon glyphicon-briefcase',
+                type : 'resume'
+            }
+        ];
+
+
+        $scope.modules = $filter('moduleFilter')(modules);
+
+
         if(!$routeParams['subview']){
-            $location.path('/business-manager');
+            $location.path('/business-manager/'+$scope.modules[0].type);
         }
         else{
             switch($routeParams['subview']){
@@ -94,55 +142,7 @@ angular.module('ezeidApp').controller('BusinessManagerCtrl',[
          * Initializes business manager after loading configuration
          */
         var init = function(){
-            var modules = [
-                {
-                    title : ($rootScope._userInfo.SalesModuleTitle) ? $rootScope._userInfo.SalesModuleTitle : 'Sales',
-                    permission : ($rootScope._userInfo.UserModuleRights) ? $rootScope._userInfo.UserModuleRights[0] : 0,
-                    listType : ($rootScope._userInfo.SalesItemListType) ? $rootScope._userInfo.SalesItemListType : 0,
-                    message : ($rootScope._userInfo.SalesFormMsg) ? $rootScope._userInfo.SalesFormMsg : '',
-                    icon : 'glyphicon glyphicon-stats',
-                    type : 'sales'
-                },
-                {
-                    title : ($rootScope._userInfo.AppointmentModuleTitle) ? $rootScope._userInfo.AppointmentModuleTitle :'Reservation',
-                    permission : ($rootScope._userInfo.UserModuleRights) ? $rootScope._userInfo.UserModuleRights[1] : 0,
-                    listType : ($rootScope._userInfo.ReservationItemListType) ? $rootScope._userInfo.ReservationItemListType : 0,
-                    message : ($rootScope._userInfo.ReservationFormMsg) ? $rootScope._userInfo.ReservationFormMsg : '',
-                    icon : 'glyphicon glyphicon-calendar',
-                    type : 'reservation'
-                },
-                {
-                    title : ($rootScope._userInfo.HomeDeliveryModuleTitle) ? $rootScope._userInfo.HomeDeliveryModuleTitle : 'Home Delivery',
-                    permission : ($rootScope._userInfo.UserModuleRights) ? $rootScope._userInfo.UserModuleRights[2] : 0,
-                    listType : ($rootScope._userInfo.HomeDeliveryItemListType) ? $rootScope._userInfo.HomeDeliveryItemListType : 0,
-                    message : ($rootScope._userInfo.HomeDeliveryFormMsg) ? $rootScope._userInfo.HomeDeliveryFormMsg : '',
-                    icon : 'glyphicon glyphicon-cutlery',
-                    type : 'home-delivery'
-                },
-                {
-                    title : ($rootScope._userInfo.ServiceModuleTitle) ? $rootScope._userInfo.ServiceModuleTitle : 'Service',
-                    permission : ($rootScope._userInfo.UserModuleRights) ? $rootScope._userInfo.UserModuleRights[3] : 0,
-                    listType : 1,
-                    message : ($rootScope._userInfo.ServiceFormMsg) ? $rootScope._userInfo.ServiceFormMsg : '',
-                    icon : 'glyphicon glyphicon-dashboard',
-                    type : 'service'
-                },
-                {
-                    title : ($rootScope._userInfo.CVModuleTitle) ? $rootScope._userInfo.CVModuleTitle :'Resume',
-                    permission : ($rootScope._userInfo.UserModuleRights) ? $rootScope._userInfo.UserModuleRights[4] : 0,
-                    listType : 1,
-                    message : ($rootScope._userInfo.CVFormMsg) ? $rootScope._userInfo.CVFormMsg : '',
-                    freshers : ($rootScope._userInfo.FreshersAccepted) ? true : false,
-                    icon : 'glyphicon glyphicon-briefcase',
-                    type : 'resume'
-                }
-            ];
-
-            $scope.modules = $filter('moduleFilter')(modules);
-
             $scope.count = [1,2,3,4,5,6,7,8,9,10];
-
-
         };
 
 

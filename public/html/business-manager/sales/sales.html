@@ -1,4 +1,4 @@
-<div class="panel panel-default">
+<div class="panel panel-default" ng-controller="SalesCtrl">
     <div class="panel-heading">
         <h3 class="text-center font-roboto">Sales</h3>
     </div>
@@ -11,7 +11,8 @@
                             <span class="glyphicon glyphicon-plus-sign"></span> Add New Row
                         </button>
                     </div>
-                    <div class="col-lg-4 col-md-4 col-sm-6 col-xs-8 pull-right">
+
+                    <div class="col-lg-3 col-md-3 col-sm-6 col-xs-8 pull-right">
                         <div class="btn-group pull-right" role="group" aria-label="First group">
                             <button type="button" class="btn btn-info bt-xs no-radius">
                                 <span class="glyphicon glyphicon-chevron-left"></span>
@@ -30,9 +31,49 @@
                                 <span class="glyphicon glyphicon-chevron-right"></span>
                                 Next
                             </button>
-
                         </div>
                     </div>
+
+                    <!--<div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 pull-right">-->
+                        <!--<div class="form-group has-success">-->
+                            <!--<select class="form-control success">-->
+                                <!--<option value="">All</option>-->
+                                <!--<option value="">New</option>-->
+                                <!--<option value="">Accepted</option>-->
+                            <!--</select>-->
+                        <!--</div>-->
+                    <!--</div>-->
+
+                    <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1 pull-right" title="Filters">
+                        <button class="btn btn-sm btn-warning no-radius" data-toggle="popover"
+                                title='<h4 class="font-open-sans-light">Filter by
+                                    <span class="pull-right glyphicon glyphicon-remove popover-close tiny"></span>
+                                </h4>'
+                                data-content='
+                                    <label class="font-open-sans-light text-info">Status Type</label>
+                                    <div class="form-group form-group-sm">
+                                        <select class="form-control">
+                                            <option value="">All</option>
+                                            <option value="">New</option>
+                                            <option value="">Accepted</option>
+                                        </select>
+                                    </div>
+
+                                    <label class="font-open-sans-light text-info">Action Type</label>
+                                    <div class="form-group  form-group-sm">
+                                        <select class="form-control">
+                                            <option value="">All</option>
+                                            <option value="">New</option>
+                                            <option value="">Accepted</option>
+                                        </select>
+                                    </div>
+                                '
+                                >
+                            <span class="glyphicon glyphicon-filter"></span> Filters
+                        </button>
+                    </div>
+
+
                 </div>
             </div>
 
@@ -164,7 +205,6 @@
                                 <span class="glyphicon glyphicon-chevron-right"></span>
                                 Next
                             </button>
-
                         </div>
                     </div>
                 </div>
