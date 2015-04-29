@@ -1383,15 +1383,19 @@ span.smallCloselink {
     color:#078FC3;
 }
 
+.business-manager .nav > li > a.active {
+    background: #1E5DA5;
+}
+
 
 .business-manager .nav > li > a:hover, .business-manager .nav > li > a:focus, .business-manager .nav > li > a:active {
     background: #007fff;
 }
 
 .business-manager .well{
-    background: #9A08CB;
+    background: #076A8C;
     color: #00D8FF;
-    border: 1px solid #DB16AC;
+    border: 1px solid #000000;
     box-shadow: 0px 0px 30px #DDD;
 }
 
@@ -1435,14 +1439,33 @@ span.smallCloselink {
     cursor: not-allowed;
 }
 
+.business-manager hr{
+    display: block;
+    height: 1px;
+    border: 1px solid transparent;
+    border-top: 1px solid #DBDBDB;
+    margin: 1em 0;
+    padding: 0;
+}
+
+.tiny{
+    font-size: 80%;
+}
+
+.tx-row{
+    padding-top: 5px;
+    padding-bottom: 5px;
+    background: #F0EFFF;
+}
+
+.tx-row:nth-child(2n+0) {
+    background: #FFFFFF;
+}
+
 .top-clearfix-half{
     margin-top:50px;
 }
 
-/*** When row contents are changed and not saved this style will apply to row ***/
-.ui-grid-row-dirty .ui-grid-cell{
-    color: #c67605;
-}
 
 
 
