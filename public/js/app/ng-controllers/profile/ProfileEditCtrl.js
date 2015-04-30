@@ -73,7 +73,6 @@ angular.module('ezeidApp').controller('ProfileEditCtrl',[
              * @todo Check Validations
              */
 
-
             var defer = $q.defer();
             var data = {
                 IDTypeID : $scope.editUserDetails.IDTypeID,
