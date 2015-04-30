@@ -88,6 +88,7 @@ angular.module('ezeidApp').controller('SearchController', [
     SearchSec.searchResult = [];
     $scope.selectedTID = [];
     var selectedAllResult = 0;
+    var selectedMarkerLocationId = 0;
 
     SearchSec.Criteria = {
         Token: '',
@@ -361,10 +362,17 @@ angular.module('ezeidApp').controller('SearchController', [
         if (positions != null) {
             for (var i = 0; i < positions.length; i++) {
                 var _item = positions[i];
+                console.log(_item);
+                console.log(selectedMarkerLocationId);
+
                 var mapIcon;
                 mapIcon = '/images/Indi_user.png';
-                var businessIcon = 'images/business-icon_48.png';
+               // var businessIcon = 'images/business-icon_48.png';
                 var individualIcon = 'images/Individual-Icon_48.png';
+                var selectedIcon = 'images/business_selected.png';
+
+                var businessIcon = (_item.TID == selectedMarkerLocationId) ? 'images/business_selected.png' : 'images/business-icon_48.png';
+
                 var pos = new google.maps.LatLng(_item.Latitude, _item.Longitude);
                 //Pushing position of markers to fit in bounds
                 latLngList.push(pos);
@@ -373,7 +381,7 @@ angular.module('ezeidApp').controller('SearchController', [
                  marker = new google.maps.Marker({
                     position: pos,
                     map: map,
-                    icon: (_item.IDTypeID == 2) ? businessIcon : individualIcon,
+                    icon: (_item.IDTypeID == 2) ?  businessIcon : individualIcon,
                     label : mTitle,
                     title: mTitle
                 });
@@ -396,15 +404,11 @@ angular.module('ezeidApp').controller('SearchController', [
 
                 google.maps.event.addListener(marker, 'click', (function (_item) {
 
-                    console.log(marker);
-
-                    // markers[indexOfMarker].setMap(null);
+                   // markers[indexOfMarker].setMap(null);
 
                     return function () {
 
-                        console.log(markers.length);
-                      //  marker.setIcon("images/business_selected.png");
-
+                        //  marker.setIcon("images/business_selected.png");
 
                         $scope.showLoadingImage = true;
                         SearchSec.showSearchWindow = false;
@@ -702,8 +706,7 @@ angular.module('ezeidApp').controller('SearchController', [
 
                         /*********************Code for checking map load and handling it with reload ends ****************/
                     }
-                    // PlaceMarker(data);//older one
-                }
+                 }
                 else {
                     // Notification.error({ message: 'Invalid key or not found…', delay: MsgDelay });
                     $scope.ShowNoDataFound = true;
@@ -723,7 +726,6 @@ angular.module('ezeidApp').controller('SearchController', [
                             }
                         });
                     }
-                    //PlaceMarker(null);
                 }
             });
     };
@@ -1278,7 +1280,6 @@ angular.module('ezeidApp').controller('SearchController', [
 
     //close download form
     SearchSec.SearchTypeKeyWord = function () {
-
         SearchSec.IsShowForm = false;
         SearchSec.IsFilterRowVisible = true;
     };
@@ -1359,7 +1360,6 @@ angular.module('ezeidApp').controller('SearchController', [
                 else
                 {
                     // Notification.error({ message: 'Invalid key or not found…', delay: MsgDelay });
-
                 }
             });
 
@@ -1380,15 +1380,18 @@ angular.module('ezeidApp').controller('SearchController', [
     function getSearchInformation(_item)
     {
         var currentDate = moment().format('YYYY-MM-DD HH:mm:ss');
+        selectedMarkerLocationId = 0;
         $rootScope.$broadcast('$preLoaderStart');
         $http({ method: 'get', url: GURL + 'ewtGetSearchInformation?Token=' + $rootScope._userInfo.Token + '&TID=' + _item.TID + '&CurrentDate=' + currentDate}).success(function (data) {
             $rootScope.$broadcast('$preLoaderStop');
             if (data != 'null') {
                 $timeout(function () {
+
+                    selectedMarkerLocationId =  data[0].LocID;
                     $scope.showLoadingImage = false;
                     SearchSec.mInfo = data[0];
 
-                    rePlaceMarker(data[0]);
+                    PlaceMarker(SearchSec.searchResult);
 
                     $scope.showSalesEnquiry = SearchSec.mInfo.VisibleModules[0];
                     $scope.showHomeDelivery = SearchSec.mInfo.VisibleModules[1];
@@ -1465,27 +1468,25 @@ angular.module('ezeidApp').controller('SearchController', [
 
                  google.maps.event.addListener(marker, 'click', (function (_item) {
 
-                 return function () {
+                 return function ()
+                 {
 
-                 $scope.showLoadingImage = true;
-                 SearchSec.showSearchWindow = false;
-                 SearchSec.showInfoWindow = true;
-                 SearchSec.showResultWindow = false;
+                     $scope.showLoadingImage = true;
+                     SearchSec.showSearchWindow = false;
+                     SearchSec.showInfoWindow = true;
+                     SearchSec.showResultWindow = false;
 
-                 $scope.ShowInfoWindow = true;
-                 $scope.ShowLinks = true;
-                 $scope.showSmallBanner = true;
-                 $scope.AddressForInfoTab = "";
-                 var sen = this;
-
-                 getSearchInformation(_item);
+                     $scope.ShowInfoWindow = true;
+                     $scope.ShowLinks = true;
+                     $scope.showSmallBanner = true;
+                     $scope.AddressForInfoTab = "";
+                     var sen = this;
+                     getSearchInformation(_item);
 
                  }
-                 })(_item));
-             }
-        }
-
-
+             })(_item));
+         }
+    }
         // To check and uncheck All check box
         $scope.toggleCheckboxAll = function(event){
             var elem = event.currentTarget;

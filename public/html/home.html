@@ -587,10 +587,10 @@
                                                                                 </td>
                                                                             </tr>
                                                                             <tr ng-repeat="_item in search.searchResult">
-                                                                                <td><input type="checkbox" data-tid="{{_item.TID}}" class="result-checkbox" name="companyID" ng-click="toggleCheckbox($event)"></td>
+                                                                                <td style="text-align: center;"><input type="checkbox" data-tid="{{_item.TID}}" class="result-checkbox" name="companyID" ng-click="toggleCheckbox($event)"></td>
                                                                                 <td data-th="User" class="resultTableCellBorder image-cell"><img width="32px" height="32px" ng-src="../images/user_32.png" /></td>
                                                                                 <td data-th="Company Name" style="color: #0866A6;" class="showPointer resultTableCellBorder">
-                                                                                    <span title="{{_item.CompanyName}}" ng-click="getSearchInfo(_item)">{{_item.CompanyName | truncate:21}}</span>
+                                                                                    <span title="{{_item.CompanyName}}" ng-click="getSearchInfo(_item)">{{_item.CompanyName | truncate:35}}</span>
                                                                                 </td>
                                                                                 <td data-th="City" title="{{_item.city}}" class="resultTableCellBorder">{{_item.city | truncate:9}}</td>
                                                                                 <td data-th="Distance" class="resultTableCellBorder">{{_item.distance}}(km)</td>
