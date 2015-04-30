@@ -311,7 +311,7 @@ angular.module('ezeidApp').controller('SearchController', [
 //    google.maps.event.addDomListener(window, 'load', initialize);
 
     function PlaceCurrentLocationMarker(location) {
-        if (marker != undefined) {
+       if (marker != undefined) {
             marker.setMap(null);
             $(".ezeid-map-label").remove();
         }
@@ -328,8 +328,14 @@ angular.module('ezeidApp').controller('SearchController', [
 
         google.maps.event.addListener(marker, 'dragend', function (e) {
 
+
+
             $rootScope.CLoc.CLat = marker.getPosition().k;
             $rootScope.CLoc.CLong = marker.getPosition().D;
+
+            console.log($rootScope.CLoc.CLat);
+            console.log($rootScope.CLoc.CLong);
+
             getReverseGeocodingData(marker.getPosition().k, marker.getPosition().D);
 //                myinfowindow.setContent('<h6>You are here</h6>');
             //myinfowindow.open(map, marker);
@@ -362,8 +368,6 @@ angular.module('ezeidApp').controller('SearchController', [
         if (positions != null) {
             for (var i = 0; i < positions.length; i++) {
                 var _item = positions[i];
-                console.log(_item);
-                console.log(selectedMarkerLocationId);
 
                 var mapIcon;
                 mapIcon = '/images/Indi_user.png';
@@ -377,8 +381,9 @@ angular.module('ezeidApp').controller('SearchController', [
                 //Pushing position of markers to fit in bounds
                 latLngList.push(pos);
                 var mTitle = (_item.IDTypeID == 2 && _item.CompanyName !== "")? _item.CompanyName : _item.Name;
-               /* var marker = new google.maps.Marker({*/
-                 marker = new google.maps.Marker({
+
+
+                var marker = new google.maps.Marker({
                     position: pos,
                     map: map,
                     icon: (_item.IDTypeID == 2) ?  businessIcon : individualIcon,
@@ -405,11 +410,12 @@ angular.module('ezeidApp').controller('SearchController', [
                 google.maps.event.addListener(marker, 'click', (function (_item) {
 
                    // markers[indexOfMarker].setMap(null);
+                    console.log("sai1");
 
                     return function () {
 
                         //  marker.setIcon("images/business_selected.png");
-
+                        console.log("sai2");
                         $scope.showLoadingImage = true;
                         SearchSec.showSearchWindow = false;
                         SearchSec.showInfoWindow = true;
@@ -1435,8 +1441,8 @@ angular.module('ezeidApp').controller('SearchController', [
              {
                  var _item = positions;
                  _item.TID = _item.LocID;
-                 var mapIcon;
-                 mapIcon = '/images/Indi_user.png';
+                /* var mapIcon;
+                 mapIcon = '/images/Indi_user.png';*/
                  var selectedIcon = 'images/business_selected.png';
                  var pos = new google.maps.LatLng(_item.Latitude, _item.Longitude);
                  //Pushing position of markers to fit in bounds
