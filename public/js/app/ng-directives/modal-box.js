@@ -6,7 +6,7 @@ angular.module('ezeidApp').directive('modal', function () {
         template: '<div class="modal fade">' +
             '<div class="modal-dialog modal-lg {{mclass}}">' +
             '<div class="modal-content">' +
-            '<span class="closelink" data-dismiss="modal" aria-hidden="true">X</span>'+
+            '<span class="closelink" data-dismiss="modal" aria-hidden="true">×</span>'+
             '<div class="modal-header">' +
 //                '<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>' +
             '<h4 class="modal-title text-center">{{ mtitle }}</h4>' +

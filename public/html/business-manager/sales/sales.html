@@ -157,7 +157,7 @@
                             </div>
 
                             <div class="col-lg-7">
-                                <button class="btn btn-xs btn-info no-radius" data-toggle="tooltip" title="View Details">
+                                <button class="btn btn-xs btn-info no-radius" data-toggle="tooltip" title="View Details" ng-click="toggleModalBox()">
                                     <span class="glyphicon glyphicon-fullscreen"></span>
                                 </button>
                                 <button class="btn btn-xs btn-success no-radius" data-toggle="tooltip" title="Save">
@@ -210,5 +210,17 @@
                 </div>
             </div>
         </div>
+        <!-- Modal Box starts -->
+        <modal mtitle="'Transaction Details'" mclass="business-manager-modal" visible="showModal">
+            <div class="container-fluid">
+              <div class="row">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                  Welcome to the Modal Box
+                </div>
+              </div>
+            </div>
+
+        </modal>
+        <!-- end: ModalBox ends -->
     </div>
 </div>

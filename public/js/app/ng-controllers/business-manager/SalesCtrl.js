@@ -36,7 +36,14 @@
             });
 
 
+            $scope.showModal = false;
+
+            $scope.toggleModalBox = function(){
+              console.log('hello');
+              $scope.showModal = !$scope.showModal;
+            };
+
+
         }]);
 
         })();
-
