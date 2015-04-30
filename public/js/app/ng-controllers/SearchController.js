@@ -947,7 +947,7 @@ angular.module('ezeidApp').controller('SearchController', [
     };
 
     // Close Sales Enquiry Form
-    SearchSec.closeSalesEnquiryForm = function () {
+    SearchSec.showSearchTab = function () {
         $('#SalesEnquiryRequest_popup').slideUp();
         SearchSec.salesMessage = "";
     };
