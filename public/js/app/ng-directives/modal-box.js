@@ -4,7 +4,7 @@
 angular.module('ezeidApp').directive('modal', function () {
     return {
         template: '<div class="modal fade">' +
-            '<div class="modal-dialog modal-lg">' +
+            '<div class="modal-dialog modal-lg {{mclass}}">' +
             '<div class="modal-content">' +
             '<span class="closelink" data-dismiss="modal" aria-hidden="true">X</span>'+
             '<div class="modal-header">' +
@@ -22,7 +22,7 @@ angular.module('ezeidApp').directive('modal', function () {
         link: function postLink(scope, element, attrs) {
 
 
-
+            scope.mclass = (attrs.mclass) ? attrs.mclass : '';
             scope.mtitle = attrs.mtitle;
             scope.$watch(attrs.visible, function(value){
                 if(value == true)
