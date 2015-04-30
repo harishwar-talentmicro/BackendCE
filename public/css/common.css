@@ -192,7 +192,7 @@
 }
 
 #map-canvasH{
-    height: 419px;
+    height: 445px;
     width: 100%;
 }
 
@@ -205,14 +205,14 @@
 
 .app-store{
     float:right;
-    margin-top:-40px;
-    padding-top:2px;
+    margin-top: -47px;
+    padding-top: 3px;
 }
 
 .apple{
     background: url('../images/logo-app_store.png');
     /*height: 50px;*/
-    height: 48px;
+    height: 37px;
     display: block;
     width: 100px;
     background-size: contain;
@@ -223,7 +223,7 @@
 .google-play{
     background: url('../images/icon-google-play.png');
     /*height: 50px;*/
-    height: 48px;
+    height: 35px;
     display: block;
     width: 100px;
     background-size: contain;
