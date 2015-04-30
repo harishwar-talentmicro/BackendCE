@@ -1,1 +1,214 @@
-<h1>This is sales module</h1>
+<div class="panel panel-default" ng-controller="SalesCtrl">
+    <div class="panel-heading">
+        <h3 class="text-center font-roboto">Sales</h3>
+    </div>
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <div class="row bottom-clearfix">
+                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
+                        <button class="btn btn-sm btn-success no-radius" data-toggle="tooltip" title="Add New Transaction">
+                            <span class="glyphicon glyphicon-plus-sign"></span> Add New Row
+                        </button>
+                    </div>
+
+                    <div class="col-lg-3 col-md-3 col-sm-6 col-xs-8 pull-right">
+                        <div class="btn-group pull-right" role="group" aria-label="First group">
+                            <button type="button" class="btn btn-info bt-xs no-radius">
+                                <span class="glyphicon glyphicon-chevron-left"></span>
+                                Prev
+                            </button>
+                            <button type="button" class="btn btn-info bt-xs no-radius">
+                                4
+                            </button>
+                            <button type="button" class="btn btn-info bt-xs no-radius active">
+                                5
+                            </button>
+                            <button type="button" class="btn btn-info bt-xs no-radius">
+                                6
+                            </button>
+                            <button type="button" class="btn btn-info bt-xs no-radius">
+                                <span class="glyphicon glyphicon-chevron-right"></span>
+                                Next
+                            </button>
+                        </div>
+                    </div>
+
+                    <!--<div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 pull-right">-->
+                        <!--<div class="form-group has-success">-->
+                            <!--<select class="form-control success">-->
+                                <!--<option value="">All</option>-->
+                                <!--<option value="">New</option>-->
+                                <!--<option value="">Accepted</option>-->
+                            <!--</select>-->
+                        <!--</div>-->
+                    <!--</div>-->
+
+                    <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1 pull-right" title="Filters">
+                        <button class="btn btn-sm btn-warning no-radius" data-toggle="popover"
+                                title='<h4 class="font-open-sans-light">Filter by
+                                    <span class="pull-right glyphicon glyphicon-remove popover-close tiny"></span>
+                                </h4>'
+                                data-content='
+                                    <label class="font-open-sans-light text-info">Status Type</label>
+                                    <div class="form-group form-group-sm">
+                                        <select class="form-control">
+                                            <option value="">All</option>
+                                            <option value="">New</option>
+                                            <option value="">Accepted</option>
+                                        </select>
+                                    </div>
+
+                                    <label class="font-open-sans-light text-info">Action Type</label>
+                                    <div class="form-group  form-group-sm">
+                                        <select class="form-control">
+                                            <option value="">All</option>
+                                            <option value="">New</option>
+                                            <option value="">Accepted</option>
+                                        </select>
+                                    </div>
+                                '
+                                >
+                            <span class="glyphicon glyphicon-filter"></span> Filters
+                        </button>
+                    </div>
+
+
+                </div>
+            </div>
+
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <!---------- Single Transaction Entry ---------------------->
+
+                <div class="row tx-row" ng-repeat="c in count track by $index">
+
+                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
+                        <div class="row">
+                            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                                TRN{{c}}
+                            </div>
+                            <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8">
+                                <small>
+                                    27 Apr 2015 <br/>
+                                    06:43 AM
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1">
+                        <b class="font-roboto">IND1</b>
+                        <br/>
+                        <small class="text-info">
+                            Indrajeet Nagda, 7597213177
+                        </small>
+                    </div>
+
+
+                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
+                        <small>42, Krishna Vihar, Jayanagar, Bengaluru, Karnataka</small>
+                    </div>
+
+                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2" title="Norton Smart Security(2), Windows 8.1(3), MS Office(4), Windows Server(12)">
+                        <small class="text-success">
+                            <b>Norton Smart Security(2), Windows 8.1(3), MS Office(4) ...</b>
+                        </small>
+                    </div>
+
+                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
+                        <div class="row">
+                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                                 <small class="text-info">Delivery In Progress</small>
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                                <label class="label label-info">Rs. 1000</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1">
+                        <b>Call</b>
+                        <br/>
+                        <small class="text-danger">
+                            28 May 2014
+                            <br/>
+                            11:04 PM
+                        </small>
+
+                    </div>
+
+
+                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
+                        <div class="row">
+                            <div class="col-lg-5 col-md-5 col-sm-6 col-xs-5">
+                                <small class="text-info tiny">
+                                    Updated By
+                                    <br/>
+                                </small>
+                                <small class="text-danger tiny">
+                                    KRUNAL
+                                    <br/>
+                                    28-05-14
+                                    <br/>
+                                    11:04 PM
+                                </small>
+
+                            </div>
+
+                            <div class="col-lg-7">
+                                <button class="btn btn-xs btn-info no-radius" data-toggle="tooltip" title="View Details">
+                                    <span class="glyphicon glyphicon-fullscreen"></span>
+                                </button>
+                                <button class="btn btn-xs btn-success no-radius" data-toggle="tooltip" title="Save">
+                                    <span class="glyphicon glyphicon-floppy-save"></span>
+                                </button>
+                                <button class="btn btn-xs btn-warning no-radius" data-toggle="tooltip" title="Edit">
+                                    <span class="glyphicon glyphicon-pencil"></span>
+                                </button>
+                            </div>
+
+
+                        </div>
+                        <div class="row">
+
+                        </div>
+                    </div>
+
+                </div>
+
+                <!----------end : Single Transaction Entry ---------------------->
+            </div>
+            <hr/>
+
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <div class="row bottom-clearfix">
+                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
+
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-sm-6 col-xs-8 pull-right">
+                        <div class="btn-group pull-right" role="group" aria-label="First group">
+                            <button type="button" class="btn btn-info bt-xs no-radius">
+                                <span class="glyphicon glyphicon-chevron-left"></span>
+                                Prev
+                            </button>
+                            <button type="button" class="btn btn-info bt-xs no-radius">
+                                4
+                            </button>
+                            <button type="button" class="btn btn-info bt-xs no-radius active">
+                                5
+                            </button>
+                            <button type="button" class="btn btn-info bt-xs no-radius">
+                                6
+                            </button>
+                            <button type="button" class="btn btn-info bt-xs no-radius">
+                                <span class="glyphicon glyphicon-chevron-right"></span>
+                                Next
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
