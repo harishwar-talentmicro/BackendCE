@@ -12,7 +12,7 @@
                         </button>
                     </div>
 
-                    <div class="col-lg-3 col-md-3 col-sm-6 col-xs-8 pull-right">
+                    <div class="col-lg-3 col-md-4 col-sm-6 col-xs-8 pull-right">
                         <div class="btn-group pull-right" role="group" aria-label="First group">
                             <button type="button" class="btn btn-info bt-xs no-radius">
                                 <span class="glyphicon glyphicon-chevron-left"></span>
@@ -77,12 +77,11 @@
                 </div>
             </div>
 
-            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <div class="col-lg-12 col-md-6 col-sm-6 col-xs-12"  ng-repeat="c in count track by $index">
+              <div class="row tx-row">
                 <!---------- Single Transaction Entry ---------------------->
 
-                <div class="row tx-row" ng-repeat="c in count track by $index">
-
-                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
+                    <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
                         <div class="row">
                             <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
                                 TRN{{c}}
@@ -97,7 +96,7 @@
                     </div>
 
 
-                    <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1">
+                    <div class="col-lg-1 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
                         <b class="font-roboto">IND1</b>
                         <br/>
                         <small class="text-info">
@@ -106,28 +105,28 @@
                     </div>
 
 
-                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
+                    <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
                         <small>42, Krishna Vihar, Jayanagar, Bengaluru, Karnataka</small>
                     </div>
 
-                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2" title="Norton Smart Security(2), Windows 8.1(3), MS Office(4), Windows Server(12)">
+                    <div class="col-lg-2  col-md-12 col-sm-12 col-xs-12 bottom-clearfix" title="Norton Smart Security(2), Windows 8.1(3), MS Office(4), Windows Server(12)">
                         <small class="text-success">
                             <b>Norton Smart Security(2), Windows 8.1(3), MS Office(4) ...</b>
                         </small>
                     </div>
 
-                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
+                    <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
                         <div class="row">
-                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                            <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
                                  <small class="text-info">Delivery In Progress</small>
                             </div>
-                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                            <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
                                 <label class="label label-info">Rs. 1000</label>
                             </div>
                         </div>
                     </div>
 
-                    <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1">
+                    <div class="col-lg-1 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
                         <b>Call</b>
                         <br/>
                         <small class="text-danger">
@@ -139,9 +138,9 @@
                     </div>
 
 
-                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
+                    <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12">
                         <div class="row">
-                            <div class="col-lg-5 col-md-5 col-sm-6 col-xs-5">
+                            <div class="col-lg-5 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
                                 <small class="text-info tiny">
                                     Updated By
                                     <br/>
@@ -156,7 +155,7 @@
 
                             </div>
 
-                            <div class="col-lg-7">
+                            <div class="col-lg-7 col-md-12 col-sm-12 col-xs-12">
                                 <button class="btn btn-xs btn-info no-radius" data-toggle="tooltip" title="View Details" ng-click="toggleModalBox()">
                                     <span class="glyphicon glyphicon-fullscreen"></span>
                                 </button>
@@ -170,10 +169,7 @@
 
 
                         </div>
-                        <div class="row">
-
-                        </div>
-                    </div>
+                      </div>
 
                 </div>
 
