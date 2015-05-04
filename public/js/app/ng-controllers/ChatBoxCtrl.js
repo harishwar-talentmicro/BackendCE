@@ -33,8 +33,8 @@ angular.module('ezeidApp').controller('ChatBoxCtrl',[
         $scope.isChatBoxVisible = false;
         $scope.chatArrow = true;
 
+        // Below function is for open/close chat window
         $scope.toggleChatBox = function(){
-
            $scope.isChatBoxVisible = !$scope.isChatBoxVisible;
            if($scope.isChatBoxVisible){
                 console.log("visibal");
@@ -60,4 +60,10 @@ angular.module('ezeidApp').controller('ChatBoxCtrl',[
             }*/
 
         };
+
+        //Open add group popup
+        $scope.openAddGroupPopup = function(){
+            console.log("SAi")
+        };
+
     }]);
