@@ -31,16 +31,20 @@
             $route
             ) {
 
+
+            $scope.showModal = false;
+
+
             $(document).on('click','.popover-close',function(){
                 $('*[data-toggle="popover"]').popover('hide');
             });
 
 
-            $scope.showModal = false;
-
             $scope.toggleModalBox = function(){
               console.log('hello');
+              console.log($scope.showModal);
               $scope.showModal = !$scope.showModal;
+              console.log($scope.showModal);
             };
 
 
