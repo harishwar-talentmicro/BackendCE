@@ -9518,6 +9518,7 @@ try{
         
     var RtnMessage = {
         IsSuccessfull:false,
+        MemberID:0
     };
     
     if(Token !=  null && GroupID != null && EZEID != null){
@@ -9527,11 +9528,14 @@ try{
                                 var query = db.escape(GroupID)+ ',' + db.escape(EZEID); 
                                     console.log('CALL pSaveGroupMembers(' + query + ')');
                                     db.query('CALL pSaveGroupMembers(' + query + ')', function (err, InsertResult) {
+                                        
                                         if (!err) {
-                                        if (InsertResult.affectedRows > 0) {
-                                        RtnMessage.IsSuccessfull = true;
-                                        res.send(RtnMessage);
-                                        console.log('FnSaveGroupMembers:Inserted sucessfully..');
+                                        if (InsertResult != null) {
+                                            var Temp = InsertResult[0];
+                                            RtnMessage.IsSuccessfull = true;
+                                            RtnMessage.MemberID = Temp[0].MemberID;
+                                            res.send(RtnMessage);
+                                            console.log('FnSaveGroupMembers:Inserted sucessfully..');
                                     }
                                     else
                                     {
@@ -9654,18 +9658,18 @@ try{
 
         var Token = req.query.Token;
         var MemberID = req.query.MemberID;
-        var GroupAdmin = req.query.GroupAdmin;
+       
         var RtnMessage = {
             IsSuccessfull: false,
             Message:''
         };
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
 
-        if (Token !=null && MemberID != null && GroupAdmin != null) {
+        if (Token !=null && MemberID != null) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
-                        var query = db.escape(Token) + ',' + db.escape(MemberID) + ',' + db.escape(GroupAdmin);
+                        var query = db.escape(MemberID);
                         console.log('CALL pDeleteGroupMembers(' + query + ')');
                         db.query('CALL pDeleteGroupMembers(' + query + ')', function (err, DeleteResult) {
                     console.log(err);
@@ -9708,9 +9712,6 @@ try{
             }
             else if (MemberID == null) {
                 console.log('FnDeleteGroupMembers: MemberID is empty');
-            }
-            else if (GroupAdmin == null) {
-                console.log('FnDeleteGroupMembers: GroupAdmin is empty');
             }
             res.statusCode=400;
             res.send(RtnMessage);
