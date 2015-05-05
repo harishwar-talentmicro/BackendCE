@@ -1164,8 +1164,8 @@ span.smallCloselink {
   color: #0099DD;
 }
 
-.modal-dialog.modal-lg.business-manager-modal > .modal-content > .modal-body >
-{ padding-top: 0px;
+
+.modal-dialog.modal-lg.business-manager-modal > .modal-content > .modal-body {
   border: 1px solid #EEE;
   border-top: none;
 }
