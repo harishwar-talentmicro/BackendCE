@@ -9392,11 +9392,11 @@ try{
                                         
                                     console.log('CALL pCreateGroup(' + query + ')');
                                     db.query('CALL pCreateGroup(' + query + ')', function (err, InsertResult) {
-                                        
                                         if (!err) {
-                                            if (InsertResult != null){                                                
+                                            if (InsertResult != null){   
+                                                var Temp = InsertResult[0];                                                
                                                 RtnMessage.IsSuccessfull = true;
-                                                RtnMessage.GroupID = InsertResult[0];
+                                                RtnMessage.GroupID = Temp[0].GroupID;
                                                 res.send(RtnMessage);
                                                 console.log('FnCreateGroup:Inserted sucessfully..');
                                             }
