@@ -14,7 +14,8 @@ angular.module('ezeidApp').controller('SearchController', [
     'GURL',
     'MsgDelay',
     '$routeParams',
-    function ($http, $rootScope, $scope, $compile, $timeout, Notification, $filter, $location, $window, $q, $interval,GURL,MsgDelay,$routeParams) {
+    'GoogleMaps',
+    function ($http, $rootScope, $scope, $compile, $timeout, Notification, $filter, $location, $window, $q, $interval,GURL,MsgDelay,$routeParams,GoogleMaps) {
 
     var map;
     var marker;
@@ -152,7 +153,7 @@ angular.module('ezeidApp').controller('SearchController', [
         $scope.gMap = map;
         var ClocBtn = (document.getElementById('mapClocH'));
         map.controls[google.maps.ControlPosition.TOP_RIGHT].push(ClocBtn)
-        var input = /** @type {HTMLInputElement} */(document.getElementById('txtSearch'));
+        var input = (document.getElementById('txtSearch'));
         var input1 = $("#txtSearch")[0];
 
         map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
@@ -164,14 +165,21 @@ angular.module('ezeidApp').controller('SearchController', [
             types: ['establishment']
         };
 
-        autocomplete = new google.maps.places.Autocomplete(input, options);
+        var autocomplete = new google.maps.places.Autocomplete(input);
+
         google.maps.event.addListener(autocomplete,'place_changed',function(){
             var place = autocomplete.getPlace();
-            $rootScope.CLoc.CLat = place.geometry.location.k;
-            $rootScope.CLoc.CLong = place.geometry.location.D;
+            console.log("SAi2");
+            console.log(place);
+            /*$rootScope.CLoc.CLat = place.geometry.location.k;
+            $rootScope.CLoc.CLong = place.geometry.location.D;*/
+
+            $rootScope.CLoc.CLat = place.geometry.location.A;
+            $rootScope.CLoc.CLong = place.geometry.location.F;
 
             var loc = new google.maps.LatLng($rootScope.CLoc.CLat, $rootScope.CLoc.CLong);
             PlaceCurrentLocationMarker(loc);
+
         });
         /********** Google Maps autocomplete ends *********/
 
@@ -180,7 +188,6 @@ angular.module('ezeidApp').controller('SearchController', [
         //directionsDisplay.setMap(map);
         // Try W3C Geolocation (Preferred)
         if (navigator.geolocation) {
-            browserSupportFlag = true;
             navigator.geolocation.getCurrentPosition(FindCurrentLocation, function () {
                 handleNoGeolocation();
             });
@@ -311,6 +318,7 @@ angular.module('ezeidApp').controller('SearchController', [
 //    google.maps.event.addDomListener(window, 'load', initialize);
 
     function PlaceCurrentLocationMarker(location) {
+        console.log("sai1222");
        if (marker != undefined) {
             marker.setMap(null);
             $(".ezeid-map-label").remove();
@@ -328,13 +336,8 @@ angular.module('ezeidApp').controller('SearchController', [
 
         google.maps.event.addListener(marker, 'dragend', function (e) {
 
-
-
             $rootScope.CLoc.CLat = marker.getPosition().k;
             $rootScope.CLoc.CLong = marker.getPosition().D;
-
-            console.log($rootScope.CLoc.CLat);
-            console.log($rootScope.CLoc.CLong);
 
             getReverseGeocodingData(marker.getPosition().k, marker.getPosition().D);
 //                myinfowindow.setContent('<h6>You are here</h6>');
