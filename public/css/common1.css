@@ -346,8 +346,6 @@ body {
 .addressTextContainer
 {
     margin-top: 0%;
-   /* height: 30px;*/
-   /* background: #FFFFFF;*/
 }
 .headerVerified
 {
@@ -1343,7 +1341,7 @@ table.rwd-table > tbody > tr > td.serachResultSelectAll
 }
 .chatMiddleContainer
 {
-    height: 502px;
+    height: 526px;
 }
 .chatBottomContainer
 {
@@ -1374,4 +1372,42 @@ table.rwd-table > tbody > tr > td.serachResultSelectAll
 .textColorGray
 {
     color: #797979;
+}
+.chatPopUpWidth
+{
+    width: 275px;
+    margin-right: 35px;
+}
+.addGroupInputContainer
+{
+    float: left;
+    width: 100%;
+}
+.cbp-spmenu-right1
+{
+  right: 0px;
+}
+.cbp-spmenu-vertical1 {
+  z-index: 999;
+  top: 70px;
+  height: 30px;
+  width: 95px;
+  background: #FFA500;
+  color: #FFFFFF;
+  padding: 5px;
+  border-radius: 5px 0px 0px 5px;
+  cursor: pointer;
+  border: 1px solid #F29300;
+}
+.cbp-spmenu-open1
+{
+  width: 450px;
+}
+.cbp-spmenu1 {
+  position: fixed;
+}
+.cbp-spmenu1, .cbp-spmenu-push {
+  -webkit-transition: all 1s ease;
+  -moz-transition: all 1s ease;
+  transition: all 1s ease;
 }
