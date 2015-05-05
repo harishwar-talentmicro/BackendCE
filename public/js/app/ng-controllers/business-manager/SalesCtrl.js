@@ -31,12 +31,26 @@
             $route
             ) {
 
+
+
+
+
             $(document).on('click','.popover-close',function(){
                 $('*[data-toggle="popover"]').popover('hide');
             });
 
+            $scope.showModal = false;
+            $scope.modalBox = {
+              title : 'Transaction Details',
+              class : 'business-manager-modal'
+            };
+
+            $scope.toggleModalBox = function(){
+              $scope.showModal = !$scope.showModal;
+            };
+
+
 
         }]);
 
-        })();
-
+})();

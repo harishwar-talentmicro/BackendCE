@@ -4,11 +4,11 @@
 angular.module('ezeidApp').directive('modal', function () {
     return {
         template: '<div class="modal fade">' +
-            '<div class="modal-dialog modal-lg">' +
+            '<div class="modal-dialog modal-lg {{ mclass }}">' +
             '<div class="modal-content">' +
-            '<span class="closelink" data-dismiss="modal" aria-hidden="true">X</span>'+
+            '<span class="closelink" data-dismiss="modal" aria-hidden="true" ng-hide="mclass">×</span>'+
             '<div class="modal-header">' +
-//                '<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>' +
+               '<button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-show="mclass">×</button>' +
             '<h4 class="modal-title text-center">{{ mtitle }}</h4>' +
             '</div>' +
             '<div class="modal-body" ng-transclude></div>' +
@@ -20,9 +20,7 @@ angular.module('ezeidApp').directive('modal', function () {
         replace:true,
         scope:true,
         link: function postLink(scope, element, attrs) {
-
-
-
+            scope.mclass = attrs.mclass;
             scope.mtitle = attrs.mtitle;
             scope.$watch(attrs.visible, function(value){
                 if(value == true)
@@ -32,6 +30,10 @@ angular.module('ezeidApp').directive('modal', function () {
             });
             scope.$watch(attrs.mtitle,function(value){
                 scope.mtitle = value;
+            });
+
+            scope.$watch(attrs.mclass,function(value){
+                scope.mclass = value;
             });
 
             $(element).on('shown.bs.modal', function(){

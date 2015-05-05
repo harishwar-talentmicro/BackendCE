@@ -182,6 +182,8 @@
                         <!--<li><a class="dash-icon" href="/home">Home</a></li>-->
 
                         <li><a class="edit-icon" href="/profile-manager/user">Profile Manager</a></li>
+                        <li ng-show="$root._userInfo.Type == 2 && $root._userInfo.Verified == 2"><a class="bulkMailer-icon" href="/business-manager">Business Manager</a></li>
+                        <li ng-show="$root._userInfo.Type == 2 && $root._userInfo.Verified !== 2"><a class="bulkMailer-icon">Business Manager</a></li>
                         <!--<li><a class="edit-icon" href="/editprofile">Edit Profile</a></li>-->
                         <!--<li><a class="addLocation-icon" href="/addloc">Locations</a></li>-->
 

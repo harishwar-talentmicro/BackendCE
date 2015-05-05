@@ -171,11 +171,10 @@ hr {
     padding-right: 0px;
     margin-bottom: 0px;
     height: auto;
-    min-height: 419px;
+    min-height: 445px;
     background: #FFFFFF;
     border-right: 2px dashed #717171;
 }
-
 .fourteenFontSize
 {
     font-size: 14px;
@@ -853,7 +852,7 @@ body {
 }
 .bannerHeaderTopMargin
 {
-    margin-top: 58px;
+    margin-top: 60px;
 }
 .WraperBottomPadding
 {
@@ -1334,9 +1333,9 @@ table.rwd-table > tbody > tr > td.serachResultSelectAll
     border-radius: 5px 0px 0px 5px;
     cursor: pointer;
     border: 1px solid #F29300;
-    -webkit-transition: all 2s ease;
-    -moz-transition: all 2s ease;
-    transition: all 2s ease;
+    -webkit-transition: all 1s ease;
+    -moz-transition: all 1s ease;
+    transition: all 1s ease;
 }
 .chatHeader
 {
@@ -1366,4 +1365,13 @@ table.rwd-table > tbody > tr > td.serachResultSelectAll
 {
     padding-right: 2px;
     padding-left: 2px;
+}
+.glowing-border:focus {
+    outline: none;
+    border-color: #9ecaed;
+    box-shadow: 0 0 10px #9ecaed;
+}
+.textColorGray
+{
+    color: #797979;
 }

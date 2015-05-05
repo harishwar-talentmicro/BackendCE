@@ -14,7 +14,8 @@
     <link href="css/common.css" rel="stylesheet">
     <link href="css/common1.css" rel="stylesheet">
     <link href="css/new-theme.css" rel="stylesheet"/>
-    <link href="css/component.css" rel="stylesheet">
+    <link href="css/component.css" rel="stylesheet"/>
+    <link href="css/common2.css" rel="stylesheet"/>
 
 </head>
 <body ng-app="ezeidApp">
@@ -65,7 +66,6 @@
                     </div>
                 </div>
             </div>
-
         </div>
 
         <div class="chatBottomContainer row setRowLeftRightMarginZero setLeftRightPaddingZero whiteTextColor" >
@@ -76,7 +76,7 @@
                 <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 emailPannelTopMargin keyWordText">
                     <img ng-src="../images/chat_icon.png">
                 </div>
-                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 topMarginButton keyWordText">
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 topMarginButton keyWordText" ng-click="openAddGroupPopup()">
                     <img ng-src="../images/add_group.png">
                 </div>
             </div>
@@ -132,13 +132,13 @@
 
     <script src="js/libs/moment.min.js"></script>
 
-    <!---- Bower Resolved : Remove this while minifying javascript(Replace this block with bower components --->
+    <!-- Bower Resolved : Remove this while minifying javascript(Replace this block with bower components -->
     <script src="js/libs/jquery-1.9.1.min.js"></script>
     <script src="js/libs/bootstrap.min.js"></script>
     <script src="js/libs/angular.min.js"></script>
     <script src="js/dependency/angular-touch/angular-touch.min.js"></script>
     <script src="js/dependency/angular-animate/angular-animate.min.js"></script>
-    <!---- end : Bower Resolved : Remove this while minifying javascript --->
+    <!-- end : Bower Resolved : Remove this while minifying javascript -->
 
     <script src="js/libs/aes.js"></script>
     <script src="js/libs/jquery.datetimepicker.js"></script>
@@ -220,5 +220,3 @@
 
 </body>
 </html>
-
-

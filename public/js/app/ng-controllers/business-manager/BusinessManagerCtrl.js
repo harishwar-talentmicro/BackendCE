@@ -106,7 +106,13 @@ angular.module('ezeidApp').controller('BusinessManagerCtrl',[
 
 
         if(!$routeParams['subview']){
+          if($scope.modules.length < 1){
+            $location.path('/');
+          }
+          else
+          {
             $location.path('/business-manager/'+$scope.modules[0].type);
+          }
         }
         else{
             switch($routeParams['subview']){
@@ -131,9 +137,15 @@ angular.module('ezeidApp').controller('BusinessManagerCtrl',[
                     $scope.activeModule = 'resume';
                     break;
                 default:
-                    $location.path('/business-manager');
+                  if($scope.modules.length < 1){
+                    $location.path('/');
+                  }
+                  else
+                  {
+                    $location.path('/business-manager/'+$scope.modules[0].type);
                     $scope.activeModule = null;
-                    break;
+                  }
+                  break;
             }
         }
 
@@ -213,6 +225,7 @@ angular.module('ezeidApp').controller('BusinessManagerCtrl',[
                     $location.path('/');
                 });
             }
+
             else{
                 if($rootScope._userInfo.Verified !== 2){
                     /**
@@ -225,6 +238,8 @@ angular.module('ezeidApp').controller('BusinessManagerCtrl',[
                 }
             }
         }
+
+
 
 
 

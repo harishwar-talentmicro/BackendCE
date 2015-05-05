@@ -1,16 +1,4 @@
-<!--<div id="" ng-controller="HomeController as Home" class="WraperBottomPadding">-->
 <div id="wrapper" ng-controller="HomeController as Home" xmlns="http://www.w3.org/1999/html">
-<!--<div ng-show="showLoadingImage" class="lodingImgContainer">-->
-<!--<div class="lodingImgContainer">
-    <div class="preloader1">
-    </div>
-</div>-->
-
-<!-- lightbox container hidden with CSS -->
-<!--<a  class="lightbox" id="img1">-->
-    <!--<img ng-src="../images/preloader.GIF">-->
-<!--</a>-->
-
     <header-section></header-section>
     <div ng-controller="SearchController as search">
 
@@ -232,28 +220,11 @@
                                     </tr>
                                </tbody>
                            </table>
-
                         </div>
-                       <!-- <div ng-show="showNoWorkingHoursFound" class="row keyWordText" >No Working hours found!!</div>-->
                         <div class="row keyWordText" >
                             <h4>Holidays</h4>
                         </div>
-                        <!--<div class="row keyWordText holidayTableContainer">-->
-                        <div class="row keyWordText">
-                            <!--<table class="setWidthHundred" border="1" style="width: 100%">
-                                <thead>
-                                    <tr class="tableHeaderBackground">
-                                        <th style="width: 25%" class="panelPd5px leftBlackBorder rightBlackBorder holidayDateCol">Date</th>
-                                        <th style="width: 75%" class="panelPd5px name_size rightBlackBorder holidayCalender">Holiday Purpose</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr ng-repeat="_item in search.holiday">
-                                        <td class="panelPd5px" class="" style="width: 25%; text-align: left;">{{_item.HolidayDate}}</td>
-                                        <td class="panelPd5px" class="" style="width: 75%; text-align: left;">{{_item.HolidayTitle}}</td>
-                                    </tr>
-                                </tbody>
-                            </table>-->
+                       <div class="row keyWordText">
                             <div style="height: 30px; overflow-y:hidden;">
                                 <table class="setWidthHundred" border="1" style="width: 100%">
                                     <thead>
@@ -483,46 +454,56 @@
                                                                 <input type="radio" class="setRadioFilterSpace" ng-model="search.Criteria.SearchType" id="JobKeywords" name="searchBy" value="3" ng-change="search.isEZEIDselected('3')" ng-click="search.SearchTypeKeyWord()" class="radioTopMargin" >
                                                                 <label class="btn-link" for="JobKeywords"> Job Keywords</label>
                                                             </div>
-                                                           <!-- <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                                                Search by
-                                                                <input type="radio" class="setRadioFilterSpace" ng-model="search.Criteria.SearchType" id="EZEID" value="1" name="searchBy" ng-change="search.isEZEIDselected('1')" class="radioTopMargin" checked>EZE ID
-                                                                 <input type="radio" class="setRadioFilterSpace" ng-model="search.Criteria.SearchType" id="Keywords" value="2" ng-change="search.isEZEIDselected('2')" ng-click="search.SearchTypeKeyWord()" name="searchBy" class="radioTopMargin">Keywords
-                                                                <input type="radio" class="setRadioFilterSpace" ng-model="search.Criteria.SearchType" name="searchBy" value="3" ng-change="search.isEZEIDselected('3')" ng-click="search.SearchTypeKeyWord()" class="radioTopMargin" >Job Keywords
-                                                            </div>-->
                                                         </div>
                                                         <div class="row addItemRowUserEzeid setTextAlignment setTopMargin">
-
-                                                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 normalFontSize setPaddingLeftRight4">
-                                                                    <div class="form-group">
-                                                                    <input id="inputEmail" class="form-control setTextAlignment" ng-model="search.Criteria.Keywords" ng-click="search.SearchTypeKeyWord()"
+                                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 normalFontSize setPaddingLeftRight4">
+                                                                <div class="form-group">
+                                                                    <input id="inputEmail" class="form-control setTextAlignment glowing-border" ng-model="search.Criteria.Keywords" ng-click="search.SearchTypeKeyWord()"
                                                                            required autofocus type="text" ng-class="search.Criteria.SearchType == 1 ? 'setUpperChar' : ''"
                                                                            placeholder="{{search.Placeholder}}">
-                                                                    </div>
+                                                                </div>
                                                             </div>
-
+                                                        </div>
+                                                        <div ng-hide="showAdvancedFilter || search.Criteria.SearchType == 1" class="row addItemRowUserEzeid setTextAlignment setTopMargin">
+                                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 normalFontSize setPaddingLeftRight4">
+                                                                <div class="form-group">
+                                                                    <!--<button class="btn btn-primary" type="button" ng-click="search.showAdvancedFilter()"><span class="glyphicon glyphicon-plus"></span> Advanced Filters</button>-->
+                                                                    <a class="setBottomMargin0 btn-link textColorGray" ng-click="search.showAdvancedFilter()"><span class="glyphicon glyphicon-plus"></span> Advanced Filters</a>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div ng-show="showAdvancedFilter" class="row addItemRowUserEzeid setTextAlignment setTopMargin">
+                                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 normalFontSize setPaddingLeftRight4">
+                                                                <div class="form-group">
+                                                                    <!--<button class="btn btn-primary" type="button" ng-click="search.hideAdvancedFilter()"><span class="glyphicon glyphicon-minus"></span> Advanced Filters</button>-->
+                                                                    <a class="setBottomMargin0 btn-link" ng-click="search.hideAdvancedFilter()"><span class="glyphicon glyphicon-minus"></span> Advanced Filters</a>
+                                                                </div>
+                                                            </div>
                                                         </div>
                                                         <div ng-hide="search.Criteria.SearchType == 1">
-                                                            <div class="row searchWithin setTopMargin fontColorType setPaddingLeftRight4">
-                                                                <div class="col-lg-2 col-md-2 col-sm-3 col-xs-3 normalFontSize removePadding input-box-height center-vertical">
-                                                                    <span class="center-vertical">Proximity of</span>
+                                                            <div ng-show="showAdvancedFilter">
+                                                                <div class="row searchWithin setTopMargin fontColorType setPaddingLeftRight4">
+                                                                    <div class="col-lg-2 col-md-2 col-sm-3 col-xs-3 normalFontSize removePadding input-box-height center-vertical">
+                                                                        <span class="center-vertical">Proximity of</span>
+                                                                    </div>
+                                                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 setLeftRightPaddingZero normalFontSize">
+                                                                        <select class="form-control" ng-model="search.Criteria.Proximity">
+                                                                            <!-- <option value="{{proximity.MilesValue}}"  ng-selected="{{proximity.MilesValue == 50}}" ng-repeat="proximity in search.proximities">{{proximity.Title}}</option>-->
+                                                                            <option value="{{proximity.MilesValue}}"  ng-selected="{{proximity.MilesValue == 0}}" ng-repeat="proximity in search.proximities">{{proximity.Title}}</option>
+                                                                            <option value="0">Any</option>
+                                                                        </select>
+                                                                    </div>
+                                                                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 normalFontSize text-right input-box-height center-vertical" >
+                                                                        <span class="center-vertical">starting from</span>
+                                                                    </div>
                                                                 </div>
-                                                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 setLeftRightPaddingZero normalFontSize">
-                                                                    <select class="form-control" ng-model="search.Criteria.Proximity">
-                                                                       <!-- <option value="{{proximity.MilesValue}}"  ng-selected="{{proximity.MilesValue == 50}}" ng-repeat="proximity in search.proximities">{{proximity.Title}}</option>-->
-                                                                        <option value="{{proximity.MilesValue}}"  ng-selected="{{proximity.MilesValue == 0}}" ng-repeat="proximity in search.proximities">{{proximity.Title}}</option>
-                                                                        <option value="0">Any</option>
-                                                                    </select>
+
+                                                                <div class="row searchButtonMarginSet setTopMargin">
+                                                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 searchAddress ">
+                                                                        <div class="addressTextContainer"><div class="inerAddTex wordwrap">{{ Address }} </div></div>
+                                                                    </div>
                                                                 </div>
-                                                                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 normalFontSize text-right input-box-height center-vertical" >
-                                                                    <span class="center-vertical">starting from</span>
-                                                                </div>
-                                                            </div>
-                                                            <div class="row searchButtonMarginSet setTopMargin">
-                                                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 searchAddress ">
-                                                                    <div class="addressTextContainer"><div class="inerAddTex wordwrap">{{ Address }} </div></div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="row centerAlign searchButtonMarginSet showPlaces setTopMargin fontColorType setPaddingLeftRight4 row-search-criteria">
+                                                                <div class="row centerAlign searchButtonMarginSet showPlaces setTopMargin fontColorType setPaddingLeftRight4 row-search-criteria">
                                                                     <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 parkingText setLeftRightPaddingZero">
                                                                         <input type="checkbox" id="ezeidChkShowParking" class="chkShowParking" ng-model="search.Criteria.ParkingStatus1" name="parking" value="1,2" checked>
                                                                         <label class="btn-link" for="ezeidChkShowParking">Parking Required</label>
@@ -546,22 +527,21 @@
                                                                         <img src="../images/smallGreyStar_16.png" ng-hide="showStar5" ng-click="search.addRatting(5,'gray')" >
                                                                         <img src="../images/smallStar_16_.png" ng-show="showStar5" ng-click="search.addRatting(5,'yellow')" >
                                                                     </div>
-
-                                                            </div>
-                                                            <div class="row centerAlign searchButtonMarginSet showPlaces setTopMargin setPaddingLeftRight4 row-search-criteria">
+                                                                </div>
+                                                                <div class="row centerAlign searchButtonMarginSet showPlaces setTopMargin setPaddingLeftRight4 row-search-criteria">
                                                                     <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 setLeftRightPaddingZero">
-                                                                    <span checked data-toggle="tooltip" data-placement="top" title="Show Business Entities providing Home Delivery.">
-                                                                        <input type="checkbox" id="ezeidHomeDelivery" class="chkShowParking" ng-model="search.Criteria.HomeDelivery1" name="parking" value="1,2">
-                                                                        <label for="ezeidHomeDelivery" class="btn-link">Need Home Delivery</label>
-                                                                    </span>
+                                                                        <span checked data-toggle="tooltip" data-placement="top" title="Show Business Entities providing Home Delivery.">
+                                                                            <input type="checkbox" id="ezeidHomeDelivery" class="chkShowParking" ng-model="search.Criteria.HomeDelivery1" name="parking" value="1,2">
+                                                                            <label for="ezeidHomeDelivery" class="btn-link">Need Home Delivery</label>
+                                                                        </span>
                                                                     </div>
                                                                     <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 setLeftRightPaddingZero" >
-                                                                    <span checked data-toggle="tooltip" data-placement="top" title="Show Business Entities that are Open(Working) now.">
-                                                                        <input type="checkbox" id="ezeidChkParking" class="chkShowParking" ng-model="search.Criteria.OpenStatus1" name="parking" value="1,2" checked>
-                                                                        <label for="ezeidChkParking" class="btn-link">Open Business only</label>
-                                                                    </span>
+                                                                        <span checked data-toggle="tooltip" data-placement="top" title="Show Business Entities that are Open(Working) now.">
+                                                                            <input type="checkbox" id="ezeidChkParking" class="chkShowParking" ng-model="search.Criteria.OpenStatus1" name="parking" value="1,2" checked>
+                                                                            <label for="ezeidChkParking" class="btn-link">Open Business only</label>
+                                                                        </span>
                                                                     </div>
-
+                                                                </div>
                                                             </div>
                                                         </div>
                                                         <div class="row centerAlign searchButtonMarginSet setTopMargin">
@@ -607,10 +587,10 @@
                                                                                 </td>
                                                                             </tr>
                                                                             <tr ng-repeat="_item in search.searchResult">
-                                                                                <td><input type="checkbox" data-tid="{{_item.TID}}" class="result-checkbox" name="companyID" ng-click="toggleCheckbox($event)"></td>
+                                                                                <td style="text-align: center;"><input type="checkbox" data-tid="{{_item.TID}}" class="result-checkbox" name="companyID" ng-click="toggleCheckbox($event)"></td>
                                                                                 <td data-th="User" class="resultTableCellBorder image-cell"><img width="32px" height="32px" ng-src="../images/user_32.png" /></td>
                                                                                 <td data-th="Company Name" style="color: #0866A6;" class="showPointer resultTableCellBorder">
-                                                                                    <span title="{{_item.CompanyName}}" ng-click="getSearchInfo(_item)">{{_item.CompanyName | truncate:21}}</span>
+                                                                                    <span title="{{_item.CompanyName}}" ng-click="getSearchInfo(_item)">{{_item.CompanyName | truncate:35}}</span>
                                                                                 </td>
                                                                                 <td data-th="City" title="{{_item.city}}" class="resultTableCellBorder">{{_item.city | truncate:9}}</td>
                                                                                 <td data-th="Distance" class="resultTableCellBorder">{{_item.distance}}(km)</td>

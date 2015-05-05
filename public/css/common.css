@@ -192,7 +192,7 @@
 }
 
 #map-canvasH{
-    height: 419px;
+    height: 445px;
     width: 100%;
 }
 
@@ -205,14 +205,14 @@
 
 .app-store{
     float:right;
-    margin-top:-40px;
-    padding-top:2px;
+    margin-top: -47px;
+    padding-top: 3px;
 }
 
 .apple{
     background: url('../images/logo-app_store.png');
     /*height: 50px;*/
-    height: 48px;
+    height: 37px;
     display: block;
     width: 100px;
     background-size: contain;
@@ -223,7 +223,7 @@
 .google-play{
     background: url('../images/icon-google-play.png');
     /*height: 50px;*/
-    height: 48px;
+    height: 35px;
     display: block;
     width: 100px;
     background-size: contain;
@@ -1138,6 +1138,37 @@ span.smallCloselink {
     width: 96px;
 }
 
+.modal-dialog.modal-lg.business-manager-modal > .modal-content {
+  background: #FFF;
+  border: 1px solid #808080;
+  box-shadow: 0px 0px 30px #696969;
+  padding: 10px;
+}
+
+
+.modal-dialog.modal-lg.business-manager-modal > .modal-content > span.closelink{
+  top: 0px;
+  right: 0px;
+  border: none;
+  background: none;
+  color: #000;
+  text-indent: 0px;
+  font-size: 20px;
+  font-weight: bold;
+  border-radius: 0px;
+}
+
+.modal-dialog.modal-lg.business-manager-modal > .modal-content > .modal-header > h4{
+  font-family : 'Open Sans Light',sans-serif;
+  font-size : 30px;
+  color: #0099DD;
+}
+
+.modal-dialog.modal-lg.business-manager-modal > .modal-content > .modal-body {
+  padding-top: 0px;
+  border: 1px solid #EEE;
+  border-top: none;
+}
 .panel .jumbotron{
     background: none;
     padding:0px;

@@ -157,8 +157,6 @@
          */
 
         $rootScope.$on("$routeChangeStart",function(event,next,current){
-            // // console.log(next.$$route.originalPath);
-
             try{
                 if(CLOSED_ROUTES.indexOf(next.$$route.originalPath) === -1
                     &&

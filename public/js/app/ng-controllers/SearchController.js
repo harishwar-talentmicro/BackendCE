@@ -37,7 +37,7 @@ angular.module('ezeidApp').controller('SearchController', [
     var rating = [1,2,3,4,5];
     $scope.showWorkingHourModel = false;
     $scope.showLoadingImage = false;
-    $scope.allBanners = [];
+    $scope.showAdvancedFilter = false;
 
     $('#datetimepicker1').datetimepicker({
         format: "d-M-Y  h:m A",
@@ -88,6 +88,7 @@ angular.module('ezeidApp').controller('SearchController', [
     SearchSec.searchResult = [];
     $scope.selectedTID = [];
     var selectedAllResult = 0;
+    var selectedMarkerLocationId = 0;
 
     SearchSec.Criteria = {
         Token: '',
@@ -193,7 +194,6 @@ angular.module('ezeidApp').controller('SearchController', [
             initialLocation = currentLoc;
             map.setCenter(initialLocation);
             PlaceCurrentLocationMarker(initialLocation);
-            //PlaceMarker(initialLocation);
         }
 
         // Listen for the event fired when the user selects an item from the
@@ -311,7 +311,7 @@ angular.module('ezeidApp').controller('SearchController', [
 //    google.maps.event.addDomListener(window, 'load', initialize);
 
     function PlaceCurrentLocationMarker(location) {
-        if (marker != undefined) {
+       if (marker != undefined) {
             marker.setMap(null);
             $(".ezeid-map-label").remove();
         }
@@ -328,8 +328,14 @@ angular.module('ezeidApp').controller('SearchController', [
 
         google.maps.event.addListener(marker, 'dragend', function (e) {
 
+
+
             $rootScope.CLoc.CLat = marker.getPosition().k;
             $rootScope.CLoc.CLong = marker.getPosition().D;
+
+            console.log($rootScope.CLoc.CLat);
+            console.log($rootScope.CLoc.CLong);
+
             getReverseGeocodingData(marker.getPosition().k, marker.getPosition().D);
 //                myinfowindow.setContent('<h6>You are here</h6>');
             //myinfowindow.open(map, marker);
@@ -362,18 +368,25 @@ angular.module('ezeidApp').controller('SearchController', [
         if (positions != null) {
             for (var i = 0; i < positions.length; i++) {
                 var _item = positions[i];
+
                 var mapIcon;
                 mapIcon = '/images/Indi_user.png';
-                var businessIcon = 'images/business-icon_48.png';
+               // var businessIcon = 'images/business-icon_48.png';
                 var individualIcon = 'images/Individual-Icon_48.png';
+                var selectedIcon = 'images/business_selected.png';
+
+                var businessIcon = (_item.TID == selectedMarkerLocationId) ? 'images/business_selected.png' : 'images/business-icon_48.png';
+
                 var pos = new google.maps.LatLng(_item.Latitude, _item.Longitude);
                 //Pushing position of markers to fit in bounds
                 latLngList.push(pos);
                 var mTitle = (_item.IDTypeID == 2 && _item.CompanyName !== "")? _item.CompanyName : _item.Name;
+
+
                 var marker = new google.maps.Marker({
                     position: pos,
                     map: map,
-                    icon: (_item.IDTypeID == 2) ? businessIcon : individualIcon,
+                    icon: (_item.IDTypeID == 2) ?  businessIcon : individualIcon,
                     label : mTitle,
                     title: mTitle
                 });
@@ -394,12 +407,15 @@ angular.module('ezeidApp').controller('SearchController', [
                 labels.push(label);
                 markers.push(marker);
 
-
-
                 google.maps.event.addListener(marker, 'click', (function (_item) {
+
+                   // markers[indexOfMarker].setMap(null);
+                    console.log("sai1");
 
                     return function () {
 
+                        //  marker.setIcon("images/business_selected.png");
+                        console.log("sai2");
                         $scope.showLoadingImage = true;
                         SearchSec.showSearchWindow = false;
                         SearchSec.showInfoWindow = true;
@@ -412,7 +428,6 @@ angular.module('ezeidApp').controller('SearchController', [
                         var sen = this;
 
                         getSearchInformation(_item);
-
                     }
                 })(_item));
             }
@@ -428,6 +443,9 @@ angular.module('ezeidApp').controller('SearchController', [
             map.fitBounds (bounds);
         }
     }
+
+
+
 
     $http({ method: 'get', url: GURL + 'ewmGetCategory?LangID=1' }).success(function (data) {
         var _obj = { CategoryID: 0, CategoryTitle: '--Any--' };
@@ -454,19 +472,17 @@ angular.module('ezeidApp').controller('SearchController', [
             SearchSec.showSearchWindow = true;
             SearchSec.showInfoWindow = false;
             SearchSec.showResultTab = false;
+            $scope.showAdvancedFilter = false;
         }
         else if(SearchSec.Criteria.SearchType == 2)
         {
             SearchSec.Placeholder = 'Type Keywords to locate products or services.';
-            //  SearchSec.showSmallBanner = true;
         }
         else
         {
             SearchSec.Placeholder = 'Type Job skill keywords to locate employers.';
-            //  SearchSec.showSmallBanner = false;
         }
         $scope.searchType = 2;
-
         return value === SearchSec.Criteria.SearchType;
     };
 
@@ -488,7 +504,8 @@ angular.module('ezeidApp').controller('SearchController', [
         $scope.AddressForInfoTab = "";
         AutoRefresh = false;
 
-        SearchSec.Criteria.CurrentDate = currentDate;
+            SearchSec.Criteria.CurrentDate = currentDate;
+
             if($rootScope._userInfo.Token == "")
             {
                 $rootScope._userInfo.Token = 2;
@@ -496,7 +513,7 @@ angular.module('ezeidApp').controller('SearchController', [
             }
             else
             {
-                // //console.log($rootScope._userInfo.Token);
+                 //console.log($rootScope._userInfo.Token);
             }
 
             SearchSec.Criteria.Latitude = $rootScope.CLoc.CLat;
@@ -508,11 +525,10 @@ angular.module('ezeidApp').controller('SearchController', [
                $rootScope.$broadcast('$preLoaderStop');
                if (data != 'null' && data.length>0)
                {
-                   $scope.SearchResultCount = data.length;
+                  $scope.SearchResultCount = data.length;
                    /*$window.localStorage.removeItem("searchResult");
                    $window.localStorage.removeItem("selectedTids");*/
                    $window.localStorage.setItem("searchResult", JSON.stringify(data));
-
 
                    if(SearchSec.Criteria.SearchType == 2 || SearchSec.Criteria.SearchType == 3)
                    {
@@ -602,8 +618,6 @@ angular.module('ezeidApp').controller('SearchController', [
                                         $scope.shoReserVation = parseInt(SearchSec.mInfo.VisibleModules[2]);
                                         $scope.showServiceRequest = parseInt(SearchSec.mInfo.VisibleModules[3]);
                                         $scope.showSendCv = parseInt(SearchSec.mInfo.VisibleModules[4]);
-
-
 
                                         //Below lines are to show address in info tab
                                         $scope.AddressForInfoTab = (SearchSec.mInfo.AddressLine1 != "") ? SearchSec.mInfo.AddressLine1 +', ' : "";
@@ -698,8 +712,7 @@ angular.module('ezeidApp').controller('SearchController', [
 
                         /*********************Code for checking map load and handling it with reload ends ****************/
                     }
-                    // PlaceMarker(data);//older one
-                }
+                 }
                 else {
                     // Notification.error({ message: 'Invalid key or not found…', delay: MsgDelay });
                     $scope.ShowNoDataFound = true;
@@ -719,7 +732,6 @@ angular.module('ezeidApp').controller('SearchController', [
                             }
                         });
                     }
-                    //PlaceMarker(null);
                 }
             });
     };
@@ -924,8 +936,18 @@ angular.module('ezeidApp').controller('SearchController', [
         }
     };
 
+    // Show Advanced filter option
+    SearchSec.showAdvancedFilter = function () {
+        $scope.showAdvancedFilter = true;
+    };
+
+    // Hide Advanced filter option
+    SearchSec.hideAdvancedFilter = function () {
+        $scope.showAdvancedFilter = false;
+    };
+
     // Close Sales Enquiry Form
-    SearchSec.closeSalesEnquiryForm = function () {
+    SearchSec.showSearchTab = function () {
         $('#SalesEnquiryRequest_popup').slideUp();
         SearchSec.salesMessage = "";
     };
@@ -1264,7 +1286,6 @@ angular.module('ezeidApp').controller('SearchController', [
 
     //close download form
     SearchSec.SearchTypeKeyWord = function () {
-
         SearchSec.IsShowForm = false;
         SearchSec.IsFilterRowVisible = true;
     };
@@ -1345,7 +1366,6 @@ angular.module('ezeidApp').controller('SearchController', [
                 else
                 {
                     // Notification.error({ message: 'Invalid key or not found…', delay: MsgDelay });
-
                 }
             });
 
@@ -1366,13 +1386,18 @@ angular.module('ezeidApp').controller('SearchController', [
     function getSearchInformation(_item)
     {
         var currentDate = moment().format('YYYY-MM-DD HH:mm:ss');
+        selectedMarkerLocationId = 0;
         $rootScope.$broadcast('$preLoaderStart');
         $http({ method: 'get', url: GURL + 'ewtGetSearchInformation?Token=' + $rootScope._userInfo.Token + '&TID=' + _item.TID + '&CurrentDate=' + currentDate}).success(function (data) {
             $rootScope.$broadcast('$preLoaderStop');
             if (data != 'null') {
                 $timeout(function () {
+
+                    selectedMarkerLocationId =  data[0].LocID;
                     $scope.showLoadingImage = false;
                     SearchSec.mInfo = data[0];
+
+                    PlaceMarker(SearchSec.searchResult);
 
                     $scope.showSalesEnquiry = SearchSec.mInfo.VisibleModules[0];
                     $scope.showHomeDelivery = SearchSec.mInfo.VisibleModules[1];
@@ -1405,6 +1430,68 @@ angular.module('ezeidApp').controller('SearchController', [
                 Notification.error({ message: 'No Results found..!', delay: MsgDelay });
             }
         });
+    }
+
+    function rePlaceMarker(positions) {
+
+            //Latitude Longitude list for setting up all markers in map display (setting bounds to display all markers in map)
+            var latLngList = [];
+            latLngList.push(new google.maps.LatLng($rootScope.CLoc.CLat, $rootScope.CLoc.CLong));
+             if (positions != null)
+             {
+                 var _item = positions;
+                 _item.TID = _item.LocID;
+                /* var mapIcon;
+                 mapIcon = '/images/Indi_user.png';*/
+                 var selectedIcon = 'images/business_selected.png';
+                 var pos = new google.maps.LatLng(_item.Latitude, _item.Longitude);
+                 //Pushing position of markers to fit in bounds
+                 latLngList.push(pos);
+                 var mTitle = (_item.IDTypeID == 2 && _item.CompanyName !== "")? _item.CompanyName : _item.FirstName;
+                 var marker = new google.maps.Marker({
+                     position: pos,
+                     map: map,
+                     icon: selectedIcon,
+                     label : mTitle,
+                     title: mTitle
+                 });
+
+                 var label = new Label({
+                 map: map
+                 });
+
+                 //$(".ezeid-map-label").remove();
+
+                 label.bindTo('position', marker, 'position');
+                 label.bindTo('text', marker, 'label');
+
+                 //  $(".ezeid-map-label").remove();
+
+                 var currentPos = google.maps.LatLng($rootScope.CLoc.CLat,$rootScope.CLoc.CLong);
+                 map.setCenter(currentPos);
+                 labels.push(label);
+                 markers.push(marker);
+
+                 google.maps.event.addListener(marker, 'click', (function (_item) {
+
+                 return function ()
+                 {
+
+                     $scope.showLoadingImage = true;
+                     SearchSec.showSearchWindow = false;
+                     SearchSec.showInfoWindow = true;
+                     SearchSec.showResultWindow = false;
+
+                     $scope.ShowInfoWindow = true;
+                     $scope.ShowLinks = true;
+                     $scope.showSmallBanner = true;
+                     $scope.AddressForInfoTab = "";
+                     var sen = this;
+                     getSearchInformation(_item);
+
+                 }
+             })(_item));
+         }
     }
         // To check and uncheck All check box
         $scope.toggleCheckboxAll = function(event){
