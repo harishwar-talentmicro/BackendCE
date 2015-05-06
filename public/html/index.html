@@ -20,53 +20,35 @@
 
 </head>
 <body ng-app="ezeidApp">
+  <div ng-controller="ChatController">
+      <div class="Popup_window form_style map_popup_iconActions" id="createGroup_popup" style="height: 103%;">
+          <div class="window_page Maping_popup chatPopUpWidth">
+              <span class="closelink" ng-click="closeAddGroupPopupForm()">X</span>
+              <form name="createGroupForm" ng-submit="createGroupForm.$valid && createNewGroup()" novalidate>
+                  <h3 class="addressTextContainer">Create Group</h3>
+                  <div class="row setRowLeftRightMarginZero setLeftRightPaddingZero">
+                      <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setLeftRightPaddingZero">
+                         <div class="form-group addGroupInputContainer setBottomMargin0">
+                           <input type="text" name="createGroup" ng-model="groupTitle" class="form-control ng-pristine ng-valid ng-touched" placeholder="Group Title" required>
+                         </div>
+                      </div>
+                  </div><br/>
+                  <div class="row setRowLeftRightMarginZero setLeftRightPaddingZero">
+                      <div class="form-group setBottomMargin0">
+                          <input type="submit" ng-disabled="!groupTitle" class="btn btn-primary text_Box" value="Create" />
+                          <input type="reset" class="btn btn-primary marR10px cancelEnq text_Box" ng-click="closeAddGroupPopupForm()" value="Close" />
+                      </div>
+                  </div>
+              </form>
+          </div>
+      </div>
     <nav class="cbp-spmenu cbp-spmenu-vertical cbp-spmenu-right" id="cbp-spmenu-s2">
-        <div class="chatHeader">
+      <div class="chatHeader">
             <h3 class="chatHeadding" style="padding-top: 7px;">Chat</h3>
         </div>
         <div class="chatMiddleContainer">
-            <div class="row setRowLeftRightMarginZero setLeftRightPaddingZero fontColorType" style="border-bottom: 1px solid #ccc;">
-                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setLeftRightPaddingZero">
-                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 setTopMarginOneNhalf keyWordText setPaddingLeftRight2">
-                        <img ng-src="../images/group_icon.png">
-                    </div>
-                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 topMarginButton setPaddingLeftRight2">
-                        <div class="row setRowLeftRightMarginZero setLeftRightPaddingZero">
-                            Family Group
-                        </div>
-                        <div class="row setRowLeftRightMarginZero setLeftRightPaddingZero">
-                            Hi all! How are you?
-                        </div>
-                    </div>
-                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 setTopMarginOneNhalf setPaddingLeftRight2">
-                        16:57
-                    </div>
-                    <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1 keyWordText setPaddingLeftRight2">
-                    </div>
-                </div>
-            </div>
-
-            <div class="row setRowLeftRightMarginZero setLeftRightPaddingZero fontColorType" style="border-bottom: 1px solid #ccc;">
-                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setLeftRightPaddingZero">
-                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 setTopMarginOneNhalf keyWordText setPaddingLeftRight2">
-                        <img ng-src="../images/user_32.png">
-                    </div>
-                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 topMarginButton setPaddingLeftRight2">
-                        <div class="row setRowLeftRightMarginZero setLeftRightPaddingZero">
-                            Harish
-                        </div>
-                        <div class="row setRowLeftRightMarginZero setLeftRightPaddingZero">
-                            I will call you in 5 mins
-                        </div>
-                    </div>
-                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 setTopMarginOneNhalf setPaddingLeftRight2">
-                        Yesterday
-                    </div>
-                    <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1  keyWordText setPaddingLeftRight2" style="height: 43px; background:#33CC33;">
-                        <div class="" style="padding-top: 12px;">5</div>
-                    </div>
-                </div>
-            </div>
+           <div ng-include="chatListing">
+           </div>
         </div>
 
         <div class="chatBottomContainer row setRowLeftRightMarginZero setLeftRightPaddingZero whiteTextColor" >
@@ -83,30 +65,20 @@
             </div>
         </div>
     </nav>
-
+  </div>
     <div class="viewport" ng-view>
     </div>
 
      <div ng-controller="ChatBoxCtrl">
-        <div id="showRight" class="chat-box" ng-click="toggleChatBox()">
-            <div ng-class="chatArrow == true ? 'glyphicon glyphicon-menu-left' : 'glyphicon glyphicon-menu-right'"> <small>Chat <span class="glyphicon glyphicon-comment"></span> </small></div>
+       <!-- <div id="showRight" class="chat-box" ng-click="toggleChatBox()"> -->
+        <div id="showRight" ng-click="toggleChatBox()">
+          <div id="showRight1" class="cbp-spmenu1 cbp-spmenu-vertical1 cbp-spmenu-right1">
+              <div ng-class="chatArrow == true ? 'glyphicon glyphicon-menu-left' : 'glyphicon glyphicon-menu-right'"> Chat <span class="glyphicon glyphicon-comment"></span></div>
+          </div>
         </div>
      </div>
 
-   <!--<div class="chat-box-container" ng-class="{{(isChatBoxVisible) ? 'active' : ''}}" ng-controller="ChatBoxCtrl">
-        <div class="chat-toggle-box" ng-click="toggleChatBox()">
-            <small><span class="glyphicon glyphicon-comment"></span> Chat</small>
-        </div>
-        <div class="chat-box">
-            <h5 class="text-center heading">Business Chat</h5>
-            <h1 class="text-center">
-                Coming Soon
-            </h1>
-            <div class="text-center">
-                <img width="180" src="images/chat_label.png" />
-            </div>
-        </div>
-    </div>-->
+
 
     <div id="progress-overlay" class="hidden">
         <div id="progress-overlay-background"></div>
@@ -120,7 +92,6 @@
                             <h1 class="text-center font-open-sans">
                                 Loading ! <br/>
                                 <small class="text-info"> Please wait ...</small>
-
                             </h1>
                         </div>
 
@@ -133,13 +104,13 @@
 
     <script src="js/libs/moment.min.js"></script>
 
-    <!---- Bower Resolved : Remove this while minifying javascript(Replace this block with bower components --->
+
     <script src="js/libs/jquery-1.9.1.min.js"></script>
     <script src="js/libs/bootstrap.min.js"></script>
     <script src="js/libs/angular.min.js"></script>
     <script src="js/dependency/angular-touch/angular-touch.min.js"></script>
     <script src="js/dependency/angular-animate/angular-animate.min.js"></script>
-    <!---- end : Bower Resolved : Remove this while minifying javascript --->
+
 
     <script src="js/libs/aes.js"></script>
     <script src="js/libs/jquery.datetimepicker.js"></script>
@@ -156,6 +127,7 @@
     <script src="js/app/modal.js"></script>
     <script src="js/app/Disclaimer.js"></script>
     <script src="js/app/ng-controllers/ChatBoxCtrl.js"></script>
+    <script src="js/app/ng-controllers/ChatController.js"></script>
     <script src="js/app/ng-controllers/HomeController.js"></script>
     <script src="js/app/ng-controllers/TermsController.js"></script>
     <script src="js/app/ng-controllers/SearchController.js"></script>
@@ -212,11 +184,18 @@
 
     <script src="js/app/classie.js"></script>
     <script>
-        var menuRight = document.getElementById( 'cbp-spmenu-s2' )
+        var menuRight = document.getElementById( 'cbp-spmenu-s2' );
+        console.log(menuRight);
         body = document.body;
         showRight.onclick = function() {
             classie.toggle( this, 'active' );
             classie.toggle( menuRight, 'cbp-spmenu-open' );
+            };
+
+        var menuRight1 = document.getElementById( 'showRight1' )
+        showRight1.onclick = function() {
+            classie.toggle( this, 'active' );
+            classie.toggle( menuRight1, 'cbp-spmenu-open1' );
         };
     </script>
 

@@ -212,7 +212,18 @@
         </div>
 
         <div class="row">
-          <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-include="'html/business-manager/modal-box.html'"></div>
+          <!-- Modal Box starts -->
+          <modal mtitle="modalBox.title" mclass="modalBox.class" visible="showModal">
+              <div class="container-fluid">
+                <div class="row">
+                  <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 transaction-details-box">
+                    Welcome to the Modal Box
+                  </div>
+                </div>
+              </div>
+          </modal>
+          <!-- end: ModalBox ends -->
+
         </div>
     </div>
 </div>
