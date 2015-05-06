@@ -116,6 +116,10 @@
                 templateUrl: 'html/landing.html',
                 controller : 'LandingPageCtrl'
             })
+            .when('/searchResult',{
+                templateUrl: 'html/result.html',
+                controller : 'SearchResultCtrl'
+            })
             .when('/:ezeid',{
                 templateUrl : 'html/home.html'
             })
