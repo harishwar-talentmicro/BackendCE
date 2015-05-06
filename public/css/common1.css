@@ -1411,3 +1411,28 @@ table.rwd-table > tbody > tr > td.serachResultSelectAll
   -moz-transition: all 1s ease;
   transition: all 1s ease;
 }
+.paddingLeft5
+{
+  padding-left: 5px;
+}
+.paddingLeft12
+{
+  padding-left: 12px;
+}
+.paddingLeft14{
+  padding-left: 14px;
+}
+.lableRecent {
+  height: 40px;
+  background: #ffffff;
+  /*margin-top: 1%;
+  margin-bottom: 1%;*/
+}
+.setMemberRowHeight{
+  height: 40px;
+}
+.marginTopBottom1
+{
+  margin-top: 1%;
+  margin-bottom: 1%;
+}

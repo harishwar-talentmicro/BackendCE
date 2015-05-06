@@ -43,7 +43,14 @@ angular.module('ezeidApp').
                 step: 1,
                 grid: true,
                 grid_snap: true,
-                keyboard : true
+                keyboard : true,
+                onChange : function(obj){
+                    /**
+                     * Values can be captured when this input is changed
+                     * var fromRange = obj.from ; var toRange = obj.to;
+                     */
+
+                }
             });
 
             $scope.isFilterShown = false;

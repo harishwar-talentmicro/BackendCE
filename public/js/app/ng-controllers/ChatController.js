@@ -30,11 +30,12 @@ angular.module('ezeidApp').controller('ChatController',[
         $routeParams
         ) {
           $scope.groupTitle = "";
-          $scope.chatListing = "/html/chat/chatListing.html"
-          $scope.groupListing = "/html/chat/groupListing.html"
+          $scope.chatListing = "html/chat/chatListing.html";
+          $scope.groupListing = "/html/chat/groupListing.html";
+          $scope.chatMessage = "/html/chat/chatMessage.html";
 
           //$scope.activeTemplate = $scope.chatListing;
-        //  $scope.activeTemplate = $scope.groupListing;
+          $scope.activeTemplate = $scope.groupListing;
 
         //Open add group popup
         $scope.openAddGroupPopup = function(){
@@ -63,8 +64,8 @@ angular.module('ezeidApp').controller('ChatController',[
             console.log(data);
                if (data != 'null')
                {
-                //  $scope.groupTitle = "";
-              //    $scope.activeTemplate = $scope.groupListing;
+                  $scope.groupTitle = "";
+                  $scope.activeTemplate = $scope.groupListing;
                   //  salesEnquiry._info = {};
                    //
                   //  $scope.formTitle = "Bulk Sales Enquiry";
