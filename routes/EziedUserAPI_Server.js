@@ -9168,12 +9168,6 @@ try{
     
     if (!ChatID)
         ChatID = 0;
-    
-//    var now = new Date(); 
-//    var CurrentDate_utc = new Date(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(),  now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds());
-    console.log(req.body);
-    console.log(now);  
-    console.log(CurrentDate_utc);  
     var RtnMessage = {
             IsSuccessfull: false,
             ChatID:0
@@ -9184,7 +9178,7 @@ try{
                     if (Result != null) {
                         console.log('ChatID:'+ChatID);
                         if(ChatID == 0){
-                            var Query = 'select max(ChatID) as ChatID from tchatMaster';
+                            var Query = 'select max(ChatMsgID) as ChatID from tchatbox';
                             db.query(Query, function (err, Result){
                                 console.log('Result');
                                 console.log(Result);
@@ -9385,10 +9379,7 @@ try{
     
     var Token = req.body.Token;
     var GroupTitle = req.body.GroupTitle;
-    var GroupID = req.body.GroupID;
     
-    if(!GroupID)
-        GroupID = 0;
     var RtnMessage = {
             IsSuccessfull: false,
             GroupID:0
@@ -9397,27 +9388,15 @@ try{
         FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
-                        if(GroupID == 0){
-                            var Query = 'select max(GroupID) as GroupID from tgroupmaster';
-                            db.query(Query, function (err, Result){
-                                if(!err){
-                                    var MaxGroupID = Result[0].GroupID;
-                                    console.log(MaxGroupID);
-                                    GroupID = MaxGroupID + 1;
-                                    console.log(GroupID);
-                                }
-                                else{
-                                    console.log('FnCreateGroup:Error in generate GroupID');
-                                    res.send(RtnMessage);
-                                }
-                                var query = db.escape(Token) + ',' + db.escape(GroupID) + ',' + db.escape(GroupTitle);
+                                var query = db.escape(Token) + ',' + db.escape(GroupTitle);
                                         
-                                    console.log('CALL pSaveGroupChatList(' + query + ')');
-                                    db.query('CALL pSaveGroupChatList(' + query + ')', function (err, InsertResult) {
+                                    console.log('CALL pCreateGroup(' + query + ')');
+                                    db.query('CALL pCreateGroup(' + query + ')', function (err, InsertResult) {
                                         if (!err) {
-                                            if (InsertResult != null) {
+                                            if (InsertResult != null){   
+                                                var Temp = InsertResult[0];                                                
                                                 RtnMessage.IsSuccessfull = true;
-                                                RtnMessage.GroupID = GroupID;
+                                                RtnMessage.GroupID = Temp[0].GroupID;
                                                 res.send(RtnMessage);
                                                 console.log('FnCreateGroup:Inserted sucessfully..');
                                             }
@@ -9432,9 +9411,7 @@ try{
                                             res.send(RtnMessage);
                                         }
                                     });
-                            });
                         }
-                    }
                     else {
                         res.statusCode = 401;
                         res.send(RtnMessage);
@@ -9477,7 +9454,7 @@ try{
         FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
-                        var Query = 'select * from tgroupmaster';
+                        var Query = 'select TID as GroupID,MasterID,GroupTitle from mgroup';
                             db.query(Query, function (err, GetResult){
                                 if (!err) {
                                     if (GetResult != null) {
@@ -9538,42 +9515,27 @@ try{
     var Token = req.body.Token;
     var GroupID = req.body.GroupID;
     var EZEID = req.body.EZEID;
-    var GroupAdmin = req.body.GroupAdmin;
-    
+        
     var RtnMessage = {
         IsSuccessfull:false,
         MemberID:0
     };
     
-    if(Token !=  null && GroupID != null && EZEID != null && GroupAdmin != null){
+    if(Token !=  null && GroupID != null && EZEID != null){
         FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
-                        var Query = 'select max(MemberID) as MemberID from tgroupmembers';
-                            db.query(Query, function (err, Result){
-                                if(!err){
-                                    var MaxMemberID = Result[0].MemberID;
-                                    console.log(MaxMemberID);
-                                    MemberID = MaxMemberID + 1;
-                                    console.log(MemberID);
-                                }
-                                else{
-                                    console.log('FnSaveGroupMembers:Error in generate MemberID');
-                                    
-                                }
-                                var query = db.escape(Token) + ',' + db.escape(GroupID) + ',' + db.escape(MemberID) 
-                                    + ',' + db.escape(EZEID) + ',' + db.escape(GroupAdmin);
-                                        
+                                var query = db.escape(GroupID)+ ',' + db.escape(EZEID); 
                                     console.log('CALL pSaveGroupMembers(' + query + ')');
                                     db.query('CALL pSaveGroupMembers(' + query + ')', function (err, InsertResult) {
-                                        console.log(InsertResult);
-                                        console.log(err);
+                                        
                                         if (!err) {
-                                        if (InsertResult.affectedRows > 0) {
-                                        RtnMessage.IsSuccessfull = true;
-                                        RtnMessage.MemberID = MemberID;
-                                        res.send(RtnMessage);
-                                        console.log('FnSaveGroupMembers:Inserted sucessfully..');
+                                        if (InsertResult != null) {
+                                            var Temp = InsertResult[0];
+                                            RtnMessage.IsSuccessfull = true;
+                                            RtnMessage.MemberID = Temp[0].MemberID;
+                                            res.send(RtnMessage);
+                                            console.log('FnSaveGroupMembers:Inserted sucessfully..');
                                     }
                                     else
                                     {
@@ -9586,7 +9548,6 @@ try{
                                     res.send(RtnMessage);
                                     }
                                 });
-                            });
                     }
                     else {
                         res.statusCode = 401;
@@ -9609,9 +9570,6 @@ try{
         }
         else if(EZEID == null ){
             console.log('FnSaveGroupMembers:EZEID is empty');
-        }
-        else if(GroupAdmin == null ){
-            console.log('FnSaveGroupMembers:GroupAdmin is empty');
         }
         res.statusCode = 400;
         res.send('null');
@@ -9700,18 +9658,18 @@ try{
 
         var Token = req.query.Token;
         var MemberID = req.query.MemberID;
-        var GroupAdmin = req.query.GroupAdmin;
+       
         var RtnMessage = {
             IsSuccessfull: false,
             Message:''
         };
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
 
-        if (Token !=null && MemberID != null && GroupAdmin != null) {
+        if (Token !=null && MemberID != null) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
-                        var query = db.escape(Token) + ',' + db.escape(MemberID) + ',' + db.escape(GroupAdmin);
+                        var query = db.escape(MemberID);
                         console.log('CALL pDeleteGroupMembers(' + query + ')');
                         db.query('CALL pDeleteGroupMembers(' + query + ')', function (err, DeleteResult) {
                     console.log(err);
@@ -9754,9 +9712,6 @@ try{
             }
             else if (MemberID == null) {
                 console.log('FnDeleteGroupMembers: MemberID is empty');
-            }
-            else if (GroupAdmin == null) {
-                console.log('FnDeleteGroupMembers: GroupAdmin is empty');
             }
             res.statusCode=400;
             res.send(RtnMessage);
