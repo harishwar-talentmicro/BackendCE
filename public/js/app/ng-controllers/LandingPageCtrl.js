@@ -48,6 +48,12 @@ angular.module('ezeidApp').
                 'Job Keywords'
             ];
 
+            $scope.placeHolderText = [
+                'Type EZEID here',
+                'Type keywords to locate products and services',
+                'Type Job Skill Keywords to locate employers'
+            ];
+
             $scope.searchParams = {
                 searchType : 1,
                 searchTerm : '',
@@ -86,6 +92,9 @@ angular.module('ezeidApp').
              * Triggers Search
              */
             $scope.triggerSearch = function(){
+                if($scope.searchParams.searchTerm.length < 1){
+                    return false;
+                }
                 var modifyValue = [
                     'homeDelivery',
                     'parkingStatus',
@@ -114,7 +123,7 @@ angular.module('ezeidApp').
              * @param e
              */
             $scope.checkEnterKey = function(e){
-                if(e.which === 13 && $scope.searchParams.searchTerm.length > 0){
+                if(e.charCode === 13 && $scope.searchParams.searchTerm.length > 0){
                     $scope.triggerSearch();
                 }
             };

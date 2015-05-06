@@ -37,11 +37,11 @@
                             <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><b>{{searchType[searchParams.searchType]}}</b> <span class="caret"></span></button>
                             <ul class="dropdown-menu" role="menu">
                                 <li class="btn-link" ng-repeat="search in searchType track by $index">
-                                    <a class="btn-link" ng-click="(searchParams.searchType = $index)(searchParams.searchTerm = '')">{{search}}</a>
+                                    <a class="btn-link" ng-click="($event.preventDefault())(searchParams.searchType = $index) (searchParams.searchTerm = '')">{{search}}</a>
                                 </li>
                             </ul>
                         </div>
-                        <input type="text" ng-keypress="checkEnterKey($event)" ng-model="searchParams.searchTerm" ng-class="(searchParams.searchType === 0) ? 'text-uppercase' : ''" class="form-control" aria-label="...">
+                        <input type="text" ng-keypress="checkEnterKey($event)" placeholder="{{placeHolderText[searchParams.searchType]}}" ng-model="searchParams.searchTerm" ng-class="(searchParams.searchType === 0) ? 'text-uppercase' : ''" class="form-control" aria-label="...">
                         <div class="input-group-btn">
                             <button type="button" class="btn btn-default" title="search" ng-click="triggerSearch()"><i class="fa fa-search"></i> </button>
                             <button  ng-click="toggleFilterContainer($event,true)"
