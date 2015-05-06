@@ -167,7 +167,6 @@ angular.module('ezeidApp').controller('SearchController', [
             var loc = new google.maps.LatLng($rootScope.CLoc.CLat, $rootScope.CLoc.CLong);
             PlaceCurrentLocationMarker(loc);
 
-
             if (place.length == 0) {
                 return;
             }
@@ -220,6 +219,13 @@ angular.module('ezeidApp').controller('SearchController', [
 
         //Map Right click Listener
         google.maps.event.addListener(map, 'rightclick', function(event) {
+
+            for (var i = 0, marker; marker = markers[i]; i++) {
+                $(".ezeid-map-label").remove();
+                marker.setMap(null);
+            }
+            markers = [];
+
             $rootScope.CLoc = {
                 CLat : 0,
                 CLong : 0
