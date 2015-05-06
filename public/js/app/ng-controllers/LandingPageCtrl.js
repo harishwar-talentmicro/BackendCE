@@ -36,10 +36,23 @@ angular.module('ezeidApp').
             )
         {
 
+            $("#range_29").ionRangeSlider({
+                type: "double",
+                min: 1,
+                max: 5,
+                step: 1,
+                grid: true,
+                grid_snap: true,
+                keyboard : true
+            });
+
             $scope.isFilterShown = false;
 
             $scope.toggleFilterContainer = function(e){
                     $scope.isFilterShown = !$scope.isFilterShown;
             };
+
+
+
 
         }]);
