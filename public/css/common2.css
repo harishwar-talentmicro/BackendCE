@@ -1,3 +1,331 @@
 /**
  * This CSS is maintained by sandeep
  */
+
+/* Preface */
+/* hpw -  home page wrapper */
+
+/* Style for home page of Ezeid */
+.hpw .bg-image
+{
+    background: url('../images/front-page-bg.jpg');
+    height: 100%;
+    background-size: cover;
+}
+
+#home-page-wrapper{
+    background: url('../images/front-page-bg.jpg');
+    height: 75%;
+    background-size: cover;
+    background-position-y: -140px;
+}
+.hpw .logo
+{
+    content: url(https://www.ezeid.com/images/logo.png);
+    background-position:top;
+    width: 100%;
+}
+
+.hpw .header-item
+{
+    padding-top: 10px;
+}
+
+.hpw .header
+{
+    background: none;
+    position: absolute;
+    font-size: 14px;
+    min-width: 1024px;
+    /*position: fixed;*/
+    z-index: 1005;
+    height: 44px;
+    left: 0;
+    right: 0;
+    padding: 0 10px;
+    top: 0;
+    color: #fff;
+    background-size: cover;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.hpw .header .header-group {
+    height: 44px;
+    float: left;
+    margin: 0 10px 0 0;
+    position: relative;
+    padding-left: 10px;
+}
+
+.hpw .header .header-title
+{
+    color: #ffffff;
+    font-size: large;
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 600;
+}
+
+.hpw .header-logo
+{
+    margin-right: 12px;
+    margin-top:10px;
+    box-shadow: 0px 0px 50px #FFF;
+    border: 1px solid #FFF;
+}
+
+.hpw .landing-center {
+    white-space: normal;
+    vertical-align: middle;
+    display: inline-block;
+    position: relative;
+    padding: 15%;
+    width: 100%;
+    text-align: center;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+}
+
+.hpw .h1 {
+    font-weight: bold;
+    font-size: 53px;
+    line-height: 68%;
+    color:#fff;
+    text-transform: uppercase;
+    text-shadow: 1px 1px 6px rgba(0,0,0,0.2);
+}
+
+.hpw .h4 {
+    font-weight: bold;
+    font-size: 23px;
+    line-height: 68%;
+    color:#fff;
+    text-transform: uppercase;
+    text-shadow: 1px 1px 6px rgba(0,0,0,0.2);
+    padding-top: 10px;
+}
+
+.hpw .search-bar
+{
+    width: 100%;
+    padding-top: 10px;
+    text-align: center;
+}
+
+.hpw .search-input
+{
+    width: 47%;
+    border: cadetblue 1px solid;
+    height: 44px;
+    height: 44px;
+    padding-left: 10px;
+    background-color: rgb(247, 247, 247);
+}
+
+.hpw .main-title
+{
+    font-size: 30px;
+    line-height: 50%;
+    color: #fff;
+    text-shadow: 1px 1px 6px rgba(0,0,0,0.2);
+    padding-top: 10px;
+    font-family: 'Jura',sans-serif;
+}
+
+.hpw .main-subtitle
+{
+    font-size: 15px;
+    line-height: 50%;
+    color: #E8E6E6;
+    text-shadow: 1px 1px 6px rgba(0,0,0,0.4);
+    padding-top: 2%;
+    font-family: 'Jura',sans-serif;
+}
+
+.hpw .m_top_10
+{
+    margin-top: 10px;
+}
+
+.hpw .filter-container{
+    background: #ffffff;
+    height: auto;
+    position: absolute;
+}
+
+.hpw .filter-text-highlight
+{
+    height: 20%;
+    background-color: rgb(228, 227, 226);
+}
+
+.hpw .p-bottom-3
+{
+    padding-bottom: 3px;
+}
+
+.hpw .p-bottom-3
+{
+    padding-bottom: 3px;
+}
+
+.hpw .advance-filter-content
+ {
+    padding-top: 3px;
+ }
+
+.hpw .filter-item-border
+{
+    padding: 10px;
+    border-bottom: 1px solid #DFDADA;;
+}
+
+.hpw .p-top-10
+{
+    padding-top: 10px;
+}
+
+.hpw .select-items
+{
+    padding: 5px;
+    line-height: 10px;
+}
+
+.hpw .select-items:hover
+{
+    padding: 5px;
+    background-color: rgb(221, 219, 239);
+    line-height: 10px;
+}
+
+.hpw .border-style-right
+{
+    border-right: 1px solid rgb(213, 213, 213);
+    border-right-style: dotted;
+}
+
+.hpw .border-style-bottom
+{
+    border-bottom: 3px solid rgb(49, 176, 213);
+}
+
+/* description page styles */
+.hpw .description-page
+{
+    /*background-color: #6AC3AF;*/
+    padding-top: 10px;
+    position: relative;
+    /*color: #fff;*/
+}
+
+.hpw .footer-main-content
+{
+    font-weight: 700;
+}
+
+.hpw .p-top-30
+{
+    padding-top: 30px;
+}
+
+.hpw .width-75
+{
+    width: 75% !important;
+}
+
+.hpw .width-81
+{
+    width: 81% !important;
+}
+
+.hpw .text-desc
+{
+    color:#9494B3 !important;
+}
+
+.text-bolder
+{
+    font-weight: bolder;
+}
+
+.hpw .description-content
+{
+    padding-top: 15px;
+}
+
+.hpw .text-orange
+{
+    color: orange;
+}
+
+.hpw .description-tab
+{
+    padding-top: 10px;
+}
+
+.hpw .description-tab:hover
+{
+    background-color: rgb(218, 232, 231);
+}
+
+.hpw .description-title
+{
+    color: rgb(5, 99, 145);
+    font-weight: bolder;
+}
+
+/* footer page */
+.hpw .footer-page
+{
+    background-color: #000000;
+    color: #ffffff;
+    padding-top: 10px;
+}
+/* css for line seperator */
+/* Gradient transparent - color - transparent */
+
+hr.style-one {
+    border: 0;
+    height: 1px;
+    background-image: -webkit-linear-gradient(left, rgba(0,0,0,0), rgba(255, 255, 255, 0.75), rgba(0,0,0,0));
+    background-image:    -moz-linear-gradient(left, rgba(0,0,0,0), rgba(0,0,0,0.75), rgba(0,0,0,0));
+    background-image:     -ms-linear-gradient(left, rgba(0,0,0,0), rgba(0,0,0,0.75), rgba(0,0,0,0));
+    background-image:      -o-linear-gradient(left, rgba(0,0,0,0), rgba(0,0,0,0.75), rgba(0,0,0,0));
+}
+hr.style-two {
+    border: 0;
+    height: 1px;
+    background-image: -webkit-linear-gradient(left, rgba(0,0,0,0), rgba(35, 17, 142, 0.75), rgba(0,0,0,0));
+    background-image:    -moz-linear-gradient(left, rgba(0,0,0,0), rgba(0,0,0,0.75), rgba(0,0,0,0));
+    background-image:     -ms-linear-gradient(left, rgba(0,0,0,0), rgba(0,0,0,0.75), rgba(0,0,0,0));
+    background-image:      -o-linear-gradient(left, rgba(0,0,0,0), rgba(0,0,0,0.75), rgba(0,0,0,0));
+}
+
+/* result page styles goes here */
+.hpw .fixed-pos
+{
+    position: fixed;
+}
+
+.hpw .height-80
+{
+    height: 80%;
+}
+
+.rpw .header
+{
+    padding-bottom: 10px;
+    background-color: #000000 !important;
+}
+
+.rpw .logo{
+    height: auto;
+    padding: 4px;
+    width: auto;
+}
+
+.rpw .header-btn
+{
+    padding-top: 4px;
+}
