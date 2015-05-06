@@ -1,23 +1,27 @@
-<section id="home-page-wrapper" class="hpw" ng-controller="LandingPageCtrl">
-    <!-- Header Menu goes here -->
-    <div class="header">
-        <!-- Menu Contentent: Left -->
-        <div class="header-group header-main">
-            <div class="header-logo logo"></div>
-        </div>
-        <!-- Menu Contents: Right -->
-        <div class="header-group pull-right header-item">
-            <div class="btn-group">
-                <div class="btn btn-info dropdown-toggle no-radius" data-toggle="dropdown"><b>Download App <span class="caret"></span></b></div>
-                <ul class="dropdown-menu" role="menu">
-                    <li class="text text-danger"><a href="#"><i class="fa fa-apple text-danger"></i> <b class="text text-danger">App Store</b></a></li>
-                    <li><a href="#"><i class="fa fa-google text text-success"></i> <b class="text text-success">Google Play</b></a></li>
-                </ul>
+<section id="home-page-wrapper" class="hpw">
+    <!-- New header menu goes here -->
+    <nav class="navbar navbar-head">
+        <div class="container-fluid">
+            <!-- Header content - left :Logo goes here -->
+            <div class="navbar-header">
+                <div class="logo p-top-10">
+                </div>
             </div>
-            <div class="btn btn-success  no-radius" title="sign in"><i class="fa fa-sign-in"></i></div>
-            <div class="btn btn-warning  no-radius" title="sign up"><i class="fa fa-user"></i></div>
-        </div>
-    </div>
+
+            <!-- Header content -right  -->
+            <div class="nav navbar-nav navbar-right p-top-10 p-right-10">
+                <div class="btn-group">
+                    <div class="btn btn-info dropdown-toggle no-radius" data-toggle="dropdown"><b>Download App <span class="caret"></span></b></div>
+                    <ul class="dropdown-menu" role="menu">
+                        <li class="text text-danger"><a href="#"><i class="fa fa-apple text-danger"></i> <b class="text text-danger">App Store</b></a></li>
+                        <li><a href="#"><i class="fa fa-google text text-success"></i> <b class="text text-success">Google Play</b></a></li>
+                    </ul>
+                </div>
+                <div class="btn btn-success  no-radius" title="sign in"><i class="fa fa-sign-in"></i></div>
+                <div class="btn btn-warning  no-radius" title="sign up"><i class="fa fa-user"></i></div>
+            </div>
+        </div><!-- /.container-fluid -->
+    </nav>
     <!-- Header Menu ends here -->
 
     <!-- Mid contents of the Header image goes here -->
@@ -44,7 +48,11 @@
                                      type="button" class="btn btn-info dropdown-toggle btn-advanced-filter" data-toggle="dropdown" title="advance search"><i class="fa fa-filter"></i> </button>
                         </div>
                     </div>
-                    <div class="filter-container" ng-show="isFilterShown">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 col-lg-offset-3 col-md-offset-3 col-sm-offset-3 col-xs-offset-0">
+                    <div class="filter-container animation-slideup" ng-show="isFilterShown">
                         <div class="container text text-center filter-text-highlight">
                             <i>Advance Filters</i>
                         </div>
@@ -53,21 +61,22 @@
                             <div class="container">
                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 p-bottom-3 filter-item-border">
                                     <div class="text-left text-primary"><b>Proximity of:</b></div>
-                                    <select class="form-control">
-                                        <!-- ngRepeat: proximity in search.proximities -->
-                                        <option value="1">1 mile (1.6 km)</option><!-- end ngRepeat: proximity in search.proximities -->
-                                        <option value="2">2 mile (3.2 km)</option><!-- end ngRepeat: proximity in search.proximities -->
-                                        <option value="3">5 mile (8 km)</option><!-- end ngRepeat: proximity in search.proximities -->
-                                        <option value="4">10 mile (16 km)</option><!-- end ngRepeat: proximity in search.proximities -->
-                                        <option value="5">25 mile (40 km)</option><!-- end ngRepeat: proximity in search.proximities -->
-                                        <option value="6">50 mile (80 km)</option><!-- end ngRepeat: proximity in search.proximities -->
-                                        <option value="7">Any</option>
-                                    </select>
+                                    <div class="form-group">
+                                        <select name="proximity" class="form-control">
+                                            <option value="1">1 mile (1.6 km)</option>
+                                            <option value="2">2 mile (3.2 km)</option>
+                                            <option value="3">5 mile (8 km)</option>
+                                            <option value="4">10 mile (16 km)</option>
+                                            <option value="5">25 mile (40 km)</option>
+                                            <option value="6">50 mile (80 km)</option>
+                                            <option value="7">Any</option>
+                                        </select>
+                                    </div>
                                 </div>
                                 <br>
 
                                 <div class="row">
-                                    <div class="container  text-left">
+                                    <div class="text-left">
                                         <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 p-top-10 border-style-right">
                                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 select-items">
                                                 <input type="checkbox" id="item1" class="chkShowParking" name="parking" value="1,1" >
@@ -86,7 +95,8 @@
                                             </div>
                                         </div>
                                         <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 p-top-10 text-warning">
-                                            <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star-half"></i>
+                                            <span class="text text-info text-bolder">Filter by ratings:</span>
+                                            <input id="range_29" />
                                         </div>
                                     </div>
                                 </div>
@@ -97,7 +107,7 @@
             </div>
         </div>
     </div>
-    <div class="description-page">
+    <div class="description-page negetive-z-index">
         <div class="container width-75 p-top-30">
             <div class="desctiption-title font-roboto">
                 <h3 class="text text-info text-center">Our Services</h3>

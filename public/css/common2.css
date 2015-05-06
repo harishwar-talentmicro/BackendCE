@@ -26,6 +26,14 @@
     width: 100%;
 }
 
+@media screen and (max-width: 768px) {
+    .hpw .logo {
+        content: url(https://www.ezeid.com/images/logo.png);
+        background-position:top;
+        width: 10%;
+    }
+}
+
 .hpw .header-item
 {
     padding-top: 10px;
@@ -49,6 +57,13 @@
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
+}
+
+.hpw .navbar-head
+{
+    position: absolute;
+    z-index: 1000;
+    width:100%
 }
 
 .hpw .header .header-group {
@@ -151,7 +166,6 @@
 .hpw .filter-container{
     background: #ffffff;
     height: auto;
-    position: absolute;
 }
 
 .hpw .filter-text-highlight
@@ -186,6 +200,11 @@
     padding-top: 10px;
 }
 
+.hpw .p-right-10
+{
+    padding-right: 10px;
+}
+
 .hpw .select-items
 {
     padding: 5px;
@@ -217,6 +236,11 @@
     padding-top: 10px;
     position: relative;
     /*color: #fff;*/
+}
+
+.hpw .negetive-z-index
+{
+    z-index:-1000;
 }
 
 .hpw .footer-main-content

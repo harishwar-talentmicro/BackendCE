@@ -230,7 +230,7 @@ app.use(function(req, res, next) {
             res.type('json').send('Invalid Service call');   
     }
     else{
-        res.redirect('/');
+        res.send('');
     }
 });
 
