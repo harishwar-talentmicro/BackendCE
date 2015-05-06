@@ -14,8 +14,7 @@ angular.module('ezeidApp').controller('SearchController', [
     'GURL',
     'MsgDelay',
     '$routeParams',
-    'GoogleMaps',
-    function ($http, $rootScope, $scope, $compile, $timeout, Notification, $filter, $location, $window, $q, $interval,GURL,MsgDelay,$routeParams,GoogleMaps) {
+    function ($http, $rootScope, $scope, $compile, $timeout, Notification, $filter, $location, $window, $q, $interval,GURL,MsgDelay,$routeParams) {
 
     var map;
     var marker;
@@ -154,7 +153,6 @@ angular.module('ezeidApp').controller('SearchController', [
         var ClocBtn = (document.getElementById('mapClocH'));
         map.controls[google.maps.ControlPosition.TOP_RIGHT].push(ClocBtn)
         var input = (document.getElementById('txtSearch'));
-        var input1 = $("#txtSearch")[0];
 
         map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
 
@@ -165,27 +163,37 @@ angular.module('ezeidApp').controller('SearchController', [
             types: ['establishment']
         };
 
-        var autocomplete = new google.maps.places.Autocomplete(input);
+       // var autocomplete = new google.maps.places.Autocomplete(input);
+        var autocomplete = new google.maps.places.Autocomplete(input, {
+            types: ["geocode"]
+        });
 
-        google.maps.event.addListener(autocomplete,'place_changed',function(){
+       google.maps.event.addListener(autocomplete,'place_changed',function(){
             var place = autocomplete.getPlace();
             console.log("SAi2");
-            console.log(place);
-            /*$rootScope.CLoc.CLat = place.geometry.location.k;
+
+            if (place.geometry.viewport) {
+                map.fitBounds(place.geometry.viewport);
+            } else {
+                map.setCenter(place.geometry.location);
+                map.setZoom(17);
+            }
+             /*$rootScope.CLoc.CLat = place.geometry.location.k;
             $rootScope.CLoc.CLong = place.geometry.location.D;*/
 
             $rootScope.CLoc.CLat = place.geometry.location.A;
             $rootScope.CLoc.CLong = place.geometry.location.F;
 
+            console.log($rootScope.CLoc.CLat);
+            console.log($rootScope.CLoc.CLong);
+
             var loc = new google.maps.LatLng($rootScope.CLoc.CLat, $rootScope.CLoc.CLong);
             PlaceCurrentLocationMarker(loc);
-
         });
+
         /********** Google Maps autocomplete ends *********/
 
-        var searchBox = new google.maps.places.SearchBox(
-            /** @type {HTMLInputElement} */(input));
-        //directionsDisplay.setMap(map);
+        var searchBox = new google.maps.places.SearchBox(input);
         // Try W3C Geolocation (Preferred)
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(FindCurrentLocation, function () {
@@ -198,16 +206,17 @@ angular.module('ezeidApp').controller('SearchController', [
         }
 
         function handleNoGeolocation() {
-            initialLocation = currentLoc;
+           initialLocation = currentLoc;
             map.setCenter(initialLocation);
             PlaceCurrentLocationMarker(initialLocation);
         }
 
         // Listen for the event fired when the user selects an item from the
         // pick list. Retrieve the matching places for that item.
-        google.maps.event.addListener(searchBox, 'places_changed', function () {
+       /* google.maps.event.addListener(searchBox, 'places_changed', function () {
             var places = searchBox.getPlaces();
 
+            console.log("sai 12");
             if (places.length == 0) {
                 return;
             }
@@ -228,7 +237,7 @@ angular.module('ezeidApp').controller('SearchController', [
                 PlaceCurrentLocationMarker(loc);
             }
         });
-
+*/
         //Map Right click Listener
         google.maps.event.addListener(map, 'rightclick', function(event) {
             $rootScope.CLoc = {
@@ -321,7 +330,7 @@ angular.module('ezeidApp').controller('SearchController', [
         console.log("sai1222");
        if (marker != undefined) {
             marker.setMap(null);
-            $(".ezeid-map-label").remove();
+          //  $(".ezeid-map-label").remove();
         }
         map.setCenter(location);
         marker = new google.maps.Marker({
@@ -340,8 +349,6 @@ angular.module('ezeidApp').controller('SearchController', [
             $rootScope.CLoc.CLong = marker.getPosition().D;
 
             getReverseGeocodingData(marker.getPosition().k, marker.getPosition().D);
-//                myinfowindow.setContent('<h6>You are here</h6>');
-            //myinfowindow.open(map, marker);
         });
     }
     this.getMyLocation = function () {
@@ -361,7 +368,7 @@ angular.module('ezeidApp').controller('SearchController', [
         directionsDisplay.setMap(null);
         for (var i = 0, Cmarker; Cmarker = markers[i]; i++) {
             Cmarker.setMap(null);
-            $(".ezeid-map-label").remove();
+           // $(".ezeid-map-label").remove();
         }
         markers = [];
 
@@ -855,6 +862,7 @@ angular.module('ezeidApp').controller('SearchController', [
     }
 
     function getMapSearchResults(results, status) {
+      console.log("sai1");
         if (status == google.maps.places.PlacesServiceStatus.OK) {
             if (results.length > 0) {
                 var place = results[0];
