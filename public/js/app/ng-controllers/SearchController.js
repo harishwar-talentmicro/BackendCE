@@ -161,6 +161,13 @@ angular.module('ezeidApp').controller('SearchController', [
         google.maps.event.addListener(autocomplete,'place_changed',function(){
             var place = autocomplete.getPlace();
 
+            if (place.geometry.viewport) {
+                map.fitBounds(place.geometry.viewport);
+            } else {
+                map.setCenter(place.geometry.location);
+                map.setZoom(17);
+            }
+
             $rootScope.CLoc.CLat = place.geometry.location.lat();
             $rootScope.CLoc.CLong = place.geometry.location.lng();
 
@@ -179,7 +186,6 @@ angular.module('ezeidApp').controller('SearchController', [
             markers = [];
             var bounds = new google.maps.LatLngBounds();
             if (place.length > 0) {
-
                 var place = places[0];
                 $rootScope.CLoc.CLat = place.geometry.location.lat();
                 $rootScope.CLoc.CLong = place.geometry.location.lng();
@@ -187,6 +193,33 @@ angular.module('ezeidApp').controller('SearchController', [
                 PlaceCurrentLocationMarker(loc);
             }
         });
+
+        $("input").focusin(function () {
+            $(document).keypress(function (e) {
+                console.log(e);
+                if (e.which == 13) {
+                   // infowindow.close();
+
+                    console.log("sai88");
+                    var firstResult = $(".pac-container .pac-item:first").text();
+
+                    var geocoder = new google.maps.Geocoder();
+                    geocoder.geocode({"address":firstResult }, function(results, status) {
+                        if (status == google.maps.GeocoderStatus.OK) {
+                            var lat = results[0].geometry.location.lat(),
+                                lng = results[0].geometry.location.lng(),
+                                placeName = results[0].address_components[0].long_name,
+                                latlng = new google.maps.LatLng(lat, lng);
+
+                           // moveMarker(placeName, latlng);
+                            PlaceCurrentLocationMarker(latlng);
+                            $("input").val(firstResult);
+                        }
+                    });
+                }
+            });
+        });
+
 
        /*google.maps.event.addListener(autocomplete,'place_changed',function(){
             var place = autocomplete.getPlace();
@@ -509,8 +542,6 @@ angular.module('ezeidApp').controller('SearchController', [
                if (data != 'null' && data.length>0)
                {
                   $scope.SearchResultCount = data.length;
-                   /*$window.localStorage.removeItem("searchResult");
-                   $window.localStorage.removeItem("selectedTids");*/
                    $window.localStorage.setItem("searchResult", JSON.stringify(data));
 
                    if(SearchSec.Criteria.SearchType == 2 || SearchSec.Criteria.SearchType == 3)
@@ -678,16 +709,16 @@ angular.module('ezeidApp').controller('SearchController', [
                          }
                         else
                          {
-                                 if( SearchSec.Criteria.SearchType < 2 )
-                                 {
-                                     //Redirect to Login page
-                                     $('#SignIn_popup').slideDown();
-                                     $rootScope.defer = $q.defer();
-                                     var prom = $rootScope.defer.promise;
-                                     prom.then(function(d){
-                                         SearchSec.getSearch();
-                                     });
-                                 }
+                             if( SearchSec.Criteria.SearchType < 2 )
+                             {
+                                 //Redirect to Login page
+                                 $('#SignIn_popup').slideDown();
+                                 $rootScope.defer = $q.defer();
+                                 var prom = $rootScope.defer.promise;
+                                 prom.then(function(d){
+                                     SearchSec.getSearch();
+                                 });
+                             }
                          }
 
 
