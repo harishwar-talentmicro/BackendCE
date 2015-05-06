@@ -6470,7 +6470,6 @@ exports.FnSaveTranscation = function(req, res){
         var TID = parseInt(req.body.TID);
          
         var MessageText =req.body.MessageText;
-        var MessageType = req.body.MessageType;
         var Status = req.body.Status;
         var TaskDateTime = req.body.TaskDateTime;
         var Notes = req.body.Notes;
@@ -6523,7 +6522,7 @@ exports.FnSaveTranscation = function(req, res){
                 if (!err) {
                     if (Result != null) {
 
-                        var query = db.escape(Token)+","+db.escape(MessageType)+","+ db.escape(MessageText)+ "," + db.escape(Status) +"," + db.escape(TaskDateNew) + ","  + db.escape(Notes) + "," + db.escape(LocID)  + "," + db.escape(Country)   + "," + db.escape(State) + "," + db.escape(City)   + "," + db.escape(Area)   + ","  + db.escape(Latitude)  + "," + db.escape(Longitude)  +  "," + db.escape(EZEID)  + "," + db.escape(ContactInfo)  + "," + db.escape(FolderRuleID)  + "," + db.escape(Duration)  + "," + db.escape(DurationScales) + "," + db.escape(NextAction) + "," + db.escape(NextActionDateTimeNew) + "," + db.escape(TID) + "," + db.escape(((ItemIDList != "") ? ItemIDList : "")) + "," + db.escape(DeliveryAddress) ;
+                        var query = db.escape(Token)+","+db.escape(FunctionType)+","+ db.escape(MessageText)+ "," + db.escape(Status) +"," + db.escape(TaskDateNew) + ","  + db.escape(Notes) + "," + db.escape(LocID)  + "," + db.escape(Country)   + "," + db.escape(State) + "," + db.escape(City)   + "," + db.escape(Area) + ","  + db.escape(Latitude)  + "," + db.escape(Longitude)  +  "," + db.escape(EZEID)  + "," + db.escape(ContactInfo)  + "," + db.escape(FolderRuleID)  + "," + db.escape(Duration)  + "," + db.escape(DurationScales) + "," + db.escape(NextAction) + "," + db.escape(NextActionDateTimeNew) + "," + db.escape(TID) + "," + db.escape(((ItemIDList != "") ? ItemIDList : "")) + "," + db.escape(DeliveryAddress) ;
                         // db.escape(NextActionDateTime);
                         console.log('CALL pSaveTrans(' + query + ')');
                         db.query('CALL pSaveTrans(' + query + ')', function (err, InsertResult) {
