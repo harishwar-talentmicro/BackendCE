@@ -1436,3 +1436,13 @@ table.rwd-table > tbody > tr > td.serachResultSelectAll
   margin-top: 1%;
   margin-bottom: 1%;
 }
+.noticeTextContainerBorder{
+    border:solid 1px black;
+}
+.bannerContainerBorder{
+    border:solid 1px lightseagreen;
+}
+.noticeTextColor
+{
+    color: #FFCD28;
+}
