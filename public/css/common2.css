@@ -41,6 +41,13 @@
     padding-top: 100px;
 }
 
+@media screen and (max-width: 1320px) {
+    .srw .tile-frame-padding-top
+    {
+        padding-top: 158px;
+    }
+}
+
 @media screen and (max-width: 874px) {
     .srw .tile-frame-padding-top
     {
@@ -69,6 +76,11 @@
     .srw .tile-frame-padding-top
     {
         padding-top: 146px;
+    }
+
+    .srw .block
+    {
+        padding-top: 2% !important;
     }
 }
 
@@ -474,6 +486,7 @@ hr.style-two {
     border: 7px solid rgba(0,0,0,0);
     color: #fff;
     font-weight: 500;
+    min-height: 150px;
 }
 
 .srw .individual-tiles:hover
@@ -525,6 +538,16 @@ hr.style-two {
     min-height: 10px;
 }
 
+.srw .row1,.row-2,.row-3,.row-4
+{
+    height: 25%;
+}
+
+.srw .block
+{
+    height: 37px;
+}
+
 .srw .block-1
 {
     background-color: rgb(245, 82, 82);
@@ -560,7 +583,6 @@ hr.style-two {
     background-color: rgba(210, 80, 159, 0.77);
 }
 
-
 .srw .block-8
 {
     background-color: rgba(10, 64, 136, 0.66);
@@ -581,7 +603,12 @@ hr.style-two {
     background-color: rgba(116, 166, 216, 0.63);
 }
 
-.row-1,.row-2,.row-3,.row-4
+.srw .row-1,.row-2,.row-3,.row-4
 {
     height: 25%;
+}
+
+.srw .block
+{
+    padding-top: 3%;
 }
