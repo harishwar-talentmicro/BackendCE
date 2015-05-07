@@ -32,6 +32,18 @@
             ) {
 
 
+            /**
+             * Logged in user cannot use this module as he is not having the required permissions for it
+             */
+            var moduleIndex = $scope.modules.indexOfWhere('type','sales');
+            var permission = parseInt($scope.modules[moduleIndex].permission);
+            if(permission.isNaN || permission === 0 )
+            {
+                $location.path('/business-manager');
+            };
+
+
+
             $(document).on('click','.popover-close',function(){
                 $('*[data-toggle="popover"]').popover('hide');
             });
@@ -159,12 +171,14 @@
                         $scope.txList = [];
                     }
                     defer.resolve(resp);
-                    Notification.success({ message : JSON.stringify(resp), delay : MsgDelay});
                 }).error(function(err){
                     defer.reject();
                 });
                 return defer.promise;
             };
+
+            console.log($scope.modules);
+
 
             $scope.$watch('pageNumber',function(newVal,oldVal){
                 if(newVal !== oldVal)

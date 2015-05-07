@@ -20,13 +20,7 @@
     }
 </style>
 
-    <div id="wrapper" ng-controller="CVAttachController as CVAttachCtrl">
-        <header-section></header-section>
-   <div class="container" style="padding-top:90px; position:relative;">
-        <!-- Example row of columns -->
-        <div class="row">
-            <div class="col-sm-8" style="margin: auto; float: none;">
-                <div class="panel panel-default" style="min-height:500px">
+<div  ng-controller="CVAttachController as CVAttachCtrl" class="panel panel-default" style="min-height:500px">
                     <form name="cvForm" ng-submit="cvForm.$valid && CVAttachCtrl.saveCVDocInfo()" novalidate>
                         <div class="form_style">
                             <ul>
@@ -110,9 +104,4 @@
                         </div>
                     </form>
                 </div>
-            </div>
-        </div>
-    </div>
 
-</div>
-<footer-section></footer-section>

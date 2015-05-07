@@ -242,7 +242,7 @@
                                     <br/>
                                 </small>
                                 <small class="text-danger tiny">
-                                    {{tx.UpdatedUser}}
+                                    {{tx.UpdatedUser | truncate:8:'..'}}
                                     <br/>
                                     {{tx.updatedDate | dateTimeFilter : "DD MMM YYYY hh:mm:ss A" : "DD-MMM-YY"}}
                                     <br/>

@@ -147,14 +147,14 @@ angular.module('ezeidApp').controller('ProfileManagerCtrl',[
                 case 'weblinks':
                     $scope.activeTemplate = '/tpl/weblinks-template.html';
                     break;
-                case 'configuration1':
-                    $scope.activeTemplate = '/tpl/configuration-template.html';
-                    break;
                 case 'configuration' :
                     $scope.activeTemplate = 'html/profile/configuration/configuration.html';
                     break;
                 case 'documents' :
-                    $scope.activeTemplate = 'html/documents.html';
+                    $scope.activeTemplate = 'html/profile/personal-documents.html';
+                    break;
+                case 'resume' :
+                    $scope.activeTemplate = 'html/profile/attach-resume.html';
                     break;
                 default:
                     $location.path('/profile-manager/user');
