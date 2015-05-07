@@ -1,0 +1,284 @@
+<section id="result-page-wrapper" class="hpw rpw">
+    <!-- New header menu goes here -->
+    <nav class="navbar navbar-head" style="position: relative">
+        <div class="container-fluid">
+            <!-- Header content - left :Logo goes here -->
+            <div class="navbar-header">
+                <div class="logo p-top-10">
+                </div>
+            </div>
+
+            <!-- Header content -right  -->
+            <div class="nav navbar-nav navbar-right p-top-10 p-right-10">
+                <div class="btn-group">
+                    <div class="btn btn-info dropdown-toggle no-radius" data-toggle="dropdown"><b>Download App <span class="caret"></span></b></div>
+                    <ul class="dropdown-menu" role="menu">
+                        <li class="text text-danger"><a href="#"><i class="fa fa-apple text-danger"></i> <b class="text text-danger">App Store</b></a></li>
+                        <li><a href="#"><i class="fa fa-google text text-success"></i> <b class="text text-success">Google Play</b></a></li>
+                    </ul>
+                </div>
+                <div class="btn btn-success  no-radius" title="sign in"><i class="fa fa-sign-in"></i></div>
+                <div class="btn btn-warning  no-radius" title="sign up"><i class="fa fa-user"></i></div>
+            </div>
+        </div><!-- /.container-fluid -->
+    </nav>
+    <hr>
+     <!--Middle container-->
+    <div ng-controller="InformationDetailCtrl as detailCtrl">
+        <div class="Popup_window form_style map_popup_iconActions" id="SalesEnquiryRequest_popup" style="height: 103%;">
+            <div class="window_page Maping_popup">
+                <span class="closelink" ng-click="closeSalesEnquiryForm()">X</span>
+                <form name="salesEnquiryForm" ng-submit="salesEnquiryForm.$valid && sendSalesEnquiry()" novalidate>
+                    <h3 class="marB15px">Sales Enquiry</h3>
+                    <div class="col-md-12">
+                        <p style="margin-top:-7px;">
+                            Enter your Requirement (You do not need to submit your contacts numbers, instead we
+                            will send your EZE ID Card)
+                        </p>
+                    </div>
+                    <div class="form-group" style="float: left;">
+                        <textarea class="form-control fixTextArea emptyBox" name="salesMessage" ng-model="salesMessage" placeholder="Type Message here" required></textarea><br/>
+                    </div>
+                    <div class="form-group">
+                        <input type="submit" ng-disabled="!salesMessage" class="btn btn-primary text_Box" value="Send" />
+                        <input type="reset" class="btn btn-primary marR10px cancelEnq text_Box" ng-click="closeSalesEnquiryForm()" value="Close" />
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="Popup_window form_style map_popup_iconActions" id="HomeDelivery_popup">
+            <div class="window_page Maping_popup">
+                <span class="closeHomeDelivery" ng-click="closeHomeDeliverForm()">X</span>
+                <form name="homeDeliverForm" ng-submit="homeDeliverForm.$valid && sendHomeDelivery()" novalidate>
+                    <h3 class="marB15px">Home Delivery</h3>
+                    <div class="col-md-12">
+                        <p style="margin-top:-7px;">
+                            Enter your Requirement (You do not need to submit your contacts numbers, instead we
+                            will send your EZE ID Card)
+                        </p>
+                    </div>
+                    <div class="form-group" style="float: left;">
+                        <textarea class="form-control fixTextArea emptyBox" name="homeDeliverMessage" ng-model="HomeDeliverMessage" placeholder="Type here" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <input type="submit" ng-disabled="!HomeDeliverMessage" class="btn btn-primary text_BoxHome" value="Send" />
+                        <input type="reset" ng-click="closeHomeDeliverForm()" class="btn btn-primary marR10px cancelEnq text_BoxHome" value="Close" />
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="Popup_window form_style map_popup_iconActions" id="Reservation_popup">
+            <div class="window_page Maping_popup">
+                <span class="closelink" ng-click="closeReservationForm()">X</span>
+                    <span style="margin-top:-2px;float:right; border:1px solid #000000;background:#FAA9A3;color:#000000;">
+                        <span>Mandatory</span>
+                    </span>
+                <form name="reservationForm" ng-submit="reservationForm.$valid && sendReservation(SearchInfo.IDTypeID==1 ? '6' : '3')" novalidate>
+                    <h3 ng-show="SearchInfo.IDTypeID==1" class="marB15px">Appointment</h3>
+                    <h3 ng-show="SearchInfo.IDTypeID==2" class="marB15px">Reservation</h3>
+
+                    <div class="form-group">
+                        <p>
+                            <label>
+                                <span ng-show="SearchInfo.IDTypeID==2"> Reservation Date & Time:</span>
+                                <span ng-show="SearchInfo.IDTypeID==1"> Appointment Date & Time:</span>
+                                <span ng-show="SearchInfo.IDTypeID==3"> Appointment Date & Time:</span>
+                            </label>
+                            <span style="width:60%;display:block;">
+                               <date-time-picker recipient="ReservationDateTime" settings='{
+                                                                    "format" : "d-M-Y",
+                                                                    "timepicker" : false,
+                                                                    "mask" : false,
+                                                                    "hours12" : false,
+                                                                    "minDate" : "+1970/01/01"
+                                                                    }'></date-time-picker>
+                            </span>
+                        </p>
+                        <textarea id="reservationMessage" name="reservationMessage"
+                                  ng-class="reservationForm.reservationMessage.$touched && !ReservationMessage.length ? 'mandatoryTextBox' : ''"
+                                  class="form-control fixTextArea emptyBox" name="reservationMessage" ng-model="ReservationMessage"
+                                  placeholder="{{reservationPlaceHolder}}" required>
+                        </textarea>
+                    </div>
+                    <div class="form-group">
+                        <input type="submit" ng-disabled="!ReservationDateTime || !ReservationMessage" class="btn btn-primary appoint_marT" value="Send" />
+                        <input type="reset" ng-click="closeReservationForm()" class="btn btn-primary marR10px cancelEnq appoint_marT" value="Close" />
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="Popup_window form_style map_popup_iconActions" id="ServiceRequest_popup">
+            <div class="window_page Maping_popup">
+                <span class="closelink" ng-click="closeServiceRequestForm()">X</span>
+                <form name="serviceRequestForm" ng-submit="serviceRequestForm.$valid && sendServiceRequest()" novalidate>
+                    <h3 class="marB15px">Service Request</h3>
+                    <div class="col-md-12">
+                        <p>
+                            Enter your Requirement (You do not need to submit your contacts numbers, instead we
+                            will send your EZE ID Card)
+                        </p>
+                    </div>
+                    <div class="form-group" style="float: left;">
+                        <textarea class="form-control fixTextArea emptyBox" name="serviceRequestMessage" ng-model="ServiceRequestMessage" placeholder="Type here" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <input type="submit" ng-disabled="!ServiceRequestMessage" class="btn btn-primary" value="Send" />
+                        <input type="reset" ng-click="closeServiceRequestForm()" class="btn btn-primary marR10px cancelEnq" value="Close" />
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="Popup_window form_style map_popup_iconActions" id="CV_popup">
+            <div class="window_page Maping_popup">
+                <span class="closeCV" ng-click="closeCVForm()">X</span>
+                <form name="cvRequestForm" novalidate>
+                    <h3 class="marB15px">CV Confirm</h3>
+                    <div class="col-md-12">
+                        Are you want to send your CV to Company
+                    </div><br /><br />
+
+                    <div class="form-group">
+                        <input type="button" class="btn btn-primary" ng-click="checkForCVAvailability()" value="Yes" />
+                        <input type="reset" ng-click="closeCVForm()" class="btn btn-primary marR10px cancelEnq" value="Close" />
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="Popup_window form_style map_popup_iconActions" id="sendMessage_popup">
+            <div class="window_page Maping_popup">
+                <span class="closeCV" ng-click="search.closeSendMessageForm()">X</span>
+                <form name="sendMessageForm" ng-submit="sendMessageForm.$valid && search.sendUserMessage()" novalidate>
+                    <h3 class="marB15px">Message</h3>
+                    <div class="col-md-12">
+                        <p>
+                            Enter your Message (You do not need to submit your contacts numbers, instead we
+                            will send your EZE ID Card)
+                        </p>
+                    </div>
+                    <div class="form-group">
+                        <textarea class="form-control fixTextArea emptyBox" name="sendMessage" ng-model="search.SendMessage" placeholder="Type Message here" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <input type="submit" ng-disabled="!search.SendMessage" class="btn btn-primary" value="Send" />
+                        <input type="reset" class="btn btn-primary marR10px cancelEnq" ng-click="search.closeSendMessageForm()" value="Close" />
+                    </div>
+                </form>
+            </div>
+        </div>
+        <section id="main-content" style="min-height: 600px; margin-left: 15px; margin-right: 15px;">
+            <div class="row setRowLeftRightMarginZero">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-center noticeTextContainerBorder noticeTextColor" >
+                    Notice text display hear..
+                </div>
+            </div><br/>
+            <div class="row setRowLeftRightMarginZero noticeTextContainerBorder" style="min-height: 445px;">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setPaddingLeftRight0">
+                    <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5 setPaddingLeftRight0 bannerContainerBorder" style="height: 445px;">
+                        <img width="100%" height="120px" ng-src="{{SearchInfo.BannerImage}}" />
+                        <img class="imgLeft showPointer" ng-show="previousButton == true" ng-click="getPreviousBanner()" src="images/arrow_left.png" />
+                        <!-- <img class="imgLeft showPointer" ng-show="search.previousButton == false" src="images/arrow_left_gray.png" /> -->
+                        <img class="imgRight showPointer" ng-show="nextButton == true" ng-click="getNextBanner()" src="images/arrow_right.png" />
+                        <!-- <img class="imgRight showPointer" ng-show="search.nextButton == false" src="images/arrow_right_grey.png" /> -->
+                    </div>
+                    <div class="col-lg-7 col-md-7 col-sm-7 col-xs-7 setPaddingLeftRight0">
+                        <div class="row setRowLeftRightMarginZero noticeTextContainerBorder">
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setPaddingLeftRight0">
+                                <div ng-show="SearchInfo.Picture">
+                                    <div ng-show="SearchInfo.IDTypeID == 1" class="row addItemRowUserEzeid1 userImgSpace" >
+                                        <img width="77" height="90" ng-src="{{SearchInfo.Picture}}" >
+                                    </div>
+                                    <div ng-hide="SearchInfo.IDTypeID == 1" class="row addItemRowUserEzeid1 userImgSpace" >
+                                        <img  width="308" height="90" ng-src="{{SearchInfo.Picture}}" >
+                                    </div>
+                                </div>
+                                <div ng-hide="SearchInfo.Picture">
+                                    <div ng-show="SearchInfo.IDTypeID == 1" class="row addItemRowUserEzeid1 userImgSpace" >
+                                        <img width="77" height="90" ng-src="../images/new_individual.png" >
+                                    </div>
+                                    <div ng-hide="SearchInfo.IDTypeID == 1" class="row addItemRowUserEzeid1 userImgSpace" >
+                                        <img  width="308" height="90" ng-src="../images/business_profile_pic.png" >
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row setRowLeftRightMarginZero noticeTextContainerBorder">
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setPaddingLeftRight0">
+                                Information..
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div><br/>
+            <div class="row setRowLeftRightMarginZero noticeTextContainerBorder">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setPaddingLeftRight0 searchHeaderAlignment msgButtonContainer messageButtonContainer" ng-hide="(SearchInfo.IDTypeID == 1)">
+                    <div class="showPointer removePadding keyWordText boxMessaageBackgroun" ng-show="SearchInfo.EZEIDVerifiedID == '2' && showSalesEnquiry == 1" title="Sales Enquiry" ng-click="openSalesEnquiryForm()">
+                        <img src="../images/new_sales_icon.png">
+                        Sales Enquiry
+                    </div>
+                    <div class="showPointer removePadding keyWordText boxMessaageBackgroun" ng-show="SearchInfo.EZEIDVerifiedID == '2' && showHomeDelivery == 1" title="Home Delivery" ng-click="openHomeDeliverForm()">
+                        <img src="../images/new_home_delivery.png">
+                        Home Delivery
+                    </div>
+                    <div class="showPointer removePadding keyWordText boxMessaageBackgroun" ng-show="SearchInfo.EZEIDVerifiedID == '2' && shoReserVation == 1" title="Reservation" ng-click="openReservationForm()">
+                        <img src="../images/new_reservations.png">
+                        Reservation
+                    </div>
+                    <div class="showPointer removePadding keyWordText boxMessaageBackgroun" ng-show="SearchInfo.EZEIDVerifiedID == '2' && showServiceRequest == 1" title="Support Request" ng-click="openServiceRequestForm()">
+                        <img src="../images/new_service_request.png">
+                        Service Request
+                    </div>
+                    <div class="showPointer removePadding keyWordText boxMessaageBackgroun" title="Send CV" ng-click="openCVForm()" ng-show="SearchInfo.EZEIDVerifiedID == '2' && showSendCv == 1">
+                        <img src="../images/new_send_cv.png">
+                        Send CV
+                    </div>
+                    <div class="showPointer removePadding keyWordText boxMessaageBackgroun pull-right"
+                         ng-click="search.viewDirections(search.mInfo)" title="View Directions">
+                        <img src="../images/view_directions.png">
+                        View Directions
+                    </div>
+                    <div class="showPointer removePadding keyWordText boxMessaageBackgroun pull-right"
+                         ng-click="search.getdirections(search.mInfo)" title="Directions">
+                        <img src="../images/new_directions.png">
+                        <span>Plot Route</span>
+                    </div>
+                </div>
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setPaddingLeftRight0 searchHeaderAlignment msgButtonContainer messageButtonContainer" ng-show="(SearchInfo.IDTypeID == 1)">
+                    <div class="showPointer removePadding keyWordText boxMessaageBackgroun pull-right"
+                         ng-click="search.viewDirections(search.mInfo)" title="View Directions">
+                        <img src="../images/view_directions.png">
+                        View Directions
+                    </div>
+                    <div class="showPointer removePadding keyWordText boxMessaageBackgroun pull-right"
+                         ng-click="search.getdirections(search.mInfo)" title="Directions boxMessaageBackgroun">
+                        <img src="../images/new_directions.png">
+                        Plot Route
+                    </div>
+                </div>
+            </div><br/>
+            <div class="row setRowLeftRightMarginZero noticeTextContainerBorder">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setPaddingLeftRight0 text-center">
+                    {{SearchInfo.AboutCompany}}
+                </div>
+            </div><br/>
+        </section>
+    </div>
+
+    <!--Middle container End-->
+    <div class="footer-page">
+        <div class="container width-81 text-center">
+            <div class="col-lg-2">
+                <i class="btn btn-default btn-sm fa fa-facebook"></i>
+                <i class="btn btn-default btn-sm fa fa-twitter"></i>
+                <i class="btn btn-default btn-sm fa fa-pinterest"></i>
+                <i class="btn btn-default btn-sm fa fa-linkedin"></i>
+
+            </div>
+            <div class="col-lg-8 text-center">
+                <span class="footer-main-content">Copyright © TalentMicro Innovations Pvt. Ltd.</span>
+                <hr class="style-one">
+                <small>CONTACT US | LEGAL | PATENT IN PROCESS NO.<b>6622/CHE/2014</b></small>
+            </div>
+        </div>
+    </div>
+</section>
+

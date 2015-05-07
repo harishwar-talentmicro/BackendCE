@@ -57,7 +57,7 @@ angular.module('ezeidApp').
             $scope.searchParams = {
                 searchType : 1,
                 searchTerm : '',
-                proximity : 50,
+                proximity : 0,
                 rating : '1,2,3,4,5',
                 homeDelivery : false,
                 parkingStatus : 0,
