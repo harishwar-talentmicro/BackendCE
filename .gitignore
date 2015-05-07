@@ -6,3 +6,4 @@ Gruntfile.js
 npm-debug.log
 /nbproject/private/
 nbproject/
+public_dist/
