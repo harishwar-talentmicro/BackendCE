@@ -20,7 +20,8 @@
         '/business-manager',
         '/business-manager/:subview',
         '/profile-manager',
-        '/profile-manager/:subview'
+        '/profile-manager/:subview',
+        '/searchDetails'
     ]);
 
     /**
@@ -150,6 +151,10 @@
             .when('/searchResult',{
                 templateUrl: 'html/result.html',
                 controller : 'SearchResultCtrl'
+            })
+            .when('/searchDetails',{
+                templateUrl: 'html/informationDetail.html',
+                controller : 'InformationDetailCtrl'
             })
             .when('/:ezeid',{
                 templateUrl : 'html/home.html'
