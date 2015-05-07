@@ -87,8 +87,8 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
             Picture : '',
             PictureFileName : '',
             PostalCode : '',
-            Latitude : 0,
-            Longitude : 0,
+            Latitude : 12.9667,
+            Longitude : 77.5667,
             Altitude : 0,
             TemplateID : 0,
             IDTypeID : 2
@@ -125,31 +125,39 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
          * Show and hide map using location index
          * @param index
          */
-        $scope.toggleMapControls = function(index){
-            mapList['map'+index].toggleMapControls();
-            mapList['map'+index].clearAllMarkers();
-            /**
-             * Placing unmovable marker back
-             */
-            var pos = null;
-            var title = null;
-            if(index === 0){
-                pos = mapList['map'+index].createGMapPosition(
-                    $scope.userDetails.Latitude,
-                    $scope.userDetails.Longitude
-                );
-                title = 'Primary Location';
-            }
-            else{
-                pos = mapList['map'+index].createGMapPosition(
-                    $scope.secondaryLocations[index-1].Latitude,
-                    $scope.secondaryLocations[index-1].Longitude
-                );
-                title = $scope.secondaryLocations[index-1].LocTitle;
-            }
+        $scope.toggleMapControls = function(index,editFlag){
+            mapList['map'+index].toggleMapControls().then(function(){
+                if(!editFlag) {
+                    mapList['map' + index].clearAllMarkers();
+                }
+                /**
+                 * Placing unmovable marker back
+                 */
+                var pos = null;
+                var title = null;
+                if(index === 0){
+                    pos = mapList['map'+index].createGMapPosition(
+                        $scope.userDetails.Latitude,
+                        $scope.userDetails.Longitude
+                    );
+                    title = 'Primary Location';
+                }
+                else{
+                    pos = mapList['map'+index].createGMapPosition(
+                        $scope.secondaryLocations[index-1].Latitude,
+                        $scope.secondaryLocations[index-1].Longitude
+                    );
+                    title = $scope.secondaryLocations[index-1].LocTitle;
+                }
 
-            var marker = mapList['map'+index].createMarker(pos,title,null,false,null);
-            mapList['map'+index].placeMarker(marker);
+                if(!editFlag){
+                    $timeout(function(){
+                        var marker = mapList['map'+index].createMarker(pos,title,null,false,null);
+                        mapList['map'+index].placeMarker(marker);
+                    },500);
+                }
+
+            });
         };
 
 
@@ -358,6 +366,17 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
                         }
                     }
                     $scope.placeEditModeMarker(index);
+                },function(){
+                    for(var prop in $scope.editLocationDetails){
+                        if($scope.editLocationDetails.hasOwnProperty(prop)){
+                            for(var prop1 in $scope.userDetails){
+                                if(prop === prop1){
+                                    $scope.editLocationDetails[prop] = $scope.userDetails[prop];
+                                }
+                            }
+                        }
+                    }
+                    $scope.placeEditModeMarker(index);
                 });
             }
             else{
@@ -374,6 +393,17 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
                     }
                     $scope.placeEditModeMarker(index);
 
+                },function(){
+                    for(var prop in $scope.editLocationDetails){
+                        if($scope.editLocationDetails.hasOwnProperty(prop)){
+                            for(var prop1 in $scope.secondaryLocations[index-1]){
+                                if(prop === prop1){
+                                    $scope.editLocationDetails[prop] = $scope.secondaryLocations[index-1][prop];
+                                }
+                            }
+                        }
+                    }
+                    $scope.placeEditModeMarker(index);
                 });
             }
 
@@ -381,6 +411,7 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
         };
 
         $scope.saveLocation = function(locIndex){
+            var data = {};
             if(locIndex === 0 ){
                 var userDetails = angular.copy($scope.userDetails);
                 for(var prop in $scope.editLocationDetails){
@@ -393,7 +424,7 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
                     }
                 }
 
-                var data = {
+                data = {
                     IDTypeID : userDetails.IDTypeID,
                     EZEID : userDetails.EZEID,
                     Password : '',
@@ -406,8 +437,8 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
                     RoleID : 0,
                     LanguageID : 1,
                     NameTitleID : 0,
-                    Latitude : (userDetails.Latitude) ? userDetails.Latitude : 0,
-                    Longitude : (userDetails.Longitude) ? userDetails.Longitude : 0,
+                    Latitude : (userDetails.Latitude) ? userDetails.Latitude : 12.9667,
+                    Longitude : (userDetails.Longitude) ? userDetails.Longitude : 77.5667,
                     Altitude : (userDetails.Altitude) ? userDetails.Altitude : 0,
                     AddressLine1 : userDetails.AddressLine1,
                     AddressLine2 : userDetails.AddressLine2,
@@ -471,6 +502,7 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
                              * Resetting edit mode data
                              */
                             $scope.resetEditLocationDetails();
+                            $scope.toggleMapControls(locIndex);
                         }
                         else{
                             Notification.error({
@@ -499,7 +531,7 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
              * If location is secondary
              */
             else{
-                    var data  = {
+                    data  = {
                         Token : $rootScope._userInfo.Token,
                         TID : ($scope.editLocationDetails.TID) ? $scope.editLocationDetails.TID : 0,
                         LocTitle : $scope.editLocationDetails.LocTitle,
@@ -522,7 +554,7 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
                         ISDMobileNumber : $scope.editLocationDetails.ISDMobileNumber,
                         ParkingStatus : $scope.editLocationDetails.ParkingStatus,
                         TemplateID : ($scope.editLocationDetails.TemplateID) ? $scope.editLocationDetails.TemplateID : 0
-                    }
+                    };
                     $http({
                         url : GURL + 'ewmAddLocation',
                         method : 'POST',
@@ -548,6 +580,7 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
                                  * Resetting edit mode data
                                  */
                                 $scope.resetEditLocationDetails();
+                                $scope.toggleMapControls(locIndex);
 
                             }
 
@@ -602,7 +635,7 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
                 $timeout(function(){
                     $scope.toggleMapControls(locIndex);
                     $scope.editLocation(locIndex);
-                },2000);
+                },500);
                 return;
             }
             var newLoc = angular.copy($scope.editLocationDetails);
@@ -744,8 +777,8 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
                 Picture : '',
                 PictureFileName : '',
                 PostalCode : '',
-                Latitude : 0,
-                Longitude : 0,
+                Latitude : 12.9667,
+                Longitude : 77.5667,
                 Altitude : 0,
                 IDTypeID: ($scope.userDetails.IDTypeID) ? $scope.userDetails.IDTypeID : 2,
             };

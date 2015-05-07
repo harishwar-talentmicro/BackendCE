@@ -218,6 +218,7 @@ angular.module('ezeidApp').factory('GoogleMaps',['$q','$timeout','$compile',func
     };
 
     GoogleMap.prototype.toggleMapControls = function(){
+        var defer = $q.defer();
         if($('#'+this.settings.searchElementId).is(':visible')){
             $('#'+this.settings.searchElementId).hide();
             $('#'+this.settings.currentLocationElementId).hide();
@@ -226,6 +227,10 @@ angular.module('ezeidApp').factory('GoogleMaps',['$q','$timeout','$compile',func
             $('#'+this.settings.searchElementId).show();
             $('#'+this.settings.currentLocationElementId).show();
         }
+        $timeout(function(){
+            defer.resolve(true);
+        },1000);
+        return defer.promise;
     };
     /**
      * Pushing map controls onto the map
