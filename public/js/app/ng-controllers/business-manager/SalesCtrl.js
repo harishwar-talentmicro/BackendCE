@@ -137,8 +137,9 @@
                     url : GURL + 'ewtGetTranscation',
                     method : 'GET',
                     params : {
-                        PageNo : pageNo,
-                        Status : statusType,
+                        Token : $rootScope._userInfo.Token,
+                        Page : pageNo,
+                        Status : (statusType) ? statusType : '',
                         FunctionType : 0    // For Sales
                     }
                 }).success(function(resp){
@@ -176,7 +177,12 @@
                     });
                 }
             });
-
+            $scope.$emit('$preLoaderStop');
+            $scope.loadTransaction().then(function(){
+                $scope.$emit('$preLoaderStart');
+            },function(){
+                $scope.$emit('$preLoaderStop');
+            });
 
         }]);
 
