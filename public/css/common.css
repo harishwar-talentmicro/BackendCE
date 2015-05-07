@@ -1165,19 +1165,36 @@ span.smallCloselink {
 }
 
 .modal-dialog.modal-lg.business-manager-modal > .modal-content > .modal-body {
-  padding-top: 0px;
-  border: 1px solid #EEE;
-  border-top: none;
+    padding: 0px;
+    padding-top: 10px;
+    border: 1px solid #EEE;
+    border-top: none;
 }
 
 .modal-dialog.modal-lg.business-manager-modal .business-manager-item{
-  margin-top: 5px;
-  margin-bottom: 5px;
-  border: 1px solid #D8D8D8;
-  box-shadow: 0px 0px 3px #DDD;
-  padding: 5px;
-  margin-left: 0px;
-  margin-right: 0px;
+    border: 1px solid #D8D8D8;
+    box-shadow: 0px 0px 3px #DDD;
+    background: #F2F2F2;
+    padding: 5px;
+    margin: 5px 0px 5px 0px;
+}
+
+.modal-dialog.modal-lg.business-manager-modal .business-manager-item .selected {
+    border: 1px solid #0DAFD5;
+    box-shadow: 0px 0px 30px #D2D2D2;
+    background: #4EAEFF;
+    padding: 5px;
+    margin: 5px 0px 5px 0px;
+}
+
+.modal-dialog.modal-lg.business-manager-modal label{
+    font-family: 'Roboto', sans-serif;
+    font-weight: normal;
+    color: #11A300;
+}
+
+.button.close{
+    text-decoration: none;
 }
 
 .modal-dialog.modal-lg.business-manager-modal .business-manager-item > div.business-manager-item-thumbnail{
@@ -1520,6 +1537,9 @@ span.smallCloselink {
     color:#000;
 }
 
+.business-manager .item-list-box{
+    border-right: 1px solid #DADADA;
+}
 .tiny{
     font-size: 80%;
 }
@@ -1535,10 +1555,11 @@ span.smallCloselink {
   margin: 5px;
 }
 
-@media (min-width: 992px)
-.tx-row {
-  border:1px solid #DDD;
-  margin-left: 5px;
+@media (min-width: 992px) {
+    .tx-row {
+        border: 1px solid #DDD;
+        margin-left: 5px;
+    }
 }
 
 .tx-row:nth-child(2n+0) {
@@ -1783,7 +1804,7 @@ span.smallCloselink {
     height: 30px;
     opacity: 1;
 }
-.animation-slideup.ng-show-add,
+.animation-slideup.ng-show-remove,
 .animation-slideup.ng-show-remove.ng-show-remove-active {
     -webkit-transform: scaleY(0);
     -moz-transform: scaleY(0);

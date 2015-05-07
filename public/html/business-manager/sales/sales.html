@@ -7,27 +7,23 @@
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                 <div class="row bottom-clearfix">
                     <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
-                        <button class="btn btn-sm btn-success no-radius" data-toggle="tooltip" title="Add New Transaction">
+                        <button class="btn btn-sm btn-success no-radius"
+                                ng-click="toggleModalBox()"
+                                data-toggle="tooltip" title="Add New Transaction">
                             <span class="glyphicon glyphicon-plus-sign"></span> Add New Transaction
                         </button>
                     </div>
 
                     <div class="col-lg-3 col-md-4 col-sm-6 col-xs-8 pull-right">
                         <div class="btn-group pull-right" role="group" aria-label="First group">
-                            <button type="button" class="btn btn-info bt-xs no-radius">
+                            <button type="button" ng-disabled="pageNumber <= 1" class="btn btn-info bt-xs no-radius">
                                 <span class="glyphicon glyphicon-chevron-left"></span>
                                 Prev
                             </button>
-                            <button type="button" class="btn btn-info bt-xs no-radius">
-                                4
-                            </button>
                             <button type="button" class="btn btn-info bt-xs no-radius active">
-                                5
+                                {{pageNumber}}
                             </button>
-                            <button type="button" class="btn btn-info bt-xs no-radius">
-                                6
-                            </button>
-                            <button type="button" class="btn btn-info bt-xs no-radius">
+                            <button type="button" ng-disabled="totalPages < 2" class="btn btn-info bt-xs no-radius">
                                 <span class="glyphicon glyphicon-chevron-right"></span>
                                 Next
                             </button>
@@ -77,14 +73,113 @@
                 </div>
             </div>
 
+
             <div class="col-lg-12 col-md-6 col-sm-6 col-xs-12"  ng-repeat="c in count track by $index">
+                <div class="row tx-row">
+                    <!---------- Single Transaction Entry ---------------------->
+
+                    <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
+                        <div class="row">
+                            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                                TRN{{c}}
+                            </div>
+                            <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8">
+                                <small>
+                                    27 Apr 2015 <br/>
+                                    06:43 AM
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="col-lg-1 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
+                        <b class="font-roboto">IND1</b>
+                        <br/>
+                        <small class="text-info">
+                            Indrajeet Nagda, 7597213177
+                        </small>
+                    </div>
+
+
+                    <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
+                        <small>42, Krishna Vihar, Jayanagar, Bengaluru, Karnataka</small>
+                    </div>
+
+                    <div class="col-lg-2  col-md-12 col-sm-12 col-xs-12 bottom-clearfix" title="Norton Smart Security(2), Windows 8.1(3), MS Office(4), Windows Server(12)">
+                        <small class="text-success">
+                            <b>Norton Smart Security(2), Windows 8.1(3), MS Office(4) ...</b>
+                        </small>
+                    </div>
+
+                    <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
+                        <div class="row">
+                            <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
+                                <small class="text-info">Delivery In Progress</small>
+                            </div>
+                            <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
+                                <label class="label label-info">Rs. 1000</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-1 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
+                        <b>Call</b>
+                        <br/>
+                        <small class="text-danger">
+                            28 May 2014
+                            <br/>
+                            11:04 PM
+                        </small>
+
+                    </div>
+
+
+                    <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12">
+                        <div class="row">
+                            <div class="col-lg-5 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
+                                <small class="text-info tiny">
+                                    Updated By
+                                    <br/>
+                                </small>
+                                <small class="text-danger tiny">
+                                    KRUNAL
+                                    <br/>
+                                    28-05-14
+                                    <br/>
+                                    11:04 PM
+                                </small>
+
+                            </div>
+
+                            <div class="col-lg-7 col-md-12 col-sm-12 col-xs-12">
+                                <button class="btn btn-xs btn-info no-radius" data-toggle="tooltip" title="View Details" ng-click="toggleModalBox()">
+                                    <span class="glyphicon glyphicon-fullscreen"></span>
+                                </button>
+                                <button class="btn btn-xs btn-success no-radius" data-toggle="tooltip" title="Save">
+                                    <span class="glyphicon glyphicon-floppy-save"></span>
+                                </button>
+                                <button class="btn btn-xs btn-warning no-radius" data-toggle="tooltip" title="Edit">
+                                    <span class="glyphicon glyphicon-pencil"></span>
+                                </button>
+                            </div>
+
+
+                        </div>
+                    </div>
+
+                </div>
+
+                <!----------end : Single Transaction Entry ---------------------->
+            </div>
+            <div class="col-lg-12 col-md-6 col-sm-6 col-xs-12"  ng-repeat="tx in txList track by tx.TID">
               <div class="row tx-row">
                 <!---------- Single Transaction Entry ---------------------->
 
                     <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
                         <div class="row">
                             <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
-                                TRN{{c}}
+                                {{tx.TrnNo}}
                             </div>
                             <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8">
                                 <small>
@@ -212,37 +307,360 @@
           <modal mtitle="modalBox.title" mclass="modalBox.class" visible="showModal">
               <div class="container-fluid">
                 <div class="row">
+
                   <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 transaction-details-box">
                     <div class="row">
-                      <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                            <div class="row">
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <label>EZEID</label>
+                                </div>
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <div class="form-group form-group-sm ">
+                                        <input type="text" class="form-control no-radius" ezeid-only name="ezeid" ng-model="modalBox.tx.ezeid" />
+                                    </div>
+
+                                </div>
+
+
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                            <div class="row">
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <label>Contact Information</label>
+                                </div>
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <div class="form-group form-group-sm ">
+                                        <input type="text" class="form-control no-radius" placeholder="Contact Information" name="contactInfo" ng-model="modalBox.tx.contactInfo" />
+                                    </div>
+
+                                </div>
+
+
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                            <div class="row">
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <label>Location</label>
+                                </div>
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <div class="form-group form-group-sm ">
+                                        <select class="form-control" ng-model="modalBox.tx.locId" name="locId">
+                                            <option value="0">--Select Locations--</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                            <div class="row">
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <label>Transaction Status</label>
+                                </div>
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <div class="form-group form-group-sm ">
+                                        <select class="form-control" ng-model="modalBox.tx.statusType" name="statusType">
+                                            <option value="0">--Select Status of Transaction--</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                            <div class="row">
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <label>Next Action</label>
+                                </div>
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <div class="form-group form-group-sm ">
+                                        <select class="form-control" ng-model="modalBox.tx.nextAction" name="nextAction">
+                                            <option value="0">--Select Next Action to be taken--</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                            <div class="row">
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <label>Next Action Date and Time</label>
+                                </div>
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <div class="form-group form-group-sm ">
+                                        <date-time-picker recipient="modalBox.tx.nextActionDateTime" settings='{
+                                                                    "format" : "d-M-Y H:m:s",
+                                                                    "timepicker" : true,
+                                                                    "mask" : false,
+                                                                    "hours12" : false,
+                                                                    "minDate" : "-1970/01/01"
+                                                                    }'></date-time-picker>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                            <div class="row">
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <label>Folder Rules</label>
+                                </div>
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <div class="form-group form-group-sm ">
+                                        <select class="form-control" ng-model="modalBox.tx.folderRule" name="folderRule">
+                                            <option value="0">--Select Folder Rule form list--</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                            <div class="row">
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <label>Order Amount</label>
+                                </div>
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <div class="form-group form-group-sm ">
+                                        <input type="text" numbers-only class="form-control no-radius" placeholder="Contact Information" name="orderAmount" ng-model="modalBox.tx.orderAmount" />
+                                    </div>
+
+                                </div>
+
+
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                            <div class="row">
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <label>Transaction Message</label>
+                                </div>
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <textarea rows="2" class="form-control no-radius" ng-model="modalBox.tx.message" name="message"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                            <div class="row">
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <label>Notes</label>
+                                </div>
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+
+                                        <textarea rows="4" class="form-control no-radius" ng-model="modalBox.tx.notes" name="notes"></textarea>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                            <div class="row">
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <label>Enquiry Address</label>
+                                </div>
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <div class="form-group form-group-sm ">
+                                        <input type="text" placeholder="Area" class="form-control no-radius"  name="area" ng-model="modalBox.tx.area" />
+                                    </div>
+                                </div>
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <div class="form-group form-group-sm ">
+                                        <input type="text" placeholder="City" class="form-control no-radius" name="city" ng-model="modalBox.tx.city" />
+                                    </div>
+                                </div>
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <div class="form-group form-group-sm ">
+                                        <input type="text" placeholder="State" class="form-control no-radius" name="state" ng-model="modalBox.tx.state" />
+                                    </div>
+                                </div>
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <div class="form-group form-group-sm ">
+                                        <input type="text" placeholder="Country" class="form-control no-radius"  name="country" ng-model="modalBox.tx.country" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                            <div class="row">
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <label>Delivery Address</label>
+                                </div>
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+
+                                        <textarea rows="4" class="form-control no-radius" ng-model="modalBox.tx.deliveryAddress" name="deliveryAddress"></textarea>
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                      <hr/>
+                    <div class="row">
+
+                      <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12 item-list-box">
                         <div class="row">
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                <h4 class="text-center font-roboto text-warning">Select Items</h4>
+                            </div>
+                        </div>
+
+                        <div class="row">
+
                           <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-
-
                             <div class="row business-manager-item">
+
                               <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 business-manager-item-thumbnail">
                                 <img height="64" width="64" class="img-circle" src="images/grey-background.jpg" />
                               </div>
+
                               <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 business-manager-item-details">
                                 <h4 class="font-open-sans">Dosa
                                   <button class="btn btn-xs btn-success pull-right no-radius"  data-toggle="tooltip" title="Add Item">
                                     <span class="glyphicon glyphicon-plus-sign"></span>
                                   </button>
                                 </h4>
-                                <br/>
-                                <small class="text-info">Rs. 30</small>
+                              </div>
+
+
+                              <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                  <div class="row">
+                                      <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 col-lg-offset-4 col-md-offset-4 col-sm-offset-4 col-xs-offset-4 business-manager-item-details">
+                                          <button class="btn btn-block btn-xs btn-info no-radius"> 50 /-</button>
+                                      </div>
+                                  </div>
+
                               </div>
 
                             </div>
-
-
                           </div>
+
                         </div>
+
                       </div>
 
-                      <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8"></div>
+                      <div class="col-lg-8 col-md-8 col-sm-6 col-xs-12">
+                          <div class="row">
+                              <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                  <h4 class="text-center font-roboto text-success">Items in your order list </h4>
+                              </div>
+                          </div>
+
+                          <div class="row">
+                              <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                  <div class="row business-manager-item selected">
+                                      <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 business-manager-item-thumbnail bottom-clearfix">
+                                          <img height="64" width="64" class="img-circle" src="images/grey-background.jpg" />
+                                      </div>
+                                      <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 business-manager-item-details bottom-clearfix">
+                                          <h4 class="font-open-sans">Dosa
+                                              <button class="btn btn-xs btn-danger pull-right no-radius" data-toggle="tooltip" title="Remove Item">
+                                                  <span class="glyphicon glyphicon-trash"></span>
+                                              </button>
+                                          </h4>
+                                      </div>
+
+                                      <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 business-manager-item-details">
+                                          <div class="row">
+                                              <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                                                  <button class="btn btn-block btn-xs btn-info no-radius"> 50 /-</button>
+                                              </div>
+                                              <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                                                  <button class="btn btn-block btn-xs btn-warning no-radius"> 1</button>
+                                              </div>
+                                              <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                                                  <button class="btn btn-block btn-xs btn-success no-radius"> 50 /-</button>
+                                              </div>
+                                          </div>
+
+
+
+                                      </div>
+
+                                  </div>
+                              </div>
+
+                              <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                  <div class="row business-manager-item selected">
+                                      <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 business-manager-item-thumbnail bottom-clearfix">
+                                          <img height="64" width="64" class="img-circle" src="images/grey-background.jpg" />
+                                      </div>
+                                      <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 business-manager-item-details bottom-clearfix">
+                                          <h4 class="font-open-sans">Dosa
+                                              <button class="btn btn-xs btn-danger pull-right no-radius" data-toggle="tooltip" title="Remove Item">
+                                                  <span class="glyphicon glyphicon-trash"></span>
+                                              </button>
+                                          </h4>
+                                      </div>
+
+                                      <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 business-manager-item-details">
+                                          <div class="row">
+                                              <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                                                  <button class="btn btn-block btn-xs btn-info no-radius"> 50 /-</button>
+                                              </div>
+                                              <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                                                  <button class="btn btn-block btn-xs btn-warning no-radius"> 1</button>
+                                              </div>
+                                              <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                                                  <button class="btn btn-block btn-xs btn-success no-radius"> 50 /-</button>
+                                              </div>
+                                          </div>
+
+                                      </div>
+
+                                  </div>
+                              </div>
+
+
+                              <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                  <div class="row business-manager-item selected">
+                                      <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 business-manager-item-thumbnail bottom-clearfix">
+                                          <img height="64" width="64" class="img-circle" src="images/grey-background.jpg" />
+                                      </div>
+                                      <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 business-manager-item-details bottom-clearfix">
+                                          <h4 class="font-open-sans">Dosa
+                                              <button class="btn btn-xs btn-danger pull-right no-radius" data-toggle="tooltip" title="Remove Item">
+                                                  <span class="glyphicon glyphicon-trash"></span>
+                                              </button>
+                                          </h4>
+                                      </div>
+
+                                      <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 business-manager-item-details">
+                                          <div class="row">
+                                              <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                                                  <button class="btn btn-block btn-xs btn-info no-radius"> 50 /-</button>
+                                              </div>
+                                              <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                                                  <button class="btn btn-block btn-xs btn-warning no-radius"> 1</button>
+                                              </div>
+                                              <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                                                  <button class="btn btn-block btn-xs btn-success no-radius"> 50 /-</button>
+                                              </div>
+                                          </div>
+
+                                      </div>
+
+                                  </div>
+                              </div>
+
+                          </div>
+
+                      </div>
+
+
+
                     </div>
                   </div>
+
                 </div>
               </div>
           </modal>
