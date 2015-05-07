@@ -6470,7 +6470,6 @@ exports.FnSaveTranscation = function(req, res){
         var TID = parseInt(req.body.TID);
          
         var MessageText =req.body.MessageText;
-        var MessageType = req.body.MessageType;
         var Status = req.body.Status;
         var TaskDateTime = req.body.TaskDateTime;
         var Notes = req.body.Notes;
@@ -6523,7 +6522,7 @@ exports.FnSaveTranscation = function(req, res){
                 if (!err) {
                     if (Result != null) {
 
-                        var query = db.escape(Token)+","+db.escape(MessageType)+","+ db.escape(MessageText)+ "," + db.escape(Status) +"," + db.escape(TaskDateNew) + ","  + db.escape(Notes) + "," + db.escape(LocID)  + "," + db.escape(Country)   + "," + db.escape(State) + "," + db.escape(City)   + "," + db.escape(Area)   + ","  + db.escape(Latitude)  + "," + db.escape(Longitude)  +  "," + db.escape(EZEID)  + "," + db.escape(ContactInfo)  + "," + db.escape(FolderRuleID)  + "," + db.escape(Duration)  + "," + db.escape(DurationScales) + "," + db.escape(NextAction) + "," + db.escape(NextActionDateTimeNew) + "," + db.escape(TID) + "," + db.escape(((ItemIDList != "") ? ItemIDList : "")) + "," + db.escape(DeliveryAddress) ;
+                        var query = db.escape(Token)+","+db.escape(FunctionType)+","+ db.escape(MessageText)+ "," + db.escape(Status) +"," + db.escape(TaskDateNew) + ","  + db.escape(Notes) + "," + db.escape(LocID)  + "," + db.escape(Country)   + "," + db.escape(State) + "," + db.escape(City)   + "," + db.escape(Area) + ","  + db.escape(Latitude)  + "," + db.escape(Longitude)  +  "," + db.escape(EZEID)  + "," + db.escape(ContactInfo)  + "," + db.escape(FolderRuleID)  + "," + db.escape(Duration)  + "," + db.escape(DurationScales) + "," + db.escape(NextAction) + "," + db.escape(NextActionDateTimeNew) + "," + db.escape(TID) + "," + db.escape(((ItemIDList != "") ? ItemIDList : "")) + "," + db.escape(DeliveryAddress) ;
                         // db.escape(NextActionDateTime);
                         console.log('CALL pSaveTrans(' + query + ')');
                         db.query('CALL pSaveTrans(' + query + ')', function (err, InsertResult) {
@@ -8935,7 +8934,7 @@ exports.FnGetWebLink = function (req, res) {
         }
     }
     catch (ex) {
-        console.log('FnGetResource error:' + ex.description);
+        console.log('FnGetWebLink error:' + ex.description);
         throw new Error(ex);
     }
 };
@@ -9087,7 +9086,642 @@ exports.FnWebLinkRedirect = function(req,res,next){
     }
 }
 
+exports.FnGetSearchItem = function(req,res){
+try{
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    
+    var Token = req.query.Token;
+    var FunctionType = req.query.FunctionType;
+    var ItemTitle = req.query.ItemTitle;
+    
+    if(Token != null && FunctionType != null && ItemTitle != null){    
+        FnValidateToken(Token, function (err, Result) {
+            if (!err) {
+                if (Result != null) {
+                    var SearchQuery = db.escape(Token) + ',' + db.escape(FunctionType) + ',' + db.escape(ItemTitle);
+                    db.query('CALL PGetItemAutocomplete(' + SearchQuery + ')', function (err, SearchResult) {  
+                        if (!err) {
+                            if (SearchResult[0].length > 0) {
+                                res.send(SearchResult[0]);
+                                console.log('FnGetSearchItem:Items sent successfully');
+                                }
+                                else {
+                                    res.send('null');
+                                    console.log('FnGetSearchItem:No items found');
+                                }
+                            }
+                            else {
+                                res.statusCode = 500;
+                                res.send('null');
+                                console.log('FnGetSearchItem:Error in getting Search items' + err);
+                            }
+                        });
+                }
+                    else {
+                        console.log('FnGetSearchItem: Invalid token');
+                        res.statusCode = 401;
+                        res.send('null');
+                    }
+                }
+                else {
+                    console.log('FnGetSearchItem: Token error: ' + err);
+                    res.statusCode = 500;
+                    res.send('null');
 
+                }
+            });
+        }
+        else {
+                if (Token = null) {
+                    console.log('FnGetSearchItem: Token is empty');
+                }
+                else if (FunctionType == null) {
+                    console.log('FnGetSearchItem:FunctionType is empty');
+                }
+                else if (ItemTitle == null) {
+                    console.log('FnGetSearchItem: ItemTitle is empty');
+                }
+                
+                res.statusCode = 400;
+                res.send('null');
+            }
+        }
+    catch (ex) {
+        console.log('FnGetSearchItem error:' + ex.description);
+        throw new Error(ex);
+    }
+};
+
+exports.FnSaveChatMessage = function(req, res){
+try{
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    
+    var Token = req.body.Token;
+    var ChatID = req.body.ChatID;
+    var FromEZEID = req.body.FromEZEID;
+    var ToEZEID = req.body.ToEZEID;
+    var ChatMsg = req.body.ChatMsg;
+        ChatMsg = JSON.parse(ChatMsg);
+    
+    if (!ChatID)
+        ChatID = 0;
+    var RtnMessage = {
+            IsSuccessfull: false,
+            ChatID:0
+        };
+        if(Token != null && FromEZEID != null && ToEZEID != null){
+        FnValidateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+                        console.log('ChatID:'+ChatID);
+                        if(ChatID == 0){
+                            var Query = 'select max(ChatMsgID) as ChatID from tchatbox';
+                            db.query(Query, function (err, Result){
+                                console.log('Result');
+                                console.log(Result);
+                                if(!err){
+                                    var MaxID = Result[0].ChatID;
+                                    console.log(MaxID);
+                                    ChatID = MaxID + 1;
+                                    console.log(ChatID);
+                                }
+                                else{
+                                    console.log('FnSaveChatMessage: Error in generate ChatID');
+                                    res.send(RtnMessage);
+                                }
+                                    var chats = {
+                                                Msg: ChatMsg.Msg,
+                                                Type: ChatMsg.Type,
+                                                Date: ChatMsg.Date,
+                                                Sender : FromEZEID,
+                                                Receiver : ToEZEID
+                                                };
+                                    console.log(chats);
+                                    var chatArr = [chats];
+                                    console.log(chatArr);
+                                    var query = db.escape(ChatID) + ',' + db.escape(FromEZEID) + ',' + db.escape(ToEZEID) 
+                                        + ',' + db.escape(JSON.stringify(chatArr));
+                                    console.log('CALL pSaveChatMsg(' + query + ')');
+                                    db.query('CALL pSaveChatMsg(' + query + ')', function (err, InsertResult) {
+                                        console.log(InsertResult);
+                                        console.log(err);
+                                        if (!err) {
+                                        if (InsertResult != null) {
+                                        RtnMessage.IsSuccessfull = true;
+                                        RtnMessage.ChatID = ChatID;
+                                        res.send(RtnMessage);
+                                        console.log('FnSaveChatMessage:Inserted sucessfully..');
+                                    }
+                                    else
+                                    {
+                                    console.log('FnSaveChatMessage:No Inserted sucessfully..');
+                                    res.send(RtnMessage);}
+                                }
+                                else
+                                    {
+                                    console.log('FnSaveChatMessage:Error in Insert..');
+                                    res.send(RtnMessage);
+                                    }
+                                });
+                            });
+                    }
+                    else
+                    {
+                        console.log('Sender...');
+                        var SearchQuery = 'select FromEZEID,ToEZEID,ChatMsg from tchatMaster where ChatID='+db.escape(ChatID);
+                        db.query(SearchQuery, function (err, SearchResult) {
+                            console.log(SearchResult);
+                            if(!err){
+                                if(SearchResult[0]!=null){
+                               if(FromEZEID == SearchResult[0].FromEZEID && ToEZEID == SearchResult[0].ToEZEID){
+                                   FromEZEID = SearchResult[0].FromEZEID;
+                                   ToEZEID = SearchResult[0].ToEZEID;
+                                   var chats = {
+                                            Msg: ChatMsg.Msg,
+                                            Type: ChatMsg.Type,
+                                            Date: ChatMsg.Date,
+                                            Sender : FromEZEID,
+                                            Receiver : ToEZEID
+                                            };
+                                    console.log(chats);
+                                   var prevChatArr = JSON.parse(SearchResult[0].ChatMsg);
+                                    prevChatArr.push(chats);
+                                    console.log('prevChatArr');
+                                    console.log(prevChatArr);
+                                   var query = db.escape(ChatID) + ',' + db.escape(FromEZEID) + ',' + db.escape(ToEZEID) 
+                                            + ',' + db.escape(JSON.stringify(prevChatArr));
+                                    
+                                   console.log('CALL pSaveChatMsg(' + query + ')');
+                                   db.query('CALL pSaveChatMsg(' + query + ')', function (err, UpdateResult) {
+                                       console.log(err);
+                                        if (!err) {
+                                            if (UpdateResult != null) {
+                                                RtnMessage.IsSuccessfull = true;
+                                                RtnMessage.ChatID = ChatID;
+                                                res.send(RtnMessage);
+                                                console.log('FnSaveChatMessage:Updated sucessfully..');
+                                            }
+                                            else
+                                            {
+                                            console.log('FnSaveChatMessage:No Updated sucessfully..');
+                                            res.send(RtnMessage);}
+                                        }
+                                        else
+                                            {
+                                            console.log('FnSaveChatMessage:Error in Update');
+                                            res.send(RtnMessage);
+                                            }
+                                    });
+                               }
+                                else{
+                                    console.log('Receiver.....');
+                                    if(FromEZEID == SearchResult[0].ToEZEID && ToEZEID == SearchResult[0].FromEZEID){
+                                        FromEZEID = SearchResult[0].ToEZEID;
+                                        ToEZEID = SearchResult[0].FromEZEID;
+                                        console.log(FromEZEID,ToEZEID);
+                                        var chats = {
+                                            Msg: ChatMsg.Msg,
+                                            Type: ChatMsg.Type,
+                                            Date: ChatMsg.Date,
+                                            Sender : FromEZEID,
+                                            Receiver : ToEZEID
+                                            };
+                                        console.log(chats);
+                                        var prevChatArr = JSON.parse(SearchResult[0].ChatMsg);
+                                        prevChatArr.push(chats);
+                                        console.log('prevChatArr');
+                                        console.log(prevChatArr);
+                                        
+                                          var query = db.escape(ChatID) + ',' + db.escape(FromEZEID) + ',' + db.escape(ToEZEID) 
+                                            + ',' + db.escape(JSON.stringify(prevChatArr));
+                                    
+                                           console.log('CALL pSaveChatMsg(' + query + ')');
+                                           db.query('CALL pSaveChatMsg(' + query + ')', function (err, UpdateResult) {
+                                               console.log(err);
+                                                if (!err) {
+                                                    if (UpdateResult != null) {
+                                                        RtnMessage.IsSuccessfull = true;
+                                                        RtnMessage.ChatID = ChatID;
+                                                        res.send(RtnMessage);
+                                                        console.log('FnSaveChatMessage:Updated sucessfully..');
+                                                    }
+                                                    else
+                                                    {
+                                                    console.log('FnSaveChatMessage:No Updated sucessfully..');
+                                                    res.send(RtnMessage);}
+                                                }
+                                                else
+                                                    {
+                                                    console.log('FnSaveChatMessage:Error in Receiver Update');
+                                                    res.send(RtnMessage);
+                                                    }
+                                            });
+                                    }
+                                    else{
+                                        console.log('FnSaveChatMessage:Error in receiver side');
+                                        res.send(RtnMessage);
+                                    }
+                            }
+                            }
+                            else{
+                                    console.log('FnSaveChatMessage:Error in SearchResult');
+                                    res.send(RtnMessage);
+                                }
+                            }
+                            else{
+                                    console.log('FnSaveChatMessage:Error in SearchResult');
+                                    res.send(RtnMessage);
+                                }                           
+                        });                       
+                    }
+                    }
+                    else {
+                        res.statusCode = 401;
+                        res.send(RtnMessage);
+                        console.log('FnSaveChatMessage:Invalid Token');
+                    }
+                } else {
+
+                    res.statusCode = 500;
+                    res.send(RtnMessage);
+                    console.log('FnSaveChatMessage:Error in validating token:  ' + err);
+                }
+            });
+        }
+    else{
+        if(Token == null){
+            console.log('FnSaveChatMessage:Token is empty');
+        }
+        else if (FromEZEID == null){
+            console.log('FnSaveChatMessage:FromEZEID is empty');
+        }
+        else if (ToEZEID == null){
+            console.log('FnSaveChatMessage:ToEZEID is empty');
+        }
+        res.statusCode = 400;
+        res.send('null');
+    }
+    
+}
+catch (ex) {
+        console.log('FnSaveChatMessage: error:' + ex.description);
+        throw new Error(ex);
+    }
+};
+
+exports.FnCreateGroup = function(req, res){
+try{
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    
+    var Token = req.body.Token;
+    var GroupTitle = req.body.GroupTitle;
+    
+    var RtnMessage = {
+            IsSuccessfull: false,
+            GroupID:0
+        };
+        if(Token != null && GroupTitle != null){
+        FnValidateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+                                var query = db.escape(Token) + ',' + db.escape(GroupTitle);
+                                        
+                                    console.log('CALL pCreateGroup(' + query + ')');
+                                    db.query('CALL pCreateGroup(' + query + ')', function (err, InsertResult) {
+                                        if (!err) {
+                                            if (InsertResult != null){   
+                                                var Temp = InsertResult[0];                                                
+                                                RtnMessage.IsSuccessfull = true;
+                                                RtnMessage.GroupID = Temp[0].GroupID;
+                                                res.send(RtnMessage);
+                                                console.log('FnCreateGroup:Inserted sucessfully..');
+                                            }
+                                            else                                             
+                                            {
+                                                console.log('FnCreateGroup:No Inserted sucessfully..');
+                                                res.send(RtnMessage);}
+                                        }
+                                        else
+                                        {
+                                            console.log('FnCreateGroup:Error in Insert..');
+                                            res.send(RtnMessage);
+                                        }
+                                    });
+                        }
+                    else {
+                        res.statusCode = 401;
+                        res.send(RtnMessage);
+                        console.log('FnCreateGroup:Invalid Token');
+                    }
+                } else {
+
+                    res.statusCode = 500;
+                    res.send(RtnMessage);
+                    console.log('FnCreateGroup:Error in validating token:  ' + err);
+                }
+            });
+        }
+    else{
+        if(Token == null ){
+            console.log('FnCreateGroup:Token is empty');
+        }
+        else if(GroupTitle == null ){
+            console.log('FnCreateGroup:GroupTitle is empty');
+        }
+        res.statusCode = 400;
+        res.send('null');
+    }
+    
+}
+    catch (ex) {
+        console.log('FnSaveGroupChatList: Error:' + ex.description);
+        throw new Error(ex);
+    }
+};
+
+exports.FnGetGroupList = function(req, res){
+try{
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    
+    var Token = req.query.Token;
+    
+    if(Token !=  null){
+        FnValidateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+                        var Query = 'select TID as GroupID,MasterID,GroupTitle from mgroup';
+                            db.query(Query, function (err, GetResult){
+                                if (!err) {
+                                    if (GetResult != null) {
+                                        if (GetResult.length > 0) {
+                                            console.log('FnGetGroupList: GroupList Send successfully');
+                                            res.send(GetResult);
+                                        }
+                                        else {
+                                            console.log('FnGetGroupList: No GroupList Links found');
+                                            res.send('null');
+                                        }
+                                    }
+                                    else {
+                                        console.log('FnGetGroupList: No GroupList Links found');
+                                        res.send('null');
+                                    }
+                                }
+                                else {
+                                    console.log('FnGetGroupList: error in getting GroupList' + err);
+                                    res.statusCode = 500;
+                                    res.send('null');
+                                }
+                            });
+                    }
+                    else {
+                        res.statusCode = 401;
+                        res.send('null');
+                        console.log('FnGetGroupList: Invalid Token');
+                    }
+                } else {
+
+                    res.statusCode = 500;
+                    res.send('null');
+                    console.log('FnGetGroupList: Error in validating token:  ' + err);
+                }
+            });
+        }
+        else {
+            if (Token == null) {
+                console.log('FnGetGroupList: Token is empty');
+            }
+            res.statusCode=400;
+            res.send('null');
+        }
+    }
+    catch (ex) {
+        console.log('FnGetGroupList error:' + ex.description);
+        throw new Error(ex);
+    }
+};
+
+exports.FnSaveGroupMembers = function(req, res){
+try{
+
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    
+    var Token = req.body.Token;
+    var GroupID = req.body.GroupID;
+    var EZEID = req.body.EZEID;
+        
+    var RtnMessage = {
+        IsSuccessfull:false,
+        MemberID:0
+    };
+    
+    if(Token !=  null && GroupID != null && EZEID != null){
+        FnValidateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+                                var query = db.escape(GroupID)+ ',' + db.escape(EZEID); 
+                                    console.log('CALL pSaveGroupMembers(' + query + ')');
+                                    db.query('CALL pSaveGroupMembers(' + query + ')', function (err, InsertResult) {
+                                        
+                                        if (!err) {
+                                        if (InsertResult != null) {
+                                            var Temp = InsertResult[0];
+                                            RtnMessage.IsSuccessfull = true;
+                                            RtnMessage.MemberID = Temp[0].MemberID;
+                                            res.send(RtnMessage);
+                                            console.log('FnSaveGroupMembers:Inserted sucessfully..');
+                                    }
+                                    else
+                                    {
+                                    console.log('FnSaveGroupMembers:No Inserted sucessfully..');
+                                    res.send(RtnMessage);}
+                                }
+                                else
+                                    {
+                                    console.log('FnSaveGroupMembers:Error in getting insert group members..');
+                                    res.send(RtnMessage);
+                                    }
+                                });
+                    }
+                    else {
+                        res.statusCode = 401;
+                        res.send(RtnMessage);
+                        console.log('FnAddGroupMembers:Invalid Token');
+                    }
+                } else {
+                    res.statusCode = 500;
+                    res.send(RtnMessage);
+                    console.log('FnAddGroupMembers:Error in validating token:  ' + err);
+                }
+            });
+        }
+    else{
+        if(Token == null ){
+            console.log('FnSaveGroupMembers:Token is empty');
+        }
+        else if(GroupID == null ){
+            console.log('FnSaveGroupMembers:GroupID is empty');
+        }
+        else if(EZEID == null ){
+            console.log('FnSaveGroupMembers:EZEID is empty');
+        }
+        res.statusCode = 400;
+        res.send('null');
+    }
+    
+}
+    catch (ex) {
+        console.log('FnSaveGroupMembers: Error:' + ex.description);
+        throw new Error(ex);
+    }
+};
+
+exports.FnGetMembersList = function(req, res){
+try{
+
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    
+    var Token = req.query.Token;
+    var GroupID = req.query.GroupID;
+
+    if(Token !=  null && GroupID != null){
+        FnValidateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+                        db.query('CALL pGetMembersList(' + db.escape(GroupID) + ')', function (err, GetResult) {
+                            if (!err) {
+                                if (GetResult != null) {
+                                    if (GetResult[0].length > 0) {
+                                        console.log('FnGetMembersList: Members List Send successfully');
+                                        res.send(GetResult[0]);
+                                    }
+                                    else {
+                                        console.log('FnGetMembersList:No Members List found');
+                                        res.send('null');
+                                    }
+                                }
+                                else {
+                                    console.log('FnGetMembersList:No Members List found');
+                                    res.send('null');
+                                }
+
+                            }
+                            else {
+                                console.log('FnGetMembersList: error in getting group members list' + err);
+                                res.statusCode = 500;
+                                res.send('null');
+                            }
+                        });
+                    }
+                    else {
+                        res.statusCode = 401;
+                        res.send('null');
+                        console.log('FnGetMembersList: Invalid Token');
+                    }
+                } else {
+
+                    res.statusCode = 500;
+                    res.send('null');
+                    console.log('FnGetMembersList: Error in validating token:  ' + err);
+                }
+            });
+        }
+        else {
+            if (Token == null) {
+                console.log('FnGetMembersList: Token is empty');
+            }
+            else if (GroupID == null) {
+                console.log('FnGetMembersList: GroupID is empty');
+            }
+            
+            res.statusCode=400;
+            res.send('null');
+        }
+    }
+    catch (ex) {
+        console.log('FnGetMembersList error:' + ex.description);
+        throw new Error(ex);
+    }
+};
+
+exports.FnDeleteGroupMembers = function(req, res){
+try{
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.query.Token;
+        var MemberID = req.query.MemberID;
+       
+        var RtnMessage = {
+            IsSuccessfull: false,
+            Message:''
+        };
+        var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
+
+        if (Token !=null && MemberID != null) {
+            FnValidateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+                        var query = db.escape(MemberID);
+                        console.log('CALL pDeleteGroupMembers(' + query + ')');
+                        db.query('CALL pDeleteGroupMembers(' + query + ')', function (err, DeleteResult) {
+                    console.log(err);
+                            if (!err){
+                                   if (DeleteResult.affectedRows > 0) {
+                                    RtnMessage.IsSuccessfull = true;
+                                    RtnMessage.Message = 'Delete Successfully';
+                                    res.send(RtnMessage);
+                                    console.log('FnDeleteGroupMembers: Group members delete successfully');
+                                }
+                                else {
+                                    console.log('FnDeleteGroupMembers:No delete Group members');
+                                    RtnMessage.Message = 'No Deleted';
+                                    res.send(RtnMessage);
+                                }
+                            }                   
+                            else {
+                                console.log('FnDeleteGroupMembers: error in deleting Group members' + err);
+                                res.statusCode = 500;
+                                res.send(RtnMessage);
+                            }
+                        });
+                    }
+                    else {
+                        console.log('FnDeleteGroupMembers: Invalid token');
+                        res.statusCode = 401;
+                        res.send(RtnMessage);
+                    }
+                }
+                else {
+                    console.log('FnDeleteGroupMembers:Error in processing Token' + err);
+                    res.statusCode = 500;
+                    res.send(RtnMessage);
+                }
+            });
+        }
+        else {
+            if (Token == null) {
+                console.log('FnDeleteGroupMembers: Token is empty');
+            }
+            else if (MemberID == null) {
+                console.log('FnDeleteGroupMembers: MemberID is empty');
+            }
+            res.statusCode=400;
+            res.send(RtnMessage);
+        }
+    }
+    catch (ex) {
+        console.log('FnDeleteGroupMembers:error ' + ex.description);
+        throw new Error(ex);
+    }
+};
+                        
 
 //EZEIDAP Parts
 

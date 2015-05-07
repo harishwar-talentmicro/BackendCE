@@ -129,6 +129,11 @@ footer p {
     font-stretch : condensed;
 }
 
+@font-face {
+    font-family: 'FontAwesome';
+    src: url('../fonts/fontawesome-webfont.ttf');
+}
+
 input[type='text'],input[type='email'],input[type='url'],input[type='number'],input[type='password'],select.form-control,textarea.form-control{
     border-radius: 2px;
 }

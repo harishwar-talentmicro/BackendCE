@@ -162,7 +162,13 @@ app.post('/ewtWebLink',LocationManager.FnSaveWebLink);
 app.get('/ewtWebLink',LocationManager.FnGetWebLink);
 app.delete('/ewtwebLink',LocationManager.FnDeleteWebLink);
 app.delete('/ewtDeleteTranscation',LocationManager.FnDeleteTranscation);
-
+app.get('/ewtGetSearchItem',LocationManager.FnGetSearchItem);
+app.post('/ewtSaveChatMessage', LocationManager.FnSaveChatMessage);
+app.post('/ewtCreateGroup', LocationManager.FnCreateGroup);
+app.get('/ewtGetGroupList', LocationManager.FnGetGroupList);
+app.post('/ewtSaveGroupMembers', LocationManager.FnSaveGroupMembers);
+app.get('/ewtGetMembersList', LocationManager.FnGetMembersList);
+app.delete('/ewtDeleteGroupMembers', LocationManager.FnDeleteGroupMembers);
 
 //below service are for EZEIDAP
 app.post('/ewLoginAP', LocationManager.FnLoginAP);
@@ -186,6 +192,7 @@ app.post('/ewtSearchRealEstateAP', LocationManager.FnSearchRealEstateAP);
 app.post('/ewtUpdateRedFlagAP',LocationManager.FnUpdateRedFlagAP);
 app.post('/ewtUpdateEZEIDAP', LocationManager.FnUpdateEZEIDAP);
 app.post('/ewtDeleteBannerPicAP', LocationManager.FnDeleteBannerPictureAP);
+
 
 //EZEID VAS
 app.get('/ewtLoginVES',LocationManager.FnLoginVES);
@@ -223,7 +230,7 @@ app.use(function(req, res, next) {
             res.type('json').send('Invalid Service call');   
     }
     else{
-        res.redirect('/');
+        res.send('');
     }
 });
 

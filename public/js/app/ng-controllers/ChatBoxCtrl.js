@@ -37,15 +37,13 @@ angular.module('ezeidApp').controller('ChatBoxCtrl',[
         $scope.toggleChatBox = function(){
            $scope.isChatBoxVisible = !$scope.isChatBoxVisible;
            if($scope.isChatBoxVisible){
-                console.log("visibal");
-                $(".chat-box").addClass('active');
+              //  $(".chat-box").addClass('active');
                 $scope.chatArrow = false;
             }
             else
             {
                 $scope.chatArrow = true;
-                console.log("In-visibal");
-                $(".chat-box").removeClass('active');
+              //  $(".chat-box").removeClass('active');
             }
 
 
@@ -60,10 +58,4 @@ angular.module('ezeidApp').controller('ChatBoxCtrl',[
             }*/
 
         };
-
-        //Open add group popup
-        $scope.openAddGroupPopup = function(){
-            console.log("SAi")
-        };
-
-    }]);
+}]);

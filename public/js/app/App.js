@@ -112,7 +112,14 @@
             .when('/profile-manager',{
                 redirectTo : '/profile-manager/user'
             })
-            .when('/home',{templateUrl: 'html/home.html'})
+            .when('/landing',{
+                templateUrl: 'html/landing.html',
+                controller : 'LandingPageCtrl'
+            })
+            .when('/searchResult',{
+                templateUrl: 'html/result.html',
+                controller : 'SearchResultCtrl'
+            })
             .when('/:ezeid',{
                 templateUrl : 'html/home.html'
             })
