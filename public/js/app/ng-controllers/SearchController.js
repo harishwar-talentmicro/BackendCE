@@ -196,12 +196,8 @@ angular.module('ezeidApp').controller('SearchController', [
 
         $("input").focusin(function () {
             $(document).keypress(function (e) {
-                console.log(e);
                 if (e.which == 13) {
-                   // infowindow.close();
-
-                    console.log("sai88");
-                    var firstResult = $(".pac-container .pac-item:first").text();
+                  var firstResult = $(".pac-container .pac-item:first").text();
 
                     var geocoder = new google.maps.Geocoder();
                     geocoder.geocode({"address":firstResult }, function(results, status) {
@@ -211,7 +207,8 @@ angular.module('ezeidApp').controller('SearchController', [
                                 placeName = results[0].address_components[0].long_name,
                                 latlng = new google.maps.LatLng(lat, lng);
 
-                           // moveMarker(placeName, latlng);
+                            $rootScope.CLoc.CLat = results[0].geometry.location.lat();
+                            $rootScope.CLoc.CLong = results[0].geometry.location.lng();
                             PlaceCurrentLocationMarker(latlng);
                             $("input").val(firstResult);
                         }
@@ -220,16 +217,6 @@ angular.module('ezeidApp').controller('SearchController', [
             });
         });
 
-
-       /*google.maps.event.addListener(autocomplete,'place_changed',function(){
-            var place = autocomplete.getPlace();
-
-            $rootScope.CLoc.CLat = place.geometry.location.lat();
-            $rootScope.CLoc.CLong = place.geometry.location.lng();
-
-            var loc = new google.maps.LatLng($rootScope.CLoc.CLat, $rootScope.CLoc.CLong);
-            PlaceCurrentLocationMarker(loc);
-        });*/
         /********** Google Maps autocomplete ends *********/
 
         var searchBox = new google.maps.places.SearchBox(input);
@@ -280,7 +267,6 @@ angular.module('ezeidApp').controller('SearchController', [
         });
 
         google.maps.event.addListenerOnce(map, 'idle', function () {
-
             $scope.isMapLoaded = true;
             $timeout(function(){
                 $scope.isMapReady = true;
@@ -508,7 +494,7 @@ angular.module('ezeidApp').controller('SearchController', [
 
     SearchSec.getSearch = function () {
 
-        $scope.SearchResultCount= "";
+        $scope.SearchResultCount = "";
         $scope.ShowNoDataFound = false;
         SearchSec.Criteria.Rating = rating.toString();
         SearchSec.IsSearchButtonClicked = true;

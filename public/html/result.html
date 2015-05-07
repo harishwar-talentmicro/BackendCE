@@ -1,37 +1,27 @@
-<section id="result-page-wrapper" class="hpw rpw">
+<section id="result-page-menu-wrapper" class="hpw rpw">
     <!-- New header menu goes here -->
-    <nav class="navbar navbar-head">
+    <nav class="navbar navbar-inverse no-radius m-bottom-0">
         <div class="container-fluid">
-            <!-- Header content - left :Logo goes here -->
+            <!-- Brand and toggle get grouped for better mobile display -->
             <div class="navbar-header">
-                <div class="logo p-top-10">
-                </div>
-            </div>
-
-            <!-- Header content -right  -->
-            <div class="nav navbar-nav navbar-right p-top-10 p-right-10">
-                <div class="btn-group">
-                    <div class="btn btn-info dropdown-toggle no-radius" data-toggle="dropdown"><b>Download App <span class="caret"></span></b></div>
-                    <ul class="dropdown-menu" role="menu">
-                        <li class="text text-danger"><a href="#"><i class="fa fa-apple text-danger"></i> <b class="text text-danger">App Store</b></a></li>
-                        <li><a href="#"><i class="fa fa-google text text-success"></i> <b class="text text-success">Google Play</b></a></li>
-                    </ul>
-                </div>
-                <div class="btn btn-success  no-radius" title="sign in"><i class="fa fa-sign-in"></i></div>
-                <div class="btn btn-warning  no-radius" title="sign up"><i class="fa fa-user"></i></div>
-            </div>
-        </div><!-- /.container-fluid -->
-    </nav>
-
-    <div class="container-fluid">
-        <div class="header">
-            <div class="col-lg-2 col-md-4 col-sm-6 col-xs-4 text-left">
                 <div class="logo"></div>
+                <!-- For mobile view menu -->
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-2">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+
             </div>
-            <div class="col-lg-10 col-md-8 col-sm-6 col-xs-8 text-right">
-                <div class="header-group pull-right col-lg-pull-1 header-btn">
-                    <div class="btn-group">
-                        <div class="btn btn-info dropdown-toggle no-radius" data-toggle="dropdown"><b><i class="fa fa-user"></i> Hi! Allex <span class="caret"></span></b></div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-2">
+
+                <ul class="nav navbar-nav navbar-right">
+                    <li class="dropdown ">
+
+                        <a class="dropdown-toggle border-right-1 btn-link" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-user"></i> Hi Allex <span class="caret"></span></a>
                         <ul class="dropdown-menu" role="menu">
                             <li><a href="#"><i class="fa fa-wrench"></i> Profile Manager</a></li>
                             <li><a href="#"><i class="fa fa-envelope"></i> Messages</a></li>
@@ -40,10 +30,113 @@
                             <li><a href="#"><i class="fa fa-server"></i> Bulk Mailer</a></li>
                             <li><a href="#"><i class="fa fa-warning"></i> Change Password</a></li>
                         </ul>
-                        <div class="btn btn-danger no-radius" title="sign out "><i class="fa fa-sign-out"></i></div>
+
+
+                    </li>
+                    <li><a class="btn-link"><i class="fa fa-sign-out"></i> Sign Out</a></li>
+                </ul>
+            </div><!-- /.navbar-collapse -->
+        </div><!-- /.container-fluid -->
+    </nav>
+
+    <!-- Navbar header menu for search result goes here -->
+    <nav class="navbar navbar-default m-bottom-0 no-radius">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <div class="row text-center search-bar-center">
+                    <form class="navbar-form navbar-left no-border " role="search">
+                        <!-- Search Bar and advance filter goes here -->
+                        <div class="input-group">
+                            <div class="input-group-btn">
+                                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><b>Dropdown{{searchType[searchParams.searchType]}}</b> <span class="caret"></span></button>
+                                <ul class="dropdown-menu" role="menu">
+                                    <li class="btn-link" ng-repeat="search in searchType track by $index">
+                                        <a class="btn-link" ng-click="($event.preventDefault())(searchParams.searchType = $index) (searchParams.searchTerm = '')">{{search}}</a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <input type="text" ng-keypress="checkEnterKey($event)" placeholder="{{placeHolderText[searchParams.searchType]}}" ng-model="searchParams.searchTerm" ng-class="(searchParams.searchType === 0) ? 'text-uppercase' : ''" class="form-control" aria-label="...">
+                            <div class="input-group-btn">
+                                <button type="button" class="btn btn-default" title="search" ng-click="triggerSearch()"><i class="fa fa-search"></i> </button>
+                                <button  ng-click="toggleFilterContainer($event,true)" type="button" class="btn btn-info dropdown-toggle btn-advanced-filter" data-toggle="dropdown" title="advance search"><i class="fa fa-filter"></i> </button>
+                            </div>
+                        </div>
+                    </form>
+                    <!-- Toggle buttons for switching betweeen maps and list -->
+                    <ul class="nav navbar-nav navbar-right">
+                        <li class="dropdown p8">
+                            <div class="btn-group">
+                                <button class="btn btn-default"><i class="fa fa-list"></i> List</button>
+                                <button class="btn btn-default"><i class="fa fa-map-marker"></i> Maps</button>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div><!-- /.navbar-collapse -->
+        </div><!-- /.container-fluid -->
+    </nav>
+</section>
+<!-- Search result wrapper -->
+<section id="search-result-wrapper" class="hpw srw">
+    <div class="metro-ui-wrapper">
+        <!-- main-tiles-frame -->
+        <div class="main-tiles-frame tile-frame-padding-top">
+            <!-- All such results goes here -->
+            <div class="row p-top-10">
+                <!-- Master Tile! -->
+                <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12 individual-tiles text-center p3" ng-repeat="x in count track by $index">
+                    <div class="row-1">
+                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 block-1 block">
+                            1.3Km
+                        </div>
+                        <div class="col-lg-7 col-md-7 col-sm-7 col-xs-7 block-2 block">
+                            <b>HIRE123</b>
+                        </div>
+                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 block-3 block">
+                            CH
+                        </div>
+                    </div>
+                    <!-- Row Ends -->
+                    <div class="row-2">
+                        <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10 block-4 block">
+                            <i>Hirecraft Softwares</i>
+                        </div>
+                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 block-5 block">
+                            <i class="fa fa-user"></i>
+                        </div>
+                    </div>
+                    <!-- Row Ends -->
+                    <div class="row-3">
+                        <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10 text-center block-6 block">
+                            <!--<i class="fa fa-envelope"></i> Allexmclen@gmail.com<br>-->
+                            <i class="fa fa-mobile-phone"></i> 740625740
+                        </div>
+                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 block-7 block">
+                            <i class="fa fa-map-marker"></i>
+                        </div>
+                    </div>
+                    <!-- Row Ends -->
+                    <div class="row-4">
+                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 block-8"><i class="fa fa-cog"></i></div>
+                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 block-9"><i class="fa fa-anchor"></i></div>
+                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 block-10"><i class="fa fa-android"></i></div>
+                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 block-11"><i class="fa fa-user"></i></div>
                     </div>
                 </div>
+
             </div>
         </div>
+        <!-- main-tiles-frame-ends -->
     </div>
 </section>

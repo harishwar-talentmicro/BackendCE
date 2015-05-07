@@ -20,12 +20,15 @@
         '/business-manager',
         '/business-manager/:subview',
         '/profile-manager',
-        '/profile-manager/:subview'
+        '/profile-manager/:subview',
+        '/searchDetails'
     ]);
 
     /**
      * These routes will not consider whether user is authenticated or not
      * and user can navigate to these routes as public routes whether logged in or not
+     * The only difference between normal open routes and this is that it adds up the _userInfo to $rootScope if
+     * user is logged in
      */
     ezeid.value('OPEN_ROUTES',[
 
@@ -40,6 +43,35 @@
     ]);
 
     ezeid.value('MsgDelay',5000);
+
+
+    ezeid.value('$queryLsToken',(function(){
+       if(typeof(localStorage) !== "undefined"){
+           try {
+               var encrypted = localStorage.getItem("_token");
+               if (encrypted) {
+                   var decrypted = CryptoJS.AES.decrypt(encrypted, "EZEID");
+                   var jsonString = null;
+                   try {
+                       jsonString = JSON.parse(decrypted.toString(CryptoJS.enc.Utf8));
+                   }
+                   catch (ex) {
+                   }
+                   return jsonString;
+               }
+               else {
+                   return null;
+               }
+           }
+           catch(ex){
+               return null;
+           }
+        }
+        else{
+            alert('You are using and outdated browser! Please upgrade to newer browser');
+            return null;
+        }
+    })());
 
 
     /**
@@ -120,6 +152,10 @@
                 templateUrl: 'html/result.html',
                 controller : 'SearchResultCtrl'
             })
+            .when('/searchDetails',{
+                templateUrl: 'html/informationDetail.html',
+                controller : 'InformationDetailCtrl'
+            })
             .when('/:ezeid',{
                 templateUrl : 'html/home.html'
             })
@@ -131,8 +167,8 @@
     /***
      * @ezeid Configuring Route access based on authentication
      */
-    ezeid.run(['$location','$rootScope','CLOSED_ROUTES','$routeParams','$timeout','UNAUTHORIZED_ROUTES',
-        function($location,$rootScope,CLOSED_ROUTES,$routeParams,$timeout,UNAUTHORIZED_ROUTES){
+    ezeid.run(['$location','$rootScope','CLOSED_ROUTES','$routeParams','$timeout','UNAUTHORIZED_ROUTES','OPEN_ROUTES','$queryLsToken',
+        function($location,$rootScope,CLOSED_ROUTES,$routeParams,$timeout,UNAUTHORIZED_ROUTES,OPEN_ROUTES,$queryLsToken){
 
             $rootScope.$on('$includeContentRequested',function(){
                 $rootScope.$broadcast('$preLoaderStart');
@@ -163,7 +199,7 @@
          * Checking login while navigating to different pages
          */
 
-        $rootScope.$on("$routeChangeStart",function(event,next,current){
+        $rootScope.$on("$routeChangeStart1",function(event,next,current){
             try{
                 if(CLOSED_ROUTES.indexOf(next.$$route.originalPath) === -1
                     &&
@@ -238,7 +274,7 @@
                                 else{
                                     if(UNAUTHORIZED_ROUTES.indexOf(next.$$route.originalPath) === -1){
                                         /**
-                                         * If route is found in unauthorized routes then don't allow him to navigate to that route
+                                         * If route is not found in unauthorized routes then don't allow him to navigate to that route
                                          * when he is already logged in
                                          */
                                         $location.path('/');
@@ -297,9 +333,83 @@
             }
         });
 
-        $rootScope.$on('$routeChangeSuccess',function(){
+        $rootScope.$on('$routeChangeStart',function(event,next,current){
+            /**
+             * Fetching userInfo From local storage here if userInfo is not found in $rootScope
+             */
+            if(!$rootScope._userInfo){
+                $rootScope._userInfo = $queryLsToken;
+            }
+
+            else if(!$rootScope._userInfo.IsAuthenticate){
+                $rootScope._userInfo = $queryLsToken;
+            }
+
+            var requestedRoute = '';
+
+            try{
+                requestedRoute = next.$$route.originalPath
+            }
+            catch(ex){
+                /**
+                 * In case if user has opened up the site index he will not be having any requestedRoute
+                 * then in that case let him navigate
+                 */
+                return;
+            }
+
+            /**
+             * Checking requestedRoute presence in our configured route lists
+             */
+
+            if(OPEN_ROUTES.indexOf(requestedRoute) !== -1){
+                /**
+                 * If route is Open then let him navigate it
+                 */
+                return;
+            }
+
+            else if(CLOSED_ROUTES.indexOf(requestedRoute) !== -1){
+                /**
+                 * If user is authenticated let him navigate
+                 */
+                if($rootScope._userInfo.IsAuthenticate){
+                    return;
+                }
+                /**
+                 * If user is not logged in then redirect him to home page
+                 */
+                else{
+                    $rootScope._userInfo = undefined;
+                    $location.path('/');
+                }
+            }
+
+            else if(UNAUTHORIZED_ROUTES.indexOf(requestedRoute) !== -1){
+                /**
+                 * If user is authenticated don't let him navigate to this route
+                 */
+                if($rootScope._userInfo.IsAuthenticate){
+                    $location.path('/');
+                }
+                /**
+                 * If user is not logged in then only let him navigate to this page
+                 */
+                else{
+                    return;
+                }
+            }
+            /**
+             * The route which is not added anywhere is considered as publicly open route
+             * and let him navigate to it without checking whether he is logged in or not
+             */
+            else{
+                return;
+            }
 
         });
+
+
     }]);
     /************************************** Run Configuration ends here ****************************/
 })();
