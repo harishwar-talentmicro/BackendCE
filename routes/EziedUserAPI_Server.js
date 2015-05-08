@@ -4176,6 +4176,8 @@ exports.FnGetSearchInformation = function (req, res) {
         var Token = req.query.Token;
         var TID = parseInt(req.query.TID);
         var CurrentDate = req.query.CurrentDate;
+        var LocIDS = req.query.LocIDS;
+        var ID=''
         var WorkingDate
         var moment = require('moment');
         if(CurrentDate != null)
@@ -4183,11 +4185,16 @@ exports.FnGetSearchInformation = function (req, res) {
         else
              var WorkingDate = moment(new Date()).format('YYYY-MM-DD HH:MM');
         //console.log(WorkingDate);
-
+        if(LocIDS != null){
+            
+            ID = LocIDS + ',' + ID;
+            var IDS =ID.slice(0,-1)
+            console.log('TID Values:'+ IDS);}
         if (Token != null && Token != '' && TID.toString() != 'NaN' && WorkingDate != null) {
             if(Token == 2){
 
-                            var SearchParameter = db.escape(TID) + ',' + db.escape(Token) + ',' + db.escape(WorkingDate);
+                            var SearchParameter = db.escape(TID) + ',' + db.escape(Token) + ',' + db.escape(WorkingDate) 
+                                    + ',' + db.escape(IDS);
                             // console.log('Search Information: ' +SearchParameter);
            //     console.log('CALL pSearchInformation(' + SearchParameter + ')');
                             db.query('CALL pSearchInformation(' + SearchParameter + ')', function (err, UserInfoResult) {
@@ -4404,7 +4411,7 @@ exports.FnGetBannerPicture = function(req, res){
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
             Ezeid = Ezeid.split(',').pop();
         if ( SeqNo.toString() != 'NaN' && Ezeid != null && LocID != null) {
-            var Query = db.escape(Ezeid) + ',' + db.escape(SeqNo) + ',' + db.escape(LocID);
+            var Query = db.escape(Ezeid) + ',' + db.escape(SeqNo) + ',' + db.escape(0);
             //console.log(InsertQuery);
             db.query('CALL PGetBannerPicsUsers(' + Query + ')', function (err, BannerResult) {
                 if (!err) {
@@ -9760,6 +9767,7 @@ try{
                         //console.log(Query);
                             //db.query(Query, function (err, SearchResult) {
                                     db.query('CALL pGetSearchPics(' + db.escape(IDS) + ')', function (err, SearchResult) {
+                                    
                                     if (!err) {
                                         if (SearchResult != null) {
                                             if (SearchResult[0] != null) {
