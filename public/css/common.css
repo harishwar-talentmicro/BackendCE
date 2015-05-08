@@ -1158,6 +1158,12 @@ span.smallCloselink {
   border-radius: 0px;
 }
 
+.modal-dialog.modal-lg.business-manager-modal > button.up-btn.close{
+    z-index: 100;
+    position: absolute;
+    right: 10px;
+}
+
 .modal-dialog.modal-lg.business-manager-modal > .modal-content > .modal-header > h4{
   font-family : 'Open Sans Light',sans-serif;
   font-size : 30px;

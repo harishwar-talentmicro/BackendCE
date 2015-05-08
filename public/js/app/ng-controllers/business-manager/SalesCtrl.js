@@ -298,6 +298,42 @@
             });
 
 
+            /**
+             * Load transaction items
+             * @param txId
+             * @returns {*}
+             */
+            $scope.loadTxItems = function(txId){
+                var defer = $q.defer();
+                $http({
+                    url : GURL + 'ewtGetTranscationItems',
+                    method : 'GET',
+                    params : {
+                        Token : $rootScope._userInfo.Token,
+                        MessageID : txId    // For Sales
+                    }
+                }).success(function(resp){
+                    if(resp && resp !== 'null' && resp.length > 0){
+                        /**
+                         * Change
+                         * 1. $scope.totalPages
+                         * 2. $scope.pageNumber
+                         * 3. $scope.txList
+                         */
+                        $scope.txStatusTypes = resp;
+                    }
+                    else{
+
+                        $scope.txStatusTypes = [];
+                    }
+                    defer.resolve(resp);
+                }).error(function(err){
+                    defer.reject();
+                });
+                return defer.promise;
+            };
+
+
             $scope.loadTxActionTypes().then(function(){
                 $scope.loadTxStatusTypes().then(function(){
                     $scope.loadTransaction().then(function(){
@@ -311,6 +347,7 @@
             },function(){
                 $scope.$emit('$preLoaderStop');
             });
+
 
 
 

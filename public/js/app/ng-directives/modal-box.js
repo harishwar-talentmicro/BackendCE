@@ -5,9 +5,10 @@ angular.module('ezeidApp').directive('modal', function () {
     return {
         template: '<div class="modal fade">' +
             '<div class="modal-dialog modal-lg {{ mclass }}">' +
+            '<button type="button" class="close up-btn" data-dismiss="modal" aria-hidden="true" ng-show="mclass && !showheader">×</button>' +
             '<div class="modal-content">' +
             '<span class="closelink" data-dismiss="modal" aria-hidden="true" ng-hide="mclass">×</span>'+
-            '<div class="modal-header">' +
+            '<div class="modal-header" ng-show="showheader">' +
                '<button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-show="mclass">×</button>' +
             '<h4 class="modal-title text-center">{{ mtitle }}</h4>' +
             '</div>' +
@@ -22,6 +23,15 @@ angular.module('ezeidApp').directive('modal', function () {
         link: function postLink(scope, element, attrs) {
             scope.mclass = attrs.mclass;
             scope.mtitle = attrs.mtitle;
+            scope.showheader = true;
+            console.log(attrs.showheader);
+            console.log(scope.showheader);
+            if(typeof(attrs.showheader) !== "undefined"){
+                scope.showheader = attrs.showheader;
+                scope.$watch(attrs.showheader,function(value){
+                    scope.showheader = value;
+                });
+            }
             scope.$watch(attrs.visible, function(value){
                 if(value == true)
                     $(element).modal('show');
