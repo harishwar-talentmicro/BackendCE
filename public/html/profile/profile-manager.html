@@ -652,7 +652,7 @@
                                                                                         data-toggle="tooltip"
                                                                                         title="Edit"
                                                                                         class="btn btn-xs btn-default no-radius"
-                                                                                        ng-click="(toggleMapControls(0))(editLocation(0))"
+                                                                                        ng-click="(toggleMapControls(0,true))(editLocation(0))"
                                                                                         ng-show="locationsToggleIndex[0].viewMode && !locationsToggleIndex[0].editMode">
                                                                                     <span class="glyphicon glyphicon-pencil"></span> Edit
                                                                                 </button>
@@ -1128,7 +1128,7 @@
                                                                                         data-toggle="tooltip"
                                                                                         title="Edit"
                                                                                         class="btn btn-xs btn-default no-radius"
-                                                                                        ng-click="(toggleMapControls(locIndex+1))(editLocation(locIndex+1))"
+                                                                                        ng-click="(toggleMapControls(locIndex+1,true))(editLocation(locIndex+1))"
                                                                                         ng-show="locationsToggleIndex[locIndex+1].viewMode && !locationsToggleIndex[locIndex+1].editMode">
                                                                                     <span class="glyphicon glyphicon-pencil"></span> Edit
                                                                                 </button>
@@ -1730,8 +1730,13 @@
                                         </li>
 
                                         <li ng-show="userDetails.IDTypeID === 1" role="presentation" class=" bottom-clearfix"
-                                            ng-class="{'active' : (activeTemplate === 'html/documents.html')}">
+                                            ng-class="{'active' : (activeTemplate === 'html/profile/personal-documents.html')}">
                                             <a href="/profile-manager/documents"><span class="glyphicon glyphicon-file"></span> Personal Documents</a>
+                                        </li>
+
+                                        <li ng-show="userDetails.IDTypeID === 1" role="presentation" class=" bottom-clearfix"
+                                            ng-class="{'active' : (activeTemplate === 'html/profile/attach-resume.html')}">
+                                            <a href="/profile-manager/resume"><span class="glyphicon glyphicon glyphicon-copy"></span> Resume Attachment</a>
                                         </li>
                                         <!--- Hidden in case of business and public place ----------->
                                         <li role="presentation" class=" bottom-clearfix"
