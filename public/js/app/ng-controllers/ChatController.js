@@ -61,7 +61,7 @@ angular.module('ezeidApp').controller('ChatController',[
          // console.log($scope.groupTitle);
           $http({ method: 'post', url: GURL + 'ewtSaveGroupChatList', data: {Token: $rootScope._userInfo.Token, GroupTitle: $scope.groupTitle}}).success(function (data)
             {
-            console.log(data);
+           // console.log(data);
                if (data != 'null')
                {
                   $scope.groupTitle = "";

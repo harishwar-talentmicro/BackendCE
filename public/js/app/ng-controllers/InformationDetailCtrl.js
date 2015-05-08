@@ -61,7 +61,7 @@ angular.module('ezeidApp').
         var directionsService = new google.maps.DirectionsService();
         var service;
 
-            var TID = 592;//254;
+            var TID = 592; //254;
 
         /*initialize();
 
