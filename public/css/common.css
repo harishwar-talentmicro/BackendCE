@@ -1566,6 +1566,11 @@ span.smallCloselink {
     background: #FFFFFF;
 }
 
+.tx-row.edit{
+    background: #FFF5B0;
+    box-shadow: none;
+}
+
 .top-clearfix-half{
     margin-top:50px;
 }
