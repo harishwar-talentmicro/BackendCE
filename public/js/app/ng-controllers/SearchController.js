@@ -580,7 +580,7 @@ angular.module('ezeidApp').controller('SearchController', [
                     }
                     else
                     {
-                         if($rootScope._userInfo.IsAuthenticate == true || data[0].IDTypeID == 2 && (SearchSec.Criteria.SearchType == 1))
+                         if(($rootScope._userInfo.IsAuthenticate == true || data[0].IDTypeID == 2) && (SearchSec.Criteria.SearchType == 1))
                          {
                              $rootScope.$broadcast('$preLoaderStart');
                                $http({ method: 'get', url: GURL + 'ewtGetSearchInformation',
