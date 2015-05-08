@@ -1446,3 +1446,8 @@ table.rwd-table > tbody > tr > td.serachResultSelectAll
 {
     color: #FFCD28;
 }
+.infoModal>.modal>.business-manager-modal > .modal-content > .modal-body {
+    padding: 0px;
+    border: 1px solid #EEE;
+    border-top: none;
+}

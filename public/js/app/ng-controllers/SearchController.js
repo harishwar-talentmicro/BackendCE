@@ -353,7 +353,7 @@ angular.module('ezeidApp').controller('SearchController', [
         });
     }
     this.getMyLocation = function () {
-        if (navigator.geolocation) {
+       if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(FindCurrentLocation);
         }
     };
@@ -421,7 +421,7 @@ angular.module('ezeidApp').controller('SearchController', [
                     // markers[indexOfMarker].setMap(null);
                     return function ()
                     {
-                         // marker.setIcon("images/business_selected.png");
+                        // marker.setIcon("images/business_selected.png");
                         $scope.showLoadingImage = true;
                         SearchSec.showSearchWindow = false;
                         SearchSec.showInfoWindow = true;
