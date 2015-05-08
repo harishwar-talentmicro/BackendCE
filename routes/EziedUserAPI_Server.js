@@ -4176,6 +4176,8 @@ exports.FnGetSearchInformation = function (req, res) {
         var Token = req.query.Token;
         var TID = parseInt(req.query.TID);
         var CurrentDate = req.query.CurrentDate;
+        var LocIDS = req.query.LocIDS;
+        var ID=''
         var WorkingDate
         var moment = require('moment');
         if(CurrentDate != null)
@@ -4183,11 +4185,16 @@ exports.FnGetSearchInformation = function (req, res) {
         else
              var WorkingDate = moment(new Date()).format('YYYY-MM-DD HH:MM');
         //console.log(WorkingDate);
-
+        if(LocIDS != null){
+            
+            ID = LocIDS + ',' + ID;
+            var IDS =ID.slice(0,-1)
+            console.log('TID Values:'+ IDS);}
         if (Token != null && Token != '' && TID.toString() != 'NaN' && WorkingDate != null) {
             if(Token == 2){
 
-                            var SearchParameter = db.escape(TID) + ',' + db.escape(Token) + ',' + db.escape(WorkingDate);
+                            var SearchParameter = db.escape(TID) + ',' + db.escape(Token) + ',' + db.escape(WorkingDate) 
+                                    + ',' + db.escape(IDS);
                             // console.log('Search Information: ' +SearchParameter);
            //     console.log('CALL pSearchInformation(' + SearchParameter + ')');
                             db.query('CALL pSearchInformation(' + SearchParameter + ')', function (err, UserInfoResult) {
@@ -4404,7 +4411,7 @@ exports.FnGetBannerPicture = function(req, res){
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
             Ezeid = Ezeid.split(',').pop();
         if ( SeqNo.toString() != 'NaN' && Ezeid != null && LocID != null) {
-            var Query = db.escape(Ezeid) + ',' + db.escape(SeqNo) + ',' + db.escape(LocID);
+            var Query = db.escape(Ezeid) + ',' + db.escape(SeqNo) + ',' + db.escape(0);
             //console.log(InsertQuery);
             db.query('CALL PGetBannerPicsUsers(' + Query + ')', function (err, BannerResult) {
                 if (!err) {
@@ -9732,6 +9739,84 @@ try{
     }
     catch (ex) {
         console.log('FnGetChatList error:' + ex.description);
+        throw new Error(ex);
+    }
+};
+
+exports.FnGetSearchPicture = function(req, res){
+try{
+    
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    
+    var Token = req.query.Token;
+    var TID = req.query.TID;
+        var ID=''
+        if(TID != null){
+            
+            ID = TID + ',' + ID;
+            var IDS =ID.slice(0,-1)
+            console.log('TID Values:'+ IDS);}
+    
+        if (Token != null && IDS != null){
+            FnValidateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+                        console.log('CALL pGetSearchPics(' + db.escape(IDS) + ')');
+                        //var Query = 'Select TID,EZEID,CompanyName from tmaster where TID in (' + TID + ')';
+                        //console.log(Query);
+                            //db.query(Query, function (err, SearchResult) {
+                                    db.query('CALL pGetSearchPics(' + db.escape(IDS) + ')', function (err, SearchResult) {
+                                    
+                                    if (!err) {
+                                        if (SearchResult != null) {
+                                            if (SearchResult[0] != null) {
+                                                console.log('FnGetSearchPicture:Picture send sucessfully..');
+                                                res.send(SearchResult[0]);
+                                            }
+                                            else {
+                                            console.log('FnGetSearchPicture: No Picture send sucessfully');
+                                            res.send('null');
+                                        }
+                                    }
+                                    else {
+                                        console.log('FnGetSearchPicture: No Picture send sucessfully');
+                                        res.send('null');
+                                    }
+                                }
+                                else {
+                                    console.log('FnGetSearchPicture: error in getting picture result' + err);
+                                    res.statusCode = 500;
+                                    res.send('null');
+                                }
+                            });
+                    }
+                    else {
+                        res.statusCode = 401;
+                        res.send('null');
+                        console.log('FnGetSearchPicture: Invalid Token');
+                    }
+                } else {
+
+                    res.statusCode = 500;
+                    res.send('null');
+                    console.log('FnGetSearchPicture: Error in validating token:  ' + err);
+                }
+            });
+        }
+        else {
+            if (Token == null) {
+                console.log('FnGetSearchPicture: Token is empty');
+            }
+            else if (TID == null) {
+                console.log('FnGetSearchPicture: TID is empty');
+            }
+            res.statusCode=400;
+            res.send('null');
+        }
+    }
+    catch (ex) {
+        console.log('FnGetSearchPicture error:' + ex.description);
         throw new Error(ex);
     }
 };
