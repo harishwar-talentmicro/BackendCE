@@ -25,7 +25,7 @@ angular.module('ezeidApp').directive('contentItem', ['$compile','$templateCache'
         }
 
         return template;
-    }
+    };
 
     var linker = function(scope, element, attrs) {
         // scope.rootDirectory = 'images/';
@@ -33,7 +33,7 @@ angular.module('ezeidApp').directive('contentItem', ['$compile','$templateCache'
         var templateType = scope.$eval(attrs.templateType);
         element.html(getTemplate(templateType)).show();
         $compile(element.contents())(scope);
-    }
+    };
 
 
     return {

@@ -24,8 +24,6 @@ angular.module('ezeidApp').directive('modal', function () {
             scope.mclass = attrs.mclass;
             scope.mtitle = attrs.mtitle;
             scope.showheader = true;
-            console.log(attrs.showheader);
-            console.log(scope.showheader);
             if(typeof(attrs.showheader) !== "undefined"){
                 scope.showheader = attrs.showheader;
                 scope.$watch(attrs.showheader,function(value){
