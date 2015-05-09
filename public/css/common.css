@@ -1187,10 +1187,9 @@ span.smallCloselink {
 
 
 .modal-dialog.modal-lg.business-manager-modal .business-manager-item.selected {
-    background: #FFF;
-    border: 2px dotted #ABABAB;
+    border: 2px dotted #DFDFDF;
     box-shadow: 0px 0px 30px #D2D2D2;
-    background: #4EAEFF;
+    background: #FFFFFF;
     padding: 5px;
     margin: 5px 0px 5px 0px;
 }

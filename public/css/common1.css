@@ -413,6 +413,14 @@ body {
     font-size: 10px;
     color: #ffffff;
 }
+.newMsgButtonContainer
+{
+    font-size: 10px;
+    color: #ffffff;
+    background: #09a2de;
+    border: 1px solid green;
+    margin-top: 1%;
+}
 .innerMsgButtonContainer
 {
     padding-top: 0.5%;
@@ -1446,11 +1454,76 @@ table.rwd-table > tbody > tr > td.serachResultSelectAll
 {
     color: #FFCD28;
 }
+.infoModal>.modal>.business-manager-modal > .modal-content > modal-body{
+    /*background: #deebf7;*/
+    border: none;
+}
+
 .infoModal>.modal>.business-manager-modal > .modal-content > .modal-body {
     padding: 0px;
-    border: 1px solid #EEE;
-    border-top: none;
+    padding-top: 0px;
+    border: none;
+
 }
+
+.infoModal>.modal>.business-manager-modal > .modal-content {
+    background: #deebf7;
+    border: 1px solid #808080;
+    box-shadow: 0px 0px 30px #696969;
+    padding: 10px;
+}
+
+
+
+.mapModal>.modal>.business-manager-modal > .modal-content > modal-body{
+    /*background: #deebf7;*/
+    border: none;
+}
+
+.mapModal>.modal>.business-manager-modal > .modal-content > .modal-body {
+    padding: 0px;
+    padding-top: 0px;
+    border: none;
+
+}
+
+.mapModal>.modal>.business-manager-modal > .modal-content {
+    background: #ffffff;
+    border: 1px solid #808080;
+    box-shadow: 0px 0px 30px #696969;
+    padding: 10px;
+}
+
 .searchDetailContainer{
     background: #deebf7;
+}
+.noticeTextContainer {
+    position: absolute;
+    top: 1%;
+    z-index: 3;
+    right: 0px;
+    background: #FFCD28;
+    font-size: 13px;
+    width: 348px;
+    margin-right: 3.7%;
+}
+.profilePicBorder
+{
+    border: solid 4px #00b050;
+    border-radius: 10%;
+}
+.aboutCompanyTextContainer
+{
+    height: 60px;
+    font-size: 12px;
+    overflow-y: auto;
+}
+.aboutcontainerFrame
+{
+    border: solid 1px green;
+    margin-top: 1%;
+}
+.mapButtonContainer
+{
+    margin-top: 1%;
 }
