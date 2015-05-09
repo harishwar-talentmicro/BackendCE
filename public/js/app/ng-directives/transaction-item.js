@@ -1,5 +1,5 @@
 (function(){
-    angular.module('ezeidApp').directive('transaction-item', ['$compile','$templateCache',function ($compile,$templateCache) {
+    angular.module('ezeidApp').directive('transactionItem', ['$compile','$templateCache',function ($compile,$templateCache) {
 
         var getTemplate = function(templateType) {
             var template = '';

@@ -1200,6 +1200,12 @@ span.smallCloselink {
     color: #11A300;
 }
 
+.modal-dialog.modal-lg.business-manager-modal .input-group-addon{
+    background: #eee;
+    color: #666;
+    border: 1px solid #999;
+}
+
 .button.close{
     text-decoration: none;
 }
