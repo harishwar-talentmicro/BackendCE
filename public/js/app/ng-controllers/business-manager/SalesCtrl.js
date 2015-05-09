@@ -42,43 +42,33 @@
                 $location.path('/business-manager');
             };
 
-            var itemTypeTemplates = [
-                '/tpl/tx-item-description.html',
-                '/tpl/tx-item-description-picture.html',
-                '/tpl/tx-item-description-picture-qty.html',
-                '/tpl/tx-item-description-picture-qty-rate.html'
-            ];
+
 
             $scope.listConf = [
                 {
                     message : true,
                     item : false,
-                    amount : false,
-                    itemTemplate : null
+                    amount : false
                 },
                 {
                     message : true,
                     item : true,
-                    amount : false,
-                    itemTemplate : itemTypeTemplates[0]       // Only Item with description
+                    amount : false
                 },
                 {
                     message : true,
                     item : true,
-                    amount : false,
-                    itemTemplate : itemTypeTemplates[1]       // Item + Picture + Description
+                    amount : false
                 },
                 {
                     message : true,
                     item : true,
-                    amount : false,
-                    itemTemplate : itemTypeTemplates[2]       // Item + Picture + Description + Quantity
+                    amount : false
                 },
                 {
                     message : true,
                     item : true,
-                    amount : true,
-                    itemTemplate : itemTypeTemplates[2]       // Item + Picture + Description + Quantity + Rate
+                    amount : true
                 }
             ];
 
@@ -94,6 +84,7 @@
             $scope.txList = [];
 
             /**
+             *
              * Sales items present for this user
              * @type {Array}
              */
@@ -171,7 +162,13 @@
                      * Fill the information of Current Transaction
                      */
                 }
-                $scope.showModal = !$scope.showModal;
+                $scope.loadItemList().then(function(){
+                    $scope.$emit('$preLoaderStop');
+                    $scope.showModal = !$scope.showModal;
+                },function(){
+                    $scope.$emit('$preLoaderStop');
+                    Notification.error({message : 'Unable to load item list', delay : MsgDelay} );
+                });
             };
 
             $scope.resetModalBox = function(){
@@ -353,7 +350,7 @@
             $scope.loadItemList = function(){
                 var defer = $q.defer();
                 $http({
-                    url : GURL + 'ewtItemList',
+                    url : GURL + 'ewtGetItemList',
                     method : 'GET',
                     params : {
                         Token : $rootScope._userInfo.Token,
