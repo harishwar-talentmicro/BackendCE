@@ -255,6 +255,12 @@
     padding-right: 10px;
 }
 
+.hpw .p-right-10-p
+
+{
+    padding-right: 10%;
+}
+
 .hpw .select-items
 {
     padding: 5px;
@@ -487,6 +493,12 @@ hr.style-two {
     color: #fff;
     font-weight: 500;
     min-height: 150px;
+
+    background-image: url('https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcQim4Ld4E0wIBtLvPIpRjo1haCIrbcSRrq2bE9CJfDCHi2iJP_eBA');
+    background-repeat: no-repeat;
+    background-position: center;
+    /* z-index: 1000000000; */
+
 }
 
 .srw .individual-tiles:hover
@@ -548,67 +560,118 @@ hr.style-two {
     height: 37px;
 }
 
+.srw .block-row-2
+{
+    height: 73px;
+    color: black;
+}
+
 .srw .block-1
 {
-    background-color: rgb(245, 82, 82);
+    background-color: rgba(23, 187, 106, 1);
 }
 
 .srw .block-2
 {
-    background-color: rgba(245, 82, 82, 0.71);
+    background-color: rgba(23, 187, 106, 1);
 }
 
 .srw .block-3
 {
-    background-color: rgba(247, 131, 131, 0.69);
+    background-color: rgba(23, 187, 106, 1);
 }
 
 .srw .block-4
 {
-    background-color: rgb(229, 90, 122);
+    background-color: #fff;
 }
 
 .srw .block-5
 {
-    background-color: rgba(229, 90, 122, 0.66);
+    background-color: rgba(173, 173, 173, 1);
 }
 
-.srw .block-6
+.srw .row-1,.row-2,.row-3
 {
-    background-color: rgba(210, 80, 159, 1);
-}
-
-.srw .block-7
-{
-    background-color: rgba(210, 80, 159, 0.77);
-}
-
-.srw .block-8
-{
-    background-color: rgba(10, 64, 136, 0.66);
-}
-
-.srw .block-9
-{
-    background-color:rgba(92, 128, 175, 0.81);;
-}
-
-.srw .block-10
-{
-    background-color: rgba(121, 151, 189, 0.83);
-}
-
-.srw .block-11
-{
-    background-color: rgba(116, 166, 216, 0.63);
-}
-
-.srw .row-1,.row-2,.row-3,.row-4
-{
-    height: 25%;
+    height: 33%;
 }
 
 .srw .block
 {
     padding-top: 3%;
 }
+
+.hpw .pointer
+{
+    cursor: pointer;
+}
+
+.hpw .text-10
+{
+    font-size: 10px;
+}
+
+.hpw .text-12
+{
+    font-size: 12px;
+}
+
+.hpw .text-yellow
+{
+    color: yellow;
+}
+
+.hpw .text-golden
+{
+    color: rgb(221, 177, 2);
+}
+
+.hpw .orange
+{
+    background-color: rgb(242, 165, 0) !important;
+}
+
+.hpw .green
+{
+    background-color: rgba(23, 187, 106, 1); !important;
+    color:#fff;
+}
+
+.hpw .blue
+{
+    background-color: cadetblue !important;
+}
+
+.hpw .pink
+{
+    background-color: #FD837D !important;
+}
+
+.hpw .block-1,.block-2,.block-3,.block-4,.block-5,.block-6,.block-7:not(.tile-text)
+{
+    opacity: 0.8;
+}
+
+.hpw .text-white
+{
+    color:#fff;
+}
+
+.hpw .text-red
+{
+    color:rgb(255, 0, 0);
+}
+
+.hpw .text-black
+{
+    color:rgb(0, 0, 0);
+}
+
+.hpw .text-blue
+{
+    color:rgb(0, 42, 255);
+}
+
+
+/*background-image: url('https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcQim4Ld4E0wIBtLvPIpRjo1haCIrbcSRrq2bE9CJfDCHi2iJP_eBA');*/
+

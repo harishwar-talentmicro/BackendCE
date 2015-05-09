@@ -38,14 +38,16 @@ angular.module('ezeidApp').
             MsgDelay,
             $location,
             $routeParams
-            )
+        )
         {
+            //$scope.flagArr = [];
             //Below line is for Loading img
             $scope.$emit('$preLoaderStart');
 
             // To get search key result
             getSearchKeyWord($routeParams);
 
+            $scope.params = $routeParams;
 
             //Below function is for getting key word search result
             function getSearchKeyWord(_filterValue)
@@ -57,21 +59,22 @@ angular.module('ezeidApp').
                 }
 
                 $http({ method: 'post', url: GURL + 'ewSearchByKeywords', data: {
-                                                                                    SearchType:_filterValue.searchType,
-                                                                                    Keywords:_filterValue.searchTerm,
-                                                                                    Token: $rootScope._userInfo.Token,
-                                                                                    SCategory:0,
-                                                                                    Proximity:_filterValue.proximity,
-                                                                                    Latitude:12.295810,
-                                                                                    Longitude:76.639381,
-                                                                                    ParkingStatus:_filterValue.parkingStatus,
-                                                                                    OpenStatus:_filterValue.openStatus,
-                                                                                    Rating:_filterValue.rating,
-                                                                                    HomeDelivery:_filterValue.homeDelivery,
-                                                                                    CurrentDate:CurrentDate
+                    SearchType:_filterValue.searchType,
+                    Keywords:_filterValue.searchTerm,
+                    Token: $rootScope._userInfo.Token,
+                    SCategory:0,
+                    Proximity:_filterValue.proximity,
+                    Latitude:12.295810,
+                    Longitude:76.639381,
+                    ParkingStatus:_filterValue.parkingStatus,
+                    OpenStatus:_filterValue.openStatus,
+                    Rating:_filterValue.rating,
+                    HomeDelivery:_filterValue.homeDelivery,
+                    CurrentDate:CurrentDate
                 } }).success(function (data) {
                     $rootScope.$broadcast('$preLoaderStop');
-                       console.log(data);
+                    console.log(data);
+                    $scope.searchListData = data;
                     if (data != 'null' && data.length>0)
                     {
                         $scope.SearchResultCount = data.length;
@@ -101,6 +104,18 @@ angular.module('ezeidApp').
 
             }
 
+            /**
+             * Select random colors for search result list tiles
+             */
+
+            /* make an array of colors for tiles */
+            var colorArray = ["orange","green","blue","pink"];
+
+            /* generate a random color string */
+            $scope.random = function(){
+                var rand = colorArray[Math.floor(Math.random() * colorArray.length)];
+                return rand;
+            };
 
         }
-]);
+    ]);
