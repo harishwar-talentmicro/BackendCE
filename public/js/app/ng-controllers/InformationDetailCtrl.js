@@ -49,6 +49,7 @@ angular.module('ezeidApp').
         var today = moment(x.toISOString()).utc().format('DD-MMM-YYYY hh:mm A');
         $scope.activeTemplate = "html/mapPopView.html";
         $scope.showWorkingHourModel = false;
+        $scope.form_rating = 0;
 
         $scope.modalBox = {
             title : 'EZEID Map',
@@ -61,7 +62,7 @@ angular.module('ezeidApp').
         var directionsService = new google.maps.DirectionsService();
         var service;
 
-        var TID = 592; //254;
+        var TID =  592;//254;
         var SearchType = 2;
 
         /*initialize();
@@ -176,7 +177,7 @@ angular.module('ezeidApp').
 
                             if($scope.SearchInfo.ParkingStatus==0)
                             {
-                                SearchSec.parkingTitle = "Parking Status";
+                                $scope.parkingTitle = "Parking Status";
                             }
                             if($scope.SearchInfo.ParkingStatus==1)
                             {
@@ -190,6 +191,8 @@ angular.module('ezeidApp').
                             {
                                 $scope.parkingTitle = "No parking";
                             }
+
+                            $scope.form_rating = data[0].Rating;
 
                             //Call for banner
                             AutoRefresh = true;
@@ -563,6 +566,7 @@ angular.module('ezeidApp').
             }
             else
             {
+                console.log($scope.SearchInfo);
                 $scope.showWorkingHourModel = true;
                 $http({ method: 'get', url: GURL + 'ewtGetWorkingHrsHolidayList?Token=' + $rootScope._userInfo.Token + '&LocID=' + $scope.SearchInfo.LocID }).success(function (data)
                 {

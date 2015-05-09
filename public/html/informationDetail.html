@@ -253,8 +253,7 @@
                <section id="main-content" class="searchDetailContainer">
                 <div class="row setRowLeftRightMarginZero">
                    <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5 setPaddingLeftRight0">
-                       <!-- <img width="356px" height="356px" ng-src="{{SearchInfo.BannerImage}}" />-->
-                       <img class="bannerContainerBorder" width="356px" height="356px" ng-src="images/front-page-bg.jpg" />
+                       <img class="bannerContainerBorder" width="356px" height="356px" ng-src="{{SearchInfo.BannerImage}}" />
 
                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-center setPaddingLeftRight0 noticeTextContainer" >
                            The business you are requesting has insufficient information and hence displaying the closet matching company.
@@ -297,8 +296,7 @@
                                         <span><b>{{SearchInfo.CompanyName}} </b></span>
                                     </div>
                                     <div class="row centerAlign searchButtonMarginSet">
-                                        <!--{{SearchInfo.AboutCompany}}-->
-                                        <p class="text-justify" title="SearchInfo.AboutCompany">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.</p>
+                                       <p class="text-justify" title="SearchInfo.AboutCompany">{{SearchInfo.AboutCompany}}</p>
                                     </div>
                                 </div>
 
@@ -362,35 +360,50 @@
                  </div>
                 <div class="row setRowLeftRightMarginZero">
                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setPaddingLeftRight0 searchHeaderAlignment newMsgButtonContainer" ng-hide="(SearchInfo.IDTypeID == 1)">
-                    <div class="showPointer removePadding keyWordText boxMessaageBackgroun" ng-show="SearchInfo.EZEIDVerifiedID == '2' && showSalesEnquiry == 1" title="Sales Enquiry" ng-click="openSalesEnquiryForm()">
-                        <img src="../images/new_sales_icon.png">
-                        Sales Enquiry
+                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 setLeftRightPaddingZero">
+                        <div class="showPointer removePadding keyWordText boxMessaageBackgroun" ng-show="SearchInfo.EZEIDVerifiedID == '2' && showSalesEnquiry == 1" title="Sales Enquiry" ng-click="openSalesEnquiryForm()">
+                            <img src="../images/new_sales_icon.png">
+                            Sales Enquiry
+                        </div>
                     </div>
-                    <div class="showPointer removePadding keyWordText boxMessaageBackgroun" ng-show="SearchInfo.EZEIDVerifiedID == '2' && showHomeDelivery == 1" title="Home Delivery" ng-click="openHomeDeliverForm()">
-                        <img src="../images/new_home_delivery.png">
-                        Home Delivery
+                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 setLeftRightPaddingZero">
+                        <div class="showPointer removePadding keyWordText boxMessaageBackgroun" ng-show="SearchInfo.EZEIDVerifiedID == '2' && showHomeDelivery == 1" title="Home Delivery" ng-click="openHomeDeliverForm()">
+                            <img src="../images/new_home_delivery.png">
+                            Home Delivery
+                        </div>
                     </div>
-                    <div class="showPointer removePadding keyWordText boxMessaageBackgroun" ng-show="SearchInfo.EZEIDVerifiedID == '2' && shoReserVation == 1" title="Reservation" ng-click="openReservationForm()">
-                        <img src="../images/new_reservations.png">
-                        Reservation
+
+                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 setLeftRightPaddingZero">
+                        <div class="showPointer removePadding keyWordText boxMessaageBackgroun" ng-show="SearchInfo.EZEIDVerifiedID == '2' && shoReserVation == 1" title="Reservation" ng-click="openReservationForm()">
+                            <img src="../images/new_reservations.png">
+                            Reservation
+                        </div>
                     </div>
-                    <div class="showPointer removePadding keyWordText boxMessaageBackgroun" ng-show="SearchInfo.EZEIDVerifiedID == '2' && showServiceRequest == 1" title="Support Request" ng-click="openServiceRequestForm()">
-                        <img src="../images/new_service_request.png">
-                        Service Request
+                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 setLeftRightPaddingZero">
+                        <div class="showPointer removePadding keyWordText boxMessaageBackgroun" ng-show="SearchInfo.EZEIDVerifiedID == '2' && showServiceRequest == 1" title="Support Request" ng-click="openServiceRequestForm()">
+                            <img src="../images/new_service_request.png">
+                            Service Request
+                        </div>
                     </div>
-                    <div class="showPointer removePadding keyWordText boxMessaageBackgroun" title="Send CV" ng-click="openCVForm()" ng-show="SearchInfo.EZEIDVerifiedID == '2' && showSendCv == 1">
-                        <img src="../images/new_send_cv.png">
-                        Send CV
+                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 setLeftRightPaddingZero">
+                        <div class="showPointer removePadding keyWordText boxMessaageBackgroun" title="Send CV" ng-click="openCVForm()" ng-show="SearchInfo.EZEIDVerifiedID == '2' && showSendCv == 1">
+                            <img src="../images/new_send_cv.png">
+                            Send CV
+                        </div>
                     </div>
-                    <div class="showPointer removePadding keyWordText boxMessaageBackgroun pull-right"
-                         ng-click="viewDirections(SearchInfo)" title="View Directions">
-                        <img src="../images/view_directions.png">
-                        View Directions
-                    </div>
-                    <div class="showPointer removePadding keyWordText boxMessaageBackgroun pull-right"
-                         ng-click="getdirections(SearchInfo)" title="Directions">
-                        <img src="../images/new_directions.png">
-                        <span>Plot Route</span>
+                    <!--<div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 setLeftRightPaddingZero">
+                        <div class="showPointer removePadding keyWordText boxMessaageBackgroun"
+                             ng-click="viewDirections(SearchInfo)" title="View Directions">
+                            <img src="../images/view_directions.png">
+                            View Directions
+                        </div>
+                    </div>-->
+                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 setLeftRightPaddingZero">
+                        <div class="showPointer removePadding keyWordText boxMessaageBackgroun"
+                             ng-click="getdirections(SearchInfo)" title="Directions">
+                            <img src="../images/new_directions.png">
+                            <span>Map</span>
+                        </div>
                     </div>
                 </div>
                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setPaddingLeftRight0 searchHeaderAlignment msgButtonContainer messageButtonContainer" ng-show="(SearchInfo.IDTypeID == 1)">
