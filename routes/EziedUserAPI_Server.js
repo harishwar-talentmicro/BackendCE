@@ -1653,10 +1653,10 @@ exports.FnRegistration = function (req, res) {
         var LastName = req.body.LastName;
         var CompanyName = req.body.CompanyName;
         var JobTitle = req.body.JobTitle;
-        //var CategoryID = req.body.CategoryID;
-        //if (CategoryID == null || CategoryID == '') {
-        //    CategoryID = 0;
-        //}
+        var CategoryID = parseInt(req.body.CategoryID);
+        if (CategoryID == 'NaN') {
+            CategoryID = 0;
+        }
         var FunctionID = req.body.FunctionID;
         if (FunctionID == null || FunctionID == '') {
             FunctionID = 0;
@@ -1770,7 +1770,7 @@ exports.FnRegistration = function (req, res) {
                     db.escape(PostalCode) + ',' + db.escape(PIN) + ',' + db.escape(PhoneNumber) + ',' + db.escape(MobileNumber) + ',' + db.escape(EMailID) + ',' +
                     db.escape(Picture) + ',' + db.escape(PictureFileName) + ',' + db.escape(WebSite) + ',' + db.escape(Operation) + ',' + db.escape(AboutCompany) + ','
                     + db.escape(StatusID) + ',' + db.escape(Icon) + ',' + db.escape(IconFileName) + ',' + db.escape(ISDPhoneNumber) + ',' + db.escape(ISDMobileNumber) + ','
-                    + db.escape(Gender) + ',' + db.escape(DOBDate) + ',' + db.escape(IPAddress) + ',' + db.escape(SelectionTypes) + ',' + db.escape(ParkingStatus) + ',' + db.escape(TemplateID);
+                    + db.escape(Gender) + ',' + db.escape(DOBDate) + ',' + db.escape(IPAddress) + ',' + db.escape(SelectionTypes) + ',' + db.escape(ParkingStatus)+ ',' + db.escape(TemplateID)  + ',' + db.escape(CategoryID);
 
                  
                 //console.log(InsertQuery);
@@ -1916,7 +1916,7 @@ exports.FnRegistration = function (req, res) {
         }
         else
         {
-            if (IDTypeID != null && EZEID != null && AddressLine1 != null && Citytitle != null && StateID != null && CountryID != null && PostalCode != null && MobileNumber != null && Gender.toString() != 'NaN') {
+            if (IDTypeID != null && EZEID != null && AddressLine1 != null && Citytitle != null && StateID != null && CountryID != null && PostalCode != null  && Gender.toString() != 'NaN') {
                 if (LastName == null) {
                     LastName = '';
                 }
@@ -1950,7 +1950,7 @@ exports.FnRegistration = function (req, res) {
                     db.escape(PostalCode) + ',' + db.escape(PIN) + ',' + db.escape(PhoneNumber) + ',' + db.escape(MobileNumber) + ',' + db.escape(EMailID) + ',' +
                     db.escape(Picture) + ',' + db.escape(PictureFileName) + ',' + db.escape(WebSite) + ',' + db.escape(Operation) + ',' + db.escape(AboutCompany)
                     + ',' + db.escape(StatusID) + ',' + db.escape(Icon) + ',' + db.escape(IconFileName) + ',' + db.escape(ISDPhoneNumber) + ',' + db.escape(ISDMobileNumber)
-                    + ',' + db.escape(Gender) + ',' + db.escape(DOBDate) + ',' + db.escape(IPAddress) + ',' + db.escape(SelectionTypes)+ ',' + db.escape(ParkingStatus) + ',' + db.escape(TemplateID);
+                    + ',' + db.escape(Gender) + ',' + db.escape(DOBDate) + ',' + db.escape(IPAddress) + ',' + db.escape(SelectionTypes)+ ',' + db.escape(ParkingStatus) + ',' + db.escape(TemplateID) + ',' + db.escape(CategoryID);
 
                  // console.log(InsertQuery);
                 db.query('CALL pSaveEZEIDData(' + InsertQuery + ')', function (err, InsertResult) {
@@ -2073,8 +2073,6 @@ exports.FnRegistration = function (req, res) {
                     console.log('FnRegistration: CountryID is empty');
                 } else if (PostalCode == null) {
                     console.log('FnRegistration: PostalCode is empty');
-                } else if (MobileNumber == null) {
-                    console.log('FnRegistration: MobileNumber is empty');
                 }
                 else if (Gender.toString() == 'NaN') {
                     console.log('FnRegistration: Gender is empty')
@@ -9816,7 +9814,7 @@ try{
     }
 };
 
-exports.FnGetAboutCompany = function(req, res){
+exports.FnGetCompanyProfile = function(req, res){
     try{
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -9835,25 +9833,25 @@ exports.FnGetAboutCompany = function(req, res){
                                 if (GetResult != null) {
                                     if (GetResult[0].length > 0) {
                                         RtnMessage.Result=GetResult[0];
-                                        RtnMessage.Message = 'About compnay detail sent successfully';
-                                        console.log('FnGetAboutCompany: About Company Send successfully');
+                                        RtnMessage.Message = 'About Company Profile sent successfully';
+                                        console.log('FnGetCompanyProfile: Company Profile  Send successfully');
                                         res.send(RtnMessage);
                                     }
                                     else {
-                                        RtnMessage.Message = 'No company details found';
-                                        console.log('FnGetAboutCompany: No About Company   found');
+                                        RtnMessage.Message = 'No Company Profile  found';
+                                        console.log('FnGetCompanyProfile: No Company Profile    found');
                                         res.send(RtnMessage);
                                     }
                                 }
                                 else {
-                                    RtnMessage.Message = 'No About Company found';
-                                    console.log('FnGetAboutCompany: No About Company found');
+                                    RtnMessage.Message = 'No Company Profile found';
+                                    console.log('FnGetCompanyProfile: No Company Profile found');
                                     res.send(RtnMessage);
                                 }
                             }
                             else {
-                                RtnMessage.Message = 'error in getting About Company';
-                                console.log('FnGetAboutCompany: error in getting About Company' + err);
+                                RtnMessage.Message = 'error in getting Company Profile ';
+                                console.log('FnGetCompanyProfile: error in getting Company Profile' + err);
                                 res.statusCode = 500;
                                 res.send(RtnMessage);
                             }
@@ -9863,20 +9861,20 @@ exports.FnGetAboutCompany = function(req, res){
                         res.statusCode = 401;
                         RtnMessage.Message = 'Invalid Token';
                         res.send(RtnMessage);
-                        console.log('FnGetAboutCompany: Invalid Token');
+                        console.log('FnGetCompanyProfile: Invalid Token');
                     }
                 } else {
 
                     res.statusCode = 500;
                     RtnMessage.Message = 'Error in validating token';
                     res.send(RtnMessage);
-                    console.log('FnGetAboutCompany: Error in validating token:  ' + err);
+                    console.log('FnGetCompanyProfile: Error in validating token:  ' + err);
                 }
             });
         }
         else {
             if (Token == null) {
-                console.log('FnGetAboutCompany: Token is empty');
+                console.log('FnGetCompanyProfile: Token is empty');
                 RtnMessage.Message = 'Token is empty';
             }
 
@@ -9885,30 +9883,30 @@ exports.FnGetAboutCompany = function(req, res){
         }
     }
     catch (ex) {
-        console.log('FnGetAboutCompany error:' + ex.description);
+        console.log('FnGetCompanyProfile error:' + ex.description);
         throw new Error(ex);
     }
 };
 
-exports.FnSaveAboutCompany = function(req, res){
+exports.FnSaveCompanyProfile = function(req, res){
     try{
 
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
         var Token = req.body.Token;
-        var AboutCompany = req.body.AboutCompany;
+        var CompanyProfile = req.body.CompanyProfile;
 
         var RtnMessage = {
             IsSuccessfull : false,
            Message: ''
         };
 
-        if(Token !=  null && AboutCompany != null){
+        if(Token !=  null && CompanyProfile != null){
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
-                        var query = db.escape(Token)+ ',' + db.escape(AboutCompany);
+                        var query = db.escape(Token)+ ',' + db.escape(CompanyProfile);
                         db.query('CALL pSaveTagLine(' + query + ')', function (err, InsertResult) {
                             console.log(InsertResult[0]);
                             if (!err) {
@@ -9916,19 +9914,19 @@ exports.FnSaveAboutCompany = function(req, res){
                                     RtnMessage.IsSuccessfull = true;
                                     RtnMessage.Message = 'Inserted successfully';
                                     res.send(RtnMessage);
-                                    console.log('FnSaveAboutCompany:Inserted sucessfully..');
+                                    console.log('FnSaveCompanyProfile:Inserted sucessfully..');
                                 }
                                 else
                                 {
                                     RtnMessage.Message = 'Not inserted';
-                                    console.log('FnSaveAboutCompany:No Inserted sucessfully..');
+                                    console.log('FnSaveCompanyProfile:No Inserted sucessfully..');
                                     res.send(RtnMessage);
                                 }
                             }
                             else
                             {
                                 RtnMessage.Message = 'Error in saving...';
-                                console.log('FnSaveAboutCompany:Error in getting insert group members..'+ err);
+                                console.log('FnSaveCompanyProfile:Error in getting insert group members..'+ err);
                                 res.send(RtnMessage);
                             }
                         });
@@ -9937,12 +9935,12 @@ exports.FnSaveAboutCompany = function(req, res){
                         res.statusCode = 401;
                         RtnMessage.Message = 'Invalid Token';
                         res.send(RtnMessage);
-                        console.log('FnSaveAboutCompany:Invalid Token');
+                        console.log('FnSaveCompanyProfile:Invalid Token');
                     }
                 } else {
                     res.statusCode = 500;
                     res.send(RtnMessage);
-                    console.log('FnSaveAboutCompany:Error in validating token:  ' + err);
+                    console.log('FnSaveCompanyProfile:Error in validating token:  ' + err);
                 }
             });
         }
@@ -9951,9 +9949,9 @@ exports.FnSaveAboutCompany = function(req, res){
                 console.log('FnSaveAboutCompany:Token is empty');
                 RtnMessage.Message = 'Token is empty';
             }
-            else if(AboutCompany == null ){
-                console.log('FnSaveAboutCompany:About Company is empty');
-                RtnMessage.Message = 'AboutCompany is emtpy';
+            else if(CompanyProfile == null ){
+                console.log('FnSaveCompanyProfile:Company Profile is empty');
+                RtnMessage.Message = 'Company Profile is emtpy';
             }
 
             res.statusCode = 400;
@@ -9961,7 +9959,7 @@ exports.FnSaveAboutCompany = function(req, res){
         }
     }
     catch (ex) {
-        console.log('FnSaveAboutCompany: Error:' + ex.description);
+        console.log('FnSaveCompanyProfile: Error:' + ex.description);
         throw new Error(ex);
     }
 };
