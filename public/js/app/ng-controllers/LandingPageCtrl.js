@@ -42,11 +42,14 @@ angular.module('ezeidApp').
              * 2 : Job Keyword
              * @type {{searchType: number}}
              */
-            $scope.searchType = [
-                'EZEID',
-                'Keywords',
-                'Job Keywords'
-            ];
+
+
+            var searchTypeArr = [];
+            searchTypeArr[1] = "EZEID";
+            searchTypeArr[2] = "Keywords";
+            searchTypeArr[3] = "Job Keywords";
+
+            $scope.searchType = searchTypeArr;
 
             $scope.placeHolderText = [
                 'Type EZEID here',
@@ -55,7 +58,7 @@ angular.module('ezeidApp').
             ];
 
             $scope.searchParams = {
-                searchType : 1,
+                searchType : 2,
                 searchTerm : '',
                 proximity : 0,
                 rating : '1,2,3,4,5',

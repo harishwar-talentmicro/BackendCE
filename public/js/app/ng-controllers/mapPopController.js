@@ -1,12 +1,14 @@
 angular.module('ezeidApp').controller('mapPopController',['$http', '$rootScope', '$scope', '$q', 'Notification',  '$timeout', '$window', 'GURL', function($http, $rootScope, $scope, $q, Notification, $timeout, $window, GURL){
 
-    console.log("sai777");
     var map;
     var marker;
     var directionsDisplay;
     var directionsService = new google.maps.DirectionsService();
     var service;
-
+    $scope.modalBox = {
+        title : 'EZEID Map',
+        class : 'business-manager-modal'
+    }
     initialize();
 
     function initialize() {

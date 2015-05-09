@@ -172,8 +172,8 @@ app.delete('/ewtDeleteGroupMembers', LocationManager.FnDeleteGroupMembers);
 app.get('/ewtGetChatDetails', LocationManager.FnGetChatDetails);
 app.get('/ewtGetChatList', LocationManager.FnGetChatList);
 app.get('/ewtGetSearchPics', LocationManager.FnGetSearchPicture);
-
-
+app.get('/ewtCompanyProfile', LocationManager.FnGetCompanyProfile);
+app.post('/ewtCompanyProfile', LocationManager.FnSaveCompanyProfile);
 //below service are for EZEIDAP
 app.post('/ewLoginAP', LocationManager.FnLoginAP);
 app.get('/ewLogoutAP', LocationManager.FnLogoutAP);
