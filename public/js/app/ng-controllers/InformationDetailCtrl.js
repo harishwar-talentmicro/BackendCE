@@ -35,7 +35,7 @@ angular.module('ezeidApp').
             )
     {
             $scope.$emit('$preLoaderStart');
-            //console.log($rootScope);
+           // console.log($rootScope);
             //Below line is for Loading img
             $scope.SearchInfo = {};
             var currentBanner = 1;
@@ -47,15 +47,107 @@ angular.module('ezeidApp').
             var currentDate = moment().format('YYYY-MM-DD HH:mm:ss');
             var x = new Date();
             var today = moment(x.toISOString()).utc().format('DD-MMM-YYYY hh:mm A');
-            var TID = 592;//254;
+            $scope.activeTemplate = "html/mapPopView.html";
 
-            // To get search information
+        $scope.modalBox = {
+            title : 'Transaction Details',
+            class : 'business-manager-modal'
+        }
+
+
+        var map;
+        var marker;
+        var directionsDisplay;
+        var directionsService = new google.maps.DirectionsService();
+        var service;
+
+            var TID = 592; //254;
+
+        /*initialize();
+
+        function initialize() {
+            directionsDisplay = new google.maps.DirectionsRenderer();
+            var myLatlng = new google.maps.LatLng(-34.397, 150.644);
+            var myOptions = {
+                zoom: 8,
+                center: myLatlng,
+                mapTypeId: google.maps.MapTypeId.ROADMAP
+            }
+            map = new google.maps.Map(document.getElementById("map-canvasH1"), myOptions);
+        }*/
+
+       /* function initialize () {
+            console.log("sai21");
+            // Create the search box and link it to the UI element.
+            directionsDisplay = new google.maps.DirectionsRenderer();
+            var initialLocation;
+            var currentLoc = new google.maps.LatLng(12.295810, 76.639381);
+            map = new google.maps.Map(document.getElementById('map-canvasH1'), {
+                mapTypeId: google.maps.MapTypeId.ROADMAP,
+                Zoom: 15
+            });
+
+          // Try W3C Geolocation (Preferred)
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(FindCurrentLocation, function () {
+                    handleNoGeolocation();
+                });
+            }
+            // Browser doesn't support Geolocation
+            else {
+                handleNoGeolocation();
+            }
+
+            function handleNoGeolocation() {
+                initialLocation = currentLoc;
+                map.setCenter(initialLocation);
+                PlaceCurrentLocationMarker(initialLocation);
+            }
+
+            $(window).resize(function() {
+                google.maps.event.trigger(map, "resize");
+            });
+        }
+
+        function PlaceCurrentLocationMarker(location) {
+            if (marker != undefined) {
+                marker.setMap(null);
+                $(".ezeid-map-label").remove();
+            }
+            map.setCenter(location);
+            marker = new google.maps.Marker({
+                position: location,
+                title: "Current Location",
+                draggable: true,
+                map: map,
+                icon: 'images/you_are_here.png'
+            });
+           // getReverseGeocodingData(marker.position.lat(), marker.position.lng());
+
+            google.maps.event.addListener(marker, 'dragend', function (e) {
+                $rootScope.CLoc.CLat = marker.position.lat();
+                $rootScope.CLoc.CLong = marker.position.lng();
+          //      getReverseGeocodingData($rootScope.CLoc.CLat, $rootScope.CLoc.CLong);
+            });
+        }
+
+        function FindCurrentLocation(position) {
+            initialLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+            $rootScope.CLoc = {
+                CLat: position.coords.latitude,
+                CLong: position.coords.longitude
+            };
+
+          // PlaceCurrentLocationMarker(initialLocation);
+        }*/
+           // To get search information
             getSearchInformation(TID);
 
             //Below function is for getting search information
             function getSearchInformation(_TID)
             {
                 $scope.SearchInfo = {};
+                $scope.AddressForInfoTab = "";
                 AutoRefresh = false;
                 if($rootScope._userInfo.Token == "")
                 {
@@ -64,7 +156,7 @@ angular.module('ezeidApp').
                 }
                 $http({ method: 'get', url: GURL + 'ewtGetSearchInformation?Token=' + $rootScope._userInfo.Token + '&TID=' + _TID + '&CurrentDate=' + currentDate}).success(function (data) {
                     $rootScope.$broadcast('$preLoaderStop');
-                    console.log(data);
+                   // console.log(data);
                     if (data != 'null') {
                         $timeout(function () {
                             $scope.SearchInfo = data[0];
@@ -74,9 +166,20 @@ angular.module('ezeidApp').
                             $scope.showServiceRequest = $scope.SearchInfo.VisibleModules[3];
                             $scope.showSendCv = $scope.SearchInfo.VisibleModules[4];
 
+                            //Below lines are to show address in info tab
+                            $scope.AddressForInfoTab = ($scope.SearchInfo.AddressLine1 != "") ? $scope.SearchInfo.AddressLine1 +', ' : "";
+                            $scope.AddressForInfoTab += ($scope.SearchInfo.AddressLine2 != "") ? $scope.SearchInfo.AddressLine2 +', ' : "";
+                            $scope.AddressForInfoTab += ($scope.SearchInfo.CityTitle != "") ? $scope.SearchInfo.CityTitle +', ' : "";
+                            $scope.AddressForInfoTab += ($scope.SearchInfo.CountryTitle != "") ? $scope.SearchInfo.CountryTitle +', ' : "";
+                            $scope.AddressForInfoTab += ($scope.SearchInfo.PostalCode != "") ? $scope.SearchInfo.PostalCode : "";
+
+
                             //Call for banner
                             AutoRefresh = true;
                             getBanner(1);
+                            /*if(!map){
+                                initialize();
+                            }*/
 
                             if($scope.SearchInfo.IDTypeID == 2)
                             {
@@ -399,6 +502,42 @@ angular.module('ezeidApp').
         $scope.closeCVForm = function () {
             $('#CV_popup').slideUp();
         };
+
+        $scope.getdirections = function (data) {
+            $scope.showMapPopupModel = true;
+
+            /*var start = new google.maps.LatLng($rootScope.CLoc.CLat, $rootScope.CLoc.CLong);
+            var end = new google.maps.LatLng(data.Latitude, data.Longitude);
+            directionsDisplay.setMap(map);
+            var request = {
+                origin: start,
+                destination: end,
+                travelMode: google.maps.TravelMode.DRIVING
+            };
+            directionsService.route(request, function (response, status) {
+                if (status == google.maps.DirectionsStatus.OK) {
+                    directionsDisplay.setDirections(response);
+                }
+            });*/
+        };
+
+        //View Directions
+        $scope.viewDirections = function (data) {
+
+            var start = new google.maps.LatLng($rootScope.CLoc.CLat, $rootScope.CLoc.CLong);
+            var end = new google.maps.LatLng(data.Latitude, data.Longitude);
+
+            var userLoc = {
+                startLat: $rootScope.CLoc.CLat,
+                startLong: $rootScope.CLoc.CLong,
+                endLat: data.Latitude,
+                endLong : data.Longitude
+            };
+
+            $window.localStorage.setItem("directionLocation", JSON.stringify(userLoc));
+            $window.open(GURL+"viewdirection", '_blank');
+        };
+
 
 
     }

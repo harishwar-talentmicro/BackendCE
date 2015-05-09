@@ -1047,14 +1047,13 @@ button.btn.btn-primary.btn-block.greenButton {
 
 .imgRight {
     position: absolute;
-    top: 7.5%;
-    /* left: 48px; */
+    top: 39.5%;
     z-index: 3;
     right: 10px;
 }
 .imgLeft {
     position: absolute;
-    top: 7.5%;
+    top: 39.5%;
     left: 10px;
     z-index: 3;
 }
@@ -1440,9 +1439,18 @@ table.rwd-table > tbody > tr > td.serachResultSelectAll
     border:solid 1px black;
 }
 .bannerContainerBorder{
-    border:solid 1px lightseagreen;
+    border:solid 4px #00b050;
+    border-radius: 1%;
 }
 .noticeTextColor
 {
     color: #FFCD28;
+}
+.infoModal>.modal>.business-manager-modal > .modal-content > .modal-body {
+    padding: 0px;
+    border: 1px solid #EEE;
+    border-top: none;
+}
+.searchDetailContainer{
+    background: #deebf7;
 }
