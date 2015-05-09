@@ -93,6 +93,7 @@
             $scope.totalPages = 1;
             $scope.txStatusTypes = [];
             $scope.txActionTypes = [];
+            $scope.txFolderRules = [];
 
             $scope.showModal = false;
             $scope.modalBox = {
@@ -101,6 +102,7 @@
               tx : {
                   orderAmount : 0,
                   trnNo : '',
+                  ezeidTid : 0,
 
                   TID : 0,
                   functionType : 0, // Function Type will be 0 for sales
@@ -157,11 +159,7 @@
              * @param e
              */
             $scope.toggleModalBox = function(e){
-                if(e){
-                    /**
-                     * Fill the information of Current Transaction
-                     */
-                }
+                $scope.$emit('$preLoaderStart');
                 $scope.loadItemList().then(function(){
                     $scope.$emit('$preLoaderStop');
                     $scope.showModal = !$scope.showModal;
@@ -169,6 +167,18 @@
                     $scope.$emit('$preLoaderStop');
                     Notification.error({message : 'Unable to load item list', delay : MsgDelay} );
                 });
+
+                $scope.resetModalBox();
+
+                if(e){
+                    /**
+                     * Fill the information of Current Transaction
+                     */
+                }
+                else{
+
+                }
+
             };
 
             $scope.resetModalBox = function(){
@@ -296,19 +306,30 @@
             };
 
 
-            $scope.checkEzeidInfo = function(ezeid){
-                if(!ezeid){
+            $scope.$watch('modalBox.tx.ezeid',function(newVal,oldVal){
+                if(!newVal){
+                    $scope.modalBox.tx.ezeid = '';
+                    $scope.modalBox.tx.ezeidTid = 0;
                     return;
                 }
+                if(newVal !== oldVal){
+                    $scope.checkEzeidInfo(newVal);
+                }
+            });
+            $scope.checkEzeidInfo = function(ezeid){
+                $scope.$emit('$preLoaderStart');
                 $scope.getEzeidDetails(ezeid).then(function(resp){
+                    $scope.$emit('$preLoaderStop');
                     $scope.modalBox.tx.ezeid = $filter('uppercase')(ezeid);
                     $scope.modalBox.tx.contactInfo = resp.FirstName + ' ' +
                     resp.LastName  +
                         ((resp.MobileNumber && resp.MobileNumber !== 'null') ? ', ' + resp.MobileNumber : '');
                     $scope.modalBox.tx.ezeidTid = resp.TID;
                 },function(){
+                    $scope.$emit('$preLoaderStop');
                     Notification.error({ message : 'Invalid EZEID', delay : MsgDelay});
                     $scope.modalBox.tx.ezeid = '';
+                    $scope.modalBox.tx.ezeidTid = 0;
                 });
             };
 
@@ -433,24 +454,9 @@
             };
 
 
-            $scope.$watch('pageNumber',function(newVal,oldVal){
-                if(newVal !== oldVal)
-                {
-                    $scope.$broadcast('$preLoaderStart');
-                    $scope.loadTransaction(newVal,$scope.statusType).then(function(){
-                        $scope.$broadcast('$preLoaderStop');
-                    },function(){
-                        $scope.$broadcast('$preLoaderStop');
-                    });
-                }
-            });
-
-
-
             /**
-             * Load transaction items
-             * @param txId
-             * @returns {*}
+             * Load business items
+             * @returns {*|promise}
              */
             $scope.loadItemList = function(){
                 var defer = $q.defer();
@@ -474,6 +480,47 @@
                 });
                 return defer.promise;
             };
+
+
+            /**
+             * Loads FolderRules for Sales
+             * @return {*|promise}
+             */
+            $scope.loadFolderRules = function(){
+                var defer = $q.defer();
+                $http({
+                    url : GURL + 'ewtGetFolderList',
+                    method : 'GET',
+                    params : {
+                        Token : $rootScope._userInfo.Token,
+                        FunctionType : 0    // Sales
+                    }
+                }).success(function(resp){
+                    if(resp && resp !== 'null' && resp.length > 0){
+                        $scope.txFolderRules = resp;
+                        defer.resolve(resp);
+                    }
+                    else{
+                        defer.resolve([]);
+                    }
+                }).error(function(err){
+                    defer.reject();
+                });
+                return defer.promise;
+            };
+
+
+            $scope.$watch('pageNumber',function(newVal,oldVal){
+                if(newVal !== oldVal)
+                {
+                    $scope.$broadcast('$preLoaderStart');
+                    $scope.loadTransaction(newVal,$scope.statusType).then(function(){
+                        $scope.$broadcast('$preLoaderStop');
+                    },function(){
+                        $scope.$broadcast('$preLoaderStop');
+                    });
+                }
+            });
 
             /**
              * Load transaction items
