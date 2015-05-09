@@ -1,3 +1,8 @@
+/**
+ * @todo
+ * Have to code whole according to home delivery
+ */
+
 (function(){
     angular.module('ezeidApp').controller('SalesCtrl',[
         '$rootScope',
@@ -42,45 +47,12 @@
                 $location.path('/business-manager');
             };
 
-            var itemTypeTemplates = [
-                '/tpl/tx-item-description.html',
-                '/tpl/tx-item-description-picture.html',
-                '/tpl/tx-item-description-picture-qty.html',
-                '/tpl/tx-item-description-picture-qty-rate.html'
-            ];
 
-            $scope.listConf = [
-                {
-                    message : true,
-                    item : false,
-                    amount : false,
-                    itemTemplate : null
-                },
-                {
-                    message : true,
-                    item : true,
-                    amount : false,
-                    itemTemplate : itemTypeTemplates[0]       // Only Item with description
-                },
-                {
-                    message : true,
-                    item : true,
-                    amount : false,
-                    itemTemplate : itemTypeTemplates[1]       // Item + Picture + Description
-                },
-                {
-                    message : true,
-                    item : true,
-                    amount : false,
-                    itemTemplate : itemTypeTemplates[2]       // Item + Picture + Description + Quantity
-                },
-                {
-                    message : true,
-                    item : true,
-                    amount : true,
-                    itemTemplate : itemTypeTemplates[2]       // Item + Picture + Description + Quantity + Rate
+            $scope.listConf = {
+                0 : {
+
                 }
-            ];
+            };
 
             $scope.$emit('$preLoaderStart');
 
