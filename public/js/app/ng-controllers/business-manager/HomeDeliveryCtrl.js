@@ -1,3 +1,8 @@
+/**
+ * @todo
+ * Have to code whole according to home delivery
+ */
+
 (function(){
     angular.module('ezeidApp').controller('SalesCtrl',[
         '$rootScope',
@@ -43,34 +48,11 @@
             };
 
 
+            $scope.listConf = {
+                0 : {
 
-            $scope.listConf = [
-                {
-                    message : true,
-                    item : false,
-                    amount : false
-                },
-                {
-                    message : true,
-                    item : true,
-                    amount : false
-                },
-                {
-                    message : true,
-                    item : true,
-                    amount : false
-                },
-                {
-                    message : true,
-                    item : true,
-                    amount : false
-                },
-                {
-                    message : true,
-                    item : true,
-                    amount : true
                 }
-            ];
+            };
 
             $scope.$emit('$preLoaderStart');
 
@@ -84,7 +66,6 @@
             $scope.txList = [];
 
             /**
-             *
              * Sales items present for this user
              * @type {Array}
              */
@@ -162,13 +143,7 @@
                      * Fill the information of Current Transaction
                      */
                 }
-                $scope.loadItemList().then(function(){
-                    $scope.$emit('$preLoaderStop');
-                    $scope.showModal = !$scope.showModal;
-                },function(){
-                    $scope.$emit('$preLoaderStop');
-                    Notification.error({message : 'Unable to load item list', delay : MsgDelay} );
-                });
+                $scope.showModal = !$scope.showModal;
             };
 
             $scope.resetModalBox = function(){
@@ -350,7 +325,7 @@
             $scope.loadItemList = function(){
                 var defer = $q.defer();
                 $http({
-                    url : GURL + 'ewtGetItemList',
+                    url : GURL + 'ewtItemList',
                     method : 'GET',
                     params : {
                         Token : $rootScope._userInfo.Token,

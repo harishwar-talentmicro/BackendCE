@@ -4176,8 +4176,7 @@ exports.FnGetSearchInformation = function (req, res) {
         var Token = req.query.Token;
         var TID = parseInt(req.query.TID);
         var CurrentDate = req.query.CurrentDate;
-        var LocIDS = req.query.LocIDS;
-        var ID=''
+        var SearchType = req.query.SearchType;
         var WorkingDate
         var moment = require('moment');
         if(CurrentDate != null)
@@ -4185,16 +4184,12 @@ exports.FnGetSearchInformation = function (req, res) {
         else
              var WorkingDate = moment(new Date()).format('YYYY-MM-DD HH:MM');
         //console.log(WorkingDate);
-        if(LocIDS != null){
-            
-            ID = LocIDS + ',' + ID;
-            var IDS =ID.slice(0,-1)
-            console.log('TID Values:'+ IDS);}
+
         if (Token != null && Token != '' && TID.toString() != 'NaN' && WorkingDate != null) {
             if(Token == 2){
 
                             var SearchParameter = db.escape(TID) + ',' + db.escape(Token) + ',' + db.escape(WorkingDate) 
-                                    + ',' + db.escape(IDS);
+                                    + ',' + db.escape(SearchType);
                             // console.log('Search Information: ' +SearchParameter);
            //     console.log('CALL pSearchInformation(' + SearchParameter + ')');
                             db.query('CALL pSearchInformation(' + SearchParameter + ')', function (err, UserInfoResult) {
@@ -4223,7 +4218,7 @@ exports.FnGetSearchInformation = function (req, res) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
-                        var SearchParameter = db.escape(TID) + ',' + db.escape(Token) + ',' + db.escape(WorkingDate);
+                        var SearchParameter = db.escape(TID) + ',' + db.escape(Token) + ',' + db.escape(WorkingDate)+ ',' + db.escape(SearchType);
                         // console.log('Search Information: ' +SearchParameter);
                        // console.log('CALL pSearchInformation(' + SearchParameter + ')');
                             db.query('CALL pSearchInformation(' + SearchParameter + ')', function (err, UserInfoResult) {
@@ -9817,6 +9812,156 @@ try{
     }
     catch (ex) {
         console.log('FnGetSearchPicture error:' + ex.description);
+        throw new Error(ex);
+    }
+};
+
+exports.FnGetAboutCompany = function(req, res){
+    try{
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.query.Token;
+        var RtnMessage = {
+            Result: [],
+            Message: ''
+        };
+        if(Token !=  null){
+            FnValidateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+                        db.query('CALL pGetTagLine(' + db.escape(Token) + ')', function (err, GetResult) {
+                            if (!err) {
+                                if (GetResult != null) {
+                                    if (GetResult[0].length > 0) {
+                                        RtnMessage.Result=GetResult[0];
+                                        RtnMessage.Message = 'About compnay detail sent successfully';
+                                        console.log('FnGetAboutCompany: About Company Send successfully');
+                                        res.send(RtnMessage);
+                                    }
+                                    else {
+                                        RtnMessage.Message = 'No company details found';
+                                        console.log('FnGetAboutCompany: No About Company   found');
+                                        res.send(RtnMessage);
+                                    }
+                                }
+                                else {
+                                    RtnMessage.Message = 'No About Company found';
+                                    console.log('FnGetAboutCompany: No About Company found');
+                                    res.send(RtnMessage);
+                                }
+                            }
+                            else {
+                                RtnMessage.Message = 'error in getting About Company';
+                                console.log('FnGetAboutCompany: error in getting About Company' + err);
+                                res.statusCode = 500;
+                                res.send(RtnMessage);
+                            }
+                        });
+                    }
+                    else {
+                        res.statusCode = 401;
+                        RtnMessage.Message = 'Invalid Token';
+                        res.send(RtnMessage);
+                        console.log('FnGetAboutCompany: Invalid Token');
+                    }
+                } else {
+
+                    res.statusCode = 500;
+                    RtnMessage.Message = 'Error in validating token';
+                    res.send(RtnMessage);
+                    console.log('FnGetAboutCompany: Error in validating token:  ' + err);
+                }
+            });
+        }
+        else {
+            if (Token == null) {
+                console.log('FnGetAboutCompany: Token is empty');
+                RtnMessage.Message = 'Token is empty';
+            }
+
+            res.statusCode=400;
+            res.send(RtnMessage);
+        }
+    }
+    catch (ex) {
+        console.log('FnGetAboutCompany error:' + ex.description);
+        throw new Error(ex);
+    }
+};
+
+exports.FnSaveAboutCompany = function(req, res){
+    try{
+
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.body.Token;
+        var AboutCompany = req.body.AboutCompany;
+
+        var RtnMessage = {
+            IsSuccessfull : false,
+           Message: ''
+        };
+
+        if(Token !=  null && AboutCompany != null){
+            FnValidateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+                        var query = db.escape(Token)+ ',' + db.escape(AboutCompany);
+                        db.query('CALL pSaveTagLine(' + query + ')', function (err, InsertResult) {
+                            console.log(InsertResult[0]);
+                            if (!err) {
+                                if (InsertResult.affectedRows > 0) {
+                                    RtnMessage.IsSuccessfull = true;
+                                    RtnMessage.Message = 'Inserted successfully';
+                                    res.send(RtnMessage);
+                                    console.log('FnSaveAboutCompany:Inserted sucessfully..');
+                                }
+                                else
+                                {
+                                    RtnMessage.Message = 'Not inserted';
+                                    console.log('FnSaveAboutCompany:No Inserted sucessfully..');
+                                    res.send(RtnMessage);
+                                }
+                            }
+                            else
+                            {
+                                RtnMessage.Message = 'Error in saving...';
+                                console.log('FnSaveAboutCompany:Error in getting insert group members..'+ err);
+                                res.send(RtnMessage);
+                            }
+                        });
+                    }
+                    else {
+                        res.statusCode = 401;
+                        RtnMessage.Message = 'Invalid Token';
+                        res.send(RtnMessage);
+                        console.log('FnSaveAboutCompany:Invalid Token');
+                    }
+                } else {
+                    res.statusCode = 500;
+                    res.send(RtnMessage);
+                    console.log('FnSaveAboutCompany:Error in validating token:  ' + err);
+                }
+            });
+        }
+        else{
+            if(Token == null ){
+                console.log('FnSaveAboutCompany:Token is empty');
+                RtnMessage.Message = 'Token is empty';
+            }
+            else if(AboutCompany == null ){
+                console.log('FnSaveAboutCompany:About Company is empty');
+                RtnMessage.Message = 'AboutCompany is emtpy';
+            }
+
+            res.statusCode = 400;
+            res.send(RtnMessage);
+        }
+    }
+    catch (ex) {
+        console.log('FnSaveAboutCompany: Error:' + ex.description);
         throw new Error(ex);
     }
 };
