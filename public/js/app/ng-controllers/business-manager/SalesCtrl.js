@@ -93,6 +93,7 @@
             $scope.totalPages = 1;
             $scope.txStatusTypes = [];
             $scope.txActionTypes = [];
+            $scope.txFolderRules = [];
 
             $scope.showModal = false;
             $scope.modalBox = {
@@ -101,6 +102,7 @@
               tx : {
                   orderAmount : 0,
                   trnNo : '',
+                  ezeidTid : 0,
 
                   TID : 0,
                   functionType : 0, // Function Type will be 0 for sales
@@ -157,11 +159,7 @@
              * @param e
              */
             $scope.toggleModalBox = function(e){
-                if(e){
-                    /**
-                     * Fill the information of Current Transaction
-                     */
-                }
+                $scope.$emit('$preLoaderStart');
                 $scope.loadItemList().then(function(){
                     $scope.$emit('$preLoaderStop');
                     $scope.showModal = !$scope.showModal;
@@ -169,6 +167,18 @@
                     $scope.$emit('$preLoaderStop');
                     Notification.error({message : 'Unable to load item list', delay : MsgDelay} );
                 });
+
+                $scope.resetModalBox();
+
+                if(e){
+                    /**
+                     * Fill the information of Current Transaction
+                     */
+                }
+                else{
+
+                }
+
             };
 
             $scope.resetModalBox = function(){
@@ -178,6 +188,7 @@
                     tx : {
                         orderAmount : 0,
                         trnNo : '',
+                        ezeidTid : 0,
 
                         TID : 0,
                         functionType : 0, // Function Type will be 0 for sales
@@ -206,6 +217,121 @@
                 };
             };
 
+            /**
+             * Creates transaction item from business item from the properties of business item
+             * @param item
+             */
+            var createTxItem = function(businessItem){
+                var txItem = {};
+                var allowProperties = [
+                    'TID',
+                    'Rate',
+                    'ItemName',
+                    'Pic'
+                ];
+                for(var prop in businessItem){
+                    if(allowProperties.indexOf(prop) !== -1){
+                        if(prop == 'TID'){
+                            txItem.ItemID = businessItem['TID'];
+                        }
+                        else if(prop == 'Rate'){
+                            try{
+                                txItem.Rate = parseFloat(businessItem[prop]);
+                            }
+                            catch(ex){
+                                txItem.Rate = 0;
+                            }
+                        }
+                        else{
+                            txItem[prop] = businessItem[prop];
+                        }
+                    }
+                }
+                txItem.Qty = 1;
+                return txItem;
+            };
+
+            /**
+             * Add item to transaction item list (selected items list)
+             * @param item
+             */
+            $scope.addItem = function(item){
+                var txItemIndex  = $scope.modalBox.tx.itemList.indexOfWhere('ItemID',item.TID);
+                console.log(txItemIndex);
+                if(txItemIndex === -1){
+                    $scope.modalBox.tx.itemList.push(createTxItem(item));
+                }
+                else{
+                    $scope.modalBox.tx.itemList[txItemIndex].Qty += 1;
+                }
+                console.log($scope.modalBox.tx);
+            };
+
+            /**
+             * Add item to transaction item list (selected items list)
+             * @param item
+             */
+            $scope.removeItem = function(txItem){
+                var txItemIndex  = $scope.modalBox.tx.itemList.indexOfWhere('ItemID',txItem.ItemID);
+                console.log(txItemIndex);
+                $scope.modalBox.tx.itemList.splice(txItemIndex,1);
+            };
+
+
+            /**
+             * Fetches the information of particular EZEID
+             * @param ezeid
+             * @returns {*}
+             */
+            $scope.getEzeidDetails = function(ezeid){
+                var defer = $q.defer();
+                $http({
+                    url : GURL + 'ewtEZEIDPrimaryDetails',
+                    method : 'GET',
+                    params : {
+                        Token : $rootScope._userInfo.Token,
+                        EZEID :   ezeid
+                    }
+                }).success(function(resp){
+                    if(resp && resp !== 'null' && resp.length > 0){
+                        defer.resolve(resp[0]);
+                    }
+                    else{
+                        defer.reject();
+                    }
+                }).error(function(err){
+                    defer.reject();
+                });
+                return defer.promise;
+            };
+
+
+            $scope.$watch('modalBox.tx.ezeid',function(newVal,oldVal){
+                if(!newVal){
+                    $scope.modalBox.tx.ezeid = '';
+                    $scope.modalBox.tx.ezeidTid = 0;
+                    return;
+                }
+                if(newVal !== oldVal){
+                    $scope.checkEzeidInfo(newVal);
+                }
+            });
+            $scope.checkEzeidInfo = function(ezeid){
+                $scope.$emit('$preLoaderStart');
+                $scope.getEzeidDetails(ezeid).then(function(resp){
+                    $scope.$emit('$preLoaderStop');
+                    $scope.modalBox.tx.ezeid = $filter('uppercase')(ezeid);
+                    $scope.modalBox.tx.contactInfo = resp.FirstName + ' ' +
+                    resp.LastName  +
+                        ((resp.MobileNumber && resp.MobileNumber !== 'null') ? ', ' + resp.MobileNumber : '');
+                    $scope.modalBox.tx.ezeidTid = resp.TID;
+                },function(){
+                    $scope.$emit('$preLoaderStop');
+                    Notification.error({ message : 'Invalid EZEID', delay : MsgDelay});
+                    $scope.modalBox.tx.ezeid = '';
+                    $scope.modalBox.tx.ezeidTid = 0;
+                });
+            };
 
             /**
              * Loads all transactions
@@ -328,24 +454,9 @@
             };
 
 
-            $scope.$watch('pageNumber',function(newVal,oldVal){
-                if(newVal !== oldVal)
-                {
-                    $scope.$broadcast('$preLoaderStart');
-                    $scope.loadTransaction(newVal,$scope.statusType).then(function(){
-                        $scope.$broadcast('$preLoaderStop');
-                    },function(){
-                        $scope.$broadcast('$preLoaderStop');
-                    });
-                }
-            });
-
-
-
             /**
-             * Load transaction items
-             * @param txId
-             * @returns {*}
+             * Load business items
+             * @returns {*|promise}
              */
             $scope.loadItemList = function(){
                 var defer = $q.defer();
@@ -369,6 +480,47 @@
                 });
                 return defer.promise;
             };
+
+
+            /**
+             * Loads FolderRules for Sales
+             * @return {*|promise}
+             */
+            $scope.loadFolderRules = function(){
+                var defer = $q.defer();
+                $http({
+                    url : GURL + 'ewtGetFolderList',
+                    method : 'GET',
+                    params : {
+                        Token : $rootScope._userInfo.Token,
+                        FunctionType : 0    // Sales
+                    }
+                }).success(function(resp){
+                    if(resp && resp !== 'null' && resp.length > 0){
+                        $scope.txFolderRules = resp;
+                        defer.resolve(resp);
+                    }
+                    else{
+                        defer.resolve([]);
+                    }
+                }).error(function(err){
+                    defer.reject();
+                });
+                return defer.promise;
+            };
+
+
+            $scope.$watch('pageNumber',function(newVal,oldVal){
+                if(newVal !== oldVal)
+                {
+                    $scope.$broadcast('$preLoaderStart');
+                    $scope.loadTransaction(newVal,$scope.statusType).then(function(){
+                        $scope.$broadcast('$preLoaderStop');
+                    },function(){
+                        $scope.$broadcast('$preLoaderStop');
+                    });
+                }
+            });
 
             /**
              * Load transaction items

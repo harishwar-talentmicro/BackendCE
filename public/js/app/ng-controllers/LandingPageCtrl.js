@@ -42,20 +42,24 @@ angular.module('ezeidApp').
              * 2 : Job Keyword
              * @type {{searchType: number}}
              */
-            $scope.searchType = [
-                'EZEID',
-                'Keywords',
-                'Job Keywords'
-            ];
 
-            $scope.placeHolderText = [
-                'Type EZEID here',
-                'Type keywords to locate products and services',
-                'Type Job Skill Keywords to locate employers'
-            ];
+
+            var searchTypeArr = [];
+            searchTypeArr[1] = "EZEID";
+            searchTypeArr[2] = "Keywords";
+            searchTypeArr[3] = "Job Keywords";
+
+            $scope.searchType = searchTypeArr;
+
+            var placeHolder = [];
+            placeHolder[1] = "Type EZEID here";
+            placeHolder[2] = "Type keywords to locate products and services";
+            placeHolder[3] = "Type Job Skill Keywords to locate employers";
+
+            $scope.placeHolderText = placeHolder;
 
             $scope.searchParams = {
-                searchType : 1,
+                searchType : 2,
                 searchTerm : '',
                 proximity : 0,
                 rating : '1,2,3,4,5',
@@ -64,6 +68,7 @@ angular.module('ezeidApp').
                 openStatus : false
             };
 
+            var ratingArr = [];
             $("#range_29").ionRangeSlider({
                 type: "double",
                 min: 1,
@@ -73,15 +78,17 @@ angular.module('ezeidApp').
                 grid_snap: true,
                 keyboard : true,
                 onChange : function(obj){
+
                     var arr = [];
-                    for(var ci = obj.from; obj <= obj.to; ci++)
+                    var ratingTo = parseInt(obj.to);
+                    var ratingFrom = parseInt(obj.from);
+                    for(var ci = ratingFrom; ci <= ratingTo; ci++)
                     {
                         arr.push(ci);
                     }
-                    $scope.searchParams.rating = arr.concat(',');
+                    $scope.searchParams.rating = arr.join();
                 }
             });
-
             $scope.isFilterShown = false;
 
             $scope.toggleFilterContainer = function(e){
@@ -127,7 +134,4 @@ angular.module('ezeidApp').
                     $scope.triggerSearch();
                 }
             };
-
-
-
         }]);
