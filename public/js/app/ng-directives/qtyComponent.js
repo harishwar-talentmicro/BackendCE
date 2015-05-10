@@ -1,5 +1,5 @@
 angular.module('ezeidApp').directive('qtyComponent',['$compile',function($compile){
-    var template = '<div class="input-group  modalbox-input-group-control">'+
+    var template = '<div class="input-group input-group-sm">'+
         '<span class="input-group-addon minus"><span class="glyphicon glyphicon-minus"></span> </span>'+
         '<input class="form-control" type="text" ng-model="qty" />'+
     '<span class="input-group-addon plus"><span class="glyphicon glyphicon-plus"></span> </span>'+

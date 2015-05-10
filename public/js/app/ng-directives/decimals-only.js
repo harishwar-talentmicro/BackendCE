@@ -1,7 +1,7 @@
 /**
  * Number only directive (allows only number for input fields)
  */
-angular.module('ezeidApp').directive('numbersOnly', function(){
+angular.module('ezeidApp').directive('decimalsOnly', function(){
     return {
         //require: 'ngModel',
         //link: function(scope, element, attrs, modelCtrl) {
@@ -22,9 +22,17 @@ angular.module('ezeidApp').directive('numbersOnly', function(){
 
         link : function(scope,element,attrs,model){
             element.on('keypress',function(e){
-                if(e.keyCode < 48 || e.keyCode > 57){
+
+                if((e.keyCode < 48 || e.keyCode > 57) && e.keyCode !== 46){
                     return false;
                 }
+                else if(e.keyCode == 46){
+                    var elemval = element.val();
+                    if(elemval.split('').indexOf('.') !== -1){
+                        return false;
+                    }
+                }
+
             });
         }
     };

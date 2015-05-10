@@ -136,7 +136,7 @@
                             </div>
                             <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix" ng-show="globalConfig.itemListType[modalBox.item.type] > 2">
                                 <div class="form-group">
-                                    <input class="form-control" type="number" placeholder="Rate " ng-model="modalBox.item.rate"/>
+                                    <input class="form-control" type="text" decimals-only placeholder="Rate" ng-model="modalBox.item.rate"/>
                                 </div>
                             </div>
 
@@ -144,7 +144,7 @@
                         <div class="row">
                             <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix"  ng-show="globalConfig.itemListType[modalBox.item.type] > 0">
                                 <div class="form-group">
-                                    <textarea class="form-control" maxlength="250" placeholder="Item Description (Max 250 characters)" rows="14"></textarea>
+                                    <textarea class="form-control" maxlength="250" ng-model="modalBox.item.description" placeholder="Item Description (Max 250 characters)" rows="14"></textarea>
                                 </div>
                             </div>
                             <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix"  ng-show="globalConfig.itemListType[modalBox.item.type] > 1">

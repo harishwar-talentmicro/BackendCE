@@ -292,11 +292,12 @@ angular.module('ezeidApp').controller('ItemMasterCtrl',[
             }
             if($scope.globalConfig.itemListType[item.type] > 2){
                 if(!item.rate){
-                    err.push('Item Rate could not be zero');
+                    err.push('Please enter rate of item');
                 }
             }
         }
-        if(err.length > 1){
+
+        if(err.length > 0){
             for(var i = 0; i < err.length; i++){
                 Notification.error({ message : err[i], delay : 5000});
             }
