@@ -494,9 +494,10 @@ hr.style-two {
     font-weight: 500;
     min-height: 150px;
 
-    background-image: url('https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcQim4Ld4E0wIBtLvPIpRjo1haCIrbcSRrq2bE9CJfDCHi2iJP_eBA');
-    background-repeat: no-repeat;
-    background-position: center;
+    /* tiles background image */
+    /*background-image: url('https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcQim4Ld4E0wIBtLvPIpRjo1haCIrbcSRrq2bE9CJfDCHi2iJP_eBA');*/
+    /*background-repeat: no-repeat;*/
+    /*background-position: center;*/
     /* z-index: 1000000000; */
 
 }

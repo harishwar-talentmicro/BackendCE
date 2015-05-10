@@ -67,6 +67,7 @@ angular.module('ezeidApp').
                 openStatus : false
             };
 
+            var ratingArr = [];
             $("#range_29").ionRangeSlider({
                 type: "double",
                 min: 1,
@@ -76,15 +77,19 @@ angular.module('ezeidApp').
                 grid_snap: true,
                 keyboard : true,
                 onChange : function(obj){
+
                     var arr = [];
-                    for(var ci = obj.from; obj <= obj.to; ci++)
+                    var ratingTo = parseInt(obj.to);
+                    var ratingFrom = parseInt(obj.from);
+
+                    for(var ci = ratingFrom; ci <= ratingTo; ci++)
                     {
                         arr.push(ci);
                     }
+
                     $scope.searchParams.rating = arr.concat(',');
                 }
             });
-
             $scope.isFilterShown = false;
 
             $scope.toggleFilterContainer = function(e){
@@ -130,7 +135,4 @@ angular.module('ezeidApp').
                     $scope.triggerSearch();
                 }
             };
-
-
-
         }]);
