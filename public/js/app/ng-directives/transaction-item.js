@@ -45,7 +45,9 @@
             scope: {
                 itemListType : '=',
                 item:'=',
-                removeItem : '&'
+                removeItem : '&',
+                editPermission : '=',
+                editMode : '='
             }
         };
     }]);

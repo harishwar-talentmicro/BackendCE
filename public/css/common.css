@@ -1221,6 +1221,12 @@ span.smallCloselink {
   margin:0px;
   padding:0px;
 }
+
+#bus-item-list-container, #tx-item-list-container{
+    max-height: 300px;
+    overflow-y: scroll;
+}
+
 .panel .jumbotron{
     background: none;
     padding:0px;

@@ -44,7 +44,9 @@
             scope: {
                 itemListType : '=',
                 item : '=',
-                addItem : '&'
+                addItem : '&',
+                editPermission : '=',
+                editMode : '='
             }
         };
     }]);
