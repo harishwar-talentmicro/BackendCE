@@ -51,11 +51,12 @@ angular.module('ezeidApp').
 
             $scope.searchType = searchTypeArr;
 
-            $scope.placeHolderText = [
-                'Type EZEID here',
-                'Type keywords to locate products and services',
-                'Type Job Skill Keywords to locate employers'
-            ];
+            var placeHolder = [];
+            placeHolder[1] = "Type EZEID here";
+            placeHolder[2] = "Type keywords to locate products and services";
+            placeHolder[3] = "Type Job Skill Keywords to locate employers";
+
+            $scope.placeHolderText = placeHolder;
 
             $scope.searchParams = {
                 searchType : 2,
@@ -81,13 +82,11 @@ angular.module('ezeidApp').
                     var arr = [];
                     var ratingTo = parseInt(obj.to);
                     var ratingFrom = parseInt(obj.from);
-
                     for(var ci = ratingFrom; ci <= ratingTo; ci++)
                     {
                         arr.push(ci);
                     }
-
-                    $scope.searchParams.rating = arr.concat(',');
+                    $scope.searchParams.rating = arr.join();
                 }
             });
             $scope.isFilterShown = false;

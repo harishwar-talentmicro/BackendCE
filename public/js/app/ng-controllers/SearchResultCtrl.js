@@ -40,14 +40,17 @@ angular.module('ezeidApp').
             $routeParams
         )
         {
+            var isResultNumber = 1; /* 1: Results,0:no results */
+
             //Below line is for Loading img
             $scope.$emit('$preLoaderStart');
 
-            // To get search key result
-            getSearchKeyWord($routeParams);
-
             //Set all the serach parameters
             $scope.params = $routeParams;
+
+            // To get search key result
+            getSearchKeyWord($scope.params);
+
 
             //set the ion range slider to the initial value
             $("#range_29").ionRangeSlider({
@@ -66,7 +69,7 @@ angular.module('ezeidApp').
                     {
                         arr.push(ci);
                     }
-                    $scope.params.rating = arr.concat(',');
+                    $scope.params.rating = arr.join();
                 }
             });
 
@@ -117,7 +120,11 @@ angular.module('ezeidApp').
                     CurrentDate:CurrentDate
                 } }).success(function (data) {
                     $rootScope.$broadcast('$preLoaderStop');
-                    console.log(data);
+
+                    /* status to check if there is some result */
+
+                    $scope.isResultNumber = (data == 'null')?0:1;
+
                     $scope.searchListData = data;
                     if (data != 'null' && data.length>0)
                     {
@@ -159,6 +166,45 @@ angular.module('ezeidApp').
             $scope.random = function(){
                 var rand = colorArray[Math.floor(Math.random() * colorArray.length)];
                 return rand;
+            };
+
+            /**
+             * Search for a keywod
+             */
+            $scope.searchKey = function(e){
+
+                if(e.charCode === 13 && $scope.params.searchTerm.length > 0){
+                    $scope.initiateSearch();
+                }
+            };
+
+            /**
+             * Master search function
+             */
+            $scope.initiateSearch = function(e){
+                if($scope.params.searchTerm.length < 1){
+                    return false;
+                }
+
+                var modifyValue = [
+                    'homeDelivery',
+                    'parkingStatus',
+                    'openStatus'
+                ];
+                var searchStr = "";
+                for(var prop in $scope.params){
+                    if($scope.params.hasOwnProperty(prop)){
+                        if(modifyValue.indexOf(prop) !== -1){
+                            var val = ($scope.params[prop] == true) ? 1:0;
+                            var attr = prop + '=' + val +'&'
+                            searchStr += attr;
+                        }
+                        else{
+                            searchStr += (prop + '=' + encodeURIComponent($scope.params[prop])+'&');
+                        }
+                    }
+                }
+                $location.url('/searchResult?'+searchStr);
             };
         }
     ]);
