@@ -1527,3 +1527,16 @@ table.rwd-table > tbody > tr > td.serachResultSelectAll
 {
     margin-top: 1%;
 }
+.setPaddingRightZero
+{
+    padding-right: 0px;
+}
+.emailContiner> .modal{
+    padding-left: 0px !important;
+}
+.emailContiner> .modal > .business-manager-modal > .modal-content > .modal-body{
+    background: #deebf7;
+}
+.mapModal>.modal>.business-manager-modal > .modal-content > .modal-body {
+    background: #deebf7;
+}

@@ -20,7 +20,7 @@ angular.module('ezeidApp').controller('viewDirectionController',['$http', '$root
             center : new google.maps.LatLng(12.295810, 76.639381)
         };
         /* center: new google.maps.LatLng(41.850033, -87.6500523)*/
-         map = new google.maps.Map(document.getElementById('map-canvasH'),mapOptions);
+        map = new google.maps.Map(document.getElementById('map-canvasH'),mapOptions);
 
         directionsDisplay.setMap(map);
         directionsDisplay.setPanel(document.getElementById('directions-panel'));
@@ -82,7 +82,7 @@ angular.module('ezeidApp').controller('viewDirectionController',['$http', '$root
         }
         else
         {
-            $('#SalesEnquiryRequest_popup').slideDown();
+          // $('#SalesEnquiryRequest_popup').slideDown();
             $scope.showEmailForm = true;
         }
     };
@@ -107,9 +107,7 @@ angular.module('ezeidApp').controller('viewDirectionController',['$http', '$root
 
     //  EMail direction image
     viewDirection.emailDirectionImage = function () {
-
-    //  $http({ method: 'get', url: GURL + 'ewtSendBulkMailer?Token=' + $rootScope._userInfo.Token + '&TID=""&TemplateID=""&ToMailID='+ viewDirection._info.ToMailID +'&Attachment='+ finalImageSrc +'&AttachmentFileName=ViewDirection'}).success(function (data)
-        $http({ method: 'post', url: GURL + 'ewtSendBulkMailer', data: { Token: $rootScope._userInfo.Token, TID: "", TemplateID: "", ToMailID: viewDirection._info.ToMailID, Attachment: finalImageSrc, AttachmentFileName :'ViewDirection.jpg'} }).success(function (data)
+       $http({ method: 'post', url: GURL + 'ewtSendBulkMailer', data: { Token: $rootScope._userInfo.Token, TID: "", TemplateID: "", ToMailID: viewDirection._info.ToMailID, Attachment: finalImageSrc, AttachmentFileName :'ViewDirection.jpg'} }).success(function (data)
         {
             if (data != 'null')
             {
