@@ -1,4 +1,21 @@
-angular.module('ezeidApp').controller('mapPopController',['$http', '$rootScope', '$scope', '$q', 'Notification',  '$timeout', '$window', 'GURL', function($http, $rootScope, $scope, $q, Notification, $timeout, $window, GURL){
+angular.module('ezeidApp').controller('mapPopController',[
+    '$http',
+    '$rootScope',
+    '$scope',
+    '$q',
+    'Notification',
+    '$timeout',
+    'MsgDelay',
+    '$window',
+    'GURL',
+    function($http,
+             $rootScope,
+             $scope, $q,
+             Notification,
+             $timeout,
+             MsgDelay,
+             $window,
+             GURL){
 
     var map;
     var marker;
@@ -15,8 +32,7 @@ angular.module('ezeidApp').controller('mapPopController',['$http', '$rootScope',
         title : 'EZEID Map',
         class : 'business-manager-modal'
     }
-    var viewDirection = this;
-    viewDirection._info = {};
+    $scope.ToMailID1 = "";
     initialize();
 
     function initialize () {
@@ -28,7 +44,6 @@ angular.module('ezeidApp').controller('mapPopController',['$http', '$rootScope',
             center :currentLoc
         };
         map = new google.maps.Map(document.getElementById('map-canvasH1'),mapOptions);
-
         directionsDisplay.setMap(map);
         directionsDisplay.setPanel(document.getElementById('directions-panel'));
 
@@ -68,7 +83,6 @@ angular.module('ezeidApp').controller('mapPopController',['$http', '$rootScope',
             marker.setMap(null);
         }
         map.setCenter(location);
-
         marker = new google.maps.Marker({
             position: location,
             title: "Current Location",
@@ -78,12 +92,12 @@ angular.module('ezeidApp').controller('mapPopController',['$http', '$rootScope',
         });
         google.maps.event.trigger(map, "resize");
         map.setCenter(location);
-        // getReverseGeocodingData(marker.position.lat(), marker.position.lng());
     }
 
     //to show route and direction panel
     $scope.getdirections = function () {
-
+        //Below line is for Loading img
+        $scope.$emit('$preLoaderStart');
         $scope.showDirectionPannel = true;
         directtionLatLong = JSON.parse($window.localStorage.getItem("myLocation"));
 
@@ -126,6 +140,7 @@ angular.module('ezeidApp').controller('mapPopController',['$http', '$rootScope',
                 img = img.replace('data:image/png;base64,', '');
                 finalImageSrc = 'data:image/jpg;base64,' + img;
                 $('#googlemapbinary').attr('src', finalImageSrc);
+                $scope.$emit('$preLoaderStop');
                 return false;
             }
         });
@@ -136,6 +151,7 @@ angular.module('ezeidApp').controller('mapPopController',['$http', '$rootScope',
        if($rootScope._userInfo.IsAuthenticate == false)
         {
             $('#SignIn_popup').slideDown();
+            $scope.ToMailID1 = "";
         }
         else
         {
@@ -145,7 +161,7 @@ angular.module('ezeidApp').controller('mapPopController',['$http', '$rootScope',
 
     //  EMail direction image
     $scope.emailDirectionImage = function () {
-        $http({ method: 'post', url: GURL + 'ewtSendBulkMailer', data: { Token: $rootScope._userInfo.Token, TID: "", TemplateID: "", ToMailID: viewDirection._info.ToMailID, Attachment: finalImageSrc, AttachmentFileName :'ViewDirection.jpg'} }).success(function (data)
+        $http({ method: 'post', url: GURL + 'ewtSendBulkMailer', data: { Token: $rootScope._userInfo.Token, TID: "", TemplateID: "", ToMailID: $scope.ToMailID1, Attachment: finalImageSrc, AttachmentFileName :'ViewDirection.jpg'} }).success(function (data)
         {
             if (data != 'null')
             {
@@ -154,10 +170,10 @@ angular.module('ezeidApp').controller('mapPopController',['$http', '$rootScope',
                 Notification.success({message: "Mail are submitted for transmitted..", delay: MsgDelay});
                 $window.localStorage.removeItem("searchResult");
                 $scope.showEmailForm = false;
+                $scope.ToMailID1 = "";
             }
             else
             {
-                // Notification.error({ message: 'Invalid key or not found…', delay: MsgDelay });
                 Notification.error({ message: 'Sorry..! Message not send ', delay: MsgDelay });
                 $window.localStorage.removeItem("searchResult");
             }
@@ -169,6 +185,7 @@ angular.module('ezeidApp').controller('mapPopController',['$http', '$rootScope',
         $scope.showEmailForm = false;
         document.getElementById("ToMailID").className = "form-control emptyBox";
         $scope.FromEmailID = "";
+        $scope.ToMailID1 = "";
     };
 
 }]);
