@@ -50,7 +50,7 @@
                var encrypted = localStorage.getItem("_token");
                if (encrypted) {
                    var decrypted = CryptoJS.AES.decrypt(encrypted, "EZEID");
-                   var jsonString = null;
+                   var jsonString = {};
                    try {
                        jsonString = JSON.parse(decrypted.toString(CryptoJS.enc.Utf8));
                    }
@@ -59,16 +59,16 @@
                    return jsonString;
                }
                else {
-                   return null;
+                   return {};
                }
            }
            catch(ex){
-               return null;
+               return {};
            }
         }
         else{
             alert('You are using and outdated browser! Please upgrade to newer browser');
-            return null;
+            return {};
         }
     })());
 
