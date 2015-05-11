@@ -14,10 +14,13 @@
     "jade": "~1.9.1",
     "morgan": "~1.5.1",
     "serve-favicon": "~2.2.0",
-	"compression": "~1.4.0",
+	"compression": "~1.4.3",
 	"request": "~2.53.0",
 	"moment": "~2.9.0",
-	"multer": "~0.1.7"
+	"multer": "~0.1.7",
+    "gm":"~1.17.0",
+    "pdfkit":"~0.7.1",
+    "crypto":"~0.0.3"
   },
   "devDependencies": {
     "grunt-ngmin": "0.0.3"

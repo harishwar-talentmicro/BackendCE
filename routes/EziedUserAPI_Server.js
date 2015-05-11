@@ -4892,13 +4892,36 @@ exports.FnGetStatusType = function (req, res) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
-
+                        var StatusAllOpen = 
+                            {
+                                        TID:'-1',
+                                        MasterID:'0',
+                                        StatusTitle:'Status All Open',
+                                        ProgressPercent:0,
+                                        Status:1,
+                                        NotificationMsg:"",
+                                        NotificationMailMsg:"",
+                                        StatusValue:"11"
+                                    };
+                            var StatusAll = {
+                                        TID:'-2',
+                                        MasterID:'0',
+                                        StatusTitle:'Status All',
+                                        ProgressPercent:0,
+                                        Status:1,
+                                        NotificationMsg:"",
+                                        NotificationMailMsg:"",
+                                        StatusValue:"12"
+                                    };
+                     
+                        
                         var query = db.escape(Token) + ',' + db.escape(FunctionType);
                         db.query('CALL pGetStatusType(' + query + ')', function (err, StatusResult) {
                             if (!err) {
                                 if (StatusResult != null) {
                                     if (StatusResult[0].length > 0) {
-
+                                        StatusResult[0].unshift(StatusAll);
+                                        StatusResult[0].unshift(StatusAllOpen);
                                         console.log('FnGetStatusType: Status type details Send successfully');
                                         res.send(StatusResult[0]);
                                     }
@@ -8608,8 +8631,8 @@ exports.FnSendBulkMailer = function (req, res) {
 
                                     var mailOptions = {
                                         To: ToMailID,
-                                        subject: 'test subject',
-                                        html: 'test body', // html body
+                                        subject: 'Route Map',
+                                        html: 'Dear User, <br/> Please find the route map in attachment here with in '+OutputFileName+'.pdf format', // html body
                                         Attachment: Base64PdfData,
                                         AttachmentFileName: OutputFileName+'.pdf'
                                     };
@@ -9748,7 +9771,7 @@ try{
         if(TID != null){
             
             ID = TID + ',' + ID;
-            var IDS =ID.slice(0,-1)
+            var IDS =ID.slice(0,-1);
             console.log('TID Values:'+ IDS);}
     
         if (Token != null && IDS != null){
@@ -9756,10 +9779,7 @@ try{
                 if (!err) {
                     if (Result != null) {
                         console.log('CALL pGetSearchPics(' + db.escape(IDS) + ')');
-                        //var Query = 'Select TID,EZEID,CompanyName from tmaster where TID in (' + TID + ')';
-                        //console.log(Query);
-                            //db.query(Query, function (err, SearchResult) {
-                                    db.query('CALL pGetSearchPics(' + db.escape(IDS) + ')', function (err, SearchResult) {
+                            db.query('CALL pGetSearchPics(' + db.escape(IDS) + ')', function (err, SearchResult) {
                                     
                                     if (!err) {
                                         if (SearchResult != null) {
@@ -9819,16 +9839,14 @@ exports.FnGetCompanyProfile = function(req, res){
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
-        var Token = req.query.Token;
+        var TID = req.query.TID;
         var RtnMessage = {
             Result: [],
             Message: ''
         };
-        if(Token !=  null){
-            FnValidateToken(Token, function (err, Result) {
-                if (!err) {
+        if(TID  !=  null){
                     if (Result != null) {
-                        db.query('CALL pGetTagLine(' + db.escape(Token) + ')', function (err, GetResult) {
+                        db.query('CALL pGetTagLine(' + db.escape(TID) + ')', function (err, GetResult) {
                             if (!err) {
                                 if (GetResult != null) {
                                     if (GetResult[0].length > 0) {
@@ -9863,21 +9881,12 @@ exports.FnGetCompanyProfile = function(req, res){
                         res.send(RtnMessage);
                         console.log('FnGetCompanyProfile: Invalid Token');
                     }
-                } else {
-
-                    res.statusCode = 500;
-                    RtnMessage.Message = 'Error in validating token';
-                    res.send(RtnMessage);
-                    console.log('FnGetCompanyProfile: Error in validating token:  ' + err);
-                }
-            });
         }
         else {
-            if (Token == null) {
-                console.log('FnGetCompanyProfile: Token is empty');
-                RtnMessage.Message = 'Token is empty';
+            if (TID == null) {
+                console.log('FnGetCompanyProfile: TID is empty');
+                RtnMessage.Message = 'TID is empty';
             }
-
             res.statusCode=400;
             res.send(RtnMessage);
         }
@@ -9963,6 +9972,92 @@ exports.FnSaveCompanyProfile = function(req, res){
         throw new Error(ex);
     }
 };
+
+exports.FnGetLocationListForEZEID = function (req, res) {
+    try {
+
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.query.Token;
+        var TID = req.query.TID;
+        var RtnMessage = {
+            Result: [],
+            Message: ''
+        };
+        console.log(req.query.Token);
+        console.log(Token);
+        if (Token && TID) {
+            FnValidateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+                        var Query ='select TID, MasterID,LocTitle, Latitude, Longitude,MobileNumber,ifnull((Select FirstName from tmaster where TID='+db.escape(TID)+'),"") as FirstName,ifnull((Select LastName from tmaster where TID='+db.escape(TID)+'),"")  as LastName from tlocations where MasterID='+db.escape(TID);
+                        
+                        db.query(Query, function (err, GetResult) {
+                            if (!err) {
+                                if (GetResult != null) {
+                                    if (GetResult.length > 0) {
+                                        RtnMessage.Result = GetResult;
+                                        RtnMessage.Message ='Location List Send successfully';
+                                        console.log('FnGetLocationListForEZEID: Location List Send successfully');
+                                        res.send(RtnMessage);
+                                    }
+                                    else {
+                                        RtnMessage.Message ='No Location List found';
+                                        console.log('FnGetLocationListForEZEID:No Location List found');
+                                        res.send(RtnMessage);
+                                    }
+                                }
+                                else {
+
+                                    RtnMessage.Message ='No Location List found';
+                                    console.log('FnGetLocationListForEZEID:No Location List found');
+                                    res.send(RtnMessage);
+                                }
+
+                            }
+                            else {
+                                RtnMessage.Message ='error in getting Location List';
+                                console.log('FnGetLocationListForEZEID: error in getting Resource details' + err);
+                                res.statusCode = 500;
+                                res.send(RtnMessage);
+                            }
+                        });
+                    }
+                    else {
+                        res.statusCode = 401;
+                        RtnMessage.Message = 'Invalid Token';
+                        res.send(RtnMessage);
+                        console.log('FnGetLocationListForEZEID: Invalid Token');
+                    }
+                } else {
+
+                    res.statusCode = 500;
+                    RtnMessage.Message = 'Error in validating token';
+                    res.send(RtnMessage);
+                    console.log('FnGetLocationListForEZEID: Error in validating token:  ' + err);
+                }
+            });
+        }
+        else {
+            if (Token == null) {
+                console.log('FnGetLocationListForEZEID: Token is empty');
+                RtnMessage.Message ='Token is empty';
+            }
+            else if (TID == null) {
+                console.log('FnGetLocationListForEZEID: TID is empty');
+                RtnMessage.Message ='TID is empty';
+            }
+            res.statusCode=400;
+            res.send(RtnMessage);
+        }
+    }
+    catch (ex) {
+        console.log('FnGetLocationListForEZEID error:' + ex.description);
+        throw new Error(ex);
+    }
+};
+
 
 
 //EZEIDAP Parts

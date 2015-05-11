@@ -31,11 +31,11 @@
                 templateType = parseInt(scope.itemListType);
             }
             catch(ex){
-
+                templateType = 0;
             }
             element.html(getTemplate(templateType)).show();
             $compile(element.contents())(scope);
-        }
+        };
 
 
         return {

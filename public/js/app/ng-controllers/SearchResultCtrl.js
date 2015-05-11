@@ -1,4 +1,4 @@
-/**
+/*
  * Created by admin on 6/5/15.
  */
 /**
@@ -24,6 +24,7 @@ angular.module('ezeidApp').
         'MsgDelay',
         '$location',
         '$routeParams',
+        'GoogleMaps',
         function (
             $rootScope,
             $scope,
@@ -37,7 +38,8 @@ angular.module('ezeidApp').
             $interval,
             MsgDelay,
             $location,
-            $routeParams
+            $routeParams,
+            GoogleMap
         )
         {
             var isResultNumber = 1; /* 1: Results,0:no results */
@@ -120,7 +122,7 @@ angular.module('ezeidApp').
                     CurrentDate:CurrentDate
                 } }).success(function (data) {
                     $rootScope.$broadcast('$preLoaderStop');
-
+                    console.log(data);
                     /* status to check if there is some result */
 
                     $scope.isResultNumber = (data == 'null')?0:1;
@@ -156,10 +158,10 @@ angular.module('ezeidApp').
             }
 
             /**
-             * Select random colors for search result list tiles
-             */
+             Select random colors for search result list tiles
+             /
 
-            /* make an array of colors for tiles */
+             /* make an array of colors for tiles */
             var colorArray = ["orange","green","blue","pink"];
 
             /* generate a random color string */
@@ -206,5 +208,40 @@ angular.module('ezeidApp').
                 }
                 $location.url('/searchResult?'+searchStr);
             };
+
+            /* integrate google map */
+
+            var googleMap = new GoogleMap();
+            googleMap.setSettings({
+                mapElementClass : "col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix class-map-ctrl",
+                searchElementClass : "form-control pull-left pac-input",
+                currentLocationElementClass : "link-btn pac-loc",
+                controlsContainerClass : "col-lg-6 col-md-6'"
+            });
+            googleMap.createMap("map-ctrl",$scope,"findCurrentLocation()");
+
+            googleMap.renderMap();
+
+            googleMap.mapIdleListener().then(function(){
+                googleMap.pushMapControls();
+                googleMap.listenOnMapControls();
+                googleMap.getCurrentLocation();
+                googleMap.placeCurrentLocationMarker();
+                googleMap.resizeMap();
+                googleMap.toggleMapControls();
+
+                /* place markers on map */
+                var pos = googleMap.createGMapPosition(23,23);
+                var marker = googleMap.createMarker(pos,'Location 1',null,false,null);
+                googleMap.placeMarker(marker);
+
+                var pos = googleMap.createGMapPosition(12,20);
+                var marker = googleMap.createMarker(pos,'Location 1',null,false,null);
+                googleMap.placeMarker(marker);
+
+                googleMap.setMarkersInBounds();
+            });
+
+
         }
     ]);
