@@ -67,7 +67,6 @@ angular.module('ezeidApp').
             // login popoup
             $('#SignIn_popup').slideDown();
             console.log("sai11");
-
         }
         else
         {
@@ -75,8 +74,11 @@ angular.module('ezeidApp').
             // To get search information
             getSearchInformation(TID,$scope.SearchType);
 
-            // To get about Company
-            getAboutComapny();
+            if($scope.SearchType == 2)
+            {
+                // To get about Company
+                getAboutComapny();
+            }
         }
 
 
