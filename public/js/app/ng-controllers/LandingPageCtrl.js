@@ -20,6 +20,7 @@ angular.module('ezeidApp').
         '$interval',
         'MsgDelay',
         '$location',
+        'GoogleMaps',
         function (
             $rootScope,
             $scope,
@@ -32,7 +33,8 @@ angular.module('ezeidApp').
             GURL,
             $interval,
             MsgDelay,
-            $location
+            $location,
+            GoogleMap
             )
         {
             /**
@@ -43,7 +45,7 @@ angular.module('ezeidApp').
              * @type {{searchType: number}}
              */
 
-
+            var placeDetail = [];
             var searchTypeArr = [];
             searchTypeArr[1] = "EZEID";
             searchTypeArr[2] = "Keywords";
@@ -134,4 +136,31 @@ angular.module('ezeidApp').
                     $scope.triggerSearch();
                 }
             };
+
+            var handleNoGeolocation = function(){
+                console.log('No Geolocation data');
+            };
+
+            $scope.googleMap = new GoogleMap();
+
+            var promise = $scope.googleMap.getCurrentLocation()
+                promise.then(function(resp){
+                if(resp){
+                    $scope.googleMap.getReverseGeolocation($scope.googleMap.currentMarkerPosition.latitude,
+                        $scope.googleMap.currentMarkerPosition.longitude).then(function(resp){
+                            $scope.placeDetail = $scope.googleMap.parseReverseGeolocationData(resp.data);
+
+                        },function(){
+
+                        });
+                }
+                else{
+                    handleNoGeolocation();
+                }
+            },function(){
+                handleNoGeolocation();
+            });
+
+
+
         }]);

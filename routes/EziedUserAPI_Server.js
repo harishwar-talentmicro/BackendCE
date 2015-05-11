@@ -4892,36 +4892,12 @@ exports.FnGetStatusType = function (req, res) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
-                        var StatusAllOpen = 
-                            {
-                                        TID:'-1',
-                                        MasterID:'0',
-                                        StatusTitle:'Status All Open',
-                                        ProgressPercent:0,
-                                        Status:1,
-                                        NotificationMsg:"",
-                                        NotificationMailMsg:"",
-                                        StatusValue:"11"
-                                    };
-                            var StatusAll = {
-                                        TID:'-2',
-                                        MasterID:'0',
-                                        StatusTitle:'Status All',
-                                        ProgressPercent:0,
-                                        Status:1,
-                                        NotificationMsg:"",
-                                        NotificationMailMsg:"",
-                                        StatusValue:"12"
-                                    };
-                     
-                        
+                                             
                         var query = db.escape(Token) + ',' + db.escape(FunctionType);
                         db.query('CALL pGetStatusType(' + query + ')', function (err, StatusResult) {
                             if (!err) {
                                 if (StatusResult != null) {
                                     if (StatusResult[0].length > 0) {
-                                        StatusResult[0].unshift(StatusAll);
-                                        StatusResult[0].unshift(StatusAllOpen);
                                         console.log('FnGetStatusType: Status type details Send successfully');
                                         res.send(StatusResult[0]);
                                     }
@@ -4974,6 +4950,103 @@ exports.FnGetStatusType = function (req, res) {
         throw new Error(ex);
     }
 };
+
+exports.FnStatusType = function (req, res) {
+    try {
+
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.query.Token;
+        var FunctionType = req.query.FunctionType;
+
+        if (Token != null  && FunctionType != null ) {
+            FnValidateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+                        var StatusAllOpen = 
+                            {
+                                        TID:'-1',
+                                        MasterID:'0',
+                                        StatusTitle:'All Open',
+                                        ProgressPercent:0,
+                                        Status:1,
+                                        NotificationMsg:"",
+                                        NotificationMailMsg:"",
+                                        StatusValue:"11"
+                                    };
+                            var StatusAll = {
+                                        TID:'-2',
+                                        MasterID:'0',
+                                        StatusTitle:'All',
+                                        ProgressPercent:0,
+                                        Status:1,
+                                        NotificationMsg:"",
+                                        NotificationMailMsg:"",
+                                        StatusValue:"12"
+                                    };
+                     
+                        
+                        var query = db.escape(Token) + ',' + db.escape(FunctionType);
+                        db.query('CALL pGetStatusType(' + query + ')', function (err, StatusResult) {
+                            if (!err) {
+                                if (StatusResult != null) {
+                                    if (StatusResult[0].length > 0) {
+                                        StatusResult[0].unshift(StatusAll);
+                                        StatusResult[0].unshift(StatusAllOpen);
+                                        console.log('FnStatusType: Status type details Send successfully');
+                                        res.send(StatusResult[0]);
+                                    }
+                                    else {
+
+                                        console.log('FnGetStatusType:No Status type details found');
+                                        res.send('null');
+                                    }
+                                }
+                                else {
+
+                                    console.log('FnGetStatusType:No Status type details found');
+                                    res.send('null');
+                                }
+                            }
+                            else {
+                                console.log('FnGetStatusType: error in getting Status type details' + err);
+                                res.statusCode = 500;
+                                res.send('null');
+                            }
+                        });
+                    }
+                    else {
+                        res.statusCode = 401;
+                        res.send('null');
+                        console.log('FnGetStatusType: Invalid Token');
+                    }
+                } else {
+
+                    res.statusCode = 500;
+                    res.send('null');
+                    console.log('FnGetStatusType: Error in validating token:  ' + err);
+                }
+            });
+        }
+        else {
+            if (Token == null) {
+                console.log('FnGetStatusType: Token is empty');
+            }
+            else if (FunctionType == null) {
+                console.log('FnGetStatusType: FunctionType is empty');
+            }
+
+            res.statusCode=400;
+            res.send('null');
+        }
+    }
+    catch (ex) {
+        console.log('FnGetStatusType error:' + ex.description);
+        throw new Error(ex);
+    }
+};
+
 
 //below method for get the action type details based on business user
 exports.FnGetActionType = function (req, res) {
@@ -9845,10 +9918,9 @@ exports.FnGetCompanyProfile = function(req, res){
             Message: ''
         };
         if(TID  !=  null){
-                    if (Result != null) {
                         db.query('CALL pGetTagLine(' + db.escape(TID) + ')', function (err, GetResult) {
                             if (!err) {
-                                if (GetResult != null) {
+                                if (GetResult[0] != null) {
                                     if (GetResult[0].length > 0) {
                                         RtnMessage.Result=GetResult[0];
                                         RtnMessage.Message = 'About Company Profile sent successfully';
@@ -9874,13 +9946,7 @@ exports.FnGetCompanyProfile = function(req, res){
                                 res.send(RtnMessage);
                             }
                         });
-                    }
-                    else {
-                        res.statusCode = 401;
-                        RtnMessage.Message = 'Invalid Token';
-                        res.send(RtnMessage);
-                        console.log('FnGetCompanyProfile: Invalid Token');
-                    }
+
         }
         else {
             if (TID == null) {
@@ -11871,7 +11937,6 @@ exports.FnDeleteBannerPictureAP = function(req, res){
         throw new Error(ex);
     }
 }
-
 
 //EZEID VAS
 
