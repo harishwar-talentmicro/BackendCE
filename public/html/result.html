@@ -1,144 +1,146 @@
-<section id="result-page-menu-wrapper" class="hpw rpw" ng-controller="LandingPageCtrl">
-    <!-- New header menu goes here -->
-    <nav class="navbar navbar-inverse no-radius m-bottom-0">
-        <div class="container-fluid">
-            <!-- Brand and toggle get grouped for better mobile display -->
-            <div class="navbar-header">
-                <div class="logo"></div>
-                <!-- For mobile view menu -->
-                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-2">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
+<div class="search-result hpw">
+    <section id="result-page-menu-wrapper" class=" rpw" ng-controller="LandingPageCtrl">
+        <!-- New header menu goes here -->
+        <nav class="navbar navbar-inverse no-radius m-bottom-0">
+            <div class="container-fluid">
+                <!-- Brand and toggle get grouped for better mobile display -->
+                <div class="navbar-header">
+                    <div class="logo"></div>
+                    <!-- For mobile view menu -->
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-2">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
 
-            </div>
+                </div>
 
-            <!-- Collect the nav links, forms, and other content for toggling -->
-            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-2">
+                <!-- Collect the nav links, forms, and other content for toggling -->
+                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-2">
 
-                <ul class="nav navbar-nav navbar-right">
-                    <li class="dropdown ">
-
-                        <a class="dropdown-toggle border-right-1 btn-link" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-user"></i> Hi Allex <span class="caret"></span></a>
-                        <ul class="dropdown-menu" role="menu">
-                            <li><a href="#"><i class="fa fa-wrench"></i> Profile Manager</a></li>
-                            <li><a href="#"><i class="fa fa-envelope"></i> Messages</a></li>
-                            <li><a href="#"><i class="fa fa-calendar"></i> Access History</a></li>
-                            <li><a href="#"><i class="fa fa-shield"></i> Whitelist & Blacklist</a></li>
-                            <li><a href="#"><i class="fa fa-server"></i> Bulk Mailer</a></li>
-                            <li><a href="#"><i class="fa fa-warning"></i> Change Password</a></li>
-                        </ul>
-                    </li>
-                    <li><a class="btn-link"><i class="fa fa-sign-out"></i> Sign Out</a></li>
-                </ul>
-            </div><!-- /.navbar-collapse -->
-        </div><!-- /.container-fluid -->
-    </nav>
-
-    <!-- Navbar header menu for search result goes here -->
-    <nav class="navbar navbar-default m-bottom-0 no-radius">
-        <div class="container-fluid">
-            <!-- Brand and toggle get grouped for better mobile display -->
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-            </div>
-
-            <!-- Collect the nav links, forms, and other content for toggling -->
-            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                <div class="row text-center search-bar-center">
-                    <div class="navbar-form navbar-left no-border " role="search">
-                        <!-- Search Bar and advance filter goes here -->
-                        <div class="input-group">
-                            <div class="input-group-btn">
-                                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><b>{{searchType[params.searchType]}}</b> <span class="caret"></span></button>
-                                <ul class="dropdown-menu" role="menu">
-                                    <li class="btn-link" ng-repeat="search in searchType track by $index">
-                                        <a class="btn-link" ng-click="($event.preventDefault())(params.searchType = $index) (searchParams.searchTerm = '')">{{search}}</a>
-                                    </li>
-                                </ul>
-                            </div>
-
-                            <input type="text" ng-keypress="searchKey($event)" placeholder="{{placeHolderText[searchParams.searchType]}}" ng-model="params.searchTerm" ng-class="(searchParams.searchType === 0) ? 'text-uppercase' : ''" class="form-control" aria-label="...">
-                            <div class="input-group-btn">
-                                <button type="button" class="btn btn-default" title="search" ng-click="initiateSearch()"><i class="fa fa-search"></i> </button>
-                                <button  ng-click="toggleFilterContainer($event,true)" type="button" class="btn btn-info dropdown-toggle btn-advanced-filter" data-toggle="dropdown" title="advance search"><i class="fa fa-filter"></i> </button>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Toggle buttons for switching betweeen maps and list -->
                     <ul class="nav navbar-nav navbar-right">
-                        <li class="dropdown p8">
-                            <div class="btn-group">
-                                <button class="btn btn-default"><i class="fa fa-list"></i> List</button>
-                                <button class="btn btn-default"><i class="fa fa-map-marker"></i> Maps</button>
-                            </div>
+                        <li class="dropdown ">
+
+                            <a class="dropdown-toggle border-right-1 btn-link" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-user"></i> Hi Allex <span class="caret"></span></a>
+                            <ul class="dropdown-menu" role="menu">
+                                <li><a href="#"><i class="fa fa-wrench"></i> Profile Manager</a></li>
+                                <li><a href="#"><i class="fa fa-envelope"></i> Messages</a></li>
+                                <li><a href="#"><i class="fa fa-calendar"></i> Access History</a></li>
+                                <li><a href="#"><i class="fa fa-shield"></i> Whitelist & Blacklist</a></li>
+                                <li><a href="#"><i class="fa fa-server"></i> Bulk Mailer</a></li>
+                                <li><a href="#"><i class="fa fa-warning"></i> Change Password</a></li>
+                            </ul>
                         </li>
+                        <li><a class="btn-link"><i class="fa fa-sign-out"></i> Sign Out</a></li>
                     </ul>
-                </div>
-            </div><!-- /.navbar-collapse -->
-        </div><!-- /.container-fluid -->
-        <div class="no-result" ng-show="isResultNumber == 0">
-            <hr class="style-two">
-            <h3 class="text text-center font-open-sans-light"><i class="fa fa-warning"></i> No Result Found, Try again with different search parameters</h3>
-        </div>
-    </nav>
+                </div><!-- /.navbar-collapse -->
+            </div><!-- /.container-fluid -->
+        </nav>
 
-    <!-- Advance filter container -->
-    <div class="row">
-        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 col-lg-offset-3 col-md-offset-3 col-sm-offset-3 col-xs-offset-0">
-            <!--<div class="filter-container animation-slideup" ng-show="isFilterShown">-->
-            <div class="filter-container animation-slideup" ng-show="isFilterShown">
-                <div class="container text text-center filter-text-highlight">
-                    <i>Advance Filters</i>
+        <!-- Navbar header menu for search result goes here -->
+        <nav class="navbar navbar-default m-bottom-0 no-radius">
+            <div class="container-fluid">
+                <!-- Brand and toggle get grouped for better mobile display -->
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
                 </div>
-                <!-- Main contents of advance filters -->
-                <div class="advance-filter-content border-style-bottom">
-                    <div class="container">
-                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 p-bottom-3 filter-item-border">
-                            <div class="text-left text-primary"><b>Proximity of:</b></div>
-                            <div class="form-group">
-                                <select name=search"proximity" ng-model="params.proximity" class="form-control">
-                                    <option ng-selected="1 == params.proximity" value="1">1 mile (1.6 km)</option>
-                                    <option ng-selected="2 == params.proximity" value="2">2 mile (3.2 k)</option>
-                                    <option ng-selected="5 == params.proximity" value="5">5 mile (8 km)</option>
-                                    <option ng-selected="10 == params.proximity" value="10">10 mile (16 km)</option>
-                                    <option ng-selected="25 == params.proximity" value="25">25 mile (40 km)</option>
-                                    <option ng-selected="50 == params.proximity" value="50">50 mile (80 km)</option>
-                                    <option ng-selected="0 == params.proximity" value="0">Any</option>
-                                </select>
+
+                <!-- Collect the nav links, forms, and other content for toggling -->
+                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                    <div class="row text-center search-bar-center">
+                        <div class="navbar-form navbar-left no-border " role="search">
+                            <!-- Search Bar and advance filter goes here -->
+                            <div class="input-group">
+                                <div class="input-group-btn">
+                                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><b>{{searchType[params.searchType]}}</b> <span class="caret"></span></button>
+                                    <ul class="dropdown-menu" role="menu">
+                                        <li class="btn-link" ng-repeat="search in searchType track by $index">
+                                            <a class="btn-link" ng-click="($event.preventDefault())(params.searchType = $index) (searchParams.searchTerm = '')">{{search}}</a>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <input type="text" ng-keypress="searchKey($event)" placeholder="{{placeHolderText[searchParams.searchType]}}" ng-model="params.searchTerm" ng-class="(searchParams.searchType === 0) ? 'text-uppercase' : ''" class="form-control" aria-label="...">
+                                <div class="input-group-btn">
+                                    <button type="button" class="btn btn-default" title="search" ng-click="initiateSearch()"><i class="fa fa-search"></i> </button>
+                                    <button  ng-click="toggleFilterContainer($event,true)" type="button" class="btn btn-info dropdown-toggle btn-advanced-filter" data-toggle="dropdown" title="advance search"><i class="fa fa-filter"></i> </button>
+                                </div>
                             </div>
                         </div>
-                        <br>
-
-                        <div class="row">
-                            <div class="text-left">
-                                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 p-top-10 border-style-right">
-                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 select-items">
-                                        <input type="checkbox" id="item1" ng-checked="params.parkingStatus == 1" class="chkShowParking"  ng-model="params.parkingStatus" name="parking" >
-                                        &nbsp;
-                                        <label  for="item1">Parking Required</label>
-                                    </div>
-                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 select-items">
-                                        <input type="checkbox" id="item2" class="chkShowParking" ng-checked="params.homeDelivery == 1" ng-model="params.homeDelivery" name="homeDelivery" >
-                                        &nbsp;
-                                        <label  for="item2">Need home delivery</label>
-                                    </div>
-                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 select-items">
-                                        <input type="checkbox" id="item3" class="chkShowParking" ng-checked="params.openStatus == 1" ng-model="params.openStatus" name="openStatus" >
-                                        &nbsp;
-                                        <label  for="item3">Open business only</label>
-                                    </div>
+                        <!-- Toggle buttons for switching betweeen maps and list -->
+                        <ul class="nav navbar-nav navbar-right">
+                            <li class="dropdown p8">
+                                <div class="btn-group">
+                                    <button class="btn btn-default" ng-click="toggleMapView(false)"><i class="fa fa-list"></i> List</button>
+                                    <button class="btn btn-default" ng-click="toggleMapView(true)"><i class="fa fa-map-marker"></i> Maps</button>
                                 </div>
-                                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 p-top-10 text-warning">
-                                    <span class="text text-info text-bolder">Filter by ratings:</span>
-                                    <input id="range_29" />
+                            </li>
+                        </ul>
+                    </div>
+                </div><!-- /.navbar-collapse -->
+            </div><!-- /.container-fluid -->
+            <div class="no-result" ng-show="isResultNumber == 0">
+                <hr class="style-two">
+                <h3 class="text text-center font-open-sans-light"><i class="fa fa-warning"></i> No Result Found, Try again with different search parameters</h3>
+            </div>
+        </nav>
+
+        <!-- Advance filter container -->
+        <div class="row">
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 col-lg-offset-3 col-md-offset-3 col-sm-offset-3 col-xs-offset-0">
+                <!--<div class="filter-container animation-slideup" ng-show="isFilterShown">-->
+                <div class="filter-container animation-slideup" ng-show="isFilterShown">
+                    <div class="container text text-center filter-text-highlight">
+                        <i>Advance Filters</i>
+                    </div>
+                    <!-- Main contents of advance filters -->
+                    <div class="advance-filter-content border-style-bottom">
+                        <div class="container">
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 p-bottom-3 filter-item-border">
+                                <div class="text-left text-primary"><b>Proximity of:</b></div>
+                                <div class="form-group">
+                                    <select name=search"proximity" ng-model="params.proximity" class="form-control">
+                                        <option ng-selected="1 == params.proximity" value="1">1 mile (1.6 km)</option>
+                                        <option ng-selected="2 == params.proximity" value="2">2 mile (3.2 k)</option>
+                                        <option ng-selected="5 == params.proximity" value="5">5 mile (8 km)</option>
+                                        <option ng-selected="10 == params.proximity" value="10">10 mile (16 km)</option>
+                                        <option ng-selected="25 == params.proximity" value="25">25 mile (40 km)</option>
+                                        <option ng-selected="50 == params.proximity" value="50">50 mile (80 km)</option>
+                                        <option ng-selected="0 == params.proximity" value="0">Any</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <br>
+
+                            <div class="row">
+                                <div class="text-left">
+                                    <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 p-top-10 border-style-right">
+                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 select-items">
+                                            <input type="checkbox" id="item1" ng-checked="params.parkingStatus == 1" class="chkShowParking"  ng-model="params.parkingStatus" name="parking" >
+                                            &nbsp;
+                                            <label  for="item1">Parking Required</label>
+                                        </div>
+                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 select-items">
+                                            <input type="checkbox" id="item2" class="chkShowParking" ng-checked="params.homeDelivery == 1" ng-model="params.homeDelivery" name="homeDelivery" >
+                                            &nbsp;
+                                            <label  for="item2">Need home delivery</label>
+                                        </div>
+                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 select-items">
+                                            <input type="checkbox" id="item3" class="chkShowParking" ng-checked="params.openStatus == 1" ng-model="params.openStatus" name="openStatus" >
+                                            &nbsp;
+                                            <label  for="item3">Open business only</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 p-top-10 text-warning">
+                                        <span class="text text-info text-bolder">Filter by ratings:</span>
+                                        <input id="range_29" />
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -146,186 +148,178 @@
                 </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
-<!-- Search result wrapper -->
-<section id="search-result-wrapper" class="hpw srw">
-    <div class="metro-ui-wrapper">
-        <!-- main-tiles-frame -->
-        <div class="main-tiles-frame tile-frame-padding-top font-roboto">
-            <!-- All such results goes here -->
-            <div class="row p-top-10">
+    <!-- Search result wrapper -->
+    <section id="search-result-wrapper" class="hpw srw">
+        <div class="metro-ui-wrapper">
+            <!-- main-tiles-frame -->
+            <div class="main-tiles-frame tile-frame-padding-top font-roboto">
+                <!-- All such results goes here -->
+                <div class="row p-top-10">
 
-                <!-- Maps goes here -->
-                <div id="map-ctrl" class="col-lg-12 "></div>
+                    <!-- Maps goes here -->
+                    <div id="map-ctrl" class="col-lg-12" ng-show="searchListMapFlag"></div>
+                    <!-- Maps ends here -->
 
-
-
-
-
-                <!-- flipping tiles -->
-                <div class="metro p-bottom-100 hidden">
-                    <div class="row container">
-                        <!-- Main Tile -->
-                        <div class="col-lg-3 blue text-white">
-                            <div class="panel ul">
-                                <div class="color-1 li width-100"> <a href="#">
-                                    <div class="front">
-                                        <div class="row" style="width: 100%;">
-                                            <!-- front side goes here -->
-                                            <!-- row 1 -->
-                                            <div class="row tile-row-1 text-white">
-                                                <p class="col-lg-4 p3">
-                                                    <i class="fa fa-map-marker"></i> <small>15Km</small>
-                                                </p>
-                                                <div class="text text-center col-lg-8">
-                                                    <p class="font-open-sans text-font-800">HIRECRAFT PRO</p>
-                                                </div>
-                                            </div>
-                                            <!-- row 2 -->
-                                            <div class="row tile-row-1 text-white">
-                                                <p class="text text-center">Hirecraft</p>
-                                                <hr class="style-one">
-                                                <p>+91 888339383</p>
-                                            </div>
-
-                                            <!-- row 3 -->
-                                            <div class="tile-row-3">
-                                                <div class="col-lg-5 col-md-4 col-sm-4 col-xs-4 block-5 pointer"  ng-class="color" title="{{flagArr[0]}}"></i>
-                                                    <div class="row" ng-init="(search.OpenStatus == 2)?openStatusArr = ['close','up','white']:openStatusArr = ['open','up','black']">
-                                                        <div class="col-lg-4 col-md-4 col-sm-2 col-xs-2 block-5 pointer" ng-class="color" title="{{openStatusArr[0]}}">
-                                                            <i class="fa fa-thumbs-{{openStatusArr[1]}} text-{{openStatusArr[2]}}"></i>
-                                                        </div>
-                                                        <!-- car parking status -->
-                                                        <div class="car-parking" ng-init="(search.ParkingStatus == 2)?parkingStatusArr = ['No Parking','white']:parkingStatusArr = ['Parking','black']">
-                                                            <div class="col-lg-4 col-md-4 col-sm-2 col-xs-2 block-5 pointer" ng-class="color" title="{{parkingStatusArr[0]}}"><i class="fa fa-car text-{{parkingStatusArr[1]}}"></i></div>
-                                                        </div>
-                                                        <!-- is verified status -->
-                                                        <div class="is-verified" ng-init="(search.EZEIDVerifiedID == 2)?isVerifiedArr = ['Verified','black']:isVerifiedArr = ['Not Verified','white']">
-                                                            <div class="col-lg-4 col-md-4 col-sm-2 col-xs-2 block-5 pointer" ng-class="color" title="{{isVerifiedArr[0]}}"><i class="fa fa-check-square text-{{isVerifiedArr[1]}}"></i></div>
-                                                        </div>
+                    <!-- flipping tiles -->
+                    <div class="metro p-bottom-100 hidden">
+                        <div class="row container">
+                            <!-- Main Tile -->
+                            <div class="col-lg-3 blue text-white">
+                                <div class="panel ul">
+                                    <div class="color-1 li width-100"> <a href="#">
+                                        <div class="front">
+                                            <div class="row" style="width: 100%;">
+                                                <!-- front side goes here -->
+                                                <!-- row 1 -->
+                                                <div class="row tile-row-1 text-white">
+                                                    <p class="col-lg-4 p3">
+                                                        <i class="fa fa-map-marker"></i> <small>15Km</small>
+                                                    </p>
+                                                    <div class="text text-center col-lg-8">
+                                                        <p class="font-open-sans text-font-800">HIRECRAFT PRO</p>
                                                     </div>
                                                 </div>
-
-                                                <!--<div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 block-10 pointer" title="Verified"><i class="fa fa-check-square"></i></div>-->
-                                                <div class="col-lg-5 col-md-6 col-sm-6 col-xs-6 block-5 pointer" ng-class="color" title="Ratings">
-                                                    <div class="star-rating">
-                                                        <small>
-                                                            <i ng-repeat="n in [1,2,3,4,5] track by $index"  class="fa fa-star" ng-class="(search.Rating >= $index)?'text-yellow':''"></i>
-                                                        </small>
-                                                    </div>
+                                                <!-- row 2 -->
+                                                <div class="row tile-row-1 text-white">
+                                                    <p class="text text-center">Hirecraft</p>
+                                                    <hr class="style-one">
+                                                    <p>+91 888339383</p>
                                                 </div>
-                                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 block-5 pointer" ng-class="color" title="View Full Details"><i class="fa fa-play-circle text-blue"></i></div>
+
+                                                <!-- row 3 -->
+                                                <div class="tile-row-3">
+                                                    <div class="col-lg-5 col-md-4 col-sm-4 col-xs-4 block-5 pointer"  ng-class="color" title="{{flagArr[0]}}"></i>
+                                                        <div class="row" ng-init="(search.OpenStatus == 2)?openStatusArr = ['close','up','white']:openStatusArr = ['open','up','black']">
+                                                            <div class="col-lg-4 col-md-4 col-sm-2 col-xs-2 block-5 pointer" ng-class="color" title="{{openStatusArr[0]}}">
+                                                                <i class="fa fa-thumbs-{{openStatusArr[1]}} text-{{openStatusArr[2]}}"></i>
+                                                            </div>
+                                                            <!-- car parking status -->
+                                                            <div class="car-parking" ng-init="(search.ParkingStatus == 2)?parkingStatusArr = ['No Parking','white']:parkingStatusArr = ['Parking','black']">
+                                                                <div class="col-lg-4 col-md-4 col-sm-2 col-xs-2 block-5 pointer" ng-class="color" title="{{parkingStatusArr[0]}}"><i class="fa fa-car text-{{parkingStatusArr[1]}}"></i></div>
+                                                            </div>
+                                                            <!-- is verified status -->
+                                                            <div class="is-verified" ng-init="(search.EZEIDVerifiedID == 2)?isVerifiedArr = ['Verified','black']:isVerifiedArr = ['Not Verified','white']">
+                                                                <div class="col-lg-4 col-md-4 col-sm-2 col-xs-2 block-5 pointer" ng-class="color" title="{{isVerifiedArr[0]}}"><i class="fa fa-check-square text-{{isVerifiedArr[1]}}"></i></div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <!--<div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 block-10 pointer" title="Verified"><i class="fa fa-check-square"></i></div>-->
+                                                    <div class="col-lg-5 col-md-6 col-sm-6 col-xs-6 block-5 pointer" ng-class="color" title="Ratings">
+                                                        <div class="star-rating">
+                                                            <small>
+                                                                <i ng-repeat="n in [1,2,3,4,5] track by $index"  class="fa fa-star" ng-class="(search.Rating >= $index)?'text-yellow':''"></i>
+                                                            </small>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 block-5 pointer" ng-class="color" title="View Full Details"><i class="fa fa-play-circle text-blue"></i></div>
+                                                </div>
+                                                <!-- Row Ends -->
                                             </div>
-                                            <!-- Row Ends -->
                                         </div>
-                                    </div>
-                                    <div class="back">
-                                        <div class="row" style="width: 100%;">
-                                            <!-- back side goes here -->
-                                            <h5>Back Side</h5>
+                                        <div class="back">
+                                            <div class="row" style="width: 100%;">
+                                                <!-- back side goes here -->
+                                                <h5>Back Side</h5>
+                                            </div>
                                         </div>
+                                    </a>
                                     </div>
-                                </a>
                                 </div>
                             </div>
-                        </div>
 
+                        </div>
                     </div>
-                </div>
+                    <!-- flipping tiles ends here -->
 
 
 
-
-
-
-
-
-
-
-
-                <!-- Master Tile! -->
-                <div class="master-tile">
-                    <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12 individual-tiles text-center p3" ng-init="color = random()" ng-repeat="search in searchListData">
-                        <div class="row-1">
-                            <div class="block-header">
-                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 block-1 block block-row-1 text-12" ng-class="color">
-                                    <small><i class="fa fa-map-marker fa-2x"></i> <i class="text-bolder">10 Km</i></small>
-                                </div>
-                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 block-2 block block-row-1 text-center p-right-10-p" ng-class="color">
-                                    <b class="tile-text">{{search.EZEID}}</b>
-                                </div>
-                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 block-3 block block-row-1" ng-class="color">
-                                    <!-- clickable checkbox -->
-                                    <input type="checkbox" />
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Row Ends -->
-                        <div class="row-2">
-                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 block-4 block block-row-2" ng-class="color">
-                                <b>{{search.CompanyName}}</b>
-                                <!-- contact informations -->
-                                <hr class="style-two">
-                                <small>
-                                    <!-- Mobile Number -->
-                                    {{(search.MobileNumber.trim() && search.MobileNumber !== 'null')?search.CountryCode+' '+search.MobileNumber:'No mobile'}}
-                                    <!-- Seperator -->
-                                    <i class="{{((search.MobileNumber.trim() && search.MobileNumber !== 'null') && (search.PhoneNumber.trim() && search.PhoneNumber !== 'null'))?'fa fa-minus fa-rotate-90 text-info':''}}"></i>
-                                    <!-- Telephone Number -->
-                                    {{(search.PhoneNumber.trim() && search.PhoneNumber !== 'null')?search.CountryCode+' '+search.PhoneNumber:''}}</small>
-                            </div>
-                        </div>
-                        <!-- Row Ends -->
-                        <div class="row-3">
-                            <div class="col-lg-5 col-md-4 col-sm-4 col-xs-4 block-5 pointer"  ng-class="color" title="{{flagArr[0]}}"></i>
-                                <div class="row" ng-init="(search.OpenStatus == 2)?openStatusArr = ['close','up','white']:openStatusArr = ['open','up','black']">
-                                    <div class="col-lg-4 col-md-4 col-sm-2 col-xs-2 block-5 pointer" ng-class="color" title="{{openStatusArr[0]}}">
-                                        <i class="fa fa-thumbs-{{openStatusArr[1]}} text-{{openStatusArr[2]}}"></i>
+                    <!-- Master Tile! -->
+                    <div class="master-tile" ng-hide="searchListMapFlag">
+                        <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12 individual-tiles text-center p3" ng-init="color = random()" ng-repeat="search in searchListData">
+                            <div class="row-1">
+                                <div class="block-header">
+                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 block-1 block block-row-1 text-12" ng-class="color">
+                                        <small><i class="fa fa-map-marker fa-2x"></i> <i class="text-bolder">10 Km</i></small>
                                     </div>
-                                    <!-- car parking status -->
-                                    <div class="car-parking" ng-init="(search.ParkingStatus == 2)?parkingStatusArr = ['No Parking','white']:parkingStatusArr = ['Parking','black']">
-                                        <div class="col-lg-4 col-md-4 col-sm-2 col-xs-2 block-5 pointer" ng-class="color" title="{{parkingStatusArr[0]}}"><i class="fa fa-car text-{{parkingStatusArr[1]}}"></i></div>
+                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 block-2 block block-row-1 text-center p-right-10-p" ng-class="color">
+                                        <b class="tile-text">{{search.EZEID}}</b>
                                     </div>
-                                    <!-- is verified status -->
-                                    <div class="is-verified" ng-init="(search.EZEIDVerifiedID == 2)?isVerifiedArr = ['Verified','black']:isVerifiedArr = ['Not Verified','white']">
-                                        <div class="col-lg-4 col-md-4 col-sm-2 col-xs-2 block-5 pointer" ng-class="color" title="{{isVerifiedArr[0]}}"><i class="fa fa-check-square text-{{isVerifiedArr[1]}}"></i></div>
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 block-3 block block-row-1" ng-class="color">
+                                        <!-- clickable checkbox -->
+                                        <input type="checkbox" />
                                     </div>
                                 </div>
                             </div>
-
-                            <!--<div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 block-10 pointer" title="Verified"><i class="fa fa-check-square"></i></div>-->
-                            <div class="col-lg-5 col-md-6 col-sm-6 col-xs-6 block-5 pointer" ng-class="color" title="Ratings">
-                                <div class="star-rating">
+                            <!-- Row Ends -->
+                            <div class="row-2">
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 block-4 block block-row-2" ng-class="color">
+                                    <b>{{search.CompanyName}}</b>
+                                    <!-- contact informations -->
+                                    <hr class="style-two">
                                     <small>
-                                        <i ng-repeat="n in [1,2,3,4,5] track by $index"  class="fa fa-star" ng-class="(search.Rating >= $index)?'text-yellow':''"></i>
-                                    </small>
+                                        <!-- Mobile Number -->
+                                        {{(search.MobileNumber.trim() && search.MobileNumber !== 'null')?search.CountryCode+' '+search.MobileNumber:'No mobile'}}
+                                        <!-- Seperator -->
+                                        <i class="{{((search.MobileNumber.trim() && search.MobileNumber !== 'null') && (search.PhoneNumber.trim() && search.PhoneNumber !== 'null'))?'fa fa-minus fa-rotate-90 text-info':''}}"></i>
+                                        <!-- Telephone Number -->
+                                        {{(search.PhoneNumber.trim() && search.PhoneNumber !== 'null')?search.CountryCode+' '+search.PhoneNumber:''}}</small>
                                 </div>
                             </div>
-                            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 block-5 pointer" ng-class="color" title="View Full Details"><i class="fa fa-play-circle text-blue"></i></div>
-                        </div>
-                        <!-- Row Ends -->
+                            <!-- Row Ends -->
+                            <div class="row-3">
+                                <div class="col-lg-5 col-md-4 col-sm-4 col-xs-4 block-5 pointer"  ng-class="color" title="{{flagArr[0]}}"></i>
+                                    <div class="row" ng-init="(search.OpenStatus == 2)?openStatusArr = ['close','up','white']:openStatusArr = ['open','up','black']">
+                                        <div class="col-lg-4 col-md-4 col-sm-2 col-xs-2 block-5 pointer" ng-class="color" title="{{openStatusArr[0]}}">
+                                            <i class="fa fa-thumbs-{{openStatusArr[1]}} text-{{openStatusArr[2]}}"></i>
+                                        </div>
+                                        <!-- car parking status -->
+                                        <div class="car-parking" ng-init="(search.ParkingStatus == 2)?parkingStatusArr = ['No Parking','white']:parkingStatusArr = ['Parking','black']">
+                                            <div class="col-lg-4 col-md-4 col-sm-2 col-xs-2 block-5 pointer" ng-class="color" title="{{parkingStatusArr[0]}}"><i class="fa fa-car text-{{parkingStatusArr[1]}}"></i></div>
+                                        </div>
+                                        <!-- is verified status -->
+                                        <div class="is-verified" ng-init="(search.EZEIDVerifiedID == 2)?isVerifiedArr = ['Verified','black']:isVerifiedArr = ['Not Verified','white']">
+                                            <div class="col-lg-4 col-md-4 col-sm-2 col-xs-2 block-5 pointer" ng-class="color" title="{{isVerifiedArr[0]}}"><i class="fa fa-check-square text-{{isVerifiedArr[1]}}"></i></div>
+                                        </div>
+                                    </div>
+                                </div>
 
+                                <!--<div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 block-10 pointer" title="Verified"><i class="fa fa-check-square"></i></div>-->
+                                <div class="col-lg-5 col-md-6 col-sm-6 col-xs-6 block-5 pointer" ng-class="color" title="Ratings">
+                                    <div class="star-rating">
+                                        <small>
+                                            <i ng-repeat="n in [1,2,3,4,5] track by $index"  class="fa fa-star" ng-class="(search.Rating >= $index)?'text-yellow':''"></i>
+                                        </small>
+                                    </div>
+                                </div>
+                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 block-5 pointer" ng-class="color" title="View Full Details"><i class="fa fa-play-circle text-blue"></i></div>
+                            </div>
+                            <!-- Row Ends -->
+
+                        </div>
                     </div>
                 </div>
             </div>
+            <!-- main-tiles-frame-ends -->
         </div>
-        <!-- main-tiles-frame-ends -->
+    </section>
+    <!-- footer goes here -->
+    <div class="footer-page">
+        <div class="container width-81 text-center">
+            <div class="col-lg-2">
+                <i class="btn btn-default btn-sm fa fa-facebook"></i>
+                <i class="btn btn-default btn-sm fa fa-twitter"></i>
+                <i class="btn btn-default btn-sm fa fa-pinterest"></i>
+                <i class="btn btn-default btn-sm fa fa-linkedin"></i>
 
-
-        <div class="metro hidden">
-            <div class="panel ul">
-                <div class="color-1 li"> <a href="#">
-                    <div class="front">
-                        <i class="fa fa-home fa-4x"></i>
-                    </div>
-                    <div class="back">
-                        <span>HOME</span>
-                    </div>
-                </a>
-                </div>
+            </div>
+            <div class="col-lg-8 text-center">
+                <span class="footer-main-content">Copyright &#169; TalentMicro Innovations Pvt. Ltd.</span>
+                <hr class="style-one">
+                <small>CONTACT US | LEGAL | PATENT IN PROCESS NO.<b>6622/CHE/2014</b></small>
             </div>
         </div>
     </div>
-</section>
+</div>

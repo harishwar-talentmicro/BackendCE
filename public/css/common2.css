@@ -383,7 +383,7 @@
 /* footer page */
 .hpw .footer-page
 {
-    background-color: #000000;
+    background-color: rgba(0, 0, 0, 0.82);
     color: #ffffff;
     padding-top: 10px;
 }
@@ -488,10 +488,16 @@ hr.style-two {
     z-index:10000;
 }
 
+.hpw .search-result
+{
+    height: 100%;
+}
+
 /* METRO UI {main search result styles goes here} */
 .srw .metro-ui-wrapper
 {
-    min-height: 900px;
+    position: relative;
+    min-height: 700px;
     /*margin-top: -22px;*/
 
     background: -webkit-linear-gradient(90deg, #085078 10%, #85D8CE 90%); /* Chrome 10+, Saf5.1+ */
