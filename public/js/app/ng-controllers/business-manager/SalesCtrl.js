@@ -251,25 +251,60 @@
                 }
             };
 
+            var loadTransactionItems = function(txId){
+                var defer = $q.defer();
+                $http({
+                    url : GURL + 'ewtGetTranscationItems',
+                    method : 'GET',
+                    params : {
+                        Token : $rootScope._userInfo.Token,
+                        MessageID : txId
+                    }
+                }).success(function(resp){
+                    if(resp && resp.length > 0 && resp !== 'null'){
+                        $scope.modalBox.tx.itemList = resp;
+                        defer.resolve(resp);
+                    }
+                    else{
+                        defer.resolve([]);
+                    }
+                }).error(function(err){
+                    Notification.error({ message : 'Unable to load items for this enquiry ! Please try again', delay : MsgDelay});
+                    defer.reject();
+                });
+                return defer.promise;
+            };
+
             /**
              * Modal Box toggle
              * @param e
              */
-            $scope.toggleModalBox = function(e){
+            $scope.toggleModalBox = function(e,index){
 
                 $scope.resetModalBox();
 
 
-                if(e){
+                if(e && typeof(index) !== 'undefined' && typeof(index) !== 'null'){
                     /**
                      * Fill the information of Current Transaction
                      */
                     $scope.modalBox.editMode = true;
+                    $scope.modalBox.tx = prepareEditTransaction($scope.txList[index]);
+                    if($scope.moduleConf.listType > 0){
+                        loadTransactionItems().then(function(resp){
+                            $scope.showModal = !$scope.showModal;
+                        },function(){
+                            $scope.showModal = !$scope.showModal;
+                        });
+                    }
+                    else{
+                        $scope.showModal = !$scope.showModal;
+                    }
                 }
                 else{
                     $scope.modalBox.editMode = false;
+                    $scope.showModal = !$scope.showModal;
                 }
-                $scope.showModal = !$scope.showModal;
             };
 
             $scope.resetModalBox = function(){
@@ -406,6 +441,11 @@
                     $scope.checkEzeidInfo(newVal);
                 }
             });
+
+            /**
+             * Loading EZEID userInfo and managing fields visibility based on the it
+             * @param ezeid
+             */
             $scope.checkEzeidInfo = function(ezeid){
                 $scope.$emit('$preLoaderStart');
                 $scope.getEzeidDetails(ezeid).then(function(resp){

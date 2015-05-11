@@ -45,41 +45,41 @@
               </form>
           </div>
       </div>
-    <nav class="cbp-spmenu cbp-spmenu-vertical cbp-spmenu-right" id="cbp-spmenu-s2">
-      <div class="chatHeader">
-            <h3 class="chatHeadding" style="padding-top: 7px;">Chat</h3>
-        </div>
-        <div class="chatMiddleContainer">
-            <div ng-include="activeTemplate">
-           </div>
-        </div>
+    <!--<nav class="cbp-spmenu cbp-spmenu-vertical cbp-spmenu-right" id="cbp-spmenu-s2">-->
+      <!--<div class="chatHeader">-->
+            <!--<h3 class="chatHeadding" style="padding-top: 7px;">Chat</h3>-->
+        <!--</div>-->
+        <!--<div class="chatMiddleContainer">-->
+            <!--<div ng-include="activeTemplate">-->
+           <!--</div>-->
+        <!--</div>-->
 
-        <div class="chatBottomContainer row setRowLeftRightMarginZero setLeftRightPaddingZero whiteTextColor" >
-            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setLeftRightPaddingZero">
-                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 topMarginButton">
-                    <button class="btn btn-primary btn-block greenButton" type="button">Available</button>
-                </div>
-                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 emailPannelTopMargin keyWordText">
-                    <img ng-src="../images/chat_icon.png">
-                </div>
-                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 topMarginButton keyWordText" ng-click="openAddGroupPopup()">
-                    <img ng-src="../images/add_group.png">
-                </div>
-            </div>
-        </div>
-    </nav>
+        <!--<div class="chatBottomContainer row setRowLeftRightMarginZero setLeftRightPaddingZero whiteTextColor" >-->
+            <!--<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setLeftRightPaddingZero">-->
+                <!--<div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 topMarginButton">-->
+                    <!--<button class="btn btn-primary btn-block greenButton" type="button">Available</button>-->
+                <!--</div>-->
+                <!--<div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 emailPannelTopMargin keyWordText">-->
+                    <!--<img ng-src="../images/chat_icon.png">-->
+                <!--</div>-->
+                <!--<div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 topMarginButton keyWordText" ng-click="openAddGroupPopup()">-->
+                    <!--<img ng-src="../images/add_group.png">-->
+                <!--</div>-->
+            <!--</div>-->
+        <!--</div>-->
+    <!--</nav>-->
   </div>
     <div class="viewport" ng-view>
     </div>
 
-     <div ng-controller="ChatBoxCtrl">
-       <!-- <div id="showRight" class="chat-box" ng-click="toggleChatBox()"> -->
-        <div id="showRight" ng-click="toggleChatBox()">
-          <div id="showRight1" class="cbp-spmenu1 cbp-spmenu-vertical1 cbp-spmenu-right1">
-              <div ng-class="chatArrow == true ? 'glyphicon glyphicon-menu-left' : 'glyphicon glyphicon-menu-right'"> Chat <span class="glyphicon glyphicon-comment"></span></div>
-          </div>
-        </div>
-     </div>
+     <!--<div ng-controller="ChatBoxCtrl">-->
+       <!--&lt;!&ndash; <div id="showRight" class="chat-box" ng-click="toggleChatBox()"> &ndash;&gt;-->
+        <!--<div id="showRight" ng-click="toggleChatBox()">-->
+          <!--<div id="showRight1" class="cbp-spmenu1 cbp-spmenu-vertical1 cbp-spmenu-right1">-->
+              <!--<div ng-class="chatArrow == true ? 'glyphicon glyphicon-menu-left' : 'glyphicon glyphicon-menu-right'"> Chat <span class="glyphicon glyphicon-comment"></span></div>-->
+          <!--</div>-->
+        <!--</div>-->
+     <!--</div>-->
 
 
 
@@ -195,21 +195,21 @@
     <script src="js/app/label.js"></script>
 
     <script src="js/app/classie.js"></script>
-    <script>
-        var menuRight = document.getElementById( 'cbp-spmenu-s2' );
-        console.log(menuRight);
-        body = document.body;
-        showRight.onclick = function() {
-            classie.toggle( this, 'active' );
-            classie.toggle( menuRight, 'cbp-spmenu-open' );
-            };
+    <!--<script>-->
+        <!--var menuRight = document.getElementById( 'cbp-spmenu-s2' );-->
+        <!--console.log(menuRight);-->
+        <!--body = document.body;-->
+        <!--showRight.onclick = function() {-->
+            <!--classie.toggle( this, 'active' );-->
+            <!--classie.toggle( menuRight, 'cbp-spmenu-open' );-->
+            <!--};-->
 
-        var menuRight1 = document.getElementById( 'showRight1' )
-        showRight1.onclick = function() {
-            classie.toggle( this, 'active' );
-            classie.toggle( menuRight1, 'cbp-spmenu-open1' );
-        };
-    </script>
+        <!--var menuRight1 = document.getElementById( 'showRight1' )-->
+        <!--showRight1.onclick = function() {-->
+            <!--classie.toggle( this, 'active' );-->
+            <!--classie.toggle( menuRight1, 'cbp-spmenu-open1' );-->
+        <!--};-->
+    <!--</script>-->
 
 </body>
 </html>
