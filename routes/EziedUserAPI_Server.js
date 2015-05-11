@@ -9819,16 +9819,14 @@ exports.FnGetCompanyProfile = function(req, res){
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
-        var Token = req.query.Token;
+        var TID = req.query.TID;
         var RtnMessage = {
             Result: [],
             Message: ''
         };
-        if(Token !=  null){
-            FnValidateToken(Token, function (err, Result) {
-                if (!err) {
+        if(TID  !=  null){
                     if (Result != null) {
-                        db.query('CALL pGetTagLine(' + db.escape(Token) + ')', function (err, GetResult) {
+                        db.query('CALL pGetTagLine(' + db.escape(TID) + ')', function (err, GetResult) {
                             if (!err) {
                                 if (GetResult != null) {
                                     if (GetResult[0].length > 0) {
@@ -9863,21 +9861,12 @@ exports.FnGetCompanyProfile = function(req, res){
                         res.send(RtnMessage);
                         console.log('FnGetCompanyProfile: Invalid Token');
                     }
-                } else {
-
-                    res.statusCode = 500;
-                    RtnMessage.Message = 'Error in validating token';
-                    res.send(RtnMessage);
-                    console.log('FnGetCompanyProfile: Error in validating token:  ' + err);
-                }
-            });
         }
         else {
-            if (Token == null) {
-                console.log('FnGetCompanyProfile: Token is empty');
-                RtnMessage.Message = 'Token is empty';
+            if (TID == null) {
+                console.log('FnGetCompanyProfile: TID is empty');
+                RtnMessage.Message = 'TID is empty';
             }
-
             res.statusCode=400;
             res.send(RtnMessage);
         }
