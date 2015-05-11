@@ -160,6 +160,7 @@
             $scope.modalBox = {
               title : 'Transaction Details',
               class : 'business-manager-modal',
+              locationList : [],
               tx : {
                   orderAmount : 0,
                   trnNo : '',
@@ -194,12 +195,37 @@
             $scope.editModes = [];
 
 
+
+
+            $scope.loadLocationListForEzeid = function(tid){
+                var defer = $q.defer();
+                $http({
+                    url : GURL + 'ewtGetLocationListForEZEID',
+                    method : 'GET',
+                    params : {
+                        Token : $rootScope._userInfo.Token,
+                        TID :   tid
+                    }
+                }).success(function(resp){
+                    if(resp && resp !== 'null'){
+                        $scope.modalBox.locationList = resp.Result;
+                        defer.resolve(resp[0]);
+                    }
+                    else{
+                        defer.reject();
+                    }
+                }).error(function(err){
+                    defer.reject();
+                });
+                return defer.promise;
+            };
             /**
              * Copies the transaction properties to editMode Object
              * @param tx
              * @return editModeTx
              */
             var prepareEditTransaction = function(tx){
+
                 var editModeTx =  {
                     orderAmount : 0,
                         trnNo : tx.TrnNo,
@@ -311,10 +337,17 @@
                 }
             };
 
+            $scope.$watch('showModal',function(newVal,oldVal){
+                if(!newVal){
+                    $scope.resetModalBox();
+                }
+            });
+
             $scope.resetModalBox = function(){
                 $scope.modalBox = {
                     title : 'Transaction Details',
                     class : 'business-manager-modal',
+                    locationList : [],
                     editMode : false,
                     tx : {
                         orderAmount : 0,
@@ -453,15 +486,21 @@
             $scope.checkEzeidInfo = function(ezeid){
                 $scope.$emit('$preLoaderStart');
                 $scope.getEzeidDetails(ezeid).then(function(resp){
-                    $scope.$emit('$preLoaderStop');
                     $scope.modalBox.tx.ezeid = $filter('uppercase')(ezeid);
                     $scope.modalBox.tx.contactInfo = resp.FirstName + ' ' +
                     resp.LastName  +
                         ((resp.MobileNumber && resp.MobileNumber !== 'null') ? ', ' + resp.MobileNumber : '');
                     $scope.modalBox.tx.ezeidTid = resp.TID;
+                    $scope.loadLocationListForEzeid(resp.TID).then(function(){
+                        $scope.$emit('$preLoaderStop');
+                    },function(){
+                        $scope.$emit('$preLoaderStop');
+                        //Notification.error({ message : 'Unable to load location list for this user', delay : MsgDelay});
+                    });
+
                 },function(){
                     $scope.$emit('$preLoaderStop');
-                    Notification.error({ message : 'Invalid EZEID', delay : MsgDelay});
+                    //Notification.error({ message : 'Invalid EZEID', delay : MsgDelay});
                     $scope.modalBox.tx.ezeid = '';
                     $scope.modalBox.tx.ezeidTid = 0;
                 });
@@ -711,6 +750,7 @@
             /**
              * Main Intialization
              */
+
 
             var init = function(){
                 $scope.loadfilterStatusTypes().then(function(resp){
