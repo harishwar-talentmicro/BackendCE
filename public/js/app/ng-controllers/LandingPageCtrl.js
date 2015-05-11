@@ -51,7 +51,8 @@ angular.module('ezeidApp').
             searchTypeArr[2] = "Keywords";
             searchTypeArr[3] = "Job Keywords";
 
-            $scope.searchType = searchTypeArr;
+            /* splice array as index [0] is there, with empty value */
+            $scope.searchType = searchTypeArr.splice(1,3);
 
             var placeHolder = [];
             placeHolder[1] = "Type EZEID here";
