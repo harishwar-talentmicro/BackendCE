@@ -562,6 +562,10 @@ body {
     font-weight: bold;
     background: #ffffff;
 }
+.setBackGroundWhite
+{
+    background: #ffffff;
+}
 
 .rwd-table tr:nth-child(even) {background: #f9f9f9}
 .rwd-table tr:nth-child(odd) {background: #FFF}
@@ -1505,7 +1509,7 @@ table.rwd-table > tbody > tr > td.serachResultSelectAll
     background: #FFCD28;
     font-size: 13px;
     width: 348px;
-    margin-right: 3.7%;
+    margin-right: 2.3%;
 }
 .profilePicBorder
 {
@@ -1539,4 +1543,8 @@ table.rwd-table > tbody > tr > td.serachResultSelectAll
 }
 .mapModal>.modal>.business-manager-modal > .modal-content > .modal-body {
     background: #deebf7;
+}
+#map-canvasH1{
+    height: 445px;
+    width: 100%;
 }

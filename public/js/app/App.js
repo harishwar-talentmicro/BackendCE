@@ -20,8 +20,7 @@
         '/business-manager',
         '/business-manager/:subview',
         '/profile-manager',
-        '/profile-manager/:subview',
-        '/searchDetails'
+        '/profile-manager/:subview'
     ]);
 
     /**
@@ -31,7 +30,7 @@
      * user is logged in
      */
     ezeid.value('OPEN_ROUTES',[
-
+        '/searchDetails'
     ]);
 
     /**
