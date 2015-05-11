@@ -174,6 +174,8 @@ app.get('/ewtGetChatList', LocationManager.FnGetChatList);
 app.get('/ewtGetSearchPics', LocationManager.FnGetSearchPicture);
 app.get('/ewtCompanyProfile', LocationManager.FnGetCompanyProfile);
 app.post('/ewtCompanyProfile', LocationManager.FnSaveCompanyProfile);
+app.get('/ewtGetLocationListForEZEID', LocationManager.FnGetLocationListForEZEID);
+
 //below service are for EZEIDAP
 app.post('/ewLoginAP', LocationManager.FnLoginAP);
 app.get('/ewLogoutAP', LocationManager.FnLogoutAP);

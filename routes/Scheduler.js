@@ -44,10 +44,10 @@ var MessageScheduler = schedule.scheduleJob(rule, function () {
                 if (MessageResult.length > 0) {
                     for (var i = 0; i < MessageResult.length; i++) {
                         console.log("Message result length: ")
-                        console.log(MessageResult.length);
+                        //console.log(MessageResult.length);
                         var RegData = MessageResult[i];
-                        console.log('Attachment: ');
-                        console.log(RegData.Attachment);
+                       // console.log('Attachment: ');
+                       // console.log(RegData.Attachment);
                         var mailOptions = {
                             from: 'noreply@ezeid.com',
                             to: RegData.ToMailID,
@@ -60,7 +60,7 @@ var MessageScheduler = schedule.scheduleJob(rule, function () {
                         var qry = 'update tMailbox set sentStatus = 1 where TID = ' + RegData.TID;
                         db.query(qry, function (err, UpdateResult) {
                             if (!err) {
-                                console.log(UpdateResult);
+                                //console.log(UpdateResult);
                                 if (UpdateResult != null) {
                                     console.log('scheduleJob: update happened');
                                     FnSendMailEzeid(mailOptions, function (err, Result) {
@@ -151,9 +151,7 @@ function FnSendMailEzeid(MailContent, CallBack) {
                     content: bufferData
                 }]
             }
-            console.log('----------------------------')
-            console.log('File Content: ');
-            console.log(BodyData);
+           
             sendgrid.send(BodyData, function(err, body) {
                 if(!err){
                     // var msg = JSON.parse(body);
