@@ -41,8 +41,13 @@
                         <!--</div>-->
                     <!--</div>-->
 
-                    <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1 pull-right" title="Filters">
-                        <transaction-filter filter-list="filterStatusTypes" filter-type="filterStatus"></transaction-filter>
+                    <div class="col-lg-2 col-md-2 col-sm-3 col-xs-4 pull-right" title="Filters">
+                        <div class="form-group form-group-sm">
+                            <select class="form-control" ng-model="filterStatus">
+                                <option ng-repeat="sfilter in filterStatusTypes track by $index" value="{{sfilter.TID}}">{{sfilter.StatusTitle}}</option>
+                            </select>
+                        </div>
+
                     </div>
 
 
@@ -501,6 +506,7 @@
                                     <div class="form-group form-group-sm ">
                                         <select class="form-control" ng-model="modalBox.tx.locId">
                                             <option value="0">--No Delivery Locations Selected--</option>
+                                            <option ng-repeat="location in modalBox.locationList track by location.TID" value="{{location.TID}}">{{location.LocTitle}}</option>
                                         </select>
                                     </div>
                                 </div>
