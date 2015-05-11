@@ -700,13 +700,13 @@ hr.style-two {
 
 .hpw .cyan
 {
-    background-color: rgb(0,128,128) !important;
+    background-color: rgb(8, 111, 111) !important;
     color:#fff;
 }
 
 .hpw .pink
 {
-    background-color: rgb(255,128,128) !important;
+    background-color: rgba(255, 0, 0, 0.73) !important;
     color:#fff;
 }
 

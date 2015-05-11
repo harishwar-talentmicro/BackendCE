@@ -1,42 +1,7 @@
 <div class="search-result hpw">
     <section id="result-page-menu-wrapper" class=" rpw" ng-controller="LandingPageCtrl">
         <!-- New header menu goes here -->
-        <nav class="navbar navbar-inverse no-radius m-bottom-0">
-            <div class="container-fluid">
-                <!-- Brand and toggle get grouped for better mobile display -->
-                <div class="navbar-header">
-                    <div class="logo"></div>
-                    <!-- For mobile view menu -->
-                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-2">
-                        <span class="sr-only">Toggle navigation</span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                    </button>
-
-                </div>
-
-                <!-- Collect the nav links, forms, and other content for toggling -->
-                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-2">
-
-                    <ul class="nav navbar-nav navbar-right">
-                        <li class="dropdown ">
-
-                            <a class="dropdown-toggle border-right-1 btn-link" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-user"></i> Hi Allex <span class="caret"></span></a>
-                            <ul class="dropdown-menu" role="menu">
-                                <li><a href="#"><i class="fa fa-wrench"></i> Profile Manager</a></li>
-                                <li><a href="#"><i class="fa fa-envelope"></i> Messages</a></li>
-                                <li><a href="#"><i class="fa fa-calendar"></i> Access History</a></li>
-                                <li><a href="#"><i class="fa fa-shield"></i> Whitelist & Blacklist</a></li>
-                                <li><a href="#"><i class="fa fa-server"></i> Bulk Mailer</a></li>
-                                <li><a href="#"><i class="fa fa-warning"></i> Change Password</a></li>
-                            </ul>
-                        </li>
-                        <li><a class="btn-link"><i class="fa fa-sign-out"></i> Sign Out</a></li>
-                    </ul>
-                </div><!-- /.navbar-collapse -->
-            </div><!-- /.container-fluid -->
-        </nav>
+        <header-section></header-section>
 
         <!-- Navbar header menu for search result goes here -->
         <nav class="navbar navbar-default m-bottom-0 no-radius">
@@ -272,16 +237,16 @@
                             <div class="row-3">
                                 <div class="col-lg-5 col-md-4 col-sm-4 col-xs-4 block-5 pointer"  ng-class="color" title="{{flagArr[0]}}"></i>
                                     <div class="row" ng-init="(search.OpenStatus == 2)?openStatusArr = ['close','up','white']:openStatusArr = ['open','up','black']">
-                                        <div class="col-lg-4 col-md-4 col-sm-2 col-xs-2 block-5 pointer" ng-class="color" title="{{openStatusArr[0]}}">
+                                        <div class="col-lg-4 col-md-4 col-sm-2 col-xs-2  pointer"  title="{{openStatusArr[0]}}">
                                             <i class="fa fa-thumbs-{{openStatusArr[1]}} text-{{openStatusArr[2]}}"></i>
                                         </div>
                                         <!-- car parking status -->
                                         <div class="car-parking" ng-init="(search.ParkingStatus == 2)?parkingStatusArr = ['No Parking','white']:parkingStatusArr = ['Parking','black']">
-                                            <div class="col-lg-4 col-md-4 col-sm-2 col-xs-2 block-5 pointer" ng-class="color" title="{{parkingStatusArr[0]}}"><i class="fa fa-car text-{{parkingStatusArr[1]}}"></i></div>
+                                            <div class="col-lg-4 col-md-4 col-sm-2 col-xs-2 pointer" title="{{parkingStatusArr[0]}}"><i class="fa fa-car text-{{parkingStatusArr[1]}}"></i></div>
                                         </div>
                                         <!-- is verified status -->
                                         <div class="is-verified" ng-init="(search.EZEIDVerifiedID == 2)?isVerifiedArr = ['Verified','black']:isVerifiedArr = ['Not Verified','white']">
-                                            <div class="col-lg-4 col-md-4 col-sm-2 col-xs-2 block-5 pointer" ng-class="color" title="{{isVerifiedArr[0]}}"><i class="fa fa-check-square text-{{isVerifiedArr[1]}}"></i></div>
+                                            <div class="col-lg-4 col-md-4 col-sm-2 col-xs-2 pointer" title="{{isVerifiedArr[0]}}"><i class="fa fa-check-square text-{{isVerifiedArr[1]}}"></i></div>
                                         </div>
                                     </div>
                                 </div>
