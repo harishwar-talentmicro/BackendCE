@@ -2,7 +2,6 @@
  * InformationDetail Controller
  *
  */
-
 angular.module('ezeidApp').
     controller('InformationDetailCtrl', [
         '$rootScope',
@@ -57,17 +56,32 @@ angular.module('ezeidApp').
             class : 'business-manager-modal'
         }
 
-       // var TID =  592;//254;
-        //var SearchType = 2;
-
         var TID =  $routeParams.TID;
-        var SearchType = $routeParams.searchType;
+        $scope.SearchType = $routeParams.searchType;
 
+        console.log($rootScope._userInfo);
+
+
+        if((!$rootScope._userInfo) && ($scope.SearchType == 1))
+        {
+            // login popoup
+            $('#SignIn_popup').slideDown();
+            console.log("sai11");
+
+        }
+        else
+        {
+            console.log("sai12");
             // To get search information
-            getSearchInformation(TID,SearchType);
+            getSearchInformation(TID,$scope.SearchType);
 
-        // To get about Company
-         getAboutComapny();
+            // To get about Company
+            getAboutComapny();
+        }
+
+
+
+
 
         //Below function is for getting search information
         function getSearchInformation(_TID,_SearchType)
@@ -75,8 +89,11 @@ angular.module('ezeidApp').
                 $scope.SearchInfo = {};
                 $scope.AddressForInfoTab = "";
                 AutoRefresh = false;
-                if($rootScope._userInfo.Token == "")
+                if(!$rootScope._userInfo)
                 {
+                    $rootScope._userInfo = {};
+                }
+                if(!$rootScope._userInfo.IsAuthenticate){
                     $rootScope._userInfo.Token = 2;
                     $scope.Token = 2;
                 }
@@ -143,13 +160,7 @@ angular.module('ezeidApp').
         //Below function is for getting about company
         function getAboutComapny()
         {
-
-            if($rootScope._userInfo.Token == "")
-            {
-                $rootScope._userInfo.Token = 2;
-                $scope.Token = 2;
-            }
-            $http({ method: 'get', url: GURL + 'ewtCompanyProfile?Token=' + $rootScope._userInfo.Token}).success(function (data) {
+            $http({ method: 'get', url: GURL + 'ewtCompanyProfile?TID=' + TID}).success(function (data) {
                 $rootScope.$broadcast('$preLoaderStop');
                 if (data != 'null') {
                         $scope.companyTagLine = data.Result[0].TagLine;
@@ -179,10 +190,11 @@ angular.module('ezeidApp').
             $scope.$on('$locationChangeStart', function( event ) {
                 AutoRefresh = false;
             });
+
             // To get banner
             function getBanner(_requestedBannerValue)
             {
-                $http({ method: 'get', url: GURL + 'ewtGetBannerPicture?Token=' + $rootScope._userInfo.Token +'&SeqNo='+_requestedBannerValue+'&Ezeid='+$scope.SearchInfo.EZEID+'&StateTitle='+ $scope.SearchInfo.StateTitle+'&LocID='+$scope.SearchInfo.LocID}).success(function (data) {
+                $http({ method: 'get', url: GURL + 'ewtGetBannerPicture?SeqNo='+_requestedBannerValue+'&Ezeid='+$scope.SearchInfo.EZEID+'&StateTitle='+ $scope.SearchInfo.StateTitle+'&LocID='+$scope.SearchInfo.LocID}).success(function (data) {
 
                     if (data.Picture != 'null') {
                         $scope.SearchInfo.BannerImage = data.Picture;
