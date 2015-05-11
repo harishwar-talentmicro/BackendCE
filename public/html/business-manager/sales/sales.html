@@ -42,32 +42,7 @@
                     <!--</div>-->
 
                     <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1 pull-right" title="Filters">
-                        <button class="btn btn-sm btn-warning no-radius" data-toggle="popover"
-                                title='<h4 class="font-open-sans-light">Filter by
-                                    <span class="pull-right glyphicon glyphicon-remove popover-close tiny"></span>
-                                </h4>'
-                                data-content='
-                                    <label class="font-open-sans-light text-info">Status Type</label>
-                                    <div class="form-group form-group-sm">
-                                        <select class="form-control">
-                                            <option value="">All</option>
-                                            <option value="">New</option>
-                                            <option value="">Accepted</option>
-                                        </select>
-                                    </div>
-
-                                    <label class="font-open-sans-light text-info">Action Type</label>
-                                    <div class="form-group  form-group-sm">
-                                        <select class="form-control">
-                                            <option value="">All</option>
-                                            <option value="">New</option>
-                                            <option value="">Accepted</option>
-                                        </select>
-                                    </div>
-                                '
-                                >
-                            <span class="glyphicon glyphicon-filter"></span> Filters
-                        </button>
+                        <transaction-filter filter-list="filterStatusTypes" filter-type="filterStatus"></transaction-filter>
                     </div>
 
 
