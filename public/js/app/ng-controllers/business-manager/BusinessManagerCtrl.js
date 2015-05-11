@@ -111,7 +111,12 @@ angular.module('ezeidApp').controller('BusinessManagerCtrl',[
           }
           else
           {
-            $location.path('/business-manager/'+$scope.modules[0].type);
+              if($scope.modules[0].permission > 0){
+                  $location.path('/business-manager/'+$scope.modules[0].type);
+              }
+              else{
+                  $location.path('/');
+              }
           }
         }
         else{
