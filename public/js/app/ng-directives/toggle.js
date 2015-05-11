@@ -11,9 +11,11 @@ angular.module('ezeidApp').directive('toggle', function(){
                 });
             }
             if (attrs.toggle=="popover"){
+                //$compile(element.contents())(scope);
                 $(element).popover({
                     html : true,
-                    animation : true
+                    animation : true,
+                    content : attrs.content
                 });
             }
             if(attrs.toggle == "tab"){
