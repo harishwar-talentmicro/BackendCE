@@ -17,7 +17,7 @@
                                       id="ToMailID" ng-model="ToMailID1"
                                       ng-class="MailTemplateForm.FromEmailID.$touched && !viewDirection._info.ToMailID.length ? 'mandatoryTextBox' : ''"
                                       placeholder="EmailID" maxlength="100" ng-pattern="/^[a-z]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5}$/" required>
-                               <span ng-show="MailTemplateForm.ToMailID.$error.email" ng-if="MailTemplateForm.ToMailID.$error.email == true ? viewDirection._info.isWrongEmailPatternFrom = true : viewDirection._info.isWrongEmailPatternFrom = false"></span>
+                              <!-- <span ng-show="MailTemplateForm.ToMailID.$error.email" ng-if="MailTemplateForm.ToMailID1.$error.email == true ? viewDirection._info.isWrongEmailPatternFrom = true : viewDirection._info.isWrongEmailPatternFrom = false"></span>-->
                            </div>
                        </div>
                    </div><br/>
@@ -37,25 +37,24 @@
            </modal>
        </div>
 
-       <div class="well well-lg templateBoxContainer" id="googlemap">
-           <div class="row setRowLeftRightMarginZero">
-               <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 setLeftRightPaddingZero" >
+       <div class="well well-lg templateBoxContainer" >
+           <div class="row setRowLeftRightMarginZero" id="googlemap">
+               <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setLeftRightPaddingZero" >
                    <div class="row setRowLeftRightMarginZero mapButtonContainer">
                        <div id="map-canvasH1"></div>
                    </div>
                    <div class="row setRowLeftRightMarginZero mapButtonContainer">
-                       <button class="btn btn-primary" type="button" ng-click="getdirections()">Plot Route</button>
-                       <button  ng-disabled="!enableButtons" class="btn btn-primary" type="button" ng-click="printHtml()">Print</button>
-                       <button  ng-disabled="!enableButtons" class="btn btn-primary" type="button" ng-click="emailHtml()">Email</button>
+                       <button class="btn btn-primary" type="button" ng-click="plotRoute()">Plot Route</button>
+                       <button class="btn btn-primary" type="button" ng-click="showDirections()" ng-disabled="true">Directions</button>
+
                    </div>
                </div>
-               <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 setPaddingRightZero" ng-show="showDirectionPannel">
-                   <div id="directions-panel"></div>
-               </div><br/>
+              <!-- <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5 setPaddingRightZero" style="font-size: 10px;">
+                   <div ng-show="showDirectionPannel" id="directions-panel"></div>
+                   <div ng-hide="showDirectionPannel"> Click on [Directions] botton to Display Driving Directions...</div>
+               </div><br/>-->
            </div>
        </div>
 
-       <div id="googlemapimage" style="display: none;">
-           <img id="googlemapbinary"/>
-       </div>
+
    </div>
