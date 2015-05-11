@@ -176,7 +176,7 @@ angular.module('ezeidApp').
              /
 
              /* make an array of colors for tiles */
-            var colorArray = ["orange","green","blue","pink"];
+            var colorArray = ["orange","green","cyan","pink"];
 
             /* generate a random color string */
             $scope.random = function(){
@@ -262,12 +262,13 @@ angular.module('ezeidApp').
 
                     /* place markers on map */
                     console.log($scope.coordinatesArr);
+                    var markerImage = '../../images/business-icon_48.png';
                     for(var i=0;i < $scope.coordinatesArr.length;i++)
                     {
                         if($scope.coordinatesArr[i][0] != 0 || $scope.coordinatesArr[i][0] != 0)
                         {
                             var pos = googleMap.createGMapPosition($scope.coordinatesArr[i][0],$scope.coordinatesArr[i][1]);
-                            var marker = googleMap.createMarker(pos,$scope.coordinatesArr[i][2],null,false,null);
+                            var marker = googleMap.createMarker(pos,$scope.coordinatesArr[i][2],markerImage,false,null);
                             googleMap.placeMarker(marker);
                         }
                     }
