@@ -339,7 +339,7 @@
             }
 
             else if(!$rootScope._userInfo.IsAuthenticate){
-                $rootScope._userInfo = $queryLsToken;
+                $rootScope._userInfo = {};
             }
 
             var requestedRoute = '';

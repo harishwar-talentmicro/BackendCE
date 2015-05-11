@@ -148,9 +148,13 @@
             $scope.moduleItems = [];
 
             $scope.totalPages = 1;
+            $scope.filterStatus = -1;
+            $scope.filterStatusTypes = [];
             $scope.txStatusTypes = [];
             $scope.txActionTypes = [];
             $scope.txFolderRules = [];
+
+
 
             $scope.showModal = false;
             $scope.modalBox = {
@@ -515,6 +519,34 @@
 
 
             /**
+             * Load Transaction Status types for filtering transaction
+             * @returns {*}
+             */
+            $scope.loadfilterStatusTypes = function(){
+                var defer = $q.defer();
+                $http({
+                    url : GURL + 'ewmStatusType',
+                    method : 'GET',
+                    params : {
+                        Token : $rootScope._userInfo.Token,
+                        FunctionType : 0    // For Sales
+                    }
+                }).success(function(resp){
+                    if(resp && resp !== 'null' && resp.length > 0){
+                        $scope.filterStatusTypes = resp;
+                    }
+                    else{
+
+                        $scope.filterStatusTypes = [];
+                    }
+                    defer.resolve(resp);
+                }).error(function(err){
+                    defer.reject();
+                });
+                return defer.promise;
+            };
+
+            /**
              * Load Transaction Action Types
              * @returns {*}
              */
@@ -529,12 +561,6 @@
                     }
                 }).success(function(resp){
                     if(resp && resp !== 'null' && resp.length > 0){
-                        /**
-                         * Change
-                         * 1. $scope.totalPages
-                         * 2. $scope.pageNumber
-                         * 3. $scope.txList
-                         */
                         $scope.txActionTypes = resp;
                     }
                     else{
@@ -644,7 +670,7 @@
                 if(newVal !== oldVal)
                 {
                     $scope.$broadcast('$preLoaderStart');
-                    $scope.loadTransaction(newVal,$scope.statusType).then(function(){
+                    $scope.loadTransaction(newVal,$scope.filterStatus).then(function(){
                         $scope.$broadcast('$preLoaderStop');
                     },function(){
                         $scope.$broadcast('$preLoaderStop');
@@ -686,33 +712,40 @@
              * Main Intialization
              */
 
-            var init = function(){;
-                $scope.loadTxActionTypes().then(function(){
-                    $scope.loadTxStatusTypes().then(function(){
-                        $scope.loadTransaction().then(function(){
-                            $scope.loadItemList().then(function(){
-                                $scope.loadFolderRules().then(function(){
-                                    $scope.$emit('$preLoaderStop');
+            var init = function(){
+                $scope.loadfilterStatusTypes().then(function(resp){
+                    console.log(resp);
+                    $scope.loadTxActionTypes().then(function(){
+                        $scope.loadTxStatusTypes().then(function(){
+                            $scope.loadTransaction().then(function(){
+                                $scope.loadItemList().then(function(){
+                                    $scope.loadFolderRules().then(function(){
+                                        $scope.$emit('$preLoaderStop');
+                                    },function(){
+                                        $scope.$emit('$preLoaderStop');
+                                        Notification.error({message : 'Unable to load folder rules', delay : MsgDelay} );
+                                    });
                                 },function(){
                                     $scope.$emit('$preLoaderStop');
-                                    Notification.error({message : 'Unable to load folder rules', delay : MsgDelay} );
+                                    Notification.error({message : 'Unable to load item list', delay : MsgDelay} );
                                 });
                             },function(){
                                 $scope.$emit('$preLoaderStop');
-                                Notification.error({message : 'Unable to load item list', delay : MsgDelay} );
+                                Notification.error({message : 'Unable to load sales transaction list', delay : MsgDelay} );
                             });
                         },function(){
                             $scope.$emit('$preLoaderStop');
-                            Notification.error({message : 'Unable to load sales transaction list', delay : MsgDelay} );
+                            Notification.error({message : 'Unable to load sales transaction status types', delay : MsgDelay} );
                         });
                     },function(){
                         $scope.$emit('$preLoaderStop');
-                        Notification.error({message : 'Unable to load sales transaction status types', delay : MsgDelay} );
+                        Notification.error({message : 'Unable to load sales next actions list', delay : MsgDelay} );
                     });
                 },function(){
                     $scope.$emit('$preLoaderStop');
-                    Notification.error({message : 'Unable to load sales next actions list', delay : MsgDelay} );
+                    Notification.error({message : 'Unable to load status types', delay : MsgDelay} );
                 });
+
             };
 
             $rootScope.$on('$includeContentLoaded',function(){
