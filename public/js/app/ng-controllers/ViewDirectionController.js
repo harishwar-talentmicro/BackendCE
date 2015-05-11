@@ -75,7 +75,6 @@ angular.module('ezeidApp').controller('viewDirectionController',['$http', '$root
 
     // EMail direction Html
     viewDirection.emailHtml = function () {
-
         if($rootScope._userInfo.IsAuthenticate == false)
         {
             $('#SignIn_popup').slideDown();
