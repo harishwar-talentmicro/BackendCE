@@ -517,29 +517,51 @@
                         </div>
 
 
-                        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12" ng-hide="modalBox.tx.ezeidTid">
+                        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
                             <div class="row">
                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                    <label>Enquiry Address</label>
+                                    <label>Delivery Address</label>
                                 </div>
-                                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                     <div class="form-group form-group-sm ">
-                                        <input type="text" placeholder="Area" class="form-control no-radius"  name="area" ng-model="modalBox.tx.area" />
+                                        <select class="form-control" ng-model="modalBox.tx.locId">
+                                            <option value="0">--No Delivery Locations Selected--</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <div class="form-group form-group-sm ">
+                                        <input
+                                                ng-disabled="modalBox.tx.locId"
+                                                type="text" placeholder="Address" class="form-control no-radius"  name="area" ng-model="modalBox.tx.address" />
                                     </div>
                                 </div>
                                 <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
                                     <div class="form-group form-group-sm ">
-                                        <input type="text" placeholder="City" class="form-control no-radius" name="city" ng-model="modalBox.tx.city" />
+                                        <input type="text"
+                                               ng-disabled="modalBox.tx.locId"
+                                               placeholder="Locality" class="form-control no-radius"  name="area" ng-model="modalBox.tx.area" />
                                     </div>
                                 </div>
                                 <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
                                     <div class="form-group form-group-sm ">
-                                        <input type="text" placeholder="State" class="form-control no-radius" name="state" ng-model="modalBox.tx.state" />
+                                        <input
+                                                ng-disabled="modalBox.tx.locId"
+                                                type="text" placeholder="City" class="form-control no-radius" name="city" ng-model="modalBox.tx.city" />
                                     </div>
                                 </div>
                                 <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
                                     <div class="form-group form-group-sm ">
-                                        <input type="text" placeholder="Country" class="form-control no-radius"  name="country" ng-model="modalBox.tx.country" />
+                                        <input type="text"
+                                               ng-disabled="modalBox.tx.locId"
+                                               placeholder="State" class="form-control no-radius" name="state" ng-model="modalBox.tx.state" />
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                    <div class="form-group form-group-sm ">
+                                        <input type="text"
+                                               ng-disabled="modalBox.tx.locId"
+                                               placeholder="Country" class="form-control no-radius"  name="country" ng-model="modalBox.tx.country" />
                                     </div>
                                 </div>
                             </div>
