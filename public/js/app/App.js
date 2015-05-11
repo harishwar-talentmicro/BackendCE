@@ -110,7 +110,7 @@
 
 
     ezeid.config(['$routeProvider','$httpProvider','$locationProvider',function($routeProvider,$httpProvider,$locationProvider){
-        $routeProvider.when('/index',{templateUrl: 'html/index.html'})
+        $routeProvider
             .when('/',{templateUrl: 'html/home.html'})
             .when('/messages',{templateUrl: 'html/messages.html'})
             .when('/acchist',{templateUrl: 'html/accesshistory.html'})
