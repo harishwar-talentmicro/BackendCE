@@ -9822,10 +9822,9 @@ exports.FnGetCompanyProfile = function(req, res){
             Message: ''
         };
         if(TID  !=  null){
-                    if (Result != null) {
                         db.query('CALL pGetTagLine(' + db.escape(TID) + ')', function (err, GetResult) {
                             if (!err) {
-                                if (GetResult != null) {
+                                if (GetResult[0] != null) {
                                     if (GetResult[0].length > 0) {
                                         RtnMessage.Result=GetResult[0];
                                         RtnMessage.Message = 'About Company Profile sent successfully';
@@ -9851,13 +9850,7 @@ exports.FnGetCompanyProfile = function(req, res){
                                 res.send(RtnMessage);
                             }
                         });
-                    }
-                    else {
-                        res.statusCode = 401;
-                        RtnMessage.Message = 'Invalid Token';
-                        res.send(RtnMessage);
-                        console.log('FnGetCompanyProfile: Invalid Token');
-                    }
+
         }
         else {
             if (TID == null) {
@@ -11848,7 +11841,6 @@ exports.FnDeleteBannerPictureAP = function(req, res){
         throw new Error(ex);
     }
 }
-
 
 //EZEID VAS
 
