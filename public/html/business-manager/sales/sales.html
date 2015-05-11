@@ -8,6 +8,7 @@
                 <div class="row bottom-clearfix">
                     <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
                         <button class="btn btn-sm btn-success no-radius"
+                                ng-show="salesPermissionConf.txCreate"
                                 ng-click="toggleModalBox()"
                                 data-toggle="tooltip" title="Add New Transaction">
                             <span class="glyphicon glyphicon-plus-sign"></span> Add New Transaction
@@ -202,9 +203,9 @@
                     </div>
 
 
-                    <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
-                        <small>{{tx.DeliveryAddress}}</small>
-                    </div>
+                    <!--<div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">-->
+                        <!--<small>{{tx.DeliveryAddress}}</small>-->
+                    <!--</div>-->
 
                     <div class="col-lg-2  col-md-12 col-sm-12 col-xs-12 bottom-clearfix" title="{{tx.Message}}">
                         <small class="text-success">
@@ -213,21 +214,23 @@
                     </div>
 
                     <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 bottom-clearfix"
-                         ng-hide="editModes[$index]" ng-dblclick="toggleAllEditMode($index)">
+                         ng-hide="editModes[$index]" ng-dblclick="((salesPermissionConf.txUpdate) ? toggleAllEditMode($index) : 0)">
                         <div class="row">
-                            <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12" data-toggle="tooltip" title="Double click to edit">
+                            <div ng-class="(moduleConf.listType == 4) ? 'col-lg-6' : 'col-lg-12'" class="col-md-12 col-sm-12 col-xs-12"
+                                 title="{{(salesPermissionConf.txUpdate) ? 'Double click to edit' : 'Do not have permission to edit'}}">
                                  <small class="text-info">{{tx.statustitle}}</small>
                             </div>
-                            <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12" data-toggle="tooltip" title="Double click to edit">
-                                <label class="label label-info">{{tx.Amount}}</label>
+                            <div ng-show="moduleConf.listType == 4" class="col-lg-6 col-md-12 col-sm-12 col-xs-12"
+                                 title="{{(salesPermissionConf.txUpdate) ? 'Double click to edit' : 'Do not have permission to edit'}}">
+                                <label class="label label-info">{{tx.Amount | formatDecimal:'Rs. ':2}}</label>
                             </div>
                         </div>
                     </div>
 
                     <div class="col-lg-1 col-md-12 col-sm-12 col-xs-12 bottom-clearfix"
-                         data-toggle="tooltip" title="Double click to edit"
+                         title="{{(salesPermissionConf.txUpdate) ? 'Double click to edit' : 'Do not have permission to edit'}}"
                          ng-hide="editModes[$index]"
-                         ng-dblclick="toggleAllEditMode($index)">
+                         ng-dblclick="(salesPermissionConf.txUpdate) ? toggleAllEditMode($index) : 0">
 
                         <small><b>{{tx.ActionTitle}}</b></small>
                         <br/>
@@ -245,14 +248,14 @@
                                 <label class="tiny">Transaction Status</label>
                                 <br/>
                                 <div class="form-group form-group-sm">
-                                    <select class="form-control">
+                                    <select class="form-control" ng-model="modalBox.tx.statusType">
                                         <option value="0">--Select Status--</option>
                                         <option ng-repeat="txStatus in txStatusTypes track by txStatus.TID" value="{{txStatus.TID}}">{{txStatus.StatusTitle}}</option>
                                     </select>
                                 </div>
 
                             </div>
-                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-show="moduleConf.listType == 4">
                                 <div class="form-group form-group-sm">
                                     <input type="text" class="form-control"  placeholder="Amount" />
                                 </div>
@@ -260,7 +263,7 @@
                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                 <label class="tiny">Next Action to be taken</label>
                                 <div class="form-group form-group-sm">
-                                    <select class="form-control">
+                                    <select class="form-control"  ng-model="modalBox.tx.nextAction">
                                         <option value="0">--Select Next Action--</option>
                                         <option ng-repeat="txAction in txActionTypes track by txAction.TID" value="{{txAction.TID}}">{{txAction.ActionTitle}}</option>
                                     </select>
@@ -300,14 +303,27 @@
                             </div>
 
                             <div class="col-lg-7 col-md-12 col-sm-12 col-xs-12">
-                                <button class="btn btn-xs btn-info no-radius" data-toggle="tooltip" title="View Details" ng-click="toggleModalBox()">
+                                <button ng-hide="editModes[$index]" class="btn btn-xs btn-block btn-info no-radius"
+                                        data-toggle="tooltip" title="View Details" ng-click="toggleModalBox($event)">
                                     <span class="glyphicon glyphicon-fullscreen"></span>
+                                    Details
                                 </button>
-                                <button class="btn btn-xs btn-success no-radius" data-toggle="tooltip" title="Save">
+                                <br/>
+                                <button ng-show="editModes[$index]" class="btn btn-xs btn-block btn-success no-radius" data-toggle="tooltip" title="Save">
                                     <span class="glyphicon glyphicon-floppy-save"></span>
+                                    Save
                                 </button>
-                                <button class="btn btn-xs btn-warning no-radius" data-toggle="tooltip" title="Edit">
+                                <br/>
+                                <button ng-show="editModes[$index]" ng-click="(editModes[$index] = false)" class="btn btn-xs btn-block btn-danger no-radius" data-toggle="tooltip" title="Save">
+                                    <span class="glyphicon glyphicon-remove"></span>
+                                    Cancel
+                                </button>
+                                <br/>
+                                <button ng-hide="editModes[$index]" ng-disabled="!salesPermissionConf.txUpdate"
+                                        title="{{(salesPermissionConf.txUpdate) ? 'Edit' : 'You do not have permission to edit'}}"
+                                        ng-click="(editModes[$index] = true)" class="btn btn-xs btn-block btn-warning no-radius">
                                     <span class="glyphicon glyphicon-pencil"></span>
+                                    Edit
                                 </button>
                             </div>
 
@@ -465,7 +481,7 @@
                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                     <div class="form-group form-group-sm ">
                                         <select class="form-control" ng-model="modalBox.tx.folderRule" name="folderRule">
-                                            <option value="0">--Select Folder Rule form list--</option>
+                                            <option value="0">--Select Folder Rule from list--</option>
                                             <option ng-repeat="txFolderRule in txFolderRules track by txFolderRule.TID" value="{{txAction.TID}}">{{txFolderRule.FolderTitle}}</option>
                                         </select>
                                     </div>
@@ -558,22 +574,25 @@
                     </div>
 
                       <hr/>
-                    <div class="row">
+                    <div ng-show="moduleItems.length" class="row bottom-clearfix">
 
                         <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12 item-list-box">
                             <div class="row">
                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                     <h4 class="text-center font-roboto text-warning">Select Items</h4>
+                                    <h6 class="text-center font-robot text-info">
+                                        {{moduleItems.length}} items in list
+                                    </h6>
                                 </div>
                             </div>
 
-                            <div class="row">
+                            <div class="row"   id="bus-item-list-container">
 
                               <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                     <bussiness-item
                                             ng-repeat="item in moduleItems track by item.TID"
                                             item="item" item-list-type="_userInfo.SalesItemListType"
-                                            add-item="addItem(item)">
+                                            add-item="addItem(item)" edit-permission="salesPermissionConf.txUpdate" edit-mode="modalBox.editMode">
                                     </bussiness-item>
                               </div>
 
@@ -585,10 +604,11 @@
                           <div class="row">
                               <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                   <h4 class="text-center font-roboto text-success">Items in your order list </h4>
+                                  <h6 class="text-center font-roboto text-info">{{modalBox.tx.itemList.length}} items in your enquiry list </h6>
                               </div>
                           </div>
 
-                          <div class="row">
+                          <div class="row" id="tx-item-list-container">
 
                               <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-center" ng-hide="modalBox.tx.itemList.length > 0">
                                   <small class="font-open-sans text-warning">Add items to your enquiry</small>
@@ -597,7 +617,8 @@
                               <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12" ng-repeat="item in modalBox.tx.itemList track by item.ItemID">
                                   <transaction-item
                                           item="item" item-list-type="_userInfo.SalesItemListType"
-                                          remove-item="removeItem(item)">
+                                          remove-item="removeItem(item)"
+                                          edit-permission="salesPermissionConf.txUpdate" edit-mode="modalBox.editMode">
                                   </transaction-item>
                               </div>
 
@@ -608,6 +629,30 @@
 
 
                     </div>
+
+
+                    <div class="row top-clearfix-padding-half bottom-clearfix">
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-show="modalBox.editMode && (!salesPermissionConf.txUpdate)">
+                            <small class="text-danger">You do not have permission to edit the enquiry</small>
+                        </div>
+                      <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6">
+                          <button class="btn btn-info btn-sm no-radius" ng-hide="modalBox.editMode">
+                              <span class="glyphicon glyphicon-hand-right"></span>
+                              Proceed to Enquire
+                          </button>
+                          <button class="btn btn-success btn-sm no-radius" ng-show="modalBox.editMode"
+                                  title="(salesPermissionConf.txUpdate) ? 'Update sales enquiry' : 'You do not have editing permission'"
+                                  ng-disabled="(!salesPermissionConf.txUpdate)">
+                              <span class="glyphicon glyphicon-ok-circle"></span>
+                              Update Enquiry
+                          </button>
+                          <button class="btn btn-danger btn-sm no-radius" ng-click="toggleModalBox()">
+                              <span class="glyphicon glyphicon-remove"></span>
+                              Cancel
+                          </button>
+                      </div>
+                    </div>
+
                   </div>
 
                 </div>
@@ -623,14 +668,17 @@
 <!-- Template for Item having item name,description,picture,qty and rate -->
 <script type="text/ng-template" id="/tpl/tx-item-description-picture-qty-rate.html">
     <div class="row business-manager-item selected">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <button ng-hide="(!editPermission) && editMode" class="btn btn-xs btn-danger pull-right no-radius"  ng-click="removeItem(item)">
+                <span class="glyphicon glyphicon-trash"></span>
+            </button>
+        </div>
         <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 business-manager-item-thumbnail bottom-clearfix">
             <img height="64" width="64" class="img-circle" ng-src="{{item.Pic}}" />
         </div>
         <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 business-manager-item-details bottom-clearfix">
             <h4 class="font-open-sans">{{item.ItemName}}
-                <button class="btn btn-xs btn-danger pull-right no-radius"  ng-click="removeItem(item)">
-                    <span class="glyphicon glyphicon-trash"></span>
-                </button>
+
             </h4>
         </div>
 
@@ -643,20 +691,19 @@
                         <span class="input-group-addon">
                             Rate &nbsp; &nbsp;&nbsp;&nbsp;
                         </span>
-                        <input class="form-control text-right" type="number" value="{{item.Rate | currency:'':2}}" disabled/>
-
+                        <input class="form-control text-right" type="text" value="{{item.Rate | formatDecimal:'':2}}" disabled/>
                     </div>
                     <div class="input-group form-group-sm bottom-clearfix">
                         <span class="input-group-addon">
                             Quantity
                         </span>
-                        <input class="form-control text-right" numbers-only type="number" ng-model="item.Qty" ng-change="(!item.Qty) ? (item.Qty = 1) : ''" min="1"/>
+                        <input  ng-disabled="!(editPermission && editMode)" class="form-control text-right" numbers-only type="number" ng-model="item.Qty" ng-change="(!item.Qty) ? (item.Qty = 1) : ''" min="1" max="10000000000"/>
                     </div>
                     <div class="input-group form-group-sm bottom-clearfix">
                         <span class="input-group-addon">
                                 Amount &nbsp;
-                            </span>
-                        <input class="form-control text-right"  type="number" value="{{(item.Rate * item.Qty) | currency:'':2}}" disabled/>
+                        </span>
+                        <input class="form-control text-right"  type="text" value="{{(item.Rate * item.Qty) | formatDecimal:'':2}}" disabled/>
 
                     </div>
 
@@ -672,7 +719,7 @@
 <script type="text/ng-template" id="/tpl/tx-item-description-picture-qty.html">
     <div class="row business-manager-item selected">
         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-            <button class="btn btn-xs btn-danger pull-right no-radius" ng-click="removeItem(item)" >
+            <button  ng-hide="(!editPermission) && editMode" class="btn btn-xs btn-danger pull-right no-radius" ng-click="removeItem(item)" >
                 <span class="glyphicon glyphicon-trash"></span> Delete
             </button>
         </div>
@@ -709,7 +756,7 @@
 <script type="text/ng-template" id="/tpl/tx-item-description-picture.html">
     <div class="row business-manager-item selected">
         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-            <button class="btn btn-xs btn-danger pull-right no-radius" ng-click="removeItem(item)" >
+            <button  ng-hide="(!editPermission) && editMode" class="btn btn-xs btn-danger pull-right no-radius" ng-click="removeItem(item)" >
                 <span class="glyphicon glyphicon-trash"></span> Delete
             </button>
         </div>
@@ -737,7 +784,7 @@
 <script type="text/ng-template" id="/tpl/tx-item-description.html">
     <div class="row business-manager-item selected">
         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-            <button class="btn btn-xs btn-danger pull-right no-radius" ng-click="removeItem(item)" >
+            <button  ng-hide="(!editPermission) && editMode" class="btn btn-xs btn-danger pull-right no-radius" ng-click="removeItem(item)" >
                 <span class="glyphicon glyphicon-trash"></span> Delete
             </button>
         </div>
@@ -757,7 +804,7 @@
     <div class="row business-manager-item">
 
         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 business-manager-item-details">
-            <button class="btn btn-xs btn-success pull-right no-radius" ng-click="addItem(item)">
+            <button ng-hide="(!editPermission) && editMode" class="btn btn-xs btn-success pull-right no-radius" ng-click="addItem(item)">
                 <span class="glyphicon glyphicon-plus-sign"></span>
                 Add Item
             </button>
@@ -775,7 +822,7 @@
         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 business-manager-item-details">
             <div class="row">
                 <div class="col-lg-offset-2 col-md-offset-2 col-sm-offset-2 col-xs-offset-2 col-lg-8 col-md-8 col-sm-8 col-xs-8">
-                    Rate : <span class="pull-right"> {{item.Rate | currency:'':2}}</span>
+                    Rate : <span class="pull-right"> {{item.Rate | formatDecimal:'':2}}</span>
                 </div>
 
             </div>
@@ -794,15 +841,18 @@
 <!-- Template for Item having item name,description,picture and qty -->
 <script type="text/ng-template" id="/tpl/bus-item-description-picture-qty.html">
     <div class="row business-manager-item">
+        <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12">
+            <button ng-hide="(!editPermission) && editMode" class="btn btn-xs btn-success pull-right no-radius" ng-click="addItem(item)">
+                <span class="glyphicon glyphicon-plus-sign"></span>
+                Add Item
+            </button>
+        </div>
         <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 business-manager-item-thumbnail bottom-clearfix">
             <img height="64" width="64" class="img-circle" ng-src="{{item.Pic}}" />
         </div>
         <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 business-manager-item-details bottom-clearfix">
             <h4 class="font-open-sans">{{item.ItemName}}
-                <button class="btn btn-xs btn-success pull-right no-radius" ng-click="addItem(item)">
-                    <span class="glyphicon glyphicon-plus-sign"></span>
-                    Add Item
-                </button>
+
             </h4>
         </div>
         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 business-manager-item-details bottom-clearfix">
@@ -816,26 +866,22 @@
 <!-- Template for Item having item name,description and pic -->
 <script type="text/ng-template" id="/tpl/bus-item-description-picture.html">
     <div class="row business-manager-item">
+        <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12">
+            <button ng-hide="(!editPermission) && editMode" class="btn btn-xs btn-success pull-right no-radius" ng-click="addItem(item)">
+                <span class="glyphicon glyphicon-plus-sign"></span>
+                Add Item
+            </button>
+        </div>
         <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 business-manager-item-thumbnail bottom-clearfix">
             <img height="64" width="64" class="img-circle" ng-src="{{item.Pic}}" />
         </div>
         <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 business-manager-item-details bottom-clearfix">
             <h4 class="font-open-sans">{{item.ItemName}}
-                <button class="btn btn-xs btn-success pull-right no-radius"  ng-click="addItem(item)">
-                    <span class="glyphicon glyphicon-plus-sign"></span>
-                    Add Item
-                </button>
+
             </h4>
         </div>
 
-        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 business-manager-item-details">
-            <div class="row">
-                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 col-lg-offset-4 col-md-offset-4 col-sm-offset-4 col-xs-offset-4">
-                    <button class="btn btn-block btn-xs btn-warning no-radius"> {{item.Qty}}</button>
-                </div>
-            </div>
 
-        </div>
 
         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 business-manager-item-details bottom-clearfix">
             <small class="text-info" title="{{item.Description}}">
@@ -848,12 +894,15 @@
 <!-- Template for Item having item name and description -->
 <script type="text/ng-template" id="/tpl/bus-item-description.html">
     <div class="row business-manager-item">
+        <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12">
+            <button ng-hide="(!editPermission) && editMode" class="btn btn-xs btn-success pull-right no-radius" ng-click="addItem(item)">
+                <span class="glyphicon glyphicon-plus-sign"></span>
+                Add Item
+            </button>
+        </div>
         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 business-manager-item-details bottom-clearfix">
             <h4 class="font-open-sans text-center">{{item.ItemName}}
-                <button class="btn btn-xs btn-success pull-right no-radius"  ng-click="addItem(item)">
-                    <span class="glyphicon glyphicon-plus-sign"></span>
-                    Add Item
-                </button>
+
             </h4>
         </div>
         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 business-manager-item-details bottom-clearfix">

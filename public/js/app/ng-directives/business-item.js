@@ -29,7 +29,7 @@
                 templateType = parseInt(scope.itemListType);
             }
             catch(ex){
-
+                templateType = 0;
             }
 
             element.html(getTemplate(templateType)).show();
@@ -44,7 +44,9 @@
             scope: {
                 itemListType : '=',
                 item : '=',
-                addItem : '&'
+                addItem : '&',
+                editPermission : '=',
+                editMode : '='
             }
         };
     }]);

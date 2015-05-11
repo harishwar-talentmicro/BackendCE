@@ -43,8 +43,60 @@
             };
 
 
+            /**
+             * Permission Configuration for what fields and button should be visible and what should be hidden
+             * 0 : Hidden
+             * 1 : Read Only
+             * 2 : Read,Create and update
+             * 3 : Reader,Create and Update
+             * 4 : Read and Update
+             * 5 : Read and Update
+             */
 
-            $scope.listConf = [
+            var permissionConf = [
+                {
+                    txCreate : false,
+                    txList : false,
+                    txUpdate : false
+                },
+                {
+                    txCreate : false,
+                    txList : true,
+                    txUpdate : false
+                },
+                {
+                    txCreate : true,
+                    txList : true,
+                    txUpdate : true
+                },
+                {
+                    txCreate : true,
+                    txList : true,
+                    txUpdate : true
+                },
+                {
+                    txCreate : false,
+                    txList : true,
+                    txUpdate : false
+                },{
+                    txCreate : false,
+                    txList : true,
+                    txUpdate : false
+                },
+
+
+            ];
+
+            /**
+             * Item list configuration for what fields should be visible and what fields should be hidden on modal box and tx list
+             * 0 : msg only
+             * 1 : item and description
+             * 2 : item, description and picture
+             * 3 : item, description, picture and quantity
+             * 4 : item, description,picture,quantity, rate
+             * @type {*[]}
+             */
+            var listConf = [
                 {
                     message : true,
                     item : false,
@@ -71,6 +123,11 @@
                     amount : true
                 }
             ];
+
+
+            $scope.moduleConf = $scope.modules[moduleIndex];
+            $scope.salesListConf = listConf[$scope.modules[moduleIndex].listType];
+            $scope.salesPermissionConf = permissionConf[$scope.modules[moduleIndex].permission];
 
             $scope.$emit('$preLoaderStart');
 
@@ -134,18 +191,58 @@
 
 
             /**
+             * Copies the transaction properties to editMode Object
+             * @param tx
+             * @return editModeTx
+             */
+            var prepareEditTransaction = function(tx){
+                var editModeTx =  {
+                    orderAmount : 0,
+                        trnNo : tx.TrnNo,
+                        ezeidTid : (tx.EZEID) ? true : 0,
+
+                        TID : tx.TID,
+                        functionType : 0, // Function Type will be 0 for sales
+                        ezeid : tx.EZEID,
+                        statusType : 0,
+                        notes : tx.Notes,
+                        locId : tx.LocID,
+                        country : '',
+                        state : '',
+                        city : '',
+                        area : '',
+                        contactInfo : tx.ContactInfo,
+                        deliveryAddress : '',
+                        nextAction : (tx.NextActionID && tx.NextActionID !== 'null') ? tx.NextActionID : 0,
+                        nextActionDateTime : $filter('dateTimeFilter')(tx.NextActionDate,'DD MMM YYYY hh:mm:ss A','DD MMM YYYY hh:mm:ss A'),
+                        taskDateTime : tx.TaskDateTime,
+                        folderRule : (tx.FolderRuleID && tx.FolderRuleID !== 'null') ? tx.FolderRuleID : 0,
+                        message : tx.Message,
+                        messageType : ($rootScope._userInfo.SalesItemListType) ? $rootScope._userInfo.SalesItemListType : 0,
+                        latitude : 0,
+                        longitude : 0,
+                        duration : 0,
+                        durationScale : 0,
+                        itemList : []
+                };
+                return editModeTx;
+
+            };
+            /**
              * Toggles the edit mode for particular transaction
              * Inline editing
              * @param index
              */
             $scope.toggleAllEditMode = function(index){
-                console.log(index);
                 if(typeof(index) === "undefined")
                 {
                     index = -1;
                 }
                 for(var c = 0; c < $scope.editModes.length; c++){
                     if(c === index){
+                        $scope.resetModalBox();
+                        $scope.modalBox.tx = prepareEditTransaction($scope.txList[index]);
+                        console.log($scope.modalBox.tx);
                         $scope.editModes[c] = true;
                     }
                     else{
@@ -154,37 +251,67 @@
                 }
             };
 
+            var loadTransactionItems = function(txId){
+                var defer = $q.defer();
+                $http({
+                    url : GURL + 'ewtGetTranscationItems',
+                    method : 'GET',
+                    params : {
+                        Token : $rootScope._userInfo.Token,
+                        MessageID : txId
+                    }
+                }).success(function(resp){
+                    if(resp && resp.length > 0 && resp !== 'null'){
+                        $scope.modalBox.tx.itemList = resp;
+                        defer.resolve(resp);
+                    }
+                    else{
+                        defer.resolve([]);
+                    }
+                }).error(function(err){
+                    Notification.error({ message : 'Unable to load items for this enquiry ! Please try again', delay : MsgDelay});
+                    defer.reject();
+                });
+                return defer.promise;
+            };
+
             /**
              * Modal Box toggle
              * @param e
              */
-            $scope.toggleModalBox = function(e){
-                $scope.$emit('$preLoaderStart');
-                $scope.loadItemList().then(function(){
-                    $scope.$emit('$preLoaderStop');
-                    $scope.showModal = !$scope.showModal;
-                },function(){
-                    $scope.$emit('$preLoaderStop');
-                    Notification.error({message : 'Unable to load item list', delay : MsgDelay} );
-                });
+            $scope.toggleModalBox = function(e,index){
 
                 $scope.resetModalBox();
 
-                if(e){
+
+                if(e && typeof(index) !== 'undefined' && typeof(index) !== 'null'){
                     /**
                      * Fill the information of Current Transaction
                      */
+                    $scope.modalBox.editMode = true;
+                    $scope.modalBox.tx = prepareEditTransaction($scope.txList[index]);
+                    if($scope.moduleConf.listType > 0){
+                        loadTransactionItems().then(function(resp){
+                            $scope.showModal = !$scope.showModal;
+                        },function(){
+                            $scope.showModal = !$scope.showModal;
+                        });
+                    }
+                    else{
+                        $scope.showModal = !$scope.showModal;
+                    }
                 }
                 else{
-
+                    $scope.modalBox.editMode = false;
+                    $scope.showModal = !$scope.showModal;
                 }
-
             };
 
             $scope.resetModalBox = function(){
                 $scope.modalBox = {
                     title : 'Transaction Details',
                     class : 'business-manager-modal',
+                    editMode : false,
                     tx : {
                         orderAmount : 0,
                         trnNo : '',
@@ -257,14 +384,12 @@
              */
             $scope.addItem = function(item){
                 var txItemIndex  = $scope.modalBox.tx.itemList.indexOfWhere('ItemID',item.TID);
-                console.log(txItemIndex);
                 if(txItemIndex === -1){
                     $scope.modalBox.tx.itemList.push(createTxItem(item));
                 }
                 else{
                     $scope.modalBox.tx.itemList[txItemIndex].Qty += 1;
                 }
-                console.log($scope.modalBox.tx);
             };
 
             /**
@@ -316,6 +441,11 @@
                     $scope.checkEzeidInfo(newVal);
                 }
             });
+
+            /**
+             * Loading EZEID userInfo and managing fields visibility based on the it
+             * @param ezeid
+             */
             $scope.checkEzeidInfo = function(ezeid){
                 $scope.$emit('$preLoaderStart');
                 $scope.getEzeidDetails(ezeid).then(function(resp){
@@ -555,22 +685,43 @@
             /**
              * Main Intialization
              */
-            $scope.loadTxActionTypes().then(function(){
-                $scope.loadTxStatusTypes().then(function(){
-                    $scope.loadTransaction().then(function(){
-                        $scope.$emit('$preLoaderStop');
+
+            var init = function(){;
+                $scope.loadTxActionTypes().then(function(){
+                    $scope.loadTxStatusTypes().then(function(){
+                        $scope.loadTransaction().then(function(){
+                            $scope.loadItemList().then(function(){
+                                $scope.loadFolderRules().then(function(){
+                                    $scope.$emit('$preLoaderStop');
+                                },function(){
+                                    $scope.$emit('$preLoaderStop');
+                                    Notification.error({message : 'Unable to load folder rules', delay : MsgDelay} );
+                                });
+                            },function(){
+                                $scope.$emit('$preLoaderStop');
+                                Notification.error({message : 'Unable to load item list', delay : MsgDelay} );
+                            });
+                        },function(){
+                            $scope.$emit('$preLoaderStop');
+                            Notification.error({message : 'Unable to load sales transaction list', delay : MsgDelay} );
+                        });
                     },function(){
                         $scope.$emit('$preLoaderStop');
+                        Notification.error({message : 'Unable to load sales transaction status types', delay : MsgDelay} );
                     });
                 },function(){
                     $scope.$emit('$preLoaderStop');
+                    Notification.error({message : 'Unable to load sales next actions list', delay : MsgDelay} );
                 });
-            },function(){
-                $scope.$emit('$preLoaderStop');
+            };
+
+            $rootScope.$on('$includeContentLoaded',function(){
+                $timeout(function(){
+                    $scope.$emit('$preLoaderStart');
+                    init();
+                },1000);
+
             });
-
-
-
 
         }]);
 

@@ -1,10 +1,57 @@
    <div ng-controller="mapPopController as mapCtrl">
-       <div class="row setRowLeftRightMarginZero">
-            <div style="width: 100%; height: 400px;" id="map-canvasH1"></div>
+
+       <div class="emailContiner">
+           <modal mtitle="'Email Route Map'" visible="showEmailForm" mclass="modalBox.class" style="padding-left: 0px;!important">
+               <div class="container-fluid">
+                   <div class="row">
+                       <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                           <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 searchHeaderAlignment TemplateTextContainer topMarginButton keyWordText">
+                               EmailID
+                           </div>
+                           <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10 searchHeaderAlignment">
+                               <input type="text" name="ToMailID" class="form-control emptyBox"
+                                      id="ToMailID" ng-model="viewDirection._info.ToMailID"
+                                      ng-class="MailTemplateForm.FromEmailID.$touched && !viewDirection._info.ToMailID.length ? 'mandatoryTextBox' : ''"
+                                      placeholder="EmailID" maxlength="100" ng-pattern="/^[a-z]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5}$/" required>
+                               <span ng-show="MailTemplateForm.ToMailID.$error.email" ng-if="MailTemplateForm.ToMailID.$error.email == true ? viewDirection._info.isWrongEmailPatternFrom = true : viewDirection._info.isWrongEmailPatternFrom = false"></span>
+                           </div>
+                       </div>
+                   </div><br/>
+                   <div class="row">
+                       <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                           <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 searchHeaderAlignment TemplateTextContainer bewareTextInnerContainer keyWordText">
+                           </div>
+                           <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 searchHeaderAlignment" style="text-align: left;">
+                               <button type="submit" ng-disabled="!viewDirection._info.ToMailID" class="btn btn-primary" ng-click="emailDirectionImage()" >Send</button>
+                           </div>
+                           <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 searchHeaderAlignment" style="text-align: left;">
+                               <button type="button" class="btn btn-primary" ng-click="closeEmailDialouge()">Cancel</button>
+                           </div>
+                       </div>
+                   </div><br/>
+               </div>
+           </modal>
        </div>
-       <div class="row setRowLeftRightMarginZero mapButtonContainer">
-           <button class="btn btn-primary" type="button">Plot Route</button>
-           <button class="btn btn-primary" type="button">Print</button>
-           <button class="btn btn-primary" type="button">Email</button>
+
+       <div class="well well-lg templateBoxContainer" id="googlemap">
+           <div class="row setRowLeftRightMarginZero">
+               <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 setLeftRightPaddingZero">
+                   <div class="row setRowLeftRightMarginZero mapButtonContainer">
+                       <div style="width: 100%; height: 400px;" id="map-canvasH1"></div>
+                   </div>
+                   <div class="row setRowLeftRightMarginZero mapButtonContainer">
+                       <button class="btn btn-primary" type="button" ng-click="getdirections()">Plot Route</button>
+                       <button  ng-disabled="!enableButtons" class="btn btn-primary" type="button" ng-click="printHtml()">Print</button>
+                       <button  ng-disabled="!enableButtons" class="btn btn-primary" type="button" ng-click="emailHtml()">Email</button>
+                   </div>
+               </div>
+               <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 setPaddingRightZero" ng-show="showDirectionPannel">
+                   <div id="directions-panel"></div>
+               </div><br/>
+           </div>
+       </div>
+
+       <div id="googlemapimage" style="display: none;">
+           <img id="googlemapbinary"/>
        </div>
    </div>
