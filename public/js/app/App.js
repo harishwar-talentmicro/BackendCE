@@ -196,140 +196,6 @@
          * Checking login while navigating to different pages
          */
 
-        $rootScope.$on("$routeChangeStart1",function(event,next,current){
-            try{
-                if(CLOSED_ROUTES.indexOf(next.$$route.originalPath) === -1
-                    &&
-                    UNAUTHORIZED_ROUTES.indexOf(next.$$route.originalPath) === -1){
-                    return;
-                }
-            }
-            catch(ex){
-                return;
-            }
-            /**
-             * Checking if the user is authenticated an then routing it to particular url
-             */
-
-
-            if ($rootScope._userInfo) {
-                if($rootScope._userInfo.IsAuthenticate){
-                    try{
-                        if(UNAUTHORIZED_ROUTES.indexOf(next.$$route.originalPath) !== -1){
-                            /**
-                             * If route is found in unauthorized routes then don't allow him to navigate to that route
-                             * when he is already logged in
-                             */
-                            $location.path('/');
-                        }
-
-                    }
-                    catch(ex){
-
-                    }
-                }
-            }
-            else {
-                if (typeof (Storage) !== "undefined") {
-                    var encrypted = localStorage.getItem("_token");
-                    if (encrypted) {
-                        var decrypted = CryptoJS.AES.decrypt(encrypted, "EZEID");
-                        var jsonString = null;
-                        try{
-                            jsonString = decrypted.toString(CryptoJS.enc.Utf8);
-                        }
-                        catch(ex){
-
-                        }
-
-                        if (jsonString) {
-                            $rootScope._userInfo = JSON.parse(jsonString);
-                            if($rootScope._userInfo.hasOwnProperty('IsAuthenticate')){
-                                if($rootScope._userInfo.IsAuthenticate == true || $rootScope._userInfo.IsAuthenticate == "true"){
-                                    /**
-                                     * Allow him to access the site as he is already logged in
-                                     */
-                                    try{
-                                        if(UNAUTHORIZED_ROUTES.indexOf(next.$$route.originalPath) !== -1){
-                                            /**
-                                             * If route is found in unauthorized routes then don't allow him to navigate to that route
-                                             * when he is already logged in
-                                             */
-                                            $location.path('/');
-                                        }
-                                    }
-                                    catch(ex){
-                                        return true;
-                                    }
-
-                                    /**
-                                     * Allow him to access the site as he is already logged in
-                                     */
-
-
-                                }
-                                else{
-                                    if(UNAUTHORIZED_ROUTES.indexOf(next.$$route.originalPath) === -1){
-                                        /**
-                                         * If route is not found in unauthorized routes then don't allow him to navigate to that route
-                                         * when he is already logged in
-                                         */
-                                        $location.path('/');
-                                    }
-                                }
-                            }
-                            else{
-                                if(UNAUTHORIZED_ROUTES.indexOf(next.$$route.originalPath) === -1){
-                                    /**
-                                     * If route is found in unauthorized routes then don't allow him to navigate to that route
-                                     * when he is already logged in
-                                     */
-                                    $location.path('/');
-                                }
-                            }
-                        }
-                        else{
-                            if(UNAUTHORIZED_ROUTES.indexOf(next.$$route.originalPath) === -1){
-                                /**
-                                 * If route is found in unauthorized routes then don't allow him to navigate to that route
-                                 * when he is already logged in
-                                 */
-                                $location.path('/');
-                            }
-                        }
-                    }
-                    else {
-                        $rootScope._userInfo = {
-                            IsAuthenticate: false,
-                            Token: '',
-                            FirstName: '',
-                            Type: '',
-                            Icon: ''
-                        };
-                        if(UNAUTHORIZED_ROUTES.indexOf(next.$$route.originalPath) === -1){
-                            /**
-                             * If route is found in unauthorized routes then don't allow him to navigate to that route
-                             * when he is already logged in
-                             */
-                            $location.path('/');
-                        }
-                    }
-                }
-                else {
-                    // Sorry! No Web Storage support..
-                    $rootScope._userInfo = {
-                        IsAuthenticate: false,
-                        Token: '',
-                        FirstName: '',
-                        Type: '',
-                        Icon: ''
-                    };
-                    alert('Sorry..! Your browser is not supported. Upgrade to latest browser');
-                    $location.path('/');
-                }
-            }
-        });
-
         $rootScope.$on('$routeChangeStart',function(event,next,current){
             /**
              * Fetching userInfo From local storage here if userInfo is not found in $rootScope
@@ -338,7 +204,7 @@
                 $rootScope._userInfo = $queryLsToken;
             }
 
-            else if(!$rootScope._userInfo.IsAuthenticate){
+            if(!$rootScope._userInfo.IsAuthenticate){
                 $rootScope._userInfo = {};
             }
 
