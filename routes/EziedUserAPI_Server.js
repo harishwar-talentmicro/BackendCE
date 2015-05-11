@@ -8609,7 +8609,7 @@ exports.FnSendBulkMailer = function (req, res) {
                                     var mailOptions = {
                                         To: ToMailID,
                                         subject: 'Route Map',
-                                        html: 'Dear user <br/> Please find the route map in attachment here with in '+OutputFileName+'.pdf format', // html body
+                                        html: 'Dear User, <br/> Please find the route map in attachment here with in '+OutputFileName+'.pdf format', // html body
                                         Attachment: Base64PdfData,
                                         AttachmentFileName: OutputFileName+'.pdf'
                                     };
@@ -9973,8 +9973,9 @@ exports.FnGetLocationListForEZEID = function (req, res) {
             Result: [],
             Message: ''
         };
-
-        if (Token != null && TID != null) {
+        console.log(req.query.Token);
+        console.log(Token);
+        if (Token && TID) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
