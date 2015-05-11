@@ -299,7 +299,7 @@ angular.module('ezeidApp').factory('GoogleMaps',['$q','$timeout','$compile',func
                 _this.currentMarkerPosition.latitude = currentLocation.coords.latitude;
                 _this.currentMarkerPosition.longitude = currentLocation.coords.longitude;
                 defer.resolve(true);
-            },this.handleNoGeolocation(defer))
+            },function(){this.handleNoGeolocation(defer)});
         } else{
             this.handleNoGeolocation(defer);
         };
