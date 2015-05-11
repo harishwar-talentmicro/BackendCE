@@ -149,23 +149,23 @@
         <div class="infoModal">
             <modal showheader="false" mtitle="''" visible="showDetailsModal" mclass="modalBox.class">
                <section id="main-content" class="searchDetailContainer">
-                <div class="row setRowLeftRightMarginZero">
-                   <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5 setPaddingLeftRight0">
-                       <img class="bannerContainerBorder" width="356px" height="356px" ng-src="{{SearchInfo.BannerImage}}" />
-
-                       <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-center setPaddingLeftRight0 noticeTextContainer" >
-                           The business you are requesting has insufficient information and hence displaying the closet matching company.
+                <div class="row setRowLeftRightMarginZero text-center">
+                   <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5 setPaddingLeftRight0" ng-show="(SearchType == 2)">
+                       <div class="row setRowLeftRightMarginZero">
+                           <img class="bannerContainerBorder" width="356px" height="356px" ng-src="{{SearchInfo.BannerImage}}" />
+                           <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-center setPaddingLeftRight0 noticeTextContainer" >
+                               The business you are requesting has insufficient information and hence displaying the closet matching company.
+                           </div>
+                           <img class="imgLeft showPointer" ng-show="previousButton == true" ng-click="getPreviousBanner()" src="images/arrow_left.png" />
+                           <img class="imgRight showPointer" ng-show="nextButton == true" ng-click="getNextBanner()" src="images/arrow_right.png" />
                        </div>
-
-                        <img class="imgLeft showPointer" ng-show="previousButton == true" ng-click="getPreviousBanner()" src="images/arrow_left.png" />
-                        <img class="imgRight showPointer" ng-show="nextButton == true" ng-click="getNextBanner()" src="images/arrow_right.png" />
                    </div>
-                    <div class="col-lg-7 col-md-7 col-sm-7 col-xs-7 setPaddingLeftRight0">
+                   <div ng-class="SearchType == 2 ? 'col-lg-7 col-md-7 col-sm-7 col-xs-7' : 'col-lg-12 col-md-12 col-sm-12 col-xs-12'" class="setPaddingLeftRight0">
                         <div class="row setRowLeftRightMarginZero">
                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setPaddingLeftRight0">
                                 <div ng-show="SearchInfo.Picture">
                                     <div ng-show="SearchInfo.IDTypeID == 1" class="row addItemRowUserEzeid1 marginTopBottom1">
-                                        <img width="148px" height="148px" ng-src="{{SearchInfo.Picture}}">
+                                        <img class="profilePicBorder" width="148px" height="148px" ng-src="{{SearchInfo.Picture}}">
                                     </div>
                                     <div ng-hide="SearchInfo.IDTypeID == 1" class="row addItemRowUserEzeid1 marginTopBottom1">
                                         <img class="profilePicBorder" width="315px" height="155px" ng-src="{{SearchInfo.Picture}}">
@@ -297,12 +297,12 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setPaddingLeftRight0 searchHeaderAlignment msgButtonContainer messageButtonContainer" ng-show="(SearchInfo.IDTypeID == 1)">
-                    <div class="showPointer removePadding keyWordText boxMessaageBackgroun pull-right"
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 newMsgButtonContainer setPaddingLeftRight0 searchHeaderAlignment msgButtonContainer messageButtonContainer" ng-show="(SearchInfo.IDTypeID == 1)">
+                    <!--<div class="showPointer removePadding keyWordText boxMessaageBackgroun pull-right"
                          ng-click="viewDirections(SearchInfo)" title="View Directions">
                         <img src="../images/view_directions.png">
                         View Directions
-                    </div>
+                    </div>-->
                     <div class="showPointer removePadding keyWordText boxMessaageBackgroun pull-right"
                          ng-click="getdirections(SearchInfo)" title="Directions boxMessaageBackgroun">
                         <img src="../images/new_directions.png">
@@ -310,20 +310,20 @@
                     </div>
                 </div>
             </div>
-                <div class="row setRowLeftRightMarginZero aboutcontainerFrame">
-                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setPaddingLeftRight0 text-center">
-                        <!--{{SearchInfo.AboutCompany}}-->
-                        <div class="row setRowLeftRightMarginZero text-center boxMessaageBackgroun">
-                            <span class="text-bolder"><ins>About Company</ins></span>
-                        </div>
-                        <div class="row setRowLeftRightMarginZero aboutCompanyTextContainer">
-                            {{companyTagLine}}
-                        </div>
+            <div ng-show="(SearchType == 2)" class="row setRowLeftRightMarginZero aboutcontainerFrame">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setPaddingLeftRight0 text-center">
+                    <!--{{SearchInfo.AboutCompany}}-->
+                    <div class="row setRowLeftRightMarginZero text-center boxMessaageBackgroun">
+                        <span class="text-bolder"><ins>About Company</ins></span>
+                    </div>
+                    <div class="row setRowLeftRightMarginZero aboutCompanyTextContainer setBackGroundWhite">
+                        {{companyTagLine}}
                     </div>
                 </div>
-             </section>
-            </modal>
-        </div>
+            </div>
+         </section>
+        </modal>
+    </div>
 
         <modal mtitle="'Working Hours'" visible="showWorkingHourModel" class="workingHours">
             <div class="container-fluid">

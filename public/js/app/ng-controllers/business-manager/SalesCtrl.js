@@ -291,7 +291,7 @@
                     $scope.modalBox.editMode = true;
                     $scope.modalBox.tx = prepareEditTransaction($scope.txList[index]);
                     if($scope.moduleConf.listType > 0){
-                        loadTransactionItems().then(function(resp){
+                        loadTransactionItems($scope.modalBox.tx.TID).then(function(resp){
                             $scope.showModal = !$scope.showModal;
                         },function(){
                             $scope.showModal = !$scope.showModal;

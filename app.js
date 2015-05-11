@@ -120,6 +120,7 @@ app.get('/ewtGetWhiteBlackList', LocationManager.FnGetWhiteBlackList);
 app.post('/ewtDeleteWhiteBlackList', LocationManager.FnDeleteWhiteBlackList);
 app.get('/ewtGetWhiteListCount', LocationManager.FnGetWhiteListCount);
 app.get('/ewtGetStatusType',LocationManager.FnGetStatusType);
+app.get('/ewmStatusType',LocationManager.FnStatusType);
 app.get('/ewtGetActionType',LocationManager.FnGetActionType);
 app.get('/ewtEZEIDPrimaryDetails',LocationManager.FnEZEIDPrimaryDetails);
 app.get('/ewtGetItemList',LocationManager.FnGetItemList);
