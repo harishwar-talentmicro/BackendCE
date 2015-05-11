@@ -259,14 +259,14 @@
                             <!-- Dropdown content -->
                             <ul class="dropdown-menu" role="menu">
                                 <!-- Profile Manager -->
-                                <li><a href="#" href="/profile-manager/user"><i class="fa fa-wrench"></i> Profile Manager</a></li>
+                                <li><a href="/profile-manager/user"><i class="fa fa-wrench"></i> Profile Manager</a></li>
                                 <!-- condition1: Business Manager -->
                                 <li ng-show="$root._userInfo.Type == 2 && $root._userInfo.Verified == 2">
                                     <a href="/business-manager"><i class="fa fa-briefcase"></i> Business Manager</a>
                                 </li>
                                 <!-- condition2: Business Manager -->
                                 <li ng-show="$root._userInfo.Type == 2 && $root._userInfo.Verified !== 2">
-                                    <a href="#"><i class="fa fa-briefcase"></i> Business Manager</a></li>
+                                    <a ng-click="$event.preventDefault()"><i class="fa fa-briefcase"></i> Business Manager</a></li>
                                 <!-- Message -->
                                 <li><a href="/messages"><i class="fa fa-envelope"></i> Messages</a></li>
                                 <!-- Personal documents -->

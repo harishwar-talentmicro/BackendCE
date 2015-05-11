@@ -102,10 +102,10 @@
                                             <label  for="item3">Open business only</label>
                                         </div>
                                     </div>
-                                    <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 p-top-10 text-warning">
-                                        <span class="text text-info text-bolder">Filter by ratings:</span>
-                                        <input id="range_29" />
-                                    </div>
+                                    <!--<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 p-top-10 text-warning">-->
+                                        <!--<span class="text text-info text-bolder">Filter by ratings:</span>-->
+                                        <!--<input id="range_29" />-->
+                                    <!--</div>-->
                                 </div>
                             </div>
                         </div>
@@ -133,7 +133,7 @@
                             <!-- Main Tile -->
                             <div class="col-lg-3 blue text-white">
                                 <div class="panel ul">
-                                    <div class="color-1 li width-100"> <a href="#">
+                                    <div class="color-1 li width-100"> < href="#">
                                         <div class="front">
                                             <div class="row" style="width: 100%;">
                                                 <!-- front side goes here -->
@@ -179,7 +179,12 @@
                                                             </small>
                                                         </div>
                                                     </div>
-                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 block-5 pointer" ng-class="color" title="View Full Details"><i class="fa fa-play-circle text-blue"></i></div>
+
+                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 block-5 pointer" ng-class="color" title="View Full Details">
+
+                                                         <i class="fa fa-play-circle text-white"></i>
+
+                                                    </div>
                                                 </div>
                                                 <!-- Row Ends -->
                                             </div>
@@ -203,7 +208,7 @@
 
                     <!-- Master Tile! -->
                     <div class="master-tile" ng-hide="searchListMapFlag">
-                        <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12 individual-tiles text-center p3" ng-init="color = random()" ng-repeat="search in searchListData">
+                        <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12 individual-tiles text-center p3" ng-init="color = random()" ng-repeat="search in searchListData track by $index">
                             <div class="row-1">
                                 <div class="block-header">
                                     <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 block-1 block block-row-1 text-12" ng-class="color">
@@ -259,7 +264,11 @@
                                         </small>
                                     </div>
                                 </div>
-                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 block-5 pointer" ng-class="color" title="View Full Details"><i class="fa fa-play-circle text-blue"></i></div>
+                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 block-5 pointer" ng-class="color" title="View Full Details">
+                                    <a ng-href="/searchDetails?searchType={{params.searchType}}&TID={{search.TID}}">
+                                    <i class="fa fa-play-circle text-blue"></i>
+                                        </a>
+                                </div>
                             </div>
                             <!-- Row Ends -->
 

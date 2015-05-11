@@ -61,43 +61,48 @@ angular.module('ezeidApp').
 
 
             //set the ion range slider to the initial value
-            $("#range_29").ionRangeSlider({
-                type: "double",
-                min: 1,
-                max: 5,
-                step: 1,
-                grid: true,
-                grid_snap: true,
-                keyboard : true,
-                onChange : function(obj){
-                    var arr = [];
-                    var toRating = parseInt(obj.to);
-                    var fromRating = parseInt(obj.from);
-                    for(var ci = fromRating; ci <= toRating   ; ci++)
-                    {
-                        arr.push(ci);
-                    }
-                    $scope.params.rating = arr.join();
-                }
-            });
+            //if(!$rootScope.sliderInit){
+            //    $("#range_29").ionRangeSlider({
+            //        type: "double",
+            //        min: 1,
+            //        max: 5,
+            //        step: 1,
+            //        grid: true,
+            //        grid_snap: true,
+            //        keyboard : true,
+            //        onChange : function(obj){
+            //            var arr = [];
+            //            var toRating = parseInt(obj.to);
+            //            var fromRating = parseInt(obj.from);
+            //            for(var ci = fromRating; ci <= toRating   ; ci++)
+            //            {
+            //                arr.push(ci);
+            //            }
+            //            $scope.params.rating = arr.join();
+            //        }
+            //    });
+            //    $rootScope.sliderInit = true;
+            //}
 
             //find out range of the ratings
             var initialVal = $routeParams.rating[0]?$routeParams.rating[0]:1;
-            var finalVal = initialVal;
+            var finalVal = 5;
             for(var i=0; i < $routeParams.rating.length; i++)
             {
                 finalVal = $routeParams.rating[i];
             }
 
             /* checks for initial and final value */
-            var initial = !isNaN(initialVal) && parseInt(initialVal) >= 1?initialVal:1;
-            var final = !isNaN(finalVal) && parseInt(finalVal) <= 5?finalVal:1;
+            //var initial = !isNaN(initialVal) && parseInt(initialVal) >= 1?initialVal:1;
+            //var final = !isNaN(finalVal) && parseInt(finalVal) <= 5?finalVal:5;
+            var initial = initialVal;
+            var final = finalVal;
 
-            var slider = $("#range_29").data("ionRangeSlider");
-            slider.update({
-                from: initial,
-                to: final
-            });
+            //var slider = $("#range_29").data("ionRangeSlider");
+            //slider.update({
+            //    from: initial,
+            //    to: final
+            //});
 
 
 
@@ -130,18 +135,22 @@ angular.module('ezeidApp').
                     $rootScope.$broadcast('$preLoaderStop');
                     console.log(data);
                     /* put the maps coordinates in array */
-
-                    for(var i=0;i<data.length;i++)
-                    {
-                        coordinates.push([data[i].Latitude,data[i].Longitude,data[i].CompanyName]);
+                    $scope.coordinatesArr = [];
+                    if(data != 'null'){
+                        for(var i=0; i<data.length; i++)
+                        {
+                            coordinates.push([data[i].Latitude,data[i].Longitude,data[i].CompanyName]);
+                        }
+                        $scope.coordinatesArr = coordinates;
                     }
 
-                    $scope.coordinatesArr = coordinates;
+
+
                     //console.log($scope.coordinatesArr);
                     /* status to check if there is some result */
-                    $scope.isResultNumber = (data == 'null')?0:1;
+                    $scope.isResultNumber = (data == 'null') ?0 : 1;
 
-                    $scope.searchListData = data;
+                    $scope.searchListData = (data == 'null') ? [] : data;
                     if (data != 'null' && data.length>0)
                     {
                         $scope.SearchResultCount = data.length;
