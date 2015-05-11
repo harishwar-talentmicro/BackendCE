@@ -115,7 +115,6 @@
             .when('/',{templateUrl: 'html/home.html'})
             .when('/messages',{templateUrl: 'html/messages.html'})
             .when('/acchist',{templateUrl: 'html/accesshistory.html'})
-            .when('/attachcv',{templateUrl: 'html/attachcv.html'})
             .when('/busslist',{templateUrl: 'html/businesslist.html'})
             .when('/terms',{templateUrl: 'html/terms.html'})
             .when('/help',{templateUrl: 'html/help.html'})
@@ -124,7 +123,6 @@
             .when('/salesenquiry',{templateUrl: 'html/salesenquiry.html'})
             .when('/bulksalesenquiry',{templateUrl : 'html/bulksalesenquiry.html'})
             .when('/viewdirection',{templateUrl : 'html/viewdirection.html'})
-            .when('/addworkinghours',{templateUrl : 'html/working-hours.html'})
             .when('/signup',{
                 templateUrl : 'html/profile/sign-up.html',
                 controller : 'SignUpCtrl'

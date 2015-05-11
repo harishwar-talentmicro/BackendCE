@@ -1200,6 +1200,12 @@ span.smallCloselink {
     color: #11A300;
 }
 
+.modal-dialog.modal-lg.business-manager-modal .input-group-addon{
+    background: #eee;
+    color: #666;
+    border: 1px solid #999;
+}
+
 .button.close{
     text-decoration: none;
 }
@@ -1215,6 +1221,12 @@ span.smallCloselink {
   margin:0px;
   padding:0px;
 }
+
+#bus-item-list-container, #tx-item-list-container{
+    max-height: 300px;
+    overflow-y: scroll;
+}
+
 .panel .jumbotron{
     background: none;
     padding:0px;

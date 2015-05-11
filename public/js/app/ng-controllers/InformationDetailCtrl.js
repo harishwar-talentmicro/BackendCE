@@ -35,7 +35,6 @@ angular.module('ezeidApp').
             )
     {
         $scope.$emit('$preLoaderStart');
-       // console.log($rootScope);
         //Below line is for Loading img
         $scope.SearchInfo = {};
         var currentBanner = 1;
@@ -47,8 +46,10 @@ angular.module('ezeidApp').
         var currentDate = moment().format('YYYY-MM-DD HH:mm:ss');
         var x = new Date();
         var today = moment(x.toISOString()).utc().format('DD-MMM-YYYY hh:mm A');
-        $scope.activeTemplate = "html/mapPopView.html";
+        $scope.activeTemplate = "";
         $scope.showWorkingHourModel = false;
+        $scope.showMapPopupModel = false;
+        $scope.showDetailsModal = true;
         $scope.form_rating = 0;
 
         $scope.modalBox = {
@@ -56,98 +57,21 @@ angular.module('ezeidApp').
             class : 'business-manager-modal'
         }
 
-        var map;
-        var marker;
-        var directionsDisplay;
-        var directionsService = new google.maps.DirectionsService();
-        var service;
+       // var TID =  592;//254;
+        //var SearchType = 2;
 
-        var TID =  592;//254;
-        var SearchType = 2;
+        var TID =  $routeParams.TID;
+        var SearchType = $routeParams.searchType;
 
-        /*initialize();
-
-        function initialize() {
-            directionsDisplay = new google.maps.DirectionsRenderer();
-            var myLatlng = new google.maps.LatLng(-34.397, 150.644);
-            var myOptions = {
-                zoom: 8,
-                center: myLatlng,
-                mapTypeId: google.maps.MapTypeId.ROADMAP
-            }
-            map = new google.maps.Map(document.getElementById("map-canvasH1"), myOptions);
-        }*/
-
-       /* function initialize () {
-            console.log("sai21");
-            // Create the search box and link it to the UI element.
-            directionsDisplay = new google.maps.DirectionsRenderer();
-            var initialLocation;
-            var currentLoc = new google.maps.LatLng(12.295810, 76.639381);
-            map = new google.maps.Map(document.getElementById('map-canvasH1'), {
-                mapTypeId: google.maps.MapTypeId.ROADMAP,
-                Zoom: 15
-            });
-
-          // Try W3C Geolocation (Preferred)
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(FindCurrentLocation, function () {
-                    handleNoGeolocation();
-                });
-            }
-            // Browser doesn't support Geolocation
-            else {
-                handleNoGeolocation();
-            }
-
-            function handleNoGeolocation() {
-                initialLocation = currentLoc;
-                map.setCenter(initialLocation);
-                PlaceCurrentLocationMarker(initialLocation);
-            }
-
-            $(window).resize(function() {
-                google.maps.event.trigger(map, "resize");
-            });
-        }
-
-        function PlaceCurrentLocationMarker(location) {
-            if (marker != undefined) {
-                marker.setMap(null);
-                $(".ezeid-map-label").remove();
-            }
-            map.setCenter(location);
-            marker = new google.maps.Marker({
-                position: location,
-                title: "Current Location",
-                draggable: true,
-                map: map,
-                icon: 'images/you_are_here.png'
-            });
-           // getReverseGeocodingData(marker.position.lat(), marker.position.lng());
-
-            google.maps.event.addListener(marker, 'dragend', function (e) {
-                $rootScope.CLoc.CLat = marker.position.lat();
-                $rootScope.CLoc.CLong = marker.position.lng();
-          //      getReverseGeocodingData($rootScope.CLoc.CLat, $rootScope.CLoc.CLong);
-            });
-        }
-
-        function FindCurrentLocation(position) {
-            initialLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-            $rootScope.CLoc = {
-                CLat: position.coords.latitude,
-                CLong: position.coords.longitude
-            };
-
-          // PlaceCurrentLocationMarker(initialLocation);
-        }*/
-           // To get search information
+            // To get search information
             getSearchInformation(TID,SearchType);
 
-            //Below function is for getting search information
-            function getSearchInformation(_TID,_SearchType)
-            {
+        // To get about Company
+         getAboutComapny();
+
+        //Below function is for getting search information
+        function getSearchInformation(_TID,_SearchType)
+        {
                 $scope.SearchInfo = {};
                 $scope.AddressForInfoTab = "";
                 AutoRefresh = false;
@@ -158,7 +82,6 @@ angular.module('ezeidApp').
                 }
                 $http({ method: 'get', url: GURL + 'ewtGetSearchInformation?Token=' + $rootScope._userInfo.Token + '&TID=' + _TID + '&SearchType=' + _SearchType + '&CurrentDate=' + currentDate}).success(function (data) {
                     $rootScope.$broadcast('$preLoaderStop');
-                   // console.log(data);
                     if (data != 'null') {
                         $timeout(function () {
                             $scope.SearchInfo = data[0];
@@ -174,6 +97,8 @@ angular.module('ezeidApp').
                             $scope.AddressForInfoTab += ($scope.SearchInfo.CityTitle != "") ? $scope.SearchInfo.CityTitle +', ' : "";
                             $scope.AddressForInfoTab += ($scope.SearchInfo.CountryTitle != "") ? $scope.SearchInfo.CountryTitle +', ' : "";
                             $scope.AddressForInfoTab += ($scope.SearchInfo.PostalCode != "") ? $scope.SearchInfo.PostalCode : "";
+
+                            $window.localStorage.setItem("myLocation",$scope.SearchInfo.Latitude+","+$scope.SearchInfo.Longitude );
 
                             if($scope.SearchInfo.ParkingStatus==0)
                             {
@@ -197,9 +122,6 @@ angular.module('ezeidApp').
                             //Call for banner
                             AutoRefresh = true;
                             getBanner(1);
-                            /*if(!map){
-                                initialize();
-                            }*/
 
                             if($scope.SearchInfo.IDTypeID == 2)
                             {
@@ -217,6 +139,23 @@ angular.module('ezeidApp').
                     }
                 });
             }
+
+        //Below function is for getting about company
+        function getAboutComapny()
+        {
+
+            if($rootScope._userInfo.Token == "")
+            {
+                $rootScope._userInfo.Token = 2;
+                $scope.Token = 2;
+            }
+            $http({ method: 'get', url: GURL + 'ewtCompanyProfile?Token=' + $rootScope._userInfo.Token}).success(function (data) {
+                $rootScope.$broadcast('$preLoaderStop');
+                if (data != 'null') {
+                        $scope.companyTagLine = data.Result[0].TagLine;
+                }
+            });
+        }
 
             //Auto refresh Banner
             $interval(function() {
@@ -243,7 +182,6 @@ angular.module('ezeidApp').
             // To get banner
             function getBanner(_requestedBannerValue)
             {
-
                 $http({ method: 'get', url: GURL + 'ewtGetBannerPicture?Token=' + $rootScope._userInfo.Token +'&SeqNo='+_requestedBannerValue+'&Ezeid='+$scope.SearchInfo.EZEID+'&StateTitle='+ $scope.SearchInfo.StateTitle+'&LocID='+$scope.SearchInfo.LocID}).success(function (data) {
 
                     if (data.Picture != 'null') {
@@ -389,8 +327,8 @@ angular.module('ezeidApp').
             }
         };
 
-            //Send Reservation
-            $scope.sendReservation = function (messageType) {
+        //Send Reservation
+        $scope.sendReservation = function (messageType) {
                 if ($rootScope._userInfo.IsAuthenticate == true) {
 
                     /**
@@ -417,51 +355,51 @@ angular.module('ezeidApp').
                 }
             };
 
-            // Close Reservation Form
-            $scope.closeReservationForm = function () {
-                $('#Reservation_popup').slideUp();
-                document.getElementById("reservationMessage").className = "form-control fixTextArea emptyBox";
-                $scope.ReservationDateTime = "";
-            };
+        // Close Reservation Form
+        $scope.closeReservationForm = function () {
+            $('#Reservation_popup').slideUp();
+            document.getElementById("reservationMessage").className = "form-control fixTextArea emptyBox";
+            $scope.ReservationDateTime = "";
+        };
 
-            //open Service Request form
-            $scope.openServiceRequestForm = function () {
-                if($rootScope._userInfo.Token == 2)
-                {
-                    $('#SignIn_popup').slideDown();
-                }
-                else
-                {
-                    $('#ServiceRequest_popup').slideDown();
-                }
-            };
+        //open Service Request form
+        $scope.openServiceRequestForm = function () {
+            if($rootScope._userInfo.Token == 2)
+            {
+                $('#SignIn_popup').slideDown();
+            }
+            else
+            {
+                $('#ServiceRequest_popup').slideDown();
+            }
+        };
 
-            //Send Service Request
-            $scope.sendServiceRequest = function () {
-                if ($rootScope._userInfo.IsAuthenticate == true) {
-                    var currentTaskDate = moment().format('DD-MMM-YYYY hh:mm A');
-                    $http({ method: 'post', url: GURL + 'ewtSaveMessage', data: { TokenNo: $rootScope._userInfo.Token, ToMasterID: $scope.SearchInfo.TID, MessageType: 4, Message: $scope.ServiceRequestMessage, TaskDateTime: today, LocID :$scope.SearchInfo.LocID,CurrentTaskDate : currentTaskDate } }).success(function (data) {
+        //Send Service Request
+        $scope.sendServiceRequest = function () {
+            if ($rootScope._userInfo.IsAuthenticate == true) {
+                var currentTaskDate = moment().format('DD-MMM-YYYY hh:mm A');
+                $http({ method: 'post', url: GURL + 'ewtSaveMessage', data: { TokenNo: $rootScope._userInfo.Token, ToMasterID: $scope.SearchInfo.TID, MessageType: 4, Message: $scope.ServiceRequestMessage, TaskDateTime: today, LocID :$scope.SearchInfo.LocID,CurrentTaskDate : currentTaskDate } }).success(function (data) {
 
-                        if (data.IsSuccessfull) {
-                            $('#ServiceRequest_popup').slideUp();
-                            $scope.ServiceRequestMessage = "";
-                            Notification.success({ message: 'Message send success', delay: MsgDelay });
-                        }
-                        else {
-                            Notification.error({ message: 'Sorry..! Message not send ', delay: MsgDelay });
-                        }
-                    });
-                }else {
-                    //Redirect to Login page
-                    $('#SignIn_popup').slideDown();
-                }
-            };
+                    if (data.IsSuccessfull) {
+                        $('#ServiceRequest_popup').slideUp();
+                        $scope.ServiceRequestMessage = "";
+                        Notification.success({ message: 'Message send success', delay: MsgDelay });
+                    }
+                    else {
+                        Notification.error({ message: 'Sorry..! Message not send ', delay: MsgDelay });
+                    }
+                });
+            }else {
+                //Redirect to Login page
+                $('#SignIn_popup').slideDown();
+            }
+        };
 
-            // Close Service Request Form
-            $scope.closeServiceRequestForm = function () {
-                $('#ServiceRequest_popup').slideUp();
-                $scope.ServiceRequestMessage = "";
-            };
+        // Close Service Request Form
+        $scope.closeServiceRequestForm = function () {
+            $('#ServiceRequest_popup').slideUp();
+            $scope.ServiceRequestMessage = "";
+        };
 
         //open CV form
         $scope.openCVForm = function() {
@@ -524,38 +462,16 @@ angular.module('ezeidApp').
         };
 
         $scope.getdirections = function (data) {
+            $scope.activeTemplate = "html/mapPopView.html";
             $scope.showMapPopupModel = true;
 
-            /*var start = new google.maps.LatLng($rootScope.CLoc.CLat, $rootScope.CLoc.CLong);
             var end = new google.maps.LatLng(data.Latitude, data.Longitude);
-            directionsDisplay.setMap(map);
-            var request = {
-                origin: start,
-                destination: end,
-                travelMode: google.maps.TravelMode.DRIVING
-            };
-            directionsService.route(request, function (response, status) {
-                if (status == google.maps.DirectionsStatus.OK) {
-                    directionsDisplay.setDirections(response);
-                }
-            });*/
-        };
-
-        //View Directions
-        $scope.viewDirections = function (data) {
-
-            var start = new google.maps.LatLng($rootScope.CLoc.CLat, $rootScope.CLoc.CLong);
-            var end = new google.maps.LatLng(data.Latitude, data.Longitude);
-
             var userLoc = {
-                startLat: $rootScope.CLoc.CLat,
-                startLong: $rootScope.CLoc.CLong,
                 endLat: data.Latitude,
                 endLong : data.Longitude
             };
 
-            $window.localStorage.setItem("directionLocation", JSON.stringify(userLoc));
-            $window.open(GURL+"viewdirection", '_blank');
+            $window.localStorage.setItem("myLocation", JSON.stringify(userLoc));
         };
 
         //open working hour popup
@@ -566,7 +482,6 @@ angular.module('ezeidApp').
             }
             else
             {
-                console.log($scope.SearchInfo);
                 $scope.showWorkingHourModel = true;
                 $http({ method: 'get', url: GURL + 'ewtGetWorkingHrsHolidayList?Token=' + $rootScope._userInfo.Token + '&LocID=' + $scope.SearchInfo.LocID }).success(function (data)
                 {
@@ -620,7 +535,6 @@ angular.module('ezeidApp').
                         // Notification.error({ message: 'Invalid key or not found…', delay: MsgDelay });
                     }
                 });
-
                 // $('#WorkingHour_popup').slideDown();
             }
         };

@@ -1,5 +1,5 @@
 (function(){
-    angular.module('ezeidApp').directive('transaction-item', ['$compile','$templateCache',function ($compile,$templateCache) {
+    angular.module('ezeidApp').directive('transactionItem', ['$compile','$templateCache',function ($compile,$templateCache) {
 
         var getTemplate = function(templateType) {
             var template = '';
@@ -31,11 +31,11 @@
                 templateType = parseInt(scope.itemListType);
             }
             catch(ex){
-
+                templateType = 0;
             }
             element.html(getTemplate(templateType)).show();
             $compile(element.contents())(scope);
-        }
+        };
 
 
         return {
@@ -45,7 +45,9 @@
             scope: {
                 itemListType : '=',
                 item:'=',
-                removeItem : '&'
+                removeItem : '&',
+                editPermission : '=',
+                editMode : '='
             }
         };
     }]);

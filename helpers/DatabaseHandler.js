@@ -5,7 +5,8 @@
 //Get the Libraries
 
 var mysql = require('mysql'),
- db_server = "10.0.100.223",//Name of the Server.
+ //db_server = "10.0.100.223",//Name of the Server.
+ db_server = "182.73.205.244",//Name of the Server.
  db_port = 3306, //Integers please.
 db_collection = "ezeid"; //Name of DB Collection
 
