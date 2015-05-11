@@ -4892,13 +4892,36 @@ exports.FnGetStatusType = function (req, res) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
-
+                        var StatusAllOpen = 
+                            {
+                                        TID:'-1',
+                                        MasterID:'0',
+                                        StatusTitle:'Status All Open',
+                                        ProgressPercent:0,
+                                        Status:1,
+                                        NotificationMsg:"",
+                                        NotificationMailMsg:"",
+                                        StatusValue:"11"
+                                    };
+                            var StatusAll = {
+                                        TID:'-2',
+                                        MasterID:'0',
+                                        StatusTitle:'Status All',
+                                        ProgressPercent:0,
+                                        Status:1,
+                                        NotificationMsg:"",
+                                        NotificationMailMsg:"",
+                                        StatusValue:"12"
+                                    };
+                     
+                        
                         var query = db.escape(Token) + ',' + db.escape(FunctionType);
                         db.query('CALL pGetStatusType(' + query + ')', function (err, StatusResult) {
                             if (!err) {
                                 if (StatusResult != null) {
                                     if (StatusResult[0].length > 0) {
-
+                                        StatusResult[0].unshift(StatusAll);
+                                        StatusResult[0].unshift(StatusAllOpen);
                                         console.log('FnGetStatusType: Status type details Send successfully');
                                         res.send(StatusResult[0]);
                                     }
