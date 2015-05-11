@@ -1,0 +1,215 @@
+﻿<script>
+    //To input numbers only
+    function isNumberKey(evt)
+    {
+        var charCode = (evt.which) ? evt.which : event.keyCode
+        if (charCode > 31 && (charCode < 48 || charCode > 57))
+            return false;
+
+        return true;
+    }
+
+
+</script>
+<div>
+    <form name="SignInForm" novalidate ng-submit="SignInForm.$valid && SignInCtrl.LoginUser(SignInCtrl.LInfo,SignInForm)">
+        <div class="Popup_window form_style" id="SignIn_popup">
+        <div class="window_page wdLogin Maping_popup">
+            <span ng-click="SignInCtrl.reset(SignInForm)" class="closelink">X</span>
+            <div class="logo_style">
+                <span class="logo_container">EZEID</span>
+            </div>
+            <div class="signIn_style">
+                <span class="signIn">Sign In</span>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 col-md-offset-4">
+                </div>
+            </div>
+            <div class="clearfix mobile_marT15px"></div>
+            <div class="row">
+                <div class="col-lg-12">
+                    <ul style="margin-top:10px!important;" class="pad0px">
+                        <li class="dsp_block padT10px">
+                            <div class="pull-left wd48p marL10px">
+                                <input type="text" name="UserName" id="UserName" autofocus="autofocus" style='text-transform:uppercase' class="form-control wd10_px user_input mar_leftInp emptyBox"  ng-class="SignInForm.UserName.$touched && !SignInCtrl.LInfo.UserName.length ? 'mandatoryTextBox' : ''" ng-model="SignInCtrl.LInfo.UserName" placeholder="Type EZE ID" required />
+                            </div>
+                            <div class="clearfix mob_marT15px"></div>
+                            <div class="pull-left wd48p marL10px">
+                                <input type="password" name="Password" class="form-control wd10_px mar_leftInp emptyBox" ng-class="SignInForm.Password.$touched && !SignInCtrl.LInfo.Password.length ? 'mandatoryTextBox' : ''" ng-model="SignInCtrl.LInfo.Password" placeholder="Password" required>
+                            </div>
+                            <div class="clearfix"></div>
+                            <div class="pull-left wd48p">
+                                <div id="honeypot-div" ng-hide="true">
+                                    If you see this, leave this form field blank
+                                    and invest in CSS support.
+                                    <input type="text" name="capHoney" ng-model="SignInCtrl.Captcha" class="form-control" value="" />
+                                </div>
+                            </div>
+                            <div class="clearfix"></div>
+                            <span class="pull-left msg_login" ng-model="SignInCtrl.FMessage" style="color:red;">{{SignInCtrl.FMessage}}</span>
+                            <div class="clearfix"></div>
+                        </li>
+                    </ul>
+                </div>
+                <div class="clearfix"></div>
+                <div class="row quick_butt">
+                    <div class="col-md-12 col-md-offset">
+                        <input type="submit" ng-disabled="!SignInCtrl.LInfo.UserName || !SignInCtrl.LInfo.Password" class="btn btn-primary wdButt1 pull-left marLL10px" value="Sign In"/>
+                        <input type="button" ng-click="SignInCtrl.reset(SignInForm)" class="btn btn-primary wdButt1 signin_cancel marL10px" value="Close"/>
+                    </div>
+                </div>
+                <div class="clearfix mob_marT15px"></div>
+                <div class="row">
+                    <div class="col-md-12 col-md-offset-3">
+                        <!--<a href="#" class="marL110px" id="forgetPasswd" ng-click="SignInCtrl.openQuickSignUpForm()">Quick Sign Up</a>  |-->
+                        <a href="/signup" class="">Full Sign Up</a>  |
+                        <a href class="" id="forgetPasswd" ng-click="SignInCtrl.openForgotPasswordForm()">Forgot Password ?</a>
+                    </div>
+                </div>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    </form>
+
+    <div class="Popup_window form_style no_select" id="forgot-password">
+    <div class="window_page wd_forgetPass Maping_popup">
+        <span ng-click="SignInCtrl.closeForgotPasswordForm()" class="closelink">X</span>
+        <h3><span class="mar_forget">Forgot Password ?</span></h3>
+        <form name="forgotPasswordForm" novalidate>
+            <div class="clearfix mobile_marT15px"></div>
+            <ul style="padding-bottom: 11px!important;margin-bottom:8px!important;" class="pad0px">
+                <li class="dsp_block padT10px">
+                    <div class="pull-left wd48p forget_padd">
+                        <input type="text" name="ezeid" class="form-control wd_forget wd_forgetP2 emptyBox" style='text-transform:uppercase' ng-model="SignInCtrl.EzeId" placeholder="Enter Your EZEID"required/>
+                    </div>
+                </li>
+                <div class="clearfix"></div>
+                <li class="dsp_block padT10px forget_padd">
+                    <input type="submit" ng-disabled="!SignInCtrl.EzeId" class="btn btn-primary pull-left wd_forget1" ng-click="SignInCtrl.forgotPassword()" value="Submit"/>
+                    <input type="reset" class="btn btn-primary pull-left signin_cancel wd_forget1 marL10px" ng-click="SignInCtrl.closeForgotPasswordForm()" value="Close"/>
+                </li>
+                <div class="clearfix"></div>
+                <div ng-model="SignInCtrl.ForgotMessage" class="msgRed" ng-show="SignInCtrl.ForgotMessage.length">Error please try again</div>
+                <div class="clearfix"></div>
+            </ul>
+            <div class="clearfix"></div>
+        </form>
+    </div>
+</div>
+
+    <div class="Popup_window form_style" id="ChangePassword_popup">
+    <div class="changePass_popUp Maping_popup">
+        <span class="closelink" ng-click="SignInCtrl.closeChangePasswordForm()">X</span>
+
+        <form name="ChangePasswordForm" novalidate>
+                <span style="margin-top:-2px;float:right; border:1px solid #000000;background:#FAA9A3;color:#000000;" >
+                    Mandatory
+                </span>
+
+             <h3><span class="changePass_mar">Change Password</span></h3>
+        <!--<form name="ChangePasswordForm" novalidate>-->
+            <div class="clearfix mobile_marT15px"></div>
+            <ul style="height:172px;" class="pad0px">
+                <li class="dsp_block padT10px">
+                    <div class="pull-left wd48p">
+                        <input type="password" id="OldPassword" name="OldPassword" ng-class="ChangePasswordForm.OldPassword.$touched && !SignInCtrl.OldPassword.length ? 'mandatoryTextBox' : ''" class="form-control wd_oldPass changePass_inpMar emptyBox change_PadLeft" ng-model="SignInCtrl.OldPassword" placeholder="Old Password" required>
+                    </div>
+                    <div class="clearfix"></div>
+                    <div class="wd48p">
+                        <input type="password" id="NewPassword" name="NewPassword" ng-class="ChangePasswordForm.NewPassword.$touched && !SignInCtrl.NewPassword.length ? 'mandatoryTextBox' : ''" class="form-control wd_oldPass changePass_inpMar emptyBox change_PadLeft" ng-model="SignInCtrl.NewPassword" placeholder="New Password" required>
+                    </div>
+                    <div class="clearfix"></div>
+                    <div class="wd48p">
+                        <input type="password" id="ReEnterPassword" name="ReEnterPassword" ng-class="ChangePasswordForm.ReEnterPassword.$touched && !SignInCtrl.ReEnterPassword.length ? 'mandatoryTextBox' : ''" class="form-control wd_oldPass changePass_inpMar emptyBox change_PadLeft" ng-model="SignInCtrl.ReEnterPassword" placeholder="Reenter Password" required>
+                    </div>
+                </li>
+                <li>
+                    <input type="submit" ng-disabled="!SignInCtrl.OldPassword || !SignInCtrl.NewPassword || !SignInCtrl.ReEnterPassword || SignInCtrl.NewPassword != SignInCtrl.ReEnterPassword" ng-click="SignInCtrl.changePassword()" class="btn btn-primary pull-left mar_forget change_marTop" value="Change">
+                    <input type="reset" ng-click="SignInCtrl.closeChangePasswordForm()" class="btn btn-primary pull-left signin_cancel marL10px change_marTop" value="Close">
+
+                </li>
+            </ul>
+            <br>
+            <h3><span class="changePass_mar1"></span></h3>
+            <div ng-model="SignInCtrl.ErrorMessageConfirm" class="msgRed" ng-show="SignInCtrl.NewPassword != SignInCtrl.ReEnterPassword && SignInCtrl.NewPassword.length > 0 && SignInCtrl.ReEnterPassword.length > 0 || SignInCtrl.ErrorMessage.length > 0">Password mismatch...</div>
+            <div class="clearfix"></div>
+        </form>
+    </div>
+    <div class="clearfix"></div>
+</div>
+
+
+
+<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+    <div class="container-fluid maxWidthEzeid">
+        <div class="navbar-header">
+            <!-- For mobile view -->
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/home"/>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+            
+            <form class="navbar-form navbar-right" role="form">
+               <a class="btn btn-primary" id="signin" ng-hide="$root._userInfo.IsAuthenticate">Sign In</a>
+               <a href="/signup" class="btn btn-primary" ng-hide="$root._userInfo.IsAuthenticate">Sign Up Now</a>
+                <!--<img ng-show="$root._userInfo.IsAuthenticate" class="user_icon" style="border-radius: 18px;margin-right:-46px;" src="{{$root._userInfo.Icon}}"/>-->
+                <img ng-show="$root._userInfo.IsAuthenticate && $root._userInfo.Icon.length" class="user_icon" style="border-radius: 18px;margin-right:-46px;" ng-src="{{$root._userInfo.Icon}}"/>
+                <a id="userid" class="btn btn-primary userMarR" ng-show="$root._userInfo.IsAuthenticate">
+                   {{$root._userInfo.userName}}
+                   <!-- {{$root._userInfo.FirstName}}-->
+
+                    <img style="position:relative; top:-2px;" src="images/drp_arrow.png">
+                </a>
+               <!-- <a href="/home" id="" class="btn btn-primary logOut-hover logMarR orangeSearchButton" title="Logout" ng-click="SignInCtrl.Logout()" ng-show="$root._userInfo.IsAuthenticate">
+                    &lt;!&ndash;<button  ng-disabled="!search.Criteria.Keywords" class="btn btn-primary btn-md btn-block orangeSearchButton" type="submit">Search</button>&ndash;&gt;
+                    <img style="position:relative; top:-2px;" src="images/logout_241.PNG" height="20">
+                </a>-->
+                <button type="submit" href="/home" id="" class="btn btn-primary logOut-hover logMarR orangeSearchButton" title="Logout" ng-click="SignInCtrl.Logout()" ng-show="$root._userInfo.IsAuthenticate">
+                    <!--<button  ng-disabled="!search.Criteria.Keywords" class="btn btn-primary btn-md btn-block orangeSearchButton" type="submit">Search</button>-->
+                    <img style="position:relative; top:-2px;" src="images/logout_241.PNG" height="20">
+                </button>
+                <div class="clearfix"></div>
+
+                <div class="notification_drp" id="userid_popup">
+                    <div class="drp_pointer"></div>
+                    <ul>
+                        <!--<li><a class="dash-icon" href="/home">Home</a></li>-->
+
+                        <li><a class="edit-icon" href="/profile-manager/user">Profile Manager</a></li>
+                        <li ng-show="$root._userInfo.Type == 2 && $root._userInfo.Verified == 2"><a class="bulkMailer-icon" href="/business-manager">Business Manager</a></li>
+                        <li ng-show="$root._userInfo.Type == 2 && $root._userInfo.Verified !== 2"><a class="bulkMailer-icon">Business Manager</a></li>
+                        <!--<li><a class="edit-icon" href="/editprofile">Edit Profile</a></li>-->
+                        <!--<li><a class="addLocation-icon" href="/addloc">Locations</a></li>-->
+
+                        <!--<li ng-show="$root._userInfo.Type == 2 && $root._userInfo.Verified == 2"><a class="business-list" href="/business-preference">Configuration</a></li>-->
+
+                        <li><a class="notification-icon" href="/messages">Messages</a></li>
+
+                        <li ng-show="$root._userInfo.Type == 1"><a class="personal_doc" href="/profile-manager/documents">Personal Documents</a></li>
+
+                        <!--<li ng-show="$root._userInfo.Type == 2 && $root._userInfo.Verified == 2"><a class="business-list" href="/busslist">Business List</a></li>-->
+                        <li ng-show="$root._userInfo.Type == 1"><a class="cv-icon" href="/profile-manager/resume">CV Attachment</a></li>
+                        <li><a class="history-icon" href="/acchist">Access History</a></li>
+                        <li><a class="blacklist-icon" href="/blackwhitelist">Whitelist & Blacklist</a></li>
+                        <li ng-show="$root._userInfo.Type == 2"><a class="bulkMailer-icon" href="/bulksalesenquiry">Bulk Mailer</a></li>
+                        <!--<li><a class="changePass-icon" href ng-click="SignInCtrl.openChangePasswordForm()">Change Password</a></li>-->
+                        <li><a class="changePass-icon" href="/profile-manager/password">Change Password</a></li>
+
+                    </ul>
+                </div>
+            </form>
+        </div><!--/.navbar-collapse -->
+    </div>
+</nav>
+
+</div>
+        <!--- Header comment by sandeep--->

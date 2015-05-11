@@ -357,15 +357,12 @@ angular.module('ezeidApp').
             return defer.promise;
         };
 
+        var test = "";
+
         $scope.validateSignUpData = function(){
             var validationStatus = true;
 
-            var emailPattern = /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
-            var emailRegEx = new RegExp(emailPattern);
-            if(!(emailRegEx.test($scope.email))){
-                $scope.error.email = 'Email ID is invalid';
-                validationStatus *= false;
-            }
+
 
             if($scope.password.length < 4){
                 $scope.error.password = 'Password should be minimum 4 characters';
@@ -390,48 +387,66 @@ angular.module('ezeidApp').
                 }
             }
 
-            if(!$scope.firstName){
-                $scope.error.firstName = 'First Name cannot be empty';
-                validationStatus *= false;
-            }
-
-            if(typeof($scope.firstName) !== "undefined"){
-                if($scope.firstName.length < 1){
-                    $scope.error.firstName = "Last Name cannot be empty";
+            if($scope.userType != 3)
+            {
+                var emailPattern = /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+                var emailRegEx = new RegExp(emailPattern);
+                if($scope.email.length > 0 && !(emailRegEx.test($scope.email))){
+                    $scope.error.email = 'Email ID is invalid';
                     validationStatus *= false;
                 }
-            }
 
-            if(!$scope.lastName){
-                $scope.error.lastName = 'Last Name cannot be empty';
-                validationStatus *= false;
-            }
-
-            if(typeof($scope.lastName) !== "undefined"){
-                if($scope.lastName.length < 1){
-                    $scope.error.lastName = "First Name cannot be empty";
+                if(!$scope.firstName){
+                    $scope.error.firstName = 'First Name cannot be empty';
                     validationStatus *= false;
                 }
-            }
 
-            if(!$scope.about){
-                $scope.error.about = ($scope.userType === 1 || $scope.userType === 2) ?
-                    'Please enter a description about your company' : 'Please enter a description about public place';
-                validationStatus *= false;
-            }
+                if(typeof($scope.firstName) !== "undefined"){
+                    if($scope.firstName.length < 1){
+                        $scope.error.firstName = "Last Name cannot be empty";
+                        validationStatus *= false;
+                    }
+                }
 
-            if(typeof($scope.about) !== "undefined"){
-                if($scope.about.length < 1){
+                if(!$scope.lastName){
+                    $scope.error.lastName = 'Last Name cannot be empty';
+                    validationStatus *= false;
+                }
+
+                if(typeof($scope.lastName) !== "undefined"){
+                    if($scope.lastName.length < 1){
+                        $scope.error.lastName = "First Name cannot be empty";
+                        validationStatus *= false;
+                    }
+                }
+
+                if(!$scope.about){
                     $scope.error.about = ($scope.userType === 1 || $scope.userType === 2) ?
                         'Please enter a description about your company' : 'Please enter a description about public place';
                     validationStatus *= false;
                 }
+
+                if(typeof($scope.about) !== "undefined"){
+                    if($scope.about.length < 1){
+                        $scope.error.about = ($scope.userType === 1 || $scope.userType === 2) ?
+                            'Please enter a description about your company' : 'Please enter a description about public place';
+                        validationStatus *= false;
+                    }
+                }
+
+                if($scope.userType === 1 && typeof($scope.dateOfBirth) === "undefined"){
+                    $scope.error.dateOfBirth = 'Please enter your date of Birth'
+                    validationStatus *= false;
+                }
+
+                if(($scope.userType === 2) && ((!$scope.mobile) && (!$scope.email))){
+                    console.log('Email or Mobile cannot be empty');
+                    $scope.error.contact = 'Email or Mobile cannot be empty';
+                    validationStatus *= false;
+                }
             }
 
-            if($scope.userType === 1 && typeof($scope.dateOfBirth) === "undefined"){
-                $scope.error.dateOfBirth = 'Please enter your date of Birth'
-                validationStatus *= false;
-            }
+
 
             if($scope.isPinApplicable){
                 var parsePin = parseInt($scope.pin);
@@ -496,7 +511,7 @@ angular.module('ezeidApp').
                     PostalCode : '' ,
                     PIN : $scope.pin ,
                     PhoneNumber : '' ,
-                    MobileNumber : '' ,
+                    MobileNumber : $scope.mobile ,
                     EMailID : $scope.email ,
                     Picture : '' ,
                     PictureFileName : '' ,

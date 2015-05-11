@@ -45,13 +45,14 @@ angular.module('ezeidApp').
              * @type {{searchType: number}}
              */
 
-
+            var placeDetail = [];
             var searchTypeArr = [];
             searchTypeArr[1] = "EZEID";
             searchTypeArr[2] = "Keywords";
             searchTypeArr[3] = "Job Keywords";
 
-            $scope.searchType = searchTypeArr;
+            /* splice array as index [0] is there, with empty value */
+            $scope.searchType = searchTypeArr.splice(1,3);
 
             var placeHolder = [];
             placeHolder[1] = "Type EZEID here";
@@ -148,8 +149,8 @@ angular.module('ezeidApp').
                 if(resp){
                     $scope.googleMap.getReverseGeolocation($scope.googleMap.currentMarkerPosition.latitude,
                         $scope.googleMap.currentMarkerPosition.longitude).then(function(resp){
-                            var placeDetail = $scope.googleMap.parseReverseGeolocationData(resp.data);
-                            console.log(placeDetail);
+                            $scope.placeDetail = $scope.googleMap.parseReverseGeolocationData(resp.data);
+
                         },function(){
 
                         });

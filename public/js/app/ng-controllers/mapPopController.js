@@ -26,6 +26,7 @@ angular.module('ezeidApp').controller('mapPopController',[
     $scope.showDirectionPannel= false;
     $scope.enableButtons = false;
     $scope.showEmailForm = false;
+    $scope.routePloted = false;
     var finalImageSrc = "";
     $scope.ToMailID = "";
     $scope.modalBox = {
@@ -44,6 +45,7 @@ angular.module('ezeidApp').controller('mapPopController',[
             center :currentLoc
         };
         map = new google.maps.Map(document.getElementById('map-canvasH1'),mapOptions);
+
         directionsDisplay.setMap(map);
         directionsDisplay.setPanel(document.getElementById('directions-panel'));
 
@@ -78,7 +80,6 @@ angular.module('ezeidApp').controller('mapPopController',[
         }
     }
     function PlaceCurrentLocationMarker(location) {
-
         if (marker != undefined) {
             marker.setMap(null);
         }
@@ -94,15 +95,37 @@ angular.module('ezeidApp').controller('mapPopController',[
         map.setCenter(location);
     }
 
-    //to show route and direction panel
-    $scope.getdirections = function () {
-        //Below line is for Loading img
-        $scope.$emit('$preLoaderStart');
+    //To show route
+    $scope.plotRoute = function () {
+        $scope.ToMailID1 = "";
+        if(!$scope.routePloted)
+        {
+            drowRoute();
+        }
+    };
+
+    //To show direction panel
+    $scope.showDirections = function () {
+        $scope.ToMailID1 = "";
         $scope.showDirectionPannel = true;
+        if(!$scope.routePloted)
+        {
+            drowRoute();
+        }
+        else{
+            $timeout(function(){
+                convertasbinaryimage();
+                $scope.enableButtons = true;
+            },8000);
+        }
+    };
+
+    function drowRoute()
+    {
+       // $scope.$emit('$preLoaderStart');
         directtionLatLong = JSON.parse($window.localStorage.getItem("myLocation"));
 
-        /*var start = new google.maps.LatLng($rootScope.CLoc.CLat, $rootScope.CLoc.CLong);*/
-        var start = new google.maps.LatLng(12.295810, 76.639381);
+        var start = new google.maps.LatLng($rootScope.CLoc.CLat, $rootScope.CLoc.CLong);
         var end = new google.maps.LatLng($scope.searchResult12);
         directionsDisplay.setMap(map);
         var request = {
@@ -113,21 +136,26 @@ angular.module('ezeidApp').controller('mapPopController',[
         directionsService.route(request, function (response, status) {
             if (status == google.maps.DirectionsStatus.OK) {
                 directionsDisplay.setDirections(response);
+
                 $timeout(function(){
                     convertasbinaryimage();
                     $scope.enableButtons = true;
                 },8000);
             }
         });
-    };
+        $scope.routePloted = true;
+    }
 
     // Print direction Html
     $scope.printHtml = function () {
-        var printContents = document.getElementById("googlemapimage").innerHTML;
-        var popupWin = window.open('', '_blank', 'width=300,height=300');
-        popupWin.document.open();
-        popupWin.document.write('<html><head><link rel="stylesheet" type="text/css" href="style.css" /></head><body onload="window.print()">' + printContents + '</html>');
-        popupWin.document.close();
+        $window.print();
+
+            var printContents = document.getElementById("googlemapimage").innerHTML;
+            var popupWin = $window.open('', '_blank', 'width=500,height=500');
+
+            popupWin.document.open();
+            popupWin.document.write('<html><head><link rel="stylesheet" type="text/css" href="style.css" /></head><body onload="window.print()">' + printContents + '</html>');
+            popupWin.document.close();
     };
 
     function convertasbinaryimage()
@@ -140,7 +168,7 @@ angular.module('ezeidApp').controller('mapPopController',[
                 img = img.replace('data:image/png;base64,', '');
                 finalImageSrc = 'data:image/jpg;base64,' + img;
                 $('#googlemapbinary').attr('src', finalImageSrc);
-                $scope.$emit('$preLoaderStop');
+               // $scope.$emit('$preLoaderStop');
                 return false;
             }
         });
@@ -148,10 +176,10 @@ angular.module('ezeidApp').controller('mapPopController',[
 
     // EMail direction Html
     $scope.emailHtml = function () {
+        $scope.ToMailID1 = "";
        if($rootScope._userInfo.IsAuthenticate == false)
         {
             $('#SignIn_popup').slideDown();
-            $scope.ToMailID1 = "";
         }
         else
         {

@@ -251,7 +251,7 @@
                                                                             type="text"
                                                                             min-length="1"
                                                                             max-length="100"
-                                                                            placeholder="{{(userType == 2) ? 'About Company': 'About Public Place'}}"
+                                                                            placeholder="{{(userType == 2) ? 'Company Tagline': 'Tagline for Public Place'}}"
                                                                             ng-class="(signUpForm.about.$dirty && signUpForm.about.$modelValue.length < 1) ? 'mandatoryTextBox' : ''"
                                                                             ng-change="signUpForm.about.$setDirty()"
                                                                             class="form-control emptyBox" />
@@ -349,7 +349,24 @@
                                                                 </div>
                                                                 <small class="text-danger">{{error.email}}</small>
                                                             </div>
+
+                                                            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                                                                <div class="form-group">
+                                                                    <input
+                                                                            name="mobile"
+                                                                            ng-model="mobile"
+                                                                            type="text"
+                                                                            min-length="10"
+                                                                            max-length="12"
+                                                                            placeholder="Mobile"
+                                                                            ng-class="(signUpForm.mobile.$dirty && signUpForm.mobile.$modelValue.length < 1) ? 'mandatoryTextBox' : ''"
+                                                                            class="form-control emptyBox" />
+                                                                </div>
+                                                                <small class="text-danger">{{error.contact}}</small>
+                                                            </div>
                                                         </div>
+
+
 
 
 

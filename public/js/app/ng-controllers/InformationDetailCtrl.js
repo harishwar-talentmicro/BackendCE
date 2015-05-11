@@ -49,6 +49,7 @@ angular.module('ezeidApp').
         $scope.showWorkingHourModel = false;
         $scope.showMapPopupModel = false;
         $scope.showDetailsModal = true;
+        $scope.showNoticeText = true;
         $scope.form_rating = 0;
 
         $scope.modalBox = {
@@ -59,10 +60,10 @@ angular.module('ezeidApp').
         var TID =  $routeParams.TID;
         $scope.SearchType = $routeParams.searchType;
 
-        console.log($rootScope._userInfo);
+       // console.log($rootScope._userInfo);
 
 
-        if((!$rootScope._userInfo) && ($scope.SearchType == 1))
+       /* if((!$rootScope._userInfo) && ($scope.SearchType == 1))
         {
             // login popoup
             $('#SignIn_popup').slideDown();
@@ -79,10 +80,11 @@ angular.module('ezeidApp').
                 // To get about Company
                 getAboutComapny();
             }
-        }
+        }*/
 
 
-
+        getSearchInformation(TID,$scope.SearchType);
+        getAboutComapny();
 
 
         //Below function is for getting search information
@@ -102,8 +104,16 @@ angular.module('ezeidApp').
                 $http({ method: 'get', url: GURL + 'ewtGetSearchInformation?Token=' + $rootScope._userInfo.Token + '&TID=' + _TID + '&SearchType=' + _SearchType + '&CurrentDate=' + currentDate}).success(function (data) {
                     $rootScope.$broadcast('$preLoaderStop');
                     if (data != 'null') {
+
+                        console.log(data);
                         $timeout(function () {
                             $scope.SearchInfo = data[0];
+
+                            if(TID == $scope.SearchInfo.LocID)
+                            {
+                                $scope.showNoticeText = false;
+                            }
+
                             $scope.showSalesEnquiry = $scope.SearchInfo.VisibleModules[0];
                             $scope.showHomeDelivery = $scope.SearchInfo.VisibleModules[1];
                             $scope.shoReserVation = $scope.SearchInfo.VisibleModules[2];
@@ -164,7 +174,7 @@ angular.module('ezeidApp').
         {
             $http({ method: 'get', url: GURL + 'ewtCompanyProfile?TID=' + TID}).success(function (data) {
                 $rootScope.$broadcast('$preLoaderStop');
-                if (data != 'null') {
+                if (data.Result.length > 0) {
                         $scope.companyTagLine = data.Result[0].TagLine;
                 }
             });

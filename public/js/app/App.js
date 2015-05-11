@@ -111,7 +111,10 @@
 
     ezeid.config(['$routeProvider','$httpProvider','$locationProvider',function($routeProvider,$httpProvider,$locationProvider){
         $routeProvider
-            .when('/',{templateUrl: 'html/home.html'})
+            .when('/',{
+                templateUrl: 'html/landing.html',
+                controller : 'LandingPageCtrl'
+            })
             .when('/messages',{templateUrl: 'html/messages.html'})
             .when('/acchist',{templateUrl: 'html/accesshistory.html'})
             .when('/busslist',{templateUrl: 'html/businesslist.html'})
