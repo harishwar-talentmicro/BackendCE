@@ -25,6 +25,7 @@
                     prefix = '';
                 }
                 var decimal = parseFloat(numStr);
+                console.log(decimal);
                 if(isNaN(decimal)){
                     return prefix + ' ' + zero.toFixed(2);
                 }
