@@ -23,7 +23,7 @@ angular.module('ezeidApp').controller('mapPopController',[
              GoogleMaps){
 
 
-
+        var directtionLatLong;
         /* integrate google map */
         var googleMap = new GoogleMaps();
 
@@ -76,9 +76,17 @@ angular.module('ezeidApp').controller('mapPopController',[
 
         };
 
-
+        // To initialize map
         initializeMap();
 
+        //To show route
+        $scope.plotRoute = function () {
+            console.log("sai22");
+            directtionLatLong = JSON.parse($window.localStorage.getItem("myLocation"));
+            console.log(directtionLatLong);
+            googleMap.renderDirection('directionPannel',googleMap.currentMarkerPosition.latitude,googleMap.currentMarkerPosition.longitude,directtionLatLong.endLat,directtionLatLong.endLong);
+
+        };
 
 
 
