@@ -6613,7 +6613,7 @@ exports.FnSaveTranscation = function(req, res){
         }
         if(FolderRuleID.toString() == 'NaN')
             FolderRuleID=0;
-        if (Token != null && ItemsList.length != 'undefined' && ItemsList.length != 0 && ItemsList != null) {
+        if (Token != null && ItemsList != null) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
@@ -8526,7 +8526,7 @@ exports.FnSendBulkMailer = function (req, res) {
                     if (!err) {
                         if (Result != null) {
                             //var query = db.escape(Token) + ', ' +db.escape(TID);
-                            var query = 'Select FirstName, LastName, CompanyName,ifnull(SalesMailID,"shailesh.singh009@gmail.com") as SalesMailID from tmaster where TID in (' + TID + ')';
+                            var query = 'Select FirstName, LastName, CompanyName,ifnull(SalesMailID,"") as SalesMailID from tmaster where TID in (' + TID + ')';
                             console.log(query);
                             db.query(query, function (err, GetResult) {
                                 if (!err) {

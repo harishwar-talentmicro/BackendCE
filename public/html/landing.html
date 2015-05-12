@@ -13,10 +13,11 @@
                 <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 col-lg-offset-3 col-md-offset-3 col-sm-offset-3 col-xs-offset-0">
                     <div class="input-group p-bottom-3">
                         <div class="input-group-btn">
-                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><b>{{searchType[searchParams.searchType]}}</b> <span class="caret"></span></button>
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><b>{{searchType[searchParams.searchType - 1]}}</b> <span class="caret"></span></button>
                             <ul class="dropdown-menu" role="menu">
                                 <li class="btn-link" ng-repeat="search in searchType track by $index">
-                                    <a class="btn-link" ng-click="($event.preventDefault())(searchParams.searchType = $index) (searchParams.searchTerm = '')">{{search}}</a>
+                                    <!-- Index incremented by 1: As the array's default index is [0,1,2] & searchType's value is [1,2,3] -->
+                                    <a class="btn-link" ng-click="($event.preventDefault())(searchParams.searchType = $index + 1) (searchParams.searchTerm = '')">{{search}}</a>
                                 </li>
                             </ul>
                         </div>
@@ -185,44 +186,6 @@
     </div>
 
     <!-- Footer goes here -->
-    <div class="footer-page hpw">
-        <div class="container width-81 text-center">
-            <div class="col-lg-4">
-                <h4 class="text-white text-left text-bolder text-uppercase">About EZEID</h4>
-                <hr class="style-one">
-                <p class="text-white text-justify font-open-sans-light">EZE ID is first of its kind online identification, locating and online business platform that works for both
-                    Individuals and Business Organizations. Coexistence of People and Business Organization make it unique and easy
-                    to create better living and do the business much faster than any other methods in the industry.</p>
-            </div>
-            <div class="col-lg-3">
-                <h4 class="text-white font-roboto text-bolder text-left">Follow Us</h4>
-                <hr>
-                <ul class="list-unstyled no-padding text-left">
-                    <li class="border-bottom-gray p-5 footer-list pointer"><i class="fa fa-facebook footer-icon-style"></i> Facebook</li>
-                    <li class="border-bottom-gray p-5 footer-list pointer"><i class="fa fa-linkedin footer-icon-style"></i> Linkedin</li>
-                    <li class="border-bottom-gray p-5 footer-list pointer"><i class="fa fa-pinterest footer-icon-style"></i> Pinterest</li>
-                    <li class="p-5 footer-list pointer"><i class="fa fa-twitter footer-icon-style"></i> Twitter</li>
-
-                </ul>
-            </div>
-            <div class="col-lg-3">
-                <h4 class="text-white font-roboto text-bolder text-left">Information</h4>
-                <hr>
-                <ul class="list-unstyled no-padding text-left">
-                    <li class="border-bottom-gray p-5 footer-list pointer"> Contact Us</li>
-                    <li class="border-bottom-gray p-5 footer-list pointer"> Legal</li>
-                </ul>
-            </div>
-            <div class="col-lg-2">
-                <h4 class=" font-open-sans text-sky-blue text-left">&nbsp;</h4>
-
-                <ul class="list-unstyled no-padding text-left">
-                    <li class="p-5  pointer text-center green"><i class="fa fa-apple"></i> <b>Apple Store</b></li>
-                    <li class="p-5  pointer text-center ">&nbsp;</li>
-                    <li class="p-5  pointer text-center p-top-10 blue"><i class="fa fa-google"></i> <b>Play Store</b></li>
-                </ul>
-            </div>
-        </div>
-    </div>
+    <footer-section></footer-section>
     <!-- Footer Ends here -->
 </section>
