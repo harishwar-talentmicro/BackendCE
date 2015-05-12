@@ -505,6 +505,32 @@ angular.module('ezeidApp').factory('GoogleMaps',['$q','$timeout','$compile',func
         }
     };
 
+    /**
+     * Render direction on map
+     */
+    GoogleMap.renderDirection = function(directionPanelId,startLatitude,startLongitude,endLatitude,endLongitude){
+        var _this = this;
+        var directionsDisplay = new google.maps.DirectionsRenderer();;
+        var directionsService = new google.maps.DirectionsService();
+
+        directionsDisplay.setMap(_this.map);
+        directionsDisplay.setPanel(document.getElementById('directions-panel'));
+
+        var start = _this.createGMapPosition(startLatitude,startLongitude);
+        var end = _this.createGMapPosition(endLatitude,endLongitude);
+
+        var request = {
+            origin: start,
+            destination: end,
+            travelMode: google.maps.TravelMode.DRIVING
+        };
+        directionsService.route(request, function(response, status) {
+            if (status == google.maps.DirectionsStatus.OK) {
+                directionsDisplay.setDirections(response);
+            }
+        });
+
+    };
     return GoogleMap;
 
 

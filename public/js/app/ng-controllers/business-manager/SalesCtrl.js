@@ -174,7 +174,7 @@
                   ezeid : '',
                   statusType : 0,
                   notes : '',
-                  locId : 0,
+                  locId : '',
                   country : '',
                   state : '',
                   city : '',
@@ -344,9 +344,11 @@
              *
              */
             $scope.resolveGelocationAddress = function(){
+                $scope.modalBox.tx.address = '';
                 if(!$scope.modalBox.tx.locId){
                     return;
                 }
+
                 $scope.$emit('$preLoaderStart');
                 var locIndex = $scope.modalBox.locationList.indexOfWhere("TID",parseInt($scope.modalBox.tx.locId));
                 if(locIndex === -1){
@@ -355,6 +357,8 @@
                 }
                 var lat = $scope.modalBox.locationList[locIndex].Latitude;
                 var lng = $scope.modalBox.locationList[locIndex].Longitude;
+                $scope.modalBox.tx.address = $scope.modalBox.locationList[locIndex].AddressLine1+' ' +
+                    $scope.modalBox.locationList[locIndex].AddressLine2;
                 var googleMap = new GoogleMap();
                 googleMap.getReverseGeolocation(lat,lng).then(function(resp){
                     $scope.$emit('$preLoaderStop');
@@ -402,7 +406,7 @@
                         ezeid : '',
                         statusType : 0,
                         notes : '',
-                        locId : 0,
+                        locId : '',
                         country : '',
                         state : '',
                         city : '',
@@ -838,6 +842,15 @@
                 },1000);
 
             });
+
+
+            /**
+             * Saving transaction in
+             * @param editMode
+             */
+            $scope.saveTransaction = function(editMode){
+
+            };
 
         }]);
 
