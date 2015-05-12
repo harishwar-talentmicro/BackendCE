@@ -290,7 +290,9 @@
                                     Details
                                 </button>
                                 <br/>
-                                <button ng-show="editModes[$index]" class="btn btn-xs btn-block btn-success no-radius" data-toggle="tooltip" title="Save">
+                                <button ng-click="saveTransaction()"
+                                        ng-show="editModes[$index]"
+                                        class="btn btn-xs btn-block btn-success no-radius" data-toggle="tooltip" title="Save">
                                     <span class="glyphicon glyphicon-floppy-save"></span>
                                     Save
                                 </button>
@@ -302,7 +304,7 @@
                                 <br/>
                                 <button ng-hide="editModes[$index]" ng-disabled="!salesPermissionConf.txUpdate"
                                         title="{{(salesPermissionConf.txUpdate) ? 'Edit' : 'You do not have permission to edit'}}"
-                                        ng-click="(salesPermissionConf.txUpdate) ? toggleAllEditMode($index) : 0" class="btn btn-xs btn-block btn-warning no-radius">
+                                        ng-click="(salesPermissionConf.txUpdate) ? (toggleAllEditMode($index,true,true)) : 0" class="btn btn-xs btn-block btn-warning no-radius">
                                     <span class="glyphicon glyphicon-pencil"></span>
                                     Edit
                                 </button>
@@ -444,7 +446,7 @@
                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                     <div class="form-group form-group-sm ">
                                         <date-time-picker recipient="modalBox.tx.nextActionDateTime" settings='{
-                                                                    "format" : "d-M-Y H:m:s",
+                                                                    "format" : "d M Y H:m:s",
                                                                     "timepicker" : true,
                                                                     "mask" : false,
                                                                     "hours12" : false,
@@ -644,11 +646,12 @@
                             <small class="text-danger">You do not have permission to edit the enquiry</small>
                         </div>
                       <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6">
-                          <button class="btn btn-info btn-sm no-radius" ng-hide="modalBox.editMode">
+                          <button class="btn btn-info btn-sm no-radius" ng-hide="modalBox.editMode" ng-click="saveTransaction()">
                               <span class="glyphicon glyphicon-hand-right"></span>
                               Proceed to Enquire
                           </button>
-                          <button class="btn btn-success btn-sm no-radius" ng-show="modalBox.editMode"
+                          <button ng-click="saveTransaction()"
+                                  class="btn btn-success btn-sm no-radius" ng-show="modalBox.editMode"
                                   title="(salesPermissionConf.txUpdate) ? 'Update sales enquiry' : 'You do not have editing permission'"
                                   ng-disabled="(!salesPermissionConf.txUpdate)">
                               <span class="glyphicon glyphicon-ok-circle"></span>
