@@ -8540,7 +8540,7 @@ exports.FnSendBulkMailer = function (req, res) {
                     if (!err) {
                         if (Result != null) {
                             //var query = db.escape(Token) + ', ' +db.escape(TID);
-                            var query = 'Select FirstName, LastName, CompanyName,ifnull(SalesMailID,"") as SalesMailID from tmaster where TID in (' + TID + ')';
+                            var query = 'Select FirstName, LastName, CompanyName,ifnull(SalesMailID," ") as SalesMailID from tmaster where TID in (' + TID + ')';
                             console.log(query);
                             db.query(query, function (err, GetResult) {
                                 if (!err) {
