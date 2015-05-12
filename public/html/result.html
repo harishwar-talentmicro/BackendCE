@@ -19,6 +19,7 @@
                 <!-- Collect the nav links, forms, and other content for toggling -->
                 <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                     <div class="row text-center search-bar-center">
+
                         <div class="navbar-form navbar-left no-border " role="search">
                             <!-- Search Bar and advance filter goes here -->
                             <div class="input-group">
@@ -45,6 +46,8 @@
                         <!-- Toggle buttons for switching betweeen maps and list -->
                         <ul class="nav navbar-nav navbar-right">
                             <li class="dropdown p8">
+                                <!-- Select All BTN -->
+                                <button class="btn btn-primary" ng-click=""><i class="fa fa-check-square"></i> Select All</button>
                                 <div class="btn-group">
                                     <button class="btn btn-default" ng-click="toggleMapView(false)"><i class="fa fa-list"></i> List</button>
                                     <button class="btn btn-default" ng-click="toggleMapView(true)"><i class="fa fa-map-marker"></i> Maps</button>

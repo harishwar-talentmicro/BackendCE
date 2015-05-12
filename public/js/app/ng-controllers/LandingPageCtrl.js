@@ -35,7 +35,7 @@ angular.module('ezeidApp').
             MsgDelay,
             $location,
             GoogleMap
-            )
+        )
         {
             /**
              * searchType
@@ -47,6 +47,8 @@ angular.module('ezeidApp').
 
             var placeDetail = [];
             var searchTypeArr = ["EZEID","Keywords","Job Keywords"];
+            var mapLatitude;
+            var mapLongitude;
 
             /* splice array as index [0] is there, with empty value */
             $scope.searchType = searchTypeArr;
@@ -93,7 +95,7 @@ angular.module('ezeidApp').
             $scope.isFilterShown = false;
 
             $scope.toggleFilterContainer = function(e){
-                    $scope.isFilterShown = !$scope.isFilterShown;
+                $scope.isFilterShown = !$scope.isFilterShown;
             };
 
             /**
@@ -143,13 +145,15 @@ angular.module('ezeidApp').
             $scope.googleMap = new GoogleMap();
 
             var promise = $scope.googleMap.getCurrentLocation()
-                promise.then(function(resp){
+            promise.then(function(resp){
                 if(resp){
                     $scope.googleMap.getReverseGeolocation($scope.googleMap.currentMarkerPosition.latitude,
                         $scope.googleMap.currentMarkerPosition.longitude).then(function(resp){
                             placeDetail = $scope.googleMap.parseReverseGeolocationData(resp.data);
                             $scope.locationString = placeDetail.city != ''?'Your current location is: '+placeDetail.city+", "+placeDetail.state:'';
-
+                            /* Setting up default lattitude & longitude of the map */
+                            $scope.mapLatitude = $scope.googleMap.currentMarkerPosition.latitude;
+                            $scope.mapLongitude = $scope.googleMap.currentMarkerPosition.longitude;
                         },function(){
 
                         });
@@ -160,6 +164,65 @@ angular.module('ezeidApp').
             },function(){
                 handleNoGeolocation();
             });
+
+
+            /* Load the map in the modal box */
+            /* Google map integration */
+            var initializeMap = function(){
+                $scope.googleMap.setSettings({
+                    mapElementClass : "col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix class-map-ctrl-style1",
+                    searchElementClass : "form-control pull-left pac-input",
+                    currentLocationElementClass : "link-btn pac-loc",
+                    controlsContainerClass : "col-lg-6 col-md-6'"
+                });
+                $scope.googleMap.createMap("map-ctrl",$scope,"findCurrentLocation()");
+
+                $scope.googleMap.renderMap();
+
+                $scope.googleMap.mapIdleListener().then(function(){
+                    $scope.googleMap.pushMapControls();
+                    $scope.googleMap.listenOnMapControls();
+                    $scope.googleMap.getCurrentLocation().then(function(){
+                        $scope.googleMap.placeCurrentLocationMarker();
+                        $scope.googleMap.resizeMap();
+
+                    },function(){
+                        //populateMarkers();
+                    });
+
+                });
+            };
+
+            var isMapInitialized = false;
+            $scope.modalVisibility = function()
+            {
+                /* toggle map visibility status */
+                $scope.modal.visible = !$scope.modal.visible;
+                /* Now the map is visible */
+                if($scope.modal.visible)
+                {
+                    /* check for the map initialzation */
+                    if(!isMapInitialized){
+                        /* initialize map */
+                        initializeMap();
+                        isMapInitialized = true;
+                    }
+                    else{
+
+
+                        googleMap.resizeMap();
+
+                    }
+                }
+
+            };
+
+
+            $scope.modal = {
+                visible : false,
+                title : 'Change Your Searched Location',
+                class : 'business-manager-modal'
+            };
 
 
 

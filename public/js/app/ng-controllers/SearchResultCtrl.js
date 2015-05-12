@@ -124,8 +124,8 @@ angular.module('ezeidApp').
                     Token: $rootScope._userInfo.Token,
                     SCategory:0,
                     Proximity:_filterValue.proximity,
-                    Latitude:12.295810,
-                    Longitude:76.639381,
+                    Latitude:12.295810,//latitude
+                    Longitude:76.639381,//longitude
                     ParkingStatus:_filterValue.parkingStatus,
                     OpenStatus:_filterValue.openStatus,
                     Rating:_filterValue.rating,

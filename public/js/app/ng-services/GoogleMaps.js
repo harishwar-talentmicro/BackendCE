@@ -151,6 +151,8 @@ angular.module('ezeidApp').factory('GoogleMaps',['$q','$timeout','$compile',func
         zoom : 14
     };
 
+    GoogleMap.prototype.currentLocationMarker = null;
+
     /**
      * Setting Initial settings
      * @desc Allows to change css classes for map canvas, search box, current location button
@@ -289,6 +291,12 @@ angular.module('ezeidApp').factory('GoogleMaps',['$q','$timeout','$compile',func
         for (var i = 0, marker; marker = this.markerList[i]; i++) {
             marker.setMap(null);
         }
+        try{
+            GoogleMap.currentLocationMarker = null;
+        }
+        catch(ex){
+
+        }
     };
 
     GoogleMap.prototype.getCurrentLocation = function(){
@@ -337,13 +345,34 @@ angular.module('ezeidApp').factory('GoogleMaps',['$q','$timeout','$compile',func
         }
     };
 
-    GoogleMap.prototype.placeCurrentLocationMarker = function(dragCallback,callback){
+    GoogleMap.prototype.removeCurrentLocationMarker = function(){
+        try{
+            this.currentLocationMarker.setMap(null);
+        }
+        catch(ex){
+            console.error('Currrent Marker removal unsuccessful');
+        }
+
+    };
+
+    GoogleMap.prototype.placeCurrentLocationMarker = function(dragCallback,callback,clearMarkers){
         if(typeof(dragCallback) == "undefined"){
             dragCallback = null;
         }
-        this.clearAllMarkers();
+        if(typeof(clearMarkers) == "undefined" && clearMarkers){
+            this.clearAllMarkers();
+        }
+        else{
+            if(clearMarkers){
+                this.clearAllMarkers();
+            }
+        }
+
+        this.removeCurrentLocationMarker();
+
         var currentLocation = new google.maps.LatLng(this.currentMarkerPosition.latitude,this.currentMarkerPosition.longitude);
         var marker = this.createMarker(currentLocation,'Your current location',null,true,dragCallback);
+        this.currentLocationMarker = marker;
         this.placeMarker(marker);
         this.map.setCenter(currentLocation);
         this.map.setZoom(14);
@@ -413,25 +442,34 @@ angular.module('ezeidApp').factory('GoogleMaps',['$q','$timeout','$compile',func
         if(geocoderResults && geocoderResults.length > 0){
 
             var results = geocoderResults[0]['address_components'];
-            angular.forEach(results,function(result,index){
-                switch(result.types[0]){
-                    case 'locality':
-                        returnObj.city = (returnObj.city) ? (returnObj.city + ', ' + result.long_name) : result.long_name;
-                        break;
-                    case 'administrative_area_level_1':
-                        returnObj.state =  result.long_name;
-                        break;
-                    case 'postal_code':
-                        returnObj.postalCode = result.long_name;
-                        break;
-                    case 'country':
-                        returnObj.country = result.long_name;
-                        break;
-                    default :
-                        break;
-                }
+            console.log(results);
+            try{
+                angular.forEach(results,function(result,index){
+                    switch(result.types[0]){
+                        case 'locality':
+                            returnObj.city = (returnObj.city) ? (returnObj.city + ', ' + result.long_name) : result.long_name;
+                            break;
+                        case 'administrative_area_level_1':
+                            returnObj.state =  result.long_name;
+                            break;
+                        case 'postal_code':
+                            returnObj.postalCode = result.long_name;
+                            break;
+                        case 'country':
+                            returnObj.country = result.long_name;
+                            break;
+                        case 'sublocality_level_1':
+                            returnObj.area = result.long_name;
+                            break;
+                        default :
+                            break;
+                    }
 
-            });
+                });
+            }
+            catch(ex){
+                console.error('Geolocation data parsing error : '+ ex);
+            }
         }
 
         return returnObj;
