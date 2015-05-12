@@ -152,6 +152,8 @@ angular.module('ezeidApp').factory('GoogleMaps',['$q','$timeout','$compile',func
     };
 
     GoogleMap.prototype.currentLocationMarker = null;
+    GoogleMap.prototype.currentMarkerDragCallBack = null;
+    GoogleMap.prototype.currentMarkerPlaceCallback = null;
 
     /**
      * Setting Initial settings
@@ -356,9 +358,19 @@ angular.module('ezeidApp').factory('GoogleMaps',['$q','$timeout','$compile',func
     };
 
     GoogleMap.prototype.placeCurrentLocationMarker = function(dragCallback,callback,clearMarkers){
-        if(typeof(dragCallback) == "undefined"){
+        if(typeof(dragCallback) == "undefined" || typeof(dragCallback) == "null"){
             dragCallback = null;
         }
+        else{
+            if(dragCallback){
+                GoogleMap.currentMarkerDragCallBack = dragCallback;
+            }
+            else{
+                dragCallback = (GoogleMap.currentMarkerDragCallBack) ? GoogleMap.currentMarkerDragCallBack : null;
+            }
+        }
+
+
         if(typeof(clearMarkers) == "undefined" && clearMarkers){
             this.clearAllMarkers();
         }
@@ -377,9 +389,15 @@ angular.module('ezeidApp').factory('GoogleMaps',['$q','$timeout','$compile',func
         this.map.setCenter(currentLocation);
         this.map.setZoom(14);
         if(callback){
+            this.currentMarkerPlaceCallback = callback;
             $timeout(function(){
                 callback(marker.position.lat(),marker.position.lng());
             },2000);
+        }
+        else{
+            if(this.currentMarkerDragCallBack){
+               this.currentMarkerDragCallBack(marker.position.lat(),marker.position.lng());
+            }
         }
     };
 

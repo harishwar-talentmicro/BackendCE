@@ -68,7 +68,9 @@ angular.module('ezeidApp').
                 rating : '1,2,3,4,5',
                 homeDelivery : false,
                 parkingStatus : 0,
-                openStatus : false
+                openStatus : false,
+                lat:'12.93',
+                lng:'77.57'
             };
 
             var ratingArr = [];
@@ -152,8 +154,8 @@ angular.module('ezeidApp').
                             placeDetail = $scope.googleMap.parseReverseGeolocationData(resp.data);
                             $scope.locationString = placeDetail.city != ''?'Your current location is: '+placeDetail.city+", "+placeDetail.state:'';
                             /* Setting up default lattitude & longitude of the map */
-                            $scope.mapLatitude = $scope.googleMap.currentMarkerPosition.latitude;
-                            $scope.mapLongitude = $scope.googleMap.currentMarkerPosition.longitude;
+                            $scope.searchParams.lat = $scope.googleMap.currentMarkerPosition.latitude;
+                            $scope.searchParams.lng = $scope.googleMap.currentMarkerPosition.longitude;
                         },function(){
 
                         });
@@ -182,16 +184,24 @@ angular.module('ezeidApp').
                 $scope.googleMap.mapIdleListener().then(function(){
                     $scope.googleMap.pushMapControls();
                     $scope.googleMap.listenOnMapControls();
-                    $scope.googleMap.getCurrentLocation().then(function(){
-                        $scope.googleMap.placeCurrentLocationMarker();
+                    $scope.googleMap.resizeMap();
+                    /* place the present location marker on map */
+                    $scope.googleMap.getCurrentLocation().then(function(e){
+                        $scope.googleMap.placeCurrentLocationMarker(getNewCoordinates);
                         $scope.googleMap.resizeMap();
-
                     },function(){
                         //populateMarkers();
                     });
 
                 });
             };
+
+            /* update the coordinates on drag event of map marker */
+            var getNewCoordinates = function(lat,lng)
+            {
+                $scope.searchParams.lat = lat;
+                $scope.searchParams.lng = lng;
+            }
 
             var isMapInitialized = false;
             $scope.modalVisibility = function()
@@ -210,7 +220,7 @@ angular.module('ezeidApp').
                     else{
 
 
-                        googleMap.resizeMap();
+                        $scope.googleMap.resizeMap();
 
                     }
                 }

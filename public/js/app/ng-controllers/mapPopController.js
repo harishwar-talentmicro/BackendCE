@@ -53,7 +53,11 @@ angular.module('ezeidApp').controller('mapPopController',[
                 googleMap.listenOnMapControls();
                 googleMap.getCurrentLocation().then(function(){
                     googleMap.resizeMap();
-                    googleMap.placeCurrentLocationMarker();
+                    googleMap.placeCurrentLocationMarker(function(lat,lng){
+                        console.log(lat+'   '+lng);
+                        googleMap.currentMarkerPosition.latitude = lat;
+                        googleMap.currentMarkerPosition.longitude = lng;
+                    });
                   //  populateMarkers();
                 },function(){
                    // populateMarkers();
@@ -289,9 +293,9 @@ angular.module('ezeidApp').controller('mapPopController',[
               $scope.ToMailID1 = "";
           };*/
 
-        $interval(function(){
-            console.log('exec');
-           console.log( googleMap.currentMarkerPosition);
-        },10000);
+//        $interval(function(){
+//            console.log('exec');
+//           console.log( googleMap.currentMarkerPosition);
+//        },10000);
 
 }]);
