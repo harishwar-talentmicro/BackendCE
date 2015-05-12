@@ -21,16 +21,18 @@
                                 </li>
                             </ul>
                         </div>
-                        <input type="text" ng-keypress="checkEnterKey($event)" placeholder="{{placeHolderText[searchParams.searchType]}}" ng-model="searchParams.searchTerm" ng-class="(searchParams.searchType === 0) ? 'text-uppercase' : ''" class="form-control" aria-label="...">
+                        <input type="text" ng-keypress="checkEnterKey($event)" placeholder="{{placeHolderText[searchParams.searchType - 1]}}" ng-model="searchParams.searchTerm" ng-class="(searchParams.searchType === 1) ? 'text-uppercase' : ''" class="form-control" aria-label="...">
                         <div class="input-group-btn">
-                            <button type="button" class="btn btn-default" title="search" ng-click="triggerSearch()"><i class="fa fa-search"></i> </button>
+                            <!-- Filter BTN -->
                             <button  ng-click="toggleFilterContainer($event,true)"
-                                     type="button" class="btn btn-info dropdown-toggle btn-advanced-filter" data-toggle="dropdown" title="advance search"><i class="fa fa-filter"></i> </button>
+                                     type="button" class="btn btn-default dropdown-toggle btn-advanced-filter" data-toggle="dropdown" title="advance search"><i class="fa fa-filter"></i> </button>
+                            <!-- Search BTN -->
+                            <button type="button" class="btn btn-warning" title="search" ng-click="triggerSearch()"><i class="fa fa-search"></i> </button>
                         </div>
                     </div>
                     <div class="current-location text-center">
                         <p class="text-white">
-                            Your current location is: <i>{{placeDetail.city+", "+placeDetail.state}}</i>
+                            <i>{{locationString}}</i>
                         </p>
                     </div>
                 </div>
