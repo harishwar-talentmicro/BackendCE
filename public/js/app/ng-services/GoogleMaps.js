@@ -508,7 +508,7 @@ angular.module('ezeidApp').factory('GoogleMaps',['$q','$timeout','$compile',func
     /**
      * Render direction on map
      */
-    GoogleMap.renderDirection = function(directionPanelId,startLatitude,startLongitude,endLatitude,endLongitude){
+    GoogleMap.prototype.renderDirection = function(directionPanelId,startLatitude,startLongitude,endLatitude,endLongitude){
         var _this = this;
         var directionsDisplay = new google.maps.DirectionsRenderer();;
         var directionsService = new google.maps.DirectionsService();
