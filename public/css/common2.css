@@ -927,3 +927,39 @@ hr.style-two {
 {
     color: #0FB;
 }
+
+.hpw .fb-icon
+{
+    padding: 3px;
+    padding-left: 5px;
+    padding-right: 5px;
+    background-color: rgb(55, 110, 184);
+}
+
+.hpw .linked-icon
+{
+    background-color: rgb(0, 168, 255);
+    padding: 3px;
+}
+
+.hpw .pinterst-icon
+{
+    background-color: rgb(255, 0, 0);
+    padding: 4px;
+}
+
+.hpw .twitter-icon
+{
+    background-color: rgb(67, 163, 242);
+    padding: 3px;
+}
+
+.hpw .metal-gray
+{
+    background-color: rgb(205, 205, 205);
+}
+
+.hpw .play-store-bg
+{
+    background-color: rgb(10, 165, 165);
+}

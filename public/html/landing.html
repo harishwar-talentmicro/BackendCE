@@ -16,20 +16,23 @@
                             <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><b>{{searchType[searchParams.searchType - 1]}}</b> <span class="caret"></span></button>
                             <ul class="dropdown-menu" role="menu">
                                 <li class="btn-link" ng-repeat="search in searchType track by $index">
+                                    <!-- Index incremented by 1: As the array's default index is [0,1,2] & searchType's value is [1,2,3] -->
                                     <a class="btn-link" ng-click="($event.preventDefault())(searchParams.searchType = $index + 1) (searchParams.searchTerm = '')">{{search}}</a>
                                 </li>
                             </ul>
                         </div>
-                        <input type="text" ng-keypress="checkEnterKey($event)" placeholder="{{placeHolderText[searchParams.searchType]}}" ng-model="searchParams.searchTerm" ng-class="(searchParams.searchType === 0) ? 'text-uppercase' : ''" class="form-control" aria-label="...">
+                        <input type="text" ng-keypress="checkEnterKey($event)" placeholder="{{placeHolderText[searchParams.searchType - 1]}}" ng-model="searchParams.searchTerm" ng-class="(searchParams.searchType === 1) ? 'text-uppercase' : ''" class="form-control" aria-label="...">
                         <div class="input-group-btn">
-                            <button type="button" class="btn btn-default" title="search" ng-click="triggerSearch()"><i class="fa fa-search"></i> </button>
+                            <!-- Filter BTN -->
                             <button  ng-click="toggleFilterContainer($event,true)"
-                                     type="button" class="btn btn-info dropdown-toggle btn-advanced-filter" data-toggle="dropdown" title="advance search"><i class="fa fa-filter"></i> </button>
+                                     type="button" class="btn btn-default dropdown-toggle btn-advanced-filter" data-toggle="dropdown" title="advance search"><i class="fa fa-filter"></i> </button>
+                            <!-- Search BTN -->
+                            <button type="button" class="btn btn-warning" title="search" ng-click="triggerSearch()"><i class="fa fa-search"></i> </button>
                         </div>
                     </div>
                     <div class="current-location text-center">
                         <p class="text-white">
-                            Your current location is: <i>{{placeDetail.city+", "+placeDetail.state}}</i>
+                            <i>{{locationString}}</i>
                         </p>
                     </div>
                 </div>

@@ -144,86 +144,14 @@
 
 
 
-    <!--<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">-->
-        <!--<div class="container-fluid maxWidthEzeid">-->
-            <!--<div class="navbar-header">-->
-                <!--&lt;!&ndash; For mobile view menu &ndash;&gt;-->
-                <!--<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">-->
-                    <!--<span class="sr-only">Toggle navigation</span>-->
-                    <!--<span class="icon-bar"></span>-->
-                    <!--<span class="icon-bar"></span>-->
-                    <!--<span class="icon-bar"></span>-->
-                <!--</button>-->
-                <!--<a class="navbar-brand" href="/home"/>-->
-            <!--</div>-->
-            <!--<div id="navbar" class="navbar-collapse collapse">-->
-
-                <!--<form class="navbar-form navbar-right" role="form">-->
-                    <!--&lt;!&ndash; Sign in link &ndash;&gt;-->
-                    <!--<a class="btn btn-primary" id="signin" ng-hide="$root._userInfo.IsAuthenticate">Sign In</a>-->
-                    <!--&lt;!&ndash; Sign up link &ndash;&gt;-->
-                    <!--<a href="/signup" class="btn btn-primary" ng-hide="$root._userInfo.IsAuthenticate">Sign Up Now</a>-->
-
-                    <!--&lt;!&ndash; ???? &ndash;&gt;-->
-                    <!--<img ng-show="$root._userInfo.IsAuthenticate && $root._userInfo.Icon.length" class="user_icon" style="border-radius: 18px;margin-right:-46px;" ng-src="{{$root._userInfo.Icon}}"/>-->
-
-                    <!--&lt;!&ndash; User Menu dropdown  &ndash;&gt;-->
-                    <!--<a id="userid" class="btn btn-primary userMarR" ng-show="$root._userInfo.IsAuthenticate">-->
-                        <!--&lt;!&ndash; User's name &ndash;&gt;-->
-                        <!--{{$root._userInfo.userName}}-->
-                        <!--&lt;!&ndash; Not Required &ndash;&gt;-->
-                        <!--<img style="position:relative; top:-2px;" src="images/drp_arrow.png">-->
-                    <!--</a>-->
-
-                    <!--&lt;!&ndash; Log Out btn &ndash;&gt;-->
-                    <!--<button type="submit" href="/home" id="" class="btn btn-primary logOut-hover logMarR orangeSearchButton" title="Logout" ng-click="SignInCtrl.Logout()" ng-show="$root._userInfo.IsAuthenticate">-->
-                        <!--<img style="position:relative; top:-2px;" src="images/logout_241.PNG" height="20">-->
-                    <!--</button>-->
-                    <!--<div class="clearfix"></div>-->
-
-                    <!--&lt;!&ndash; User's detailed menu &ndash;&gt;-->
-                    <!--<div class="notification_drp" id="userid_popup">-->
-                        <!--<div class="drp_pointer"></div>-->
-                        <!--<ul>-->
-                            <!--&lt;!&ndash; Profile manager &ndash;&gt;-->
-                            <!--<li><a class="edit-icon" href="/profile-manager/user">Profile Manager</a></li>-->
-                            <!--&lt;!&ndash; condition1: Business Manager &ndash;&gt;-->
-                            <!--<li ng-show="$root._userInfo.Type == 2 && $root._userInfo.Verified == 2"><a class="bulkMailer-icon" href="/business-manager">Business Manager</a></li>-->
-                            <!--&lt;!&ndash; condition2: Business Manager &ndash;&gt;-->
-                            <!--<li ng-show="$root._userInfo.Type == 2 && $root._userInfo.Verified !== 2"><a class="bulkMailer-icon">Business Manager</a></li>-->
-                            <!--&lt;!&ndash; Message &ndash;&gt;-->
-                            <!--<li><a class="notification-icon" href="/messages">Messages</a></li>-->
-                            <!--&lt;!&ndash; Personal documents &ndash;&gt;-->
-                            <!--<li ng-show="$root._userInfo.Type == 1"><a class="personal_doc" href="/profile-manager/documents">Personal Documents</a></li>-->
-                            <!--&lt;!&ndash; CV Attachment &ndash;&gt;-->
-                            <!--<li ng-show="$root._userInfo.Type == 1"><a class="cv-icon" href="/profile-manager/resume">CV Attachment</a></li>-->
-                            <!--&lt;!&ndash; Access History &ndash;&gt;-->
-                            <!--<li><a class="history-icon" href="/acchist">Access History</a></li>-->
-                            <!--&lt;!&ndash; Whitelist & Blacklist &ndash;&gt;-->
-                            <!--<li><a class="blacklist-icon" href="/blackwhitelist">Whitelist & Blacklist</a></li>-->
-                            <!--&lt;!&ndash; Bulk Mailer &ndash;&gt;-->
-                            <!--<li ng-show="$root._userInfo.Type == 2"><a class="bulkMailer-icon" href="/bulksalesenquiry">Bulk Mailer</a></li>-->
-                            <!--&lt;!&ndash; Change Password &ndash;&gt;-->
-                            <!--<li><a class="changePass-icon" href="/profile-manager/password">Change Password</a></li>-->
-
-                        <!--</ul>-->
-                    <!--</div>-->
-                <!--</form>-->
-            <!--</div>&lt;!&ndash;/.navbar-collapse &ndash;&gt;-->
-        <!--</div>-->
-    <!--</nav>-->
-
-
-
-
-
-
     <!-- New header menu goes here -->
     <nav class="navbar navbar-inverse hpw no-radius m-bottom-0">
         <div class="container-fluid">
             <!-- Brand and toggle get grouped for better mobile display -->
             <div class="navbar-header">
-                <div class="logo"></div>
+                <a href="/">
+                    <div class="logo"></div>
+                </a>
                 <!-- For mobile view menu -->
                 <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-2">
                     <span class="sr-only">Toggle navigation</span>
@@ -237,7 +165,7 @@
             <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-2">
                 <form class="" role="form">
-                <ul class="nav navbar-nav navbar-right">
+                    <ul class="nav navbar-nav navbar-right">
 
                         <!-- Signin Link -->
                         <li ng-hide="$root._userInfo.IsAuthenticate"><a class="btn-link" id="signin"><i class="fa fa-sign-in"></i> Sign In</a></li>
@@ -294,7 +222,7 @@
                         <!-- Logout link -->
                         <li><a type="submit" href="/home" title="Log Out" ng-click="SignInCtrl.Logout()" ng-show="$root._userInfo.IsAuthenticate" class="btn-link"><i class="fa fa-power-off"></i> Sign Out</a></li>
 
-                </ul>
+                    </ul>
                 </form>
             </div><!-- /.navbar-collapse -->
         </div><!-- /.container-fluid -->

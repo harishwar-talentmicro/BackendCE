@@ -6613,7 +6613,7 @@ exports.FnSaveTranscation = function(req, res){
         }
         if(FolderRuleID.toString() == 'NaN')
             FolderRuleID=0;
-        if (Token != null && ItemsList.length != 'undefined' && ItemsList.length != 0 && ItemsList != null) {
+        if (Token != null && ItemsList != null) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
@@ -10057,13 +10057,12 @@ exports.FnGetLocationListForEZEID = function (req, res) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
-                        var Query ='select TID, MasterID,LocTitle, Latitude, Longitude,MobileNumber,ifnull((Select FirstName from tmaster where TID='+db.escape(TID)+'),"") as FirstName,ifnull((Select LastName from tmaster where TID='+db.escape(TID)+'),"")  as LastName from tlocations where MasterID='+db.escape(TID);
-                        
-                        db.query(Query, function (err, GetResult) {
+                        //var Query ='select TID, MasterID,LocTitle, Latitude, Longitude,MobileNumber,ifnull((Select FirstName from tmaster where TID='+db.escape(TID)+'),"") as FirstName,ifnull((Select LastName from tmaster where TID='+db.escape(TID)+'),"")  as LastName from tlocations where MasterID='+db.escape(TID);
+                        db.query('CALL pGetSubUserLocationList(' + db.escape(TID) + ')', function (err, GetResult) {
                             if (!err) {
-                                if (GetResult != null) {
-                                    if (GetResult.length > 0) {
-                                        RtnMessage.Result = GetResult;
+                                if (GetResult[0] != null) {
+                                    if (GetResult[0].length > 0) {
+                                        RtnMessage.Result = GetResult[0];
                                         RtnMessage.Message ='Location List Send successfully';
                                         console.log('FnGetLocationListForEZEID: Location List Send successfully');
                                         res.send(RtnMessage);
