@@ -226,7 +226,7 @@ angular.module('ezeidApp').controller('BusinessManagerCtrl',[
                     }
                     //init();
                 },function(){
-                    Notification.error({ message : 'An error occurred', delay : MsgDelay})
+                    Notification.error({ message : 'An error occurred', delay : MsgDelay});
                     $location.path('/');
                 });
             }
