@@ -124,8 +124,8 @@ angular.module('ezeidApp').
                     Token: $rootScope._userInfo.Token,
                     SCategory:0,
                     Proximity:_filterValue.proximity,
-                    Latitude:12.295810,//latitude
-                    Longitude:76.639381,//longitude
+                    Latitude:_filterValue.lat,
+                    Longitude:_filterValue.lng,
                     ParkingStatus:_filterValue.parkingStatus,
                     OpenStatus:_filterValue.openStatus,
                     Rating:_filterValue.rating,
@@ -307,10 +307,41 @@ angular.module('ezeidApp').
                 }
             };
 
+            // To check and uncheck All check box
+            $scope.toggleCheckboxAll = function(event){
+                var elem = event.currentTarget;
+                if($(elem).is(":checked"))
+                {
+                    $scope.selectedList = [];
+                    selectedAllResult = 1;
+
+                    $scope.searchResult = JSON.parse($window.localStorage.getItem("searchResult"));
+                    if(!$scope.searchResult)
+                    {
+                        $scope.selectedList = [];
+                    }
+                    else
+                    {
+                        for (var i = 0; i < $scope.searchResult.length; i++) {
+                            $scope.selectedList.push($scope.searchResult[i].TID);
+                        }
+
+                        $('.result-checkbox').each(function( index ) {
+                            $(this).prop('checked',true);
+                        });
+                    }
+                }
+                else{
+                    selectedAllResult = 0;
+                    $scope.selectedList = [];
+
+                    $('.result-checkbox').each(function( index ) {
+                        $(this).prop('checked',false);
+                    });
+                }
+            };
 
 
 
         }
-
-
     ]);

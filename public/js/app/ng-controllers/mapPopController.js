@@ -57,6 +57,10 @@ angular.module('ezeidApp').controller('mapPopController',[
                         console.log(lat+'   '+lng);
                         googleMap.currentMarkerPosition.latitude = lat;
                         googleMap.currentMarkerPosition.longitude = lng;
+                    },function(lat,lng){
+                        console.log(lat+'   '+lng);
+                        googleMap.currentMarkerPosition.latitude = lat;
+                        googleMap.currentMarkerPosition.longitude = lng;
                     });
                   //  populateMarkers();
                 },function(){
