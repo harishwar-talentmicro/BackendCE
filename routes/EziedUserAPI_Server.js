@@ -6613,7 +6613,7 @@ exports.FnSaveTranscation = function(req, res){
         }
         if(FolderRuleID.toString() == 'NaN')
             FolderRuleID=0;
-        if (Token != null && ItemsList.length != 'undefined' && ItemsList.length != 0 && ItemsList != null) {
+        if (Token != null && ItemsList != null) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
