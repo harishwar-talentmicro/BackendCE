@@ -33,10 +33,12 @@
                                     </ul>
                                 </div>
 
-                                <input type="text" ng-keypress="searchKey($event)" placeholder="{{placeHolderText[searchParams.searchType]}}" ng-model="params.searchTerm" ng-class="(searchParams.searchType === 0) ? 'text-uppercase' : ''" class="form-control" aria-label="...">
+                                <input type="text" ng-keypress="searchKey($event)" placeholder="{{placeHolderText[params.searchType - 1]}}" ng-model="params.searchTerm" ng-class="(params.searchType === 1) ? 'text-uppercase' : ''" class="form-control" aria-label="...">
                                 <div class="input-group-btn">
-                                    <button type="button" class="btn btn-default" title="search" ng-click="initiateSearch()"><i class="fa fa-search"></i> </button>
-                                    <button  ng-click="toggleFilterContainer($event,true)" type="button" class="btn btn-info dropdown-toggle btn-advanced-filter" data-toggle="dropdown" title="advance search"><i class="fa fa-filter"></i> </button>
+                                    <!-- Advance Search BTN -->
+                                    <button  ng-click="toggleFilterContainer($event,true)" type="button" class="btn btn-default dropdown-toggle btn-advanced-filter" data-toggle="dropdown" title="advance search"><i class="fa fa-filter"></i> </button>
+                                    <!-- Search BTN -->
+                                    <button type="button" class="btn btn-primary" title="search" ng-click="initiateSearch()"><i class="fa fa-search"></i> </button>
                                 </div>
                             </div>
                         </div>
@@ -282,44 +284,5 @@
         </div>
     </section>
     <!-- Footer goes here -->
-    <div class="footer-page hpw">
-        <div class="container width-81 text-center">
-            <div class="col-lg-4">
-                <h4 class="text-white text-left text-bolder text-uppercase">About EZEID</h4>
-                <hr class="style-one">
-                <p class="text-white text-justify font-open-sans-light">EZE ID is first of its kind online identification, locating and online business platform that works for both
-                    Individuals and Business Organizations. Coexistence of People and Business Organization make it unique and easy
-                    to create better living and do the business much faster than any other methods in the industry.</p>
-            </div>
-            <div class="col-lg-3">
-                <h4 class="text-white font-roboto text-bolder text-left">Follow Us</h4>
-                <hr>
-                <ul class="list-unstyled no-padding text-left">
-                    <li class="border-bottom-gray p-5 footer-list pointer"><i class="fa fa-facebook footer-icon-style"></i> Facebook</li>
-                    <li class="border-bottom-gray p-5 footer-list pointer"><i class="fa fa-linkedin footer-icon-style"></i> Linkedin</li>
-                    <li class="border-bottom-gray p-5 footer-list pointer"><i class="fa fa-pinterest footer-icon-style"></i> Pinterest</li>
-                    <li class="p-5 footer-list pointer"><i class="fa fa-twitter footer-icon-style"></i> Twitter</li>
-
-                </ul>
-            </div>
-            <div class="col-lg-3">
-                <h4 class="text-white font-roboto text-bolder text-left">Information</h4>
-                <hr>
-                <ul class="list-unstyled no-padding text-left">
-                    <li class="border-bottom-gray p-5 footer-list pointer"> Contact Us</li>
-                    <li class="border-bottom-gray p-5 footer-list pointer"> Legal</li>
-                </ul>
-            </div>
-            <div class="col-lg-2">
-                <h4 class=" font-open-sans text-sky-blue text-left">&nbsp;</h4>
-
-                <ul class="list-unstyled no-padding text-left">
-                    <li class="p-5  pointer text-center green"><i class="fa fa-apple"></i> <b>Apple Store</b></li>
-                    <li class="p-5  pointer text-center ">&nbsp;</li>
-                    <li class="p-5  pointer text-center p-top-10 blue"><i class="fa fa-google"></i> <b>Play Store</b></li>
-                </ul>
-            </div>
-        </div>
-    </div>
-    <!-- Footer Ends here -->
+    <footer-section></footer-section>
 </div>

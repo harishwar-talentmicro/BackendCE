@@ -147,7 +147,8 @@ angular.module('ezeidApp').
                 if(resp){
                     $scope.googleMap.getReverseGeolocation($scope.googleMap.currentMarkerPosition.latitude,
                         $scope.googleMap.currentMarkerPosition.longitude).then(function(resp){
-                            $scope.placeDetail = $scope.googleMap.parseReverseGeolocationData(resp.data);
+                            placeDetail = $scope.googleMap.parseReverseGeolocationData(resp.data);
+                            $scope.locationString = placeDetail.city != ''?'Your current location is: '+placeDetail.city+", "+placeDetail.state:'';
 
                         },function(){
 
