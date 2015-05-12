@@ -969,3 +969,10 @@ hr.style-two {
 {
     background-color: rgb(10, 165, 165);
 }
+
+/* front page mobile app styles */
+.hpw .mobile-app-page
+{
+    background-color: #fff;
+    height: 100px;
+}
