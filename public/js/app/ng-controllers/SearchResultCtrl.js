@@ -46,9 +46,9 @@ angular.module('ezeidApp').
             var coordinatesArr = [];
             var coordinates = [];
             $scope.searchListMapFlag = false;//1: List, 2:Flag
-
-
-
+            var selectedAllResult = 0;
+            $scope.selectedList = [];
+            $scope.searchResult = [];
 
             //Below line is for Loading img
             $scope.$emit('$preLoaderStart');
@@ -124,8 +124,8 @@ angular.module('ezeidApp').
                     Token: $rootScope._userInfo.Token,
                     SCategory:0,
                     Proximity:_filterValue.proximity,
-                    Latitude:12.295810,//latitude
-                    Longitude:76.639381,//longitude
+                    Latitude:_filterValue.lat,
+                    Longitude:_filterValue.lng,
                     ParkingStatus:_filterValue.parkingStatus,
                     OpenStatus:_filterValue.openStatus,
                     Rating:_filterValue.rating,
@@ -133,17 +133,17 @@ angular.module('ezeidApp').
                     CurrentDate:CurrentDate
                 } }).success(function (data) {
                     $rootScope.$broadcast('$preLoaderStop');
-                    console.log(data);
+
                     /* put the maps coordinates in array */
                     $scope.coordinatesArr = [];
                     if(data != 'null'){
+
                         for(var i=0; i<data.length; i++)
                         {
                             coordinates.push([data[i].Latitude,data[i].Longitude,data[i].CompanyName]);
                         }
                         $scope.coordinatesArr = coordinates;
                     }
-
 
 
                     //console.log($scope.coordinatesArr);
@@ -307,10 +307,81 @@ angular.module('ezeidApp').
                 }
             };
 
+            // To check and uncheck All check box
+            $scope.toggleCheckboxAll = function(event){
 
+                var elem = event.currentTarget;
+                if($(elem).is(":checked"))
+                {
+                    $scope.selectedList = [];
+                    selectedAllResult = 1;
+
+                    $scope.searchResult = JSON.parse($window.localStorage.getItem("searchResult"));
+                    if(!$scope.searchResult)
+                    {
+                        $scope.selectedList = [];
+                    }
+                    else
+                    {
+                        for (var i = 0; i < $scope.searchResult.length; i++) {
+                            $scope.selectedList.push($scope.searchResult[i].TID);
+                        }
+
+                        $('.result-checkbox').each(function( index ) {
+                            $(this).prop('checked',true);
+                        });
+                    }
+                }
+                else{
+                    selectedAllResult = 0;
+                    $scope.selectedList = [];
+
+                    $('.result-checkbox').each(function( index ) {
+                        $(this).prop('checked',false);
+                    });
+                }
+            };
+
+            // To get and remove value of check box
+            $scope.toggleCheckbox = function(event){
+
+                console.log("sai1");
+                var elem = event.currentTarget;
+                var val = $(elem).data('tid');
+
+                if($(elem).is(":checked")){
+                    $scope.selectedList.push(val);
+
+                    if($scope.selectedList.length === $scope.searchResult.length)
+                    {
+                        $scope._selectAll = true;
+                    }
+                    else
+                    {
+                        $scope._selectAll = false;
+                    }
+                }
+                else{
+                    var index = $scope.selectedList.indexOf(val);
+                    $scope.selectedList.splice(index,1);
+
+                    if($scope.selectedList.length === $scope.searchResult.length)
+                    {
+                        $scope._selectAll = true;
+                    }
+                    else
+                    {
+                        $scope._selectAll = false;
+                    }
+                }
+
+                console.log($scope.selectedList);
+            };
+
+            $rootScope.$on('$locationChangeStart',function(){
+                $window.localStorage.setItem("selectedTids", JSON.stringify($scope.selectedList));
+            });
 
 
         }
-
-
     ]);

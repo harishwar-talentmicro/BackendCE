@@ -104,9 +104,19 @@ angular.module('ezeidApp').
              * Triggers Search
              */
             $scope.triggerSearch = function(){
+
+                /* check if the search term is not empty */
                 if($scope.searchParams.searchTerm.length < 1){
                     return false;
                 }
+                /* check if the user is logged in and the search type is 1[EZEID] */
+                if(!$rootScope._userInfo.IsAuthenticate && $scope.searchParams.searchType == 1)
+                {
+                    /* through error */
+                    Notification.error({ message : 'Please login to search for EZEID', delay : MsgDelay});
+                    return false;
+                }
+
                 var modifyValue = [
                     'homeDelivery',
                     'parkingStatus',
@@ -177,7 +187,7 @@ angular.module('ezeidApp').
                     currentLocationElementClass : "link-btn pac-loc",
                     controlsContainerClass : "col-lg-6 col-md-6'"
                 });
-                $scope.googleMap.createMap("map-ctrl",$scope,"findCurrentLocation()");
+                $scope.googleMap.createMap("modal-map-ctrl",$scope,"findCurrentLocation()");
 
                 $scope.googleMap.renderMap();
 

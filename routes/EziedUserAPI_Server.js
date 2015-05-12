@@ -4959,6 +4959,10 @@ exports.FnStatusType = function (req, res) {
 
         var Token = req.query.Token;
         var FunctionType = req.query.FunctionType;
+        var RtnMessage = {
+            Result: [],
+            Message: ''
+        };
 
         if (Token != null  && FunctionType != null ) {
             FnValidateToken(Token, function (err, Result) {
@@ -4989,42 +4993,50 @@ exports.FnStatusType = function (req, res) {
                         
                         var query = db.escape(Token) + ',' + db.escape(FunctionType);
                         db.query('CALL pGetStatusType(' + query + ')', function (err, StatusResult) {
+                            
                             if (!err) {
                                 if (StatusResult != null) {
                                     if (StatusResult[0].length > 0) {
                                         StatusResult[0].unshift(StatusAll);
                                         StatusResult[0].unshift(StatusAllOpen);
+                                        RtnMessage.Result = StatusResult[0];
+                                        RtnMessage.Message = 'Status type details Send successfully';
                                         console.log('FnStatusType: Status type details Send successfully');
-                                        res.send(StatusResult[0]);
+                                        res.send(RtnMessage);
+                                        
                                     }
                                     else {
 
                                         console.log('FnGetStatusType:No Status type details found');
-                                        res.send('null');
+                                        RtnMessage.Message ='No Status type details found';
+                                        res.send(RtnMessage);
                                     }
                                 }
                                 else {
-
-                                    console.log('FnGetStatusType:No Status type details found');
-                                    res.send('null');
+                                        console.log('FnGetStatusType:No Status type details found');
+                                        RtnMessage.Message ='No Status type details found';
+                                        res.send(RtnMessage);
                                 }
                             }
                             else {
+                                RtnMessage.Message = 'error in getting Status type details';
                                 console.log('FnGetStatusType: error in getting Status type details' + err);
                                 res.statusCode = 500;
-                                res.send('null');
+                                res.send(RtnMessage);
                             }
                         });
                     }
                     else {
                         res.statusCode = 401;
-                        res.send('null');
+                        RtnMessage.Message = 'Invalid Token';
+                        res.send(RtnMessage);
                         console.log('FnGetStatusType: Invalid Token');
                     }
                 } else {
 
                     res.statusCode = 500;
-                    res.send('null');
+                    RtnMessage.Message = 'Error in validating token';
+                    res.send(RtnMessage);
                     console.log('FnGetStatusType: Error in validating token:  ' + err);
                 }
             });
@@ -5032,13 +5044,15 @@ exports.FnStatusType = function (req, res) {
         else {
             if (Token == null) {
                 console.log('FnGetStatusType: Token is empty');
+                RtnMessage.Message ='Token is empty';
             }
             else if (FunctionType == null) {
                 console.log('FnGetStatusType: FunctionType is empty');
+                RtnMessage.Message ='FunctionType is empty';
             }
 
             res.statusCode=400;
-            res.send('null');
+            res.send(RtnMessage);
         }
     }
     catch (ex) {
@@ -8526,7 +8540,7 @@ exports.FnSendBulkMailer = function (req, res) {
                     if (!err) {
                         if (Result != null) {
                             //var query = db.escape(Token) + ', ' +db.escape(TID);
-                            var query = 'Select FirstName, LastName, CompanyName,ifnull(SalesMailID,"") as SalesMailID from tmaster where TID in (' + TID + ')';
+                            var query = 'Select FirstName, LastName, CompanyName,ifnull(SalesMailID," ") as SalesMailID from tmaster where TID in (' + TID + ')';
                             console.log(query);
                             db.query(query, function (err, GetResult) {
                                 if (!err) {

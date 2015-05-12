@@ -25,13 +25,14 @@ angular.module('ezeidApp').controller('mapPopController',[
 
 
         /* integrate google map */
-
-
         var googleMap = new GoogleMaps();
 
         $scope.findCurrentLocation = function(){
-            console.log('x');
-            googleMap.placeCurrentLocationMarker();
+            googleMap.getCurrentLocation().then(function(){
+                googleMap.placeCurrentLocationMarker(null,null,true);
+            },function(){
+                googleMap.placeCurrentLocationMarker(null,null,true);
+            });
         };
 
 
@@ -50,40 +51,28 @@ angular.module('ezeidApp').controller('mapPopController',[
 
             googleMap.mapIdleListener().then(function(){
                 googleMap.pushMapControls();
-                googleMap.listenOnMapControls();
+                googleMap.listenOnMapControls(function(lat,lng){
+                    googleMap.currentMarkerPosition.latitude = lat;
+                    googleMap.currentMarkerPosition.longitude = lng;
+                },function(lat,lng){
+                    googleMap.currentMarkerPosition.latitude = lat;
+                    googleMap.currentMarkerPosition.longitude = lng;
+                });
                 googleMap.getCurrentLocation().then(function(){
                     googleMap.resizeMap();
                     googleMap.placeCurrentLocationMarker(function(lat,lng){
-                        console.log(lat+'   '+lng);
+                        googleMap.currentMarkerPosition.latitude = lat;
+                        googleMap.currentMarkerPosition.longitude = lng;
+                    },function(lat,lng){
                         googleMap.currentMarkerPosition.latitude = lat;
                         googleMap.currentMarkerPosition.longitude = lng;
                     });
-                  //  populateMarkers();
+
                 },function(){
-                   // populateMarkers();
+
                 });
 
             });
-
-            var populateMarkers = function(){
-                googleMap.resizeMap();
-                googleMap.toggleMapControls();
-
-                /* place markers on map */
-                console.log($scope.coordinatesArr);
-                var markerImage = '../../images/business-icon_48.png';
-                for(var i=0;i < $scope.coordinatesArr.length;i++)
-                {
-                    if($scope.coordinatesArr[i][0] != 0 || $scope.coordinatesArr[i][0] != 0)
-                    {
-                        var pos = googleMap.createGMapPosition($scope.coordinatesArr[i][0],$scope.coordinatesArr[i][1]);
-                        var marker = googleMap.createMarker(pos,$scope.coordinatesArr[i][2],markerImage,false,null);
-                        googleMap.placeMarker(marker);
-                    }
-                }
-
-                googleMap.setMarkersInBounds();
-            };
 
         };
 
