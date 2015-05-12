@@ -229,7 +229,8 @@
                                 <br/>
                                 <div class="form-group form-group-sm">
                                     <select class="form-control" ng-model="modalBox.tx.statusType">
-                                        <option value="0">--Select Status--</option>
+                                        <option value="0">New</option>
+                                        <option value="">--Select Status Type--</option>
                                         <option ng-repeat="txStatus in txStatusTypes track by txStatus.TID" value="{{txStatus.TID}}">{{txStatus.StatusTitle}}</option>
                                     </select>
                                 </div>
@@ -237,7 +238,7 @@
                             </div>
                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-show="moduleConf.listType == 4">
                                 <div class="form-group form-group-sm">
-                                    <input type="text" class="form-control"  placeholder="Amount" />
+                                    <input type="text" class="form-control"  placeholder="Amount" ng-model="modalBox.tx.orderAmount" decimals-only />
                                 </div>
                             </div>
                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
@@ -251,7 +252,7 @@
 
                                 <label class="tiny">Next Action Date</label>
                                 <date-time-picker recipient="modalBox.tx.nextActionDateTime" settings='{
-                                                                        "format" : "d-M-Y H:m:s",
+                                                                        "format" : "d M Y H:m:s",
                                                                         "timepicker" : true,
                                                                         "mask" : false,
                                                                         "hours12" : false,
@@ -294,14 +295,14 @@
                                     Save
                                 </button>
                                 <br/>
-                                <button ng-show="editModes[$index]" ng-click="(editModes[$index] = false)" class="btn btn-xs btn-block btn-danger no-radius" data-toggle="tooltip" title="Save">
+                                <button ng-show="editModes[$index]" ng-click="(editModes[$index] = false)(resetModalBox())" class="btn btn-xs btn-block btn-danger no-radius" data-toggle="tooltip" title="Save">
                                     <span class="glyphicon glyphicon-remove"></span>
                                     Cancel
                                 </button>
                                 <br/>
                                 <button ng-hide="editModes[$index]" ng-disabled="!salesPermissionConf.txUpdate"
                                         title="{{(salesPermissionConf.txUpdate) ? 'Edit' : 'You do not have permission to edit'}}"
-                                        ng-click="(editModes[$index] = true)" class="btn btn-xs btn-block btn-warning no-radius">
+                                        ng-click="(salesPermissionConf.txUpdate) ? toggleAllEditMode($index) : 0" class="btn btn-xs btn-block btn-warning no-radius">
                                     <span class="glyphicon glyphicon-pencil"></span>
                                     Edit
                                 </button>
@@ -410,7 +411,8 @@
                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                     <div class="form-group form-group-sm ">
                                         <select class="form-control" ng-model="modalBox.tx.statusType" name="statusType">
-                                            <option value="0">--Select Status of Transaction--</option>
+                                            <option value="">--Select Status of Transaction--</option>
+                                            <option value="0">New</option>
                                             <option ng-repeat="txStatus in txStatusTypes track by txStatus.TID" value="{{txStatus.TID}}">{{txStatus.StatusTitle}}</option>
                                         </select>
                                     </div>
@@ -504,8 +506,8 @@
                                 </div>
                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                     <div class="form-group form-group-sm ">
-                                        <select class="form-control" ng-model="modalBox.tx.locId">
-                                            <option value="0">--No Delivery Locations Selected--</option>
+                                        <select class="form-control" ng-model="modalBox.tx.locId" ng-change="resolveGelocationAddress()">
+                                            <option value="0">Other Location</option>
                                             <option ng-repeat="location in modalBox.locationList track by location.TID" value="{{location.TID}}">{{location.LocTitle}}</option>
                                         </select>
                                     </div>
@@ -514,7 +516,7 @@
                                     <div class="form-group form-group-sm ">
                                         <input
                                                 ng-disabled="modalBox.tx.locId"
-                                                type="text" placeholder="Address" class="form-control no-radius"  name="area" ng-model="modalBox.tx.address" />
+                                                type="text" placeholder="Address Line 1" class="form-control no-radius"  name="area" ng-model="modalBox.tx.address" />
                                     </div>
                                 </div>
                                 <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
@@ -662,6 +664,7 @@
               </div>
           </modal>
           <!-- end: ModalBox ends -->
+
 
         </div>
     </div>

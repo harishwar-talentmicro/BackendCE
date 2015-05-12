@@ -1,10 +1,10 @@
 <section id="result-page-wrapper" class="hpw rpw">
     <!-- New header menu goes here -->
     <header-section></header-section>
-    <hr>
+    <!--header ends here-->
+
      <!--Middle container-->
-   <!-- <div ng-controller="InformationDetailCtrl as detailCtrl">-->
-    <div>
+    <div class="" style="min-height: 700px;">
         <div class="Popup_window form_style map_popup_iconActions" id="SalesEnquiryRequest_popup" style="height: 103%;">
             <div class="window_page Maping_popup">
                 <span class="closelink" ng-click="closeSalesEnquiryForm()">X</span>
@@ -129,29 +129,30 @@
             <modal showheader="false" mtitle="''" visible="showDetailsModal" mclass="modalBox.class">
                <section id="main-content" class="searchDetailContainer">
                 <div class="row setRowLeftRightMarginZero text-center">
-                   <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5 setPaddingLeftRight0" ng-show="(SearchType == 2)">
+                   <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5 setPaddingLeftRight0">
                        <div class="row setRowLeftRightMarginZero">
                            <div ng-show="SearchInfo.BannerImage">
                                <img class="bannerContainerBorder" width="356px" height="356px" ng-src="{{SearchInfo.BannerImage}}" />
+
+                               <img class="imgLeft showPointer" ng-show="previousButton == true" ng-click="getPreviousBanner()" src="images/arrow_left.png" />
+                               <img class="imgRight showPointer" ng-show="nextButton == true" ng-click="getNextBanner()" src="images/arrow_right.png" />
                            </div>
                            <div ng-hide="SearchInfo.BannerImage">
                                <img class="bannerContainerBorder" width="356px" height="356px" ng-src="images/new_banner.gif" />
                            </div>
 
 
-
                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-center setPaddingLeftRight0 noticeTextContainer" ng-show="showNoticeText">
                                The business you are requesting has insufficient information and hence displaying the closest matching company.
                            </div>
-                           <img class="imgLeft showPointer" ng-show="previousButton == true" ng-click="getPreviousBanner()" src="images/arrow_left.png" />
-                           <img class="imgRight showPointer" ng-show="nextButton == true" ng-click="getNextBanner()" src="images/arrow_right.png" />
+
                        </div>
                    </div>
-                    <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5 setPaddingLeftRight0" ng-hide="(SearchType == 2)">
+                    <!--<div class="col-lg-5 col-md-5 col-sm-5 col-xs-5 setPaddingLeftRight0" ng-hide="(SearchType == 2)">
                         <div class="row setRowLeftRightMarginZero">
                             <img class="bannerContainerBorder" width="356px" height="356px" ng-src="images/new_banner.gif"/>
                         </div>
-                    </div>
+                    </div>-->
                    <div class="col-lg-7 col-md-7 col-sm-7 col-xs-7 setPaddingLeftRight0">
                         <div class="row setRowLeftRightMarginZero">
                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setPaddingLeftRight0">
@@ -203,7 +204,7 @@
                                     </div>
                                 </div>
 
-                                <div class="row centerAlign searchButtonMarginSet topMarginButton">
+                                <div class="row centerAlign searchButtonMarginSet">
                                     <div title="Working hours" class="col-lg-2 col-md-2 col-sm-2 col-xs-2 showPointer setLeftRightPaddingZero" ng-hide="(SearchInfo.IDTypeID == 1)">
                                         <img src="../images/open_big.png" ng-click="openWorkingHourPopup()" ng-show="SearchInfo.OpenStatus==1">
                                         <img src="../images/close_big.png" ng-click="openWorkingHourPopup()" ng-hide="SearchInfo.OpenStatus==1">
@@ -430,23 +431,11 @@
         </div>
 
     </div>
-
     <!--Middle container End-->
-    <div class="footer-page">
-        <div class="container width-81 text-center">
-            <div class="col-lg-2">
-                <i class="btn btn-default btn-sm fa fa-facebook"></i>
-                <i class="btn btn-default btn-sm fa fa-twitter"></i>
-                <i class="btn btn-default btn-sm fa fa-pinterest"></i>
-                <i class="btn btn-default btn-sm fa fa-linkedin"></i>
 
-            </div>
-            <div class="col-lg-8 text-center">
-                <span class="footer-main-content">Copyright © TalentMicro Innovations Pvt. Ltd.</span>
-                <hr class="style-one">
-                <small>CONTACT US | LEGAL | PATENT IN PROCESS NO.<b>6622/CHE/2014</b></small>
-            </div>
-        </div>
-    </div>
+    <!-- Footer goes here -->
+    <footer-section></footer-section>
+    <!-- Footer Ends here -->
+
 </section>
 
