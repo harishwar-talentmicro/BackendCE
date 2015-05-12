@@ -14,6 +14,7 @@
         '$location',
         '$routeParams',
         '$route',
+        'GoogleMaps',
         function (
             $rootScope,
             $scope,
@@ -28,7 +29,8 @@
             MsgDelay,
             $location,
             $routeParams,
-            $route
+            $route,
+            GoogleMap
             ) {
 
 
@@ -162,7 +164,7 @@
               class : 'business-manager-modal',
               locationList : [],
               tx : {
-                  orderAmount : 0,
+                  orderAmount : 0.00,
                   trnNo : '',
                   ezeidTid : 0,
 
@@ -209,7 +211,7 @@
                 }).success(function(resp){
                     if(resp && resp !== 'null'){
                         $scope.modalBox.locationList = resp.Result;
-                        defer.resolve(resp[0]);
+                        defer.resolve(resp.Result);
                     }
                     else{
                         defer.reject();
@@ -227,7 +229,7 @@
             var prepareEditTransaction = function(tx){
 
                 var editModeTx =  {
-                    orderAmount : 0,
+                        orderAmount : (!isNaN(parseFloat(tx.Amount))) ? parseFloat(tx.Amount) : 0.00,
                         trnNo : tx.TrnNo,
                         ezeidTid : (tx.EZEID) ? true : 0,
 
@@ -336,6 +338,46 @@
                     $scope.showModal = !$scope.showModal;
                 }
             };
+
+            /**
+             *
+             */
+            $scope.resolveGelocationAddress = function(){
+                if(!$scope.modalBox.tx.locId){
+                    return;
+                }
+                $scope.$emit('$preLoaderStart');
+                var locIndex = $scope.modalBox.locationList.indexOfWhere("TID",parseInt($scope.modalBox.tx.locId));
+                if(locIndex === -1){
+                    $scope.$emit('$preLoaderStop');
+                    return;
+                }
+                var lat = $scope.modalBox.locationList[locIndex].Latitude;
+                var lng = $scope.modalBox.locationList[locIndex].Longitude;
+                var googleMap = new GoogleMap();
+                googleMap.getReverseGeolocation(lat,lng).then(function(resp){
+                    $scope.$emit('$preLoaderStop');
+                    if(resp.data){
+                        var data = googleMap.parseReverseGeolocationData(resp.data);
+
+
+                        $scope.modalBox.tx.city = data.city;
+                        $scope.modalBox.tx.state = data.state;
+                        $scope.modalBox.tx.country = data.country;
+                        $scope.modalBox.tx.area = data.area;
+                    }
+                    else{
+                        $scope.$emit('$preLoaderStop');
+                        Notification.error({message : 'Please enable geolocation settings n your browser',delay : MsgDelay});
+                    }
+
+                },function(){
+                    Notification.error({message : 'Please enable geolocation settings n your browser',delay : MsgDelay});
+                    $scope.$emit('$preLoaderStop');
+                });
+
+            };
+
 
             $scope.$watch('showModal',function(newVal,oldVal){
                 if(!newVal){
