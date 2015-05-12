@@ -888,6 +888,11 @@ hr.style-two {
     width:100% !important;
 }
 
+.hpw .width-100-px
+{
+    width: 100px !important;
+}
+
 .hpw .tile-row
 {
     padding-left: 3px;
