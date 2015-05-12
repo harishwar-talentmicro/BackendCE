@@ -1,6 +1,10 @@
    <div ng-controller="mapPopController as mapCtrl">
 
-       <div class="emailContiner">
+
+       <div id="map-ctrl" class="col-lg-12"></div>
+
+
+      <!-- <div class="emailContiner">
            <modal mtitle="'Email Route Map'" visible="showEmailForm" mclass="modalBox.class" style="padding-left: 0px;!important">
                <div class="container-fluid">
                    <div class="row">
@@ -9,15 +13,15 @@
                                EmailID
                            </div>
                            <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10 searchHeaderAlignment">
-                              <!-- <input type="text" name="ToMailID" class="form-control emptyBox"
+                              &lt;!&ndash; <input type="text" name="ToMailID" class="form-control emptyBox"
                                       id="ToMailID" ng-model="viewDirection._info.ToMailID"
                                       ng-class="MailTemplateForm.FromEmailID.$touched && !viewDirection._info.ToMailID.length ? 'mandatoryTextBox' : ''"
-                                      placeholder="EmailID" maxlength="100" ng-pattern="/^[a-z]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5}$/" required>-->
+                                      placeholder="EmailID" maxlength="100" ng-pattern="/^[a-z]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5}$/" required>&ndash;&gt;
                                <input type="text" name="ToMailID" class="form-control emptyBox"
                                       id="ToMailID" ng-model="ToMailID1"
                                       ng-class="MailTemplateForm.FromEmailID.$touched && !viewDirection._info.ToMailID.length ? 'mandatoryTextBox' : ''"
                                       placeholder="EmailID" maxlength="100" ng-pattern="/^[a-z]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5}$/" required>
-                              <!-- <span ng-show="MailTemplateForm.ToMailID.$error.email" ng-if="MailTemplateForm.ToMailID1.$error.email == true ? viewDirection._info.isWrongEmailPatternFrom = true : viewDirection._info.isWrongEmailPatternFrom = false"></span>-->
+                              &lt;!&ndash; <span ng-show="MailTemplateForm.ToMailID.$error.email" ng-if="MailTemplateForm.ToMailID1.$error.email == true ? viewDirection._info.isWrongEmailPatternFrom = true : viewDirection._info.isWrongEmailPatternFrom = false"></span>&ndash;&gt;
                            </div>
                        </div>
                    </div><br/>
@@ -36,8 +40,8 @@
                </div>
            </modal>
        </div>
-
-       <div class="well well-lg templateBoxContainer" >
+-->
+      <!-- <div class="well well-lg templateBoxContainer" >
            <div class="row setRowLeftRightMarginZero" id="googlemap">
                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setLeftRightPaddingZero" >
                    <div class="row setRowLeftRightMarginZero mapButtonContainer">
@@ -49,12 +53,13 @@
 
                    </div>
                </div>
-              <!-- <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5 setPaddingRightZero" style="font-size: 10px;">
+              &lt;!&ndash; <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5 setPaddingRightZero" style="font-size: 10px;">
                    <div ng-show="showDirectionPannel" id="directions-panel"></div>
                    <div ng-hide="showDirectionPannel"> Click on [Directions] botton to Display Driving Directions...</div>
-               </div><br/>-->
+               </div><br/>&ndash;&gt;
            </div>
-       </div>
+       </div>-->
+
 
 
    </div>
