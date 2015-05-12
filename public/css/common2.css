@@ -737,7 +737,7 @@ hr.style-two {
 
 .hpw .detailed-page
 {
-    background-color: #0FC7D7;
+    background-color: rgba(52, 178, 139, 0.88);
     min-height: 100px;
 }
 
@@ -888,6 +888,11 @@ hr.style-two {
     width:100% !important;
 }
 
+.hpw .width-100-px
+{
+    width: 100px !important;
+}
+
 .hpw .tile-row
 {
     padding-left: 3px;
@@ -975,4 +980,17 @@ hr.style-two {
 {
     background-color: #fff;
     height: 100px;
+}
+
+.hpw .ezeid-id-style
+{
+    color: #fff;
+    padding-left: 2px;
+    padding-right: 2px;
+    background-color: rgb(15, 199, 215);
+}
+
+.hpw .text-dark-blue
+{
+    color: rgb(14, 7, 128);
 }
