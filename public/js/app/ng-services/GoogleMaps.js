@@ -308,7 +308,9 @@ angular.module('ezeidApp').factory('GoogleMaps',['$q','$timeout','$compile',func
 
     GoogleMap.prototype.handleNoGeolocation = function(promise){
         var currentLoc = new google.maps.LatLng(this.currentMarkerPosition.latitude,this.currentMarkerPosition.longitude);
-        this.map.setCenter(currentLoc);
+        if(this.map){
+            this.map.setCenter(currentLoc);
+        }
         promise.resolve(false);
     };
 
