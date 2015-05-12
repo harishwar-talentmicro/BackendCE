@@ -162,6 +162,7 @@
             $scope.modalBox = {
               title : 'Transaction Details',
               class : 'business-manager-modal',
+              editMode : false,
               locationList : [],
               tx : {
                   orderAmount : 0.00,
