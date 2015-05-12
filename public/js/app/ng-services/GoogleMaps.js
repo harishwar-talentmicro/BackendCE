@@ -299,9 +299,9 @@ angular.module('ezeidApp').factory('GoogleMaps',['$q','$timeout','$compile',func
                 _this.currentMarkerPosition.latitude = currentLocation.coords.latitude;
                 _this.currentMarkerPosition.longitude = currentLocation.coords.longitude;
                 defer.resolve(true);
-            },function(){this.handleNoGeolocation(defer)});
+            },function(){_this.handleNoGeolocation(defer)});
         } else{
-            this.handleNoGeolocation(defer);
+            _this.handleNoGeolocation(defer);
         };
         return defer.promise;
     };
