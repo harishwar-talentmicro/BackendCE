@@ -60,32 +60,8 @@ angular.module('ezeidApp').
         var TID =  $routeParams.TID;
         $scope.SearchType = $routeParams.searchType;
 
-       // console.log($rootScope._userInfo);
-
-
-       /* if((!$rootScope._userInfo) && ($scope.SearchType == 1))
-        {
-            // login popoup
-            $('#SignIn_popup').slideDown();
-            console.log("sai11");
-        }
-        else
-        {
-            console.log("sai12");
-            // To get search information
-            getSearchInformation(TID,$scope.SearchType);
-
-            if($scope.SearchType == 2)
-            {
-                // To get about Company
-                getAboutComapny();
-            }
-        }*/
-
-
         getSearchInformation(TID,$scope.SearchType);
         getAboutComapny();
-
 
         //Below function is for getting search information
         function getSearchInformation(_TID,_SearchType)
