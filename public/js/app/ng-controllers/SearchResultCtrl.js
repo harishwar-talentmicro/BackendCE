@@ -42,6 +42,7 @@ angular.module('ezeidApp').
             GoogleMap
         )
         {
+            var selectAll = false;
             var isResultNumber = 1; /* 1: Results,0:no results */
             var coordinatesArr = [];
             var coordinates = [];
@@ -207,9 +208,19 @@ angular.module('ezeidApp').
              * Master search function
              */
             $scope.initiateSearch = function(e){
+
+                /* check if the search term is not empty */
                 if($scope.params.searchTerm.length < 1){
                     return false;
                 }
+                /* check if the user is logged in and the search type is 1[EZEID] */
+                if(!$rootScope._userInfo.IsAuthenticate && $scope.params.searchType == 1)
+                {
+                    /* through error */
+                    Notification.error({ message : 'Please login to search for EZEID', delay : MsgDelay});
+                    return false;
+                }
+
 
                 var modifyValue = [
                     'homeDelivery',
@@ -308,10 +319,15 @@ angular.module('ezeidApp').
             };
 
             // To check and uncheck All check box
-            $scope.toggleCheckboxAll = function(event){
+            $scope.toggleCheckboxAll = function(){
 
-                var elem = event.currentTarget;
-                if($(elem).is(":checked"))
+                /* toggle the select all variable's value */
+                $scope.selectAll = !$scope.selectAll;
+
+                //var elem = event.currentTarget;
+
+                /* chechk all the check boxes */
+                if($scope.selectAll)
                 {
                     $scope.selectedList = [];
                     selectedAllResult = 1;
@@ -332,6 +348,7 @@ angular.module('ezeidApp').
                         });
                     }
                 }
+                /* uncheck all the check boxes */
                 else{
                     selectedAllResult = 0;
                     $scope.selectedList = [];
@@ -344,8 +361,6 @@ angular.module('ezeidApp').
 
             // To get and remove value of check box
             $scope.toggleCheckbox = function(event){
-
-                console.log("sai1");
                 var elem = event.currentTarget;
                 var val = $(elem).data('tid');
 
@@ -358,7 +373,7 @@ angular.module('ezeidApp').
                     }
                     else
                     {
-                        $scope._selectAll = false;
+                        $scope.selectAll = false;
                     }
                 }
                 else{
@@ -374,8 +389,9 @@ angular.module('ezeidApp').
                         $scope._selectAll = false;
                     }
                 }
+                $scope.selectAll = $scope._selectAll;
 
-                console.log($scope.selectedList);
+                //console.log($scope.selectedList);
             };
 
             $rootScope.$on('$locationChangeStart',function(){
