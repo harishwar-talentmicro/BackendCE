@@ -48,7 +48,7 @@ angular.module('ezeidApp').
         $scope.activeTemplate = "";
         $scope.showWorkingHourModel = false;
         $scope.showMapPopupModel = false;
-        $scope.showDetailsModal = true;
+        $scope.showDetailsModal = false;
         $scope.showNoticeText = true;
         $scope.form_rating = 0;
 
@@ -57,11 +57,7 @@ angular.module('ezeidApp').
             class : 'business-manager-modal'
         };
 
-        $scope.$watch('showDetailsModal',function(newVal,oldVal){
-            if(!newVal){
-                $window.history.back();
-            }
-        });
+
 
         var TID =  $routeParams.TID;
         $scope.SearchType = $routeParams.searchType;
@@ -86,6 +82,14 @@ angular.module('ezeidApp').
                 $http({ method: 'get', url: GURL + 'ewtGetSearchInformation?Token=' + $rootScope._userInfo.Token + '&TID=' + _TID + '&SearchType=' + _SearchType + '&CurrentDate=' + currentDate}).success(function (data) {
                     $rootScope.$broadcast('$preLoaderStop');
                     if (data != 'null') {
+                        $scope.showDetailsModal = true;
+
+                        $scope.$watch('showDetailsModal',function(newVal,oldVal){
+                            console.log($window.history);
+                            if(!newVal){
+                                $window.history.back();
+                            }
+                        });
 
                         $timeout(function () {
                             $scope.SearchInfo = data[0];

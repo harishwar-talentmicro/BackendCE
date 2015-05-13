@@ -148,12 +148,7 @@
 
                        </div>
                    </div>
-                    <!--<div class="col-lg-5 col-md-5 col-sm-5 col-xs-5 setPaddingLeftRight0" ng-hide="(SearchType == 2)">
-                        <div class="row setRowLeftRightMarginZero">
-                            <img class="bannerContainerBorder" width="356px" height="356px" ng-src="images/new_banner.gif"/>
-                        </div>
-                    </div>-->
-                   <div class="col-lg-7 col-md-7 col-sm-7 col-xs-7 setPaddingLeftRight0">
+                    <div class="col-lg-7 col-md-7 col-sm-7 col-xs-7 setPaddingLeftRight0">
                         <div class="row setRowLeftRightMarginZero">
                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setPaddingLeftRight0">
                                 <div ng-show="SearchInfo.Picture">
@@ -284,22 +279,17 @@
                     </div>
                     <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 setLeftRightPaddingZero">
                         <div class="showPointer removePadding keyWordText boxMessaageBackgroun"
-                             ng-click="getdirections(SearchInfo)" title="Directions">
+                             ng-click="getdirections(SearchInfo)" title="Map">
                             <img src="../images/new_directions.png">
                             <span>Map</span>
                         </div>
                     </div>
                 </div>
                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 newMsgButtonContainer setPaddingLeftRight0 searchHeaderAlignment msgButtonContainer messageButtonContainer" ng-show="(SearchInfo.IDTypeID == 1)">
-                    <!--<div class="showPointer removePadding keyWordText boxMessaageBackgroun pull-right"
-                         ng-click="viewDirections(SearchInfo)" title="View Directions">
-                        <img src="../images/view_directions.png">
-                        View Directions
-                    </div>-->
-                    <div class="showPointer removePadding keyWordText boxMessaageBackgroun pull-right"
-                         ng-click="getdirections(SearchInfo)" title="Directions boxMessaageBackgroun">
+                   <div class="showPointer removePadding keyWordText boxMessaageBackgroun pull-right"
+                         ng-click="getdirections(SearchInfo)" title="Map" class="boxMessaageBackgroun">
                         <img src="../images/new_directions.png">
-                        Plot Route
+                       Map
                     </div>
                 </div>
             </div>
