@@ -266,7 +266,8 @@
              * Inline editing
              * @param index
              */
-            $scope.toggleAllEditMode = function(index){
+            $scope.toggleAllEditMode = function(index,resolveGeolocation,loadItems){
+                $scope.$emit('$preLoaderStart');
                 if(typeof(index) === "undefined")
                 {
                     index = -1;
@@ -282,6 +283,27 @@
                         $scope.editModes[c] = false;
                     }
                 }
+                if(resolveGeolocation){
+                    $scope.resolveGelocationAddress().then(function(){
+                        if(loadItems){
+                            loadTransactionItems($scope.modalBox.tx.TID).then(function(){
+                                $scope.$emit('$preLoaderStop');
+                            },function(){
+                                $scope.$emit('$preLoaderStop');
+                            });
+                        }
+                    },function(){
+                        if(loadItems){
+                            loadTransactionItems($scope.modalBox.tx.TID).then(function(){
+                                $scope.$emit('$preLoaderStop');
+                            },function(){
+                                $scope.$emit('$preLoaderStop');
+                            });
+                        }
+                    });
+                }
+
+
             };
 
             var loadTransactionItems = function(txId){
@@ -357,6 +379,10 @@
                 }
                 var lat = $scope.modalBox.locationList[locIndex].Latitude;
                 var lng = $scope.modalBox.locationList[locIndex].Longitude;
+
+                $scope.modalBox.tx.latitude = lat;
+                $scope.modalBox.tx.longitude = lng;
+
                 $scope.modalBox.tx.address = $scope.modalBox.locationList[locIndex].AddressLine1+' ' +
                     $scope.modalBox.locationList[locIndex].AddressLine2;
                 var googleMap = new GoogleMap();
@@ -370,6 +396,8 @@
                         $scope.modalBox.tx.state = data.state;
                         $scope.modalBox.tx.country = data.country;
                         $scope.modalBox.tx.area = data.area;
+
+
                     }
                     else{
                         $scope.$emit('$preLoaderStop');
@@ -459,6 +487,7 @@
                     }
                 }
                 txItem.Qty = 1;
+                txItem.Amount = txItem.Qty * txItem.Rate;
                 return txItem;
             };
 
@@ -473,6 +502,8 @@
                 }
                 else{
                     $scope.modalBox.tx.itemList[txItemIndex].Qty += 1;
+                    $scope.modalBox.tx.itemList[txItemIndex].Amount =
+                        ($scope.modalBox.tx.itemList[txItemIndex].Qty * $scope.modalBox.tx.itemList[txItemIndex].Rate);
                 }
             };
 
@@ -845,11 +876,88 @@
 
 
             /**
+             * Preparing data for saving transaction
+             * @param tx
+             * @param editMode
+             */
+            var prepareSaveTransaction = function(editMode){
+
+                /**
+                 * @todo Implement Validations
+                 * 1. Access Rights and permission
+                 * 2. Format of Dates, aciton types and status
+                 * 3. Amount
+                 * @type {{TID: number, Token: *, MessageText: string, Status: number, TaskDateTime: string, Notes: string, LocID: *, Country: string, State: string, City: string, Area: string, FunctionType: number, Latitude: number, Longitude: number, EZEID: string, ContactInfo: string, FolderRuleID: number, Duration: number, DurationScales: number, NextAction: number, NextActionDateTime: string, ItemsList: Array, DeliveryAddress: string}}
+                 */
+                var preparedTx = {
+                    TID : ($scope.modalBox.tx.TID) ? $scope.modalBox.tx.TID : 0,
+                    Token : $rootScope._userInfo.Token,
+                    MessageText : $scope.modalBox.tx.message,
+                    Status : $scope.modalBox.tx.statusType,
+                    TaskDateTime : (!editMode) ? moment().format('DD MMM YYYY hh:mm:ss') : $scope.modalBox.tx.taskDateTime,
+                    Notes : $scope.modalBox.tx.notes,
+                    LocID : ($scope.modalBox.tx.locId) ? $scope.modalBox.tx.locId : 0,
+                    Country : $scope.modalBox.tx.country,
+                    State : $scope.modalBox.tx.state,
+                    City : $scope.modalBox.tx.city,
+                    Area : $scope.modalBox.tx.area,
+                    FunctionType : 0,   // For sales
+                    Latitude : $scope.modalBox.tx.latitude,
+                    Longitude : $scope.modalBox.tx.longitude,
+                    EZEID : $scope.modalBox.tx.ezeid,
+                    ContactInfo : $scope.modalBox.tx.contactInfo,
+                    FolderRuleID : ($scope.modalBox.tx.folderRule) ? $scope.modalBox.tx.folderRule : 0,
+                    Duration : 0,
+                    DurationScales : 0,
+                    NextAction : ($scope.modalBox.tx.nextAction) ? $scope.modalBox.tx.nextAction : 0,
+                    NextActionDateTime : ($scope.modalBox.tx.nextActionDateTime) ? $scope.modalBox.tx.nextActionDateTime : moment().format('DD MMM YYYY hh:mm:ss'),
+                    ItemsList: JSON.stringify($scope.modalBox.tx.itemList),
+                    DeliveryAddress : (!editMode) ? ($scope.modalBox.tx.address + $scope.modalBox.tx.area + $scope.modalBox.tx.city +
+                        $scope.modalBox.tx.state + $scope.modalBox.tx.country) : $scope.modalBox.tx.deliveryAddress
+                };
+                return preparedTx;
+            };
+            /**
              * Saving transaction in
              * @param editMode
              */
-            $scope.saveTransaction = function(editMode){
+            $scope.saveTransaction = function(){
+                var data = prepareSaveTransaction($scope.modalBox.editMode);
 
+                if(!data.ContactInfo){
+                    Notification.error({ message : 'Please enter contact information for customer',delay : MsgDelay});
+                    return ;
+                }
+
+                if($scope.modalBox.tx.itemList.length <  1 && $scope.modules[moduleIndex].listType > 0){
+                    Notification.error({ message : 'Please select items for the enquiry',delay : MsgDelay});
+                    return ;
+                }
+
+                $scope.$emit('$preLoaderStart');
+                $http({
+                    url : GURL + 'ewtSaveTranscation',
+                    method : 'POST',
+                    data : data
+                }).success(function(resp){
+                    if(resp && resp.hasOwnProperty('IsSuccessfull')){
+                        if(resp.IsSuccessfull){
+                            Notification.success({ message : 'Enquiry is posted successfully.', delay : MsgDelay});
+                            $scope.toggleModal();
+                        }
+                        else{
+                            Notification.error({ message : 'An error occurred while placing enquiry', delay : MsgDelay});
+                        }
+                    }
+                    else{
+                        Notification.error({ message : 'An error occurred while placing enquiry', delay : MsgDelay});
+                    }
+
+                    $scope.$emit('$preLoaderStop');
+                }).error(function(err){
+                    $scope.$emit('$preLoaderStop');
+                    Notification.error({ message : err, delay : MsgDelay});
+                });
             };
 
         }]);

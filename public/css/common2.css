@@ -14,11 +14,18 @@
 }
 
 #home-page-wrapper{
+
+}
+
+.hpw .main-page-image
+{
     background: url('../images/front-page-bg.jpg');
-    height: 75%;
+    height: inherit;
     background-size: cover;
+    background-repeat: space;
     background-position-y: -140px;
 }
+
 .hpw .logo
 {
     content: url(https://www.ezeid.com/images/logo.png);
@@ -717,7 +724,7 @@ hr.style-two {
 
 .hpw .text-white
 {
-    color:#fff;
+    color:#fff !important;
 }
 
 .hpw .text-red
@@ -993,4 +1000,27 @@ hr.style-two {
 .hpw .text-dark-blue
 {
     color: rgb(14, 7, 128);
+}
+
+.hpw .navbar-inverse .navbar-nav>li>a {
+    color: #fff;
+}
+
+.hpw .header-link:hover
+{
+    background-color: #fff !important;
+    color:black !important;
+}
+
+.hpw .header-dropdown-style>li>a
+{
+    font-weight: 400;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid rgb(224, 224, 224);
+}
+
+.hpw .header-dropdown-style>li>a:hover
+{
+    background-color: rgb(211, 229, 244);
 }

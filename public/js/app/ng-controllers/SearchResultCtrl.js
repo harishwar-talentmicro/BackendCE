@@ -137,14 +137,18 @@ angular.module('ezeidApp').
 
                     /* put the maps coordinates in array */
                     $scope.coordinatesArr = [];
+                    /* count the result */
+                    var count = 0;
                     if(data != 'null'){
 
                         for(var i=0; i<data.length; i++)
                         {
+                            count++;
                             coordinates.push([data[i].Latitude,data[i].Longitude,data[i].CompanyName]);
                         }
                         $scope.coordinatesArr = coordinates;
                     }
+                    $scope.searchCount = count;
 
 
                     //console.log($scope.coordinatesArr);
@@ -398,6 +402,21 @@ angular.module('ezeidApp').
                 $window.localStorage.setItem("selectedTids", JSON.stringify($scope.selectedList));
             });
 
+            /* redirect to full details page */
+            $scope.redirectFullPage = function(searchType,tid)
+            {
+                /* redirect to full detail page */
+                $location.url('/searchDetails?searchType='+searchType+'&TID='+tid);
+            }
+            ///searchDetails?searchType={{params.searchType}}&TID={{search.TID}}
 
+
+
+            /* watch modal box close */
+            //$scope.$watch('showDetailsModal',function(newVal,oldVal){
+            //    if(!newVal){
+            //        $window.history.back();
+            //    }
+            //});
         }
     ]);

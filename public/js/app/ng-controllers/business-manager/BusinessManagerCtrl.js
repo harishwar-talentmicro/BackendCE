@@ -177,7 +177,7 @@ angular.module('ezeidApp').controller('BusinessManagerCtrl',[
             $http({
                 url : GURL + 'ewtGetSearchInformation',
                 params : {
-                    Token : $rootScope._userInfo.Token,
+                    Token : ($rootScope._userInfo.Token) ? $rootScope._userInfo.Token : 2,
                     TID : masterId,
                     CurrentDate : moment(Date.now()).format("YYYY-MM-DD HH:mm:ss")
                 }
@@ -218,15 +218,15 @@ angular.module('ezeidApp').controller('BusinessManagerCtrl',[
                      *
                      */
 
-//                    if($scope.masterUser.EZEIDVerifiedID !== 2){
-//                        $location.path('/');
-//                    }
-//                    else{
-//                        init();
-//                    }
-                    init();
+                    if($scope.masterUser.EZEIDVerifiedID !== 2){
+                        $location.path('/');
+                    }
+                    else{
+                        init();
+                    }
+                    //init();
                 },function(){
-                    Notification.error({ message : 'An error occurred', delay : MsgDelay})
+                    Notification.error({ message : 'An error occurred', delay : MsgDelay});
                     $location.path('/');
                 });
             }
