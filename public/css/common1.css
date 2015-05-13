@@ -317,7 +317,6 @@ hr {
 }
 .setTopMargin
 {
-    /*margin-top: 3%;*/
     margin-top: 2%;
 }
 .chkShowParking
@@ -1547,4 +1546,9 @@ table.rwd-table > tbody > tr > td.serachResultSelectAll
 #map-canvasH1{
     height: 445px;
     width: 100%;
+}
+.mapControls
+{
+    top: 30px!important;
+    right: 75px!important;
 }

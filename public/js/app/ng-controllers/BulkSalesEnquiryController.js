@@ -42,7 +42,7 @@ angular.module('ezeidApp').controller('bulksalesController',[
                 Icon:''
             };
             alert('Sorry..! Browser does not support');
-            window.location.href = "/home";
+            window.location.href = "/";
         }
     }
 
@@ -256,7 +256,6 @@ angular.module('ezeidApp').controller('bulksalesController',[
         }
         else
         {
-
             if($scope.selectedTID.length > 0)
             {
                /* $http({ method: 'get', url: GURL + 'ewtSendBulkMailer?Token=' + $rootScope._userInfo.Token + '&TID='+ $scope.selectedTID + '&TemplateID='+ salesEnquiry._info.TID }).success(function (data)*/
@@ -288,7 +287,6 @@ angular.module('ezeidApp').controller('bulksalesController',[
                  });
             }
            else {
-
                 Notification.error({message: "Please select a company !", delay: MsgDelay});
             }
         }
@@ -298,9 +296,7 @@ angular.module('ezeidApp').controller('bulksalesController',[
     salesEnquiry.closeSalesEnquiryForm = function () {
         $window.localStorage.removeItem("searchResult");
         $window.localStorage.removeItem("selectedTids");
-        $location.path("/home");
-       // window.location.href = "/home";
-
+        $location.path("/");
     };
 
     $scope.$on('$locationChangeStart', function( event ) {
