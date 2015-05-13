@@ -1,3 +1,4 @@
+"use strict"
 /**
  * Sign up Controller
  * @name SignUpCtrl
@@ -161,11 +162,14 @@ angular.module('ezeidApp').
                 if(resp){
                     $scope.googleMap.getReverseGeolocation($scope.googleMap.currentMarkerPosition.latitude,
                         $scope.googleMap.currentMarkerPosition.longitude).then(function(resp){
-                            placeDetail = $scope.googleMap.parseReverseGeolocationData(resp.data);
-                            $scope.locationString = placeDetail.city != ''?'Your current location is: '+placeDetail.city+", "+placeDetail.state:'';
-                            /* Setting up default lattitude & longitude of the map */
-                            $scope.searchParams.lat = $scope.googleMap.currentMarkerPosition.latitude;
-                            $scope.searchParams.lng = $scope.googleMap.currentMarkerPosition.longitude;
+                            if(resp){
+                                console.log(resp);
+                                placeDetail = $scope.googleMap.parseReverseGeolocationData(resp.data);
+                                $scope.locationString = placeDetail.city != ''?'Your current location is: '+placeDetail.area+", "+placeDetail.city+", "+placeDetail.state:'';
+                                /* Setting up default lattitude & longitude of the map */
+                                $scope.searchParams.lat = $scope.googleMap.currentMarkerPosition.latitude;
+                                $scope.searchParams.lng = $scope.googleMap.currentMarkerPosition.longitude;
+                            }
                         },function(){
 
                         });
@@ -193,7 +197,7 @@ angular.module('ezeidApp').
 
                 $scope.googleMap.mapIdleListener().then(function(){
                     $scope.googleMap.pushMapControls();
-                    $scope.googleMap.listenOnMapControls();
+                    $scope.googleMap.listenOnMapControls(getNewCoordinates,getNewCoordinates);
                     $scope.googleMap.resizeMap();
                     /* place the present location marker on map */
                     $scope.googleMap.getCurrentLocation().then(function(e){
@@ -209,17 +213,33 @@ angular.module('ezeidApp').
             /* update the coordinates on drag event of map marker */
             var getNewCoordinates = function(lat,lng)
             {
+                console.log(lat);
                 $scope.searchParams.lat = lat;
                 $scope.searchParams.lng = lng;
-            }
+
+                /* get new location string */
+                $scope.googleMap.getReverseGeolocation(lat,lng).then(function(resp){
+                        if(resp){
+
+                            placeDetail = $scope.googleMap.parseReverseGeolocationData(resp.data);
+                            $scope.locationString = placeDetail.city != ''?'Your preferred search location is: '+placeDetail.area+", "+placeDetail.city+", "+placeDetail.state:'';
+                        }
+                    });
+
+            };
 
             var isMapInitialized = false;
+            $scope.modalVisible = false;
             $scope.modalVisibility = function()
             {
                 /* toggle map visibility status */
-                $scope.modal.visible = !$scope.modal.visible;
-                /* Now the map is visible */
-                if($scope.modal.visible)
+
+                $scope.modalVisible = !$scope.modalVisible;
+            };
+
+            $scope.$watch('modalVisible',function(newVal,oldVal){
+
+                if(newVal)
                 {
                     /* check for the map initialzation */
                     if(!isMapInitialized){
@@ -228,21 +248,22 @@ angular.module('ezeidApp').
                         isMapInitialized = true;
                     }
                     else{
-
-
-                        $scope.googleMap.resizeMap();
-
+                        $timeout(function(){
+                            $scope.googleMap.resizeMap();
+                        },1500);
                     }
                 }
 
-            };
+            });
 
 
             $scope.modal = {
-                visible : false,
                 title : 'Change Your Searched Location',
                 class : 'business-manager-modal'
             };
+
+
+
 
 
 
