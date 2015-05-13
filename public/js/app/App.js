@@ -192,7 +192,7 @@
 
                         $('#progress-overlay').addClass('hidden');
                     }
-                },2000);
+                },10);
             });
 
         /**
