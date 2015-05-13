@@ -735,10 +735,11 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
             var image = $(elem)[0].files[0];
             var fileName = image.name;
 
-            var imageHeight = 90;
-            var imageWidth = 308;
+            var imageHeight = 155;
+            var imageWidth = 315;
             if($scope.userDetails.IDTypeID == 1){
-                imageWidth = 77;
+                imageHeight = 148;
+                imageWidth = 148;
             }
             ScaleAndCropImage.covertToBase64(image).then(function(imageUrl){
                 var scaledImageUrl = ScaleAndCropImage.scalePropotional(imageUrl,imageHeight,imageWidth);
