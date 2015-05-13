@@ -2,10 +2,7 @@
 angular.module('ezeidApp').controller('TermsController',['$rootScope','$scope', '$http', function ($rootScope, $scope, $http) {
 
     var SLocCtrl = this;
-
     var MsgDelay = 2000;
-
-
     if ($rootScope._userInfo) {
     }
     else {

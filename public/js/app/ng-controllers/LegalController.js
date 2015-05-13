@@ -2,10 +2,7 @@
 angular.module('ezeidApp').controller('LegalController',['$rootScope','$scope','$http','GURL',function ($rootScope, $scope, $http,GURL) {
 
     var SLocCtrl = this;
-
     var MsgDelay = 2000;
-
-
     if ($rootScope._userInfo) {
     }
     else {
