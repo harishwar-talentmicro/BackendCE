@@ -253,7 +253,6 @@ angular.module('ezeidApp').
                         },1500);
                     }
                 }
-
             });
 
 
@@ -261,10 +260,4 @@ angular.module('ezeidApp').
                 title : 'Change Your Searched Location',
                 class : 'business-manager-modal'
             };
-
-
-
-
-
-
         }]);

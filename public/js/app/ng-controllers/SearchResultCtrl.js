@@ -186,19 +186,6 @@ angular.module('ezeidApp').
             }
 
             /**
-             Select random colors for search result list tiles
-             /
-
-             /* make an array of colors for tiles */
-            var colorArray = ["orange","green","cyan","pink"];
-
-            /* generate a random color string */
-            $scope.random = function(){
-                var rand = colorArray[Math.floor(Math.random() * colorArray.length)];
-                return rand;
-            };
-
-            /**
              * Search for a keywod
              */
             $scope.searchKey = function(e){
@@ -410,13 +397,38 @@ angular.module('ezeidApp').
             }
             ///searchDetails?searchType={{params.searchType}}&TID={{search.TID}}
 
+            /**
+             Select random colors for search result list tiles
+             /
+
+             /* make an array of colors for tiles */
+            var colorArray = ["orange","green","cyan","pink"];
+            $scope.oldColorValue = 0;
+            /* generate a random color string */
+            $scope.count = 0;
+            $scope.random = function(){
+                var num = getRandomNumber(colorArray.length);
+                if(num != $scope.oldColorValue)
+                {
+                    $scope.oldColorValue = num;
+                    return colorArray[num];
+                }
+                else
+                {
+                    return $scope.random();
+                }
+            };
 
 
-            /* watch modal box close */
-            //$scope.$watch('showDetailsModal',function(newVal,oldVal){
-            //    if(!newVal){
-            //        $window.history.back();
-            //    }
-            //});
+            var getRandomNumber = function(len)
+            {
+                return Math.floor(Math.random() * len);
+            }
+
+            /* generating a set of random value */
+            var geneateRandomValue = function()
+            {
+
+            }
         }
     ]);
