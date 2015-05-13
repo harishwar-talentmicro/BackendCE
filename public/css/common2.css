@@ -14,11 +14,18 @@
 }
 
 #home-page-wrapper{
+
+}
+
+.hpw .main-page-image
+{
     background: url('../images/front-page-bg.jpg');
-    height: 75%;
+    height: inherit;
     background-size: cover;
+    background-repeat: space;
     background-position-y: -140px;
 }
+
 .hpw .logo
 {
     content: url(https://www.ezeid.com/images/logo.png);
