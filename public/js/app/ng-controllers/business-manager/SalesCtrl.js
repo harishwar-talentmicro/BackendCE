@@ -940,9 +940,10 @@
                     method : 'POST',
                     data : data
                 }).success(function(resp){
-                    if(resp && res.hasOwnProperty('IsSuccessfull')){
+                    if(resp && resp.hasOwnProperty('IsSuccessfull')){
                         if(resp.IsSuccessfull){
                             Notification.success({ message : 'Enquiry is posted successfully.', delay : MsgDelay});
+                            $scope.toggleModal();
                         }
                         else{
                             Notification.error({ message : 'An error occurred while placing enquiry', delay : MsgDelay});
