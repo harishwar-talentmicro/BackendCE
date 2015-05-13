@@ -36,7 +36,7 @@ angular.module('ezeidApp').controller('BusinessListController',[
                 Icon:''
             };
             alert('Sorry..! Browser does not support');
-            window.location.href = "index.html";
+            window.location.href = "/";
         }
     }
 
@@ -44,7 +44,7 @@ angular.module('ezeidApp').controller('BusinessListController',[
         if ($rootScope._userInfo.IsAuthenticate == true) {
             getBusinessInfo();
         } else {
-            window.location.href = "index.html";
+            window.location.href = "/";
         }
     });
 
@@ -99,7 +99,7 @@ angular.module('ezeidApp').controller('BusinessListController',[
             if(data.IsUpdated) {
                 Notification.success({message: "Saved...", delay: MsgDelay});
                 getBusinessInfo();
-                window.location.href = "/home";
+                window.location.href = "/";
             }else{
                 Notification.error({message: "Sorry..! not saved", delay: MsgDelay});
             }

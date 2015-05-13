@@ -87,7 +87,6 @@ angular.module('ezeidApp').
                     $rootScope.$broadcast('$preLoaderStop');
                     if (data != 'null') {
 
-                        console.log(data);
                         $timeout(function () {
                             $scope.SearchInfo = data[0];
 
