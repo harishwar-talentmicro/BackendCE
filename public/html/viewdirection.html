@@ -57,10 +57,10 @@
                                         </div>
                                        <div class="row setRowLeftRightMarginZero mapButtonContainer">
                                             <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 searchHeaderAlignment">
-                                                <button type="submit" class="btn btn-primary" ng-click="viewDirection.printHtml()">Print</button>
+                                                <button type="submit" class="btn btn-primary" ng-disabled="!isPrintEnabled" ng-click="viewDirection.printHtml()">{{(isPrintEnabled) ? 'Print Map' : 'Preparing Map for printing...'}}Print</button>
                                             </div>
                                             <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 searchHeaderAlignment">
-                                                <button type="button" class="btn btn-primary" ng-click="viewDirection.emailHtml()" >Email</button>
+                                                <button type="button" class="btn btn-primary" ng-click="viewDirection.emailHtml()" >{{(isPrintEnabled) ? 'Email' : 'Preparing Map for printing...'}}</button>
                                             </div>
                                         </div>
                                     </div>

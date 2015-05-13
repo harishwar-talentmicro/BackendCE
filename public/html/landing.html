@@ -13,13 +13,13 @@
         <!-- Search Bar goes here -->
         <div class="container m_top_10">
             <div class="row">
-                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 col-lg-offset-3 col-md-offset-3 col-sm-offset-3 col-xs-offset-0">
+                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 col-lg-offset-2 col-md-offset-2 col-sm-offset-2 col-xs-offset-0">
                     <div class="input-group p-bottom-3">
                         <div class="input-group-btn">
                             <!-- Change Location btn -->
                             <button type="button" ng-click="modalVisibility()" class="btn btn-info" title="Change current location"><i class="fa fa-map-marker"></i></button>
 
-                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><b>{{searchType[searchParams.searchType - 1]}}</b> <span class="caret"></span></button>
+                            <button title="Search by" type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><b class="search-type">{{searchType[searchParams.searchType - 1]}}</b> <span class="caret"></span></button>
                             <ul class="dropdown-menu" role="menu">
                                 <li class="btn-link" ng-repeat="search in searchType track by $index">
                                     <!-- Index incremented by 1: As the array's default index is [0,1,2] & searchType's value is [1,2,3] -->

@@ -48,6 +48,11 @@
     padding-top: 100px;
 }
 
+.hpw .search-type
+{
+    display:inline;
+}
+
 @media screen and (max-width: 1320px) {
     .srw .tile-frame-padding-top
     {
@@ -63,6 +68,10 @@
 }
 
 @media screen and (max-width: 768px) {
+    .hpw .search-type
+    {
+        display:none;
+    }
     .hpw .logo {
         content: url(https://www.ezeid.com/images/logo.png);
         background-position:top;
