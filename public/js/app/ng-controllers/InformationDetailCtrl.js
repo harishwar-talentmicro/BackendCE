@@ -55,7 +55,13 @@ angular.module('ezeidApp').
         $scope.modalBox = {
             title : 'EZEID Map',
             class : 'business-manager-modal'
-        }
+        };
+
+        $scope.$watch('showDetailsModal',function(newVal,oldVal){
+            if(!newVal){
+                $window.history.back();
+            }
+        });
 
         var TID =  $routeParams.TID;
         $scope.SearchType = $routeParams.searchType;
