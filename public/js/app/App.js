@@ -157,7 +157,7 @@
                 controller : 'InformationDetailCtrl'
             })
             .when('/:ezeid',{
-                templateUrl : 'html/home.html'
+                redirectTo : '/'
             })
             .otherwise({redirectTo : '/'});
         $locationProvider.html5Mode(true);
@@ -192,7 +192,7 @@
 
                         $('#progress-overlay').addClass('hidden');
                     }
-                },2000);
+                },10);
             });
 
         /**

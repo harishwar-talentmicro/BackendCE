@@ -13,6 +13,7 @@ angular.module('ezeidApp').controller('viewDirectionController',['$http', '$root
     var initialLocation;
     var finalImageSrc = "";
 
+    $scope.isPrintEnabled = false;
         $timeout(function(){
             initialize();
         },1000);
@@ -35,7 +36,8 @@ angular.module('ezeidApp').controller('viewDirectionController',['$http', '$root
 
         var autocomplete = new google.maps.places.Autocomplete(input, {
             types: ["geocode"]
-        })
+        });
+
 
         google.maps.event.addListener(autocomplete,'place_changed',function(){
             var place = autocomplete.getPlace();
@@ -80,10 +82,21 @@ angular.module('ezeidApp').controller('viewDirectionController',['$http', '$root
             if (status == google.maps.DirectionsStatus.OK) {
                 directionsDisplay.setDirections(response);
 
-                $timeout(function(){
-                    convertasbinaryimage();
-                },8000);
+
             }
+        });
+
+        google.maps.event.addListener(directionsDisplay, 'directions_changed', function() {
+            // ... CALLBACK
+                google.maps.event.addListener(map,'tilesloaded',function(){
+                            convertasbinaryimage().then(function(){
+                                $timeout(function(){
+                                    $scope.isPrintEnabled = true;
+                                },15000);
+                            });
+                }
+            );
+
         });
 
         // Try W3C Geolocation (Preferred)
@@ -137,19 +150,25 @@ angular.module('ezeidApp').controller('viewDirectionController',['$http', '$root
         PlaceCurrentLocationMarker(initialLocation);
     }
 
+
+
     function convertasbinaryimage()
     {
+        var defer = $q.defer();
         html2canvas(document.getElementById("googlemap"), {
             useCORS: true,
+            proxy : '//maps.googlemaps.com',
             onrendered: function(canvas) {
                 var img = canvas.toDataURL("image/jpg");
                 img = img.replace('data:image/png;base64,', '');
                 finalImageSrc = 'data:image/jpg;base64,' + img;
                 $('#googlemapbinary').attr('src', finalImageSrc);
                // $rootScope.$broadcast('$preLoaderStop');
+                defer.resolve();
                 return false;
             }
         });
+        return defer.promise;
     }
 
     // EMail direction Html
