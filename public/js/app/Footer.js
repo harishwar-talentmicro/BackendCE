@@ -1,7 +1,52 @@
-﻿var FooterApp = angular.module('ngFooter', []);
+﻿var FooterApp = angular.module('ngFooter', []).controller('footerCtrl', [
+    '$rootScope',
+    '$scope',
+    '$http',
+    '$q',
+    '$timeout',
+    'Notification',
+    '$filter',
+    '$window',
+    'GURL',
+    '$interval',
+    'MsgDelay',
+    '$location',
+    '$routeParams',
+    function (
+        $rootScope,
+        $scope,
+        $http,
+        $q,
+        $timeout,
+        Notification,
+        $filter,
+        $window,
+        GURL,
+        $interval,
+        MsgDelay,
+        $location,
+        $routeParams
+    ) {
+        $scope.modalBox = {
+            title : 'Legal',
+            class : 'business-manager-modal'
+        };
+
+        $scope.showDetailsModal = false;
+
+        $scope.modalVisibility = function()
+        {
+            /* toggle map visibility status */
+
+            $scope.showDetailsModal = !$scope.showDetailsModal;
+        };
+    }
+]);
 
 FooterApp.directive('footerSection', function () {
     return {
+
+
         restrict: 'EA',
         templateUrl: 'directives/Footer.html',
         controller: function () {
@@ -16,7 +61,8 @@ FooterApp.directive('footerSection', function () {
         controllerAs: 'FooterCtrl',
         link: function () {
             $('#legal-link').click(function(){
-                $("#Legal_popup").slideDown();
+                console.log("sai");
+                $('#Legal_popup').slideDown();
             });
             $('#legal-popup-close').click(function(){
                 $("#Legal_popup").slideUp();
