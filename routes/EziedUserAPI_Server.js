@@ -4186,8 +4186,8 @@ exports.FnGetSearchInformation = function (req, res) {
         if (Token != null && Token != '' && TID.toString() != 'NaN' && WorkingDate != null) {
             if(Token == 2){
 
-                            var SearchParameter = db.escape(TID) + ',' + db.escape(Token) + ',' + db.escape(WorkingDate) 
-                                    + ',' + db.escape(SearchType);
+                            var SearchParameter = db.escape(TID) + ',' + db.escape(Token) + ',' + db.escape(WorkingDate)
+                                    + ',' + db.escape(SearchType)+ ',' + db.escape(0);
                             // console.log('Search Information: ' +SearchParameter);
            //     console.log('CALL pSearchInformation(' + SearchParameter + ')');
                             db.query('CALL pSearchInformation(' + SearchParameter + ')', function (err, UserInfoResult) {
@@ -4199,8 +4199,27 @@ exports.FnGetSearchInformation = function (req, res) {
                                         console.log('FnSearchEzeid: tmaster: Search result sent successfully');
                                     }
                                     else {
-                                        res.send('null');
-                                        console.log('FnSearchEzeid: tmaster: no search found');
+                                        var searchParams = db.escape(TID) + ',' + db.escape(Token) + ',' + db.escape(WorkingDate)
+                                            + ',' + db.escape(SearchType)+ ',' + db.escape(1);
+                                        db.query('CALL pSearchInformation('+ searchParams +')', function (err, UserInfoReResult) {
+                                            if(!err){
+                                                if(UserInfoReResult[0].length > 0){
+                                                    res.send(UserInfoReResult[0]);
+                                                    console.log('FnSearchEzeid: tmaster: Search result re sent successfully');
+                                                }
+                                                else
+                                                {
+                                                    res.send('null');
+                                                    console.log('FnSearchEzeid: tmaster: no re search infromation ');
+                                                }
+
+                                            }
+                                            else {
+                                                res.statusCode = 500;
+                                                res.send('null');
+                                                console.log('FnSearchEzeid: tmaster: ' + err);
+                                            }
+                                        });
                                     }
                                 }
                                 else {
@@ -4228,8 +4247,26 @@ exports.FnGetSearchInformation = function (req, res) {
                                     console.log('FnSearchEzeid: tmaster: Search result sent successfully');
                                 }
                                 else {
-                                    res.send('null');
-                                    console.log('FnSearchEzeid: tmaster: no search found');
+                                    var searchParams = db.escape(TID) + ',' + db.escape(Token) + ',' + db.escape(WorkingDate)
+                                        + ',' + db.escape(SearchType)+ ',' + db.escape(1);
+                                    db.query('CALL pSearchInformation('+ searchParams +')', function (err, UserInfoReResult) {
+                                        if(!err){
+                                            if(UserInfoReResult[0].length > 0){
+                                                res.send(UserInfoReResult[0]);
+                                                console.log('FnSearchEzeid: tmaster: Search result re sent successfully');
+                                            }
+                                            else
+                                            {
+                                                res.send('null');
+                                                console.log('FnSearchEzeid: tmaster: no re search infromation ');
+                                            }
+                                        }
+                                        else {
+                                            res.statusCode = 500;
+                                            res.send('null');
+                                            console.log('FnSearchEzeid: tmaster: ' + err);
+                                        }
+                                    });
                                 }
                             }
                             else {
