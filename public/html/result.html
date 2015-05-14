@@ -57,12 +57,12 @@
                         </ul>
                     </div>
 
-                    <p ng-show="searchCount > 0" class="text-center"><i>{{searchCount}} Items found for <b>{{params.searchTerm}}</b></i></p>
+                    <p ng-show="searchCount > 0" class="text-center"><i>{{searchCount}} Items found for <b>{{defaultSearchTerm}}</b></i></p>
                 </div><!-- /.navbar-collapse -->
             </div><!-- /.container-fluid -->
             <div class="no-result" ng-show="isResultNumber == 0">
                 <hr class="style-two">
-                <h3 class="text text-center font-open-sans-light"><i class="fa fa-warning"></i> No Result Found, Try again with different search parameters</h3>
+                <h3 class="text text-center font-open-sans-light"><i class="fa fa-warning"></i> Nothing Found, Try again with different keywords</h3>
             </div>
         </nav>
 
