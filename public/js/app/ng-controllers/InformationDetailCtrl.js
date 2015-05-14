@@ -70,7 +70,10 @@ angular.module('ezeidApp').
         {
             $scope.showLoginText = false;
             getSearchInformation(TID,$scope.SearchType);
-            getAboutComapny();
+            if($scope.SearchType == 1)
+            {
+               getAboutComapny();
+            }
         }
         //Below function is for getting search information
         function getSearchInformation(_TID,_SearchType)

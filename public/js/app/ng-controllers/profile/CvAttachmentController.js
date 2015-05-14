@@ -1,6 +1,6 @@
 angular.module('ezeidApp').controller('CVAttachController',[
-    '$http', '$rootScope', '$scope', '$timeout', 'Notification', '$filter','$q', '$window','GURL',
-    function($http, $rootScope, $scope, $timeout, Notification, $filter,$q, $window,GURL){
+    '$http', '$rootScope', '$scope', '$timeout', 'Notification', '$filter','$q', '$window','$location','GURL',
+    function($http, $rootScope, $scope, $timeout, Notification, $filter,$q, $window,$location,GURL){
 
     var CVAttachCtrl = this;
     CVAttachCtrl._CVInfo={};
@@ -44,7 +44,7 @@ angular.module('ezeidApp').controller('CVAttachController',[
         if ($rootScope._userInfo.IsAuthenticate == true) {
             getCVInfo();
         } else {
-            window.location.href = "index.html";
+            $location.path('/');
             CVAttachCtrl._CVInfo.Status = 1;
         }
     });
@@ -140,7 +140,6 @@ angular.module('ezeidApp').controller('CVAttachController',[
                 if(data.IsSuccessfull) {
                     Notification.success({message: "Saved..", delay: MsgDelay});
                     getCVInfo();
-                //    window.location.href = "/home";
                 }else{
                     Notification.error({message: "Sorry..! not saved", delay: MsgDelay});
                 }
@@ -148,8 +147,7 @@ angular.module('ezeidApp').controller('CVAttachController',[
 
         if($scope.DocumentToUpload)
         {
-            CVAttachCtrl._CVInfo.CVDocFile = $scope.DocumentToUpload[0].name;
-           // for (var i = 0; i < $scope.DocumentToUpload.length; i++) {
+                CVAttachCtrl._CVInfo.CVDocFile = $scope.DocumentToUpload[0].name;
                 var $file = $scope.DocumentToUpload[0];
                 var formData = new FormData();
                 formData.append('file', $file);
@@ -159,13 +157,12 @@ angular.module('ezeidApp').controller('CVAttachController',[
                 $http({ method: 'POST', url: '/ewTUploadDoc/', data: formData,
                     headers: { 'Content-Type': undefined }, transformRequest: angular.identity })
                     .success(function (data, status, headers, config) {
-                        window.location.href = "/home";
-                    });
-                /*  error(function(data, status, headers, config) {
-                 });*/
-           // }
+                        $location.path('/');
+                    })
+                  .error(function(data, status, headers, config) {
+                        Notification.error({message: "An error occurred..", delay: MsgDelay});
+                 });
         }
-
         }
     };
 
