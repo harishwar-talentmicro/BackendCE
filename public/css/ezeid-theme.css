@@ -269,7 +269,10 @@ h5 {
 .close {
     background: url(../images/close.png) no-repeat 1px 1px;
     padding: 2px 0px 2px 22px;
-    text-decoration: underline;
+    text-decoration: none;
+    font-size: 28px;
+    color: #D53636;
+    opacity: 1;
 }
 
 .add_new:hover {
