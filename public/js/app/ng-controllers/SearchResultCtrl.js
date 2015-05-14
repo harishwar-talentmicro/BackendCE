@@ -150,8 +150,6 @@ angular.module('ezeidApp').
                     }
                     $scope.searchCount = count;
 
-
-                    //console.log($scope.coordinatesArr);
                     /* status to check if there is some result */
                     $scope.isResultNumber = (data == 'null') ?0 : 1;
 
@@ -174,7 +172,6 @@ angular.module('ezeidApp').
                                 $rootScope.defer = $q.defer();
                                 var prom = $rootScope.defer.promise;
                                 prom.then(function(d){
-                                    //SearchSec.getSearch();
                                 });
                             }
                         }
@@ -212,6 +209,10 @@ angular.module('ezeidApp').
                     return false;
                 }
 
+
+                /* update the coordinates */
+                $scope.params.lat = $rootScope.coordinatesLat;
+                $scope.params.lng = $rootScope.coordinatesLng;
 
                 var modifyValue = [
                     'homeDelivery',
@@ -251,8 +252,8 @@ angular.module('ezeidApp').
                     currentLocationElementClass : "link-btn pac-loc",
                     controlsContainerClass : "col-lg-6 col-md-6'"
                 });
-                googleMap.createMap("map-ctrl",$scope,"findCurrentLocation()");
 
+                googleMap.createMap("map-ctrl",$scope,"findCurrentLocation()");
                 googleMap.renderMap();
 
                 googleMap.mapIdleListener().then(function(){
@@ -314,8 +315,6 @@ angular.module('ezeidApp').
 
                 /* toggle the select all variable's value */
                 $scope.selectAll = !$scope.selectAll;
-
-                //var elem = event.currentTarget;
 
                 /* chechk all the check boxes */
                 if($scope.selectAll)
@@ -395,7 +394,6 @@ angular.module('ezeidApp').
                 /* redirect to full detail page */
                 $location.url('/searchDetails?searchType='+searchType+'&TID='+tid);
             }
-            ///searchDetails?searchType={{params.searchType}}&TID={{search.TID}}
 
             /**
              Select random colors for search result list tiles
@@ -423,12 +421,6 @@ angular.module('ezeidApp').
             var getRandomNumber = function(len)
             {
                 return Math.floor(Math.random() * len);
-            }
-
-            /* generating a set of random value */
-            var geneateRandomValue = function()
-            {
-
-            }
+            };
         }
     ]);
