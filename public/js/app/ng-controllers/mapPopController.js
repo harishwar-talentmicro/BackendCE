@@ -83,21 +83,24 @@ angular.module('ezeidApp').controller('mapPopController',[
             googleMap.clearAllMarkers();
             directtionLatLong = JSON.parse($window.localStorage.getItem("myLocation"));
 
-            var userLoc = {
+           /* var userLoc = {
                 startLat: googleMap.currentMarkerPosition.latitude,
                 startLong : googleMap.currentMarkerPosition.longitude
             };
             $window.localStorage.setItem("userCurrentLoc", JSON.stringify(userLoc));
-
+*/
             googleMap.renderDirection('directionPannel',googleMap.currentMarkerPosition.latitude,googleMap.currentMarkerPosition.longitude,directtionLatLong.endLat,directtionLatLong.endLong);
             googleMap.placeCurrentLocationMarker();
         };
 
         //Show direction in view direction page
         $scope.showDirections = function () {
-            //$location.path("/viewdirection");
+            var userLoc = {
+                startLat: googleMap.currentMarkerPosition.latitude,
+                startLong : googleMap.currentMarkerPosition.longitude
+            };
+            $window.localStorage.setItem("userCurrentLoc", JSON.stringify(userLoc));
 
-         //   $window.localStorage.setItem("directionLocation",$scope.SearchInfo.Latitude+","+$scope.SearchInfo.Longitude );
             $window.location.href = "/viewdirection";
         };
 }]);

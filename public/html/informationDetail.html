@@ -2,9 +2,13 @@
     <!-- New header menu goes here -->
     <header-section></header-section>
     <!--header ends here-->
+    <div ng-show="showLoginText">
+        <h1 class="font-open-sans-light text-center top-clearfix">Please login to continue</h1>
+        <p class="font-open-sans-light text-center text-warning"><a href="/">Go Back</a></p>
+    </div>
 
      <!--Middle container-->
-    <div class="" style="min-height: 700px;">
+    <div style="min-height: 700px;">
         <div class="Popup_window form_style map_popup_iconActions" id="SalesEnquiryRequest_popup" style="height: 103%;">
             <div class="window_page Maping_popup">
                 <span class="closelink" ng-click="closeSalesEnquiryForm()">X</span>
@@ -127,10 +131,10 @@
 
         <div class="infoModal">
             <modal showheader="false" mtitle="''" visible="showDetailsModal" mclass="modalBox.class">
-               <section id="main-content" class="searchDetailContainer">
+               <section id="main-content">
                 <div class="row setRowLeftRightMarginZero text-center">
                    <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5 setPaddingLeftRight0">
-                       <div class="row setRowLeftRightMarginZero">
+                       <div class="row setRowLeftRightMarginZero text-left">
                            <div ng-show="SearchInfo.BannerImage">
                                <img class="bannerContainerBorder" width="356px" height="356px" ng-src="{{SearchInfo.BannerImage}}" />
 
@@ -247,7 +251,9 @@
                 <div class="row setRowLeftRightMarginZero">
                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setPaddingLeftRight0 searchHeaderAlignment newMsgButtonContainer" ng-hide="(SearchInfo.IDTypeID == 1)">
                     <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 setLeftRightPaddingZero">
-                        <div class="showPointer removePadding keyWordText boxMessaageBackgroun" ng-show="SearchInfo.EZEIDVerifiedID == '2' && showSalesEnquiry == 1" title="Sales Enquiry" ng-click="openSalesEnquiryForm()">
+                        <div class="showPointer removePadding keyWordText boxMessaageBackgroun"
+                             ng-show="SearchInfo.EZEIDVerifiedID == '2' && showSalesEnquiry == 1"
+                             title="Sales Enquiry" ng-click="openSalesEnquiryForm()">
                             <img src="../images/new_sales_icon.png">
                             Sales Enquiry
                         </div>
@@ -280,7 +286,7 @@
                     <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 setLeftRightPaddingZero">
                         <div class="showPointer removePadding keyWordText boxMessaageBackgroun"
                              ng-click="getdirections(SearchInfo)" title="Map">
-                            <img src="../images/new_directions.png">
+                            <img src="../images/maps_32.png">
                             <span>Map</span>
                         </div>
                     </div>
@@ -288,22 +294,23 @@
                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 newMsgButtonContainer setPaddingLeftRight0 searchHeaderAlignment msgButtonContainer messageButtonContainer" ng-show="(SearchInfo.IDTypeID == 1)">
                    <div class="showPointer removePadding keyWordText boxMessaageBackgroun pull-right"
                          ng-click="getdirections(SearchInfo)" title="Map" class="boxMessaageBackgroun">
-                        <img src="../images/new_directions.png">
+                        <img src="../images/maps_32.png">
                        Map
                     </div>
                 </div>
             </div>
-            <div ng-show="(SearchType == 2)" class="row setRowLeftRightMarginZero aboutcontainerFrame">
-                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setPaddingLeftRight0 text-center">
-                    <!--{{SearchInfo.AboutCompany}}-->
-                    <div class="row setRowLeftRightMarginZero text-center boxMessaageBackgroun">
-                        <span class="text-bolder"><ins>About Company</ins></span>
-                    </div>
-                    <div class="row setRowLeftRightMarginZero aboutCompanyTextContainer setBackGroundWhite">
-                        {{companyTagLine}}
-                    </div>
-                </div>
-            </div>
+           <div ng-show="{{companyTagLine}}">
+               <div ng-show="(SearchType == 2)" class="row setRowLeftRightMarginZero aboutcontainerFrame">
+                   <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setPaddingLeftRight0 text-center">
+                       <div class="row setRowLeftRightMarginZero text-center boxMessaageBackgroun">
+                           <span class="text-bolder">About Company</span>
+                       </div>
+                       <div class="row setRowLeftRightMarginZero aboutCompanyTextContainer">
+                           {{companyTagLine}}
+                       </div>
+                   </div>
+               </div>
+           </div>
          </section>
         </modal>
     </div>

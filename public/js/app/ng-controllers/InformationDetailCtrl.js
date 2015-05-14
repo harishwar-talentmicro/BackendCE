@@ -51,20 +51,27 @@ angular.module('ezeidApp').
         $scope.showDetailsModal = false;
         $scope.showNoticeText = true;
         $scope.form_rating = 0;
+        $scope.showLoginText = false;
 
         $scope.modalBox = {
             title : 'EZEID Map',
             class : 'business-manager-modal'
         };
 
-
-
         var TID =  $routeParams.TID;
         $scope.SearchType = $routeParams.searchType;
 
-        getSearchInformation(TID,$scope.SearchType);
-        getAboutComapny();
-
+        if(($scope.SearchType == 1) && (!$rootScope._userInfo.IsAuthenticate))
+        {
+            $scope.showLoginText = true;
+            Notification.error({ message : 'Please login to search for EZEID', delay : MsgDelay});
+        }
+        else
+        {
+            $scope.showLoginText = false;
+            getSearchInformation(TID,$scope.SearchType);
+            getAboutComapny();
+        }
         //Below function is for getting search information
         function getSearchInformation(_TID,_SearchType)
         {
@@ -85,7 +92,6 @@ angular.module('ezeidApp').
                         $scope.showDetailsModal = true;
 
                         $scope.$watch('showDetailsModal',function(newVal,oldVal){
-                            console.log($window.history);
                             if(!newVal){
                                 $window.history.back();
                             }
