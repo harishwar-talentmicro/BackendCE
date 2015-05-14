@@ -163,7 +163,8 @@ angular.module('ezeidApp').
                     $scope.googleMap.getReverseGeolocation($scope.googleMap.currentMarkerPosition.latitude,
                         $scope.googleMap.currentMarkerPosition.longitude).then(function(resp){
                             if(resp){
-                                console.log(resp);
+                                $rootScope.coordinatesLat = $scope.googleMap.currentMarkerPosition.latitude;
+                                $rootScope.coordinatesLng = $scope.googleMap.currentMarkerPosition.longitude;
                                 placeDetail = $scope.googleMap.parseReverseGeolocationData(resp.data);
                                 $scope.locationString = placeDetail.city != ''?'Your current location is: '+placeDetail.area+", "+placeDetail.city+", "+placeDetail.state:'';
                                 /* Setting up default lattitude & longitude of the map */
@@ -180,7 +181,6 @@ angular.module('ezeidApp').
             },function(){
                 handleNoGeolocation();
             });
-
 
             /* Load the map in the modal box */
             /* Google map integration */
@@ -213,9 +213,8 @@ angular.module('ezeidApp').
             /* update the coordinates on drag event of map marker */
             var getNewCoordinates = function(lat,lng)
             {
-                console.log(lat);
-                $scope.searchParams.lat = lat;
-                $scope.searchParams.lng = lng;
+                $rootScope.coordinatesLat = $scope.searchParams.lat = lat;
+                $rootScope.coordinatesLng = $scope.searchParams.lng = lng;
 
                 /* get new location string */
                 $scope.googleMap.getReverseGeolocation(lat,lng).then(function(resp){
@@ -228,17 +227,19 @@ angular.module('ezeidApp').
 
             };
 
+            /**
+             * Load map in the modal box to change the preferred search location
+             * @type {boolean}
+             */
             var isMapInitialized = false;
             $scope.modalVisible = false;
             $scope.modalVisibility = function()
             {
                 /* toggle map visibility status */
-
                 $scope.modalVisible = !$scope.modalVisible;
             };
 
             $scope.$watch('modalVisible',function(newVal,oldVal){
-
                 if(newVal)
                 {
                     /* check for the map initialzation */
@@ -253,18 +254,11 @@ angular.module('ezeidApp').
                         },1500);
                     }
                 }
-
             });
 
-
+            /* modal box for loading map and change the searched map loacaion */
             $scope.modal = {
                 title : 'Change Your Searched Location',
                 class : 'business-manager-modal'
             };
-
-
-
-
-
-
         }]);

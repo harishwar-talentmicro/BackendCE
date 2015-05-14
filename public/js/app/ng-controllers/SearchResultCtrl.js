@@ -150,8 +150,6 @@ angular.module('ezeidApp').
                     }
                     $scope.searchCount = count;
 
-
-                    //console.log($scope.coordinatesArr);
                     /* status to check if there is some result */
                     $scope.isResultNumber = (data == 'null') ?0 : 1;
 
@@ -174,7 +172,6 @@ angular.module('ezeidApp').
                                 $rootScope.defer = $q.defer();
                                 var prom = $rootScope.defer.promise;
                                 prom.then(function(d){
-                                    //SearchSec.getSearch();
                                 });
                             }
                         }
@@ -184,19 +181,6 @@ angular.module('ezeidApp').
                 });
 
             }
-
-            /**
-             Select random colors for search result list tiles
-             /
-
-             /* make an array of colors for tiles */
-            var colorArray = ["orange","green","cyan","pink"];
-
-            /* generate a random color string */
-            $scope.random = function(){
-                var rand = colorArray[Math.floor(Math.random() * colorArray.length)];
-                return rand;
-            };
 
             /**
              * Search for a keywod
@@ -225,6 +209,10 @@ angular.module('ezeidApp').
                     return false;
                 }
 
+
+                /* update the coordinates */
+                $scope.params.lat = $rootScope.coordinatesLat;
+                $scope.params.lng = $rootScope.coordinatesLng;
 
                 var modifyValue = [
                     'homeDelivery',
@@ -264,8 +252,8 @@ angular.module('ezeidApp').
                     currentLocationElementClass : "link-btn pac-loc",
                     controlsContainerClass : "col-lg-6 col-md-6'"
                 });
-                googleMap.createMap("map-ctrl",$scope,"findCurrentLocation()");
 
+                googleMap.createMap("map-ctrl",$scope,"findCurrentLocation()");
                 googleMap.renderMap();
 
                 googleMap.mapIdleListener().then(function(){
@@ -327,8 +315,6 @@ angular.module('ezeidApp').
 
                 /* toggle the select all variable's value */
                 $scope.selectAll = !$scope.selectAll;
-
-                //var elem = event.currentTarget;
 
                 /* chechk all the check boxes */
                 if($scope.selectAll)
@@ -408,15 +394,33 @@ angular.module('ezeidApp').
                 /* redirect to full detail page */
                 $location.url('/searchDetails?searchType='+searchType+'&TID='+tid);
             }
-            ///searchDetails?searchType={{params.searchType}}&TID={{search.TID}}
+
+            /**
+             Select random colors for search result list tiles
+             /
+
+             /* make an array of colors for tiles */
+            var colorArray = ["orange","green","cyan","pink"];
+            $scope.oldColorValue = 0;
+            /* generate a random color string */
+            $scope.count = 0;
+            $scope.random = function(){
+                var num = getRandomNumber(colorArray.length);
+                if(num != $scope.oldColorValue)
+                {
+                    $scope.oldColorValue = num;
+                    return colorArray[num];
+                }
+                else
+                {
+                    return $scope.random();
+                }
+            };
 
 
-
-            /* watch modal box close */
-            //$scope.$watch('showDetailsModal',function(newVal,oldVal){
-            //    if(!newVal){
-            //        $window.history.back();
-            //    }
-            //});
+            var getRandomNumber = function(len)
+            {
+                return Math.floor(Math.random() * len);
+            };
         }
     ]);
