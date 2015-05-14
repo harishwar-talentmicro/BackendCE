@@ -414,10 +414,11 @@ body {
 }
 .newMsgButtonContainer
 {
+    border:solid 2px #FFFFFF;
     font-size: 10px;
     color: #ffffff;
     background: #09a2de;
-    border: 1px solid green;
+   /* border: 1px solid green;*/
     margin-top: 1%;
 }
 .innerMsgButtonContainer
@@ -1450,7 +1451,7 @@ table.rwd-table > tbody > tr > td.serachResultSelectAll
     border:solid 1px black;
 }
 .bannerContainerBorder{
-    border:solid 4px #00b050;
+    border:solid 2px #FFFFFF;
     border-radius: 1%;
 }
 .noticeTextColor
@@ -1466,11 +1467,11 @@ table.rwd-table > tbody > tr > td.serachResultSelectAll
     padding: 0px;
     padding-top: 0px;
     border: none;
-
 }
 
 .infoModal>.modal>.business-manager-modal > .modal-content {
-    background: #deebf7;
+   /* background: #deebf7;*/
+    background: linear-gradient(90deg, #50C9C3 10%, #96DEDA 90%);
     border: 1px solid #808080;
     box-shadow: 0px 0px 30px #696969;
     padding: 10px;
@@ -1501,19 +1502,35 @@ table.rwd-table > tbody > tr > td.serachResultSelectAll
     background: #deebf7;
 }
 .noticeTextContainer {
-    position: absolute;
+    /*position: absolute;
     top: 1%;
     z-index: 3;
     right: 0px;
     background: #FFCD28;
     font-size: 13px;
     width: 348px;
-    margin-right: 2.3%;
+    margin-right: 2.3%;*/
+
+    position: absolute;
+    top: 0.5%;
+    z-index: 3;
+    right: 0px;
+    background: rgba(255, 255, 54, 0.7);
+    font-size: 13px;
+    width: 352px;
+    margin-right: 3.2%;
 }
 .profilePicBorder
 {
-    border: solid 4px #00b050;
-    border-radius: 10%;
+    border:solid 2px #FFFFFF;
+    /*border-radius: 3%;*/
+    /*border-top-left-radius: 10px 5px;
+    border-bottom-right-radius: 10% 5%;
+    */
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
 }
 .aboutCompanyTextContainer
 {
@@ -1523,7 +1540,7 @@ table.rwd-table > tbody > tr > td.serachResultSelectAll
 }
 .aboutcontainerFrame
 {
-    border: solid 1px green;
+    border: solid 2px #ffffff;
     margin-top: 1%;
 }
 .mapButtonContainer
