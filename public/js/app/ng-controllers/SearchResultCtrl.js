@@ -50,7 +50,7 @@ angular.module('ezeidApp').
             var selectedAllResult = 0;
             $scope.selectedList = [];
             $scope.searchResult = [];
-
+            $scope.defaultSearchTerm = '';
             //Below line is for Loading img
             $scope.$emit('$preLoaderStart');
 
@@ -118,6 +118,9 @@ angular.module('ezeidApp').
                 {
                     $rootScope._userInfo.Token = 2;
                 }
+
+                /* set the value of the search term */
+                $scope.defaultSearchTerm = _filterValue.searchTerm;
 
                 $http({ method: 'post', url: GURL + 'ewSearchByKeywords', data: {
                     SearchType:_filterValue.searchType,
