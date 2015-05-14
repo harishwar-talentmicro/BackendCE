@@ -4235,7 +4235,7 @@ exports.FnGetSearchInformation = function (req, res) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
-                        var SearchParameter = db.escape(TID) + ',' + db.escape(Token) + ',' + db.escape(WorkingDate)+ ',' + db.escape(SearchType);
+                        var SearchParameter = db.escape(TID) + ',' + db.escape(Token) + ',' + db.escape(WorkingDate)+ ',' + db.escape(SearchType)+',' + db.escape(0);
                         // console.log('Search Information: ' +SearchParameter);
                        // console.log('CALL pSearchInformation(' + SearchParameter + ')');
                             db.query('CALL pSearchInformation(' + SearchParameter + ')', function (err, UserInfoResult) {
