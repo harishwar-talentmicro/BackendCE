@@ -156,12 +156,13 @@ angular.module('ezeidApp').controller('ProfileManagerCtrl',[
                 case 'resume' :
                     $scope.activeTemplate = 'html/profile/attach-resume.html';
                     break;
+                case 'about-company':
+                    $scope.activeTemplate = 'html/profile/about-company.html';
+                    break;
                 default:
                     $location.path('/profile-manager/user');
                     break;
             }
         }
-
-
 
     }]);

@@ -1580,6 +1580,7 @@
                     </div>
                 </div>
             </div>
+         </div>
     </section>
 </script>
 
@@ -1742,6 +1743,12 @@
                                         <li role="presentation" class=" bottom-clearfix"
                                             ng-class="{'active' : (activeTemplate === '/tpl/password-template.html')}">
                                             <a href="/profile-manager/password"><span class="glyphicon glyphicon-lock"></span> Change Password</a>
+                                        </li>
+
+                                        <!--- Hidden in case of individual and public place ----------->
+                                        <li ng-show="_userInfo.Type == 2" role="presentation" class=" bottom-clearfix"
+                                            ng-class="{'active' : (activeTemplate === 'html/profile/about-company.html')}">
+                                            <a href="/profile-manager/about-company"><span class="glyphicon glyphicon-bookmark"></span> Company Profile</a>
                                         </li>
 
 
