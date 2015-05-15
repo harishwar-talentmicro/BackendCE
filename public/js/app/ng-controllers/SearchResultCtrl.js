@@ -219,6 +219,8 @@ angular.module('ezeidApp').
                                 prom.then(function(d){
                                 });
                             }
+                            $scope.searchListData = null;
+                            $scope.searchCount = 0;
                         }
                     }
                 });

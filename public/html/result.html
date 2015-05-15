@@ -50,8 +50,8 @@
                                 <!-- Select All BTN -->
                                 <button class="btn btn-primary" ng-click="toggleCheckboxAll()"><i class="fa " ng-class="selectAll?'fa-check-square':'fa-square'"></i> Select All</button>
                                 <div class="btn-group">
-                                    <button class="btn btn-default" ng-click="toggleMapView(false)"><i class="fa fa-list"></i> List View</button>
-                                    <button class="btn btn-default" ng-click="toggleMapView(true)"><i class="fa fa-map-marker"></i> Map View</button>
+                                    <button class="btn btn-default" ng-disabled="!searchListData" ng-click="toggleMapView(false)"><i class="fa fa-list"></i> List View</button>
+                                    <button class="btn btn-default" ng-disabled="!searchListData" ng-click="toggleMapView(true)"><i class="fa fa-map-marker"></i> Map View</button>
                                 </div>
                             </li>
                         </ul>
@@ -129,7 +129,7 @@
                                         </div>
                                     </div>
                                     <!-- Star Rating goes here -->
-                                    <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 p-top-10 text-warning">
+                                    <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 p-top-10 text-warning hidden">
                                         <p>Filter by star rating</p>
                                         <div class="star-ratings">
                                             <i ng-repeat="st in star track by $index" ng-click="starRatingFilterAction($index)" ng-class="star[$index] == true?'text-yellow':'text-black'" class="fa fa-star pointer"></i>
@@ -256,7 +256,7 @@
                     <!-- FLIPPING TILES PROTOTYPE ENDS [DON'T DELETE] -->
 
                     <!-- Master Tile! -->
-                    <div class="master-tile" ng-hide="searchListMapFlag">
+                    <div class="master-tile" ng-hide="searchListMapFlag && !showDownloadLink">
                         <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12 individual-tiles text-center p3" ng-init="color = random()" ng-repeat="search in searchListData track by $index">
                             <div class="tile-outer-frame pointer" ng-click="redirectFullPage(params.searchType,search.TID)">
                                 <div class="row-1">
