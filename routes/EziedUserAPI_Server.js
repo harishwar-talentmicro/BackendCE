@@ -4186,8 +4186,8 @@ exports.FnGetSearchInformation = function (req, res) {
         if (Token != null && Token != '' && TID.toString() != 'NaN' && WorkingDate != null) {
             if(Token == 2){
 
-                            var SearchParameter = db.escape(TID) + ',' + db.escape(Token) + ',' + db.escape(WorkingDate) 
-                                    + ',' + db.escape(SearchType);
+                            var SearchParameter = db.escape(TID) + ',' + db.escape(Token) + ',' + db.escape(WorkingDate)
+                                    + ',' + db.escape(SearchType)+ ',' + db.escape(0);
                             // console.log('Search Information: ' +SearchParameter);
            //     console.log('CALL pSearchInformation(' + SearchParameter + ')');
                             db.query('CALL pSearchInformation(' + SearchParameter + ')', function (err, UserInfoResult) {
@@ -4199,8 +4199,27 @@ exports.FnGetSearchInformation = function (req, res) {
                                         console.log('FnSearchEzeid: tmaster: Search result sent successfully');
                                     }
                                     else {
-                                        res.send('null');
-                                        console.log('FnSearchEzeid: tmaster: no search found');
+                                        var searchParams = db.escape(TID) + ',' + db.escape(Token) + ',' + db.escape(WorkingDate)
+                                            + ',' + db.escape(SearchType)+ ',' + db.escape(1);
+                                        db.query('CALL pSearchInformation('+ searchParams +')', function (err, UserInfoReResult) {
+                                            if(!err){
+                                                if(UserInfoReResult[0].length > 0){
+                                                    res.send(UserInfoReResult[0]);
+                                                    console.log('FnSearchEzeid: tmaster: Search result re sent successfully');
+                                                }
+                                                else
+                                                {
+                                                    res.send('null');
+                                                    console.log('FnSearchEzeid: tmaster: no re search infromation ');
+                                                }
+
+                                            }
+                                            else {
+                                                res.statusCode = 500;
+                                                res.send('null');
+                                                console.log('FnSearchEzeid: tmaster: ' + err);
+                                            }
+                                        });
                                     }
                                 }
                                 else {
@@ -4216,7 +4235,7 @@ exports.FnGetSearchInformation = function (req, res) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
-                        var SearchParameter = db.escape(TID) + ',' + db.escape(Token) + ',' + db.escape(WorkingDate)+ ',' + db.escape(SearchType);
+                        var SearchParameter = db.escape(TID) + ',' + db.escape(Token) + ',' + db.escape(WorkingDate)+ ',' + db.escape(SearchType)+',' + db.escape(0);
                         // console.log('Search Information: ' +SearchParameter);
                        // console.log('CALL pSearchInformation(' + SearchParameter + ')');
                             db.query('CALL pSearchInformation(' + SearchParameter + ')', function (err, UserInfoResult) {
@@ -4228,8 +4247,26 @@ exports.FnGetSearchInformation = function (req, res) {
                                     console.log('FnSearchEzeid: tmaster: Search result sent successfully');
                                 }
                                 else {
-                                    res.send('null');
-                                    console.log('FnSearchEzeid: tmaster: no search found');
+                                    var searchParams = db.escape(TID) + ',' + db.escape(Token) + ',' + db.escape(WorkingDate)
+                                        + ',' + db.escape(SearchType)+ ',' + db.escape(1);
+                                    db.query('CALL pSearchInformation('+ searchParams +')', function (err, UserInfoReResult) {
+                                        if(!err){
+                                            if(UserInfoReResult[0].length > 0){
+                                                res.send(UserInfoReResult[0]);
+                                                console.log('FnSearchEzeid: tmaster: Search result re sent successfully');
+                                            }
+                                            else
+                                            {
+                                                res.send('null');
+                                                console.log('FnSearchEzeid: tmaster: no re search infromation ');
+                                            }
+                                        }
+                                        else {
+                                            res.statusCode = 500;
+                                            res.send('null');
+                                            console.log('FnSearchEzeid: tmaster: ' + err);
+                                        }
+                                    });
                                 }
                             }
                             else {
@@ -10411,6 +10448,7 @@ exports.FnUpdateUserProfileAP = function (req, res) {
         var Rating = req.body.Rating;
         var Size = req.body.Size;
         var IDTypeId = req.body.IDTypeID;
+        var SelectionType = req.body.SelectionType;
         var RtnMessage = {
             IsSuccessful: false
         };
@@ -10423,8 +10461,8 @@ exports.FnUpdateUserProfileAP = function (req, res) {
                             var InsertQuery = db.escape(0) + ',' + db.escape(Latitude) + ',' + db.escape(Longitude) + ',' +
                                 db.escape(EZEIDVerifiedID) + ',' + db.escape(Token) + ',' + db.escape('') + ',' + db.escape('') + ',' + db.escape('') + ',' +
                                 db.escape('') + ',' + db.escape('') + ',' + db.escape(EZEID) + ',' +
-                                db.escape('') + ',' + db.escape('') + ',' + db.escape(0)+ ',' + db.escape('')+ ',' + db.escape(0) + ',' + db.escape(0)+ ',' + db.escape(IDTypeId);
-                           // console.log(InsertQuery);
+                                db.escape('') + ',' + db.escape('') + ',' + db.escape(0)+ ',' + db.escape('')+ ',' + db.escape(0) + ',' + db.escape(0)+ ',' + db.escape(IDTypeId) + ',' + db.escape(SelectionType);
+                            // console.log(InsertQuery);
                             db.query('CALL pUpdateUserProfileAP(' + InsertQuery + ')', function (err, InsertResult) {
                                 if (!err) {
                                     console.log(InsertResult);
@@ -10452,8 +10490,8 @@ exports.FnUpdateUserProfileAP = function (req, res) {
                             var InsertQuery = db.escape(CategoryID) + ',' + db.escape(Latitude) + ',' + db.escape(Longitude) + ',' +
                                 db.escape(EZEIDVerifiedID) + ',' + db.escape(Token) + ',' + db.escape(Keywords) + ',' + db.escape(Picture) + ',' + db.escape(PictureFileName) + ',' +
                                 db.escape(Icon) + ',' + db.escape(IconFileName) + ',' + db.escape(EZEID) + ',' +
-                                db.escape(BrochureDoc) + ',' + db.escape(BrochureDocFile) + ',' + db.escape(ActiveInactive)+ ',' + db.escape(BRContentType)+ ',' + db.escape(Rating) + ',' + db.escape(Size)+ ',' + db.escape(IDTypeId);
-                           // console.log('InsertQuery: ' + InsertQuery);
+                                db.escape(BrochureDoc) + ',' + db.escape(BrochureDocFile) + ',' + db.escape(ActiveInactive)+ ',' + db.escape(BRContentType)+ ',' + db.escape(Rating) + ',' + db.escape(Size)+ ',' + db.escape(IDTypeId)  + ',' + db.escape(SelectionType);
+                            // console.log('InsertQuery: ' + InsertQuery);
                             db.query('CALL pUpdateUserProfileAP(' + InsertQuery + ')', function (err, InsertResult) {
                                 if (!err) {
                                     console.log(InsertResult);

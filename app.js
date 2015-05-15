@@ -28,16 +28,29 @@ var multer  = require('multer');
 app.use(multer({ dest: './uploads/'}));
 
 //app.use(express.static(path.join(__dirname, 'public')));
-app.use('/css', express.static(path.join(__dirname, 'public/css/')));
-app.use('/html', express.static(path.join(__dirname, 'public/html/')));
-app.use('/js', express.static(path.join(__dirname, 'public/js/')));
+// Set header to force download
+function setHeaders(res, path) {
+    res.setHeader('Content-Disposition', contentDisposition(path))
+}
+
+app.use('/css', express.static(path.join(__dirname, 'public/css/'),{
+    setHeaders : function(res,path){
+        res.setHeader('Content-type','text/css');
+    }
+}));
+app.use('/html', express.static(path.join(__dirname, 'public/html/'),{
+    setHeaders : function(res,path){
+        res.setHeader('Content-type','text/html');
+    }
+}));
+app.use('/js', express.static(path.join(__dirname, 'public/js/'),{
+    setHeaders : function(res,path){
+        res.setHeader('Content-type','text/javascript');
+    }
+}));
 app.use('/fonts', express.static(path.join(__dirname, 'public/fonts/')));
 app.use('/directives', express.static(path.join(__dirname, 'public/directives/')));
 app.use('/images', express.static(path.join(__dirname, 'public/images/')));
-
-app.get('/', function(req, res){
-    res.sendfile(__dirname + '/public/html/index.html');
-});
 
 // error handlers
 
@@ -226,7 +239,14 @@ app.get('/:id',LocationManager.FnWebLinkRedirect);
 
 app.get('/:page',function(req,res){
     res.sendFile(__dirname + '/public/html/index.html');
+    
 });
+
+
+app.get('/',function(req,res){
+    res.sendFile(__dirname + '/public/html/index.html');
+});
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

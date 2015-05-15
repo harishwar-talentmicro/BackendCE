@@ -11,7 +11,6 @@ HeaderApp.directive('headerSection',['Notification','$window' ,function (Notific
             this.AccsHis = [];
             SignCtrl.RegInfo = {};
 
-
             //login
             this.LoginUser = function (Logdata, form) {
 
@@ -27,7 +26,9 @@ HeaderApp.directive('headerSection',['Notification','$window' ,function (Notific
                                 // Notification.success({ message: "Sign In Success", delay: MsgDelay });
 
                                 $('#SignIn_popup').slideUp();
-                                $location.path('/');
+
+                                $window.history.forward();
+                               // $location.path('/');
                                 if (form) {
                                     form.$setPristine();
                                     form.$setUntouched();
@@ -58,7 +59,6 @@ HeaderApp.directive('headerSection',['Notification','$window' ,function (Notific
                                 }
                             }
 
-                            console.log(userName);
                             $rootScope._userInfo.userName = userName.toUpperCase();
 
 
