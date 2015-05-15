@@ -157,7 +157,8 @@
                 controller : 'InformationDetailCtrl'
             })
             .when('/:ezeid',{
-                redirectTo : '/'
+                templateUrl: 'html/landing.html',
+                controller : 'LandingPageCtrl'
             })
             .otherwise({redirectTo : '/'});
         $locationProvider.html5Mode(true);
