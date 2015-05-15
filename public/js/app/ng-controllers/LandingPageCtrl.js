@@ -279,4 +279,110 @@ angular.module('ezeidApp').
                 title : 'Change Your Searched Location',
                 class : 'business-manager-modal'
             };
+
+
+            /* Star Rating Functionalities */
+            $scope.star = [false,false,false,false,false];
+            $scope.max = getMinStarVal();
+            $scope.min = getMaxStarVal();
+            $scope.click1 = false;
+            $scope.click2 = false;
+            $scope.starRatingFilterAction = function(starNumber)
+            {
+                $scope.star[starNumber] = !$scope.star[starNumber];
+                return ;
+                if($scope.click1 == false && $scope.click2 == false)
+                {
+                    $scope.click1 = starNumber;
+                    return ;
+                }
+
+                var max = getMaxStarVal();
+                var min = getMinStarVal();
+                if(starNumber < max && starNumber > min)
+                {
+                    /* fill all the intermediate stars */
+                    fillStar(starNumber,max);
+                }
+                else if(starNumber > max)
+                {
+                    /* fill all the intermediate stars */
+                    fillStar(min,starNumber);
+                }
+                else if(starNumber < min)
+                {
+                    fillStar(starNumber,max);
+                }
+
+            }
+
+            /* reset the star filtering */
+            function resetStarFilter()
+            {
+                for(var i=0; i<5;i++)
+                {
+                    $scope.star[i] = false;
+                }
+            }
+
+            /* fill the stars if we get the range */
+            function fillStar(start,end)
+            {
+                resetStarFilter();
+                for(var i = start;i<=end;i++)
+                {
+                    $scope.star[i] = true;
+                }
+            }
+
+            /* unfill stars */
+            function unfillStars(value)
+            {
+                var maxVal = getMaxStarVal();
+                if(value <= maxVal)
+                {
+                    /* Unfill all the stars before this value */
+                    for(var i=0;i<value;i++)
+                    {
+                        $scope.star[i] = false;
+                    }
+                }
+                else
+                {
+                    /* Unfill all the stars before this value */
+                    for(var i=value;i<5;i++)
+                    {
+                        $scope.star[i] = false;
+                    }
+                }
+            }
+
+            /* get maximum value of stars */
+            function getMaxStarVal()
+            {
+                var maxVal = 0;
+                for(var i=0;i<5;i++)
+                {
+                    if($scope.star == true && $scope.star > maxVal)
+                    {
+                        maxVal = i;
+                    }
+                }
+                return maxVal;
+            }
+
+            /* get minimum value of stars */
+            function getMinStarVal()
+            {
+                var minVal = 0;
+                for(var i = 4;i>=0;i--)
+                {
+                    if($scope.star == true && $scope.star < minVal)
+                    {
+                        minVal = i;
+                    }
+                }
+                return minVal;
+            }
         }]);
+
