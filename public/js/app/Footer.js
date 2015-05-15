@@ -12,6 +12,7 @@
     'MsgDelay',
     '$location',
     '$routeParams',
+    '$location',
     function (
         $rootScope,
         $scope,
@@ -25,7 +26,8 @@
         $interval,
         MsgDelay,
         $location,
-        $routeParams
+        $routeParams,
+        $location
     ) {
         $scope.modalBox = {
             title : 'Legal',
@@ -49,9 +51,10 @@ FooterApp.directive('footerSection', function () {
 
         restrict: 'EA',
         templateUrl: 'directives/Footer.html',
-        controller: function () {
+        controller: function ($location) {
             this.ContactUS = function () {
-                window.location.href = "index.html?ID=TALENTMICRO";
+                //window.location.href = "TALENTMICRO";
+                $location.path('/TALENTMICRO');
             };
 
             this.closeLegal = function() {
