@@ -210,15 +210,15 @@
                                     </div>
                                     <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer setLeftRightPaddingZero" ng-hide="(SearchInfo.IDTypeID == 1)">
                                         <div class="" ng-hide="SearchInfo.ParkingStatus==3">
-                                            <img title="{{parkingTitle}}" src="../images/parking_new.png" >
+                                            <img title="{{parkingTitle}}" src="../images/parking_new.png">
                                         </div>
                                         <div class="" ng-show="SearchInfo.ParkingStatus==3">
-                                            <img title="{{parkingTitle}}" src="../images/new_no_parking.png" >
+                                            <img title="{{parkingTitle}}" src="../images/new_no_parking.png">
                                         </div>
                                     </div>
                                     <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setLeftRightPaddingZero">
-                                        <img ng-show="(SearchInfo.EZEIDVerifiedID == 2)" src="images/verified_32.png" />
-                                        <img ng-hide="(SearchInfo.EZEIDVerifiedID == 2)" src="images/not_verified_32.png" />
+                                        <img title="verified" ng-show="(SearchInfo.EZEIDVerifiedID == 2)" src="images/verified_32.png"/>
+                                        <img title="not verified" ng-hide="(SearchInfo.EZEIDVerifiedID == 2)" src="images/not_verified_32.png"/>
                                     </div>
                                     <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 setLeftRightPaddingZero defaultRatingBox">
                                         <div class="starRating">
@@ -297,7 +297,7 @@
                     </div>
                 </div>
             </div>
-           <div ng-show="{{companyTagLine}}">
+           <div ng-show="companyTagLine">
                <div ng-show="(SearchType == 2)" class="row setRowLeftRightMarginZero aboutcontainerFrame">
                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setPaddingLeftRight0 text-center">
                        <div class="row setRowLeftRightMarginZero text-center boxMessaageBackgroun">
