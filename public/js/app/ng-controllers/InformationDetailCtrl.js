@@ -17,6 +17,7 @@ angular.module('ezeidApp').
         'MsgDelay',
         '$location',
         '$routeParams',
+        '$route',
         function (
             $rootScope,
             $scope,
@@ -30,10 +31,27 @@ angular.module('ezeidApp').
             $interval,
             MsgDelay,
             $location,
-            $routeParams
+            $routeParams,
+            $route
             )
     {
         $scope.$emit('$preLoaderStart');
+
+        if($rootScope._userInfo){
+            if(!$rootScope._userInfo.IsAuthenticate){
+                var unregister = $rootScope.$watch('_userInfo',function(newVal,oldVal){
+                    if(newVal){
+                        if(newVal.hasOwnProperty('IsAuthenticate')){
+                            if(newVal.IsAuthenticate){
+                                unregister();
+                                $route.reload();
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
         //Below line is for Loading img
         $scope.SearchInfo = {};
         var currentBanner = 1;
