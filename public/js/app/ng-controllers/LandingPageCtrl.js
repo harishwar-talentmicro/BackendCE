@@ -159,7 +159,7 @@ angular.module('ezeidApp').
             };
 
             var handleNoGeolocation = function(){
-                console.log('No Geolocation data');
+                //console.log('No Geolocation data');
             };
 
             $scope.googleMap = new GoogleMap();

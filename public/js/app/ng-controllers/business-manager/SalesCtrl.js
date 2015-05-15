@@ -276,7 +276,7 @@
                     if(c === index){
                         $scope.resetModalBox();
                         $scope.modalBox.tx = prepareEditTransaction($scope.txList[index]);
-                        console.log($scope.modalBox.tx);
+                        //console.log($scope.modalBox.tx);
                         $scope.editModes[c] = true;
                     }
                     else{
@@ -513,7 +513,7 @@
              */
             $scope.removeItem = function(txItem){
                 var txItemIndex  = $scope.modalBox.tx.itemList.indexOfWhere('ItemID',txItem.ItemID);
-                console.log(txItemIndex);
+                //console.log(txItemIndex);
                 $scope.modalBox.tx.itemList.splice(txItemIndex,1);
             };
 
@@ -832,7 +832,7 @@
 
             var init = function(){
                 $scope.loadfilterStatusTypes().then(function(resp){
-                    console.log(resp);
+                    //console.log(resp);
                     $scope.loadTxActionTypes().then(function(){
                         $scope.loadTxStatusTypes().then(function(){
                             $scope.loadTransaction().then(function(){

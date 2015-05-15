@@ -66,6 +66,10 @@
             </div>
         </nav>
 
+        <div ng-show="showLoginText">
+            <h1 class="font-open-sans-light text-center top-clearfix">Please login to continue</h1>
+            <p class="font-open-sans-light text-center text-warning"><a href="/">Go Back</a></p>
+        </div>
 
         <div class="row setTopMargin setRowLeftRightMarginZero centerAlign" ng-show="showDownloadLink">
             <div class="col-md-12">
@@ -160,7 +164,8 @@
             <!-- main-tiles-frame -->
             <div class="main-tiles-frame tile-frame-padding-top font-roboto">
                 <!-- All such results goes here -->
-                <div class="row p-top-30" ng-hide="showDownloadLink">
+               <!-- <div class="row p-top-30" ng-hide="showDownloadLink">-->
+                <div class="row p-top-30">
 
                     <!-- Maps goes here -->
                     <div id="map-ctrl" class="col-lg-12" ng-show="searchListMapFlag"></div>

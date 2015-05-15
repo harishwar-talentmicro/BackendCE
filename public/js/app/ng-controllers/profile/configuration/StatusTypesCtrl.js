@@ -67,7 +67,7 @@ angular.module('ezeidApp').controller('StatusTypesCtrl',['$scope','$rootScope','
     $scope.toggleModalBox = function(type,index){
 
         if(typeof(index) !== "undefined" && typeof(type) !== "undefined"){
-            // console.log(index+'   '+type);
+            // //console.log(index+'   '+type);
             $scope.modalBox.txStatus = angular.copy($scope.txStatuses[functionTypes[type]][index]);
             $scope.modalBox.title = "Update Status Type";
         }
@@ -182,7 +182,7 @@ angular.module('ezeidApp').controller('StatusTypesCtrl',['$scope','$rootScope','
                             var index  = salesArr.indexOfWhere('TID',$scope.modalBox.txStatus.TID);
                             for(var prop in salesArr[index]){
                                 if(salesArr[index].hasOwnProperty(prop)){
-                                    // console.log(prop);
+                                    // //console.log(prop);
                                     $scope.txStatuses[functionTypes[$scope.modalBox.txStatus.type]][index][prop] = $scope.modalBox.txStatus[prop];
                                 }
                             }
@@ -248,7 +248,7 @@ angular.module('ezeidApp').controller('StatusTypesCtrl',['$scope','$rootScope','
 
                         }
 
-                        // console.log($scope.txStatuses);
+                        // //console.log($scope.txStatuses);
                     }
                 }
 
@@ -270,7 +270,7 @@ angular.module('ezeidApp').controller('StatusTypesCtrl',['$scope','$rootScope','
                             }
                             $scope.txStatuses[functionTypes[fType]].push(txStatus);
                         }
-                        // console.log($scope.txStatuses);
+                        // //console.log($scope.txStatuses);
                     }
 
                     $scope.count += 1;
@@ -279,7 +279,7 @@ angular.module('ezeidApp').controller('StatusTypesCtrl',['$scope','$rootScope','
                     }
                 }
             }).error(function(err){
-                // console.log(err);
+                // //console.log(err);
             });
     };
 

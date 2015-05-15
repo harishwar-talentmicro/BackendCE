@@ -9964,13 +9964,23 @@ exports.FnGetCompanyProfile = function(req, res){
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
+        var Token = req.query.Token;
         var TID = req.query.TID;
+        console.log(req.query);
         var RtnMessage = {
             Result: [],
             Message: ''
         };
-        if(TID  !=  null){
-                        db.query('CALL pGetTagLine(' + db.escape(TID) + ')', function (err, GetResult) {
+        if ( Token != null){
+            TID = 0;
+        }
+        else{
+            TID = TID;
+            Token = 0;
+        }
+        if(Token != null && TID != null ){
+                    console.log('CALL pGetTagLine(' + db.escape(TID)+ ',' + db.escape(Token) + ')');
+                        db.query('CALL pGetTagLine(' + db.escape(TID)+ ',' + db.escape(Token) + ')', function (err, GetResult) {
                             if (!err) {
                                 if (GetResult[0] != null) {
                                     if (GetResult[0].length > 0) {

@@ -25,6 +25,7 @@ angular.module('ezeidApp').
         '$location',
         '$routeParams',
         'GoogleMaps',
+        '$route',
         function (
             $rootScope,
             $scope,
@@ -39,7 +40,8 @@ angular.module('ezeidApp').
             MsgDelay,
             $location,
             $routeParams,
-            GoogleMap
+            GoogleMap,
+            $route
         )
         {
             var selectAll = false;
@@ -51,20 +53,50 @@ angular.module('ezeidApp').
             $scope.selectedList = [];
             $scope.searchResult = [];
             $scope.defaultSearchTerm = '';
+            $scope.showLoginText = false;
 
             //Below line is for Loading img
             $scope.$emit('$preLoaderStart');
 
+            //To Call current url, after login from current page
+            if($rootScope._userInfo){
+                if(!$rootScope._userInfo.IsAuthenticate){
+                    var unregister = $rootScope.$watch('_userInfo',function(newVal,oldVal){
+                        if(newVal){
+                            if(newVal.hasOwnProperty('IsAuthenticate')){
+                                if(newVal.IsAuthenticate){
+                                    unregister();
+                                    $route.reload();
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+
             //Set all the serach parameters
             $scope.params = $routeParams;
 
-            if($scope.params.searchType != 1)
+          /*  if($scope.params.searchType != 1)
             {
                 $scope.showDownloadLink = false;
+            }*/
+
+            if(($scope.params.searchType == 1) && (!$rootScope._userInfo.IsAuthenticate))
+            {
+                $scope.showLoginText = true;
+                Notification.error({ message : 'Please login to search for EZEID', delay : MsgDelay});
+            }
+            else
+            {
+                $scope.showDownloadLink = false;
+                $scope.showLoginText = false;
+                // To get search key result
+                getSearchKeyWord($scope.params);
             }
 
-            // To get search key result
-            getSearchKeyWord($scope.params);
+           /* // To get search key result
+            getSearchKeyWord($scope.params);*/
 
 
             //set the ion range slider to the initial value

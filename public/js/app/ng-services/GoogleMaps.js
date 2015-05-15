@@ -460,7 +460,7 @@ angular.module('ezeidApp').factory('GoogleMaps',['$q','$timeout','$compile',func
         if(geocoderResults && geocoderResults.length > 0){
 
             var results = geocoderResults[0]['address_components'];
-            console.log(results);
+            //console.log(results);
             try{
                 angular.forEach(results,function(result,index){
                     switch(result.types[0]){

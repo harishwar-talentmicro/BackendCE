@@ -17,6 +17,7 @@ angular.module('ezeidApp').
         'MsgDelay',
         '$location',
         '$routeParams',
+        '$route',
         function (
             $rootScope,
             $scope,
@@ -30,10 +31,27 @@ angular.module('ezeidApp').
             $interval,
             MsgDelay,
             $location,
-            $routeParams
+            $routeParams,
+            $route
             )
     {
         $scope.$emit('$preLoaderStart');
+
+        if($rootScope._userInfo){
+            if(!$rootScope._userInfo.IsAuthenticate){
+                var unregister = $rootScope.$watch('_userInfo',function(newVal,oldVal){
+                    if(newVal){
+                        if(newVal.hasOwnProperty('IsAuthenticate')){
+                            if(newVal.IsAuthenticate){
+                                unregister();
+                                $route.reload();
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
         //Below line is for Loading img
         $scope.SearchInfo = {};
         var currentBanner = 1;
@@ -70,107 +88,109 @@ angular.module('ezeidApp').
         {
             $scope.showLoginText = false;
             getSearchInformation(TID,$scope.SearchType);
-            if($scope.SearchType == 1)
-            {
-               getAboutComapny();
-            }
         }
         //Below function is for getting search information
         function getSearchInformation(_TID,_SearchType)
         {
-                $scope.SearchInfo = {};
-                $scope.AddressForInfoTab = "";
-                AutoRefresh = false;
-                if(!$rootScope._userInfo)
-                {
-                    $rootScope._userInfo = {};
-                }
-                if(!$rootScope._userInfo.IsAuthenticate){
-                    $rootScope._userInfo.Token = 2;
-                    $scope.Token = 2;
-                }
-                $http({ method: 'get', url: GURL + 'ewtGetSearchInformation?Token=' + $rootScope._userInfo.Token + '&TID=' + _TID + '&SearchType=' + _SearchType + '&CurrentDate=' + currentDate}).success(function (data) {
-                    $rootScope.$broadcast('$preLoaderStop');
-                    if (data != 'null') {
-                        $scope.showDetailsModal = true;
-
-                        $scope.$watch('showDetailsModal',function(newVal,oldVal){
-                            if(!newVal){
-                                $window.history.back();
-                            }
-                        });
-
-                        $timeout(function () {
-                            $scope.SearchInfo = data[0];
-
-                            if(TID == $scope.SearchInfo.LocID)
-                            {
-                                $scope.showNoticeText = false;
-                            }
-
-                            $scope.showSalesEnquiry = $scope.SearchInfo.VisibleModules[0];
-                            $scope.showHomeDelivery = $scope.SearchInfo.VisibleModules[1];
-                            $scope.shoReserVation = $scope.SearchInfo.VisibleModules[2];
-                            $scope.showServiceRequest = $scope.SearchInfo.VisibleModules[3];
-                            $scope.showSendCv = $scope.SearchInfo.VisibleModules[4];
-
-                            //Below lines are to show address in info tab
-                            $scope.AddressForInfoTab = ($scope.SearchInfo.AddressLine1 != "") ? $scope.SearchInfo.AddressLine1 +', ' : "";
-                            $scope.AddressForInfoTab += ($scope.SearchInfo.AddressLine2 != "") ? $scope.SearchInfo.AddressLine2 +', ' : "";
-                            $scope.AddressForInfoTab += ($scope.SearchInfo.CityTitle != "") ? $scope.SearchInfo.CityTitle +', ' : "";
-                            $scope.AddressForInfoTab += ($scope.SearchInfo.CountryTitle != "") ? $scope.SearchInfo.CountryTitle +', ' : "";
-                            $scope.AddressForInfoTab += ($scope.SearchInfo.PostalCode != "") ? $scope.SearchInfo.PostalCode : "";
-
-                            $window.localStorage.setItem("myLocation",$scope.SearchInfo.Latitude+","+$scope.SearchInfo.Longitude );
-
-                            if($scope.SearchInfo.ParkingStatus==0)
-                            {
-                                $scope.parkingTitle = "Parking Status";
-                            }
-                            if($scope.SearchInfo.ParkingStatus==1)
-                            {
-                                $scope.parkingTitle = "Public Parking";
-                            }
-                            if($scope.SearchInfo.ParkingStatus==2)
-                            {
-                                $scope.parkingTitle = "Vallet Parking";
-                            }
-                            if($scope.SearchInfo.ParkingStatus==3)
-                            {
-                                $scope.parkingTitle = "No parking";
-                            }
-
-                            $scope.form_rating = data[0].Rating;
-
-                            //Call for banner
-                            AutoRefresh = true;
-                            getBanner(1);
-
-                            if($scope.SearchInfo.IDTypeID == 2)
-                            {
-                                $scope.reservationPlaceHolder = "Reservation requirement details";
-                            }
-                            else
-                            {
-                                $scope.reservationPlaceHolder = "Appointment requirement details";
-                            }
-                        });
-                    }
-                    else
-                    {
-                        Notification.error({ message: 'No Results found..!', delay: MsgDelay });
-                    }
-                });
+            $scope.SearchInfo = {};
+            $scope.AddressForInfoTab = "";
+            AutoRefresh = false;
+            if(!$rootScope._userInfo)
+            {
+                $rootScope._userInfo = {};
             }
+            if(!$rootScope._userInfo.IsAuthenticate){
+                $rootScope._userInfo.Token = 2;
+                $scope.Token = 2;
+            }
+            $http({ method: 'get', url: GURL + 'ewtGetSearchInformation?Token=' + $rootScope._userInfo.Token + '&TID=' + _TID + '&SearchType=' + _SearchType + '&CurrentDate=' + currentDate}).success(function (data) {
+                $rootScope.$broadcast('$preLoaderStop');
+                if (data != 'null') {
+                    $scope.showDetailsModal = true;
+
+                    $scope.$watch('showDetailsModal',function(newVal,oldVal){
+                        if(!newVal){
+                            $window.history.back();
+                        }
+                    });
+
+                    $timeout(function () {
+                        $scope.SearchInfo = data[0];
+
+                        if($scope.SearchInfo.IDTypeID == 2)
+                        {
+                            getAboutComapny();
+                        }
+
+                        if(TID == $scope.SearchInfo.LocID)
+                        {
+                            $scope.showNoticeText = false;
+                        }
+
+                        $scope.showSalesEnquiry = $scope.SearchInfo.VisibleModules[0];
+                        $scope.showHomeDelivery = $scope.SearchInfo.VisibleModules[1];
+                        $scope.shoReserVation = $scope.SearchInfo.VisibleModules[2];
+                        $scope.showServiceRequest = $scope.SearchInfo.VisibleModules[3];
+                        $scope.showSendCv = $scope.SearchInfo.VisibleModules[4];
+
+                        //Below lines are to show address in info tab
+                        $scope.AddressForInfoTab = ($scope.SearchInfo.AddressLine1 != "") ? $scope.SearchInfo.AddressLine1 +', ' : "";
+                        $scope.AddressForInfoTab += ($scope.SearchInfo.AddressLine2 != "") ? $scope.SearchInfo.AddressLine2 +', ' : "";
+                        $scope.AddressForInfoTab += ($scope.SearchInfo.CityTitle != "") ? $scope.SearchInfo.CityTitle +', ' : "";
+                        $scope.AddressForInfoTab += ($scope.SearchInfo.CountryTitle != "") ? $scope.SearchInfo.CountryTitle +', ' : "";
+                        $scope.AddressForInfoTab += ($scope.SearchInfo.PostalCode != "") ? $scope.SearchInfo.PostalCode : "";
+
+                        $window.localStorage.setItem("myLocation",$scope.SearchInfo.Latitude+","+$scope.SearchInfo.Longitude );
+
+                        if($scope.SearchInfo.ParkingStatus==0)
+                        {
+                            $scope.parkingTitle = "Parking Status";
+                        }
+                        if($scope.SearchInfo.ParkingStatus==1)
+                        {
+                            $scope.parkingTitle = "Public Parking";
+                        }
+                        if($scope.SearchInfo.ParkingStatus==2)
+                        {
+                            $scope.parkingTitle = "Vallet Parking";
+                        }
+                        if($scope.SearchInfo.ParkingStatus==3)
+                        {
+                            $scope.parkingTitle = "No parking";
+                        }
+
+                        $scope.form_rating = data[0].Rating;
+
+                        //Call for banner
+                        AutoRefresh = true;
+                        getBanner(1);
+
+                        if($scope.SearchInfo.IDTypeID == 2)
+                        {
+                            $scope.reservationPlaceHolder = "Reservation requirement details";
+                        }
+                        else
+                        {
+                            $scope.reservationPlaceHolder = "Appointment requirement details";
+                        }
+                    });
+                }
+                else
+                {
+                    Notification.error({ message: 'No Results found..!', delay: MsgDelay });
+                }
+            });
+        }
 
         //Below function is for getting about company
         function getAboutComapny()
         {
-            $http({ method: 'get', url: GURL + 'ewtCompanyProfile?TID=' + TID}).success(function (data) {
+            $http({ method: 'get', url: GURL + 'ewtCompanyProfile?TID=' + $scope.SearchInfo.TID}).success(function (data) {
                 $rootScope.$broadcast('$preLoaderStop');
+
                 if (data.Result.length > 0) {
-                        $scope.companyTagLine = data.Result[0].TagLine;
-                }
+                    $scope.companyTagLine = data.Result[0].TagLine;
+                 }
             });
         }
 
