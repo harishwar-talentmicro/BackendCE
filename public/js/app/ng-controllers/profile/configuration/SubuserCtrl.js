@@ -123,14 +123,14 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$htt
                 $scope.modalBox.subuser = $scope.subusers[userIndex];
             };
             $scope.checkAvailability(callback);
-            // console.log($scope.modalBox.subuser);
+            // //console.log($scope.modalBox.subuser);
         }
         else{
             $scope.resetModalData();
         }
-        // console.log($scope.showModal);
+        // //console.log($scope.showModal);
         $scope.showModal = !$scope.showModal;
-        // console.log($scope.showModal);
+        // //console.log($scope.showModal);
     };
 
 
@@ -307,7 +307,7 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$htt
      * Add and update subuser to server
      */
     $scope.saveSubUser = function(){
-        // console.log($scope.modalBox.subuser);
+        // //console.log($scope.modalBox.subuser);
         var data = {
             Token : $rootScope._userInfo.Token,
 
@@ -337,7 +337,7 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$htt
             ServiceRules : $scope.modalBox.subuser.rules.service.join(','),
             ResumeRules : $scope.modalBox.subuser.rules.resume.join(',')
         };
-        // console.log(data);
+        // //console.log(data);
 
         $http({
             url : GURL + 'ewtCreateSubUser',
@@ -384,9 +384,9 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$htt
         }).success(function(resp){
                 $scope.functionTypeCount += 1;
                 if(resp && resp.length > 0 && resp !== "null"){
-                    // console.log(resp);
+                    // //console.log(resp);
                         for(var i = 0; i < resp.length; i++){
-                            // console.log(resp[i]);
+                            // //console.log(resp[i]);
                             $scope.rules.push(resp[i]);
                         }
 
