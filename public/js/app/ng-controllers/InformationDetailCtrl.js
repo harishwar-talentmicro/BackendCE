@@ -70,10 +70,6 @@ angular.module('ezeidApp').
         {
             $scope.showLoginText = false;
             getSearchInformation(TID,$scope.SearchType);
-            if($scope.SearchType == 1)
-            {
-               getAboutComapny();
-            }
         }
         //Below function is for getting search information
         function getSearchInformation(_TID,_SearchType)
@@ -92,7 +88,7 @@ angular.module('ezeidApp').
                 $http({ method: 'get', url: GURL + 'ewtGetSearchInformation?Token=' + $rootScope._userInfo.Token + '&TID=' + _TID + '&SearchType=' + _SearchType + '&CurrentDate=' + currentDate}).success(function (data) {
                     $rootScope.$broadcast('$preLoaderStop');
                     if (data != 'null') {
-                        $scope.showDetailsModal = true;
+
 
                         $scope.$watch('showDetailsModal',function(newVal,oldVal){
                             if(!newVal){
@@ -103,6 +99,12 @@ angular.module('ezeidApp').
                         $timeout(function () {
                             $scope.SearchInfo = data[0];
 
+                            if($scope.SearchInfo.IDTypeID == 2)
+                            {
+                                getAboutComapny();
+                            }
+
+                            $scope.showDetailsModal = true;
                             if(TID == $scope.SearchInfo.LocID)
                             {
                                 $scope.showNoticeText = false;
@@ -166,7 +168,7 @@ angular.module('ezeidApp').
         //Below function is for getting about company
         function getAboutComapny()
         {
-            $http({ method: 'get', url: GURL + 'ewtCompanyProfile?TID=' + TID}).success(function (data) {
+            $http({ method: 'get', url: GURL + 'ewtCompanyProfile?TID=' +$scope.SearchInfo.TID}).success(function (data) {
                 $rootScope.$broadcast('$preLoaderStop');
                 if (data.Result.length > 0) {
                         $scope.companyTagLine = data.Result[0].TagLine;
