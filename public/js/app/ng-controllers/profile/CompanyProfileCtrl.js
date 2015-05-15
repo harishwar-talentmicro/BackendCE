@@ -30,26 +30,6 @@
             $routeParams,
             $route) {
 
-            console.log($rootScope._userInfo);
-
-            $scope.dataProgressLoader.dataLoadInProgress = false;
-            $scope.dataProgressLoader.dataLoadError = false;
-            $scope.dataProgressLoader.dataLoadComplete = true;
-
-            var init = function(){
-                $http({
-                    url : GURL + 'ewtCompanyProfile',
-                    method : 'GET',
-                    params : {
-                        Token : $rootScope._userInfo.Token
-                    }
-                }).success(function(resp){
-                    console.log(resp);
-                }).error(function(err){
-                    console.log('err');
-                });
-            };
-
 
             /**
              * Company Profile Loaded from service
@@ -95,11 +75,70 @@
                         CompanyProfile : $scope.companyProfileEdit
                     }
                 }).success(function(resp){
-                    console.log(resp);
+                    if(resp && resp !== 'null' && resp.hasOwnProperty('IsSuccessfull'))
+                    {
+                        if(resp.IsSuccessfull){
+                            Notification.success({ message : 'Company Profile is saved successfully', delay : MsgDelay});
+                            $scope.companyProfile = $scope.companyProfileEdit;
+                            $scope.toggleEditMode();
+                        }
+                        else{
+                            Notification.error({ message : 'An error occured while saving company profile', delay : MsgDelay});
+                        }
+
+                    }
+                    else{
+                        Notification.error({ message : 'An error occured while saving company profile', delay : MsgDelay});
+                    }
                 }).error(function(err){
-                    console.log(err);
+                    Notification.error({ message : 'An error occured while saving company profile', delay : MsgDelay});
                 });
             };
+
+
+
+            var initialize = function(){
+                $scope.loadUserDetails().then(function(){
+                    $scope.dataProgressLoader.dataLoadInProgress = false;
+                    $scope.dataProgressLoader.dataLoadError = false;
+                    $scope.dataProgressLoader.dataLoadComplete = true;
+                    loadCompanyProfile();
+                },function(){
+                    $scope.dataProgressLoader.dataLoadInProgress = false;
+                    $scope.dataProgressLoader.dataLoadError = true;
+                    $scope.dataProgressLoader.dataLoadComplete = false;
+                });
+            };
+
+
+            var loadCompanyProfile = function(){
+                $http({
+                    url : GURL + 'ewtCompanyProfile',
+                    method : 'GET',
+                    params : {
+                        Token : $rootScope._userInfo.Token
+                    }
+                }).success(function(resp){
+                    console.log(resp);
+                    if(resp && resp !== 'null' && resp.hasOwnProperty('Result')){
+                        if(resp.Result.length > 0){
+                            if(resp.Result[0].TagLine){
+                                $scope.companyProfile = resp.Result[0].TagLine;
+                            }
+                        }
+                        else{
+                            Notification.error({ message : 'Unable to load your company profile information', delay : MsgDelay});
+                        }
+                    }
+                    else{
+                        Notification.error({ message : 'Unable to load your company profile information', delay : MsgDelay});
+                    }
+                }).error(function(err){
+                    Notification.error({ message : 'Unable to load your company profile information', delay : MsgDelay});
+                });
+            };
+
+
 
 
             if($rootScope._userInfo){
@@ -108,7 +147,7 @@
                   $location.path('/');
                 }
                 else{
-                    init();
+                    initialize();
                 }
             }
             else{
