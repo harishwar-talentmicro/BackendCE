@@ -119,7 +119,7 @@
                         Token : $rootScope._userInfo.Token
                     }
                 }).success(function(resp){
-                    console.log(resp);
+                    //console.log(resp);
                     if(resp && resp !== 'null' && resp.hasOwnProperty('Result')){
                         if(resp.Result.length > 0){
                             if(resp.Result[0].TagLine){

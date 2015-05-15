@@ -32,7 +32,7 @@ angular.module('ezeidApp').controller('RulesCtrl',['$scope','$interval','$http',
          * Called only once if the map is not initialized (opening modal box for first time)
          */
         if(!$scope.isMapInitialized){
-            // console.log('showmodal == false');
+            // //console.log('showmodal == false');
             /**
              * Map Related initializations
              * To initialize map on any location just call these three functions
@@ -61,7 +61,7 @@ angular.module('ezeidApp').controller('RulesCtrl',['$scope','$interval','$http',
          */
 
         $scope.showModal = !$scope.showModal;
-        // console.log($scope.showModal);
+        // //console.log($scope.showModal);
     };
 
 
@@ -418,14 +418,14 @@ angular.module('ezeidApp').controller('RulesCtrl',['$scope','$interval','$http',
         getReverseGeolocation : function(lat,lng,callback){
             var geocoder = new google.maps.Geocoder();
             if(!geocoder){
-                // console.log('Geocoder API not present (JS missing)');
+                // //console.log('Geocoder API not present (JS missing)');
                 return;
             }
             var geoCoderDetails = [];
             var latlng = new google.maps.LatLng(lat, lng);
             geocoder.geocode({'latLng': latlng}, function(results, status) {
                 if (status == google.maps.GeocoderStatus.OK) {
-//                    // console.log(JSON.stringify(results));
+//                    // //console.log(JSON.stringify(results));
                     if (results[1]) {
                         $scope.modalBox.geoCoderDetails =  results;
                     } else {
@@ -495,10 +495,10 @@ angular.module('ezeidApp').controller('RulesCtrl',['$scope','$interval','$http',
         if($scope.IsReverseGeolocationOn){
             $scope.modalBox.rule.coordinates.latitude = lat;
             $scope.modalBox.rule.coordinates.longitude = lng;
-            // console.log('I am triggerd');
+            // //console.log('I am triggerd');
             $scope.gMap.getReverseGeolocation(lat,lng);
-            // console.log('Geocoder Details from service');
-            // console.log($scope.modalBox.geoCoderDetails);
+            // //console.log('Geocoder Details from service');
+            // //console.log($scope.modalBox.geoCoderDetails);
         }
         else{
             $scope.IsReverseGeolocationOn = true;
@@ -530,7 +530,7 @@ angular.module('ezeidApp').controller('RulesCtrl',['$scope','$interval','$http',
             method : "POST",
             data : ruleData
         }).success(function(resp){
-            // console.log(resp);
+            // //console.log(resp);
         }).error(function(err){
 
         });
@@ -568,7 +568,7 @@ angular.module('ezeidApp').filter('ruleAdminAreaFilter',function(){
         var items = geoCoderAPIResult[1].address_components;
         for(var i = 0; i < items; i++){
             if(items[i].types.indexOf(adminAreaLevel) !== -1){
-                // console.log(i);
+                // //console.log(i);
                 result = items[i].short_name;
                 break;
             }

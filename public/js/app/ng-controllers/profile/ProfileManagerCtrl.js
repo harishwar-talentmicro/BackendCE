@@ -106,8 +106,8 @@ angular.module('ezeidApp').controller('ProfileManagerCtrl',[
                     Token : $rootScope._userInfo.Token
                 }
             }).success(function(resp){
-                    // console.log('User Details');
-                    // console.log(JSON.stringify(resp));
+                    // //console.log('User Details');
+                    // //console.log(JSON.stringify(resp));
                     promiseResolved = true;
                     if(resp && resp.length > 0 && resp !== 'null'){
                         $scope.userDetails = resp[0];
