@@ -25,6 +25,7 @@ angular.module('ezeidApp').
         '$location',
         '$routeParams',
         'GoogleMaps',
+        '$route',
         function (
             $rootScope,
             $scope,
@@ -39,7 +40,8 @@ angular.module('ezeidApp').
             MsgDelay,
             $location,
             $routeParams,
-            GoogleMap
+            GoogleMap,
+            $route
         )
         {
             var selectAll = false;
@@ -55,6 +57,22 @@ angular.module('ezeidApp').
 
             //Below line is for Loading img
             $scope.$emit('$preLoaderStart');
+
+            //To Call current url, after login from current page
+            if($rootScope._userInfo){
+                if(!$rootScope._userInfo.IsAuthenticate){
+                    var unregister = $rootScope.$watch('_userInfo',function(newVal,oldVal){
+                        if(newVal){
+                            if(newVal.hasOwnProperty('IsAuthenticate')){
+                                if(newVal.IsAuthenticate){
+                                    unregister();
+                                    $route.reload();
+                                }
+                            }
+                        }
+                    });
+                }
+            }
 
             //Set all the serach parameters
             $scope.params = $routeParams;
