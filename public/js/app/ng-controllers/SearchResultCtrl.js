@@ -50,40 +50,22 @@ angular.module('ezeidApp').
             var selectedAllResult = 0;
             $scope.selectedList = [];
             $scope.searchResult = [];
-            $scope.defaultSearchTerm = '';
+            $scope.showDownloadLink = false;
+
+
             //Below line is for Loading img
             $scope.$emit('$preLoaderStart');
 
             //Set all the serach parameters
             $scope.params = $routeParams;
 
+            if($scope.params.searchType != 1)
+            {
+                $scope.showDownloadLink = false;
+            }
+
             // To get search key result
             getSearchKeyWord($scope.params);
-
-
-            //set the ion range slider to the initial value
-            //if(!$rootScope.sliderInit){
-            //    $("#range_29").ionRangeSlider({
-            //        type: "double",
-            //        min: 1,
-            //        max: 5,
-            //        step: 1,
-            //        grid: true,
-            //        grid_snap: true,
-            //        keyboard : true,
-            //        onChange : function(obj){
-            //            var arr = [];
-            //            var toRating = parseInt(obj.to);
-            //            var fromRating = parseInt(obj.from);
-            //            for(var ci = fromRating; ci <= toRating   ; ci++)
-            //            {
-            //                arr.push(ci);
-            //            }
-            //            $scope.params.rating = arr.join();
-            //        }
-            //    });
-            //    $rootScope.sliderInit = true;
-            //}
 
             //find out range of the ratings
             var initialVal = $routeParams.rating[0]?$routeParams.rating[0]:1;
@@ -110,6 +92,7 @@ angular.module('ezeidApp').
             //Below function is for getting key word search result
             function getSearchKeyWord(_filterValue)
             {
+                $scope.showDownloadLink = false;
                 var CurrentDate = moment().format('YYYY-MM-DD HH:mm:ss');
                 if(!$rootScope._userInfo){
                     $rootScope._userInfo = {};
@@ -118,9 +101,6 @@ angular.module('ezeidApp').
                 {
                     $rootScope._userInfo.Token = 2;
                 }
-
-                /* set the value of the search term */
-                $scope.defaultSearchTerm = _filterValue.searchTerm;
 
                 $http({ method: 'post', url: GURL + 'ewSearchByKeywords', data: {
                     SearchType:_filterValue.searchType,
@@ -163,8 +143,11 @@ angular.module('ezeidApp').
                         $window.localStorage.setItem("searchResult", JSON.stringify(data));
                         if(data[0].Filename)
                         {
-                            if($rootScope._userInfo.IsAuthenticate == true || data[0].IDTypeID > 1)
+                            if(($rootScope._userInfo.IsAuthenticate == true) && (data[0].IDTypeID == 1))
                             {
+                                $scope.showDownloadLink = true;
+                                $scope.downloadData = data[0];
+
                                 var downloadUrl = "/ewtGetSearchDocuments?Token="+$rootScope._userInfo.Token+"&&Keywords="+_filterValue.searchTerm;
                                 $window.open(downloadUrl, '_blank');
                             }
@@ -178,11 +161,8 @@ angular.module('ezeidApp').
                                 });
                             }
                         }
-
                     }
-
                 });
-
             }
 
             /**
@@ -211,7 +191,6 @@ angular.module('ezeidApp').
                     Notification.error({ message : 'Please login to search for EZEID', delay : MsgDelay});
                     return false;
                 }
-
 
                 /* update the coordinates */
                 $scope.params.lat = $rootScope.coordinatesLat;
@@ -276,8 +255,7 @@ angular.module('ezeidApp').
                     googleMap.toggleMapControls();
 
                     /* place markers on map */
-                    console.log($scope.coordinatesArr);
-                    var markerImage = '../../images/business-icon_48.png';
+                   var markerImage = '../../images/business-icon_48.png';
                     for(var i=0;i < $scope.coordinatesArr.length;i++)
                     {
                         if($scope.coordinatesArr[i][0] != 0 || $scope.coordinatesArr[i][0] != 0)
@@ -290,7 +268,6 @@ angular.module('ezeidApp').
 
                     googleMap.setMarkersInBounds();
                 };
-
             };
 
             var toggleSearchResult = function(param)
@@ -383,8 +360,6 @@ angular.module('ezeidApp').
                     }
                 }
                 $scope.selectAll = $scope._selectAll;
-
-                //console.log($scope.selectedList);
             };
 
             $rootScope.$on('$locationChangeStart',function(){
@@ -419,7 +394,6 @@ angular.module('ezeidApp').
                     return $scope.random();
                 }
             };
-
 
             var getRandomNumber = function(len)
             {
