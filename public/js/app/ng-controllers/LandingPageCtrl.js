@@ -22,6 +22,7 @@ angular.module('ezeidApp').
         'MsgDelay',
         '$location',
         'GoogleMaps',
+        '$routeParams',
         function (
             $rootScope,
             $scope,
@@ -35,7 +36,8 @@ angular.module('ezeidApp').
             $interval,
             MsgDelay,
             $location,
-            GoogleMap
+            GoogleMap,
+            $routeParams
         )
         {
             /**
@@ -73,6 +75,11 @@ angular.module('ezeidApp').
                 lat:'12.93',
                 lng:'77.57'
             };
+
+            if($routeParams['ezeid']){
+                $scope.searchParams.searchTerm = $routeParams['ezeid'];
+                $scope.searchParams.searchType = 1;
+            }
 
             var ratingArr = [];
             $("#range_29").ionRangeSlider({
@@ -171,14 +178,25 @@ angular.module('ezeidApp').
                                 $scope.searchParams.lat = $scope.googleMap.currentMarkerPosition.latitude;
                                 $scope.searchParams.lng = $scope.googleMap.currentMarkerPosition.longitude;
                             }
+                            if($routeParams['ezeid']){
+                                $scope.triggerSearch();
+                            }
                         },function(){
-
+                            if($routeParams['ezeid']){
+                                $scope.triggerSearch();
+                            }
                         });
                 }
                 else{
                     handleNoGeolocation();
+                    if($routeParams['ezeid']){
+                        $scope.triggerSearch();
+                    }
                 }
             },function(){
+                if($routeParams['ezeid']){
+                    $scope.triggerSearch();
+                }
                 handleNoGeolocation();
             });
 
