@@ -405,7 +405,17 @@ angular.module('ezeidApp').
              /
 
              /* make an array of colors for tiles */
-            var colorArray = ["orange","green","cyan","pink"];
+            var colorArray = [
+                "orange",
+                "green",
+                "cyan",
+                "pink",
+                "bg-orange-shade-1",
+                "bg-green-shade-1",
+                "bg-blue-shade-1",
+                "bg-blue-shade-2",
+                "bg-orange-shade-2"
+            ];
             $scope.oldColorValue = 0;
             /* generate a random color string */
             $scope.count = 0;

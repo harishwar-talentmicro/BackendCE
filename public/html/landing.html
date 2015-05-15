@@ -2,94 +2,95 @@
 
     <div class="main-page-image">
 
-    <!-- New header menu goes here -->
-    <header-section></header-section>
-    <!-- Header Menu ends here -->
+        <!-- New header menu goes here -->
+        <header-section></header-section>
+        <!-- Header Menu ends here -->
 
-    <!-- Mid contents of the Header image goes here -->
-    <div class="landing-center">
-        <div class="main-title text-bolder">IDENTIFY <i class="fa fa-arrow-circle-right"></i> LOCATE <i class="fa fa-arrow-circle-right"></i> COMMUNICATE</div>
-        <div class="main-subtitle">Search any product or service in your neighbourhood. <b>It is Easy, Accurate & Verified</b></div>
-        <!-- Search Bar goes here -->
-        <div class="container m_top_10">
-            <div class="row">
-                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 col-lg-offset-2 col-md-offset-2 col-sm-offset-2 col-xs-offset-0">
-                    <div class="input-group p-bottom-3">
-                        <div class="input-group-btn">
-                            <!-- Change Location btn -->
-                            <button type="button" ng-click="modalVisibility()" class="btn btn-info" title="Change current location"><i class="fa fa-map-marker"></i></button>
+        <!-- Mid contents of the Header image goes here -->
+        <div class="landing-center">
+            <div class="main-title text-bolder">IDENTIFY <i class="fa fa-arrow-circle-right"></i> LOCATE <i class="fa fa-arrow-circle-right"></i> COMMUNICATE</div>
+            <div class="main-subtitle">Search any product or service in your neighbourhood. <b>It is Easy, Accurate & Verified</b></div>
+            <!-- Search Bar goes here -->
+            <div class="container m_top_10">
+                <div class="row">
+                    <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 col-lg-offset-2 col-md-offset-2 col-sm-offset-2 col-xs-offset-0">
+                        <div class="input-group p-bottom-3">
+                            <div class="input-group-btn">
+                                <!-- Change Location btn -->
+                                <button type="button" ng-click="modalVisibility()" class="btn btn-info" title="Change current location"><i class="fa fa-map-marker"></i></button>
 
-                            <button title="Search by" type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><b class="search-type">{{searchType[searchParams.searchType - 1]}}</b> <span class="caret"></span></button>
-                            <ul class="dropdown-menu" role="menu">
-                                <li class="btn-link" ng-repeat="search in searchType track by $index">
-                                    <!-- Index incremented by 1: As the array's default index is [0,1,2] & searchType's value is [1,2,3] -->
-                                    <a class="btn-link" ng-click="($event.preventDefault())(searchParams.searchType = $index + 1) (searchParams.searchTerm = '')">{{search}}</a>
-                                </li>
-                            </ul>
+                                <button title="Search by" type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><b class="search-type">{{searchType[searchParams.searchType - 1]}}</b> <span class="caret"></span></button>
+                                <ul class="dropdown-menu" role="menu">
+                                    <li class="btn-link" ng-repeat="search in searchType track by $index">
+                                        <!-- Index incremented by 1: As the array's default index is [0,1,2] & searchType's value is [1,2,3] -->
+                                        <a class="btn-link" ng-click="($event.preventDefault())(searchParams.searchType = $index + 1) (searchParams.searchTerm = '')">{{search}}</a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <input type="text" ng-keypress="checkEnterKey($event)" placeholder="{{placeHolderText[searchParams.searchType - 1]}}" ng-model="searchParams.searchTerm" ng-class="(searchParams.searchType === 1) ? 'text-uppercase' : ''" class="form-control" aria-label="...">
+                            <div class="input-group-btn">
+                                <!-- Filter BTN -->
+                                <button  ng-click="toggleFilterContainer($event,true)" ng-disabled="searchParams.searchType === 1"
+                                         type="button" class="btn btn-default dropdown-toggle btn-advanced-filter" data-toggle="dropdown" title="advance search"><i class="fa fa-filter"></i> </button>
+                                <!-- Search BTN -->
+                                <button type="button" class="btn btn-warning" title="search" ng-click="triggerSearch()"><i class="fa fa-search"></i> </button>
+                            </div>
                         </div>
-                        <input type="text" ng-keypress="checkEnterKey($event)" placeholder="{{placeHolderText[searchParams.searchType - 1]}}" ng-model="searchParams.searchTerm" ng-class="(searchParams.searchType === 1) ? 'text-uppercase' : ''" class="form-control" aria-label="...">
-                        <div class="input-group-btn">
-                            <!-- Filter BTN -->
-                            <button  ng-click="toggleFilterContainer($event,true)" ng-disabled="searchParams.searchType === 1"
-                                     type="button" class="btn btn-default dropdown-toggle btn-advanced-filter" data-toggle="dropdown" title="advance search"><i class="fa fa-filter"></i> </button>
-                            <!-- Search BTN -->
-                            <button type="button" class="btn btn-warning" title="search" ng-click="triggerSearch()"><i class="fa fa-search"></i> </button>
+                        <div class="current-location text-center">
+                            <p class="text-white">
+                                <i>{{locationString}}</i>
+                            </p>
                         </div>
-                    </div>
-                    <div class="current-location text-center">
-                        <p class="text-white">
-                            <i>{{locationString}}</i>
-                        </p>
                     </div>
                 </div>
-            </div>
-            <div class="row">
-                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 col-lg-offset-3 col-md-offset-3 col-sm-offset-3 col-xs-offset-0">
-                    <div class="filter-container animation-slideup" ng-show="isFilterShown">
-                        <div class="container text text-center filter-text-highlight">
-                            <i>Advance Filters</i>
-                        </div>
-                        <!-- Main contents of advance filters -->
-                        <div class="advance-filter-content border-style-bottom">
-                            <div class="container">
-                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 p-bottom-3 filter-item-border">
-                                    <div class="text-left text-primary"><b>Proximity of:</b></div>
-                                    <div class="form-group">
-                                        <select name="proximity" ng-model="searchParams.proximity" class="form-control">
-                                            <option value="1">1 mile (1.6 km)</option>
-                                            <option value="2">2 mile (3.2 km)</option>
-                                            <option value="5">5 mile (8 km)</option>
-                                            <option value="10">10 mile (16 km)</option>
-                                            <option value="25">25 mile (40 km)</option>
-                                            <option value="50">50 mile (80 km)</option>
-                                            <option value="0">Any</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <br>
-
-                                <div class="row">
-                                    <div class="text-left">
-                                        <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 p-top-10 border-style-right">
-                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 select-items">
-                                                <input type="checkbox" id="item1" class="chkShowParking"  ng-model="searchParams.parkingStatus" name="parking" value="1,1" >
-                                                &nbsp;
-                                                <label  for="item1">Parking Required</label>
-                                            </div>
-                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 select-items">
-                                                <input type="checkbox" id="item2" class="chkShowParking" ng-model="searchParams.homeDelivery" name="homeDelivery" >
-                                                &nbsp;
-                                                <label  for="item2">Need home delivery</label>
-                                            </div>
-                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 select-items">
-                                                <input type="checkbox" id="item3" class="chkShowParking" ng-model="searchParams.openStatus" name="openStatus" >
-                                                &nbsp;
-                                                <label  for="item3">Open business only</label>
-                                            </div>
+                <div class="row">
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 col-lg-offset-3 col-md-offset-3 col-sm-offset-3 col-xs-offset-0">
+                        <div class="filter-container animation-slideup" ng-show="isFilterShown">
+                            <div class="container text text-center filter-text-highlight">
+                                <i>Advance Filters</i>
+                            </div>
+                            <!-- Main contents of advance filters -->
+                            <div class="advance-filter-content border-style-bottom">
+                                <div class="container">
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 p-bottom-3 filter-item-border">
+                                        <div class="text-left text-primary"><b>Proximity of:</b></div>
+                                        <div class="form-group">
+                                            <select name="proximity" ng-model="searchParams.proximity" class="form-control">
+                                                <option value="1">1 mile (1.6 km)</option>
+                                                <option value="2">2 mile (3.2 km)</option>
+                                                <option value="5">5 mile (8 km)</option>
+                                                <option value="10">10 mile (16 km)</option>
+                                                <option value="25">25 mile (40 km)</option>
+                                                <option value="50">50 mile (80 km)</option>
+                                                <option value="0">Any</option>
+                                            </select>
                                         </div>
-                                        <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 p-top-10 text-warning">
-                                            <span class="text text-info text-bolder">Filter by ratings:</span>
-                                            <input id="range_29" />
+                                    </div>
+                                    <br>
+
+                                    <div class="row">
+                                        <div class="text-left">
+                                            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 p-top-10 border-style-right">
+                                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 select-items">
+                                                    <input type="checkbox" id="item1" class="chkShowParking"  ng-model="searchParams.parkingStatus" name="parking" value="1,1" >
+                                                    &nbsp;
+                                                    <label  for="item1">Parking Required</label>
+                                                </div>
+                                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 select-items">
+                                                    <input type="checkbox" id="item2" class="chkShowParking" ng-model="searchParams.homeDelivery" name="homeDelivery" >
+                                                    &nbsp;
+                                                    <label  for="item2">Need home delivery</label>
+                                                </div>
+                                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 select-items">
+                                                    <input type="checkbox" id="item3" class="chkShowParking" ng-model="searchParams.openStatus" name="openStatus" >
+                                                    &nbsp;
+                                                    <label  for="item3">Open business only</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 p-top-10 text-warning">
+                                                <span class="text text-info text-bolder">Filter by ratings:</span>
+                                                <input id="range_29" />
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -99,7 +100,6 @@
                 </div>
             </div>
         </div>
-    </div>
     </div>
     <div class="description-page negetive-z-index">
         <div class="container width-75 p-top-30">
@@ -189,22 +189,114 @@
         </div>
     </div>
     <!-- Mobile App page -->
-    <!--<div class="mobile-app-page">-->
-        <!--<div class="container width-75">-->
-            <!--<div class="app-title text-center">-->
-                <!--<h2 class="font-open-sans text-black text-bolder"><span class="text-dark-blue">EZE</span><span class="ezeid-id-style">ID</span> APP</h2>-->
-            <!--</div>-->
+    <div class="mobile-app-page ">
+        <div class="container width-75">
+            <div class="col-lg-8">
+                <div class="app-title text-center">
+                    <h2 class="font-open-sans text-black text-bolder"><span class="text-dark-blue ezeid-eze-style">EZE</span><span class="ezeid-id-style">ID</span></h2>
+                </div>
+            </div>
+            <div class="col-lg-4">&nbsp;</div>
             <!--<hr class="style-two">-->
-            <!--&lt;!&ndash; Basic content &ndash;&gt;-->
-            <!--<div class="col-lg-8 col-md-8 col-sm-8 col-xs-8">-->
+            <div class="row p-top-30">
+                <!-- Basic content -->
+                <div class="col-lg-8 col-md-12 col-sm-12 col-xs-12">
 
-            <!--</div>-->
-            <!--&lt;!&ndash; Image goes here &ndash;&gt;-->
-            <!--<div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">-->
-                <!--<img src="../images/mobile-sample-1.png" class="width-100 p-top-10">-->
-            <!--</div>-->
-        <!--</div>-->
-    <!--</div>-->
+                    <div class="text-center font-roboto mobile-title-content">
+                        <h4 class="text-bolder text-center mobile-page-heading">EZE ID is available through web portal, Android App and iOS App</h4>
+                            <span class="text-center">And it enable you to use the device of your choice.
+                            Navigation to a located EZE ID(Person or Business ID) is possible only through Mobile Apps,
+                            but buying online using web portal or mobile apps is easy and fun.
+                                </span>
+                    </div>
+
+                    <!-- Description Tiles -->
+                    <div class="mobile-parent-tile tl row p-top-10">
+                        <div class="col-lg-5 p-bottom-20">
+                            <div class="container mobile-individual-tile mobile-tile1">
+                                <div class="text-center tile-initial-image">
+                                    <i class="fa fa-search text-white fa-4x"></i>
+                                </div>
+                                <div class="textbox">
+                                    <p class="text text-center text-white text-bolder p3">Find your Friend or a Business by EZE ID and reach the door step with no further help</p>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="col-lg-7 p-bottom-20">
+                            <div class="container mobile-individual-tile mobile-tile2">
+                                <div class="text-center tile-initial-image">
+                                    <i class="fa fa-file-word-o text-white fa-4x"></i>
+                                </div>
+                                <div class="textbox">
+                                    <p class="text text-center text-white text-bolder p3">Submit your CV to matching Employers of your neighbourhood for a happy career</p>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="col-lg-4 p-bottom-20">
+                            <div class="container mobile-individual-tile mobile-tile3">
+                                <div class="text-center tile-initial-image">
+                                    <i class="fa fa-comments text-white fa-4x"></i>
+                                </div>
+                                <div class="textbox">
+                                    <p class="text text-center text-white text-bolder p3">Chat with Friends or Business with ease</p>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="col-lg-4 p-bottom-20">
+                            <div class="container mobile-individual-tile mobile-tile4">
+                                <div class="text-center tile-initial-image">
+                                    <i class="fa fa-user-md text-white fa-4x"></i>
+                                </div>
+                                <div class="textbox">
+                                    <p class="text text-center text-white text-bolder p3">Find a Doctor or a Space and Book at Appointment on the spot</p>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="col-lg-4 p-bottom-20">
+                            <div class="container mobile-individual-tile mobile-tile5">
+                                <div class="text-center tile-initial-image">
+                                    <i class="fa fa-shopping-cart text-white fa-4x"></i>
+                                </div>
+                                <div class="textbox">
+                                    <p class="text text-center text-white text-bolder p3">Find a product or service and just click to order online.</p>
+                                </div>
+
+                            </div>
+                        </div>
+                        <!-- Download Mobile App -->
+                        <div class="col-lg-6 p-bottom-20">
+                            <div class="container mobile-individual-tile mobile-tile6 pointer">
+                                <div class="text-center p-top-30">
+                                    <img src="https://www.ezeid.com/images/icon-google-play.png" class="width-130-px">
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="col-lg-6 p-bottom-20">
+                            <div class="container mobile-individual-tile mobile-tile7 pointer">
+                                <div class="text-center p-top-30">
+                                    <img src="https://www.ezeid.com/images/logo-app_store.png" class="width-130-px">
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <!-- Image goes here -->
+                <div class="col-lg-4 hidden-1200 hidden-sm hidden-xs">
+                    <div class="phone-img p-5">
+                        <img src="../images/ss.png" />
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
     <!-- Modal Box content -->
     <modal mtitle="modal.title" mclass="modal.class" visible="modalVisible">
         <div class="row">
