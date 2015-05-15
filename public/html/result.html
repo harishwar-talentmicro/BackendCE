@@ -66,6 +66,18 @@
             </div>
         </nav>
 
+
+        <div class="row setTopMargin setRowLeftRightMarginZero centerAlign" ng-show="showDownloadLink">
+            <div class="col-md-12">
+                <a target="_blank" href="/ewtGetSearchDocuments?Token={{_userInfo.Token}}&&Keywords={{params.searchTerm}}"><u>Click here to download: [<b> {{downloadData.Filename}} </b>]</u></a>
+                <br/>
+            </div>
+            <div class="col-md-12">
+                <span> NO: {{downloadData.No}}  {{downloadData.date != "" ? "| Expiry Date:"+downloadData.date : ""}}</span>
+            </div>
+        </div>
+
+
         <!-- Advance filter container -->
         <div class="row">
             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 col-lg-offset-3 col-md-offset-3 col-sm-offset-3 col-xs-offset-0">
@@ -141,7 +153,7 @@
             <!-- main-tiles-frame -->
             <div class="main-tiles-frame tile-frame-padding-top font-roboto">
                 <!-- All such results goes here -->
-                <div class="row p-top-30">
+                <div class="row p-top-30" ng-hide="showDownloadLink">
 
                     <!-- Maps goes here -->
                     <div id="map-ctrl" class="col-lg-12" ng-show="searchListMapFlag"></div>

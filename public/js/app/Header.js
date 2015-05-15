@@ -18,8 +18,6 @@ HeaderApp.directive('headerSection',['Notification','$window' ,function (Notific
                     $http({
                         method: 'post', url: GURL + 'ewLogin', data: Logdata
                     }).success(function (data,status,x) {
-
-
                         $rootScope._userInfo = data;
 
                             if ($rootScope._userInfo.IsAuthenticate == true) {
@@ -60,8 +58,6 @@ HeaderApp.directive('headerSection',['Notification','$window' ,function (Notific
                             }
 
                             $rootScope._userInfo.userName = userName.toUpperCase();
-
-
 
                         if (typeof (Storage) !== "undefined") {
                             var encrypted = CryptoJS.AES.encrypt(JSON.stringify(data), "EZEID");
