@@ -50,8 +50,7 @@ angular.module('ezeidApp').
             var selectedAllResult = 0;
             $scope.selectedList = [];
             $scope.searchResult = [];
-            $scope.showDownloadLink = false;
-
+            $scope.defaultSearchTerm = '';
 
             //Below line is for Loading img
             $scope.$emit('$preLoaderStart');
@@ -66,6 +65,31 @@ angular.module('ezeidApp').
 
             // To get search key result
             getSearchKeyWord($scope.params);
+
+
+            //set the ion range slider to the initial value
+            //if(!$rootScope.sliderInit){
+            //    $("#range_29").ionRangeSlider({
+            //        type: "double",
+            //        min: 1,
+            //        max: 5,
+            //        step: 1,
+            //        grid: true,
+            //        grid_snap: true,
+            //        keyboard : true,
+            //        onChange : function(obj){
+            //            var arr = [];
+            //            var toRating = parseInt(obj.to);
+            //            var fromRating = parseInt(obj.from);
+            //            for(var ci = fromRating; ci <= toRating   ; ci++)
+            //            {
+            //                arr.push(ci);
+            //            }
+            //            $scope.params.rating = arr.join();
+            //        }
+            //    });
+            //    $rootScope.sliderInit = true;
+            //}
 
             //find out range of the ratings
             var initialVal = $routeParams.rating[0]?$routeParams.rating[0]:1;
@@ -101,6 +125,9 @@ angular.module('ezeidApp').
                 {
                     $rootScope._userInfo.Token = 2;
                 }
+
+                /* set the value of the search term */
+                $scope.defaultSearchTerm = _filterValue.searchTerm;
 
                 $http({ method: 'post', url: GURL + 'ewSearchByKeywords', data: {
                     SearchType:_filterValue.searchType,
