@@ -19,11 +19,12 @@
 
 .hpw .main-page-image
 {
-    background: url('../images/front-page-bg1.png');
+    background : #000066;
     height: inherit;
     background-size: cover;
     background-repeat: space;
     background-position-y: -140px;
+    opacity : 0.1;
 }
 
 .hpw .phone-image
@@ -595,8 +596,6 @@ hr.style-two {
 {
     height: auto;
     background-color: #fff;
-    -moz-background-clip: padding;
-    -webkit-background-clip: padding;
     background-clip: padding-box;
     border: 7px solid rgba(0,0,0,0);
     color: #fff;
@@ -620,8 +619,6 @@ hr.style-two {
 .srw .lightbox
 {
     background-color: white;
-    -moz-background-clip: padding;
-    -webkit-background-clip: padding;
     background-clip: padding-box;
     border: 20px solid rgba(0,0,0,0.3);
     -webkit-border-radius: 40px;
@@ -824,7 +821,7 @@ hr.style-two {
 }
 
 .metro .ul .li {
-.list-style: none;
+    list-style: none;
     float: left;
 }
 

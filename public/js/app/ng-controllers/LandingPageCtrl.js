@@ -384,5 +384,20 @@ angular.module('ezeidApp').
                 }
                 return minVal;
             }
+
+            $timeout(function(){
+                var image = new Image();
+
+                image.onload = function(){
+
+                        $('.main-page-image').css(
+                            {'background': 'url(/images/front-page-bg1.png)',
+                                'background-size':'cover'
+                            }).fadeTo(3000,1);
+                }
+                image.src = '/images/front-page-bg1.png';
+
+            },1000);
+
         }]);
 
