@@ -24,7 +24,7 @@
                             <div class="input-group">
                                 <div class="input-group-btn">
                                     <!-- Change Location btn -->
-                                    <button type="button" ng-click="modalVisibility()" class="btn btn-info" title="Change current location"><i class="fa fa-map-marker"></i></button>
+                                    <button type="button" ng-click="modalVisibility()" class="btn btn-info" title="Click to change Search Location"><i class="fa fa-map-marker"></i></button>
                                     <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
                                         <!-- Index subtracted by 1: As searchType's value is [1,2,3] the array's default index is [0,1,2] -->
                                         <b>{{searchType[params.searchType - 1]}}</b> <span class="caret"></span></button>
@@ -35,10 +35,11 @@
                                     </ul>
                                 </div>
 
-                                <input type="text" ng-keypress="(searchKey($event))" ng-click="(searchCount = 0)" placeholder="{{placeHolderText[params.searchType - 1]}}" ng-model="params.searchTerm" ng-class="(params.searchType === 1) ? 'text-uppercase' : ''" class="form-control" aria-label="...">
+                                <input type="text" ng-keypress="(searchKey($event))" placeholder="{{placeHolderText[params.searchType - 1]}}" ng-model="params.searchTerm" ng-class="(params.searchType === 1) ? 'text-uppercase' : ''" class="form-control" aria-label="...">
+                                <!--<input type="text" ng-keypress="(searchKey($event))" ng-click="(searchCount = 0)" placeholder="{{placeHolderText[params.searchType - 1]}}" ng-model="params.searchTerm" ng-class="(params.searchType === 1) ? 'text-uppercase' : ''" class="form-control" aria-label="...">-->
                                 <div class="input-group-btn">
                                     <!-- Advance Search BTN -->
-                                    <button ng-disabled="params.searchType === 1"  ng-click="toggleFilterContainer($event,true)" type="button" class="btn btn-default dropdown-toggle btn-advanced-filter" data-toggle="dropdown" title="advance search"><i class="fa fa-filter"></i> </button>
+                                    <button ng-disabled="params.searchType === 1"  ng-click="(toggleFilterContainer($event,true))(isFilterOptionsShown = false)" type="button" class="btn btn-default dropdown-toggle btn-advanced-filter" data-toggle="dropdown" title="Click to choose Search Options"><i class="fa fa-filter"></i> </button>
                                     <!-- Search BTN -->
                                     <button type="button" class="btn btn-warning" title="search" ng-click="initiateSearch()"><i class="fa fa-search"></i> </button>
                                 </div>
@@ -56,8 +57,11 @@
                             </li>
                         </ul>
                     </div>
-
-                    <p ng-show="searchCount > 0" class="text-center"><i>{{searchCount}} Items found for <b>{{defaultSearchTerm}}</b></i></p>
+                    <div class="dropdown">
+                        <p ng-show="searchCount > 0" class="text-center"><i>{{searchCount}} Items found for <b>{{defaultSearchTerm}}</b></i> with
+                            <button ng-click="(isFilterOptionsShown = !isFilterOptionsShown)(isFilterShown = false)" class="btn btn-xs btn-default">Advance filters <span class="caret"></span></button>
+                        </p>
+                    </div>
                 </div><!-- /.navbar-collapse -->
             </div><!-- /.container-fluid -->
             <div class="no-result" ng-show="isResultNumber == 0">
@@ -81,7 +85,24 @@
             </div>
         </div>
 
+        <!-- Advance Filter Dropdown(Existing) -->
+        <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 col-lg-offset-6 col-md-offset-6 col-sm-offset-6 col-xs-offset-0">
+                <div class="filter-list width-50" ng-show="isFilterOptionsShown">
 
+                    <div class="advance-filter-content border-style-bottom white">
+                        <!-- List of all the FILTERS -->
+                        <ul class="list-unstyled">
+                            <li class="p-left-16"><b>Proximity:</b> {{params.proximity == 0?"NA":params.proximity+" Miles"}}</li>
+                            <li class="p-left-16 gray"><b >Parking Required:</b> Yes</li>
+                            <li class="p-left-16"><b >Home Delivery:</b> NA</li>
+                            <li class="p-left-16 gray"><b >Open Status:</b> NA</li>
+                            <li class="p-left-16 "><b >Ratings:</b> 1-5</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
         <!-- Advance filter container -->
         <div class="row">
             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 col-lg-offset-3 col-md-offset-3 col-sm-offset-3 col-xs-offset-0">
@@ -134,7 +155,7 @@
                                         <div class="star-ratings">
                                             <i ng-repeat="st in star track by $index" ng-click="starRatingFilterAction($index)" ng-class="star[$index] == true?'text-yellow':'text-black'" class="fa fa-star pointer"></i>
                                         </div>
-                                        </div>
+                                    </div>
                                     <!--<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 p-top-10 text-warning">-->
                                     <!--<span class="text text-info text-bolder">Filter by ratings:</span>-->
                                     <!--<input id="range_29" />-->
@@ -164,7 +185,7 @@
             <!-- main-tiles-frame -->
             <div class="main-tiles-frame tile-frame-padding-top font-roboto">
                 <!-- All such results goes here -->
-               <!-- <div class="row p-top-30" ng-hide="showDownloadLink">-->
+                <!-- <div class="row p-top-30" ng-hide="showDownloadLink">-->
                 <div class="row p-top-30">
 
                     <!-- Maps goes here -->
@@ -204,7 +225,7 @@
                                                 </div>
                                                 <div class="col-lg-2">
                                                     <i class="si si si-verified-document si-big"></i>
-                                                    </div>
+                                                </div>
                                                 <div class="col-lg-5">
                                                     <i class="fa fa-star text-info"></i>
                                                     <i class="fa fa-star text-info"></i>
