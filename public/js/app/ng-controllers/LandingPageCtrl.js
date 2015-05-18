@@ -53,6 +53,35 @@ angular.module('ezeidApp').
             var mapLatitude;
             var mapLongitude;
 
+            /* Star ratings reso. */
+            $scope.stars = [true,true,true,true,true];
+            $scope.selectStar = function(index)
+            {
+                $scope.stars[index] = !$scope.stars[index];
+            }
+
+            $scope.starArr = [
+                ["a","b","c","d","e"],
+                ["a","b","c","d"],
+                ["a","b","c"],
+                ["a","b"],
+                ["a"]
+            ];
+
+            /* convert star ratings to comma seperated string */
+            var starStr = [];
+            $scope.getStars = function()
+            {
+                for(var i=0;i<5;i++)
+                {
+                    if($scope.stars[i])
+                    {
+                        starStr.push(i+1);
+                    }
+                }
+                return starStr.join(",");
+            }
+
             /* splice array as index [0] is there, with empty value */
             $scope.searchType = searchTypeArr;
 
@@ -81,27 +110,27 @@ angular.module('ezeidApp').
                 $scope.searchParams.searchType = 1;
             }
 
-            var ratingArr = [];
-            $("#range_29").ionRangeSlider({
-                type: "double",
-                min: 1,
-                max: 5,
-                step: 1,
-                grid: true,
-                grid_snap: true,
-                keyboard : true,
-                onChange : function(obj){
-
-                    var arr = [];
-                    var ratingTo = parseInt(obj.to);
-                    var ratingFrom = parseInt(obj.from);
-                    for(var ci = ratingFrom; ci <= ratingTo; ci++)
-                    {
-                        arr.push(ci);
-                    }
-                    $scope.searchParams.rating = arr.join();
-                }
-            });
+            //var ratingArr = [];
+            //$("#range_29").ionRangeSlider({
+            //    type: "double",
+            //    min: 1,
+            //    max: 5,
+            //    step: 1,
+            //    grid: true,
+            //    grid_snap: true,
+            //    keyboard : true,
+            //    onChange : function(obj){
+            //
+            //        var arr = [];
+            //        var ratingTo = parseInt(obj.to);
+            //        var ratingFrom = parseInt(obj.from);
+            //        for(var ci = ratingFrom; ci <= ratingTo; ci++)
+            //        {
+            //            arr.push(ci);
+            //        }
+            //        $scope.searchParams.rating = arr.join();
+            //    }
+            //});
             $scope.isFilterShown = false;
 
             $scope.toggleFilterContainer = function(e){
@@ -130,6 +159,9 @@ angular.module('ezeidApp').
                     'parkingStatus',
                     'openStatus'
                 ];
+
+                $scope.searchParams.rating = $scope.getStars();
+
                 var searchStr = "";
                 for(var prop in $scope.searchParams){
                     if($scope.searchParams.hasOwnProperty(prop)){
