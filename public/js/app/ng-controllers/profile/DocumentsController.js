@@ -108,28 +108,24 @@ angular.module('ezeidApp').controller('DocumentController',[
             });
     }
 
-    DocCtrl.ChangePin = function(){
-
-
-            if($scope.Pin<100 && $scope.Pin != "")
-            {
-                $scope.Pin = ""
-                Notification.error({ message: 'Pin should greater or equal 100 ', delay: MsgDelay });
-            }
-            else
-            {
-                $http({ method: 'post', url: GURL + 'ewtUpdateDocPin', data: { TokenNo: $rootScope._userInfo.Token, Pin: $scope.Pin} }).success(function (data) {
-                    if (data.IsUpdated) {
-
-                        Notification.success({ message: 'Saved...', delay: MsgDelay });
-                    }
-                    else {
-                        Notification.error({ message: 'Sorry..! not saved ', delay: MsgDelay });
-                    }
-                });
-            }
-
-    }
+    $scope.ChangePin = function(){
+      if($scope.Pin<100 && $scope.Pin != "")
+        {
+            $scope.Pin = "";
+            Notification.error({ message: 'Pin should greater or equal 100 ', delay: MsgDelay });
+        }
+        else
+        {
+            $http({ method: 'post', url: GURL + 'ewtUpdateDocPin', data: { TokenNo: $rootScope._userInfo.Token, Pin: $scope.Pin} }).success(function (data) {
+                if (data.IsUpdated) {
+                    Notification.success({ message: 'Saved...', delay: MsgDelay });
+                }
+                else {
+                    Notification.error({ message: 'Sorry..! not saved ', delay: MsgDelay });
+                }
+            });
+        }
+    };
 
     $scope.uploadFile = function (files) {
         $scope.DocumentToUpload = files;
@@ -159,11 +155,11 @@ angular.module('ezeidApp').controller('DocumentController',[
 
         if($rootScope._userInfo && $rootScope._userInfo.Token){
             $http({ method: 'get', url: GURL + 'ewtGetDoc?TokenNo=' + $rootScope._userInfo.Token + '&&Type='+ option }).success(function (data) {
-               // if(data && data.length > 0){
-                if(data && data.length > 0 && data[0].No != '' && data !='null'){
+
+                 if(data && data.length > 0 && data[0].No != '' && data !='null'){
                     if($scope.OptionSelected==1){
                         $scope.IdPlaceHolder = "Enter ID Card number";
-                         $scope.form.RefNo = data[0].No;
+                        $scope.form.RefNo = data[0].No;
                         $scope.form.RefExpiryDate = $filter('date')(new Date(data[0].ExpiryDate), 'dd-MMM-yyyy');
                         $scope.form.RefDoc = data[0].IDDoc;
                         $scope.form.RefFileName = data[0].DocFilename;
@@ -276,33 +272,32 @@ angular.module('ezeidApp').controller('DocumentController',[
                     $scope.OnOptionSelected($scope.OptionSelected);
                     GetUserDetails();
                     Notification.success({ message: "Saved... ", delay: MsgDelay });
+
                 }else{
                     Notification.error({ message: 'Sorry..! not saved', delay: MsgDelay });
                 }
             });
 
-       //Below code is for upload document
-       for (var i = 0; i < $scope.DocumentToUpload.length; i++) {
-             var $file = $scope.DocumentToUpload[i];
-             var formData = new FormData();
-             formData.append('file', $file);
-             formData.append('RefType', $scope.OptionSelected);
-             formData.append('TokenNo', $rootScope._userInfo.Token);
+        //Below code is for upload document
+          for (var i = 0; i < $scope.DocumentToUpload.length; i++) {
+                var $file = $scope.DocumentToUpload[i];
+                var formData = new FormData();
+                formData.append('file', $file);
+                formData.append('RefType', $scope.OptionSelected);
+                formData.append('TokenNo', $rootScope._userInfo.Token);
 
-             $http({ method: 'POST', url: GURL + 'ewTUploadDoc/', data: formData,
-                     headers: { 'Content-Type': undefined }, transformRequest: angular.identity })
-                     .success(function (data, status, headers, config) {
-                    // GetUserDetails();
-                   //  Notification.success({ message: "Saved...", delay: MsgDelay });
-                  });
-                    /*error(function(data, status, headers, config) {
+                $http({ method: 'POST', url: GURL + 'ewTUploadDoc/', data: formData,
+                    headers: { 'Content-Type': undefined }, transformRequest: angular.identity })
+                    .success(function (data, status, headers, config) {
+                        // GetUserDetails();
+                        //  Notification.success({ message: "Saved...", delay: MsgDelay });
+                    });
+                /*error(function(data, status, headers, config) {
                  });*/
-         }
-
-
+            }
 
     }
     $scope.closeDocument = function(){
-        window.location.href = "/home";
+        window.location.href = "/";
     }
 }]);

@@ -55,6 +55,37 @@ angular.module('ezeidApp').
             $scope.defaultSearchTerm = '';
             $scope.showLoginText = false;
 
+
+            /* Star ratings reso. */
+
+            $scope.selectSearchStar = function(index)
+            {
+                $scope.searchStars[index] = !$scope.searchStars[index];
+            }
+
+            $scope.searchStarArr = [
+                ["a","b","c","d","e"],
+                ["a","b","c","d"],
+                ["a","b","c"],
+                ["a","b"],
+                ["a"]
+            ];
+
+            /* convert star ratings to comma seperated string */
+
+            $scope.getSearchStars = function()
+            {
+                var starStr = [];
+                for(var i=0;i<5;i++)
+                {
+                    if($scope.searchStars[i])
+                    {
+                        starStr.push(i+1);
+                    }
+                }
+                return starStr.join(",");
+            }
+
             //Below line is for Loading img
             $scope.$emit('$preLoaderStart');
 
@@ -76,6 +107,13 @@ angular.module('ezeidApp').
 
             //Set all the serach parameters
             $scope.params = $routeParams;
+            $scope.searchStars = [false,false,false,false,false];
+            var starRating = $scope.params.rating.split(',');
+            for(var i=0;i<starRating.length;i++)
+            {
+                $scope.searchStars[starRating[i]-1] = true;
+            }
+
 
           /*  if($scope.params.searchType != 1)
             {
@@ -97,31 +135,6 @@ angular.module('ezeidApp').
 
            /* // To get search key result
             getSearchKeyWord($scope.params);*/
-
-
-            //set the ion range slider to the initial value
-            //if(!$rootScope.sliderInit){
-            //    $("#range_29").ionRangeSlider({
-            //        type: "double",
-            //        min: 1,
-            //        max: 5,
-            //        step: 1,
-            //        grid: true,
-            //        grid_snap: true,
-            //        keyboard : true,
-            //        onChange : function(obj){
-            //            var arr = [];
-            //            var toRating = parseInt(obj.to);
-            //            var fromRating = parseInt(obj.from);
-            //            for(var ci = fromRating; ci <= toRating   ; ci++)
-            //            {
-            //                arr.push(ci);
-            //            }
-            //            $scope.params.rating = arr.join();
-            //        }
-            //    });
-            //    $rootScope.sliderInit = true;
-            //}
 
             //find out range of the ratings
             var initialVal = $routeParams.rating[0]?$routeParams.rating[0]:1;
@@ -160,7 +173,7 @@ angular.module('ezeidApp').
 
                 /* set the value of the search term */
                 $scope.defaultSearchTerm = _filterValue.searchTerm;
-
+                $scope.$emit('$preLoaderStart');
                 $http({ method: 'post', url: GURL + 'ewSearchByKeywords', data: {
                     SearchType:_filterValue.searchType,
                     Keywords:_filterValue.searchTerm,
@@ -223,6 +236,7 @@ angular.module('ezeidApp').
                             $scope.searchCount = 0;
                         }
                     }
+                    $scope.$emit('$preLoaderStop');
                 });
             }
 
@@ -263,6 +277,7 @@ angular.module('ezeidApp').
                     'openStatus'
                 ];
                 var searchStr = "";
+                $scope.params.rating = $scope.getSearchStars();
                 for(var prop in $scope.params){
                     if($scope.params.hasOwnProperty(prop)){
                         if(modifyValue.indexOf(prop) !== -1){
@@ -313,6 +328,7 @@ angular.module('ezeidApp').
 
                 var populateMarkers = function(){
                     googleMap.resizeMap();
+                    $scope.googleMap.setMarkersInBounds();
                     googleMap.toggleMapControls();
 
                     /* place markers on map */
@@ -346,6 +362,7 @@ angular.module('ezeidApp').
                     if(flag){
                         $timeout(function(){
                             googleMap.resizeMap();
+                            $scope.googleMap.setMarkersInBounds();
                         },500);
                     }
                 }
