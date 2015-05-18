@@ -43,7 +43,7 @@
 
                     <div class="col-lg-2 col-md-2 col-sm-3 col-xs-4 pull-right" title="Filters">
                         <div class="form-group form-group-sm">
-                            <select class="form-control" ng-model="filterStatus">
+                            <select class="form-control" ng-model="filterStatus" ng-change="loadTransaction(pageNumber,filterStatus)">
                                 <option ng-repeat="sfilter in filterStatusTypes track by $index" value="{{sfilter.TID}}">{{sfilter.StatusTitle}}</option>
                             </select>
                         </div>
@@ -234,13 +234,12 @@
                                         <option ng-repeat="txStatus in txStatusTypes track by txStatus.TID" value="{{txStatus.TID}}">{{txStatus.StatusTitle}}</option>
                                     </select>
                                 </div>
-
                             </div>
-                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-show="moduleConf.listType == 4">
-                                <div class="form-group form-group-sm">
-                                    <input type="text" class="form-control"  placeholder="Amount" ng-model="modalBox.tx.orderAmount" decimals-only />
-                                </div>
-                            </div>
+                            <!--<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-show="moduleConf.listType == 4">-->
+                                <!--<div class="form-group form-group-sm">-->
+                                    <!--<input type="text" class="form-control"  placeholder="Amount" ng-model="modalBox.tx.orderAmount" decimals-only />-->
+                                <!--</div>-->
+                            <!--</div>-->
                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                 <label class="tiny">Next Action to be taken</label>
                                 <div class="form-group form-group-sm">
