@@ -61,7 +61,7 @@ angular.module('ezeidApp').controller('mapPopController',[
                     googleMap.currentMarkerPosition.longitude = lng;
                 });
                 googleMap.getCurrentLocation().then(function(){
-                    //googleMap.resizeMap();
+                    googleMap.resizeMap();
                     googleMap.placeCurrentLocationMarker(function(lat,lng){
                         googleMap.currentMarkerPosition.latitude = lat;
                         googleMap.currentMarkerPosition.longitude = lng;

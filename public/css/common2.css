@@ -1521,3 +1521,11 @@ hr.style-two {
 }
 
 /* Flipping Tiles styles for result page goes here */
+.newRedBanner
+{
+    width: 356px;
+    height: 356px;
+    background: #ff0000;
+    text-align: center;
+    color: #ffffff;
+}
