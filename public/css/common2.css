@@ -64,6 +64,11 @@
     display:inline;
 }
 
+.hpw .desc-img
+{
+    width:120%
+}
+
 @media screen and (max-width: 1320px) {
     .srw .tile-frame-padding-top
     {
@@ -1534,4 +1539,10 @@ hr.style-two {
     background: #ff0000;
     text-align: center;
     color: #ffffff;
+}
+
+.hpw .advance-filter
+{
+    position: absolute;
+    z-index: 10000 !important;
 }
