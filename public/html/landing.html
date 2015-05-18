@@ -31,7 +31,7 @@
                             <div class="input-group-btn">
                                 <!-- Filter BTN -->
                                 <button  ng-click="toggleFilterContainer($event,true)" ng-disabled="searchParams.searchType === 1"
-                                         type="button" class="btn btn-default dropdown-toggle btn-advanced-filter" data-toggle="dropdown" title="Click to choose Search Options"><i class="fa fa-filter"></i> </button>
+                                         type="button" class="btn no-radius btn-default dropdown-toggle btn-advanced-filter" data-toggle="dropdown" title="Click to choose Search Options"><i class="fa fa-filter"></i> </button>
                                 <!-- Search BTN -->
                                 <button type="button" class="btn btn-warning" title="search" ng-click="triggerSearch()"><i class="fa fa-search"></i> </button>
                             </div>
@@ -105,6 +105,9 @@
                                             </div>
                                         </div>
                                     </div>
+                                </div>
+                                <div class="done-btn text-right p-5">
+                                    <button class="btn btn-info btn-sm" ng-click="isFilterShown = !isFilterShown">OK</button>
                                 </div>
                             </div>
                         </div>
