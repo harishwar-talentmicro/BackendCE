@@ -288,11 +288,11 @@
                             <div class="tile-outer-frame pointer" ng-click="redirectFullPage(params.searchType,search.TID)">
                                 <div class="row-1">
                                     <div class="block-header">
-                                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 block-1 block block-row-1 text-12" ng-class="color">
-                                            <!--<small ng-click="sayAlert(search.EZEID)"><i class="fa fa-map-marker fa-2x"></i> <i class="text-bolder"></i></small>-->
+                                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 block-1 block block-row-1 text-12" ng-class="color">
+                                            <small ng-click="sayAlert(search.EZEID)"> <i class="text-bolder">{{search.distance}} Km</i></small>
                                             &nbsp;
                                         </div>
-                                        <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 block-2 block block-row-1 text-center " ng-class="color">
+                                        <div class="col-lg-7 col-md-7 col-sm-7 col-xs-7 block-2 block block-row-1 text-center " ng-class="color">
                                             <b class="tile-text">{{search.EZEID}}</b>
                                         </div>
                                         <div ng-click="$event.stopPropagation()" class="col-lg-2 col-md-2 col-sm-2 col-xs-2 block-3 block block-row-1" ng-class="color">
