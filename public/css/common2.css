@@ -8,7 +8,7 @@
 /* Style for home page of Ezeid */
 .hpw .bg-image
 {
-    background: url('../images/front-page-bg.jpg');
+    background: url('../images/front-page-bg1.png');
     height: 100%;
     background-size: cover;
 }
@@ -19,11 +19,22 @@
 
 .hpw .main-page-image
 {
-    background: url('../images/front-page-bg.jpg');
+    background : #000066;
     height: inherit;
     background-size: cover;
     background-repeat: space;
     background-position-y: -140px;
+    opacity : 0.1;
+}
+
+.hpw .phone-image
+{
+    background-image: url('../images/ezeid-ss.png');
+    height: 440px;
+    /* width: 600px; */
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position-y: 0px;
 }
 
 .hpw .logo
@@ -58,12 +69,30 @@
     {
         padding-top: 158px;
     }
+
+    .hpw .hidden-md
+    {
+        display: none;
+    }
+}
+
+@media screen and (max-width: 1200px)
+{
+    .hpw .hidden-1200
+    {
+        display: none;
+    }
 }
 
 @media screen and (max-width: 874px) {
     .srw .tile-frame-padding-top
     {
         padding-top: 148px;
+    }
+
+    .hpw .hidden-sm
+    {
+        display: none;
     }
 }
 
@@ -72,6 +101,12 @@
     {
         display:none;
     }
+
+    .hpw .hidden-xs
+    {
+        display: none;
+    }
+
     .hpw .logo {
         content: url(https://www.ezeid.com/images/logo.png);
         background-position:top;
@@ -161,7 +196,7 @@
     vertical-align: middle;
     display: inline-block;
     position: relative;
-    padding: 15%;
+    padding: 10%;
     width: 100%;
     text-align: center;
     height: inherit;
@@ -251,9 +286,9 @@
 }
 
 .hpw .advance-filter-content
- {
+{
     padding-top: 3px;
- }
+}
 
 .hpw .filter-item-border
 {
@@ -264,6 +299,16 @@
 .hpw .p-top-10
 {
     padding-top: 10px;
+}
+
+.hpw .p-top-7
+{
+    padding-top: 7px;
+}
+
+.hpw .p-top-100
+{
+    padding-top: 100px;
 }
 
 .hpw .p-bottom-100
@@ -556,8 +601,6 @@ hr.style-two {
 {
     height: auto;
     background-color: #fff;
-    -moz-background-clip: padding;
-    -webkit-background-clip: padding;
     background-clip: padding-box;
     border: 7px solid rgba(0,0,0,0);
     color: #fff;
@@ -581,8 +624,6 @@ hr.style-two {
 .srw .lightbox
 {
     background-color: white;
-    -moz-background-clip: padding;
-    -webkit-background-clip: padding;
     background-clip: padding-box;
     border: 20px solid rgba(0,0,0,0.3);
     -webkit-border-radius: 40px;
@@ -615,6 +656,12 @@ hr.style-two {
 {
     padding: 3px !important;
 }
+
+.hpw .p10
+{
+    padding: 10px !important;
+}
+
 
 .srw .row-1
 {
@@ -714,6 +761,11 @@ hr.style-two {
     background-color: cadetblue !important;
 }
 
+.hpw .white
+{
+    background-color: #ffffff !important;
+}
+
 .hpw .cyan
 {
     background-color: rgb(8, 111, 111) !important;
@@ -774,7 +826,7 @@ hr.style-two {
 }
 
 .metro .ul .li {
-    .list-style: none;
+    list-style: none;
     float: left;
 }
 
@@ -1033,3 +1085,439 @@ hr.style-two {
 {
     background-color: rgb(211, 229, 244);
 }
+
+.hpw .ezeid-eze-style
+{
+    background-color: rgb(242, 248, 254);
+    padding-left: 5px;
+}
+
+.hpw .mobile-title-content
+{
+    color:gray;
+    padding-top: 50px;
+}
+
+.hpw .text-webkit-center
+{
+    text-align: -webkit-center;
+}
+
+/* tile css */
+.hpw .mobile-individual-tile
+{
+    height: 100px;
+    width:100%;
+}
+
+.hpw .mobile-individual-tile-search-result
+{
+    height: auto;
+    width:100%;
+}
+
+.hpw .mobile-tile1
+{
+    background-color: rgba(24, 0, 227, 0.42);
+}
+
+.hpw .mobile-tile2
+{
+    background-color: rgba(227, 0, 57, 0.47);
+}
+
+.hpw .mobile-tile3
+{
+    background-color: rgba(10, 241, 161, 1);
+}
+
+.hpw .mobile-tile4
+{
+    background-color: rgba(0, 175, 227, 0.66);
+}
+
+.hpw .mobile-tile5
+{
+    background-color: rgb(209, 171, 254);
+}
+
+.hpw .mobile-tile6
+{
+    background-color:rgb(222, 222, 222);
+}
+
+.hpw .mobile-tile6:hover
+{
+    background-color:rgba(222, 222, 222, 0);
+}
+
+.hpw .mobile-tile7
+{
+    background-color: rgb(255, 238, 210);
+}
+
+.hpw .mobile-tile7:hover
+{
+    background-color: rgba(255, 238, 210,0);
+}
+
+.hpw .width-170-px
+{
+    width: 170px;
+}
+
+.hpw .width-130-px
+{
+    width: 130px;
+}
+
+
+
+.tl .container {
+    position:relative;
+    overflow:hidden;
+}
+.tl .container .textbox {
+    width:100%;
+    height:100%;
+    position:absolute;
+    top:0;
+    left:0;
+    margin-top:-160px;
+    /*border-radius:5px;*/
+    background-color: rgba(129, 128, 128, 0.9);
+    -webkit-box-shadow: inset 0px 0px 5px 2px rgba(255,255,255,.75);
+    /*box-shadow: inset 0px 0px 5px 2px rgba(255,255,255,.75);*/
+}
+
+.no-box-shadow
+{
+    -webkit-box-shadow: none !important;
+}
+
+.tl .container:hover .textbox {
+    margin-top:0;
+}
+.tl .text {
+    padding-top: 50px;
+}
+.tl .textbox {
+    -webkit-transition: all 0.7s ease;
+    transition: all 0.7s ease;
+}
+
+.hpw .p-top-30
+{
+    padding-top: 30px;
+}
+
+.hpw .p-bottom-20
+{
+    padding-bottom: 20px;
+}
+
+.hpw .tile-initial-image
+{
+    padding-top: 23px
+}
+
+.hpw .mobile-page-heading
+{
+    color: rgb(150, 142, 142);
+}
+
+.hpw .mobile-page-heading > span
+{
+    color:gray;
+}
+
+.hpw .bg-orange-shade-1
+{
+    background-color: rgb(243, 126, 61);
+    color:#fff;
+}
+
+.hpw .bg-green-shade-1
+{
+    background-color: rgb(0, 176, 80);
+    color:#fff;
+}
+
+.hpw .bg-blue-shade-1
+{
+    background-color: rgb(44, 110, 170);
+    color:#fff;
+}
+
+.hpw .bg-blue-shade-2
+{
+    background-color: rgb(0, 51, 102);
+    color:#fff;
+}
+
+.hpw .bg-orange-shade-2
+{
+    background-color: rgb(255, 102, 0);
+    color:#fff;
+}
+
+/* SPRITE IMAGE CSS */
+
+.si {
+    display: inline-block;
+    background: url('../images/sprite_icons.png') no-repeat;
+    /*width: 64px;*/
+    height: 32px;
+    overflow: hidden;
+    zoom:0.5;
+    -moz-transform:scale(0.5);
+    -moz-transform-origin: 0 0;
+}
+
+[class^="si-"]{
+    display: inline-block;
+    background: url('../images/sprite_icons.png') no-repeat;
+    /*width: 64px;*/
+    height: 32px;
+    overflow: hidden;
+    zoom:0.5;
+    -moz-transform:scale(0.5);
+    -moz-transform-origin: 0 0;
+}
+
+.si-huge{
+
+    zoom:1;
+    -moz-transform:scale(1);
+    -moz-transform-origin: 0 0;
+}
+
+.si-big{
+    zoom:0.60;
+    -moz-transform:scale(0.60);
+    -moz-transform-origin: 0 0;
+}
+
+.si-small{
+    zoom:0.29;
+    -moz-transform:scale(0.29);
+    -moz-transform-origin: 0 0;
+}
+
+
+.si-access-history
+{
+    width:30px;
+    background-position: 0px 0px;
+}
+
+.si-black-white-list
+{
+    width:30px;
+    background-position: -34px 0px;
+}
+
+.si-bulk-mail
+{
+    width:30px;
+    background-position: -67px 0px;
+}
+
+.si-pie-chart
+{
+    width:30px;
+    background-position: -100px 0px;
+}
+
+.si-change-passwd
+{
+    width:30px;
+    background-position: -132px 0px;
+}
+
+.si-verified
+{
+    width:30px;
+    background-position: -166px 0px;
+}
+
+.si-closed
+{
+    width:30px;
+    background-position: -199px 0px;
+}
+
+.si-facebook
+{
+    width:30px;
+    background-position: -232px 0px;
+}
+
+.si-linkedin
+{
+    width:30px;
+    background-position: -265px 0px;
+}
+
+.si-left-quote
+{
+    width:30px;
+    background-position: -298px 0px;
+}
+
+.si-map-marker-red
+{
+    width:30px;
+    background-position: -332px 0px;
+}
+
+
+.si-map-marker-blue
+{
+    width:30px;
+    background-position: -365px 0px;
+}
+
+
+.si-envelope
+{
+    width:30px;
+    background-position: -396px 0px;
+}
+
+
+.si-user-many
+{
+    width:32px;
+    background-position: -430px 0px;
+}
+
+
+.si-mobile
+{
+    width:30px;
+    background-position: -464px 0px;
+}
+
+.si-user
+{
+    width:30px;
+    background-position: -496px 0px;
+}
+
+
+.si-parking-no
+{
+    width:30px;
+    background-position: -529px 0px;
+}
+
+
+.si-verified-document
+{
+    width:30px;
+    background-position: -561px 0px;
+}
+
+
+.si-not-verified-document
+{
+    width:30px;
+    background-position: -593px 0px;
+}
+
+
+.si-open
+{
+    width:30px;
+    background-position: -630px 0px;
+}
+
+.si-parking
+{
+    width:30px;
+    background-position: -661px 0px;
+}
+
+.si-pie-chart-original
+{
+    width:30px;
+    background-position: -694px 0px;
+}
+
+.si-sign-out
+{
+    width:30px;
+    background-position: -728px 0px;
+}
+
+.si-pinterest
+{
+    width:30px;
+    background-position: -760px 0px;
+}
+
+.si-sign-up
+{
+    width:30px;
+    background-position: -793px 0px;
+}
+
+.si-user-cross
+{
+    width:30px;
+    background-position: -827px 0px;
+}
+
+.si-right-quote
+{
+    width:30px;
+    background-position: -860px 0px;
+}
+
+
+.si-telephone
+{
+    width:30px;
+    background-position: -893px 0px;
+}
+
+.si-search-white
+{
+    width:32px;
+    background-position: -924px 0px;
+}
+
+
+.si-twitter
+{
+    width:30px;
+    background-position: -958px 0px;
+}
+
+
+.si-filter
+{
+    width:30px;
+    background-position: -1025px 0px;
+}
+
+.si-checkbox-unchecked
+{
+    width:30px;
+    background-position: -1057px 0px;
+}
+
+.si-shopping-cart
+{
+    width:30px;
+    background-position: -1089px 0px;
+}
+
+.si-list
+{
+    width:30px;
+    background-position: -1122px 0px;
+}
+
+/* Flipping Tiles styles for result page goes here */

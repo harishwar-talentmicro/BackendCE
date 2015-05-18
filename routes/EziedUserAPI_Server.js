@@ -5732,7 +5732,12 @@ exports.FnSaveTranscationItems = function(req, res){
 
         var Token = req.body.Token;
         var MessageID = req.body.MessageID;
-        var ItemList = req.body.ItemList;
+        var ItemID = req.body.ItemID;
+        var Qty = req.body.Qty;
+        var Rate = req.body.Rate;
+        var Amount = req.body.Amount;
+        var Duration = req.body.Duration;
+        
 
         var RtnMessage = {
             IsSuccessfull: false
@@ -6664,6 +6669,7 @@ exports.FnSaveTranscation = function(req, res){
         }
         if(FolderRuleID.toString() == 'NaN')
             FolderRuleID=0;
+        
         if (Token != null && ItemsList != null) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
