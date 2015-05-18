@@ -395,6 +395,11 @@
     width: 75% !important;
 }
 
+.hpw .width-50
+{
+    width: 50% !important;
+}
+
 .hpw .width-81
 {
     width: 81% !important;
@@ -761,6 +766,10 @@ hr.style-two {
     background-color: cadetblue !important;
 }
 
+.hpw .red
+{
+    background-color: rgb(235, 51, 51) !important;;
+}
 .hpw .white
 {
     background-color: #ffffff !important;
@@ -1038,6 +1047,11 @@ hr.style-two {
     background-color: rgb(205, 205, 205);
 }
 
+.hpw .gray
+{
+    background-color: rgb(228, 227, 226);
+}
+
 .hpw .play-store-bg
 {
     background-color: rgb(10, 165, 165);
@@ -1118,12 +1132,12 @@ hr.style-two {
 
 .hpw .mobile-tile1
 {
-    background-color: rgba(24, 0, 227, 0.42);
+    background-color: rgba(24, 0, 227, 0.6);
 }
 
 .hpw .mobile-tile2
 {
-    background-color: rgba(227, 0, 57, 0.47);
+    background-color: rgba(227, 0, 57, 0.6);
 }
 
 .hpw .mobile-tile3
@@ -1133,33 +1147,25 @@ hr.style-two {
 
 .hpw .mobile-tile4
 {
-    background-color: rgba(0, 175, 227, 0.66);
+    background-color: rgba(0, 175, 227, 0.86);
 }
 
 .hpw .mobile-tile5
 {
-    background-color: rgb(209, 171, 254);
+    background-color: rgb(174, 144, 253);
 }
 
 .hpw .mobile-tile6
 {
-    background-color:rgb(222, 222, 222);
+    background-color:rgba(11, 7, 82, 0.54);
 }
 
-.hpw .mobile-tile6:hover
-{
-    background-color:rgba(222, 222, 222, 0);
-}
 
 .hpw .mobile-tile7
 {
-    background-color: rgb(255, 238, 210);
+    background-color:rgba(255, 44, 0, 0.75);
 }
 
-.hpw .mobile-tile7:hover
-{
-    background-color: rgba(255, 238, 210,0);
-}
 
 .hpw .width-170-px
 {
