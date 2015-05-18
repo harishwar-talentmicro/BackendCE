@@ -52,8 +52,8 @@
                             <!-- Main contents of advance filters -->
                             <div class="advance-filter-content border-style-bottom">
                                 <div class="container">
-                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 p-bottom-3 filter-item-border">
-                                        <div class="text-left text-primary"><b>Proximity of:</b></div>
+                                    <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12 p-bottom-3 filter-item-border">
+                                        <div class="text-left text-primary"><b>Proximity:</b></div>
                                         <div class="form-group">
                                             <select name="proximity" ng-model="searchParams.proximity" class="form-control">
                                                 <option value="1">1 mile (1.6 km)</option>
@@ -65,31 +65,43 @@
                                                 <option value="0">Any</option>
                                             </select>
                                         </div>
+
+                                        <!-- Filter Contents -->
+                                        <div class="p-top-10 text-left">
+                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 select-items">
+                                                <input type="checkbox" id="item1" class="chkShowParking"  ng-model="searchParams.parkingStatus" name="parking" >
+                                                &nbsp;
+                                                <label  for="item1"> Parking Required</label>
+                                            </div>
+                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 select-items">
+                                                <input type="checkbox" id="item2" class="chkShowParking" ng-model="searchParams.homeDelivery" name="homeDelivery" >
+                                                &nbsp;
+                                                <label  for="item2">Need home delivery</label>
+                                            </div>
+                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 select-items">
+                                                <input type="checkbox" id="item3" class="chkShowParking" ng-model="searchParams.openStatus" name="openStatus" >
+                                                &nbsp;
+                                                <label  for="item3">Open business only</label>
+                                            </div>
+                                        </div>
                                     </div>
+
                                     <br>
 
                                     <div class="row">
                                         <div class="text-left">
-                                            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 p-top-10 border-style-right">
-                                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 select-items">
-                                                    <input type="checkbox" id="item1" class="chkShowParking"  ng-model="searchParams.parkingStatus" name="parking" value="1,1" >
-                                                    &nbsp;
-                                                    <label  for="item1">Parking Required</label>
-                                                </div>
-                                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 select-items">
-                                                    <input type="checkbox" id="item2" class="chkShowParking" ng-model="searchParams.homeDelivery" name="homeDelivery" >
-                                                    &nbsp;
-                                                    <label  for="item2">Need home delivery</label>
-                                                </div>
-                                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 select-items">
-                                                    <input type="checkbox" id="item3" class="chkShowParking" ng-model="searchParams.openStatus" name="openStatus" >
-                                                    &nbsp;
-                                                    <label  for="item3">Open business only</label>
-                                                </div>
-                                            </div>
                                             <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 p-top-10 text-warning">
                                                 <span class="text text-info text-bolder">Filter by ratings:</span>
-                                                <input id="range_29" />
+                                                <!--<input id="range_29" />-->
+                                                <div class="star-ratings text-left">
+                                                    <div class="stars" ng-repeat="star in stars track by $index">
+                                                        <span ng-click="selectStar($index)">
+                                                            <input type="checkbox" ng-model="stars[$index]" ng-change="selectStar($index)" />
+                                                        </span>
+                                                        &nbsp;
+                                                        <i ng-repeat="str in starArr[$index]" class="fa fa-star text-yellow"></i>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -109,30 +121,32 @@
         </div>
     </div>
     <div class="description-page negetive-z-index">
-        <div class="container width-75 p-top-30">
+        <div class="container width-81">
             <div class="description-content">
                 <!-- Description contents goes here -->
                 <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 text-center description-tab">
-                    <div class="col-lg-3 col-md-12 col-sm-12 col-xs-12">
+                    <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12">
                         <!-- Image goes here -->
-                        <div class="font-awesome-image p-top-30">
-                            <i class="fa fa-map-marker fa-3x text-red"></i>
+                        <div class="font-awesome-image">
+                            <!--<i class="fa fa-map-marker fa-3x text-red"></i>-->
+                            <img src="../images/radar.png" width="120%  " />
                         </div>
                     </div>
-                    <div class="col-lg-9 col-md-12 col-sm-12 col-xs-12">
+                    <div class="col-lg-8 col-md-12 col-sm-12 col-xs-12">
                         <!-- Description goes here -->
                         <p class="text-justify">The first proximity based search and e-business platform that connects business with neighbourhood consumers</p>
                     </div>
                 </div>
 
                 <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 text-center description-tab">
-                    <div class="col-lg-3 col-md-12 col-sm-12 col-xs-12">
+                    <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12">
                         <!-- Image goes here -->
-                        <div class="font-awesome-image p-top-30">
-                            <i class="fa fa-recycle fa-3x text-info"></i>
+                        <div class="font-awesome-image">
+                            <img src="../images/CRM.png" width="120%  " />
+                            <!--<i class="fa fa-recycle fa-3x text-info"></i>-->
                         </div>
                     </div>
-                    <div class="col-lg-9 col-md-12 col-sm-12 col-xs-12">
+                    <div class="col-lg-8 col-md-12 col-sm-12 col-xs-12">
                         <!-- Description goes here -->
                         <p class="text-justify">
                             Business Organization can build online business functionality like​
@@ -142,13 +156,14 @@
                 </div>
 
                 <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 text-center description-tab">
-                    <div class="col-lg-3 col-md-12 col-sm-12 col-xs-12">
+                    <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12">
                         <!-- Image goes here -->
-                        <div class="font-awesome-image p-top-30">
-                            <i class="fa fa-thumbs-up fa-3x text-success"></i>
+                        <div class="font-awesome-image">
+                            <!--<i class="fa fa-thumbs-up fa-3x text-success"></i>-->
+                            <img src="../images/online-shopping.png" width="120%  " />
                         </div>
                     </div>
-                    <div class="col-lg-9 col-md-12 col-sm-12 col-xs-12">
+                    <div class="col-lg-8 col-md-12 col-sm-12 col-xs-12">
                         <!-- Description goes here -->
                         <p class="text-justify">
                             Individuals will enjoy the benefits of sharing any personal information just by a short code and locate anything you need in your neighbourhood
@@ -348,7 +363,7 @@
                 <!-- Image goes here -->
                 <div class="col-lg-4 hidden-1200 hidden-sm hidden-xs">
                     <div class="phone-img p-5">
-                        <img src="../images/ss.png" />
+                        <img src="../images/phone.png" />
                     </div>
 
                 </div>

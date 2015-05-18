@@ -58,9 +58,7 @@
                         </ul>
                     </div>
                     <div class="dropdown">
-                        <p ng-show="searchCount > 0" class="text-center"><i>{{searchCount}} Items found for <b>{{defaultSearchTerm}}</b></i> with
-                            <button ng-click="(isFilterOptionsShown = !isFilterOptionsShown)(isFilterShown = false)" class="btn btn-xs btn-default">Advance filters <span class="caret"></span></button>
-                        </p>
+                        <p ng-show="searchCount > 0" class="text-center"><i>{{searchCount}} Items found for <b>{{defaultSearchTerm}}</b></i></p>
                     </div>
                 </div><!-- /.navbar-collapse -->
             </div><!-- /.container-fluid -->
@@ -86,7 +84,7 @@
         </div>
 
         <!-- Advance Filter Dropdown(Existing) -->
-        <div class="row">
+        <div class="row hidden">
             <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 col-lg-offset-6 col-md-offset-6 col-sm-offset-6 col-xs-offset-0">
                 <div class="filter-list width-50" ng-show="isFilterOptionsShown">
 
@@ -114,52 +112,57 @@
                     <!-- Main contents of advance filters -->
                     <div class="advance-filter-content border-style-bottom">
                         <div class="container">
-                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 p-bottom-3 filter-item-border">
-                                <div class="text-left text-primary"><b>Proximity of:</b></div>
+                            <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12 p-bottom-3 filter-item-border">
+                                <div class="text-left text-primary"><b>Proximity:</b></div>
                                 <div class="form-group">
-                                    <select name=search"proximity" ng-model="params.proximity" class="form-control">
-                                        <option ng-selected="1 == params.proximity" value="1">1 mile (1.6 km)</option>
-                                        <option ng-selected="2 == params.proximity" value="2">2 mile (3.2 k)</option>
-                                        <option ng-selected="5 == params.proximity" value="5">5 mile (8 km)</option>
-                                        <option ng-selected="10 == params.proximity" value="10">10 mile (16 km)</option>
-                                        <option ng-selected="25 == params.proximity" value="25">25 mile (40 km)</option>
-                                        <option ng-selected="50 == params.proximity" value="50">50 mile (80 km)</option>
-                                        <option ng-selected="0 == params.proximity" value="0">Any</option>
+                                    <select name="proximity" ng-model="searchParams.proximity" class="form-control">
+                                        <option value="1">1 mile (1.6 km)</option>
+                                        <option value="2">2 mile (3.2 km)</option>
+                                        <option value="5">5 mile (8 km)</option>
+                                        <option value="10">10 mile (16 km)</option>
+                                        <option value="25">25 mile (40 km)</option>
+                                        <option value="50">50 mile (80 km)</option>
+                                        <option value="0">Any</option>
                                     </select>
                                 </div>
+
+                                <!-- Filter Contents -->
+                                <div class="p-top-10 text-left">
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 select-items">
+                                        <input type="checkbox" id="item1" class="chkShowParking"  ng-model="searchParams.parkingStatus" name="parking" >
+                                        &nbsp;
+                                        <label  for="item1"> Parking Required</label>
+                                    </div>
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 select-items">
+                                        <input type="checkbox" id="item2" class="chkShowParking" ng-model="searchParams.homeDelivery" name="homeDelivery" >
+                                        &nbsp;
+                                        <label  for="item2">Need home delivery</label>
+                                    </div>
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 select-items">
+                                        <input type="checkbox" id="item3" class="chkShowParking" ng-model="searchParams.openStatus" name="openStatus" >
+                                        &nbsp;
+                                        <label  for="item3">Open business only</label>
+                                    </div>
+                                </div>
                             </div>
+
                             <br>
 
                             <div class="row">
                                 <div class="text-left">
-                                    <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 p-top-10 border-style-right">
-                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 select-items">
-                                            <input type="checkbox" id="item1" ng-checked="params.parkingStatus == 1" class="chkShowParking"  ng-model="params.parkingStatus" name="parking" >
-                                            &nbsp;
-                                            <label  for="item1">Parking Required</label>
-                                        </div>
-                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 select-items">
-                                            <input type="checkbox" id="item2" class="chkShowParking" ng-checked="params.homeDelivery == 1" ng-model="params.homeDelivery" name="homeDelivery" >
-                                            &nbsp;
-                                            <label  for="item2">Need home delivery</label>
-                                        </div>
-                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 select-items">
-                                            <input type="checkbox" id="item3" class="chkShowParking" ng-checked="params.openStatus == 1" ng-model="params.openStatus" name="openStatus" >
-                                            &nbsp;
-                                            <label  for="item3">Open business only</label>
+                                    <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 p-top-10 text-warning">
+                                        <span class="text text-info text-bolder">Filter by ratings:</span>
+                                        <!--<input id="range_29" />-->
+                                        <div class="star-ratings text-left">
+                                            <div class="searchStars" ng-repeat="star in searchStars track by $index">
+                                                        <span ng-click="selectSearchStar($index)">
+                                                            <input type="checkbox" ng-model="searchStars[$index]" ng-change="selectSearchStar($index)" />
+                                                        </span>
+                                                &nbsp;
+                                                <i ng-repeat="str in searchStarArr[$index]" class="fa fa-star text-yellow"></i>
+                                            </div>
                                         </div>
                                     </div>
-                                    <!-- Star Rating goes here -->
-                                    <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 p-top-10 text-warning hidden">
-                                        <p>Filter by star rating</p>
-                                        <div class="star-ratings">
-                                            <i ng-repeat="st in star track by $index" ng-click="starRatingFilterAction($index)" ng-class="star[$index] == true?'text-yellow':'text-black'" class="fa fa-star pointer"></i>
-                                        </div>
-                                    </div>
-                                    <!--<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 p-top-10 text-warning">-->
-                                    <!--<span class="text text-info text-bolder">Filter by ratings:</span>-->
-                                    <!--<input id="range_29" />-->
-                                    <!--</div>-->
                                 </div>
                             </div>
                         </div>

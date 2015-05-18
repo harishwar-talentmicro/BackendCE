@@ -236,7 +236,7 @@
 
                         TID : tx.TID,
                         functionType : 0, // Function Type will be 0 for sales
-                        ezeid : tx.EZEID,
+                        ezeid : tx.RequesterEZEID,
                         statusType : 0,
                         notes : tx.Notes,
                         locId : tx.LocID,
@@ -245,7 +245,7 @@
                         city : '',
                         area : '',
                         contactInfo : tx.ContactInfo,
-                        deliveryAddress : '',
+                        deliveryAddress : tx.DeliveryAddress,
                         nextAction : (tx.NextActionID && tx.NextActionID !== 'null') ? tx.NextActionID : 0,
                         nextActionDateTime : $filter('dateTimeFilter')(tx.NextActionDate,'DD MMM YYYY hh:mm:ss A','DD MMM YYYY hh:mm:ss A'),
                         taskDateTime : tx.TaskDateTime,
@@ -477,6 +477,7 @@
                         }
                     }
                 }
+                txItem.TID = 0;
                 txItem.Qty = 1;
                 txItem.Amount = txItem.Qty * txItem.Rate;
                 return txItem;
@@ -640,8 +641,12 @@
                         FunctionType : 0    // For Sales
                     }
                 }).success(function(resp){
-                    if(resp && resp !== 'null' && resp.length > 0){
-                        $scope.filterStatusTypes = resp;
+                    console.log(resp);
+                    if(resp && resp !== 'null' && resp.hasOwnProperty('Result')){
+
+                        if(resp.Result && resp.Result.length > 0){
+                            $scope.filterStatusTypes = resp.Result;
+                        }
                     }
                     else{
 
@@ -826,7 +831,7 @@
                     //console.log(resp);
                     $scope.loadTxActionTypes().then(function(){
                         $scope.loadTxStatusTypes().then(function(){
-                            $scope.loadTransaction().then(function(){
+                            $scope.loadTransaction(1,-1).then(function(){
                                 $scope.loadItemList().then(function(){
                                     $scope.loadFolderRules().then(function(){
                                         $scope.$emit('$preLoaderStop');
@@ -903,8 +908,9 @@
                     NextAction : ($scope.modalBox.tx.nextAction) ? $scope.modalBox.tx.nextAction : 0,
                     NextActionDateTime : ($scope.modalBox.tx.nextActionDateTime) ? $scope.modalBox.tx.nextActionDateTime : moment().format('DD MMM YYYY hh:mm:ss'),
                     ItemsList: JSON.stringify($scope.modalBox.tx.itemList),
-                    DeliveryAddress : (!editMode) ? ($scope.modalBox.tx.address + $scope.modalBox.tx.area + $scope.modalBox.tx.city +
-                        $scope.modalBox.tx.state + $scope.modalBox.tx.country) : $scope.modalBox.tx.deliveryAddress
+                    DeliveryAddress : (!editMode) ?
+                        ($scope.modalBox.tx.address +', '+ $scope.modalBox.tx.area+', ' + $scope.modalBox.tx.city +', '+
+                        $scope.modalBox.tx.state+', ' + $scope.modalBox.tx.country) : $scope.modalBox.tx.deliveryAddress
                 };
                 return preparedTx;
             };
