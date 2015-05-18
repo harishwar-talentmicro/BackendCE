@@ -371,7 +371,7 @@ angular.module('ezeidApp').factory('GoogleMaps',['$q','$timeout','$compile',func
         }
 
 
-        if(typeof(clearMarkers) == "undefined" && clearMarkers){
+        if(typeof(clearMarkers) == "undefined"){
             this.clearAllMarkers();
         }
         else{
