@@ -284,23 +284,16 @@
                     }
                 }
                 if(resolveGeolocation){
-                    $scope.resolveGelocationAddress().then(function(){
-                        if(loadItems){
-                            loadTransactionItems($scope.modalBox.tx.TID).then(function(){
-                                $scope.$emit('$preLoaderStop');
-                            },function(){
-                                $scope.$emit('$preLoaderStop');
-                            });
-                        }
-                    },function(){
-                        if(loadItems){
-                            loadTransactionItems($scope.modalBox.tx.TID).then(function(){
-                                $scope.$emit('$preLoaderStop');
-                            },function(){
-                                $scope.$emit('$preLoaderStop');
-                            });
-                        }
-                    });
+                    $scope.resolveGeolocationAddress();
+
+                    if(loadItems){
+                        loadTransactionItems($scope.modalBox.tx.TID).then(function(){
+                            $scope.$emit('$preLoaderStop');
+                        },function(){
+                            $scope.$emit('$preLoaderStop');
+                        });
+                    }
+
                 }
 
 
@@ -365,7 +358,7 @@
             /**
              *
              */
-            $scope.resolveGelocationAddress = function(){
+            $scope.resolveGeolocationAddress = function(){
                 $scope.modalBox.tx.address = '';
                 if(!$scope.modalBox.tx.locId){
                     return;
@@ -390,8 +383,6 @@
                     $scope.$emit('$preLoaderStop');
                     if(resp.data){
                         var data = googleMap.parseReverseGeolocationData(resp.data);
-
-
                         $scope.modalBox.tx.city = data.city;
                         $scope.modalBox.tx.state = data.state;
                         $scope.modalBox.tx.country = data.country;
@@ -943,7 +934,7 @@
                     if(resp && resp.hasOwnProperty('IsSuccessfull')){
                         if(resp.IsSuccessfull){
                             Notification.success({ message : 'Enquiry is posted successfully.', delay : MsgDelay});
-                            $scope.toggleModal();
+                            $scope.toggleModalBox();
                         }
                         else{
                             Notification.error({ message : 'An error occurred while placing enquiry', delay : MsgDelay});

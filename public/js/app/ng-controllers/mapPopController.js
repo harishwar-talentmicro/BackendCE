@@ -44,6 +44,8 @@ angular.module('ezeidApp').controller('mapPopController',[
                 searchElementClass : "form-control pull-left pac-input",
                 currentLocationElementClass : "link-btn pac-loc",
                 controlsContainerClass : "col-lg-6 col-md-6'"
+
+
             });
             googleMap.createMap("map-ctrl",$scope,"findCurrentLocation()");
 
@@ -59,20 +61,44 @@ angular.module('ezeidApp').controller('mapPopController',[
                     googleMap.currentMarkerPosition.longitude = lng;
                 });
                 googleMap.getCurrentLocation().then(function(){
-                    googleMap.resizeMap();
+                    //googleMap.resizeMap();
                     googleMap.placeCurrentLocationMarker(function(lat,lng){
                         googleMap.currentMarkerPosition.latitude = lat;
                         googleMap.currentMarkerPosition.longitude = lng;
                     },function(lat,lng){
                         googleMap.currentMarkerPosition.latitude = lat;
                         googleMap.currentMarkerPosition.longitude = lng;
-                    });
+                        googleMap.setMarkersInBounds();
+                    },false);
 
                 },function(){
-
                 });
-
             });
+
+            directtionLatLong = JSON.parse($window.localStorage.getItem("myLocation"));
+
+            //googleMap.renderDirection('directionPannel',googleMap.currentMarkerPosition.latitude,googleMap.currentMarkerPosition.longitude,directtionLatLong.endLat,directtionLatLong.endLong);
+            //googleMap.placeCurrentLocationMarker();
+
+            var pos = null;
+            var title = '';
+            var containerElement = '';
+
+            pos = googleMap.createGMapPosition(
+                directtionLatLong.endLat,
+                directtionLatLong.endLong
+            );
+            title = 'Primary Location';
+            containerElement = 'map-location-0';
+
+            var markerImage = directtionLatLong.IDTypeID == 1 ? 'images/Individual-Icon_48.png' : 'images/business-icon_48.png';
+            var marker = googleMap.createMarker(pos,title,markerImage,false,null);
+            googleMap.placeMarker(marker);
+
+            $timeout(function(){
+                googleMap.setMarkersInBounds();
+            },1000);
+
         };
 
         // To initialize map
@@ -91,6 +117,7 @@ angular.module('ezeidApp').controller('mapPopController',[
 */
             googleMap.renderDirection('directionPannel',googleMap.currentMarkerPosition.latitude,googleMap.currentMarkerPosition.longitude,directtionLatLong.endLat,directtionLatLong.endLong);
             googleMap.placeCurrentLocationMarker();
+            googleMap.setMarkersInBounds();
         };
 
         //Show direction in view direction page
