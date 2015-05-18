@@ -1,4 +1,5 @@
-<section id="result-page-wrapper" class="hpw rpw">
+<div class="search-result hpw">
+    <section id="result-page-wrapper" class="rpw">
     <!-- New header menu goes here -->
     <header-section></header-section>
     <!--header ends here-->
@@ -7,8 +8,13 @@
         <p class="font-open-sans-light text-center text-warning"><a href="/">Go Back</a></p>
     </div>
 
+    <div ng-show="showNotFound">
+        <h1 class="font-open-sans-light text-center top-clearfix">Not found..</h1>
+        <p class="font-open-sans-light text-center text-warning"><a href="/">Go Back</a></p>
+    </div>
+
      <!--Middle container-->
-    <div style="min-height: 700px;">
+    <div style="min-height: 600px;">
         <div class="Popup_window form_style map_popup_iconActions" id="SalesEnquiryRequest_popup" style="height: 103%;">
             <div class="window_page Maping_popup">
                 <span class="closelink" ng-click="closeSalesEnquiryForm()">X</span>
@@ -775,4 +781,4 @@
     <!-- Footer Ends here -->
 
 </section>
-
+</div>

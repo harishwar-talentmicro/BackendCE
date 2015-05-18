@@ -70,6 +70,7 @@ angular.module('ezeidApp').
         $scope.showNoticeText = true;
         $scope.form_rating = 0;
         $scope.showLoginText = false;
+        $scope.showNotFound = false;
 
         $scope.modalBox = {
             title : 'EZEID Map',
@@ -177,7 +178,7 @@ angular.module('ezeidApp').
                 }
                 else
                 {
-                    Notification.error({ message: 'No Results found..!', delay: MsgDelay });
+                    $scope.showNotFound = true;
                 }
             });
         }
@@ -506,7 +507,8 @@ angular.module('ezeidApp').
             var end = new google.maps.LatLng(data.Latitude, data.Longitude);
             var userLoc = {
                 endLat: data.Latitude,
-                endLong : data.Longitude
+                endLong : data.Longitude,
+                IDTypeID : data.IDTypeID
             };
 
             $window.localStorage.setItem("myLocation", JSON.stringify(userLoc));
