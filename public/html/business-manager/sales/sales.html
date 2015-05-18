@@ -175,7 +175,7 @@
 
 
                     <div class="col-lg-1 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
-                        <b class="font-roboto">{{ (tx.EZEID) ? tx.EZEID : "&lt; small &gt; EZEID is not available&lt;/ small &gt; "}}</b>
+                        <b class="font-roboto">{{ (tx.RequesterEZEID) ? (tx.RequesterEZEID | uppercase) : "&lt; small &gt; EZEID is not available&lt;/ small &gt; "}}</b>
                         <br/>
                         <small class="text-info">
                             {{tx.ContactInfo}}
@@ -362,6 +362,7 @@
                                         <input type="text" class="form-control no-radius"
                                                ezeid-only
                                                name="ezeid"
+                                               ng-disabled="modalBox.editMode"
                                                ng-model="modalBox.tx.ezeid"
                                                ng-change="(modalBox.tx.contactInfo = '')"
                                                ng-model-options="{updateOn : 'blur',debounce : { 'blur' : 0} }" />
