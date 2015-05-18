@@ -44,8 +44,6 @@ angular.module('ezeidApp').controller('mapPopController',[
                 searchElementClass : "form-control pull-left pac-input",
                 currentLocationElementClass : "link-btn pac-loc",
                 controlsContainerClass : "col-lg-6 col-md-6'"
-
-
             });
             googleMap.createMap("map-ctrl",$scope,"findCurrentLocation()");
 
@@ -71,29 +69,10 @@ angular.module('ezeidApp').controller('mapPopController',[
                     });
 
                 },function(){
+
                 });
+
             });
-
-            directtionLatLong = JSON.parse($window.localStorage.getItem("myLocation"));
-
-            googleMap.renderDirection('directionPannel',googleMap.currentMarkerPosition.latitude,googleMap.currentMarkerPosition.longitude,directtionLatLong.endLat,directtionLatLong.endLong);
-            googleMap.placeCurrentLocationMarker();
-
-            var pos = null;
-            var title = '';
-            var containerElement = '';
-
-            pos = googleMap.createGMapPosition(
-                directtionLatLong.endLat,
-                directtionLatLong.endLong
-            );
-            title = 'Primary Location';
-            containerElement = 'map-location-0';
-
-            var markerImage = directtionLatLong.IDTypeID == 1 ? 'images/Individual-Icon_48.png' : 'images/business-icon_48.png';
-1
-            var marker = googleMap.createMarker(pos,title,markerImage,false,null);
-            googleMap.placeMarker(marker);
         };
 
         // To initialize map
