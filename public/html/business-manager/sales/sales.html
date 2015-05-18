@@ -508,7 +508,7 @@
                                 </div>
                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-hide="modalBox.editMode">
                                     <div class="form-group form-group-sm ">
-                                        <select class="form-control" ng-model="modalBox.tx.locId" ng-change="resolveGelocationAddress()">
+                                        <select class="form-control" ng-model="modalBox.tx.locId" ng-change="resolveGeolocationAddress()">
                                             <option value="">Other Location</option>
                                             <option ng-repeat="location in modalBox.locationList track by location.TID" value="{{location.TID}}">{{location.LocTitle}}</option>
                                         </select>
