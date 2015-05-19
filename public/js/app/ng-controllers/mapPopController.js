@@ -25,9 +25,12 @@ angular.module('ezeidApp').controller('mapPopController',[
              GoogleMaps){
 
 
+
         var directtionLatLong;
         /* integrate google map */
         var googleMap = new GoogleMaps();
+
+        $scope.$emit('$preLoaderStart');
 
         $scope.findCurrentLocation = function(){
             googleMap.getCurrentLocation().then(function(){
@@ -37,6 +40,7 @@ angular.module('ezeidApp').controller('mapPopController',[
             });
         };
         var initializeMap = function(){
+
             googleMap.setSettings({
                 mapElementClass : "col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix class-map-ctrl",
                 searchElementClass : "form-control pull-left pac-input",

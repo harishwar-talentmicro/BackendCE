@@ -222,4 +222,8 @@ angular.module('ezeidApp').controller('viewDirectionController',['$http', '$root
         });
     };
 
+    // close view direction page
+    viewDirection.closeForm = function () {
+        $window.location.href = "/";
+    };
 }]);
