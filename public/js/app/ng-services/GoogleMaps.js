@@ -186,12 +186,13 @@ angular.module('ezeidApp').factory('GoogleMaps',['$q','$timeout','$compile',func
      * @param dragListener
      * @returns {Marker}
      */
-    GoogleMap.prototype.createMarker = function(position,title,icon,draggable,dragListener){
+    GoogleMap.prototype.createMarker = function(position,title,icon,draggable,dragListener,labelText){
         var marker = new google.maps.Marker({
             position: position,
             title:title,
             draggable: (draggable)? draggable: false,
-            icon: (icon)? icon :  'images/you_are_here.png'
+            icon: (icon)? icon :  'images/you_are_here.png',
+            label : (labelText) ? labelText : ''
         });
         if(dragListener){
             google.maps.event.addListener(marker,'dragend',function(){
@@ -329,7 +330,7 @@ angular.module('ezeidApp').factory('GoogleMaps',['$q','$timeout','$compile',func
         return pos;
     };
 
-    GoogleMap.prototype.placeMarker = function(marker,dragCallback,callback){
+    GoogleMap.prototype.placeMarker = function(marker,dragCallback,callback,labelFlag){
 
         if(dragCallback){
             google.maps.event.addListener(marker,'dragend',function(){
@@ -345,6 +346,20 @@ angular.module('ezeidApp').factory('GoogleMaps',['$q','$timeout','$compile',func
         if(callback){
             callback(marker.position.lat(),marker.position.lng());
         }
+
+        if(labelFlag){
+            try{
+                var label = new Label({
+                    map: this.map
+                });
+                label.bindTo('position', marker, 'position');
+                label.bindTo('text', marker, 'label');
+            }
+            catch(ex){
+                console.error('Label extended library not defined');
+            }
+        }
+
     };
 
     GoogleMap.prototype.removeCurrentLocationMarker = function(){
