@@ -146,17 +146,25 @@ angular.module('ezeidApp').controller('DocumentController',[
     getDocumentDetails($scope.OptionSelected);
 
     $scope.OnOptionSelected = function(option){
+        console.log("sai1");
         $scope.OptionSelected = option;
         getDocumentDetails(option);
     };
 
     function getDocumentDetails(option){
+
+        console.log("sai1");
+        console.log(option);
         $scope.form = original_form;
 
         if($rootScope._userInfo && $rootScope._userInfo.Token){
             $http({ method: 'get', url: GURL + 'ewtGetDoc?TokenNo=' + $rootScope._userInfo.Token + '&&Type='+ option }).success(function (data) {
 
                  if(data && data.length > 0 && data[0].No != '' && data !='null'){
+
+                    console.log("scope option",$scope.OptionSelected);
+                    console.log(data);
+
                     if($scope.OptionSelected==1){
                         $scope.IdPlaceHolder = "Enter ID Card number";
                         $scope.form.RefNo = data[0].No;
