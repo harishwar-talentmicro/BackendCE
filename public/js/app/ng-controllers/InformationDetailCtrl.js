@@ -36,6 +36,7 @@ angular.module('ezeidApp').
             )
     {
         $scope.$emit('$preLoaderStart');
+       // $rootScope.$emit('$preLoaderStart');
 
         if($rootScope._userInfo){
             if(!$rootScope._userInfo.IsAuthenticate){
@@ -105,7 +106,7 @@ angular.module('ezeidApp').
                 $scope.Token = 2;
             }
             $http({ method: 'get', url: GURL + 'ewtGetSearchInformation?Token=' + $rootScope._userInfo.Token + '&TID=' + _TID + '&SearchType=' + _SearchType + '&CurrentDate=' + currentDate}).success(function (data) {
-                $rootScope.$broadcast('$preLoaderStop');
+               // $rootScope.$broadcast('$preLoaderStop');
                 if (data != 'null') {
                     $scope.showDetailsModal = true;
 

@@ -30,7 +30,6 @@ angular.module('ezeidApp').controller('DocumentController',[
             }
         });
 
-
         /**
          * Hiding progress loader when userDetails are loaded successfully
          */
@@ -151,6 +150,7 @@ angular.module('ezeidApp').controller('DocumentController',[
     };
 
     function getDocumentDetails(option){
+
         $scope.form = original_form;
 
         if($rootScope._userInfo && $rootScope._userInfo.Token){
@@ -163,44 +163,41 @@ angular.module('ezeidApp').controller('DocumentController',[
                         $scope.form.RefExpiryDate = $filter('date')(new Date(data[0].ExpiryDate), 'dd-MMM-yyyy');
                         $scope.form.RefDoc = data[0].IDDoc;
                         $scope.form.RefFileName = data[0].DocFilename;
-                        $scope.showDownloadLink = $scope.form.RefFileName == "" ? false : true;
+                        $scope.showDownloadLink = $scope.form.RefNo == "" ? false : true;
 
                      }else if($scope.OptionSelected==2){
                         $scope.IdPlaceHolder = "Enter Passport number";
-
                         $scope.form.RefNo = data[0].No;
                         $scope.form.RefExpiryDate = $filter('date')(new Date(data[0].ExpiryDate), 'dd-MMM-yyyy');
                         $scope.form.RefDoc = data[0].IDDoc;
                         $scope.form.RefFileName = data[0].DocFilename;
-                        $scope.showDownloadLink = $scope.form.RefFileName == "" ? false : true;
+                        $scope.showDownloadLink = $scope.form.RefNo == "" ? false : true;
 
                     }else if($scope.OptionSelected==3){
 
                         $scope.IdPlaceHolder = "Enter Driver's Licence number";
-
                         $scope.form.RefNo = data[0].No;
                         $scope.form.RefExpiryDate = $filter('date')(new Date(data[0].ExpiryDate), 'dd-MMM-yyyy');
                         $scope.form.RefDoc = data[0].IDDoc;
                         $scope.form.RefFileName = data[0].DocFilename;
-                        $scope.showDownloadLink = $scope.form.RefFileName == "" ? false : true;
+                       /* $scope.showDownloadLink = $scope.form.RefFileName == "" ? false : true;*/
+                        $scope.showDownloadLink = $scope.form.RefNo == "" ? false : true;
 
                     }else if($scope.OptionSelected==4){
                         $scope.IdPlaceHolder = "Reference No. for Document #1";
-
                         $scope.form.RefNo = data[0].No;
                         $scope.form.RefExpiryDate = $filter('date')(new Date(data[0].ExpiryDate), 'dd-MMM-yyyy');
                         $scope.form.RefDoc = data[0].IDDoc;
                         $scope.form.RefFileName = data[0].DocFilename;
-                        $scope.showDownloadLink = $scope.form.RefFileName == "" ? false : true;
+                        $scope.showDownloadLink = $scope.form.RefNo == "" ? false : true;
 
                     }else if($scope.OptionSelected==5){
                         $scope.IdPlaceHolder = "Reference No. for Document #2";
-
                         $scope.form.RefNo = data[0].No;
                         $scope.form.RefExpiryDate = $filter('date')(new Date(data[0].ExpiryDate), 'dd-MMM-yyyy');
                         $scope.form.RefDoc = data[0].IDDoc;
                         $scope.form.RefFileName = data[0].DocFilename;
-                        $scope.showDownloadLink = $scope.form.RefFileName == "" ? false : true;
+                        $scope.showDownloadLink = $scope.form.RefNo == "" ? false : true;
                     }
                 }
                 else
@@ -231,24 +228,24 @@ angular.module('ezeidApp').controller('DocumentController',[
                             if($scope.OptionSelected==1){
                                 $scope.IdPlaceHolder = "Enter ID Card number";
                                 $scope.form.RefFileName = data[0].DocFilename;
-                                $scope.showDownloadLink = $scope.form.RefFileName == "" || $scope.form.RefFileName== 'undefined' ? false : true;
+                                $scope.showDownloadLink = $scope.form.RefNo == "" || $scope.form.RefNo == 'undefined' ? false : true;
                             }
                             else if($scope.OptionSelected==2){
                                 $scope.IdPlaceHolder = "Enter Passport number";
                                 $scope.form.RefFileName = data[0].DocFilename;
-                                $scope.showDownloadLink = $scope.form.RefFileName == "" ? false : true;
+                                $scope.showDownloadLink = $scope.form.RefNo == "" ? false : true;
                             }else if($scope.OptionSelected==3){
                                 $scope.IdPlaceHolder = "Enter Driver's Licence number";
                                 $scope.form.RefFileName = data[0].DocFilename;
-                                $scope.showDownloadLink = $scope.form.RefFileName == "" ? false : true;
+                                $scope.showDownloadLink = $scope.form.RefNo == "" ? false : true;
                             }else if($scope.OptionSelected==4){
                                 $scope.IdPlaceHolder = "Reference No. for Document #1";
                                 $scope.form.RefFileName = data[0].DocFilename;
-                                $scope.showDownloadLink = $scope.form.RefFileName == "" ? false : true;
+                                $scope.showDownloadLink = $scope.form.RefNo == "" ? false : true;
                             }else if($scope.OptionSelected==5){
                                 $scope.IdPlaceHolder = "Reference No. for Document #2";
                                 $scope.form.RefFileName = data[0].DocFilename;
-                                $scope.showDownloadLink = $scope.form.RefFileName == "" ? false : true;
+                                $scope.showDownloadLink = $scope.form.RefNo == "" ? false : true;
                             }
                         }
                     }
@@ -279,6 +276,8 @@ angular.module('ezeidApp').controller('DocumentController',[
             });
 
         //Below code is for upload document
+        if($scope.DocumentToUpload)
+        {
           for (var i = 0; i < $scope.DocumentToUpload.length; i++) {
                 var $file = $scope.DocumentToUpload[i];
                 var formData = new FormData();
@@ -291,11 +290,11 @@ angular.module('ezeidApp').controller('DocumentController',[
                     .success(function (data, status, headers, config) {
                         // GetUserDetails();
                         //  Notification.success({ message: "Saved...", delay: MsgDelay });
+                    }).error(function(data, status, headers, config) {
+                        Notification.error({message: "An error occurred..", delay: MsgDelay});
                     });
-                /*error(function(data, status, headers, config) {
-                 });*/
             }
-
+        }
     }
     $scope.closeDocument = function(){
         window.location.href = "/";
