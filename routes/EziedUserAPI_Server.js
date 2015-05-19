@@ -1654,7 +1654,7 @@ exports.FnRegistration = function (req, res) {
         var CompanyName = req.body.CompanyName;
         var JobTitle = req.body.JobTitle;
         var CategoryID = parseInt(req.body.CategoryID);
-        if (CategoryID == 'NaN') {
+        if (CategoryID.toString() == 'NaN') {
             CategoryID = 0;
         }
         var FunctionID = req.body.FunctionID;
