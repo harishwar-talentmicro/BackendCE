@@ -203,6 +203,7 @@ app.get('/ewtGetEstateDataAP', LocationManager.FnGetRealStateDataAP);
 app.get('/ewtGetEZEIDPictureAP', LocationManager.FnGetAPEZEIDPicture);
 app.post('/ewtSaveBannerPictureAP', LocationManager.FnSaveBannerPictureAP);
 app.get('/ewtGetBannerPictureAP', LocationManager.FnGetBannerPictureAP);
+app.get('/ewtGetAllBannerPicsAP', LocationManager.FnGetAllBannerPicsAP);
 app.get('/ewtGetSecondaryLocListAP',LocationManager.FnGetSecondaryLocationListAP);
 app.get('/ewtGetSecondaryLocAP',LocationManager.FnGetSecondaryLocationAP);
 app.post('/ewtUpdateSecondaryLocationAP', LocationManager.FnUpdateSecondaryLocationAP);

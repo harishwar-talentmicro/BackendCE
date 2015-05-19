@@ -35,8 +35,9 @@ angular.module('ezeidApp').
             $route
             )
     {
-        $scope.$emit('$preLoaderStart');
-       // $rootScope.$emit('$preLoaderStart');
+        // $scope.$emit('$preLoaderStart');
+        //$scope.$broadcast('$preLoaderStart');
+        // $('#mydiv').show();
 
         if($rootScope._userInfo){
             if(!$rootScope._userInfo.IsAuthenticate){
@@ -73,6 +74,30 @@ angular.module('ezeidApp').
         $scope.showLoginText = false;
         $scope.showNotFound = false;
 
+        /**
+         * Function for converting UTC time from server to LOCAL timezone
+         */
+        var convertTimeToLocal = function(timeFromServer,dateFormat,returnFormat){
+            if(!dateFormat){
+                dateFormat = 'DD-MMM-YYYY hh:mm A';
+            }
+            if(!returnFormat){
+                returnFormat = dateFormat;
+            }
+            var x = new Date(timeFromServer);
+            var mom1 = moment(x);
+            return mom1.add((mom1.utcOffset()),'m').format(returnFormat);
+        };
+
+        function selectedTimeUtcToLocal(selectedTime)
+        {
+            var x = new Date();
+            var today = moment(x.toISOString()).utc().format('DD-MMM-YYYY');
+
+            var currentTaskDate = moment(today+' '+selectedTime).format('DD-MMM-YYYY H:mm');
+            return convertTimeToLocal(currentTaskDate,'DD-MMM-YYYY H:mm',"H:mm");
+        }
+
         $scope.modalBox = {
             title : 'EZEID Map',
             class : 'business-manager-modal'
@@ -107,17 +132,25 @@ angular.module('ezeidApp').
             }
             $http({ method: 'get', url: GURL + 'ewtGetSearchInformation?Token=' + $rootScope._userInfo.Token + '&TID=' + _TID + '&SearchType=' + _SearchType + '&CurrentDate=' + currentDate}).success(function (data) {
                // $rootScope.$broadcast('$preLoaderStop');
-                if (data != 'null') {
-                    $scope.showDetailsModal = true;
-
-                    $scope.$watch('showDetailsModal',function(newVal,oldVal){
+                if (data != 'null')
+                {
+                  //  $scope.showDetailsModal = true;
+                  /*  $scope.$watch('showDetailsModal',function(newVal,oldVal){
                         if(!newVal){
                             $window.history.back();
                         }
-                    });
+                    });*/
 
                     $timeout(function () {
                         $scope.SearchInfo = data[0];
+                        //$('#mydiv').hide();
+
+                        $scope.showDetailsModal = true;
+                        $scope.$watch('showDetailsModal',function(newVal,oldVal){
+                            if(!newVal){
+                                $window.history.back();
+                            }
+                        });
 
                         if($scope.SearchInfo.IDTypeID == 2)
                         {
@@ -188,7 +221,7 @@ angular.module('ezeidApp').
         function getAboutComapny()
         {
             $http({ method: 'get', url: GURL + 'ewtCompanyProfile?TID=' + $scope.SearchInfo.TID}).success(function (data) {
-                $rootScope.$broadcast('$preLoaderStop');
+               // $rootScope.$broadcast('$preLoaderStop');
 
                 if (data.Result.length > 0) {
                     $scope.companyTagLine = data.Result[0].TagLine;
@@ -526,44 +559,45 @@ angular.module('ezeidApp').
                 $scope.showWorkingHourModel = true;
                 $http({ method: 'get', url: GURL + 'ewtGetWorkingHrsHolidayList?Token=' + $rootScope._userInfo.Token + '&LocID=' + $scope.SearchInfo.LocID }).success(function (data)
                 {
+
                     if (data != 'null')
                     {
                         if(data.WorkingHours != "")
                         {
-                            $scope.Mo1 = data.WorkingHours[0].MO1;
-                            $scope.Mo2 = data.WorkingHours[0].MO2;
-                            $scope.Mo3 = data.WorkingHours[0].MO3;
-                            $scope.Mo4 = data.WorkingHours[0].MO4;
+                            $scope.Mo1 = (data.WorkingHours[0].MO1 == "00:00") ? '08:00' : selectedTimeUtcToLocal(data.WorkingHours[0].MO1);
+                            $scope.Mo2 = (data.WorkingHours[0].MO2 == "00:00") ? '13:00' : selectedTimeUtcToLocal(data.WorkingHours[0].MO2);
+                            $scope.Mo3 = (data.WorkingHours[0].MO3 == "00:00") ? '13:00' : selectedTimeUtcToLocal(data.WorkingHours[0].MO3);
+                            $scope.Mo4 = (data.WorkingHours[0].MO4 == "00:00") ? '21:00' : selectedTimeUtcToLocal(data.WorkingHours[0].MO4);
 
-                            $scope.Tu1 = data.WorkingHours[0].TU1;
-                            $scope.Tu2 = data.WorkingHours[0].TU2;
-                            $scope.Tu3 = data.WorkingHours[0].TU3;
-                            $scope.Tu4 = data.WorkingHours[0].TU4;
+                            $scope.Tu1 = (data.WorkingHours[0].TU1 == "00:00") ? '08:00' : selectedTimeUtcToLocal(data.WorkingHours[0].TU1);
+                            $scope.Tu2 = (data.WorkingHours[0].TU2 == "00:00") ? '13:00' : selectedTimeUtcToLocal(data.WorkingHours[0].TU2);
+                            $scope.Tu3 = (data.WorkingHours[0].TU3 == "00:00") ? '13:00' : selectedTimeUtcToLocal(data.WorkingHours[0].TU3);
+                            $scope.Tu4 = (data.WorkingHours[0].TU4 == "00:00") ? '21:00' : selectedTimeUtcToLocal(data.WorkingHours[0].TU4);
 
-                            $scope.We1 = data.WorkingHours[0].WE1;
-                            $scope.We2 = data.WorkingHours[0].WE2;
-                            $scope.We3 = data.WorkingHours[0].WE3;
-                            $scope.We4 = data.WorkingHours[0].WE4;
+                            $scope.We1 = (data.WorkingHours[0].WE1 == "00:00") ? '08:00' : selectedTimeUtcToLocal(data.WorkingHours[0].WE1);
+                            $scope.We2 = (data.WorkingHours[0].WE2 == "00:00") ? '13:00' : selectedTimeUtcToLocal(data.WorkingHours[0].WE2);
+                            $scope.We3 = (data.WorkingHours[0].WE3 == "00:00") ? '13:00' : selectedTimeUtcToLocal(data.WorkingHours[0].WE3);
+                            $scope.We4 = (data.WorkingHours[0].WE4 == "00:00") ? '21:00' : selectedTimeUtcToLocal(data.WorkingHours[0].WE4);
 
-                            $scope.Th1 = data.WorkingHours[0].TH1;
-                            $scope.Th2 = data.WorkingHours[0].TH2;
-                            $scope.Th3 = data.WorkingHours[0].TH3;
-                            $scope.Th4 = data.WorkingHours[0].TH4;
+                            $scope.Th1 = (data.WorkingHours[0].TH1 == "00:00") ? '08:00' : selectedTimeUtcToLocal(data.WorkingHours[0].TH1);
+                            $scope.Th2 = (data.WorkingHours[0].TH2 == "00:00") ? '13:00' : selectedTimeUtcToLocal(data.WorkingHours[0].TH2);
+                            $scope.Th3 = (data.WorkingHours[0].TH3 == "00:00") ? '13:00' : selectedTimeUtcToLocal(data.WorkingHours[0].TH3);
+                            $scope.Th4 = (data.WorkingHours[0].TH4 == "00:00") ? '21:00' : selectedTimeUtcToLocal(data.WorkingHours[0].TH4);
 
-                            $scope.Fr1 = data.WorkingHours[0].FR1;
-                            $scope.Fr2 = data.WorkingHours[0].FR2;
-                            $scope.Fr3 = data.WorkingHours[0].FR3;
-                            $scope.Fr4 = data.WorkingHours[0].FR4;
+                            $scope.Fr1 = (data.WorkingHours[0].FR1 == "00:00") ? '08:00' : selectedTimeUtcToLocal(data.WorkingHours[0].FR1);
+                            $scope.Fr2 = (data.WorkingHours[0].FR2 == "00:00") ? '13:00' : selectedTimeUtcToLocal(data.WorkingHours[0].FR2);
+                            $scope.Fr3 = (data.WorkingHours[0].FR3 == "00:00") ? '13:00' : selectedTimeUtcToLocal(data.WorkingHours[0].FR3);
+                            $scope.Fr4 = (data.WorkingHours[0].FR4 == "00:00") ? '21:00' : selectedTimeUtcToLocal(data.WorkingHours[0].FR4);
 
-                            $scope.Sa1 = data.WorkingHours[0].SA1;
-                            $scope.Sa2 = data.WorkingHours[0].SA2;
-                            $scope.Sa3 = data.WorkingHours[0].SA3;
-                            $scope.Sa4 = data.WorkingHours[0].SA4;
+                            $scope.Sa1 = (data.WorkingHours[0].SA1 == "00:00") ? '08:00' : selectedTimeUtcToLocal(data.WorkingHours[0].SA1);
+                            $scope.Sa2 = (data.WorkingHours[0].SA2 == "00:00") ? '13:00' : selectedTimeUtcToLocal(data.WorkingHours[0].SA2);
+                            $scope.Sa3 = (data.WorkingHours[0].SA3 == "00:00") ? '13:00' : selectedTimeUtcToLocal(data.WorkingHours[0].SA3);
+                            $scope.Sa4 = (data.WorkingHours[0].SA4 == "00:00") ? '21:00' : selectedTimeUtcToLocal(data.WorkingHours[0].SA4);
 
-                            $scope.Su1 = data.WorkingHours[0].SU1;
-                            $scope.Su2 = data.WorkingHours[0].SU2;
-                            $scope.Su3 = data.WorkingHours[0].SU3;
-                            $scope.Su4 = data.WorkingHours[0].SU4;
+                            $scope.Su1 = (data.WorkingHours[0].SU1 == "00:00") ? '08:00' : selectedTimeUtcToLocal(data.WorkingHours[0].SU1);
+                            $scope.Su2 = (data.WorkingHours[0].SU2 == "00:00") ? '13:00' : selectedTimeUtcToLocal(data.WorkingHours[0].SU2);
+                            $scope.Su3 = (data.WorkingHours[0].SU3 == "00:00") ? '13:00' : selectedTimeUtcToLocal(data.WorkingHours[0].SU3);
+                            $scope.Su4 = (data.WorkingHours[0].SU4 == "00:00") ? '21:00' : selectedTimeUtcToLocal(data.WorkingHours[0].SU4);
                         }
 
                         if(data.HolidayList != "")

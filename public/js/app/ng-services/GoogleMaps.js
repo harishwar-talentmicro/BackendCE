@@ -192,8 +192,8 @@ angular.module('ezeidApp').factory('GoogleMaps',['$q','$timeout','$compile',func
             title:title,
             draggable: (draggable)? draggable: false,
             icon: (icon)? icon :  'images/you_are_here.png',
-            label : (labelText) ? labelText : '',
-            data : makerData
+            data : makerData,
+            label : (labelText) ? labelText : title
         });
         if(dragListener){
             google.maps.event.addListener(marker,'dragend',function(){
@@ -331,24 +331,11 @@ angular.module('ezeidApp').factory('GoogleMaps',['$q','$timeout','$compile',func
         return pos;
     };
 
-    GoogleMap.prototype.placeMarker = function(marker,dragCallback,callback,labelFlag,clickCallbackFn){
+    GoogleMap.prototype.placeMarker = function(marker,dragCallback,callback,labelFlag){
 
         if(dragCallback){
             google.maps.event.addListener(marker,'dragend',function(){
                 dragCallback(marker.position.lat(),marker.position.lng());
-            });
-        }
-
-        if(clickCallbackFn){
-            google.maps.event.addListener(marker,'click',function(){
-               var markerData = marker.data;
-                try{
-                    clickCallbackFn(markerData);
-                }
-                catch(ex){
-                    console.error('Marker click callback is not a function');
-                }
-
             });
         }
 
