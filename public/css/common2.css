@@ -1565,3 +1565,21 @@ hr.style-two {
     margin-top: -32px;  /* -1 * image height / 2 */
     display: block;
 }
+
+.hpw .card {
+    /*width: 100px;*/
+    /*height: 100px;*/
+    /*margin: 20px;*/
+    display: inline-block;
+}
+
+ .hpw .front, .back {
+    /*border: 2px gray solid;*/
+    /*padding: 10px;*/
+}
+.hpw .front {
+    /*background-color: #ccc;*/
+}
+.hpw .back {
+    /*background-color: red;*/
+}
