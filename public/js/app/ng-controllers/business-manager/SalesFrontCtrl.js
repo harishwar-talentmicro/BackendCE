@@ -38,6 +38,8 @@
                 class: 'business-manager-modal'
             };
 
+
+
             $scope.showModal = false;
             $scope.modalBox = {
                 title : 'Transaction Details',
