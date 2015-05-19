@@ -13,6 +13,9 @@ angular.module('ezeidApp').controller('viewDirectionController',['$http', '$root
     var initialLocation;
     var finalImageSrc = "";
 
+    //Below line is for Loading img
+    $scope.$emit('$preLoaderStart');
+
     $scope.isPrintEnabled = false;
         $timeout(function(){
             initialize();
@@ -20,7 +23,6 @@ angular.module('ezeidApp').controller('viewDirectionController',['$http', '$root
 
 
     function initialize () {
-      //  $scope.$emit('$preLoaderStart');
         directionsDisplay = new google.maps.DirectionsRenderer();
         var currentLoc = new google.maps.LatLng(12.295810, 76.639381);
         var mapOptions = {
@@ -67,6 +69,8 @@ angular.module('ezeidApp').controller('viewDirectionController',['$http', '$root
             google.maps.event.trigger(map, "resize");
         });
 
+        $rootScope.$broadcast('$preLoaderStop');
+
         /*------------- Below code is for Drow Direction ------------*/
 
       var userStartDirecttionLatLong = JSON.parse($window.localStorage.getItem("userCurrentLoc"));
@@ -81,8 +85,6 @@ angular.module('ezeidApp').controller('viewDirectionController',['$http', '$root
         directionsService.route(request, function(response, status) {
             if (status == google.maps.DirectionsStatus.OK) {
                 directionsDisplay.setDirections(response);
-
-
             }
         });
 
