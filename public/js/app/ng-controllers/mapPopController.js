@@ -36,19 +36,14 @@ angular.module('ezeidApp').controller('mapPopController',[
                 googleMap.placeCurrentLocationMarker(null,null,true);
             });
         };
-
-
         var initializeMap = function(){
             googleMap.setSettings({
                 mapElementClass : "col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix class-map-ctrl",
                 searchElementClass : "form-control pull-left pac-input",
                 currentLocationElementClass : "link-btn pac-loc",
                 controlsContainerClass : "col-lg-6 col-md-6'"
-
-
             });
             googleMap.createMap("map-ctrl",$scope,"findCurrentLocation()");
-
             googleMap.renderMap();
 
             googleMap.mapIdleListener().then(function(){
@@ -73,6 +68,7 @@ angular.module('ezeidApp').controller('mapPopController',[
 
                 },function(){
                 });
+
             });
 
             directtionLatLong = JSON.parse($window.localStorage.getItem("myLocation"));
@@ -109,12 +105,6 @@ angular.module('ezeidApp').controller('mapPopController',[
             googleMap.clearAllMarkers();
             directtionLatLong = JSON.parse($window.localStorage.getItem("myLocation"));
 
-           /* var userLoc = {
-                startLat: googleMap.currentMarkerPosition.latitude,
-                startLong : googleMap.currentMarkerPosition.longitude
-            };
-            $window.localStorage.setItem("userCurrentLoc", JSON.stringify(userLoc));
-*/
             googleMap.renderDirection('directionPannel',googleMap.currentMarkerPosition.latitude,googleMap.currentMarkerPosition.longitude,directtionLatLong.endLat,directtionLatLong.endLong);
             googleMap.placeCurrentLocationMarker();
             googleMap.setMarkersInBounds();
@@ -127,7 +117,6 @@ angular.module('ezeidApp').controller('mapPopController',[
                 startLong : googleMap.currentMarkerPosition.longitude
             };
             $window.localStorage.setItem("userCurrentLoc", JSON.stringify(userLoc));
-
             $window.location.href = "/viewdirection";
         };
 }]);
