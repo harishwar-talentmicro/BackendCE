@@ -11224,48 +11224,48 @@ exports.FnGetBannerPictureAP = function(req, res){
                                 if (BannerResult != null) {
                                     if(BannerResult[0].length > 0){
                                         var Picture = BannerResult[0];
-
+                                        console.log('FnGetBannerPicsAP:tmaster: Banner Picture send sucessfully ');
                                         res.send(Picture[0]);
                                     }
                                     else
                                     {
                                         res.send('null');
-                                        console.log('FnSaveBannerPicture:tmaster: save banner Failed');
+                                        console.log('FnGetBannerPicsAP:tmaster: No Banner Picture send sucessfully ');
                                     }
                                 }
                                 else {
                                     res.send('null');
-                                    console.log('FnSaveBannerPicture:tmaster: Registration Failed');
+                                    console.log('FnGetBannerPicsAP:tmaster: No Banner Picture send sucessfully ');
                                 }
                             }
                             else {
                                 res.statusCode=500;
                                 res.send('null');
-                                console.log('FnSaveBannerPicture:tmaster:' + err);
+                                console.log('FnGetBannerPicsAP:tmaster:' + err);
                             }
                         });
                     }
                     else {
                         res.statusCode=401;
-                        console.log('FnSaveBannerPicture: Invalid Token')
+                        console.log('FnGetBannerPicsAP: Invalid Token')
                         res.send('null');
                     }
                 }
                 else {
                     res.statusCode=500;
-                    console.log('FnSaveBannerPicture: Error in processing Token' + err);
+                    console.log('FnGetBannerPicsAP: Error in processing Token' + err);
                     res.send('null');
                 }
             });
         }
         else {
             if (SeqNo.toString() == 'NaN') {
-                console.log('FnSaveBannerPicture: SeqNo is empty');
+                console.log('FnGetBannerPicsAP: SeqNo is empty');
             }
             else if(Token == null) {
-                console.log('FnSaveBannerPicture: Token is empty');
+                console.log('FnGetBannerPicsAP: Token is empty');
             }else if(Ezeid == null) {
-                console.log('FnSaveBannerPicture: Ezeid is empty');
+                console.log('FnGetBannerPicsAP: Ezeid is empty');
             }
             res.statusCode=400;
             res.send('null');
@@ -11273,7 +11273,78 @@ exports.FnGetBannerPictureAP = function(req, res){
 
     }
     catch (ex) {
-        console.log('FnSaveBannerPicture error:' + ex.description);
+        console.log('FnGetBannerPicsAP error:' + ex.description);
+        throw new Error(ex);
+    }
+}
+
+exports.FnGetAllBannerPicsAP = function(req, res){
+    try{
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        var Token = req.query.Token;
+        var EZEID = req.query.EZEID;
+
+        if (Token != null && Ezeid != null) {
+            FnValidateTokenAP(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+                        var Query = db.escape(EZEID);
+                        //console.log(InsertQuery);
+                        db.query('CALL pGetAllBannerPics(' + Query + ')', function (err, BannerResult) {
+                            console.log(err);
+                            if (!err) {
+                                //console.log(InsertResult);
+                                if (BannerResult != null) {
+                                    if(BannerResult[0].length > 0){
+                                        var Picture = BannerResult[0];
+                                        console.log('FnGetAllBannerPicsAP:tmaster: Banner Picture send sucessfully ');
+                                        res.send(Picture[0]);
+                                    }
+                                    else
+                                    {
+                                        res.send('null');
+                                        console.log('FnGetAllBannerPicsAP:tmaster: No Banner Picture send sucessfully ');
+                                    }
+                                }
+                                else {
+                                    res.send('null');
+                                    console.log('FnGetAllBannerPicsAP:tmaster: No Banner Picture send sucessfully ');
+                                }
+                            }
+                            else {
+                                res.statusCode=500;
+                                res.send('null');
+                                console.log('FnGetAllBannerPicsAP:tmaster:' + err);
+                            }
+                        });
+                    }
+                    else {
+                        res.statusCode=401;
+                        console.log('FnGetAllBannerPicsAP: Invalid Token')
+                        res.send('null');
+                    }
+                }
+                else {
+                    res.statusCode=500;
+                    console.log('FnGetAllBannerPicsAP: Error in processing Token' + err);
+                    res.send('null');
+                }
+            });
+        }
+        else {
+            if(Token == null) {
+                console.log('FnGetAllBannerPicsAP: Token is empty');
+            }else if(Ezeid == null) {
+                console.log('FnGetAllBannerPicsAP: Ezeid is empty');
+            }
+            res.statusCode=400;
+            res.send('null');
+        }
+
+    }
+    catch (ex) {
+        console.log('FnGetAllBannerPicsAP error:' + ex.description);
         throw new Error(ex);
     }
 }
