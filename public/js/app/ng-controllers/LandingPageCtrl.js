@@ -177,25 +177,25 @@ angular.module('ezeidApp').
                     var coordinates = getSearchedCoordinates($scope.googleMap.currentMarkerPosition.latitude,$scope.googleMap.currentMarkerPosition.longitude);
 
                     $scope.googleMap.getReverseGeolocation(coordinates[0],coordinates[1]).then(function (resp) {
-                            if (resp) {
-                                $rootScope.coordinatesLat = $scope.googleMap.currentMarkerPosition.latitude;
-                                $rootScope.coordinatesLng = $scope.googleMap.currentMarkerPosition.longitude;
-                                placeDetail = $scope.googleMap.parseReverseGeolocationData(resp.data);
+                        if (resp) {
+                            $rootScope.coordinatesLat = $scope.googleMap.currentMarkerPosition.latitude;
+                            $rootScope.coordinatesLng = $scope.googleMap.currentMarkerPosition.longitude;
+                            placeDetail = $scope.googleMap.parseReverseGeolocationData(resp.data);
 
-                                $scope.locationString = placeDetail.city != '' ? 'Your current location is: ' + placeDetail.area + ", " + placeDetail.city + ", " + placeDetail.state : '';
-                                $scope.location = getLocationString(placeDetail.area,placeDetail.city,placeDetail.state);
-                                /* Setting up default lattitude & longitude of the map */
-                                $scope.searchParams.lat = $scope.googleMap.currentMarkerPosition.latitude;
-                                $scope.searchParams.lng = $scope.googleMap.currentMarkerPosition.longitude;
-                            }
-                            if ($routeParams['ezeid']) {
-                                $scope.triggerSearch();
-                            }
-                        }, function () {
-                            if ($routeParams['ezeid']) {
-                                $scope.triggerSearch();
-                            }
-                        });
+                            $scope.locationString = placeDetail.city != '' ? 'Your current location is: ' + placeDetail.area + ", " + placeDetail.city + ", " + placeDetail.state : '';
+                            $scope.location = getLocationString(placeDetail.area,placeDetail.city,placeDetail.state);
+                            /* Setting up default lattitude & longitude of the map */
+                            $scope.searchParams.lat = $scope.googleMap.currentMarkerPosition.latitude;
+                            $scope.searchParams.lng = $scope.googleMap.currentMarkerPosition.longitude;
+                        }
+                        if ($routeParams['ezeid']) {
+                            $scope.triggerSearch();
+                        }
+                    }, function () {
+                        if ($routeParams['ezeid']) {
+                            $scope.triggerSearch();
+                        }
+                    });
                 }
                 else {
                     handleNoGeolocation();
@@ -222,23 +222,39 @@ angular.module('ezeidApp').
                 $scope.googleMap.createMap("modal-map-ctrl", $scope, "findCurrentLocation()");
 
                 $scope.googleMap.renderMap();
-
                 $scope.googleMap.mapIdleListener().then(function () {
                     $scope.googleMap.pushMapControls();
                     $scope.googleMap.listenOnMapControls(getNewCoordinates, getNewCoordinates);
-                    $scope.googleMap.resizeMap();
+
                     /* place the present location marker on map */
                     $scope.googleMap.getCurrentLocation().then(function (e) {
                         $scope.googleMap.placeCurrentLocationMarker(getNewCoordinates);
-                        $scope.googleMap.resizeMap();
+                        if(typeof($routeParams.lat) != 'undefined') {
+                            populateMarkers();
+                        }
                         $scope.googleMap.setMarkersInBounds();
                     }, function () {
-                        //populateMarkers();
+
                     });
 
                 });
             };
 
+            /* place this marker if the preffered search location is different from your present location */
+
+            var populateMarkers = function () {
+                $scope.googleMap.resizeMap();
+                $scope.googleMap.setMarkersInBounds();
+                $scope.googleMap.toggleMapControls();
+
+                /* place markers on map for different searched coordinates */
+                var markerImage = '../../images/business-icon_48.png';
+                var pos = $scope.googleMap.createGMapPosition($routeParams.lat, $routeParams.lng);
+                var marker = $scope.googleMap.createMarker(pos, "Current Searched Location", markerImage, false, null);
+                $scope.googleMap.placeMarker(marker);
+
+                $scope.googleMap.setMarkersInBounds();
+            };
             /* update the coordinates on drag event of map marker */
             var getNewCoordinates = function (lat, lng) {
                 $rootScope.coordinatesLat = $scope.searchParams.lat = lat;

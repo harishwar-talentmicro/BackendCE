@@ -313,7 +313,7 @@ angular.module('ezeidApp').
                 /* populates the map marker for search result */
                 var populateMarkers = function(){
                     googleMap.resizeMap();
-                    $scope.googleMap.setMarkersInBounds();
+                    googleMap.setMarkersInBounds();
                     googleMap.toggleMapControls();
 
                     /* place markers on map */
