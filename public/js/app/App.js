@@ -171,29 +171,68 @@
     ezeid.run(['$location','$rootScope','CLOSED_ROUTES','$routeParams','$timeout','UNAUTHORIZED_ROUTES','OPEN_ROUTES','$queryLsToken',
         function($location,$rootScope,CLOSED_ROUTES,$routeParams,$timeout,UNAUTHORIZED_ROUTES,OPEN_ROUTES,$queryLsToken){
 
+            var dataProgress = false;
+            var htmlProgress = false;
+
+            //$rootScope.$on('$includeContentRequested',function(){
+            //    $rootScope.$broadcast('$preLoaderStart');
+            //});
+            //
+            //$rootScope.$on('$includeContentLoaded',function(){
+            //    $rootScope.$broadcast('$preLoaderStop');
+            //});
+
             $rootScope.$on('$includeContentRequested',function(){
-                $rootScope.$broadcast('$preLoaderStart');
-            });
-
-            $rootScope.$on('$includeContentLoaded',function(){
-                $rootScope.$broadcast('$preLoaderStop');
-            });
-
-
-
-            $rootScope.$on('$preLoaderStart',function(){
-                if($('#progress-overlay').hasClass('hidden')){
-                    $('#progress-overlay').removeClass('hidden');
+                htmlProgress = true;
+                if(!dataProgress){
+                    if($('#progress-overlay').hasClass('hidden')){
+                        $('#progress-overlay').removeClass('hidden');
+                    }
                 }
             });
 
-            $rootScope.$on('$preLoaderStop',function(){
-                $timeout(function(){
+            $rootScope.$on('$includeContentLoaded',function(){
+                htmlProgress = false;
+                if(!dataProgress){
                     if(!$('#progress-overlay').hasClass('hidden')){
 
                         $('#progress-overlay').addClass('hidden');
                     }
-                },10);
+                }
+            });
+
+
+
+            //$rootScope.$on('$preLoaderStart',function(){
+            //    if($('#progress-overlay').hasClass('hidden')){
+            //        $('#progress-overlay').removeClass('hidden');
+            //    }
+            //});
+            //
+            //$rootScope.$on('$preLoaderStop',function(){
+            //    if(!$('#progress-overlay').hasClass('hidden')){
+            //
+            //        $('#progress-overlay').addClass('hidden');
+            //    }
+            //});
+
+            $rootScope.$on('$preLoaderStart',function(){
+                dataProgress = true;
+                if(!htmlProgress){
+                    if($('#progress-overlay').hasClass('hidden')){
+                        $('#progress-overlay').removeClass('hidden');
+                    }
+                }
+            });
+
+            $rootScope.$on('$preLoaderStop',function(){
+                dataProgress = false;
+                if(!htmlProgress){
+                    if(!$('#progress-overlay').hasClass('hidden')){
+
+                        $('#progress-overlay').addClass('hidden');
+                    }
+                }
             });
 
         /**

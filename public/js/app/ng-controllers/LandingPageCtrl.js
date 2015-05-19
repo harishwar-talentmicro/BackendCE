@@ -185,7 +185,7 @@ angular.module('ezeidApp').
                             $scope.locationString = placeDetail.city != '' ? 'Your current location is: ' + placeDetail.area + ", " + placeDetail.city + ", " + placeDetail.state : '';
                             $scope.location = getLocationString(placeDetail.area,placeDetail.city,placeDetail.state);
                             /* Setting up default lattitude & longitude of the map */
-                            $scope.searchParams.lat = $scope.googleMap.currentMarkerPosition.latitude;
+                                $scope.searchParams.lat = $scope.googleMap.currentMarkerPosition.latitude;
                             $scope.searchParams.lng = $scope.googleMap.currentMarkerPosition.longitude;
                         }
                         if ($routeParams['ezeid']) {
@@ -210,6 +210,16 @@ angular.module('ezeidApp').
                 handleNoGeolocation();
             });
 
+
+            /* Callback function for get current location functionality */
+            $scope.findCurrentLocation = function(){
+                $scope.googleMap.getCurrentLocation().then(function(){
+                    $scope.googleMap.placeCurrentLocationMarker(null,null,true);
+                },function(){
+                    $scope.googleMap.placeCurrentLocationMarker(null,null,true);
+                });
+            };
+
             /* Load the map in the modal box */
             /* Google map integration */
             var initializeMap = function () {
@@ -227,17 +237,27 @@ angular.module('ezeidApp').
                     $scope.googleMap.listenOnMapControls(getNewCoordinates, getNewCoordinates);
 
                     /* place the present location marker on map */
-                    $scope.googleMap.getCurrentLocation().then(function (e) {
+                    if($routeParams['lat']){
+                        $scope.googleMap.currentMarkerPosition.latitude = $routeParams['lat'];
+                        $scope.googleMap.currentMarkerPosition.longitude = $routeParams['lng'];
                         $scope.googleMap.placeCurrentLocationMarker(getNewCoordinates);
-                        /* if this modal box map is opened from search result page: Add marker for additional */
-                        if(typeof($routeParams.lat) != 'undefined') {
-                            populateMarkers();
-                        }
-                        $scope.googleMap.resizeMap();
-                        $scope.googleMap.setMarkersInBounds();
-                    }, function () {
 
-                    });
+                        /* if this modal box map is opened from search result page: Add marker for additional */
+                        $scope.googleMap.resizeMap();
+                    }
+                    else{
+                        $scope.googleMap.getCurrentLocation().then(function (e) {
+
+                            $scope.googleMap.placeCurrentLocationMarker(getNewCoordinates);
+
+                            /* if this modal box map is opened from search result page: Add marker for additional */
+                            $scope.googleMap.resizeMap();
+                            $scope.googleMap.setMarkersInBounds();
+                        }, function () {
+
+                        });
+                    }
+
 
                 });
             };

@@ -24,6 +24,8 @@ angular.module('ezeidApp').controller('mapPopController',[
              GURL,
              GoogleMaps){
 
+        //Below line is for Loading img
+        $scope.$emit('$preLoaderStart');
 
         var directtionLatLong;
         /* integrate google map */
@@ -37,6 +39,7 @@ angular.module('ezeidApp').controller('mapPopController',[
             });
         };
         var initializeMap = function(){
+
             googleMap.setSettings({
                 mapElementClass : "col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix class-map-ctrl",
                 searchElementClass : "form-control pull-left pac-input",
@@ -93,6 +96,7 @@ angular.module('ezeidApp').controller('mapPopController',[
 
             $timeout(function(){
                 googleMap.setMarkersInBounds();
+                $rootScope.$broadcast('$preLoaderStop');
             },1000);
 
         };

@@ -179,11 +179,13 @@ angular.module('ezeidApp').
                     /* count the result */
                     var count = 0;
                     if(data != 'null'){
-
+                        var link = '';
+                        var searchType = $routeParams.searchType;
                         for(var i=0; i<data.length; i++)
                         {
                             count++;
-                            coordinates.push([data[i].Latitude,data[i].Longitude,data[i].CompanyName]);
+                            link = "/searchDetails?searchType="+searchType+"&TID="+data[i].TID;
+                            coordinates.push([data[i].Latitude,data[i].Longitude,data[i].CompanyName,link]);
                         }
                         $scope.coordinatesArr = coordinates;
                     }
@@ -287,6 +289,16 @@ angular.module('ezeidApp').
             /* integrate google map */
             var googleMap = new GoogleMap();
 
+            /* Callback function for get current location functionality */
+            $scope.findCurrentLocation = function(){
+                console.log(googleMap);
+                googleMap.getCurrentLocation().then(function(){
+                    googleMap.placeCurrentLocationMarker(null,null,false);
+                },function(){
+                    googleMap.placeCurrentLocationMarker(null,null,false);
+                });
+            };
+
             var initializeMap = function(){
                 googleMap.setSettings({
                     mapElementClass : "col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix class-map-ctrl",
@@ -323,8 +335,10 @@ angular.module('ezeidApp').
                         if($scope.coordinatesArr[i][0] != 0 || $scope.coordinatesArr[i][0] != 0)
                         {
                             var pos = googleMap.createGMapPosition($scope.coordinatesArr[i][0],$scope.coordinatesArr[i][1]);
-                            var marker = googleMap.createMarker(pos,$scope.coordinatesArr[i][2],markerImage,false,null);
-                            googleMap.placeMarker(marker);
+                            var marker = googleMap.createMarker(pos,$scope.coordinatesArr[i][2],markerImage,false,null,$scope.coordinatesArr[i][2],$scope.coordinatesArr[i][3]);
+                            googleMap.placeMarker(marker,null,null,true,function(link){
+                                $window.location.href = link;
+                            });
                         }
                     }
 

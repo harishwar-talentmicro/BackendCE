@@ -113,6 +113,7 @@ angular.module('ezeidApp').controller('WorkingHourCtrl',['$scope','$rootScope','
         $scope.saveInfo.SU1 = ($scope.mInfo.SU1) ? selectedTimeToUtc($scope.mInfo.SU1) : "";
         $scope.saveInfo.SU2 = ($scope.mInfo.SU2) ? selectedTimeToUtc($scope.mInfo.SU2) : "";
         $scope.saveInfo.SU3 = ($scope.mInfo.SU3) ? selectedTimeToUtc($scope.mInfo.SU3) : "";
+        $scope.saveInfo.SU4 = ($scope.mInfo.SU4) ? selectedTimeToUtc($scope.mInfo.SU4) : "";
 
         $scope.saveInfo.WorkingHrsTemplate = $scope.mInfo.WorkingHrsTemplate;
         $scope.saveInfo.SpilloverTime = ($scope.mInfo.SpilloverTime == undefined) ? 0 : $scope.mInfo.SpilloverTime;
