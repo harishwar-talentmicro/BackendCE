@@ -314,7 +314,7 @@ angular.module('ezeidApp').
                 var populateMarkers = function(){
                     googleMap.resizeMap();
                     googleMap.setMarkersInBounds();
-                    googleMap.toggleMapControls();
+                    //googleMap.toggleMapControls();
 
                     /* place markers on map */
                    var markerImage = '../../images/business-icon_48.png';
