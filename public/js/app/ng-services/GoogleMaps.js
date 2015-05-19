@@ -186,13 +186,13 @@ angular.module('ezeidApp').factory('GoogleMaps',['$q','$timeout','$compile',func
      * @param dragListener
      * @returns {Marker}
      */
-    GoogleMap.prototype.createMarker = function(position,title,icon,draggable,dragListener,labelText,makerData){
+    GoogleMap.prototype.createMarker = function(position,title,icon,draggable,dragListener,labelText,markerData){
         var marker = new google.maps.Marker({
             position: position,
             title:title,
             draggable: (draggable)? draggable: false,
             icon: (icon)? icon :  'images/you_are_here.png',
-            data : makerData,
+            data : markerData,
             label : (labelText) ? labelText : title
         });
         if(dragListener){
