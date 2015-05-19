@@ -420,13 +420,12 @@ angular.module('ezeidApp').
 
                     $('.main-page-image').css(
                         {
-                            'background': 'url(/images/front-page-bg1.png)',
+                            'background': 'url(/images/bg-test.jpg)',
                             'background-size': 'cover'
                         }).fadeTo(3000, 1);
                 }
-                image.src = '/images/front-page-bg1.png';
-
-            }, 1000);
+                image.src = '/images/bg-test.jpg';
+            },2);
 
             /**
              *
