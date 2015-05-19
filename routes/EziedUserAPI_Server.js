@@ -11285,7 +11285,7 @@ exports.FnGetAllBannerPicsAP = function(req, res){
         var Token = req.query.Token;
         var EZEID = req.query.EZEID;
 
-        if (Token != null && Ezeid != null) {
+        if (Token != null && EZEID != null) {
             FnValidateTokenAP(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
@@ -11293,13 +11293,15 @@ exports.FnGetAllBannerPicsAP = function(req, res){
                         //console.log(InsertQuery);
                         db.query('CALL pGetAllBannerPics(' + Query + ')', function (err, BannerResult) {
                             console.log(err);
+                        
                             if (!err) {
                                 //console.log(InsertResult);
                                 if (BannerResult != null) {
-                                    if(BannerResult[0].length > 0){
-                                        var Picture = BannerResult[0];
+                                    //if(BannerResult[0].length > 0){
+                                        //var Picture = BannerResult;
                                         console.log('FnGetAllBannerPicsAP:tmaster: Banner Picture send sucessfully ');
-                                        res.send(Picture[0]);
+                                        //res.send(Picture);
+                                        res.send(BannerResult[0]);
                                     }
                                     else
                                     {
@@ -11307,11 +11309,6 @@ exports.FnGetAllBannerPicsAP = function(req, res){
                                         console.log('FnGetAllBannerPicsAP:tmaster: No Banner Picture send sucessfully ');
                                     }
                                 }
-                                else {
-                                    res.send('null');
-                                    console.log('FnGetAllBannerPicsAP:tmaster: No Banner Picture send sucessfully ');
-                                }
-                            }
                             else {
                                 res.statusCode=500;
                                 res.send('null');
