@@ -276,7 +276,6 @@
                     if(c === index){
                         $scope.resetModalBox();
                         $scope.modalBox.tx = prepareEditTransaction($scope.txList[index]);
-                        //console.log($scope.modalBox.tx);
                         $scope.editModes[c] = true;
                     }
                     else{
@@ -285,20 +284,21 @@
                 }
                 if(resolveGeolocation){
                     $scope.resolveGeolocationAddress();
-
-                    if(loadItems){
-                        loadTransactionItems($scope.modalBox.tx.TID).then(function(){
-                            $scope.$emit('$preLoaderStop');
-                        },function(){
-                            $scope.$emit('$preLoaderStop');
-                        });
-                    }
-
                 }
-
-
+                if(loadItems){
+                    loadTransactionItems($scope.modalBox.tx.TID).then(function(){
+                        $scope.$emit('$preLoaderStop');
+                    },function(){
+                        $scope.$emit('$preLoaderStop');
+                    });
+                }
             };
 
+            /**
+             * Loads the transaction items for already existing transaction
+             * @param txId (MessageID)
+             * @returns {* | promise}
+             */
             var loadTransactionItems = function(txId){
                 var defer = $q.defer();
                 $http({
@@ -939,8 +939,16 @@
                 }).success(function(resp){
                     if(resp && resp.hasOwnProperty('IsSuccessfull')){
                         if(resp.IsSuccessfull){
-                            Notification.success({ message : 'Enquiry is posted successfully.', delay : MsgDelay});
-                            $scope.toggleModalBox();
+                            var msg = 'Enquiry is posted successfully';
+                            if($scope.modalBox.editMode){
+                                msg = 'Enquiry is updated successfully';
+                            }
+                            Notification.success({ message : msg, delay : MsgDelay});
+                            if($scope.showModal){
+                                $scope.showModal = !$scope.showModal;
+                            }
+                            $scope.resetModalBox();
+                            $scope.toggleAllEditMode();
                         }
                         else{
                             Notification.error({ message : 'An error occurred while placing enquiry', delay : MsgDelay});

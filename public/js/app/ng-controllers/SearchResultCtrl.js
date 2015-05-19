@@ -173,7 +173,7 @@ angular.module('ezeidApp').
 
                 /* set the value of the search term */
                 $scope.defaultSearchTerm = _filterValue.searchTerm;
-
+                $scope.$emit('$preLoaderStart');
                 $http({ method: 'post', url: GURL + 'ewSearchByKeywords', data: {
                     SearchType:_filterValue.searchType,
                     Keywords:_filterValue.searchTerm,
@@ -236,6 +236,7 @@ angular.module('ezeidApp').
                             $scope.searchCount = 0;
                         }
                     }
+                    $scope.$emit('$preLoaderStop');
                 });
             }
 
@@ -327,6 +328,7 @@ angular.module('ezeidApp').
 
                 var populateMarkers = function(){
                     googleMap.resizeMap();
+                    $scope.googleMap.setMarkersInBounds();
                     googleMap.toggleMapControls();
 
                     /* place markers on map */
@@ -360,6 +362,7 @@ angular.module('ezeidApp').
                     if(flag){
                         $timeout(function(){
                             googleMap.resizeMap();
+                            $scope.googleMap.setMarkersInBounds();
                         },500);
                     }
                 }

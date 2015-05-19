@@ -253,6 +253,7 @@ angular.module('ezeidApp').
                     $scope.googleMap.getCurrentLocation().then(function(e){
                         $scope.googleMap.placeCurrentLocationMarker(getNewCoordinates);
                         $scope.googleMap.resizeMap();
+                        $scope.googleMapsetMarkersInBounds();
                     },function(){
                         //populateMarkers();
                     });
@@ -301,6 +302,7 @@ angular.module('ezeidApp').
                     else{
                         $timeout(function(){
                             $scope.googleMap.resizeMap();
+                            $scope.googleMap.setMarkersInBounds();
                         },1500);
                     }
                 }
