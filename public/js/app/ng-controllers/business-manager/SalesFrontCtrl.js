@@ -32,6 +32,11 @@
                   GoogleMap) {
 
 
+            /* modal box for getting sales details */
+            $scope.salesModal = {
+                title: 'Sales Enquiry',
+                class: 'business-manager-modal'
+            };
 
             $scope.showModal = false;
             $scope.modalBox = {

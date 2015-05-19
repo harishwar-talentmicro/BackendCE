@@ -609,5 +609,15 @@ angular.module('ezeidApp').
         };
 
 
+        /**
+         * For Sales Enquiry Modal Box
+         * @Updated by Sandeep[18/5/15]
+         */
+        $scope.salesDetailVisibility = false;
+        $scope.toggleSalesDetailsVisibility = function()
+        {
+            $scope.salesDetailVisibility = !$scope.salesDetailVisibility;
+        }
+
     }
 ]);
