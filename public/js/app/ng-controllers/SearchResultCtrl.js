@@ -114,12 +114,6 @@ angular.module('ezeidApp').
                 $scope.searchStars[starRating[i]-1] = true;
             }
 
-
-          /*  if($scope.params.searchType != 1)
-            {
-                $scope.showDownloadLink = false;
-            }*/
-
             if(($scope.params.searchType == 1) && (!$rootScope._userInfo.IsAuthenticate))
             {
                 $scope.showLoginText = true;
@@ -144,18 +138,8 @@ angular.module('ezeidApp').
                 finalVal = $routeParams.rating[i];
             }
 
-            /* checks for initial and final value */
-            //var initial = !isNaN(initialVal) && parseInt(initialVal) >= 1?initialVal:1;
-            //var final = !isNaN(finalVal) && parseInt(finalVal) <= 5?finalVal:5;
             var initial = initialVal;
             var final = finalVal;
-
-            //var slider = $("#range_29").data("ionRangeSlider");
-            //slider.update({
-            //    from: initial,
-            //    to: final
-            //});
-
 
 
             //Below function is for getting key word search result
@@ -326,6 +310,7 @@ angular.module('ezeidApp').
 
                 });
 
+                /* populates the map marker for search result */
                 var populateMarkers = function(){
                     googleMap.resizeMap();
                     $scope.googleMap.setMarkersInBounds();

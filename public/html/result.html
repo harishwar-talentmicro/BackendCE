@@ -58,7 +58,7 @@
                         </ul>
                     </div>
                     <div class="dropdown">
-                        <p ng-show="searchCount > 0" class="text-center"><i>{{searchCount}} Items found for <b>{{defaultSearchTerm}}</b></i></p>
+                        <p ng-show="searchCount > 0" class="text-center"><i>{{searchCount}} Items found for <b>{{defaultSearchTerm}}</b></i> | Searched in: {{location}}</p>
                     </div>
                 </div><!-- /.navbar-collapse -->
             </div><!-- /.container-fluid -->
@@ -107,7 +107,7 @@
                 <!--<div class="filter-container animation-slideup" ng-show="isFilterShown">-->
                 <div class="filter-container animation-slideup" ng-show="isFilterShown">
                     <div class="container text text-center filter-text-highlight">
-                        <i>Advance Filters</i>
+                        <i>Search Options</i>
                     </div>
                     <!-- Main contents of advance filters -->
                     <div class="advance-filter-content border-style-bottom">
