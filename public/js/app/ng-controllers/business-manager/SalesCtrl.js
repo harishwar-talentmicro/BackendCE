@@ -237,7 +237,7 @@
                         TID : tx.TID,
                         functionType : 0, // Function Type will be 0 for sales
                         ezeid : tx.RequesterEZEID,
-                        statusType : 0,
+                        statusType : (tx.Status) ? tx.Status : 0,
                         notes : tx.Notes,
                         locId : tx.LocID,
                         country : '',
@@ -282,14 +282,29 @@
                         $scope.editModes[c] = false;
                     }
                 }
+                var itemsLoaded = true;
+                var locationLoaded = true;
                 if(resolveGeolocation){
-                    $scope.resolveGeolocationAddress();
+                    locationLoaded = false;
+                    $scope.resolveGeolocationAddress().then(function(){
+                        locationLoaded = true;
+                        if(itemsLoaded && locationLoaded){
+                            $scope.$emit('$preLoaderStop');
+                        }
+                    });
                 }
                 if(loadItems){
+                    itemsLoaded = false;
                     loadTransactionItems($scope.modalBox.tx.TID).then(function(){
-                        $scope.$emit('$preLoaderStop');
+                        itemsLoaded = true;
+                        if(itemsLoaded && locationLoaded){
+                            $scope.$emit('$preLoaderStop');
+                        }
                     },function(){
-                        $scope.$emit('$preLoaderStop');
+                        itemsLoaded = true;
+                        if(itemsLoaded && locationLoaded){
+                            $scope.$emit('$preLoaderStop');
+                        }
                     });
                 }
             };
@@ -356,19 +371,38 @@
             };
 
             /**
-             *
+             * Finds address using geolocation lat lng
+             * called on change of location
+             */
+            $scope.findAddress = function(){
+                $scope.$emit('$preLoaderStart');
+                $scope.resolveGeolocationAddress().then(function(){
+                    $scope.$emit('$preLoaderStop');
+                },function(){
+                    $scope.$emit('$preLoaderStop');
+                });
+            };
+
+            /**
+             *  Resolves geolocation and sets geolocation address in modalbox for particular transaction
              */
             $scope.resolveGeolocationAddress = function(){
+                var defer = $q.defer();
                 $scope.modalBox.tx.address = '';
                 if(!$scope.modalBox.tx.locId){
-                    return;
+                    $timeout(function(){
+                        defer.resolve();
+                    },500);
+                    return defer.promise;
                 }
 
-                $scope.$emit('$preLoaderStart');
+                //$scope.$emit('$preLoaderStart');
                 var locIndex = $scope.modalBox.locationList.indexOfWhere("TID",parseInt($scope.modalBox.tx.locId));
                 if(locIndex === -1){
-                    $scope.$emit('$preLoaderStop');
-                    return;
+                    $timeout(function(){
+                        defer.resolve();
+                    },500);
+                    return defer.promise;
                 }
                 var lat = $scope.modalBox.locationList[locIndex].Latitude;
                 var lng = $scope.modalBox.locationList[locIndex].Longitude;
@@ -380,7 +414,7 @@
                     $scope.modalBox.locationList[locIndex].AddressLine2;
                 var googleMap = new GoogleMap();
                 googleMap.getReverseGeolocation(lat,lng).then(function(resp){
-                    $scope.$emit('$preLoaderStop');
+                    //$scope.$emit('$preLoaderStop');
                     if(resp.data){
                         var data = googleMap.parseReverseGeolocationData(resp.data);
                         $scope.modalBox.tx.city = data.city;
@@ -391,15 +425,17 @@
 
                     }
                     else{
-                        $scope.$emit('$preLoaderStop');
+                        //$scope.$emit('$preLoaderStop');
                         Notification.error({message : 'Please enable geolocation settings n your browser',delay : MsgDelay});
                     }
+                    defer.resolve();
 
                 },function(){
                     Notification.error({message : 'Please enable geolocation settings n your browser',delay : MsgDelay});
-                    $scope.$emit('$preLoaderStop');
+                    //$scope.$emit('$preLoaderStop');
+                    defer.resolve();
                 });
-
+                return defer.promise;
             };
 
 
@@ -931,6 +967,30 @@
                     return ;
                 }
 
+
+                if($scope.modalBox.tx.message.length < 1 && $scope.modules[moduleIndex].listType > 0){
+                    var itemList = [];
+                    try{
+                        itemList = JSON.parse(data.ItemsList);
+                    }
+                    catch(ex){
+                        console.log(ex);
+                    }
+                    var msg = '';
+                    for(var ct = 0; ct < itemList.length; ct++){
+                        msg += itemList[ct]['ItemName'];
+                        if(itemList[ct]['Qty']){
+                            msg += ' ('+ itemList[ct]['Qty'] + ')';
+                        }
+                        if(itemList[ct]['Amount']){
+                            msg += ' : '+ itemList[ct]['Amount'];
+                        }
+                        msg += ', ';
+                    }
+                    msg = msg.substring(0, msg.length - 2);
+                    data.MessageText = msg;
+                }
+
                 $scope.$emit('$preLoaderStart');
                 $http({
                     url : GURL + 'ewtSaveTranscation',
@@ -943,12 +1003,17 @@
                             if($scope.modalBox.editMode){
                                 msg = 'Enquiry is updated successfully';
                             }
+
+                            if($scope.editModes.indexOf(true) !== -1){
+                                msg = 'Enquiry is updated successfully';
+                            }
                             Notification.success({ message : msg, delay : MsgDelay});
                             if($scope.showModal){
                                 $scope.showModal = !$scope.showModal;
                             }
                             $scope.resetModalBox();
                             $scope.toggleAllEditMode();
+                            $scope.loadTransaction();
                         }
                         else{
                             Notification.error({ message : 'An error occurred while placing enquiry', delay : MsgDelay});
