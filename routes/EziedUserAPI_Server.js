@@ -8847,7 +8847,6 @@ try{
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     var fs = require('fs');
-    var Token = req.body.Token;
     var Image = req.body.Image;
     var Target_Width = req.body.Width;
     var Target_Height = req.body.Height;
@@ -8858,10 +8857,8 @@ try{
         };
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
      
-        if (Token != null && Target_Width != null && Target_Height != null ) {
-        FnValidateToken(Token, function (err, Result) {
-            if (!err) {
-                if (Result != null) {
+        if (Target_Width != null && Target_Height != null ) {
+        
                     var fs = require('fs');
                     var gm = require('gm').subClass({ imageMagick: true });
                     
@@ -8901,20 +8898,8 @@ try{
                             res.send(RtnMessage);
                         }
                     });
-                }
-                else {
-                        res.statusCode = 401;
-                        res.send(RtnMessage);
-                        console.log('FnCropImage: Invalid Token');
-                    }
-                } else {
-
-                    res.statusCode = 500;
-                    res.send(RtnMessage);
-                    console.log('FnCropImage: Error in validating token:  ' + err);
-                }
-            });
         }
+                
         else {
             if (Token == null) {
                 console.log('FnCropImage: Token is empty');
