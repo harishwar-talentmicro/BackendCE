@@ -192,7 +192,7 @@ angular.module('ezeidApp').factory('GoogleMaps',['$q','$timeout','$compile',func
             title:title,
             draggable: (draggable)? draggable: false,
             icon: (icon)? icon :  'images/you_are_here.png',
-            label : (labelText) ? labelText : ''
+            label : (labelText) ? labelText : title
         });
         if(dragListener){
             google.maps.event.addListener(marker,'dragend',function(){
