@@ -229,9 +229,11 @@ angular.module('ezeidApp').
                     /* place the present location marker on map */
                     $scope.googleMap.getCurrentLocation().then(function (e) {
                         $scope.googleMap.placeCurrentLocationMarker(getNewCoordinates);
+                        /* if this modal box map is opened from search result page: Add marker for additional */
                         if(typeof($routeParams.lat) != 'undefined') {
                             populateMarkers();
                         }
+                        $scope.googleMap.resizeMap();
                         $scope.googleMap.setMarkersInBounds();
                     }, function () {
 
@@ -245,7 +247,7 @@ angular.module('ezeidApp').
             var populateMarkers = function () {
                 $scope.googleMap.resizeMap();
                 $scope.googleMap.setMarkersInBounds();
-                $scope.googleMap.toggleMapControls();
+                //$scope.googleMap.toggleMapControls();
 
                 /* place markers on map for different searched coordinates */
                 var markerImage = '../../images/business-icon_48.png';
