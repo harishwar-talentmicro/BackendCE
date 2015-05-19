@@ -38,8 +38,7 @@ angular.module('ezeidApp').
             $location,
             GoogleMap,
             $routeParams
-        )
-        {
+        ) {
             /**
              * searchType
              * 0 : EZEID
@@ -49,34 +48,30 @@ angular.module('ezeidApp').
              */
 
             var placeDetail = [];
-            var searchTypeArr = ["EZEID","Keywords","Job Keywords"];
+            var searchTypeArr = ["EZEID", "Keywords", "Job Keywords"];
             var mapLatitude;
             var mapLongitude;
 
             /* Star ratings reso. */
-            $scope.stars = [true,true,true,true,true];
-            $scope.selectStar = function(index)
-            {
+            $scope.stars = [true, true, true, true, true];
+            $scope.selectStar = function (index) {
                 $scope.stars[index] = !$scope.stars[index];
             }
 
             $scope.starArr = [
-                ["a","b","c","d","e"],
-                ["a","b","c","d"],
-                ["a","b","c"],
-                ["a","b"],
+                ["a", "b", "c", "d", "e"],
+                ["a", "b", "c", "d"],
+                ["a", "b", "c"],
+                ["a", "b"],
                 ["a"]
             ];
 
             /* convert star ratings to comma seperated string */
             var starStr = [];
-            $scope.getStars = function()
-            {
-                for(var i=0;i<5;i++)
-                {
-                    if($scope.stars[i])
-                    {
-                        starStr.push(i+1);
+            $scope.getStars = function () {
+                for (var i = 0; i < 5; i++) {
+                    if ($scope.stars[i]) {
+                        starStr.push(i + 1);
                     }
                 }
                 return starStr.join(",");
@@ -94,63 +89,41 @@ angular.module('ezeidApp').
             $scope.placeHolderText = placeHolder;
 
             $scope.searchParams = {
-                searchType : 2,
-                searchTerm : '',
-                proximity : 0,
-                rating : '1,2,3,4,5',
-                homeDelivery : false,
-                parkingStatus : 0,
-                openStatus : false,
-                lat:'12.93',
-                lng:'77.57'
+                searchType: 2,
+                searchTerm: '',
+                proximity: 0,
+                rating: '1,2,3,4,5',
+                homeDelivery: false,
+                parkingStatus: 0,
+                openStatus: false,
+                lat: '12.93',
+                lng: '77.57'
             };
 
-            if($routeParams['ezeid']){
+            if ($routeParams['ezeid']) {
                 $scope.searchParams.searchTerm = $routeParams['ezeid'];
                 $scope.searchParams.searchType = 1;
             }
 
-            //var ratingArr = [];
-            //$("#range_29").ionRangeSlider({
-            //    type: "double",
-            //    min: 1,
-            //    max: 5,
-            //    step: 1,
-            //    grid: true,
-            //    grid_snap: true,
-            //    keyboard : true,
-            //    onChange : function(obj){
-            //
-            //        var arr = [];
-            //        var ratingTo = parseInt(obj.to);
-            //        var ratingFrom = parseInt(obj.from);
-            //        for(var ci = ratingFrom; ci <= ratingTo; ci++)
-            //        {
-            //            arr.push(ci);
-            //        }
-            //        $scope.searchParams.rating = arr.join();
-            //    }
-            //});
             $scope.isFilterShown = false;
 
-            $scope.toggleFilterContainer = function(e){
+            $scope.toggleFilterContainer = function (e) {
                 $scope.isFilterShown = !$scope.isFilterShown;
             };
 
             /**
              * Triggers Search
              */
-            $scope.triggerSearch = function(){
+            $scope.triggerSearch = function () {
 
                 /* check if the search term is not empty */
-                if($scope.searchParams.searchTerm.length < 1){
+                if ($scope.searchParams.searchTerm.length < 1) {
                     return false;
                 }
                 /* check if the user is logged in and the search type is 1[EZEID] */
-                if(!$rootScope._userInfo.IsAuthenticate && $scope.searchParams.searchType == 1)
-                {
+                if (!$rootScope._userInfo.IsAuthenticate && $scope.searchParams.searchType == 1) {
                     /* through error */
-                    Notification.error({ message : 'Please login to search for EZEID', delay : MsgDelay});
+                    Notification.error({message: 'Please login to search for EZEID', delay: MsgDelay});
                     return false;
                 }
 
@@ -163,20 +136,20 @@ angular.module('ezeidApp').
                 $scope.searchParams.rating = $scope.getStars();
 
                 var searchStr = "";
-                for(var prop in $scope.searchParams){
-                    if($scope.searchParams.hasOwnProperty(prop)){
-                        if(modifyValue.indexOf(prop) !== -1){
+                for (var prop in $scope.searchParams) {
+                    if ($scope.searchParams.hasOwnProperty(prop)) {
+                        if (modifyValue.indexOf(prop) !== -1) {
                             var val = ($scope.searchParams[prop]) ? 1 : 0;
-                            var attr = prop + '=' + val +'&'
+                            var attr = prop + '=' + val + '&'
                             searchStr += attr;
                         }
-                        else{
-                            searchStr += (prop + '=' + encodeURIComponent($scope.searchParams[prop])+'&');
+                        else {
+                            searchStr += (prop + '=' + encodeURIComponent($scope.searchParams[prop]) + '&');
                         }
                     }
                 }
 
-                $location.url('/searchResult?'+searchStr);
+                $location.url('/searchResult?' + searchStr);
             };
 
 
@@ -184,49 +157,54 @@ angular.module('ezeidApp').
              * Check enter key press in search box
              * @param e
              */
-            $scope.checkEnterKey = function(e){
-                if(e.charCode === 13 && $scope.searchParams.searchTerm.length > 0){
+            $scope.checkEnterKey = function (e) {
+                if (e.charCode === 13 && $scope.searchParams.searchTerm.length > 0) {
                     $scope.triggerSearch();
                 }
             };
 
-            var handleNoGeolocation = function(){
-                //console.log('No Geolocation data');
+            var handleNoGeolocation = function () {
+
             };
 
             $scope.googleMap = new GoogleMap();
 
             var promise = $scope.googleMap.getCurrentLocation()
-            promise.then(function(resp){
-                if(resp){
-                    $scope.googleMap.getReverseGeolocation($scope.googleMap.currentMarkerPosition.latitude,
-                        $scope.googleMap.currentMarkerPosition.longitude).then(function(resp){
-                            if(resp){
-                                $rootScope.coordinatesLat = $scope.googleMap.currentMarkerPosition.latitude;
-                                $rootScope.coordinatesLng = $scope.googleMap.currentMarkerPosition.longitude;
-                                placeDetail = $scope.googleMap.parseReverseGeolocationData(resp.data);
-                                $scope.locationString = placeDetail.city != ''?'Your current location is: '+placeDetail.area+", "+placeDetail.city+", "+placeDetail.state:'';
-                                /* Setting up default lattitude & longitude of the map */
-                                $scope.searchParams.lat = $scope.googleMap.currentMarkerPosition.latitude;
-                                $scope.searchParams.lng = $scope.googleMap.currentMarkerPosition.longitude;
-                            }
-                            if($routeParams['ezeid']){
-                                $scope.triggerSearch();
-                            }
-                        },function(){
-                            if($routeParams['ezeid']){
-                                $scope.triggerSearch();
-                            }
-                        });
+            promise.then(function (resp) {
+                if (resp) {
+
+                    /* get the current location coordinates and if it don't exists then update with the present Coordinates */
+                    var coordinates = getSearchedCoordinates($scope.googleMap.currentMarkerPosition.latitude,$scope.googleMap.currentMarkerPosition.longitude);
+
+                    $scope.googleMap.getReverseGeolocation(coordinates[0],coordinates[1]).then(function (resp) {
+                        if (resp) {
+                            $rootScope.coordinatesLat = $scope.googleMap.currentMarkerPosition.latitude;
+                            $rootScope.coordinatesLng = $scope.googleMap.currentMarkerPosition.longitude;
+                            placeDetail = $scope.googleMap.parseReverseGeolocationData(resp.data);
+
+                            $scope.locationString = placeDetail.city != '' ? 'Your current location is: ' + placeDetail.area + ", " + placeDetail.city + ", " + placeDetail.state : '';
+                            $scope.location = getLocationString(placeDetail.area,placeDetail.city,placeDetail.state);
+                            /* Setting up default lattitude & longitude of the map */
+                            $scope.searchParams.lat = $scope.googleMap.currentMarkerPosition.latitude;
+                            $scope.searchParams.lng = $scope.googleMap.currentMarkerPosition.longitude;
+                        }
+                        if ($routeParams['ezeid']) {
+                            $scope.triggerSearch();
+                        }
+                    }, function () {
+                        if ($routeParams['ezeid']) {
+                            $scope.triggerSearch();
+                        }
+                    });
                 }
-                else{
+                else {
                     handleNoGeolocation();
-                    if($routeParams['ezeid']){
+                    if ($routeParams['ezeid']) {
                         $scope.triggerSearch();
                     }
                 }
-            },function(){
-                if($routeParams['ezeid']){
+            }, function () {
+                if ($routeParams['ezeid']) {
                     $scope.triggerSearch();
                 }
                 handleNoGeolocation();
@@ -234,47 +212,63 @@ angular.module('ezeidApp').
 
             /* Load the map in the modal box */
             /* Google map integration */
-            var initializeMap = function(){
+            var initializeMap = function () {
                 $scope.googleMap.setSettings({
-                    mapElementClass : "col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix class-map-ctrl-style1",
-                    searchElementClass : "form-control pull-left pac-input",
-                    currentLocationElementClass : "link-btn pac-loc",
-                    controlsContainerClass : "col-lg-6 col-md-6'"
+                    mapElementClass: "col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix class-map-ctrl-style1",
+                    searchElementClass: "form-control pull-left pac-input",
+                    currentLocationElementClass: "link-btn pac-loc",
+                    controlsContainerClass: "col-lg-6 col-md-6'"
                 });
-                $scope.googleMap.createMap("modal-map-ctrl",$scope,"findCurrentLocation()");
+                $scope.googleMap.createMap("modal-map-ctrl", $scope, "findCurrentLocation()");
 
                 $scope.googleMap.renderMap();
-
-                $scope.googleMap.mapIdleListener().then(function(){
+                $scope.googleMap.mapIdleListener().then(function () {
                     $scope.googleMap.pushMapControls();
-                    $scope.googleMap.listenOnMapControls(getNewCoordinates,getNewCoordinates);
-                    $scope.googleMap.resizeMap();
+                    $scope.googleMap.listenOnMapControls(getNewCoordinates, getNewCoordinates);
+
                     /* place the present location marker on map */
-                    $scope.googleMap.getCurrentLocation().then(function(e){
+                    $scope.googleMap.getCurrentLocation().then(function (e) {
                         $scope.googleMap.placeCurrentLocationMarker(getNewCoordinates);
-                        $scope.googleMap.resizeMap();
-                        $scope.googleMapsetMarkersInBounds();
-                    },function(){
-                        //populateMarkers();
+                        if(typeof($routeParams.lat) != 'undefined') {
+                            populateMarkers();
+                        }
+                        $scope.googleMap.setMarkersInBounds();
+                    }, function () {
+
                     });
 
                 });
             };
 
+            /* place this marker if the preffered search location is different from your present location */
+
+            var populateMarkers = function () {
+                $scope.googleMap.resizeMap();
+                $scope.googleMap.setMarkersInBounds();
+                $scope.googleMap.toggleMapControls();
+
+                /* place markers on map for different searched coordinates */
+                var markerImage = '../../images/business-icon_48.png';
+                var pos = $scope.googleMap.createGMapPosition($routeParams.lat, $routeParams.lng);
+                var marker = $scope.googleMap.createMarker(pos, "Current Searched Location", markerImage, false, null);
+                $scope.googleMap.placeMarker(marker);
+
+                $scope.googleMap.setMarkersInBounds();
+            };
             /* update the coordinates on drag event of map marker */
-            var getNewCoordinates = function(lat,lng)
-            {
+            var getNewCoordinates = function (lat, lng) {
                 $rootScope.coordinatesLat = $scope.searchParams.lat = lat;
                 $rootScope.coordinatesLng = $scope.searchParams.lng = lng;
 
                 /* get new location string */
-                $scope.googleMap.getReverseGeolocation(lat,lng).then(function(resp){
-                        if(resp){
+                $scope.googleMap.getReverseGeolocation(lat, lng).then(function (resp) {
+                    if (resp) {
 
-                            placeDetail = $scope.googleMap.parseReverseGeolocationData(resp.data);
-                            $scope.locationString = placeDetail.city != ''?'Your preferred search location is: '+placeDetail.area+", "+placeDetail.city+", "+placeDetail.state:'';
-                        }
-                    });
+                        placeDetail = $scope.googleMap.parseReverseGeolocationData(resp.data);
+                        $scope.locationString = placeDetail.city != '' ? 'Your preferred search location is: ' + placeDetail.area + ", " + placeDetail.city + ", " + placeDetail.state : '';
+                        $scope.location = getLocationString(placeDetail.area,placeDetail.city,placeDetail.state);
+                    }
+                });
 
             };
 
@@ -284,121 +278,102 @@ angular.module('ezeidApp').
              */
             var isMapInitialized = false;
             $scope.modalVisible = false;
-            $scope.modalVisibility = function()
-            {
+            $scope.modalVisibility = function () {
                 /* toggle map visibility status */
                 $scope.modalVisible = !$scope.modalVisible;
             };
 
-            $scope.$watch('modalVisible',function(newVal,oldVal){
-                if(newVal)
-                {
+            $scope.$watch('modalVisible', function (newVal, oldVal) {
+                if (newVal) {
                     /* check for the map initialzation */
-                    if(!isMapInitialized){
+                    if (!isMapInitialized) {
                         /* initialize map */
                         initializeMap();
                         isMapInitialized = true;
                     }
-                    else{
-                        $timeout(function(){
+                    else {
+                        $timeout(function () {
                             $scope.googleMap.resizeMap();
                             $scope.googleMap.setMarkersInBounds();
-                        },1500);
+                        }, 1500);
                     }
                 }
             });
 
             /* modal box for loading map and change the searched map loacaion */
             $scope.modal = {
-                title : 'Change Your Searched Location',
-                class : 'business-manager-modal'
+                title: 'Change Your Searched Location',
+                class: 'business-manager-modal'
             };
 
 
             /* Star Rating Functionalities */
-            $scope.star = [false,false,false,false,false];
+            $scope.star = [false, false, false, false, false];
             $scope.max = getMinStarVal();
             $scope.min = getMaxStarVal();
             $scope.click1 = false;
             $scope.click2 = false;
-            $scope.starRatingFilterAction = function(starNumber)
-            {
+            $scope.starRatingFilterAction = function (starNumber) {
                 $scope.star[starNumber] = !$scope.star[starNumber];
-                return ;
-                if($scope.click1 == false && $scope.click2 == false)
-                {
+                return;
+                if ($scope.click1 == false && $scope.click2 == false) {
                     $scope.click1 = starNumber;
-                    return ;
+                    return;
                 }
 
                 var max = getMaxStarVal();
                 var min = getMinStarVal();
-                if(starNumber < max && starNumber > min)
-                {
+                if (starNumber < max && starNumber > min) {
                     /* fill all the intermediate stars */
-                    fillStar(starNumber,max);
+                    fillStar(starNumber, max);
                 }
-                else if(starNumber > max)
-                {
+                else if (starNumber > max) {
                     /* fill all the intermediate stars */
-                    fillStar(min,starNumber);
+                    fillStar(min, starNumber);
                 }
-                else if(starNumber < min)
-                {
-                    fillStar(starNumber,max);
+                else if (starNumber < min) {
+                    fillStar(starNumber, max);
                 }
 
             }
 
             /* reset the star filtering */
-            function resetStarFilter()
-            {
-                for(var i=0; i<5;i++)
-                {
+            function resetStarFilter() {
+                for (var i = 0; i < 5; i++) {
                     $scope.star[i] = false;
                 }
             }
 
             /* fill the stars if we get the range */
-            function fillStar(start,end)
-            {
+            function fillStar(start, end) {
                 resetStarFilter();
-                for(var i = start;i<=end;i++)
-                {
+                for (var i = start; i <= end; i++) {
                     $scope.star[i] = true;
                 }
             }
 
             /* unfill stars */
-            function unfillStars(value)
-            {
+            function unfillStars(value) {
                 var maxVal = getMaxStarVal();
-                if(value <= maxVal)
-                {
+                if (value <= maxVal) {
                     /* Unfill all the stars before this value */
-                    for(var i=0;i<value;i++)
-                    {
+                    for (var i = 0; i < value; i++) {
                         $scope.star[i] = false;
                     }
                 }
-                else
-                {
+                else {
                     /* Unfill all the stars before this value */
-                    for(var i=value;i<5;i++)
-                    {
+                    for (var i = value; i < 5; i++) {
                         $scope.star[i] = false;
                     }
                 }
             }
 
             /* get maximum value of stars */
-            function getMaxStarVal()
-            {
+            function getMaxStarVal() {
                 var maxVal = 0;
-                for(var i=0;i<5;i++)
-                {
-                    if($scope.star == true && $scope.star > maxVal)
-                    {
+                for (var i = 0; i < 5; i++) {
+                    if ($scope.star == true && $scope.star > maxVal) {
                         maxVal = i;
                     }
                 }
@@ -406,32 +381,68 @@ angular.module('ezeidApp').
             }
 
             /* get minimum value of stars */
-            function getMinStarVal()
-            {
+            function getMinStarVal() {
                 var minVal = 0;
-                for(var i = 4;i>=0;i--)
-                {
-                    if($scope.star == true && $scope.star < minVal)
-                    {
+                for (var i = 4; i >= 0; i--) {
+                    if ($scope.star == true && $scope.star < minVal) {
                         minVal = i;
                     }
                 }
                 return minVal;
             }
 
-            $timeout(function(){
+            $timeout(function () {
                 var image = new Image();
 
-                image.onload = function(){
+                image.onload = function () {
 
-                        $('.main-page-image').css(
-                            {'background': 'url(/images/front-page-bg1.png)',
-                                'background-size':'cover'
-                            }).fadeTo(3000,1);
+                    $('.main-page-image').css(
+                        {
+                            'background': 'url(/images/front-page-bg1.png)',
+                            'background-size': 'cover'
+                        }).fadeTo(3000, 1);
                 }
                 image.src = '/images/front-page-bg1.png';
 
-            },1000);
+            }, 1000);
+
+            /**
+             *
+             * Get the location string and perform all CHECKS
+             */
+            function getLocationString(area, city, state)
+            {
+                var str = [];
+                if(typeof(area) != 'undefined' && area.length > 0)
+                {
+                    str.push(area);
+                }
+
+                if(typeof(city) != 'undefined' && city.length > 0)
+                {
+                    str.push(city);
+                }
+
+                if(typeof(state) != 'undefined' && state.length > 0)
+                {
+                    str.push(state);
+                }
+
+                return str.join(", ");
+            }
+
+            /* get lattitude and longitude based on present lat and lng */
+            function getSearchedCoordinates(lat,lng)
+            {
+                if(typeof($routeParams.lat) != 'undefined' && typeof($routeParams.lng) != 'undefined')
+                {
+                    return [$routeParams.lat,$routeParams.lng];
+                }
+                else
+                {
+                    return [lat,lng];
+                }
+            }
 
         }]);
 
