@@ -35,10 +35,6 @@ angular.module('ezeidApp').
             $route
             )
     {
-        // $scope.$emit('$preLoaderStart');
-        //$scope.$broadcast('$preLoaderStart');
-        // $('#mydiv').show();
-
         if($rootScope._userInfo){
             if(!$rootScope._userInfo.IsAuthenticate){
                 var unregister = $rootScope.$watch('_userInfo',function(newVal,oldVal){
@@ -55,6 +51,8 @@ angular.module('ezeidApp').
         }
 
         //Below line is for Loading img
+        $scope.$emit('$preLoaderStart');
+
         $scope.SearchInfo = {};
         var currentBanner = 1;
         var Miliseconds = 8000;
@@ -131,7 +129,7 @@ angular.module('ezeidApp').
                 $scope.Token = 2;
             }
             $http({ method: 'get', url: GURL + 'ewtGetSearchInformation?Token=' + $rootScope._userInfo.Token + '&TID=' + _TID + '&SearchType=' + _SearchType + '&CurrentDate=' + currentDate}).success(function (data) {
-               // $rootScope.$broadcast('$preLoaderStop');
+                $rootScope.$broadcast('$preLoaderStop');
                 if (data != 'null')
                 {
                   //  $scope.showDetailsModal = true;
@@ -143,8 +141,6 @@ angular.module('ezeidApp').
 
                     $timeout(function () {
                         $scope.SearchInfo = data[0];
-                        //$('#mydiv').hide();
-
                         $scope.showDetailsModal = true;
                         $scope.$watch('showDetailsModal',function(newVal,oldVal){
                             if(!newVal){
@@ -221,8 +217,6 @@ angular.module('ezeidApp').
         function getAboutComapny()
         {
             $http({ method: 'get', url: GURL + 'ewtCompanyProfile?TID=' + $scope.SearchInfo.TID}).success(function (data) {
-               // $rootScope.$broadcast('$preLoaderStop');
-
                 if (data.Result.length > 0) {
                     $scope.companyTagLine = data.Result[0].TagLine;
                  }

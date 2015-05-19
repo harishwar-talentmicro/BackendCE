@@ -24,13 +24,12 @@ angular.module('ezeidApp').controller('mapPopController',[
              GURL,
              GoogleMaps){
 
-
+        //Below line is for Loading img
+        $scope.$emit('$preLoaderStart');
 
         var directtionLatLong;
         /* integrate google map */
         var googleMap = new GoogleMaps();
-
-        $scope.$emit('$preLoaderStart');
 
         $scope.findCurrentLocation = function(){
             googleMap.getCurrentLocation().then(function(){
@@ -97,6 +96,7 @@ angular.module('ezeidApp').controller('mapPopController',[
 
             $timeout(function(){
                 googleMap.setMarkersInBounds();
+                $rootScope.$broadcast('$preLoaderStop');
             },1000);
 
         };
