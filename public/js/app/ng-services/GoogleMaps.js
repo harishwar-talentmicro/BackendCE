@@ -470,13 +470,17 @@ angular.module('ezeidApp').factory('GoogleMaps',['$q','$timeout','$compile',func
             city : '',
             state : '',
             country : '',
-            postalCode : ''
+            postalCode : '',
+            area : '',
+            sublocality2 : '',
+            sublocality3 : '',
+            route : ''
         };
 
         if(geocoderResults && geocoderResults.length > 0){
 
             var results = geocoderResults[0]['address_components'];
-            //console.log(results);
+            console.log(results);
             try{
                 angular.forEach(results,function(result,index){
                     switch(result.types[0]){
@@ -494,6 +498,15 @@ angular.module('ezeidApp').factory('GoogleMaps',['$q','$timeout','$compile',func
                             break;
                         case 'sublocality_level_1':
                             returnObj.area = result.long_name;
+                            break;
+                        case 'sublocality_level_2':
+                            returnObj.sublocality2 = result.long_name;
+                            break;
+                        case 'sublocality_level_3':
+                            returnObj.sublocality3 = result.long_name;
+                            break;
+                        case 'route':
+                            returnObj.route = result.long_name;
                             break;
                         default :
                             break;
