@@ -504,6 +504,11 @@ hr.style-two {
     height: 80%;
 }
 
+.hpw .height-100-px
+{
+    height:100px;
+}
+
 .rpw .header
 {
     padding-bottom: 10px;
@@ -1582,4 +1587,62 @@ hr.style-two {
 }
 .hpw .back {
     /*background-color: red;*/
+}
+
+
+/***************************for flipping tiles test************/
+
+.hpw .no-margin
+{
+    margin: 0px !important;
+}
+
+.hpw .height-auto
+{
+    height: auto !important;
+}
+
+.hpw .flip-card
+{
+    height: 10em;
+}
+
+.hpw .metro-bg-1
+{
+   background-color: #ea6153;
+}
+
+.hpw .metro-bg-2
+{
+    background-color: rgb(30,113,69);
+}
+
+.hpw .metro-bg-3
+{
+    background-color: rgb(43,87,151);
+}
+
+.hpw .metro-bg-4
+{
+    background-color:  #e3a21a;
+}
+
+.hpw .metro-bg-5
+{
+    background-color: #16a085;
+}
+
+.hpw .metro-bg-6
+{
+    background-color: #e74c3c;
+}
+
+.hpw .metro-bg-7
+{
+    background-color: rgb(153,180,51);
+}
+
+.hpw .metro-bg-default
+{
+    background-color: #2c3e50;;
 }

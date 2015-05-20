@@ -58,7 +58,7 @@
                         </ul>
                     </div>
                     <div class="dropdown">
-                        <p ng-show="searchCount > 0" class="text-center"><i>{{searchCount}} Items found for <b>{{defaultSearchTerm}}</b></i> | Searched in: {{location}}</p>
+                        <p ng-show="searchCount > 0" class="text-center"><i>{{searchCount}} Items found for <b>{{defaultSearchTerm}}</b></i> | Your Location: {{location}}</p>
                     </div>
                 </div><!-- /.navbar-collapse -->
             </div><!-- /.container-fluid -->
@@ -85,21 +85,21 @@
 
         <!-- Advance Filter Dropdown(Existing) -->
         <!--<div class="row">-->
-            <!--<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 col-lg-offset-6 col-md-offset-6 col-sm-offset-6 col-xs-offset-0">-->
-                <!--<div class="filter-list width-50" ng-show="isFilterOptionsShown">-->
+        <!--<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 col-lg-offset-6 col-md-offset-6 col-sm-offset-6 col-xs-offset-0">-->
+        <!--<div class="filter-list width-50" ng-show="isFilterOptionsShown">-->
 
-                    <!--<div class="advance-filter-content border-style-bottom white">-->
-                        <!--&lt;!&ndash; List of all the FILTERS &ndash;&gt;-->
-                        <!--<ul class="list-unstyled">-->
-                            <!--<li class="p-left-16"><b>Proximity:</b> {{params.proximity == 0?"NA":params.proximity+" Miles"}}</li>-->
-                            <!--<li class="p-left-16 gray"><b >Parking Required:</b> Yes</li>-->
-                            <!--<li class="p-left-16"><b >Home Delivery:</b> NA</li>-->
-                            <!--<li class="p-left-16 gray"><b >Open Status:</b> NA</li>-->
-                            <!--<li class="p-left-16 "><b >Ratings:</b> 1-5</li>-->
-                        <!--</ul>-->
-                    <!--</div>-->
-                <!--</div>-->
-            <!--</div>-->
+        <!--<div class="advance-filter-content border-style-bottom white">-->
+        <!--&lt;!&ndash; List of all the FILTERS &ndash;&gt;-->
+        <!--<ul class="list-unstyled">-->
+        <!--<li class="p-left-16"><b>Proximity:</b> {{params.proximity == 0?"NA":params.proximity+" Miles"}}</li>-->
+        <!--<li class="p-left-16 gray"><b >Parking Required:</b> Yes</li>-->
+        <!--<li class="p-left-16"><b >Home Delivery:</b> NA</li>-->
+        <!--<li class="p-left-16 gray"><b >Open Status:</b> NA</li>-->
+        <!--<li class="p-left-16 "><b >Ratings:</b> 1-5</li>-->
+        <!--</ul>-->
+        <!--</div>-->
+        <!--</div>-->
+        <!--</div>-->
         <!--</div>-->
         <!-- Advance filter container -->
         <div class="row">
@@ -201,79 +201,97 @@
                     <div id="map-ctrl" class="col-lg-12" ng-show="searchListMapFlag"></div>
                     <!-- Maps ends here -->
 
-                    <!-- FLIPPING TILES PROTOTYPE [DON'T DELETE] -->
+
+                    <!-- FLIPPING TILES PROTOTYPE [DON'T DELETE] =======================================-->
 
                     <!-- Flipping tiles starts here -->
-                    <div class="filpping-tiles row t1 hidden">
+                    <div class="filpping-tiles t1"  ng-hide="searchListMapFlag && !showDownloadLink" >
                         <div class="master-tile">
                             <div class="mobile-parent-tile flip row p-top-10">
 
+
                                 <!-- Here Goes the Individual Tiles -->
-                                <div class="col-lg-3 p-bottom-20">
-                                    <div class="container front mobile-individual-tile-search-result mobile-tile1">
-                                        <!-- Initial Tile goes here -->
-                                        <div class="text-center text-white">
-                                            <!-- Row 1 -->
-                                            <div class="tile-row-1 p-5">
-                                                <p class="text-bolder">HIRE123</p>
+
+                                <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12 flip-card bottom-clearfix" ng-init="color = random()" ng-repeat="search in searchListData track by $index">
+
+                                    <!-- Initial Tile goes here[FRONT] -->
+                                    <div class="text-center text-white front height-auto" ng-class="color">
+                                        <!-- Row 1 -->
+                                        <div class="tile-row-1 p-5">
+                                            <div class="col-lg-4 col-md-6 col-sm-6 col-xs-6 text-left">
+                                                {{distanceFilter(search.distance)}} Km
                                             </div>
-                                            <!-- Row 2 -->
-                                            <div class="tile-row-2">
-                                                <p class="text-bolder">Hirecraft Softwares Pvt. Ltd.</p>
-                                                <hr class="style-two">
-                                                <span>7406254748</span>
-                                            </div>
-                                            <!-- Row 3 -->
-                                            <div class="row white p-top-10">
-                                                <div class="col-lg-2">
-                                                    <i class="si si si-closed si-big"></i>
-                                                </div>
-                                                <div class="col-lg-2">
-                                                    <i class="si si si-parking si-big"></i>
-                                                </div>
-                                                <div class="col-lg-2">
-                                                    <i class="si si si-verified-document si-big"></i>
-                                                </div>
-                                                <div class="col-lg-5">
-                                                    <i class="fa fa-star text-info"></i>
-                                                    <i class="fa fa-star text-info"></i>
-                                                    <i class="fa fa-star text-info"></i>
-                                                    <i class="fa fa-star text-info"></i>
-                                                    <i class="fa fa-star text-info"></i>
-                                                </div>
-                                                <div class="col-lg-1 si si-verified"></div>
+                                            <div class="col-lg-8 col-md-6 col-sm-6 col-xs-6 text-right">
+                                                <p class="text-bolder text-uppercase">{{search.EZEID}}</p>
                                             </div>
                                         </div>
-
-
-
-                                        <!-- On-Hover Tile Goes here -->
-                                        <div class="textbox back orange no-box-shadow text-white">
-
-                                            <div class="flip-tile-row-1 p-top-10">
-                                                <div class="col-lg-12 text-right"><input type="checkbox" /></div>
+                                        <!-- Row 2 -->
+                                        <div class="tile-row-2">
+                                            <p class="text-bolder">{{search.CompanyName}}</p>
+                                            <hr class="style-two">
+                                            <small>
+                                                <!-- Mobile Number -->
+                                                {{(search.MobileNumber.trim() && search.MobileNumber !== 'null')?search.CountryCode+' '+search.MobileNumber:'No mobile'}}
+                                                <!-- Seperator -->
+                                                <i class="{{((search.MobileNumber.trim() && search.MobileNumber !== 'null') && (search.PhoneNumber.trim() && search.PhoneNumber !== 'null'))?'fa fa-minus fa-rotate-90 text-info':''}}"></i>
+                                                <!-- Telephone Number -->
+                                                {{(search.PhoneNumber.trim() && search.PhoneNumber !== 'null')?search.CountryCode+' '+search.PhoneNumber:''}}
+                                            </small>
+                                        </div>
+                                        <!-- Row 3 -->
+                                        <div class="row white p-top-10 no-margin">
+                                            <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1">
+                                                <i class="si si si-big" ng-class="search.OpenStatus == 2?'si-closed':'si-open'"></i>
                                             </div>
-                                            <div class="flip-tile-row-2 p-top-10">
-                                                <div class="col-lg-12 text-center">
-                                                    <small>One stop solution for all your business needs</small>
-                                                    <hr class="style-one">
-                                                    <p class="text-center">7406547499</p>
-                                                </div>
+                                            <div class="col-lg-1  col-md-1 col-sm-1 col-xs-1">
+                                                <i class="si si si-big" ng-class="search.ParkingStatus == 2?'si-parking-no':'si-parking'"></i>
                                             </div>
-                                            <div class="flip-tile-row-3 p-5 text-center">
-                                                <button class="btn btn-default btn-sm">
-                                                    <i class="fa fa-map-marker"></i> Directions
-                                                </button>
-                                                <button class="btn btn-default btn-sm">
-                                                    <i class="fa fa-user"></i> Sales
-                                                </button>
-                                                <button class="btn btn-default btn-sm">
-                                                    <i class="fa fa-cutlery"></i> Food
-                                                </button>
+                                            <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1">
+                                                <i class="si si si-big" ng-class="search.EZEIDVerifiedID == 2?'si-verified-document':'si-not-verified-document'"></i>
+                                            </div>
+                                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+
+                                                <i ng-repeat="n in [1,2,3,4,5] track by $index"  class="fa fa-star" ng-class="($index < search.Rating)?'text-info':''"></i>
+
+                                            </div>
+                                            <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1">
+                                                <i class="si si-verified si-big"></i>
                                             </div>
                                         </div>
-
                                     </div>
+
+
+
+                                    <!-- On-Hover Tile Goes here[BACK] -->
+                                    <div class="textbox back metro-bg-default no-box-shadow text-white back height-auto">
+
+                                        <div class="flip-tile-row-1 p-top-10">
+                                            <div class="col-lg-12 text-right">
+                                                <input data-tid="{{search.MasterID}}" type="checkbox" class="result-checkbox" name="companyID" ng-click="toggleCheckbox($event)" />
+                                            </div>
+                                        </div>
+                                        <div class="flip-tile-row-2 p-top-10">
+                                            <div class="col-lg-12 text-center">
+                                                <small>{{search.TagLine}}</small>
+                                                <hr class="style-one">
+                                                <small>{{makeAddress(search.AddressLine1,search.AddressLine2,search.city)}}</small>
+                                              <p><small class="text-center">7406547499</small></p>
+                                            </div>
+                                        </div>
+                                        <div class="flip-tile-row-3 p-5 text-center">
+                                            <button class="btn btn-default btn-xs">
+                                                <i class="fa fa-map-marker"></i> Directions
+                                            </button>
+                                            <button class="btn btn-default btn-xs">
+                                                <i class="fa fa-user"></i> Sales
+                                            </button>
+                                            <button class="btn btn-default btn-xs">
+                                                <i class="fa fa-cutlery"></i> Food
+                                            </button>
+                                        </div>
+                                    </div>
+
+
                                 </div>
                                 <!-- Individual Tiles ends here -->
 
@@ -284,8 +302,11 @@
 
                     <!-- FLIPPING TILES PROTOTYPE ENDS [DON'T DELETE] -->
 
+
+
+                    <!-- ======================================================= -->
                     <!-- Master Tile! -->
-                    <div class="master-tile" ng-hide="searchListMapFlag && !showDownloadLink">
+                    <div class="master-tile hidden" ng-hide="searchListMapFlag && !showDownloadLink">
                         <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12 individual-tiles text-center p3" ng-init="color = random()" ng-repeat="search in searchListData track by $index">
                             <div class="tile-outer-frame pointer" ng-click="redirectFullPage(params.searchType,search.TID)">
                                 <div class="row-1">
@@ -363,11 +384,3 @@
     <!-- Footer goes here -->
     <footer-section></footer-section>
 </div>
-
-<script type="text/javascript">
-    $(function(){
-        $(".flip-card").flip({
-            trigger: "hover"
-        });
-    });
-</script>
