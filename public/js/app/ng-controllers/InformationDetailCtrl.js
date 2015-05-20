@@ -130,7 +130,7 @@ angular.module('ezeidApp').
             }
             $http({ method: 'get', url: GURL + 'ewtGetSearchInformation?Token=' + $rootScope._userInfo.Token + '&TID=' + _TID + '&SearchType=' + _SearchType + '&CurrentDate=' + currentDate}).success(function (data) {
                 $rootScope.$broadcast('$preLoaderStop');
-                if (data != 'null')
+                if (data && data != 'null')
                 {
                   //  $scope.showDetailsModal = true;
                   /*  $scope.$watch('showDetailsModal',function(newVal,oldVal){
@@ -608,6 +608,23 @@ angular.module('ezeidApp').
             }
         };
 
+
+        /**
+         * @author Indrajeet
+         * @description New Sales Module Integration
+         */
+        $scope._salesModalTitle = 'Sales Enquiry Form';
+        $scope._showSalesModal = false;
+        $scope._toggleSalesModal = function(){
+            if($rootScope._userInfo.Token == 2)
+            {
+                $('#SignIn_popup').slideDown();
+            }
+            else{
+                console.log($scope.SearchInfo);
+                $scope._showSalesModal = !$scope._showSalesModal;
+            }
+        };
 
     }
 ]);

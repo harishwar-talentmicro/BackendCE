@@ -16,7 +16,7 @@
                     </div>
 
                     <div class="col-lg-3 col-md-4 col-sm-6 col-xs-8 pull-right">
-                        <div class="btn-group pull-right" role="group" aria-label="First group">
+                        <div class="btn-group pull-right" role="group" aria-label="First group"  ng-show="txList.length">
                             <button type="button" ng-disabled="pageNumber <= 1" class="btn btn-info bt-xs no-radius">
                                 <span class="glyphicon glyphicon-chevron-left"></span>
                                 Prev
@@ -154,7 +154,7 @@
                 <!--&lt;!&ndash;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;end : Single Transaction Entry &#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&ndash;&gt;-->
             <!--</div>-->
 
-            <div class="col-lg-12 col-md-6 col-sm-6 col-xs-12"  ng-repeat="tx in txList track by tx.TID">
+            <div ng-show="txList.length" class="col-lg-12 col-md-6 col-sm-6 col-xs-12"  ng-repeat="tx in txList track by tx.TID">
               <div class="row tx-row" ng-class="(editModes[$index]) ? 'edit' : ''" tabindex="{{$index+1}}">
                 <!---------- Single Transaction Entry ---------------------->
 
@@ -318,13 +318,16 @@
                 <!----------end : Single Transaction Entry ---------------------->
             </div>
             <hr/>
+            <div ng-hide="txList.length" class="col-lg-12 col-md-6 col-sm-6 col-xs-12 text-center">
+                <small class="text-center text-warning">No records found</small>
+            </div>
 
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                 <div class="row bottom-clearfix">
                     <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
 
                     </div>
-                    <div class="col-lg-4 col-md-4 col-sm-6 col-xs-8 pull-right">
+                    <div class="col-lg-4 col-md-4 col-sm-6 col-xs-8 pull-right" ng-show="txList.length">
                         <div class="btn-group pull-right" role="group" aria-label="First group">
                             <button type="button" ng-disabled="pageNumber <= 1" class="btn btn-info bt-xs no-radius">
                                 <span class="glyphicon glyphicon-chevron-left"></span>
@@ -508,7 +511,7 @@
                                 </div>
                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-hide="modalBox.editMode">
                                     <div class="form-group form-group-sm ">
-                                        <select class="form-control" ng-model="modalBox.tx.locId" ng-change="resolveGeolocationAddress()">
+                                        <select class="form-control" ng-model="modalBox.tx.locId" ng-change="findAddress()">
                                             <option value="">Other Location</option>
                                             <option ng-repeat="location in modalBox.locationList track by location.TID" value="{{location.TID}}">{{location.LocTitle}}</option>
                                         </select>

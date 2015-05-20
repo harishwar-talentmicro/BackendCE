@@ -58,6 +58,7 @@ HeaderApp.directive('headerSection',['Notification','$window' ,function (Notific
                             }
 
                             $rootScope._userInfo.userName = userName.toUpperCase();
+                            $rootScope._userInfo.ezeid = Logdata.UserName.toUpperCase();
 
                         if (typeof (Storage) !== "undefined") {
                             var encrypted = CryptoJS.AES.encrypt(JSON.stringify(data), "EZEID");

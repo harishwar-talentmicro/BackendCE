@@ -1545,3 +1545,22 @@ hr.style-two {
     position: absolute;
     z-index: 10000 !important;
 }
+
+
+.hpw .card {
+    /*width: 100px;*/
+    /*height: 100px;*/
+    /*margin: 20px;*/
+    display: inline-block;
+}
+
+ .hpw .front, .back {
+    /*border: 2px gray solid;*/
+    /*padding: 10px;*/
+}
+.hpw .front {
+    /*background-color: #ccc;*/
+}
+.hpw .back {
+    /*background-color: red;*/
+}
