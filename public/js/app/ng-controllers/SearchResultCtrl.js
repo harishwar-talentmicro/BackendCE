@@ -54,7 +54,8 @@ var res = angular.module('ezeidApp').
             $scope.searchResult = [];
             $scope.defaultSearchTerm = '';
             $scope.showLoginText = false;
-
+            /* check box status array */
+            $scope.checkBoxStatus = [];
 
             /* Star ratings reso. */
 
@@ -187,6 +188,7 @@ var res = angular.module('ezeidApp').
                             count++;
                             link = "/searchDetails?searchType="+searchType+"&TID="+data[i].TID;
                             coordinates.push([data[i].Latitude,data[i].Longitude,data[i].CompanyName,link]);
+                            $scope.checkBoxStatus.push(false);
                         }
                         $scope.coordinatesArr = coordinates;
                     }
@@ -368,6 +370,22 @@ var res = angular.module('ezeidApp').
                 }
             };
 
+            $scope.checkAllIcons = function()
+            {
+                for(var i=0;i<$scope.checkBoxStatus.length;i++)
+                {
+                    $scope.checkBoxStatus[i] = true;
+                }
+            }
+
+            $scope.uncheckAllIcons = function()
+            {
+                for(var i=0;i<$scope.checkBoxStatus.length;i++)
+                {
+                    $scope.checkBoxStatus[i] = false;
+                }
+            }
+
             // To check and uncheck All check box
             $scope.toggleCheckboxAll = function(){
 
@@ -379,6 +397,8 @@ var res = angular.module('ezeidApp').
                 {
                     $scope.selectedList = [];
                     selectedAllResult = 1;
+
+                    $scope.checkAllIcons();
 
                     $scope.searchResult = JSON.parse($window.localStorage.getItem("searchResult"));
                     if(!$scope.searchResult)
@@ -398,6 +418,7 @@ var res = angular.module('ezeidApp').
                 }
                 /* uncheck all the check boxes */
                 else{
+                    $scope.uncheckAllIcons();
                     selectedAllResult = 0;
                     $scope.selectedList = [];
 
@@ -411,7 +432,8 @@ var res = angular.module('ezeidApp').
             $scope.toggleCheckbox = function(event){
                 var elem = event.currentTarget;
                 var val = $(elem).data('tid');
-
+                var id = $(elem).data('id');
+                $scope.checkBoxStatus[id] = !$scope.checkBoxStatus[id];
                 if($(elem).is(":checked")){
                     $scope.selectedList.push(val);
 
@@ -464,6 +486,7 @@ var res = angular.module('ezeidApp').
                 "metro-bg-5",
                 "metro-bg-6",
                 "metro-bg-7",
+                "metro-bg-8",
             ];
             $scope.oldColorValue = 0;
             /* generate a random color string */
