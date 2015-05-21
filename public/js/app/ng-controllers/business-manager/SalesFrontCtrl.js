@@ -477,27 +477,49 @@
             };
 
             var validateTransaction = function(tx){
+                
                 var flag = true;
-                if(tx.address.trim().length < 1){
+                if(!tx.address){
                     $scope.txerror.address = true;
                     flag *= false;
                 }
-                if(tx.area.trim().length < 1){
+                if(tx.address && tx.address.trim().length < 1){
+                    $scope.txerror.address = true;
+                    flag *= false;
+                }
+                if(!tx.area){
+                    $scope.txerror.area = true;
+                    flag *= false;
+                }
+                if(tx.area && tx.area.trim().length < 1){
                     $scope.txerror.area = true;
                     flag *= false;
                 }
 
-                if(tx.city.trim().length < 1){
+                if(!tx.city){
                     $scope.txerror.city = true;
                     flag *= false;
                 }
 
-                if(tx.state.trim().length < 1){
+                if(tx.city && tx.city.trim().length < 1){
+                    $scope.txerror.city = true;
+                    flag *= false;
+                }
+
+                if(!tx.state){
+                    $scope.txerror.state = true;
+                    flag *= false;
+                }
+                if(tx.state && tx.state.trim().length < 1){
                     $scope.txerror.state = true;
                     flag *= false;
                 }
 
-                if(tx.country.trim().length < 1){
+                if(!tx.country){
+                    $scope.txerror.country = true;
+                    flag *= false;
+                }
+                if(tx.country && tx.country.trim().length < 1){
                     $scope.txerror.country = true;
                     flag *= false;
                 }
@@ -536,13 +558,13 @@
                     return ;
                 }
 
-                if($scope.modalBox.tx.itemList.length <  1 && $scope.modules[moduleIndex].listType > 0){
+                if($scope.modalBox.tx.itemList.length <  1 && $scope.salesItemListType > 0){
                     Notification.error({ message : 'Please select items for the enquiry',delay : MsgDelay});
                     return ;
                 }
 
 
-                if($scope.modalBox.tx.message.length < 1 && $scope.modules[moduleIndex].listType > 0){
+                if($scope.modalBox.tx.message.length < 1 && $scope.salesItemListType > 0){
                     var itemList = [];
                     try{
                         itemList = JSON.parse(data.ItemsList);
@@ -582,12 +604,10 @@
                                 msg = 'Enquiry is updated successfully';
                             }
                             Notification.success({ message : msg, delay : MsgDelay});
-                            if($scope.showModal){
-                                $scope.showModal = !$scope.showModal;
+                            if($scope._showSalesModal){
+                                $scope._showSalesModal = !$scope._showSalesModal;
                             }
                             $scope.resetModalBox();
-                            $scope.toggleAllEditMode();
-                            $scope.loadTransaction();
                         }
                         else{
                             Notification.error({ message : 'An error occurred while placing enquiry', delay : MsgDelay});
