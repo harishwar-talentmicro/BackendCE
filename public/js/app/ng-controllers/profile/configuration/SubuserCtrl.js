@@ -373,7 +373,6 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$htt
      * Loading SubuserList after loading all types of rules
      */
     $scope.loadAllRules = function(){
-        $scope.$emit('$preLoaderStart');
         $http({
             url : GURL + 'ewtGetFolderList',
             method : "GET",
@@ -468,6 +467,7 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$htt
      * Getting Master User Details
      * Then calling loadRules Function to load all rules
      */
+
     $scope.getMasterUserDetails = function(){
         $scope.$emit('$preLoaderStart');
         $http({
