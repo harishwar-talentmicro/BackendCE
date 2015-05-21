@@ -459,7 +459,7 @@
                     Duration : 0,
                     DurationScales : 0,
                     NextAction : 0,
-                    NextActionDateTime : '',
+                    NextActionDateTime : moment().format('DD MMM YYYY hh:mm:ss'),
                     ItemsList: JSON.stringify($scope.modalBox.tx.itemList),
                     DeliveryAddress : $scope.modalBox.tx.address + $scope.modalBox.tx.area + $scope.modalBox.tx.city +
                     $scope.modalBox.tx.state + $scope.modalBox.tx.country
@@ -477,7 +477,7 @@
             };
 
             var validateTransaction = function(tx){
-                
+
                 var flag = true;
                 if(!tx.address){
                     $scope.txerror.address = true;
@@ -596,17 +596,9 @@
                     if(resp && resp.hasOwnProperty('IsSuccessfull')){
                         if(resp.IsSuccessfull){
                             var msg = 'Enquiry is posted successfully';
-                            if($scope.modalBox.editMode){
-                                msg = 'Enquiry is updated successfully';
-                            }
 
-                            if($scope.editModes.indexOf(true) !== -1){
-                                msg = 'Enquiry is updated successfully';
-                            }
                             Notification.success({ message : msg, delay : MsgDelay});
-                            if($scope._showSalesModal){
-                                $scope._showSalesModal = !$scope._showSalesModal;
-                            }
+                            $scope._toggleSalesModal();
                             $scope.resetModalBox();
                         }
                         else{

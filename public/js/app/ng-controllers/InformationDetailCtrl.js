@@ -616,12 +616,15 @@ angular.module('ezeidApp').
         $scope._salesModalTitle = 'Sales Enquiry Form';
         $scope._showSalesModal = false;
         $scope._toggleSalesModal = function(){
-            if($rootScope._userInfo.Token == 2)
+            if(!$rootScope._userInfo.Token)
+            {
+                $('#SignIn_popup').slideDown();
+            }
+            else if($rootScope._userInfo.Token == 2)
             {
                 $('#SignIn_popup').slideDown();
             }
             else{
-                console.log($scope.SearchInfo);
                 $scope._showSalesModal = !$scope._showSalesModal;
             }
         };
