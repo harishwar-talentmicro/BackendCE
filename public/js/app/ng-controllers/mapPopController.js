@@ -71,7 +71,6 @@ angular.module('ezeidApp').controller('mapPopController',[
 
                 },function(){
                 });
-
             });
 
             directtionLatLong = JSON.parse($window.localStorage.getItem("myLocation"));
@@ -98,7 +97,6 @@ angular.module('ezeidApp').controller('mapPopController',[
                 googleMap.setMarkersInBounds();
                 $rootScope.$broadcast('$preLoaderStop');
             },1000);
-
         };
 
         // To initialize map

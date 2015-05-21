@@ -3973,11 +3973,11 @@ exports.FnSearchByKeywords = function (req, res) {
                                     }
                                 }
                             }
-                            var SearchQuery = db.escape('') + ',' + db.escape(CategoryID) + ',' + db.escape(0) + ',' + db.escape(0.00) + ',' + db.escape(0.00) 
-                                + ',' + db.escape(EZEID) + ',' + db.escape(LocSeqNo) + ',' + db.escape(Pin) + ',' + db.escape(SearchType) + ',' + db.escape(DocType) 
+                            var SearchQuery = db.escape('') + ',' + db.escape(CategoryID) + ',' + db.escape(0) + ',' + db.escape(Latitude) 
+                            + ',' + db.escape(Longitude) +',' + db.escape(EZEID) + ',' + db.escape(LocSeqNo) + ',' + db.escape(Pin) + ',' + db.escape(SearchType) + ',' + db.escape(DocType) 
                                 + ',' + db.escape("0") + ',' + db.escape("0") + ',' + db.escape("0") + ',' + db.escape(token) 
                                 + ',' + db.escape(HomeDelivery) + ',' + db.escape(CurrentDate);
-                            //console.log('SearchQuery: ' + SearchQuery);
+                            console.log('CALL pSearchResultNew(' + SearchQuery + ')');
                             db.query('CALL pSearchResultNew(' + SearchQuery + ')', function (err, SearchResult) {
                                 // db.query(searchQuery, function (err, SearchResult) {
                                 if (!err) {
@@ -6649,6 +6649,7 @@ exports.FnSaveTranscation = function(req, res){
                 DeliveryAddress = '';
                 
         var ItemIDList='';
+        var ToEZEID = req.body.ToEZEID;
        // console.log(ItemsList);
         var RtnMessage = {
             IsSuccessfull: false,
@@ -6675,7 +6676,7 @@ exports.FnSaveTranscation = function(req, res){
                 if (!err) {
                     if (Result != null) {
 
-                        var query = db.escape(Token)+","+db.escape(FunctionType)+","+ db.escape(MessageText)+ "," + db.escape(Status) +"," + db.escape(TaskDateNew) + ","  + db.escape(Notes) + "," + db.escape(LocID)  + "," + db.escape(Country)   + "," + db.escape(State) + "," + db.escape(City)   + "," + db.escape(Area) + ","  + db.escape(Latitude)  + "," + db.escape(Longitude)  +  "," + db.escape(EZEID)  + "," + db.escape(ContactInfo)  + "," + db.escape(FolderRuleID)  + "," + db.escape(Duration)  + "," + db.escape(DurationScales) + "," + db.escape(NextAction) + "," + db.escape(NextActionDateTimeNew) + "," + db.escape(TID) + "," + db.escape(((ItemIDList != "") ? ItemIDList : "")) + "," + db.escape(DeliveryAddress) ;
+                        var query = db.escape(Token)+","+db.escape(FunctionType)+","+ db.escape(MessageText)+ "," + db.escape(Status) +"," + db.escape(TaskDateNew) + ","  + db.escape(Notes) + "," + db.escape(LocID)  + "," + db.escape(Country)   + "," + db.escape(State) + "," + db.escape(City)   + "," + db.escape(Area) + ","  + db.escape(Latitude)  + "," + db.escape(Longitude)  +  "," + db.escape(EZEID)  + "," + db.escape(ContactInfo)  + "," + db.escape(FolderRuleID)  + "," + db.escape(Duration)  + "," + db.escape(DurationScales) + "," + db.escape(NextAction) + "," + db.escape(NextActionDateTimeNew) + "," + db.escape(TID) + "," + db.escape(((ItemIDList != "") ? ItemIDList : "")) + "," + db.escape(DeliveryAddress) + "," + db.escape(ToEZEID) ;
                         // db.escape(NextActionDateTime);
                         console.log('CALL pSaveTrans(' + query + ')');
                         db.query('CALL pSaveTrans(' + query + ')', function (err, InsertResult) {
@@ -6960,7 +6961,7 @@ exports.FnGetTranscation = function (req, res) {
             Result:''
         };
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
-        if (Token != null && FunctionType != null && Page.toString() != 'NaN' && Page.toString() != 0) {
+        if (Token != null && FunctionType.toString() != null && Page.toString() != 'NaN' && Page.toString() != 0) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
@@ -6971,15 +6972,20 @@ exports.FnGetTranscation = function (req, res) {
                         if (FromPage <= 1) {
                             FromPage = 0;
                         }
+                        console.log('FromPage:'+FromPage);
+                        console.log('ToPage:'+ToPage);
+                        
                         var query = 'CALL pGetMessagesNew('+ db.escape(Token) + ',' + db.escape(FunctionType) + ',' 
                         + db.escape(Status) + ',' + db.escape(FromPage) + ',' + db.escape(ToPage) +')';
-                        console.log(query);
+                        
                             //var parameters = db.escape(Token) + ',' + db.escape(FunctionType);;
                         //console.log(parameters);
+                         
+                        console.log(query);
                         db.query(query, function (err, GetResult) {
                             if (!err) {
                                 if (GetResult != null) {
-                                    
+                                    console.log('Length:'+GetResult[0].length);
                                     if (GetResult[0].length > 0) {
                                         var totalRecord=GetResult[0].length;
                                         var limit= 10;
@@ -6991,6 +6997,7 @@ exports.FnGetTranscation = function (req, res) {
                                             else{
                                                 TotalPage = PageValue;
                                             }
+                                        console.log('TotalPage:'+TotalPage);
                                             RtnMessage.TotalPage = TotalPage;
                                             RtnMessage.Result =GetResult[0];
                                             res.send(RtnMessage);
@@ -8843,63 +8850,84 @@ exports.FnSendBulkMailer = function (req, res) {
 
 //below method to crop the image
 exports.FnCropImage = function(req, res){
-try{
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    var fs = require('fs');
-    var Image = req.body.Image;
-    var Target_Width = req.body.Width;
-    var Target_Height = req.body.Height;
-    
-    var RtnMessage = {
+    try{
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        
+        var fs = require('fs');
+        var Image = req.body.Image;
+        var Target_Width = req.body.Width;
+        var Target_Height = req.body.Height; 
+        
+        var RtnMessage = {
             IsSuccessfull: false,
             Picture: ''
         };
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
-     
-        if (Target_Width != null && Target_Height != null ) {
         
-                    var fs = require('fs');
-                    var gm = require('gm').subClass({ imageMagick: true });
+        if (Target_Width != null && Target_Height != null ) {
+            var fs = require('fs');
+            
+            var gm = require('gm').subClass({ imageMagick: true });
+            var bitmap = fs.readFileSync('../bin/'+req.files.Image.path);
+            
+            var Original_Width = 0;
+            var Original_Height = 0;
+            
+            gm(bitmap).size(function (err, size) {
+                if (!err){
+                    console.log(size.width > size.height ? 'wider' : 'taller');
+                    Original_Width = size.width;
+                    Original_Height = size.height;   
                     
-                    var bitmap = fs.readFileSync('../bin/'+req.files.Image.path);
-                    console.log(bitmap);
-                    var Original_Width = 0;
-                    var Original_Height = 0;
-                                       
-                    gm(bitmap).size(function (err, size) {
-                    if (!err){
-                        console.log(size.width > size.height ? 'wider' : 'taller');
-                        Original_Width = size.width;
-                        Original_Height = size.height;
+                    if(Original_Width > Original_Height){
+                        x_width = Target_Width * Original_Height / Target_Height ;
                         
-                        if(Original_Width > Original_Height){
-                                x_width = Target_Width * Original_Height / Target_Height ;
-                                  
-                                    gm(bitmap).crop(x_width,Original_Height)
-                                        RtnMessage.Picture = 'data:image/jpg;base64,' + new Buffer(bitmap).toString('base64');
-                                        RtnMessage.IsSuccessfull = true;
-                                        console.log('FnCropImage: Image Cropped successfully');                            
-                                        res.send(RtnMessage);
-                            
-                            }
-                            else{
-                                x_height = Original_Width * Target_Height / Target_Width;
+                        gm(bitmap).crop(x_width,Original_Height)
+                        .write('./CropImage/image.jpg',function (err) {
+                            if (!err){
+                                var input = fs.readFileSync('./CropImage/image.jpg');
+                                var base64 = new Buffer(input).toString('base64');
                                 
-                                gm(bitmap).crop(Original_Width,x_height)
-                                    RtnMessage.Picture = new Buffer(bitmap).toString('base64');
-                                    RtnMessage.IsSuccessfull = true;
-                                    console.log('FnCropImage: Image Cropped successfully');                            
-                                    res.send(RtnMessage);
+                                RtnMessage.Picture = 'data:image/jpg;base64,' +base64;
+                                RtnMessage.IsSuccessfull = true;
+                                console.log('FnCropImage: Image Cropped successfully');                            
+                                res.send(RtnMessage);
                             }
+                            else
+                            {
+                                console.log('FnCropImageSize: No Image Cropped');
+                                res.send(RtnMessage);
+                            }
+                        });
                     }
-                        else{
-                            console.log('FnCropImage: Error in getting image size');
-                            res.send(RtnMessage);
-                        }
-                    });
-        }
-                
+                    else{
+                        x_height = Original_Width * Target_Height / Target_Width;       
+                        
+                        gm(bitmap).crop(Original_Width,x_height)
+                        .write('./CropImage/image.jpg',function (err) {
+                            if (!err){
+                                var input = fs.readFileSync('./CropImage/image.jpg');
+                                var base64 = new Buffer(input).toString('base64');
+                                RtnMessage.Picture = 'data:image/jpg;base64,' +base64;
+                                RtnMessage.IsSuccessfull = true;
+                                console.log('FnCropImage: Image Cropped successfully');                            
+                                res.send(RtnMessage);
+                            }
+                            else
+                            {
+                                console.log('FnCropImageSize: No Image Cropped');
+                                res.send(RtnMessage);
+                            }
+                        });
+                    }
+                }
+                else{
+                    console.log('FnCropImage: Error in getting image size');
+                    res.send(RtnMessage);
+                }
+            });
+        }       
         else {
             if (Token == null) {
                 console.log('FnCropImage: Token is empty');
@@ -8917,11 +8945,11 @@ try{
             res.statusCode=400;
             res.send(RtnMessage);
         }
-             }
-            catch (ex) {
-                console.log('FnCropImage:error ' + ex.description);
-                throw new Error(ex);
-        }
+    }
+    catch (ex) {
+        console.log('FnCropImage:error ' + ex.description);
+        throw new Error(ex);
+    }
 };
 
 exports.FnSaveWebLink = function(req, res){
