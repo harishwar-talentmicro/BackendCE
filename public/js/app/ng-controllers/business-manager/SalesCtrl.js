@@ -139,7 +139,7 @@
             });
 
             $scope.pageNumber = 1;
-            $scope.statusType = null;
+            $scope.statusType = -1;
             $scope.txList = [];
 
             /**
@@ -1014,7 +1014,7 @@
                             }
                             $scope.resetModalBox();
                             $scope.toggleAllEditMode();
-                            $scope.loadTransaction();
+                            $scope.loadTransaction(1,$scope.statusType);
                         }
                         else{
                             Notification.error({ message : 'An error occurred while placing enquiry', delay : MsgDelay});
