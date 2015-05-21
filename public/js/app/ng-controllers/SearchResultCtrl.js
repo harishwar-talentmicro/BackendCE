@@ -547,7 +547,7 @@ var res = angular.module('ezeidApp').
             $scope.makeAddress = function(AddressLine1,AddressLine2,city)
             {
                 var addressArr = [AddressLine1,AddressLine1,city];
-                return UtilityService.getAddressString(addressArr);
+                return UtilityService.getAddressString(addressArr,40);
             }
 
             $scope.showDirectionMapPopup = function(Latitude,Longitude,IDTypeID){

@@ -39,6 +39,16 @@ angular.module('ezeidApp').service('UtilityService',['$q',function($q){
             }
 
             return addressStr;
+        },
+
+        /* checks if the variabe is existing and have a value */
+        isExists : function(param)
+        {
+            if(typeof param != 'undefined' && param.toString().length > 0)
+            {
+                return param;
+            }
+            return false;
         }
 
     };
