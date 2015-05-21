@@ -582,7 +582,7 @@ angular.module('ezeidApp').factory('GoogleMaps',['$q','$timeout','$compile',func
         if(options){
             for(var a = 0; a < props.length; a++){
                 if(typeof(options[props[a]]) == "null" || typeof(options[props[a]] == "undefined")){
-                    options[props[a]] = false;
+                    options[props[a]] = true;
                 }
             }
         }
@@ -626,7 +626,7 @@ angular.module('ezeidApp').factory('GoogleMaps',['$q','$timeout','$compile',func
         return addressString;
     };
 
-    
+
     return GoogleMap;
 
 
