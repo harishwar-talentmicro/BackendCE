@@ -622,7 +622,9 @@ angular.module('ezeidApp').factory('GoogleMaps',['$q','$timeout','$compile',func
         if(options.postalCode && addressObject.postalCode){
             addressString += addressObject.postalCode + ', ';
         }
-
+        if(addressString.length > 0){
+            addressString = addressString.substr(0,addressString.length -1);
+        }
         return addressString;
     };
 

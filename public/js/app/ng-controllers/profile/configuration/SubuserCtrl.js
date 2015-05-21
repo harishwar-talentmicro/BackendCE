@@ -373,6 +373,7 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$htt
      * Loading SubuserList after loading all types of rules
      */
     $scope.loadAllRules = function(){
+        $scope.$emit('$preLoaderStart');
         $http({
             url : GURL + 'ewtGetFolderList',
             method : "GET",
@@ -399,6 +400,7 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$htt
                 }
 
             }).error(function(err){
+                $scope.$emit('$preLoaderStop');
                 Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
             });
     };
@@ -455,7 +457,9 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$htt
             else{
                 Notification.error({ message: "No subusers added ", delay : MsgDelay});
             }
+            $scope.$emit('$preLoaderStop');
         }).error(function(err){
+                $scope.$emit('$preLoaderStop');
                 Notification.error({ message: "No subusers added ", delay : MsgDelay});
         });
     };
@@ -465,6 +469,7 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$htt
      * Then calling loadRules Function to load all rules
      */
     $scope.getMasterUserDetails = function(){
+        $scope.$emit('$preLoaderStart');
         $http({
             url : GURL + 'ewtGetUserDetails',
             method : "GET",
@@ -477,6 +482,7 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$htt
                     $scope.loadAllRules();
                 }
             }).error(function(err){
+                $scope.$emit('$preLoaderStop');
                 Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
             });
 
