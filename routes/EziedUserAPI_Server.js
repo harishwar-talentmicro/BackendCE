@@ -8860,6 +8860,7 @@ exports.FnCropImage = function(req, res){
         var allowedTypes = ['JPG','PNG'];
 
         var fs = require('fs');
+        var Token = req.body.Token;
         var Image = req.body.image;
         var Target_Width = (!isNaN(parseInt(req.body.required_width))) ? parseInt(req.body.required_width) : 0;
         var Target_Height = (!isNaN(parseInt(req.body.required_height))) ? parseInt(req.body.required_width) : 0;
@@ -8876,7 +8877,10 @@ exports.FnCropImage = function(req, res){
 
         //var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
 
-        if (Target_Width && Target_Height) {
+        if (Token && Target_Width && Target_Height) {
+            FnValidateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
 
             var fs = require('fs');
             
@@ -9019,8 +9023,20 @@ exports.FnCropImage = function(req, res){
                 console.log('FnCropImage: Error in getting image size');
                 res.status(200).json(RtnMessage);
             }
-
-        }       
+                    }
+                    else{
+                        deleteTempFile();
+                        res.status(401).json(RtnMessage);
+                        console.log('FnCropImage:Invalid Token');
+                    }
+                }
+                else{
+                    deleteTempFile();
+                    console.log('FnCropImage:Error in processing Token');
+                    res.status(500).json(RtnMessage);
+                }
+            });
+        }
         else {
             if (Token == null) {
                 console.log('FnCropImage: Token is empty');
@@ -12183,7 +12199,227 @@ exports.FnDeleteBannerPictureAP = function(req, res){
         console.log('FnDeleteBannerPictureAP:error ' + ex.description);
         throw new Error(ex);
     }
-}
+};
+
+exports.FnCropImageAP = function(req, res){
+    var deleteTempFile = function(){
+        fs.unlink('../bin/'+req.files.image.path);
+    };
+    var RtnMessage = {
+        status: false,
+        picture : ''
+    };
+    try{
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        var allowedTypes = ['JPG','PNG'];
+
+        var fs = require('fs');
+        var Token = req.body.Token;
+        var Image = req.body.image;
+        var Target_Width = (!isNaN(parseInt(req.body.required_width))) ? parseInt(req.body.required_width) : 0;
+        var Target_Height = (!isNaN(parseInt(req.body.required_height))) ? parseInt(req.body.required_width) : 0;
+        var outputType = (req.body.output_type) ? req.body.output_type.toUpperCase() : '';
+        var scaleFlag = (req.body.scale) ? req.body.scale : false;
+        var cropFlag = (req.body.crop) ? req.body.crop : false;
+        /**
+         * By default image will be generated in png format
+         */
+        if(allowedTypes.indexOf(outputType)== -1){
+            outputType = 'PNG';
+        }
+        
+
+        //var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
+
+        if (Token && Target_Width && Target_Height) {
+            FnValidateTokenAP(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+
+            var fs = require('fs');
+            
+            var gm = require('gm').subClass({ imageMagick: true });
+            var bitmap = fs.readFileSync('../bin/'+req.files.image.path);
+            
+            var Original_Width = 0;
+            var Original_Height = 0;
+
+
+
+            try{
+                gm(bitmap).size(function (err, size) {
+                    if (!err) {
+
+                        console.log(size.width > size.height ? 'wider' : 'taller');
+
+
+                        Original_Width = size.width;
+                        Original_Height = size.height;
+
+
+                        var scaleWidth = 0;
+                        var scaleHeight = 0;
+
+                        if (Target_Height > Target_Width) {
+
+                            if (Original_Height < Original_Width) {
+                                scaleHeight = Target_Height;
+                                scaleWidth = (Original_Width * scaleHeight) / Original_Height;
+                            }
+
+                            else {
+                                scaleWidth = Target_Width;
+                                scaleHeight = (Original_Height * scaleWidth) / Original_Width;
+                            }
+                        }
+
+                        else {
+                            if (Original_Height > Original_Width) {
+                                scaleWidth = Target_Width;
+                                scaleHeight = (Original_Height * scaleWidth) / Original_Width;
+                            }
+
+                            else {
+
+                                scaleHeight = Target_Height;
+                                scaleWidth = (Original_Width * scaleHeight) / Original_Height;
+                                if (scaleWidth < Target_Width) {
+                                    scaleWidth = Target_Width;
+                                    scaleHeight = (Original_Height * scaleWidth) / Original_Width;
+                                }
+                            }
+                        }
+
+
+                        if(scale){
+                            gm(bitmap).scale(scaleWidth, scaleHeight).toBuffer(outputType,function (err, scaledBuff) {
+                                if(!err){
+                                    if(crop){
+                                        gm(scaledBuff).crop(Target_Width, Target_Height).toBuffer(outputType,function(err,croppedBuff){
+                                            if(!err){
+                                                var base64Image = new Buffer(croppedBuff).toString('base64');
+                                                deleteTempFile();
+                                                res.status(200).json({
+                                                    status: true,
+                                                    picture : 'data:image/'+outputType+';base64,'+base64Image
+                                                });
+                                            }
+                                            else{
+                                                deleteTempFile();
+                                                res.status(400).json(RtnMessage);
+                                            }
+                                        });
+                                    }
+                                    else{
+                                        var base64Image = new Buffer(scaledBuff).toString('base64');
+                                        deleteTempFile();
+
+                                        res.status(200).json({
+                                            status: true,
+                                            picture : 'data:image/'+outputType+';base64,'+base64Image
+                                        });
+                                    }
+                                }
+                                else{
+                                    deleteTempFile();
+                                    res.status(400).json(RtnMessage);
+                                }
+                            });
+                        }
+
+                        else if(crop){
+                            gm(bitmap).crop(Target_Width, Target_Height).toBuffer(outputType,function(err,croppedBuff){
+                                if(!err){
+                                    var base64Image = new Buffer(croppedBuff).toString('base64');
+                                    deleteTempFile();
+
+                                    res.status(200).json({
+                                        status: true,
+                                        picture : 'data:image/'+outputType+';base64,'+base64Image
+                                    });
+                                }
+                                else{
+                                    deleteTempFile();
+                                    res.status(400).json(RtnMessage);
+                                }
+                            });
+                        }
+                        else{
+                            gm(bitmap).toBuffer(outputType,function(err,croppedBuff){
+                                if(!err){
+                                    var base64Image = new Buffer(croppedBuff).toString('base64');
+                                    deleteTempFile();
+
+                                    res.status(200).json({
+                                        status: true,
+                                        picture : 'data:image/'+outputType+';base64,'+base64Image
+                                    });
+                                }
+                                else{
+                                    deleteTempFile();
+                                    res.status(400).json(RtnMessage);
+                                }
+                            });
+                        }
+                    }
+
+                    else{
+                        deleteTempFile();
+                        console.log('FnCropImage: Error in getting image size');
+                        res.status(200).json(RtnMessage);
+                    }
+                });
+            }
+            catch(ex){
+
+                console.log(ex);
+                deleteTempFile();
+                console.log('FnCropImage: Error in getting image size');
+                res.status(200).json(RtnMessage);
+            }
+                    }
+                    else{
+                        deleteTempFile();
+                        console.log("FnCropImage:Invaild Token");
+                        res.status(401).json(RtnMessage);
+                    }
+                }
+                else{
+                    deleteTempFile();
+                    console.log("FnCropImage:Error processing in token");
+                    res.status(500).json(RtnMessage);
+                }
+            });
+        }
+        else {
+            if (Token == null) {
+                console.log('FnCropImage: Token is empty');
+            }
+            else if (Image == null) {
+                console.log('FnCropImage: Image is empty');
+            }
+            else if (Target_Width == null) {
+                console.log('FnCropImage: Width is empty');
+            }
+            else if (Target_Height == null) {
+                console.log('FnCropImage: Height is empty');
+            }
+            deleteTempFile();
+            console.log('FnCropImage: Error in getting image size');
+
+            res.status(400).json(RtnMessage);
+        }
+    }
+    catch (ex) {
+        console.log('FnCropImage:error ' + ex.description);
+        throw new Error(ex);
+        deleteTempFile();
+        console.log('FnCropImage: Error in getting image size');
+
+        res.status(400).json(RtnMessage);
+    }
+};
 
 //EZEID VAS
 

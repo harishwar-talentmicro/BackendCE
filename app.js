@@ -170,7 +170,7 @@ app.post('/ewtTemplateDetails',LocationManager.FnSaveMailTemplate);
 app.get('/ewtTemplateList',LocationManager.FnGetTemplateList);
 app.get('/ewtTemplateDetails',LocationManager.FnGetTemplateDetails);
 app.post('/ewtSendBulkMailer',LocationManager.FnSendBulkMailer);
-app.post('/ewtCropImage',LocationManager.FnCropImage);
+app.post('/crop_image',LocationManager.FnCropImage);
 app.get('/ewtGetWorkingHrsHolidayList',LocationManager.FnGetWorkingHrsHolidayList);
 app.post('/ewtWebLink',LocationManager.FnSaveWebLink);
 app.get('/ewtWebLink',LocationManager.FnGetWebLink);
@@ -213,6 +213,7 @@ app.post('/ewtSearchRealEstateAP', LocationManager.FnSearchRealEstateAP);
 app.post('/ewtUpdateRedFlagAP',LocationManager.FnUpdateRedFlagAP);
 app.post('/ewtUpdateEZEIDAP', LocationManager.FnUpdateEZEIDAP);
 app.post('/ewtDeleteBannerPicAP', LocationManager.FnDeleteBannerPictureAP);
+app.post('/crop_imageAP',LocationManager.FnCropImageAP);
 
 
 //EZEID VAS
