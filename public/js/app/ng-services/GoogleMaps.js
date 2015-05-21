@@ -480,7 +480,6 @@ angular.module('ezeidApp').factory('GoogleMaps',['$q','$timeout','$compile',func
         if(geocoderResults && geocoderResults.length > 0){
 
             var results = geocoderResults[0]['address_components'];
-            console.log(results);
             try{
                 angular.forEach(results,function(result,index){
                     switch(result.types[0]){
@@ -488,25 +487,25 @@ angular.module('ezeidApp').factory('GoogleMaps',['$q','$timeout','$compile',func
                             returnObj.city = (returnObj.city) ? (returnObj.city + ', ' + result.long_name) : result.long_name;
                             break;
                         case 'administrative_area_level_1':
-                            returnObj.state =  result.long_name;
+                            returnObj.state =  (result.long_name) ? result.long_name : '';
                             break;
                         case 'postal_code':
-                            returnObj.postalCode = result.long_name;
+                            returnObj.postalCode = (result.long_name) ? result.long_name : '';
                             break;
                         case 'country':
-                            returnObj.country = result.long_name;
+                            returnObj.country = (result.long_name) ? result.long_name : '';
                             break;
                         case 'sublocality_level_1':
-                            returnObj.area = result.long_name;
+                            returnObj.area = (result.long_name) ? result.long_name : '';
                             break;
                         case 'sublocality_level_2':
-                            returnObj.sublocality2 = result.long_name;
+                            returnObj.sublocality2 = (result.long_name) ? result.long_name : '';
                             break;
                         case 'sublocality_level_3':
-                            returnObj.sublocality3 = result.long_name;
+                            returnObj.sublocality3 = (result.long_name) ? result.long_name : '';
                             break;
                         case 'route':
-                            returnObj.route = result.long_name;
+                            returnObj.route = (result.long_name) ? result.long_name : '';
                             break;
                         default :
                             break;
@@ -560,6 +559,74 @@ angular.module('ezeidApp').factory('GoogleMaps',['$q','$timeout','$compile',func
         });
 
     };
+
+    /**
+     * Creates address string from parsed geolocation data object
+     * @param addressObject
+     */
+    GoogleMap.prototype.createAddressFromGeolocation = function(addressObject,options){
+        var props = ['route','sublocality3','sublocality2','area','city','state','country','postalCode'];
+        if(!options){
+            options = {
+                route : true,
+                sublocality3 : true,
+                sublocality2 : true,
+                area : true,
+                city : true,
+                state : true,
+                country : true,
+                postalCode : true
+            };
+        }
+
+        if(options){
+            for(var a = 0; a < props.length; a++){
+                if(typeof(options[props[a]]) == "null" || typeof(options[props[a]] == "undefined")){
+                    options[props[a]] = true;
+                }
+            }
+        }
+
+        var addressString = '';
+        if(options.route && addressObject.route){
+            addressString += addressObject.route + ', '
+        }
+
+        if(!addressObject){
+            return addressString;
+        }
+        if(options.sublocality3 && addressObject.sublocality3){
+            addressString += addressObject.sublocality3 + ', ';
+        }
+
+        if(options.sublocality2 && addressObject.sublocality2){
+            addressString += addressObject.sublocality2 + ', ';
+        }
+
+        if(options.area && addressObject.area){
+            addressString += addressObject.area + ', ';
+        }
+
+        if(options.city && addressObject.city){
+            addressString += addressObject.city + ', ';
+        }
+
+        if(options.state && addressObject.state){
+            addressString += addressObject.state + ', ';
+        }
+
+        if(options.country && addressObject.country){
+            addressString += addressObject.country + ', ';
+        }
+
+        if(options.postalCode && addressObject.postalCode){
+            addressString += addressObject.postalCode + ', ';
+        }
+
+        return addressString;
+    };
+
+
     return GoogleMap;
 
 

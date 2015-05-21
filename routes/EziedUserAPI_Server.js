@@ -6972,9 +6972,7 @@ exports.FnGetTranscation = function (req, res) {
                         if (FromPage <= 1) {
                             FromPage = 0;
                         }
-                        console.log('FromPage:'+FromPage);
-                        console.log('ToPage:'+ToPage);
-                        
+                                              
                         var query = 'CALL pGetMessagesNew('+ db.escape(Token) + ',' + db.escape(FunctionType) + ',' 
                         + db.escape(Status) + ',' + db.escape(FromPage) + ',' + db.escape(ToPage) +')';
                         
@@ -6991,13 +6989,12 @@ exports.FnGetTranscation = function (req, res) {
                                         var limit= 10;
                                         var PageValue = parseInt(totalRecord / limit);
                                         var PageMod = totalRecord % limit;
-                                        if (PageMod > 0){
+                                        if (PageMod >= 0){
                                             TotalPage = PageValue + 1;
                                             }
                                             else{
                                                 TotalPage = PageValue;
                                             }
-                                        console.log('TotalPage:'+TotalPage);
                                             RtnMessage.TotalPage = TotalPage;
                                             RtnMessage.Result =GetResult[0];
                                             res.send(RtnMessage);
@@ -8891,7 +8888,8 @@ exports.FnCropImage = function(req, res){
                                 
                                 RtnMessage.Picture = 'data:image/jpg;base64,' +base64;
                                 RtnMessage.IsSuccessfull = true;
-                                console.log('FnCropImage: Image Cropped successfully');                            
+                                console.log('FnCropImage: Image Cropped successfully'); 
+                                
                                 res.send(RtnMessage);
                             }
                             else
