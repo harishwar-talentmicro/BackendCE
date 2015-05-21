@@ -135,8 +135,8 @@ angular.module('ezeidApp').factory('GoogleMaps',['$q','$timeout','$compile',func
      * @type {{latitude: number, longitude: number}}
      */
     GoogleMap.prototype.currentMarkerPosition = {
-        latitude : 0,
-        longitude : 0
+        lat : 12.933616,
+        lng : 77.573546
     };
 
     /**
@@ -145,8 +145,8 @@ angular.module('ezeidApp').factory('GoogleMaps',['$q','$timeout','$compile',func
      */
     GoogleMap.prototype.mapOptions = {
         center : {
-            lat : 0,
-            lng : 0
+            lat : 12.933616,
+            lng : 77.573546
         },
         zoom : 14
     };

@@ -438,6 +438,7 @@
                  * @type {{TID: number, Token: *, MessageText: string, Status: number, TaskDateTime: string, Notes: string, LocID: *, Country: string, State: string, City: string, Area: string, FunctionType: number, Latitude: number, Longitude: number, EZEID: string, ContactInfo: string, FolderRuleID: number, Duration: number, DurationScales: number, NextAction: number, NextActionDateTime: string, ItemsList: Array, DeliveryAddress: string}}
                  */
                 var preparedTx = {
+                    ToEZEID : $scope.SearchInfo.EZEID,
                     TID : 0,
                     Token : $rootScope._userInfo.Token,
                     MessageText : $scope.modalBox.tx.message,
@@ -458,7 +459,7 @@
                     Duration : 0,
                     DurationScales : 0,
                     NextAction : 0,
-                    NextActionDateTime : '',
+                    NextActionDateTime : moment().format('DD MMM YYYY hh:mm:ss'),
                     ItemsList: JSON.stringify($scope.modalBox.tx.itemList),
                     DeliveryAddress : $scope.modalBox.tx.address + $scope.modalBox.tx.area + $scope.modalBox.tx.city +
                     $scope.modalBox.tx.state + $scope.modalBox.tx.country
@@ -476,27 +477,49 @@
             };
 
             var validateTransaction = function(tx){
+
                 var flag = true;
-                if(tx.address.trim().length < 1){
+                if(!tx.address){
                     $scope.txerror.address = true;
                     flag *= false;
                 }
-                if(tx.area.trim().length < 1){
+                if(tx.address && tx.address.trim().length < 1){
+                    $scope.txerror.address = true;
+                    flag *= false;
+                }
+                if(!tx.area){
+                    $scope.txerror.area = true;
+                    flag *= false;
+                }
+                if(tx.area && tx.area.trim().length < 1){
                     $scope.txerror.area = true;
                     flag *= false;
                 }
 
-                if(tx.city.trim().length < 1){
+                if(!tx.city){
                     $scope.txerror.city = true;
                     flag *= false;
                 }
 
-                if(tx.state.trim().length < 1){
+                if(tx.city && tx.city.trim().length < 1){
+                    $scope.txerror.city = true;
+                    flag *= false;
+                }
+
+                if(!tx.state){
+                    $scope.txerror.state = true;
+                    flag *= false;
+                }
+                if(tx.state && tx.state.trim().length < 1){
                     $scope.txerror.state = true;
                     flag *= false;
                 }
 
-                if(tx.country.trim().length < 1){
+                if(!tx.country){
+                    $scope.txerror.country = true;
+                    flag *= false;
+                }
+                if(tx.country && tx.country.trim().length < 1){
                     $scope.txerror.country = true;
                     flag *= false;
                 }
@@ -535,13 +558,13 @@
                     return ;
                 }
 
-                if($scope.modalBox.tx.itemList.length <  1 && $scope.modules[moduleIndex].listType > 0){
+                if($scope.modalBox.tx.itemList.length <  1 && $scope.salesItemListType > 0){
                     Notification.error({ message : 'Please select items for the enquiry',delay : MsgDelay});
                     return ;
                 }
 
 
-                if($scope.modalBox.tx.message.length < 1 && $scope.modules[moduleIndex].listType > 0){
+                if($scope.modalBox.tx.message.length < 1 && $scope.salesItemListType > 0){
                     var itemList = [];
                     try{
                         itemList = JSON.parse(data.ItemsList);
@@ -573,20 +596,10 @@
                     if(resp && resp.hasOwnProperty('IsSuccessfull')){
                         if(resp.IsSuccessfull){
                             var msg = 'Enquiry is posted successfully';
-                            if($scope.modalBox.editMode){
-                                msg = 'Enquiry is updated successfully';
-                            }
 
-                            if($scope.editModes.indexOf(true) !== -1){
-                                msg = 'Enquiry is updated successfully';
-                            }
                             Notification.success({ message : msg, delay : MsgDelay});
-                            if($scope.showModal){
-                                $scope.showModal = !$scope.showModal;
-                            }
+                            $scope._toggleSalesModal();
                             $scope.resetModalBox();
-                            $scope.toggleAllEditMode();
-                            $scope.loadTransaction();
                         }
                         else{
                             Notification.error({ message : 'An error occurred while placing enquiry', delay : MsgDelay});

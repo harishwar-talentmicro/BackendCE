@@ -9,7 +9,7 @@
  * "use strict";
  */
 
-angular.module('ezeidApp').
+var res = angular.module('ezeidApp').
     controller('SearchResultCtrl', [
         '$rootScope',
         '$scope',
@@ -54,7 +54,8 @@ angular.module('ezeidApp').
             $scope.searchResult = [];
             $scope.defaultSearchTerm = '';
             $scope.showLoginText = false;
-
+            /* check box status array */
+            $scope.checkBoxStatus = [];
 
             /* Star ratings reso. */
 
@@ -178,6 +179,7 @@ angular.module('ezeidApp').
                     $scope.coordinatesArr = [];
                     /* count the result */
                     var count = 0;
+                    console.log(data);
                     if(data != 'null'){
                         var link = '';
                         var searchType = $routeParams.searchType;
@@ -186,6 +188,7 @@ angular.module('ezeidApp').
                             count++;
                             link = "/searchDetails?searchType="+searchType+"&TID="+data[i].TID;
                             coordinates.push([data[i].Latitude,data[i].Longitude,data[i].CompanyName,link]);
+                            $scope.checkBoxStatus.push(false);
                         }
                         $scope.coordinatesArr = coordinates;
                     }
@@ -367,6 +370,22 @@ angular.module('ezeidApp').
                 }
             };
 
+            $scope.checkAllIcons = function()
+            {
+                for(var i=0;i<$scope.checkBoxStatus.length;i++)
+                {
+                    $scope.checkBoxStatus[i] = true;
+                }
+            }
+
+            $scope.uncheckAllIcons = function()
+            {
+                for(var i=0;i<$scope.checkBoxStatus.length;i++)
+                {
+                    $scope.checkBoxStatus[i] = false;
+                }
+            }
+
             // To check and uncheck All check box
             $scope.toggleCheckboxAll = function(){
 
@@ -378,6 +397,8 @@ angular.module('ezeidApp').
                 {
                     $scope.selectedList = [];
                     selectedAllResult = 1;
+
+                    $scope.checkAllIcons();
 
                     $scope.searchResult = JSON.parse($window.localStorage.getItem("searchResult"));
                     if(!$scope.searchResult)
@@ -397,6 +418,7 @@ angular.module('ezeidApp').
                 }
                 /* uncheck all the check boxes */
                 else{
+                    $scope.uncheckAllIcons();
                     selectedAllResult = 0;
                     $scope.selectedList = [];
 
@@ -410,7 +432,8 @@ angular.module('ezeidApp').
             $scope.toggleCheckbox = function(event){
                 var elem = event.currentTarget;
                 var val = $(elem).data('tid');
-
+                var id = $(elem).data('id');
+                $scope.checkBoxStatus[id] = !$scope.checkBoxStatus[id];
                 if($(elem).is(":checked")){
                     $scope.selectedList.push(val);
 
@@ -456,15 +479,14 @@ angular.module('ezeidApp').
 
              /* make an array of colors for tiles */
             var colorArray = [
-                "orange",
-                "green",
-                "cyan",
-                "pink",
-                "bg-orange-shade-1",
-                "bg-green-shade-1",
-                "bg-blue-shade-1",
-                "bg-blue-shade-2",
-                "bg-orange-shade-2"
+                "metro-bg-1",
+                "metro-bg-2",
+                "metro-bg-3",
+                "metro-bg-4",
+                "metro-bg-5",
+                "metro-bg-6",
+                "metro-bg-7",
+                "metro-bg-8",
             ];
             $scope.oldColorValue = 0;
             /* generate a random color string */
@@ -486,5 +508,65 @@ angular.module('ezeidApp').
             {
                 return Math.floor(Math.random() * len);
             };
+
+            $timeout(function(){
+                $(".flip-card").flip({
+                    trigger: "hover"
+                });
+
+            },500);
+
+            /* Basic Kms closed */
+            $scope.distanceFilter = function(dist)
+            {
+                if(dist > 900)
+                {
+                    return '900+ ';
+                }
+                else if(dist.toString().length > 4)
+                {
+                    return Math.round(dist);
+                }
+                else
+                {
+                    return dist;
+                }
+            }
+
+            /* make an address string */
+            $scope.makeAddress = function(AddressLine1,AddressLine2,city)
+            {
+                var str = [];
+                if(AddressLine1.length > 0)
+                {
+                    str.push(AddressLine1);
+                }
+
+                if(AddressLine2.length > 0)
+                {
+                    str.push(AddressLine2);
+                }
+
+                if(city.length > 0)
+                {
+                    str.push(city);
+                }
+
+                var finalString = str.join(', ');
+
+                if(finalString.length > 46)
+                {
+                    /* remove the address line2 and return */
+                    return AddressLine1+', '+city+'...';
+                    //return finalString.substring(0,45)+'..';
+                }
+                else
+                {
+                    return finalString;
+                }
+            }
         }
+
+
+
     ]);
