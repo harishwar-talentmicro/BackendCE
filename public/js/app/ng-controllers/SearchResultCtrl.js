@@ -26,6 +26,7 @@ var res = angular.module('ezeidApp').
         '$routeParams',
         'GoogleMaps',
         '$route',
+        'UtilityService',
         function (
             $rootScope,
             $scope,
@@ -41,7 +42,8 @@ var res = angular.module('ezeidApp').
             $location,
             $routeParams,
             GoogleMap,
-            $route
+            $route,
+            UtilityService
         )
         {
             var selectAll = false;
@@ -536,34 +538,8 @@ var res = angular.module('ezeidApp').
             /* make an address string */
             $scope.makeAddress = function(AddressLine1,AddressLine2,city)
             {
-                var str = [];
-                if(AddressLine1.length > 0)
-                {
-                    str.push(AddressLine1);
-                }
-
-                if(AddressLine2.length > 0)
-                {
-                    str.push(AddressLine2);
-                }
-
-                if(city.length > 0)
-                {
-                    str.push(city);
-                }
-
-                var finalString = str.join(', ');
-
-                if(finalString.length > 46)
-                {
-                    /* remove the address line2 and return */
-                    return AddressLine1+', '+city+'...';
-                    //return finalString.substring(0,45)+'..';
-                }
-                else
-                {
-                    return finalString;
-                }
+                var addressArr = [AddressLine1,AddressLine1,city];
+                return UtilityService.getAddressString(addressArr);
             }
         }
 
