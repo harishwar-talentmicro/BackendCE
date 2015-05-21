@@ -24,7 +24,7 @@
     background-size: cover;
     background-repeat: space;
     background-position-y: -140px;
-    opacity : 0.1;
+    opacity : 1;
 }
 
 .hpw .phone-image
@@ -205,7 +205,8 @@
     width: 100%;
     text-align: center;
     height: inherit;
-    background: rgba(0,0,0,0.5);
+    /*background: rgba(0,0,0,0.5);*/
+    background : rgba(34, 34, 32, 1);
 }
 
 .hpw .h1 {

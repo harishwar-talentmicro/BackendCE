@@ -417,12 +417,20 @@ angular.module('ezeidApp').
                 var image = new Image();
 
                 image.onload = function () {
-
-                    $('.main-page-image').css(
-                        {
+                    $('.main-page-image').css({
                             'background': 'url(/images/bg-test.jpg)',
                             'background-size': 'cover'
-                        }).fadeTo(3000, 1);
+                    });
+
+                    $timeout(function(){
+                        $('.landing-center').css({
+                            'opacity' : 0.7
+                        });
+                        $('.landing-center').fadeTo(3000,1).css({
+                            'background' : 'rgba(0, 0, 0, 0.5)'
+                        });
+                    },500);
+
                 }
                 image.src = '/images/bg-test.jpg';
             },2);
