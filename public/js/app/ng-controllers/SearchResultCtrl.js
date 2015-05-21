@@ -235,7 +235,12 @@ var res = angular.module('ezeidApp').
                             $scope.searchCount = 0;
                         }
                     }
-                    $scope.$emit('$preLoaderStop');
+                    /* put a little delay */
+                    $timeout(function(){
+                        $scope.$emit('$preLoaderStop');
+
+                    },1500);
+
                 });
             }
 
@@ -524,7 +529,7 @@ var res = angular.module('ezeidApp').
                     trigger: "hover"
                 });
 
-            },500);
+            },1000);
 
             /* Basic Kms closed */
             $scope.distanceFilter = function(dist)
