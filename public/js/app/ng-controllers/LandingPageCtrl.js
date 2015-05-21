@@ -182,8 +182,19 @@ angular.module('ezeidApp').
                             $rootScope.coordinatesLng = $scope.googleMap.currentMarkerPosition.longitude;
                             placeDetail = $scope.googleMap.parseReverseGeolocationData(resp.data);
 
-                            $scope.locationString = placeDetail.city != '' ? 'Your current location is: ' + placeDetail.area + ", " + placeDetail.city + ", " + placeDetail.state : '';
-                            $scope.location = getLocationString(placeDetail.area,placeDetail.city,placeDetail.state);
+                            //$scope.locationString = placeDetail.city != '' ? 'Your current location is: ' + placeDetail.area + ", " + placeDetail.city + ", " + placeDetail.state : '';
+                            var options = {
+                                route : true,
+                                sublocality3 : true,
+                                sublocality2 : true,
+                                area : true,
+                                city : true,
+                                state : true,
+                                country : false,
+                                postalCode : false
+                            };
+                            $scope.locationString = $scope.googleMap.createAddressFromGeolocation(placeDetail,options);
+                            $scope.location = $scope.googleMap.createAddressFromGeolocation(placeDetail,options);
                             /* Setting up default lattitude & longitude of the map */
                                 $scope.searchParams.lat = $scope.googleMap.currentMarkerPosition.latitude;
                             $scope.searchParams.lng = $scope.googleMap.currentMarkerPosition.longitude;
@@ -287,8 +298,20 @@ angular.module('ezeidApp').
                     if (resp) {
 
                         placeDetail = $scope.googleMap.parseReverseGeolocationData(resp.data);
-                        $scope.locationString = placeDetail.city != '' ? 'Your preferred search location is: ' + placeDetail.area + ", " + placeDetail.city + ", " + placeDetail.state : '';
-                        $scope.location = getLocationString(placeDetail.area,placeDetail.city,placeDetail.state);
+
+                        var options = {
+                            route : true,
+                            sublocality3 : true,
+                            sublocality2 : true,
+                            area : true,
+                            city : true,
+                            state : true,
+                            country : false,
+                            postalCode : false
+                        };
+                        $scope.locationString = $scope.googleMap.createAddressFromGeolocation(placeDetail,options);
+
+                        $scope.location = $scope.googleMap.createAddressFromGeolocation(placeDetail,options);
                     }
                 });
 

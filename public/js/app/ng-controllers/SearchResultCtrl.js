@@ -235,7 +235,12 @@ var res = angular.module('ezeidApp').
                             $scope.searchCount = 0;
                         }
                     }
-                    $scope.$emit('$preLoaderStop');
+                    /* put a little delay */
+                    $timeout(function(){
+                        $scope.$emit('$preLoaderStop');
+
+                    },1500);
+
                 });
             }
 
@@ -524,7 +529,7 @@ var res = angular.module('ezeidApp').
                     trigger: "hover"
                 });
 
-            },500);
+            },1000);
 
             /* Basic Kms closed */
             $scope.distanceFilter = function(dist)
@@ -547,7 +552,7 @@ var res = angular.module('ezeidApp').
             $scope.makeAddress = function(AddressLine1,AddressLine2,city)
             {
                 var addressArr = [AddressLine1,AddressLine1,city];
-                return UtilityService.getAddressString(addressArr);
+                return UtilityService.getAddressString(addressArr,40);
             }
 
             $scope.showDirectionMapPopup = function(Latitude,Longitude,IDTypeID){

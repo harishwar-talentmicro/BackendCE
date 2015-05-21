@@ -581,7 +581,7 @@ angular.module('ezeidApp').factory('GoogleMaps',['$q','$timeout','$compile',func
 
         if(options){
             for(var a = 0; a < props.length; a++){
-                if(typeof(options[props[a]]) == "null" || typeof(options[props[a]] == "undefined")){
+                if(typeof(options[props[a]]) == "null" || typeof(options[props[a]]) == "undefined"){
                     options[props[a]] = true;
                 }
             }
@@ -623,7 +623,7 @@ angular.module('ezeidApp').factory('GoogleMaps',['$q','$timeout','$compile',func
             addressString += addressObject.postalCode + ', ';
         }
         if(addressString.length > 0){
-            addressString = addressString.substr(0,addressString.length -1);
+            addressString = addressString.substr(0,addressString.length -2);
         }
         return addressString;
     };

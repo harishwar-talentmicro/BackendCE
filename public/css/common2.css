@@ -39,7 +39,7 @@
 
 .hpw .logo
 {
-    content: url(https://www.ezeid.com/images/logo.png);
+    content: url('../images/ezeid-logo.png');
     background-position:top;
     width: 100%;
 }
