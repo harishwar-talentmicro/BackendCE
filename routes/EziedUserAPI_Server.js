@@ -8857,74 +8857,143 @@ exports.FnCropImage = function(req, res){
         var Target_Height = req.body.Height; 
         
         var RtnMessage = {
-            IsSuccessfull: false,
-            Picture: ''
+            status: false,
+            picture : ''
         };
-        var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
-        
+        //var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
+
         if (Target_Width != null && Target_Height != null ) {
+
             var fs = require('fs');
             
             var gm = require('gm').subClass({ imageMagick: true });
+            console.log(gm);
             var bitmap = fs.readFileSync('../bin/'+req.files.Image.path);
             
             var Original_Width = 0;
             var Original_Height = 0;
-            
-            gm(bitmap).size(function (err, size) {
-                if (!err){
-                    console.log(size.width > size.height ? 'wider' : 'taller');
-                    Original_Width = size.width;
-                    Original_Height = size.height;   
-                    
-                    if(Original_Width > Original_Height){
-                        x_width = Target_Width * Original_Height / Target_Height ;
-                        
-                        gm(bitmap).crop(x_width,Original_Height)
-                        .write('./CropImage/image.jpg',function (err) {
-                            if (!err){
-                                var input = fs.readFileSync('./CropImage/image.jpg');
-                                var base64 = new Buffer(input).toString('base64');
-                                
-                                RtnMessage.Picture = 'data:image/jpg;base64,' +base64;
-                                RtnMessage.IsSuccessfull = true;
-                                console.log('FnCropImage: Image Cropped successfully'); 
-                                
-                                res.send(RtnMessage);
+            console.log(bitmap);
+            try{
+                gm(bitmap).size(function (err, size) {
+                    if (!err) {
+
+                        console.log(size.width > size.height ? 'wider' : 'taller');
+                        Original_Width = size.width;
+                        Original_Height = size.height;
+
+
+                        var scaleWidth = 0;
+                        var scaleHeight = 0;
+
+                        if (Target_Height > Target_Width) {
+
+                            if (Original_Height < Original_Width) {
+                                scaleHeight = Target_Height;
+                                scaleWidth = (Original_Width * scaleHeight) / Original_Height;
                             }
-                            else
-                            {
-                                console.log('FnCropImageSize: No Image Cropped');
-                                res.send(RtnMessage);
+
+                            else {
+                                scaleWidth = Target_Width;
+                                scaleHeight = (Original_Height * scaleWidth) / Original_Width;
+                            }
+                        }
+
+                        else {
+                            if (Original_Height > Original_Width) {
+                                scaleWidth = Target_Width;
+                                scaleHeight = (Original_Height * scaleWidth) / Original_Width;
+                            }
+
+                            else {
+
+                                scaleHeight = Target_Height;
+                                scaleWidth = (Original_Width * scaleHeight) / Original_Height;
+                                if (scaleWidth < Target_Width) {
+                                    scaleWidth = Target_Width;
+                                    scaleHeight = (Original_Height * scaleWidth) / Original_Width;
+                                }
+                            }
+                        }
+
+
+                        gm(bitmap).scale(scaleWidth, scaleHeight).toBuffer('PNG',function (err, scaledBuff) {
+                            if(!err){
+                                gm(scaledBuff).crop(Target_Width, Target_Height).toBuffer('PNG',function(err,croppedBuff){
+                                    if(!err){
+                                        var base64Image = new Buffer(croppedBuff).toString('base64');
+
+                                        res.status(200).json({
+                                            status: true,
+                                            picture : 'data:image/png;base64,'+base64Image
+                                        });
+                                    }
+                                    else{
+                                        res.status(400).json(RtnMessage);
+                                    }
+                                });
+                            }
+                            else{
+                                res.status(400).json(RtnMessage);
                             }
                         });
+
+
                     }
+                    ///////////////////////////////////
+
+                    //if(Original_Width > Original_Height){
+                    //    x_width = Target_Width * Original_Height / Target_Height ;
+                    //
+                    //    gm(bitmap).crop(x_width,Original_Height)
+                    //    .write('./CropImage/image.jpg',function (err) {
+                    //        if (!err){
+                    //            var input = fs.readFileSync('./CropImage/image.jpg');
+                    //            var base64 = new Buffer(input).toString('base64');
+                    //
+                    //            RtnMessage.Picture = 'data:image/jpg;base64,' +base64;
+                    //            RtnMessage.IsSuccessfull = true;
+                    //            console.log('FnCropImage: Image Cropped successfully');
+                    //
+                    //            res.send(RtnMessage);
+                    //        }
+                    //        else
+                    //        {
+                    //            console.log('FnCropImageSize: No Image Cropped');
+                    //            res.send(RtnMessage);
+                    //        }
+                    //    });
+                    //}
+                    //else{
+                    //    x_height = Original_Width * Target_Height / Target_Width;
+                    //
+                    //    gm(bitmap).crop(Original_Width,x_height)
+                    //    .write('./CropImage/image.jpg',function (err) {
+                    //        if (!err){
+                    //            var input = fs.readFileSync('./CropImage/image.jpg');
+                    //            var base64 = new Buffer(input).toString('base64');
+                    //            RtnMessage.Picture = 'data:image/jpg;base64,' +base64;
+                    //            RtnMessage.IsSuccessfull = true;
+                    //            console.log('FnCropImage: Image Cropped successfully');
+                    //            res.send(RtnMessage);
+                    //        }
+                    //        else
+                    //        {
+                    //            console.log('FnCropImageSize: No Image Cropped');
+                    //            res.send(RtnMessage);
+                    //        }
+                    //    });
+                    //}
+
                     else{
-                        x_height = Original_Width * Target_Height / Target_Width;       
-                        
-                        gm(bitmap).crop(Original_Width,x_height)
-                        .write('./CropImage/image.jpg',function (err) {
-                            if (!err){
-                                var input = fs.readFileSync('./CropImage/image.jpg');
-                                var base64 = new Buffer(input).toString('base64');
-                                RtnMessage.Picture = 'data:image/jpg;base64,' +base64;
-                                RtnMessage.IsSuccessfull = true;
-                                console.log('FnCropImage: Image Cropped successfully');                            
-                                res.send(RtnMessage);
-                            }
-                            else
-                            {
-                                console.log('FnCropImageSize: No Image Cropped');
-                                res.send(RtnMessage);
-                            }
-                        });
+                        console.log('FnCropImage: Error in getting image size');
+                        res.status(200).json(RtnMessage);
                     }
-                }
-                else{
-                    console.log('FnCropImage: Error in getting image size');
-                    res.send(RtnMessage);
-                }
-            });
+                });
+            }
+            catch(ex){
+                console.log(ex);
+            }
+
         }       
         else {
             if (Token == null) {
@@ -8939,9 +9008,7 @@ exports.FnCropImage = function(req, res){
             else if (Target_Height == null) {
                 console.log('FnCropImage: Height is empty');
             }
-            
-            res.statusCode=400;
-            res.send(RtnMessage);
+            res.status(400).json(RtnMessage);
         }
     }
     catch (ex) {
