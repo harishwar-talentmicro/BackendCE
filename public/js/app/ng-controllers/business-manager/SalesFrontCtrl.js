@@ -438,6 +438,7 @@
                  * @type {{TID: number, Token: *, MessageText: string, Status: number, TaskDateTime: string, Notes: string, LocID: *, Country: string, State: string, City: string, Area: string, FunctionType: number, Latitude: number, Longitude: number, EZEID: string, ContactInfo: string, FolderRuleID: number, Duration: number, DurationScales: number, NextAction: number, NextActionDateTime: string, ItemsList: Array, DeliveryAddress: string}}
                  */
                 var preparedTx = {
+                    ToEZEID : $scope.SearchInfo.EZEID,
                     TID : 0,
                     Token : $rootScope._userInfo.Token,
                     MessageText : $scope.modalBox.tx.message,

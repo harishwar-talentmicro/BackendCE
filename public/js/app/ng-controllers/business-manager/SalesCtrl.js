@@ -922,6 +922,7 @@
                  * @type {{TID: number, Token: *, MessageText: string, Status: number, TaskDateTime: string, Notes: string, LocID: *, Country: string, State: string, City: string, Area: string, FunctionType: number, Latitude: number, Longitude: number, EZEID: string, ContactInfo: string, FolderRuleID: number, Duration: number, DurationScales: number, NextAction: number, NextActionDateTime: string, ItemsList: Array, DeliveryAddress: string}}
                  */
                 var preparedTx = {
+                    ToEZEID : $rootScope._userInfo.ezeid,
                     TID : ($scope.modalBox.tx.TID) ? $scope.modalBox.tx.TID : 0,
                     Token : $rootScope._userInfo.Token,
                     MessageText : $scope.modalBox.tx.message,
