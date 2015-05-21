@@ -57,6 +57,14 @@ var res = angular.module('ezeidApp').
             /* check box status array */
             $scope.checkBoxStatus = [];
 
+            $scope.activeTemplate = "";
+            $scope.showMapPopupModel = false;
+
+            $scope.modalBox = {
+                title : 'EZEID Map',
+                class : 'business-manager-modal'
+            };
+
             /* Star ratings reso. */
 
             $scope.selectSearchStar = function(index)
@@ -470,7 +478,7 @@ var res = angular.module('ezeidApp').
             $scope.redirectFullPage = function(searchType,tid)
             {
                 /* redirect to full detail page */
-                $location.url('/searchDetails?searchType='+searchType+'&TID='+tid);
+             //   $location.url('/searchDetails?searchType='+searchType+'&TID='+tid);
             }
 
             /**
@@ -565,8 +573,25 @@ var res = angular.module('ezeidApp').
                     return finalString;
                 }
             }
+
+            $scope.showDirectionMapPopup = function(Latitude,Longitude,IDTypeID){
+                console.log("SAi");
+                console.log(Latitude);
+                console.log(Longitude);
+                console.log(IDTypeID);
+                $scope.activeTemplate = "html/mapPopView.html";
+                $scope.showMapPopupModel = true;
+
+               //  var end = new google.maps.LatLng(data.Latitude, data.Longitude);
+                 var userLoc = {
+                 endLat : Latitude,
+                 endLong : Longitude,
+                 IDTypeID : IDTypeID
+                 };
+
+                 $window.localStorage.setItem("myLocation", JSON.stringify(userLoc));
+            };
+
+
         }
-
-
-
     ]);

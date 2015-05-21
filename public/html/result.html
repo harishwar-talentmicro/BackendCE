@@ -174,6 +174,15 @@
             </div>
         </div>
 
+        <div class="mapModal">
+            <modal showheader="false" mtitle="modalBox.title" visible="showMapPopupModel" mclass="modalBox.class">
+                <section id="map-content">
+                    <div class="row setRowLeftRightMarginZero">
+                        <div ng-include="activeTemplate"></div>
+                    </div>
+                </section>
+            </modal>
+        </div>
 
         <!-- Modal Box content -->
         <modal mtitle="modal.title" mclass="modal.class" visible="modalVisible">
@@ -279,7 +288,7 @@
                                             </div>
                                         </div>
                                         <div class="flip-tile-row-3 p-5 text-center ">
-                                            <button class="btn btn-default btn-xs">
+                                            <button class="btn btn-default btn-sm" ng-click="showDirectionMapPopup(search.Latitude,search.Longitude,search.IDTypeID)">
                                                 <i class="fa fa-map-marker"></i> Directions
                                             </button>
                                             <!--<button class="btn btn-default btn-xs">-->
