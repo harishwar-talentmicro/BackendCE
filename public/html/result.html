@@ -174,6 +174,15 @@
             </div>
         </div>
 
+        <div class="mapModal">
+            <modal showheader="false" mtitle="modalBox.title" visible="showMapPopupModel" mclass="modalBox.class">
+                <section id="map-content">
+                    <div class="row setRowLeftRightMarginZero">
+                        <div ng-include="activeTemplate"></div>
+                    </div>
+                </section>
+            </modal>
+        </div>
 
         <!-- Modal Box content -->
         <modal mtitle="modal.title" mclass="modal.class" visible="modalVisible">
@@ -202,7 +211,7 @@
                     <!-- Maps ends here -->
 
 
-                    <!-- FLIPPING TILES PROTOTYPE [DON'T DELETE] =======================================-->
+                    <!-- FLIPPING TILES Start Here =======================================-->
 
                     <!-- Flipping tiles starts here -->
                     <div class="filpping-tiles t1"  ng-hide="searchListMapFlag && !showDownloadLink" >
@@ -278,8 +287,8 @@
                                               <p><small class="text-center">7406547499</small></p>
                                             </div>
                                         </div>
-                                        <div class="flip-tile-row-3 p-5 text-center ">
-                                            <button class="btn btn-default btn-xs">
+                                        <div class="flip-tile-row-3 p-5 text-center" ng-click="$event.stopPropagation()">
+                                            <button class="btn btn-default btn-sm" ng-click="showDirectionMapPopup(search.Latitude,search.Longitude,search.IDTypeID)">
                                                 <i class="fa fa-map-marker"></i> Directions
                                             </button>
                                             <!--<button class="btn btn-default btn-xs">-->
@@ -300,81 +309,8 @@
                     </div>
                     <!-- flipping tiles ends here -->
 
-                    <!-- FLIPPING TILES PROTOTYPE ENDS [DON'T DELETE] -->
+                    <!-- FLIPPING TILES ENDS -->
 
-
-
-                    <!-- ======================================================= -->
-                    <!-- Master Tile! -->
-                    <div class="master-tile hidden" ng-hide="searchListMapFlag && !showDownloadLink">
-                        <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12 individual-tiles text-center p3" ng-init="color = random()" ng-repeat="search in searchListData track by $index">
-                            <div class="tile-outer-frame pointer" ng-click="redirectFullPage(params.searchType,search.TID)">
-                                <div class="row-1">
-                                    <div class="block-header">
-                                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 block-1 block block-row-1 text-12" ng-class="color">
-                                            <small ng-click="sayAlert(search.EZEID)"> <i class="text-bolder">{{search.distance}} Km</i></small>
-                                            &nbsp;
-                                        </div>
-                                        <div class="col-lg-7 col-md-7 col-sm-7 col-xs-7 block-2 block block-row-1 text-center " ng-class="color">
-                                            <b class="tile-text">{{search.EZEID}}</b>
-                                        </div>
-                                        <div ng-click="$event.stopPropagation()" class="col-lg-2 col-md-2 col-sm-2 col-xs-2 block-3 block block-row-1" ng-class="color">
-                                            <!-- clickable checkbox -->
-                                            <input type="checkbox" data-tid="{{search.MasterID}}" class="result-checkbox" name="companyID" ng-click="toggleCheckbox($event)"/>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- Row Ends -->
-                                <div class="row-2">
-                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 block-4 block block-row-2" ng-class="color">
-                                        <b>{{search.CompanyName}}</b>
-                                        <!-- contact informations -->
-                                        <hr class="style-two">
-                                        <small>
-                                            <!-- Mobile Number -->
-                                            {{(search.MobileNumber.trim() && search.MobileNumber !== 'null')?search.CountryCode+' '+search.MobileNumber:'No mobile'}}
-                                            <!-- Seperator -->
-                                            <i class="{{((search.MobileNumber.trim() && search.MobileNumber !== 'null') && (search.PhoneNumber.trim() && search.PhoneNumber !== 'null'))?'fa fa-minus fa-rotate-90 text-info':''}}"></i>
-                                            <!-- Telephone Number -->
-                                            {{(search.PhoneNumber.trim() && search.PhoneNumber !== 'null')?search.CountryCode+' '+search.PhoneNumber:''}}</small>
-                                    </div>
-                                </div>
-                                <!-- Row Ends -->
-                                <div class="row-3">
-                                    <div class="col-lg-5 col-md-4 col-sm-4 col-xs-4 block-5 pointer"  ng-class="color" title="{{flagArr[0]}}"></i>
-                                        <div class="row" ng-init="(search.OpenStatus == 2)?openStatusArr = ['close','up','white']:openStatusArr = ['open','up','black']">
-                                            <div class="col-lg-4 col-md-4 col-sm-2 col-xs-2  pointer"  title="{{openStatusArr[0]}}">
-                                                <i class="fa fa-thumbs-{{openStatusArr[1]}} text-{{openStatusArr[2]}}"></i>
-                                            </div>
-                                            <!-- car parking status -->
-                                            <div class="car-parking" ng-init="(search.ParkingStatus == 2)?parkingStatusArr = ['No Parking','white']:parkingStatusArr = ['Parking','black']">
-                                                <div class="col-lg-4 col-md-4 col-sm-2 col-xs-2 pointer" title="{{parkingStatusArr[0]}}"><i class="fa fa-car text-{{parkingStatusArr[1]}}"></i></div>
-                                            </div>
-                                            <!-- is verified status -->
-                                            <div class="is-verified" ng-init="(search.EZEIDVerifiedID == 2)?isVerifiedArr = ['Verified','black']:isVerifiedArr = ['Not Verified','white']">
-                                                <div class="col-lg-4 col-md-4 col-sm-2 col-xs-2 pointer" title="{{isVerifiedArr[0]}}"><i class="fa fa-check-square text-{{isVerifiedArr[1]}}"></i></div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!--<div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 block-10 pointer" title="Verified"><i class="fa fa-check-square"></i></div>-->
-                                    <div class="col-lg-5 col-md-6 col-sm-6 col-xs-6 block-5 pointer" ng-class="color" title="Ratings">
-                                        <div class="star-rating">
-                                            <small>
-                                                <i ng-repeat="n in [1,2,3,4,5] track by $index"  class="fa fa-star" ng-class="($index < search.Rating)?'text-yellow':''"></i>
-                                            </small>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 block-5 pointer" ng-class="color" title="View Full Details">
-                                        <!--<a ng-href="/searchDetails?searchType={{params.searchType}}&TID={{search.TID}}">-->
-                                        <i class="fa fa-arrow-circle-right fa-1x text-white"></i>
-                                        <!--</a>-->
-                                    </div>
-                                </div>
-                                <!-- Row Ends -->
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
             <!-- main-tiles-frame-ends -->
