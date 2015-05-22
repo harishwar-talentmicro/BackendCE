@@ -216,7 +216,7 @@ angular.module('ezeidApp').controller('RulesCtrl',['$scope','$interval','$http',
             method : "POST",
             data : ruleData
         }).success(function(resp){
-            console.log(resp);
+            //console.log(resp);
         }).error(function(err){
             Notification.error({ message : 'An error occurred while adding rule', delay : MsgDelay});
         });
