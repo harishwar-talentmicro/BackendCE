@@ -8873,7 +8873,7 @@ exports.FnCropImage = function(req, res){
         if(allowedTypes.indexOf(outputType)== -1){
             outputType = 'PNG';
         }
-        
+
 
         //var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
 
@@ -8910,22 +8910,22 @@ exports.FnCropImage = function(req, res){
 							
                             if (Original_Height < Original_Width) {
                                 scaleHeight = Target_Height;
-                                //scaleWidth = (Original_Width * scaleHeight) / Original_Height;
-								scaleWidth = null;
+                                scaleWidth = (Original_Width * scaleHeight) / Original_Height;
+								//scaleWidth = null;
                             }
 
                             else {
                                 scaleWidth = Target_Width;
-                                //scaleHeight = (Original_Height * scaleWidth) / Original_Width;
-								scaleHeight = null;
+                                scaleHeight = (Original_Height * scaleWidth) / Original_Width;
+								//scaleHeight = null;
                             }
                         }
 
                         else {
                             if (Original_Height > Original_Width) {
                                 scaleWidth = Target_Width;
-                                //scaleHeight = (Original_Height * scaleWidth) / Original_Width;
-								scaleHeight = null;
+                                scaleHeight = (Original_Height * scaleWidth) / Original_Width;
+								//scaleHeight = null;
                             }
 
                             else {
@@ -8936,12 +8936,10 @@ exports.FnCropImage = function(req, res){
                                 if (scaleWidth < Target_Width) {
 									console.log('else part 2 if');
                                     scaleWidth = Target_Width;
-                                    //scaleHeight = (Original_Height * scaleWidth) / Original_Width;
-									scaleHeight = null;
+                                    scaleHeight = (Original_Height * scaleWidth) / Original_Width;
+									//scaleHeight = null;
                                 }
-								else{
-									scaleWidth = null;
-								}
+
                             }
                         }
 						
@@ -8949,7 +8947,7 @@ exports.FnCropImage = function(req, res){
 
 						
                         if(scaleFlag){
-                            gm(bitmap).resize(scaleWidth, scaleHeight).toBuffer(outputType,function (err, scaledBuff) {
+                            gm(bitmap).scale(scaleWidth, scaleHeight).toBuffer(outputType,function (err, scaledBuff) {
                                 if(!err){
                                     if(cropFlag){
 										console.log('cropping');
@@ -12277,22 +12275,22 @@ exports.FnCropImageAP = function(req, res){
 
                                         if (Original_Height < Original_Width) {
                                             scaleHeight = Target_Height;
-                                            //scaleWidth = (Original_Width * scaleHeight) / Original_Height;
-                                            scaleWidth = null;
+                                            scaleWidth = (Original_Width * scaleHeight) / Original_Height;
+                                            //scaleWidth = null;
                                         }
 
                                         else {
                                             scaleWidth = Target_Width;
-                                            //scaleHeight = (Original_Height * scaleWidth) / Original_Width;
-                                            scaleHeight = null;
+                                            scaleHeight = (Original_Height * scaleWidth) / Original_Width;
+                                            //scaleHeight = null;
                                         }
                                     }
 
                                     else {
                                         if (Original_Height > Original_Width) {
                                             scaleWidth = Target_Width;
-                                            //scaleHeight = (Original_Height * scaleWidth) / Original_Width;
-                                            scaleHeight = null;
+                                            scaleHeight = (Original_Height * scaleWidth) / Original_Width;
+                                            //scaleHeight = null;
                                         }
 
                                         else {
@@ -12303,12 +12301,10 @@ exports.FnCropImageAP = function(req, res){
                                             if (scaleWidth < Target_Width) {
                                                 console.log('else part 2 if');
                                                 scaleWidth = Target_Width;
-                                                //scaleHeight = (Original_Height * scaleWidth) / Original_Width;
-                                                scaleHeight = null;
+                                                scaleHeight = (Original_Height * scaleWidth) / Original_Width;
+                                                //scaleHeight = null;
                                             }
-                                            else{
-                                                scaleWidth = null;
-                                            }
+
                                         }
                                     }
 
@@ -12316,7 +12312,7 @@ exports.FnCropImageAP = function(req, res){
 
 
                                     if(scaleFlag){
-                                        gm(bitmap).resize(scaleWidth, scaleHeight).toBuffer(outputType,function (err, scaledBuff) {
+                                        gm(bitmap).scale(scaleWidth, scaleHeight).toBuffer(outputType,function (err, scaledBuff) {
                                             if(!err){
                                                 if(cropFlag){
                                                     console.log('cropping');
