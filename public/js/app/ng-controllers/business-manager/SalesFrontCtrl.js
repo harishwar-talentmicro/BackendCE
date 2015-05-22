@@ -102,7 +102,7 @@
              * @todo
              * salesItemListTpe : To be loaded from server but currently no API call is available for this
              */
-            $scope.salesItemListType = 3;
+            $scope.salesItemListType = 0;
             $scope.editPermission = true;
             $scope.editMode = true;
 

@@ -8860,7 +8860,7 @@ exports.FnCropImage = function(req, res){
         var allowedTypes = ['JPG','PNG'];
 
         var fs = require('fs');
-        var Token = req.body.Token;
+        var Token = (req.body.Token) ? ((req.body.Token == 2) ? '' : req.body.Token) : '';
         var Image = req.body.image;
         var Target_Width = (!isNaN(parseInt(req.body.required_width))) ? parseInt(req.body.required_width) : 0;
         var Target_Height = (!isNaN(parseInt(req.body.required_height))) ? parseInt(req.body.required_width) : 0;
@@ -8937,10 +8937,10 @@ exports.FnCropImage = function(req, res){
                         }
 
 
-                        if(scale){
+                        if(scaleFlag){
                             gm(bitmap).scale(scaleWidth, scaleHeight).toBuffer(outputType,function (err, scaledBuff) {
                                 if(!err){
-                                    if(crop){
+                                    if(cropFlag){
                                         gm(scaledBuff).crop(Target_Width, Target_Height).toBuffer(outputType,function(err,croppedBuff){
                                             if(!err){
                                                 var base64Image = new Buffer(croppedBuff).toString('base64');
@@ -8973,7 +8973,7 @@ exports.FnCropImage = function(req, res){
                             });
                         }
 
-                        else if(crop){
+                        else if(cropFlag){
                             gm(bitmap).crop(Target_Width, Target_Height).toBuffer(outputType,function(err,croppedBuff){
                                 if(!err){
                                     var base64Image = new Buffer(croppedBuff).toString('base64');
@@ -12215,7 +12215,7 @@ exports.FnCropImageAP = function(req, res){
         var allowedTypes = ['JPG','PNG'];
 
         var fs = require('fs');
-        var Token = req.body.Token;
+        var Token = (req.body.Token) ? ((req.body.Token == 2) ? '' : req.body.Token) : '';
         var Image = req.body.image;
         var Target_Width = (!isNaN(parseInt(req.body.required_width))) ? parseInt(req.body.required_width) : 0;
         var Target_Height = (!isNaN(parseInt(req.body.required_height))) ? parseInt(req.body.required_width) : 0;
@@ -12292,10 +12292,10 @@ exports.FnCropImageAP = function(req, res){
                         }
 
 
-                        if(scale){
+                        if(scaleFlag){
                             gm(bitmap).scale(scaleWidth, scaleHeight).toBuffer(outputType,function (err, scaledBuff) {
                                 if(!err){
-                                    if(crop){
+                                    if(cropFlag){
                                         gm(scaledBuff).crop(Target_Width, Target_Height).toBuffer(outputType,function(err,croppedBuff){
                                             if(!err){
                                                 var base64Image = new Buffer(croppedBuff).toString('base64');
@@ -12328,7 +12328,7 @@ exports.FnCropImageAP = function(req, res){
                             });
                         }
 
-                        else if(crop){
+                        else if(cropFlag){
                             gm(bitmap).crop(Target_Width, Target_Height).toBuffer(outputType,function(err,croppedBuff){
                                 if(!err){
                                     var base64Image = new Buffer(croppedBuff).toString('base64');
