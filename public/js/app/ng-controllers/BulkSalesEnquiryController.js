@@ -53,6 +53,7 @@ angular.module('ezeidApp').controller('bulksalesController',[
     }
     $scope.searchResult = JSON.parse($window.localStorage.getItem("searchResult"));
     salesEnquiry.result = $scope.searchResult;
+
     $scope.searchResult == null ? $scope.showListing = false : $scope.showListing = true;
 
    /* if($scope.searchResult != null)

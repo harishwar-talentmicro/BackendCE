@@ -20,7 +20,8 @@
         '/business-manager',
         '/business-manager/:subview',
         '/profile-manager',
-        '/profile-manager/:subview'
+        '/profile-manager/:subview',
+        '/service-reservation'
     ]);
 
     /**
@@ -125,6 +126,7 @@
             .when('/salesenquiry',{templateUrl: 'html/salesenquiry.html'})
             .when('/bulksalesenquiry',{templateUrl : 'html/bulksalesenquiry.html'})
             .when('/viewdirection',{templateUrl : 'html/viewdirection.html'})
+            .when('/service-reservation',{templateUrl : 'html/reservation/reservation.html'})
             .when('/signup',{
                 templateUrl : 'html/profile/sign-up.html',
                 controller : 'SignUpCtrl'

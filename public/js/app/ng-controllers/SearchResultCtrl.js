@@ -236,6 +236,9 @@ var res = angular.module('ezeidApp').
                         }
                     }
                     $scope.$emit('$preLoaderStop');
+                })
+                .error(function(data, status, headers, config) {
+                    $rootScope.$broadcast('$preLoaderStop');
                 });
             }
 
