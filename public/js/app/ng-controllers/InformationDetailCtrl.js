@@ -210,6 +210,9 @@ angular.module('ezeidApp').
                 {
                     $scope.showNotFound = true;
                 }
+            })
+            .error(function(data, status, headers, config) {
+                    $rootScope.$broadcast('$preLoaderStop');
             });
         }
 

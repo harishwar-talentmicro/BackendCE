@@ -240,7 +240,9 @@ var res = angular.module('ezeidApp').
                         $scope.$emit('$preLoaderStop');
 
                     },1500);
-
+                })
+                .error(function(data, status, headers, config) {
+                    $rootScope.$broadcast('$preLoaderStop');
                 });
             }
 
@@ -501,7 +503,7 @@ var res = angular.module('ezeidApp').
                 "metro-bg-5",
                 "metro-bg-6",
                 "metro-bg-7",
-                "metro-bg-8",
+                "metro-bg-8"
             ];
             $scope.oldColorValue = 0;
             /* generate a random color string */
