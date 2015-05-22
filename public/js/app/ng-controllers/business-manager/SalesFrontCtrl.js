@@ -102,7 +102,7 @@
              * @todo
              * salesItemListTpe : To be loaded from server but currently no API call is available for this
              */
-            $scope.salesItemListType = 3;
+            $scope.salesItemListType = 0;
             $scope.editPermission = true;
             $scope.editMode = true;
 
@@ -128,7 +128,7 @@
              */
             $scope.removeItem = function(txItem){
                 var txItemIndex  = $scope.modalBox.tx.itemList.indexOfWhere('ItemID',txItem.ItemID);
-                //console.log(txItemIndex);
+                ////console.log(txItemIndex);
                 $scope.modalBox.tx.itemList.splice(txItemIndex,1);
             };
 
@@ -573,7 +573,7 @@
                         itemList = JSON.parse(data.ItemsList);
                     }
                     catch(ex){
-                        console.log(ex);
+                        //console.log(ex);
                     }
                     var msg = '';
                     for(var ct = 0; ct < itemList.length; ct++){

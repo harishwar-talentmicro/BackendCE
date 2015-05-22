@@ -189,7 +189,7 @@ var res = angular.module('ezeidApp').
                     $scope.coordinatesArr = [];
                     /* count the result */
                     var count = 0;
-                    console.log(data);
+                    //console.log(data);
                     if(data != 'null'){
                         var link = '';
                         var searchType = $routeParams.searchType;
@@ -235,10 +235,11 @@ var res = angular.module('ezeidApp').
                             $scope.searchCount = 0;
                         }
                     }
-                    $scope.$emit('$preLoaderStop');
-                })
-                .error(function(data, status, headers, config) {
-                    $rootScope.$broadcast('$preLoaderStop');
+                    /* put a little delay */
+                    $timeout(function(){
+                        $scope.$emit('$preLoaderStop');
+
+                    },1500);
                 });
             }
 
@@ -307,7 +308,7 @@ var res = angular.module('ezeidApp').
 
             /* Callback function for get current location functionality */
             $scope.findCurrentLocation = function(){
-                console.log(googleMap);
+                //console.log(googleMap);
                 googleMap.getCurrentLocation().then(function(){
                     googleMap.placeCurrentLocationMarker(null,null,false);
                 },function(){
@@ -527,7 +528,7 @@ var res = angular.module('ezeidApp').
                     trigger: "hover"
                 });
 
-            },500);
+            },1000);
 
             /* Basic Kms closed */
             $scope.distanceFilter = function(dist)
@@ -550,7 +551,7 @@ var res = angular.module('ezeidApp').
             $scope.makeAddress = function(AddressLine1,AddressLine2,city)
             {
                 var addressArr = [AddressLine1,AddressLine1,city];
-                return UtilityService.getAddressString(addressArr);
+                return UtilityService.getAddressString(addressArr,40);
             }
 
             $scope.showDirectionMapPopup = function(Latitude,Longitude,IDTypeID){

@@ -43,11 +43,11 @@ angular.module('ezeidApp')
             }*/
           /*  canvas.width = width;
             canvas.height = height;*/
-            // //console.log($rootScope._userInfo.Type);
+            // ////console.log($rootScope._userInfo.Type);
             var canvas = getResizeArea();
             if($rootScope._userInfo.Type == 1)
             {
-                // //console.log("sai11");
+                // ////console.log("sai11");
 
                 var width = 77;
                 var height = 90;
@@ -57,7 +57,7 @@ angular.module('ezeidApp')
             }
             else
             {
-                // //console.log("sai22");
+                // ////console.log("sai22");
 
                 var width = 280;
                 var height = 90;
@@ -70,7 +70,7 @@ angular.module('ezeidApp')
             var ctx = canvas.getContext("2d");
            // ctx.drawImage(origImage, 0, 0, width, height);
             ctx.drawImage(origImage, 0, 0, origImage.width, origImage.height, 0, 0, width, height);
-            // //console.log("big",canvas.toDataURL(type, quality));
+            // ////console.log("big",canvas.toDataURL(type, quality));
             $rootScope.BigImage = canvas.toDataURL(type, quality);
 
 
@@ -84,7 +84,7 @@ angular.module('ezeidApp')
             //draw image on canvas
             var ctx1 = canvas1.getContext("2d");
             ctx1.drawImage(origImage, 0, 0, width1, height1);
-            // //console.log("small",canvas1.toDataURL(type, quality));
+            // ////console.log("small",canvas1.toDataURL(type, quality));
 
             $rootScope.smallImage = canvas1.toDataURL(type, quality);
 
@@ -145,18 +145,18 @@ angular.module('ezeidApp')
          * New Link Function For directive
          */
         var newLinkFn = function(scope,elem,attrs,ctrl){
-            // //console.log(elem);
+            // ////console.log(elem);
             elem.on('change',function(){
-                // //console.log(this);
-                // //console.log($(this));
+                // ////console.log(this);
+                // ////console.log($(this));
                 var file = $(this)[0].files[0];
-                // //console.log(file);
+                // ////console.log(file);
                 var fileReader = new FileReader();
                 var imageDataUri = null;
                 fileReader.onload = function(){
                     imageDataUri =  fileReader.result;
-                    // //console.log(fileReader.result);
-                    // //console.log(scope.userType);
+                    // ////console.log(fileReader.result);
+                    // ////console.log(scope.userType);
                     if(scope.userType == 1){
 
 

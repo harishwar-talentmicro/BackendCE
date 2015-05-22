@@ -32,7 +32,7 @@
                         <div class="row bottom-clearfix"></div>
                         <div class="row bottom-clearfix">
                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                <button class="btn btn-sm btn-primary" ng-click="openModalBox()"><span class="glyphicon glyphicon-plus"></span> Add</button>
+                                <button class="btn btn-sm btn-primary" disabled ng-click="openModalBox()"><span class="glyphicon glyphicon-plus"></span> Add</button><h3>In Progress ! Will be available very soon</h3>
                             </div>
                         </div>
                         <!------- Sales Rules goes here --------------->
@@ -43,7 +43,7 @@
                         <div class="row bottom-clearfix"></div>
                         <div class="row bottom-clearfix">
                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                <button class="btn btn-sm btn-primary" ng-click="openModalBox()"><span class="glyphicon glyphicon-plus"></span> Add</button>
+                                <button class="btn btn-sm btn-primary" disabled ng-click="openModalBox()"><span class="glyphicon glyphicon-plus"></span> Add</button><h3>In Progress ! Will be available very soon</h3>
                             </div>
                         </div>
                         <!--------- Reservation rules goes here------------------>
@@ -54,7 +54,7 @@
                         <div class="row bottom-clearfix"></div>
                         <div class="row bottom-clearfix">
                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                <button class="btn btn-sm btn-primary" ng-click="openModalBox()"><span class="glyphicon glyphicon-plus"></span> Add</button>
+                                <button class="btn btn-sm btn-primary" disabled ng-click="openModalBox()"><span class="glyphicon glyphicon-plus"></span> Add</button><h3>In Progress ! Will be available very soon</h3>
                             </div>
                         </div>
                         <!--------- Home Delivery rules goes here------------------>
@@ -65,7 +65,7 @@
                         <div class="row bottom-clearfix"></div>
                         <div class="row bottom-clearfix">
                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                <button class="btn btn-sm btn-primary" ng-click="openModalBox()"><span class="glyphicon glyphicon-plus"></span> Add</button>
+                                <button class="btn btn-sm btn-primary" disabled ng-click="openModalBox()"><span class="glyphicon glyphicon-plus"></span> Add</button><h3>In Progress ! Will be available very soon</h3>
                             </div>
                         </div>
                         <!--------- Service rules goes here------------------>
@@ -76,7 +76,7 @@
                         <div class="row bottom-clearfix"></div>
                         <div class="row bottom-clearfix">
                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                <button class="btn btn-sm btn-primary" ng-click="openModalBox()"><span class="glyphicon glyphicon-plus"></span> Add</button>
+                                <button class="btn btn-sm btn-primary" disabled ng-click="openModalBox()"><span class="glyphicon glyphicon-plus"></span> Add</button><h3>In Progress ! Will be available very soon</h3>
                             </div>
                         </div>
                         <!--------- Resume rules goes here------------------>
@@ -100,7 +100,7 @@
                     <div class="row">
                         <div class="col-lg-4 col-sm-4 col-sm-4 col-xs-12 bottom-clearfix">
                             <div class="form-group" data-toggle="tooltip" data-original-title="Rule Title" data-title="" data-placement="right">
-                                <input class="form-control" ng-model="modalBox.rule.folderTitle" placeholder="Rule Title" />
+                                <input class="form-control" maxlength="15" ng-model="modalBox.rule.folderTitle" placeholder="Rule Title" />
                             </div>
                         </div>
                         <div class="col-lg-4 col-sm-4 col-sm-4 col-xs-12 bottom-clearfix">
@@ -143,7 +143,7 @@
                                 <label>Longitude : {{modalBox.rule.coordinates.longitude}}</label>
                             </div>
                             <div class="form-group">
-                                <label>Admin Area : {{ modalBox.geoCoderDetails | ruleAdminAreaFilter:modalBox.rule.matchAdminLevel}}</label>
+                                <label>Admin Area : </label>
                             </div>
                         </div>
                         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 bottom-clearfix">
