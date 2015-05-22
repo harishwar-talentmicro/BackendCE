@@ -471,12 +471,13 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
                     TemplateID : (userDetails.TemplateID) ? userDetails.TemplateID : 0
 
                 };
-
+                $scope.$emit('$preLoaderStart');
                 $http({
                     url : GURL + 'ewSavePrimaryEZEData',
                     method : 'POST',
                     data : data
                 }).success(function(resp){
+                    $scope.$emit('$preLoaderStop');
                     if(resp && resp !== null && resp !== 'null'){
                         if(resp.IsAuthenticate){
 
@@ -503,8 +504,10 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
                              */
                             $scope.resetEditLocationDetails();
                             $scope.toggleMapControls(locIndex);
+
                         }
                         else{
+
                             Notification.error({
                                 message: 'An error occured while saving primary location details ! Try again',
                                 delay : MsgDelay
@@ -519,6 +522,7 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
                     }
 
                 }).error(function(err){
+                    $scope.$emit('$preLoaderStop');
                     Notification.error({
                         message: 'An error occured while saving primary location details ! Try again',
                         delay : MsgDelay
@@ -555,11 +559,13 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
                         ParkingStatus : $scope.editLocationDetails.ParkingStatus,
                         TemplateID : ($scope.editLocationDetails.TemplateID) ? $scope.editLocationDetails.TemplateID : 0
                     };
+                    $scope.$emit('$preLoaderStart');
                     $http({
                         url : GURL + 'ewmAddLocation',
                         method : 'POST',
                         data : data
                     }).success(function(resp){
+                            $scope.$emit('$preLoaderStop');
                             if(resp && resp.length > 0){
                                 for(var prop in $scope.editLocationDetails){
                                     if($scope.editLocationDetails.hasOwnProperty(prop)){
@@ -592,6 +598,7 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
                             }
 
                         }).error(function(err){
+                            $scope.$emit('$preLoaderStop');
                             Notification.error({
                                 message: 'An error occurred while saving secondary location ! Please try again',
                                 delay : MsgDelay
@@ -741,16 +748,43 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
                 imageHeight = 148;
                 imageWidth = 148;
             }
-            ScaleAndCropImage.covertToBase64(image).then(function(imageUrl){
-                var scaledImageUrl = ScaleAndCropImage.scalePropotional(imageUrl,imageHeight,imageWidth);
-                var finalImage = ScaleAndCropImage.cropImage(scaledImageUrl,imageHeight,imageWidth);
-                $scope.editLocationDetails.Picture = finalImage;
+            //ScaleAndCropImage.covertToBase64(image).then(function(imageUrl){
+            //    var scaledImageUrl = ScaleAndCropImage.scalePropotional(imageUrl,imageHeight,imageWidth);
+            //    var finalImage = ScaleAndCropImage.cropImage(scaledImageUrl,imageHeight,imageWidth);
+            //    $scope.editLocationDetails.Picture = finalImage;
+            //    if($scope.userDetails.IDTypeID == 1){
+            //        $scope.editLocationDetails.IconFileName = fileName;
+            //        var scImageUrl = ScaleAndCropImage.scalePropotional(imageUrl,40,40);
+            //        var iconImg = ScaleAndCropImage.cropImage(scImageUrl,40,40);
+            //        $scope.editLocationDetails.Icon = iconImg;
+            //    }
+            //});
+            $scope.$emit('$preLoaderStart');
+            ScaleAndCropImage.convertToBase64FromServer(image,imageHeight,imageWidth).then(function(imageUrl){
+                $scope.editLocationDetails.Picture = imageUrl;
                 if($scope.userDetails.IDTypeID == 1){
                     $scope.editLocationDetails.IconFileName = fileName;
                     var scImageUrl = ScaleAndCropImage.scalePropotional(imageUrl,40,40);
                     var iconImg = ScaleAndCropImage.cropImage(scImageUrl,40,40);
                     $scope.editLocationDetails.Icon = iconImg;
                 }
+                $scope.$emit('$preLoaderStop');
+            },function(err){
+                console.info('Server Cropping failed ! Falling back to browser croppping mode');
+                ScaleAndCropImage.covertToBase64(image).then(function(imageUrl){
+                    var scaledImageUrl = ScaleAndCropImage.scalePropotional(imageUrl,imageHeight,imageWidth);
+                    var finalImage = ScaleAndCropImage.cropImage(scaledImageUrl,imageHeight,imageWidth);
+                    $scope.editLocationDetails.Picture = finalImage;
+                    if($scope.userDetails.IDTypeID == 1){
+                        $scope.editLocationDetails.IconFileName = fileName;
+                        var scImageUrl = ScaleAndCropImage.scalePropotional(imageUrl,40,40);
+                        var iconImg = ScaleAndCropImage.cropImage(scImageUrl,40,40);
+                        $scope.editLocationDetails.Icon = iconImg;
+                    }
+                    $scope.$emit('$preLoaderStop');
+                },function(){
+                    $scope.$emit('$preLoaderStop');
+                });
             });
         };
 

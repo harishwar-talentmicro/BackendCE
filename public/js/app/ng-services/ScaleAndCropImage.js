@@ -11,8 +11,48 @@
  *
  *
  */
-angular.module('ezeidApp').service('ScaleAndCropImage',['$q',function($q){
+angular.module('ezeidApp').service('ScaleAndCropImage',['$q','GURL','$http','$rootScope',function($q,GURL,$http,$rootScope){
     return {
+         convertToBase64FromServer : function(image,requiredHeight,requiredWidth){
+             var deferred = $q.defer();
+             try{
+                 var requestedData = new FormData();
+                 requestedData.append('image',image);
+                 requestedData.append('Token',$rootScope._userInfo.Token);
+                 requestedData.append('output_type','png');
+                 requestedData.append('required_height',requiredHeight);
+                 requestedData.append('required_width',requiredWidth);
+                 requestedData.append('scale',true);
+                 requestedData.append('crop',true);
+
+                 $http({
+                     headers: {'Content-Type': undefined },
+                     transformRequest: angular.identity,
+                     url : GURL + 'crop_image',
+                     method : 'POST',
+                     data : requestedData
+                 }).success(function(resp){
+                    console.log(resp);
+                    if(resp && resp.status){
+                        deferred.resolve(resp.picture);
+                    }
+                    else{
+                        deferred.reject(resp.message);
+                    }
+                 }).error(function(err){
+                        deferred.reject(err);
+                 });
+
+                 return deferred.promise;
+             }
+             catch(ex){
+                 $timeout(function(){
+                     deferred.reject('Outdated browser');
+                 },500);
+                 return deferred.promise;
+             }
+
+         },
          covertToBase64 : function (image){
 
              var deferred = $q.defer();
