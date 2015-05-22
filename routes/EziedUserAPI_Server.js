@@ -8896,51 +8896,63 @@ exports.FnCropImage = function(req, res){
                 gm(bitmap).size(function (err, size) {
                     if (!err) {
 
-                        console.log(size.width > size.height ? 'wider' : 'taller');
+                        //console.log(size.width > size.height ? 'wider' : 'taller');
 
 
                         Original_Width = size.width;
                         Original_Height = size.height;
-
+						console.log('Original height : ' + Original_Height + ' Original_Width : '+Original_Width );
 
                         var scaleWidth = 0;
                         var scaleHeight = 0;
-
+						
                         if (Target_Height > Target_Width) {
-
+							
                             if (Original_Height < Original_Width) {
                                 scaleHeight = Target_Height;
-                                scaleWidth = (Original_Width * scaleHeight) / Original_Height;
+                                //scaleWidth = (Original_Width * scaleHeight) / Original_Height;
+								scaleWidth = null;
                             }
 
                             else {
                                 scaleWidth = Target_Width;
-                                scaleHeight = (Original_Height * scaleWidth) / Original_Width;
+                                //scaleHeight = (Original_Height * scaleWidth) / Original_Width;
+								scaleHeight = null;
                             }
                         }
 
                         else {
                             if (Original_Height > Original_Width) {
                                 scaleWidth = Target_Width;
-                                scaleHeight = (Original_Height * scaleWidth) / Original_Width;
+                                //scaleHeight = (Original_Height * scaleWidth) / Original_Width;
+								scaleHeight = null;
                             }
 
                             else {
-
+								console.log('else part 2');
                                 scaleHeight = Target_Height;
                                 scaleWidth = (Original_Width * scaleHeight) / Original_Height;
+								
                                 if (scaleWidth < Target_Width) {
+									console.log('else part 2 if');
                                     scaleWidth = Target_Width;
-                                    scaleHeight = (Original_Height * scaleWidth) / Original_Width;
+                                    //scaleHeight = (Original_Height * scaleWidth) / Original_Width;
+									scaleHeight = null;
                                 }
+								else{
+									scaleWidth = null;
+								}
                             }
                         }
+						
+						
 
-
+						
                         if(scaleFlag){
-                            gm(bitmap).scale(scaleWidth, scaleHeight).toBuffer(outputType,function (err, scaledBuff) {
+                            gm(bitmap).resize(scaleWidth, scaleHeight).toBuffer(outputType,function (err, scaledBuff) {
                                 if(!err){
                                     if(cropFlag){
+										console.log('cropping');
                                         gm(scaledBuff).crop(Target_Width, Target_Height).toBuffer(outputType,function(err,croppedBuff){
                                             if(!err){
                                                 var base64Image = new Buffer(croppedBuff).toString('base64');
@@ -12247,59 +12259,105 @@ exports.FnCropImageAP = function(req, res){
 
 
 
-            try{
-                gm(bitmap).size(function (err, size) {
-                    if (!err) {
+                        try{
+                            gm(bitmap).size(function (err, size) {
+                                if (!err) {
 
-                        console.log(size.width > size.height ? 'wider' : 'taller');
-
-
-                        Original_Width = size.width;
-                        Original_Height = size.height;
+                                    //console.log(size.width > size.height ? 'wider' : 'taller');
 
 
-                        var scaleWidth = 0;
-                        var scaleHeight = 0;
+                                    Original_Width = size.width;
+                                    Original_Height = size.height;
+                                    console.log('Original height : ' + Original_Height + ' Original_Width : '+Original_Width );
 
-                        if (Target_Height > Target_Width) {
+                                    var scaleWidth = 0;
+                                    var scaleHeight = 0;
 
-                            if (Original_Height < Original_Width) {
-                                scaleHeight = Target_Height;
-                                scaleWidth = (Original_Width * scaleHeight) / Original_Height;
-                            }
+                                    if (Target_Height > Target_Width) {
 
-                            else {
-                                scaleWidth = Target_Width;
-                                scaleHeight = (Original_Height * scaleWidth) / Original_Width;
-                            }
-                        }
+                                        if (Original_Height < Original_Width) {
+                                            scaleHeight = Target_Height;
+                                            //scaleWidth = (Original_Width * scaleHeight) / Original_Height;
+                                            scaleWidth = null;
+                                        }
 
-                        else {
-                            if (Original_Height > Original_Width) {
-                                scaleWidth = Target_Width;
-                                scaleHeight = (Original_Height * scaleWidth) / Original_Width;
-                            }
+                                        else {
+                                            scaleWidth = Target_Width;
+                                            //scaleHeight = (Original_Height * scaleWidth) / Original_Width;
+                                            scaleHeight = null;
+                                        }
+                                    }
 
-                            else {
+                                    else {
+                                        if (Original_Height > Original_Width) {
+                                            scaleWidth = Target_Width;
+                                            //scaleHeight = (Original_Height * scaleWidth) / Original_Width;
+                                            scaleHeight = null;
+                                        }
 
-                                scaleHeight = Target_Height;
-                                scaleWidth = (Original_Width * scaleHeight) / Original_Height;
-                                if (scaleWidth < Target_Width) {
-                                    scaleWidth = Target_Width;
-                                    scaleHeight = (Original_Height * scaleWidth) / Original_Width;
-                                }
-                            }
-                        }
+                                        else {
+                                            console.log('else part 2');
+                                            scaleHeight = Target_Height;
+                                            scaleWidth = (Original_Width * scaleHeight) / Original_Height;
+
+                                            if (scaleWidth < Target_Width) {
+                                                console.log('else part 2 if');
+                                                scaleWidth = Target_Width;
+                                                //scaleHeight = (Original_Height * scaleWidth) / Original_Width;
+                                                scaleHeight = null;
+                                            }
+                                            else{
+                                                scaleWidth = null;
+                                            }
+                                        }
+                                    }
 
 
-                        if(scaleFlag){
-                            gm(bitmap).scale(scaleWidth, scaleHeight).toBuffer(outputType,function (err, scaledBuff) {
-                                if(!err){
-                                    if(cropFlag){
-                                        gm(scaledBuff).crop(Target_Width, Target_Height).toBuffer(outputType,function(err,croppedBuff){
+
+
+                                    if(scaleFlag){
+                                        gm(bitmap).resize(scaleWidth, scaleHeight).toBuffer(outputType,function (err, scaledBuff) {
+                                            if(!err){
+                                                if(cropFlag){
+                                                    console.log('cropping');
+                                                    gm(scaledBuff).crop(Target_Width, Target_Height).toBuffer(outputType,function(err,croppedBuff){
+                                                        if(!err){
+                                                            var base64Image = new Buffer(croppedBuff).toString('base64');
+                                                            deleteTempFile();
+                                                            res.status(200).json({
+                                                                status: true,
+                                                                picture : 'data:image/'+outputType+';base64,'+base64Image
+                                                            });
+                                                        }
+                                                        else{
+                                                            deleteTempFile();
+                                                            res.status(400).json(RtnMessage);
+                                                        }
+                                                    });
+                                                }
+                                                else{
+                                                    var base64Image = new Buffer(scaledBuff).toString('base64');
+                                                    deleteTempFile();
+
+                                                    res.status(200).json({
+                                                        status: true,
+                                                        picture : 'data:image/'+outputType+';base64,'+base64Image
+                                                    });
+                                                }
+                                            }
+                                            else{
+                                                deleteTempFile();
+                                                res.status(400).json(RtnMessage);
+                                            }
+                                        });
+                                    }
+
+                                    else if(cropFlag){
+                                        gm(bitmap).crop(Target_Width, Target_Height).toBuffer(outputType,function(err,croppedBuff){
                                             if(!err){
                                                 var base64Image = new Buffer(croppedBuff).toString('base64');
                                                 deleteTempFile();
+
                                                 res.status(200).json({
                                                     status: true,
                                                     picture : 'data:image/'+outputType+';base64,'+base64Image
@@ -12312,72 +12370,38 @@ exports.FnCropImageAP = function(req, res){
                                         });
                                     }
                                     else{
-                                        var base64Image = new Buffer(scaledBuff).toString('base64');
-                                        deleteTempFile();
+                                        gm(bitmap).toBuffer(outputType,function(err,croppedBuff){
+                                            if(!err){
+                                                var base64Image = new Buffer(croppedBuff).toString('base64');
+                                                deleteTempFile();
 
-                                        res.status(200).json({
-                                            status: true,
-                                            picture : 'data:image/'+outputType+';base64,'+base64Image
+                                                res.status(200).json({
+                                                    status: true,
+                                                    picture : 'data:image/'+outputType+';base64,'+base64Image
+                                                });
+                                            }
+                                            else{
+                                                deleteTempFile();
+                                                res.status(400).json(RtnMessage);
+                                            }
                                         });
                                     }
                                 }
+
                                 else{
                                     deleteTempFile();
-                                    res.status(400).json(RtnMessage);
+                                    console.log('FnCropImage: Error in getting image size');
+                                    res.status(200).json(RtnMessage);
                                 }
                             });
                         }
+                        catch(ex){
 
-                        else if(cropFlag){
-                            gm(bitmap).crop(Target_Width, Target_Height).toBuffer(outputType,function(err,croppedBuff){
-                                if(!err){
-                                    var base64Image = new Buffer(croppedBuff).toString('base64');
-                                    deleteTempFile();
-
-                                    res.status(200).json({
-                                        status: true,
-                                        picture : 'data:image/'+outputType+';base64,'+base64Image
-                                    });
-                                }
-                                else{
-                                    deleteTempFile();
-                                    res.status(400).json(RtnMessage);
-                                }
-                            });
+                            console.log(ex);
+                            deleteTempFile();
+                            console.log('FnCropImage: Error in getting image size');
+                            res.status(200).json(RtnMessage);
                         }
-                        else{
-                            gm(bitmap).toBuffer(outputType,function(err,croppedBuff){
-                                if(!err){
-                                    var base64Image = new Buffer(croppedBuff).toString('base64');
-                                    deleteTempFile();
-
-                                    res.status(200).json({
-                                        status: true,
-                                        picture : 'data:image/'+outputType+';base64,'+base64Image
-                                    });
-                                }
-                                else{
-                                    deleteTempFile();
-                                    res.status(400).json(RtnMessage);
-                                }
-                            });
-                        }
-                    }
-
-                    else{
-                        deleteTempFile();
-                        console.log('FnCropImage: Error in getting image size');
-                        res.status(200).json(RtnMessage);
-                    }
-                });
-            }
-            catch(ex){
-
-                console.log(ex);
-                deleteTempFile();
-                console.log('FnCropImage: Error in getting image size');
-                res.status(200).json(RtnMessage);
-            }
                     }
                     else{
                         deleteTempFile();

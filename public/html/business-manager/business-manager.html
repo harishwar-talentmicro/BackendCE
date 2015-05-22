@@ -22,7 +22,7 @@
                                     <ul class="nav nav-tabs nav-justified nav-configuration">
                                         <li role="presentation" ng-repeat="module in modules track by $index" ng-click="selectModule({moduleIndex : $index})">
                                             <!--<a ng-show="module.permission == 0" class="disabled"><span class="{{module.icon}}"></span> {{module.title}}</a>-->
-                                            <a ng-hide="module.permission == 0" href="/business-manager/sales" ng-class="(module.type == activeModule) ? 'active' : ''"><span class="{{module.icon}}"></span> {{module.title}}</a>
+                                            <a ng-hide="module.permission == 0" href="/business-manager/{{module.type}}" ng-class="(module.type == activeModule) ? 'active' : ''"><span class="{{module.icon}}"></span> {{module.title}}</a>
                                         </li>
                                     </ul>
                                 </div>
