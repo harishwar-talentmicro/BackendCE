@@ -8846,234 +8846,208 @@ exports.FnSendBulkMailer = function (req, res) {
 };
 
 //below method to crop the image
-exports.FnCropImage = function(req, res){
+exports.FnCropImage = function(req,res){
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+    var fs = require('fs');
+
+    console.log(req.files.image.path);
     var deleteTempFile = function(){
-        fs.unlink('../bin/'+req.files.image.path);
+        fs.unlink('../bin/uploads/'+req.files.image.path);
     };
-    var RtnMessage = {
-        status: false,
-        picture : ''
-    };
-    try{
-        res.setHeader("Access-Control-Allow-Origin", "*");
-        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-        var allowedTypes = ['JPG','PNG'];
 
-        var fs = require('fs');
-        var Token = (req.body.Token) ? ((req.body.Token == 2) ? '' : req.body.Token) : '';
-        var Image = req.body.image;
-        var Target_Width = (!isNaN(parseInt(req.body.required_width))) ? parseInt(req.body.required_width) : 0;
-        var Target_Height = (!isNaN(parseInt(req.body.required_height))) ? parseInt(req.body.required_width) : 0;
-        var outputType = (req.body.output_type) ? req.body.output_type.toUpperCase() : '';
-        var scaleFlag = (req.body.scale) ? req.body.scale : false;
-        var cropFlag = (req.body.crop) ? req.body.crop : false;
-        /**
-         * By default image will be generated in png format
-         */
-        if(allowedTypes.indexOf(outputType)== -1){
-            outputType = 'PNG';
+
+    var respMsg = {
+        status : false,
+        message : 'Invalid image',
+        picture : null,
+        error : {
+            picture : 'Image file is invalid or corrupted'
         }
+    };
+
+    var allowedTypes = ['jpg','png'];
+
+    var  targetHeight = (req.body.required_height) ? (!isNaN(parseInt(req.body.required_height)) ? parseInt(req.body.required_height) : 0 ) : 0  ,
+        targetWidth = (req.body.required_width) ? (!isNaN(parseInt(req.body.required_width)) ? parseInt(req.body.required_width) : 0 ) : 0  ;
 
 
-        //var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
+    var scaleHeight = null,scaleWidth = null;
 
-        if (Token && Target_Width && Target_Height) {
-            FnValidateToken(Token, function (err, Result) {
-                if (!err) {
-                    if (Result != null) {
+    var cropFlag = (req.body.crop) ? req.body.crop : true;
+    var scaleFlag = (req.body.scale) ? req.body.scale : true;
+    var token = (req.body.Token && req.body.Token !==2 ) ? req.body.Token : '';
+    var outputType = (allowedTypes.indexOf(req.body.output_type) == -1) ? 'png' : req.body.output_type;
 
-            var fs = require('fs');
-            
-            var gm = require('gm').subClass({ imageMagick: true });
-            var bitmap = fs.readFileSync('../bin/'+req.files.image.path);
-            
-            var Original_Width = 0;
-            var Original_Height = 0;
+    if(!(targetHeight && targetWidth)){
+        respMsg.message = 'Invalid target dimensions';
+        respMsg.error = {
+            required_height : (targetHeight) ? 'Invalid target height' : null,
+            required_width : (targetWidth) ? 'Invalid target width' : null
+        };
+        res.status(400).json(respMsg);
+        deleteTempFile();
+        return;
+    }
 
+    if(!token){
+        respMsg.message = 'Please login to continue';
+        respMsg.error = {
+            Token : 'Token is invalid'
+        };
+        res.status(401).json(respMsg);
+        deleteTempFile();
+        return;
+    }
 
-
-            try{
-                gm(bitmap).size(function (err, size) {
-                    if (!err) {
-
-                        //console.log(size.width > size.height ? 'wider' : 'taller');
-
-
-                        Original_Width = size.width;
-                        Original_Height = size.height;
-						console.log('Original height : ' + Original_Height + ' Original_Width : '+Original_Width );
-
-                        var scaleWidth = 0;
-                        var scaleHeight = 0;
-						
-                        if (Target_Height > Target_Width) {
-							
-                            if (Original_Height < Original_Width) {
-                                scaleHeight = Target_Height;
-                                scaleWidth = (Original_Width * scaleHeight) / Original_Height;
-								//scaleWidth = null;
-                            }
-
-                            else {
-                                scaleWidth = Target_Width;
-                                scaleHeight = (Original_Height * scaleWidth) / Original_Width;
-								//scaleHeight = null;
-                            }
-                        }
-
-                        else {
-                            if (Original_Height > Original_Width) {
-                                scaleWidth = Target_Width;
-                                scaleHeight = (Original_Height * scaleWidth) / Original_Width;
-								//scaleHeight = null;
-                            }
-
-                            else {
-								console.log('else part 2');
-                                scaleHeight = Target_Height;
-                                scaleWidth = (Original_Width * scaleHeight) / Original_Height;
-								
-                                if (scaleWidth < Target_Width) {
-									console.log('else part 2 if');
-                                    scaleWidth = Target_Width;
-                                    scaleHeight = (Original_Height * scaleWidth) / Original_Width;
-									//scaleHeight = null;
-                                }
-
-                            }
-                        }
-						
-						
-
-						
-                        if(scaleFlag){
-                            gm(bitmap).scale(scaleWidth, scaleHeight).toBuffer(outputType,function (err, scaledBuff) {
-                                if(!err){
-                                    if(cropFlag){
-										console.log('cropping');
-                                        gm(scaledBuff).crop(Target_Width, Target_Height).toBuffer(outputType,function(err,croppedBuff){
-                                            if(!err){
-                                                var base64Image = new Buffer(croppedBuff).toString('base64');
-                                                deleteTempFile();
-                                                res.status(200).json({
-                                                    status: true,
-                                                    picture : 'data:image/'+outputType+';base64,'+base64Image
-                                                });
-                                            }
-                                            else{
-                                                deleteTempFile();
-                                                res.status(400).json(RtnMessage);
-                                            }
-                                        });
+    FnValidateToken(token, function (err, Result) {
+        if (!err) {
+            if (Result != null) {
+                try{
+                    console.log(req.files.image.path);
+                    var bitmap = fs.readFileSync('../bin/'+req.files.image.path);
+                    var gm = require('gm').subClass({ imageMagick: true });
+                    gm(bitmap).size(function (err, size) {
+                        if (!err) {
+                            // Orientation landscape
+                            if(size.height < size.width){
+                                // scale++
+                                if(size.height < targetHeight || size.width < targetWidth){
+                                    if(targetHeight > targetWidth){
+                                        scaleHeight = targetHeight.toString();
+                                        ////
+                                        scaleWidth = (size.width * scaleHeight)/ size.height;
                                     }
                                     else{
-                                        var base64Image = new Buffer(scaledBuff).toString('base64');
-                                        deleteTempFile();
+                                        scaleWidth = targetWidth.toString();
+                                        ////
+                                        scaleHeight = (size.height * scaleWidth) / size.width;
+                                    }
+                                }
+                                // scale--
+                                else{
+                                    if(targetHeight > targetWidth){
+                                        console.log('true condition');
+                                        scaleHeight = targetHeight.toString();
+                                        ////
+                                        scaleWidth = (scaleHeight * size.width) / size.height;
+                                    }
+                                    else{
+                                        scaleWidth = targetWidth.toString();
+                                        ////
+                                        scaleHeight = (scaleWidth * size.height)/ size.width;
 
-                                        res.status(200).json({
-                                            status: true,
-                                            picture : 'data:image/'+outputType+';base64,'+base64Image
-                                        });
+                                    }
+                                }
+                            }
+
+                            // Orientation is potrait
+                            else{
+                                //scale++
+                                if(size.height < targetHeight || size.width < targetHeight){
+                                    if(targetHeight > targetWidth){
+                                        console.log('condition false');
+
+                                        scaleHeight = targetHeight.toString();
+                                        scaleWidth = (scaleHeight * size.width)/ size.height;
+
+
+                                    }
+                                    else{
+                                        scaleWidth = targetWidth.toString();
+                                        scaleHeight = (scaleWidth * size.height) / size.width;
                                     }
                                 }
                                 else{
-                                    deleteTempFile();
-                                    res.status(400).json(RtnMessage);
+                                    scaleWidth = targetWidth.toString();
+                                    ////
+                                    scaleHeight = (scaleWidth * size.height) / size.width;
                                 }
-                            });
-                        }
+                            }
 
-                        else if(cropFlag){
-                            gm(bitmap).crop(Target_Width, Target_Height).toBuffer(outputType,function(err,croppedBuff){
-                                if(!err){
-                                    var base64Image = new Buffer(croppedBuff).toString('base64');
-                                    deleteTempFile();
+                            //var dimensions = {
+                            //    originalHeight : size.height,
+                            //    originalWidth : size.width,
+                            //    scaleHeight : scaleHeight,
+                            //    scaleWidth : scaleWidth,
+                            //    targetHeight : targetHeight,
+                            //    targetWidth : targetWidth
+                            //};
 
-                                    res.status(200).json({
-                                        status: true,
-                                        picture : 'data:image/'+outputType+';base64,'+base64Image
+                            if(scaleFlag && cropFlag){
+                                gm(bitmap)
+                                    .resize(scaleWidth,scaleHeight,"!")
+                                    .crop(targetWidth,targetHeight,0,0).toBuffer(outputType.toUpperCase(),function(err,croppedBuff){
+                                        if(!err){
+                                            var cdataUrl = new Buffer(croppedBuff).toString('base64');
+                                            var picUrl = 'data:image/'+outputType+';base64,'+cdataUrl;
+                                            res.status(200).json({status : true, picture : picUrl, message : 'Picture cropped successfully'});
+                                        }
+                                        else{
+                                            res.status(400).json(respMsg);
+                                        }
                                     });
-                                }
-                                else{
-                                    deleteTempFile();
-                                    res.status(400).json(RtnMessage);
-                                }
-                            });
+
+                            }
+
+                            else if(scaleFlag && !cropFlag){
+                                gm(bitmap)
+                                    .resize(scaleWidth,scaleHeight).toBuffer(outputType.toUpperCase(),function(err,croppedBuff){
+                                        if(!err){
+                                            var cdataUrl = new Buffer(croppedBuff).toString('base64');
+                                            var picUrl = 'data:image/'+outputType+';base64,'+cdataUrl;
+                                            res.status(200).json({status : true, picture : picUrl, message : 'Picture cropped successfully'});
+                                        }
+                                        else{
+                                            res.status(400).json(respMsg);
+                                        }
+                                    });
+
+                            }
+
+                            else if(!scaleFlag && cropFlag){
+                                gm(bitmap)
+                                    .crop(targetWidth,targetHeight,0,0).toBuffer(outputType.toUpperCase(),function(err,croppedBuff){
+                                        if(!err){
+                                            var cdataUrl = new Buffer(croppedBuff).toString('base64');
+                                            var picUrl = 'data:image/'+outputType+';base64,'+cdataUrl;
+                                            res.status(200).json({status : true, picture : picUrl, message : 'Picture cropped successfully'});
+                                        }
+                                        else{
+                                            res.status(400).json(respMsg);
+                                        }
+                                    });
+                            }
                         }
                         else{
-                            gm(bitmap).toBuffer(outputType,function(err,croppedBuff){
-                                if(!err){
-                                    var base64Image = new Buffer(croppedBuff).toString('base64');
-                                    deleteTempFile();
-
-                                    res.status(200).json({
-                                        status: true,
-                                        picture : 'data:image/'+outputType+';base64,'+base64Image
-                                    });
-                                }
-                                else{
-                                    deleteTempFile();
-                                    res.status(400).json(RtnMessage);
-                                }
-                            });
+                            throw new Error('FnCropImage : '+ 'Invalid image file. Unable to find image size');
+                            res.status(400).json(respMsg);
                         }
-                    }
-
-                    else{
-                        deleteTempFile();
-                        console.log('FnCropImage: Error in getting image size');
-                        res.status(200).json(RtnMessage);
-                    }
-                });
-            }
-            catch(ex){
-
-                console.log(ex);
-                deleteTempFile();
-                console.log('FnCropImage: Error in getting image size');
-                res.status(200).json(RtnMessage);
-            }
-                    }
-                    else{
-                        deleteTempFile();
-                        res.status(401).json(RtnMessage);
-                        console.log('FnCropImage:Invalid Token');
-                    }
+                    });
                 }
-                else{
-                    deleteTempFile();
-                    console.log('FnCropImage:Error in processing Token');
-                    res.status(500).json(RtnMessage);
+                catch(ex){
+                    console.log(ex);
+                    throw new Error('FnCropImage : '+ ex.description);
                 }
-            });
+            }
+            else{
+                respMsg.message = 'Please login to continue';
+                respMsg.error = {
+                    Token : 'Token is invalid'
+                };
+                res.status(401).json(respMsg);
+                throw new Error('FnCropImage : '+ 'Invalid Token');
+            }
         }
-        else {
-            if (Token == null) {
-                console.log('FnCropImage: Token is empty');
-            }
-            else if (Image == null) {
-                console.log('FnCropImage: Image is empty');
-            }
-            else if (Target_Width == null) {
-                console.log('FnCropImage: Width is empty');
-            }
-            else if (Target_Height == null) {
-                console.log('FnCropImage: Height is empty');
-            }
-            deleteTempFile();
-            console.log('FnCropImage: Error in getting image size');
-
-            res.status(400).json(RtnMessage);
+        else{
+            throw new Error('FnCropImage : '+ 'Error in query execution while validating token');
+            res.status(400).json(respMsg);
         }
-    }
-    catch (ex) {
-        console.log('FnCropImage:error ' + ex.description);
-        throw new Error(ex);
-        deleteTempFile();
-        console.log('FnCropImage: Error in getting image size');
+    });
 
-        res.status(400).json(RtnMessage);
-    }
+    deleteTempFile();
+
 };
 
 exports.FnSaveWebLink = function(req, res){
@@ -12211,234 +12185,206 @@ exports.FnDeleteBannerPictureAP = function(req, res){
     }
 };
 
-exports.FnCropImageAP = function(req, res){
+exports.FnCropImageAP = function(req,res){
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+    var fs = require('fs');
+
     var deleteTempFile = function(){
         fs.unlink('../bin/'+req.files.image.path);
     };
-    var RtnMessage = {
-        status: false,
-        picture : ''
-    };
-    try{
-        res.setHeader("Access-Control-Allow-Origin", "*");
-        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-        var allowedTypes = ['JPG','PNG'];
 
-        var fs = require('fs');
-        var Token = (req.body.Token) ? ((req.body.Token == 2) ? '' : req.body.Token) : '';
-        var Image = req.body.image;
-        var Target_Width = (!isNaN(parseInt(req.body.required_width))) ? parseInt(req.body.required_width) : 0;
-        var Target_Height = (!isNaN(parseInt(req.body.required_height))) ? parseInt(req.body.required_width) : 0;
-        var outputType = (req.body.output_type) ? req.body.output_type.toUpperCase() : '';
-        var scaleFlag = (req.body.scale) ? req.body.scale : false;
-        var cropFlag = (req.body.crop) ? req.body.crop : false;
-        /**
-         * By default image will be generated in png format
-         */
-        if(allowedTypes.indexOf(outputType)== -1){
-            outputType = 'PNG';
+
+    var respMsg = {
+        status : false,
+        message : 'Invalid image',
+        picture : null,
+        error : {
+            picture : 'Image file is invalid or corrupted'
         }
-        
+    };
 
-        //var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
-
-        if (Token && Target_Width && Target_Height) {
-            FnValidateTokenAP(Token, function (err, Result) {
-                if (!err) {
-                    if (Result != null) {
-
-            var fs = require('fs');
-            
-            var gm = require('gm').subClass({ imageMagick: true });
-            var bitmap = fs.readFileSync('../bin/'+req.files.image.path);
-            
-            var Original_Width = 0;
-            var Original_Height = 0;
+    var allowedTypes = ['jpg','png'];
 
 
-
-                        try{
-                            gm(bitmap).size(function (err, size) {
-                                if (!err) {
-
-                                    //console.log(size.width > size.height ? 'wider' : 'taller');
+    var  targetHeight = (req.body.required_height) ? (!isNaN(parseInt(req.body.required_height)) ? parseInt(req.body.required_height) : 0 ) : 0  ,
+        targetWidth = (req.body.required_width) ? (!isNaN(parseInt(req.body.required_width)) ? parseInt(req.body.required_width) : 0 ) : 0  ;
 
 
-                                    Original_Width = size.width;
-                                    Original_Height = size.height;
-                                    console.log('Original height : ' + Original_Height + ' Original_Width : '+Original_Width );
+    var scaleHeight = null,scaleWidth = null;
 
-                                    var scaleWidth = 0;
-                                    var scaleHeight = 0;
+    var cropFlag = (req.body.crop) ? req.body.crop : true;
+    var scaleFlag = (req.body.scale) ? req.body.scale : true;
+    var token = (req.body.Token && req.body.Token !== 2 ) ? req.body.Token : '';
+    var outputType = (allowedTypes.indexOf(req.body.output_type) == -1) ? 'png' : req.body.output_type;
 
-                                    if (Target_Height > Target_Width) {
+    if(!(targetHeight && targetWidth)){
+        respMsg.message = 'Invalid target dimensions';
+        respMsg.error = {
+            required_height : (targetHeight) ? 'Invalid target height' : null,
+            required_width : (targetWidth) ? 'Invalid target width' : null
+        };
+        res.status(400).json(respMsg);
+        deleteTempFile();
+        return;
+    }
 
-                                        if (Original_Height < Original_Width) {
-                                            scaleHeight = Target_Height;
-                                            scaleWidth = (Original_Width * scaleHeight) / Original_Height;
-                                            //scaleWidth = null;
-                                        }
+    if(!token){
+        respMsg.message = 'Please login to continue';
+        respMsg.error = {
+            Token : 'Token is invalid'
+        };
+        res.status(401).json(respMsg);
+        deleteTempFile();
+        return;
+    }
 
-                                        else {
-                                            scaleWidth = Target_Width;
-                                            scaleHeight = (Original_Height * scaleWidth) / Original_Width;
-                                            //scaleHeight = null;
-                                        }
-                                    }
-
-                                    else {
-                                        if (Original_Height > Original_Width) {
-                                            scaleWidth = Target_Width;
-                                            scaleHeight = (Original_Height * scaleWidth) / Original_Width;
-                                            //scaleHeight = null;
-                                        }
-
-                                        else {
-                                            console.log('else part 2');
-                                            scaleHeight = Target_Height;
-                                            scaleWidth = (Original_Width * scaleHeight) / Original_Height;
-
-                                            if (scaleWidth < Target_Width) {
-                                                console.log('else part 2 if');
-                                                scaleWidth = Target_Width;
-                                                scaleHeight = (Original_Height * scaleWidth) / Original_Width;
-                                                //scaleHeight = null;
-                                            }
-
-                                        }
-                                    }
-
-
-
-
-                                    if(scaleFlag){
-                                        gm(bitmap).scale(scaleWidth, scaleHeight).toBuffer(outputType,function (err, scaledBuff) {
-                                            if(!err){
-                                                if(cropFlag){
-                                                    console.log('cropping');
-                                                    gm(scaledBuff).crop(Target_Width, Target_Height).toBuffer(outputType,function(err,croppedBuff){
-                                                        if(!err){
-                                                            var base64Image = new Buffer(croppedBuff).toString('base64');
-                                                            deleteTempFile();
-                                                            res.status(200).json({
-                                                                status: true,
-                                                                picture : 'data:image/'+outputType+';base64,'+base64Image
-                                                            });
-                                                        }
-                                                        else{
-                                                            deleteTempFile();
-                                                            res.status(400).json(RtnMessage);
-                                                        }
-                                                    });
-                                                }
-                                                else{
-                                                    var base64Image = new Buffer(scaledBuff).toString('base64');
-                                                    deleteTempFile();
-
-                                                    res.status(200).json({
-                                                        status: true,
-                                                        picture : 'data:image/'+outputType+';base64,'+base64Image
-                                                    });
-                                                }
-                                            }
-                                            else{
-                                                deleteTempFile();
-                                                res.status(400).json(RtnMessage);
-                                            }
-                                        });
-                                    }
-
-                                    else if(cropFlag){
-                                        gm(bitmap).crop(Target_Width, Target_Height).toBuffer(outputType,function(err,croppedBuff){
-                                            if(!err){
-                                                var base64Image = new Buffer(croppedBuff).toString('base64');
-                                                deleteTempFile();
-
-                                                res.status(200).json({
-                                                    status: true,
-                                                    picture : 'data:image/'+outputType+';base64,'+base64Image
-                                                });
-                                            }
-                                            else{
-                                                deleteTempFile();
-                                                res.status(400).json(RtnMessage);
-                                            }
-                                        });
+    FnValidateTokenAP(token, function (err, Result) {
+        if (!err) {
+            if (Result != null) {
+                try{
+                    var bitmap = fs.readFileSync('../bin/'+req.files.image.path);
+                    var gm = require('gm').subClass({ imageMagick: true });
+                    gm(bitmap).size(function (err, size) {
+                        if (!err) {
+                            // Orientation landscape
+                            if(size.height < size.width){
+                                // scale++
+                                if(size.height < targetHeight || size.width < targetWidth){
+                                    if(targetHeight > targetWidth){
+                                        scaleHeight = targetHeight.toString();
+                                        ////
+                                        scaleWidth = (size.width * scaleHeight)/ size.height;
                                     }
                                     else{
-                                        gm(bitmap).toBuffer(outputType,function(err,croppedBuff){
-                                            if(!err){
-                                                var base64Image = new Buffer(croppedBuff).toString('base64');
-                                                deleteTempFile();
-
-                                                res.status(200).json({
-                                                    status: true,
-                                                    picture : 'data:image/'+outputType+';base64,'+base64Image
-                                                });
-                                            }
-                                            else{
-                                                deleteTempFile();
-                                                res.status(400).json(RtnMessage);
-                                            }
-                                        });
+                                        scaleWidth = targetWidth.toString();
+                                        ////
+                                        scaleHeight = (size.height * scaleWidth) / size.width;
                                     }
                                 }
-
+                                // scale--
                                 else{
-                                    deleteTempFile();
-                                    console.log('FnCropImage: Error in getting image size');
-                                    res.status(200).json(RtnMessage);
+                                    if(targetHeight > targetWidth){
+                                        console.log('true condition');
+                                        scaleHeight = targetHeight.toString();
+                                        ////
+                                        scaleWidth = (scaleHeight * size.width) / size.height;
+                                    }
+                                    else{
+                                        scaleWidth = targetWidth.toString();
+                                        ////
+                                        scaleHeight = (scaleWidth * size.height)/ size.width;
+
+                                    }
                                 }
-                            });
+                            }
+
+                            // Orientation is potrait
+                            else{
+                                //scale++
+                                if(size.height < targetHeight || size.width < targetHeight){
+                                    if(targetHeight > targetWidth){
+                                        console.log('condition false');
+
+                                        scaleHeight = targetHeight.toString();
+                                        scaleWidth = (scaleHeight * size.width)/ size.height;
+
+
+                                    }
+                                    else{
+                                        scaleWidth = targetWidth.toString();
+                                        scaleHeight = (scaleWidth * size.height) / size.width;
+                                    }
+                                }
+                                else{
+                                    scaleWidth = targetWidth.toString();
+                                    ////
+                                    scaleHeight = (scaleWidth * size.height) / size.width;
+                                }
+                            }
+
+                            //var dimensions = {
+                            //    originalHeight : size.height,
+                            //    originalWidth : size.width,
+                            //    scaleHeight : scaleHeight,
+                            //    scaleWidth : scaleWidth,
+                            //    targetHeight : targetHeight,
+                            //    targetWidth : targetWidth
+                            //};
+
+                            if(scaleFlag && cropFlag){
+                                gm(bitmap)
+                                    .resize(scaleWidth,scaleHeight,"!")
+                                    .crop(targetWidth,targetHeight,0,0).toBuffer(outputType.toUpperCase(),function(err,croppedBuff){
+                                        if(!err){
+                                            var cdataUrl = new Buffer(croppedBuff).toString('base64');
+                                            var picUrl = 'data:image/'+outputType+';base64,'+cdataUrl;
+                                            res.status(200).json({status : true, picture : picUrl, message : 'Picture cropped successfully'});
+                                        }
+                                        else{
+                                            res.status(400).json(respMsg);
+                                        }
+                                    });
+
+                            }
+
+                            else if(scaleFlag && !cropFlag){
+                                gm(bitmap)
+                                    .resize(scaleWidth,scaleHeight).toBuffer(outputType.toUpperCase(),function(err,croppedBuff){
+                                        if(!err){
+                                            var cdataUrl = new Buffer(croppedBuff).toString('base64');
+                                            var picUrl = 'data:image/'+outputType+';base64,'+cdataUrl;
+                                            res.status(200).json({status : true, picture : picUrl, message : 'Picture cropped successfully'});
+                                        }
+                                        else{
+                                            res.status(400).json(respMsg);
+                                        }
+                                    });
+
+                            }
+
+                            else if(!scaleFlag && cropFlag){
+                                gm(bitmap)
+                                    .crop(targetWidth,targetHeight,0,0).toBuffer(outputType.toUpperCase(),function(err,croppedBuff){
+                                        if(!err){
+                                            var cdataUrl = new Buffer(croppedBuff).toString('base64');
+                                            var picUrl = 'data:image/'+outputType+';base64,'+cdataUrl;
+                                            res.status(200).json({status : true, picture : picUrl, message : 'Picture cropped successfully'});
+                                        }
+                                        else{
+                                            res.status(400).json(respMsg);
+                                        }
+                                    });
+                            }
                         }
-                        catch(ex){
-
-                            console.log(ex);
-                            deleteTempFile();
-                            console.log('FnCropImage: Error in getting image size');
-                            res.status(200).json(RtnMessage);
+                        else{
+                            throw new Error('FnCropImage : '+ 'Invalid image file. Unable to find image size');
+                            res.status(400).json(respMsg);
                         }
-                    }
-                    else{
-                        deleteTempFile();
-                        console.log("FnCropImage:Invaild Token");
-                        res.status(401).json(RtnMessage);
-                    }
+                    });
                 }
-                else{
-                    deleteTempFile();
-                    console.log("FnCropImage:Error processing in token");
-                    res.status(500).json(RtnMessage);
+                catch(ex){
+                    throw new Error('FnCropImage : '+ ex.description);
                 }
-            });
+            }
+            else{
+                respMsg.message = 'Please login to continue';
+                respMsg.error = {
+                    Token : 'Token is invalid'
+                };
+                res.status(401).json(respMsg);
+                throw new Error('FnCropImage : '+ 'Invalid Token');
+            }
         }
-        else {
-            if (Token == null) {
-                console.log('FnCropImage: Token is empty');
-            }
-            else if (Image == null) {
-                console.log('FnCropImage: Image is empty');
-            }
-            else if (Target_Width == null) {
-                console.log('FnCropImage: Width is empty');
-            }
-            else if (Target_Height == null) {
-                console.log('FnCropImage: Height is empty');
-            }
-            deleteTempFile();
-            console.log('FnCropImage: Error in getting image size');
-
-            res.status(400).json(RtnMessage);
+        else{
+            throw new Error('FnCropImage : '+ 'Error in query execution while validating token');
+            res.status(400).json(respMsg);
         }
-    }
-    catch (ex) {
-        console.log('FnCropImage:error ' + ex.description);
-        throw new Error(ex);
-        deleteTempFile();
-        console.log('FnCropImage: Error in getting image size');
+    });
 
-        res.status(400).json(RtnMessage);
-    }
+    deleteTempFile();
+
 };
 
 //EZEID VAS
