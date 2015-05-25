@@ -130,6 +130,9 @@ angular.module('ezeidApp').
             }
             $http({ method: 'get', url: GURL + 'ewtGetSearchInformation?Token=' + $rootScope._userInfo.Token + '&TID=' + _TID + '&SearchType=' + _SearchType + '&CurrentDate=' + currentDate}).success(function (data) {
                 $rootScope.$broadcast('$preLoaderStop');
+
+                console.log(data);
+
                 if (data && data != 'null')
                 {
                   //  $scope.showDetailsModal = true;
@@ -532,6 +535,8 @@ angular.module('ezeidApp').
         };
 
         $scope.getdirections = function (data) {
+
+            console.log(data);
             $scope.activeTemplate = "html/mapPopView.html";
             $scope.showMapPopupModel = true;
 

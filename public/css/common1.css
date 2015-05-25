@@ -1514,11 +1514,11 @@ table.rwd-table > tbody > tr > td.serachResultSelectAll
     position: absolute;
     top: 0.5%;
     z-index: 3;
-    right: 0px;
+        /*right: 0px;*/
     background: rgba(255, 255, 54, 0.7);
     font-size: 13px;
-    width: 352px;
-    margin-right: 3.2%;
+    width: 352px;/*
+    margin-right: 3.2%;*/
 }
 .profilePicBorder
 {

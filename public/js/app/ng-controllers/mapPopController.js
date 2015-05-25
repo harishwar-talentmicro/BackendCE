@@ -89,9 +89,14 @@ angular.module('ezeidApp').controller('mapPopController',[
             title = 'Primary Location';
             containerElement = 'map-location-0';
 
-            var markerImage = directtionLatLong.IDTypeID == 1 ? 'images/Individual-Icon_48.png' : 'images/business-icon_48.png';
-            var marker = googleMap.createMarker(pos,title,markerImage,false,null);
-            googleMap.placeMarker(marker);
+            $scope.userLat = directtionLatLong.endLat;
+
+            if(directtionLatLong.endLat)
+            {
+                var markerImage = directtionLatLong.IDTypeID == 1 ? 'images/Individual-Icon_48.png' : 'images/business-icon_48.png';
+                var marker = googleMap.createMarker(pos,title,markerImage,false,null);
+                googleMap.placeMarker(marker);
+            }
 
             $timeout(function(){
                 googleMap.setMarkersInBounds();

@@ -49,8 +49,8 @@
                 <!--<a  ng-click="changeActive(pageResources)" class="btn-link"><span class="glyphicon glyphicon-list-alt"></span> Reservation Resources</a>-->
             <!--</li>-->
 
-            <li role="presentation" ng-class="{'active':pageResources === activeSubTemplate}" class="disabled">
-                <a class="btn-link"><span class="glyphicon glyphicon-list-alt"></span> Reservation Resources</a>
+            <li role="presentation" ng-class="{'active':pageResources === activeSubTemplate}">
+                <a ng-click="changeActive(pageResources)" class="btn-link"><span class="glyphicon glyphicon-list-alt"></span> Reservation Resources</a>
             </li>
 
             <li role="presentation" ng-class="{'active':pageStatusTypes === activeSubTemplate}">
