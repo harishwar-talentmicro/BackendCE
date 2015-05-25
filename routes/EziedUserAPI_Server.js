@@ -8708,25 +8708,48 @@ exports.FnSendBulkMailer = function (req, res) {
             }
         }
         else {
+            var fs = require('fs');
             
             if (Token != null && Attachment != null && AttachmentFileName != null && ToMailID != null) {
                 FnValidateToken(Token, function (err, Result) {
                     if (!err) {
                         if (Result != null) {
-                            var query = 'select EZEID from tmaster where Token='+db.escape(Token);
-                            db.query(query, function (err, Result) {
+                            var query = db.escape(Token);
+                            console.log('CALL pSendMailerDetails(' + query + ')');
+                            db.query('CALL pSendMailerDetails(' + query + ')', function (err, Result) {
+                                
                             if (!err) {
                             if (Result.length > 0) {
-                                OutputFileName = Result[0].EZEID;
+                                var output = Result[0];
+                                OutputFileName = output[0].Name;
+                                var EZEID = output[0].EZEID;
+                                
                                 console.log(OutputFileName+'.pdf');
+                                console.log('FnSendBulkMailer:UserDetails found..');
+                                
                             }
                             else{
-                                    console.log('FnSendBulkMailer:No EZEID found..');
+                                    console.log('FnSendBulkMailer:No EZEID NAME found..');
+                                    
                                 }
                             }
                             else{
-                                    console.log('FnSendBulkMailer:Error in finding EZEID');
+                                    console.log('FnSendBulkMailer:Error in finding EZEID NAME');
+                                    
                                 }
+                                fs.readFile("./MailContentTemplate.txt/", "utf8", function (err, data) {
+                                        if (!err){
+                                        data = data.replace("[EZEIDNAME]", OutputFileName);
+                                        data = data.replace("[EZEID]", EZEID);
+                                        console.log('FnSendBulkMailer:Replace name send successfully');
+                                            
+                                        }
+                                        else
+                                        {
+                                            console.log('FnSendBulkMailer:Error in getting template file');
+                                            
+                                            
+                                        }
                           
                             var pdfDocument = require('pdfkit');
                             //var doc = new pdfDocument();
@@ -8738,7 +8761,7 @@ exports.FnSendBulkMailer = function (req, res) {
                             var bufferData = new Buffer(Attachment.replace(/^data:image\/(png|gif|jpeg|jpg);base64,/, ''), 'base64');							
                             var pdfdoc = doc.image(bufferData);
                             //console.log(bufferData);
-							var fs = require('fs');
+							
                             var ws = fs.createWriteStream('./TempMapLocationFile/'+OutputFileName+'.pdf');
                             var stream = doc.pipe(ws);
                             doc.end();
@@ -8763,15 +8786,15 @@ exports.FnSendBulkMailer = function (req, res) {
                                     //fs.writeFileSync('base64.txt', Base64PdfData);
 									fs.unlinkSync('TempMapLocationFile/'+OutputFileName+'.pdf');
                                     console.log('successfully deleted TempMapLocationFile/'+OutputFileName+'.pdf');
-
+                                    
                                     var mailOptions = {
                                         To: ToMailID,
                                         subject: 'Route Map',
-                                        html: 'Dear User, <br/> Please find the route map in attachment here with in '+OutputFileName+'.pdf format', // html body
+                                        html: data, // html body
                                         Attachment: Base64PdfData,
                                         AttachmentFileName: OutputFileName+'.pdf'
                                     };
-
+                                    
                                     var post = {
                                         MessageType: 10,
                                         Priority: 5,
@@ -8796,7 +8819,10 @@ exports.FnSendBulkMailer = function (req, res) {
                                             res.send(RtnResponse);
                                         }
                                     });
+                                    
                                     console.log('FnSendBulkMailer:Mail details sent for processing');
+                                
+                            
                                 }
                                 else {
                                     res.send('null');
@@ -8805,8 +8831,8 @@ exports.FnSendBulkMailer = function (req, res) {
 
 							});
                         });
-                            // console.log(mailOptions);
-                        }
+                    });
+                    }
                         else {
                             res.statusCode = 401;
                             res.send('null');
