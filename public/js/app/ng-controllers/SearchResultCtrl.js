@@ -75,11 +75,11 @@ var res = angular.module('ezeidApp').
             }
 
             $scope.searchStarArr = [
-                ["a","b","c","d","e"],
-                ["a","b","c","d"],
-                ["a","b","c"],
+                ["a"],
                 ["a","b"],
-                ["a"]
+                ["a","b","c"],
+                ["a","b","c","d"],
+                ["a","b","c","d","e"],
             ];
 
             /* convert star ratings to comma seperated string */
@@ -116,8 +116,31 @@ var res = angular.module('ezeidApp').
                 }
             }
 
+
+            /* make the filter to 0 */
+            $scope.changeParkingStatus = function(e)
+            {
+                $scope.params.parkingStatus = $scope.params.parkingStatus == 0?1:0;
+            }
+            $scope.changeOpenStatus = function()
+            {
+
+                $scope.params.openStatus = $scope.params.openStatus == 0?1:0;
+            }
+            $scope.changeHomeDelivery = function()
+            {
+                $scope.params.homeDelivery = $scope.params.homeDelivery == 0?1:0;
+            }
+
             //Set all the serach parameters
             $scope.params = $routeParams;
+
+            $scope.searchParams = $routeParams;
+            /* set the lat - long in case the user directly coming to this page */
+            $rootScope.coordinatesLat = $routeParams.lat;
+            $rootScope.coordinatesLng = $routeParams.lng;
+
+
             $scope.searchStars = [false,false,false,false,false];
             var starRating = $scope.params.rating.split(',');
             for(var i=0;i<starRating.length;i++)
@@ -280,6 +303,9 @@ var res = angular.module('ezeidApp').
                     'parkingStatus',
                     'openStatus'
                 ];
+                /* check and set all the filter values */
+                $scope.checkAndSetFilterValues();
+
                 var searchStr = "";
                 $scope.params.rating = $scope.getSearchStars();
                 for(var prop in $scope.params){
@@ -294,6 +320,7 @@ var res = angular.module('ezeidApp').
                         }
                     }
                 }
+
                 $location.url('/searchResult?'+searchStr);
             };
 
@@ -524,21 +551,27 @@ var res = angular.module('ezeidApp').
                 return Math.floor(Math.random() * len);
             };
 
-            $timeout(function(){
-                $(".flip-card").flip({
-                    trigger: "hover"
-                });
 
-            },1000);
+            /**
+             * Script responsible for flipping-tiles, It should be loaded after every component is loaded in the page
+             */
+            $rootScope.$on('$includeContentLoaded', function() {
+                $timeout(function(){
+                    $(".flip-card").flip({
+                        trigger: "hover"
+                    });
+
+                },500);
+            });
 
             /* Basic Kms closed */
             $scope.distanceFilter = function(dist)
             {
-                if(dist > 900)
+                if(dist > 99999)
                 {
-                    return '900+ ';
+                    return '99999+ ';
                 }
-                else if(dist.toString().length > 4)
+                else if(dist > 10)
                 {
                     return Math.round(dist);
                 }
@@ -551,7 +584,7 @@ var res = angular.module('ezeidApp').
             /* make an address string */
             $scope.makeAddress = function(AddressLine1,AddressLine2,city)
             {
-                var addressArr = [AddressLine1,AddressLine1,city];
+                var addressArr = [AddressLine1,AddressLine2,city];
                 return UtilityService.getAddressString(addressArr,40);
             }
 
@@ -568,6 +601,27 @@ var res = angular.module('ezeidApp').
                  $window.localStorage.setItem("myLocation", JSON.stringify(userLoc));
             };
 
+            /* check and set the value of filter-checkboxes */
+            $scope.checkAndSetFilterValues = function()
+            {
+                var openStatus = $('.chkOpenStatus').prop('checked');
+                var homeDelivery = $('.chkHomeDelivery').prop('checked');
+                var parkingStatus = $('.chkShowParking').prop('checked');
 
+                $scope.params.parkingStatus = parkingStatus?1:0;
+                $scope.params.homeDelivery = homeDelivery?1:0;
+                $scope.params.openStatus = openStatus?1:0;
+            }
+
+            /* reset the filters [star-filter][filter] */
+            $scope.resetFilter = function()
+            {
+                /* uncheck all the filters */
+                $('.filter').prop('checked','');
+                /* check all the filters */
+                $('.star-filter').prop('checked','checked');
+                /* set proximity to ANY */
+                $('.proximity').val('0');
+            }
         }
     ]);
