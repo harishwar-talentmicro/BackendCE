@@ -505,6 +505,11 @@ hr.style-two {
     height: 80%;
 }
 
+.hpw .height-128
+{
+    height:128px !important;
+}
+
 .hpw .height-100-px
 {
     height:100px;
@@ -1651,4 +1656,12 @@ hr.style-two {
 .hpw .metro-bg-default
 {
     background-color: #2c3e50;;
+}
+
+.hpw .text-0-9{
+    font-size: 0.9em;
+}
+
+.hpw .text-0-8{
+    font-size: 0.8em;
 }

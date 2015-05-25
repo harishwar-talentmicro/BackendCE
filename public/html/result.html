@@ -30,7 +30,7 @@
                                         <b>{{searchType[params.searchType - 1]}}</b> <span class="caret"></span></button>
                                     <ul class="dropdown-menu" role="menu">
                                         <li class="btn-link" ng-repeat="search in searchType track by $index">
-                                            <a class="btn-link" ng-click="($event.preventDefault())(params.searchType = $index + 1) (searchParams.searchTerm = '')">{{search}}</a>
+                                            <a class="btn-link" ng-click="($event.preventDefault())(params.searchType = $index + 1) (params.searchTerm = '')">{{search}}</a>
                                         </li>
                                     </ul>
                                 </div>
@@ -39,7 +39,7 @@
                                 <!--<input type="text" ng-keypress="(searchKey($event))" ng-click="(searchCount = 0)" placeholder="{{placeHolderText[params.searchType - 1]}}" ng-model="params.searchTerm" ng-class="(params.searchType === 1) ? 'text-uppercase' : ''" class="form-control" aria-label="...">-->
                                 <div class="input-group-btn">
                                     <!-- Advance Search BTN -->
-                                    <button ng-disabled="params.searchType === 1"  ng-click="(toggleFilterContainer($event,true))(isFilterOptionsShown = false)" type="button" class="btn btn-default dropdown-toggle btn-advanced-filter" data-toggle="dropdown" title="Click to choose Search Options"><i class="fa fa-filter"></i> </button>
+                                    <button ng-disabled="params.searchType === 1"  ng-click="(toggleFilterContainer($event,true))(isFilterOptionsShown = false)" type="button" class="btn btn-default dropdown-toggle btn-advanced-filter no-radius" data-toggle="dropdown" title="Click to choose Search Options"><i class="fa fa-filter"></i> </button>
                                     <!-- Search BTN -->
                                     <button type="button" class="btn btn-warning" title="search" ng-click="initiateSearch()"><i class="fa fa-search"></i> </button>
                                 </div>
@@ -115,31 +115,31 @@
                             <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12 p-bottom-3 filter-item-border">
                                 <div class="text-left text-primary"><b>Proximity:</b></div>
                                 <div class="form-group">
-                                    <select name="proximity" ng-model="searchParams.proximity" class="form-control">
-                                        <option value="1">1 mile (1.6 km)</option>
-                                        <option value="2">2 mile (3.2 km)</option>
-                                        <option value="5">5 mile (8 km)</option>
-                                        <option value="10">10 mile (16 km)</option>
-                                        <option value="25">25 mile (40 km)</option>
-                                        <option value="50">50 mile (80 km)</option>
-                                        <option value="0">Any</option>
+                                    <select name="proximity" ng-model="params.proximity" class="form-control proximity">
+                                        <option ng-selected="params.proximity == 1"  value="1">1 mile (1.6 km)</option>
+                                        <option ng-selected="params.proximity == 2" value="2">2 mile (3.2 km)</option>
+                                        <option ng-selected="params.proximity == 5" value="5">5 mile (8 km)</option>
+                                        <option ng-selected="params.proximity == 10" value="10">10 mile (16 km)</option>
+                                        <option ng-selected="params.proximity == 25" value="25">25 mile (40 km)</option>
+                                        <option ng-selected="params.proximity == 50" value="50">50 mile (80 km)</option>
+                                        <option ng-selected="params.proximity == 0" value="0">Any</option>
                                     </select>
                                 </div>
 
                                 <!-- Filter Contents -->
                                 <div class="p-top-10 text-left">
                                     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 select-items">
-                                        <input type="checkbox" id="item1" class="chkShowParking"  ng-model="searchParams.parkingStatus" name="parking" >
+                                            <input type="checkbox" id="item1" ng-checked="params.parkingStatus == 1" class="chkShowParking filter"  ng-model="params.parkingStatus" name="parking" >
                                         &nbsp;
                                         <label  for="item1"> Parking Required</label>
                                     </div>
                                     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 select-items">
-                                        <input type="checkbox" id="item2" class="chkShowParking" ng-model="searchParams.homeDelivery" name="homeDelivery" >
+                                            <input type="checkbox" id="item2" class="chkHomeDelivery filter" ng-checked="params.homeDelivery == 1" ng-model="params.homeDelivery" name="homeDelivery" >
                                         &nbsp;
                                         <label  for="item2">Need home delivery</label>
                                     </div>
                                     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 select-items">
-                                        <input type="checkbox" id="item3" class="chkShowParking" ng-model="searchParams.openStatus" name="openStatus" >
+                                            <input type="checkbox" id="item3" class="chkOpenStatus filter" ng-checked="params.openStatus == 1" ng-model="params.openStatus" name="openStatus" >
                                         &nbsp;
                                         <label  for="item3">Open business only</label>
                                     </div>
@@ -156,7 +156,7 @@
                                         <div class="star-ratings text-left">
                                             <div class="searchStars" ng-repeat="star in searchStars track by $index">
                                                         <span ng-click="selectSearchStar($index)">
-                                                            <input type="checkbox" ng-model="searchStars[$index]" ng-change="selectSearchStar($index)" />
+                                                            <input type="checkbox" class="star-filter" ng-model="searchStars[$index]" ng-change="selectSearchStar($index)" />
                                                         </span>
                                                 &nbsp;
                                                 <i ng-repeat="str in searchStarArr[$index]" class="fa fa-star text-yellow"></i>
@@ -167,6 +167,7 @@
                             </div>
                         </div>
                         <div class="done-btn text-right p-5">
+                            <button class="btn btn-warning btn-sm text-right" ng-click="resetFilter()"><i class="fa fa-recycle"></i> Reset</button>
                             <button class="btn btn-info btn-sm" ng-click="isFilterShown = !isFilterShown">OK</button>
                         </div>
                     </div>
@@ -227,7 +228,7 @@
                                     <div class="text-center text-white front height-auto" ng-class="color">
                                         <!-- Row 1 -->
                                         <div class="tile-row-1 p-5">
-                                            <div class="col-lg-4 col-md-6 col-sm-6 col-xs-6 text-left">
+                                            <div class="col-lg-4 col-md-6 col-sm-6 col-xs-6 text-left text-0-8">
                                                 {{distanceFilter(search.distance)}} Km
                                             </div>
                                             <div class="col-lg-8 col-md-6 col-sm-6 col-xs-6 text-right">
@@ -272,7 +273,7 @@
 
 
                                     <!-- On-Hover Tile Goes here[BACK] -->
-                                    <div class="textbox back metro-bg-default no-box-shadow text-white back height-auto">
+                                    <div class="textbox back metro-bg-default no-box-shadow text-white height-128">
 
                                         <div class="flip-tile-row-1 p-top-10">
                                             <div class="col-lg-12 text-right" ng-click="$event.stopPropagation()">
@@ -281,14 +282,20 @@
                                         </div>
                                         <div class="flip-tile-row-2 p-top-10">
                                             <div class="col-lg-12 text-center">
-                                                <small>{{search.TagLine}}</small>
-                                                <hr class="style-one">
+                                                <i>{{search.TagLine}}</i>
+                                                <br>
                                                 <small>{{makeAddress(search.AddressLine1,search.AddressLine2,search.city)}}</small>
-                                              <p><small class="text-center">7406547499</small></p>
+                                              <p> <small>
+                                                  <!-- Mobile Number -->
+                                                  {{(search.MobileNumber.trim() && search.MobileNumber !== 'null')?search.CountryCode+' '+search.MobileNumber:'No mobile'}}
+                                                  <!-- Seperator -->
+                                                  <i class="{{((search.MobileNumber.trim() && search.MobileNumber !== 'null') && (search.PhoneNumber.trim() && search.PhoneNumber !== 'null'))?'fa fa-minus fa-rotate-90 text-info':''}}"></i>
+                                                  <!-- Telephone Number -->
+                                                  {{(search.PhoneNumber.trim() && search.PhoneNumber !== 'null')?search.CountryCode+' '+search.PhoneNumber:''}}</small></p>
                                             </div>
                                         </div>
                                         <div class="flip-tile-row-3 p-5 text-center" ng-click="$event.stopPropagation()">
-                                            <button class="btn btn-default btn-sm" ng-click="showDirectionMapPopup(search.Latitude,search.Longitude,search.IDTypeID)">
+                                            <button class="btn btn-default btn-xs" ng-click="showDirectionMapPopup(search.Latitude,search.Longitude,search.IDTypeID)">
                                                 <i class="fa fa-map-marker"></i> Directions
                                             </button>
                                             <!--<button class="btn btn-default btn-xs">-->

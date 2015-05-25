@@ -4,6 +4,6 @@ bin/*.log
 bin/uploads/
 Gruntfile.js
 npm-debug.log
-/nbproject/private/
+nbproject/private/
 nbproject/
 public_dist/
