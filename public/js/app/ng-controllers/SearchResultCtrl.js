@@ -618,6 +618,7 @@ var res = angular.module('ezeidApp').
             {
                 /* uncheck all the filters */
                 $('.filter').prop('checked','');
+                
                 /* check all the filters */
                 $('.star-filter').prop('checked','checked');
                 /* set proximity to ANY */

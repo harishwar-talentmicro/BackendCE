@@ -39,7 +39,7 @@
                                 <!--<input type="text" ng-keypress="(searchKey($event))" ng-click="(searchCount = 0)" placeholder="{{placeHolderText[params.searchType - 1]}}" ng-model="params.searchTerm" ng-class="(params.searchType === 1) ? 'text-uppercase' : ''" class="form-control" aria-label="...">-->
                                 <div class="input-group-btn">
                                     <!-- Advance Search BTN -->
-                                    <button ng-disabled="params.searchType === 1"  ng-click="(toggleFilterContainer($event,true))(isFilterOptionsShown = false)" type="button" class="btn btn-default dropdown-toggle btn-advanced-filter" data-toggle="dropdown" title="Click to choose Search Options"><i class="fa fa-filter"></i> </button>
+                                    <button ng-disabled="params.searchType === 1"  ng-click="(toggleFilterContainer($event,true))(isFilterOptionsShown = false)" type="button" class="btn btn-default dropdown-toggle btn-advanced-filter no-radius" data-toggle="dropdown" title="Click to choose Search Options"><i class="fa fa-filter"></i> </button>
                                     <!-- Search BTN -->
                                     <button type="button" class="btn btn-warning" title="search" ng-click="initiateSearch()"><i class="fa fa-search"></i> </button>
                                 </div>
