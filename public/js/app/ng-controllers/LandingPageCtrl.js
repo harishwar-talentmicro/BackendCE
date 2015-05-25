@@ -59,11 +59,11 @@ angular.module('ezeidApp').
             }
 
             $scope.starArr = [
-                ["a", "b", "c", "d", "e"],
-                ["a", "b", "c", "d"],
-                ["a", "b", "c"],
-                ["a", "b"],
-                ["a"]
+                ["a"],
+                ["a","b"],
+                ["a","b","c"],
+                ["a","b","c","d"],
+                ["a","b","c","d","e"],
             ];
 
             /* convert star ratings to comma seperated string */
