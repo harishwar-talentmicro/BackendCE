@@ -10,17 +10,10 @@
     <title>EZEID</title>
     <link rel="icon" href="images/favicon.ico">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.4/css/bootstrap.min.css" rel="stylesheet">
-    <link href="css/ezeid-theme.css" rel="stylesheet">
-    <link href="css/common.css" rel="stylesheet">
-    <link href="css/common1.css" rel="stylesheet">
-    <link href="css/new-theme.css" rel="stylesheet"/>
-    <link href="css/component.css" rel="stylesheet"/>
-    <link href="css/common2.css" rel="stylesheet"/>
-    <link href="css/font-awesome.min.css" rel="stylesheet"/>
-
-    <link href="css/ionrangeslider/css/ion.rangeSlider.css" rel="stylesheet"/>
-    <link href="css/ionrangeslider/css/ion.rangeSlider.skinModern.css" rel="stylesheet"/>
-
+	<!-- build:css(public) styles/main.css -->
+    <link href="css/all-css.css" rel="stylesheet" />
+	<!-- endbuild -->
+    
 </head>
 <body ng-app="ezeidApp">
   <div ng-controller="ChatController">
@@ -123,85 +116,91 @@
 
 
   <!-- build:js({.tmp,public}) scripts/scripts.js -->
-  <script src="js/libs/aes.js"></script>
-  <script src="js/libs/jquery.datetimepicker.js"></script>
-  <script src="js/libs/ion.rangeSlider.js"></script>
-  <script src="js/libs/html2canvas.js"></script>
-  <script src="js/dependency/angular-ui-notification.min.js"></script>
-  <script src="js/dependency/angularjs-dropdown-multiselect.js"></script>
-  <script src="js/app/appConfig.js"></script>
-  <script src="js/app/App.js"></script>
-  <script src="js/app/Header.js"></script>
-  <script src="js/app/Footer.js"></script>
-  <script src="js/app/common.js"></script>
-  <script src="js/app/popover.js"></script>
-  <script src="js/app/modal.js"></script>
-  <script src="js/app/Disclaimer.js"></script>
-  <script src="js/app/ng-controllers/ChatBoxCtrl.js"></script>
-  <script src="js/app/ng-controllers/ChatController.js"></script>
-  <script src="js/app/ng-controllers/HomeController.js"></script>
-  <script src="js/app/ng-controllers/TermsController.js"></script>
-  <script src="js/app/ng-controllers/SearchController.js"></script>
-  <script src="js/app/ng-controllers/LegalController.js"></script>
-  <script src="js/app/ng-controllers/HelpController.js"></script>
-  <script src="js/app/ng-services/ScaleAndCropImage.js"></script>
-  <script src="js/app/ng-services/GoogleMaps.js"></script>
-  <script src="js/app/ng-controllers/NotifyController.js"></script>
-  <script src="js/app/ng-controllers/AccessHistoryController.js"></script>
-  <script src="js/app/ng-controllers/ViewDirectionController.js"></script>
-  <script src="js/app/ng-controllers/BulkSalesEnquiryController.js"></script>
-  <script src="js/app/ng-controllers/BlacklistWhiteListController.js"></script>
-  <script src="js/app/ng-controllers/BusinessListController.js"></script>
-  <script src="js/app/ng-controllers/SalesEnquiryController.js"></script>
-  <script src="js/app/ng-controllers/profile/SignUpCtrl.js"></script>
-  <script src="js/app/ng-controllers/profile/ProfileManagerCtrl.js"></script>
-  <script src="js/app/ng-controllers/profile/PasswordCtrl.js"></script>
-  <script src="js/app/ng-controllers/profile/ProfileCtrl.js"></script>
-  <script src="js/app/ng-controllers/profile/ProfileEditCtrl.js"></script>
-  <script src="js/app/ng-controllers/profile/LocationsCtrl.js"></script>
-  <script src="js/app/ng-controllers/profile/WebLinksCtrl.js"></script>
-  <script src="js/app/ng-controllers/profile/DocumentsController.js"></script>
-  <script src="js/app/ng-controllers/profile/CvAttachmentController.js"></script>
-  <script src="js/app/ng-controllers/profile/configuration/ConfigurationNavigationCtrl.js"></script>
-  <script src="js/app/ng-controllers/profile/configuration/ItemMasterCtrl.js"></script>
-  <script src="js/app/ng-controllers/profile/configuration/ModuleSettingsCtrl.js"></script>
-  <script src="js/app/ng-controllers/profile/configuration/RulesCtrl.js"></script>
-  <script src="js/app/ng-controllers/profile/configuration/StatusTypesCtrl.js"></script>
-  <script src="js/app/ng-controllers/profile/configuration/SubuserCtrl.js"></script>
-  <script src="js/app/ng-controllers/profile/configuration/WorkingHourCtrl.js"></script>
-  <script src="js/app/ng-controllers/profile/configuration/HolidayCalenderCtrl.js"></script>
-  <script src="js/app/ng-controllers/profile/configuration/ActionTypesCtrl.js"></script>
-  <script src="js/app/ng-controllers/business-manager/BusinessManagerCtrl.js"></script>
-  <script src="js/app/ng-controllers/business-manager/SalesCtrl.js"></script>
-  <script src="js/app/ng-controllers/business-manager/SalesFrontCtrl.js"></script>
-  <script src="js/app/ng-controllers/LandingPageCtrl.js"></script>
-  <script src="js/app/ng-controllers/SearchResultCtrl.js"></script>
-  <script src="js/app/ng-controllers/InformationDetailCtrl.js"></script>
-  <script src="js/app/ng-controllers/mapPopController.js"></script>
-  <script src="js/app/ng-directives/modal-box.js"></script>
-  <script src="js/app/ng-directives/date-time-picker.js"></script>
-  <script src="js/app/ng-directives/ezeid-only.js"></script>
-  <script src="js/app/ng-directives/pin-only.js"></script>
-  <script src="js/app/ng-directives/toggle.js"></script>
-  <script src="js/app/ng-directives/numbers-only.js"></script>
-  <script src="js/app/ng-directives/decimals-only.js"></script>
-  <script src="js/app/ng-directives/capitalize.js"></script>
-  <script src="js/app/ng-directives/image-upload.js"></script>
-  <script src="js/app/ng-directives/qtyComponent.js"></script>
-  <script src="js/app/ng-directives/transaction-item.js"></script>
-  <script src="js/app/ng-directives/business-item.js"></script>
-  <script src="js/app/ng-directives/transaction-filter.js"></script>
-  <script src="js/app/ng-filters/truncate.js"></script>
-  <script src="js/app/ng-filters/rule-filter.js"></script>
-  <script src="js/app/ng-filters/module-filter.js"></script>
-  <script src="js/app/ng-filters/date-time-filter.js"></script>
-  <script src="js/app/ng-filters/format-decimal.js"></script>
+      <script src="js/libs/aes.js"></script>
+    <script src="js/libs/jquery.datetimepicker.js"></script>
+    <script src="js/libs/jquery.flip.min.js"></script>
+    <script src="js/libs/html2canvas.js"></script>
+    <script src="js/dependency/angular-ui-notification.min.js"></script>
+    <script src="js/dependency/angularjs-dropdown-multiselect.js"></script>
 
-  <script src="js/app/classie.js"></script>
+
+    <script src="js/app/appConfig.js"></script>
+    <script src="js/app/App.js"></script>
+    <script src="js/app/Header.js"></script>
+    <script src="js/app/Footer.js"></script>
+    <script src="js/app/common.js"></script>
+    <script src="js/app/popover.js"></script>
+    <script src="js/app/modal.js"></script>
+    <script src="js/app/Disclaimer.js"></script>
+    <script src="js/app/ng-controllers/ChatBoxCtrl.js"></script>
+    <script src="js/app/ng-controllers/ChatController.js"></script>
+    <script src="js/app/ng-controllers/HomeController.js"></script>
+    <script src="js/app/ng-controllers/TermsController.js"></script>
+    <script src="js/app/ng-controllers/SearchController.js"></script>
+    <script src="js/app/ng-controllers/LegalController.js"></script>
+    <script src="js/app/ng-controllers/HelpController.js"></script>
+    <script src="js/app/ng-services/ScaleAndCropImage.js"></script>
+    <script src="js/app/ng-services/GoogleMaps.js"></script>
+    <script src="js/app/ng-services/UtilityService.js"></script>
+    <script src="js/app/ng-controllers/NotifyController.js"></script>
+    <script src="js/app/ng-controllers/AccessHistoryController.js"></script>
+    <script src="js/app/ng-controllers/ViewDirectionController.js"></script>
+    <script src="js/app/ng-controllers/BulkSalesEnquiryController.js"></script>
+    <script src="js/app/ng-controllers/BlacklistWhiteListController.js"></script>
+    <script src="js/app/ng-controllers/BusinessListController.js"></script>
+    <script src="js/app/ng-controllers/SalesEnquiryController.js"></script>
+    <script src="js/app/ng-controllers/profile/SignUpCtrl.js"></script>
+    <script src="js/app/ng-controllers/profile/ProfileManagerCtrl.js"></script>
+    <script src="js/app/ng-controllers/profile/PasswordCtrl.js"></script>
+    <script src="js/app/ng-controllers/profile/ProfileCtrl.js"></script>
+    <script src="js/app/ng-controllers/profile/ProfileEditCtrl.js"></script>
+    <script src="js/app/ng-controllers/profile/LocationsCtrl.js"></script>
+    <script src="js/app/ng-controllers/profile/WebLinksCtrl.js"></script>
+    <script src="js/app/ng-controllers/profile/DocumentsController.js"></script>
+    <script src="js/app/ng-controllers/profile/CvAttachmentController.js"></script>
+    <script src="js/app/ng-controllers/profile/CompanyProfileCtrl.js"></script>
+    <script src="js/app/ng-controllers/profile/configuration/ConfigurationNavigationCtrl.js"></script>
+    <script src="js/app/ng-controllers/profile/configuration/ItemMasterCtrl.js"></script>
+    <script src="js/app/ng-controllers/profile/configuration/ModuleSettingsCtrl.js"></script>
+    <script src="js/app/ng-controllers/profile/configuration/RulesCtrl.js"></script>
+    <script src="js/app/ng-controllers/profile/configuration/StatusTypesCtrl.js"></script>
+    <script src="js/app/ng-controllers/profile/configuration/SubuserCtrl.js"></script>
+    <script src="js/app/ng-controllers/profile/configuration/WorkingHourCtrl.js"></script>
+    <script src="js/app/ng-controllers/profile/configuration/HolidayCalenderCtrl.js"></script>
+    <script src="js/app/ng-controllers/profile/configuration/ActionTypesCtrl.js"></script>
+    <script src="js/app/ng-controllers/business-manager/BusinessManagerCtrl.js"></script>
+    <script src="js/app/ng-controllers/business-manager/SalesCtrl.js"></script>
+    <script src="js/app/ng-controllers/business-manager/SalesFrontCtrl.js"></script>
+    <script src="js/app/ng-controllers/LandingPageCtrl.js"></script>
+    <script src="js/app/ng-controllers/SearchResultCtrl.js"></script>
+
+    <script src="js/app/ng-controllers/InformationDetailCtrl.js"></script>
+    <script src="js/app/ng-controllers/mapPopController.js"></script>
+
+    <script src="js/app/ng-directives/modal-box.js"></script>
+    <script src="js/app/ng-directives/date-time-picker.js"></script>
+    <script src="js/app/ng-directives/ezeid-only.js"></script>
+    <script src="js/app/ng-directives/pin-only.js"></script>
+    <script src="js/app/ng-directives/toggle.js"></script>
+    <script src="js/app/ng-directives/numbers-only.js"></script>
+    <script src="js/app/ng-directives/decimals-only.js"></script>
+    <script src="js/app/ng-directives/capitalize.js"></script>
+    <script src="js/app/ng-directives/image-upload.js"></script>
+    <script src="js/app/ng-directives/qtyComponent.js"></script>
+    <script src="js/app/ng-directives/transaction-item.js"></script>
+    <script src="js/app/ng-directives/business-item.js"></script>
+    <script src="js/app/ng-directives/transaction-filter.js"></script>
+    <script src="js/app/ng-filters/truncate.js"></script>
+    <script src="js/app/ng-filters/rule-filter.js"></script>
+    <script src="js/app/ng-filters/module-filter.js"></script>
+    <script src="js/app/ng-filters/date-time-filter.js"></script>
+    <script src="js/app/ng-filters/format-decimal.js"></script>
+	
+	<script src="js/app/classie.js"></script>
   <!-- endbuild -->
 
 
-  <script type='text/javascript' src='//maps.google.com/maps/api/js??key=AIzaSyBkR9SJSSO-5E7X2B4gZDAsK9Idq5tl5Kw&v=3.exp&sensor=false&libraries=places,geometry'></script>
+  <script type='text/javascript' src='//maps.google.com/maps/api/js?key=AIzaSyBkR9SJSSO-5E7X2B4gZDAsK9Idq5tl5Kw&v=3.exp&sensor=false&libraries=places,geometry'></script>
   <script src="js/app/label.js"></script>
 
 

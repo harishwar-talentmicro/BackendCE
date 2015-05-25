@@ -337,8 +337,17 @@
                         $scope.getModuleItemList().then(function(){
                             $scope.getLocationList().then(function(){
                                 $scope.$emit('$preLoaderStop');
+                            },function(){
+                                Notification.error({ message : 'An error occured ! Please try again', delay : MsgDelay});
+                                $scope.$emit('$preLoaderStop');
                             });
+                        },function(){
+                            Notification.error({ message : 'An error occured ! Please try again', delay : MsgDelay});
+                            $scope.$emit('$preLoaderStop');
                         });
+                    },function(){
+                        Notification.error({ message : 'An error occured ! Please try again', delay : MsgDelay});
+                        $scope.$emit('$preLoaderStop');
                     });
                 }
             });
@@ -355,7 +364,7 @@
                     url: GURL + 'ewtEZEIDPrimaryDetails',
                     params : {
                         Token : $rootScope._userInfo.Token,
-                        EZEID : $rootScope._userInfo.ezeid
+                        EZEID : $scope.SearchInfo.EZEID
                     }
                 }).success(function (resp) {
                     if (resp && resp != 'null' && resp.length > 0) {
