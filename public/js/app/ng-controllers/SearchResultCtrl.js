@@ -116,8 +116,31 @@ var res = angular.module('ezeidApp').
                 }
             }
 
+
+            /* make the filter to 0 */
+            $scope.changeParkingStatus = function(e)
+            {
+                $scope.params.parkingStatus = $scope.params.parkingStatus == 0?1:0;
+            }
+            $scope.changeOpenStatus = function()
+            {
+
+                $scope.params.openStatus = $scope.params.openStatus == 0?1:0;
+            }
+            $scope.changeHomeDelivery = function()
+            {
+                $scope.params.homeDelivery = $scope.params.homeDelivery == 0?1:0;
+            }
+
             //Set all the serach parameters
             $scope.params = $routeParams;
+
+            $scope.searchParams = $routeParams;
+            /* set the lat - long in case the user directly coming to this page */
+            $rootScope.coordinatesLat = $routeParams.lat;
+            $rootScope.coordinatesLng = $routeParams.lng;
+
+            console.log($scope.params);
             $scope.searchStars = [false,false,false,false,false];
             var starRating = $scope.params.rating.split(',');
             for(var i=0;i<starRating.length;i++)
@@ -240,9 +263,7 @@ var res = angular.module('ezeidApp').
                         $scope.$emit('$preLoaderStop');
 
                     },1500);
-                })
-                .error(function(data, status, headers, config) {
-                    $rootScope.$broadcast('$preLoaderStop');
+
                 });
             }
 
@@ -272,7 +293,8 @@ var res = angular.module('ezeidApp').
                     Notification.error({ message : 'Please login to search for EZEID', delay : MsgDelay});
                     return false;
                 }
-
+                console.log($scope.params);
+                console.log($scope.searchParams);
                 /* update the coordinates */
                 $scope.params.lat = $rootScope.coordinatesLat;
                 $scope.params.lng = $rootScope.coordinatesLng;
@@ -296,6 +318,7 @@ var res = angular.module('ezeidApp').
                         }
                     }
                 }
+                console.log(searchStr);
                 $location.url('/searchResult?'+searchStr);
             };
 
@@ -503,7 +526,7 @@ var res = angular.module('ezeidApp').
                 "metro-bg-5",
                 "metro-bg-6",
                 "metro-bg-7",
-                "metro-bg-8"
+                "metro-bg-8",
             ];
             $scope.oldColorValue = 0;
             /* generate a random color string */
@@ -553,7 +576,7 @@ var res = angular.module('ezeidApp').
             /* make an address string */
             $scope.makeAddress = function(AddressLine1,AddressLine2,city)
             {
-                var addressArr = [AddressLine1,AddressLine1,city];
+                var addressArr = [AddressLine1,AddressLine2,city];
                 return UtilityService.getAddressString(addressArr,40);
             }
 
