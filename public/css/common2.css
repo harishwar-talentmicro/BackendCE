@@ -505,6 +505,11 @@ hr.style-two {
     height: 80%;
 }
 
+.hpw .height-128
+{
+    height:128px !important;
+}
+
 .hpw .height-100-px
 {
     height:100px;

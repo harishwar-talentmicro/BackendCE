@@ -8915,11 +8915,13 @@ exports.FnCropImage = function(req,res){
                                 // scale++
                                 if(size.height < targetHeight || size.width < targetWidth){
                                     if(targetHeight > targetWidth){
+										console.log("executing condition 1 : sOrient: landscape & scale++ & tOrient : potrait");
                                         scaleHeight = targetHeight.toString();
                                         ////
                                         scaleWidth = (size.width * scaleHeight)/ size.height;
                                     }
                                     else{
+										console.log("executing condition 2 : sOrient: landscape & scale++ & tOrient : landscape");
                                         scaleWidth = targetWidth.toString();
                                         ////
                                         scaleHeight = (size.height * scaleWidth) / size.width;
@@ -8928,15 +8930,17 @@ exports.FnCropImage = function(req,res){
                                 // scale--
                                 else{
                                     if(targetHeight > targetWidth){
-                                        console.log('true condition');
-                                        scaleHeight = targetHeight.toString();
-                                        ////
-                                        scaleWidth = (scaleHeight * size.width) / size.height;
-                                    }
-                                    else{
+										console.log("executing condition 2 : sOrient: landscape & scale-- & tOrient : landscape");
                                         scaleWidth = targetWidth.toString();
                                         ////
                                         scaleHeight = (scaleWidth * size.height)/ size.width;
+                                    }
+                                    else{
+										
+										console.log("executing condition 2 : sOrient: landscape & scale-- & tOrient : potrait");
+                                        scaleHeight = targetHeight.toString();
+                                        ////
+                                        scaleWidth = (scaleHeight * size.width) / size.height;
 
                                     }
                                 }
@@ -8966,18 +8970,21 @@ exports.FnCropImage = function(req,res){
                                 }
                             }
 
-                            //var dimensions = {
-                            //    originalHeight : size.height,
-                            //    originalWidth : size.width,
-                            //    scaleHeight : scaleHeight,
-                            //    scaleWidth : scaleWidth,
-                            //    targetHeight : targetHeight,
-                            //    targetWidth : targetWidth
-                            //};
+                            var dimensions = {
+                                originalHeight : size.height,
+                                originalWidth : size.width,
+                                scaleHeight : scaleHeight,
+                                scaleWidth : scaleWidth,
+                                targetHeight : targetHeight,
+                                targetWidth : targetWidth
+                            };
+							
+							console.log(dimensions);
 
                             if(scaleFlag && cropFlag){
+								console.log('Scale and crop');
                                 gm(bitmap)
-                                    .resize(scaleWidth,scaleHeight,"!")
+                                    .resize(scaleWidth,scaleHeight)
                                     .crop(targetWidth,targetHeight,0,0).toBuffer(outputType.toUpperCase(),function(err,croppedBuff){
                                         if(!err){
                                             var cdataUrl = new Buffer(croppedBuff).toString('base64');
@@ -12191,8 +12198,9 @@ exports.FnCropImageAP = function(req,res){
 
     var fs = require('fs');
 
+    console.log(req.files.image.path);
     var deleteTempFile = function(){
-        fs.unlink('../bin/'+req.files.image.path);
+        fs.unlink('../bin/uploads/'+req.files.image.path);
     };
 
 
@@ -12207,7 +12215,6 @@ exports.FnCropImageAP = function(req,res){
 
     var allowedTypes = ['jpg','png'];
 
-
     var  targetHeight = (req.body.required_height) ? (!isNaN(parseInt(req.body.required_height)) ? parseInt(req.body.required_height) : 0 ) : 0  ,
         targetWidth = (req.body.required_width) ? (!isNaN(parseInt(req.body.required_width)) ? parseInt(req.body.required_width) : 0 ) : 0  ;
 
@@ -12216,7 +12223,7 @@ exports.FnCropImageAP = function(req,res){
 
     var cropFlag = (req.body.crop) ? req.body.crop : true;
     var scaleFlag = (req.body.scale) ? req.body.scale : true;
-    var token = (req.body.Token && req.body.Token !== 2 ) ? req.body.Token : '';
+    var token = (req.body.Token && req.body.Token !==2 ) ? req.body.Token : '';
     var outputType = (allowedTypes.indexOf(req.body.output_type) == -1) ? 'png' : req.body.output_type;
 
     if(!(targetHeight && targetWidth)){
@@ -12244,6 +12251,7 @@ exports.FnCropImageAP = function(req,res){
         if (!err) {
             if (Result != null) {
                 try{
+                    console.log(req.files.image.path);
                     var bitmap = fs.readFileSync('../bin/'+req.files.image.path);
                     var gm = require('gm').subClass({ imageMagick: true });
                     gm(bitmap).size(function (err, size) {
@@ -12253,11 +12261,13 @@ exports.FnCropImageAP = function(req,res){
                                 // scale++
                                 if(size.height < targetHeight || size.width < targetWidth){
                                     if(targetHeight > targetWidth){
+                                        console.log("executing condition 1 : sOrient: landscape & scale++ & tOrient : potrait");
                                         scaleHeight = targetHeight.toString();
                                         ////
                                         scaleWidth = (size.width * scaleHeight)/ size.height;
                                     }
                                     else{
+                                        console.log("executing condition 2 : sOrient: landscape & scale++ & tOrient : landscape");
                                         scaleWidth = targetWidth.toString();
                                         ////
                                         scaleHeight = (size.height * scaleWidth) / size.width;
@@ -12266,15 +12276,17 @@ exports.FnCropImageAP = function(req,res){
                                 // scale--
                                 else{
                                     if(targetHeight > targetWidth){
-                                        console.log('true condition');
-                                        scaleHeight = targetHeight.toString();
-                                        ////
-                                        scaleWidth = (scaleHeight * size.width) / size.height;
-                                    }
-                                    else{
+                                        console.log("executing condition 2 : sOrient: landscape & scale-- & tOrient : landscape");
                                         scaleWidth = targetWidth.toString();
                                         ////
                                         scaleHeight = (scaleWidth * size.height)/ size.width;
+                                    }
+                                    else{
+
+                                        console.log("executing condition 2 : sOrient: landscape & scale-- & tOrient : potrait");
+                                        scaleHeight = targetHeight.toString();
+                                        ////
+                                        scaleWidth = (scaleHeight * size.width) / size.height;
 
                                     }
                                 }
@@ -12304,18 +12316,21 @@ exports.FnCropImageAP = function(req,res){
                                 }
                             }
 
-                            //var dimensions = {
-                            //    originalHeight : size.height,
-                            //    originalWidth : size.width,
-                            //    scaleHeight : scaleHeight,
-                            //    scaleWidth : scaleWidth,
-                            //    targetHeight : targetHeight,
-                            //    targetWidth : targetWidth
-                            //};
+                            var dimensions = {
+                                originalHeight : size.height,
+                                originalWidth : size.width,
+                                scaleHeight : scaleHeight,
+                                scaleWidth : scaleWidth,
+                                targetHeight : targetHeight,
+                                targetWidth : targetWidth
+                            };
+
+                            console.log(dimensions);
 
                             if(scaleFlag && cropFlag){
+                                console.log('Scale and crop');
                                 gm(bitmap)
-                                    .resize(scaleWidth,scaleHeight,"!")
+                                    .resize(scaleWidth,scaleHeight)
                                     .crop(targetWidth,targetHeight,0,0).toBuffer(outputType.toUpperCase(),function(err,croppedBuff){
                                         if(!err){
                                             var cdataUrl = new Buffer(croppedBuff).toString('base64');
@@ -12365,6 +12380,7 @@ exports.FnCropImageAP = function(req,res){
                     });
                 }
                 catch(ex){
+                    console.log(ex);
                     throw new Error('FnCropImage : '+ ex.description);
                 }
             }
