@@ -209,8 +209,17 @@
                                 $scope.modalBox.tx.state = data.state;
                                 $scope.modalBox.tx.country = data.country;
                                 $scope.modalBox.tx.area = data.area;
-                                $scope.modalBox.tx.address = data.route + ', '+ data.sublocality3 + ', '+ data.sublocality2;
-
+                                //$scope.modalBox.tx.address = data.route + ', '+ data.sublocality3 + ', '+ data.sublocality2;
+                                $scope.modalBox.tx.address = googleMap.createAddressFromGeolocation(data,{
+                                    route : true,
+                                    sublocality3 : true,
+                                    sublocality2 : true,
+                                    area : false,
+                                    city : false,
+                                    state : false,
+                                    country : false,
+                                    postalCode : false
+                                });
 
                             }
                             else{
