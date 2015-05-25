@@ -195,7 +195,7 @@
                                     <a href="/business-manager"><i class="fa fa-briefcase"></i> Business Manager</a>
                                 </li>
                                 <!-- condition2: Business Manager -->
-                                <li ng-show="$root._userInfo.Type == 2 && $root._userInfo.Verified !== 2">
+                                <li class="disabled" ng-show="$root._userInfo.Type == 2 && $root._userInfo.Verified !== 2" class="disabled">
                                     <a ng-click="$event.preventDefault()"><i class="fa fa-briefcase"></i> Business Manager</a></li>
                                 <!-- Message -->
                                 <li><a href="/messages"><i class="fa fa-envelope"></i> Messages</a></li>
