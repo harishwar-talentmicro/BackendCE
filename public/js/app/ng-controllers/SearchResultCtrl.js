@@ -558,18 +558,26 @@ var res = angular.module('ezeidApp').
             }
 
             $scope.showDirectionMapPopup = function(Latitude,Longitude,IDTypeID){
+
+
                 $scope.activeTemplate = "html/mapPopView.html";
                 $scope.showMapPopupModel = true;
 
                  var userLoc = {
-                 endLat : Latitude,
-                 endLong : Longitude,
-                 IDTypeID : IDTypeID
+                     endLat : Latitude,
+                     endLong : Longitude,
+                     IDTypeID : IDTypeID
                  };
 
                  $window.localStorage.setItem("myLocation", JSON.stringify(userLoc));
             };
 
+            $('#mapPOPUP').on('hidden.bs.modal', function () {
+
+                $scope.showMapPopupModel = false;
+                $scope.activeTemplate = "";
+
+            })
 
         }
     ]);

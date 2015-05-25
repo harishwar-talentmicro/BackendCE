@@ -59,4 +59,5 @@ angular.module('ezeidApp').controller('ConfigurationNavigationCtrl',[
         };
 
 
+
 }]);

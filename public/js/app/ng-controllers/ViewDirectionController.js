@@ -21,7 +21,6 @@ angular.module('ezeidApp').controller('viewDirectionController',['$http', '$root
             initialize();
         },1000);
 
-
     function initialize () {
         directionsDisplay = new google.maps.DirectionsRenderer();
         var currentLoc = new google.maps.LatLng(12.295810, 76.639381);
@@ -39,7 +38,6 @@ angular.module('ezeidApp').controller('viewDirectionController',['$http', '$root
         var autocomplete = new google.maps.places.Autocomplete(input, {
             types: ["geocode"]
         });
-
 
         google.maps.event.addListener(autocomplete,'place_changed',function(){
             var place = autocomplete.getPlace();
@@ -76,6 +74,7 @@ angular.module('ezeidApp').controller('viewDirectionController',['$http', '$root
       var userStartDirecttionLatLong = JSON.parse($window.localStorage.getItem("userCurrentLoc"));
 
         directtionLatLong = JSON.parse($window.localStorage.getItem("myLocation"));
+
         var request = {
             origin: userStartDirecttionLatLong.startLat+","+userStartDirecttionLatLong.startLong,
             destination: directtionLatLong.endLat+","+directtionLatLong.endLong,
@@ -206,9 +205,13 @@ angular.module('ezeidApp').controller('viewDirectionController',['$http', '$root
 
     //  EMail direction image
     viewDirection.emailDirectionImage = function () {
+        //Below line is for Loading img
+        $scope.$emit('$preLoaderStart');
         $http({ method: 'post', url: GURL + 'ewtSendBulkMailer', data: { Token: $rootScope._userInfo.Token, TID: "", TemplateID: "", ToMailID: viewDirection._info.ToMailID, Attachment: finalImageSrc, AttachmentFileName :'ViewDirection.jpg'} }).success(function (data)
         {
-            if (data != 'null')
+            $rootScope.$broadcast('$preLoaderStop');
+            /* if (data != 'null')*/
+            if(data)
             {
                 viewDirection._info.FromEmailID = "";
                 viewDirection._info.ToMailID = "";

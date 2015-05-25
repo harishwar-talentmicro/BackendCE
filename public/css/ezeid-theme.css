@@ -1448,14 +1448,14 @@ span.closelink {
 
 
 /*alerts css*/
-.alert {
-    position: fixed;
-    z-index: 2147483647 !important;
-    width: 31%;
-    float: left;
-    margin-left: 280px;
-    margin-top: -77px;
-}
+/*.alert {*/
+    /*position: fixed;*/
+    /*z-index: 2147483647 !important;*/
+    /*width: 31%;*/
+    /*float: left;*/
+    /*margin-left: 280px;*/
+    /*margin-top: -77px;*/
+/*}*/
 
 /*Google Maps Info Window*/
 

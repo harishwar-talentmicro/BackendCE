@@ -3,8 +3,8 @@
            <div id="map-ctrl" class="col-lg-12"></div>
        </div>
        <div class="row setRowLeftRightMarginZero mapButtonContainer">
-           <button class="btn btn-primary" type="button" ng-click="plotRoute()">Plot Route</button>
-           <button class="btn btn-primary" type="button" ng-click="showDirections()">Directions</button>
+           <button ng-disabled="!userLat" class="btn btn-primary" type="button" ng-click="plotRoute()">Plot Route</button>
+           <button ng-disabled="!userLat" class="btn btn-primary" type="button" ng-click="showDirections()">Directions</button>
        </div>
        <div id="directionPannel" style="display: none;">
        </div>
