@@ -378,7 +378,6 @@
                 }).success(function (resp) {
                     if (resp && resp != 'null' && resp.length > 0) {
                         $scope.masterUser = resp[0];
-                        $scope.modalBox.title = ($scope.masterUser.SalesModuleTitle) ? $scope.masterUser.SalesModuleTitle : 'Sales Enquiry Form';
                         $scope.salesItemListType = ($scope.masterUser.SalesItemListType &&
                         (!isNaN(parseInt($scope.masterUser.SalesItemListType)))) ? parseInt($scope.masterUser.SalesItemListType) : 0 ;
                         $scope._salesModalTitle = ($scope.masterUser.SalesModuleTitle) ? $scope.masterUser.SalesModuleTitle : 'Sales Enquiry';
