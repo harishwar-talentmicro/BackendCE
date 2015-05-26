@@ -162,6 +162,10 @@
                 templateUrl: 'html/landing.html',
                 controller : 'LandingPageCtrl'
             })
+            .when('/:ezeid',{
+                templateUrl: 'html/outbox.html',
+                controller : 'outboxPageCtrl'
+            })
             .otherwise({redirectTo : '/'});
         $locationProvider.html5Mode(true);
         $httpProvider.interceptors.push("ezeidInterceptor");
