@@ -1,0 +1,44 @@
+<!-- Outbox module goes here -->
+<section id="outbox-wrapper" class="hpw ow">
+    <!-- Header menu goes here -->
+    <header-section></header-section>
+
+    <!-- MAIN SECTION OF OUTBOX MODULE -->
+    <div class="width-75 container p-top-30">
+        <div class="panel panel-default shadow-border">
+            <div class="panel-heading text-center menu-text">
+                <h3 class="text-center font-roboto"><i class="fa fa-check-square-o"></i> Your Transactions</h3>
+            </div>
+            <div class="panel-body">
+                <!-- Side menu goes here -->
+                <div class="col-lg-3 col-md-4 col-sm-12 col-xs-12 menu-style">
+                    <ul class="list-unstyled">
+                        <li><p class="active"><i class="fa fa-briefcase"></i> Sales</p></li>
+                        <li><p><i class="fa fa-check-square"></i> Reservation</p></li>
+                        <li><p><i class="fa fa-truck"></i> Home Delivery</p></li>
+                        <li><p><i class="fa fa-wrench"></i> Service</p></li>
+                        <li><p><i class="fa fa-file-word-o"></i> Resume</p></li>
+                    </ul>
+                </div>
+                <!-- Main content goes here -->
+                <div class="col-lg-9 col-md-8 col-sm-12 col-xs-12">
+                    <div class="outbox-main-content">
+                        <!-- Transaction history goes here -->
+
+                        <!-- Individual Strips starts here -->
+                        <transaction-history-item ng-to='xyz retailers' ng-message='abc' ng-quantity='d' ng-date='' ng-id='e'> </transaction-history-item>
+                        <!-- Individual Strips ends here -->
+                    </div>
+                </div>
+                <!-- Transaction history ends here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- details modal of the transaction history item goes here -->
+
+    <!-- transaction history item modal ends here -->
+
+    <!-- Footer goes here -->
+    <footer-section></footer-section>
+</section>
