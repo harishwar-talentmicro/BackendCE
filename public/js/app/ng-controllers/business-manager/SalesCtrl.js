@@ -613,6 +613,18 @@
             };
 
             /**
+             * This function will be called when status types filter selection box value is changed
+             */
+            $scope.triggerStatusFilter = function(pageNo,statusType){
+                $scope.$emit('$preLoaderStart');
+                $scope.loadTransaction(pageNo,statusType).then(function(){
+                    $scope.$emit('$preLoaderStop');
+                },function(){
+                    $scope.$emit('$preLoaderStop');
+                });
+            };
+
+            /**
              * Loads all transactions
              * @param pageNo
              * @param statusType
@@ -643,7 +655,7 @@
                          * 2. $scope.pageNumber
                          * 3. $scope.txList
                          */
-                        $scope.totalPage = resp.TotalPage;
+                        $scope.totalPages = resp.TotalPage;
                         $scope.pageNumber = pageNo;
                         $scope.txList = resp.Result;
 
@@ -945,6 +957,7 @@
                     NextAction : ($scope.modalBox.tx.nextAction) ? $scope.modalBox.tx.nextAction : 0,
                     NextActionDateTime : ($scope.modalBox.tx.nextActionDateTime) ? $scope.modalBox.tx.nextActionDateTime : moment().format('DD MMM YYYY hh:mm:ss'),
                     ItemsList: JSON.stringify($scope.modalBox.tx.itemList),
+                    item_list_type : $rootScope._userInfo.SalesItemListType,
                     DeliveryAddress : (!editMode) ?
                         ($scope.modalBox.tx.address +', '+ $scope.modalBox.tx.area+', ' + $scope.modalBox.tx.city +', '+
                         $scope.modalBox.tx.state+', ' + $scope.modalBox.tx.country) : $scope.modalBox.tx.deliveryAddress
@@ -1029,6 +1042,14 @@
                     $scope.$emit('$preLoaderStop');
                     Notification.error({ message : err, delay : MsgDelay});
                 });
+            };
+
+            $scope.incrementPage = function(){
+              $scope.pageNumber  += 1;
+            };
+
+            $scope.decrementPage = function(){
+                $scope.pageNumber  -= 1;
             };
 
         }]);

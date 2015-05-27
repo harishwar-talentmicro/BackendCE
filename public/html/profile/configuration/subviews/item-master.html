@@ -36,8 +36,11 @@
                                 <button ng-hide="(globalConfig.itemListType[0] < 1)" class="btn btn-sm btn-primary" ng-click="toggleModalBox(0)"><span class="glyphicon glyphicon-plus"></span> Add</button>
                             </div>
                         </div>
-                        <div class="row">
+                        <div class="row" ng-show="globalConfig.itemListType[0] > 0">
                             <content-item ng-repeat="item in items.sales" content="item" index="$index" toggle-modal-box="toggleModalBox(type,itemIndex)" template-type="{{globalConfig.itemListType[0]}}"></content-item>
+                        </div>
+                        <div class="row" ng-hide="globalConfig.itemListType[0] > 0">
+                            <h3>Your Sales enquiry Item list type is message only, therefore items are not applicable</h3>
                         </div>
                     </div>
                 </div>
@@ -65,8 +68,11 @@
                                 <button ng-hide="(globalConfig.itemListType[2] < 1)" class="btn btn-sm btn-primary" ng-click="toggleModalBox(2)"><span class="glyphicon glyphicon-plus"></span> Add</button>
                             </div>
                         </div>
-                        <div class="row">
+                        <div class="row" ng-show="globalConfig.itemListType[2] > 0">
                             <content-item ng-repeat="item in items.homeDelivery" content="item" index="$index" toggle-modal-box="toggleModalBox(type,itemIndex)"  template-type="{{globalConfig.itemListType[2]}}"></content-item>
+                        </div>
+                        <div class="row" ng-hide="globalConfig.itemListType[2] > 0">
+                            <h3>Your Home Delivery Item list type is message only, therefore items are not applicable</h3>
                         </div>
                     </div>
                 </div>
@@ -81,8 +87,11 @@
                                 <button ng-hide="(globalConfig.itemListType[3] < 1)" class="btn btn-sm btn-primary" ng-click="toggleModalBox(3)"><span class="glyphicon glyphicon-plus"></span> Add</button>
                             </div>
                         </div>
-                        <div class="row">
+                        <div class="row" ng-show="globalConfig.itemListType[3] > 0">
                             <content-item ng-repeat="item in items.service" content="item" index="$index" toggle-modal-box="toggleModalBox(type,itemIndex)"  template-type="{{globalConfig.itemListType[3]}}"></content-item>
+                        </div>
+                        <div class="row" ng-hide="globalConfig.itemListType[3] > 0">
+                            <h3>Your Home Delivery Item list type is message only, therefore items are not applicable</h3>
                         </div>
                     </div>
                 </div>
@@ -97,8 +106,11 @@
                                 <button ng-hide="(globalConfig.itemListType[4] < 1)" class="btn btn-sm btn-primary" ng-click="toggleModalBox(4)" ><span class="glyphicon glyphicon-plus"></span> Add</button>
                             </div>
                         </div>
-                        <div class="row">
+                        <div class="row" ng-show="globalConfig.itemListType[4] > 0">
                             <content-item ng-repeat="item in items.resume" content="item" index="$index"toggle-modal-box="toggleModalBox(type,itemIndex)"  template-type="{{globalConfig.itemListType[4]}}"></content-item>
+                        </div>
+                        <div class="row" ng-hide="globalConfig.itemListType[4] > 0">
+                            <h3>Your Home Delivery Item list type is message only, therefore items are not applicable</h3>
                         </div>
                     </div>
                 </div>

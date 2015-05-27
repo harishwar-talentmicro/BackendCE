@@ -17,14 +17,14 @@
 
                     <div class="col-lg-3 col-md-4 col-sm-6 col-xs-8 pull-right">
                         <div class="btn-group pull-right" role="group" aria-label="First group"  ng-show="txList.length">
-                            <button type="button" ng-disabled="pageNumber <= 1" class="btn btn-info bt-xs no-radius">
+                            <button type="button" ng-disabled="pageNumber <= 1" ng-click="decrementPage()" class="btn btn-info bt-xs no-radius">
                                 <span class="glyphicon glyphicon-chevron-left"></span>
                                 Prev
                             </button>
                             <button type="button" class="btn btn-info bt-xs no-radius active">
                                 {{pageNumber}}
                             </button>
-                            <button type="button" ng-disabled="totalPages < 2" class="btn btn-info bt-xs no-radius">
+                            <button type="button" ng-disabled="(totalPages < 2)" ng-click="incrementPage()" class="btn btn-info bt-xs no-radius">
                                 <span class="glyphicon glyphicon-chevron-right"></span>
                                 Next
                             </button>
@@ -43,7 +43,7 @@
 
                     <div class="col-lg-2 col-md-2 col-sm-3 col-xs-4 pull-right" title="Filters">
                         <div class="form-group form-group-sm">
-                            <select class="form-control" ng-model="filterStatus" ng-change="loadTransaction(pageNumber,filterStatus)">
+                            <select class="form-control" ng-model="filterStatus" ng-change="triggerStatusFilter(pageNumber,filterStatus)">
                                 <option ng-repeat="sfilter in filterStatusTypes track by $index" value="{{sfilter.TID}}">{{sfilter.StatusTitle}}</option>
                             </select>
                         </div>
@@ -587,7 +587,8 @@
                     </div>
 
                       <hr/>
-                    <div ng-show="moduleItems.length" class="row bottom-clearfix">
+                    <div ng-show="moduleItems.length > 0 &&  _userInfo.SalesItemListType > 0" class="row bottom-clearfix">
+                        {{_userInfo.SalesItemListType}}
 
                         <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12 item-list-box">
                             <div class="row">

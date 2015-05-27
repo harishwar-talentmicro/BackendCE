@@ -620,7 +620,6 @@
         <h4>
             1. Primary Location
                                                                             <span class="pull-right">
-                                                                                <!-- @todo Add facility to save and after saving change editMode to false and toggleMapControls after saving successfully -->
                                                                                 <button
                                                                                         data-toggle="tooltip"
                                                                                         title="Save Changes"
@@ -674,6 +673,7 @@
                                                                                 </button>
                                                                             </span>
         </h4>
+        <small ng-show="(!locationsToggleIndex[0].editMode) && locationsToggleIndex[0].viewMode" class="warning">Please click on edit button to change your map location and address</small>
     </div>
 </div>
 
@@ -1154,7 +1154,7 @@
     </div>
 
     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
-
+        <small ng-show="(!locationsToggleIndex[locIndex+1].editMode) && locationsToggleIndex[locIndex+1].viewMode" class="warning">Please click on edit button to change your map location and address</small>
     </div>
 </div>
 
@@ -1694,8 +1694,8 @@
                     <div class="panel-heading">
                         <h4 class="text-center">Profile Manager : {{userDetails.EZEID}}
                             <span ng-show="userDetails.IDTypeID == 1">(Individual)</span>
-                            <span ng-show="userDetails.IDTypeID == 2 && userDetails.SelectionType == 2">(Business Paid Listing)</span>
-                            <span ng-show="userDetails.IDTypeID == 2 && userDetails.SelectionType !== 2">(Business Free Listing)</span>
+                            <span ng-show="userDetails.IDTypeID == 2 && userDetails.EZEIDVerifiedID == 2">(Business Paid Listing)</span>
+                            <span ng-show="userDetails.IDTypeID == 2 && userDetails.EZEIDVerifiedID !== 2">(Business Free Listing)</span>
                             <span ng-show="userDetails.IDTypeID == 3">(Public Place)</span>
                             <label class="label label-danger pull-right label-mandatory">* Mandatory</label>
                         </h4>
@@ -1711,7 +1711,7 @@
                                         </li>
 
 
-                                        <li role="presentation" ng-show="(userDetails.SelectionType === 2 && userDetails.IDTypeID === 2 && userDetails.EZEIDVerifiedID == 2)"
+                                        <li role="presentation" ng-show="(userDetails.IDTypeID == 2 && userDetails.EZEIDVerifiedID == 2)"
                                             ng-class="{'active' : (activeTemplate === 'html/profile/configuration/configuration.html')}"
                                             class="bottom-clearfix">
                                             <a href="/profile-manager/configuration"><span class="glyphicon glyphicon-cog"></span> Configuration</a>
@@ -1719,14 +1719,19 @@
 
 
                                         <!--- Disabled in case of business user free listing ----------->
-                                        <li role="presentation" ng-show="(userDetails.EZEIDVerifiedID !== 2 && userDetails.IDTypeID === 2 )" class="bottom-clearfix disabled">
+                                        <li role="presentation" ng-show="(userDetails.EZEIDVerifiedID !== 2 && userDetails.IDTypeID == 2 )" class="bottom-clearfix disabled">
                                             <a><span class="glyphicon glyphicon-cog"></span> Configuration</a>
                                         </li>
 
 
                                         <li role="presentation" class=" bottom-clearfix"
-                                            ng-show="(userDetails.SelectionType === 2 && userDetails.IDTypeID === 2)"
+                                            ng-show="(userDetails.IDTypeID == 2 && _userInfo.Verified == 2)"
                                             ng-class="{'active' :(activeTemplate === '/tpl/weblinks-template.html')}">
+                                            <a href="/profile-manager/weblinks"><span class="glyphicon glyphicon-link"></span> Web Links</a>
+                                        </li>
+
+                                        <li role="presentation" class=" bottom-clearfix disabled"
+                                            ng-show="(userDetails.IDTypeID == 2 && userDetails.EZEIDVerifiedID !== 2)">
                                             <a href="/profile-manager/weblinks"><span class="glyphicon glyphicon-link"></span> Web Links</a>
                                         </li>
 
