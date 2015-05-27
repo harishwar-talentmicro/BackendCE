@@ -76,6 +76,10 @@ app.use(function(err, req, res, next) {
     });
 });
 
+app.get('/legal.html',function(req,res,next){
+    res.sendFile(__dirname + '/public/html/legal.html');
+});
+
 //this part is for passenger
 app.post('/ewLogin', LocationManager.FnLogin);
 app.get('/ewLogout', LocationManager.FnLogout);
@@ -160,8 +164,6 @@ app.get('/ewtConfig',LocationManager.FnGetConfig);
 app.post('/ewtSaveTranscation',LocationManager.FnSaveTranscation);
 app.get('/ewtGetUserwiseFolderList',LocationManager.FnGetUserwiseFolderList);
 app.get('/ewtGetTranscation',LocationManager.FnGetTranscation);
-app.post('/ewtResource',LocationManager.FnSaveResource);
-app.get('/ewtResource',LocationManager.FnGetResource);
 app.post('/ewtSaveResourceItemMap',LocationManager.FnSaveResourceItemMap);
 app.get('/ewtGetItemListForEZEID',LocationManager.FnGetItemListForEZEID);
 app.get('/ewtGetLocationList',LocationManager.FnGetLocationList);
@@ -189,6 +191,9 @@ app.get('/ewtGetSearchPics', LocationManager.FnGetSearchPicture);
 app.get('/ewtCompanyProfile', LocationManager.FnGetCompanyProfile);
 app.post('/ewtCompanyProfile', LocationManager.FnSaveCompanyProfile);
 app.get('/ewtGetLocationListForEZEID', LocationManager.FnGetLocationListForEZEID);
+app.post('/reservation_resource',LocationManager.FnSaveReservationResource);
+app.put('/reservation_resource',LocationManager.FnUpdateReservationResource);
+app.get('/reservation_resource',LocationManager.FnGetReservationResource);
 
 //below service are for EZEIDAP
 app.post('/ewLoginAP', LocationManager.FnLoginAP);

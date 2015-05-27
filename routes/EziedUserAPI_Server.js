@@ -7698,159 +7698,6 @@ exports.FnGetUserwiseFolderList = function (req, res) {
     }
 };
 
-exports.FnSaveResource = function(req, res){
-    try{
-        res.setHeader("Access-Control-Allow-Origin", "*");
-        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-
-        var Token = req.body.Token;
-        var TID = req.body.TID;
-        var ResourceName = req.body.ResourceName;
-        var Duration = req.body.Duration;
-        var DurationScale = req.body.DurationScale;
-        
-        var RtnMessage = {
-            IsSuccessfull: false
-        };
-       
-        if (Token != null && TID != null && ResourceName != null && Duration != null && DurationScale != null ) {
-            FnValidateToken(Token, function (err, Result) {
-                if (!err) {
-                    if (Result != null) {
-
-                        var query = db.escape(Token) + ', ' +db.escape(TID) + ',' + db.escape(ResourceName) + ',' + db.escape(Duration) + ',' + db.escape(DurationScale);
-                        db.query('CALL pSaveResource(' + query + ')', function (err, InsertResult) {
-                            if (!err){
-                                if (InsertResult.affectedRows > 0) {
-                                    RtnMessage.IsSuccessfull = true;
-                                    res.send(RtnMessage);
-                                    console.log('FnSaveResource: Resource details save successfully');
-                                }
-                                else {
-                                    console.log('FnSaveResource:No save Resource details');
-                                    res.send(RtnMessage);
-                                }
-                            }
-
-                            else {
-                                console.log('FnSaveResource: error in saving Resource details' + err);
-                                res.statusCode = 500;
-                                res.send(RtnMessage);
-                            }
-                        });
-                    }
-                    else {
-                        console.log('FnSaveResource: Invalid token');
-                        res.statusCode = 401;
-                        res.send(RtnMessage);
-                    }
-                }
-                else {
-                    console.log('FnSaveResource:Error in processing Token' + err);
-                    res.statusCode = 500;
-                    res.send(RtnMessage);
-
-                }
-            });
-
-        }
-
-        else {
-            if (Token == null) {
-                console.log('FnSaveResource: Token is empty');
-            }
-            else if (TID == null) {
-                console.log('FnSaveResource: TID is empty');
-            }
-            else if (ResourceName == null) {
-                console.log('FnSaveResource: ResourceName is empty');
-            }
-            else if (Duration == null) {
-                console.log('FnSaveResource: Duration is empty');
-            }
-            else if (DurationScale == null) {
-                console.log('FnSaveResource: DurationScale is empty');
-            }
-            res.statusCode=400;
-            res.send(RtnMessage);
-        }
-
-    }
-    catch (ex) {
-        console.log('FnSaveResource:error ' + ex.description);
-        throw new Error(ex);
-    }
-};
-
-exports.FnGetResource = function (req, res) {
-    try {
-
-        res.setHeader("Access-Control-Allow-Origin", "*");
-        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-
-        var Token = req.query.Token;
-        
-        if (Token != null) {
-            FnValidateToken(Token, function (err, Result) {
-                if (!err) {
-                    if (Result != null) {
-
-                        db.query('CALL pGetResource(' + db.escape(Token) + ')', function (err, GetResult) {
-                            if (!err) {
-                                if (GetResult != null) {
-                                    if (GetResult[0].length > 0) {
-
-                                        console.log('FnGetResource: Resource details Send successfully');
-                                        res.send(GetResult[0]);
-                                    }
-                                    else {
-
-                                        console.log('FnGetResource:No Resource details found');
-                                        res.send('null');
-                                    }
-                                }
-                                else {
-
-                                    console.log('FnGetResource:No Resource details found');
-                                    res.send('null');
-                                }
-
-                            }
-                            else {
-
-                                console.log('FnGetResource: error in getting Resource details' + err);
-                                res.statusCode = 500;
-                                res.send('null');
-                            }
-                        });
-                    }
-                    else {
-                        res.statusCode = 401;
-                        res.send('null');
-                        console.log('FnGetResource: Invalid Token');
-                    }
-                } else {
-
-                    res.statusCode = 500;
-                    res.send('null');
-                    console.log('FnGetResource: Error in validating token:  ' + err);
-                }
-            });
-        }
-        else {
-            if (Token == null) {
-                console.log('FnGetResource: Token is empty');
-            }
-            res.statusCode=400;
-            res.send('null');
-        }
-    }
-    catch (ex) {
-        console.log('FnGetResource error:' + ex.description);
-        throw new Error(ex);
-    }
-};
-
 exports.FnSaveResourceItemMap = function(req, res){
     try{
         res.setHeader("Access-Control-Allow-Origin", "*");
@@ -10334,6 +10181,338 @@ exports.FnGetLocationListForEZEID = function (req, res) {
         throw new Error(ex);
     }
 };
+
+//mehtod to save the reservation resource
+exports.FnSaveReservationResource = function(req, res){
+    try{
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.body.Token ;
+        var TID = parseInt(req.body.TID);
+        var picture = (req.body.picture) ? ((req.body.picture.trim().length > 0) ? req.body.picture : null ) : null ;;
+        var title = (req.body.title) ? ((req.body.title.trim().length > 0) ? req.body.title : null ) : null ;;
+        var description = req.body.description;
+        var status = (parseInt(req.body.status)=== 1 || parseInt(req.body.status) === 2) ? req.body.status : 1;
+         if (TID.toString() == 'NaN')
+            TID = 0;
+        var responseMessage = {
+            status: false,
+            error:{},
+            message:'',
+            data: null
+        };
+        var validateStatus = true;
+        
+        if(!picture){
+            responseMessage.error['picture'] = 'Invalid Picture';
+            validateStatus *= false;
+        }
+        
+        if(!title){
+            responseMessage.error['title'] = 'Invalid Picture';
+            validateStatus *= false;
+        }
+        
+        
+        if(!validateStatus){
+            console.log('FnSaveReservationResource  error : ' + JSON.stringify(responseMessage.error));
+            responseMessage.message = 'Unable to save resource ! Please check the errors';
+            res.status(200).json(responseMessage);
+            return;
+        }
+        
+        if (Token) {
+            FnValidateToken(Token, function (err, result) {
+                if (!err) {
+                    if (result != null) {
+
+                        var query = db.escape(Token) + ', ' + db.escape(TID) + ',' + db.escape(picture) + ',' + db.escape(title) + ',' + db.escape(description) + ',' + db.escape(status);
+                        db.query('CALL pSaveResource(' + query + ')', function (err, insertResult) {
+                            if (!err){
+                                if (insertResult.affectedRows > 0) {
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Resource details save successfully';
+                                    responseMessage.data = {
+                                        TID : insertResult.insertId,
+                                        title : req.body.title,
+                                        status : req.body.status,
+                                        description : req.body.description,
+                                        picture : req.body.picture
+                                    };
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnSaveReservationResource: Resource details save successfully');
+                                }
+                                else {
+                                    responseMessage.message = 'An error occured ! Please try again';
+                                    responseMessage.error = {};
+                                    res.status(400).json(responseMessage);
+                                    console.log('FnSaveReservationResource:No save Resource details');
+                                }
+                            }
+
+                            else {
+                                responseMessage.message = 'An error occured ! Please try again';
+                                responseMessage.error = {};
+                                res.status(500).json(responseMessage);
+                                console.log('FnSaveReservationResource:No save Resource details
+                                console.log('FnSaveReservationResource: error in saving Resource details:' + err);
+                            }
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token'; 
+                        responseMessage.error = {}; 
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnSaveReservationResource: Invalid token');
+                                            }
+                }
+                else {
+                    responseMessage.error= {};
+                    responseMessage.message = 'Error in validating Token'; 
+                    res.status(500).json(responseMessage);
+                    console.log('FnSaveReservationResource:Error in processing Token' + err);
+                }
+            });
+
+        }
+
+        else {
+            if (!Token) {
+                responseMessage.message = 'Invalid Token';            
+                responseMessage.error = {
+                    Token : 'Invalid Token';
+                };
+                console.log('FnSaveReservationResource: Token is mandatory field');
+            }
+           
+            res.status(401).json(responseMessage);
+        }
+
+    }
+    catch (ex) {
+        responseMessage.error = {};
+        responseMessage.message = 'An error occured !'
+        console.log('FnSaveReservationResource:error ' + ex.description);
+        throw new Error(ex);
+        res.status(400).json(responseMessage);
+    }
+};
+
+//method to update the reservation resource
+exports.FnUpdateReservationResource = function(req, res){
+    
+    try{
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.body.Token ;
+        var TID = parseInt(req.body.TID);
+        var picture = (req.body.picture) ? ((req.body.picture.trim().length > 0) ? req.body.picture : null ) : null ;;
+        var title = (req.body.title) ? ((req.body.title.trim().length > 0) ? req.body.title : null ) : null ;;
+        var description = req.body.description;
+        var status = (parseInt(req.body.status)=== 1 || parseInt(req.body.status) === 2) ? req.body.status : 1;
+         
+        var responseMessage = {
+            status: false,
+            error:{},
+            message:'',
+            data: null
+        };
+        var validateStatus = true;
+        
+        if(!picture){
+            responseMessage.error['picture'] = 'Invalid Picture';
+            validateStatus *= false;
+        }
+        
+        if(!title){
+            responseMessage.error['title'] = 'Invalid Title';
+            validateStatus *= false;
+        }
+        
+        
+        if(!validateStatus){
+            console.log('FnUpdateReservationResource  error : ' + JSON.stringify(responseMessage.error));
+            responseMessage.message = 'Unable to update resource ! Please check the errors';
+            res.status(200).json(responseMessage);
+            return;
+        }
+        
+        if (Token) {
+            FnValidateToken(Token, function (err, result) {
+                if (!err) {
+                    if (result != null) {
+
+                        var query = db.escape(Token) + ', ' + db.escape(TID) + ',' + db.escape(picture) + ',' + db.escape(title) + ',' + db.escape(description) + ',' + db.escape(status);
+                        db.query('CALL pSaveResource(' + query + ')', function (err, updateResult) {
+                            if (!err){
+                                if (updateResult.affectedRows > 0) {
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Resource details update successfully';
+                                    responseMessage.data = {
+                                        TID : req.body.TID,
+                                        title : req.body.title,
+                                        status : req.body.status,
+                                        description : req.body.description,
+                                        picture : req.body.picture
+                                    };
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnUpdateReservationResource: Resource details save successfully');
+                                }
+                                else {
+                                    responseMessage.message = 'An error occured ! Please try again';
+                                    responseMessage.error = {};
+                                    res.status(400).json(responseMessage);
+                                    console.log('FnUpdateReservationResource:No save Resource details');
+                                }
+                            }
+
+                            else {
+                                responseMessage.message = 'An error occured ! Please try again';
+                                responseMessage.error = {};
+                                res.status(500).json(responseMessage);
+                                console.log('FnUpdateReservationResource: error in saving Resource details:' + err);
+                            }
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token'; 
+                        responseMessage.error = {}; 
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnUpdateReservationResource: Invalid token');
+                                            }
+                }
+                else {
+                    responseMessage.error= {};
+                    responseMessage.message = 'Error in processing Token'; 
+                    res.status(500).json(responseMessage);
+                    console.log('FnUpdateReservationResource:Error in processing Token' + err);
+                }
+            });
+
+        }
+
+        else {
+            if (!Token) {
+                responseMessage.message = 'Invalid Token';            
+                responseMessage.error = {
+                    Token : 'Invalid Token';
+                };
+                console.log('FnUpdateReservationResource: Token is mandatory field');
+            }
+           
+            res.status(401).json(responseMessage);
+        }
+
+    }
+    catch (ex) {
+        responseMessage.error = {};
+        responseMessage.message = 'An error occured !'
+        console.log('FnUpdateReservationResource:error ' + ex.description);
+        throw new Error(ex);
+        res.status(400).json(responseMessage);
+    }
+};
+
+//method to get reservation resource details
+exports.FnGetReservationResource = function (req, res) {
+    try {
+
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.query.Token;
+        var responseMessage = {
+            status: false,
+            data: null,
+            error:{},
+            Message:''
+        };
+        
+        if (Token) {
+            FnValidateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+
+                        db.query('CALL pGetResource(' + db.escape(Token) + ')', function (err, GetResult) {
+                            if (!err) {
+                                if (GetResult != null) {
+                                    if (GetResult[0].length > 0) {
+                                        responseMessage.status = true;
+                                        responseMessage.data = GetResult[0] ;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Resource details Send successfully';
+                                        console.log('FnGetReservationResource: Resource details Send successfully');
+                                        res.status(200).json(responseMessage);
+                                    }
+                                    else {
+                                        
+                                        responseMessage.error = {};
+                                        responseMessage.message = 'No founded Resource details';
+                                        console.log('FnGetReservationResource: No founded Resource details');
+                                        res.json(responseMessage);
+                                    }
+                                }
+                                else {
+
+                                    
+                                    responseMessage.error = {};
+                                    responseMessage.message = 'No Resource details found';
+                                    console.log('FnGetReservationResource: No Resource details found');
+                                    res.json(responseMessage);
+                                }
+
+                            }
+                            else {
+                                
+                                responseMessage.data = null ;
+                                responseMessage.error = {};
+                                responseMessage.message = 'Error in getting Resource details';
+                                console.log('FnGetReservationResource: error in getting Resource details' + err);
+                                res.status(500).json(responseMessage);
+                            }
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid Token';
+                        responseMessage.error = {};
+                        res.status(401).json(responseMessage);
+                        console.log('FnGetReservationResource: Invalid Token');
+                    }
+                } else {
+                    responseMessage.error = {};
+                    responseMessage.message = 'Error in validating token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnGetReservationResource: Error in validating token:  ' + err);
+                }
+            });
+        }
+        else {
+            if (!Token) {
+                responseMessage.message = 'Invalid Token';            
+                responseMessage.error = {
+                    Token : 'Invalid Token';
+                };
+                console.log('FnGetReservationResource: Token is mandatory field');
+            }
+           
+            res.status(401).json(responseMessage);
+        }
+    }
+     catch (ex) {
+        responseMessage.error = {};
+        responseMessage.message = 'An error occured !'
+        console.log('FnGetReservationResource:error ' + ex.description);
+        throw new Error(ex);
+        res.status(400).json(responseMessage);
+    }
+};
+
 
 
 
