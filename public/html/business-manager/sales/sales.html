@@ -329,14 +329,14 @@
                     </div>
                     <div class="col-lg-4 col-md-4 col-sm-6 col-xs-8 pull-right" ng-show="txList.length">
                         <div class="btn-group pull-right" role="group" aria-label="First group">
-                            <button type="button" ng-disabled="pageNumber <= 1" class="btn btn-info bt-xs no-radius">
+                            <button type="button" ng-disabled="pageNumber <= 1" class="btn btn-info bt-xs no-radius" ng-click="decrementPage()">
                                 <span class="glyphicon glyphicon-chevron-left"></span>
                                 Prev
                             </button>
                             <button type="button" class="btn btn-info bt-xs no-radius active">
                                 {{pageNumber}}
                             </button>
-                            <button type="button" ng-disabled="(totalPages > currentPage)" class="btn btn-info bt-xs no-radius">
+                            <button type="button" ng-disabled="(currentPage >= totalPages)" class="btn btn-info bt-xs no-radius"  ng-click="incrementPage()">
                                 <span class="glyphicon glyphicon-chevron-right"></span>
                                 Next
                             </button>
