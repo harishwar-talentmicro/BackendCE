@@ -497,5 +497,17 @@ angular.module('ezeidApp').
                 }
             }
 
+            /* reset the filters [star-filter][filter] */
+            $scope.resetFilter = function()
+            {
+                /* uncheck all the filters */
+                $('.filter').prop('checked','');
+
+                /* check all the filters */
+                $('.star-filter').prop('checked','checked');
+                /* set proximity to ANY */
+                $('.proximity').val('0');
+            }
+
         }]);
 
