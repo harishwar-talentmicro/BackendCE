@@ -43,7 +43,7 @@
 
                     <div class="col-lg-2 col-md-2 col-sm-3 col-xs-4 pull-right" title="Filters">
                         <div class="form-group form-group-sm">
-                            <select class="form-control" ng-model="filterStatus" ng-change="loadTransaction(pageNumber,filterStatus)">
+                            <select class="form-control" ng-model="filterStatus" ng-change="triggerStatusFilter(pageNumber,filterStatus)">
                                 <option ng-repeat="sfilter in filterStatusTypes track by $index" value="{{sfilter.TID}}">{{sfilter.StatusTitle}}</option>
                             </select>
                         </div>
