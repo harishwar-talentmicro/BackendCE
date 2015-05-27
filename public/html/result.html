@@ -1,5 +1,5 @@
 <div class="search-result hpw">
-    <section id="result-page-menu-wrapper" class=" rpw" ng-controller="LandingPageCtrl">
+    <section id="result-page-menu-wrapper" class=" rpw" sg-controller="">
         <!-- New header menu goes here -->
         <header-section></header-section>
 
@@ -36,7 +36,6 @@
                                 </div>
 
                                 <input type="text" ng-keypress="(searchKey($event))" placeholder="{{placeHolderText[params.searchType - 1]}}" ng-model="params.searchTerm" ng-class="(params.searchType === 1) ? 'text-uppercase' : ''" class="form-control" aria-label="...">
-                                <!--<input type="text" ng-keypress="(searchKey($event))" ng-click="(searchCount = 0)" placeholder="{{placeHolderText[params.searchType - 1]}}" ng-model="params.searchTerm" ng-class="(params.searchType === 1) ? 'text-uppercase' : ''" class="form-control" aria-label="...">-->
                                 <div class="input-group-btn">
                                     <!-- Advance Search BTN -->
                                     <button ng-disabled="params.searchType === 1"  ng-click="(toggleFilterContainer($event,true))(isFilterOptionsShown = false)" type="button" class="btn btn-default dropdown-toggle btn-advanced-filter no-radius" data-toggle="dropdown" title="Click to choose Search Options"><i class="fa fa-filter"></i> </button>
@@ -82,29 +81,8 @@
                 <span> NO: {{downloadData.No}}  {{downloadData.date != "" ? "| Expiry Date:"+downloadData.date : ""}}</span>
             </div>
         </div>
-
-        <!-- Advance Filter Dropdown(Existing) -->
-        <!--<div class="row">-->
-        <!--<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 col-lg-offset-6 col-md-offset-6 col-sm-offset-6 col-xs-offset-0">-->
-        <!--<div class="filter-list width-50" ng-show="isFilterOptionsShown">-->
-
-        <!--<div class="advance-filter-content border-style-bottom white">-->
-        <!--&lt;!&ndash; List of all the FILTERS &ndash;&gt;-->
-        <!--<ul class="list-unstyled">-->
-        <!--<li class="p-left-16"><b>Proximity:</b> {{params.proximity == 0?"NA":params.proximity+" Miles"}}</li>-->
-        <!--<li class="p-left-16 gray"><b >Parking Required:</b> Yes</li>-->
-        <!--<li class="p-left-16"><b >Home Delivery:</b> NA</li>-->
-        <!--<li class="p-left-16 gray"><b >Open Status:</b> NA</li>-->
-        <!--<li class="p-left-16 "><b >Ratings:</b> 1-5</li>-->
-        <!--</ul>-->
-        <!--</div>-->
-        <!--</div>-->
-        <!--</div>-->
-        <!--</div>-->
-        <!-- Advance filter container -->
         <div class="row">
             <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 col-lg-offset-5 col-md-offset-5 col-sm-offset-5 col-xs-offset-0">
-                <!--<div class="filter-container animation-slideup" ng-show="isFilterShown">-->
                 <div class="filter-container animation-slideup" ng-show="isFilterShown">
                     <div class="container text text-center filter-text-highlight">
                         <i>Search Options</i>
@@ -185,7 +163,7 @@
             </modal>
         </div>
 
-        <!-- Modal Box content -->
+        <!-- Modal Box content for map -->
         <modal mtitle="modal.title" mclass="modal.class" visible="modalVisible">
             <div class="row">
                 <!-- Map goes here -->
@@ -202,10 +180,10 @@
     <section id="search-result-wrapper" class="hpw srw">
         <div class="metro-ui-wrapper">
             <!-- main-tiles-frame -->
-            <div class="main-tiles-frame tile-frame-padding-top font-roboto">
+            <div class="main-tiles-frame tile-frame-paddisg-top font-roboto">
                 <!-- All such results goes here -->
-                <!-- <div class="row p-top-30" ng-hide="showDownloadLink">-->
-                <div class="row p-top-30">
+                <!-- <div class="row p-top-30" sg-hide="showDownloadLink">-->
+                <div class="row search-result-page-padding">
 
                     <!-- Maps goes here -->
                     <div id="map-ctrl" class="col-lg-12" ng-show="searchListMapFlag"></div>
@@ -215,7 +193,7 @@
                     <!-- FLIPPING TILES Start Here =======================================-->
 
                     <!-- Flipping tiles starts here -->
-                    <div class="filpping-tiles t1"  ng-hide="searchListMapFlag && !showDownloadLink" >
+                    <div class="filppisg-tiles t1"  ng-hide="searchListMapFlag && !showDownloadLink" >
                         <div class="master-tile">
                             <div class="mobile-parent-tile flip row p-top-10">
 
@@ -237,7 +215,7 @@
                                         </div>
                                         <!-- Row 2 -->
                                         <div class="tile-row-2">
-                                            <p class="text-bolder">{{search.CompanyName}}</p>
+                                            <p class="text-bolder">{{search.CompanyName != ''?search.CompanyName:'___'}}</p>
                                             <hr class="style-two">
                                             <small>
                                                 <!-- Mobile Number -->
@@ -254,7 +232,7 @@
                                                 <i class="si si si-big" ng-class="search.OpenStatus == 2?'si-closed':'si-open'"></i>
                                             </div>
                                             <div class="col-lg-1  col-md-1 col-sm-1 col-xs-1">
-                                                <i class="si si si-big" ng-class="search.ParkingStatus == 2?'si-parking-no':'si-parking'"></i>
+                                                <i class="si si si-big" ng-class="search.ParkingStatus == 2?'si-parkisg-no':'si-parking'"></i>
                                             </div>
                                             <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1">
                                                 <i class="si si si-big" ng-class="search.EZEIDVerifiedID == 2?'si-verified-document':'si-not-verified-document'"></i>

@@ -69,6 +69,11 @@
     width:120%
 }
 
+.hpw .search-result-page-padding
+{
+    padding-top: 140px;
+}
+
 @media screen and (max-width: 1320px) {
     .srw .tile-frame-padding-top
     {
@@ -79,6 +84,9 @@
     {
         display: none;
     }
+
+
+
 }
 
 @media screen and (max-width: 1200px)
@@ -87,6 +95,12 @@
     {
         display: none;
     }
+
+    .hpw .search-result-page-padding
+    {
+        padding-top: 185px;
+    }
+
 }
 
 @media screen and (max-width: 874px) {
@@ -98,6 +112,12 @@
     .hpw .hidden-sm
     {
         display: none;
+    }
+
+
+    .hpw .search-result-page-padding
+    {
+        padding-top: 185px;
     }
 }
 
