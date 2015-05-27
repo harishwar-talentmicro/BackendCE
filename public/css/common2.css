@@ -1734,6 +1734,19 @@ hr.style-two {
     padding-bottom: 10px;
     border: 1px solid rgb(228, 228, 228);
     padding: 10px;
-    height: auto;
-    margin-bottom: 10px;
+height: auto;
+margin-bottom: 10px;
+}
+
+/* styles for Reservation Module */
+.rm .blk
+{
+    height:1em;
+    border-left:1px solid rgb(239, 239, 239);
+    border-right:1px solid rgb(239, 239, 239);
+}
+
+.rm .blk-content:hover
+{
+    background-color: rgb(239, 239, 239);
 }
