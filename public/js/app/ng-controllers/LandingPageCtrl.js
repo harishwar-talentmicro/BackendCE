@@ -58,6 +58,7 @@ angular.module('ezeidApp').
                 $scope.stars[index] = !$scope.stars[index];
             }
 
+            /* dummy array for creating star rating STARS */
             $scope.starArr = [
                 ["a"],
                 ["a","b"],
