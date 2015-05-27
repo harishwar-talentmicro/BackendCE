@@ -10256,7 +10256,6 @@ exports.FnSaveReservationResource = function(req, res){
                                 responseMessage.message = 'An error occured ! Please try again';
                                 responseMessage.error = {};
                                 res.status(500).json(responseMessage);
-                                console.log('FnSaveReservationResource:No save Resource details
                                 console.log('FnSaveReservationResource: error in saving Resource details:' + err);
                             }
                         });
