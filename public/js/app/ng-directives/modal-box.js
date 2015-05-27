@@ -19,41 +19,53 @@ angular.module('ezeidApp').directive('modal', function () {
         restrict: 'E',
         transclude: true,
         replace:true,
-        scope:true,
-        link: function postLink(scope, element, attrs) {
-            scope.mclass = attrs.mclass;
-            scope.mtitle = attrs.mtitle;
-            scope.showheader = true;
-            if(typeof(attrs.showheader) !== "undefined"){
-                scope.showheader = attrs.showheader;
-                scope.$watch(attrs.showheader,function(value){
-                    scope.showheader = value;
-                });
-            }
-            scope.$watch(attrs.visible, function(value){
-                if(value == true)
+        scope:{
+            visible : '=',
+            mclass : '=',
+            showheader : '=',
+            mtitle : '='
+        },
+        link: function (scope, element, attrs) {
+//            scope.mclass = attrs.mclass;
+//            scope.mtitle = attrs.mtitle;
+//            scope.showheader = true;
+//            if(typeof(attrs.showheader) !== "undefined"){
+//                scope.showheader = attrs.showheader;
+//                scope.$watch(attrs.showheader,function(value){
+//                    scope.showheader = value;
+//                });
+//            }
+            scope.$watch('visible', function(value){
+                if(value == true){
+                    console.log('true opened : '+value);
                     $(element).modal('show');
-                else
-                    $(element).modal('hide');
-            });
-            scope.$watch(attrs.mtitle,function(value){
-                scope.mtitle = value;
-            });
+                }
 
-            scope.$watch(attrs.mclass,function(value){
-                scope.mclass = value;
+                else{
+                    console.log('false close : '+value);
+                    $(element).modal('hide');
+                }
             });
+//            scope.$watch(attrs.mtitle,function(value){
+//                scope.mtitle = value;
+//            });
+//
+//            scope.$watch(attrs.mclass,function(value){
+//                scope.mclass = value;
+//            });
 
             $(element).on('shown.bs.modal', function(){
-                scope.$apply(function(){
-                    scope.$parent[attrs.visible] = true;
-                });
+//                scope.$apply(function(){
+//                    scope.$parent[attrs.visible] = true;
+//                });
+                scope.visible = true;
             });
 
             $(element).on('hidden.bs.modal', function(){
-                scope.$apply(function(){
-                    scope.$parent[attrs.visible] = false;
-                });
+//                scope.$apply(function(){
+//                    scope.$parent[attrs.visible] = false;
+//                });
+                scope.visible = false;
             });
         }
     };

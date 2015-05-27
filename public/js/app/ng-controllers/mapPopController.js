@@ -24,6 +24,9 @@ angular.module('ezeidApp').controller('mapPopController',[
              GURL,
              GoogleMaps){
 
+
+        console.log("sAi...");
+
         //Below line is for Loading img
         $scope.$emit('$preLoaderStart');
 
@@ -126,4 +129,5 @@ angular.module('ezeidApp').controller('mapPopController',[
             $window.localStorage.setItem("userCurrentLoc", JSON.stringify(userLoc));
             $window.location.href = "/viewdirection";
         };
+
 }]);

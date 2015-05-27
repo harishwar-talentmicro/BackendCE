@@ -759,7 +759,7 @@ body {
 .workingHours
 {
 }
-.workingHours, .modal-body
+.workingHours .modal-body
 {
     padding-top: 0px;
 }
@@ -1568,4 +1568,17 @@ table.rwd-table > tbody > tr > td.serachResultSelectAll
 {
     top: 30px!important;
     right: 75px!important;
+}
+.setWidthFiftyPercent
+ {
+     width: 50%;
+ }
+.setWidthThird
+ {
+     width: 33.33%;
+ }
+.setLeftRightMarginFivePX
+{
+    margin-left: 5px;
+    margin-right: 5px;
 }
