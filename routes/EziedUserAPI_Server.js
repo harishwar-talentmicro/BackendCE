@@ -10282,7 +10282,7 @@ exports.FnSaveReservationResource = function(req, res){
             if (!Token) {
                 responseMessage.message = 'Invalid Token';            
                 responseMessage.error = {
-                    Token : 'Invalid Token';
+                    Token : 'Invalid Token'
                 };
                 console.log('FnSaveReservationResource: Token is mandatory field');
             }
@@ -10400,7 +10400,7 @@ exports.FnUpdateReservationResource = function(req, res){
             if (!Token) {
                 responseMessage.message = 'Invalid Token';            
                 responseMessage.error = {
-                    Token : 'Invalid Token';
+                    Token : 'Invalid Token'
                 };
                 console.log('FnUpdateReservationResource: Token is mandatory field');
             }
@@ -10495,7 +10495,7 @@ exports.FnGetReservationResource = function (req, res) {
             if (!Token) {
                 responseMessage.message = 'Invalid Token';            
                 responseMessage.error = {
-                    Token : 'Invalid Token';
+                    Token : 'Invalid Token'
                 };
                 console.log('FnGetReservationResource: Token is mandatory field');
             }
