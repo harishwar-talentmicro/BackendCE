@@ -6967,7 +6967,7 @@ exports.FnGetTranscation = function (req, res) {
                     if (Result != null) {
                         
                          var ToPage = 10 * Page;
-                        var FromPage = ToPage - 9;
+                        var FromPage = ToPage - 10;
 
                         if (FromPage <= 1) {
                             FromPage = 0;
@@ -6995,6 +6995,10 @@ exports.FnGetTranscation = function (req, res) {
                                             else{
                                                 TotalPage = PageValue;
                                             }
+
+
+
+                                            TotalPage = parseInt(GetResult[0][0].TotalCount /10) + 1;
                                             RtnMessage.TotalPage = TotalPage;
                                             RtnMessage.Result =GetResult[0];
                                             res.send(RtnMessage);
