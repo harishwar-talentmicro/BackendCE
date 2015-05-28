@@ -86,6 +86,9 @@ HeaderApp.directive('headerSection',['Notification','$window' ,function (Notific
             //forgot password
             this.openForgotPasswordForm=function(){
                 SignCtrl.EzeId="";
+                $("#SignIn_popup").slideUp();
+                $('#forgot-password').css({'position':'fixed'});
+                $('#forgot-password > div').css({'position':'relative'});
                 $('#forgot-password').slideDown();
                 $(".wd_forgot").focus();
             };
