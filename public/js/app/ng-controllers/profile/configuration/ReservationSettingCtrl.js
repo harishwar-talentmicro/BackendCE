@@ -205,7 +205,7 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',['$scope',
         }
         if(err.length > 0){
             for(var i = 0; i < err.length; i++){
-                Notification.error({ message : err[i], delay : 5000});
+                Notification.error({ message : err[i], delay : 2000});
             }
             return false;
         }
@@ -229,11 +229,11 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',['$scope',
 
                     if(resp.status){
 
-                        Notification.success({ message : 'Resource added successfully', delay : 5000 });
+                        Notification.success({ message : 'Resource added successfully', delay : 2000 });
 
                     }
                     else{
-                        Notification.error({ message : 'An error occurred while saving resource! Please try again', delay : 5000});
+                        Notification.error({ message : 'An error occurred while saving resource! Please try again', delay : 2000});
                     }
                     resetResourceValue()
                     $scope.showModal = false;
@@ -323,7 +323,7 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',['$scope',
         }
         if(err.length > 0){
             for(var i = 0; i < err.length; i++){
-                Notification.error({ message : err[i], delay : 5000});
+                Notification.error({ message : err[i], delay : 2000});
             }
             return false;
         }
@@ -337,7 +337,7 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',['$scope',
             $scope.modalBox.servicesItem.Token = $rootScope._userInfo.Token;
             $scope.$emit('$preLoaderStart');
             $http({
-                url : GURL + 'reservation_services',
+                url : GURL + 'reservation_service',
                 method : ($scope.modalBox.servicesItem.TID == 0) ? "POST" : "PUT",
                 data : $scope.modalBox.servicesItem
             }).success(function(resp)
@@ -347,20 +347,19 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',['$scope',
 
                     if(resp.status){
 
-                        Notification.success({ message : 'Resource added successfully', delay : 5000 });
+                        Notification.success({ message : 'Service added successfully', delay : 2000});
 
                     }
                     else{
-                        Notification.error({ message : 'An error occurred while saving resource! Please try again', delay : 5000});
+                        Notification.error({ message : 'An error occurred while saving Service! Please try again', delay : 2000});
                     }
-                    resetResourceValue()
+                    resetResourceValue();
                     $scope.showModal = false;
                 }).error(function(err){
                     $scope.$emit('$preLoaderStop');
-                    Notification.error({ message : 'An error occurred while saving resource! Please try again', delay : 2000});
+                    Notification.error({ message : 'An error occurred while saving Service! Please try again', delay : 2000});
                 });
         }
-
     };
 
 
