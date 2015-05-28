@@ -23,7 +23,7 @@
 
                     <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
                         <div class="form-group">
-                            <select class="form-control" placeholder="Item Status" ng-model="modalBox.item.ResourceStatus">
+                            <select class="form-control" placeholder="Item Status" ng-model="modalBox.item.status">
                                 <option value="1">Active</option>
                                 <option value="2">Inactive</option>
                             </select>
@@ -32,9 +32,9 @@
 
                     <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
                         <div class="form-group">
-                            <select class="form-control emptyBox" name="role" ng-model="modalBox.item.OperatorID"
-                                    ng-options="Operator.TID as Operator.EZEID for Operator in subusers">
-                                <option value="" default selected> --Select Operator ID-- </option>
+                            <select class="form-control emptyBox" ng-model="modalBox.item.OperatorID">
+                                <option value="0"> -- Select Operator -- </option>
+                                <option ng-repeat="i in subusers" value="{{i.TID}}">{{i.EZEID}}</option>
                             </select>
                         </div>
                     </div>
@@ -42,7 +42,7 @@
                 <div class="row">
                     <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix" >
                         <div class="form-group">
-                            <textarea class="form-control" ng-model="modalBox.item.ResourceDescription" maxlength="250" placeholder="Resource Description (Max 250 characters)" rows="12"></textarea>
+                            <textarea class="form-control" ng-model="modalBox.item.description" maxlength="250" placeholder="Resource Description (Max 250 characters)" rows="12"></textarea>
                         </div>
                     </div>
                     <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
@@ -127,16 +127,16 @@
     </modal>
 
 
-        <div ng-show="true">
-            <h1>
-                <span class="glyphicon glyphicon-calendar"></span> Coming Soon !
-            </h1>
-        </div>
+    <div ng-show="false">
+        <h1>
+            <span class="glyphicon glyphicon-calendar"></span> Coming Soon !
+        </h1>
+    </div>
 
 
 
 
-    <div class="panel-body" ng-show="false">
+    <div class="panel-body" ng-show="true">
 
         <div role="tabpanel">
             <!-- Nav tabs -->
