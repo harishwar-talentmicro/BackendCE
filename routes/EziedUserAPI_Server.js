@@ -3604,6 +3604,11 @@ exports.FnGetBussinessListing = function (req, res) {
 var fs = require("fs");
 exports.FnUploadDocument = function (req, res) {
     try {
+        
+        var deleteTempFile = function(){
+        fs.unlink('../bin/'+req.files.file.path);
+        };
+        
         var RtnMessage = {
             IsSuccessfull: false
         };
@@ -3639,16 +3644,19 @@ exports.FnUploadDocument = function (req, res) {
                                             RtnMessage.IsSuccessfull = true;
                                             console.log('FnUploadDocument: Document Saved successfully');
                                             res.send(RtnMessage);
+                                            deleteTempFile();
                                         }
                                         else {
                                             console.log('FnUploadDocument: Document not inserted');
                                             res.send(RtnMessage);
+                                            deleteTempFile();
                                         }
                                     }
                                     else {
                                         res.statusCode = 500;
                                         res.send(RtnMessage);
                                         console.log('FnUploadDocument: Error in saving documents:' + err);
+                                        deleteTempFile();
                                     }
                                 });
                             });
@@ -3656,29 +3664,34 @@ exports.FnUploadDocument = function (req, res) {
                         else {
                             res.send(RtnMessage);
                             console.log('FnUploadDocument: Mandatory field are available');
+                            deleteTempFile();
                         }
                     }
                     else {
                         res.send(RtnMessage);
                         console.log('FnUploadDocument: Mandatory field are available');
+                        deleteTempFile();
                     }
                 }
                 else {
                     res.statusCode = 401;
                     res.send(RtnMessage);
                     console.log('FnUploadDocument: Invalid Token');
+                    deleteTempFile();
                 }
             }
             else {
                 res.statusCode = 500;
                 res.send(RtnMessage);
                 console.log('FnUploadDocument: Error in validating token: ' + err);
+                deleteTempFile();
             }
         });
     }
     catch (ex) {
         console.log('FnGetDocument error:' + ex.description);
         throw new Error(ex);
+        deleteTempFile();
     }
 };
 
