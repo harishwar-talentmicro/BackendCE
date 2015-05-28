@@ -148,6 +148,27 @@ angular.module('ezeidApp').controller('ModuleSettingsCtrl',[
                         $scope.$emit('$preLoaderStop');
                     }
 
+                    var _moduleVisible = "22222";
+
+                    if(resp[0].VisibleModules){
+                        var str = resp[0].VisibleModules.toString();
+                        if(str.length === 5){
+                            var _arr = str.split('');
+                            for(var _c = 0; _c < _arr.length; _c++){
+                                if(parseInt(_arr[_c]) === 0){
+                                    _arr[_c] = 2;
+                                }
+                            }
+                            resp[0].VisibleModules = _arr.join('');
+                        }
+                        else{
+                            resp[0].VisibleModules = _moduleVisible;
+                        }
+                    }
+                    else{
+                        resp[0].VisibleModules = _moduleVisible;
+                    }
+
                     $scope.settings.sales.title = (resp[0].SalesTitle) ? resp[0].SalesTitle : '';
                         $scope.settings.sales.defaultFormMsg = (resp[0].SalesFormMsg) ?  resp[0].SalesFormMsg :'';
                         $scope.settings.sales.visibility = (resp[0].VisibleModules) ? resp[0].VisibleModules.split("")[0] : 1;
