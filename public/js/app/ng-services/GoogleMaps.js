@@ -368,7 +368,7 @@ angular.module('ezeidApp').factory('GoogleMaps',['$q','$timeout','$compile',func
             this.currentLocationMarker.setMap(null);
         }
         catch(ex){
-            console.error('Currrent Marker removal unsuccessful');
+            //console.error('Currrent Marker removal unsuccessful');
         }
 
     };

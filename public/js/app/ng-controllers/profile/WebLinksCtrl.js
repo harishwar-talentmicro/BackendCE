@@ -38,6 +38,11 @@ angular.module('ezeidApp').controller('WebLinksCtrl',[
         var isUserDetailsLoaded = false;
         var isWebLinksLoaded = false;
 
+        if($rootScope._userInfo.Verified !== 2){
+            $scope.$emit('$preLoaderStop');
+            Notification.error({ message : 'Please be verified by EZEID Area Partner before accessing this area', delay : MsgDelay});
+            $location.path('/profile-manager/user');
+        }
         $scope.webLinks = [];
 
         $scope.webLinkAddMode = false;

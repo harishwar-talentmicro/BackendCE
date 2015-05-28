@@ -31,6 +31,13 @@
             $route) {
 
 
+            if($rootScope._userInfo.Verified !== 2){
+                $scope.$emit('$preLoaderStop');
+                Notification.error({ message : 'Please be verified by EZEID Area Partner before accessing this area', delay : MsgDelay});
+                $location.path('/profile-manager/user');
+            }
+
+
             /**
              * Company Profile Loaded from service
              * @type {string}

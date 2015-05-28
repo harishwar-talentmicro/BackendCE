@@ -983,7 +983,7 @@
         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
             <h5 class="text-primary text-left font-open-sans data">
                 <select class="form-control" ng-model="editLocationDetails.TemplateID" name="primaryLocationForm.TemplateID">
-                    <option ng-repeat="template in workingHoursTemplateMap" value="0">--Select Working Hours Template--</option>
+                    <option ng-repeat="template in workingHoursTemplateMap" value="">--Select Working Hours Template--</option>
                     <option ng-repeat="template in workingHoursTemplateMap" value="{{template.TID}}">{{template.TemplateName}}</option>
                 </select>
             </h5>
@@ -1428,7 +1428,7 @@
         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
             <h5 class="text-primary text-left font-open-sans data">
                 <select class="form-control" ng-model="editLocationDetails.TemplateID" name="secondaryLocation{{locIndex}}Form.TemplateID">
-                    <option ng-repeat="template in workingHoursTemplateMap" value="0">--Select Working Hours Template--</option>
+                    <option ng-repeat="template in workingHoursTemplateMap" value="">--Select Working Hours Template--</option>
                     <option ng-repeat="template in workingHoursTemplateMap" value="{{template.TID}}">{{template.TemplateName}}</option>
                 </select>
             </h5>

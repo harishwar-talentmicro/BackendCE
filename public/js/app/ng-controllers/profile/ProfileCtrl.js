@@ -22,6 +22,7 @@ angular.module('ezeidApp').controller('ProfileCtrl',[
     'ScaleAndCropImage',
     'MsgDelay',
     '$location',
+    'GoogleMaps',
     function (
             $rootScope,
             $scope,
@@ -33,8 +34,10 @@ angular.module('ezeidApp').controller('ProfileCtrl',[
             $window,
             GURL,
             $interval,
+            ScaleAndCropImage,
             MsgDelay,
-            $location
+            $location,
+            GoogleMap
         ) {
         /**
          * List of countries
@@ -102,6 +105,39 @@ angular.module('ezeidApp').controller('ProfileCtrl',[
             }
         };
 
+        var updateLatLngForLocations = function(lat,lng){
+            if($scope.userDetails.Latitude == 0 && $scope.userDetails.Longitude == 0){
+                $scope.userDetails.Latitude = lat;
+                $scope.userDetails.Longitude = lng;
+            }
+            else{
+                for(var i = 0; i < $scope.secondaryLocations.length; i++){
+                    if($scope.secondaryLocations[i].Latitude == 0 && $scope.secondaryLocations[i].Longitude == 0){
+                        $scope.secondaryLocations[i].Latitude = lat;
+                        $scope.secondaryLocations[i].Longitude = lng;
+                    }
+                }
+            }
+        };
+
+        var setZeroLatLngToCurrentLocation = function(){
+            try{
+                var googleMap = new GoogleMap();
+                googleMap.getCurrentLocation().then(function(){
+                    var lat = googleMap.currentMarkerPosition.latitude;
+                    var lng = googleMap.currentMarkerPosition.longitude;
+                    updateLatLngForLocations(lat,lng);
+                },function(){
+                    var lat = googleMap.currentMarkerPosition.latitude;
+                    var lng = googleMap.currentMarkerPosition.longitude;
+                    updateLatLngForLocations(lat,lng);
+                });
+            }
+            catch(ex){
+                console.error('Google maps library not found');
+            }
+        };
+
         /**
          * If user wants the data to be refreshed,
          * In case it will load data initially from server again
@@ -128,6 +164,11 @@ angular.module('ezeidApp').controller('ProfileCtrl',[
                                     $scope.dataProgressLoader.dataLoadError = false;
                                     $scope.dataProgressLoader.dataLoadComplete = true;
                                     $scope.$emit('$preLoaderStop');
+
+                                    setZeroLatLngToCurrentLocation();
+
+
+
                                 },function(){
                                     $scope.dataProgressLoader.dataLoadInProgress = false;
                                     $scope.dataProgressLoader.dataLoadError = true;
