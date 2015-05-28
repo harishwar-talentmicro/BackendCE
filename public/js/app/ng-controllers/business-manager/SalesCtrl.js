@@ -412,29 +412,38 @@
 
                 $scope.modalBox.tx.address = $scope.modalBox.locationList[locIndex].AddressLine1+' ' +
                     $scope.modalBox.locationList[locIndex].AddressLine2;
+
                 var googleMap = new GoogleMap();
-                googleMap.getReverseGeolocation(lat,lng).then(function(resp){
-                    //$scope.$emit('$preLoaderStop');
-                    if(resp.data){
-                        var data = googleMap.parseReverseGeolocationData(resp.data);
-                        $scope.modalBox.tx.city = data.city;
-                        $scope.modalBox.tx.state = data.state;
-                        $scope.modalBox.tx.country = data.country;
-                        $scope.modalBox.tx.area = data.area;
-
-
-                    }
-                    else{
+                try{
+                    googleMap.getReverseGeolocation(lat,lng).then(function(resp){
                         //$scope.$emit('$preLoaderStop');
-                        Notification.error({message : 'Please enable geolocation settings n your browser',delay : MsgDelay});
-                    }
-                    defer.resolve();
+                        if(resp.data){
+                            var data = googleMap.parseReverseGeolocationData(resp.data);
+                            $scope.modalBox.tx.city = data.city;
+                            $scope.modalBox.tx.state = data.state;
+                            $scope.modalBox.tx.country = data.country;
+                            $scope.modalBox.tx.area = data.area;
 
-                },function(){
-                    Notification.error({message : 'Please enable geolocation settings n your browser',delay : MsgDelay});
-                    //$scope.$emit('$preLoaderStop');
-                    defer.resolve();
-                });
+
+                        }
+                        else{
+                            //$scope.$emit('$preLoaderStop');
+                            Notification.error({message : 'Please enable geolocation settings n your browser',delay : MsgDelay});
+                        }
+                        defer.resolve();
+
+                    },function(){
+                        Notification.error({message : 'Please enable geolocation settings n your browser',delay : MsgDelay});
+                        //$scope.$emit('$preLoaderStop');
+                        defer.resolve();
+                    });
+                }
+                catch(ex){
+                    $timeout(function(){
+                        Notification.error({message : 'Unable to resolve geolocation',delay : MsgDelay});
+                        defer.resolve();
+                    },400);
+                }
                 return defer.promise;
             };
 
