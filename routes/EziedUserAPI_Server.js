@@ -10251,7 +10251,7 @@ exports.FnSaveReservationResource = function(req, res){
             return;
         }
         
-        if (Token) {
+        if (Token && operator_id) {
             FnValidateToken(Token, function (err, result) {
                 if (!err) {
                     if (result != null) {
@@ -10308,12 +10308,17 @@ exports.FnSaveReservationResource = function(req, res){
         }
 
         else {
-            if (!Token) {
+            if (!Token) 
+            {  
                 responseMessage.message = 'Invalid Token';            
-                responseMessage.error = {
-                    Token : 'Invalid Token'
-                };
+                responseMessage.error = {Token : 'Invalid Token'};
                 console.log('FnSaveReservationResource: Token is mandatory field');
+            }
+            else if(!operator_id)
+            {
+                responseMessage.message = 'Invalid Operator ID';            
+                responseMessage.error = {operator_id : 'Invalid Operator ID'};
+                console.log('FnSaveReservationResource: Operator ID is mandatory field');
             }
            
             res.status(401).json(responseMessage);
@@ -10370,7 +10375,7 @@ exports.FnUpdateReservationResource = function(req, res){
             return;
         }
         
-        if (Token) {
+        if (Token && operator_id) {
             FnValidateToken(Token, function (err, result) {
                 if (!err) {
                     if (result != null) {
@@ -10427,12 +10432,17 @@ exports.FnUpdateReservationResource = function(req, res){
         }
 
         else {
-            if (!Token) {
+            if (!Token) 
+            {  
                 responseMessage.message = 'Invalid Token';            
-                responseMessage.error = {
-                    Token : 'Invalid Token'
-                };
-                console.log('FnUpdateReservationResource: Token is mandatory field');
+                responseMessage.error = {Token : 'Invalid Token'};
+                console.log('FnSaveReservationResource: Token is mandatory field');
+            }
+            else if(!operator_id)
+            {
+                responseMessage.message = 'Invalid Operator ID';            
+                responseMessage.error = {operator_id : 'Invalid Operator ID'};
+                console.log('FnSaveReservationResource: Operator ID is mandatory field');
             }
            
             res.status(401).json(responseMessage);
