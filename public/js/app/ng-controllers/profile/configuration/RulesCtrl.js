@@ -4,8 +4,8 @@
  * @todo Incomplete
  */
 angular.module('ezeidApp').controller('RulesCtrl',['$scope','$interval','$http','Notification',
-    '$rootScope','$filter','$timeout','MsgDelay','GURL','$q',
-    function($scope,$interval,$http,Notification,$rootScope,$filter,$timeout,MsgDelay,GURL,$q){
+    '$rootScope','$filter','$timeout','MsgDelay','GURL','$q','GoogleMaps',
+    function($scope,$interval,$http,Notification,$rootScope,$filter,$timeout,MsgDelay,GURL,$q,GoogleMap){
 
 
         $scope.selectedTab = 1;
@@ -13,6 +13,13 @@ angular.module('ezeidApp').controller('RulesCtrl',['$scope','$interval','$http',
         $scope.showModal = false;
         $scope.masterUser = null;
         $scope.rules = [];
+        $scope.ruleFunctionTypes = [
+            'Sales',
+            'Reservation',
+            'Home Delivery',
+            'Service',
+            'Resume'
+        ];
 
         $scope.matchAdminLevels = [
 //        'Do not search Admin Areas and take decision on CountryIDs itself',
@@ -25,6 +32,13 @@ angular.module('ezeidApp').controller('RulesCtrl',['$scope','$interval','$http',
             'Match based on Admin Level 3 (Area)'
         ];
 
+        $scope.matchAdminLevelMappedName = [
+            'country',
+            'state',
+            'city',
+            'area'
+        ];
+
         $scope.ruleTypes = [
             'Area name based match',
             'Proximity based match',
@@ -32,30 +46,154 @@ angular.module('ezeidApp').controller('RulesCtrl',['$scope','$interval','$http',
         ];
 
 
+
+        var googleMap = null;
+        var isMapInitialized = false;
+
+
+        $scope.changeLatLng = function(lat,lng){
+            $scope.modalBox.rule.Latitude = lat;
+            $scope.modalBox.rule.Longitude = lng;
+            $scope.$digest();
+
+            $timeout(function(){
+                if(googleMap){
+                    googleMap.getReverseGeolocation(lat,lng).then(function(resp){
+                        if(resp.data){
+                            var geoData = googleMap.parseReverseGeolocationData(resp.data);
+                            $scope.modalBox.tempMappedName = geoData[$scope.matchAdminLevelMappedName[$scope.modalBox.rule.MatchAdminLevel]];
+                        }
+                        else{
+                            $scope.modalBox.tempMappedName = '';
+                            Notification.error({ message : 'Unable to detect location details',delay : MsgDelay});
+                        }
+                    },function(){
+                        $scope.modalBox.tempMappedName = '';
+                        Notification.error({ message : 'Unable to detect location details',delay : MsgDelay});
+                    });
+                }
+            },500);
+        };
+
+        var createRuleMap = function(){
+            try{
+                if(!isMapInitialized){
+                    isMapInitialized = true;
+                    googleMap = new GoogleMap();
+                    googleMap.getCurrentLocation().then(function(){
+                        googleMap.createMap('conf-rules-map-container',$scope,'findCurrentLocation()');
+                        googleMap.renderMap();
+                        googleMap.mapIdleListener().then(function() {
+                            googleMap.pushMapControls($scope.changeLatLng);
+                            googleMap.listenOnMapControls($scope.changeLatLng, $scope.changeLatLng);
+                            googleMap.placeCurrentLocationMarker($scope.changeLatLng,$scope.changeLatLng,true);
+                            //googleMap.resizeMap();
+                        });
+                    },function(){
+                        googleMap.createMap('conf-rules-map-container',$scope,'findCurrentLocation()');
+                        googleMap.renderMap();
+                        googleMap.mapIdleListener().then(function() {
+                            googleMap.pushMapControls($scope.changeLatLng);
+                            googleMap.listenOnMapControls($scope.changeLatLng, $scope.changeLatLng);
+                            googleMap.placeCurrentLocationMarker($scope.changeLatLng,$scope.changeLatLng,true);
+                            //googleMap.resizeMap();
+                        });
+                    });
+
+                }
+                else{
+                    googleMap.resizeMap();
+                }
+            }
+            catch(ex){
+                console.log(ex);
+                Notification.error({ message : 'Error loading google maps', delay : MsgDelay});
+            }
+        };
+
+
+
+
+
+
         var prepareEditModeData = function(data){
             var rule = {
                 TID: 14,
                 MasterID: ($scope.masterUser)? $scope.masterUser.MasterID : 0 ,
                 FolderTitle: data.FolderTitle,
-                RuleFunction: $scope.selectedTab - 1;
-                RuleType: data.RuleType
-                CountryIDs: ""
-                MatchAdminLevel: 1
-                MappedNames: ""
-                Latitude: 21
-                Longitude: 34
-                Proximity: 1000
-                DefaultFolder: 0
-                FolderStatus: 1
-                SeqNoFrefix: "r1"
-                RunningSeqNo: 19
-                CreatedDate: null
-                LUDate: null
+                RuleFunction: $scope.selectedTab - 1,
+                RuleType: data.RuleType,
+                CountryID: data.CountryIDs,
+                MatchAdminLevel: data.MatchAdminLevel,
+                MappedNames: data.MappedNames,
+                Latitude: data.Latitude,
+                Longitude: data.Longitude,
+                Proximity: data.Proximity,
+                DefaultFolder: data.DefaultFolder,
+                FolderStatus: data.FolderStatus,
+                SeqNoFrefix: data.SeqNoFreFix
             };
+            return rule;
         };
 
         $scope.toggleModalBox = function(ruleId){
             $scope.resetModalData();
+            if(ruleId){
+                var index = $scope.rules.indexOfWhere('TID',ruleId);
+                if(index !== -1){
+                    $scope.modalBox.rule = prepareEditModeData($scope.rules[index]);
+                    $scope.modalBox.ediMode  = true;
+                    $scope.modalBox.title  = 'Edit Rule';
+                }
+            }
+            $scope.showModal = true;
+            $timeout(function(){
+                createRuleMap();
+            },2000);
+        };
+
+        /**
+         * Adding a watcher on showModal to remove MappedNames in case MatchAdminLevel changes
+         */
+        $scope.$watch('showModal',function(newVal){
+            var destroy = null;
+            if(newVal){
+                $timeout(function(){
+                    /**
+                     * On change of MatchAdminLevel clear the mappedNames
+                     */
+                    destroy = $scope.$watch('modalBox.rule.MatchAdminLevel',function(){
+                        $scope.modalBox.rule.MappedNames = '';
+                    });
+                },1000);
+            }
+            else{
+                if(destroy){
+                    destroy();
+                }
+            }
+        });
+
+
+        /**
+         * Add $scope.modalBox.tempMappedName to MappedNames model in $scope.modalBox
+         * so that multiple countries, states, cities and areas can be mapped into one rule easily
+         */
+        $scope.addMappedName = function(){
+            if(!$scope.tempMappedName){
+                return false;
+            }
+            var currentMappedNames = ($scope.modalBox.rule.MappedNames) ? $scope.modalBox.rule.MappedNames : '';
+            if(currentMappedNames && currentMappedNames.length > 0){
+                var mappedNames = currentMappedNames.split(',');
+                mappedNames.push($scope.modalBox.tempMappedName);
+                $scope.modalBox.rule.MappedNames = mappedNames.join(',');
+                $scope.modalBox.tempMappedName = '';
+            }
+            else{
+                $scope.modalBox.rule.MappedNames = $scope.modalBox.tempMappedName;
+                $scope.modalBox.tempMappedName = '';
+            }
         };
 
 
@@ -63,14 +201,15 @@ angular.module('ezeidApp').controller('RulesCtrl',['$scope','$interval','$http',
         $scope.modalBox = {
             title : 'Add New Rule',
             editMode : false,
+            tempMappedName : '',
             rule : {
                 TID : 0 ,
                 MasterID : ($scope.masterUser)? $scope.masterUser.MasterID : 0 ,
                 FolderTitle : '' ,
-                RuleFunction : $scope.selectedTab ,
-                RuleType : 0 ,
-                CountryID : 0 ,
-                MatchAdminLevel : 0 ,
+                RuleFunction : $scope.selectedTab - 1 ,
+                RuleType : 0,
+                CountryID : 0,
+                MatchAdminLevel : 0,
                 MappedNames : '' ,
                 Latitude : 0 ,
                 Longitude : 0 ,
@@ -85,14 +224,15 @@ angular.module('ezeidApp').controller('RulesCtrl',['$scope','$interval','$http',
             $scope.modalBox = {
                 title : 'Add New Rule',
                 editMode : false,
+                tempMappedName : '',
                 rule : {
                     TID : 0 ,
                     MasterID : ($scope.masterUser)? $scope.masterUser.MasterID : 0 ,
                     FolderTitle : '' ,
-                    RuleFunction : $scope.selectedTab ,
-                    RuleType : 0 ,
-                    CountryID : 0 ,
-                    MatchAdminLevel : 0 ,
+                    RuleFunction : $scope.selectedTab - 1 ,
+                    RuleType : 0,
+                    CountryID : 0,
+                    MatchAdminLevel : 0,
                     MappedNames : '' ,
                     Latitude : 0 ,
                     Longitude : 0 ,
@@ -133,6 +273,8 @@ angular.module('ezeidApp').controller('RulesCtrl',['$scope','$interval','$http',
 
             return defer.promise;
         };
+
+
 
 
         /**

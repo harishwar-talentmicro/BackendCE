@@ -86,7 +86,7 @@ angular.module('ezeidApp').controller('ModuleSettingsCtrl',[
         sales : {
             title : '',
             defaultFormMsg : '',
-            visibility : 0,
+            visibility : 2,
             itemListType : 0 ,      // 0: Message, 1: Item, 2: Item+picture, 3: Item+picture+quantity, 4: Item + picture + quantity + rate,
             url : ''
 
@@ -94,14 +94,14 @@ angular.module('ezeidApp').controller('ModuleSettingsCtrl',[
         reservation : {
             title : '',
             defaultFormMsg : '',
-            visibility : 0,
+            visibility : 2,
             displayFormat : 0, // 0 : Hours (30 min slot), 1 : Days, 2 : Months
             url : ''
         },
         homeDelivery : {
             title : '',
             defaultFormMsg : '',
-            visibility : 0,
+            visibility : 2,
             itemListType : 1,
             url : ''
 
@@ -109,7 +109,7 @@ angular.module('ezeidApp').controller('ModuleSettingsCtrl',[
         service : {
             title : '',
             defaultFormMsg : '',
-            visibility : 0,
+            visibility : 2,
             itemListType : 1,
             url : ''
 
@@ -117,7 +117,7 @@ angular.module('ezeidApp').controller('ModuleSettingsCtrl',[
         resume : {
             title : '',
             defaultFormMsg : '',
-            visibility : 0,
+            visibility : 2,
             itemListType : 1,    //Hardcoded, will always be an item only
             keywords : "",
             url : ''
@@ -199,11 +199,52 @@ angular.module('ezeidApp').controller('ModuleSettingsCtrl',[
             });
     };
 
-    $scope.validateSettings = function(){
-        /**
-         * @todo Validate Settings before saving
-          */
-        return true;
+    $scope.validateSettings = function(data){
+
+        var isValidUrl = function(url){
+            var urlPattern = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/;
+            var urlRegex = new RegExp(urlPattern);
+            return (urlRegex.test(url));
+        };
+        var error = [];
+
+        if(data.SalesURL){
+            if(!isValidUrl(data.SalesURL)){
+                error.push('sales url');
+            }
+        }
+
+        if(data.ReservationURL){
+            if(!isValidUrl(data.ReservationURL)){
+                error.push('reservation url');
+            }
+        }
+
+        if(data.HomeDeliveryURL){
+            if(!isValidUrl(data.HomeDeliveryURL)){
+                error.push('home delivery url');
+            }
+        }
+
+        if(data.ServiceURL){
+            if(!isValidUrl(data.ServiceURL)){
+                error.push('service url');
+            }
+        }
+
+        if(data.ResumeURL){
+            if(!isValidUrl(data.ResumeURL)){
+                error.push('resume url');
+            }
+        }
+        if(error.length > 0){
+            var msg = 'Please check '+ error.join(',');
+            Notification.error({ message : msg, delay : MsgDelay});
+            return false;
+        }
+        else{
+            return true;
+        }
     };
 
     $scope.saveSettings = function(){
@@ -275,7 +316,7 @@ angular.module('ezeidApp').controller('ModuleSettingsCtrl',[
             }
         };
 
-        if($scope.validateSettings()){
+        if($scope.validateSettings(data)){
             // ////console.log(data);
             $http({
                 url : GURL + "ewtConfig",

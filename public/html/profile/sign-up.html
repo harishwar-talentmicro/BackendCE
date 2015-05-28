@@ -250,7 +250,8 @@
                                                                             ng-model="about"
                                                                             type="text"
                                                                             min-length="1"
-                                                                            max-length="100"
+                                                                            max-length="50"
+                                                                            maxlength="50"
                                                                             placeholder="{{(userType == 2) ? 'Company Tagline': 'Tagline for Public Place'}}"
                                                                             ng-class="(signUpForm.about.$dirty && signUpForm.about.$modelValue.length < 1) ? 'mandatoryTextBox' : ''"
                                                                             ng-change="signUpForm.about.$setDirty()"
@@ -287,7 +288,7 @@
                                                                            max-length="30"
                                                                            placeholder="{{(userType == 2 || userType == 3) ? 'Contact Last Name': 'Last Name'}}"
                                                                            ng-class="(signUpForm.lastName.$dirty && signUpForm.lastName.$modelValue.length < 1) ? 'mandatoryTextBox' : ''"
-                                                                           class="form-control emptyBox" />
+                                                                           class="form-control " />
                                                                </div>
                                                                <small class="text-danger">{{error.lastName}}</small>
                                                            </div>
@@ -321,7 +322,8 @@
                                                                             ng-model="about"
                                                                             type="text"
                                                                             min-length="1"
-                                                                            max-length="100"
+                                                                            max-length="50"
+                                                                            maxlength="50"
                                                                             placeholder="{{'Job Title'}}"
                                                                             ng-change="signUpForm.about.$setDirty()"
                                                                             ng-class="(signUpForm.about.$dirty && signUpForm.about.$modelValue.length < 1) ? 'mandatoryTextBox' : ''"
@@ -343,6 +345,7 @@
                                                                             type="email"
                                                                             min-length="1"
                                                                             max-length="50"
+                                                                            maxlength="50"
                                                                             placeholder="{{'Email'}}"
                                                                             ng-class="(signUpForm.email.$dirty && signUpForm.email.$modelValue.length < 1) ? 'mandatoryTextBox' : ''"
                                                                             class="form-control emptyBox" />
@@ -357,7 +360,9 @@
                                                                             ng-model="mobile"
                                                                             type="text"
                                                                             min-length="10"
-                                                                            max-length="12"
+                                                                            max-length="13"
+                                                                            maxlength="13"
+                                                                            numbers-only
                                                                             placeholder="Mobile"
                                                                             ng-class="(signUpForm.mobile.$dirty && signUpForm.mobile.$modelValue.length < 1) ? 'mandatoryTextBox' : ''"
                                                                             class="form-control emptyBox" />
@@ -374,7 +379,7 @@
                                                         <div class="row" ng-show="(userType == 1) && isEzeidAvailabilityChecked && isEzeidAvailable">
                                                             <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
                                                                 <div class="form-group">
-                                                                    <select class="form-control">
+                                                                    <select class="form-control" ng-model="gender">
                                                                         <option value="2">Unspecified Gender</option>
                                                                         <option value="0">Male</option>
                                                                         <option value="1">Female</option>
