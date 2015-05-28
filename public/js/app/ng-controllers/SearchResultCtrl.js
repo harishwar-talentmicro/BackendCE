@@ -693,6 +693,13 @@ var res = angular.module('ezeidApp').
                 },500);
             });
 
+            $scope.flippingCard = function()
+            {
+                $(".flip-card").flip({
+                    trigger: "hover"
+                });
+            }
+
             /* Basic Kms closed */
             $scope.distanceFilter = function(dist)
             {
