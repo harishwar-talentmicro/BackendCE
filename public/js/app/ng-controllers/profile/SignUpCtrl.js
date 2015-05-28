@@ -467,19 +467,197 @@ angular.module('ezeidApp').
 
         };
 
+            /**
+             * Creates basic configuration settings
+             * 1. Status Types
+             * 2. Action Types
+             * 3.
+             */
+
+            var createBasicConf = function(token){
+                var defer = $q.defer();
+                var actionCompleteFlag = false;
+                var statusCompleteFlag = false;
+                /**
+                 * Checks the completion of generating the basic configuration settings or not
+                 */
+                var checkCompletion  = function(){
+                    if(actionCompleteFlag && statusCompleteFlag){
+                        defer.resolve();
+                    }
+                };
+
+
+                var actionData = [
+                    {
+                        Token : token,
+                        TID : 0,
+                        ActionTitle : 'Follow Up',
+                        Status : 1,
+                        FunctionType : 0
+                    },
+                    {
+                        Token : token,
+                        TID : 0,
+                        ActionTitle : 'Call',
+                        Status : 1,
+                        FunctionType : 0
+                    },
+                    {
+                        Token : token,
+                        TID : 0,
+                        ActionTitle : 'Meeting',
+                        Status : 1,
+                        FunctionType : 0
+                    }
+                ];
+                var actionCount = 0;
+                var createActionTypes = function(){
+                    $http({
+                        url : GURL + 'ewmSaveActionType',
+                        data : actionData[actionCount],
+                        method : 'POST'
+                    }).success(function(resp){
+                        if(actionCount < (actionData.length - 1)){
+                            actionCount++;
+                            createActionTypes();
+                        }
+                        else{
+                            actionCompleteFlag = true;
+                            checkCompletion();
+                        }
+                    }).error(function(resp){
+                        if(actionCount < actionData.length){
+                            actionCount++;
+                            createActionTypes();
+                        }
+                        else{
+                            actionCompleteFlag = true;
+                            checkCompletion();
+                        }
+                    });
+                };
+
+                createActionTypes();
+
+                var statusCount = 0;
+                var createPrimaryStatusTypes = function(masterId){
+                    var statusData = [
+                        {
+                            Token : token,
+                            TID : 0,
+                            StatusTitle : 'Under Review',
+                            MasterID : masterId,
+                            FunctionType : 0,
+                            ProgressPercent : 10,
+                            Status : 1,
+                            NotificationMsg : 'Your enquiry is under review',
+                            NotificationMailMsg: 'Your enquiry is under review',
+                            StatusValue : 1
+                        },
+                        {
+                            Token : token,
+                            TID : 0,
+                            StatusTitle : 'Accepted',
+                            MasterID : masterId,
+                            FunctionType : 0,
+                            ProgressPercent : 20,
+                            Status : 1,
+                            NotificationMsg : 'Your enquiry is accepted !',
+                            NotificationMailMsg: 'Your enquiry is accepted !',
+                            StatusValue : 2
+                        },
+                        {
+                            Token : token,
+                            TID : 0,
+                            StatusTitle : 'Under Process',
+                            MasterID : masterId,
+                            FunctionType : 0,
+                            ProgressPercent : 50,
+                            Status : 1,
+                            NotificationMsg : 'Your enquiry is under process !',
+                            NotificationMailMsg: 'Your enquiry is under process !',
+                            StatusValue : 5
+                        },
+                        {
+                            Token : token,
+                            TID : 0,
+                            StatusTitle : 'Cancelled',
+                            MasterID : masterId,
+                            FunctionType : 0,
+                            ProgressPercent : 100,
+                            Status : 1,
+                            NotificationMsg : 'Your enquiry is cancelled !',
+                            NotificationMailMsg: 'Your enquiry is cancelled !',
+                            StatusValue : 11
+                        }
+                    ];
+
+
+                    var createStatus = function(masterId){
+                        $http({
+                            url : GURL + 'ewmSaveStatusType',
+                            data : statusData[statusCount],
+                            method : 'POST'
+                        }).success(function(resp){
+                            if(statusCount < (statusData.length -1)){
+                                statusCount++;
+                                createStatus(masterId);
+                            }
+                            else{
+                                statusCompleteFlag = true;
+                                checkCompletion();
+                            }
+                        }).error(function(err){
+                            statusCompleteFlag = true;
+                            checkCompletion();
+                        });
+                    };
+
+                    createStatus(masterId);
+                };
+
+
+                $http({
+                    url : GURL + 'ewtGetUserDetails',
+                    method : "GET",
+                    params :{
+                        Token : token
+                    }
+                }).success(function(resp) {
+                    if (resp.length > 0 && resp !== 'null') {
+                        var masterId = resp[0].MasterID;
+                        createPrimaryStatusTypes(masterId);
+                    }
+                    else{
+                        statusCompleteFlag = true;
+                        checkCompletion();
+                    }
+                }).error(function(err){
+                    statusCompleteFlag = true;
+                    checkCompletion();
+                });
+
+
+
+                return defer.promise;
+            };
 
         /**
          *  Primary Registration and SignUp Process
          */
         $scope.doSignUp = function(){
+            $scope.$emit('$preLoaderStart');
             $scope.checkEzeidAvailability().then(function(resp){
                 if(!$scope.isEzeidAvailable){
+                    $scope.$emit('$preLoaderStop');
                     return false;
                 }
 
                 var validation = $scope.validateSignUpData();
                 if(!validation){
                     // ////console.log($scope.error);
+                    $scope.$emit('$preLoaderStop');
                     Notification.error({
                         message : 'Please check all the errors before registration',
                         delay : MsgDelay
@@ -544,7 +722,7 @@ angular.module('ezeidApp').
                 }).success(function(sResp){
                      if(sResp && sResp.hasOwnProperty('IsAuthenticate') && sResp !== 'null'){
                         if(sResp.IsAuthenticate){
-                            $rootScope._userInfo = sResp;
+
                             if (typeof (Storage) !== "undefined") {
                                 //sResp.userName = (sResp.IDTypeID == 1) ? sResp.FirstName : sResp.CompanyName;
                                 //if(sResp.userName.length > 15){
@@ -553,22 +731,46 @@ angular.module('ezeidApp').
                                 if(!sResp.userName){
                                     sResp.userName = $scope.ezeid;
                                 }
-                                $rootScope._userInfo.userName = sResp.userName;
                                 var encrypted = CryptoJS.AES.encrypt(JSON.stringify(sResp), "EZEID");
 
                                 localStorage.setItem("_token", encrypted);
-                                Notification.success({ message : 'Your EZEID - '+$scope.ezeid + ' have been generated successfully ! Please fill up you details to proceed', delay : MsgDelay});
-                                $location.path('/profile-manager/user');
+
+                                if($scope.userType == 2){
+                                    createBasicConf(sResp.Token).then(function(){
+                                        $scope.$emit('$preLoaderStop');
+                                        $rootScope._userInfo = sResp;
+                                        $rootScope._userInfo.userName = sResp.userName;
+                                        Notification.success({ message : 'Your EZEID - '+$scope.ezeid + ' have been generated successfully ! Please fill up you details to proceed', delay : MsgDelay});
+                                        $location.path('/profile-manager/user');
+                                    },function(){
+                                        $scope.$emit('$preLoaderStop');
+                                        $rootScope._userInfo = sResp;
+                                        $rootScope._userInfo.userName = sResp.userName;
+                                        Notification.success({ message : 'Your EZEID - '+$scope.ezeid + ' have been generated successfully ! Please fill up you details to proceed', delay : MsgDelay});
+                                        $location.path('/profile-manager/user');
+                                    });
+                                }
+                                else{
+                                    $scope.$emit('$preLoaderStop');
+                                    $rootScope._userInfo = sResp;
+                                    $rootScope._userInfo.userName = sResp.userName;
+                                    Notification.success({ message : 'Your EZEID - '+$scope.ezeid + ' have been generated successfully ! Please fill up you details to proceed', delay : MsgDelay});
+                                    $location.path('/profile-manager/user');
+                                }
+
                             } else {
+                                $scope.$emit('$preLoaderStop');
                                 Notification.error({ message : 'Browser not supported ! Upgrade your browser', delay : MsgDelay});
                                 $location.path('/');
                             }
                         }
                      }
                      else{
+                         $scope.$emit('$preLoaderStop');
                          Notification.error({ message : 'An error occured during registration ! Try again', delay : MsgDelay});
                      }
                 }).error(function(sErr){
+                    $scope.$emit('$preLoaderStop');
                     Notification.error({ message : 'An error occured during registration ! Try again', delay : MsgDelay});
                 });
             })
@@ -583,6 +785,14 @@ angular.module('ezeidApp').
                 $scope.pin = '';
             }
         });
+
+            $rootScope.$watch('_userInfo',function(newVal){
+                if(newVal){
+                    if(newVal.IsAuthenticate){
+                        $location.path('/profile-manager/user');
+                    }
+                }
+            });
 
 
         /**

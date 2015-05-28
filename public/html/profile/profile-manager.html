@@ -1719,8 +1719,25 @@
 
 
                                         <!--- Disabled in case of business user free listing ----------->
-                                        <li role="presentation" ng-show="(userDetails.EZEIDVerifiedID !== 2 && userDetails.IDTypeID == 2 )" class="bottom-clearfix disabled">
+                                        <li role="presentation"
+                                            title="Get verified by EZEID Area Partner to access this area"
+                                            ng-show="(userDetails.EZEIDVerifiedID !== 2 && userDetails.IDTypeID == 2 )"
+                                            class="bottom-clearfix disabled">
                                             <a><span class="glyphicon glyphicon-cog"></span> Configuration</a>
+                                        </li>
+
+                                        <!--- Hidden in case of individual and public place ----------->
+                                        <li ng-show="(_userInfo.Type == 2 && userDetails.EZEIDVerifiedID == 2)" role="presentation" class=" bottom-clearfix"
+                                            ng-class="{'active' : (activeTemplate === 'html/profile/about-company.html')}">
+                                            <a href="/profile-manager/about-company"><span class="glyphicon glyphicon-bookmark"></span> Company Profile</a>
+                                        </li>
+
+
+
+                                        <li ng-show="(_userInfo.Type == 2 && userDetails.EZEIDVerifiedID !== 2)" role="presentation" class=" bottom-clearfix disabled"
+                                            title="Get verified by EZEID Area Partner to access this area"
+                                            ng-class="{'active' : (activeTemplate === 'html/profile/about-company.html')}">
+                                            <a><span class="glyphicon glyphicon-bookmark"></span> Company Profile</a>
                                         </li>
 
 
@@ -1731,8 +1748,9 @@
                                         </li>
 
                                         <li role="presentation" class=" bottom-clearfix disabled"
+                                            title="Get verified by EZEID Area Partner to access this area"
                                             ng-show="(userDetails.IDTypeID == 2 && userDetails.EZEIDVerifiedID !== 2)">
-                                            <a href="/profile-manager/weblinks"><span class="glyphicon glyphicon-link"></span> Web Links</a>
+                                            <a><span class="glyphicon glyphicon-link"></span> Web Links</a>
                                         </li>
 
                                         <li ng-show="userDetails.IDTypeID === 1" role="presentation" class=" bottom-clearfix"
@@ -1748,12 +1766,6 @@
                                         <li role="presentation" class=" bottom-clearfix"
                                             ng-class="{'active' : (activeTemplate === '/tpl/password-template.html')}">
                                             <a href="/profile-manager/password"><span class="glyphicon glyphicon-lock"></span> Change Password</a>
-                                        </li>
-
-                                        <!--- Hidden in case of individual and public place ----------->
-                                        <li ng-show="_userInfo.Type == 2" role="presentation" class=" bottom-clearfix"
-                                            ng-class="{'active' : (activeTemplate === 'html/profile/about-company.html')}">
-                                            <a href="/profile-manager/about-company"><span class="glyphicon glyphicon-bookmark"></span> Company Profile</a>
                                         </li>
 
 
