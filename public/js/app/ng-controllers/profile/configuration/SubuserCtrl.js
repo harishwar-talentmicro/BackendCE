@@ -108,6 +108,27 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$htt
         }
     };
 
+    var unregisterWatch = null;
+    $scope.$watch('modalBox.subuser.isEzeidAvailable',function(newval){
+        if(newval){
+            unregisterWatch = $scope.$watch('modalBox.subuser.ezeid',function(newval,oldval){
+                if(newval !== oldval){
+                    $scope.modalBox.subuser.availabilityCheck = false;
+                    $scope.modalBox.subuser.isEzeidAvailable = false;
+                    if(unregisterWatch){
+                        unregisterWatch();
+                    }
+                }
+            });
+        }
+        else{
+            if(unregisterWatch){
+                unregisterWatch();
+            }
+        }
+    });
+
+
     //Open Modal box for user
     $scope.showModal = false;
     $scope.toggleModalBox = function(event){

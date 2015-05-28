@@ -1,6 +1,8 @@
 <div class="panel panel-default" ng-controller="ModuleSettingsCtrl">
     <div class="panel-heading">
-        <h4>Modules and  Settings</h4>
+        <h4>Modules and Settings</h4>
+        <small class="text-info">* To configure access rights for master user and subusers, please go to
+            <span class="text text-bolder btn-link" ng-click="changeActive(pageSubuser)">subuser section</span></small>
     </div>
     <div class="panel-body">
         <div class="container-fluid">
@@ -61,9 +63,9 @@
 
             <div class="row bottom-clearfix">
                 <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
-                    <label>Module Access Rights</label>
+                    <label>Module Visibility</label>
                     <br/>
-                    <small class="text-primary">(Access Rights for sub users/end users to see module)</small>
+                    <small class="text-primary">(Visibility setting for module which decides whether this module is visible to end user or not at the time of EZEID search)</small>
                 </div>
                 <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix">
                     <div class="form-group">
@@ -135,9 +137,9 @@
             </div>
             <div class="row bottom-clearfix">
                 <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
-                    <label>Module Access Rights</label>
+                    <label>Module Visibility</label>
                     <br/>
-                    <small class="text-primary">(Access Rights for sub users/end users to see module)</small>
+                    <small class="text-primary">(Visibility setting for module which decides whether this module is visible to end user or not at the time of EZEID search)</small>
                 </div>
                 <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix">
                     <div class="form-group">
@@ -209,9 +211,9 @@
             </div>
             <div class="row bottom-clearfix">
                 <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
-                    <label>Module Access Rights</label>
+                    <label>Module Visibility</label>
                     <br/>
-                    <small class="text-primary">(Access Rights for sub users/end users to see module)</small>
+                    <small class="text-primary">(Visibility setting for module which decides whether this module is visible to end user or not at the time of EZEID search)</small>
                 </div>
                 <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix">
                     <div class="form-group">
@@ -283,9 +285,9 @@
             </div>
             <div class="row bottom-clearfix">
                 <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
-                    <label>Module Access Rights</label>
+                    <label>Module Visibility</label>
                     <br/>
-                    <small class="text-primary">(Access Rights for sub users/end users to see module)</small>
+                    <small class="text-primary">(Visibility setting for module which decides whether this module is visible to end user or not at the time of EZEID search)</small>
                 </div>
                 <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix">
                     <div class="form-group">
@@ -343,9 +345,9 @@
             </div>
             <div class="row bottom-clearfix">
                 <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
-                    <label>Module Access Rights</label>
+                    <label>Module Visibility</label>
                     <br/>
-                    <small class="text-primary">(Access Rights for sub users/end users to see module)</small>
+                    <small class="text-primary">(Visibility setting for module which decides whether this module is visible to end user or not at the time of EZEID search)</small>
                 </div>
                 <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix">
                     <div class="form-group">
@@ -414,6 +416,7 @@
                 <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix">
                     <div class="form-group">
                         <select class="form-control" name="business-category" ng-model="settings.business.category">
+                            <option value="0">--Select a business category--</option>
                             <option ng-repeat="category in business.categories" value="{{category.CategoryID}}">{{category.CategoryTitle}}</option>
                         </select>
                     </div>
@@ -429,6 +432,7 @@
                     <div class="form-group">
                         <div class="input-group">
                             <select class="form-control" name="business-category" ng-model="settings.business.dataRefreshInterval">
+                                <option value="0">--Select data refresh interval--</option>
                                 <option ng-repeat="refreshInterval in refreshIntervalList" value="{{refreshInterval}}">{{refreshInterval}}</option>
                             </select>
                             <span class="input-group-addon"> MINUTES </span>
