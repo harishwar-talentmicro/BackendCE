@@ -1,9 +1,7 @@
 .idea/
 node_modules/
+projectFilesBackup/
 bin/*.log
 bin/uploads/
 Gruntfile.js
 npm-debug.log
-nbproject/private/
-nbproject/
-public_dist/
