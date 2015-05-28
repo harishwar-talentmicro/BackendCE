@@ -10890,7 +10890,7 @@ exports.FnGetReservationService = function (req, res) {
 };
 
 //method to get resource and service map
-exports.FnGetReservResourceService = function (req, res) {
+exports.FnGetReservResourceServiceMap = function (req, res) {
     try {
 
         res.setHeader("Access-Control-Allow-Origin", "*");
@@ -10909,22 +10909,22 @@ exports.FnGetReservResourceService = function (req, res) {
                 if (!err) {
                     if (Result != null) {
 
-                        db.query('CALL pGetResServices(' + db.escape(Token) + ')', function (err, GetResult) {
+                        db.query('CALL pGetResResourceServiceMap(' + db.escape(Token) + ')', function (err, GetResult) {
                             if (!err) {
                                 if (GetResult != null) {
                                     if (GetResult[0].length > 0) {
                                         responseMessage.status = true;
                                         responseMessage.data = GetResult[0] ;
                                         responseMessage.error = null;
-                                        responseMessage.message = 'Service details Send successfully';
-                                        console.log('FnGetReservationService: Service details Send successfully');
+                                        responseMessage.message = 'ResourceServiceMap details Send successfully';
+                                        console.log('FnGetReservResourceServiceMap: ResourceServiceMap details Send successfully');
                                         res.status(200).json(responseMessage);
                                     }
                                     else {
                                         
                                         responseMessage.error = {};
-                                        responseMessage.message = 'No founded service details';
-                                        console.log('FnGetReservationService: No founded Service details');
+                                        responseMessage.message = 'No founded ResourceServiceMap details';
+                                        console.log('FnGetReservResourceServiceMap: No founded ResourceServiceMap details');
                                         res.json(responseMessage);
                                     }
                                 }
@@ -10932,8 +10932,8 @@ exports.FnGetReservResourceService = function (req, res) {
 
                                     
                                     responseMessage.error = {};
-                                    responseMessage.message = 'No Service details found';
-                                    console.log('FnGetReservationService: No Service details found');
+                                    responseMessage.message = 'No ResourceServiceMap details found';
+                                    console.log('FnGetReservResourceServiceMap: No ResourceServiceMap details found');
                                     res.json(responseMessage);
                                 }
 
@@ -10942,8 +10942,8 @@ exports.FnGetReservResourceService = function (req, res) {
                                 
                                 responseMessage.data = null ;
                                 responseMessage.error = {};
-                                responseMessage.message = 'Error in getting Service details';
-                                console.log('FnGetReservationService: error in getting Service details' + err);
+                                responseMessage.message = 'Error in getting ResourceServiceMap details';
+                                console.log('FnGetReservResourceServiceMap: error in getting ResourceServiceMap details' + err);
                                 res.status(500).json(responseMessage);
                             }
                         });
@@ -10952,13 +10952,13 @@ exports.FnGetReservResourceService = function (req, res) {
                         responseMessage.message = 'Invalid Token';
                         responseMessage.error = {};
                         res.status(401).json(responseMessage);
-                        console.log('FnGetReservationService: Invalid Token');
+                        console.log('FnGetReservResourceServiceMap: Invalid Token');
                     }
                 } else {
                     responseMessage.error = {};
                     responseMessage.message = 'Error in validating token';
                     res.status(500).json(responseMessage);
-                    console.log('FnGetReservationService: Error in validating token:  ' + err);
+                    console.log('FnGetReservResourceServiceMap: Error in validating token:  ' + err);
                 }
             });
         }
@@ -10968,7 +10968,7 @@ exports.FnGetReservResourceService = function (req, res) {
                 responseMessage.error = {
                     Token : 'Invalid Token'
                 };
-                console.log('FnGetReservationService: Token is mandatory field');
+                console.log('FnGetReservResourceServiceMap: Token is mandatory field');
             }
            
             res.status(401).json(responseMessage);
@@ -10977,7 +10977,7 @@ exports.FnGetReservResourceService = function (req, res) {
      catch (ex) {
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
-        console.log('FnGetReservationService:error ' + ex.description);
+        console.log('FnGetReservResourceServiceMap:error ' + ex.description);
         throw new Error(ex);
         res.status(400).json(responseMessage);
     }
