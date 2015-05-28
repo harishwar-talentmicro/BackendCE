@@ -10543,8 +10543,6 @@ exports.FnGetReservationResource = function (req, res) {
 };
 
 
-
-
 //EZEIDAP Parts
 
 //app part
