@@ -25,7 +25,6 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',['$scope',
 
     $scope.modalBox = {
         item : {
-            TID : 0,
             OperatorID : 0,
             title : "",
             status  : 1,
@@ -47,31 +46,7 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',['$scope',
      */
     $scope.showModal = false;
     $scope.toggleModalBox = function(type,index){
-
         loadSubuserList();
-
-      /*  if(typeof(index) !== "undefined" && typeof(type) !== "undefined"){
-         // ////console.log(index+'   '+type);
-         $scope.modalBox.txStatus = angular.copy($scope.txStatuses[functionTypes[type]][index]);
-         $scope.modalBox.title = "Update Status Type";
-         }
-         else{
-
-         $scope.resetModalData();
-         $scope.modalBox = {
-         title : "Add new Status Type",
-         txStatus : {
-         TID : 0,
-         type : type,           // Function Type
-         title : "",
-         progress : 0,       // Progress % for this title
-         status : 1,         // 1 : Active
-         notificationMsg : "",   // Notification Message
-         notificationMailMsg : "",   // Notification Mail Message
-         statusValue : 0
-         }
-         };
-         }*/
         $scope.showModal = !$scope.showModal;
     };
 
