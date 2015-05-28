@@ -79,15 +79,6 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',['$scope',
     };
 
     /**
-     *     Open Modal box for user
-     */
-    $scope.showReservationCerviceModal = false;
-    $scope.toggleReservationServiceModalBox = function(type,index){
-
-        $scope.showReservationCerviceModal = !$scope.showReservationCerviceModal;
-    };
-
-    /**
      * Loads list of subusers
      */
     function loadSubuserList()
@@ -136,9 +127,7 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',['$scope',
             });
     };
 
-    /**
-     * Get All Resources
-     */
+    // Get All Resources
     function getAllResources(){
         $scope.$emit('$preLoaderStart');
         $http({
@@ -232,4 +221,30 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',['$scope',
         }
 
     };
-}]);
+
+    //  Open Services Modal box
+    $scope.showReservationServiceModal = false;
+    $scope.openReservationServiceModalBox = function(item){
+        $scope.showReservationServiceModal = true;
+        //resetServicesValue();
+        if(item != 0)
+        {
+            $scope.modalBox = {
+                item : {
+                    operatorid : item.operatorid,
+                    title : item.title,
+                    status  : item.status,
+                    description: item.description,
+                    picture : item.picture,
+                    TID: item.tid
+                }
+            };
+        }
+    };
+    $scope.closeReservationServiceModalBox = function(){
+        $scope.showReservationServiceModal = false;
+        //resetServicesValue();
+    };
+
+
+    }]);
