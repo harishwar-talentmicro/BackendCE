@@ -79,6 +79,7 @@ HeaderApp.directive('headerSection',['Notification','$window' ,function (Notific
                     form.$setUntouched();
                 }
                 this.LInfo = {};
+                SignCtrl.FMessage = '';
                 $('#SignIn_popup').slideUp();
             };
 

@@ -261,7 +261,7 @@ angular.module('ezeidApp').
             $scope.signUpForm.$setPristine();
             $scope.isSignUpTypeBlockVisible = true;
             $scope.isEzeidCheckBlockVisible = false;
-        }
+        };
 
 
         /**
