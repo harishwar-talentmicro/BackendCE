@@ -111,6 +111,7 @@ angular.module('ezeidApp').controller('ProfileCtrl',[
 //            $scope.dataProgressLoader.dataLoadError = false;
 //            $scope.dataProgressLoader.dataLoadComplete = false;
 //            $scope.dataProgressLoader.dataLoadInProgress = true;
+            $scope.$emit('$preLoaderStart');
 
             $scope.loadCountries().then(function(){
                 $scope.loadWorkingHourTemplates().then(function(workingHourTemplates){
@@ -126,32 +127,43 @@ angular.module('ezeidApp').controller('ProfileCtrl',[
                                     $scope.dataProgressLoader.dataLoadInProgress = false;
                                     $scope.dataProgressLoader.dataLoadError = false;
                                     $scope.dataProgressLoader.dataLoadComplete = true;
+                                    $scope.$emit('$preLoaderStop');
+                                },function(){
+                                    $scope.dataProgressLoader.dataLoadInProgress = false;
+                                    $scope.dataProgressLoader.dataLoadError = true;
+                                    $scope.dataProgressLoader.dataLoadComplete = false;
+                                    $scope.$emit('$preLoaderStop');
                                 });
                             },function(){
                                 $scope.dataProgressLoader.dataLoadComplete = false;
                                 $scope.dataProgressLoader.dataLoadInProgress = false;
                                 $scope.dataProgressLoader.dataLoadError = true;
+                                $scope.$emit('$preLoaderStop');
                             });
                         },function(){
                             $scope.dataProgressLoader.dataLoadComplete = false;
                             $scope.dataProgressLoader.dataLoadInProgress = false;
                             $scope.dataProgressLoader.dataLoadError = true;
+                            $scope.$emit('$preLoaderStop');
                         });
                     },function(){
                         $scope.dataProgressLoader.dataLoadComplete = false;
                         $scope.dataProgressLoader.dataLoadInProgress = false;
                         $scope.dataProgressLoader.dataLoadError = true;
+                        $scope.$emit('$preLoaderStop');
                     });
                 },function(){
                     $scope.dataProgressLoader.dataLoadComplete = false;
                     $scope.dataProgressLoader.dataLoadInProgress = false;
                     $scope.dataProgressLoader.dataLoadError = true;
+                    $scope.$emit('$preLoaderStop');
                 });
 
             },function(){
                 $scope.dataProgressLoader.dataLoadComplete = false;
                 $scope.dataProgressLoader.dataLoadInProgress = false;
                 $scope.dataProgressLoader.dataLoadError = true;
+                $scope.$emit('$preLoaderStop');
             });
         };
 
@@ -342,8 +354,13 @@ angular.module('ezeidApp').controller('ProfileCtrl',[
         };
 
 
-        $scope.loadWorkingHourTemplates();
+        $scope.loadWorkingHourTemplates().then(function(){
+            $scope.$emit('$preLoaderStart');
+            $scope.dataReloadAgain();
+        },function(){
+            $scope.$emit('$preLoaderStop');
+        });
 
-        $scope.dataReloadAgain();
+
 
 }]);

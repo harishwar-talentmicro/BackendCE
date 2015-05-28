@@ -8955,7 +8955,6 @@ exports.FnCropImage = function(req,res){
         }
     });
 
-    deleteTempFile();
 
 };
 
@@ -12643,9 +12642,6 @@ exports.FnCropImageAP = function(req,res){
             res.status(400).json(respMsg);
         }
     });
-
-    deleteTempFile();
-
 };
 //EZEID VAS
 
