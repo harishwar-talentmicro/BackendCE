@@ -357,6 +357,15 @@ angular.module('ezeidApp').controller('ItemMasterCtrl',[
      */
     $scope.count = 0;
 
+        /**
+         * Keeping track of HTTP status
+         * @type {{items: boolean, config: boolean}}
+         */
+        var loadStatus  = {
+            items : false,
+            config : false
+        }
+
     /**
      * Loads items from server based on function type
      * Recursive calls implemented to make requests one after the other
@@ -400,6 +409,7 @@ angular.module('ezeidApp').controller('ItemMasterCtrl',[
                     }
                 }
         }).error(function(err){
+            loadStatus.items = true;
                 // ////console.log(err);
         });
     };

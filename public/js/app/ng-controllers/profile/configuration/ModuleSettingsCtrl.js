@@ -31,6 +31,15 @@ angular.module('ezeidApp').controller('ModuleSettingsCtrl',[
         $scope.refreshIntervalList.push(i);
     }
 
+        /**
+         * HTTP requests load status
+         * @type {{categories: boolean, settings: boolean}}
+         */
+        var loadStatus = {
+            categories : false,
+            settings : true
+        }
+
 
     /**
      * Access Rights mapping
@@ -133,8 +142,13 @@ angular.module('ezeidApp').controller('ModuleSettingsCtrl',[
                 Token : $rootScope._userInfo.Token
             }
         }).success(function(resp){
-                if(resp && resp.length > 0){
-                        $scope.settings.sales.title = (resp[0].SalesTitle) ? resp[0].SalesTitle : '';
+                if(resp && resp.length > 0 && resp !== 'null'){
+                    loadStatus.settings = true;
+                    if(loadStatus.settings && loadStatus.categories){
+                        $scope.$emit('$preLoaderStop');
+                    }
+
+                    $scope.settings.sales.title = (resp[0].SalesTitle) ? resp[0].SalesTitle : '';
                         $scope.settings.sales.defaultFormMsg = (resp[0].SalesFormMsg) ?  resp[0].SalesFormMsg :'';
                         $scope.settings.sales.visibility = (resp[0].VisibleModules) ? resp[0].VisibleModules.split("")[0] : 1;
                         $scope.settings.sales.itemListType = (resp[0].SalesItemListType) ? resp[0].SalesItemListType : 0;
@@ -176,8 +190,12 @@ angular.module('ezeidApp').controller('ModuleSettingsCtrl',[
                         $scope.settings.resume.freshersAccepted = (resp[0].FreshersAccepted === 1) ? true : false;
 
                 }
+                else{
+                    $scope.$emit('$preLoaderStop');
+                }
             }).error(function(err){
                 // ////console.log(err);
+                $scope.$emit('$preLoaderStop');
             });
     };
 
@@ -312,11 +330,17 @@ angular.module('ezeidApp').controller('ModuleSettingsCtrl',[
                 LangID : 1
             }
         }).success(function(resp){
-                if(resp && resp.length>0){
+            loadStatus.categories = true;
+            if(loadStatus.settings && loadStatus.categories){
+                $scope.$emit('$preLoaderStop');
+            }
+
+            if(resp && resp.length>0){
                     $scope.business.categories = resp;
                 }
             }).error(function(err){
-
+                $scope.$emit('$preLoaderStop');
+                Notification.error({ message : 'Unable to load categories', delay : MsgDelay});
             });
     };
 
@@ -341,8 +365,12 @@ angular.module('ezeidApp').controller('ModuleSettingsCtrl',[
     };
 
 
+
+
     $scope.loadCategories();
     $scope.loadSettings();
+
+
 
     /**
      * @todo write method for brochure base64 conversion and upload option( in HTML view also)

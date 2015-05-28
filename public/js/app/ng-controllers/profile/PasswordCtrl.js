@@ -37,7 +37,12 @@ angular.module('ezeidApp').controller('PasswordCtrl',[
          * Hiding progress loader when userDetails are loaded successfully
          */
         if(!$scope.userDetails){
-            $scope.loadUserDetails();
+            $scope.$emit('$preLoaderStart');
+            $scope.loadUserDetails().then(function(){
+                $scope.$emit('$preLoaderStop');
+            },function(){
+                $scope.$emit('$preLoaderStop');
+            });
             $scope.$watch('userDetails',function(newVal,oldVal){
                 if(newVal){
                     if(newVal.MasterID){

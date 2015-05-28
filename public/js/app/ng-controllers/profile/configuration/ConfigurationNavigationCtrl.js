@@ -58,6 +58,8 @@ angular.module('ezeidApp').controller('ConfigurationNavigationCtrl',[
             $scope.activeSubTemplate = active;
         };
 
+        $scope.$emit('$preLoaderStart');
+
 
 
 }]);
