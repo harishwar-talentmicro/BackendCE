@@ -224,6 +224,39 @@ angular.module('ezeidApp').controller('ModuleSettingsCtrl',[
             ResumeURL : ($scope.settings.resume.url) ? $scope.settings.resume.url : ''
         };
 
+        /**
+         * Reflects the currently saved configuration in $rootScope_userInfo variable
+         * as well updates the local storage value also
+         */
+        var updateRootUserInfo = function(){
+            if (typeof (Storage) !== "undefined") {
+
+
+                $rootScope._userInfo.SalesModuleTitle = data.SalesTitle;
+                $rootScope._userInfo.AppointmentModuleTitle = data.ReservationTitle;
+                $rootScope._userInfo.HomeDeliveryModuleTitle = data.HomeDeliveryTitle;
+                $rootScope._userInfo.ServiceModuleTitle = data.ServiceTitle;
+                $rootScope._userInfo.CVModuleTitle = data.ResumeTitle;
+
+                $rootScope._userInfo.SalesFormMsg = data.SalesFormMsg;
+                $rootScope._userInfo.ReservationFormMsg = data.ReservationFormMsg;
+                $rootScope._userInfo.HomeDeliveryFormMsg = data.HomeDeliveryFormMsg;
+                $rootScope._userInfo.ServiceFormMsg = data.ServiceFormMsg;
+                $rootScope._userInfo.CVFormMsg = data.ResumeFormMsg;
+                $rootScope._userInfo.FreshersAccepted = data.FreshersAccepted;
+
+
+                $rootScope._userInfo.SalesItemListType = data.SalesItemListType;
+
+
+                var encrypted = CryptoJS.AES.encrypt(JSON.stringify($rootScope._userInfo), "EZEID");
+                localStorage.setItem("_token", encrypted);
+            } else {
+                alert('Sorry..! Browser is not supported');
+                window.location.href = "/";
+            }
+        };
+
         if($scope.validateSettings()){
             // ////console.log(data);
             $http({
@@ -231,9 +264,11 @@ angular.module('ezeidApp').controller('ModuleSettingsCtrl',[
                 method : "POST",
                 data : data
             }).success(function(resp){
-                Notification.success({message : 'Configuration Saved Successfully', delay : MsgDelay})
+                updateRootUserInfo();
+                Notification.success({message : 'Configuration Saved Successfully', delay : MsgDelay});
             }).error(function(err){
                 // ////console.log(err);
+                Notification.success({message : 'Error while saving configuration! Please try again', delay : MsgDelay});
             });
         }
     };

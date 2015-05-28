@@ -1,6 +1,6 @@
 <div class="panel panel-default" ng-controller="SalesCtrl">
     <div class="panel-heading">
-        <h3 class="text-center font-roboto">Sales</h3>
+        <h3 class="text-center font-roboto">{{(_userInfo.SalesModuleTitle) ? _userInfo.SalesModuleTitle : 'Sales'}}</h3>
     </div>
     <div class="panel-body">
         <div class="row">
@@ -16,15 +16,15 @@
                     </div>
 
                     <div class="col-lg-3 col-md-4 col-sm-6 col-xs-8 pull-right">
-                        <div class="btn-group pull-right" role="group" aria-label="First group"  ng-show="txList.length">
-                            <button type="button" ng-disabled="pageNumber <= 1" ng-click="decrementPage()" class="btn btn-info bt-xs no-radius">
+                        <div class="btn-group pull-right" role="group" aria-label="First group">
+                            <button type="button" ng-disabled="pageNumber <= 1" class="btn btn-info bt-xs no-radius" ng-click="decrementPage()">
                                 <span class="glyphicon glyphicon-chevron-left"></span>
                                 Prev
                             </button>
                             <button type="button" class="btn btn-info bt-xs no-radius active">
                                 {{pageNumber}}
                             </button>
-                            <button type="button" ng-disabled="(totalPages < 2)" ng-click="incrementPage()" class="btn btn-info bt-xs no-radius">
+                            <button type="button" ng-disabled="(pageNumber >= totalPages)" class="btn btn-info bt-xs no-radius"  ng-click="incrementPage()">
                                 <span class="glyphicon glyphicon-chevron-right"></span>
                                 Next
                             </button>
@@ -329,14 +329,14 @@
                     </div>
                     <div class="col-lg-4 col-md-4 col-sm-6 col-xs-8 pull-right" ng-show="txList.length">
                         <div class="btn-group pull-right" role="group" aria-label="First group">
-                            <button type="button" ng-disabled="pageNumber <= 1" class="btn btn-info bt-xs no-radius">
+                            <button type="button" ng-disabled="pageNumber <= 1" class="btn btn-info bt-xs no-radius" ng-click="decrementPage()">
                                 <span class="glyphicon glyphicon-chevron-left"></span>
                                 Prev
                             </button>
                             <button type="button" class="btn btn-info bt-xs no-radius active">
                                 {{pageNumber}}
                             </button>
-                            <button type="button" ng-disabled="totalPages < 2" class="btn btn-info bt-xs no-radius">
+                            <button type="button" ng-disabled="(pageNumber >= totalPages)" class="btn btn-info bt-xs no-radius"  ng-click="incrementPage()">
                                 <span class="glyphicon glyphicon-chevron-right"></span>
                                 Next
                             </button>

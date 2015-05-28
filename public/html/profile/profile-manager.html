@@ -1694,8 +1694,8 @@
                     <div class="panel-heading">
                         <h4 class="text-center">Profile Manager : {{userDetails.EZEID}}
                             <span ng-show="userDetails.IDTypeID == 1">(Individual)</span>
-                            <span ng-show="userDetails.IDTypeID == 2 && userDetails.EZEIDVerifiedID == 2">(Business Paid Listing)</span>
-                            <span ng-show="userDetails.IDTypeID == 2 && userDetails.EZEIDVerifiedID !== 2">(Business Free Listing)</span>
+                            <span ng-show="userDetails.IDTypeID == 2 && userDetails.SelectionType == 2">(Business Paid Listing)</span>
+                            <span ng-show="userDetails.IDTypeID == 2 && userDetails.SelectionType !== 2">(Business Free Listing)</span>
                             <span ng-show="userDetails.IDTypeID == 3">(Public Place)</span>
                             <label class="label label-danger pull-right label-mandatory">* Mandatory</label>
                         </h4>

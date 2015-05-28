@@ -8783,9 +8783,13 @@ exports.FnCropImage = function(req,res){
             if (Result != null) {
                 try{
                     console.log(req.files.image.path);
-                    var bitmap = fs.readFileSync('../bin/'+req.files.image.path);
-                    var gm = require('gm').subClass({ imageMagick: true });
-                    gm(bitmap).size(function (err, size) {
+                    //var bitmap = fs.readFileSync('../bin/'+req.files.image.path);
+                    
+                    fs.readFile('../bin/'+ req.files.image.path,function(err,data){
+                        if(!err){
+                        var bitmap = data;
+                        var gm = require('gm').subClass({ imageMagick: true });
+                        gm(bitmap).size(function (err, size) {
                         if (!err) {
                             // Orientation landscape
                             if(size.height < size.width){
@@ -8909,9 +8913,17 @@ exports.FnCropImage = function(req,res){
                             res.status(400).json(respMsg);
                         }
                     });
+                        }
+                        else{
+                          res.status(400).json(respMsg);
+                            throw new Error('FnCropImage : Error in reading file '+ ex.description);
+                        }
+                    });
+
                 }
                 catch(ex){
                     console.log(ex);
+                    res.status(400).json(respMsg);
                     throw new Error('FnCropImage : '+ ex.description);
                 }
             }
@@ -8930,7 +8942,6 @@ exports.FnCropImage = function(req,res){
         }
     });
 
-    deleteTempFile();
 
 };
 
@@ -12460,22 +12471,26 @@ exports.FnCropImageAP = function(req,res){
             if (Result != null) {
                 try{
                     console.log(req.files.image.path);
-                    var bitmap = fs.readFileSync('../bin/'+req.files.image.path);
-                    var gm = require('gm').subClass({ imageMagick: true });
-                    gm(bitmap).size(function (err, size) {
+                    //var bitmap = fs.readFileSync('../bin/'+req.files.image.path);
+                    
+                    fs.readFile('../bin/'+ req.files.image.path,function(err,data){
+                        if(!err){
+                        var bitmap = data;
+                        var gm = require('gm').subClass({ imageMagick: true });
+                        gm(bitmap).size(function (err, size) {
                         if (!err) {
                             // Orientation landscape
                             if(size.height < size.width){
                                 // scale++
                                 if(size.height < targetHeight || size.width < targetWidth){
                                     if(targetHeight > targetWidth){
-                                        console.log("executing condition 1 : sOrient: landscape & scale++ & tOrient : potrait");
+										console.log("executing condition 1 : sOrient: landscape & scale++ & tOrient : potrait");
                                         scaleHeight = targetHeight.toString();
                                         ////
                                         scaleWidth = (size.width * scaleHeight)/ size.height;
                                     }
                                     else{
-                                        console.log("executing condition 2 : sOrient: landscape & scale++ & tOrient : landscape");
+										console.log("executing condition 2 : sOrient: landscape & scale++ & tOrient : landscape");
                                         scaleWidth = targetWidth.toString();
                                         ////
                                         scaleHeight = (size.height * scaleWidth) / size.width;
@@ -12484,14 +12499,14 @@ exports.FnCropImageAP = function(req,res){
                                 // scale--
                                 else{
                                     if(targetHeight > targetWidth){
-                                        console.log("executing condition 2 : sOrient: landscape & scale-- & tOrient : landscape");
+										console.log("executing condition 2 : sOrient: landscape & scale-- & tOrient : landscape");
                                         scaleWidth = targetWidth.toString();
                                         ////
                                         scaleHeight = (scaleWidth * size.height)/ size.width;
                                     }
                                     else{
-
-                                        console.log("executing condition 2 : sOrient: landscape & scale-- & tOrient : potrait");
+										
+										console.log("executing condition 2 : sOrient: landscape & scale-- & tOrient : potrait");
                                         scaleHeight = targetHeight.toString();
                                         ////
                                         scaleWidth = (scaleHeight * size.width) / size.height;
@@ -12532,11 +12547,11 @@ exports.FnCropImageAP = function(req,res){
                                 targetHeight : targetHeight,
                                 targetWidth : targetWidth
                             };
-
-                            console.log(dimensions);
+							
+							console.log(dimensions);
 
                             if(scaleFlag && cropFlag){
-                                console.log('Scale and crop');
+								console.log('Scale and crop');
                                 gm(bitmap)
                                     .resize(scaleWidth,scaleHeight)
                                     .crop(targetWidth,targetHeight,0,0).toBuffer(outputType.toUpperCase(),function(err,croppedBuff){
@@ -12586,9 +12601,17 @@ exports.FnCropImageAP = function(req,res){
                             res.status(400).json(respMsg);
                         }
                     });
+                        }
+                        else{
+                          res.status(400).json(respMsg);
+                            throw new Error('FnCropImage : Error in reading file '+ ex.description);
+                        }
+                    });
+
                 }
                 catch(ex){
                     console.log(ex);
+                    res.status(400).json(respMsg);
                     throw new Error('FnCropImage : '+ ex.description);
                 }
             }
@@ -12606,11 +12629,7 @@ exports.FnCropImageAP = function(req,res){
             res.status(400).json(respMsg);
         }
     });
-
-    deleteTempFile();
-
 };
-
 //EZEID VAS
 
 exports.FnLoginVES = function (req, res) {
