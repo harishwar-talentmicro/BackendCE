@@ -246,7 +246,12 @@ HeaderApp.directive('headerSection',['Notification','$window' ,function (Notific
             });
 
             $("body").on('click','#signin',function(e){
+
+                $('#SignIn_popup').css({'position':'fixed'});
+                $('#SignIn_popup > .window_page').css({'position':'relative'});
+
                 $("#SignIn_popup").slideDown();
+
                 $("#UserName").focus();
             });
             /******************end :  New code ************************/
