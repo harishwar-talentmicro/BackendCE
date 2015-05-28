@@ -22,6 +22,7 @@ var res = angular.module('ezeidApp').
         'GoogleMaps',
         '$route',
         'UtilityService',
+        '$document',
         function (
             $rootScope,
             $scope,
@@ -38,8 +39,29 @@ var res = angular.module('ezeidApp').
             $routeParams,
             GoogleMap,
             $route,
-            UtilityService
+            UtilityService,
+            $document
         ) {
+
+
+            /* SETTINGS GOES HERE======================================== */
+            var availabilityColor = 'rgb(142, 238, 255)';
+
+            /**
+             * Working Hours[in minutes of the day]
+             */
+            $scope.workingHrs = [
+                [540,840],
+                [960,1200],
+            ];
+
+            /* Reserved hours */
+            $scope.reservedTime = [
+                [550,600,'sandeep'],
+                [700,800,'rahul'],
+                [1000,1100,'shrey'],
+            ];
+            /* SETTINGS ENDS HERE======================================== */
 
             /**
              * For creation of raw-structure of the calender(Day)
@@ -106,8 +128,34 @@ var res = angular.module('ezeidApp').
             {
                 return 72*col+row;
             }
-            /**
-             * Working Hours
-             */
-          
+
+            /* color working hours */
+            $scope.colorWorkingHours = function()
+            {
+                var workingHrs = $scope.workingHrs;
+                /* traverse through the individual time slot and color them */
+                for(var i=0; i < workingHrs.length; i++)
+                {
+                    var startTimeMins = workingHrs[i][0];
+                    var endTimeMins = workingHrs[i][1];
+
+                    /* identify the block id which comes in range */
+                    var startRange = startTimeMins/5;
+                    var endRange = (endTimeMins/5);
+
+                    /* color all the blocks */
+                    $scope.colorBlocks(startRange,endRange,availabilityColor);
+                }
+            };
+
+            /* Color the blocks */
+            $scope.colorBlocks = function(startBlock,endBlock,color)
+            {
+                for(var j=startBlock;j< endBlock;j++)
+                {
+                    $('.block-'+j).css('background-color',color);
+                }
+            }
+
+
         }]);
