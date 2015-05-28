@@ -10222,6 +10222,7 @@ exports.FnSaveReservationResource = function(req, res){
         var title = (req.body.title) ? ((req.body.title.trim().length > 0) ? req.body.title : null ) : null ;;
         var description = req.body.description;
         var status = (parseInt(req.body.status)=== 1 || parseInt(req.body.status) === 2) ? req.body.status : 1;
+        var operator_id = req.body.operator_id;
          if (TID.toString() == 'NaN')
             TID = 0;
         var responseMessage = {
@@ -10255,7 +10256,7 @@ exports.FnSaveReservationResource = function(req, res){
                 if (!err) {
                     if (result != null) {
 
-                        var query = db.escape(Token) + ', ' + db.escape(TID) + ',' + db.escape(picture) + ',' + db.escape(title) + ',' + db.escape(description) + ',' + db.escape(status);
+                        var query = db.escape(Token) + ', ' + db.escape(TID) + ',' + db.escape(picture) + ',' + db.escape(title) + ',' + db.escape(description) + ',' + db.escape(status)+ ',' + db.escape(operator_id);
                         db.query('CALL pSaveResource(' + query + ')', function (err, insertResult) {
                             if (!err){
                                 if (insertResult.affectedRows > 0) {
@@ -10341,7 +10342,8 @@ exports.FnUpdateReservationResource = function(req, res){
         var title = (req.body.title) ? ((req.body.title.trim().length > 0) ? req.body.title : null ) : null ;;
         var description = req.body.description;
         var status = (parseInt(req.body.status)=== 1 || parseInt(req.body.status) === 2) ? req.body.status : 1;
-         
+        var operator_id = req.body.operator_id;
+        
         var responseMessage = {
             status: false,
             error:{},
@@ -10373,7 +10375,7 @@ exports.FnUpdateReservationResource = function(req, res){
                 if (!err) {
                     if (result != null) {
 
-                        var query = db.escape(Token) + ', ' + db.escape(TID) + ',' + db.escape(picture) + ',' + db.escape(title) + ',' + db.escape(description) + ',' + db.escape(status);
+                        var query = db.escape(Token) + ', ' + db.escape(TID) + ',' + db.escape(picture) + ',' + db.escape(title) + ',' + db.escape(description) + ',' + db.escape(status) + ',' + db.escape(operator_id);
                         db.query('CALL pSaveResource(' + query + ')', function (err, updateResult) {
                             if (!err){
                                 if (updateResult.affectedRows > 0) {
