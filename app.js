@@ -194,6 +194,9 @@ app.get('/ewtGetLocationListForEZEID', LocationManager.FnGetLocationListForEZEID
 app.post('/reservation_resource',LocationManager.FnSaveReservationResource);
 app.put('/reservation_resource',LocationManager.FnUpdateReservationResource);
 app.get('/reservation_resource',LocationManager.FnGetReservationResource);
+app.post('/reservation_service',LocationManager.FnSaveReservationService);
+app.put('/reservation_service',LocationManager.FnUpdateReservationService);
+app.get('/reservation_service',LocationManager.FnGetReservationService);
 
 //below service are for EZEIDAP
 app.post('/ewLoginAP', LocationManager.FnLoginAP);

@@ -10222,7 +10222,7 @@ exports.FnSaveReservationResource = function(req, res){
         var title = (req.body.title) ? ((req.body.title.trim().length > 0) ? req.body.title : null ) : null ;;
         var description = req.body.description;
         var status = (parseInt(req.body.status)=== 1 || parseInt(req.body.status) === 2) ? req.body.status : 1;
-        var operator_id = req.body.operator_id;
+        var operatorid = req.body.operatorid;
          if (TID.toString() == 'NaN')
             TID = 0;
         var responseMessage = {
@@ -10239,7 +10239,7 @@ exports.FnSaveReservationResource = function(req, res){
         }
         
         if(!title){
-            responseMessage.error['title'] = 'Invalid Picture';
+            responseMessage.error['title'] = 'Invalid Title';
             validateStatus *= false;
         }
         
@@ -10256,15 +10256,15 @@ exports.FnSaveReservationResource = function(req, res){
                 if (!err) {
                     if (result != null) {
 
-                        var query = db.escape(Token) + ', ' + db.escape(TID) + ',' + db.escape(picture) + ',' + db.escape(title) + ',' + db.escape(description) + ',' + db.escape(status)+ ',' + db.escape(operator_id);
+                        var query = db.escape(Token) + ', ' + db.escape(TID) + ',' + db.escape(picture) + ',' + db.escape(title) + ',' + db.escape(description) + ',' + db.escape(status)+ ',' + db.escape(operatorid);
                         db.query('CALL pSaveResource(' + query + ')', function (err, insertResult) {
-                            if (!err){
-                                if (insertResult.affectedRows > 0) {
+                             if (!err){
+                                if (insertResult != null) {
                                     responseMessage.status = true;
                                     responseMessage.error = null;
                                     responseMessage.message = 'Resource details save successfully';
                                     responseMessage.data = {
-                                        TID : insertResult.insertId,
+                                        TID : insertResult[0][0].maxid,
                                         title : req.body.title,
                                         status : req.body.status,
                                         description : req.body.description,
@@ -10347,7 +10347,7 @@ exports.FnUpdateReservationResource = function(req, res){
         var title = (req.body.title) ? ((req.body.title.trim().length > 0) ? req.body.title : null ) : null ;;
         var description = req.body.description;
         var status = (parseInt(req.body.status)=== 1 || parseInt(req.body.status) === 2) ? req.body.status : 1;
-        var operator_id = req.body.operator_id;
+        var operatorid = req.body.operatorid;
         
         var responseMessage = {
             status: false,
@@ -10380,7 +10380,7 @@ exports.FnUpdateReservationResource = function(req, res){
                 if (!err) {
                     if (result != null) {
 
-                        var query = db.escape(Token) + ', ' + db.escape(TID) + ',' + db.escape(picture) + ',' + db.escape(title) + ',' + db.escape(description) + ',' + db.escape(status) + ',' + db.escape(operator_id);
+                        var query = db.escape(Token) + ', ' + db.escape(TID) + ',' + db.escape(picture) + ',' + db.escape(title) + ',' + db.escape(description) + ',' + db.escape(status) + ',' + db.escape(operatorid);
                         db.query('CALL pSaveResource(' + query + ')', function (err, updateResult) {
                             if (!err){
                                 if (updateResult.affectedRows > 0) {
@@ -10395,13 +10395,13 @@ exports.FnUpdateReservationResource = function(req, res){
                                         picture : req.body.picture
                                     };
                                     res.status(200).json(responseMessage);
-                                    console.log('FnUpdateReservationResource: Resource details save successfully');
+                                    console.log('FnUpdateReservationResource: Resource details update successfully');
                                 }
                                 else {
                                     responseMessage.message = 'An error occured ! Please try again';
                                     responseMessage.error = {};
                                     res.status(400).json(responseMessage);
-                                    console.log('FnUpdateReservationResource:No save Resource details');
+                                    console.log('FnUpdateReservationResource:No Resource details updated');
                                 }
                             }
 
@@ -10409,7 +10409,7 @@ exports.FnUpdateReservationResource = function(req, res){
                                 responseMessage.message = 'An error occured ! Please try again';
                                 responseMessage.error = {};
                                 res.status(500).json(responseMessage);
-                                console.log('FnUpdateReservationResource: error in saving Resource details:' + err);
+                                console.log('FnUpdateReservationResource: error in updating Resource details:' + err);
                             }
                         });
                     }
@@ -10547,6 +10547,437 @@ exports.FnGetReservationResource = function (req, res) {
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
         console.log('FnGetReservationResource:error ' + ex.description);
+        throw new Error(ex);
+        res.status(400).json(responseMessage);
+    }
+};
+
+//mehtod to save the reservation service
+exports.FnSaveReservationService = function(req, res){
+    try{
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.body.Token ;
+        var TID = 0;
+        var title = (req.body.title) ? ((req.body.title.trim().length > 0) ? req.body.title : null ) : null ;;
+        var duration = req.body.duration;
+        var rate = req.body.rate;
+        var status = (parseInt(req.body.status)=== 1 || parseInt(req.body.status) === 2) ? req.body.status : 1;
+        var service_ids = req.body.service_ids ? req.body.service_ids : 0;
+                
+        var ID=''
+        if(service_ids){
+            ID = service_ids + ',' + ID;
+            service_ids =ID.slice(0,-1);
+            console.log('service_ids Values:'+ service_ids);
+        }
+         
+        var responseMessage = {
+            status: false,
+            error:{},
+            message:'',
+            data: null
+        };
+        var validateStatus = true;
+        
+        if(!title){
+            responseMessage.error['title'] = 'Invalid Title';
+            validateStatus *= false;
+        }
+        
+        
+        if(!validateStatus){
+            console.log('FnSaveReservationService  error : ' + JSON.stringify(responseMessage.error));
+            responseMessage.message = 'Unable to save service ! Please check the errors';
+            res.status(200).json(responseMessage);
+            return;
+        }
+        
+        
+        if (Token) {
+            
+            FnValidateToken(Token, function (err, result) {
+                if (!err) {
+                    if (result != null) {
+
+                        var query = db.escape(Token) + ', ' + db.escape(TID) + ',' + db.escape(title) + ',' + db.escape(duration) + ',' + db.escape(rate) + ',' + db.escape(status)+ ',' + db.escape(service_ids);
+                        db.query('CALL pSaveResServices(' + query + ')', function (err, insertResult) {
+                            if (!err){
+                                if (insertResult != null) {
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Service details save successfully';
+                                    responseMessage.data = {
+                                        TID : insertResult[0][0].maxid,
+                                        title : req.body.title,
+                                        status : req.body.status,
+                                        duration : req.body.duration,
+                                        rate : req.body.rate,
+                                        service_ids : req.body.service_ids
+                                    };
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnSaveReservationService: Service details save successfully');
+                                }
+                                else {
+                                    responseMessage.message = 'An error occured ! Please try again';
+                                    responseMessage.error = {};
+                                    res.status(400).json(responseMessage);
+                                    console.log('FnSaveReservationService:No Service details saved');
+                                }
+                            }
+
+                            else {
+                                responseMessage.message = 'An error occured ! Please try again';
+                                responseMessage.error = {};
+                                res.status(500).json(responseMessage);
+                                console.log('FnSaveReservationService: error in saving Service details:' + err);
+                            }
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token'; 
+                        responseMessage.error = {}; 
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnSaveReservationService: Invalid token');
+                                            }
+                }
+                else {
+                    responseMessage.error= {};
+                    responseMessage.message = 'Error in validating Token'; 
+                    res.status(500).json(responseMessage);
+                    console.log('FnSaveReservationService:Error in processing Token' + err);
+                }
+            });
+
+        }
+
+        else {
+            if (!Token) 
+            {  
+                responseMessage.message = 'Invalid Token';            
+                responseMessage.error = {Token : 'Invalid Token'};
+                console.log('FnSaveReservationService: Token is mandatory field hello');
+            }        
+            res.status(401).json(responseMessage);
+        }
+
+    }
+    catch (ex) {
+        responseMessage.error = {};
+        responseMessage.message = 'An error occured !'
+        console.log('FnSaveReservationService:error ' + ex.description);
+        throw new Error(ex);
+        res.status(400).json(responseMessage);
+    }
+};
+
+//method to update the reservation service
+exports.FnUpdateReservationService = function(req, res){
+    
+    try{
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.body.Token ;
+        var TID = parseInt(req.body.TID);
+        var title = (req.body.title) ? ((req.body.title.trim().length > 0) ? req.body.title : null ) : null ;;
+        var duration = req.body.duration;
+        var rate = req.body.rate;
+        var status = (parseInt(req.body.status)=== 1 || parseInt(req.body.status) === 2) ? req.body.status : 1;
+        var service_ids = req.body.service_ids;
+        
+        var ID=''
+        if(service_ids){
+            
+            ID = service_ids + ',' + ID;
+            var service_IDS =ID.slice(0,-1);
+            console.log('service_ids Values:'+ service_IDS);
+        }
+         
+        var responseMessage = {
+            status: false,
+            error:{},
+            message:'',
+            data: null
+        };
+        var validateStatus = true;
+        
+        if(!title){
+            responseMessage.error['title'] = 'Invalid Title';
+            validateStatus *= false;
+        }
+        
+        
+        if(!validateStatus){
+            console.log('FnUpdateReservationService  error : ' + JSON.stringify(responseMessage.error));
+            responseMessage.message = 'Unable to update service ! Please check the errors';
+            res.status(200).json(responseMessage);
+            return;
+        }
+        
+        if (Token) {
+            FnValidateToken(Token, function (err, result) {
+                if (!err) {
+                    if (result != null) {
+
+                        var query = db.escape(Token) + ', ' + db.escape(TID) + ',' + db.escape(title) + ',' + db.escape(duration) + ',' + db.escape(rate) + ',' + db.escape(status)+ ',' + db.escape(service_IDS);
+                        db.query('CALL pSaveResServices(' + query + ')', function (err, insertResult) {
+                            if (!err){
+                                if (insertResult != null) {
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Service details update successfully';
+                                    responseMessage.data = {
+                                        TID : req.body.TID,
+                                        title : req.body.title,
+                                        status : req.body.status,
+                                        duration : req.body.duration,
+                                        rate : req.body.rate,
+                                        service_ids : req.body.service_ids
+                                    };
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnUpdateReservationService: Service details update successfully');
+                                }
+                                else {
+                                    responseMessage.message = 'An error occured ! Please try again';
+                                    responseMessage.error = {};
+                                    res.status(400).json(responseMessage);
+                                    console.log('FnUpdateReservationService:No Service details updated');
+                                }
+                            }
+
+                            else {
+                                responseMessage.message = 'An error occured ! Please try again';
+                                responseMessage.error = {};
+                                res.status(500).json(responseMessage);
+                                console.log('FnUpdateReservationService: error in saving Service details:' + err);
+                            }
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token'; 
+                        responseMessage.error = {}; 
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnUpdateReservationService: Invalid token');
+                                            }
+                }
+                else {
+                    responseMessage.error= {};
+                    responseMessage.message = 'Error in validating Token'; 
+                    res.status(500).json(responseMessage);
+                    console.log('FnUpdateReservationService:Error in processing Token' + err);
+                }
+            });
+
+        }
+
+        else {
+            if (!Token) 
+            {  
+                responseMessage.message = 'Invalid Token';            
+                responseMessage.error = {Token : 'Invalid Token'};
+                console.log('FnUpdateReservationService: Token is mandatory field');
+            }
+            
+            res.status(401).json(responseMessage);
+        }
+
+    }
+    catch (ex) {
+        responseMessage.error = {};
+        responseMessage.message = 'An error occured !'
+        console.log('FnUpdateReservationService:error ' + ex.description);
+        throw new Error(ex);
+        res.status(400).json(responseMessage);
+    }
+};
+
+//method to get reservation resource service details
+exports.FnGetReservationService = function (req, res) {
+    try {
+
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.query.Token;
+        var responseMessage = {
+            status: false,
+            data: null,
+            error:{},
+            Message:''
+        };
+        
+        if (Token) {
+            FnValidateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+
+                        db.query('CALL pGetResServices(' + db.escape(Token) + ')', function (err, GetResult) {
+                            if (!err) {
+                                if (GetResult != null) {
+                                    if (GetResult[0].length > 0) {
+                                        responseMessage.status = true;
+                                        responseMessage.data = GetResult[0] ;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Service details Send successfully';
+                                        console.log('FnGetReservationService: Service details Send successfully');
+                                        res.status(200).json(responseMessage);
+                                    }
+                                    else {
+                                        
+                                        responseMessage.error = {};
+                                        responseMessage.message = 'No founded service details';
+                                        console.log('FnGetReservationService: No founded Service details');
+                                        res.json(responseMessage);
+                                    }
+                                }
+                                else {
+
+                                    
+                                    responseMessage.error = {};
+                                    responseMessage.message = 'No Service details found';
+                                    console.log('FnGetReservationService: No Service details found');
+                                    res.json(responseMessage);
+                                }
+
+                            }
+                            else {
+                                
+                                responseMessage.data = null ;
+                                responseMessage.error = {};
+                                responseMessage.message = 'Error in getting Service details';
+                                console.log('FnGetReservationService: error in getting Service details' + err);
+                                res.status(500).json(responseMessage);
+                            }
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid Token';
+                        responseMessage.error = {};
+                        res.status(401).json(responseMessage);
+                        console.log('FnGetReservationService: Invalid Token');
+                    }
+                } else {
+                    responseMessage.error = {};
+                    responseMessage.message = 'Error in validating token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnGetReservationService: Error in validating token:  ' + err);
+                }
+            });
+        }
+        else {
+            if (!Token) {
+                responseMessage.message = 'Invalid Token';            
+                responseMessage.error = {
+                    Token : 'Invalid Token'
+                };
+                console.log('FnGetReservationService: Token is mandatory field');
+            }
+           
+            res.status(401).json(responseMessage);
+        }
+    }
+     catch (ex) {
+        responseMessage.error = {};
+        responseMessage.message = 'An error occured !'
+        console.log('FnGetReservationService:error ' + ex.description);
+        throw new Error(ex);
+        res.status(400).json(responseMessage);
+    }
+};
+
+//method to get resource and service map
+exports.FnGetReservResourceService = function (req, res) {
+    try {
+
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.query.Token;
+        var responseMessage = {
+            status: false,
+            data: null,
+            error:{},
+            Message:''
+        };
+        
+        if (Token) {
+            FnValidateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+
+                        db.query('CALL pGetResServices(' + db.escape(Token) + ')', function (err, GetResult) {
+                            if (!err) {
+                                if (GetResult != null) {
+                                    if (GetResult[0].length > 0) {
+                                        responseMessage.status = true;
+                                        responseMessage.data = GetResult[0] ;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Service details Send successfully';
+                                        console.log('FnGetReservationService: Service details Send successfully');
+                                        res.status(200).json(responseMessage);
+                                    }
+                                    else {
+                                        
+                                        responseMessage.error = {};
+                                        responseMessage.message = 'No founded service details';
+                                        console.log('FnGetReservationService: No founded Service details');
+                                        res.json(responseMessage);
+                                    }
+                                }
+                                else {
+
+                                    
+                                    responseMessage.error = {};
+                                    responseMessage.message = 'No Service details found';
+                                    console.log('FnGetReservationService: No Service details found');
+                                    res.json(responseMessage);
+                                }
+
+                            }
+                            else {
+                                
+                                responseMessage.data = null ;
+                                responseMessage.error = {};
+                                responseMessage.message = 'Error in getting Service details';
+                                console.log('FnGetReservationService: error in getting Service details' + err);
+                                res.status(500).json(responseMessage);
+                            }
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid Token';
+                        responseMessage.error = {};
+                        res.status(401).json(responseMessage);
+                        console.log('FnGetReservationService: Invalid Token');
+                    }
+                } else {
+                    responseMessage.error = {};
+                    responseMessage.message = 'Error in validating token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnGetReservationService: Error in validating token:  ' + err);
+                }
+            });
+        }
+        else {
+            if (!Token) {
+                responseMessage.message = 'Invalid Token';            
+                responseMessage.error = {
+                    Token : 'Invalid Token'
+                };
+                console.log('FnGetReservationService: Token is mandatory field');
+            }
+           
+            res.status(401).json(responseMessage);
+        }
+    }
+     catch (ex) {
+        responseMessage.error = {};
+        responseMessage.message = 'An error occured !'
+        console.log('FnGetReservationService:error ' + ex.description);
         throw new Error(ex);
         res.status(400).json(responseMessage);
     }
@@ -12653,6 +13084,8 @@ exports.FnCropImageAP = function(req,res){
         }
     });
 };
+
+
 //EZEID VAS
 
 exports.FnLoginVES = function (req, res) {
