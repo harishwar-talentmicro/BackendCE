@@ -26,6 +26,8 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',['$scope',
     getUserDetails();
     getAllResources();
 
+
+
     function resetResourceValue()
     {
         $scope.modalBox = {
@@ -39,6 +41,27 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',['$scope',
             }
         };
     }
+
+    function resetServicesValue()
+    {
+       $scope.modalBox = {
+            servicesItem : {
+                title : "",
+                status  : 1,
+                duration: 5,
+                rate : 0,
+                TID: 0,
+                serviceType: 1,
+                service_ids: ""
+            }
+        };
+    }
+
+    $scope.reservationServiceTabSelected = function(){
+        resetServicesValue();
+        getAllServices();
+    };
+
 
     /**
      * Resource Status Mapping
@@ -226,9 +249,21 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',['$scope',
     $scope.showReservationServiceModal = false;
     $scope.openReservationServiceModalBox = function(item){
         $scope.showReservationServiceModal = true;
-        //resetServicesValue();
+        resetServicesValue();
         if(item != 0)
         {
+            $scope.modalBox = {
+                servicesItem : {
+                    title : "",
+                    status  : 1,
+                    duration: 5,
+                    rate : 0,
+                    TID: 0,
+                    serviceType: 1,
+                    service_ids: ""
+                }
+            };
+
             $scope.modalBox = {
                 item : {
                     operatorid : item.operatorid,
@@ -244,6 +279,88 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',['$scope',
     $scope.closeReservationServiceModalBox = function(){
         $scope.showReservationServiceModal = false;
         //resetServicesValue();
+    };
+
+     $scope.getMinuteSlots = function(){
+         return new Array(288);
+     };
+
+    // Get All Services
+    function getAllServices(){
+        $scope.$emit('$preLoaderStart');
+        $http({
+            url : GURL + 'reservation_service',
+            method : "GET",
+            params :{
+                Token : $rootScope._userInfo.Token
+            }
+        }).success(function(resp){
+                $scope.$emit('$preLoaderStop');
+                console.log(resp.data);
+                if(resp){
+                    $scope.AllResources = resp.data;
+                }
+            }).error(function(err){
+                $scope.$emit('$preLoaderStop');
+                Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
+            });
+    };
+
+    /**
+     * Validates the data while adding services
+     * @param item
+     * @returns {boolean}
+     */
+    function validateServices(){
+        var err = [];
+
+        console.log($scope.modalBox.servicesItem);
+        if($scope.modalBox.servicesItem.rate.length < 1 ){
+            err.push('Services rate is empty');
+        }
+        if($scope.modalBox.servicesItem.title.length < 1){
+            err.push('Services title is empty');
+        }
+        if(err.length > 0){
+            for(var i = 0; i < err.length; i++){
+                Notification.error({ message : err[i], delay : 5000});
+            }
+            return false;
+        }
+        return true;
+    };
+
+    $scope.saveServices = function(){
+
+        if(validateServices())
+        {
+            $scope.modalBox.servicesItem.Token = $rootScope._userInfo.Token;
+            $scope.$emit('$preLoaderStart');
+            $http({
+                url : GURL + 'reservation_services',
+                method : ($scope.modalBox.servicesItem.TID == 0) ? "POST" : "PUT",
+                data : $scope.modalBox.servicesItem
+            }).success(function(resp)
+                {
+                    $scope.$emit('$preLoaderStop');
+                    console.log(resp);
+
+                    if(resp.status){
+
+                        Notification.success({ message : 'Resource added successfully', delay : 5000 });
+
+                    }
+                    else{
+                        Notification.error({ message : 'An error occurred while saving resource! Please try again', delay : 5000});
+                    }
+                    resetResourceValue()
+                    $scope.showModal = false;
+                }).error(function(err){
+                    $scope.$emit('$preLoaderStop');
+                    Notification.error({ message : 'An error occurred while saving resource! Please try again', delay : 2000});
+                });
+        }
+
     };
 
 
