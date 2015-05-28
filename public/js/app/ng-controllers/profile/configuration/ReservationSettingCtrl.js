@@ -32,7 +32,7 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',['$scope',
     {
         $scope.modalBox = {
             item : {
-                operatorid : 0,
+                operator_id : 0,
                 title : "",
                 status  : 1,
                 description: "",
@@ -79,7 +79,7 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',['$scope',
         {
             $scope.modalBox = {
                 item : {
-                    operatorid : item.operatorid,
+                    operator_id : item.operatorid,
                     title : item.title,
                     status  : item.status,
                     description: item.description,
@@ -254,31 +254,20 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',['$scope',
         {
             $scope.modalBox = {
                 servicesItem : {
-                    title : "",
-                    status  : 1,
-                    duration: 5,
-                    rate : 0,
-                    TID: 0,
-                    serviceType: 1,
-                    service_ids: ""
-                }
-            };
-
-            $scope.modalBox = {
-                item : {
-                    operatorid : item.operatorid,
                     title : item.title,
                     status  : item.status,
-                    description: item.description,
-                    picture : item.picture,
-                    TID: item.tid
+                    duration: item.duration,
+                    rate : item.rate,
+                    TID:item.tid,
+                    serviceType: 1,
+                    service_ids: item.serviceids
                 }
             };
         }
     };
     $scope.closeReservationServiceModalBox = function(){
         $scope.showReservationServiceModal = false;
-        //resetServicesValue();
+        resetServicesValue();
     };
 
      $scope.getMinuteSlots = function(){
@@ -298,7 +287,7 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',['$scope',
                 $scope.$emit('$preLoaderStop');
                 console.log(resp.data);
                 if(resp){
-                    $scope.AllResources = resp.data;
+                    $scope.AllServices = resp.data;
                 }
             }).error(function(err){
                 $scope.$emit('$preLoaderStop');
@@ -313,8 +302,6 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',['$scope',
      */
     function validateServices(){
         var err = [];
-
-        console.log($scope.modalBox.servicesItem);
         if($scope.modalBox.servicesItem.rate.length < 1 ){
             err.push('Services rate is empty');
         }
@@ -343,6 +330,7 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',['$scope',
             }).success(function(resp)
                 {
                     $scope.$emit('$preLoaderStop');
+                    $scope.showReservationServiceModal = false;
                     console.log(resp);
 
                     if(resp.status){
@@ -354,7 +342,7 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',['$scope',
                         Notification.error({ message : 'An error occurred while saving Service! Please try again', delay : 2000});
                     }
                     resetResourceValue();
-                    $scope.showModal = false;
+                    getAllServices()
                 }).error(function(err){
                     $scope.$emit('$preLoaderStop');
                     Notification.error({ message : 'An error occurred while saving Service! Please try again', delay : 2000});

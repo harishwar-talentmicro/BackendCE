@@ -246,6 +246,7 @@ angular.module('ezeidApp').
             $scope.isPinApplicable = false;
             $scope.dateOfBirth = "";
             $scope.termsAccepted = false;
+            $scope.gender = 2;
 
             $scope.signUpForm.$setPristine();
         };
@@ -260,7 +261,7 @@ angular.module('ezeidApp').
             $scope.signUpForm.$setPristine();
             $scope.isSignUpTypeBlockVisible = true;
             $scope.isEzeidCheckBlockVisible = false;
-        }
+        };
 
 
         /**
@@ -365,24 +366,24 @@ angular.module('ezeidApp').
 
 
             if($scope.password.length < 4){
-                $scope.error.password = 'Password should be minimum 4 characters';
+                $scope.error.password = '*Password should be minimum 4 characters';
                 validationStatus *= false;
             }
 
             if($scope.password !== $scope.repassword){
-                $scope.error.password = 'Passwords didn\'t matched';
+                $scope.error.password = '*Passwords didn\'t matched';
                 validationStatus *= false;
             }
 
 
             if(!$scope.companyName){
-                $scope.error.companyName = 'Company Name cannot be empty';
+                $scope.error.companyName = '*Company Name cannot be empty';
                 validationStatus *= false;
             }
 
             if(typeof($scope.companyName) !== "undefined"){
                 if($scope.companyName.length < 1){
-                    $scope.error.companyName = "Company Name cannot be empty";
+                    $scope.error.companyName = "*Company Name cannot be empty";
                     validationStatus *= false;
                 }
             }
@@ -392,56 +393,56 @@ angular.module('ezeidApp').
                 var emailPattern = /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
                 var emailRegEx = new RegExp(emailPattern);
                 if($scope.email.length > 0 && !(emailRegEx.test($scope.email))){
-                    $scope.error.email = 'Email ID is invalid';
+                    $scope.error.email = '*Email ID is invalid';
                     validationStatus *= false;
                 }
 
                 if(!$scope.firstName){
-                    $scope.error.firstName = 'First Name cannot be empty';
+                    $scope.error.firstName = '*First Name cannot be empty';
                     validationStatus *= false;
                 }
 
                 if(typeof($scope.firstName) !== "undefined"){
                     if($scope.firstName.length < 1){
-                        $scope.error.firstName = "Last Name cannot be empty";
+                        $scope.error.firstName = "*First Name cannot be empty";
                         validationStatus *= false;
                     }
                 }
 
-                if(!$scope.lastName){
-                    $scope.error.lastName = 'Last Name cannot be empty';
-                    validationStatus *= false;
-                }
+                //if(!$scope.lastName){
+                //    $scope.error.lastName = 'Last Name cannot be empty';
+                //    validationStatus *= false;
+                //}
 
-                if(typeof($scope.lastName) !== "undefined"){
-                    if($scope.lastName.length < 1){
-                        $scope.error.lastName = "First Name cannot be empty";
-                        validationStatus *= false;
-                    }
-                }
+                //if(typeof($scope.lastName) !== "undefined"){
+                //    if($scope.lastName.length < 1){
+                //        $scope.error.lastName = "First Name cannot be empty";
+                //        validationStatus *= false;
+                //    }
+                //}
 
                 if(!$scope.about){
                     $scope.error.about = ($scope.userType === 1 || $scope.userType === 2) ?
-                        'Please enter a description about your company' : 'Please enter a description about public place';
+                        'Please enter tagline about your company' : 'Please enter tagline about public place';
                     validationStatus *= false;
                 }
 
                 if(typeof($scope.about) !== "undefined"){
                     if($scope.about.length < 1){
                         $scope.error.about = ($scope.userType === 1 || $scope.userType === 2) ?
-                            'Please enter a description about your company' : 'Please enter a description about public place';
+                            '*Please enter tagline for your company' : 'Please enter tagline for public place';
                         validationStatus *= false;
                     }
                 }
 
                 if($scope.userType === 1 && typeof($scope.dateOfBirth) === "undefined"){
-                    $scope.error.dateOfBirth = 'Please enter your date of Birth'
+                    $scope.error.dateOfBirth = '*Please enter your date of Birth'
                     validationStatus *= false;
                 }
 
                 if(($scope.userType === 2) && ((!$scope.mobile) && (!$scope.email))){
                     ////console.log('Email or Mobile cannot be empty');
-                    $scope.error.contact = 'Email or Mobile cannot be empty';
+                    $scope.error.email = '*Either Mobile or email is mandatory ! Please fill any one of them';
                     validationStatus *= false;
                 }
             }
@@ -451,13 +452,13 @@ angular.module('ezeidApp').
             if($scope.isPinApplicable){
                 var parsePin = parseInt($scope.pin);
                 if(isNaN(parsePin)){
-                    $scope.error.pin = "PIN should be between 100 to 999";
+                    $scope.error.pin = "*PIN should be between 100 to 999";
                     validationStatus *= false;
                 }
                 else{
                     if(!(parsePin > 99 && parsePin < 1000)){
                         validationStatus *= false;
-                        $scope.error.pin = "PIN should be between 100 to 999";
+                        $scope.error.pin = "*PIN should be between 100 to 999";
                     }
                 }
 
@@ -523,7 +524,7 @@ angular.module('ezeidApp').
                     IconFileName : null ,
                     ISDPhoneNumber : null ,
                     ISDMobileNumber : null ,
-                    Gender : null ,
+                    Gender : $scope.gender ,
                     DOB : $scope.dateOfBirth ,
                     OperationType : 1 ,
                     SelectionType : $scope.planSelectionType ,

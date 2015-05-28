@@ -33,6 +33,7 @@ angular.module('ezeidApp').controller('WebLinksCtrl',[
         $routeParams
         ) {
 
+        $scope.$emit('$preLoaderStart');
 
         var isUserDetailsLoaded = false;
         var isWebLinksLoaded = false;
@@ -79,6 +80,7 @@ angular.module('ezeidApp').controller('WebLinksCtrl',[
                         $scope.dataProgressLoader.dataLoadInProgress = false;
                         $scope.dataProgressLoader.dataLoadError = false;
                         $scope.dataProgressLoader.dataLoadComplete = true;
+                        $scope.$emit('$preLoaderStop');
                     }
                 }
 
@@ -134,6 +136,7 @@ angular.module('ezeidApp').controller('WebLinksCtrl',[
                 $scope.dataProgressLoader.dataLoadInProgress = false;
                 $scope.dataProgressLoader.dataLoadError = false;
                 $scope.dataProgressLoader.dataLoadComplete = true;
+                $scope.$emit('$preLoaderStop');
             }
         });
 

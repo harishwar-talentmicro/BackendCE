@@ -109,7 +109,7 @@
                             </div>
                             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 bottom-clearfix">
                                 <div class="form-group">
-                                    <select class="form-control" placeholder="Item Status" ng-model="modalBox.servicesItem.status">
+                                    <select class="form-control" ng-model="modalBox.servicesItem.status">
                                         <option value="1">Active</option>
                                         <option value="2">Inactive</option>
                                     </select>
@@ -145,7 +145,7 @@
     </modal>
 
 
-    <div ng-show="false">
+    <div ng-show="true">
         <h1>
             <span class="glyphicon glyphicon-calendar"></span> Coming Soon !
         </h1>
@@ -154,7 +154,7 @@
 
 
 
-    <div class="panel-body" ng-show="true">
+    <div class="panel-body" ng-show="false">
 
         <div role="tabpanel">
             <!-- Nav tabs -->
@@ -184,12 +184,11 @@
                             </div>
 
                             <!---------- Resource listing ------------->
-                            <!--<script type="text/ng-template" id="/only-item-tpl.html">-->
                             <div ng-repeat="_item in AllResources">
                                 <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12 bottom-clearfix">
                                     <div class="business-item">
                                         <div class="thumbnail">
-                                            <span class="glyphicon glyphicon-edit" data-toggle="tooltip" title="" data-placement="right" data-original-title="Edit Item" ng-click="openResourceModalBox(_item)"></span>
+                                            <span class="glyphicon glyphicon-edit" data-toggle="tooltip" title="" data-placement="right" data-original-title="Edit Resource" ng-click="openResourceModalBox(_item)"></span>
                                             <img ng-src="{{_item.picture}}" alt="No picture available"/>
                                             <div class="caption">
                                                 <h4 class="text-primary">{{_item.title}}
@@ -202,9 +201,6 @@
                                     </div>
                                 </div>
                             </div>
-
-
-                           <!---- </script> ----->
 
                         </div>
                     </div>
@@ -222,20 +218,25 @@
                                 <button class="btn btn-sm btn-primary" ng-click="openReservationServiceModalBox(0)"><span class="glyphicon glyphicon-plus"></span> Add</button>
                             </div>
                         </div>
-                        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12 bottom-clearfix">
-                            <div class="business-item">
-                                <div class="thumbnail">
-                                    <span class="glyphicon glyphicon-edit" data-toggle="tooltip" title="" data-placement="right" data-original-title="Edit Item" ng-click="openReservationServiceModalBox({type : content.FunctionType, itemIndex : index})"></span>
-                                    <div class="caption">
-                                        <h4 class="text-primary">Test
-                                            <span ng-show="content.Status == 1" class="glyphicon glyphicon-ok-circle text-success" data-toggle="tooltip" title="" data-placement="right" data-original-title="Item Status"></span>
-                                            <span ng-show="content.Status == 2" class="glyphicon glyphicon-remove-circle text-danger" data-toggle="tooltip" title="" data-placement="right" data-original-title="Item Status"></span>
-                                        </h4>
-                                        <p class="item-description" data-toggle="tooltip" title="" data-original-title="{{content.Description}}" data-placement="right">Demo Description text</p>
+
+                        <div ng-repeat="_item in AllServices">
+                            <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12 bottom-clearfix">
+                                <div class="business-item">
+                                    <div class="thumbnail">
+                                        <span class="glyphicon glyphicon-edit" data-toggle="tooltip" title="" data-placement="right" data-original-title="Edit Service" ng-click="openReservationServiceModalBox(_item)"></span>
+                                        <div class="caption">
+                                            <h4 class="text-primary" data-toggle="tooltip" title="" data-placement="right" data-original-title="{{_item.title}}">{{_item.title | textLength:10}}
+                                                <span ng-show="_item.status == 1" class="glyphicon glyphicon-ok-circle text-success"></span>
+                                                <span ng-show="_item.status == 2" class="glyphicon glyphicon-remove-circle text-danger"></span>
+                                            </h4>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+
+
+
                     </div>
                 </div>
                 <!------- Reservation Service Tab ends ---------------------->
