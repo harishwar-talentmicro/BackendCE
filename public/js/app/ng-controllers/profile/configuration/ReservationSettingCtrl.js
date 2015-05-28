@@ -8,27 +8,28 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',['$scope',
     'Notification',
     '$filter',
     'MsgDelay',
-    'GURL',function(
+    'GURL',
+    'ScaleAndCropImage',
+    function(
         $scope,
         $rootScope,
         $http,
         Notification,
         $filter,
         MsgDelay,
-        GURL){
+        GURL,
+        ScaleAndCropImage){
 
     //Initially First Tab is selected
     $scope.selectedTab = 1;
 
     $scope.modalBox = {
         item : {
-            TID : 0,
+            OperatorID : 0,
             title : "",
-            rate : 0,
-            status : 1,
-            description : "",
-            picture : "",
-            duration : null
+            status  : 1,
+            description: "",
+            picture : ""
         }
     };
 
@@ -45,31 +46,7 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',['$scope',
      */
     $scope.showModal = false;
     $scope.toggleModalBox = function(type,index){
-
         loadSubuserList();
-
-      /*  if(typeof(index) !== "undefined" && typeof(type) !== "undefined"){
-         // ////console.log(index+'   '+type);
-         $scope.modalBox.txStatus = angular.copy($scope.txStatuses[functionTypes[type]][index]);
-         $scope.modalBox.title = "Update Status Type";
-         }
-         else{
-
-         $scope.resetModalData();
-         $scope.modalBox = {
-         title : "Add new Status Type",
-         txStatus : {
-         TID : 0,
-         type : type,           // Function Type
-         title : "",
-         progress : 0,       // Progress % for this title
-         status : 1,         // 1 : Active
-         notificationMsg : "",   // Notification Message
-         notificationMailMsg : "",   // Notification Mail Message
-         statusValue : 0
-         }
-         };
-         }*/
         $scope.showModal = !$scope.showModal;
     };
 
@@ -130,89 +107,80 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',['$scope',
             });
     };
 
+    // To upload image
+    $scope.selectItemImage = function(){
+        $("#modal-box-item-image").trigger('click');
+    };
+
+    $scope.uploadItemImage = function(){
+        var image = $("#modal-box-item-image")[0].files[0];
+        var fileName = image.name;
+        ScaleAndCropImage.covertToBase64(image).then(function(imageUrl){
+            var scaledImageUrl = ScaleAndCropImage.scalePropotional(imageUrl,128,128);
+            $scope.modalBox.item.picture = ScaleAndCropImage.cropImage(scaledImageUrl,128,128);
+        });
+    };
+
     /**
      * Validates the data while adding items
      * @param item
      * @returns {boolean}
      */
     function validateItem(){
-        console.log("sai77");
-
-
-        console.log($scope.modalBox);
-        console.log($scope.mResourceStatus);
-        console.log($scope.mOperatorID);
-        console.log($scope.mResourceDescription);
-
-       /* var err = [];
-        if(item.title.length < 1){
-            err.push('Item Title is empty');
+        var err = [];
+        if($scope.modalBox.item.description.length < 1 ){
+            err.push('Add description to this resource');
         }
-        if(item.description.length < 1 ){
-            err.push('Add description to this item');
+        if(!$scope.modalBox.item.picture){
+            err.push('Please select a picture for this resource');
         }
-        if($scope.globalConfig.itemListType[item.type] > 1){
-            if(!item.picture){
-                err.push('Please select a picture for this item');
-            }
-            if($scope.globalConfig.itemListType[item.type] > 2){
-                if(!item.rate){
-                    err.push('Please enter rate of item');
-                }
-            }
+        if($scope.modalBox.item.OperatorID == 0){
+            err.push('Please select an operator for this resource');
         }
-
+        if($scope.modalBox.item.title.length < 1){
+            err.push('Resource title is empty');
+        }
         if(err.length > 0){
             for(var i = 0; i < err.length; i++){
                 Notification.error({ message : err[i], delay : 5000});
             }
             return false;
         }
-        return true;*/
+        return true;
     };
 
     $scope.saveResource = function(){
-       /* var data = {
-            Token : $rootScope._userInfo.Token,
-            MasterID : $scope.masterUser.MasterID,
 
-            TID : $scope.modalBox.item.TID,
-            FunctionType : $scope.modalBox.item.type,
-            ItemName : $scope.modalBox.item.title,
-            ItemDescription : $scope.modalBox.item.description,
-            Pic : ($scope.modalBox.item.picture == $scope.defaultPicture) ? null : $scope.modalBox.item.picture,
-            Rate : ($scope.modalBox.item.rate)? $scope.modalBox.item.rate : 0.00,
-            Status : $scope.modalBox.item.status,
-            ItemDuration : $scope.modalBox.item.duration
+    /**
+     * Validates Items and then save it to server
+     */
+    if(validateItem()){
+        $scope.modalBox.item.Token = $rootScope._userInfo.Token;
+        $http({
+            url : GURL + 'reservation_resource',
+            method : "POST",
+            data : $scope.modalBox.item
+        }).success(function(resp){
 
-        };*/
+                console.log(resp);
 
-        /**
-         * Validates Items and then save it to server
-         */
-        if(validateItem()){
-            /*$http({
-                url : GURL + 'ewtSaveItem',
-                method : "POST",
-                data : data
-            }).success(function(resp){
-                    if(resp && resp.hasOwnProperty("IsSuccessfull")){
-                        if(resp.IsSuccessfull){
-                            $scope.loadItems($scope.modalBox.item.type);
-                            $scope.toggleModalBox();
-                            Notification.success({ message : 'Item added successfully', delay : 5000 });
-                        }
-                        else{
-                            Notification.error({ message : 'An error occured while saving item! Please try again', delay : 5000});
-                        }
+                if(resp && resp.hasOwnProperty("IsSuccessfull")){
+                    /*if(resp.IsSuccessfull){
+                        $scope.loadItems($scope.modalBox.item.type);
+                        $scope.toggleModalBox();
+                        Notification.success({ message : 'Item added successfully', delay : 5000 });
                     }
                     else{
                         Notification.error({ message : 'An error occured while saving item! Please try again', delay : 5000});
-                    }
-                }).error(function(err){
-                    Notification.error({ message : 'An error occured while saving item! Please try again', delay : 2000});
-                });*/
-        }
+                    }*/
+                }
+                else{
+                    Notification.error({ message : 'An error occured while saving item! Please try again', delay : 5000});
+                }
+            }).error(function(err){
+                Notification.error({ message : 'An error occured while saving item! Please try again', delay : 2000});
+            });
+    }
 
     };
 
