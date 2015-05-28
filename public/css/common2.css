@@ -415,6 +415,11 @@
     padding-left: 16px;
 }
 
+.hpw .p-left-5
+{
+    padding-left: 5px !important;
+}
+
 .hpw .width-75
 {
     width: 75% !important;
@@ -1741,7 +1746,7 @@ margin-bottom: 10px;
 /* styles for Reservation Module */
 .rm .blk
 {
-    height:1em;
+    height:1.1em;
     border-left:1px solid rgb(239, 239, 239);
     border-right:1px solid rgb(239, 239, 239);
 }

@@ -66,7 +66,6 @@ var res = angular.module('ezeidApp').
 
             /* check if the time label comes?Yes - return the time: return empty */
             function getTimeLabel(blockNumber) {
-                console.log(toggleColor);
                 if (blockNumber % 6 == 0) {
                     return blockNumber;
                 }
@@ -87,7 +86,6 @@ var res = angular.module('ezeidApp').
              */
             $scope.getTime = function (row,col)
             {
-                console.log(col);
                 /* return time in 30 mins interval */
                 if(row % 6 != 0 && row != 0)
                 {
@@ -96,11 +94,20 @@ var res = angular.module('ezeidApp').
 
                 /* get no. of minutes in day */
                 var mins = row*5 + col*360;
-
                 /* get time */
                 var hours = Math.floor(mins/(60));
                 var minutes = mins%60;
-                //return hours;
+                minutes = minutes < 10?'0'+minutes:minutes;
                 return (hours+':'+minutes);
             }
+
+            /* get block id */
+            $scope.getBlockId = function(row,col)
+            {
+                return 72*col+row;
+            }
+            /**
+             * Working Hours
+             */
+          
         }]);
