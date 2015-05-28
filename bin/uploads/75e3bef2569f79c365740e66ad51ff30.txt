@@ -1,3 +1,0 @@
- SearchSec.IsShowForm = false;
-
- $scope.showInfoTab = false;
