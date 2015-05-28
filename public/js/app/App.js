@@ -154,20 +154,20 @@
             .when('/searchResult',{
                 templateUrl: 'html/result.html',
                 controller : 'SearchResultCtrl'
-    })
-        .when('/searchDetails',{
-            templateUrl: 'html/informationDetail.html',
-            controller : 'InformationDetailCtrl'
-        })
-        .when('/:ezeid',{
-            templateUrl: 'html/landing.html',
-            controller : 'LandingPageCtrl'
-        })
-        .when('/:ezeid',{
-            templateUrl: 'html/outbox.html',
-            controller : 'outboxPageCtrl'
-        })
-        .otherwise({redirectTo : '/'});
+            })
+            .when('/searchDetails',{
+                templateUrl: 'html/informationDetail.html',
+                controller : 'InformationDetailCtrl'
+            })
+            .when('/outbox.html',{
+                templateUrl: 'html/outbox.html',
+                controller : 'outboxPageCtrl'
+            })
+            .when('/:ezeid',{
+                templateUrl: 'html/landing.html',
+                controller : 'LandingPageCtrl'
+            })
+            .otherwise({redirectTo : '/'});
     $locationProvider.html5Mode(true);
     $httpProvider.interceptors.push("ezeidInterceptor");
     }]);
