@@ -148,6 +148,14 @@ var res = angular.module('ezeidApp').
                 }
             };
 
+            /* color already reserved time */
+            $scope.alreadyReserveSlot = function()
+            {
+                /**
+                 * iDEA: Get the time range
+                 */
+            }
+
             /* Color the blocks */
             $scope.colorBlocks = function(startBlock,endBlock,color)
             {
