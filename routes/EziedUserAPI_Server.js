@@ -3604,6 +3604,11 @@ exports.FnGetBussinessListing = function (req, res) {
 var fs = require("fs");
 exports.FnUploadDocument = function (req, res) {
     try {
+        
+        var deleteTempFile = function(){
+        fs.unlink('../bin/'+req.files.file.path);
+        };
+        
         var RtnMessage = {
             IsSuccessfull: false
         };
@@ -3639,16 +3644,19 @@ exports.FnUploadDocument = function (req, res) {
                                             RtnMessage.IsSuccessfull = true;
                                             console.log('FnUploadDocument: Document Saved successfully');
                                             res.send(RtnMessage);
+                                            deleteTempFile();
                                         }
                                         else {
                                             console.log('FnUploadDocument: Document not inserted');
                                             res.send(RtnMessage);
+                                            deleteTempFile();
                                         }
                                     }
                                     else {
                                         res.statusCode = 500;
                                         res.send(RtnMessage);
                                         console.log('FnUploadDocument: Error in saving documents:' + err);
+                                        deleteTempFile();
                                     }
                                 });
                             });
@@ -3656,29 +3664,34 @@ exports.FnUploadDocument = function (req, res) {
                         else {
                             res.send(RtnMessage);
                             console.log('FnUploadDocument: Mandatory field are available');
+                            deleteTempFile();
                         }
                     }
                     else {
                         res.send(RtnMessage);
                         console.log('FnUploadDocument: Mandatory field are available');
+                        deleteTempFile();
                     }
                 }
                 else {
                     res.statusCode = 401;
                     res.send(RtnMessage);
                     console.log('FnUploadDocument: Invalid Token');
+                    deleteTempFile();
                 }
             }
             else {
                 res.statusCode = 500;
                 res.send(RtnMessage);
                 console.log('FnUploadDocument: Error in validating token: ' + err);
+                deleteTempFile();
             }
         });
     }
     catch (ex) {
         console.log('FnGetDocument error:' + ex.description);
         throw new Error(ex);
+        deleteTempFile();
     }
 };
 
@@ -10209,6 +10222,7 @@ exports.FnSaveReservationResource = function(req, res){
         var title = (req.body.title) ? ((req.body.title.trim().length > 0) ? req.body.title : null ) : null ;;
         var description = req.body.description;
         var status = (parseInt(req.body.status)=== 1 || parseInt(req.body.status) === 2) ? req.body.status : 1;
+        var operator_id = req.body.operator_id;
          if (TID.toString() == 'NaN')
             TID = 0;
         var responseMessage = {
@@ -10242,7 +10256,7 @@ exports.FnSaveReservationResource = function(req, res){
                 if (!err) {
                     if (result != null) {
 
-                        var query = db.escape(Token) + ', ' + db.escape(TID) + ',' + db.escape(picture) + ',' + db.escape(title) + ',' + db.escape(description) + ',' + db.escape(status);
+                        var query = db.escape(Token) + ', ' + db.escape(TID) + ',' + db.escape(picture) + ',' + db.escape(title) + ',' + db.escape(description) + ',' + db.escape(status)+ ',' + db.escape(operator_id);
                         db.query('CALL pSaveResource(' + query + ')', function (err, insertResult) {
                             if (!err){
                                 if (insertResult.affectedRows > 0) {
@@ -10328,7 +10342,8 @@ exports.FnUpdateReservationResource = function(req, res){
         var title = (req.body.title) ? ((req.body.title.trim().length > 0) ? req.body.title : null ) : null ;;
         var description = req.body.description;
         var status = (parseInt(req.body.status)=== 1 || parseInt(req.body.status) === 2) ? req.body.status : 1;
-         
+        var operator_id = req.body.operator_id;
+        
         var responseMessage = {
             status: false,
             error:{},
@@ -10360,7 +10375,7 @@ exports.FnUpdateReservationResource = function(req, res){
                 if (!err) {
                     if (result != null) {
 
-                        var query = db.escape(Token) + ', ' + db.escape(TID) + ',' + db.escape(picture) + ',' + db.escape(title) + ',' + db.escape(description) + ',' + db.escape(status);
+                        var query = db.escape(Token) + ', ' + db.escape(TID) + ',' + db.escape(picture) + ',' + db.escape(title) + ',' + db.escape(description) + ',' + db.escape(status) + ',' + db.escape(operator_id);
                         db.query('CALL pSaveResource(' + query + ')', function (err, updateResult) {
                             if (!err){
                                 if (updateResult.affectedRows > 0) {
@@ -10526,8 +10541,6 @@ exports.FnGetReservationResource = function (req, res) {
         res.status(400).json(responseMessage);
     }
 };
-
-
 
 
 //EZEIDAP Parts
