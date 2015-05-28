@@ -2,38 +2,220 @@
     <div class="panel-heading">
         <h4>Reservation Resources</h4>
     </div>
-    <div class="panel-body">
 
-        <h1>
-            <span class="glyphicon glyphicon-calendar"></span> Coming Soon !
-        </h1>
+    <!------------Resource Modal Box starts here -------------------------->
+    <modal mtitle="modalBox.title" visible="showModal">
+        <div class="container-fluid">
+
+            <form role="form">
+
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
+                        <h5>Add Resource</h5>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+                        <div class="form-group">
+                            <input class="form-control" placeholder="Resource Title" maxlength="50" ng-model="modalBox.item.title"/>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+                        <div class="form-group">
+                            <select class="form-control" placeholder="Item Status" ng-model="modalBox.item.ResourceStatus">
+                                <option value="1">Active</option>
+                                <option value="2">Inactive</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+                        <div class="form-group">
+                            <select class="form-control emptyBox" name="role" ng-model="modalBox.item.OperatorID"
+                                    ng-options="Operator.TID as Operator.EZEID for Operator in subusers">
+                                <option value="" default selected> --Select Operator ID-- </option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix" >
+                        <div class="form-group">
+                            <textarea class="form-control" ng-model="modalBox.item.ResourceDescription" maxlength="250" placeholder="Resource Description (Max 250 characters)" rows="12"></textarea>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+                        <div class="thumbnail">
+                                    <span class="glyphicon glyphicon-paperclip picture-attach"
+                                          data-toggle="tooltip" title=""
+                                          data-placement="right"
+                                          data-original-title="Attach Picture"
+                                          ng-click="selectItemImage()"></span>
+                            <img src="images/grey-background.jpg" ng-hide="modalBox.item.picture" />
+                            <img ng-src="{{modalBox.item.picture}}" ng-show="modalBox.item.picture" />
+                            <input class="hidden" type="file" name="itemImage" id="modal-box-item-image" accept="image/*" onchange="angular.element(this).scope().uploadItemImage()" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-2 col-md-2 col-sm-4 col-xs-12 bottom-clearfix">
+                        <button class="btn btn-primary btn-block" ng-click="saveResource()">Save</button>
+                    </div>
+                    <div class="col-lg-2 col-md-2 col-sm-4 col-xs-12 bottom-clearfix">
+                        <button class="btn btn-primary btn-block" ng-click="toggleModalBox()">Close</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+    </modal>
+
+    <!------------Service Modal Box starts here -------------------------->
+    <modal mtitle="modalBox.title" visible="showReservationCerviceModal">
+        <div class="container-fluid">
+
+            <form role="form">
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
+                        <h5>Add Services</h5>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+                        <div class="form-group">
+                            <input class="form-control" placeholder="Service Title" maxlength="50" ng-model="mTitle"/>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+                        <div class="form-group">
+                            <select class="form-control">
+                                <option value="1">5</option>
+                                <option value="2">10</option>
+                                <option value="2">15</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+                        <div class="form-group">
+                            <select class="form-control" placeholder="Item Status" ng-model="status">
+                                <option value="1">Active</option>
+                                <option value="2">Inactive</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+                        <div class="form-group">
+                            <input class="form-control" placeholder="Service Rate"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-2 col-md-2 col-sm-4 col-xs-12 bottom-clearfix">
+                        <button class="btn btn-primary btn-block" ng-click="saveItem()">Save</button>
+                    </div>
+                    <div class="col-lg-2 col-md-2 col-sm-4 col-xs-12 bottom-clearfix">
+                        <button class="btn btn-primary btn-block" ng-click="toggleReservationServiceModalBox()">Close</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+    </modal>
+
+
+        <div ng-show="true">
+            <h1>
+                <span class="glyphicon glyphicon-calendar"></span> Coming Soon !
+            </h1>
+        </div>
+
+
+
+
+    <div class="panel-body" ng-show="false">
 
         <div role="tabpanel">
-
             <!-- Nav tabs -->
-            <ul class="nav nav-tabs" role="tablist">
-                <li role="presentation" ng-class="{active: selectedTab == 1}">
-                    <a class="btn-link" ng-class="{'tab-active': selectedTab == 1}" ng-click="selectedTab = 1">Sales</a>
+            <ul class="nav nav-tabs text-center" role="tablist">
+                <li class="setWidthThird" role="presentation" ng-class="{active: selectedTab == 1}">
+                    <a class="btn-link" ng-class="{'tab-active': selectedTab == 1}" ng-click="selectedTab = 1">Reservation Resource</a>
                 </li>
-                <li role="presentation" ng-class="{active: selectedTab == 2}">
-                    <a class="btn-link" ng-class="{'tab-active': selectedTab == 2}" ng-click="selectedTab = 2">Reservation</a>
+                <li class="setWidthThird" role="presentation" ng-class="{active: selectedTab == 2}">
+                    <a class="btn-link" ng-class="{'tab-active': selectedTab == 2}" ng-click="selectedTab = 2">Reservation Service</a>
+                </li>
+                <li class="setWidthThird" role="presentation" ng-class="{active: selectedTab == 3}">
+                    <a class="btn-link" ng-class="{'tab-active': selectedTab == 3}" ng-click="selectedTab = 3">Resource <span class="glyphicon glyphicon-transfer setLeftRightMarginFivePX"></span> Service</a>
                 </li>
             </ul>
 
             <!-- Tab panes -->
             <div class="tab-content">
-                <!------- Reservation Tab ---------------------->
+                <!------- Reservation Resource Tab ---------------------->
+                <form name="reservationResourceForm" novalidate>
+                    <div role="tabpanel" class="tab-pane" id="reservation-tb1" ng-show="selectedTab === 1" ng-class="{'active':selectedTab ===1}">
+                        <div class="container-fluid">
+                            <div class="row bottom-clearfix"></div>
+                            <div class="row bottom-clearfix">
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <button class="btn btn-sm btn-primary" ng-click="toggleModalBox(1)"><span class="glyphicon glyphicon-plus"></span> Add</button>
+                                </div>
+                            </div>
+
+                            <!---------- Only item template --------------------------->
+                            <!--<script type="text/ng-template" id="/only-item-tpl.html">-->
+                                <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12 bottom-clearfix">
+                                    <div class="business-item">
+                                        <div class="thumbnail">
+                                            <span class="glyphicon glyphicon-edit" data-toggle="tooltip" title="" data-placement="right" data-original-title="Edit Item" ng-click="toggleModalBox({type : content.FunctionType, itemIndex : index})"></span>
+                                            <div class="caption">
+                                                <h4 class="text-primary">SAi
+                                                    <span ng-show="content.Status == 1" class="glyphicon glyphicon-ok-circle text-success" data-toggle="tooltip" title="" data-placement="right" data-original-title="Item Status"></span>
+                                                    <span ng-show="content.Status == 2" class="glyphicon glyphicon-remove-circle text-danger" data-toggle="tooltip" title="" data-placement="right" data-original-title="Item Status"></span>
+                                                </h4>
+                                                <p class="item-description" data-toggle="tooltip" title="" data-original-title="{{content.Description}}" data-placement="right">Demo Description text</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                           <!---- </script> ----->
+
+                        </div>
+                    </div>
+                </form>
+                <!------- Reservation Resource Tab ends ---------------------->
+            </div>
+
+            <div class="tab-content">
+                <!------- Reservation Service Tab ---------------------->
                 <div role="tabpanel" class="tab-pane" id="reservation-tb" ng-show="selectedTab === 2" ng-class="{'active':selectedTab ===2}">
                     <div class="container-fluid">
                         <div class="row bottom-clearfix"></div>
                         <div class="row bottom-clearfix">
                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                <button ng-hide="(globalConfig.itemListType[1] < 1)" class="btn btn-sm btn-primary" ng-click="toggleModalBox(1)"><span class="glyphicon glyphicon-plus"></span> Add</button>
+                                <button class="btn btn-sm btn-primary" ng-click="toggleReservationServiceModalBox(1)"><span class="glyphicon glyphicon-plus"></span> Add</button>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12 bottom-clearfix">
+                            <div class="business-item">
+                                <div class="thumbnail">
+                                    <span class="glyphicon glyphicon-edit" data-toggle="tooltip" title="" data-placement="right" data-original-title="Edit Item" ng-click="toggleReservationServiceModalBox({type : content.FunctionType, itemIndex : index})"></span>
+                                    <div class="caption">
+                                        <h4 class="text-primary">Test
+                                            <span ng-show="content.Status == 1" class="glyphicon glyphicon-ok-circle text-success" data-toggle="tooltip" title="" data-placement="right" data-original-title="Item Status"></span>
+                                            <span ng-show="content.Status == 2" class="glyphicon glyphicon-remove-circle text-danger" data-toggle="tooltip" title="" data-placement="right" data-original-title="Item Status"></span>
+                                        </h4>
+                                        <p class="item-description" data-toggle="tooltip" title="" data-original-title="{{content.Description}}" data-placement="right">Demo Description text</p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <!------- Reservation Tab ends ---------------------->
+                <!------- Reservation Service Tab ends ---------------------->
             </div>
         </div>
     </div>
