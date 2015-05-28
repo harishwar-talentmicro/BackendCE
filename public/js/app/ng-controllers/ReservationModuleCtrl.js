@@ -44,11 +44,24 @@ var res = angular.module('ezeidApp').
         ) {
 
 
-            /* configration */
+            /* SETTINGS GOES HERE======================================== */
             var availabilityColor = 'rgb(142, 238, 255)';
 
+            /**
+             * Working Hours[in minutes of the day]
+             */
+            $scope.workingHrs = [
+                [540,840],
+                [960,1200],
+            ];
 
-
+            /* Reserved hours */
+            $scope.reservedTime = [
+                [550,600,'sandeep'],
+                [700,800,'rahul'],
+                [1000,1100,'shrey'],
+            ];
+            /* SETTINGS ENDS HERE======================================== */
 
             /**
              * For creation of raw-structure of the calender(Day)
@@ -116,14 +129,6 @@ var res = angular.module('ezeidApp').
                 return 72*col+row;
             }
 
-            /**
-             * Working Hours[in minutes of the day]
-             */
-            $scope.workingHrs = [
-                [540,840],
-                [960,1200],
-            ];
-
             /* color working hours */
             $scope.colorWorkingHours = function()
             {
@@ -139,12 +144,18 @@ var res = angular.module('ezeidApp').
                     var endRange = (endTimeMins/5);
 
                     /* color all the blocks */
-                    for(var j=startRange;j< endRange;j++)
-                    {
-                        $('.block-'+j).css('background-color',availabilityColor);
-                    }
+                    $scope.colorBlocks(startRange,endRange,availabilityColor);
                 }
             };
+
+            /* Color the blocks */
+            $scope.colorBlocks = function(startBlock,endBlock,color)
+            {
+                for(var j=startBlock;j< endBlock;j++)
+                {
+                    $('.block-'+j).css('background-color',color);
+                }
+            }
 
 
         }]);
