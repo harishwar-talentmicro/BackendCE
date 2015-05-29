@@ -637,5 +637,12 @@ angular.module('ezeidApp').
             }
         };
 
+
+
+        $scope.redirectUrl = function(){
+            console.log($('#sales-url-link'));
+            $('#sales-url-link').trigger('click');
+        };
+
     }
 ]);

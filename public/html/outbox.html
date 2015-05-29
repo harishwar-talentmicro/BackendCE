@@ -37,28 +37,31 @@
                             <!-- main container of day - calender -->
 
                             <!-- Individual container: repeated 4 times (6 hours x 4[Early,Morning,Noon,Night]) -->
-                            <div ng-init="col = 0" class="col-lg-3 col-md-4 col-sm-6 col-xs-12" ng-repeat="time in timeArr track by $index">
+                                    <div ng-init="col = 0" class="col-lg-3 col-md-4 col-sm-6 col-xs-12" ng-repeat="time in timeArr track by $index">
 
-                                <div class="building-col-title" ng-init="cols = $index">
-                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-9 blk-title text-center cyan">
-                                        {{time}}
-                                    </div>
-                                </div>
-                                <!-- Building block: repeated for 72 times (6Hours x 60 = 360mins/5(individual block mins) = 72 Blocks) -->
-                                <div class="building-block"  ng-repeat="block in blockArr track by $index" >
-                                    <!-- Time Label goes here -->
+                                        <div class="building-col-title" ng-init="cols = $index">
+                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-9 blk-title text-center cyan">
+                                                {{time}}
+                                            </div>
+                                        </div>
+                                        <!-- Building block: repeated for 72 times (6Hours x 60 = 360mins/5(individual block mins) = 72 Blocks) -->
+                                        <div class="building-block"  ng-repeat="block in blockArr track by $index" >
+                                            <!-- Time Label goes here -->
                                     <div class="col-lg-4 col-md-3 col-sm-3 col-xs-3 blk blk-time p-left-5"
-                                         ng-class="blockColor[$index]"><b>{{getTime($index,cols)}}</b></div>
+                                         ng-class="[blockColor[$index],'time-block-'+getBlockId($index,cols),heightClass]"><b>{{getTime($index,cols)}}</b></div>
                                     <!-- Building block of whole day -->
-                                    <div class="col-lg-8 col-md-9 col-sm-9 col-xs-9 blk blk-content" ng-class="'block-'+getBlockId($index,cols)"></div>
+                                    <div class="col-lg-8 col-md-9 col-sm-9 col-xs-9 blk blk-content" ng-class="['block-'+getBlockId($index,cols),heightClass]">
+                                        <!-- reservation owner's name goes here -->
+                                    </div>
                                 </div>
                             </div>
                             <!-- coloring for availability : For executing coloring the table post-DOM rendering -->
-                            <div>{{colorWorkingHours()}}</div>
+                            <div>{{(colorWorkingHours())(alreadyReserveSlot())}}</div>
                             <!-- main container of day - calender end here -->
                         </div>
                     </div>
                     <!-- Reservation module ends here -->
+
                 </div>
 
             </div>
