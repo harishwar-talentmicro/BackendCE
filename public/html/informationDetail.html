@@ -279,36 +279,59 @@
                                         <!--<img src="../images/new_sales_icon.png">-->
                                         <!--Sales Enquiry-->
                                     <!--</div>-->
-                                    <div class="showPointer removePadding keyWordText boxMessaageBackgroun"
+                                    <a class="showPointer removePadding keyWordText boxMessaageBackgroun text-white"
+                                         ng-href="{{SearchInfo.SalesURL}}"
+                                         target="_blank"
                                          ng-show="SearchInfo.EZEIDVerifiedID == '2' && showSalesEnquiry == 1"
-                                         title="Sales Enquiry" ng-click="_toggleSalesModal()">
+                                         title="Sales Enquiry"
+                                         ng-click="(SearchInfo.SalesURL) ? '' : ($event.preventDefault())(_toggleSalesModal())">
                                          <img src="../images/new_sales_icon.png">
                                         Sales Enquiry
-                                    </div>
+                                    </a>
                                 </div>
                                 <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setLeftRightPaddingZero">
-                                    <div class="showPointer removePadding keyWordText boxMessaageBackgroun" ng-show="SearchInfo.EZEIDVerifiedID == '2' && showHomeDelivery == 1" title="Home Delivery" ng-click="openHomeDeliverForm()">
+                                    <div class="showPointer removePadding keyWordText boxMessaageBackgroun text-white"
+                                         ng-href="{{SearchInfo.HomeDeliveryURL}}"
+                                         target="_blank"
+                                         ng-show="SearchInfo.EZEIDVerifiedID == '2' && showHomeDelivery == 1"
+                                         title="Home Delivery"
+                                         ng-click="(SearchInfo.HomeDeliveryURL) ? '' : ($event.preventDefault())(openHomeDeliverForm())">
                                         <img src="../images/new_home_delivery.png">
                                         Home Delivery
                                     </div>
                                 </div>
                                 <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setLeftRightPaddingZero">
-                                    <div class="showPointer removePadding keyWordText boxMessaageBackgroun" ng-show="SearchInfo.EZEIDVerifiedID == '2' && shoReserVation == 1" title="Reservation" ng-click="openReservationForm()">
+                                    <a class="showPointer removePadding keyWordText boxMessaageBackgroun text-white"
+                                         ng-href="{{SearchInfo.ReservationURL}}"
+                                         target="_blank"
+                                         ng-show="SearchInfo.EZEIDVerifiedID == '2' && shoReserVation == 1"
+                                         title="Reservation"
+                                         ng-click="(SearchInfo.ReservationURL) ? '' : ($event.preventDefault())(openReservationForm())">
                                         <img src="../images/new_reservations.png">
                                         Reservation
-                                    </div>
+                                    </a>
                                 </div>
                                 <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setLeftRightPaddingZero">
-                                    <div class="showPointer removePadding keyWordText boxMessaageBackgroun" ng-show="SearchInfo.EZEIDVerifiedID == '2' && showServiceRequest == 1" title="Support Request" ng-click="openServiceRequestForm()">
+                                    <a class="showPointer removePadding keyWordText boxMessaageBackgroun text-white"
+                                       ng-href="{{SearchInfo.ServiceURL}}"
+                                       target="_blank"
+                                       ng-show="SearchInfo.EZEIDVerifiedID == '2' && showServiceRequest == 1"
+                                        title="Support Request"
+                                        ng-click="(SearchInfo.ServiceURL) ? '' : ($event.preventDefault())(openServiceRequestForm())">
                                         <img src="../images/new_service_request.png">
                                         Service Request
-                                    </div>
+                                    </a>
                                 </div>
                                 <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setLeftRightPaddingZero">
-                                    <div class="showPointer removePadding keyWordText boxMessaageBackgroun" title="Send CV" ng-click="openCVForm()" ng-show="SearchInfo.EZEIDVerifiedID == '2' && showSendCv == 1">
+                                    <a class="showPointer removePadding keyWordText boxMessaageBackgroun text-white"
+                                       ng-href="{{SearchInfo.CVURL}}"
+                                       target="_blank"
+                                       title="Send CV"
+                                       ng-click="(SearchInfo.CVURL) ? '' : ($event.preventDefault())(openCVForm())"
+                                       ng-show="SearchInfo.EZEIDVerifiedID == '2' && showSendCv == 1">
                                         <img src="../images/new_send_cv.png">
                                         Send CV
-                                    </div>
+                                    </a>
                                 </div>
                                 <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setLeftRightPaddingZero">
                                     <div class="showPointer removePadding keyWordText boxMessaageBackgroun"
