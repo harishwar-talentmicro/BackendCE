@@ -32,7 +32,7 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',['$scope',
     {
         $scope.modalBox = {
             item : {
-                operator_id : 0,
+                operatorid : 0,
                 title : "",
                 status  : 1,
                 description: "",
@@ -79,7 +79,7 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',['$scope',
         {
             $scope.modalBox = {
                 item : {
-                    operator_id : item.operatorid,
+                    operatorid : item.operatorid,
                     title : item.title,
                     status  : item.status,
                     description: item.description,
