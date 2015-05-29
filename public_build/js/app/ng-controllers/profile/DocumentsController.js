@@ -1,0 +1,302 @@
+angular.module('ezeidApp').controller('DocumentController',[
+    '$http', '$rootScope', '$scope', '$timeout', 'Notification', '$filter','$q','GURL','$location',
+    function($http, $rootScope, $scope, $timeout, Notification, $filter,$q,GURL,$location) {
+
+    var DocCtrl = this;
+    $scope.fileSeclected = undefined;
+    $scope.IdPlaceHolder = "Enter ID Card number";
+    $scope.Token = $rootScope._userInfo.Token;
+
+        var isUserDetailsLoaded = false;
+        /**
+         * Hiding progress loader when userDetails are loaded successfully
+         */
+        $scope.$watch('userDetails',function(newVal,oldVal){
+            if(newVal){
+                if(newVal.MasterID){
+                    isUserDetailsLoaded = true;
+                    if(isUserDetailsLoaded){
+
+                        if($scope.userDetails.IDTypeID !== 1){
+                            $location.path('/');
+                        }
+                        else{
+                            $scope.dataProgressLoader.dataLoadInProgress = false;
+                            $scope.dataProgressLoader.dataLoadError = false;
+                            $scope.dataProgressLoader.dataLoadComplete = true;
+                        }
+                    }
+                }
+            }
+        });
+
+        /**
+         * Hiding progress loader when userDetails are loaded successfully
+         */
+        if(!$scope.userDetails){
+            $scope.loadUserDetails().then(function(){
+                isUserDetailsLoaded = true;
+            });
+            $scope.$watch('userDetails',function(newVal,oldVal){
+                if(newVal){
+                    if(newVal.MasterID){
+                        if(isUserDetailsLoaded){
+
+                            if($scope.userDetails.IDTypeID !== 1){
+                                $location.path('/');
+                            }
+                            else{
+                                $scope.dataProgressLoader.dataLoadInProgress = false;
+                                $scope.dataProgressLoader.dataLoadError = false;
+                                $scope.dataProgressLoader.dataLoadComplete = true;
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        else{
+            isUserDetailsLoaded  = true;
+        }
+
+
+        var original_form = {
+        RefNo:'',
+        RefExpiryDate:'',
+        RefType:1,
+        RefDoc:undefined,
+        RefFileName:undefined
+    };
+
+    $scope.form = {
+        RefNo:'',
+        RefExpiryDate:'',
+        RefType:1,
+        RefDoc:undefined,
+        RefFileName:undefined
+    };
+
+    var MsgDelay = 2000;
+    
+    $('#datetimepicker1').datetimepicker({
+       format: "d-M-Y",
+        hours12: false,
+//        mask: true,
+        timepicker:false
+    });
+    $('#datetimepicker1').siblings('.input-group-addon').on('click',function(){
+        $('#datetimepicker1').trigger('focus');
+    });
+
+    $scope.$watch('_userInfo.IsAuthenticate', function () {
+        if ($rootScope._userInfo.IsAuthenticate == true) {
+            GetUserDetails();
+        }
+        else {
+
+        }
+    });
+
+    function GetUserDetails() {
+        //$rootScope.IsIdAvailable = true;
+        $http({
+            method: 'get',
+            url: GURL + 'ewtGetDocPin?TokenNo=' + $rootScope._userInfo.Token
+        }).success(function (data) {
+               $scope.Pin = data[0].DocPIN;
+            });
+    }
+
+    $scope.ChangePin = function(){
+      if($scope.Pin<100 && $scope.Pin != "")
+        {
+            $scope.Pin = "";
+            Notification.error({ message: 'Pin should greater or equal 100 ', delay: MsgDelay });
+        }
+        else
+        {
+            $http({ method: 'post', url: GURL + 'ewtUpdateDocPin', data: { TokenNo: $rootScope._userInfo.Token, Pin: $scope.Pin} }).success(function (data) {
+                if (data.IsUpdated) {
+                    Notification.success({ message: 'Saved...', delay: MsgDelay });
+                }
+                else {
+                    Notification.error({ message: 'Sorry..! not saved ', delay: MsgDelay });
+                }
+            });
+        }
+    };
+
+    $scope.uploadFile = function (files) {
+        $scope.DocumentToUpload = files;
+    };
+
+    var fileToDataURL = function (file) {
+        var deferred = $q.defer();
+        var reader = new FileReader();
+        reader.onload = function (e) {
+            deferred.resolve(e.target.result);
+        };
+        reader.readAsDataURL(file);
+        return deferred.promise;
+    };
+
+    $scope.OptionSelected = 1;
+
+    getDocumentDetails($scope.OptionSelected);
+
+    $scope.OnOptionSelected = function(option){
+        $scope.OptionSelected = option;
+        getDocumentDetails(option);
+    };
+
+    function getDocumentDetails(option){
+
+        $scope.form = original_form;
+
+        if($rootScope._userInfo && $rootScope._userInfo.Token){
+            $http({ method: 'get', url: GURL + 'ewtGetDoc?TokenNo=' + $rootScope._userInfo.Token + '&&Type='+ option }).success(function (data) {
+
+                 if(data && data.length > 0 && data[0].No != '' && data !='null'){
+                    if($scope.OptionSelected==1){
+                        $scope.IdPlaceHolder = "Enter ID Card number";
+                        $scope.form.RefNo = data[0].No;
+                        $scope.form.RefExpiryDate = $filter('date')(new Date(data[0].ExpiryDate), 'dd-MMM-yyyy');
+                        $scope.form.RefDoc = data[0].IDDoc;
+                        $scope.form.RefFileName = data[0].DocFilename;
+                        $scope.showDownloadLink = $scope.form.RefNo == "" ? false : true;
+
+                     }else if($scope.OptionSelected==2){
+                        $scope.IdPlaceHolder = "Enter Passport number";
+                        $scope.form.RefNo = data[0].No;
+                        $scope.form.RefExpiryDate = $filter('date')(new Date(data[0].ExpiryDate), 'dd-MMM-yyyy');
+                        $scope.form.RefDoc = data[0].IDDoc;
+                        $scope.form.RefFileName = data[0].DocFilename;
+                        $scope.showDownloadLink = $scope.form.RefNo == "" ? false : true;
+
+                    }else if($scope.OptionSelected==3){
+
+                        $scope.IdPlaceHolder = "Enter Driver's Licence number";
+                        $scope.form.RefNo = data[0].No;
+                        $scope.form.RefExpiryDate = $filter('date')(new Date(data[0].ExpiryDate), 'dd-MMM-yyyy');
+                        $scope.form.RefDoc = data[0].IDDoc;
+                        $scope.form.RefFileName = data[0].DocFilename;
+                       /* $scope.showDownloadLink = $scope.form.RefFileName == "" ? false : true;*/
+                        $scope.showDownloadLink = $scope.form.RefNo == "" ? false : true;
+
+                    }else if($scope.OptionSelected==4){
+                        $scope.IdPlaceHolder = "Reference No. for Document #1";
+                        $scope.form.RefNo = data[0].No;
+                        $scope.form.RefExpiryDate = $filter('date')(new Date(data[0].ExpiryDate), 'dd-MMM-yyyy');
+                        $scope.form.RefDoc = data[0].IDDoc;
+                        $scope.form.RefFileName = data[0].DocFilename;
+                        $scope.showDownloadLink = $scope.form.RefNo == "" ? false : true;
+
+                    }else if($scope.OptionSelected==5){
+                        $scope.IdPlaceHolder = "Reference No. for Document #2";
+                        $scope.form.RefNo = data[0].No;
+                        $scope.form.RefExpiryDate = $filter('date')(new Date(data[0].ExpiryDate), 'dd-MMM-yyyy');
+                        $scope.form.RefDoc = data[0].IDDoc;
+                        $scope.form.RefFileName = data[0].DocFilename;
+                        $scope.showDownloadLink = $scope.form.RefNo == "" ? false : true;
+                    }
+                }
+                else
+                    {
+                        if(data =='null' || $scope.form.RefFileName == "undefined"){
+                            $scope.form.RefNo = "";
+                            $scope.form.RefExpiryDate = "";
+                            $scope.form.RefDoc = "";
+                            $scope.showDownloadLink = false;
+                            if($scope.OptionSelected==1){
+                                $scope.IdPlaceHolder = "Enter ID Card number";
+                            }
+                            else if($scope.OptionSelected==2){
+                                $scope.IdPlaceHolder = "Enter Passport number";
+                            }else if($scope.OptionSelected==3){
+                                $scope.IdPlaceHolder = "Enter Driver's Licence number";
+                            }else if($scope.OptionSelected==4){
+                                $scope.IdPlaceHolder = "Reference No. for Document #1";
+                            }else if($scope.OptionSelected==5){
+                                $scope.IdPlaceHolder = "Reference No. for Document #2";
+                            }
+                        }
+                        else
+                        {
+                            $scope.form.RefNo = "";
+                            $scope.form.RefExpiryDate = "";
+                            $scope.form.RefDoc = "";
+                            if($scope.OptionSelected==1){
+                                $scope.IdPlaceHolder = "Enter ID Card number";
+                                $scope.form.RefFileName = data[0].DocFilename;
+                                $scope.showDownloadLink = $scope.form.RefNo == "" || $scope.form.RefNo == 'undefined' ? false : true;
+                            }
+                            else if($scope.OptionSelected==2){
+                                $scope.IdPlaceHolder = "Enter Passport number";
+                                $scope.form.RefFileName = data[0].DocFilename;
+                                $scope.showDownloadLink = $scope.form.RefNo == "" ? false : true;
+                            }else if($scope.OptionSelected==3){
+                                $scope.IdPlaceHolder = "Enter Driver's Licence number";
+                                $scope.form.RefFileName = data[0].DocFilename;
+                                $scope.showDownloadLink = $scope.form.RefNo == "" ? false : true;
+                            }else if($scope.OptionSelected==4){
+                                $scope.IdPlaceHolder = "Reference No. for Document #1";
+                                $scope.form.RefFileName = data[0].DocFilename;
+                                $scope.showDownloadLink = $scope.form.RefNo == "" ? false : true;
+                            }else if($scope.OptionSelected==5){
+                                $scope.IdPlaceHolder = "Reference No. for Document #2";
+                                $scope.form.RefFileName = data[0].DocFilename;
+                                $scope.showDownloadLink = $scope.form.RefNo == "" ? false : true;
+                            }
+                        }
+                    }
+            }).error( function(error){
+            });
+        }
+    }
+
+    $scope.OnSaveDocument = function(){
+
+        $scope.form.TokenNo = $rootScope._userInfo.Token;
+        $scope.form.RefType = $scope.OptionSelected;
+        $http({
+            method: "POST",
+            url: GURL + 'ewtSaveDoc',
+            data: JSON.stringify($scope.form),
+            headers: { 'Content-Type': 'application/json' }
+        }).success(function (data) {
+
+                if(data.IsSuccessfull) {
+                    $scope.OnOptionSelected($scope.OptionSelected);
+                    GetUserDetails();
+                    Notification.success({ message: "Saved... ", delay: MsgDelay });
+
+                }else{
+                    Notification.error({ message: 'Sorry..! not saved', delay: MsgDelay });
+                }
+            });
+
+        //Below code is for upload document
+        if($scope.DocumentToUpload)
+        {
+          for (var i = 0; i < $scope.DocumentToUpload.length; i++) {
+                var $file = $scope.DocumentToUpload[i];
+                var formData = new FormData();
+                formData.append('file', $file);
+                formData.append('RefType', $scope.OptionSelected);
+                formData.append('TokenNo', $rootScope._userInfo.Token);
+
+                $http({ method: 'POST', url: GURL + 'ewTUploadDoc/', data: formData,
+                    headers: { 'Content-Type': undefined }, transformRequest: angular.identity })
+                    .success(function (data, status, headers, config) {
+                        // GetUserDetails();
+                        //  Notification.success({ message: "Saved...", delay: MsgDelay });
+                    }).error(function(data, status, headers, config) {
+                        Notification.error({message: "An error occurred..", delay: MsgDelay});
+                    });
+            }
+        }
+    }
+    $scope.closeDocument = function(){
+        window.location.href = "/";
+    }
+}]);

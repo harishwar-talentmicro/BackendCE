@@ -11,7 +11,7 @@ angular.module('ezeidApp').directive('toggle', function(){
                 });
             }
             if (attrs.toggle=="popover"){
-                ////console.log(attrs.contents());
+                //////console.log(attrs.contents());
                 //$compile(element.contents())(scope);
                 $(element).popover({
                     html : true,

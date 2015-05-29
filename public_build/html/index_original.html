@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <base href="/">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="Hirecraft">
+    <title>EZEID</title>
+    <link rel="icon" href="images/favicon.ico">
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <!--<link href="//getbootstrap.com/dist/css/bootstrap.min.css" rel="stylesheet">-->
+
+    <link href="css/ezeid-theme.css" rel="stylesheet">
+    <link href="css/common.css" rel="stylesheet">
+    <link href="css/common1.css" rel="stylesheet">
+    <link href="css/new-theme.css" rel="stylesheet"/>
+    <link href="css/component.css" rel="stylesheet"/>
+    <link href="css/common2.css" rel="stylesheet"/>
+    <link href="css/font-awesome.min.css" rel="stylesheet"/>
+
+
+</head>
+<body ng-app="ezeidApp">
+  <div ng-controller="ChatController">
+      <div class="Popup_window form_style map_popup_iconActions" id="createGroup_popup" style="height: 103%;">
+          <div class="window_page Maping_popup chatPopUpWidth">
+              <span class="closelink" ng-click="closeAddGroupPopupForm()">X</span>
+              <form name="createGroupForm" ng-submit="createGroupForm.$valid && createNewGroup()" novalidate>
+                  <h3 class="addressTextContainer">Create Group</h3>
+                  <div class="row setRowLeftRightMarginZero setLeftRightPaddingZero">
+                      <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setLeftRightPaddingZero">
+                         <div class="form-group addGroupInputContainer setBottomMargin0">
+                           <input type="text" name="createGroup" ng-model="groupTitle" class="form-control ng-pristine ng-valid ng-touched" placeholder="Group Title" required>
+                         </div>
+                      </div>
+                  </div><br/>
+                  <div class="row setRowLeftRightMarginZero setLeftRightPaddingZero">
+                      <div class="form-group setBottomMargin0">
+                          <input type="submit" ng-disabled="!groupTitle" class="btn btn-primary text_Box" value="Create" />
+                          <input type="reset" class="btn btn-primary marR10px cancelEnq text_Box" ng-click="closeAddGroupPopupForm()" value="Close" />
+                      </div>
+                  </div>
+              </form>
+          </div>
+      </div>
+    <!--<nav class="cbp-spmenu cbp-spmenu-vertical cbp-spmenu-right" id="cbp-spmenu-s2">-->
+      <!--<div class="chatHeader">-->
+            <!--<h3 class="chatHeadding" style="padding-top: 7px;">Chat</h3>-->
+        <!--</div>-->
+        <!--<div class="chatMiddleContainer">-->
+            <!--<div ng-include="activeTemplate">-->
+           <!--</div>-->
+        <!--</div>-->
+
+        <!--<div class="chatBottomContainer row setRowLeftRightMarginZero setLeftRightPaddingZero whiteTextColor" >-->
+            <!--<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setLeftRightPaddingZero">-->
+                <!--<div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 topMarginButton">-->
+                    <!--<button class="btn btn-primary btn-block greenButton" type="button">Available</button>-->
+                <!--</div>-->
+                <!--<div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 emailPannelTopMargin keyWordText">-->
+                    <!--<img ng-src="../images/chat_icon.png">-->
+                <!--</div>-->
+                <!--<div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 topMarginButton keyWordText" ng-click="openAddGroupPopup()">-->
+                    <!--<img ng-src="../images/add_group.png">-->
+                <!--</div>-->
+            <!--</div>-->
+        <!--</div>-->
+    <!--</nav>-->
+  </div>
+    <div class="viewport" ng-view>
+    </div>
+
+     <!--<div ng-controller="ChatBoxCtrl">-->
+       <!--&lt;!&ndash; <div id="showRight" class="chat-box" ng-click="toggleChatBox()"> &ndash;&gt;-->
+        <!--<div id="showRight" ng-click="toggleChatBox()">-->
+          <!--<div id="showRight1" class="cbp-spmenu1 cbp-spmenu-vertical1 cbp-spmenu-right1">-->
+              <!--<div ng-class="chatArrow == true ? 'glyphicon glyphicon-menu-left' : 'glyphicon glyphicon-menu-right'"> Chat <span class="glyphicon glyphicon-comment"></span></div>-->
+          <!--</div>-->
+        <!--</div>-->
+     <!--</div>-->
+
+
+
+    <div id="progress-overlay" class="hidden">
+        <div id="progress-overlay-background"></div>
+        <div id="progress-overlay-content">
+            <div class="container">
+                <div class="col-lg-10 col-md-10 col-sm-12 col-xs-12 text-center col-lg-offset-1 col-md-offset-1">
+                    <div class="row top-clearfix-padding">
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+
+                            <img src="images/preloader.gif" class="text-center" />
+                            <h1 class="text-center font-open-sans">
+                                Loading ! <br/>
+                                <small class="text-info"> Please wait ...</small>
+                            </h1>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="js/libs/moment.min.js"></script>
+
+
+    <!--<script src="js/libs/jquery-1.9.1.min.js"></script>-->
+  <!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>-->
+    <script src="js/libs/jquery.min.js"></script>
+    <script src="js/libs/bootstrap.min.js"></script>
+    <script src="js/libs/angular.min.js"></script>
+    <script src="js/dependency/angular-touch/angular-touch.min.js"></script>
+    <script src="js/dependency/angular-animate/angular-animate.min.js"></script>
+
+
+    <script src="js/libs/aes.js"></script>
+    <script src="js/libs/jquery.datetimepicker.js"></script>
+    <script src="js/libs/jquery.flip.min.js"></script>
+    <script src="js/libs/html2canvas.js"></script>
+    <script src="js/dependency/angular-ui-notification.min.js"></script>
+    <script src="js/dependency/angularjs-dropdown-multiselect.js"></script>
+
+    <!-- WARNING! Don't Add any file link above this comment -->
+    <script src="js/app/appConfig.js"></script>
+    <script src="js/app/App.js"></script>
+    <script src="js/app/Header.js"></script>
+    <script src="js/app/Footer.js"></script>
+    <script src="js/app/common.js"></script>
+    <script src="js/app/popover.js"></script>
+    <script src="js/app/modal.js"></script>
+    <script src="js/app/Disclaimer.js"></script>
+    <script src="js/app/ng-controllers/ChatBoxCtrl.js"></script>
+    <script src="js/app/ng-controllers/ChatController.js"></script>
+    <script src="js/app/ng-controllers/HomeController.js"></script>
+    <script src="js/app/ng-controllers/TermsController.js"></script>
+    <script src="js/app/ng-controllers/SearchController.js"></script>
+    <script src="js/app/ng-controllers/LegalController.js"></script>
+    <script src="js/app/ng-controllers/HelpController.js"></script>
+    <script src="js/app/ng-services/ScaleAndCropImage.js"></script>
+    <script src="js/app/ng-services/GoogleMaps.js"></script>
+    <script src="js/app/ng-services/UtilityService.js"></script>
+    <script src="js/app/ng-controllers/NotifyController.js"></script>
+    <script src="js/app/ng-controllers/AccessHistoryController.js"></script>
+    <script src="js/app/ng-controllers/ViewDirectionController.js"></script>
+    <script src="js/app/ng-controllers/BulkSalesEnquiryController.js"></script>
+    <script src="js/app/ng-controllers/BlacklistWhiteListController.js"></script>
+    <script src="js/app/ng-controllers/BusinessListController.js"></script>
+    <script src="js/app/ng-controllers/SalesEnquiryController.js"></script>
+    <script src="js/app/ng-controllers/profile/SignUpCtrl.js"></script>
+    <script src="js/app/ng-controllers/profile/ProfileManagerCtrl.js"></script>
+    <script src="js/app/ng-controllers/profile/PasswordCtrl.js"></script>
+    <script src="js/app/ng-controllers/profile/ProfileCtrl.js"></script>
+    <script src="js/app/ng-controllers/profile/ProfileEditCtrl.js"></script>
+    <script src="js/app/ng-controllers/profile/LocationsCtrl.js"></script>
+    <script src="js/app/ng-controllers/profile/WebLinksCtrl.js"></script>
+    <script src="js/app/ng-controllers/profile/DocumentsController.js"></script>
+    <script src="js/app/ng-controllers/profile/CvAttachmentController.js"></script>
+    <script src="js/app/ng-controllers/profile/CompanyProfileCtrl.js"></script>
+    <script src="js/app/ng-controllers/profile/configuration/ConfigurationNavigationCtrl.js"></script>
+    <script src="js/app/ng-controllers/profile/configuration/ItemMasterCtrl.js"></script>
+    <script src="js/app/ng-controllers/profile/configuration/ModuleSettingsCtrl.js"></script>
+    <script src="js/app/ng-controllers/profile/configuration/RulesCtrl.js"></script>
+    <script src="js/app/ng-controllers/profile/configuration/StatusTypesCtrl.js"></script>
+    <script src="js/app/ng-controllers/profile/configuration/SubuserCtrl.js"></script>
+    <script src="js/app/ng-controllers/profile/configuration/WorkingHourCtrl.js"></script>
+    <script src="js/app/ng-controllers/profile/configuration/HolidayCalenderCtrl.js"></script>
+    <script src="js/app/ng-controllers/profile/configuration/ActionTypesCtrl.js"></script>
+    <script src="js/app/ng-controllers/business-manager/BusinessManagerCtrl.js"></script>
+    <script src="js/app/ng-controllers/business-manager/SalesCtrl.js"></script>
+    <script src="js/app/ng-controllers/business-manager/SalesFrontCtrl.js"></script>
+    <script src="js/app/ng-controllers/LandingPageCtrl.js"></script>
+    <script src="js/app/ng-controllers/SearchResultCtrl.js"></script>
+    <script src="js/app/ng-controllers/OutboxPageCtrl.js"></script>
+    <script src="js/app/ng-controllers/ReservationModuleCtrl.js"></script>
+
+    <script src="js/app/ng-controllers/InformationDetailCtrl.js"></script>
+    <script src="js/app/ng-controllers/mapPopController.js"></script>
+
+    <script src="js/app/ng-directives/modal-box.js"></script>
+    <script src="js/app/ng-directives/date-time-picker.js"></script>
+    <script src="js/app/ng-directives/ezeid-only.js"></script>
+    <script src="js/app/ng-directives/pin-only.js"></script>
+    <script src="js/app/ng-directives/toggle.js"></script>
+    <script src="js/app/ng-directives/transaction-history-item.js"></script>
+    <script src="js/app/ng-directives/numbers-only.js"></script>
+    <script src="js/app/ng-directives/decimals-only.js"></script>
+    <script src="js/app/ng-directives/capitalize.js"></script>
+    <script src="js/app/ng-directives/image-upload.js"></script>
+    <script src="js/app/ng-directives/qtyComponent.js"></script>
+    <script src="js/app/ng-directives/transaction-item.js"></script>
+    <script src="js/app/ng-directives/business-item.js"></script>
+    <script src="js/app/ng-directives/transaction-filter.js"></script>
+    <script src="js/app/ng-filters/truncate.js"></script>
+    <script src="js/app/ng-filters/rule-filter.js"></script>
+    <script src="js/app/ng-filters/module-filter.js"></script>
+    <script src="js/app/ng-filters/date-time-filter.js"></script>
+    <script src="js/app/ng-filters/format-decimal.js"></script>
+
+    <script src="js/app/ng-controllers/business-manager/reservation/ReservationCtrl.js"></script>
+    <script src="js/app/ng-controllers/profile/configuration/ReservationSettingCtrl.js"></script>
+
+    <script type='text/javascript' src='//maps.google.com/maps/api/js?v=3.exp&sensor=false&libraries=places,geometry'></script>
+    <script src="js/app/label.js"></script>
+
+    <!--<script src="js/app/classie.js"></script>-->
+    <!--<script>-->
+        <!--var menuRight = document.getElementById( 'cbp-spmenu-s2' );-->
+        <!--console.log(menuRight);-->
+        <!--body = document.body;-->
+        <!--showRight.onclick = function() {-->
+            <!--classie.toggle( this, 'active' );-->
+            <!--classie.toggle( menuRight, 'cbp-spmenu-open' );-->
+            <!--};-->
+
+        <!--var menuRight1 = document.getElementById( 'showRight1' )-->
+        <!--showRight1.onclick = function() {-->
+            <!--classie.toggle( this, 'active' );-->
+            <!--classie.toggle( menuRight1, 'cbp-spmenu-open1' );-->
+        <!--};-->
+    <!--</script>-->
+
+</body>
+</html>

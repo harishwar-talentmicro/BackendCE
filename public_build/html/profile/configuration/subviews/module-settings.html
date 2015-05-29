@@ -1,0 +1,486 @@
+<div class="panel panel-default" ng-controller="ModuleSettingsCtrl">
+    <div class="panel-heading">
+        <h4>Modules and Settings</h4>
+        <small class="text-info">* To configure access rights for master user and subusers, please go to
+            <span class="text text-bolder btn-link" ng-click="changeActive(pageSubuser)">subuser section</span></small>
+    </div>
+    <div class="panel-body">
+        <div class="container-fluid">
+            <!--<div class="row">-->
+                <!--<div class="col-lg-1"></div>-->
+                <!--<div class="col-lg-2">-->
+                    <!--<div class="ezeid-circle">Sales</div>-->
+                <!--</div>-->
+                <!--<div class="col-lg-2">-->
+                    <!--<div class="ezeid-circle">Reservation</div>-->
+                <!--</div>-->
+                <!--<div class="col-lg-2">-->
+                    <!--<div class="ezeid-circle">Home Delivery</div>-->
+                <!--</div>-->
+                <!--<div class="col-lg-2">-->
+                    <!--<div class="ezeid-circle">Service</div>-->
+                <!--</div>-->
+                <!--<div class="col-lg-2">-->
+                    <!--<div class="ezeid-circle">Resume</div>-->
+                <!--</div>-->
+                <!--<div class="col-lg-1"></div>-->
+            <!--</div>-->
+        </div>
+        <div class="well well-settings">
+            <div class="row bottom-clearfix">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <h5>
+                        Sales
+                    </h5>
+                </div>
+
+            </div>
+            <div class="row bottom-clearfix">
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+                    <label>Module Title</label>
+                    <br/>
+                    <small class="text-primary">(Appearing to end user)</small>
+                </div>
+                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix">
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Sales Module Title" ng-model="settings.sales.title" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="row bottom-clearfix">
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+                    <label>Sales Weblink </label>
+                    <br/>
+                    <small class="text-primary">(If you want the sales enquiry link to be redirected to your own website)</small>
+                </div>
+                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix">
+                    <div class="form-group">
+                        <input type="url" class="form-control" placeholder="http://www.example.com/sales" ng-model="settings.sales.url" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="row bottom-clearfix">
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+                    <label>Module Visibility</label>
+                    <br/>
+                    <small class="text-primary">(Visibility setting for module which decides whether this module is visible to end user or not at the time of EZEID search)</small>
+                </div>
+                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix">
+                    <div class="form-group">
+                        <select class="form-control" name="sales-access-rights" ng-model="settings.sales.visibility">
+                            <option ng-repeat="right in visibilities" value="{{right.value}}">{{right.title}}</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="row bottom-clearfix">
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+                    <label>Item List Type</label>
+                    <br/>
+                    <small class="text-primary">Format of Item Listing to end user</small>
+                </div>
+                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix">
+                    <div class="form-group">
+                        <select class="form-control" name="sales-item-list-type" ng-model="settings.sales.itemListType">
+                            <option ng-repeat="type in itemListTypes" value="{{type.value}}">{{type.title}}</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="row bottom-clearfix">
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+                    <label>Sales Message</label>
+                    <br/>
+                    <small class="text-primary">Default sales message to be appearing to end user</small>
+                </div>
+                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix">
+                    <div class="form-group">
+                        <textarea class="form-control" ng-model="settings.sales.defaultFormMsg"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="well well-settings">
+            <div class="row bottom-clearfix">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <h5>
+                        Reservation
+                    </h5>
+                </div>
+
+            </div>
+            <div class="row bottom-clearfix">
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+                    <label>Module Title</label>
+                    <br/>
+                    <small class="text-primary">(Appearing to end user)</small>
+                </div>
+                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix">
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Reservation Module Title" ng-model="settings.reservation.title"/>
+                    </div>
+                </div>
+            </div>
+            <div class="row bottom-clearfix">
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+                    <label>Reservation Weblink </label>
+                    <br/>
+                    <small class="text-primary">(If you want the sales enquiry link to be redirected to your own website)</small>
+                </div>
+                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix">
+                    <div class="form-group">
+                        <input type="url" class="form-control" placeholder="http://www.example.com/sales" ng-model="settings.reservation.url" />
+                    </div>
+                </div>
+            </div>
+            <div class="row bottom-clearfix">
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+                    <label>Module Visibility</label>
+                    <br/>
+                    <small class="text-primary">(Visibility setting for module which decides whether this module is visible to end user or not at the time of EZEID search)</small>
+                </div>
+                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix">
+                    <div class="form-group">
+                        <select class="form-control" name="reservation-access-rights" ng-model="settings.reservation.visibility">
+                            <option ng-repeat="right in visibilities" value="{{right.value}}">{{right.title}}</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="row bottom-clearfix">
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+                    <label>Scheduler Display Format</label>
+                    <br/>
+                    <small class="text-primary">(Schedules to be displayed in hours, days or months)</small>
+                </div>
+                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix">
+                    <div class="form-group">
+                        <select class="form-control" name="reservation-display-format" ng-model="settings.reservation.displayFormat">
+                            <option ng-repeat="format in reservationDisplayFormat" value="{{format.value}}">{{format.title}}</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="row bottom-clearfix">
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+                    <label>Reservation Message</label>
+                    <br/>
+                    <small class="text-primary">Default reservation message to be appearing to end user</small>
+                </div>
+                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix">
+                    <div class="form-group">
+                        <textarea class="form-control" ng-model="settings.reservation.defaultFormMsg"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="well well-settings">
+            <div class="row bottom-clearfix">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <h5>
+                        Home Delivery
+                    </h5>
+                </div>
+
+            </div>
+            <div class="row bottom-clearfix">
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+                    <label>Module Title</label>
+                    <br/>
+                    <small class="text-primary">(Appearing to end user)</small>
+                </div>
+                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix">
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Sales Module Title"  ng-model="settings.homeDelivery.title"/>
+                    </div>
+                </div>
+            </div>
+            <div class="row bottom-clearfix">
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+                    <label>Home Delivery Weblink </label>
+                    <br/>
+                    <small class="text-primary">(If you want the home delivery link to be redirected to your own website)</small>
+                </div>
+                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix">
+                    <div class="form-group">
+                        <input type="url" class="form-control" placeholder="http://www.example.com/sales" ng-model="settings.homeDelivery.url" />
+                    </div>
+                </div>
+            </div>
+            <div class="row bottom-clearfix">
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+                    <label>Module Visibility</label>
+                    <br/>
+                    <small class="text-primary">(Visibility setting for module which decides whether this module is visible to end user or not at the time of EZEID search)</small>
+                </div>
+                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix">
+                    <div class="form-group">
+                        <select class="form-control" name="home-delivery-access-rights" ng-model="settings.homeDelivery.visibility">
+                            <option ng-repeat="right in visibilities" value="{{right.value}}">{{right.title}}</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="row bottom-clearfix">
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+                    <label>Item List Type</label>
+                    <br/>
+                    <small class="text-primary">Format of Item Listing to end user</small>
+                </div>
+                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix">
+                    <div class="form-group">
+                        <select class="form-control" name="home-delivery-item-list-type" ng-model="settings.homeDelivery.itemListType">
+                            <option ng-repeat="type in itemListTypes" value="{{type.value}}">{{type.title}}</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="row bottom-clearfix">
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+                    <label>Home Delivery Message</label>
+                    <br/>
+                    <small class="text-primary">Default home delivery message to be appearing to end user</small>
+                </div>
+                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix">
+                    <div class="form-group">
+                        <textarea class="form-control" ng-model="settings.homeDelivery.defaultFormMsg"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="well well-settings">
+            <div class="row bottom-clearfix">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <h5>
+                        Service
+                    </h5>
+                </div>
+
+            </div>
+            <div class="row bottom-clearfix">
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+                    <label>Module Title</label>
+                    <br/>
+                    <small class="text-primary">(Appearing to end user)</small>
+                </div>
+                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix">
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Service Module Title" ng-model="settings.service.title"/>
+                    </div>
+                </div>
+            </div>
+            <div class="row bottom-clearfix">
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+                    <label>Service Weblink </label>
+                    <br/>
+                    <small class="text-primary">(If you want the service link to be redirected to your own website)</small>
+                </div>
+                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix">
+                    <div class="form-group">
+                        <input type="url" class="form-control" placeholder="http://www.example.com/sales" ng-model="settings.service.url" />
+                    </div>
+                </div>
+            </div>
+            <div class="row bottom-clearfix">
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+                    <label>Module Visibility</label>
+                    <br/>
+                    <small class="text-primary">(Visibility setting for module which decides whether this module is visible to end user or not at the time of EZEID search)</small>
+                </div>
+                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix">
+                    <div class="form-group">
+                        <select class="form-control" name="service-access-rights" ng-model="settings.service.visibility">
+                            <option ng-repeat="right in visibilities" value="{{right.value}}">{{right.title}}</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="row bottom-clearfix">
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+                    <label>Service Message</label>
+                    <br/>
+                    <small class="text-primary">Default service message to be appearing to end user</small>
+                </div>
+                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix">
+                    <div class="form-group">
+                        <textarea class="form-control" ng-model="settings.service.defaultFormMsg"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="well well-settings">
+            <div class="row bottom-clearfix">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <h5>
+                        Resume
+                    </h5>
+                </div>
+
+            </div>
+            <div class="row bottom-clearfix">
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+                    <label>Module Title</label>
+                    <br/>
+                    <small class="text-primary">(Appearing to end user)</small>
+                </div>
+                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix">
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Resume Module Title" ng-model="settings.resume.title" />
+                    </div>
+                </div>
+            </div>
+            <div class="row bottom-clearfix">
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+                    <label>Resume Weblink </label>
+                    <br/>
+                    <small class="text-primary">(If you want the job(resume) enquiry to be redirected to your own website)</small>
+                </div>
+                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix">
+                    <div class="form-group">
+                        <input type="url" class="form-control" placeholder="http://www.example.com/sales" ng-model="settings.resume.url" />
+                    </div>
+                </div>
+            </div>
+            <div class="row bottom-clearfix">
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+                    <label>Module Visibility</label>
+                    <br/>
+                    <small class="text-primary">(Visibility setting for module which decides whether this module is visible to end user or not at the time of EZEID search)</small>
+                </div>
+                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix">
+                    <div class="form-group">
+                        <select class="form-control" name="resume-access-rights" ng-model="settings.resume.visibility">
+                            <option ng-repeat="right in visibilities" value="{{right.value}}">{{right.title}}</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="row bottom-clearfix">
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+                    <label>Freshers Allowed</label>
+                    <br/>
+                    <small class="text-primary">(Is Organisation accepts resume of freshers)</small>
+                </div>
+                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix">
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="freshers-accepted" ng-model="settings.resume.freshersAccepted" />
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row bottom-clearfix">
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+                    <label>Keywords</label>
+                    <br/>
+                    <small class="text-primary">(Resume Keywords for Job Search)</small>
+                </div>
+                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix">
+                    <textarea class="form-control" placeholder="Resume Keywords for Job Search" ng-model="settings.resume.keywords"></textarea>
+                </div>
+            </div>
+            <div class="row bottom-clearfix">
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+                    <label>Resume Message</label>
+                    <br/>
+                    <small class="text-primary">Default resume message to be appearing to user while submitting resume</small>
+                </div>
+                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix">
+                    <div class="form-group">
+                        <textarea class="form-control" ng-model="settings.resume.defaultFormMsg"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-------- Business Settings Module ------------------------------>
+        <div class="well well-settings">
+            <div class="row bottom-clearfix">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <h5>
+                        Business Settings
+                    </h5>
+                </div>
+
+            </div>
+            <div class="row bottom-clearfix">
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+                    <label>Category</label>
+                    <br/>
+                    <small class="text-primary">(Your business category)</small>
+                </div>
+                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix">
+                    <div class="form-group">
+                        <select class="form-control" name="business-category" ng-model="settings.business.category">
+                            <option value="0">--Select a business category--</option>
+                            <option ng-repeat="category in business.categories" value="{{category.CategoryID}}">{{category.CategoryTitle}}</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="row bottom-clearfix">
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+                    <label>Data Refresh Interval</label>
+                    <br/>
+                    <small class="text-primary">(Interval in Minute to refresh data in any of the Views in Business ManagerInterval in Minute to refresh data in any of the Views in Business Manager)</small>
+                </div>
+                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <select class="form-control" name="business-category" ng-model="settings.business.dataRefreshInterval">
+                                <option value="0">--Select data refresh interval--</option>
+                                <option ng-repeat="refreshInterval in refreshIntervalList" value="{{refreshInterval}}">{{refreshInterval}}</option>
+                            </select>
+                            <span class="input-group-addon"> MINUTES </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row bottom-clearfix">
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+                    <label>Brochure</label>
+                    <br/>
+                    <small class="text-primary">(Company/business/organisation brochure)</small>
+                </div>
+                <div class="text-center col-lg-3 col-md-3 col-sm-3 col-xs-6 bottom-clearfix col-lg-offset-0 col-md-offset-0 col-sm-offset-0 col-xs-offset-0">
+                    <div class="hidden-lg hidden-print hidden-sm hidden-xs hidden-md hidden-desktop hidden-phone">
+                        <input type="file" id="brochure-file-upload" onchange="angular.element(this).scope().uploadBrochure()" />
+                    </div>
+
+                    <div class="thumbnail text-center no-radius">
+                        <buttton class="btn btn-primary btn-xs pull-left" ng-click="selectBrochure()" toggle data-toggle="tooltip" data-placement="right" title="Attach new brochure">
+                            <span class="glyphicon glyphicon-paperclip"></span>
+                        </buttton>
+                        <img ng-src="{{brochureImage}}" alt="brochure" />
+                        <button class="btn btn-primary btn-xs" ng-show="(brochureImage !== inactiveBrochureImage)" title="Download brochure">
+                            <span class="glyphicon glyphicon-download"></span>
+                            Download
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="row bottom-clearfix">
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+                    <label>Keywords</label>
+                    <br/>
+                    <small class="text-primary">(Keywords related to your business)</small>
+                </div>
+                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix">
+                    <textarea class="form-control" placeholder="Keywords for Searching your business" ng-model="settings.business.keywords"></textarea>
+                </div>
+            </div>
+        </div>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-4 col-xs-6">
+                    <button class="btn btn-primary btn-block" ng-click="saveSettings()">Update</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

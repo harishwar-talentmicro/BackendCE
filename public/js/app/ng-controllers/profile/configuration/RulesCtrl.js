@@ -107,7 +107,7 @@ angular.module('ezeidApp').controller('RulesCtrl',['$scope','$interval','$http',
                 }
             }
             catch(ex){
-                console.log(ex);
+                //console.log(ex);
                 Notification.error({ message : 'Error loading google maps', delay : MsgDelay});
             }
         };
@@ -186,7 +186,7 @@ angular.module('ezeidApp').controller('RulesCtrl',['$scope','$interval','$http',
 
         $scope.addMappedEzeid = function(){
             if(!$scope.modalBox.tempMappedName){
-                console.log('return false');
+                //console.log('return false');
                 return false;
             }
 
@@ -213,7 +213,7 @@ angular.module('ezeidApp').controller('RulesCtrl',['$scope','$interval','$http',
          */
         $scope.addMappedName = function(){
             if(!$scope.modalBox.tempMappedName){
-                console.log('return false');
+                //console.log('return false');
                 return false;
             }
             var currentMappedNames = ($scope.modalBox.rule.MappedNames) ? $scope.modalBox.rule.MappedNames : '';
@@ -370,7 +370,7 @@ angular.module('ezeidApp').controller('RulesCtrl',['$scope','$interval','$http',
                 }
             }).success(function(resp){
                 if(resp && resp !== 'null' && resp.length > 0){
-                    console.log(resp);
+                    //console.log(resp);
                     $scope.rules = $scope.rules.concat(resp);
                 }
                 defer.resolve();
@@ -447,7 +447,7 @@ angular.module('ezeidApp').controller('RulesCtrl',['$scope','$interval','$http',
                 method : "POST",
                 data :ruleData
             }).success(function(resp){
-                //console.log(resp);
+                ////console.log(resp);
                 Notification.success({ message : 'Rule added successfully', delay : MsgDelay});
             }).error(function(err){
                 Notification.error({ message : 'An error occurred while adding rule', delay : MsgDelay});

@@ -1,0 +1,230 @@
+﻿<script>
+    //To input numbers only
+    function isNumberKey(evt)
+    {
+        var charCode = (evt.which) ? evt.which : event.keyCode
+        if (charCode > 31 && (charCode < 48 || charCode > 57))
+            return false;
+
+        return true;
+    }
+
+
+</script>
+<div>
+    <form name="SignInForm" novalidate ng-submit="SignInForm.$valid && SignInCtrl.LoginUser(SignInCtrl.LInfo,SignInForm)">
+        <div class="Popup_window form_style" id="SignIn_popup">
+            <div class="window_page wdLogin Maping_popup">
+                <span ng-click="SignInCtrl.reset(SignInForm)" class="closelink">X</span>
+                <div class="logo_style">
+                    <span class="logo_container">EZEID</span>
+                </div>
+                <div class="signIn_style">
+                    <span class="signIn">Sign In</span>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 col-md-offset-4">
+                    </div>
+                </div>
+                <div class="clearfix mobile_marT15px"></div>
+                <div class="row">
+                    <div class="col-lg-12">
+                        <ul style="margin-top:10px!important;" class="pad0px">
+                            <li class="dsp_block padT10px">
+                                <div class="pull-left wd48p marL10px">
+                                    <input type="text" name="UserName" id="UserName" autofocus="autofocus" style='text-transform:uppercase' class="form-control wd10_px user_input mar_leftInp emptyBox"  ng-class="SignInForm.UserName.$touched && !SignInCtrl.LInfo.UserName.length ? 'mandatoryTextBox' : ''" ng-model="SignInCtrl.LInfo.UserName" placeholder="Type EZE ID" required />
+                                </div>
+                                <div class="clearfix mob_marT15px"></div>
+                                <div class="pull-left wd48p marL10px">
+                                    <input type="password" name="Password" class="form-control wd10_px mar_leftInp emptyBox" ng-class="SignInForm.Password.$touched && !SignInCtrl.LInfo.Password.length ? 'mandatoryTextBox' : ''" ng-model="SignInCtrl.LInfo.Password" placeholder="Password" required>
+                                </div>
+                                <div class="clearfix"></div>
+                                <div class="pull-left wd48p">
+                                    <div id="honeypot-div" ng-hide="true">
+                                        If you see this, leave this form field blank
+                                        and invest in CSS support.
+                                        <input type="text" name="capHoney" ng-model="SignInCtrl.Captcha" class="form-control" value="" />
+                                    </div>
+                                </div>
+                                <div class="clearfix"></div>
+                                <span class="pull-left msg_login" ng-model="SignInCtrl.FMessage" style="color:red;">{{SignInCtrl.FMessage}}</span>
+                                <div class="clearfix"></div>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="clearfix"></div>
+                    <div class="row quick_butt">
+                        <div class="col-md-12 col-md-offset">
+                            <input type="submit" ng-disabled="!SignInCtrl.LInfo.UserName || !SignInCtrl.LInfo.Password" class="btn btn-primary wdButt1 pull-left marLL10px" value="Sign In"/>
+                            <input type="button" ng-click="SignInCtrl.reset(SignInForm)" class="btn btn-primary wdButt1 signin_cancel marL10px" value="Close"/>
+                        </div>
+                    </div>
+                    <div class="clearfix mob_marT15px"></div>
+                    <div class="row">
+                        <div class="col-md-12 col-md-offset-3">
+                            <!--<a href="#" class="marL110px" id="forgetPasswd" ng-click="SignInCtrl.openQuickSignUpForm()">Quick Sign Up</a>  |-->
+                            <a href="/signup" class="">Sign Up</a>  |
+                            <a href class="" id="forgetPasswd" ng-click="SignInCtrl.openForgotPasswordForm()">Forgot Password ?</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+    </form>
+
+    <div class="Popup_window form_style no_select" id="forgot-password">
+        <div class="window_page wd_forgetPass Maping_popup">
+            <span ng-click="SignInCtrl.closeForgotPasswordForm()" class="closelink">X</span>
+            <h3><span class="mar_forget">Forgot Password ?</span></h3>
+            <form name="forgotPasswordForm" novalidate>
+                <div class="clearfix mobile_marT15px"></div>
+                <ul style="padding-bottom: 11px!important;margin-bottom:8px!important;" class="pad0px">
+                    <li class="dsp_block padT10px">
+                        <div class="pull-left wd48p forget_padd">
+                            <input type="text" name="ezeid" class="form-control wd_forget wd_forgetP2 emptyBox" style='text-transform:uppercase' ng-model="SignInCtrl.EzeId" placeholder="Enter Your EZEID"required/>
+                        </div>
+                    </li>
+                    <div class="clearfix"></div>
+                    <li class="dsp_block padT10px forget_padd">
+                        <input type="submit" ng-disabled="!SignInCtrl.EzeId" class="btn btn-primary pull-left wd_forget1" ng-click="SignInCtrl.forgotPassword()" value="Submit"/>
+                        <input type="reset" class="btn btn-primary pull-left signin_cancel wd_forget1 marL10px" ng-click="SignInCtrl.closeForgotPasswordForm()" value="Close"/>
+                    </li>
+                    <div class="clearfix"></div>
+                    <div ng-model="SignInCtrl.ForgotMessage" class="msgRed" ng-show="SignInCtrl.ForgotMessage.length">Error please try again</div>
+                    <div class="clearfix"></div>
+                </ul>
+                <div class="clearfix"></div>
+            </form>
+        </div>
+    </div>
+
+    <div class="Popup_window form_style" id="ChangePassword_popup">
+        <div class="changePass_popUp Maping_popup">
+            <span class="closelink" ng-click="SignInCtrl.closeChangePasswordForm()">X</span>
+
+            <form name="ChangePasswordForm" novalidate>
+                <span style="margin-top:-2px;float:right; border:1px solid #000000;background:#FAA9A3;color:#000000;" >
+                    Mandatory
+                </span>
+
+                <h3><span class="changePass_mar">Change Password</span></h3>
+                <!--<form name="ChangePasswordForm" novalidate>-->
+                <div class="clearfix mobile_marT15px"></div>
+                <ul style="height:172px;" class="pad0px">
+                    <li class="dsp_block padT10px">
+                        <div class="pull-left wd48p">
+                            <input type="password" id="OldPassword" name="OldPassword" ng-class="ChangePasswordForm.OldPassword.$touched && !SignInCtrl.OldPassword.length ? 'mandatoryTextBox' : ''" class="form-control wd_oldPass changePass_inpMar emptyBox change_PadLeft" ng-model="SignInCtrl.OldPassword" placeholder="Old Password" required>
+                        </div>
+                        <div class="clearfix"></div>
+                        <div class="wd48p">
+                            <input type="password" id="NewPassword" name="NewPassword" ng-class="ChangePasswordForm.NewPassword.$touched && !SignInCtrl.NewPassword.length ? 'mandatoryTextBox' : ''" class="form-control wd_oldPass changePass_inpMar emptyBox change_PadLeft" ng-model="SignInCtrl.NewPassword" placeholder="New Password" required>
+                        </div>
+                        <div class="clearfix"></div>
+                        <div class="wd48p">
+                            <input type="password" id="ReEnterPassword" name="ReEnterPassword" ng-class="ChangePasswordForm.ReEnterPassword.$touched && !SignInCtrl.ReEnterPassword.length ? 'mandatoryTextBox' : ''" class="form-control wd_oldPass changePass_inpMar emptyBox change_PadLeft" ng-model="SignInCtrl.ReEnterPassword" placeholder="Reenter Password" required>
+                        </div>
+                    </li>
+                    <li>
+                        <input type="submit" ng-disabled="!SignInCtrl.OldPassword || !SignInCtrl.NewPassword || !SignInCtrl.ReEnterPassword || SignInCtrl.NewPassword != SignInCtrl.ReEnterPassword" ng-click="SignInCtrl.changePassword()" class="btn btn-primary pull-left mar_forget change_marTop" value="Change">
+                        <input type="reset" ng-click="SignInCtrl.closeChangePasswordForm()" class="btn btn-primary pull-left signin_cancel marL10px change_marTop" value="Close">
+
+                    </li>
+                </ul>
+                <br>
+                <h3><span class="changePass_mar1"></span></h3>
+                <div ng-model="SignInCtrl.ErrorMessageConfirm" class="msgRed" ng-show="SignInCtrl.NewPassword != SignInCtrl.ReEnterPassword && SignInCtrl.NewPassword.length > 0 && SignInCtrl.ReEnterPassword.length > 0 || SignInCtrl.ErrorMessage.length > 0">Password mismatch...</div>
+                <div class="clearfix"></div>
+            </form>
+        </div>
+        <div class="clearfix"></div>
+    </div>
+
+
+
+    <!-- New header menu goes here -->
+    <nav class="navbar navbar-inverse hpw no-radius m-bottom-0">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header p-top-7">
+                <a href="/">
+                    <div class="logo"></div>
+                </a>
+                <!-- For mobile view menu -->
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-2">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-2">
+                <form class="" role="form">
+                    <ul class="nav navbar-nav navbar-right">
+
+                        <!-- Signin Link -->
+                        <li ng-hide="$root._userInfo.IsAuthenticate">
+                            <a class="btn-link header-link" id="signin"><i class="fa fa-sign-in"></i> Sign In</a>
+                        </li>
+                        <!-- Signup link -->
+                        <li><a href="/signup" ng-hide="$root._userInfo.IsAuthenticate" class="btn-link header-link"><i class="fa fa-arrow-circle-up"></i> Sign Up</a></li>
+                        <!-- Img for image manager -->
+                        <!--<li>-->
+                            <!--<img ng-show="$root._userInfo.IsAuthenticate && $root._userInfo.Icon.length" class="user_icon" style="border-radius: 18px;margin-right:-46px;" ng-src="{{$root._userInfo.Icon}}" />-->
+                        <!--</li>-->
+                        <!-- User Menu dropdown  -->
+                        <li class="dropdown ">
+                            <a class="dropdown-toggle border-right-1 btn-link" data-toggle="dropdown" role="button" aria-expanded="false" ng-show="$root._userInfo.IsAuthenticate">
+                                <i class="fa fa-user"></i>
+                                <!-- User's name -->
+                                {{$root._userInfo.userName}}
+                                <!-- Dropdown Symbol -->
+                                <span class="caret"></span>
+                            </a>
+                            <!-- Dropdown content -->
+                            <ul class="dropdown-menu header-dropdown-style" role="menu">
+                                <!-- Profile Manager -->
+                                <li><a href="/profile-manager/user"><i class="fa fa-wrench"></i> Profile Manager</a></li>
+                                <!-- condition1: Business Manager -->
+                                <li ng-show="$root._userInfo.Type == 2 && $root._userInfo.Verified == 2">
+                                    <a href="/business-manager"><i class="fa fa-briefcase"></i> Business Manager</a>
+                                </li>
+                                <!-- condition2: Business Manager -->
+                                <li class="disabled" ng-show="$root._userInfo.Type == 2 && $root._userInfo.Verified !== 2" class="disabled">
+                                    <a ng-click="$event.preventDefault()"><i class="fa fa-briefcase"></i> Business Manager</a></li>
+                                <!-- Message -->
+                                <li><a href="/messages"><i class="fa fa-envelope"></i> Messages</a></li>
+                                <!-- Access History -->
+                                <li><a href="/acchist"><i class="fa fa-calendar"></i> Access History</a></li>
+                                <!-- Whitelist & Blacklist -->
+                                <li><a href="/blackwhitelist"><i class="fa fa-shield"></i> Whitelist & Blacklist</a></li>
+                                <!-- Bulk Mailer -->
+                                <li ng-show="$root._userInfo.Type == 2">
+                                    <a href="/bulksalesenquiry"><i class="fa fa-server"></i> Bulk Mailer</a>
+                                </li>
+                                <!-- Outbox -->
+                                <li>
+                                    <a href="/outbox"><i class="fa fa-check-square-o"></i> Your Transactions</a>
+                                </li>
+                                <!-- Change Password -->
+                                <li>
+                                    <a href="/profile-manager/password"><i class="fa fa-warning"></i> Change Password</a>
+                                </li>
+                            </ul>
+                        </li>
+                        <!-- Logout link -->
+                        <li><a type="submit" title="Log Out" ng-click="SignInCtrl.Logout()" ng-show="$root._userInfo.IsAuthenticate" class="btn-link"><i class="fa fa-power-off"></i> Sign Out</a></li>
+
+                    </ul>
+                </form>
+            </div><!-- /.navbar-collapse -->
+        </div><!-- /.container-fluid -->
+    </nav>
+
+</div>
+<!--- Header comment by sandeep--->

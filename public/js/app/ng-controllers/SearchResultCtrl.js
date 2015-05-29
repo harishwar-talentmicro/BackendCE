@@ -224,7 +224,7 @@ var res = angular.module('ezeidApp').
                     $scope.coordinatesArr = [];
                     /* count the result */
                     var count = 0;
-                    //console.log(data);
+                    ////console.log(data);
                     if(data != 'null'){
                         var link = '';
                         var searchType = $routeParams.searchType;
@@ -464,7 +464,7 @@ var res = angular.module('ezeidApp').
 
             /* Callback function for get current location functionality */
             $scope.findCurrentLocation = function(){
-                //console.log(googleMap);
+                ////console.log(googleMap);
                 googleMap.getCurrentLocation().then(function(){
                     googleMap.placeCurrentLocationMarker(null,null,false);
                 },function(){
