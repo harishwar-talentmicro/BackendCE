@@ -8744,7 +8744,7 @@ exports.FnCropImage = function(req,res){
 
     console.log(req.files.image.path);
     var deleteTempFile = function(){
-        fs.unlink('../bin/uploads/'+req.files.image.path);
+        fs.unlink('../bin/'+req.files.image.path);
     };
 
 
@@ -8889,7 +8889,8 @@ exports.FnCropImage = function(req,res){
                                             res.status(400).json(respMsg);
                                         }
                                     });
-
+                                console.log('FnCropImage:Picture cropped successfully...');
+                                deleteTempFile();
                             }
 
                             else if(scaleFlag && !cropFlag){
@@ -8899,6 +8900,8 @@ exports.FnCropImage = function(req,res){
                                             var cdataUrl = new Buffer(croppedBuff).toString('base64');
                                             var picUrl = 'data:image/'+outputType+';base64,'+cdataUrl;
                                             res.status(200).json({status : true, picture : picUrl, message : 'Picture cropped successfully'});
+                                            console.log('FnCropImage:Picture cropped successfully');
+                                            deleteTempFile();
                                         }
                                         else{
                                             res.status(400).json(respMsg);
