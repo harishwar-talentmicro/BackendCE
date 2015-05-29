@@ -118,7 +118,7 @@
              * @param index
              */
             $scope.toggleAllEditMode = function(index){
-                ////console.log(index);
+                //////console.log(index);
                 if(typeof(index) === "undefined")
                 {
                     index = -1;

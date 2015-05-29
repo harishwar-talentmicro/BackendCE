@@ -91,7 +91,7 @@ angular.module('ezeidApp').controller('salesenquiryController',[
     //To get Rule/folder info
     $http({ method: 'get', url: GURL + 'ewtGetFolderList?Token='+ $rootScope._userInfo.Token + '&MasterID='+ $rootScope._userInfo.MasterID +'&FunctionType=1'}).success(function (data) {
         if (data != 'null') {
-            // // ////console.log(data);
+            // // //////console.log(data);
             msglist.Rules = data;
            // msglist._info.StatusFilter = data[0].TID;
         }
@@ -239,7 +239,7 @@ angular.module('ezeidApp').controller('salesenquiryController',[
     //Below function is called when amount textbox is edited
    /* $scope.updateItemAmount = function(){
 
-         // // ////console.log(msglist._info.Amount);
+         // // //////console.log(msglist._info.Amount);
     };
 */
     //deacrease Top quantitiy
@@ -317,13 +317,13 @@ angular.module('ezeidApp').controller('salesenquiryController',[
         msglist._info.NextActionDateTime = today;
         msglist._info.FolderRuleID = 0;
 
-      //  // // ////console.log(msglist._info);
+      //  // // //////console.log(msglist._info);
 
-        /*  // // ////console.log(msglist._info);*/
+        /*  // // //////console.log(msglist._info);*/
        /* var elem = $(event.currentTarget);
-        // // ////console.log(elem.data('itemName'));
-        // // ////console.log(elem.data('itemQty'));
-        // // ////console.log(elem.data('itemRate'));*/
+        // // //////console.log(elem.data('itemName'));
+        // // //////console.log(elem.data('itemQty'));
+        // // //////console.log(elem.data('itemRate'));*/
 
         if ($rootScope._userInfo.IsAuthenticate == true) {
 
@@ -374,7 +374,7 @@ angular.module('ezeidApp').controller('salesenquiryController',[
     //Maps
     function initialize() {
 
-        // // ////console.log("SAi");
+        // // //////console.log("SAi");
         var initialLocation;
         var currentLoc = new google.maps.LatLng(12.295810, 76.639381);
 
@@ -487,7 +487,7 @@ angular.module('ezeidApp').controller('salesenquiryController',[
             if (mapResultValue.types[0] == 'country') {
                 msglist._info.Country = mapResultValue.long_name;
                 $scope.$apply();
-                // // ////console.log(msglist._info);
+                // // //////console.log(msglist._info);
             }
         });
     }

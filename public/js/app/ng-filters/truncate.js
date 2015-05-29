@@ -8,6 +8,9 @@
 angular.module('ezeidApp').
     filter('truncate', function () {
         return function (text, length, end) {
+            if(!text){
+                return '';
+            }
             if (isNaN(length))
             {
                 length = 10;

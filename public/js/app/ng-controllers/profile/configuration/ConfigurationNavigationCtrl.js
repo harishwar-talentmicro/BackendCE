@@ -8,16 +8,24 @@ angular.module('ezeidApp').controller('ConfigurationNavigationCtrl',[
     'Notification',
     'GURL',
     '$location',
+    'MsgDelay',
     function(
         $scope,
         $rootScope,
         $http,
         Notification,
         GURL,
-        $location
+        $location,
+        MsgDelay
         ){
 
-    /**
+
+        if($rootScope._userInfo.Verified !== 2){
+            $scope.$emit('$preLoaderStop');
+            Notification.error({ message : 'Please be verified by EZEID Area Partner before accessing this area', delay : MsgDelay});
+            $location.path('/profile-manager/user');
+        }
+        /**
      * Hiding progress loader when userDetails are loaded successfully
      */
     if(!$scope.userDetails){
@@ -38,9 +46,6 @@ angular.module('ezeidApp').controller('ConfigurationNavigationCtrl',[
         });
     };
 
-    /**
-     * @todo Create and add template for resource creation and mapping with reservation items
-     */
 
         $scope.pageSubuser = "html/profile/configuration/subviews/subusers.html";
         $scope.pageItemMaster = "html/profile/configuration/subviews/item-master.html";
@@ -57,6 +62,8 @@ angular.module('ezeidApp').controller('ConfigurationNavigationCtrl',[
         $scope.changeActive = function(active){
             $scope.activeSubTemplate = active;
         };
+
+        $scope.$emit('$preLoaderStart');
 
 
 

@@ -89,8 +89,8 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',['$scope',
             };
         }
 
-        console.log("SA122");
-        console.log(item);
+        //console.log("SA122");
+        //console.log(item);
 
         loadSubuserList();
 
@@ -161,7 +161,7 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',['$scope',
             }
         }).success(function(resp){
                 $scope.$emit('$preLoaderStop');
-                console.log(resp.data);
+                //console.log(resp.data);
                 if(resp.data.length>0){
                    $scope.AllResources = resp.data;
                 }
@@ -225,7 +225,7 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',['$scope',
             }).success(function(resp)
                 {
                     $scope.$emit('$preLoaderStop');
-                    console.log(resp);
+                    //console.log(resp);
 
                     if(resp.status){
 
@@ -285,7 +285,7 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',['$scope',
             }
         }).success(function(resp){
                 $scope.$emit('$preLoaderStop');
-                console.log(resp.data);
+                //console.log(resp.data);
                 if(resp){
                     $scope.AllServices = resp.data;
                 }
@@ -331,7 +331,7 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',['$scope',
                 {
                     $scope.$emit('$preLoaderStop');
                     $scope.showReservationServiceModal = false;
-                    console.log(resp);
+                    //console.log(resp);
 
                     if(resp.status){
 

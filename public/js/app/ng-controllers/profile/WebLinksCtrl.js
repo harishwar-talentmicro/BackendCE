@@ -33,10 +33,16 @@ angular.module('ezeidApp').controller('WebLinksCtrl',[
         $routeParams
         ) {
 
+        $scope.$emit('$preLoaderStart');
 
         var isUserDetailsLoaded = false;
         var isWebLinksLoaded = false;
 
+        if($rootScope._userInfo.Verified !== 2){
+            $scope.$emit('$preLoaderStop');
+            Notification.error({ message : 'Please be verified by EZEID Area Partner before accessing this area', delay : MsgDelay});
+            $location.path('/profile-manager/user');
+        }
         $scope.webLinks = [];
 
         $scope.webLinkAddMode = false;
@@ -79,6 +85,7 @@ angular.module('ezeidApp').controller('WebLinksCtrl',[
                         $scope.dataProgressLoader.dataLoadInProgress = false;
                         $scope.dataProgressLoader.dataLoadError = false;
                         $scope.dataProgressLoader.dataLoadComplete = true;
+                        $scope.$emit('$preLoaderStop');
                     }
                 }
 
@@ -134,6 +141,7 @@ angular.module('ezeidApp').controller('WebLinksCtrl',[
                 $scope.dataProgressLoader.dataLoadInProgress = false;
                 $scope.dataProgressLoader.dataLoadError = false;
                 $scope.dataProgressLoader.dataLoadComplete = true;
+                $scope.$emit('$preLoaderStop');
             }
         });
 

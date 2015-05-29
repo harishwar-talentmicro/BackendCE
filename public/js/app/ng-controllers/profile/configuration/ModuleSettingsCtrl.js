@@ -31,6 +31,15 @@ angular.module('ezeidApp').controller('ModuleSettingsCtrl',[
         $scope.refreshIntervalList.push(i);
     }
 
+        /**
+         * HTTP requests load status
+         * @type {{categories: boolean, settings: boolean}}
+         */
+        var loadStatus = {
+            categories : false,
+            settings : true
+        }
+
 
     /**
      * Access Rights mapping
@@ -77,7 +86,7 @@ angular.module('ezeidApp').controller('ModuleSettingsCtrl',[
         sales : {
             title : '',
             defaultFormMsg : '',
-            visibility : 0,
+            visibility : 2,
             itemListType : 0 ,      // 0: Message, 1: Item, 2: Item+picture, 3: Item+picture+quantity, 4: Item + picture + quantity + rate,
             url : ''
 
@@ -85,14 +94,14 @@ angular.module('ezeidApp').controller('ModuleSettingsCtrl',[
         reservation : {
             title : '',
             defaultFormMsg : '',
-            visibility : 0,
+            visibility : 2,
             displayFormat : 0, // 0 : Hours (30 min slot), 1 : Days, 2 : Months
             url : ''
         },
         homeDelivery : {
             title : '',
             defaultFormMsg : '',
-            visibility : 0,
+            visibility : 2,
             itemListType : 1,
             url : ''
 
@@ -100,7 +109,7 @@ angular.module('ezeidApp').controller('ModuleSettingsCtrl',[
         service : {
             title : '',
             defaultFormMsg : '',
-            visibility : 0,
+            visibility : 2,
             itemListType : 1,
             url : ''
 
@@ -108,7 +117,7 @@ angular.module('ezeidApp').controller('ModuleSettingsCtrl',[
         resume : {
             title : '',
             defaultFormMsg : '',
-            visibility : 0,
+            visibility : 2,
             itemListType : 1,    //Hardcoded, will always be an item only
             keywords : "",
             url : ''
@@ -133,8 +142,34 @@ angular.module('ezeidApp').controller('ModuleSettingsCtrl',[
                 Token : $rootScope._userInfo.Token
             }
         }).success(function(resp){
-                if(resp && resp.length > 0){
-                        $scope.settings.sales.title = (resp[0].SalesTitle) ? resp[0].SalesTitle : '';
+                if(resp && resp.length > 0 && resp !== 'null'){
+                    loadStatus.settings = true;
+                    if(loadStatus.settings && loadStatus.categories){
+                        $scope.$emit('$preLoaderStop');
+                    }
+
+                    var _moduleVisible = "22222";
+
+                    if(resp[0].VisibleModules){
+                        var str = resp[0].VisibleModules.toString();
+                        if(str.length === 5){
+                            var _arr = str.split('');
+                            for(var _c = 0; _c < _arr.length; _c++){
+                                if(parseInt(_arr[_c]) === 0){
+                                    _arr[_c] = 2;
+                                }
+                            }
+                            resp[0].VisibleModules = _arr.join('');
+                        }
+                        else{
+                            resp[0].VisibleModules = _moduleVisible;
+                        }
+                    }
+                    else{
+                        resp[0].VisibleModules = _moduleVisible;
+                    }
+
+                    $scope.settings.sales.title = (resp[0].SalesTitle) ? resp[0].SalesTitle : '';
                         $scope.settings.sales.defaultFormMsg = (resp[0].SalesFormMsg) ?  resp[0].SalesFormMsg :'';
                         $scope.settings.sales.visibility = (resp[0].VisibleModules) ? resp[0].VisibleModules.split("")[0] : 1;
                         $scope.settings.sales.itemListType = (resp[0].SalesItemListType) ? resp[0].SalesItemListType : 0;
@@ -176,16 +211,61 @@ angular.module('ezeidApp').controller('ModuleSettingsCtrl',[
                         $scope.settings.resume.freshersAccepted = (resp[0].FreshersAccepted === 1) ? true : false;
 
                 }
+                else{
+                    $scope.$emit('$preLoaderStop');
+                }
             }).error(function(err){
-                // ////console.log(err);
+                // //////console.log(err);
+                $scope.$emit('$preLoaderStop');
             });
     };
 
-    $scope.validateSettings = function(){
-        /**
-         * @todo Validate Settings before saving
-          */
-        return true;
+    $scope.validateSettings = function(data){
+
+        var isValidUrl = function(url){
+            var urlPattern = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/;
+            var urlRegex = new RegExp(urlPattern);
+            return (urlRegex.test(url));
+        };
+        var error = [];
+
+        if(data.SalesURL){
+            if(!isValidUrl(data.SalesURL)){
+                error.push('sales url');
+            }
+        }
+
+        if(data.ReservationURL){
+            if(!isValidUrl(data.ReservationURL)){
+                error.push('reservation url');
+            }
+        }
+
+        if(data.HomeDeliveryURL){
+            if(!isValidUrl(data.HomeDeliveryURL)){
+                error.push('home delivery url');
+            }
+        }
+
+        if(data.ServiceURL){
+            if(!isValidUrl(data.ServiceURL)){
+                error.push('service url');
+            }
+        }
+
+        if(data.ResumeURL){
+            if(!isValidUrl(data.ResumeURL)){
+                error.push('resume url');
+            }
+        }
+        if(error.length > 0){
+            var msg = 'Please check '+ error.join(',');
+            Notification.error({ message : msg, delay : MsgDelay});
+            return false;
+        }
+        else{
+            return true;
+        }
     };
 
     $scope.saveSettings = function(){
@@ -257,8 +337,8 @@ angular.module('ezeidApp').controller('ModuleSettingsCtrl',[
             }
         };
 
-        if($scope.validateSettings()){
-            // ////console.log(data);
+        if($scope.validateSettings(data)){
+            // //////console.log(data);
             $http({
                 url : GURL + "ewtConfig",
                 method : "POST",
@@ -267,7 +347,7 @@ angular.module('ezeidApp').controller('ModuleSettingsCtrl',[
                 updateRootUserInfo();
                 Notification.success({message : 'Configuration Saved Successfully', delay : MsgDelay});
             }).error(function(err){
-                // ////console.log(err);
+                // //////console.log(err);
                 Notification.success({message : 'Error while saving configuration! Please try again', delay : MsgDelay});
             });
         }
@@ -279,9 +359,9 @@ angular.module('ezeidApp').controller('ModuleSettingsCtrl',[
          * @type {files|*|files|FileList|files}
          */
        var file =  $("#brochure-file-upload")[0].files;
-       // ////console.log('I am executing');
-        // ////console.log(file);
-            // ////console.log('Then executing');
+       // //////console.log('I am executing');
+        // //////console.log(file);
+            // //////console.log('Then executing');
             var formData = new FormData();
             formData.append('file', file);
             formData.append('Token',$rootScope._userInfo.Token);
@@ -292,7 +372,7 @@ angular.module('ezeidApp').controller('ModuleSettingsCtrl',[
                method : "POST",
                data : formData
            }).success(function(resp){
-                // ////console.log(resp);
+                // //////console.log(resp);
            }).error(function(err){
 
            });
@@ -312,11 +392,17 @@ angular.module('ezeidApp').controller('ModuleSettingsCtrl',[
                 LangID : 1
             }
         }).success(function(resp){
-                if(resp && resp.length>0){
+            loadStatus.categories = true;
+            if(loadStatus.settings && loadStatus.categories){
+                $scope.$emit('$preLoaderStop');
+            }
+
+            if(resp && resp.length>0){
                     $scope.business.categories = resp;
                 }
             }).error(function(err){
-
+                $scope.$emit('$preLoaderStop');
+                Notification.error({ message : 'Unable to load categories', delay : MsgDelay});
             });
     };
 
@@ -341,8 +427,12 @@ angular.module('ezeidApp').controller('ModuleSettingsCtrl',[
     };
 
 
+
+
     $scope.loadCategories();
     $scope.loadSettings();
+
+
 
     /**
      * @todo write method for brochure base64 conversion and upload option( in HTML view also)
