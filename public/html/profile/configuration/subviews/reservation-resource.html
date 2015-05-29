@@ -6,8 +6,7 @@
     <!------------Resource Modal Box starts here -------------------------->
     <modal mtitle="modalBox.title" visible="showModal">
         <div class="container-fluid">
-
-            <form role="form">
+            <form role="form" novalidate="novalidate">
                 <div class="row">
                     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
                         <h5>Add Resource</h5>
@@ -31,11 +30,16 @@
 
                     <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
                         <div class="form-group">
-                            {{modalBox.item.operatorid}}
-                            <select class="form-control emptyBox" ng-model="modalBox.item.operatorid">
+                            <!--<select class="form-control emptyBox" ng-model="modalBox.item.operatorid">
                                 <option value="0"> -- Select Operator -- </option>
-                                <option ng-repeat="i in subusers" value="{{i.TID}}">{{i.EZEID}}</option>
+                                <option ng-repeat="i in subusers" value="{{i.TID}}">{{i.EZEID}} (Select as operator)</option>
+                            </select>-->
+
+                            <select class="form-control" name="TitleSelect" ng-model="modalBox.item.operatorid"
+                                    ng-options="template.TID as template.EZEID for template in subusers" required>
+                                <option value = ""> -- Select Operator -- </option>
                             </select>
+
                         </div>
                     </div>
                 </div>
@@ -135,11 +139,21 @@
                     </div>
                     <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 bottom-clearfix" >
 
-                        <div style="border: 1px solid #808080;">
+                        <div class="setBorderColor allServicesBox" ng-show="modalBox.servicesItem.serviceType == 2">
                             <div ng-repeat="_item in AllServices">
-                                <div class="">
-                                    <h4 class="text-primary">{{_item.title}}</h4>
-                                </div><br/>
+
+                                <div class="row setRowLeftRightMarginZero" ng-show="_item.serviceids == 0">
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix setLeftRightPaddingZero SearchMarginLeft">
+                                        {{_item.tid}}
+                                        <input type="checkbox"
+                                               name="service"
+                                               data-tid="{{_item.tid}}"
+                                               ng-click="toggleCheckbox($event)"
+                                               ng-checked="selectedTID.indexOf(_item.tid)!=-1"/>
+                                                {{_item.title | textLength:25}}
+                                    </div>
+                                </div>
+
                             </div>
                         </div>
 
@@ -148,6 +162,62 @@
             </form>
         </div>
 
+    </modal>
+
+    <!------------Mapping Modal Box starts here -------------------------->
+    <modal mtitle="modalBox.title" visible="showReservationServiceMapModal">
+        <div class="container-fluid">
+               <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
+                        <h5>Map Resources With Services</h5>
+                    </div>
+                </div>
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix setPaddingLeftRight0 setLeftRightPaddingZero">
+                    <div class="row setRowLeftRightMarginZero">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 bottom-clearfix setPaddingLeftRight0">
+                            <div class="row">
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
+                                    <div class="form-group">
+                                        <select class="form-control" name="ResourceSelect" ng-model="modalBox.itemMap.resourceid"
+                                                ng-options="resources.tid as resources.title for resources in AllResources" required>
+                                            <option value = ""> -- Select resource -- </option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 bottom-clearfix parkingText" >
+
+                            <div class="setBorderColor allServicesBox" >
+                                <div ng-repeat="_item in AllServices">
+
+                                    <div class="row setRowLeftRightMarginZero" ng-show="_item.serviceids == 0">
+                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix setLeftRightPaddingZero SearchMarginLeft">
+                                            {{_item.tid}}
+                                            <input type="checkbox"
+                                                   name="service"
+                                                   data-tid="{{_item.tid}}"
+                                                   ng-click="toggleCheckbox($event)"
+                                                   ng-checked="selectedTID.indexOf(_item.tid)!=-1"/>
+                                            {{_item.title | textLength:25}}
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="row setRowLeftRightMarginZero">
+                       <div class="col-lg-2 col-md-2 col-sm-4 col-xs-6 bottom-clearfix">
+                            <button class="btn btn-primary btn-block" ng-click="saveServices()">Save</button>
+                        </div>
+                        <div class="col-lg-2 col-md-2 col-sm-4 col-xs-6 bottom-clearfix">
+                            <button class="btn btn-primary btn-block" ng-click="closeReservationServiceMapModalBox()">Close</button>
+                        </div>
+                    </div>
+                </div>
+        </div>
     </modal>
 
 
@@ -172,7 +242,7 @@
                     <a class="btn-link" ng-class="{'tab-active': selectedTab == 2}" ng-click="selectedTab = 2; reservationServiceTabSelected()">Reservation Service</a>
                 </li>
                 <li class="setWidthThird" role="presentation" ng-class="{active: selectedTab == 3}">
-                    <a class="btn-link" ng-class="{'tab-active': selectedTab == 3}" ng-click="selectedTab = 3">Resource <span class="glyphicon glyphicon-transfer setLeftRightMarginFivePX"></span> Service</a>
+                    <a class="btn-link" ng-class="{'tab-active': selectedTab == 3}" ng-click="selectedTab = 3;  reservationServiceMapTabSelected()">Resource <span class="glyphicon glyphicon-transfer setLeftRightMarginFivePX"></span> Service</a>
                 </li>
             </ul>
 
@@ -214,7 +284,7 @@
                 <!------- Reservation Resource Tab ends ---------------------->
             </div>
 
-            <div class="tab-content">
+           <div class="tab-content">
                 <!------- Reservation Service Tab ---------------------->
                 <div role="tabpanel" class="tab-pane" id="reservation-tb" ng-show="selectedTab === 2" ng-class="{'active':selectedTab ===2}">
                     <div class="container-fluid">
@@ -248,6 +318,42 @@
                 </div>
                 <!------- Reservation Service Tab ends ---------------------->
             </div>
+
+            <div class="tab-content">
+                <!------- Reservation Service Map Tab ---------------------->
+                <div role="tabpanel" class="tab-pane" id="reservationMap-tb" ng-show="selectedTab === 3" ng-class="{'active':selectedTab ===3}">
+                    <div class="container-fluid">
+                        <div class="row bottom-clearfix"></div>
+                        <div class="row bottom-clearfix">
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                <button class="btn btn-sm btn-primary" ng-click="openReservationServiceMapModalBox(0)"><span class="glyphicon glyphicon-plus"></span> Map Resource With Service</button>
+                            </div>
+                        </div>
+
+                        <div ng-repeat="_item in AllServices">
+                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 bottom-clearfix serviceList">
+                                <div class="business-item">
+                                    <div class="thumbnail">
+                                        <span class="glyphicon glyphicon-edit" data-toggle="tooltip" title="" data-placement="right" data-original-title="Edit Service" ng-click="openReservationServiceModalBox(_item)"></span>
+                                        <div class="caption">
+                                            <h4 class="text-primary" data-toggle="tooltip" title="" data-placement="right" data-original-title="{{_item.title}}">{{_item.title | textLength:15}}
+                                                <span ng-show="_item.status == 1" class="glyphicon glyphicon-ok-circle text-success"></span>
+                                                <span ng-show="_item.status == 2" class="glyphicon glyphicon-remove-circle text-danger"></span>
+                                            </h4>
+                                            <p class="item-description">{{_item.rate}}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+                    </div>
+                </div>
+                <!------- Reservation Service Map Tab ends ---------------------->
+            </div>
+
         </div>
     </div>
 </div>
