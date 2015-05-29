@@ -1585,7 +1585,7 @@ table.rwd-table > tbody > tr > td.serachResultSelectAll
 .serviceList > .business-item
 {
     text-align: center;
-    min-height: 70px;
-    max-height: 70px;
+    min-height: 105px;
+    max-height: 105px;
     font-size: 12px;
 }

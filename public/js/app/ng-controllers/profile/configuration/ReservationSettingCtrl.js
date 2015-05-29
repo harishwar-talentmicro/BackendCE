@@ -73,6 +73,7 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',['$scope',
      */
     $scope.showModal = false;
     $scope.openResourceModalBox = function(item){
+        console.log(item);
         $scope.showModal = true;
         resetResourceValue();
         if(item != 0)
@@ -89,8 +90,8 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',['$scope',
             };
         }
 
-        //console.log("SA122");
-        //console.log(item);
+        console.log("SA122");
+        console.log($scope.modalBox.item);
 
         loadSubuserList();
 
@@ -230,7 +231,7 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',['$scope',
                     if(resp.status){
 
                         Notification.success({ message : 'Resource added successfully', delay : 2000 });
-
+                        getAllResources();
                     }
                     else{
                         Notification.error({ message : 'An error occurred while saving resource! Please try again', delay : 2000});
