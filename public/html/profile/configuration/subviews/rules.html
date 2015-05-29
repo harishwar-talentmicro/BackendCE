@@ -32,7 +32,35 @@
                         <div class="row bottom-clearfix"></div>
                         <div class="row bottom-clearfix">
                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                <button class="btn btn-sm btn-primary" disabled ng-click="openModalBox()"><span class="glyphicon glyphicon-plus"></span> Add</button><h3>In Progress ! Will be available very soon</h3>
+                                <button class="btn btn-sm btn-primary"  ng-click="toggleModalBox()"><span class="glyphicon glyphicon-plus"></span> Add</button>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                <table class="table table-striped ezeid-table">
+                                    <thead>
+                                        <tr>
+                                            <th>S.No.</th>
+                                            <th>Rule Title</th>
+                                            <th>Type</th>
+                                            <th>Prefix</th>
+                                            <th>Mapped Names</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="rule in rules track by $index">
+                                            <td>{{$index+1}}.</td>
+                                            <td>{{rule.FolderTitle}}</td>
+                                            <td>{{ruleTypes[rule.RuleType]}}</td>
+                                            <td>{{rule.SeqNoFrefix}}</td>
+                                            <td ng-class="{'hidden': (rule.RuleType == 1) }" title="{{rule.MappedNames}}">{{(rule.MappedNames !== 'null') ? (rule.MappedNames | truncate:30) : '-' }}</td>
+                                            <td ng-class="{'hidden': (rule.RuleType !== 1) }">{{ rule.Proximity + ' km' }}</td>
+                                            <td><button class="btn btn-sm {{(rule.FolderStatus == 1) ? 'btn-success' : 'btn-danger'}}">{{(rule.FolderStatus == 1) ? 'Active' : 'Inactive'}}</button></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
                             </div>
                         </div>
                         <!------- Sales Rules goes here --------------->
@@ -43,7 +71,9 @@
                         <div class="row bottom-clearfix"></div>
                         <div class="row bottom-clearfix">
                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                <button class="btn btn-sm btn-primary" disabled ng-click="openModalBox()"><span class="glyphicon glyphicon-plus"></span> Add</button><h3>In Progress ! Will be available very soon</h3>
+                                <!--<button class="btn btn-sm btn-primary"  ng-click="toggleModalBox()"><span class="glyphicon glyphicon-plus"></span> Add</button>-->
+                                <!-- -->
+                                <h2 class="text-center font-open-sans-light"><i class="fa fa-clock-o"></i> Coming Soon ! </h2>
                             </div>
                         </div>
                         <!--------- Reservation rules goes here------------------>
@@ -54,7 +84,9 @@
                         <div class="row bottom-clearfix"></div>
                         <div class="row bottom-clearfix">
                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                <button class="btn btn-sm btn-primary" disabled ng-click="openModalBox()"><span class="glyphicon glyphicon-plus"></span> Add</button><h3>In Progress ! Will be available very soon</h3>
+                                <!--<button class="btn btn-sm btn-primary"  ng-click="toggleModalBox()"><span class="glyphicon glyphicon-plus"></span> Add</button>
+                                -->
+                                <h2 class="text-center font-open-sans-light"><i class="fa fa-clock-o"></i> Coming Soon ! </h2>
                             </div>
                         </div>
                         <!--------- Home Delivery rules goes here------------------>
@@ -65,7 +97,8 @@
                         <div class="row bottom-clearfix"></div>
                         <div class="row bottom-clearfix">
                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                <button class="btn btn-sm btn-primary" disabled ng-click="openModalBox()"><span class="glyphicon glyphicon-plus"></span> Add</button><h3>In Progress ! Will be available very soon</h3>
+                                <!--<button class="btn btn-sm btn-primary"  ng-click="toggleModalBox()"><span class="glyphicon glyphicon-plus"></span> Add</button>-->
+                                <h2 class="text-center font-open-sans-light"><i class="fa fa-clock-o"></i> Coming Soon ! </h2>
                             </div>
                         </div>
                         <!--------- Service rules goes here------------------>
@@ -76,7 +109,8 @@
                         <div class="row bottom-clearfix"></div>
                         <div class="row bottom-clearfix">
                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                <button class="btn btn-sm btn-primary" disabled ng-click="openModalBox()"><span class="glyphicon glyphicon-plus"></span> Add</button><h3>In Progress ! Will be available very soon</h3>
+                                <!--<button class="btn btn-sm btn-primary" ng-click="toggleModalBox()"><span class="glyphicon glyphicon-plus"></span> Add</button>-->
+                                <h2 class="text-center font-open-sans-light"><i class="fa fa-clock-o"></i> Coming Soon ! </h2>
                             </div>
                         </div>
                         <!--------- Resume rules goes here------------------>
@@ -87,45 +121,70 @@
         </div>
 
         <!------------ Modal Box starts here -------------------------->
-        <modal mtitle="modalBox.title" visible="showModal">
+        <modal mtitle="modalBox.title" showheader="'true'" visible="showModal">
             <div class="container-fluid">
                 <form role="form">
 
                     <div class="row">
                         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
-                            <h5>{{ruleFunctionTypes[modalBox.rule.ruleFunction]}}</h5>
+                            <h5 class="text-center">{{ruleFunctionTypes[modalBox.rule.RuleFunction]}}</h5>
                         </div>
                     </div>
 
                     <div class="row">
-                        <div class="col-lg-4 col-sm-4 col-sm-4 col-xs-12 bottom-clearfix">
+                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
                             <div class="form-group" data-toggle="tooltip" data-original-title="Rule Title" data-title="" data-placement="right">
-                                <input class="form-control" maxlength="15" ng-model="modalBox.rule.folderTitle" placeholder="Rule Title" />
+                                <input class="form-control" maxlength="15" ng-model="modalBox.rule.FolderTitle"
+                                       placeholder="Rule Title" />
                             </div>
                         </div>
-                        <div class="col-lg-4 col-sm-4 col-sm-4 col-xs-12 bottom-clearfix">
+                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
                             <div class="form-group" data-toggle="tooltip" data-original-title="Rule Type" data-title="" data-placement="right">
-                                <select class="form-control" ng-model="modalBox.rule.ruleType">
-                                    <option ng-repeat="ruleType in ruleTypes" value="{{$index}}">{{ruleType}}</option>
+                                <select class="form-control" ng-model="modalBox.rule.RuleType">
+                                    <option value="">--Select Rule type--</option>
+                                    <option value="0">Area name based match</option>
+                                    <option value="1">Proximity based match</option>
+                                    <option value="2">EZEID's linked</option>
                                 </select>
                             </div>
                         </div>
-                        <div class="col-lg-4 col-sm-4 col-sm-4 col-xs-12 bottom-clearfix">
+                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
                             <div class="form-group" data-toggle="tooltip" data-original-title="Rule Status" data-title="" data-placement="right">
-                                <select class="form-control" ng-model="modalBox.rule.status">
-                                    <option value="1">Inactive</option>
-                                    <option value="2">Active</option>
+                                <select class="form-control" ng-model="modalBox.rule.CountryID">
+                                    <option value="">--Select Country--</option>
+                                    <option ng-repeat="country in countryList track by country.CountryID" value="{{country.CountryTitle}}">{{country.CountryID}}</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+                            <small class="text-primary">Rule Transaction Prefix (Unique rule identifier id for transactions)</small>
+                        </div>
+                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+
+                            <div class="form-group">
+                                <input type="text" maxlength="5" class="form-control" placeholder="Rule Prefix" ng-model="modalBox.rule.SeqNoFrefix"/>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+                            <div class="form-group" data-toggle="tooltip" data-original-title="Rule Status" data-title="" data-placement="right">
+                                <select class="form-control" ng-model="modalBox.rule.FolderStatus">
+                                    <option value="">--Select Rule Status--</option>
+                                    <option value="2">Inactive</option>
+                                    <option value="1">Active</option>
                                 </select>
                             </div>
                         </div>
                     </div>
 
-                    <div class="row" data-toggle="tooltip" data-original-title="Admin Level Match" data-title="" data-placement="right">
+                    <div class="row" ng-show="modalBox.rule.RuleType == 0" data-toggle="tooltip" data-original-title="Admin Level Match" data-title="" data-placement="right">
                         <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12 bottom-clearfix" ng-repeat="matchAdminLevel in matchAdminLevels">
                             <div class="form-group">
                                 <div class="radio">
                                     <label>
-                                        <input type="radio" name="matchAdminLevel" id="match-admin-level-0" ng-model="modalBox.rule.matchAdminLevel" value="{{$index}}">
+                                        <input type="radio" name="matchAdminLevel" id="match-admin-level-0"
+                                               ng-model="modalBox.rule.MatchAdminLevel" value="{{$index}}">
                                         {{matchAdminLevels[$index]}}
                                     </label>
                                 </div>
@@ -135,31 +194,76 @@
 
 
                     <div class="row">
-                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 bottom-clearfix">
+                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix" ng-show="modalBox.rule.RuleType == 0">
+                            <!--<div class="form-group">-->
+                                <!--<label>Latitude : {{modalBox.rule.Latitude}}</label>-->
+                            <!--</div>-->
+                            <!--<div class="form-group">-->
+                                <!--<label>Longitude : {{modalBox.rule.Longitude}}</label>-->
+                            <!--</div>-->
                             <div class="form-group">
-                                <label>Latitude : {{modalBox.rule.coordinates.latitude}}</label>
+                                <label>Admin Area : </label> {{modalBox.tempMappedName}}
+                                <br/>
+                                <small class="text-bolder text-danger tiny">* Add Admin area as Mapped Name</small>
+                                <br/>
+                                <button class="btn btn-sm btn-success no-radius" ng-click="addMappedName()"> Add Current admin area</button>
                             </div>
+
                             <div class="form-group">
-                                <label>Longitude : {{modalBox.rule.coordinates.longitude}}</label>
-                            </div>
-                            <div class="form-group">
-                                <label>Admin Area : </label>
-                            </div>
-                        </div>
-                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 bottom-clearfix">
-                            <!-------------------------Map Row ------------------------------>
-                            <div class="row map-container bottom-clearfix">
-                                <div>
-                                    <img id="pac-loc" class="link-btn" ng-click="findCurrentLocation()" src="images/myloc.png" data-toggle="tooltip" data-placement="bottom" title="Current Location" />
-                                    <input id="pac-input" class="form-control pull-left" type="text" placeholder="Search Location" autocomplete="on">
-                                    <!--<button class="btn btn-primary pull-left marL10px marT10px" ng-click="search.SearchOnMap(search.MSerText)" ng-disabled="search.MSerText==undefined" type="button">Find</button>-->
-                                </div>
-                                <div id="map-canvas" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
-                                </div>
+                                <label>Mapped Names</label>
+
+                                <button ng-repeat="mapName in modalBox.rule.MappedNames track by $index" class="btn btn-info btn-block btn-sm">{{mapName}}
+                                    <i class="pull-right fa fa-remove" ng-click="removeMappedName($index)"></i>
+                                </button>
+
+                                <br/>
+                                <small class="text-warning tiny" ng-show="modalBox.rule.MappedNames.length < 1">No mapped names added</small>
 
                             </div>
+                        </div>
+
+                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix" ng-show="modalBox.rule.RuleType == 1">
+                            <div class="form-group">
+                                <small>Proximity from current marker position</small>
+                                <input type="text" numbers-only class="form-control"
+                                       name="proximity"
+                                       ng-model="modalBox.rule.Proximity"
+                                       placeholder="Proximity (in Kms)" />
+                            </div>
+                        </div>
+
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix" ng-show="modalBox.rule.RuleType == 2">
+
+                            <div class="form-group">
+                                <label>Enter EZEID(s) : </label>
+                                <small class="text-info tiny">You can also put comma separated multiple EZEIDs at once</small>
+                                <br/>
+                                <input type="text" class="form-control" ng-model="modalBox.tempMappedName"/>
+                                <br/>
+                                <button class="btn btn-sm btn-success no-radius" ng-click="addMappedEzeid()"> Add Current EZEID</button>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Mapped EZEIDs</label>
+
+                                <button ng-repeat="mapName in modalBox.rule.MappedNames track by $index" class="btn btn-info btn-block btn-sm">{{mapName}}
+                                    <i class="pull-right fa fa-remove" ng-click="removeMappedName($index)"></i>
+                                </button>
+
+                                <br/>
+                                <small class="text-warning tiny" ng-show="modalBox.rule.MappedNames.length < 1">No mapped ezeids added</small>
+
+                            </div>
+                        </div>
+
+                        <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix" ng-hide="modalBox.rule.RuleType == 2">
+                            <!-------------------------Map Row ------------------------------>
+                            <div id="conf-rules-map-container" class="row locations-map-container bottom-clearfix"></div>
                             <!-------------------------Map Row ends ------------------------------>
                         </div>
+
+
+
                     </div>
 
                     <div class="row">
@@ -167,7 +271,7 @@
                             <button class="btn btn-primary btn-block" ng-click="saveRule()">Save</button>
                         </div>
                         <div class="col-lg-2 col-md-2 col-sm-4 col-xs-12 bottom-clearfix">
-                            <button class="btn btn-primary btn-block" ng-click="closeModal()">Close</button>
+                            <button class="btn btn-primary btn-block" ng-click="toggleModalBox()">Close</button>
                         </div>
                     </div>
 

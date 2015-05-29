@@ -37,12 +37,12 @@ angular.module('ezeidApp').directive('modal', function () {
 //            }
             scope.$watch('visible', function(value){
                 if(value == true){
-                    console.log('true opened : '+value);
+                    //console.log('true opened : '+value);
                     $(element).modal('show');
                 }
 
                 else{
-                    console.log('false close : '+value);
+                    //console.log('false close : '+value);
                     $(element).modal('hide');
                 }
             });

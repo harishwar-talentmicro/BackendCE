@@ -2108,6 +2108,11 @@ form .row-error{
     padding: 5px;
 }
 
+#conf-rules-map-container{
+    height : 300px;
+    width: 100%;
+}
+
 .form-weblink > .row{
     margin-left: 0px;
     margin-right: 0px;

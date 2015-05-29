@@ -37,7 +37,12 @@ angular.module('ezeidApp').controller('PasswordCtrl',[
          * Hiding progress loader when userDetails are loaded successfully
          */
         if(!$scope.userDetails){
-            $scope.loadUserDetails();
+            $scope.$emit('$preLoaderStart');
+            $scope.loadUserDetails().then(function(){
+                $scope.$emit('$preLoaderStop');
+            },function(){
+                $scope.$emit('$preLoaderStop');
+            });
             $scope.$watch('userDetails',function(newVal,oldVal){
                 if(newVal){
                     if(newVal.MasterID){
@@ -91,7 +96,7 @@ angular.module('ezeidApp').controller('PasswordCtrl',[
                             delay : MsgDelay
                         });
                     }
-                // ////console.log(resp);
+                // //////console.log(resp);
             }).error(function(err){
                 Notification.error({
                     message : 'An error occured ! Please try again',

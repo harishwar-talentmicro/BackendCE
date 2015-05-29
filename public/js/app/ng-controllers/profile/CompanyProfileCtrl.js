@@ -31,6 +31,13 @@
             $route) {
 
 
+            if($rootScope._userInfo.Verified !== 2){
+                $scope.$emit('$preLoaderStop');
+                Notification.error({ message : 'Please be verified by EZEID Area Partner before accessing this area', delay : MsgDelay});
+                $location.path('/profile-manager/user');
+            }
+
+
             /**
              * Company Profile Loaded from service
              * @type {string}
@@ -119,7 +126,7 @@
                         Token : $rootScope._userInfo.Token
                     }
                 }).success(function(resp){
-                    ////console.log(resp);
+                    //////console.log(resp);
                     if(resp && resp !== 'null' && resp.hasOwnProperty('Result')){
                         if(resp.Result.length > 0){
                             if(resp.Result[0].TagLine){

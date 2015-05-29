@@ -63,7 +63,7 @@ angular.module('ezeidApp').controller('ActionTypesCtrl',['$scope','$rootScope','
     $scope.toggleModalBox = function(type,index){
 
         if(typeof(index) !== "undefined" && typeof(type) !== "undefined"){
-            // ////console.log(index+'   '+type);
+            // //////console.log(index+'   '+type);
             $scope.modalBox.txActionType = angular.copy($scope.txActionTypes[functionTypes[type]][index]);
             $scope.modalBox.title = "Update Action Type";
         }
@@ -154,7 +154,7 @@ angular.module('ezeidApp').controller('ActionTypesCtrl',['$scope','$rootScope','
                             var index  = salesArr.indexOfWhere('TID',$scope.modalBox.txActionType.TID);
                             for(var prop in salesArr[index]){
                                 if(salesArr[index].hasOwnProperty(prop)){
-                                    // ////console.log(prop);
+                                    // //////console.log(prop);
                                     $scope.txActionTypes[functionTypes[$scope.modalBox.txActionType.type]][index][prop] = $scope.modalBox.txActionType[prop];
                                 }
                             }
@@ -233,7 +233,7 @@ angular.module('ezeidApp').controller('ActionTypesCtrl',['$scope','$rootScope','
                             }
                             $scope.txActionTypes[functionTypes[fType]].push(txActionType);
                         }
-                        // ////console.log($scope.txActionTypes);
+                        // //////console.log($scope.txActionTypes);
                     }
 
                     $scope.count += 1;
@@ -242,7 +242,7 @@ angular.module('ezeidApp').controller('ActionTypesCtrl',['$scope','$rootScope','
                     }
                 }
             }).error(function(err){
-                // ////console.log(err);
+                // //////console.log(err);
             });
     };
 

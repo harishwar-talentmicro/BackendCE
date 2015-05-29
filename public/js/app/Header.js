@@ -79,12 +79,16 @@ HeaderApp.directive('headerSection',['Notification','$window' ,function (Notific
                     form.$setUntouched();
                 }
                 this.LInfo = {};
+                SignCtrl.FMessage = '';
                 $('#SignIn_popup').slideUp();
             };
 
             //forgot password
             this.openForgotPasswordForm=function(){
                 SignCtrl.EzeId="";
+                $("#SignIn_popup").slideUp();
+                $('#forgot-password').css({'position':'fixed'});
+                $('#forgot-password > div').css({'position':'relative'});
                 $('#forgot-password').slideDown();
                 $(".wd_forgot").focus();
             };
@@ -245,7 +249,12 @@ HeaderApp.directive('headerSection',['Notification','$window' ,function (Notific
             });
 
             $("body").on('click','#signin',function(e){
+
+                $('#SignIn_popup').css({'position':'fixed'});
+                $('#SignIn_popup > .window_page').css({'position':'relative'});
+
                 $("#SignIn_popup").slideDown();
+
                 $("#UserName").focus();
             });
             /******************end :  New code ************************/

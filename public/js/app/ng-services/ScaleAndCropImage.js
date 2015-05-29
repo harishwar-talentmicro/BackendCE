@@ -32,7 +32,7 @@ angular.module('ezeidApp').service('ScaleAndCropImage',['$q','GURL','$http','$ro
                      method : 'POST',
                      data : requestedData
                  }).success(function(resp){
-                    //console.log(resp);
+                    ////console.log(resp);
                     if(resp && resp.status){
                         deferred.resolve(resp.picture);
                     }
@@ -141,8 +141,8 @@ angular.module('ezeidApp').service('ScaleAndCropImage',['$q','GURL','$http','$ro
             ctx.drawImage(img,0,0);
             var retVal = canvas.toDataURL("image/jpeg", 1.0);
             $('.cr-canvas').remove();
-            // ////console.log('Cropped Image');
-            // ////console.log(retVal);
+            // //////console.log('Cropped Image');
+            // //////console.log(retVal);
             return retVal;
         }
 

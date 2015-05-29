@@ -25,7 +25,7 @@ angular.module('ezeidApp').controller('mapPopController',[
              GoogleMaps){
 
 
-        console.log("sAi...");
+        //console.log("sAi...");
 
         //Below line is for Loading img
         $scope.$emit('$preLoaderStart');
