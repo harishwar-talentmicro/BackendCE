@@ -159,7 +159,7 @@
                 templateUrl: 'html/informationDetail.html',
                 controller : 'InformationDetailCtrl'
             })
-            .when('/outbox.html',{
+            .when('/outbox',{
                 templateUrl: 'html/outbox.html',
                 controller : 'outboxPageCtrl'
             })
