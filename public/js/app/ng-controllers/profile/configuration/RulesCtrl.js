@@ -54,7 +54,8 @@ angular.module('ezeidApp').controller('RulesCtrl',['$scope','$interval','$http',
         $scope.changeLatLng = function(lat,lng){
             $scope.modalBox.rule.Latitude = lat;
             $scope.modalBox.rule.Longitude = lng;
-            $scope.$digest();
+
+            //$scope.$digest();
 
             $timeout(function(){
                 if(googleMap){
@@ -118,14 +119,15 @@ angular.module('ezeidApp').controller('RulesCtrl',['$scope','$interval','$http',
 
         var prepareEditModeData = function(data){
             var rule = {
-                TID: 14,
+                TID: data.TID,
                 MasterID: ($scope.masterUser)? $scope.masterUser.MasterID : 0 ,
                 FolderTitle: data.FolderTitle,
                 RuleFunction: $scope.selectedTab - 1,
                 RuleType: data.RuleType,
                 CountryID: data.CountryIDs,
                 MatchAdminLevel: data.MatchAdminLevel,
-                MappedNames: data.MappedNames,
+                MappedNames: (data.MappedNames.length > 0) ?
+                    ((data.MappedNames.split(',').length > 0) ? data.MappedNames.split(',') : [data.MappedNames]) : '',
                 Latitude: data.Latitude,
                 Longitude: data.Longitude,
                 Proximity: data.Proximity,
@@ -164,6 +166,7 @@ angular.module('ezeidApp').controller('RulesCtrl',['$scope','$interval','$http',
                      */
                     destroy = $scope.$watch('modalBox.rule.MatchAdminLevel',function(){
                         $scope.modalBox.rule.MappedNames = '';
+                        $scope.changeLatLng($scope.modalBox.rule.Latitude,$scope.modalBox.rule.Longitude);
                     });
                 },1000);
             }
@@ -174,26 +177,66 @@ angular.module('ezeidApp').controller('RulesCtrl',['$scope','$interval','$http',
             }
         });
 
+        $scope.$watch('modalBox.rule.RuleType',function(newVal){
+            if(newVal == 3){
 
+            }
+        });
+
+
+        $scope.addMappedEzeid = function(){
+            if(!$scope.modalBox.tempMappedName){
+                console.log('return false');
+                return false;
+            }
+
+            $scope.modalBox.tempMappedName = $scope.modalBox.tempMappedName.replace(' ','');
+            var tempIds = $scope.modalBox.tempMappedName.split(',');
+            if(tempIds.length > 0){
+                for(var x = 0; x < tempIds.length; x++){
+                    if($scope.modalBox.rule.MappedNames.indexOf(tempIds[x])=== -1){
+                        $scope.modalBox.rule.MappedNames.push(tempIds[x]);
+                    }
+                }
+            }
+
+        };
+
+        $scope.$watch('modalBox.rule.RuleType',function(newVal){
+            if(newVal == 2){
+                $scope.modalBox.tempMappedName = '';
+            }
+        });
         /**
          * Add $scope.modalBox.tempMappedName to MappedNames model in $scope.modalBox
          * so that multiple countries, states, cities and areas can be mapped into one rule easily
          */
         $scope.addMappedName = function(){
-            if(!$scope.tempMappedName){
+            if(!$scope.modalBox.tempMappedName){
+                console.log('return false');
                 return false;
             }
             var currentMappedNames = ($scope.modalBox.rule.MappedNames) ? $scope.modalBox.rule.MappedNames : '';
             if(currentMappedNames && currentMappedNames.length > 0){
-                var mappedNames = currentMappedNames.split(',');
-                mappedNames.push($scope.modalBox.tempMappedName);
-                $scope.modalBox.rule.MappedNames = mappedNames.join(',');
-                $scope.modalBox.tempMappedName = '';
+                var mappedNames = (currentMappedNames.length > 0) ? currentMappedNames : [currentMappedNames];
+                if(mappedNames.indexOf($scope.modalBox.tempMappedName) == -1){
+                    mappedNames.push($scope.modalBox.tempMappedName);
+                    $scope.modalBox.rule.MappedNames = mappedNames;
+                    $scope.modalBox.tempMappedName = '';
+                }
+                else{
+                    Notification.error({ message : 'This area is already mapped', delay : MsgDelay});
+                }
+
             }
             else{
-                $scope.modalBox.rule.MappedNames = $scope.modalBox.tempMappedName;
+                $scope.modalBox.rule.MappedNames = [$scope.modalBox.tempMappedName];
                 $scope.modalBox.tempMappedName = '';
             }
+        };
+
+        $scope.removeMappedName =   function(index){
+            $scope.modalBox.rule.MappedNames.splice(index,1);
         };
 
 
@@ -315,8 +358,9 @@ angular.module('ezeidApp').controller('RulesCtrl',['$scope','$interval','$http',
         /**
          * Loads all Rules from server
          */
-        $scope.loadAllRules = function(){
+        $scope.loadRule = function(functionCount){
             var defer = $q.defer();
+
             $http({
                 url : GURL + 'ewtGetUserwiseFolderList',
                 method : 'GET',
@@ -325,33 +369,102 @@ angular.module('ezeidApp').controller('RulesCtrl',['$scope','$interval','$http',
                     RuleFunction : functionCount
                 }
             }).success(function(resp){
-                if(functionCount = 0){
-                    $scope.rules = [];
-                }
                 if(resp && resp !== 'null' && resp.length > 0){
-                    $scope.rules.concat(resp);
+                    console.log(resp);
+                    $scope.rules = $scope.rules.concat(resp);
                 }
-                if(functionCount > 4){
-                    functionCount = 0;
-                    defer.resolve();
-                }
-                else{
-                    functionCount++;
-                    $scope.loadAllRules();
-                }
-            }).error(function(err){
-                if(functionCount > 4){
-                    functionCount = 0;
-                    defer.resolve();
-                }
-                else{
-                    functionCount++;
-                    $scope.loadAllRules();
+                defer.resolve();
 
+            }).error(function(err){
+                defer.resolve();
+            });
+            return defer.promise;
+        };
+
+
+        $scope.loadAllRules = function(){
+            var defer = $q.defer();
+
+            var sLoad = false;
+            var rLoad = false;
+            var hdLoad = false;
+            var svLoad = false;
+            var rsLoad = false;
+
+            var checkLoad = function(){
+                if(sLoad && rLoad && hdLoad && svLoad && rsLoad){
+                    defer.resolve();
                 }
+            };
+
+            $scope.loadRule(functionCount).then(function(){
+                sLoad = true;
+                checkLoad();
+            });
+            $scope.loadRule(functionCount+1).then(function(){
+                rLoad = true;
+                checkLoad();
+            });
+            $scope.loadRule(functionCount+2).then(function(){
+                hdLoad = true;
+                checkLoad();
+            });
+            $scope.loadRule(functionCount+3).then(function(){
+                svLoad = true;
+                checkLoad();
+            });
+            $scope.loadRule(functionCount+4).then(function(){
+                rsLoad = true;
+                checkLoad();
+            });
+
+            return defer.promise;
+        };
+        /**
+         * Validates rule data while saving
+         * @returns {boolean}
+         */
+        var validateSaveRuleData = function(){
+            /**
+             * @todo
+             * Validations Required before saving rules
+             */
+            return true;
+        };
+
+        $scope.saveRule = function(){
+            if(!validateSaveRuleData($scope.modalBox.rule)){
+                Notification.error({ message : 'Please check all the details properly', delay : MsgDelay});
+                return;
+            }
+
+
+            var ruleData = $scope.modalBox.rule;
+            ruleData.MappedNames = ruleData.MappedNames.join(',');
+
+            $http({
+                url : 'ewmSaveFolderRules',
+                method : "POST",
+                data :ruleData
+            }).success(function(resp){
+                //console.log(resp);
+                Notification.success({ message : 'Rule added successfully', delay : MsgDelay});
+            }).error(function(err){
+                Notification.error({ message : 'An error occurred while adding rule', delay : MsgDelay});
             });
         };
 
+
+        $scope.$emit('$preLoaderStart');
+        $scope.loadCountries().then(function(){
+            $scope.loadAllRules().then(function(){
+                $scope.$emit('$preLoaderStop');
+            },function(){
+                $scope.$emit('$preLoaderStop');
+            });
+        },function(){
+            $scope.$emit('$preLoaderStop');
+        });
 
 
 
