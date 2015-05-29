@@ -8744,7 +8744,7 @@ exports.FnCropImage = function(req,res){
 
     console.log(req.files.image.path);
     var deleteTempFile = function(){
-        fs.unlink('../bin/uploads/'+req.files.image.path);
+        fs.unlink('../bin/'+req.files.image.path);
     };
 
 
@@ -8889,7 +8889,8 @@ exports.FnCropImage = function(req,res){
                                             res.status(400).json(respMsg);
                                         }
                                     });
-
+                                console.log('FnCropImage:Picture cropped successfully...');
+                                deleteTempFile();
                             }
 
                             else if(scaleFlag && !cropFlag){
@@ -8899,6 +8900,8 @@ exports.FnCropImage = function(req,res){
                                             var cdataUrl = new Buffer(croppedBuff).toString('base64');
                                             var picUrl = 'data:image/'+outputType+';base64,'+cdataUrl;
                                             res.status(200).json({status : true, picture : picUrl, message : 'Picture cropped successfully'});
+                                            console.log('FnCropImage:Picture cropped successfully');
+                                            deleteTempFile();
                                         }
                                         else{
                                             res.status(400).json(respMsg);
@@ -10251,7 +10254,7 @@ exports.FnSaveReservationResource = function(req, res){
             return;
         }
         
-        if (Token && operator_id) {
+        if (Token && operatorid) {
             FnValidateToken(Token, function (err, result) {
                 if (!err) {
                     if (result != null) {
@@ -10314,10 +10317,10 @@ exports.FnSaveReservationResource = function(req, res){
                 responseMessage.error = {Token : 'Invalid Token'};
                 console.log('FnSaveReservationResource: Token is mandatory field');
             }
-            else if(!operator_id)
+            else if(!operatorid)
             {
                 responseMessage.message = 'Invalid Operator ID';            
-                responseMessage.error = {operator_id : 'Invalid Operator ID'};
+                responseMessage.error = {operatorid : 'Invalid Operator ID'};
                 console.log('FnSaveReservationResource: Operator ID is mandatory field');
             }
            
@@ -10375,7 +10378,7 @@ exports.FnUpdateReservationResource = function(req, res){
             return;
         }
         
-        if (Token && operator_id) {
+        if (Token && operatorid) {
             FnValidateToken(Token, function (err, result) {
                 if (!err) {
                     if (result != null) {
@@ -10436,13 +10439,13 @@ exports.FnUpdateReservationResource = function(req, res){
             {  
                 responseMessage.message = 'Invalid Token';            
                 responseMessage.error = {Token : 'Invalid Token'};
-                console.log('FnSaveReservationResource: Token is mandatory field');
+                console.log('FnUpdateReservationResource: Token is mandatory field');
             }
-            else if(!operator_id)
+            else if(!operatorid)
             {
                 responseMessage.message = 'Invalid Operator ID';            
-                responseMessage.error = {operator_id : 'Invalid Operator ID'};
-                console.log('FnSaveReservationResource: Operator ID is mandatory field');
+                responseMessage.error = {operatorid : 'Invalid Operator ID'};
+                console.log('FnUpdateReservationResource: Operator ID is mandatory field');
             }
            
             res.status(401).json(responseMessage);

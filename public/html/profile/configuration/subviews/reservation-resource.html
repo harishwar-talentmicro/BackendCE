@@ -31,6 +31,7 @@
 
                     <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
                         <div class="form-group">
+                            {{modalBox.item.operatorid}}
                             <select class="form-control emptyBox" ng-model="modalBox.item.operatorid">
                                 <option value="0"> -- Select Operator -- </option>
                                 <option ng-repeat="i in subusers" value="{{i.TID}}">{{i.EZEID}}</option>
@@ -132,20 +133,25 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 bottom-clearfix">
-                        sai..
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 bottom-clearfix" >
+
+                        <div style="border: 1px solid #808080;">
+                            <div ng-repeat="_item in AllServices">
+                                <div class="">
+                                    <h4 class="text-primary">{{_item.title}}</h4>
+                                </div><br/>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
-
-
-
             </form>
         </div>
 
     </modal>
 
 
-    <div ng-show="true">
+    <div ng-show="false">
         <h1>
             <span class="glyphicon glyphicon-calendar"></span> Coming Soon !
         </h1>
@@ -154,7 +160,7 @@
 
 
 
-    <div class="panel-body" ng-show="false">
+    <div class="panel-body" ng-show="true">
 
         <div role="tabpanel">
             <!-- Nav tabs -->
@@ -191,7 +197,7 @@
                                             <span class="glyphicon glyphicon-edit" data-toggle="tooltip" title="" data-placement="right" data-original-title="Edit Resource" ng-click="openResourceModalBox(_item)"></span>
                                             <img ng-src="{{_item.picture}}" alt="No picture available"/>
                                             <div class="caption">
-                                                <h4 class="text-primary">{{_item.title}}
+                                                <h4 class="text-primary"><span data-toggle="tooltip" title="" data-placement="top" data-original-title="{{_item.title}}">{{_item.title | textLength:9}}</span>
                                                     <span ng-show="_item.status == 1" class="glyphicon glyphicon-ok-circle text-success" data-toggle="tooltip" title="" data-placement="right" data-original-title="Resource Status"></span>
                                                     <span ng-show="_item.status == 2" class="glyphicon glyphicon-remove-circle text-danger" data-toggle="tooltip" title="" data-placement="right" data-original-title="Resource Status"></span>
                                                 </h4>
@@ -220,15 +226,16 @@
                         </div>
 
                         <div ng-repeat="_item in AllServices">
-                            <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12 bottom-clearfix">
+                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 bottom-clearfix serviceList">
                                 <div class="business-item">
                                     <div class="thumbnail">
                                         <span class="glyphicon glyphicon-edit" data-toggle="tooltip" title="" data-placement="right" data-original-title="Edit Service" ng-click="openReservationServiceModalBox(_item)"></span>
                                         <div class="caption">
-                                            <h4 class="text-primary" data-toggle="tooltip" title="" data-placement="right" data-original-title="{{_item.title}}">{{_item.title | textLength:10}}
+                                            <h4 class="text-primary" data-toggle="tooltip" title="" data-placement="right" data-original-title="{{_item.title}}">{{_item.title | textLength:15}}
                                                 <span ng-show="_item.status == 1" class="glyphicon glyphicon-ok-circle text-success"></span>
                                                 <span ng-show="_item.status == 2" class="glyphicon glyphicon-remove-circle text-danger"></span>
                                             </h4>
+                                            <p class="item-description">{{_item.rate}}</p>
                                         </div>
                                     </div>
                                 </div>
