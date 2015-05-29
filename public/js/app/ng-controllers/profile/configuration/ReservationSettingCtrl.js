@@ -412,7 +412,7 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',[
                 console.log("sai123");
                 console.log(resp);
                 $scope.$emit('$preLoaderStop');
-                if(resp){
+                if(resp.status){
                     $scope.AllMappingData = resp.data;
 
 
