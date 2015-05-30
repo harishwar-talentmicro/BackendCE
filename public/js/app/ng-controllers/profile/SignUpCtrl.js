@@ -734,6 +734,7 @@ angular.module('ezeidApp').
                                 var encrypted = CryptoJS.AES.encrypt(JSON.stringify(sResp), "EZEID");
 
                                 localStorage.setItem("_token", encrypted);
+                                document.cookie="login=1; expires=Thu, 18 Dec 2016 12:00:00 UTC; path=/";
 
                                 if($scope.userType == 2){
                                     createBasicConf(sResp.Token).then(function(){

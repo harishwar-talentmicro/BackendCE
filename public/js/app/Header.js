@@ -4,7 +4,8 @@ HeaderApp.directive('headerSection',['Notification','$window' ,function (Notific
     return {
         restrict: 'EA',
         templateUrl: 'directives/Header.html',
-        controller: ['$http', '$rootScope','$location','$window','GURL',function ($http, $rootScope,$location,$window,GURL) {
+        controller: ['$http', '$rootScope','$location','$window','GURL',
+            function ($http, $rootScope,$location,$window,GURL) {
             var MsgDelay = 2000;
             var SignCtrl = this;
             this.LInfo = {};
@@ -56,9 +57,10 @@ HeaderApp.directive('headerSection',['Notification','$window' ,function (Notific
                                     userName = Logdata.UserName;
                                 }
                             }
-
+                            document.cookie="login=1; expires=Thu, 18 Dec 2016 12:00:00 UTC; path=/";
                             $rootScope._userInfo.userName = userName.toUpperCase();
                             $rootScope._userInfo.ezeid = Logdata.UserName.toUpperCase();
+
 
                         if (typeof (Storage) !== "undefined") {
                             var encrypted = CryptoJS.AES.encrypt(JSON.stringify(data), "EZEID");
@@ -170,6 +172,7 @@ HeaderApp.directive('headerSection',['Notification','$window' ,function (Notific
                     $rootScope._userInfo = data;
                     $rootScope.IsIdAvailable = false;
                     $window.localStorage.removeItem("searchResult");
+                    document.cookie = "login=; expires=Thu, 01 Jan 1970 00:00:00 UTC";
                     $location.path('/');
                   //  Notification.success({ message: "Sign Out Success", delay: MsgDelay });
                 });

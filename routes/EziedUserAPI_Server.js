@@ -10987,6 +10987,90 @@ exports.FnGetReservResourceServiceMap = function (req, res) {
 };
 
 
+/**
+ * Finds the user login status using a cookie login
+ * which is created by angular at the time of signin or signup
+ * @param req
+ * @param res
+ * @param next
+ * @constructor
+ */
+exports.FnSearchBusListing = function(req,res,next){
+    var htmlPagesList = [
+        'signup',
+        'messages',
+        'landing',
+        'acchist',
+        'busslist',
+        'terms',
+        'help',
+        'legal',
+        'blackwhitelist',
+        'salesenquiry',
+        'bulksalesenquiry',
+        'viewdirection',
+        'service-reservation',
+        'business-manager',
+        'profile-manager',
+        'searchResult',
+        'searchDetails',
+        'outbox.html'
+    ];
+
+    var loginCookie = (req.cookies['login']) ? ((req.cookies['login'] === 'true') ? true : false ) : false;
+    if(!loginCookie){
+        /**
+         * Checks if ezeid parameter is existing and checks in the list that is it a
+         * ezeid angular url using the htmlPageList
+         * If not then it will see in the database for
+         * business ID
+         */
+        if(req.params['ezeid'] && htmlPagesList.indexOf(req.params.ezeid) === -1){
+            /**
+             * Checking the EZEID for it's validity
+             */
+            var arr = req.params.ezeid.split('.');
+
+            if(arr.length < 2 && arr.length > 0){
+                /**
+                 * Find if the user type is business or not
+                 */
+                var ezeidQuery = "SELECT tlocations.PIN AS PIN, tmaster.TID, tlocations.TID AS LID ,"+
+                    " tmaster.IDTypeID AS IDTypeID FROM tlocations"+
+                    " INNER JOIN tmaster ON " +
+                    "tmaster.TID = tlocations.MasterID AND tlocations.SeqNo = 0 AND tmaster.EZEID = "+
+                    db.escape(req.params.ezeid)+ " LIMIT 1";
+                db.query(ezeidQuery,function(err,results){
+                    if(!err){
+                        if(results.length > 0){
+                            if((!results[0].PIN) && results[0].IDTypeID !== 1){
+                                res.redirect('/searchDetails?searchType=2&TID='+results[0].LID)
+                            }
+                            else{
+                                next();
+                            }
+                        }
+                        else{
+                            next();
+                        }
+                    }
+                    else{
+                        next();
+                    }
+                });
+            }
+            else{
+                next();
+            }
+        }
+        else{
+            next();
+        }
+    }
+    else{
+        next();
+    }
+};
 //EZEIDAP Parts
 
 //app part

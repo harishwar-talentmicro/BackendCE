@@ -92,12 +92,12 @@
                     }
                     $rootScope._userInfo = null;
                     $rootScope.IsIdAvailable = false;
+                    document.cookie = "login=; expires=Thu, 01 Jan 1970 00:00:00 UTC";
 //                    Notification.error({message:'Your session has expired! Please login to continue',delay:4000});
                     $timeout(function(){
                         //Reloading page on token expiry
                         window.location.reload(true);
-
-                    },3000);
+                    },500);
                 }
 
                 if(respErr.status === 0 && respErr.statusText === ''){
