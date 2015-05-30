@@ -3,8 +3,8 @@
  * HistoryController
  */
 angular.module('ezeidApp').controller('HistoryController',[
-    '$scope', '$rootScope', '$http', 'Notification', '$filter', '$interval','GURL','MsgDelay',
-    function ($scope, $rootScope, $http, Notification, $filter, $interval,GURL,MsgDelay) {
+    '$scope', '$rootScope', '$http', 'Notification', '$filter', '$interval','GURL','MsgDelay','$location',
+    function ($scope, $rootScope, $http, Notification, $filter, $interval,GURL,MsgDelay,$location) {
     var msgSen = this;
     var _pageValue = 1;
     var MsgDelay = 2000;
@@ -83,6 +83,7 @@ angular.module('ezeidApp').controller('HistoryController',[
         $http({ method: 'get', url: GURL + 'ewtGetAccessHistory?TokenNo=' + $rootScope._userInfo.Token + '&Page='+_pageValue }).success(function (data) {
 
             if (data != 'null') {
+                console.log(data);
                 for (var i = 0; i < data.length; i++) {
                     data[i].AccessDate = convertTimeToLocal(data[i].AccessDate,'DD-MMM-YYYY hh:mm A');
                     msgSen.msgs.push(data[i]);
@@ -110,4 +111,12 @@ angular.module('ezeidApp').controller('HistoryController',[
         _pageValue = _pageValue + 1;
         LoadHistory(_pageValue);
     };
+
+    /* redirect to full details page */
+    $scope.redirectFullPage = function(tid)
+    {
+        console.log(tid);
+        /* redirect to full detail page */
+        $location.url('/searchDetails?searchType=1&TID='+tid);
+    }
 }]);

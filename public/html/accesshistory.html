@@ -22,7 +22,7 @@
                                 <tbody>
                                 <!--<tr ng-repeat="_item in msgCtrl.msgs | filter: {Status: msgCtrl.status,MessageTypeTitle:msgCtrl.type}">-->
                                     <tr ng-repeat="_item in historyCtrl.msgs" class="">
-                                        <td class="panelPd5px">{{_item.EZEID}}</td>
+                                        <td class="panelPd5px"><a class="showPointer" ng-click="redirectFullPage(_item.LocID)">{{_item.EZEID}}</a></td>
                                         <td class="panelPd5px">{{_item.Name}}</td>
                                         <td class="panelPd5px">{{_item.City}}</td>
                                         <td class="panelPd5px">{{_item.AccessDate}}</td>

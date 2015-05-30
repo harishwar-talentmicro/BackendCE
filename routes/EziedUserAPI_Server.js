@@ -6662,7 +6662,7 @@ exports.FnSaveTranscation = function(req, res){
                 DeliveryAddress = '';
         var ItemIDList='';
         var ToEZEID = req.body.ToEZEID;
-        var item_list_type = req.body.item_list_type;
+        var item_list_type = 0;
         
         var RtnMessage = {
             IsSuccessfull: false,
@@ -10986,6 +10986,148 @@ exports.FnGetReservResourceServiceMap = function (req, res) {
     }
 };
 
+//method to save the resource and service map
+exports.FnSaveReservResourceServiceMap = function(req, res){
+    try{
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.body.Token ;
+        var resourceid = req.body.resourceid;
+        var service_ids = req.body.service_ids;
+        
+        console.log('service_ids Values:'+service_ids);
+                
+        var array = [service_ids];     
+        
+        var responseMessage = {
+            status: false,
+            error:{},
+            message:'',
+            data: null
+        };
+        var validateStatus = true;
+        
+        if(!resourceid){
+            responseMessage.error['resourceid'] = 'Invalid Resourceid';
+            validateStatus *= false;
+        }
+        
+        if(!service_ids){
+            responseMessage.error['service_ids'] = 'Invalid Service_ids';
+            validateStatus *= false;
+        }
+        
+        
+        if(!validateStatus){
+            console.log('FnSaveReservResServiceMap  error : ' + JSON.stringify(responseMessage.error));
+            responseMessage.message = 'Unable to save resource and service ! Please check the errors';
+            res.status(200).json(responseMessage);
+            return;
+        }
+        
+        if (Token) {
+            FnValidateToken(Token, function (err, result) {
+                if (!err) {
+                    if (result != null) {
+                    console.log('array:'+array);
+                    var newarry = array[0].split(',');
+                    var arraylength = newarry.length;
+                    console.log('new:'+arraylength);
+                    
+                    for(var i=0; i < arraylength; i++)
+                        {
+                            var serviceid = newarry[i];
+                            console.log(serviceid);
+                       
+                        var post = {
+                                        resourceid: resourceid,
+                                        serviceid: serviceid
+                                    };
+                        
+                        console.log(post);
+                        var query = db.query('INSERT INTO mresresourceservicemap SET ?', post, function (err, result) {
+                        //db.query(query, function (err, insertResult) {
+                            console.log('Result is..........:'+result);
+                            console.log(err);
+                             if (!err){
+                                if (result != null) {
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'ResourceService Map details save successfully';
+                                    responseMessage.data = {
+                                        resourceid : req.body.resourceid,
+                                        service_ids : req.body.service_ids
+                                    };
+                                    //res.status(200).json(responseMessage);
+                                    
+                                }
+                                else {
+                                    responseMessage.message = 'An error occured ! Please try again';
+                                    responseMessage.error = {};
+                                    res.status(400).json(responseMessage);
+                                    console.log('FnSaveReservResServiceMap:No save Resource details');
+                                }
+                            }
+
+                            else {
+                                responseMessage.message = 'An error occured ! Please try again';
+                                responseMessage.error = {};
+                                res.status(500).json(responseMessage);
+                                console.log('FnSaveReservResServiceMap: error in saving Resource details:' + err);
+                            }
+                        });
+                    };
+                        responseMessage.status = true;
+                        responseMessage.error = null;
+                        responseMessage.message = 'ResourceService Map details save successfully';
+                        responseMessage.data = {
+                            resourceid : req.body.resourceid,
+                            service_ids : req.body.service_ids
+                        };
+                        res.status(200).json(responseMessage);
+                        console.log('FnSaveReservResServiceMap: ResourceService Map details save successfully');
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token'; 
+                        responseMessage.error = {}; 
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnSaveReservResServiceMap: Invalid token');
+                                            }
+                }
+                else {
+                    responseMessage.error= {};
+                    responseMessage.message = 'Error in validating Token'; 
+                    res.status(500).json(responseMessage);
+                    console.log('FnSaveReservResServiceMap:Error in processing Token' + err);
+                }
+            });
+
+        }
+
+        else {
+            if (!Token) 
+            {  
+                responseMessage.message = 'Invalid Token';            
+                responseMessage.error = {Token : 'Invalid Token'};
+                console.log('FnSaveReservResServiceMap: Token is mandatory field');
+            }
+            
+            res.status(401).json(responseMessage);
+        }
+
+    }
+    catch (ex) {
+        responseMessage.error = {};
+        responseMessage.message = 'An error occured !'
+        console.log('FnSaveReservResServiceMap:error ' + ex.description);
+        throw new Error(ex);
+        res.status(400).json(responseMessage);
+    }
+};
+
+
 
 /**
  * Finds the user login status using a cookie login
@@ -11014,7 +11156,7 @@ exports.FnSearchBusListing = function(req,res,next){
         'profile-manager',
         'searchResult',
         'searchDetails',
-        'outbox.html'
+        'outbox'
     ];
 
     var loginCookie = (req.cookies['login']) ? ((req.cookies['login'] === 'true') ? true : false ) : false;

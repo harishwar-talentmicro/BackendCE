@@ -2,8 +2,10 @@
  * ReservationSettingCtrl
  *
  */
-angular.module('ezeidApp').controller('ReservationSettingCtrl',['$scope',
+angular.module('ezeidApp').controller('ReservationSettingCtrl',[
+    '$scope',
     '$rootScope',
+    '$q',
     '$http',
     'Notification',
     '$filter',
@@ -13,6 +15,7 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',['$scope',
     function(
         $scope,
         $rootScope,
+        $q,
         $http,
         Notification,
         $filter,
@@ -22,11 +25,11 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',['$scope',
 
     //Initially First Tab is selected
     $scope.selectedTab = 1;
+    $scope.selectedTID = [];
+
     resetResourceValue();
     getUserDetails();
     getAllResources();
-
-
 
     function resetResourceValue()
     {
@@ -57,6 +60,16 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',['$scope',
         };
     }
 
+    function resetMappingValue()
+    {
+        $scope.selectedTID = [];
+        $scope.modalBox = {
+            mapItem : {
+                resourceid : 0
+            }
+        };
+    }
+
     $scope.reservationServiceTabSelected = function(){
         resetServicesValue();
         getAllServices();
@@ -73,12 +86,14 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',['$scope',
      */
     $scope.showModal = false;
     $scope.openResourceModalBox = function(item){
-        console.log(item);
         $scope.showModal = true;
         resetResourceValue();
+
+        loadSubuserList();
+
         if(item != 0)
         {
-            $scope.modalBox = {
+           $scope.modalBox = {
                 item : {
                     operatorid : item.operatorid,
                     title : item.title,
@@ -89,12 +104,7 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',['$scope',
                 }
             };
         }
-
-        console.log("SA122");
-        console.log($scope.modalBox.item);
-
-        loadSubuserList();
-
+       // loadSubuserList();
     };
 
     $scope.closeResourceModalBox = function(){
@@ -162,8 +172,8 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',['$scope',
             }
         }).success(function(resp){
                 $scope.$emit('$preLoaderStop');
-                //console.log(resp.data);
-                if(resp.data.length>0){
+                if(resp.data.length>0)
+                {
                    $scope.AllResources = resp.data;
                 }
             }).error(function(err){
@@ -225,10 +235,8 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',['$scope',
                 data : $scope.modalBox.item
             }).success(function(resp)
                 {
-                    $scope.$emit('$preLoaderStop');
-                    //console.log(resp);
-
-                    if(resp.status){
+                   $scope.$emit('$preLoaderStop');
+                   if(resp.status){
 
                         Notification.success({ message : 'Resource added successfully', delay : 2000 });
                         getAllResources();
@@ -253,17 +261,20 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',['$scope',
         resetServicesValue();
         if(item != 0)
         {
-            $scope.modalBox = {
+           var servicesIdArray = item.ServiceID.split(",");
+
+           $scope.modalBox = {
                 servicesItem : {
                     title : item.title,
                     status  : item.status,
                     duration: item.duration,
                     rate : item.rate,
-                    TID:item.tid,
-                    serviceType: 1,
-                    service_ids: item.serviceids
+                    TID: item.tid,
+                    serviceType: (item.serviceids == 0) ? 1 : 2,
+                    service_ids: servicesIdArray
                 }
             };
+            $scope.selectedTID = item.serviceids;
         }
     };
     $scope.closeReservationServiceModalBox = function(){
@@ -286,7 +297,6 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',['$scope',
             }
         }).success(function(resp){
                 $scope.$emit('$preLoaderStop');
-                //console.log(resp.data);
                 if(resp){
                     $scope.AllServices = resp.data;
                 }
@@ -322,6 +332,7 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',['$scope',
 
         if(validateServices())
         {
+            $scope.modalBox.servicesItem.service_ids = $scope.selectedTID;
             $scope.modalBox.servicesItem.Token = $rootScope._userInfo.Token;
             $scope.$emit('$preLoaderStart');
             $http({
@@ -332,8 +343,6 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',['$scope',
                 {
                     $scope.$emit('$preLoaderStop');
                     $scope.showReservationServiceModal = false;
-                    //console.log(resp);
-
                     if(resp.status){
 
                         Notification.success({ message : 'Service added successfully', delay : 2000});
@@ -351,5 +360,123 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',['$scope',
         }
     };
 
+    // To get and remove value of check box
+    $scope.toggleCheckbox = function(event){
+        var elem = event.currentTarget;
+        var val = $(elem).data('tid');
+        if($(elem).is(":checked")){
+            $scope.selectedTID.push(val);
+        }
+        else{
+            var index = $scope.selectedTID.indexOf(val);
+            $scope.selectedTID.splice(index,1);
+        }
+    };
 
-    }]);
+    // Maping tab selection
+    $scope.reservationServiceMapTabSelected = function(){
+        resetMappingValue();
+        getAllServices();
+        getAllMappingData();
+
+    };
+
+    //  Open Services Modal box
+    $scope.showReservationServiceMapModal = false;
+    $scope.openReservationServiceMapModalBox = function(item){
+        $scope.showReservationServiceMapModal = true;
+        resetMappingValue();
+        if(item != 0)
+        {
+            var servicesIdArray = JSON.parse("[" + item.ServiceID + "]");
+            $scope.modalBox = {
+                mapItem : {
+                    resourceid : 0
+                }
+            };
+            $scope.selectedTID = servicesIdArray;
+        }
+    };
+
+    $scope.closeReservationServiceMapModalBox = function(){
+        $scope.showReservationServiceMapModal = false;
+        resetMappingValue();
+    };
+
+    // Get Mapping data
+    function getAllMappingData(){
+        $scope.$emit('$preLoaderStart');
+        $http({
+            url : GURL + 'reservation_resource_service_map',
+            method : "GET",
+            params :{
+                Token : $rootScope._userInfo.Token
+            }
+        }).success(function(resp){
+                $scope.$emit('$preLoaderStop');
+                if(resp.status){
+                    /*$scope.AllMappingData = resp.data;*/
+                    var mappingData = resp.data;
+                    //console.log(mappingData);
+                    var nCount, nServicCount;
+                    for (nCount = 0; nCount < mappingData.length; nCount++)
+                    {
+                        var res = mappingData[nCount].ServiceID.split(",");
+                        console.log(res);
+                        /*mappingData[nCount].ServicesArray = res;*/
+                         mappingData[nCount].ServicesArray = JSON.parse("[" + res + "]");
+
+                        /*for (nServicCount = 0; nServicCount < res.length; nServicCount++)
+                        {
+                            mappingData[nCount].ServicesArray.push(res[nServicCount]);
+                        }*/
+                    }
+
+                    console.log("sai111");
+                    console.log(mappingData);
+
+                   // $scope.AllMappingData1[0].tmp = [7,8,9];
+                    $scope.AllMappingData = mappingData;
+
+                }
+            }).error(function(err){
+                $scope.$emit('$preLoaderStop');
+                Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
+            });
+    };
+
+    // save mapping data
+    $scope.saveMappingData = function(){
+
+            if($scope.selectedTID)
+            {
+                $scope.modalBox.mapItem.service_ids = $scope.selectedTID;
+                $scope.modalBox.mapItem.Token = $rootScope._userInfo.Token;
+                $scope.$emit('$preLoaderStart');
+                $http({
+                    url : GURL + 'reservation_resource_service_map',
+                    method : ($scope.modalBox.mapItem.TID == 0) ? "POST" : "PUT",
+                    data : $scope.modalBox.mapItem
+                }).success(function(resp)
+                    {
+                        $scope.$emit('$preLoaderStop');
+                        $scope.showReservationServiceMapModal = false;
+                        if(resp.status){
+
+                            Notification.success({ message : 'Mapping added successfully', delay : 2000});
+
+                        }
+                        else{
+                            Notification.error({ message : 'An error occurred while saving Mapping! Please try again', delay : 2000});
+                        }
+                        resetMappingValue();
+                        getAllServices();
+                        getAllMappingData();
+                    }).error(function(err){
+                        $scope.$emit('$preLoaderStop');
+                        Notification.error({ message : 'An error occurred while saving Mapping! Please try again', delay : 2000});
+                    });
+            }
+        };
+
+}]);
