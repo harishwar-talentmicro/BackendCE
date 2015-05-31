@@ -445,7 +445,7 @@ angular.module('ezeidApp').
             //        $scope.error.email = '*Either Mobile or email is mandatory ! Please fill any one of them';
             //        validationStatus *= false;
             //    }
-            //}
+            }
 
 
 
