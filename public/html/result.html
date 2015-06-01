@@ -254,7 +254,10 @@
                                     <div class="textbox back metro-bg-default no-box-shadow text-white height-128">
 
                                         <div class="flip-tile-row-1 p-top-10">
-                                            <div class="col-lg-12 text-right" ng-click="$event.stopPropagation()">
+                                            <div class="col-lg-6 text-left" ng-click="$event.stopPropagation()">
+                                                <i ng-click="showDirectionMapPopup(search.Latitude,search.Longitude,search.IDTypeID)" title="directions" class="fa fa-map-marker direction-btn"></i>
+                                            </div>
+                                            <div class="col-lg-6 text-right" ng-click="$event.stopPropagation()">
                                                 <input data-tid="{{search.MasterID}}" data-id="{{tempVal}}" type="checkbox" class="result-checkbox" name="companyID" ng-click="toggleCheckbox($event)" />
                                             </div>
                                         </div>
@@ -273,15 +276,12 @@
                                             </div>
                                         </div>
                                         <div class="flip-tile-row-3 p-5 text-center" ng-click="$event.stopPropagation()">
-                                            <button class="btn btn-default btn-xs" ng-click="showDirectionMapPopup(search.Latitude,search.Longitude,search.IDTypeID)">
-                                                <i class="fa fa-map-marker"></i> Directions
+                                            <button class="btn btn-default btn-xs">
+                                                <i class="fa fa-user"></i> Sales
                                             </button>
-                                            <!--<button class="btn btn-default btn-xs">-->
-                                            <!--<i class="fa fa-user"></i> Sales-->
-                                            <!--</button>-->
-                                            <!--<button class="btn btn-default btn-xs">-->
-                                            <!--<i class="fa fa-cutlery"></i> Food-->
-                                            <!--</button>-->
+                                            <button class="btn btn-default btn-xs">
+                                                <i class="fa fa-cutlery"></i> Food
+                                            </button>
                                         </div>
                                     </div>
 

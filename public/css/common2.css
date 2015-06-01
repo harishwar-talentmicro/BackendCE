@@ -1810,3 +1810,16 @@ margin-bottom: 10px;
     color: black;
     font-weight: bolder;
 }
+
+.hpw .direction-btn
+{
+    background-color: rgb(255, 90, 90);
+    padding: 4px;
+    border-radius: 10px;
+}
+
+.hpw .direction-btn:hover
+{
+    background-color: rgb(255, 255, 255);
+    color:black;
+}
