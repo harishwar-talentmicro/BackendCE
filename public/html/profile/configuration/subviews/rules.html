@@ -49,7 +49,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr ng-repeat="rule in rules track by $index">
+                                        <tr ng-repeat="rule in (rules | ruleFilter:0) track by $index">
                                             <td>{{$index+1}}.</td>
                                             <td>{{rule.FolderTitle}}</td>
                                             <td>{{ruleTypes[rule.RuleType]}}</td>
@@ -71,9 +71,35 @@
                         <div class="row bottom-clearfix"></div>
                         <div class="row bottom-clearfix">
                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                <!--<button class="btn btn-sm btn-primary"  ng-click="toggleModalBox()"><span class="glyphicon glyphicon-plus"></span> Add</button>-->
-                                <!-- -->
-                                <h2 class="text-center font-open-sans-light"><i class="fa fa-clock-o"></i> Coming Soon ! </h2>
+                                <button class="btn btn-sm btn-primary"  ng-click="toggleModalBox()"><span class="glyphicon glyphicon-plus"></span> Add</button>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                <table class="table table-striped ezeid-table">
+                                    <thead>
+                                    <tr>
+                                        <th>S.No.</th>
+                                        <th>Rule Title</th>
+                                        <th>Type</th>
+                                        <th>Prefix</th>
+                                        <th>Mapped Names</th>
+                                        <th>Status</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr ng-repeat="rule in (rules | ruleFilter:1) track by $index">
+                                        <td>{{$index+1}}.</td>
+                                        <td>{{rule.FolderTitle}}</td>
+                                        <td>{{ruleTypes[rule.RuleType]}}</td>
+                                        <td>{{rule.SeqNoFrefix}}</td>
+                                        <td ng-class="{'hidden': (rule.RuleType == 1) }" title="{{rule.MappedNames}}">{{(rule.MappedNames !== 'null') ? (rule.MappedNames | truncate:30) : '-' }}</td>
+                                        <td ng-class="{'hidden': (rule.RuleType !== 1) }">{{ rule.Proximity + ' km' }}</td>
+                                        <td><button class="btn btn-sm {{(rule.FolderStatus == 1) ? 'btn-success' : 'btn-danger'}}">{{(rule.FolderStatus == 1) ? 'Active' : 'Inactive'}}</button></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+
                             </div>
                         </div>
                         <!--------- Reservation rules goes here------------------>
@@ -84,9 +110,35 @@
                         <div class="row bottom-clearfix"></div>
                         <div class="row bottom-clearfix">
                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                <!--<button class="btn btn-sm btn-primary"  ng-click="toggleModalBox()"><span class="glyphicon glyphicon-plus"></span> Add</button>
-                                -->
-                                <h2 class="text-center font-open-sans-light"><i class="fa fa-clock-o"></i> Coming Soon ! </h2>
+                                <button class="btn btn-sm btn-primary"  ng-click="toggleModalBox()"><span class="glyphicon glyphicon-plus"></span> Add</button>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                <table class="table table-striped ezeid-table">
+                                    <thead>
+                                    <tr>
+                                        <th>S.No.</th>
+                                        <th>Rule Title</th>
+                                        <th>Type</th>
+                                        <th>Prefix</th>
+                                        <th>Mapped Names</th>
+                                        <th>Status</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr ng-repeat="rule in (rules | ruleFilter:2) track by $index">
+                                        <td>{{$index+1}}.</td>
+                                        <td>{{rule.FolderTitle}}</td>
+                                        <td>{{ruleTypes[rule.RuleType]}}</td>
+                                        <td>{{rule.SeqNoFrefix}}</td>
+                                        <td ng-class="{'hidden': (rule.RuleType == 1) }" title="{{rule.MappedNames}}">{{(rule.MappedNames !== 'null') ? (rule.MappedNames | truncate:30) : '-' }}</td>
+                                        <td ng-class="{'hidden': (rule.RuleType !== 1) }">{{ rule.Proximity + ' km' }}</td>
+                                        <td><button class="btn btn-sm {{(rule.FolderStatus == 1) ? 'btn-success' : 'btn-danger'}}">{{(rule.FolderStatus == 1) ? 'Active' : 'Inactive'}}</button></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+
                             </div>
                         </div>
                         <!--------- Home Delivery rules goes here------------------>
@@ -97,8 +149,35 @@
                         <div class="row bottom-clearfix"></div>
                         <div class="row bottom-clearfix">
                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                <!--<button class="btn btn-sm btn-primary"  ng-click="toggleModalBox()"><span class="glyphicon glyphicon-plus"></span> Add</button>-->
-                                <h2 class="text-center font-open-sans-light"><i class="fa fa-clock-o"></i> Coming Soon ! </h2>
+                                <button class="btn btn-sm btn-primary"  ng-click="toggleModalBox()"><span class="glyphicon glyphicon-plus"></span> Add</button>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                <table class="table table-striped ezeid-table">
+                                    <thead>
+                                    <tr>
+                                        <th>S.No.</th>
+                                        <th>Rule Title</th>
+                                        <th>Type</th>
+                                        <th>Prefix</th>
+                                        <th>Mapped Names</th>
+                                        <th>Status</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr ng-repeat="rule in (rules | ruleFilter:3) track by $index">
+                                        <td>{{$index+1}}.</td>
+                                        <td>{{rule.FolderTitle}}</td>
+                                        <td>{{ruleTypes[rule.RuleType]}}</td>
+                                        <td>{{rule.SeqNoFrefix}}</td>
+                                        <td ng-class="{'hidden': (rule.RuleType == 1) }" title="{{rule.MappedNames}}">{{(rule.MappedNames !== 'null') ? (rule.MappedNames | truncate:30) : '-' }}</td>
+                                        <td ng-class="{'hidden': (rule.RuleType !== 1) }">{{ rule.Proximity + ' km' }}</td>
+                                        <td><button class="btn btn-sm {{(rule.FolderStatus == 1) ? 'btn-success' : 'btn-danger'}}">{{(rule.FolderStatus == 1) ? 'Active' : 'Inactive'}}</button></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+
                             </div>
                         </div>
                         <!--------- Service rules goes here------------------>
@@ -109,8 +188,35 @@
                         <div class="row bottom-clearfix"></div>
                         <div class="row bottom-clearfix">
                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                <!--<button class="btn btn-sm btn-primary" ng-click="toggleModalBox()"><span class="glyphicon glyphicon-plus"></span> Add</button>-->
-                                <h2 class="text-center font-open-sans-light"><i class="fa fa-clock-o"></i> Coming Soon ! </h2>
+                                <button class="btn btn-sm btn-primary"  ng-click="toggleModalBox()"><span class="glyphicon glyphicon-plus"></span> Add</button>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                <table class="table table-striped ezeid-table">
+                                    <thead>
+                                    <tr>
+                                        <th>S.No.</th>
+                                        <th>Rule Title</th>
+                                        <th>Type</th>
+                                        <th>Prefix</th>
+                                        <th>Mapped Names</th>
+                                        <th>Status</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr ng-repeat="rule in (rules | ruleFilter:4) track by $index">
+                                        <td>{{$index+1}}.</td>
+                                        <td>{{rule.FolderTitle}}</td>
+                                        <td>{{ruleTypes[rule.RuleType]}}</td>
+                                        <td>{{rule.SeqNoFrefix}}</td>
+                                        <td ng-class="{'hidden': (rule.RuleType == 1) }" title="{{rule.MappedNames}}">{{(rule.MappedNames !== 'null') ? (rule.MappedNames | truncate:30) : '-' }}</td>
+                                        <td ng-class="{'hidden': (rule.RuleType !== 1) }">{{ rule.Proximity + ' km' }}</td>
+                                        <td><button class="btn btn-sm {{(rule.FolderStatus == 1) ? 'btn-success' : 'btn-danger'}}">{{(rule.FolderStatus == 1) ? 'Active' : 'Inactive'}}</button></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+
                             </div>
                         </div>
                         <!--------- Resume rules goes here------------------>
@@ -151,8 +257,8 @@
                         <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
                             <div class="form-group" data-toggle="tooltip" data-original-title="Rule Status" data-title="" data-placement="right">
                                 <select class="form-control" ng-model="modalBox.rule.CountryID">
-                                    <option value="">--Select Country--</option>
-                                    <option ng-repeat="country in countryList track by country.CountryID" value="{{country.CountryTitle}}">{{country.CountryID}}</option>
+                                    <option value="0">--Select Country--</option>
+                                    <option ng-repeat="country in countryList track by country.CountryID" value="{{country.CountryID}}">{{country.CountryName}}</option>
                                 </select>
                             </div>
                         </div>
@@ -232,7 +338,7 @@
                             </div>
                         </div>
 
-                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix" ng-show="modalBox.rule.RuleType == 2">
+                        <div class="col-lg-2 col-md-2 col-sm-3 col-xs-4 bottom-clearfix" ng-show="modalBox.rule.RuleType == 2">
 
                             <div class="form-group">
                                 <label>Enter EZEID(s) : </label>
@@ -257,6 +363,9 @@
                         </div>
 
                         <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix" ng-hide="modalBox.rule.RuleType == 2">
+                            <small class="text-success text-center">
+                                * Move the marker on map to get admin area
+                            </small>
                             <!-------------------------Map Row ------------------------------>
                             <div id="conf-rules-map-container" class="row locations-map-container bottom-clearfix"></div>
                             <!-------------------------Map Row ends ------------------------------>
