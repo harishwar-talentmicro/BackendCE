@@ -33,6 +33,8 @@
             GoogleMap
             ) {
 
+            $scope._tempSalesItemListType = $rootScope._userInfo.SalesItemListType;
+
 
             /**
              * Logged in user cannot use this module as he is not having the required permissions for it
@@ -799,6 +801,7 @@
                         defer.resolve(resp);
                     }
                     else{
+                        $rootScope._userInfo.SalesItemListType = 0;
                         defer.resolve([]);
                     }
                 }).error(function(err){
@@ -927,6 +930,26 @@
 
             });
 
+            var makeAddress = function(){
+                var address = [];
+                if($scope.modalBox.tx.address){
+                    address.push($scope.modalBox.tx.address);
+                }
+                if($scope.modalBox.tx.area){
+                    address.push($scope.modalBox.tx.area);
+                }
+                if($scope.modalBox.tx.city){
+                    address.push($scope.modalBox.tx.city);
+                }
+
+                if($scope.modalBox.tx.state){
+                    address.push($scope.modalBox.tx.state);
+                }
+                if($scope.modalBox.tx.country){
+                    address.push($scope.modalBox.tx.country);
+                }
+                return address.join(', ');
+            };
 
             /**
              * Preparing data for saving transaction
@@ -968,8 +991,7 @@
                     ItemsList: JSON.stringify($scope.modalBox.tx.itemList),
                     item_list_type : $rootScope._userInfo.SalesItemListType,
                     DeliveryAddress : (!editMode) ?
-                        ($scope.modalBox.tx.address +', '+ $scope.modalBox.tx.area+', ' + $scope.modalBox.tx.city +', '+
-                        $scope.modalBox.tx.state+', ' + $scope.modalBox.tx.country) : $scope.modalBox.tx.deliveryAddress
+                        makeAddress() : $scope.modalBox.tx.deliveryAddress
                 };
                 return preparedTx;
             };
@@ -1060,6 +1082,20 @@
             $scope.decrementPage = function(){
                 $scope.pageNumber  -= 1;
             };
+
+
+
+            $scope.$on(
+                "$destroy",
+                function handleDestroyEvent() {
+                    /**
+                     * If itemListType is > 0, and items are not there then automatically
+                     * listType becomes 0 but to restore the actual list type in $rootScope
+                     * this will reassign the values to _userInfo.SalesItemListType
+                     */
+                    $rootScope._userInfo.SalesItemListType = $scope._tempSalesItemListType;
+                }
+            );
 
         }]);
 
