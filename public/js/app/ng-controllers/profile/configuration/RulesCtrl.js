@@ -7,6 +7,9 @@ angular.module('ezeidApp').controller('RulesCtrl',['$scope','$interval','$http',
     '$rootScope','$filter','$timeout','MsgDelay','GURL','$q','GoogleMaps',
     function($scope,$interval,$http,Notification,$rootScope,$filter,$timeout,MsgDelay,GURL,$q,GoogleMap){
 
+        String.prototype.capitalizeFirstLetter = function() {
+            return this.charAt(0).toUpperCase() + this.slice(1);
+        };
 
         $scope.selectedTab = 1;
 
@@ -177,9 +180,10 @@ angular.module('ezeidApp').controller('RulesCtrl',['$scope','$interval','$http',
             }
         });
 
-        $scope.$watch('modalBox.rule.RuleType',function(newVal){
-            if(newVal == 3){
-
+        $scope.$watch('modalBox.rule.RuleType',function(newVal,oldVal){
+            if(newVal !== oldVal){
+                $scope.modalBox.tempMappedName = '';
+                $scope.modalBox.rule.MappedNames = [];
             }
         });
 
@@ -190,6 +194,7 @@ angular.module('ezeidApp').controller('RulesCtrl',['$scope','$interval','$http',
                 return false;
             }
 
+            $scope.modalBox.tempMappedName = $scope.modalBox.tempMappedName.toUpperCase();
             $scope.modalBox.tempMappedName = $scope.modalBox.tempMappedName.replace(' ','');
             var tempIds = $scope.modalBox.tempMappedName.split(',');
             if(tempIds.length > 0){
@@ -429,27 +434,87 @@ angular.module('ezeidApp').controller('RulesCtrl',['$scope','$interval','$http',
              * @todo
              * Validations Required before saving rules
              */
-            return true;
+            var error = [];
+            if(!$scope.modalBox.rule.FolderTitle){
+                error.push('folder title');
+            }
+            if(!$scope.modalBox.rule.CountryID){
+                error.push('country');
+            }
+
+            if(!$scope.modalBox.rule.SeqNoFrefix){
+                error.push('prefix');
+            }
+
+            if($scope.modalBox.rule.RuleType === ''){
+                error.push('rule type');
+            }
+
+            if(!$scope.modalBox.rule.FolderStatus){
+                error.push('rule status');
+            }
+
+            if($scope.modalBox.rule.RuleType !== 1){
+                if($scope.modalBox.rule.MappedNames.length < 1){
+                    error.push('mapped names');
+                }
+            }
+
+            if($scope.modalBox.rule.RuleType == 1){
+                if($scope.modalBox.rule.Proximity){
+                    error.push('proximity');
+                }
+            }
+
+
+            if(error.length > 0){
+                var msg = error.join(',').capitalizeFirstLetter() + ' cannot be empty';
+                Notification.error({ message : msg, delay : MsgDelay});
+                return false;
+            }
+            else{
+                return true;
+            }
         };
 
         $scope.saveRule = function(){
-            if(!validateSaveRuleData($scope.modalBox.rule)){
-                Notification.error({ message : 'Please check all the details properly', delay : MsgDelay});
+            if(!validateSaveRuleData()){
                 return;
             }
 
 
-            var ruleData = $scope.modalBox.rule;
+            var ruleData = angular.copy($scope.modalBox.rule);
             ruleData.MappedNames = ruleData.MappedNames.join(',');
+            ruleData.Token = $rootScope._userInfo.Token;
 
+            $scope.$emit('$preLoaderStart');
             $http({
                 url : 'ewmSaveFolderRules',
                 method : "POST",
                 data :ruleData
             }).success(function(resp){
-                ////console.log(resp);
-                Notification.success({ message : 'Rule added successfully', delay : MsgDelay});
+                if(resp && resp !== 'null'){
+                    if(resp.IsSuccessfull){
+                        $scope.loadAllRules().then(function(){
+                            $scope.$emit('$preLoaderStop');
+                        },function(){
+                            $scope.$emit('$preLoaderStop');
+                        });
+                        Notification.success({ message : 'Rule added successfully', delay : MsgDelay});
+                        $scope.toggleModalBox();
+                    }
+                    else{
+                        $scope.$emit('$preLoaderStop');
+                        Notification.error({ message : 'An error occurred while adding rule', delay : MsgDelay});
+                    }
+                }
+                else{
+                    $scope.$emit('$preLoaderStop');
+                    Notification.error({ message : 'An error occurred while adding rule', delay : MsgDelay});
+                }
+
             }).error(function(err){
+                $scope.$emit('$preLoaderStop');
                 Notification.error({ message : 'An error occurred while adding rule', delay : MsgDelay});
             });
         };
@@ -470,3 +535,5 @@ angular.module('ezeidApp').controller('RulesCtrl',['$scope','$interval','$http',
 
 
     }]);
+
+

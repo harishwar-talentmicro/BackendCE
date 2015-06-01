@@ -468,7 +468,7 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
                         ((userDetails.SelectionType === 1 || userDetails.SelectionType === 2) ?
                             userDetails.SelectionType : 1) : 0,
                     ParkingStatus : userDetails.ParkingStatus,
-                    TemplateID : (userDetails.TemplateID) ? userDetails.TemplateID : 0
+                    TemplateID : (userDetails.TemplateID && userDetails.TemplateID !== 'null') ? userDetails.TemplateID : 0
 
                 };
                 $scope.$emit('$preLoaderStart');
@@ -815,6 +815,7 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
                 Latitude : 12.9667,
                 Longitude : 77.5667,
                 Altitude : 0,
+                TemplateID : 0,
                 IDTypeID: ($scope.userDetails.IDTypeID) ? $scope.userDetails.IDTypeID : 2,
             };
 

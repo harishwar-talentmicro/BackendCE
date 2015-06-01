@@ -673,7 +673,7 @@
                                                                                 </button>
                                                                             </span>
         </h4>
-        <small ng-show="(!locationsToggleIndex[0].editMode) && locationsToggleIndex[0].viewMode" class="warning">Please click on edit button to change your map location and address</small>
+        <p class="text-right">        <small ng-show="(!locationsToggleIndex[0].editMode) && locationsToggleIndex[0].viewMode" class="warning">Please click on edit button to change your map location and address</small></p>
     </div>
 </div>
 
@@ -813,7 +813,7 @@
         </div>
     </div>
 
-    <div class="row" ng-show="userDetails.IDTypeID === 2 && userDetails.SelectionType === 2">
+    <div class="row" ng-show="userDetails.IDTypeID === 2">
         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
             <h5 class="text-primary text-left">Working Hours Template </h5>
         </div>
@@ -983,7 +983,7 @@
         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
             <h5 class="text-primary text-left font-open-sans data">
                 <select class="form-control" ng-model="editLocationDetails.TemplateID" name="primaryLocationForm.TemplateID">
-                    <option ng-repeat="template in workingHoursTemplateMap" value="">--Select Working Hours Template--</option>
+                    <option value="0">--Select Working Hours Template--</option>
                     <option ng-repeat="template in workingHoursTemplateMap" value="{{template.TID}}">{{template.TemplateName}}</option>
                 </select>
             </h5>
@@ -1153,7 +1153,7 @@
 
     </div>
 
-    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix text-right">
         <small ng-show="(!locationsToggleIndex[locIndex+1].editMode) && locationsToggleIndex[locIndex+1].viewMode" class="warning">Please click on edit button to change your map location and address</small>
     </div>
 </div>
@@ -1253,7 +1253,7 @@
     </div>
 
 
-    <div class="row" ng-show="userDetails.IDTypeID === 2 && userDetails.SelectionType === 2">
+    <div class="row" ng-show="userDetails.IDTypeID === 2">
         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
             <h5 class="text-primary text-left">Working Hours Template </h5>
         </div>
@@ -1428,7 +1428,7 @@
         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
             <h5 class="text-primary text-left font-open-sans data">
                 <select class="form-control" ng-model="editLocationDetails.TemplateID" name="secondaryLocation{{locIndex}}Form.TemplateID">
-                    <option ng-repeat="template in workingHoursTemplateMap" value="">--Select Working Hours Template--</option>
+                    <option value="0">--Select Working Hours Template--</option>
                     <option ng-repeat="template in workingHoursTemplateMap" value="{{template.TID}}">{{template.TemplateName}}</option>
                 </select>
             </h5>

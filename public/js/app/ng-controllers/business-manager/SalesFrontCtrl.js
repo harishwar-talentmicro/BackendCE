@@ -380,7 +380,7 @@
                         $scope.masterUser = resp[0];
                         $scope.salesItemListType = ($scope.masterUser.SalesItemListType &&
                         (!isNaN(parseInt($scope.masterUser.SalesItemListType)))) ? parseInt($scope.masterUser.SalesItemListType) : 0 ;
-                        $scope._salesModalTitle = ($scope.masterUser.SalesModuleTitle) ? $scope.masterUser.SalesModuleTitle : 'Sales Enquiry';
+                        //$scope._salesModalTitle = ($scope.masterUser.SalesModuleTitle) ? $scope.masterUser.SalesModuleTitle : 'Sales Enquiry';
                     }
                     defer.resolve();
                 }).error(function(err){
@@ -545,7 +545,7 @@
                     flag *= false;
                 }
 
-                if(tx.itemList.length < 1 && $scope.salesItemListType > 1){
+                if(tx.itemList.length < 1 && $scope.salesItemListType > 0 && $scope.moduleItems.length > 0){
                     $scope.txerror.items = true;
                     flag *= false;
                 }
