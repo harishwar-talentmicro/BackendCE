@@ -593,9 +593,9 @@
                         <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12 item-list-box">
                             <div class="row">
                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                    <h4 class="text-center font-roboto text-warning">Select Items</h4>
+                                    <h4 class="text-center font-roboto text-warning">Select Products</h4>
                                     <h6 class="text-center font-robot text-info">
-                                        {{moduleItems.length}} items in list
+                                        {{moduleItems.length}} products in list
                                     </h6>
                                 </div>
                             </div>
@@ -617,15 +617,15 @@
                       <div class="col-lg-8 col-md-8 col-sm-6 col-xs-12">
                           <div class="row">
                               <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                  <h4 class="text-center font-roboto text-success">Items in your order list </h4>
-                                  <h6 class="text-center font-roboto text-info">{{modalBox.tx.itemList.length}} items in your enquiry list </h6>
+                                  <h4 class="text-center font-roboto text-success">Products in your order list </h4>
+                                  <h6 class="text-center font-roboto text-info">{{modalBox.tx.itemList.length}} products in your enquiry list </h6>
                               </div>
                           </div>
 
                           <div class="row" id="tx-item-list-container">
 
                               <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-center" ng-hide="modalBox.tx.itemList.length > 0">
-                                  <small class="font-open-sans text-warning">Add items to your enquiry</small>
+                                  <small class="font-open-sans text-warning">Add products to your enquiry</small>
                               </div>
 
                               <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12" ng-repeat="item in modalBox.tx.itemList track by item.ItemID">
