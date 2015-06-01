@@ -385,11 +385,12 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',[
     //  Open Services Modal box
     $scope.showReservationServiceMapModal = false;
     $scope.openReservationServiceMapModalBox = function(item){
+
         $scope.showReservationServiceMapModal = true;
         resetMappingValue();
         if(item != 0)
         {
-            var servicesIdArray = JSON.parse("[" + item.ServiceID + "]");
+            var servicesIdArray = JSON.parse("[" + item.serviceID + "]");
             $scope.modalBox = {
                 mapItem : {
                     resourceid : item.ResourceID
@@ -445,7 +446,7 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',[
     $scope.saveMappingData = function(){
             if(($scope.selectedTID.length > 0) && ($scope.modalBox.mapItem.resourceid != 0))
             {
-                $scope.modalBox.mapItem.service_ids = $scope.selectedTID;
+                $scope.modalBox.mapItem.serviceids = $scope.selectedTID;
                 $scope.modalBox.mapItem.Token = $rootScope._userInfo.Token;
                 $scope.$emit('$preLoaderStart');
                 $http({
@@ -455,6 +456,7 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',[
                 }).success(function(resp)
                     {
                         $scope.$emit('$preLoaderStop');
+                        console.log(resp);
                         $scope.showReservationServiceMapModal = false;
                         if(resp.status){
                             Notification.success({ message : 'Mapping added successfully', delay : 2000});
