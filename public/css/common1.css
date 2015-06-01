@@ -1599,3 +1599,15 @@ table.rwd-table > tbody > tr > td.serachResultSelectAll
     height: 175px;
     overflow-x: hidden;
 }
+.serviceListMapping > .business-itemMapping {
+    text-align: center;
+    min-height: 185px;
+    max-height: 185px;
+    font-size: 12px;
+}
+.setVScrolToServices
+{
+    overflow-y: scroll;
+    overflow-x: hidden;
+    height: 150px;
+}

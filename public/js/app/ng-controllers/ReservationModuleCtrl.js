@@ -48,10 +48,11 @@ var res = angular.module('ezeidApp').
 
 
             /* for resources availability background color */
-            var availabilityColor = 'rgb(142, 238, 255)';
+            var availabilityColor = 'rgb(64, 242, 168)';
 
             /* color array for already reserved time slot */
-            var reservedColorArray = ['#99b433','#ff0097','#9f00a7','#00aba9','#2d89ef','#2b5797','#b91d47'];
+            //var reservedColorArray = ['rgb(255, 190, 126)','#ff0097','#9f00a7','#00aba9','#2d89ef','#2b5797','#b91d47'];
+            var reservedColorArray = ['rgb(255, 163, 73)'];
 
             /* default height of the block in 'em' */
             var defaultHeightClass = 'blk-1-1';//default height class::||Don't Change||
@@ -167,6 +168,7 @@ var res = angular.module('ezeidApp').
 
             /* color working hours */
             $scope.colorWorkingHours = function () {
+
                 var workingHrs = $scope.workingHrs;
                 /* traverse through the individual time slot and color them */
                 for (var i = 0; i < workingHrs.length; i++) {
@@ -216,48 +218,29 @@ var res = angular.module('ezeidApp').
                 {
                     var startRange = realRange[i][0];
                     var endRange = realRange[i][1];
+                    /* merge the cells */
+                    mergeCells(startRange,endRange,text);
                     /* commence merging process */
                     $scope.colorBlocks(startRange,endRange,color);
-
                 }
-            }
-
-            /* responsible for getting the Block ID which has to be merged[TIME] */
-            function getMergingTimeBlocks(startPoint,endPoint)
-            {
-                var startPoint = 110;
-                var endPoint = 121;
-                var data = [];
-
-                for(var i=startPoint;i<endPoint;i++)
-                {
-                    var tempArr = [];
-                    if(i%6 == 5)
-                    {
-                        data.push([startPoint,i]);
-                        tempArr = [];
-                    }
-                    else if(i%6==0){
-                        startPoint = i;
-                        tempArr = [startPoint,i];
-                    }
-                    else
-                    {
-                        tempArr = [startPoint,i];
-                    }
-                }
-
-                if(tempArr.length > 0)
-                {
-                    data.push(tempArr);
-                }
-                return data;
             }
 
             /* Actual merging goes HERE */
-            function mergeCells(startBlock,endBlock,type)
+            function mergeCells(startBlock,endBlock,text)
             {
+                /* calculate total height  */
+                var totalHeight = endBlock - startBlock + 1;
+                /* increase the first block's height to totalHeight */
+                $('.block-'+startBlock).css('height',$scope.height*totalHeight+'em');
+                /* add text */
 
+                $('.block-'+startBlock).html('<p>'+text+'</p>');
+
+                /* hide the remaining block */
+                for(var i = startBlock+1; i <= endBlock ; i++)
+                {
+                    $('.block-'+i).addClass('hidden');
+                }
             }
 
             /* partition the block range based on 4 different time of day: i.e early,morning,evening,night */
@@ -328,7 +311,4 @@ var res = angular.module('ezeidApp').
                 var num = getRandomNumber(reservedColorArray.length);
                 return reservedColorArray[num];
             }
-
-
-
         }]);
