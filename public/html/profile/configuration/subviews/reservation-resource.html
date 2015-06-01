@@ -180,7 +180,7 @@
                                     <div class="form-group">
                                         <select class="form-control" name="ResourceSelect" ng-model="modalBox.mapItem.resourceid"
                                                 ng-options="resources.tid as resources.title for resources in AllResources" required>
-                                            <option value = ""> -- Select resource -- </option>
+                                            <option value = ""> -- Select Resource -- </option>
                                         </select>
                                     </div>
                                 </div>
@@ -331,7 +331,7 @@
                         </div>
 
                         <div ng-repeat="_mapItem in AllMappingData">
-                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 bottom-clearfix serviceList">
+                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 bottom-clearfix serviceListMapping">
                                 <div class="business-item">
                                     <div class="thumbnail">
                                         <span class="glyphicon glyphicon-edit" data-toggle="tooltip" title="" data-placement="right" data-original-title="Edit Service" ng-click="openReservationServiceMapModalBox(_mapItem)"></span>
@@ -345,9 +345,18 @@
                                                 </h4>
                                             </div>
 
-                                            <div ng-repeat="_itemService in AllServices">
-                                               <p ng-show="_mapItem.ServicesArray.indexOf(_itemService.tid)!=-1" class="item-description">{{_itemService.title | textLength:25}}</p>
-                                            </div>
+                                            <p class="item-description">
+                                                <div class="setVScrolToServices">
+                                                   <div ng-repeat="_itemService in AllServices">
+                                                        <span ng-show="_mapItem.ServicesArray.indexOf(_itemService.tid)!=-1">{{_itemService.title | textLength:25}}</span>
+                                                   </div>
+                                                </div>
+                                            </p>
+                                            <!--<div class="setVScrolToServices">
+                                                <div ng-repeat="_itemService in AllServices">
+                                                    <p ng-show="_mapItem.ServicesArray.indexOf(_itemService.tid)!=-1" class="item-description">{{_itemService.title | textLength:25}}</p>
+                                                </div>
+                                            </div>-->
                                         </div>
                                     </div>
                                 </div>

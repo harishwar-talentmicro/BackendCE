@@ -10994,12 +10994,16 @@ exports.FnSaveReservResourceServiceMap = function(req, res){
 
         var Token = req.body.Token ;
         var resourceid = req.body.resourceid;
-        var service_ids = req.body.service_ids;
+        var serviceids = req.body.serviceids;
         
-        console.log('service_ids Values:'+service_ids);
-                
-        var array = [service_ids];     
-        
+        var ID=''
+        if(serviceids){
+            ID = serviceids + ',' + ID;
+            serviceids =ID.slice(0,-1);
+            console.log(serviceids);
+            }
+        service_id = serviceids.concat(',');
+            console.log('service_ids Values:'+ service_id);
         var responseMessage = {
             status: false,
             error:{},
@@ -11013,8 +11017,8 @@ exports.FnSaveReservResourceServiceMap = function(req, res){
             validateStatus *= false;
         }
         
-        if(!service_ids){
-            responseMessage.error['service_ids'] = 'Invalid Service_ids';
+        if(!serviceids){
+            responseMessage.error['serviceids'] = 'Invalid Service_ids';
             validateStatus *= false;
         }
         
@@ -11030,24 +11034,8 @@ exports.FnSaveReservResourceServiceMap = function(req, res){
             FnValidateToken(Token, function (err, result) {
                 if (!err) {
                     if (result != null) {
-                    console.log('array:'+array);
-                    var newarry = array[0].split(',');
-                    var arraylength = newarry.length;
-                    console.log('new:'+arraylength);
-                    
-                    for(var i=0; i < arraylength; i++)
-                        {
-                            var serviceid = newarry[i];
-                            console.log(serviceid);
-                       
-                        var post = {
-                                        resourceid: resourceid,
-                                        serviceid: serviceid
-                                    };
-                        
-                        console.log(post);
-                        var query = db.query('INSERT INTO mresresourceservicemap SET ?', post, function (err, result) {
-                        //db.query(query, function (err, insertResult) {
+                        var query = db.escape(resourceid) + ',' + db.escape(service_id);
+                        db.query('CALL pSaveResResourceServiceMap(' + query + ')', function (err, insertResult) {
                             console.log('Result is..........:'+result);
                             console.log(err);
                              if (!err){
@@ -11057,9 +11045,10 @@ exports.FnSaveReservResourceServiceMap = function(req, res){
                                     responseMessage.message = 'ResourceService Map details save successfully';
                                     responseMessage.data = {
                                         resourceid : req.body.resourceid,
-                                        service_ids : req.body.service_ids
+                                        serviceids : service_id
                                     };
-                                    //res.status(200).json(responseMessage);
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnSaveReservResServiceMap: ResourceService Map details save successfully');
                                     
                                 }
                                 else {
@@ -11077,16 +11066,6 @@ exports.FnSaveReservResourceServiceMap = function(req, res){
                                 console.log('FnSaveReservResServiceMap: error in saving Resource details:' + err);
                             }
                         });
-                    };
-                        responseMessage.status = true;
-                        responseMessage.error = null;
-                        responseMessage.message = 'ResourceService Map details save successfully';
-                        responseMessage.data = {
-                            resourceid : req.body.resourceid,
-                            service_ids : req.body.service_ids
-                        };
-                        res.status(200).json(responseMessage);
-                        console.log('FnSaveReservResServiceMap: ResourceService Map details save successfully');
                     }
                     else {
                         responseMessage.message = 'Invalid token'; 
