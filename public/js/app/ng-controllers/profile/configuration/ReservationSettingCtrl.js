@@ -47,6 +47,7 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',[
 
     function resetServicesValue()
     {
+       $scope.selectedTID = [];
        $scope.modalBox = {
             servicesItem : {
                 title : "",
@@ -65,6 +66,7 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',[
         $scope.selectedTID = [];
         $scope.modalBox = {
             mapItem : {
+                TID: 0,
                 resourceid : 0
             }
         };
@@ -261,20 +263,19 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',[
         resetServicesValue();
         if(item != 0)
         {
-           var servicesIdArray = item.ServiceID.split(",");
-
-           $scope.modalBox = {
+           var servicesIdArray = JSON.parse("[" + item.serviceids + "]");
+           $scope.modalBox =
+           {
                 servicesItem : {
                     title : item.title,
                     status  : item.status,
                     duration: item.duration,
                     rate : item.rate,
                     TID: item.tid,
-                    serviceType: (item.serviceids == 0) ? 1 : 2,
-                    service_ids: servicesIdArray
+                    serviceType: (item.serviceids == 0) ? 1 : 2
                 }
-            };
-            $scope.selectedTID = item.serviceids;
+           };
+           $scope.selectedTID = servicesIdArray;
         }
     };
     $scope.closeReservationServiceModalBox = function(){
@@ -391,7 +392,7 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',[
             var servicesIdArray = JSON.parse("[" + item.ServiceID + "]");
             $scope.modalBox = {
                 mapItem : {
-                    resourceid : 0
+                    resourceid : item.ResourceID
                 }
             };
             $scope.selectedTID = servicesIdArray;
@@ -413,17 +414,16 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',[
                 Token : $rootScope._userInfo.Token
             }
         }).success(function(resp){
+                console.log(resp);
                 $scope.$emit('$preLoaderStop');
                 if(resp.status){
                     /*$scope.AllMappingData = resp.data;*/
                     var mappingData = resp.data;
-                    //console.log(mappingData);
                     var nCount, nServicCount;
                     for (nCount = 0; nCount < mappingData.length; nCount++)
                     {
-                        var res = mappingData[nCount].ServiceID.split(",");
-                        console.log(res);
-                        /*mappingData[nCount].ServicesArray = res;*/
+                        var res = mappingData[nCount].serviceID.split(",");
+                       /*mappingData[nCount].ServicesArray = res;*/
                          mappingData[nCount].ServicesArray = JSON.parse("[" + res + "]");
 
                         /*for (nServicCount = 0; nServicCount < res.length; nServicCount++)
@@ -431,11 +431,7 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',[
                             mappingData[nCount].ServicesArray.push(res[nServicCount]);
                         }*/
                     }
-
-                    console.log("sai111");
-                    console.log(mappingData);
-
-                   // $scope.AllMappingData1[0].tmp = [7,8,9];
+                    // $scope.AllMappingData1[0].tmp = [7,8,9];
                     $scope.AllMappingData = mappingData;
 
                 }
@@ -447,8 +443,7 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',[
 
     // save mapping data
     $scope.saveMappingData = function(){
-
-            if($scope.selectedTID)
+            if(($scope.selectedTID.length > 0) && ($scope.modalBox.mapItem.resourceid != 0))
             {
                 $scope.modalBox.mapItem.service_ids = $scope.selectedTID;
                 $scope.modalBox.mapItem.Token = $rootScope._userInfo.Token;
@@ -462,9 +457,7 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',[
                         $scope.$emit('$preLoaderStop');
                         $scope.showReservationServiceMapModal = false;
                         if(resp.status){
-
                             Notification.success({ message : 'Mapping added successfully', delay : 2000});
-
                         }
                         else{
                             Notification.error({ message : 'An error occurred while saving Mapping! Please try again', delay : 2000});
