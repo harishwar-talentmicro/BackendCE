@@ -10994,15 +10994,16 @@ exports.FnSaveReservResourceServiceMap = function(req, res){
 
         var Token = req.body.Token ;
         var resourceid = req.body.resourceid;
-        var service_ids = req.body.service_ids;
+        var serviceids = req.body.serviceids;
         
         var ID=''
-        if(service_ids){
-            ID = service_ids + ',' + ID;
-            service_ids =ID.slice(0,-1);
-            service_id = service_ids.concat(',');
+        if(serviceids){
+            ID = serviceids + ',' + ID;
+            serviceids =ID.slice(0,-1);
+            console.log(serviceids);
+            }
+        service_id = serviceids.concat(',');
             console.log('service_ids Values:'+ service_id);
-        }
         var responseMessage = {
             status: false,
             error:{},
