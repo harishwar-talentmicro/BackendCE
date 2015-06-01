@@ -11017,8 +11017,8 @@ exports.FnSaveReservResourceServiceMap = function(req, res){
             validateStatus *= false;
         }
         
-        if(!service_ids){
-            responseMessage.error['service_ids'] = 'Invalid Service_ids';
+        if(!serviceids){
+            responseMessage.error['serviceids'] = 'Invalid Service_ids';
             validateStatus *= false;
         }
         
@@ -11045,7 +11045,7 @@ exports.FnSaveReservResourceServiceMap = function(req, res){
                                     responseMessage.message = 'ResourceService Map details save successfully';
                                     responseMessage.data = {
                                         resourceid : req.body.resourceid,
-                                        service_ids : service_id
+                                        serviceids : service_id
                                     };
                                     res.status(200).json(responseMessage);
                                     console.log('FnSaveReservResServiceMap: ResourceService Map details save successfully');
