@@ -72,6 +72,7 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',[
     }
 
     $scope.reservationServiceTabSelected = function(){
+        $scope.selectedTID = [];
         resetServicesValue();
         getAllServices();
     };
@@ -375,10 +376,10 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',[
 
     // Maping tab selection
     $scope.reservationServiceMapTabSelected = function(){
+        $scope.selectedTID = [];
         resetMappingValue();
         getAllServices();
         getAllMappingData();
-
     };
 
     //  Open Services Modal box
@@ -465,29 +466,16 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',[
 
     // Below function gives getServiceIds
     $scope.getServicesOfResource = function(_ResourceId){
-
         var ResourceId = parseInt(_ResourceId);
         var nCount;
         for (nCount = 0; nCount <  $scope.AllMappingData.length; nCount++)
         {
             if((parseInt(_ResourceId)) == $scope.AllMappingData[nCount].ResourceID)
             {
-               // var res = $scope.AllMappingData[nCount].serviceID.split(",");
-                    console.log("SAi");
-                    console.log(res);
-               // console.log(JSON.parse("[" + res + "]"));
-               // mappingData[nCount].ServicesArray = JSON.parse("[" + res + "]");
-
-
-
                 var servicesIdArray = JSON.parse("[" + $scope.AllMappingData[nCount].serviceID + "]");
                 $scope.selectedTID = servicesIdArray;
             }
-
-
         }
-       // $scope.AllMappingData = mappingData;
-
     };
 
 
