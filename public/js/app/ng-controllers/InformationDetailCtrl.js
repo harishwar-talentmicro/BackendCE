@@ -112,11 +112,43 @@ angular.module('ezeidApp').
         else
         {
             $scope.showLoginText = false;
-            getSearchInformation(TID,$scope.SearchType);
+            getSearchInformation(TID,$scope.SearchType).then(function(){
+                if($routeParams['sales']){
+                    $timeout(function(){
+                        $scope._toggleSalesModal();
+                    });
+                }
+
+                else if($routeParams['reservation']){
+                    $timeout(function(){
+                        $scope._toggleReservationModal();
+                    });
+                }
+
+                else if($routeParams['homeDelivery']){
+                    $timeout(function(){
+                        $scope._toggleHomeDeliveryModal();
+                    });
+                }
+                else if($routeParams['service']){
+                    $timeout(function(){
+                        $scope._toggleServiceModal();
+                    });
+                }
+
+                else if($routeParams['resume']){
+                    $timeout(function(){
+                        $scope._toggleResumeModal();
+                    });
+                }
+
+
+            });
         }
         //Below function is for getting search information
         function getSearchInformation(_TID,_SearchType)
         {
+            var defer = $q.defer();
             $scope.SearchInfo = {};
             $scope.AddressForInfoTab = "";
             AutoRefresh = false;
@@ -128,7 +160,9 @@ angular.module('ezeidApp').
                 $rootScope._userInfo.Token = 2;
                 $scope.Token = 2;
             }
-            $http({ method: 'get', url: GURL + 'ewtGetSearchInformation?Token=' + $rootScope._userInfo.Token + '&TID=' + _TID + '&SearchType=' + _SearchType + '&CurrentDate=' + currentDate}).success(function (data) {
+            $http({ method: 'get',
+                url: GURL + 'ewtGetSearchInformation?Token=' + $rootScope._userInfo.Token + '&TID=' + _TID + '&SearchType=' + _SearchType + '&CurrentDate=' + currentDate}).success(function (data) {
+
                 $rootScope.$broadcast('$preLoaderStop');
 
                 //console.log(data);
@@ -207,16 +241,20 @@ angular.module('ezeidApp').
                         {
                             $scope.reservationPlaceHolder = "Appointment requirement details";
                         }
+                        defer.resolve();
                     });
                 }
                 else
                 {
                     $scope.showNotFound = true;
+                    defer.reject();
                 }
             })
             .error(function(data, status, headers, config) {
+                    defer.reject();
                     $rootScope.$broadcast('$preLoaderStop');
             });
+            return defer.promise;
         }
 
         //Below function is for getting about company
@@ -616,7 +654,6 @@ angular.module('ezeidApp').
             }
         };
 
-
         /**
          * @author Indrajeet
          * @description New Sales Module Integration
@@ -635,6 +672,34 @@ angular.module('ezeidApp').
             else{
                 $scope._showSalesModal = !$scope._showSalesModal;
             }
+        };
+
+        $scope._toggleReservationModal = function(){
+            /**
+             * @todo
+             * Open Reservation Modal
+             */
+        };
+
+        $scope._toggleHomeDeliveryModal = function(){
+            /**
+             * @todo
+             * Open Home Delivery Modal
+             */
+        };
+
+        $scope._toggleServiceModal = function(){
+            /**
+             * @todo
+             * Open Service Modal
+             */
+        };
+
+        $scope._toggleResumeModal = function(){
+            /**
+             * @todo
+             * Open Resume Modal
+             */
         };
 
 
