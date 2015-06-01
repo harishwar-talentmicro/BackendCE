@@ -486,6 +486,12 @@
             <modal mtitle="_salesModalTitle" mclass="modalBox.class" visible="_showSalesModal">
                 <div class="container-fluid" ng-controller="SalesFrontCtrl">
                     <div class="row">
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-center">
+                            <h4 class="font-roboto">{{(masterUser.SalesModuleTitle) ? masterUser.SalesModuleTitle : 'Sales Enquiry Form'}}
+                                <br/><small class="text-center">(Sales enquiry)</small>
+                            </h4>
+
+                        </div>
 
                         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 transaction-details-box">
 
@@ -545,7 +551,7 @@
 
                             </div>
 
-                            <hr/>
+                            <hr ng-show="moduleItems.length"/>
 
                             <div class="row">
 

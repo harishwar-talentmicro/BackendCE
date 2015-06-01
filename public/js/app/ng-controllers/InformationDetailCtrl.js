@@ -107,39 +107,47 @@ angular.module('ezeidApp').
         if(($scope.SearchType == 1) && (!$rootScope._userInfo.IsAuthenticate))
         {
             $scope.showLoginText = true;
+            $scope.$emit('$preLoaderStop');
             Notification.error({ message : 'Please login to search for EZEID', delay : MsgDelay});
         }
         else
         {
             $scope.showLoginText = false;
             getSearchInformation(TID,$scope.SearchType).then(function(){
-                if($routeParams['sales']){
+                var visibleStr = ($scope.SearchInfo.VisibleModules) ? $scope.SearchInfo.VisibleModules.toString() : null;
+                var visibleModules = (visibleStr) ? ((visibleStr.length == 5) ? visibleStr : '22222') : '22222';
+                if($routeParams['sales'] && (visibleModules[0] == 1)){
                     $timeout(function(){
+                        $scope._salesModalTitle = $scope.SearchInfo.EZEID;
                         $scope._toggleSalesModal();
-                    });
+                    },1000);
                 }
 
-                else if($routeParams['reservation']){
+                else if($routeParams['reservation'] && (visibleModules[1] == 1)){
                     $timeout(function(){
+                        $scope._reservationModalTitle = $scope.SearchInfo.EZEID;
                         $scope._toggleReservationModal();
-                    });
+                    },1000);
                 }
 
-                else if($routeParams['homeDelivery']){
+                else if($routeParams['homeDelivery'] && (visibleModules[2] == 1)){
                     $timeout(function(){
+                        $scope._homeDeliveryTitle = $scope.SearchInfo.EZEID;
                         $scope._toggleHomeDeliveryModal();
-                    });
+                    },1000);
                 }
-                else if($routeParams['service']){
+                else if($routeParams['service'] && (visibleModules[3] == 1)){
                     $timeout(function(){
+                        $scope._serviceModalTitle = $scope.SearchInfo.EZEID;
                         $scope._toggleServiceModal();
-                    });
+                    },1000);
                 }
 
-                else if($routeParams['resume']){
+                else if($routeParams['resume'] && (visibleModules[4] == 1)){
                     $timeout(function(){
+                        $scope._resumeModalTitle = $scope.SearchInfo.EZEID;
                         $scope._toggleResumeModal();
-                    });
+                    },1000);
                 }
 
 
@@ -345,17 +353,7 @@ angular.module('ezeidApp').
                 }
             };
 
-            //open Sales Enquiry form
-            $scope.openSalesEnquiryForm = function () {
-                if($rootScope._userInfo.Token == 2)
-                {
-                    $('#SignIn_popup').slideDown();
-                }
-                else
-                {
-                    $('#SalesEnquiryRequest_popup').slideDown();
-                }
-            };
+
 
             $scope.sendSalesEnquiry = function () {
                 if ($rootScope._userInfo.IsAuthenticate == true) {

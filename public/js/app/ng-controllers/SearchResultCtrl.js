@@ -638,10 +638,29 @@ var res = angular.module('ezeidApp').
             });
 
             /* redirect to full details page */
-            $scope.redirectFullPage = function(searchType,tid)
+            $scope.redirectFullPage = function(searchType,tid,sales,reservation,homeDelivery,service,resume)
             {
                 /* redirect to full detail page */
-                $location.url('/searchDetails?searchType='+searchType+'&TID='+tid);
+
+                var params = '?searchType='+searchType+'&TID='+tid;
+
+                if(sales){
+                    params += '&sales=true';
+                }
+                else if(reservation){
+                    params += '&reservation=true';
+                }
+                else if(homeDelivery){
+                    params += '&homeDelivery=true';
+                }
+                else if(service){
+                    params += '&service=true';
+                }
+                else if(resume){
+                    params += '&resume=true';
+                }
+
+                $location.url('/searchDetails'+params);
             }
 
             /**

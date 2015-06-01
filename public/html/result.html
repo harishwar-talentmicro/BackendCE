@@ -276,12 +276,10 @@
                                             </div>
                                         </div>
                                         <div class="flip-tile-row-3 p-5 text-center" ng-click="$event.stopPropagation()">
-                                            <button class="btn btn-default btn-xs">
+                                            <button ng-show="search.IDTypeID == 2 && search.EZEIDVerifiedID == 2 && search.VisibleModules[0] == 1" class="btn btn-default btn-xs" ng-click="redirectFullPage(params.searchType,search.TID,true)">
                                                 <i class="fa fa-user"></i> Sales
                                             </button>
-                                            <button class="btn btn-default btn-xs">
-                                                <i class="fa fa-cutlery"></i> Food
-                                            </button>
+
                                         </div>
                                     </div>
 
