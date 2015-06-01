@@ -107,17 +107,17 @@
                                 <!-- Filter Contents -->
                                 <div class="p-top-10 text-left">
                                     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 select-items">
-                                            <input type="checkbox" id="item1" ng-checked="params.parkingStatus == 1" class="chkShowParking filter"  ng-model="params.parkingStatus" name="parking" >
+                                        <input type="checkbox" id="item1" ng-checked="params.parkingStatus == 1" class="chkShowParking filter"  ng-model="params.parkingStatus" name="parking" >
                                         &nbsp;
                                         <label  for="item1"> Parking Required</label>
                                     </div>
                                     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 select-items">
-                                            <input type="checkbox" id="item2" class="chkHomeDelivery filter" ng-checked="params.homeDelivery == 1" ng-model="params.homeDelivery" name="homeDelivery" >
+                                        <input type="checkbox" id="item2" class="chkHomeDelivery filter" ng-checked="params.homeDelivery == 1" ng-model="params.homeDelivery" name="homeDelivery" >
                                         &nbsp;
                                         <label  for="item2">Need home delivery</label>
                                     </div>
                                     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 select-items">
-                                            <input type="checkbox" id="item3" class="chkOpenStatus filter" ng-checked="params.openStatus == 1" ng-model="params.openStatus" name="openStatus" >
+                                        <input type="checkbox" id="item3" class="chkOpenStatus filter" ng-checked="params.openStatus == 1" ng-model="params.openStatus" name="openStatus" >
                                         &nbsp;
                                         <label  for="item3">Open business only</label>
                                     </div>
@@ -254,7 +254,10 @@
                                     <div class="textbox back metro-bg-default no-box-shadow text-white height-128">
 
                                         <div class="flip-tile-row-1 p-top-10">
-                                            <div class="col-lg-12 text-right" ng-click="$event.stopPropagation()">
+                                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 text-left" ng-click="$event.stopPropagation()">
+                                                <i ng-click="showDirectionMapPopup(search.Latitude,search.Longitude,search.IDTypeID)" title="directions" class="fa fa-map-marker direction-btn"></i>
+                                            </div>
+                                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 text-right" ng-click="$event.stopPropagation()">
                                                 <input data-tid="{{search.MasterID}}" data-id="{{tempVal}}" type="checkbox" class="result-checkbox" name="companyID" ng-click="toggleCheckbox($event)" />
                                             </div>
                                         </div>
@@ -263,25 +266,22 @@
                                                 <small>{{search.TagLine | truncate:40}}</small>
                                                 <br>
                                                 <small title="{{search.AddressLine1+', '+search.AddressLine2+', '+search.city}}">{{makeAddress(search.AddressLine1,search.AddressLine2,search.city)}}</small>
-                                              <p> <small>
-                                                  <!-- Mobile Number -->
-                                                  {{(search.MobileNumber.trim() && search.MobileNumber !== 'null')?search.CountryCode+' '+search.MobileNumber:''}}
-                                                  <!-- Seperator -->
-                                                  <i class="{{((search.MobileNumber.trim() && search.MobileNumber !== 'null') && (search.PhoneNumber.trim() && search.PhoneNumber !== 'null'))?'fa fa-minus fa-rotate-90 text-info':''}}"></i>
-                                                  <!-- Telephone Number -->
-                                                  {{(search.PhoneNumber.trim() && search.PhoneNumber !== 'null')?search.CountryCode+' '+search.PhoneNumber:''}}</small></p>
+                                                <p> <small>
+                                                    <!-- Mobile Number -->
+                                                    {{(search.MobileNumber.trim() && search.MobileNumber !== 'null')?search.CountryCode+' '+search.MobileNumber:''}}
+                                                    <!-- Seperator -->
+                                                    <i class="{{((search.MobileNumber.trim() && search.MobileNumber !== 'null') && (search.PhoneNumber.trim() && search.PhoneNumber !== 'null'))?'fa fa-minus fa-rotate-90 text-info':''}}"></i>
+                                                    <!-- Telephone Number -->
+                                                    {{(search.PhoneNumber.trim() && search.PhoneNumber !== 'null')?search.CountryCode+' '+search.PhoneNumber:''}}</small></p>
                                             </div>
                                         </div>
                                         <div class="flip-tile-row-3 p-5 text-center" ng-click="$event.stopPropagation()">
-                                            <button class="btn btn-default btn-xs" ng-click="showDirectionMapPopup(search.Latitude,search.Longitude,search.IDTypeID)">
-                                                <i class="fa fa-map-marker"></i> Directions
+                                            <button class="btn btn-default btn-xs">
+                                                <i class="fa fa-user"></i> Sales
                                             </button>
-                                            <!--<button class="btn btn-default btn-xs">-->
-                                                <!--<i class="fa fa-user"></i> Sales-->
-                                            <!--</button>-->
-                                            <!--<button class="btn btn-default btn-xs">-->
-                                                <!--<i class="fa fa-cutlery"></i> Food-->
-                                            <!--</button>-->
+                                            <button class="btn btn-default btn-xs">
+                                                <i class="fa fa-cutlery"></i> Food
+                                            </button>
                                         </div>
                                     </div>
 
@@ -295,9 +295,6 @@
                     <!-- flipping tiles ends here -->
 
                     <!-- FLIPPING TILES ENDS -->
-
-
-                    <!-- Calling Flipping-card : For executing flipping post-DOM rendering -->
                 </div>
             </div>
             <!-- main-tiles-frame-ends -->
@@ -305,5 +302,6 @@
 
     </section>
     <!-- Footer goes here -->
-    <footer-section {{flippingCards()}}></footer-section>
+    <!-- Calling Flipping-card : For executing flipping post-DOM rendering -->
+    <footer-section {{flippingCard()}}></footer-section>
 </div>
