@@ -178,7 +178,9 @@
                             <div class="row">
                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
                                     <div class="form-group">
-                                        <select class="form-control" name="ResourceSelect" ng-model="modalBox.mapItem.resourceid"
+                                        <select class="form-control" name="ResourceSelect"
+                                                ng-model="modalBox.mapItem.resourceid"
+                                                ng-change="getServicesOfResource(modalBox.mapItem.resourceid)"
                                                 ng-options="resources.tid as resources.title for resources in AllResources" required>
                                             <option value = ""> -- Select Resource -- </option>
                                         </select>
@@ -188,10 +190,10 @@
                         </div>
                         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 bottom-clearfix parkingText" >
 
-                            <div class="setBorderColor allServicesBox" >
+                            <div class="setBorderColor allServicesBox">
                                 <div ng-repeat="_item in AllServices">
 
-                                    <div class="row setRowLeftRightMarginZero" ng-show="_item.serviceids == 0">
+                                    <div class="row setRowLeftRightMarginZero">
                                         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix setLeftRightPaddingZero SearchMarginLeft">
                                             {{_item.tid}}
                                             <input type="checkbox"
@@ -221,7 +223,7 @@
     </modal>
 
 
-    <div ng-show="false">
+    <div ng-show="true">
         <h1>
             <span class="glyphicon glyphicon-calendar"></span> Coming Soon !
         </h1>
@@ -230,7 +232,7 @@
 
 
 
-    <div class="panel-body" ng-show="true">
+    <div class="panel-body" ng-show="false">
 
         <div role="tabpanel">
             <!-- Nav tabs -->
@@ -331,7 +333,7 @@
                         </div>
 
                         <div ng-repeat="_mapItem in AllMappingData">
-                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 bottom-clearfix serviceListMapping">
+                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 bottom-clearfix serviceList">
                                 <div class="business-item">
                                     <div class="thumbnail">
                                         <span class="glyphicon glyphicon-edit" data-toggle="tooltip" title="" data-placement="right" data-original-title="Edit Service" ng-click="openReservationServiceMapModalBox(_mapItem)"></span>

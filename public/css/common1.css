@@ -1609,5 +1609,11 @@ table.rwd-table > tbody > tr > td.serachResultSelectAll
 {
     overflow-y: scroll;
     overflow-x: hidden;
-    height: 150px;
+    height: 60px;
+}
+.business-itemMapping {
+    text-align: center;
+    min-height: 145px;
+    max-height: 145px;
+    font-size: 12px;
 }
