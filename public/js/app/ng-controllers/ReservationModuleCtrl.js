@@ -78,7 +78,7 @@ var res = angular.module('ezeidApp').
             /////////////////////////////////////////////////////////
             /////////////////////////////////////////////////////////
             /////////////////////////////////////////////////////////
-            ///////////////DONT EDIT BELOW THIS BOX//////////////////
+            ///////////////DON'T EDIT BELOW THIS BOX/////////////////
             /////////////////////////////////////////////////////////
             /////////////////////////////////////////////////////////
             /////////////////////////////////////////////////////////
@@ -218,7 +218,46 @@ var res = angular.module('ezeidApp').
                     var endRange = realRange[i][1];
                     /* commence merging process */
                     $scope.colorBlocks(startRange,endRange,color);
+
                 }
+            }
+
+            /* responsible for getting the Block ID which has to be merged[TIME] */
+            function getMergingTimeBlocks(startPoint,endPoint)
+            {
+                var startPoint = 110;
+                var endPoint = 121;
+                var data = [];
+
+                for(var i=startPoint;i<endPoint;i++)
+                {
+                    var tempArr = [];
+                    if(i%6 == 5)
+                    {
+                        data.push([startPoint,i]);
+                        tempArr = [];
+                    }
+                    else if(i%6==0){
+                        startPoint = i;
+                        tempArr = [startPoint,i];
+                    }
+                    else
+                    {
+                        tempArr = [startPoint,i];
+                    }
+                }
+
+                if(tempArr.length > 0)
+                {
+                    data.push(tempArr);
+                }
+                return data;
+            }
+
+            /* Actual merging goes HERE */
+            function mergeCells(startBlock,endBlock,type)
+            {
+
             }
 
             /* partition the block range based on 4 different time of day: i.e early,morning,evening,night */
@@ -289,5 +328,7 @@ var res = angular.module('ezeidApp').
                 var num = getRandomNumber(reservedColorArray.length);
                 return reservedColorArray[num];
             }
+
+
 
         }]);

@@ -397,17 +397,17 @@ angular.module('ezeidApp').
                     validationStatus *= false;
                 }
 
-                if(!$scope.firstName){
-                    $scope.error.firstName = '*First Name cannot be empty';
-                    validationStatus *= false;
-                }
-
-                if(typeof($scope.firstName) !== "undefined"){
-                    if($scope.firstName.length < 1){
-                        $scope.error.firstName = "*First Name cannot be empty";
-                        validationStatus *= false;
-                    }
-                }
+                //if(!$scope.firstName){
+                //    $scope.error.firstName = '*First Name cannot be empty';
+                //    validationStatus *= false;
+                //}
+                //
+                //if(typeof($scope.firstName) !== "undefined"){
+                //    if($scope.firstName.length < 1){
+                //        $scope.error.firstName = "*First Name cannot be empty";
+                //        validationStatus *= false;
+                //    }
+                //}
 
                 //if(!$scope.lastName){
                 //    $scope.error.lastName = 'Last Name cannot be empty';
@@ -421,30 +421,30 @@ angular.module('ezeidApp').
                 //    }
                 //}
 
-                if(!$scope.about){
-                    $scope.error.about = ($scope.userType === 1 || $scope.userType === 2) ?
-                        'Please enter tagline about your company' : 'Please enter tagline about public place';
-                    validationStatus *= false;
-                }
+                //if(!$scope.about){
+                //    $scope.error.about = ($scope.userType === 1 || $scope.userType === 2) ?
+                //        'Please enter tagline about your company' : 'Please enter tagline about public place';
+                //    validationStatus *= false;
+                //}
 
-                if(typeof($scope.about) !== "undefined"){
-                    if($scope.about.length < 1){
-                        $scope.error.about = ($scope.userType === 1 || $scope.userType === 2) ?
-                            '*Please enter tagline for your company' : 'Please enter tagline for public place';
-                        validationStatus *= false;
-                    }
-                }
+                //if(typeof($scope.about) !== "undefined"){
+                //    if($scope.about.length < 1){
+                //        $scope.error.about = ($scope.userType === 1 || $scope.userType === 2) ?
+                //            '*Please enter tagline for your company' : 'Please enter tagline for public place';
+                //        validationStatus *= false;
+                //    }
+                //}
 
-                if($scope.userType === 1 && typeof($scope.dateOfBirth) === "undefined"){
-                    $scope.error.dateOfBirth = '*Please enter your date of Birth'
-                    validationStatus *= false;
-                }
+                //if($scope.userType === 1 && typeof($scope.dateOfBirth) === "undefined"){
+                //    $scope.error.dateOfBirth = '*Please enter your date of Birth'
+                //    validationStatus *= false;
+                //}
 
-                if(($scope.userType === 2) && ((!$scope.mobile) && (!$scope.email))){
-                    //////console.log('Email or Mobile cannot be empty');
-                    $scope.error.email = '*Either Mobile or email is mandatory ! Please fill any one of them';
-                    validationStatus *= false;
-                }
+            //    if(($scope.userType === 2) && ((!$scope.mobile) && (!$scope.email))){
+            //        //////console.log('Email or Mobile cannot be empty');
+            //        $scope.error.email = '*Either Mobile or email is mandatory ! Please fill any one of them';
+            //        validationStatus *= false;
+            //    }
             }
 
 
@@ -734,6 +734,7 @@ angular.module('ezeidApp').
                                 var encrypted = CryptoJS.AES.encrypt(JSON.stringify(sResp), "EZEID");
 
                                 localStorage.setItem("_token", encrypted);
+                                document.cookie="login=1; expires=Thu, 18 Dec 2016 12:00:00 UTC; path=/";
 
                                 if($scope.userType == 2){
                                     createBasicConf(sResp.Token).then(function(){
