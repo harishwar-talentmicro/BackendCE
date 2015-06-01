@@ -26,6 +26,7 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',[
     //Initially First Tab is selected
     $scope.selectedTab = 1;
     $scope.selectedTID = [];
+
     resetResourceValue();
     getUserDetails();
     getAllResources();
@@ -55,6 +56,16 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',[
                 TID: 0,
                 serviceType: 1,
                 service_ids: ""
+            }
+        };
+    }
+
+    function resetMappingValue()
+    {
+        $scope.selectedTID = [];
+        $scope.modalBox = {
+            mapItem : {
+                resourceid : 0
             }
         };
     }
@@ -250,7 +261,7 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',[
         resetServicesValue();
         if(item != 0)
         {
-           var servicesIdArray = item.serviceids.split(",");
+           var servicesIdArray = item.ServiceID.split(",");
 
            $scope.modalBox = {
                 servicesItem : {
@@ -364,7 +375,7 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',[
 
     // Maping tab selection
     $scope.reservationServiceMapTabSelected = function(){
-       // resetServicesValue();
+        resetMappingValue();
         getAllServices();
         getAllMappingData();
 
@@ -374,29 +385,22 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',[
     $scope.showReservationServiceMapModal = false;
     $scope.openReservationServiceMapModalBox = function(item){
         $scope.showReservationServiceMapModal = true;
-        //resetServicesValue();
+        resetMappingValue();
         if(item != 0)
         {
-            var servicesIdArray = item.serviceids.split(",");
-
+            var servicesIdArray = JSON.parse("[" + item.ServiceID + "]");
             $scope.modalBox = {
-                servicesItem : {
-                    title : item.title,
-                    status  : item.status,
-                    duration: item.duration,
-                    rate : item.rate,
-                    TID: item.tid,
-                    serviceType: (item.serviceids == 0) ? 1 : 2,
-                    service_ids: servicesIdArray
+                mapItem : {
+                    resourceid : 0
                 }
             };
-            $scope.selectedTID = item.serviceids;
+            $scope.selectedTID = servicesIdArray;
         }
     };
 
     $scope.closeReservationServiceMapModalBox = function(){
         $scope.showReservationServiceMapModal = false;
-       // resetServicesValue();
+        resetMappingValue();
     };
 
     // Get Mapping data
@@ -409,12 +413,30 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',[
                 Token : $rootScope._userInfo.Token
             }
         }).success(function(resp){
-                console.log("sai123");
-                console.log(resp);
                 $scope.$emit('$preLoaderStop');
                 if(resp.status){
-                    $scope.AllMappingData = resp.data;
+                    /*$scope.AllMappingData = resp.data;*/
+                    var mappingData = resp.data;
+                    //console.log(mappingData);
+                    var nCount, nServicCount;
+                    for (nCount = 0; nCount < mappingData.length; nCount++)
+                    {
+                        var res = mappingData[nCount].ServiceID.split(",");
+                        console.log(res);
+                        /*mappingData[nCount].ServicesArray = res;*/
+                         mappingData[nCount].ServicesArray = JSON.parse("[" + res + "]");
 
+                        /*for (nServicCount = 0; nServicCount < res.length; nServicCount++)
+                        {
+                            mappingData[nCount].ServicesArray.push(res[nServicCount]);
+                        }*/
+                    }
+
+                    console.log("sai111");
+                    console.log(mappingData);
+
+                   // $scope.AllMappingData1[0].tmp = [7,8,9];
+                    $scope.AllMappingData = mappingData;
 
                 }
             }).error(function(err){
@@ -423,5 +445,38 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',[
             });
     };
 
+    // save mapping data
+    $scope.saveMappingData = function(){
+
+            if($scope.selectedTID)
+            {
+                $scope.modalBox.mapItem.service_ids = $scope.selectedTID;
+                $scope.modalBox.mapItem.Token = $rootScope._userInfo.Token;
+                $scope.$emit('$preLoaderStart');
+                $http({
+                    url : GURL + 'reservation_resource_service_map',
+                    method : ($scope.modalBox.mapItem.TID == 0) ? "POST" : "PUT",
+                    data : $scope.modalBox.mapItem
+                }).success(function(resp)
+                    {
+                        $scope.$emit('$preLoaderStop');
+                        $scope.showReservationServiceMapModal = false;
+                        if(resp.status){
+
+                            Notification.success({ message : 'Mapping added successfully', delay : 2000});
+
+                        }
+                        else{
+                            Notification.error({ message : 'An error occurred while saving Mapping! Please try again', delay : 2000});
+                        }
+                        resetMappingValue();
+                        getAllServices();
+                        getAllMappingData();
+                    }).error(function(err){
+                        $scope.$emit('$preLoaderStop');
+                        Notification.error({ message : 'An error occurred while saving Mapping! Please try again', delay : 2000});
+                    });
+            }
+        };
 
 }]);

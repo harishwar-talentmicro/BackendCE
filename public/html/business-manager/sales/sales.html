@@ -194,7 +194,7 @@
                     </div>
 
                     <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 bottom-clearfix"
-                         ng-hide="editModes[$index]" ng-dblclick="((salesPermissionConf.txUpdate) ? toggleAllEditMode($index) : 0)">
+                         ng-hide="editModes[$index]" ng-dblclick="((salesPermissionConf.txUpdate) ? toggleAllEditMode($index,false,true) : 0)">
                         <div class="row">
                             <div ng-class="(moduleConf.listType == 4) ? 'col-lg-6' : 'col-lg-12'" class="col-md-12 col-sm-12 col-xs-12"
                                  title="{{(salesPermissionConf.txUpdate) ? 'Double click to edit' : 'Do not have permission to edit'}}">
@@ -210,7 +210,7 @@
                     <div class="col-lg-1 col-md-12 col-sm-12 col-xs-12 bottom-clearfix"
                          title="{{(salesPermissionConf.txUpdate) ? 'Double click to edit' : 'Do not have permission to edit'}}"
                          ng-hide="editModes[$index]"
-                         ng-dblclick="(salesPermissionConf.txUpdate) ? toggleAllEditMode($index) : 0">
+                         ng-dblclick="(salesPermissionConf.txUpdate) ? toggleAllEditMode($index,false,true) : 0">
 
                         <small><b>{{tx.ActionTitle}}</b></small>
                         <br/>

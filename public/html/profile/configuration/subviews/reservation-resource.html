@@ -178,7 +178,7 @@
                             <div class="row">
                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
                                     <div class="form-group">
-                                        <select class="form-control" name="ResourceSelect" ng-model="modalBox.itemMap.resourceid"
+                                        <select class="form-control" name="ResourceSelect" ng-model="modalBox.mapItem.resourceid"
                                                 ng-options="resources.tid as resources.title for resources in AllResources" required>
                                             <option value = ""> -- Select resource -- </option>
                                         </select>
@@ -210,7 +210,7 @@
                     </div>
                     <div class="row setRowLeftRightMarginZero">
                        <div class="col-lg-2 col-md-2 col-sm-4 col-xs-6 bottom-clearfix">
-                            <button class="btn btn-primary btn-block" ng-click="saveServices()">Save</button>
+                            <button class="btn btn-primary btn-block" ng-click="saveMappingData()">Save</button>
                         </div>
                         <div class="col-lg-2 col-md-2 col-sm-4 col-xs-6 bottom-clearfix">
                             <button class="btn btn-primary btn-block" ng-click="closeReservationServiceMapModalBox()">Close</button>
@@ -221,7 +221,7 @@
     </modal>
 
 
-    <div ng-show="true">
+    <div ng-show="false">
         <h1>
             <span class="glyphicon glyphicon-calendar"></span> Coming Soon !
         </h1>
@@ -230,7 +230,7 @@
 
 
 
-    <div class="panel-body" ng-show="false">
+    <div class="panel-body" ng-show="true">
 
         <div role="tabpanel">
             <!-- Nav tabs -->
@@ -330,17 +330,24 @@
                             </div>
                         </div>
 
-                        <div ng-repeat="_item in AllMappingData">
+                        <div ng-repeat="_mapItem in AllMappingData">
                             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 bottom-clearfix serviceList">
                                 <div class="business-item">
                                     <div class="thumbnail">
-                                        <span class="glyphicon glyphicon-edit" data-toggle="tooltip" title="" data-placement="right" data-original-title="Edit Service" ng-click="openReservationServiceModalBox(_item)"></span>
+                                        <span class="glyphicon glyphicon-edit" data-toggle="tooltip" title="" data-placement="right" data-original-title="Edit Service" ng-click="openReservationServiceMapModalBox(_mapItem)"></span>
                                         <div class="caption">
-                                            <h4 class="text-primary" data-toggle="tooltip" title="" data-placement="right" data-original-title="{{_item.title}}">{{_item.title | textLength:15}}
-                                                <span ng-show="_item.status == 1" class="glyphicon glyphicon-ok-circle text-success"></span>
-                                                <span ng-show="_item.status == 2" class="glyphicon glyphicon-remove-circle text-danger"></span>
-                                            </h4>
-                                            <p class="item-description">{{_item.rate}}</p>
+                                            <div ng-repeat="_item in AllResources">
+                                                <h4 ng-show="_mapItem.ResourceID == _item.tid"
+                                                    class="text-primary"
+                                                    data-toggle="tooltip"
+                                                    title="" data-placement="right"
+                                                    data-original-title="{{_item.title}}">{{_item.title | textLength:15}}
+                                                </h4>
+                                            </div>
+
+                                            <div ng-repeat="_itemService in AllServices">
+                                               <p ng-show="_mapItem.ServicesArray.indexOf(_itemService.tid)!=-1" class="item-description">{{_itemService.title | textLength:25}}</p>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

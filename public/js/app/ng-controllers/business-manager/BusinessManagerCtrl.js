@@ -115,6 +115,12 @@ angular.module('ezeidApp').controller('BusinessManagerCtrl',[
                   $location.path('/business-manager/'+$scope.modules[0].type);
               }
               else{
+                  var message = 'You do not have permission to access any business module !' +
+                      ' Please enable the access right from configuration';
+                  if($rootScope._userInfo.MasterID){
+                      message = 'You don not have permission to access any business module ! Please ask your administrator for access rights';
+                  }
+                  Notification.error({ message : message, delay : MsgDelay});
                   $location.path('/');
               }
           }
