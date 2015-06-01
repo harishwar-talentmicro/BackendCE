@@ -10996,9 +10996,13 @@ exports.FnSaveReservResourceServiceMap = function(req, res){
         var resourceid = req.body.resourceid;
         var service_ids = req.body.service_ids;
         
-        service_id = service_ids.concat(',');
-        console.log('service_ids Values:'+service_ids);           
-        
+        var ID=''
+        if(service_ids){
+            ID = service_ids + ',' + ID;
+            service_ids =ID.slice(0,-1);
+            service_id = service_ids.concat(',');
+            console.log('service_ids Values:'+ service_id);
+        }
         var responseMessage = {
             status: false,
             error:{},
