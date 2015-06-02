@@ -15,14 +15,15 @@
 
                 <!-- Side menu goes here -->
                 <div class="col-lg-3 col-md-4 col-sm-12 col-xs-12 menu-style no-padding">
-                   <!-- Calender goes here -->
+                    <!-- Calender goes here -->
                     <!-- Notes section goes here[Shown only to resource] -->
                     <div class="notes-block">
                         <div class="notes-heading">
-                           <i class="fa fa-list"></i> Appointments
+                            <i class="fa fa-list"></i> Appointments
                         </div>
-                        <div class="notes-content">
-
+                        <!-- Daily Appointments goes here -->
+                        <div class="notes-content border-bottom-gray" ng-repeat="rtime in reservedTime track by $index">
+                            <i>{{reservedTime[$index][2]}}</i>
                         </div>
                     </div>
 

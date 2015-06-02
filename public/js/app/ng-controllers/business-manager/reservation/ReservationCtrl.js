@@ -192,10 +192,7 @@ var res = angular.module('ezeidApp').
                 /* get no. of minutes in day */
                 var mins = row * 5 + col * 360;
                 /* get time */
-                var hours = Math.floor(mins / (60));
-                var minutes = mins % 60;
-                minutes = minutes < 10 ? '0' + minutes : minutes;
-                return (hours + ':' + minutes);
+                return $scope.convertTime(mins);
             }
 
             /* get block id */
@@ -343,6 +340,17 @@ var res = angular.module('ezeidApp').
             $scope.getReservedBlockText = function(loggedInUid,reserverId,text)
             {
 
+            }
+
+            /**
+             * Convert to minutes to time
+             */
+            $scope.convertTime = function(mins)
+            {
+                var hours = Math.floor(mins / (60));
+                var minutes = mins % 60;
+                minutes = minutes < 10 ? '0' + minutes : minutes;
+                return (hours + ':' + minutes);
             }
 
             ////////////////////////////////////////////////////////////////////////////////////////////
