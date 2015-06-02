@@ -199,6 +199,8 @@ app.put('/reservation_service',LocationManager.FnUpdateReservationService);
 app.get('/reservation_service',LocationManager.FnGetReservationService);
 app.get('/reservation_resource_service_map',LocationManager.FnGetReservResourceServiceMap);
 app.post('/reservation_resource_service_map',LocationManager.FnSaveReservResourceServiceMap);
+app.post('/reservation_transaction',LocationManager.FnSaveReservTransaction);
+app.get('/reservation_transaction',LocationManager.FnGetReservTransaction);
 
 
 //below service are for EZEIDAP
