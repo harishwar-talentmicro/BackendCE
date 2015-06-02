@@ -4008,17 +4008,6 @@ exports.FnSearchByKeywords = function (req, res) {
                                 + ',' + db.escape("0") + ',' + db.escape("0") + ',' + db.escape("0") + ',' + db.escape(token) 
                                 + ',' + db.escape(HomeDelivery) + ',' + db.escape(CurrentDate);
                             
-                            var query = db.escape(logHistory.searchTid) + ',' + db.escape(logHistory.ezeid) + ',' + db.escape(logHistory.ip) + ',' + db.escape(logHistory.type);
-                            console.log('CALL pCreateAccessHistory(' + SearchQuery + ')');
-                            db.query('CALL pCreateAccessHistory(' + query + ')', function (err, Result){
-                                if(!err){
-                                    console.log('FnSearchByKeywords:Access history is created');
-                                }
-                                else {
-                                    res.statusCode = 500;
-                                    res.send('null');
-                                    console.log('FnSearchByKeywords: tmaster: ' + err);
-                                }
                             console.log('CALL pSearchResultNew(' + SearchQuery + ')');
                             db.query('CALL pSearchResultNew(' + SearchQuery + ')', function (err, SearchResult) {
                                 // db.query(searchQuery, function (err, SearchResult) {
@@ -4027,7 +4016,20 @@ exports.FnSearchByKeywords = function (req, res) {
                                         if (SearchResult[0].length > 0) {
                                             res.send(SearchResult[0]);
                                             console.log('FnSearchByKeywords: tmaster: Search result sent successfully');
-                                        }
+                                            
+                                            
+                                            var query = db.escape(logHistory.searchTid) + ',' + db.escape(logHistory.ezeid) + ',' + db.escape(logHistory.ip) + ',' + db.escape(logHistory.type);
+                            console.log('CALL pCreateAccessHistory(' + query + ')');
+                            db.query('CALL pCreateAccessHistory(' + query + ')', function (err, Result){
+                                if(!err){
+                                    console.log('FnSearchByKeywords:Access history is created');
+                                }
+                                else {
+                                    
+                                    console.log('FnSearchByKeywords: tmaster: ' + err);
+                                }
+                            });
+                                    }
                                         else {
                                             res.send('null');
                                             console.log('FnSearchByKeywords: tmaster: no search found');
@@ -4045,7 +4047,7 @@ exports.FnSearchByKeywords = function (req, res) {
                                     console.log('FnSearchByKeywords: tmaster: ' + err);
                                 }
                             });
-                        });
+                        
                     }
                         else {
                             res.statusCode = 401;
@@ -10518,7 +10520,7 @@ exports.FnGetReservationResource = function (req, res) {
                                 if (GetResult != null) {
                                     if (GetResult[0].length > 0) {
                                         responseMessage.status = true;
-                                        responseMessage.data = GetResult[0] ;
+                                        responseMessage.data = GetResult ;
                                         responseMessage.error = null;
                                         responseMessage.message = 'Resource details Send successfully';
                                         console.log('FnGetReservationResource: Resource details Send successfully');
@@ -11353,6 +11355,7 @@ exports.FnSaveReservTransaction = function(req, res){
 
 //method to get reservation transaction
 exports.FnGetReservTransaction = function (req, res) {
+    console.log('Reservation Resouce details');
     try {
 
         res.setHeader("Access-Control-Allow-Origin", "*");
@@ -11378,7 +11381,7 @@ exports.FnGetReservTransaction = function (req, res) {
                                 if (GetResult != null) {
                                     if (GetResult[0].length > 0) {
                                         responseMessage.status = true;
-                                        responseMessage.data = GetResult[0] ;
+                                        responseMessage.data = GetResult ;
                                         responseMessage.error = null;
                                         responseMessage.message = 'Resource Transaction details Send successfully';
                                         console.log('FnGetReservTransaction: Resource Transaction details Send successfully');
