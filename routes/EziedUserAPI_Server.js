@@ -3938,12 +3938,13 @@ exports.FnSearchByKeywords = function (req, res) {
                             var FindArray = find.split('.');
                             var SearchType = 0;
                             //console.log('findarray: ' + FindArray.length);
+                            console.log(req.ip);
+                            
                             
                             var logHistory = {
                                 searchTid : 0,  // who is searching
                                 ezeid : FindArray[0],
-                                ip : (req.headers['x-forwarded-for'] || req.connection.remoteAddress ||
-                                req.socket.remoteAddress || req.connection.socket.remoteAddress),
+                                ip : req.ip,
                                 type : 0
                             };
                             
@@ -4016,20 +4017,24 @@ exports.FnSearchByKeywords = function (req, res) {
                                         if (SearchResult[0].length > 0) {
                                             res.send(SearchResult[0]);
                                             console.log('FnSearchByKeywords: tmaster: Search result sent successfully');
-                                            
-                                            
-                                            var query = db.escape(logHistory.searchTid) + ',' + db.escape(logHistory.ezeid) + ',' + db.escape(logHistory.ip) + ',' + db.escape(logHistory.type);
-                            console.log('CALL pCreateAccessHistory(' + query + ')');
-                            db.query('CALL pCreateAccessHistory(' + query + ')', function (err){
-                                if(!err){
-                                    console.log('FnSearchByKeywords:Access history is created');
-                                }
-                                else {
-                                    
-                                    console.log('FnSearchByKeywords: tmaster: ' + err);
-                                }
-                            });
-                                    }
+                                            var getQuery = 'select TID from tmaster where Token='+db.escape(token);
+                                            db.query(getQuery, function (err, getResult) {
+                                                if(!err){
+                                                var tid = getResult[0].TID;
+                                                console.log(tid);
+                                                }
+                                                var query = db.escape(tid) + ',' + db.escape(logHistory.ezeid) + ',' + db.escape(logHistory.ip) + ',' + db.escape(logHistory.type);
+                                                console.log('CALL pCreateAccessHistory(' + query + ')');
+                                                db.query('CALL pCreateAccessHistory(' + query + ')', function (err){
+                                                    if(!err){
+                                                        console.log('FnSearchByKeywords:Access history is created');
+                                                    }
+                                                    else {
+                                                        console.log('FnSearchByKeywords: tmaster: ' + err);
+                                                    }
+                                                });
+                                            });
+                                        }
                                         else {
                                             res.send('null');
                                             console.log('FnSearchByKeywords: tmaster: no search found');
@@ -4130,10 +4135,10 @@ exports.FnSearchByKeywords = function (req, res) {
                     console.log('FnSearchByKeywords: Proximity is empty');
                 }
                 else if (Latitude == 'NaN') {
-                    console.log('FnSearchByKeywords: Proximity is empty');
+                    console.log('FnSearchByKeywords: Latitude is empty');
                 }
                 else if (Longitude == 'NaN') {
-                    console.log('FnSearchByKeywords: Proximity is empty');
+                    console.log('FnSearchByKeywords: Longitude is empty');
                 }
                 res.statusCode = 400;
                 res.send('null');
