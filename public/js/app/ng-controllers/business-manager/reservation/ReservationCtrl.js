@@ -81,6 +81,9 @@ var res = angular.module('ezeidApp').
             /* Set the logged in user */
             $scope.loggedInUid = 12;
 
+            /* Flag for resources */
+            $scope.isResource = false;
+
             getReservationTransaction();
             /* SETTINGS ENDS HERE======================================== */
 
@@ -91,20 +94,20 @@ var res = angular.module('ezeidApp').
                     url : GURL + 'reservation_transaction',
                     method : "GET",
                     params :{
-                            resourceid : 6,
-                            Token : $rootScope._userInfo.Token
+                        resourceid : 6,
+                        Token : $rootScope._userInfo.Token
                     }
                 }).success(function(resp){
 
-                        $scope.$emit('$preLoaderStop');
-                        /*if(resp.data.length>0)
-                        {
-                            $scope.AllResources = resp.data;
-                        }*/
-                    }).error(function(err){
-                        $scope.$emit('$preLoaderStop');
-                        Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
-                    });
+                    $scope.$emit('$preLoaderStop');
+                    /*if(resp.data.length>0)
+                     {
+                     $scope.AllResources = resp.data;
+                     }*/
+                }).error(function(err){
+                    $scope.$emit('$preLoaderStop');
+                    Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
+                });
             };
 
 
@@ -236,8 +239,11 @@ var res = angular.module('ezeidApp').
                     /* initiate merging process */
                     var text = $scope.getReservedBlockText($scope.loggedInUid,$scope.reservedTime[i][3],$scope.reservedTime[i][2]);
                     var color = $scope.getReservedBlockColor($scope.loggedInUid,$scope.reservedTime[i][3]);
-                    console.log(color);
-                    $scope.mergeBlockMaster(data[0], data[1], text, $scope.height,color);
+
+                    // [1000, 1140, 'shrey',5,'service3']
+                    var title = $scope.getTitleText($scope.loggedInUid,$scope.reservedTime[i][3],$scope.reservedTime[i][2]
+                        ,$scope.reservedTime[i][0],$scope.reservedTime[i][1],$scope.reservedTime[i][4]);
+                    $scope.mergeBlockMaster(data[0], data[1], text, $scope.height,color,title);
                     /* color the block */
                 }
             };
@@ -249,7 +255,7 @@ var res = angular.module('ezeidApp').
              * ->hide all the other blocks in the range
              * ->write text
              */
-            $scope.mergeBlockMaster = function (startBlock, endBlock, text, height,color) {
+            $scope.mergeBlockMaster = function (startBlock, endBlock, text, height,color,title) {
                 var realRange = refineRange(startBlock, endBlock);
                 for (var i = 0; i < realRange.length; i++) {
                     var startRange = realRange[i][0];
@@ -259,8 +265,7 @@ var res = angular.module('ezeidApp').
                     /* commence merging process */
                     $scope.colorBlocks(startRange, endRange, color);
                     /* add a flag to the first block for making it reserved */
-                    var titleText = '';
-                    $('.block-'+startRange).addClass('reserved').attr('title',text);
+                    $('.block-'+startRange).addClass('reserved').attr('title',title);
                 }
             }
 
@@ -344,9 +349,10 @@ var res = angular.module('ezeidApp').
             /* Get the text of for the reserved dates based on the user'is id */
             $scope.getReservedBlockText = function(loggedInUid,reserverId,text)
             {
-                if(loggedInUid != reserverId)
-                {
-                    return 'Reserved';
+                if(!$scope.isResource) {
+                    if (loggedInUid != reserverId) {
+                        return 'Reserved';
+                    }
                 }
                 return text;
             }
@@ -364,9 +370,15 @@ var res = angular.module('ezeidApp').
             /**
              * Get the title text for the reserved block
              */
-            $scope.getTitleText = function(title,startTime,endTime)
+            $scope.getTitleText = function(loggedInUid,reserverId,text,startTime,endTime,service)
             {
-
+                if(!$scope.isResource) {
+                    if (loggedInUid != reserverId) {
+                        return 'Reserved';
+                    }
+                }
+                /* return the complete string as title */
+                return text+' for '+service+' ('+$scope.convertTime(startTime)+' - '+$scope.convertTime(endTime)+')';
             }
 
             /**
