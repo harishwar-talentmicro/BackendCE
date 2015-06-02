@@ -208,36 +208,36 @@ angular.module('ezeidApp').controller('BusinessManagerCtrl',[
             /**
              * If user is subuser then load details of master user and find if he is verified or not
              */
-            if($rootScope._userInfo.MasterID){
-                $scope.$broadcast('$preLoaderStart');
-
-                /**
-                 * @todo MasterID is fetching wrong details
-                 * Fix that by telling Gowri to make a new API call for fetching master details from subuser to
-                 * Check that EZEID is verified or not
-                 */
-
-                $scope.loadMaster($rootScope._userInfo.MasterID).then(function(){
-                    $scope.$broadcast('$preLoaderStop');
-                    /**
-                     * Uncomment code below once @todo is done
-                     *
-                     */
-
-                    if($scope.masterUser.EZEIDVerifiedID !== 2){
-                        $location.path('/');
-                    }
-                    else{
-                        init();
-                    }
-                    //init();
-                },function(){
-                    Notification.error({ message : 'An error occurred', delay : MsgDelay});
-                    $location.path('/');
-                });
-            }
-
-            else{
+            //if($rootScope._userInfo.MasterID){
+            //    $scope.$broadcast('$preLoaderStart');
+            //
+            //    /**
+            //     * @todo MasterID is fetching wrong details
+            //     * Fix that by telling Gowri to make a new API call for fetching master details from subuser to
+            //     * Check that EZEID is verified or not
+            //     */
+            //
+            //    $scope.loadMaster($rootScope._userInfo.MasterID).then(function(){
+            //        $scope.$broadcast('$preLoaderStop');
+            //        /**
+            //         * Uncomment code below once @todo is done
+            //         *
+            //         */
+            //
+            //        if($scope.masterUser.EZEIDVerifiedID !== 2){
+            //            $location.path('/');
+            //        }
+            //        else{
+            //            init();
+            //        }
+            //        //init();
+            //    },function(){
+            //        Notification.error({ message : 'An error occurred', delay : MsgDelay});
+            //        $location.path('/');
+            //    });
+            //}
+            //
+            //else{
                 if($rootScope._userInfo.Verified !== 2){
                     /**
                      * If EZEID is not verified user will not be able to use business manager
@@ -247,8 +247,8 @@ angular.module('ezeidApp').controller('BusinessManagerCtrl',[
                 else{
                     init();
                 }
-            }
-        }
+            //}
+        };
 
 
 

@@ -328,7 +328,7 @@
 
 .hpw .p-top-7
 {
-    padding-top: 7px;
+    padding-top: 7px !important;
 }
 
 .hpw .p-top-100
@@ -418,6 +418,11 @@
 .hpw .p-left-5
 {
     padding-left: 5px !important;
+}
+
+.hpw .p-left-1
+{
+    padding-left: 1px;
 }
 
 .hpw .width-75
@@ -1815,7 +1820,7 @@ margin-bottom: 10px;
 }
 .rm .blk-content:hover
 {
-    background-color: rgb(239, 239, 239) !important;
+    background-color:rgb(166, 255, 221) !important;
 }
 
 .hpw .footer-extreme
@@ -1852,6 +1857,14 @@ margin-bottom: 10px;
     height: 1.5em;
 }
 
+.rw .color-code-heading
+{
+    text-align: center;
+    color:#fff;
+    background-color: rgba(255, 86, 72, 0.76);
+    height: 1.5em;
+}
+
 .rw .notes-content
 {
     padding-left: 2px;
@@ -1863,4 +1876,9 @@ margin-bottom: 10px;
 {
     background-color: rgb(231, 231, 231);
     cursor: pointer;
+}
+
+.hpw .border-light-gray
+{
+    border: 1px solid rgb(236, 221, 221);
 }

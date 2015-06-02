@@ -93,9 +93,11 @@ angular.module('ezeidApp').controller('ProfileManagerCtrl',[
             var defer = $q.defer();
             if($rootScope._userInfo.MasterID){
                 Notification.error({ message : 'Login with your main profile to access profile manager!', delay : MsgDelay});
-                $location.path('/');
+
                 $timeout(function(){
+                    $scope.$emit('$preLoaderStop');
                     defer.reject();
+                    $location.path('/');
                 },500);
                 return defer.promise;
             }

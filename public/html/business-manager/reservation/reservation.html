@@ -31,6 +31,16 @@
                                 <button title="cancel" class="btn btn-xs btn-danger p-bottom-3"><i class="fa fa-times-circle"></i> Cancel</button>
                             </div>
                         </div>
+                        <!-- Color Index goes here -->
+                        <div class="color-coding p-top-10">
+                            <div class="color-code-heading">
+                                <i class="fa fa-tags"></i> Color Codes
+                            </div>
+                            <div class="color-index" ng-repeat="color in colorIndex track by $index">
+                                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3" ng-class="['color-index-'+$index,$index == 3?'border-light-gray':'']">&nbsp;</div>
+                                <div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 " ng-class="('color-index-label-'+$index)">&nbsp;</div>
+                            </div>
+                        </div>
                     </div>
 
                 </div>
@@ -71,7 +81,7 @@
                                 </div>
                             </div>
                             <!-- coloring for availability : For executing coloring the table post-DOM rendering -->
-                            <div>{{(colorWorkingHours())(alreadyReserveSlot())}}</div>
+                            <div>{{(colorWorkingHours())(alreadyReserveSlot())(appendColorIndex())}}</div>
                             <!-- main container of day - calender end here -->
                         </div>
                     </div>
