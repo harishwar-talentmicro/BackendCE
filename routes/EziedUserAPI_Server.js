@@ -11156,6 +11156,11 @@ exports.FnSaveReservResourceServiceMap = function(req, res){
  * @constructor
  */
 exports.FnSearchBusListing = function(req,res,next){
+    /**
+     * HTML Pages list from angular routings scheme
+     * Any new url pattern addition in angular should be added in this list also
+     * @type {string[]}
+     */
     var htmlPagesList = [
         'signup',
         'messages',
@@ -11204,7 +11209,7 @@ exports.FnSearchBusListing = function(req,res,next){
                     if(!err){
                         if(results.length > 0){
                             if((!results[0].PIN) && results[0].IDTypeID !== 1){
-                                res.redirect('/searchDetails?searchType=2&TID='+results[0].LID)
+                                res.redirect('/searchDetails?searchType=2&TID='+results[0].LID);
                             }
                             else{
                                 next();
