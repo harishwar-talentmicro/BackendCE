@@ -189,6 +189,8 @@ angular.module('ezeidApp').
                         $scope.showDetailsModal = true;
                         $scope.$watch('showDetailsModal',function(newVal,oldVal){
                             if(!newVal){
+                                //Below line is for Loading img
+                                $scope.$emit('$preLoaderStart');
                                 $window.history.back();
                             }
                         });
