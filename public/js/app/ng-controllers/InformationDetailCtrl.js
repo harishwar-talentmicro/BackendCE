@@ -688,32 +688,54 @@ angular.module('ezeidApp').
              */
         };
 
+        $scope._homeDeliveryModalTitle = 'Home Delivery Order Form';
+        $scope._showHomeDeliveryModal = false;
         $scope._toggleHomeDeliveryModal = function(){
-            /**
-             * @todo
-             * Open Home Delivery Modal
-             */
+            if(!$rootScope._userInfo.Token)
+            {
+                $('#SignIn_popup').slideDown();
+            }
+            else if($rootScope._userInfo.Token == 2)
+            {
+                $('#SignIn_popup').slideDown();
+            }
+            else{
+                $scope._showHomeDeliveryModal = !$scope._showHomeDeliveryModal;
+            }
         };
 
+        $scope._serviceModalTitle = 'Helpdesk Form';
+        $scope._showServiceModal = false;
         $scope._toggleServiceModal = function(){
-            /**
-             * @todo
-             * Open Service Modal
-             */
+            if(!$rootScope._userInfo.Token)
+            {
+                $('#SignIn_popup').slideDown();
+            }
+            else if($rootScope._userInfo.Token == 2)
+            {
+                $('#SignIn_popup').slideDown();
+            }
+            else{
+                $scope._showServiceModal = !$scope._showServiceModal;
+            }
         };
 
+        $scope._resumeModalTitle = 'Submit Resume';
+        $scope._showResumeModal = false;
         $scope._toggleResumeModal = function(){
-            /**
-             * @todo
-             * Open Resume Modal
-             */
+            if(!$rootScope._userInfo.Token)
+            {
+                $('#SignIn_popup').slideDown();
+            }
+            else if($rootScope._userInfo.Token == 2)
+            {
+                $('#SignIn_popup').slideDown();
+            }
+            else{
+                $scope._showResumeModal = !$scope._showResumeModal;
+            }
         };
 
-
-
-        $scope.redirectUrl = function(){
-            $('#sales-url-link').trigger('click');
-        };
 
     }
 ]);

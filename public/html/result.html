@@ -280,6 +280,9 @@
                                             <button ng-show="search.IDTypeID == 2 && search.EZEIDVerifiedID == 2 && search.VisibleModules[0] == 1" class="btn btn-default btn-xs" ng-click="redirectFullPage(params.searchType,search.TID,true)">
                                                 <i class="fa fa-user"></i> Sales
                                             </button>
+                                            <button ng-show="search.IDTypeID == 2 && search.EZEIDVerifiedID == 2 && search.VisibleModules[2] == 1" class="btn btn-default btn-xs" ng-click="redirectFullPage(params.searchType,search.TID,false,false,true)">
+                                                <i class="fa fa-user"></i> Home Delivery
+                                            </button>
 
                                         </div>
                                     </div>
