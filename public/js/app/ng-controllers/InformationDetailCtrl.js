@@ -440,7 +440,7 @@ angular.module('ezeidApp').
                     var params = '?EZEID='+_Ezeid;
                         console.log(_Ezeid);
                          //$location.url('/service-reservation'+params);
-                    $location.url('/service-reservation');
+                  //  $location.url('/service-reservation');
                    // $('#Reservation_popup').slideDown();
                 }
             };
