@@ -116,9 +116,10 @@ angular.module('ezeidApp').controller('WorkingHourCtrl',['$scope','$rootScope','
         $scope.saveInfo.SU4 = ($scope.mInfo.SU4) ? selectedTimeToUtc($scope.mInfo.SU4) : "";
 
         $scope.saveInfo.WorkingHrsTemplate = $scope.mInfo.WorkingHrsTemplate;
-        $scope.saveInfo.SpilloverTime = ($scope.mInfo.SpilloverTime == undefined) ? 0 : $scope.mInfo.SpilloverTime;
-        $scope.saveInfo.Token = $rootScope._userInfo.Token;
+       /* $scope.saveInfo.SpilloverTime = ($scope.mInfo.SpilloverTime == undefined) ? 0 : $scope.mInfo.SpilloverTime;*/
+        $scope.saveInfo.SpilloverTime = 0;
         $scope.saveInfo.TID = 0;
+        $scope.saveInfo.Token = $rootScope._userInfo.Token;
 
         $http({
                 method: "POST",
