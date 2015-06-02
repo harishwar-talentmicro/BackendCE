@@ -1,5 +1,5 @@
 (function(){
-    angular.module('ezeidApp').controller('SalesCtrl',[
+    angular.module('ezeidApp').controller('ServiceCtrl',[
         '$rootScope',
         '$scope',
         '$http',
@@ -33,13 +33,13 @@
             GoogleMap
             ) {
 
-            $scope._tempSalesItemListType = $rootScope._userInfo.SalesItemListType;
+            //$scope._tempSalesItemListType = $rootScope._userInfo.SalesItemListType;
 
 
             /**
              * Logged in user cannot use this module as he is not having the required permissions for it
              */
-            var moduleIndex = $scope.modules.indexOfWhere('type','sales');
+            var moduleIndex = $scope.modules.indexOfWhere('type','service');
             var permission = parseInt($scope.modules[moduleIndex].permission);
             if(permission.isNaN || permission === 0 )
             {
@@ -130,8 +130,8 @@
 
 
             $scope.moduleConf = $scope.modules[moduleIndex];
-            $scope.salesListConf = listConf[$scope.modules[moduleIndex].listType];
-            $scope.salesPermissionConf = permissionConf[$scope.modules[moduleIndex].permission];
+            $scope.serviceListConf = listConf[$scope.modules[moduleIndex].listType];
+            $scope.servicePermissionConf = permissionConf[$scope.modules[moduleIndex].permission];
 
             $scope.$emit('$preLoaderStart');
 
@@ -146,7 +146,7 @@
 
             /**
              *
-             * Sales items present for this user
+             * service items present for this user
              * @type {Array}
              */
             $scope.moduleItems = [];
@@ -172,7 +172,7 @@
                   ezeidTid : 0,
 
                   TID : 0,
-                  functionType : 0, // Function Type will be 0 for sales
+                  functionType : 3, // Function Type will be 3 for service
                   ezeid : '',
                   statusType : 0,
                   notes : '',
@@ -188,7 +188,11 @@
                   taskDateTime : '',
                   folderRule : 0,
                   message : '',
-                  messageType : ($rootScope._userInfo.SalesItemListType) ? $rootScope._userInfo.SalesItemListType : 0,
+                  /**
+                   * Type of Service cannot be determined by user exactly
+                   * therefore after discussion with boss, the itemListType is hardcoded as message only
+                   */
+                  messageType : 0,
                   latitude : 0,
                   longitude : 0,
                   duration : 0,
@@ -237,7 +241,7 @@
                         ezeidTid : (tx.EZEID) ? true : 0,
 
                         TID : tx.TID,
-                        functionType : 0, // Function Type will be 0 for sales
+                        functionType : 3, // Function Type will be 3 for service
                         ezeid : tx.RequesterEZEID,
                         statusType : (tx.Status) ? tx.Status : 0,
                         notes : tx.Notes,
@@ -253,7 +257,7 @@
                         taskDateTime : tx.TaskDateTime,
                         folderRule : (tx.FolderRuleID && tx.FolderRuleID !== 'null') ? tx.FolderRuleID : 0,
                         message : tx.Message,
-                        messageType : ($rootScope._userInfo.SalesItemListType) ? $rootScope._userInfo.SalesItemListType : 0,
+                        messageType : 0,
                         latitude : 0,
                         longitude : 0,
                         duration : 0,
@@ -468,7 +472,7 @@
                         ezeidTid : 0,
 
                         TID : 0,
-                        functionType : 0, // Function Type will be 0 for sales
+                        functionType : 3, // Function Type will be 3 for service
                         ezeid : '',
                         statusType : 0,
                         notes : '',
@@ -484,7 +488,7 @@
                         taskDateTime : '',
                         folderRule : 0,
                         message : '',
-                        messageType : ($rootScope._userInfo.SalesItemListType) ? $rootScope._userInfo.SalesItemListType : 0,
+                        messageType : 0,
                         latitude : 0,
                         longitude : 0,
                         duration : 0,
@@ -656,7 +660,7 @@
                         Token : $rootScope._userInfo.Token,
                         Page : pageNo,
                         Status : (statusType) ? statusType : '',
-                        FunctionType : 0    // For Sales
+                        FunctionType : 3    // For service
                     }
                 }).success(function(resp){
                     if(resp && resp !== 'null'){
@@ -697,7 +701,7 @@
                     method : 'GET',
                     params : {
                         Token : $rootScope._userInfo.Token,
-                        FunctionType : 0    // For Sales
+                        FunctionType : 3    // For service
                     }
                 }).success(function(resp){
                     ////console.log(resp);
@@ -729,7 +733,7 @@
                     method : 'GET',
                     params : {
                         Token : $rootScope._userInfo.Token,
-                        FunctionType : 0    // For Sales
+                        FunctionType : 3    // For service
                     }
                 }).success(function(resp){
                     if(resp && resp !== 'null' && resp.length > 0){
@@ -758,7 +762,7 @@
                     method : 'GET',
                     params : {
                         Token : $rootScope._userInfo.Token,
-                        FunctionType : 0    // For Sales
+                        FunctionType : 3    // For service
                     }
                 }).success(function(resp){
                     if(resp && resp !== 'null' && resp.length > 0){
@@ -787,13 +791,25 @@
              * @returns {*|promise}
              */
             $scope.loadItemList = function(){
+
                 var defer = $q.defer();
+                //if($rootScope._userInfo.ServiceItemListType == 0){
+                /**
+                 * Hardcoding service item list type as message only
+                 * therefore items should not be loaded for it
+                 */
+                if(true){
+                    $timeout(function(){
+                        defer.resolve([]);
+                    },200);
+                    return defer.promise;
+                }
                 $http({
                     url : GURL + 'ewtGetItemList',
                     method : 'GET',
                     params : {
                         Token : $rootScope._userInfo.Token,
-                        FunctionType : 0    // Sales
+                        FunctionType : 3    // service
                     }
                 }).success(function(resp){
                     if(resp && resp !== 'null' && resp.length > 0){
@@ -801,7 +817,7 @@
                         defer.resolve(resp);
                     }
                     else{
-                        $rootScope._userInfo.SalesItemListType = 0;
+                        $rootScope._userInfo.ServiceItemListType = 0;
                         defer.resolve([]);
                     }
                 }).error(function(err){
@@ -812,7 +828,7 @@
 
 
             /**
-             * Loads FolderRules for Sales
+             * Loads FolderRules for service
              * @return {*|promise}
              */
             $scope.loadFolderRules = function(){
@@ -822,7 +838,7 @@
                     method : 'GET',
                     params : {
                         Token : $rootScope._userInfo.Token,
-                        FunctionType : 0    // Sales
+                        FunctionType : 3    // service
                     }
                 }).success(function(resp){
                     if(resp && resp !== 'null' && resp.length > 0){
@@ -905,15 +921,15 @@
                                 });
                             },function(){
                                 $scope.$emit('$preLoaderStop');
-                                Notification.error({message : 'Unable to load sales transaction list', delay : MsgDelay} );
+                                Notification.error({message : 'Unable to load help desk ticket list', delay : MsgDelay} );
                             });
                         },function(){
                             $scope.$emit('$preLoaderStop');
-                            Notification.error({message : 'Unable to load sales transaction status types', delay : MsgDelay} );
+                            Notification.error({message : 'Unable to load help desk status types', delay : MsgDelay} );
                         });
                     },function(){
                         $scope.$emit('$preLoaderStop');
-                        Notification.error({message : 'Unable to load sales next actions list', delay : MsgDelay} );
+                        Notification.error({message : 'Unable to load help desk  next actions list', delay : MsgDelay} );
                     });
                 },function(){
                     $scope.$emit('$preLoaderStop');
@@ -978,7 +994,7 @@
                     State : $scope.modalBox.tx.state,
                     City : $scope.modalBox.tx.city,
                     Area : $scope.modalBox.tx.area,
-                    FunctionType : 0,   // For sales
+                    FunctionType : 3,   // For service
                     Latitude : $scope.modalBox.tx.latitude,
                     Longitude : $scope.modalBox.tx.longitude,
                     EZEID : $scope.modalBox.tx.ezeid,
@@ -989,7 +1005,7 @@
                     NextAction : ($scope.modalBox.tx.nextAction) ? $scope.modalBox.tx.nextAction : 0,
                     NextActionDateTime : ($scope.modalBox.tx.nextActionDateTime) ? $scope.modalBox.tx.nextActionDateTime : moment().format('YYYY-MM-DD hh:mm:ss'),
                     ItemsList: JSON.stringify($scope.modalBox.tx.itemList),
-                    item_list_type : $rootScope._userInfo.SalesItemListType,
+                    item_list_type : 0,
                     DeliveryAddress : (!editMode) ?
                         makeAddress() : $scope.modalBox.tx.deliveryAddress
                 };
@@ -1044,13 +1060,13 @@
                 }).success(function(resp){
                     if(resp && resp.hasOwnProperty('IsSuccessfull')){
                         if(resp.IsSuccessfull){
-                            var msg = 'Enquiry is posted successfully';
+                            var msg = 'Help Desk ticket is raised successfully';
                             if($scope.modalBox.editMode){
-                                msg = 'Enquiry is updated successfully';
+                                msg = 'Ticket status is updated successfully';
                             }
 
                             if($scope.editModes.indexOf(true) !== -1){
-                                msg = 'Enquiry is updated successfully';
+                                msg = 'Ticket status is updated successfully';
                             }
                             Notification.success({ message : msg, delay : MsgDelay});
                             if($scope.showModal){
@@ -1061,11 +1077,11 @@
                             $scope.loadTransaction(1,$scope.statusType);
                         }
                         else{
-                            Notification.error({ message : 'An error occurred while placing enquiry', delay : MsgDelay});
+                            Notification.error({ message : 'An error occurred while raising a help desk ticket', delay : MsgDelay});
                         }
                     }
                     else{
-                        Notification.error({ message : 'An error occurred while placing enquiry', delay : MsgDelay});
+                        Notification.error({ message : 'An error occurred while raising help desk ticket', delay : MsgDelay});
                     }
 
                     $scope.$emit('$preLoaderStop');
@@ -1093,7 +1109,7 @@
                      * listType becomes 0 but to restore the actual list type in $rootScope
                      * this will reassign the values to _userInfo.SalesItemListType
                      */
-                    $rootScope._userInfo.SalesItemListType = $scope._tempSalesItemListType;
+                    //$rootScope._userInfo.ServiceItemListType = $scope._tempServiceItemListType;
                 }
             );
 

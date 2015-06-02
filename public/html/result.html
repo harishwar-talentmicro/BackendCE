@@ -277,11 +277,17 @@
                                             </div>
                                         </div>
                                         <div class="flip-tile-row-3 p-5 text-center" ng-click="$event.stopPropagation()">
-                                            <button ng-show="search.IDTypeID == 2 && search.EZEIDVerifiedID == 2 && search.VisibleModules[0] == 1" class="btn btn-default btn-xs" ng-click="redirectFullPage(params.searchType,search.TID,true)">
+                                            <button ng-show="search.IDTypeID == 2 && search.EZEIDVerifiedID == 2 && search.VisibleModules[0] == 1"
+                                                    class="btn btn-default btn-xs" ng-click="redirectFullPage(params.searchType,search.TID,true)">
                                                 <i class="fa fa-user"></i> Sales
                                             </button>
-                                            <button ng-show="search.IDTypeID == 2 && search.EZEIDVerifiedID == 2 && search.VisibleModules[2] == 1" class="btn btn-default btn-xs" ng-click="redirectFullPage(params.searchType,search.TID,false,false,true)">
-                                                <i class="fa fa-user"></i> Home Delivery
+                                            <button ng-show="search.IDTypeID == 2 && search.EZEIDVerifiedID == 2 && search.VisibleModules[2] == 1"
+                                                    class="btn btn-default btn-xs" ng-click="redirectFullPage(params.searchType,search.TID,false,false,true)">
+                                                <i class="fa fa-truck"></i> Home Delivery
+                                            </button>
+                                            <button ng-show="search.IDTypeID == 2 && search.EZEIDVerifiedID == 2 && search.VisibleModules[3] == 1"
+                                                    class="btn btn-default btn-xs" ng-click="redirectFullPage(params.searchType,search.TID,false,false,false,true)">
+                                                <i class="fa fa-gears"></i> Help Desk
                                             </button>
 
                                         </div>

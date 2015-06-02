@@ -509,6 +509,34 @@ angular.module('ezeidApp').
                         ActionTitle : 'Meeting',
                         Status : 1,
                         FunctionType : 0
+                    },
+                    {
+                        Token : token,
+                        TID : 0,
+                        ActionTitle : 'Deliver',
+                        Status : 1,
+                        FunctionType : 2
+                    },
+                    {
+                        Token : token,
+                        TID : 0,
+                        ActionTitle : 'Pack',
+                        Status : 1,
+                        FunctionType : 2
+                    },
+                    {
+                        Token : token,
+                        TID : 0,
+                        ActionTitle : 'Followup',
+                        Status : 1,
+                        FunctionType : 3
+                    },
+                    {
+                        Token : token,
+                        TID : 0,
+                        ActionTitle : 'Repair',
+                        Status : 1,
+                        FunctionType : 3
                     }
                 ];
                 var actionCount = 0;
@@ -589,6 +617,66 @@ angular.module('ezeidApp').
                             Status : 1,
                             NotificationMsg : 'Your enquiry is cancelled !',
                             NotificationMailMsg: 'Your enquiry is cancelled !',
+                            StatusValue : 11
+                        },
+                        {
+                            Token : token,
+                            TID : 0,
+                            StatusTitle : 'Delivery in Progress',
+                            MasterID : masterId,
+                            FunctionType : 2,
+                            ProgressPercent : 90,
+                            Status : 1,
+                            NotificationMsg : 'Your order is on the way !',
+                            NotificationMailMsg: 'Your order is on the way !',
+                            StatusValue : 9
+                        },
+                        {
+                            Token : token,
+                            TID : 0,
+                            StatusTitle : 'Under process',
+                            MasterID : masterId,
+                            FunctionType : 2,
+                            ProgressPercent : 40,
+                            Status : 1,
+                            NotificationMsg : 'Your order is being prepared !',
+                            NotificationMailMsg: 'Your order is being prepared !',
+                            StatusValue : 4
+                        },
+                        {
+                            Token : token,
+                            TID : 0,
+                            StatusTitle : 'Cancelled',
+                            MasterID : masterId,
+                            FunctionType : 3,
+                            ProgressPercent : 100,
+                            Status : 1,
+                            NotificationMsg : 'Your ticket is dropped !',
+                            NotificationMailMsg: 'Your order is dropped !',
+                            StatusValue : 11
+                        },
+                        {
+                            Token : token,
+                            TID : 0,
+                            StatusTitle : 'Under inspection',
+                            MasterID : masterId,
+                            FunctionType : 3,
+                            ProgressPercent : 30,
+                            Status : 1,
+                            NotificationMsg : 'Your issue is under inspection !',
+                            NotificationMailMsg: 'Your issue is under inspection !',
+                            StatusValue : 3
+                        },
+                        {
+                            Token : token,
+                            TID : 0,
+                            StatusTitle : 'Cancelled',
+                            MasterID : masterId,
+                            FunctionType : 2,
+                            ProgressPercent : 100,
+                            Status : 1,
+                            NotificationMsg : 'Your order is cancelled !',
+                            NotificationMailMsg: 'Your order is cancelled !',
                             StatusValue : 11
                         }
                     ];
