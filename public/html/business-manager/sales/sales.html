@@ -586,9 +586,8 @@
 
                     </div>
 
-                      <hr/>
+                      <hr ng-show="moduleItems.length > 0 &&  _userInfo.SalesItemListType > 0" />
                     <div ng-show="moduleItems.length > 0 &&  _userInfo.SalesItemListType > 0" class="row bottom-clearfix">
-                        {{_userInfo.SalesItemListType}}
 
                         <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12 item-list-box">
                             <div class="row">

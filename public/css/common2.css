@@ -1849,4 +1849,18 @@ margin-bottom: 10px;
     text-align: center;
     color:#fff;
     background-color: #4889ff;
+    height: 1.5em;
+}
+
+.rw .notes-content
+{
+    padding-left: 2px;
+    border-bottom: 1px solid lightgray;
+    font-style: italic;
+}
+
+.rw .notes-content:hover
+{
+    background-color: rgb(231, 231, 231);
+    cursor: pointer;
 }
