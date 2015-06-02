@@ -66,20 +66,52 @@ var res = angular.module('ezeidApp').
              */
             $scope.workingHrs = [
                 [540, 840],
-                [960, 1200],
+                [960, 1200]
             ];
 
             /* Reserved hours *///[Start Minute, End Minute, Reserver Name, Reserver ID, service]
             $scope.reservedTime = [
                 [550, 600, 'sandeep',3],
                 [700, 810, 'rahul',12],
-                [1000, 1140, 'shrey',5],
+                [1000, 1140, 'shrey',5]
             ];
 
             /* Set the logged in user */
             $scope.loggedInUid = 11;
 
+            getReservationTransaction();
             /* SETTINGS ENDS HERE======================================== */
+
+            // Get All Resources
+            function getReservationTransaction(){
+                $scope.$emit('$preLoaderStart');
+                $http({
+                    url : GURL + 'reservation_transaction',
+                    method : "GET",
+                    params :{
+                            resourceid : 6,
+                            Token : $rootScope._userInfo.Token
+                    }
+                }).success(function(resp){
+                        console.log(resp);
+                        $scope.$emit('$preLoaderStop');
+                        /*if(resp.data.length>0)
+                        {
+                            $scope.AllResources = resp.data;
+                        }*/
+                    }).error(function(err){
+                        $scope.$emit('$preLoaderStop');
+                        Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
+                    });
+            };
+
+
+            /**
+             * All HTTP request goes here -----------------------
+             * @returns {string}
+             */
+
+
             /////////////////////////////////////////////////////////
             /////////////////////////////////////////////////////////
             /////////////////////////////////////////////////////////
