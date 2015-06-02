@@ -11106,8 +11106,6 @@ exports.FnSaveReservResourceServiceMap = function(req, res){
     }
 };
 
-
-
 /**
  * Finds the user login status using a cookie login
  * which is created by angular at the time of signin or signup
@@ -11192,9 +11190,233 @@ exports.FnSearchBusListing = function(req,res,next){
         next();
     }
 };
-//EZEIDAP Parts
 
-//app part
+//method to save reservation transaction
+exports.FnSaveReservTransaction = function(req, res){
+    try{
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.body.Token ;
+        var TID = req.body.TID;
+        var contactinfo = req.body.contactinfo;
+        var toEzeid = req.body.toEzeid;
+        var resourceid = req.body.resourceid;
+        var res_datetime = new Date(req.body.res_datetime);
+        var duration = req.body.duration;
+        var status = req.body.status;
+        var serviceid = req.body.serviceid;
+        
+        var responseMessage = {
+            status: false,
+            error:{},
+            message:'',
+            data: null
+        };
+        var validateStatus = true;
+        
+        if(!TID){
+            responseMessage.error['TID'] = 'Invalid TID';
+            validateStatus *= false;
+        }
+        
+        if(!toEzeid){
+            responseMessage.error['toEzeid'] = 'Invalid toEzeid';
+            validateStatus *= false;
+        }
+        
+        if(!resourceid){
+            responseMessage.error['resourceid'] = 'Invalid Resourceid';
+            validateStatus *= false;
+        }
+        
+        if(!serviceid){
+            responseMessage.error['serviceid'] = 'Invalid Service_ids';
+            validateStatus *= false;
+        }
+        
+        
+        if(!validateStatus){
+            console.log('FnSaveReservTransaction  error : ' + JSON.stringify(responseMessage.error));
+            responseMessage.message = 'Unable to save resource transaction ! Please check the errors';
+            res.status(200).json(responseMessage);
+            return;
+        }
+        
+        if (Token) {
+            FnValidateToken(Token, function (err, result) {
+                if (!err) {
+                    if (result != null) {
+                        var query = db.escape(TID) + ',' + db.escape(Token) + ',' + db.escape(contactinfo) + ',' + db.escape(toEzeid) + ',' + db.escape(resourceid) + ',' + db.escape(res_datetime) + ',' + db.escape(duration) + ',' + db.escape(status) + ',' + db.escape(serviceid);
+                        db.query('CALL pSaveResTrans(' + query + ')', function (err, insertResult) {
+                            console.log('Result is..........:'+result);
+                            console.log(err);
+                             if (!err){
+                                if (result != null) {
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Resource Transaction details save successfully';
+                                    responseMessage.data = {
+                                        resourceid : req.body.resourceid,
+                                        serviceids : service_id
+                                    };
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnSaveReservTransaction: Resource Transaction details save successfully');
+                                    
+                                }
+                                else {
+                                    responseMessage.message = 'An error occured ! Please try again';
+                                    responseMessage.error = {};
+                                    res.status(400).json(responseMessage);
+                                    console.log('FnSaveReservTransaction:No save Resource Transaction details');
+                                }
+                            }
+
+                            else {
+                                responseMessage.message = 'An error occured ! Please try again';
+                                responseMessage.error = {};
+                                res.status(500).json(responseMessage);
+                                console.log('FnSaveReservTransaction: error in saving Resource Transaction details:' + err);
+                            }
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token'; 
+                        responseMessage.error = {}; 
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnSaveReservTransaction: Invalid token');
+                                            }
+                }
+                else {
+                    responseMessage.error= {};
+                    responseMessage.message = 'Error in validating Token'; 
+                    res.status(500).json(responseMessage);
+                    console.log('FnSaveReservTransaction:Error in processing Token' + err);
+                }
+            });
+
+        }
+
+        else {
+            if (!Token) 
+            {  
+                responseMessage.message = 'Invalid Token';            
+                responseMessage.error = {Token : 'Invalid Token'};
+                console.log('FnSaveReservTransaction: Token is mandatory field');
+            }
+            
+            res.status(401).json(responseMessage);
+        }
+
+    }
+    catch (ex) {
+        responseMessage.error = {};
+        responseMessage.message = 'An error occured !'
+        console.log('FnSaveReservTransaction:error ' + ex.description);
+        throw new Error(ex);
+        res.status(400).json(responseMessage);
+    }
+};
+
+//method to get reservation transaction
+exports.FnGetReservTransaction = function (req, res) {
+    try {
+
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.query.Token;
+        var resourceid = req.query.resourceid;
+
+        var responseMessage = {
+            status: false,
+            data: null,
+            error:{},
+            Message:''
+        };
+        
+        if (Token) {
+            FnValidateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+
+                        db.query('CALL pGetResResourceServiceMap(' + db.escape(Token) + ',' + db.escape(resourceid) + ')', function (err, GetResult) {
+                            if (!err) {
+                                if (GetResult != null) {
+                                    if (GetResult[0].length > 0) {
+                                        responseMessage.status = true;
+                                        responseMessage.data = GetResult[0] ;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Resource Transaction details Send successfully';
+                                        console.log('FnGetReservTransaction: Resource Transaction details Send successfully');
+                                        res.status(200).json(responseMessage);
+                                    }
+                                    else {
+                                        
+                                        responseMessage.error = {};
+                                        responseMessage.message = 'No founded Resource Transaction details';
+                                        console.log('FnGetReservTransaction: No founded Resource Transaction details');
+                                        res.json(responseMessage);
+                                    }
+                                }
+                                else {
+
+                                    
+                                    responseMessage.error = {};
+                                    responseMessage.message = 'No founded Resource Transaction details';
+                                    console.log('FnGetReservTransaction: No founded Resource Transaction details');
+                                    res.json(responseMessage);
+                                }
+
+                            }
+                            else {
+                                
+                                responseMessage.data = null ;
+                                responseMessage.error = {};
+                                responseMessage.message = 'Error in getting Resource Transaction details';
+                                console.log('FnGetReservTransaction: error in getting Resource Transaction details' + err);
+                                res.status(500).json(responseMessage);
+                            }
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid Token';
+                        responseMessage.error = {};
+                        res.status(401).json(responseMessage);
+                        console.log('FnGetReservTransaction: Invalid Token');
+                    }
+                } else {
+                    responseMessage.error = {};
+                    responseMessage.message = 'Error in validating token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnGetReservTransaction: Error in validating token:  ' + err);
+                }
+            });
+        }
+        else {
+            if (!Token) {
+                responseMessage.message = 'Invalid Token';            
+                responseMessage.error = {
+                    Token : 'Invalid Token'
+                };
+                console.log('FnGetReservTransaction: Token is mandatory field');
+            }
+           
+            res.status(401).json(responseMessage);
+        }
+    }
+     catch (ex) {
+        responseMessage.error = {};
+        responseMessage.message = 'An error occured !'
+        console.log('FnGetReservTransaction:error ' + ex.description);
+        throw new Error(ex);
+        res.status(400).json(responseMessage);
+    }
+};
+
+
+//EZEIDAP Parts
 function FnValidateTokenAP(Token, CallBack) {
     try {
 
