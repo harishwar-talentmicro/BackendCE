@@ -56,7 +56,7 @@
                                             <div class="col-lg-8 col-md-9 col-sm-9 col-xs-9 no-padding pointer" >
                                                 <!-- reservation owner's name goes here -->
                                         <div title="{{getTime($index,cols,true)}}" ng-repeat="block in blockArr track by $index"
-                                             class="notes-section blk blk-content wrap-text" ng-init="blockId = getBlockId($index,cols)" ng-class="[blockColor[$index],'block-'+blockId,heightClass]"
+                                             class="notes-section blk blk-content wrap-text text-center" ng-init="blockId = getBlockId($index,cols)" ng-class="[blockColor[$index],'block-'+blockId,heightClass]"
                                                 ng-click="reservationClickEventHandler(blockId)">
 
                                         </div>
