@@ -587,9 +587,7 @@
                     </div>
 
                       <hr/>
-                    <div ng-show="moduleItems.length > 0 &&  _userInfo.SalesItemListType > 0" class="row bottom-clearfix">
-                        {{_userInfo.SalesItemListType}}
-
+                    <div ng-show="moduleItems.length > 0 &&  parseInt(_userInfo.SalesItemListType) > 0" class="row bottom-clearfix">
                         <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12 item-list-box">
                             <div class="row">
                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
@@ -600,7 +598,7 @@
                                 </div>
                             </div>
 
-                            <div class="row"   id="bus-item-list-container">
+                            <div class="row" id="bus-item-list-container">
 
                               <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                     <bussiness-item

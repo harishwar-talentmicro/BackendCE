@@ -584,7 +584,8 @@ exports.FnLogin = function (req, res) {
             MasterID: 0,
             UserModuleRights: '',
             VisibleModules: '',
-            FreshersAccepted: ''
+            FreshersAccepted: '',
+            HomeDeliveryItemListType : ''
         };
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
         if (UserName != null && UserName != '' && Password != null && Password != '') {
@@ -636,6 +637,7 @@ exports.FnLogin = function (req, res) {
                                         RtnMessage.MasterID= loginDetails[0].ParentMasterID;
                                         RtnMessage.VisibleModules= loginDetails[0].VisibleModules;
                                         RtnMessage.FreshersAccepted= loginDetails[0].FreshersAccepted;
+                                        RtnMessage.HomeDeliveryItemListType = loginDetails[0].HomeDeliveryItemListType;
                                         res.send(RtnMessage);
                                         console.log('FnLogin:tmaster: Login success');
                                     }
