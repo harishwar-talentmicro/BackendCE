@@ -4137,10 +4137,10 @@ exports.FnSearchByKeywords = function (req, res) {
                     console.log('FnSearchByKeywords: Proximity is empty');
                 }
                 else if (Latitude == 'NaN') {
-                    console.log('FnSearchByKeywords: Latitude is empty');
+                    console.log('FnSearchByKeywords: Proximity is empty');
                 }
                 else if (Longitude == 'NaN') {
-                    console.log('FnSearchByKeywords: Longitude is empty');
+                    console.log('FnSearchByKeywords: Proximity is empty');
                 }
                 res.statusCode = 400;
                 res.send('null');
@@ -10509,7 +10509,7 @@ exports.FnGetReservationResource = function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
-        var Token = req.query.Token;
+        var ezeid = req.query.ezeid;
         var responseMessage = {
             status: false,
             data: null,
@@ -10517,12 +10517,8 @@ exports.FnGetReservationResource = function (req, res) {
             Message:''
         };
         
-        if (Token) {
-            FnValidateToken(Token, function (err, Result) {
-                if (!err) {
-                    if (Result != null) {
-
-                        db.query('CALL pGetResource(' + db.escape(Token) + ')', function (err, GetResult) {
+        if (ezeid) {
+                db.query('CALL pGetResource(' + db.escape(ezeid) + ')', function (err, GetResult) {
                             if (!err) {
                                 if (GetResult != null) {
                                     if (GetResult[0].length > 0) {
@@ -10561,27 +10557,14 @@ exports.FnGetReservationResource = function (req, res) {
                             }
                         });
                     }
-                    else {
-                        responseMessage.message = 'Invalid Token';
-                        responseMessage.error = {};
-                        res.status(401).json(responseMessage);
-                        console.log('FnGetReservationResource: Invalid Token');
-                    }
-                } else {
-                    responseMessage.error = {};
-                    responseMessage.message = 'Error in validating token';
-                    res.status(500).json(responseMessage);
-                    console.log('FnGetReservationResource: Error in validating token:  ' + err);
-                }
-            });
-        }
+                    
         else {
             if (!Token) {
-                responseMessage.message = 'Invalid Token';            
+                responseMessage.message = 'Invalid ezeid';            
                 responseMessage.error = {
-                    Token : 'Invalid Token'
+                    ezeid : 'Invalid ezeid'
                 };
-                console.log('FnGetReservationResource: Token is mandatory field');
+                console.log('FnGetReservationResource: ezeid is mandatory field');
             }
            
             res.status(401).json(responseMessage);
@@ -10846,7 +10829,7 @@ exports.FnGetReservationService = function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
-        var Token = req.query.Token;
+        var ezeid = req.query.ezeid;
         var responseMessage = {
             status: false,
             data: null,
@@ -10854,12 +10837,8 @@ exports.FnGetReservationService = function (req, res) {
             Message:''
         };
         
-        if (Token) {
-            FnValidateToken(Token, function (err, Result) {
-                if (!err) {
-                    if (Result != null) {
-
-                        db.query('CALL pGetResServices(' + db.escape(Token) + ')', function (err, GetResult) {
+        if (ezeid) {
+                    db.query('CALL pGetResServices(' + db.escape(ezeid) + ')', function (err, GetResult) {
                             if (!err) {
                                 if (GetResult != null) {
                                     if (GetResult[0].length > 0) {
@@ -10898,27 +10877,13 @@ exports.FnGetReservationService = function (req, res) {
                             }
                         });
                     }
-                    else {
-                        responseMessage.message = 'Invalid Token';
-                        responseMessage.error = {};
-                        res.status(401).json(responseMessage);
-                        console.log('FnGetReservationService: Invalid Token');
-                    }
-                } else {
-                    responseMessage.error = {};
-                    responseMessage.message = 'Error in validating token';
-                    res.status(500).json(responseMessage);
-                    console.log('FnGetReservationService: Error in validating token:  ' + err);
-                }
-            });
-        }
         else {
             if (!Token) {
-                responseMessage.message = 'Invalid Token';            
+                responseMessage.message = 'Invalid ezeid';            
                 responseMessage.error = {
-                    Token : 'Invalid Token'
+                    ezeid : 'Invalid ezeid'
                 };
-                console.log('FnGetReservationService: Token is mandatory field');
+                console.log('FnGetReservationService: ezeid is mandatory field');
             }
            
             res.status(401).json(responseMessage);
