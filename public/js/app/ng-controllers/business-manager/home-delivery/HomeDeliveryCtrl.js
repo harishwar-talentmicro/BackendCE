@@ -987,7 +987,7 @@
                     Duration : 0,
                     DurationScales : 0,
                     NextAction : ($scope.modalBox.tx.nextAction) ? $scope.modalBox.tx.nextAction : 0,
-                    NextActionDateTime : ($scope.modalBox.tx.nextActionDateTime) ? $scope.modalBox.tx.nextActionDateTime : moment().format('DD MMM YYYY hh:mm:ss'),
+                    NextActionDateTime : ($scope.modalBox.tx.nextActionDateTime) ? $scope.modalBox.tx.nextActionDateTime : moment().format('YYYY-MM-DD hh:mm:ss'),
                     ItemsList: JSON.stringify($scope.modalBox.tx.itemList),
                     item_list_type : $rootScope._userInfo.HomeDeliveryItemListType,
                     DeliveryAddress : (!editMode) ?
