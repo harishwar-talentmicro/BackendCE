@@ -1,14 +1,9 @@
-/*
- * Created by admin on 6/5/15.
- */
 /**
- * Sign up Controller
- * @name SignUpCtrl
- * Manages signup functionality
+ * Controller to manage all the functionalities in RESERVATION-MODULE
  *
- * "use strict";
+ * @author: Sandeep[EZE ID]
+ * @since 20150527
  */
-
 var res = angular.module('ezeidApp').
     controller('ReservationCtrl', [
         '$rootScope',
@@ -46,7 +41,7 @@ var res = angular.module('ezeidApp').
             $route,
             UtilityService,
             $document
-            ) {
+        ) {
 
 
             /* SETTINGS GOES HERE======================================== */
@@ -74,12 +69,15 @@ var res = angular.module('ezeidApp').
                 [960, 1200],
             ];
 
-            /* Reserved hours */
+            /* Reserved hours *///[Start Minute, End Minute, Reserver Name, Reserver ID, service]
             $scope.reservedTime = [
-                [550, 600, 'sandeep'],
-                [700, 810, 'rahul'],
-                [1000, 1140, 'shrey'],
+                [550, 600, 'sandeep',3],
+                [700, 810, 'rahul',12],
+                [1000, 1140, 'shrey',5],
             ];
+
+            /* Set the logged in user */
+            $scope.loggedInUid = 11;
 
             /* SETTINGS ENDS HERE======================================== */
             /////////////////////////////////////////////////////////
@@ -207,7 +205,6 @@ var res = angular.module('ezeidApp').
                     /* initiate merging process */
                     $scope.mergeBlockMaster(data[0], data[1], $scope.reservedTime[i][2], $scope.height);
                     /* color the block */
-                    /* add the text */
                 }
             };
 
@@ -240,8 +237,9 @@ var res = angular.module('ezeidApp').
                 /* increase the first block's height to totalHeight */
                 $('.block-' + startBlock).css('height', $scope.height * totalHeight + 'em');
                 /* add text */
-
                 $('.block-' + startBlock).html('<p>' + text + '</p>');
+                /* add padding to the text to make it in center */
+                $('.block-'+startBlock).css('padding-top',(totalHeight/2.3)+'em');
 
                 /* hide the remaining block */
                 for (var i = startBlock + 1; i <= endBlock; i++) {
@@ -307,6 +305,12 @@ var res = angular.module('ezeidApp').
             $scope.randomColor = function () {
                 var num = getRandomNumber(reservedColorArray.length);
                 return reservedColorArray[num];
+            }
+
+            /* Get the text of for the reserved dates based on the user'is id */
+            $scope.getReservedBlockText = function(loggedInUid,reserverId,text)
+            {
+
             }
 
             ////////////////////////////////////////////////////////////////////////////////////////////
