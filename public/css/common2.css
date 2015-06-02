@@ -1843,3 +1843,10 @@ margin-bottom: 10px;
     font-weight: 600;
     font-style:italic;
 }
+
+.rw .notes-heading
+{
+    text-align: center;
+    color:#fff;
+    background-color: #4889ff;
+}
