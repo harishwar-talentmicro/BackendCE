@@ -888,7 +888,7 @@
 
             var init = function(){
                 $scope.loadfilterStatusTypes().then(function(resp){
-                    //////console.log(resp);
+
                     $scope.loadTxActionTypes().then(function(){
                         $scope.loadTxStatusTypes().then(function(){
                             $scope.loadTransaction(1,-1).then(function(){
@@ -917,8 +917,8 @@
                     });
                 },function(){
                     $scope.$emit('$preLoaderStop');
-                    Notification.error({message : 'Unable to load status types', delay : MsgDelay} );
-                });
+                    //Notification.error({message : 'Unable to load status types', delay : MsgDelay} );
+               });
 
             };
 
