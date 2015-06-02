@@ -1605,9 +1605,16 @@ table.rwd-table > tbody > tr > td.serachResultSelectAll
     overflow-x: hidden;
     height: 60px;
 }
-.serviceList1 > .business-item {
+.serviceList1 > .business-item
+{
     text-align: center;
     min-height: 148px;
     max-height: 148px;
     font-size: 12px;
+}
+.skillMatrixTable
+{
+    margin-top:1%;
+    width:100% !important;
+    margin-bottom: 10px !important;
 }
