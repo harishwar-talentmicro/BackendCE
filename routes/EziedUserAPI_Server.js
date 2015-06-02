@@ -584,7 +584,8 @@ exports.FnLogin = function (req, res) {
             MasterID: 0,
             UserModuleRights: '',
             VisibleModules: '',
-            FreshersAccepted: ''
+            FreshersAccepted: '',
+            HomeDeliveryItemListType : ''
         };
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
         if (UserName != null && UserName != '' && Password != null && Password != '') {
@@ -636,6 +637,7 @@ exports.FnLogin = function (req, res) {
                                         RtnMessage.MasterID= loginDetails[0].ParentMasterID;
                                         RtnMessage.VisibleModules= loginDetails[0].VisibleModules;
                                         RtnMessage.FreshersAccepted= loginDetails[0].FreshersAccepted;
+                                        RtnMessage.HomeDeliveryItemListType = loginDetails[0].HomeDeliveryItemListType;
                                         res.send(RtnMessage);
                                         console.log('FnLogin:tmaster: Login success');
                                     }
@@ -3938,12 +3940,13 @@ exports.FnSearchByKeywords = function (req, res) {
                             var FindArray = find.split('.');
                             var SearchType = 0;
                             //console.log('findarray: ' + FindArray.length);
+                            console.log(req.ip);
+                            
                             
                             var logHistory = {
                                 searchTid : 0,  // who is searching
                                 ezeid : FindArray[0],
-                                ip : (req.headers['x-forwarded-for'] || req.connection.remoteAddress ||
-                                req.socket.remoteAddress || req.connection.socket.remoteAddress),
+                                ip : req.ip,
                                 type : 0
                             };
                             
@@ -4016,20 +4019,24 @@ exports.FnSearchByKeywords = function (req, res) {
                                         if (SearchResult[0].length > 0) {
                                             res.send(SearchResult[0]);
                                             console.log('FnSearchByKeywords: tmaster: Search result sent successfully');
-                                            
-                                            
-                                            var query = db.escape(logHistory.searchTid) + ',' + db.escape(logHistory.ezeid) + ',' + db.escape(logHistory.ip) + ',' + db.escape(logHistory.type);
-                            console.log('CALL pCreateAccessHistory(' + query + ')');
-                            db.query('CALL pCreateAccessHistory(' + query + ')', function (err){
-                                if(!err){
-                                    console.log('FnSearchByKeywords:Access history is created');
-                                }
-                                else {
-                                    
-                                    console.log('FnSearchByKeywords: tmaster: ' + err);
-                                }
-                            });
-                                    }
+                                            var getQuery = 'select TID from tmaster where Token='+db.escape(token);
+                                            db.query(getQuery, function (err, getResult) {
+                                                if(!err){
+                                                var tid = getResult[0].TID;
+                                                console.log(tid);
+                                                }
+                                                var query = db.escape(tid) + ',' + db.escape(logHistory.ezeid) + ',' + db.escape(logHistory.ip) + ',' + db.escape(logHistory.type);
+                                                console.log('CALL pCreateAccessHistory(' + query + ')');
+                                                db.query('CALL pCreateAccessHistory(' + query + ')', function (err){
+                                                    if(!err){
+                                                        console.log('FnSearchByKeywords:Access history is created');
+                                                    }
+                                                    else {
+                                                        console.log('FnSearchByKeywords: tmaster: ' + err);
+                                                    }
+                                                });
+                                            });
+                                        }
                                         else {
                                             res.send('null');
                                             console.log('FnSearchByKeywords: tmaster: no search found');
@@ -4130,10 +4137,10 @@ exports.FnSearchByKeywords = function (req, res) {
                     console.log('FnSearchByKeywords: Proximity is empty');
                 }
                 else if (Latitude == 'NaN') {
-                    console.log('FnSearchByKeywords: Proximity is empty');
+                    console.log('FnSearchByKeywords: Latitude is empty');
                 }
                 else if (Longitude == 'NaN') {
-                    console.log('FnSearchByKeywords: Proximity is empty');
+                    console.log('FnSearchByKeywords: Longitude is empty');
                 }
                 res.statusCode = 400;
                 res.send('null');
@@ -11149,6 +11156,11 @@ exports.FnSaveReservResourceServiceMap = function(req, res){
  * @constructor
  */
 exports.FnSearchBusListing = function(req,res,next){
+    /**
+     * HTML Pages list from angular routings scheme
+     * Any new url pattern addition in angular should be added in this list also
+     * @type {string[]}
+     */
     var htmlPagesList = [
         'signup',
         'messages',
@@ -11197,7 +11209,7 @@ exports.FnSearchBusListing = function(req,res,next){
                     if(!err){
                         if(results.length > 0){
                             if((!results[0].PIN) && results[0].IDTypeID !== 1){
-                                res.redirect('/searchDetails?searchType=2&TID='+results[0].LID)
+                                res.redirect('/searchDetails?searchType=2&TID='+results[0].LID);
                             }
                             else{
                                 next();
