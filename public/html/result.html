@@ -200,7 +200,8 @@
 
                                 <!-- Here Goes the Individual Tiles -->
 
-                                <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12 flip-card bottom-clearfix pointer" ng-init="color = random();tempVal = $index" ng-click="redirectFullPage(params.searchType,search.TID)" ng-repeat="search in searchListData track by $index">
+                                <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12 flip-card bottom-clearfix pointer" ng-init="color = random();tempVal = $index"
+                                     ng-click="redirectFullPage(params.searchType,search.TID)" ng-repeat="search in searchListData track by $index">
 
                                     <!-- Initial Tile goes here[FRONT] -->
                                     <div class="text-center text-white front height-128" ng-class="color">
@@ -282,7 +283,8 @@
 
                                         </div>
                                     </div>
-
+                                    <!-- Warning: Don't change the function[responsible for flipping tiles] -->
+                                    {{($index == searchListData.length) ? flipping_card() : ''}}
 
                                 </div>
                                 <!-- Individual Tiles ends here -->
@@ -300,6 +302,7 @@
 
     </section>
     <!-- Footer goes here -->
+
     <!-- Calling Flipping-card : For executing flipping post-DOM rendering -->
-    <footer-section {{flippingCard()}}></footer-section>
+    <footer-section></footer-section>
 </div>

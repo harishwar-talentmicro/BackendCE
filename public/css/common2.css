@@ -1841,5 +1841,25 @@ margin-bottom: 10px;
     word-wrap: break-word;
     padding: 2px;
     font-weight: 600;
-    color: #fff;
+    font-style:italic;
+}
+
+.rw .notes-heading
+{
+    text-align: center;
+    color:#fff;
+    background-color: #4889ff;
+}
+
+.rw .notes-content
+{
+    padding-left: 2px;
+    border-bottom: 1px solid lightgray;
+    font-style: italic;
+}
+
+.rw .notes-content:hover
+{
+    background-color: rgb(231, 231, 231);
+    cursor: pointer;
 }

@@ -712,11 +712,16 @@ var res = angular.module('ezeidApp').
                 },500);
             });
 
-            $scope.flippingCard = function()
+            /**
+             * Warning! : Don't Change the function flipping card [responsible for flipping tiles]
+             */
+            $scope.flipping_card = function()
             {
-                $(".flip-card").flip({
-                    trigger: "hover"
-                });
+                $timeout(function(){
+                    $(".flip-card").flip({
+                        trigger: "hover"
+                    });
+                },1000);
             }
 
             /* Basic Kms closed */

@@ -3940,6 +3940,15 @@ exports.FnSearchByKeywords = function (req, res) {
                             var FindArray = find.split('.');
                             var SearchType = 0;
                             //console.log('findarray: ' + FindArray.length);
+                            
+                            var logHistory = {
+                                searchTid : 0,  // who is searching
+                                ezeid : FindArray[0],
+                                ip : (req.headers['x-forwarded-for'] || req.connection.remoteAddress ||
+                                req.socket.remoteAddress || req.connection.socket.remoteAddress),
+                                type : 0
+                            };
+                            
                             if (FindArray.length > 0) {
                                 EZEID = FindArray[0];
                                 //checking the fisrt condition
@@ -3951,30 +3960,38 @@ exports.FnSearchByKeywords = function (req, res) {
                                         else if (FindArray[1].toUpperCase() == 'ID') {
                                             SearchType = 2;
                                             DocType = 'ID';
+                                            logHistory.type = 3;
                                         }
                                         else if (FindArray[1].toUpperCase() == 'DL') {
                                             SearchType = 2;
                                             DocType = 'DL';
+                                            logHistory.type = 7;
+                                            
                                         }
                                         else if (FindArray[1].toUpperCase() == 'PP') {
                                             SearchType = 2;
                                             DocType = 'PP';
+                                            logHistory.type = 4;
                                         }
                                         else if (FindArray[1].toUpperCase() == 'BR') {
                                             SearchType = 2;
                                             DocType = 'BR';
+                                            logHistory.type = 1;
                                         }
                                         else if (FindArray[1].toUpperCase() == 'CV') {
                                             SearchType = 2;
                                             DocType = 'CV';
+                                            logHistory.type = 2;
                                         }
                                         else if (FindArray[1].toUpperCase() == 'D1') {
                                             SearchType = 2;
                                             DocType = 'D1';
+                                            logHistory.type = 5;
                                         }
                                         else if (FindArray[1].toUpperCase() == 'D2') {
                                             SearchType = 2;
                                             DocType = 'D2';
+                                            logHistory.type = 6;
                                         }
                                         else {
                                             LocSeqNo = 0;
@@ -3992,6 +4009,7 @@ exports.FnSearchByKeywords = function (req, res) {
                             + ',' + db.escape(Longitude) +',' + db.escape(EZEID) + ',' + db.escape(LocSeqNo) + ',' + db.escape(Pin) + ',' + db.escape(SearchType) + ',' + db.escape(DocType) 
                                 + ',' + db.escape("0") + ',' + db.escape("0") + ',' + db.escape("0") + ',' + db.escape(token) 
                                 + ',' + db.escape(HomeDelivery) + ',' + db.escape(CurrentDate);
+                            
                             console.log('CALL pSearchResultNew(' + SearchQuery + ')');
                             db.query('CALL pSearchResultNew(' + SearchQuery + ')', function (err, SearchResult) {
                                 // db.query(searchQuery, function (err, SearchResult) {
@@ -4000,7 +4018,20 @@ exports.FnSearchByKeywords = function (req, res) {
                                         if (SearchResult[0].length > 0) {
                                             res.send(SearchResult[0]);
                                             console.log('FnSearchByKeywords: tmaster: Search result sent successfully');
-                                        }
+                                            
+                                            
+                                            var query = db.escape(logHistory.searchTid) + ',' + db.escape(logHistory.ezeid) + ',' + db.escape(logHistory.ip) + ',' + db.escape(logHistory.type);
+                            console.log('CALL pCreateAccessHistory(' + query + ')');
+                            db.query('CALL pCreateAccessHistory(' + query + ')', function (err){
+                                if(!err){
+                                    console.log('FnSearchByKeywords:Access history is created');
+                                }
+                                else {
+                                    
+                                    console.log('FnSearchByKeywords: tmaster: ' + err);
+                                }
+                            });
+                                    }
                                         else {
                                             res.send('null');
                                             console.log('FnSearchByKeywords: tmaster: no search found');
@@ -4018,7 +4049,8 @@ exports.FnSearchByKeywords = function (req, res) {
                                     console.log('FnSearchByKeywords: tmaster: ' + err);
                                 }
                             });
-                        }
+                        
+                    }
                         else {
                             res.statusCode = 401;
                             console.log('FnSearchByKeywords: Invalid token');
@@ -4190,6 +4222,8 @@ exports.FnGetSearchInformation = function (req, res) {
         var TID = parseInt(req.query.TID);
         var CurrentDate = req.query.CurrentDate;
         var SearchType = req.query.SearchType;
+        var IPAddress = (req.headers['x-forwarded-for'] || req.connection.remoteAddress ||
+                                req.socket.remoteAddress || req.connection.socket.remoteAddress);
         var WorkingDate
         var moment = require('moment');
         if(CurrentDate != null)
@@ -4202,7 +4236,7 @@ exports.FnGetSearchInformation = function (req, res) {
             if(Token == 2){
 
                             var SearchParameter = db.escape(TID) + ',' + db.escape(Token) + ',' + db.escape(WorkingDate)
-                                    + ',' + db.escape(SearchType)+ ',' + db.escape(0);
+                                    + ',' + db.escape(SearchType)+ ',' + db.escape(0) + ',' + db.escape(IPAddress);
                             // console.log('Search Information: ' +SearchParameter);
            //     console.log('CALL pSearchInformation(' + SearchParameter + ')');
                             db.query('CALL pSearchInformation(' + SearchParameter + ')', function (err, UserInfoResult) {
@@ -4215,7 +4249,7 @@ exports.FnGetSearchInformation = function (req, res) {
                                     }
                                     else {
                                         var searchParams = db.escape(TID) + ',' + db.escape(Token) + ',' + db.escape(WorkingDate)
-                                            + ',' + db.escape(SearchType)+ ',' + db.escape(1);
+                                            + ',' + db.escape(SearchType)+ ',' + db.escape(1) + ',' + db.escape(IPAddress);
                                         db.query('CALL pSearchInformation('+ searchParams +')', function (err, UserInfoReResult) {
                                             if(!err){
                                                 if(UserInfoReResult[0].length > 0){
@@ -4250,7 +4284,7 @@ exports.FnGetSearchInformation = function (req, res) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
-                        var SearchParameter = db.escape(TID) + ',' + db.escape(Token) + ',' + db.escape(WorkingDate)+ ',' + db.escape(SearchType)+',' + db.escape(0);
+                        var SearchParameter = db.escape(TID) + ',' + db.escape(Token) + ',' + db.escape(WorkingDate)+ ',' + db.escape(SearchType)+',' + db.escape(0) + ',' + db.escape(IPAddress);
                         // console.log('Search Information: ' +SearchParameter);
                        // console.log('CALL pSearchInformation(' + SearchParameter + ')');
                             db.query('CALL pSearchInformation(' + SearchParameter + ')', function (err, UserInfoResult) {
@@ -4263,7 +4297,7 @@ exports.FnGetSearchInformation = function (req, res) {
                                 }
                                 else {
                                     var searchParams = db.escape(TID) + ',' + db.escape(Token) + ',' + db.escape(WorkingDate)
-                                        + ',' + db.escape(SearchType)+ ',' + db.escape(1);
+                                        + ',' + db.escape(SearchType)+ ',' + db.escape(1) + ',' + db.escape(IPAddress);
                                     db.query('CALL pSearchInformation('+ searchParams +')', function (err, UserInfoReResult) {
                                         if(!err){
                                             if(UserInfoReResult[0].length > 0){
@@ -10488,7 +10522,7 @@ exports.FnGetReservationResource = function (req, res) {
                                 if (GetResult != null) {
                                     if (GetResult[0].length > 0) {
                                         responseMessage.status = true;
-                                        responseMessage.data = GetResult[0] ;
+                                        responseMessage.data = GetResult ;
                                         responseMessage.error = null;
                                         responseMessage.message = 'Resource details Send successfully';
                                         console.log('FnGetReservationResource: Resource details Send successfully');
@@ -11260,7 +11294,7 @@ exports.FnSaveReservTransaction = function(req, res){
                                     responseMessage.message = 'Resource Transaction details save successfully';
                                     responseMessage.data = {
                                         resourceid : req.body.resourceid,
-                                        serviceids : service_id
+                                        serviceids : serviceid
                                     };
                                     res.status(200).json(responseMessage);
                                     console.log('FnSaveReservTransaction: Resource Transaction details save successfully');
@@ -11323,6 +11357,7 @@ exports.FnSaveReservTransaction = function(req, res){
 
 //method to get reservation transaction
 exports.FnGetReservTransaction = function (req, res) {
+    console.log('Reservation Resouce details');
     try {
 
         res.setHeader("Access-Control-Allow-Origin", "*");
@@ -11343,12 +11378,12 @@ exports.FnGetReservTransaction = function (req, res) {
                 if (!err) {
                     if (Result != null) {
 
-                        db.query('CALL pGetResResourceServiceMap(' + db.escape(Token) + ',' + db.escape(resourceid) + ')', function (err, GetResult) {
+                        db.query('CALL pgetMapedservices(' + db.escape(Token) + ',' + db.escape(resourceid) + ')', function (err, GetResult) {
                             if (!err) {
                                 if (GetResult != null) {
                                     if (GetResult[0].length > 0) {
                                         responseMessage.status = true;
-                                        responseMessage.data = GetResult[0] ;
+                                        responseMessage.data = GetResult ;
                                         responseMessage.error = null;
                                         responseMessage.message = 'Resource Transaction details Send successfully';
                                         console.log('FnGetReservTransaction: Resource Transaction details Send successfully');

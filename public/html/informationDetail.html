@@ -306,7 +306,7 @@
                                          target="_blank"
                                          ng-show="SearchInfo.EZEIDVerifiedID == '2' && shoReserVation == 1"
                                          title="Reservation"
-                                         ng-click="(SearchInfo.ReservationURL) ? '' : ($event.preventDefault())(openReservationForm())">
+                                         ng-click="(SearchInfo.ReservationURL) ? '' : ($event.preventDefault())(openReservationForm(SearchInfo.EZEID))">
                                         <img src="../images/new_reservations.png">
                                         Reservation
                                     </a>

@@ -205,9 +205,11 @@ angular.module('ezeidApp').
                             $scope.showNoticeText = false;
                         }
 
+                        console.log($scope.SearchInfo.VisibleModules);
+
                         $scope.showSalesEnquiry = $scope.SearchInfo.VisibleModules[0];
-                        $scope.showHomeDelivery = $scope.SearchInfo.VisibleModules[1];
-                        $scope.shoReserVation = $scope.SearchInfo.VisibleModules[2];
+                        $scope.shoReserVation = $scope.SearchInfo.VisibleModules[1];
+                        $scope.showHomeDelivery = $scope.SearchInfo.VisibleModules[2];
                         $scope.showServiceRequest = $scope.SearchInfo.VisibleModules[3];
                         $scope.showSendCv = $scope.SearchInfo.VisibleModules[4];
 
@@ -426,17 +428,22 @@ angular.module('ezeidApp').
             };
 
             //open Reservation form
-            $scope.openReservationForm = function () {
-            document.getElementById("reservationMessage").className = "form-control fixTextArea emptyBox";
-            if($rootScope._userInfo.Token == 2)
+            $scope.openReservationForm = function (_Ezeid)
             {
-                $('#SignIn_popup').slideDown();
-            }
-            else
-            {
-                $('#Reservation_popup').slideDown();
-            }
-        };
+                document.getElementById("reservationMessage").className = "form-control fixTextArea emptyBox";
+                if($rootScope._userInfo.Token == 2)
+                {
+                    $('#SignIn_popup').slideDown();
+                }
+                else
+                {
+                    var params = '?EZEID='+_Ezeid;
+                        console.log(_Ezeid);
+                         //$location.url('/service-reservation'+params);
+                        //  $location.url('/service-reservation');
+                        // $('#Reservation_popup').slideDown();
+                }
+            };
 
         //Send Reservation
         $scope.sendReservation = function (messageType) {

@@ -46,6 +46,7 @@ var res = angular.module('ezeidApp').
 
             /* SETTINGS GOES HERE======================================== */
 
+            /* Conditions for different views:User,Doctor */
 
             /* for resources availability background color */
             var availabilityColor = 'rgb(64, 242, 168)';
@@ -68,12 +69,15 @@ var res = angular.module('ezeidApp').
                 [960, 1200],
             ];
 
-            /* Reserved hours */
+            /* Reserved hours *///[Start Minute, End Minute, Reserver Name, Reserver ID, service]
             $scope.reservedTime = [
-                [550, 600, 'sandeep'],
-                [700, 810, 'rahul'],
-                [1000, 1140, 'shrey'],
+                [550, 600, 'sandeep',3],
+                [700, 810, 'rahul',12],
+                [1000, 1140, 'shrey',5],
             ];
+
+            /* Set the logged in user */
+            $scope.loggedInUid = 11;
 
             /* SETTINGS ENDS HERE======================================== */
             /////////////////////////////////////////////////////////
@@ -146,9 +150,10 @@ var res = angular.module('ezeidApp').
              * @param row
              * @param col
              */
-            $scope.getTime = function (row, col) {
+            $scope.getTime = function (row, col, status) {
                 /* return time in 30 mins interval */
-                if (row % 6 != 0 && row != 0) {
+
+                if (typeof(status) == 'undefined' && row % 6 != 0 && row != 0) {
                     return;
                 }
 
@@ -176,7 +181,7 @@ var res = angular.module('ezeidApp').
                     var endTimeMins = workingHrs[i][1];
 
                     /* identify the block id which comes in range */
-                    var data = getBlockRange(startTimeMins,endTimeMins);
+                    var data = getBlockRange(startTimeMins, endTimeMins);
                     var startRange = data[0];
                     var endRange = data[1] - 1;//As we don't want last block to be filled
 
@@ -196,11 +201,10 @@ var res = angular.module('ezeidApp').
             $scope.alreadyReserveSlot = function () {
                 for (var i = 0; i < $scope.reservedTime.length; i++) {
                     /* get blocks coming under this range */
-                    var data = getBlockRange($scope.reservedTime[i][0],$scope.reservedTime[i][1]);
+                    var data = getBlockRange($scope.reservedTime[i][0], $scope.reservedTime[i][1]);
                     /* initiate merging process */
-                    $scope.mergeBlockMaster(data[0],data[1],$scope.reservedTime[i][2],$scope.height);
+                    $scope.mergeBlockMaster(data[0], data[1], $scope.reservedTime[i][2], $scope.height);
                     /* color the block */
-                    /* add the text */
                 }
             };
 
@@ -212,62 +216,57 @@ var res = angular.module('ezeidApp').
              * ->write text
              */
             $scope.mergeBlockMaster = function (startBlock, endBlock, text, height) {
-                var realRange = refineRange(startBlock,endBlock);
+                var realRange = refineRange(startBlock, endBlock);
                 var color = $scope.randomColor();
-                for(var i=0;i<realRange.length;i++)
-                {
+                for (var i = 0; i < realRange.length; i++) {
                     var startRange = realRange[i][0];
                     var endRange = realRange[i][1];
                     /* merge the cells */
-                    mergeCells(startRange,endRange,text);
+                    mergeCells(startRange, endRange, text);
                     /* commence merging process */
-                    $scope.colorBlocks(startRange,endRange,color);
+                    $scope.colorBlocks(startRange, endRange, color);
+                    /* add a flag to the first block for making it reserved */
+                    $('.block-'+startRange).addClass('reserved');
                 }
             }
 
             /* Actual merging goes HERE */
-            function mergeCells(startBlock,endBlock,text)
-            {
+            function mergeCells(startBlock, endBlock, text) {
                 /* calculate total height  */
                 var totalHeight = endBlock - startBlock + 1;
                 /* increase the first block's height to totalHeight */
-                $('.block-'+startBlock).css('height',$scope.height*totalHeight+'em');
+                $('.block-' + startBlock).css('height', $scope.height * totalHeight + 'em');
                 /* add text */
-
-                $('.block-'+startBlock).html('<p>'+text+'</p>');
+                $('.block-' + startBlock).html('<p>' + text + '</p>');
+                /* add padding to the text to make it in center */
+                $('.block-'+startBlock).css('padding-top',(totalHeight/2.3)+'em');
 
                 /* hide the remaining block */
-                for(var i = startBlock+1; i <= endBlock ; i++)
-                {
-                    $('.block-'+i).addClass('hidden');
+                for (var i = startBlock + 1; i <= endBlock; i++) {
+                    $('.block-' + i).addClass('hidden');
                 }
             }
 
             /* partition the block range based on 4 different time of day: i.e early,morning,evening,night */
-            function refineRange(startRange,endRange)
-            {
-                var endBlockArray = [71,143,215,287];
+            function refineRange(startRange, endRange) {
+                var endBlockArray = [71, 143, 215, 287];
                 var data = [];
                 var flag = false;
-                for(var i=0;i<endBlockArray.length;i++)
-                {
-                    if(endBlockArray[i] > startRange && endBlockArray[i] < endRange)
-                    {
-                        data.push([startRange,endBlockArray[i]]);
+                for (var i = 0; i < endBlockArray.length; i++) {
+                    if (endBlockArray[i] > startRange && endBlockArray[i] < endRange) {
+                        data.push([startRange, endBlockArray[i]]);
                         startRange = endBlockArray[i] + 1;
                         flag = true;
                     }
-                    else if(flag)
-                    {
-                        data.push([startRange,endRange - 1]);
+                    else if (flag) {
+                        data.push([startRange, endRange - 1]);
                         break;
                     }
                 }
 
                 /* in case it don't touches any of the edges */
-                if(data.length == 0)
-                {
-                    return [[startRange,(endRange-1)]];
+                if (data.length == 0) {
+                    return [[startRange, (endRange - 1)]];
                 }
                 return data;
             }
@@ -284,31 +283,49 @@ var res = angular.module('ezeidApp').
             }
 
             /* get the block ids based on the range */
-            function getBlockRange(startRange,endRange)
-            {
+            function getBlockRange(startRange, endRange) {
                 var data = [];
-                data.push(startRange/5);
-                data.push(endRange/5);
+                data.push(startRange / 5);
+                data.push(endRange / 5);
                 return data;
             };
 
             /* Color the blocks */
-            $scope.colorBlocks = function(startBlock,endBlock,color)
-            {
-                for(var j=startBlock;j<=endBlock;j++)
-                {
-                    $('.block-'+j).css('background-color',color);
+            $scope.colorBlocks = function (startBlock, endBlock, color) {
+                for (var j = startBlock; j <= endBlock; j++) {
+                    $('.block-' + j).css('background-color', color);
                 }
             }
 
-            var getRandomNumber = function(len)
-            {
+            var getRandomNumber = function (len) {
                 return Math.floor(Math.random() * len);
             };
 
             /* select random color */
-            $scope.randomColor = function(){
+            $scope.randomColor = function () {
                 var num = getRandomNumber(reservedColorArray.length);
                 return reservedColorArray[num];
+            }
+
+            /* Get the text of for the reserved dates based on the user'is id */
+            $scope.getReservedBlockText = function(loggedInUid,reserverId,text)
+            {
+
+            }
+
+            ////////////////////////////////////////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////////////////////////////////////
+            //////////////////////////FUNCTIONALITIES & EVENTS//////////////////////////////////////////
+            ////////////////////////////////////////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////////////////////////////////////
+
+            /**
+             * On Click event handler for whole of the reservation module
+             */
+            $scope.reservationClickEventHandler = function (blockId)
+            {
+                /* check if the block is already reserved */
+                var isReserved = $('.block-'+blockId).hasClass('reserved');
+                console.log(isReserved);
             }
         }]);
