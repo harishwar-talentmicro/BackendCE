@@ -46,8 +46,6 @@ var res = angular.module('ezeidApp').
 
             /* SETTINGS GOES HERE======================================== */
 
-            /* Conditions for different views:User,Doctor */
-
             /* for resources availability background color */
             var availabilityColor = 'rgb(64, 242, 168)';
 
@@ -86,6 +84,14 @@ var res = angular.module('ezeidApp').
 
             getReservationTransaction();
             /* SETTINGS ENDS HERE======================================== */
+
+            /* All the set color's INDEX with their title */
+            $scope.colorIndex = [
+                [availabilityColor,'Unreserved'],
+                [reservedColorArray[0],'Reserved'],
+                [selfReservedColor,'Your Reservation'],
+                ['#fff','Not Available'],
+            ];
 
             // Get All Resources
             function getReservationTransaction(){
@@ -391,6 +397,17 @@ var res = angular.module('ezeidApp').
                 minutes = minutes < 10 ? '0' + minutes : minutes;
                 return (hours + ':' + minutes);
             }
+
+            /**
+             * Append the color index at the bottom
+             */
+            $scope.appendColorIndex = function() {
+                for (var i = 0; i < $scope.colorIndex.length; i++)
+                {
+                    $('.color-index-'+i).css('background-color',$scope.colorIndex[i][0]);
+                    $('.color-index-label-'+i).html('<small>'+$scope.colorIndex[i][1]+'</small>');
+                }
+            };
 
             ////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////////////////////
