@@ -4020,7 +4020,7 @@ exports.FnSearchByKeywords = function (req, res) {
                                             
                                             var query = db.escape(logHistory.searchTid) + ',' + db.escape(logHistory.ezeid) + ',' + db.escape(logHistory.ip) + ',' + db.escape(logHistory.type);
                             console.log('CALL pCreateAccessHistory(' + query + ')');
-                            db.query('CALL pCreateAccessHistory(' + query + ')', function (err, Result){
+                            db.query('CALL pCreateAccessHistory(' + query + ')', function (err){
                                 if(!err){
                                     console.log('FnSearchByKeywords:Access history is created');
                                 }
