@@ -276,6 +276,9 @@ var res = angular.module('ezeidApp').
 
                     },1500);
 
+                }).error(function(){
+                    Notification.error({ message : 'An error occurred', delay : MsgDelay});
+                    $scope.$emit('$preLoaderStop');
                 });
             }
 
