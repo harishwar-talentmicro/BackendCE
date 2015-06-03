@@ -11,9 +11,9 @@
                 <li role="presentation" ng-class="{active: selectedTab == 1}">
                     <a class="btn-link" ng-class="{'tab-active': selectedTab == 1}" ng-click="selectedTab = 1">Sales</a>
                 </li>
-                <li role="presentation" ng-class="{active: selectedTab == 2}">
-                    <a class="btn-link" ng-class="{'tab-active': selectedTab == 2}" ng-click="selectedTab = 2">Reservation</a>
-                </li>
+                <!--<li role="presentation" ng-class="{active: selectedTab == 2}">-->
+                    <!--<a class="btn-link" ng-class="{'tab-active': selectedTab == 2}" ng-click="selectedTab = 2">Reservation</a>-->
+                <!--</li>-->
                 <li role="presentation" ng-class="{active: selectedTab == 3}">
                     <a class="btn-link" ng-class="{'tab-active': selectedTab == 3}" ng-click="selectedTab = 3">Home Delivery</a>
                 </li>
@@ -47,16 +47,16 @@
                 <!------- Sales Tab ends ---------------------->
 
                 <!------- Reservation Tab ---------------------->
-                <div role="tabpanel" class="tab-pane" id="reservation-tb" ng-show="selectedTab === 2" ng-class="{'active':selectedTab ===2}">
-                    <div class="container-fluid">
-                        <div class="row bottom-clearfix"></div>
-                        <div class="row bottom-clearfix">
-                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                <button ng-hide="(globalConfig.itemListType[1] < 1)" class="btn btn-sm btn-primary" ng-click="toggleModalBox(1)"><span class="glyphicon glyphicon-plus"></span> Add</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <!--<div role="tabpanel" class="tab-pane" id="reservation-tb" ng-show="selectedTab === 2" ng-class="{'active':selectedTab ===2}">-->
+                    <!--<div class="container-fluid">-->
+                        <!--<div class="row bottom-clearfix"></div>-->
+                        <!--<div class="row bottom-clearfix">-->
+                            <!--<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">-->
+                                <!--<button ng-hide="(globalConfig.itemListType[1] < 1)" class="btn btn-sm btn-primary" ng-click="toggleModalBox(1)"><span class="glyphicon glyphicon-plus"></span> Add</button>-->
+                            <!--</div>-->
+                        <!--</div>-->
+                    <!--</div>-->
+                <!--</div>-->
                 <!------- Reservation Tab ends ---------------------->
 
                 <!------- Home Delivery Tab  ---------------------->
