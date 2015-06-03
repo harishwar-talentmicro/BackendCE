@@ -20,7 +20,7 @@ angular.module('ezeidApp').controller('RulesCtrl',['$scope','$interval','$http',
             'Sales',
             'Reservation',
             'Home Delivery',
-            'Service',
+            'Help Desk',
             'Resume'
         ];
 

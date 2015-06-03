@@ -251,12 +251,6 @@ angular.module('ezeidApp').controller('BusinessManagerCtrl',[
         };
 
 
-
-
-
-
-
-
         /**
          * Opens the link
          * @param link

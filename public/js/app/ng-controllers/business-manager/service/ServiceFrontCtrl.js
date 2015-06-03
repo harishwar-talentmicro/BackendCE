@@ -1,5 +1,5 @@
 (function() {
-    angular.module('ezeidApp').controller('HomeDeliveryFrontCtrl', [
+    angular.module('ezeidApp').controller('ServiceFrontCtrl', [
         '$rootScope',
         '$scope',
         '$http',
@@ -100,9 +100,9 @@
 
             /**
              * @todo
-             * homeDeliveryItemListTpe : To be loaded from server but currently no API call is available for this
+             * ServiceItemListTypeItemListTpe : To be loaded from server but currently no API call is available for this
              */
-            $scope.homeDeliveryItemListType = 0;
+            $scope.serviceItemListType = 0;
             $scope.editPermission = true;
             $scope.editMode = true;
 
@@ -147,7 +147,7 @@
                     ezeidTid : 0,
 
                     TID : 0,
-                    functionType : 2, // Function Type will be 0 for homeDelivery
+                    functionType : 3, // Function Type will be 0 for service
                     ezeid : '',
                     statusType : 0,
                     notes : '',
@@ -163,7 +163,7 @@
                     taskDateTime : '',
                     folderRule : 0,
                     message : '',
-                    messageType : ($rootScope._userInfo.HomeDeliveryItemListType) ? $rootScope._userInfo.HomeDeliveryItemListType : 0,
+                    messageType : ($rootScope._userInfo.ServiceItemListType) ? $rootScope._userInfo.ServiceItemListType : 0,
                     latitude : 0,
                     longitude : 0,
                     duration : 0,
@@ -297,7 +297,7 @@
                         ezeidTid : 0,
 
                         TID : 0,
-                        functionType : 2, // Function Type will be 0 for homeDelivery
+                        functionType : 3, // Function Type will be 0 for service
                         ezeid : '',
                         statusType : 0,
                         notes : '',
@@ -313,7 +313,7 @@
                         taskDateTime : '',
                         folderRule : 0,
                         message : '',
-                        messageType : ($rootScope._userInfo.HomeDeliveryItemListType) ? $rootScope._userInfo.HomeDeliveryItemListType : 0,
+                        messageType : ($rootScope._userInfo.ServiceItemListType) ? $rootScope._userInfo.ServiceItemListType : 0,
                         latitude : 0,
                         longitude : 0,
                         duration : 0,
@@ -334,9 +334,9 @@
             };
 
             /**
-             * Watches the open and close property of homeDelivery modal
+             * Watches the open and close property of service modal
              */
-            $scope.$watch('_showHomeDeliveryModal',function(newVal,oldVal){
+            $scope.$watch('_showServiceModal',function(newVal,oldVal){
                 if(!newVal){
                     $scope.resetModalBox();
                 }
@@ -378,9 +378,9 @@
                 }).success(function (resp) {
                     if (resp && resp != 'null' && resp.length > 0) {
                         $scope.masterUser = resp[0];
-                        $scope.homeDeliveryItemListType = ($scope.masterUser.HomeDeliveryItemListType &&
-                        (!isNaN(parseInt($scope.masterUser.HomeDeliveryItemListType)))) ? parseInt($scope.masterUser.HomeDeliveryItemListType) : 0 ;
-                        //$scope._homeDeliveryModalTitle = ($scope.masterUser.homeDeliveryModuleTitle) ? $scope.masterUser.homeDeliveryModuleTitle : 'homeDelivery Enquiry';
+                        $scope.ServiceItemListType = ($scope.masterUser.ServiceItemListType &&
+                        (!isNaN(parseInt($scope.masterUser.ServiceItemListType)))) ? parseInt($scope.masterUser.ServiceItemListType) : 0 ;
+                        //$scope._salesModalTitle = ($scope.masterUser.SalesModuleTitle) ? $scope.masterUser.SalesModuleTitle : 'Sales Enquiry';
                     }
                     defer.resolve();
                 }).error(function(err){
@@ -402,7 +402,7 @@
                     method : 'GET',
                     params : {
                         Token: $rootScope._userInfo.Token,
-                        FunctionType: 2,
+                        FunctionType: 3,
                         EZEID: $scope.SearchInfo.EZEID
                     }
                 }).success(function(resp){
@@ -471,7 +471,7 @@
                     State : $scope.modalBox.tx.state,
                     City : $scope.modalBox.tx.city,
                     Area : $scope.modalBox.tx.area,
-                    FunctionType : 2,   // For homeDelivery
+                    FunctionType : 3,   // For service
                     Latitude : $scope.modalBox.tx.latitude,
                     Longitude : $scope.modalBox.tx.longitude,
                     EZEID : $rootScope._userInfo.ezeid,
@@ -545,7 +545,7 @@
                     flag *= false;
                 }
 
-                if(tx.itemList.length < 1 && $scope.homeDeliveryItemListType > 0 && $scope.moduleItems.length > 0){
+                if(tx.itemList.length < 1 && $scope.ServiceItemListType > 0 && $scope.moduleItems.length > 0){
                     $scope.txerror.items = true;
                     flag *= false;
                 }
@@ -579,13 +579,13 @@
                     return ;
                 }
 
-                if($scope.modalBox.tx.itemList.length <  1 && $scope.homeDeliveryItemListType > 0){
+                if($scope.modalBox.tx.itemList.length <  1 && $scope.ServiceItemListType > 0){
                     Notification.error({ message : 'Please select items for the enquiry',delay : MsgDelay});
                     return ;
                 }
 
 
-                if($scope.modalBox.tx.message.length < 1 && $scope.homeDeliveryItemListType > 0){
+                if($scope.modalBox.tx.message.length < 1 && $scope.ServiceItemListType > 0){
                     var itemList = [];
                     try{
                         itemList = JSON.parse(data.ItemsList);
@@ -616,18 +616,18 @@
                 }).success(function(resp){
                     if(resp && resp.hasOwnProperty('IsSuccessfull')){
                         if(resp.IsSuccessfull){
-                            var msg = 'Order is placed successfully';
+                            var msg = 'Help desk ticket is raised successfully';
 
                             Notification.success({ message : msg, delay : MsgDelay});
-                            $scope._toggleHomeDeliveryModal();
+                            $scope._toggleServiceModal();
                             $scope.resetModalBox();
                         }
                         else{
-                            Notification.error({ message : 'An error occurred while placing enquiry', delay : MsgDelay});
+                            Notification.error({ message : 'An error occurred while raising ticket', delay : MsgDelay});
                         }
                     }
                     else{
-                        Notification.error({ message : 'An error occurred while placing enquiry', delay : MsgDelay});
+                        Notification.error({ message : 'An error occurred while raising ticket', delay : MsgDelay});
                     }
 
                     $scope.$emit('$preLoaderStop');

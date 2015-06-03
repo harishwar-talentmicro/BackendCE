@@ -295,7 +295,7 @@
                                          target="_blank"
                                          ng-show="SearchInfo.EZEIDVerifiedID == '2' && showHomeDelivery == 1"
                                          title="Home Delivery"
-                                         ng-click="(SearchInfo.HomeDeliveryURL) ? '' : ($event.preventDefault())(openHomeDeliverForm())">
+                                         ng-click="(SearchInfo.HomeDeliveryURL) ? '' : ($event.preventDefault())(_toggleHomeDeliveryModal())">
                                         <img src="../images/new_home_delivery.png">
                                         Home Delivery
                                     </a>
@@ -317,9 +317,9 @@
                                        target="_blank"
                                        ng-show="SearchInfo.EZEIDVerifiedID == '2' && showServiceRequest == 1"
                                         title="Support Request"
-                                        ng-click="(SearchInfo.ServiceURL) ? '' : ($event.preventDefault())(openServiceRequestForm())">
+                                        ng-click="(SearchInfo.ServiceURL) ? '' : ($event.preventDefault())(_toggleServiceModal())">
                                         <img src="../images/new_service_request.png">
-                                        Service Request
+                                        Help Desk
                                     </a>
                                 </div>
                                 <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setLeftRightPaddingZero">
@@ -674,6 +674,394 @@
             <!-- end: ModalBox ends -->
         </div>
 
+        <div class="home-delivery-module-modal">
+            <!-- Modal Box starts -->
+            <modal mtitle="_homeDeliveryModalTitle" mclass="modalBox.class" visible="_showHomeDeliveryModal">
+                <div class="container-fluid" ng-controller="HomeDeliveryFrontCtrl">
+                    <div class="row">
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-center">
+                            <h4 class="font-roboto">{{(masterUser.HomeDeliveryModuleTitle) ? masterUser.HomeDeliveryModuleTitle : 'Home Delivery Order Form'}}
+                                <br/><small class="text-center">(Home Delivery Order Form)</small>
+                            </h4>
+
+                        </div>
+
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 transaction-details-box">
+
+                            <div ng-show="moduleItems.length" class="row bottom-clearfix">
+
+                                <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12 item-list-box">
+                                    <div class="row">
+                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                            <h4 class="text-center font-roboto text-warning">Select Items</h4>
+                                            <h6 class="text-center font-robot text-info">
+                                                {{moduleItems.length}} items in list
+                                            </h6>
+                                        </div>
+                                    </div>
+
+                                    <div class="row" id="bus-item-list-container-hd">
+
+                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                            <bussiness-item
+                                                    ng-repeat="item in moduleItems track by item.TID"
+                                                    item="item" item-list-type="homeDeliveryItemListType"
+                                                    add-item="addItem(item)" edit-permission="editPermission" edit-mode="editMode">
+                                            </bussiness-item>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="col-lg-8 col-md-8 col-sm-6 col-xs-12">
+                                    <div class="row">
+                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                            <h4 class="text-center font-roboto text-success">items in your order list </h4>
+                                            <h6 class="text-center font-roboto text-info">{{modalBox.tx.itemList.length}} items in your enquiry list </h6>
+                                        </div>
+                                    </div>
+
+                                    <div class="row" id="tx-item-list-container-hd">
+
+                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-center" ng-hide="modalBox.tx.itemList.length > 0">
+                                            <small class="font-open-sans text-warning">Add items to your enquiry</small>
+                                        </div>
+
+                                        <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12" ng-repeat="item in modalBox.tx.itemList track by item.ItemID">
+                                            <transaction-item
+                                                    item="item" item-list-type="homeDeliveryItemListType"
+                                                    remove-item="removeItem(item)"
+                                                    edit-permission="editPermission" edit-mode="editMode">
+                                            </transaction-item>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+
+
+                            </div>
+
+                            <hr ng-show="moduleItems.length"/>
+
+                            <div class="row">
+
+
+                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                    <div class="row">
+                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                            <label>Order Message</label>
+                                        </div>
+                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                            <textarea rows="3" class="form-control no-radius" ng-model="modalBox.tx.message" name="message"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                    <div class="row">
+                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                            <label>Order Details</label>
+                                        </div>
+                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+
+                                            <textarea rows="3" class="form-control no-radius" ng-model="modalBox.tx.notes" name="notes"></textarea>
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                                    <div class="row">
+                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                            <label>Delivery Address</label>
+                                        </div>
+                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-hide="modalBox.editMode">
+                                            <div class="form-group form-group-sm ">
+                                                <select class="form-control" ng-model="modalBox.tx.locId" ng-change="resolveAddress()">
+                                                    <option value="">Other Location</option>
+                                                    <option value="0">Current Location</option>
+                                                    <option ng-repeat="location in modalBox.locationList track by location.TID" value="{{location.TID}}">{{location.LocTitle}}</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                            <div class="form-group form-group-sm ">
+                                                <input
+                                                        ng-disabled="modalBox.tx.locId > 0"
+                                                        type="text" placeholder="Address Line 1" class="form-control no-radius"  name="area" ng-model="modalBox.tx.address" />
+                                                <small class="text-danger" ng-show="txerror.address">Please enter address line 1</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                            <div class="form-group form-group-sm ">
+                                                <input type="text"
+                                                       ng-disabled="modalBox.tx.locId"
+                                                       placeholder="Locality" class="form-control no-radius"  name="area" ng-model="modalBox.tx.area" />
+                                                <small class="text-danger" ng-show="txerror.area">Please enter locality</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                            <div class="form-group form-group-sm ">
+                                                <input
+                                                        ng-disabled="modalBox.tx.locId"
+                                                        type="text" placeholder="City" class="form-control no-radius" name="city" ng-model="modalBox.tx.city" />
+                                                <small class="text-danger" ng-show="txerror.city">Please enter city</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                            <div class="form-group form-group-sm ">
+                                                <input type="text"
+                                                       ng-disabled="modalBox.tx.locId"
+                                                       placeholder="State" class="form-control no-radius" name="state" ng-model="modalBox.tx.state" />
+                                                <small class="text-danger" ng-show="txerror.state">Please enter state</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                            <div class="form-group form-group-sm ">
+                                                <input type="text"
+                                                       ng-disabled="modalBox.tx.locId"
+                                                       placeholder="Country" class="form-control no-radius"  name="country" ng-model="modalBox.tx.country" />
+                                                <small class="text-danger" ng-show="txerror.country">Please enter country</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                            </div>
+
+
+                            <div class="row top-clearfix-padding-half bottom-clearfix">
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <small class="text-danger" ng-show="txerror.items">Please choose an item </small>
+                                </div>
+                            </div>
+
+                            <div class="row top-clearfix-padding-half bottom-clearfix">
+
+                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                                    <button class="btn btn-info btn-sm no-radius" ng-click="saveTransaction()">
+                                        <span class="glyphicon glyphicon-hand-right"></span>
+                                        Place Order
+                                    </button>
+                                    <button class="btn btn-danger btn-sm no-radius" ng-click="_toggleHomeDeliveryModal()">
+                                        <span class="glyphicon glyphicon-remove"></span>
+                                        Cancel
+                                    </button>
+                                </div>
+
+
+
+
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+            </modal>
+            <!-- end: ModalBox ends -->
+
+
+
+        </div>
+
+        <div class="service-module-modal">
+            <!-- Modal Box starts -->
+            <modal mtitle="_serviceModalTitle" mclass="modalBox.class" visible="_showServiceModal">
+                <div class="container-fluid" ng-controller="ServiceFrontCtrl">
+                    <div class="row">
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-center">
+                            <h4 class="font-roboto">{{(masterUser.ServiceModuleTitle) ? masterUser.ServiceModuleTitle : 'Help Desk'}}
+                                <br/><small class="text-center">(Help Desk enquiry)</small>
+                            </h4>
+
+                        </div>
+
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 transaction-details-box">
+
+                            <div ng-show="moduleItems.length && 0" class="row bottom-clearfix">
+
+                                <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12 item-list-box">
+                                    <div class="row">
+                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                            <h4 class="text-center font-roboto text-warning">Select Issues</h4>
+                                            <h6 class="text-center font-robot text-info">
+                                                {{moduleItems.length}} items in list
+                                            </h6>
+                                        </div>
+                                    </div>
+
+                                    <div class="row" id="bus-item-list-container-s">
+
+                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                            <bussiness-item
+                                                    ng-repeat="item in moduleItems track by item.TID"
+                                                    item="item" item-list-type="serviceItemListType"
+                                                    add-item="addItem(item)" edit-permission="editPermission" edit-mode="editMode">
+                                            </bussiness-item>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="col-lg-8 col-md-8 col-sm-6 col-xs-12">
+                                    <div class="row">
+                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                            <h4 class="text-center font-roboto text-success">Issues in your list </h4>
+                                            <h6 class="text-center font-roboto text-info">{{modalBox.tx.itemList.length}} issues in your enquiry list </h6>
+                                        </div>
+                                    </div>
+
+                                    <div class="row" id="tx-item-list-container-s">
+
+                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-center" ng-hide="modalBox.tx.itemList.length > 0">
+                                            <small class="font-open-sans text-warning">Add issues to your enquiry</small>
+                                        </div>
+
+                                        <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12" ng-repeat="item in modalBox.tx.itemList track by item.ItemID">
+                                            <transaction-item
+                                                    item="item" item-list-type="serviceItemListType"
+                                                    remove-item="removeItem(item)"
+                                                    edit-permission="editPermission" edit-mode="editMode">
+                                            </transaction-item>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+
+
+                            </div>
+
+                            <hr ng-show="moduleItems.length && 0"/>
+
+                            <div class="row">
+
+
+                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                    <div class="row">
+                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                            <label>Ticket(Issue) Description</label>
+                                        </div>
+                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                            <textarea rows="3" class="form-control no-radius" ng-model="modalBox.tx.message" name="message"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                    <div class="row">
+                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                            <label>Ticket(Issue) Details</label>
+                                        </div>
+                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+
+                                            <textarea rows="3" class="form-control no-radius" ng-model="modalBox.tx.notes" name="notes"></textarea>
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                                    <div class="row">
+                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                            <label>Delivery Address</label>
+                                        </div>
+                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-hide="modalBox.editMode">
+                                            <div class="form-group form-group-sm ">
+                                                <select class="form-control" ng-model="modalBox.tx.locId" ng-change="resolveAddress()">
+                                                    <option value="">Other Location</option>
+                                                    <option value="0">Current Location</option>
+                                                    <option ng-repeat="location in modalBox.locationList track by location.TID" value="{{location.TID}}">{{location.LocTitle}}</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                            <div class="form-group form-group-sm ">
+                                                <input
+                                                        ng-disabled="modalBox.tx.locId > 0"
+                                                        type="text" placeholder="Address Line 1" class="form-control no-radius"  name="area" ng-model="modalBox.tx.address" />
+                                                <small class="text-danger" ng-show="txerror.address">Please enter address line 1</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                            <div class="form-group form-group-sm ">
+                                                <input type="text"
+                                                       ng-disabled="modalBox.tx.locId"
+                                                       placeholder="Locality" class="form-control no-radius"  name="area" ng-model="modalBox.tx.area" />
+                                                <small class="text-danger" ng-show="txerror.area">Please enter locality</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                            <div class="form-group form-group-sm ">
+                                                <input
+                                                        ng-disabled="modalBox.tx.locId"
+                                                        type="text" placeholder="City" class="form-control no-radius" name="city" ng-model="modalBox.tx.city" />
+                                                <small class="text-danger" ng-show="txerror.city">Please enter city</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                            <div class="form-group form-group-sm ">
+                                                <input type="text"
+                                                       ng-disabled="modalBox.tx.locId"
+                                                       placeholder="State" class="form-control no-radius" name="state" ng-model="modalBox.tx.state" />
+                                                <small class="text-danger" ng-show="txerror.state">Please enter state</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                            <div class="form-group form-group-sm ">
+                                                <input type="text"
+                                                       ng-disabled="modalBox.tx.locId"
+                                                       placeholder="Country" class="form-control no-radius"  name="country" ng-model="modalBox.tx.country" />
+                                                <small class="text-danger" ng-show="txerror.country">Please enter country</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                            </div>
+
+
+                            <div class="row top-clearfix-padding-half bottom-clearfix">
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <small class="text-danger" ng-show="txerror.items">Please choose a product</small>
+                                </div>
+                            </div>
+
+                            <div class="row top-clearfix-padding-half bottom-clearfix">
+
+                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                                    <button class="btn btn-info btn-sm no-radius" ng-click="saveTransaction()">
+                                        <span class="glyphicon glyphicon-hand-right"></span>
+                                        Submit ticket(issue)
+                                    </button>
+                                    <button class="btn btn-danger btn-sm no-radius" ng-click="_toggleServiceModal()">
+                                        <span class="glyphicon glyphicon-remove"></span>
+                                        Cancel
+                                    </button>
+                                </div>
+
+
+
+
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+            </modal>
+            <!-- end: ModalBox ends -->
+        </div>
         <!-- Footer goes here -->
         <footer-section></footer-section>
         <!-- Footer Ends here -->

@@ -44,7 +44,7 @@
                                                 <p class="list-group-item-text">{{accessRights[subusers[$index].accessRights.homeDelivery].title}}</p>
                                             </a>
                                             <a class="list-group-item" ng-hide="user.accessRights.service == 0">
-                                                <h6 class="list-group-item-heading">Service</h6>
+                                                <h6 class="list-group-item-heading">Help Desk</h6>
                                                 <p class="list-group-item-text">{{accessRights[subusers[$index].accessRights.service].title}}</p>
                                             </a>
                                             <a class="list-group-item" ng-hide="user.accessRights.resume == 0">
@@ -128,7 +128,7 @@
         <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 bottom-clearfix text-center"><h5>Sales</h5></div>
         <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 bottom-clearfix text-center"><h5>Reservation</h5></div>
         <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 bottom-clearfix text-center"><h5>Home Delivery</h5></div>
-        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 bottom-clearfix text-center"><h5>Service</h5></div>
+        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 bottom-clearfix text-center"><h5>Help Desk</h5></div>
         <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 bottom-clearfix text-center"><h5>Resume</h5></div>
     </div>
     <div class="row" ng-show="modalBox.isEzeidAvailable">
@@ -204,7 +204,7 @@
             <div class="form-group">
                 <div class="input-group">
                     <span class="input-group-addon" id="basic-addon7">@</span>
-                    <input type="text" ng-model="modalBox.subuser.serviceEmail" class="form-control" placeholder="Service Email" aria-describedby="basic-addon1">
+                    <input type="text" ng-model="modalBox.subuser.serviceEmail" class="form-control" placeholder="Help Desk Email" aria-describedby="basic-addon1">
                 </div>
             </div>
         </div>
