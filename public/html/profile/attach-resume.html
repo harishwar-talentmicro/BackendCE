@@ -100,25 +100,17 @@
                     </li>
                     </li>
                 </div>
-                <div ng-show="false">
+               <!-- <div ng-show="false">
                    <h5 class="pull-left wd48p">Function</h5>
                     <h5 class="pull-right wd48p">Key Skills</h5>
                     <li class="dsp_block">
                         <div class="pull-left wd48p">
-                            <!--ng-class="cvForm.$submitted || cvForm.function.$touched && !CVAttachCtrl._CVInfo.FunctionID.length ? 'mandatoryTextBox' : ''"-->
-                            <select class="form-control emptyBox" name="function" ng-model="CVAttachCtrl._CVInfo.FunctionID"
+                           <select class="form-control emptyBox" name="function" ng-model="CVAttachCtrl._CVInfo.FunctionID"
                                     ng-options="Function.FunctionID as Function.FunctionName for Function in CVAttachCtrl.Functions"
                                     ng-change="CVAttachCtrl.getRoleForFunction(CVAttachCtrl._CVInfo.FunctionID)" required>
                                 <option value="" default selected> --Select Function-- </option>
-                                <!--<option value="" default selected>{{CVAttachCtrl.Functions[0].FunctionName}}</option>-->
                             </select>
                         </div>
-                       <!-- <div class="pull-right wd48p">
-                            <select class="form-control emptyBox" name="role" ng-model="CVAttachCtrl._CVInfo.RoleID"
-                                    ng-options="Role.RoleID as Role.RoleName for Role in CVAttachCtrl.RoleTypes">
-                                <option value="" default selected> --Select Role-- </option>
-                            </select>
-                        </div>-->
                         <div class="pull-right wd48p">
                             <input type="text"  ng-class="cvForm.keySkills.$touched && !CVAttachCtrl._CVInfo.KeySkills.length ? 'mandatoryTextBoxCV' : ''" name="keySkills" class="form-control emptyBox" ng-model="CVAttachCtrl._CVInfo.KeySkills" placeholder="Key Skills (Comma Separated)" required/>
                         </div>
@@ -154,23 +146,21 @@
                     </li>
                     <h5>CV Upload</h5>
                     <li class="dsp_block">
-                            <div class="pull-left check-box-style">
-                                <input type="radio" name="CVStatus" ng-model="CVAttachCtrl._CVInfo.Status" id="Visible" class="check-box pull-left"  value="1"
-                                       style="margin-left: 10px; margin-top: 10px;"/>
-                                <label for="Visible" class="pull-left under_label" style="margin-top: 8px;">*Active(Access is Active)</label>
-                                <input type="radio" name="CVStatus" style="margin-top: 10px;" ng-model="CVAttachCtrl._CVInfo.Status"
-                                       id="NotVisible" class="check-box pull-left" value="2"/>
-                                <label for="NotVisible" style="margin-top: 8px;" class="pull-left under_label">*Inactive(Access Denied/Not Looking
-                                    for Change)</label>
-                            </div>
-
-
+                        <div class="pull-left check-box-style">
+                            <input type="radio" name="CVStatus" ng-model="CVAttachCtrl._CVInfo.Status" id="Visible" class="check-box pull-left"  value="1"
+                                   style="margin-left: 10px; margin-top: 10px;"/>
+                            <label for="Visible" class="pull-left under_label" style="margin-top: 8px;">*Active(Access is Active)</label>
+                            <input type="radio" name="CVStatus" style="margin-top: 10px;" ng-model="CVAttachCtrl._CVInfo.Status"
+                                   id="NotVisible" class="check-box pull-left" value="2"/>
+                            <label for="NotVisible" style="margin-top: 8px;" class="pull-left under_label">*Inactive(Access Denied/Not Looking
+                                for Change)</label>
+                        </div>
                         <div class="clearfix"></div>
                     </li>
                     <h5>Skill Matrix ( To find best matching roles )</h5>
                     <li class="dsp_block">
                         <div class="row">
-                            <button class="btn btn-primary btn-sm pull-right" ng-click=""><span class="glyphicon glyphicon-plus"></span> Add More </button>
+                            <button type="button" class="btn btn-primary btn-sm pull-right" ng-click="addMore()"><span class="glyphicon glyphicon-plus"></span> Add More </button>
                         </div>
                         <div class="row">
                             <table class="panel panel-default table table-striped skillMatrixTable" border="1" st-table="rowCollection">
@@ -184,12 +174,12 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <tr>
+                                <tr ng-repeat="person in people">
                                     <td class="panelPd5px msg_pos">
                                         <input type="text" name="Skill" class="form-control" placeholder="Type skill here"/>
                                     </td>
                                     <td class="panelPd5px msg_pos">
-                                        <select class="form-control emptyBox" name="expertiesLevel">
+                                        <select class="form-control" name="expertiesLevel">
                                             <option value="0" default selected> Beginner </option>
                                             <option value="1"> Independent </option>
                                             <option value="2"> Expert </option>
@@ -212,14 +202,13 @@
                         <div class="clearfix"></div>
                     </li>
 
-
                     <li class="dsp_block">
                         <input type="submit" class="btn btn-primary pull-left" value="Save"/>
                         <input type="button" class="btn btn-primary pull-left" style="margin-left: 5px;" value="Close" onclick="window.location.href='/'"/>
                         <div class="clearfix"></div>
                     </li>
 
-                </div>
+                </div>-->
             </ul>
         </div>
     </form>

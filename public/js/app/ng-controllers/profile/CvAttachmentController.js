@@ -215,4 +215,24 @@ angular.module('ezeidApp').controller('CVAttachController',[
         }
     };
 
+    // Add more skills
+    $scope.addMoreSkill = function()
+    {
+        console.log("Sai");
+    };
+
+    $scope.people = [
+
+    ];
+
+    $scope.addMoreSkill = function(){
+        var person = {
+           /* name: $scope.name,
+            age: $scope.age,
+            title: $scope.title*/
+        };
+
+        $scope.people.push(person);
+    };
+
 }]);
