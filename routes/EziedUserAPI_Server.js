@@ -11169,7 +11169,7 @@ exports.FnSearchBusListing = function(req,res,next){
         'signup',
         'messages',
         'landing',
-        'acchist',
+        'access-history',
         'busslist',
         'terms',
         'help',
