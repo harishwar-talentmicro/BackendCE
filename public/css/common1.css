@@ -1618,3 +1618,16 @@ table.rwd-table > tbody > tr > td.serachResultSelectAll
     width:100% !important;
     margin-bottom: 10px !important;
 }
+.cvBottomSpace
+{
+    margin-bottom: 25px;
+}
+.cvBottomSpaceMiddle
+{
+    margin-bottom: 17px;
+}
+.skillText
+{
+    color: #0072C3;
+    font-size: 16px;
+}
