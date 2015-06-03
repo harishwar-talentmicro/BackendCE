@@ -3792,6 +3792,7 @@ exports.FnGetSearchDocuments = function (req, res) {
                         var EZEID, Pin = null;
                         var DocType = '';
                         var FindArray = find.split('.');
+                        var type ='';
 
                         //console.log('findarray: ' + FindArray.length);
                         if (FindArray.length > 0) {
@@ -3802,30 +3803,37 @@ exports.FnGetSearchDocuments = function (req, res) {
                                     if (FindArray[1].toUpperCase() == 'ID') {
                                         //console.log('ID');
                                         DocType = 'ID';
+                                        type = 3;
                                     }
                                     else if (FindArray[1].toUpperCase() == 'DL') {
                                         //console.log('DL');
                                         DocType = 'DL';
+                                        type = 7;
                                     }
                                     else if (FindArray[1].toUpperCase() == 'PP') {
                                         //console.log('PP');
                                         DocType = 'PP';
+                                        type = 4;
                                     }
                                     else if (FindArray[1].toUpperCase() == 'BR') {
                                         //console.log('BR');
                                         DocType = 'BR';
+                                        type = 1;
                                     }
                                     else if (FindArray[1].toUpperCase() == 'CV') {
                                         //console.log('CV');
                                         DocType = 'CV';
+                                        type = 2;
                                     }
                                     else if (FindArray[1].toUpperCase() == 'D1') {
                                         //console.log('D1');
                                         DocType = 'D1';
+                                        type = 5;
                                     }
                                     else if (FindArray[1].toUpperCase() == 'D2') {
                                         //console.log('D2');
                                         DocType = 'D2';
+                                        type = 6;
                                     }
                                     else {
                                         Pin = FindArray[1];
@@ -3838,8 +3846,7 @@ exports.FnGetSearchDocuments = function (req, res) {
                                 }
                             }
                         }
-                        var SearchQuery = db.escape(EZEID) + ',' + db.escape(Pin) + ',' + db.escape(DocType); 
-                        //console.log('SearchQuery: ' + SearchQuery);
+                        var SearchQuery = db.escape(EZEID) + ',' + db.escape(Pin) + ',' + db.escape(DocType);
                         db.query('CALL  PGetSearchDocuments(' + SearchQuery + ')', function (err, SearchResult) {
                             // db.query(searchQuery, function (err, SearchResult) {
                             if (!err) {
@@ -3855,7 +3862,27 @@ exports.FnGetSearchDocuments = function (req, res) {
                                         res.writeHead('200', { 'Content-Type': docs.ContentType });
                                         res.end(docs.Docs, 'base64');
                                         console.log('FnGetSearchDocuments: tmaster: Search result sent successfully');
-                                    }
+                                        
+                                        
+                                            var getQuery = 'select TID from tmaster where Token='+db.escape(token);
+                                            db.query(getQuery, function (err, getResult) {
+                                                if(!err){
+                                                var tid = getResult[0].TID;
+                                                console.log(tid);
+                                                }
+                                                var query = db.escape(tid) + ',' + db.escape(EZEID) + ',' + db.escape(req.ip) + ',' + db.escape(type);
+                                                console.log('CALL pCreateAccessHistory(' + query + ')');
+                                                 
+                                                    db.query('CALL pCreateAccessHistory(' + query + ')', function (err){
+                                                    if(!err){
+                                                        console.log('FnSearchByKeywords:Access history is created');
+                                                    }
+                                                    else {
+                                                        console.log('FnSearchByKeywords: tmaster: ' + err);
+                                                    }
+                                                });
+                                            });
+                                        }
                                     else {
                                         res.send('null');
                                         console.log('FnGetSearchDocuments: tmaster: no search found');
@@ -3931,7 +3958,7 @@ exports.FnSearchByKeywords = function (req, res) {
         //console.log(token);
 
         if (type == "1") {
-            console.log('executing.........................1');
+            
             if (find != null && find != '' && CategoryID != null && token != null && token != '' && CurrentDate != null) {
                 FnValidateToken(token, function (err, Result) {
                     if (!err) {
@@ -4032,7 +4059,8 @@ exports.FnSearchByKeywords = function (req, res) {
                                                 }
                                                 var query = db.escape(tid) + ',' + db.escape(logHistory.ezeid) + ',' + db.escape(logHistory.ip) + ',' + db.escape(logHistory.type);
                                                 console.log('CALL pCreateAccessHistory(' + query + ')');
-                                                db.query('CALL pCreateAccessHistory(' + query + ')', function (err){
+                                                if(logHistory.type < 1){ 
+                                                    db.query('CALL pCreateAccessHistory(' + query + ')', function (err){
                                                     if(!err){
                                                         console.log('FnSearchByKeywords:Access history is created');
                                                     }
@@ -4040,6 +4068,10 @@ exports.FnSearchByKeywords = function (req, res) {
                                                         console.log('FnSearchByKeywords: tmaster: ' + err);
                                                     }
                                                 });
+                                                    
+                                                    
+                                                }
+
                                             });
                                         }
                                         }
@@ -4094,7 +4126,7 @@ exports.FnSearchByKeywords = function (req, res) {
             }
         }
         else if (type == "2") {
-           console.log('executing.........................2');
+           
             if (find != null && find != '' && Proximity.toString() != 'NaN' && Latitude.toString() != 'NaN' && Longitude.toString() != 'NaN' && CategoryID != null && CurrentDate != null) {
                 
                 if (ParkingStatus == 0) {
@@ -11338,7 +11370,7 @@ exports.FnSaveReservTask = function(req, res){
 };
 
 //method to get reservation transaction
-exports.FnGetReservTask = function (req, res) {
+exports.FnGetMapedServices = function (req, res) {
     console.log('Reservation Resouce details');
     try {
 
@@ -11347,6 +11379,7 @@ exports.FnGetReservTask = function (req, res) {
 
         var Token = req.query.Token;
         var resourceid = req.query.resourceid;
+        var date = new Date(req.query.date);
 
         var responseMessage = {
             status: false,
@@ -11368,14 +11401,14 @@ exports.FnGetReservTask = function (req, res) {
                                         responseMessage.data = GetResult[0] ;
                                         responseMessage.error = null;
                                         responseMessage.message = 'Resource Task details Send successfully';
-                                        console.log('FnGetReservTask: Resource Task details Send successfully');
+                                        console.log('FnGetMapedServices: Resource Task details Send successfully');
                                         res.status(200).json(responseMessage);
                                     }
                                     else {
                                         
                                         responseMessage.error = {};
                                         responseMessage.message = 'No founded Resource Task details';
-                                        console.log('FnGetReservTask: No founded Resource Task details');
+                                        console.log('FnGetMapedServices: No founded Resource Task details');
                                         res.json(responseMessage);
                                     }
                                 }
@@ -11384,7 +11417,7 @@ exports.FnGetReservTask = function (req, res) {
                                     
                                     responseMessage.error = {};
                                     responseMessage.message = 'No founded Resource Task details';
-                                    console.log('FnGetReservTransaction: No founded Resource Task details');
+                                    console.log('FnGetMapedServices: No founded Resource Task details');
                                     res.json(responseMessage);
                                 }
 
@@ -11394,7 +11427,7 @@ exports.FnGetReservTask = function (req, res) {
                                 responseMessage.data = null ;
                                 responseMessage.error = {};
                                 responseMessage.message = 'Error in getting Resource Task details';
-                                console.log('FnGetReservTask: error in getting Resource Task details' + err);
+                                console.log('FnGetMapedServices: error in getting Resource Task details' + err);
                                 res.status(500).json(responseMessage);
                             }
                         });
@@ -11403,13 +11436,13 @@ exports.FnGetReservTask = function (req, res) {
                         responseMessage.message = 'Invalid Token';
                         responseMessage.error = {};
                         res.status(401).json(responseMessage);
-                        console.log('FnGetReservTask: Invalid Token');
+                        console.log('FnGetMapedServices: Invalid Token');
                     }
                 } else {
                     responseMessage.error = {};
                     responseMessage.message = 'Error in validating token';
                     res.status(500).json(responseMessage);
-                    console.log('FnGetReservTask: Error in validating token:  ' + err);
+                    console.log('FnGetMapedServices: Error in validating token:  ' + err);
                 }
             });
         }
@@ -11419,7 +11452,7 @@ exports.FnGetReservTask = function (req, res) {
                 responseMessage.error = {
                     Token : 'Invalid Token'
                 };
-                console.log('FnGetReservTask: Token is mandatory field');
+                console.log('FnGetMapedServices: Token is mandatory field');
             }
            
             res.status(401).json(responseMessage);
