@@ -509,6 +509,63 @@ angular.module('ezeidApp').
                         ActionTitle : 'Meeting',
                         Status : 1,
                         FunctionType : 0
+                    },
+                    {
+                        Token : token,
+                        TID : 0,
+                        ActionTitle : 'Deliver',
+                        Status : 1,
+                        FunctionType : 2
+                    },
+                    {
+                        Token : token,
+                        TID : 0,
+                        ActionTitle : 'Pack',
+                        Status : 1,
+                        FunctionType : 2
+                    },
+                    {
+                        Token : token,
+                        TID : 0,
+                        ActionTitle : 'Followup',
+                        Status : 1,
+                        FunctionType : 3
+                    },
+                    {
+                        Token : token,
+                        TID : 0,
+                        ActionTitle : 'Repair',
+                        Status : 1,
+                        FunctionType : 3
+                    },
+
+                    {
+                        Token : token,
+                        TID : 0,
+                        ActionTitle : 'Followup',
+                        Status : 1,
+                        FunctionType : 4
+                    },
+                    {
+                        Token : token,
+                        TID : 0,
+                        ActionTitle : 'Phone Call',
+                        Status : 1,
+                        FunctionType : 4
+                    },
+                    {
+                        Token : token,
+                        TID : 0,
+                        ActionTitle : 'Telephonic Interview',
+                        Status : 1,
+                        FunctionType : 3
+                    },
+                    {
+                        Token : token,
+                        TID : 0,
+                        ActionTitle : 'Face to Face Interview',
+                        Status : 1,
+                        FunctionType : 3
                     }
                 ];
                 var actionCount = 0;
@@ -590,7 +647,188 @@ angular.module('ezeidApp').
                             NotificationMsg : 'Your enquiry is cancelled !',
                             NotificationMailMsg: 'Your enquiry is cancelled !',
                             StatusValue : 11
-                        }
+                        },
+                        {
+                            Token : token,
+                            TID : 0,
+                            StatusTitle : 'Delivery in Progress',
+                            MasterID : masterId,
+                            FunctionType : 2,
+                            ProgressPercent : 90,
+                            Status : 1,
+                            NotificationMsg : 'Your order is on the way !',
+                            NotificationMailMsg: 'Your order is on the way !',
+                            StatusValue : 9
+                        },
+                        {
+                            Token : token,
+                            TID : 0,
+                            StatusTitle : 'Under process',
+                            MasterID : masterId,
+                            FunctionType : 2,
+                            ProgressPercent : 40,
+                            Status : 1,
+                            NotificationMsg : 'Your order is being prepared !',
+                            NotificationMailMsg: 'Your order is being prepared !',
+                            StatusValue : 4
+                        },
+                        {
+                            Token : token,
+                            TID : 0,
+                            StatusTitle : 'Cancelled',
+                            MasterID : masterId,
+                            FunctionType : 3,
+                            ProgressPercent : 100,
+                            Status : 1,
+                            NotificationMsg : 'Your ticket is dropped !',
+                            NotificationMailMsg: 'Your order is dropped !',
+                            StatusValue : 11
+                        },
+                        {
+                            Token : token,
+                            TID : 0,
+                            StatusTitle : 'Under inspection',
+                            MasterID : masterId,
+                            FunctionType : 3,
+                            ProgressPercent : 30,
+                            Status : 1,
+                            NotificationMsg : 'Your issue is under inspection !',
+                            NotificationMailMsg: 'Your issue is under inspection !',
+                            StatusValue : 3
+                        },
+                        {
+                            Token : token,
+                            TID : 0,
+                            StatusTitle : 'Cancelled',
+                            MasterID : masterId,
+                            FunctionType : 2,
+                            ProgressPercent : 100,
+                            Status : 1,
+                            NotificationMsg : 'Your order is cancelled !',
+                            NotificationMailMsg: 'Your order is cancelled !',
+                            StatusValue : 11
+                        },
+                        {
+                            Token : token,
+                            TID : 0,
+                            StatusTitle : 'Screened',
+                            MasterID : masterId,
+                            FunctionType : 4,
+                            ProgressPercent : 10,
+                            Status : 1,
+                            NotificationMsg : 'Your resume is under screening !',
+                            NotificationMailMsg: 'Your resume is under screening !',
+                            StatusValue : 1
+                        },
+                        {
+                            Token : token,
+                            TID : 0,
+                            StatusTitle : 'Shortlisted',
+                            MasterID : masterId,
+                            FunctionType : 4,
+                            ProgressPercent : 20,
+                            Status : 1,
+                            NotificationMsg : 'Your resume is shortlisted',
+                            NotificationMailMsg: 'Your resume is shorlisted !',
+                            StatusValue : 2
+                        },
+                        {
+                            Token : token,
+                            TID : 0,
+                            StatusTitle : 'Interview-1',
+                            MasterID : masterId,
+                            FunctionType : 4,
+                            ProgressPercent : 30,
+                            Status : 1,
+                            NotificationMsg : 'Interview Level 1 is scheduled',
+                            NotificationMailMsg: 'Interview Level 1 is scheduled !',
+                            StatusValue : 4
+                        },
+                        {
+                            Token : token,
+                            TID : 0,
+                            StatusTitle : 'Interview-2',
+                            MasterID : masterId,
+                            FunctionType : 4,
+                            ProgressPercent : 40,
+                            Status : 1,
+                            NotificationMsg : 'Interview Level 2 is scheduled',
+                            NotificationMailMsg: 'Interview Level 2 is scheduled ',
+                            StatusValue : 4
+                        },
+                        {
+                            Token : token,
+                            TID : 0,
+                            StatusTitle : 'Interview-3',
+                            MasterID : masterId,
+                            FunctionType : 4,
+                            ProgressPercent : 50,
+                            Status : 1,
+                            NotificationMsg : 'Interview Level 3 is scheduled',
+                            NotificationMailMsg: 'Interview Level 3 is scheduled !',
+                            StatusValue : 5
+                        },
+                        {
+                            Token : token,
+                            TID : 0,
+                            StatusTitle : 'Documents Received',
+                            MasterID : masterId,
+                            FunctionType : 4,
+                            ProgressPercent : 80,
+                            Status : 1,
+                            NotificationMsg : 'Your documents are received successfully',
+                            NotificationMailMsg: 'Your documents are received successfully',
+                            StatusValue : 6
+                        },
+                        {
+                            Token : token,
+                            TID : 0,
+                            StatusTitle : 'Joined',
+                            MasterID : masterId,
+                            FunctionType : 4,
+                            ProgressPercent : 100,
+                            Status : 1,
+                            NotificationMsg : 'You have started working',
+                            NotificationMailMsg: 'Your have started working',
+                            StatusValue : 10
+                        },
+                        {
+                            Token : token,
+                            TID : 0,
+                            StatusTitle : 'Dropped-Hire in Future',
+                            MasterID : masterId,
+                            FunctionType : 4,
+                            ProgressPercent : 100,
+                            Status : 1,
+                            NotificationMsg : 'Your application is rejected currently but you can apply in future',
+                            NotificationMailMsg: 'Your application is rejected currently but you can apply in future',
+                            StatusValue : 10
+                        },
+                        {
+                            Token : token,
+                            TID : 0,
+                            StatusTitle : 'Dropped-Do not Hire in Future',
+                            MasterID : masterId,
+                            FunctionType : 4,
+                            ProgressPercent : 100,
+                            Status : 1,
+                            NotificationMsg : 'Your application is rejected',
+                            NotificationMailMsg: 'Your application is rejected',
+                            StatusValue : 11
+                        },
+                        {
+                            Token : token,
+                            TID : 0,
+                            StatusTitle : 'Quit',
+                            MasterID : masterId,
+                            FunctionType : 4,
+                            ProgressPercent : 100,
+                            Status : 1,
+                            NotificationMsg : 'You quit the job',
+                            NotificationMailMsg: 'Your quit the job',
+                            StatusValue : 10
+                        },
+
                     ];
 
 

@@ -42,7 +42,7 @@ angular.module('ezeidApp').controller('ActionTypesCtrl',['$scope','$rootScope','
         'Sales',
         'Reservation',
         'Home Delivery',
-        'Service',
+        'Help Desk',
         'Resume'
     ];
 

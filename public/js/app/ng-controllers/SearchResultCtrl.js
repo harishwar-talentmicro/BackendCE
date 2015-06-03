@@ -717,7 +717,10 @@ var res = angular.module('ezeidApp').
              */
             $scope.flipping_card = function()
             {
+                console.log('flip');
+
                 $timeout(function(){
+                    console.log('flip');
                     $(".flip-card").flip({
                         trigger: "hover"
                     });

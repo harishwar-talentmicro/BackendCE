@@ -127,6 +127,8 @@ angular.module('ezeidApp').controller('CVAttachController',[
 
     this.saveCVDocInfo=function(){
 
+        console.log($scope.people);
+
    if(isValidate())
     {
         CVAttachCtrl._CVInfo.TokenNo = $rootScope._userInfo.Token;
@@ -213,6 +215,24 @@ angular.module('ezeidApp').controller('CVAttachController',[
         if($rootScope._userInfo.IsAuthenticate==false){
             cvForm.$setPristine(true);
         }
+    };
+
+    // Add more skills
+   /* $scope.addMoreSkill = function()
+    {
+        console.log("Sai");
+    };
+*/
+    $scope.people = [];
+
+    $scope.addMoreSkill = function(){
+        var person = {
+           /* name: $scope.name,
+            age: $scope.age,
+            title: $scope.title*/
+        };
+
+        $scope.people.push(person);
     };
 
 }]);

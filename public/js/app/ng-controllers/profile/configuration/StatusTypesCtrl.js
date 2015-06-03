@@ -42,7 +42,7 @@ angular.module('ezeidApp').controller('StatusTypesCtrl',['$scope','$rootScope','
         'Sales',
         'Reservation',
         'Home Delivery',
-        'Service',
+        'Help Desk',
         'Resume'
     ];
 
