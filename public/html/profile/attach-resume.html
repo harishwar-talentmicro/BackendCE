@@ -25,7 +25,7 @@
         <div class="form_style">
             <ul>
                 <h3>CV Attachment</h3>
-                <div ng-show="true">
+                <div ng-show="false">
                     <h5>Function & Role</h5>
                     <li class="dsp_block">
                         <div class="pull-left wd48p">
@@ -100,7 +100,7 @@
                     </li>
                     </li>
                 </div>
-               <!-- <div ng-show="false">
+                <div ng-show="true">
                    <h5 class="pull-left wd48p">Function</h5>
                     <h5 class="pull-right wd48p">Key Skills</h5>
                     <li class="dsp_block">
@@ -160,7 +160,7 @@
                     <h5>Skill Matrix ( To find best matching roles )</h5>
                     <li class="dsp_block">
                         <div class="row">
-                            <button type="button" class="btn btn-primary btn-sm pull-right" ng-click="addMore()"><span class="glyphicon glyphicon-plus"></span> Add More </button>
+                            <button type="button" class="btn btn-primary btn-sm pull-right" ng-click="addMoreSkill()"><span class="glyphicon glyphicon-plus"></span> Add More </button>
                         </div>
                         <div class="row">
                             <table class="panel panel-default table table-striped skillMatrixTable" border="1" st-table="rowCollection">
@@ -176,7 +176,7 @@
                                 <tbody>
                                 <tr ng-repeat="person in people">
                                     <td class="panelPd5px msg_pos">
-                                        <input type="text" name="Skill" class="form-control" placeholder="Type skill here"/>
+                                        <input type="text" name="Skill" ng-modal="people.name" class="form-control" placeholder="Type skill here"/>
                                     </td>
                                     <td class="panelPd5px msg_pos">
                                         <select class="form-control" name="expertiesLevel">
@@ -208,7 +208,7 @@
                         <div class="clearfix"></div>
                     </li>
 
-                </div>-->
+                </div>
             </ul>
         </div>
     </form>

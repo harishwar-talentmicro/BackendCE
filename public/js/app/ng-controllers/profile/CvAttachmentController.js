@@ -127,6 +127,8 @@ angular.module('ezeidApp').controller('CVAttachController',[
 
     this.saveCVDocInfo=function(){
 
+        console.log($scope.people);
+
    if(isValidate())
     {
         CVAttachCtrl._CVInfo.TokenNo = $rootScope._userInfo.Token;
@@ -216,14 +218,12 @@ angular.module('ezeidApp').controller('CVAttachController',[
     };
 
     // Add more skills
-    $scope.addMoreSkill = function()
+   /* $scope.addMoreSkill = function()
     {
         console.log("Sai");
     };
-
-    $scope.people = [
-
-    ];
+*/
+    $scope.people = [];
 
     $scope.addMoreSkill = function(){
         var person = {
