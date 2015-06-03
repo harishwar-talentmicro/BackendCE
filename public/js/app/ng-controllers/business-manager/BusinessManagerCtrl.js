@@ -85,7 +85,7 @@ angular.module('ezeidApp').controller('BusinessManagerCtrl',[
             {
                 title : ($rootScope._userInfo.ServiceModuleTitle) ? $rootScope._userInfo.ServiceModuleTitle : 'Service',
                 permission : ($rootScope._userInfo.UserModuleRights) ? $rootScope._userInfo.UserModuleRights[3] : 0,
-                listType : 1,
+                listType : 0,
                 message : ($rootScope._userInfo.ServiceFormMsg) ? $rootScope._userInfo.ServiceFormMsg : '',
                 icon : 'glyphicon glyphicon-dashboard',
                 type : 'service'
@@ -93,7 +93,7 @@ angular.module('ezeidApp').controller('BusinessManagerCtrl',[
             {
                 title : ($rootScope._userInfo.CVModuleTitle) ? $rootScope._userInfo.CVModuleTitle :'Resume',
                 permission : ($rootScope._userInfo.UserModuleRights) ? $rootScope._userInfo.UserModuleRights[4] : 0,
-                listType : 1,
+                listType : 0,
                 message : ($rootScope._userInfo.CVFormMsg) ? $rootScope._userInfo.CVFormMsg : '',
                 freshers : ($rootScope._userInfo.FreshersAccepted) ? true : false,
                 icon : 'glyphicon glyphicon-briefcase',

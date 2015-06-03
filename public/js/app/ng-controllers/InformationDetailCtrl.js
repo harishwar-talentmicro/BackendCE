@@ -720,7 +720,7 @@ angular.module('ezeidApp').
             }
         };
 
-        $scope._resumeModalTitle = 'Submit Resume';
+        $scope._resumeModalTitle = 'Submit Resume Application';
         $scope._showResumeModal = false;
         $scope._toggleResumeModal = function(){
             if(!$rootScope._userInfo.Token)
@@ -731,7 +731,7 @@ angular.module('ezeidApp').
             {
                 $('#SignIn_popup').slideDown();
             }
-            else{
+            else if($rootScope._userInfo.IDTypeID == 1){
                 $scope._showResumeModal = !$scope._showResumeModal;
             }
         };

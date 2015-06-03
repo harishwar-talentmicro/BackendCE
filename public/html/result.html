@@ -293,7 +293,7 @@
                                         </div>
                                     </div>
                                     <!-- Warning: Don't change the function[responsible for flipping tiles] -->
-                                    {{($index == searchListData.length) ? flipping_card() : ''}}
+                                    <div ng-init="($index == searchListData.length -1) ? flipping_card() : ''"></div>
 
                                 </div>
                                 <!-- Individual Tiles ends here -->

@@ -49,7 +49,18 @@ angular.module('ezeidApp').service('UtilityService',['$q',function($q){
                 return param;
             }
             return false;
-        }
+        },
 
+        /**
+         * Convert date to UTC format
+         */
+        convertTimeToLocal : function(timeFromServer,dateFormat){
+            if(!dateFormat){
+                dateFormat = 'DD-MMM-YYYY hh:mm A';
+            }
+            var mom1 = moment(timeFromServer,dateFormat);
+            var ret =  mom1.add((mom1.utcOffset()),'m').format(dateFormat);
+            return ret;
+        }
     };
 }]);

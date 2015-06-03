@@ -16,6 +16,14 @@
                 <!-- Side menu goes here -->
                 <div class="col-lg-3 col-md-4 col-sm-12 col-xs-12 menu-style no-padding">
                     <!-- Calender goes here -->
+                    <date-time-picker recipient="currentDateTime" settings='{
+                                                                    "format" : "Y-m-d",
+                                                                    "timepicker" : false,
+                                                                    "mask" : false,
+                                                                    "hours12" : false,
+                                                                    "inline" : true,
+                                                                    "maxDate" : "2029/01/01"
+                                                                    }'></date-time-picker>
                     <!-- Notes section goes here[Shown only to resource] -->
                     <div class="notes-block">
                         <div class="notes-heading">
@@ -27,18 +35,9 @@
                             <small>for <b> {{reservedTime[$index][4]}}</b> ({{convertTime(reservedTime[$index][0])}} - {{convertTime(reservedTime[$index][1])}})</small>
                             <br>
                             <div class="text-right p-bottom-3">
-                                <button title="done" class="btn btn-xs btn-info"><i class="fa fa-check-square-o"></i> Done</button>
-                                <button title="cancel" class="btn btn-xs btn-danger p-bottom-3"><i class="fa fa-times-circle"></i> Cancel</button>
-                            </div>
-                        </div>
-                        <!-- Color Index goes here -->
-                        <div class="color-coding p-top-10">
-                            <div class="color-code-heading">
-                                <i class="fa fa-tags"></i> Color Codes
-                            </div>
-                            <div class="color-index" ng-repeat="color in colorIndex track by $index">
-                                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3" ng-class="['color-index-'+$index,$index == 3?'border-light-gray':'']">&nbsp;</div>
-                                <div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 " ng-class="('color-index-label-'+$index)">&nbsp;</div>
+                                <button title="Close" class="btn btn-xs btn-primary"><i class="fa fa-user-times"></i> No Show</button>
+                                <button title="Close" class="btn btn-xs btn-primary"><i class="fa fa-check-square-o"></i> Close</button>
+                                <button title="cancel" class="btn btn-xs btn-primary p-bottom-3"><i class="fa fa-times-circle"></i> Cancel</button>
                             </div>
                         </div>
                     </div>
@@ -50,8 +49,32 @@
                     <!-- RESERVATION MODULE goes here -->
                     <div class="reservation-module rm">
                         <div class="col-lg-12">
-                            <!-- main container of day - calender -->
-
+                            <!-- MAIN CALENDAR of day - calender -->
+                            <div class="reservation-title">
+                                <div class="col-lg-6">
+                                    <!-- Color Index goes here -->
+                                    <span class="color-index" ng-repeat="color in colorIndex track by $index">
+                                        <i class="fa fa-square" ng-class="'color-index-'+$index"></i>
+                                        <small ng-class="('color-index-label-'+$index)">&nbsp;</small>
+                                    </span>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="ezeid-title">
+                                        Appolo Hospital
+                                    </div>
+                                </div>
+                                <hr>
+                                <div class="ezeid-resource">
+                                    <div class="buttons">
+                                        <button ng-repeat="res in resources track by $index"
+                                                ng-click="activateResource(resources[$index].tid)"
+                                                class="btn btn-default resource-btn" ng-class="['resource-'+resources[$index].tid,$index == 0?'active':'']"
+                                                title="{{resources[$index].description}}">
+                                            {{resources[$index].title}}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
                             <!-- Individual container: repeated 4 times (6 hours x 4[Early,Morning,Noon,Night]) -->
                             <div ng-init="col = 0" class="col-lg-3 col-md-6 col-sm-6 col-xs-12 p-1"
                                  ng-repeat="time in timeArr track by $index">
@@ -89,5 +112,9 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal box to make a reservation -->
+
+
     <!-- Reservation module ends here -->
 </section>

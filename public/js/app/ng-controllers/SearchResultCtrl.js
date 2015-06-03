@@ -276,6 +276,9 @@ var res = angular.module('ezeidApp').
 
                     },1500);
 
+                }).error(function(){
+                    Notification.error({ message : 'An error occurred', delay : MsgDelay});
+                    $scope.$emit('$preLoaderStop');
                 });
             }
 
@@ -717,7 +720,10 @@ var res = angular.module('ezeidApp').
              */
             $scope.flipping_card = function()
             {
+                console.log('flip');
+
                 $timeout(function(){
+                    console.log('flip');
                     $(".flip-card").flip({
                         trigger: "hover"
                     });
