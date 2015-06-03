@@ -8,7 +8,8 @@ angular.module('ezeidApp').directive('dateTimePicker', function() {
             recipient: '=',
             minTime : '=',
             maxTime : '=',
-            placeholder : '@'
+            placeholder : '@',
+            onChange : '&'
         },
         template:
             '<div class="input-group datetimepicker">'+

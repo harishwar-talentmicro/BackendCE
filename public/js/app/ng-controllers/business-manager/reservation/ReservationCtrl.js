@@ -50,7 +50,6 @@ var res = angular.module('ezeidApp').
             var availabilityColor = 'rgb(64, 242, 168)';
 
             /* color array for already reserved time slot */
-            //var reservedColorArray = ['rgb(255, 190, 126)','#ff0097','#9f00a7','#00aba9','#2d89ef','#2b5797','#b91d47'];
             var reservedColorArray = ['rgb(255, 163, 73)'];
 
             /* self reserved color */
@@ -60,7 +59,7 @@ var res = angular.module('ezeidApp').
             var defaultHeightClass = 'blk-1-1';//default height class::||Don't Change||
             $scope.height = 1.1;//default height::||Don't Change||
 
-            var proposedHeight = '1.1';//choose between 0.6em and 2.2em in multiple of 0.2: i.e [1.2,1.4,1.8,2.2...etc.]
+            var proposedHeight = '0.8';//choose between 0.6em and 2.2em in multiple of 0.2: i.e [1.2,1.4,1.8,2.2...etc.]
 
             /**
              * Working Hours[in minutes of the day]
@@ -80,41 +79,84 @@ var res = angular.module('ezeidApp').
             $scope.loggedInUid = 12;
 
             /* Flag for resources */
-            $scope.isResource = false;
+            $scope.isResource = true;
 
-            getReservationTransaction();
+            /* resources array */
+            $scope.resources = [];//FORMAT: 'tid':1,'title':'Dr. Meet','status':1
+
+            /* active resource id */
+            $scope.activeResourceId = '';
+
+            /* set the date for which calendar is shown */
+            $scope.activeDate = moment().format('DD-MM-YYYY');
+
             /* SETTINGS ENDS HERE======================================== */
 
             /* All the set color's INDEX with their title */
             $scope.colorIndex = [
-                [availabilityColor,'Unreserved'],
+                [availabilityColor,'Available'],
                 [reservedColorArray[0],'Reserved'],
-                [selfReservedColor,'Your Reservation'],
-                ['#fff','Not Available'],
+                [selfReservedColor,'Your Appointment'],
             ];
 
-            // Get All Resources
-            function getReservationTransaction(){
-                $scope.$emit('$preLoaderStart');
+            ///////////////////////////////////////GET DEFAULT CALENDAR/////////////////////////////////////////////////
+            $scope.searchedEzeid = 'krunalpaid';
+
+            getResource($scope.searchedEzeid);
+            /**
+             * Get resources of this EZE ID
+             * @param ezeid of the searched org.
+             */
+            function getResource(ezeid)
+            {
                 $http({
-                    url : GURL + 'reservation_transaction',
+                    url : GURL + 'reservation_resource',
                     method : "GET",
                     params :{
-                        resourceid : 6,
+                        ezeid : ezeid,
                         Token : $rootScope._userInfo.Token
                     }
                 }).success(function(resp){
 
                     $scope.$emit('$preLoaderStop');
-                    /*if(resp.data.length>0)
-                     {
-                     $scope.AllResources = resp.data;
-                     }*/
+                    if(resp.data.length>0)
+                    {
+                        createResourceArray(resp.data);
+                    }
                 }).error(function(err){
                     $scope.$emit('$preLoaderStop');
                     Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
                 });
-            };
+            }
+
+            /**
+             * Create the resource array for Front End
+             * @param array from HTTP request
+             */
+            function createResourceArray(array)
+            {
+                var tempArr = [];
+                $scope.resources = [];
+                for(var i = 0;i < array[0].length; i++)
+                {
+                    if($scope.activeResourceId == '')
+                    {
+                        $scope.activeResourceId = array[0][i].tid;
+                    }
+                    tempArr =
+                        {
+                            'tid' : array[0][i].tid,
+                            'title' : array[0][i].title,
+                            'status' : array[0][i].status,
+                            'description':array[0][i].description
+                        };
+                    $scope.resources.push(tempArr);
+                }
+            }
+
+
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 
             /**
@@ -404,7 +446,7 @@ var res = angular.module('ezeidApp').
             $scope.appendColorIndex = function() {
                 for (var i = 0; i < $scope.colorIndex.length; i++)
                 {
-                    $('.color-index-'+i).css('background-color',$scope.colorIndex[i][0]);
+                    $('.color-index-'+i).css('color',$scope.colorIndex[i][0]);
                     $('.color-index-label-'+i).html('<small>'+$scope.colorIndex[i][1]+'</small>');
                 }
             };
@@ -427,5 +469,42 @@ var res = angular.module('ezeidApp').
 
             /* hide the glyphicon */
             $('.input-group-addon').addClass('hidden');
+
+            /**
+             * onChange - reload the working hours and reserved our
+             */
+            $scope.currentDateTime = moment().format('DD-MM-YYYY');
+            $scope.$watch('currentDateTime',function(newVal,oldVal){
+                if(oldVal !== newVal){
+                    $scope.activeDate = moment(newVal).format('DD-MM-YYYY');
+                    /* reload calendar */
+                    $scope.reloadCalander();
+                }
+            });
+
+
+            /**
+             * onChange - reload the working hours and reserved our
+             * Activate the button of this resource and inactive others
+             * @param tid of the clicked resource
+             */
+            $scope.activateResource = function(tid)
+            {
+                $scope.activeResourceId = tid;
+                $('.resource-btn').removeClass('active');
+                $('.resource-'+tid).addClass('active');
+                /* reload calendar */
+                $scope.reloadCalander();
+            }
+
+            /**
+             * Reload the calendar with new working hours and
+             */
+            $scope.reloadCalander = function()
+            {
+                var tid = $scope.activeResourceId;
+                var date = $scope.activeDate;
+                /* http request for getting the new calendar data */
+            }
 
         }]);
