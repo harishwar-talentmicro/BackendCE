@@ -178,12 +178,13 @@ function FnSendMailEzeid(MailContent, CallBack) {
 
 function FnMessageMail(MessageContent, CallBack) {
     try {
-
+        
         //below query to check token exists for the users or not.
         if (MessageContent != null) {
             var RtnMessage = {
                 IsSuccessfull: false
             };
+            console.log(' this is MessageContent body............');
             console.log(MessageContent);
             var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
             var fs = require('fs');
@@ -204,7 +205,7 @@ function FnMessageMail(MessageContent, CallBack) {
                 if (!err) {
                     if (MessageContentResult[0] != null) {
                         if (MessageContentResult[0].length > 0) {
-                            MessageContentResult = MessageContentResult[0];
+                            
                             if (MessageContentResult[0].ToMailID != '') {
                                /* if (MessageContent.MessageType == 0) {
                                     fs.readFile("Individual.txt", "utf8", function (err, data) {
@@ -259,7 +260,7 @@ function FnMessageMail(MessageContent, CallBack) {
                                         var query = db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
                                             // Neat!
                                             if (!err) {
-                                                console.log('FnMessageMail: Mail saved Successfully');
+                                                console.log('FnMessageMail: Mail saved Successfully....1');
                                                 CallBack(null, RtnMessage);
                                             }
                                             else {
@@ -289,7 +290,7 @@ function FnMessageMail(MessageContent, CallBack) {
                                         var query = db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
                                             // Neat!
                                             if (!err) {
-                                                console.log('FnMessageMail: Mail saved Successfully');
+                                                console.log('FnMessageMail: Mail saved Successfully....2');
                                                 CallBack(null, RtnMessage);
                                             }
                                             else {
@@ -328,7 +329,7 @@ function FnMessageMail(MessageContent, CallBack) {
                                         var query = db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
                                             // Neat!
                                             if (!err) {
-                                                console.log('FnMessageMail: Mail saved Successfully');
+                                                console.log('FnMessageMail: Mail saved Successfully.....3');
                                                 CallBack(null, RtnMessage);
                                             }
                                             else {
@@ -357,7 +358,7 @@ function FnMessageMail(MessageContent, CallBack) {
                                         var query = db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
                                             // Neat!
                                             if (!err) {
-                                                console.log('FnMessageMail: Mail saved Successfully');
+                                                console.log('FnMessageMail: Mail saved Successfully.....4');
                                                 CallBack(null, RtnMessage);
                                             }
                                             else {
@@ -369,7 +370,9 @@ function FnMessageMail(MessageContent, CallBack) {
                                 } else if (MessageContent.MessageType == 5) {
                                     fs.readFile("CV.txt", "utf8", function (err, data) {
                                         if (err) throw err;
+                                        console.log('--------------------------');
                                         console.log(MessageContentResult);
+                                        console.log('--------------------------');
                                         data = data.replace("[IsVerified]", MessageContentResult[0].EZEIDVerifiedID);
                                         data = data.replace("[EZEID]", MessageContentResult[0].EZEID);
                                         data = data.replace("[EZEID]", MessageContentResult[0].EZEID);
@@ -377,9 +380,9 @@ function FnMessageMail(MessageContent, CallBack) {
                                         data = data.replace("[Roles]", MessageContentResult[0].Role);
                                         data = data.replace("[Keyskills]", MessageContentResult[0].KeySkills);
                                         data = data.replace("[https://www.ezeid.com/]", 'https://www.ezeid.com/' + MessageContentResult[0].EZEID);
-                                        console.log(MessageContentResult[0].EZEID);
-                                        if (MessageContentResult[0].DocPin = '') {
-                                            data = data.replace(".[PIN]", MessageContentResult[0].DocPin);
+                                        
+                                        if (MessageContentResult[0].DocPin == '') {
+                                            data = data.replace("[PIN]", MessageContentResult[0].DocPin);
                                         }
                                         else {
                                             data = data.replace("[PIN]", MessageContentResult[0].DocPin);
@@ -393,11 +396,11 @@ function FnMessageMail(MessageContent, CallBack) {
                                             html: data // html body
                                         };
                                         var post = { MessageType: MessageContent.MessageType,Priority: 3, ToMailID: MessageContentResult[0].ToMailID, Subject: mailOptions.subject, Body: mailOptions.html,SentbyMasterID: MessageContent.TID };
-                                        // console.log(post);
+                                         console.log(post);
                                         var query = db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
                                             // Neat!
                                             if (!err) {
-                                                console.log('FnMessageMail: Mail saved Successfully');
+                                                console.log('FnMessageMail: Mail saved Successfully....5');
                                                 CallBack(null, RtnMessage);
                                             }
                                             else {
@@ -2623,7 +2626,7 @@ exports.FnSaveMessage = function (req, res) {
                         }
                         // console.log(datechange);
                         var query = db.escape(Token) + ',' + db.escape(MessageType) + ',' + db.escape(Message) + ',' + db.escape(Status) + ',' + db.escape(TaskDate) + ',' + db.escape(ToMasterID) + ',' + db.escape(Notes) + ',' + db.escape(LocID);
-                       // console.log(query);
+                       console.log('CALL pSaveMessages(' + query + ')');
                         db.query('CALL pSaveMessages(' + query + ')', function (err, InsertResult) {
                             if (!err) {
                                 //console.log(InsertResult);
@@ -3928,6 +3931,7 @@ exports.FnSearchByKeywords = function (req, res) {
         //console.log(token);
 
         if (type == "1") {
+            console.log('executing.........................1');
             if (find != null && find != '' && CategoryID != null && token != null && token != '' && CurrentDate != null) {
                 FnValidateToken(token, function (err, Result) {
                     if (!err) {
@@ -4019,6 +4023,7 @@ exports.FnSearchByKeywords = function (req, res) {
                                         if (SearchResult[0].length > 0) {
                                             res.send(SearchResult[0]);
                                             console.log('FnSearchByKeywords: tmaster: Search result sent successfully');
+                                            if (SearchType == 2){
                                             var getQuery = 'select TID from tmaster where Token='+db.escape(token);
                                             db.query(getQuery, function (err, getResult) {
                                                 if(!err){
@@ -4036,6 +4041,7 @@ exports.FnSearchByKeywords = function (req, res) {
                                                     }
                                                 });
                                             });
+                                        }
                                         }
                                         else {
                                             res.send('null');
@@ -4088,7 +4094,7 @@ exports.FnSearchByKeywords = function (req, res) {
             }
         }
         else if (type == "2") {
-           
+           console.log('executing.........................2');
             if (find != null && find != '' && Proximity.toString() != 'NaN' && Latitude.toString() != 'NaN' && Longitude.toString() != 'NaN' && CategoryID != null && CurrentDate != null) {
                 
                 if (ParkingStatus == 0) {
@@ -10523,7 +10529,7 @@ exports.FnGetReservationResource = function (req, res) {
                                 if (GetResult != null) {
                                     if (GetResult[0].length > 0) {
                                         responseMessage.status = true;
-                                        responseMessage.data = GetResult ;
+                                        responseMessage.data = GetResult[0] ;
                                         responseMessage.error = null;
                                         responseMessage.message = 'Resource details Send successfully';
                                         console.log('FnGetReservationResource: Resource details Send successfully');
@@ -10843,7 +10849,7 @@ exports.FnGetReservationService = function (req, res) {
                                 if (GetResult != null) {
                                     if (GetResult[0].length > 0) {
                                         responseMessage.status = true;
-                                        responseMessage.data = GetResult[0] ;
+                                        responseMessage.data = GetResult[0];
                                         responseMessage.error = null;
                                         responseMessage.message = 'Service details Send successfully';
                                         console.log('FnGetReservationService: Service details Send successfully');
@@ -11203,7 +11209,7 @@ exports.FnSearchBusListing = function(req,res,next){
 };
 
 //method to save reservation transaction
-exports.FnSaveReservTransaction = function(req, res){
+exports.FnSaveReservTask = function(req, res){
     try{
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -11248,7 +11254,7 @@ exports.FnSaveReservTransaction = function(req, res){
         
         
         if(!validateStatus){
-            console.log('FnSaveReservTransaction  error : ' + JSON.stringify(responseMessage.error));
+            console.log('FnSaveReservTask  error : ' + JSON.stringify(responseMessage.error));
             responseMessage.message = 'Unable to save resource transaction ! Please check the errors';
             res.status(200).json(responseMessage);
             return;
@@ -11266,20 +11272,20 @@ exports.FnSaveReservTransaction = function(req, res){
                                 if (result != null) {
                                     responseMessage.status = true;
                                     responseMessage.error = null;
-                                    responseMessage.message = 'Resource Transaction details save successfully';
+                                    responseMessage.message = 'Resource Task details save successfully';
                                     responseMessage.data = {
                                         resourceid : req.body.resourceid,
                                         serviceids : serviceid
                                     };
                                     res.status(200).json(responseMessage);
-                                    console.log('FnSaveReservTransaction: Resource Transaction details save successfully');
+                                    console.log('FnSaveReservTask: Resource Task details save successfully');
                                     
                                 }
                                 else {
                                     responseMessage.message = 'An error occured ! Please try again';
                                     responseMessage.error = {};
                                     res.status(400).json(responseMessage);
-                                    console.log('FnSaveReservTransaction:No save Resource Transaction details');
+                                    console.log('FnSaveReservTask:No save Resource Task details');
                                 }
                             }
 
@@ -11287,7 +11293,7 @@ exports.FnSaveReservTransaction = function(req, res){
                                 responseMessage.message = 'An error occured ! Please try again';
                                 responseMessage.error = {};
                                 res.status(500).json(responseMessage);
-                                console.log('FnSaveReservTransaction: error in saving Resource Transaction details:' + err);
+                                console.log('FnSaveReservTask: error in saving Resource Transaction details:' + err);
                             }
                         });
                     }
@@ -11296,14 +11302,14 @@ exports.FnSaveReservTransaction = function(req, res){
                         responseMessage.error = {}; 
                         responseMessage.data = null;
                         res.status(401).json(responseMessage);
-                        console.log('FnSaveReservTransaction: Invalid token');
+                        console.log('FnSaveReservTask: Invalid token');
                                             }
                 }
                 else {
                     responseMessage.error= {};
                     responseMessage.message = 'Error in validating Token'; 
                     res.status(500).json(responseMessage);
-                    console.log('FnSaveReservTransaction:Error in processing Token' + err);
+                    console.log('FnSaveReservTask:Error in processing Token' + err);
                 }
             });
 
@@ -11314,7 +11320,7 @@ exports.FnSaveReservTransaction = function(req, res){
             {  
                 responseMessage.message = 'Invalid Token';            
                 responseMessage.error = {Token : 'Invalid Token'};
-                console.log('FnSaveReservTransaction: Token is mandatory field');
+                console.log('FnSaveReservTask: Token is mandatory field');
             }
             
             res.status(401).json(responseMessage);
@@ -11324,14 +11330,14 @@ exports.FnSaveReservTransaction = function(req, res){
     catch (ex) {
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
-        console.log('FnSaveReservTransaction:error ' + ex.description);
+        console.log('FnSaveReservTask:error ' + ex.description);
         throw new Error(ex);
         res.status(400).json(responseMessage);
     }
 };
 
 //method to get reservation transaction
-exports.FnGetReservTransaction = function (req, res) {
+exports.FnGetReservTask = function (req, res) {
     console.log('Reservation Resouce details');
     try {
 
@@ -11358,17 +11364,17 @@ exports.FnGetReservTransaction = function (req, res) {
                                 if (GetResult != null) {
                                     if (GetResult[0].length > 0) {
                                         responseMessage.status = true;
-                                        responseMessage.data = GetResult ;
+                                        responseMessage.data = GetResult[0] ;
                                         responseMessage.error = null;
-                                        responseMessage.message = 'Resource Transaction details Send successfully';
-                                        console.log('FnGetReservTransaction: Resource Transaction details Send successfully');
+                                        responseMessage.message = 'Resource Task details Send successfully';
+                                        console.log('FnGetReservTask: Resource Task details Send successfully');
                                         res.status(200).json(responseMessage);
                                     }
                                     else {
                                         
                                         responseMessage.error = {};
-                                        responseMessage.message = 'No founded Resource Transaction details';
-                                        console.log('FnGetReservTransaction: No founded Resource Transaction details');
+                                        responseMessage.message = 'No founded Resource Task details';
+                                        console.log('FnGetReservTask: No founded Resource Task details');
                                         res.json(responseMessage);
                                     }
                                 }
@@ -11376,8 +11382,8 @@ exports.FnGetReservTransaction = function (req, res) {
 
                                     
                                     responseMessage.error = {};
-                                    responseMessage.message = 'No founded Resource Transaction details';
-                                    console.log('FnGetReservTransaction: No founded Resource Transaction details');
+                                    responseMessage.message = 'No founded Resource Task details';
+                                    console.log('FnGetReservTransaction: No founded Resource Task details');
                                     res.json(responseMessage);
                                 }
 
@@ -11386,8 +11392,8 @@ exports.FnGetReservTransaction = function (req, res) {
                                 
                                 responseMessage.data = null ;
                                 responseMessage.error = {};
-                                responseMessage.message = 'Error in getting Resource Transaction details';
-                                console.log('FnGetReservTransaction: error in getting Resource Transaction details' + err);
+                                responseMessage.message = 'Error in getting Resource Task details';
+                                console.log('FnGetReservTask: error in getting Resource Task details' + err);
                                 res.status(500).json(responseMessage);
                             }
                         });
@@ -11396,13 +11402,13 @@ exports.FnGetReservTransaction = function (req, res) {
                         responseMessage.message = 'Invalid Token';
                         responseMessage.error = {};
                         res.status(401).json(responseMessage);
-                        console.log('FnGetReservTransaction: Invalid Token');
+                        console.log('FnGetReservTask: Invalid Token');
                     }
                 } else {
                     responseMessage.error = {};
                     responseMessage.message = 'Error in validating token';
                     res.status(500).json(responseMessage);
-                    console.log('FnGetReservTransaction: Error in validating token:  ' + err);
+                    console.log('FnGetReservTask: Error in validating token:  ' + err);
                 }
             });
         }
@@ -11412,7 +11418,7 @@ exports.FnGetReservTransaction = function (req, res) {
                 responseMessage.error = {
                     Token : 'Invalid Token'
                 };
-                console.log('FnGetReservTransaction: Token is mandatory field');
+                console.log('FnGetReservTask: Token is mandatory field');
             }
            
             res.status(401).json(responseMessage);
