@@ -1062,6 +1062,135 @@
             </modal>
             <!-- end: ModalBox ends -->
         </div>
+
+        <div class="resume-module-modal">
+            <!-- Modal Box starts -->
+            <modal mtitle="_resumeModalTitle" mclass="modalBox.class" visible="_showResumeModal">
+                <div class="container-fluid" ng-controller="ResumeFrontCtrl">
+                    <div class="row">
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-center">
+                            <h4 class="font-roboto">{{(masterUser.CVModuleTitle) ? masterUser.CVModuleTitle : 'Resume Application Form'}}
+                                <br/><small class="text-center">(Submit Resume)</small>
+                            </h4>
+
+                        </div>
+
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 transaction-details-box">
+
+                            <div class="row">
+
+
+                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                    <div class="row">
+                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                            <label>Your Resume Description</label>
+                                        </div>
+                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                            <textarea rows="3" class="form-control no-radius" ng-model="modalBox.tx.message" name="message"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                    <div class="row">
+                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                            <label>Resume Application Details(if any)</label>
+                                        </div>
+                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+
+                                            <textarea rows="3" class="form-control no-radius" ng-model="modalBox.tx.notes" name="notes"></textarea>
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                                    <div class="row">
+                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                            <label>Address</label>
+                                        </div>
+                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-hide="modalBox.editMode">
+                                            <div class="form-group form-group-sm ">
+                                                <select class="form-control" ng-model="modalBox.tx.locId" ng-change="resolveAddress()">
+                                                    <option value="">Other Location</option>
+                                                    <option value="0">Current Location</option>
+                                                    <option ng-repeat="location in modalBox.locationList track by location.TID" value="{{location.TID}}">{{location.LocTitle}}</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                            <div class="form-group form-group-sm ">
+                                                <input
+                                                        ng-disabled="modalBox.tx.locId > 0"
+                                                        type="text" placeholder="Address Line 1" class="form-control no-radius"  name="area" ng-model="modalBox.tx.address" />
+                                                <small class="text-danger" ng-show="txerror.address">Please enter address line 1</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                            <div class="form-group form-group-sm ">
+                                                <input type="text"
+                                                       ng-disabled="modalBox.tx.locId"
+                                                       placeholder="Locality" class="form-control no-radius"  name="area" ng-model="modalBox.tx.area" />
+                                                <small class="text-danger" ng-show="txerror.area">Please enter locality</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                            <div class="form-group form-group-sm ">
+                                                <input
+                                                        ng-disabled="modalBox.tx.locId"
+                                                        type="text" placeholder="City" class="form-control no-radius" name="city" ng-model="modalBox.tx.city" />
+                                                <small class="text-danger" ng-show="txerror.city">Please enter city</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                            <div class="form-group form-group-sm ">
+                                                <input type="text"
+                                                       ng-disabled="modalBox.tx.locId"
+                                                       placeholder="State" class="form-control no-radius" name="state" ng-model="modalBox.tx.state" />
+                                                <small class="text-danger" ng-show="txerror.state">Please enter state</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                            <div class="form-group form-group-sm ">
+                                                <input type="text"
+                                                       ng-disabled="modalBox.tx.locId"
+                                                       placeholder="Country" class="form-control no-radius"  name="country" ng-model="modalBox.tx.country" />
+                                                <small class="text-danger" ng-show="txerror.country">Please enter country</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                            </div>
+
+
+                            <div class="row top-clearfix-padding-half bottom-clearfix">
+
+                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                                    <button class="btn btn-info btn-sm no-radius" ng-click="saveTransaction()">
+                                        <span class="glyphicon glyphicon-hand-right"></span>
+                                        Submit resume application
+                                    </button>
+                                    <button class="btn btn-danger btn-sm no-radius" ng-click="_toggleResumeModal()">
+                                        <span class="glyphicon glyphicon-remove"></span>
+                                        Cancel
+                                    </button>
+                                </div>
+
+
+
+
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+            </modal>
+            <!-- end: ModalBox ends -->
+        </div>
         <!-- Footer goes here -->
         <footer-section></footer-section>
         <!-- Footer Ends here -->

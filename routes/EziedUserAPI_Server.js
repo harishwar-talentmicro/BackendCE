@@ -7061,6 +7061,7 @@ exports.FnGetTranscation = function (req, res) {
                                             TotalPage = parseInt(GetResult[0][0].TotalCount /10) + 1;
                                             RtnMessage.TotalPage = TotalPage;
                                             RtnMessage.Result =GetResult[0];
+                                            console.log(GetResult[0]);
                                             res.send(RtnMessage);
                                             console.log('FnGetTranscation: Transaction details Send successfully');
                                     }

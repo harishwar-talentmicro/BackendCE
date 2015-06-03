@@ -1,18 +1,18 @@
-<div class="panel panel-default" ng-controller="SalesCtrl">
+<div class="panel panel-default" ng-controller="ResumeCtrl">
     <div class="panel-heading">
-        <h3 class="text-center font-roboto">{{(_userInfo.CVModuleTitle) ? _userInfo.CVModuleTitle : 'Sales'}}</h3>
+        <h3 class="text-center font-roboto">{{(_userInfo.CVModuleTitle) ? _userInfo.CVModuleTitle : 'Resume Application Form'}}</h3>
     </div>
     <div class="panel-body">
         <div class="row">
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                 <div class="row bottom-clearfix">
                     <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
-                        <button class="btn btn-sm btn-success no-radius"
-                                ng-show="salesPermissionConf.txCreate"
-                                ng-click="toggleModalBox()"
-                                data-toggle="tooltip" title="Add New Transaction">
-                            <span class="glyphicon glyphicon-plus-sign"></span> Add New Transaction
-                        </button>
+                        <!--<button class="btn btn-sm btn-success no-radius"-->
+                                <!--ng-show="resumePermissionConf.txCreate"-->
+                                <!--ng-click="toggleModalBox()"-->
+                                <!--data-toggle="tooltip" title="Add New Transaction">-->
+                            <!--<span class="glyphicon glyphicon-plus-sign"></span> Add New Transaction-->
+                        <!--</button>-->
                     </div>
 
                     <div class="col-lg-3 col-md-4 col-sm-6 col-xs-8 pull-right">
@@ -194,23 +194,28 @@
                     </div>
 
                     <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 bottom-clearfix"
-                         ng-hide="editModes[$index]" ng-dblclick="((salesPermissionConf.txUpdate) ? toggleAllEditMode($index,false,true) : 0)">
+                         ng-hide="editModes[$index]" ng-dblclick="((resumePermissionConf.txUpdate) ? toggleAllEditMode($index,false,true) : 0)">
                         <div class="row">
                             <div ng-class="(moduleConf.listType == 4) ? 'col-lg-6' : 'col-lg-12'" class="col-md-12 col-sm-12 col-xs-12"
-                                 title="{{(salesPermissionConf.txUpdate) ? 'Double click to edit' : 'Do not have permission to edit'}}">
+                                 title="{{(resumePermissionConf.txUpdate) ? 'Double click to edit' : 'Do not have permission to edit'}}">
                                 <small class="text-info">{{(tx.statustitle) ? tx.statustitle : 'New'}}</small>
                             </div>
                             <div ng-show="moduleConf.listType == 4" class="col-lg-6 col-md-12 col-sm-12 col-xs-12"
-                                 title="{{(salesPermissionConf.txUpdate) ? 'Double click to edit' : 'Do not have permission to edit'}}">
+                                 title="{{(resumePermissionConf.txUpdate) ? 'Double click to edit' : 'Do not have permission to edit'}}">
                                 <label class="label label-info">{{tx.Amount | formatDecimal:'Rs. ':2}}</label>
                             </div>
                         </div>
                     </div>
+                    <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
+                    <a class="btn btn-link btn-info btn-xs" target="_blank"
+                       ng-href="{{tx.CVLink}}" title="Download Resume">Download Resume</a>
+                    </div>
+
 
                     <div class="col-lg-1 col-md-12 col-sm-12 col-xs-12 bottom-clearfix"
-                         title="{{(salesPermissionConf.txUpdate) ? 'Double click to edit' : 'Do not have permission to edit'}}"
+                         title="{{(resumePermissionConf.txUpdate) ? 'Double click to edit' : 'Do not have permission to edit'}}"
                          ng-hide="editModes[$index]"
-                         ng-dblclick="(salesPermissionConf.txUpdate) ? toggleAllEditMode($index,false,true) : 0">
+                         ng-dblclick="(resumePermissionConf.txUpdate) ? toggleAllEditMode($index,false,true) : 0">
 
                         <small><b>{{tx.ActionTitle}}</b></small>
                         <br/>
@@ -225,7 +230,7 @@
                     <div class="col-lg-3 col-md-12 col-sm-12 col-xs-12 bottom-clearfix" ng-show="editModes[$index]">
                         <div class="row">
                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                <label class="tiny">Transaction Status</label>
+                                <label class="tiny">Application Status</label>
                                 <br/>
                                 <div class="form-group form-group-sm">
                                     <select class="form-control" ng-model="modalBox.tx.statusType">
@@ -301,14 +306,13 @@
                                     Cancel
                                 </button>
                                 <br/>
-                                <button ng-hide="editModes[$index]" ng-disabled="!salesPermissionConf.txUpdate"
-                                        title="{{(salesPermissionConf.txUpdate) ? 'Edit' : 'You do not have permission to edit'}}"
-                                        ng-click="(salesPermissionConf.txUpdate) ? (toggleAllEditMode($index,true,true)) : 0" class="btn btn-xs btn-block btn-warning no-radius">
+                                <button ng-hide="editModes[$index]" ng-disabled="!resumePermissionConf.txUpdate"
+                                        title="{{(resumePermissionConf.txUpdate) ? 'Edit' : 'You do not have permission to edit'}}"
+                                        ng-click="(resumePermissionConf.txUpdate) ? (toggleAllEditMode($index,true,true)) : 0" class="btn btn-xs btn-block btn-warning no-radius">
                                     <span class="glyphicon glyphicon-pencil"></span>
                                     Edit
                                 </button>
                             </div>
-
 
                         </div>
                     </div>
@@ -411,7 +415,7 @@
                                 <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
                                     <div class="row">
                                         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                            <label>Transaction Status</label>
+                                            <label>Application Status</label>
                                         </div>
                                         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                             <div class="form-group form-group-sm ">
@@ -495,7 +499,7 @@
                                 <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
                                     <div class="row">
                                         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                            <label>Transaction Message</label>
+                                            <label>Resume Application Description</label>
                                         </div>
                                         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                             <textarea rows="2" class="form-control no-radius" ng-model="modalBox.tx.message" name="message"></textarea>
@@ -507,7 +511,7 @@
                                 <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
                                     <div class="row">
                                         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                            <label>Delivery Address</label>
+                                            <label>Address</label>
                                         </div>
                                         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-hide="modalBox.editMode">
                                             <div class="form-group form-group-sm ">
@@ -561,7 +565,7 @@
                                 <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
                                     <div class="row">
                                         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                            <label>Notes</label>
+                                            <label>Resume Application Details</label>
                                         </div>
                                         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
 
@@ -586,8 +590,8 @@
 
                             </div>
 
-                            <hr ng-show="moduleItems.length > 0 &&  _userInfo.SalesItemListType > 0" />
-                            <div ng-show="moduleItems.length > 0 &&  _userInfo.SalesItemListType > 0" class="row bottom-clearfix">
+                            <hr ng-show="moduleItems.length > 0 &&  _userInfo.ResumeItemListType" />
+                            <div ng-show="moduleItems.length > 0 && _userInfo.ResumeItemListType" class="row bottom-clearfix">
 
                                 <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12 item-list-box">
                                     <div class="row">
@@ -604,8 +608,8 @@
                                         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                             <bussiness-item
                                                     ng-repeat="item in moduleItems track by item.TID"
-                                                    item="item" item-list-type="_userInfo.SalesItemListType"
-                                                    add-item="addItem(item)" edit-permission="salesPermissionConf.txUpdate" edit-mode="modalBox.editMode">
+                                                    item="item" item-list-type="_userInfo.ResumeItemListType"
+                                                    add-item="addItem(item)" edit-permission="resumePermissionConf.txUpdate" edit-mode="modalBox.editMode">
                                             </bussiness-item>
                                         </div>
 
@@ -629,9 +633,9 @@
 
                                         <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12" ng-repeat="item in modalBox.tx.itemList track by item.ItemID">
                                             <transaction-item
-                                                    item="item" item-list-type="_userInfo.SalesItemListType"
+                                                    item="item" item-list-type="_userInfo.ResumeItemListType"
                                                     remove-item="removeItem(item)"
-                                                    edit-permission="salesPermissionConf.txUpdate" edit-mode="modalBox.editMode">
+                                                    edit-permission="resumePermissionConf.txUpdate" edit-mode="modalBox.editMode">
                                             </transaction-item>
                                         </div>
 
@@ -645,20 +649,20 @@
 
 
                             <div class="row top-clearfix-padding-half bottom-clearfix">
-                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-show="modalBox.editMode && (!salesPermissionConf.txUpdate)">
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-show="modalBox.editMode && (!resumePermissionConf.txUpdate)">
                                     <small class="text-danger">You do not have permission to edit the enquiry</small>
                                 </div>
                                 <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6">
                                     <button class="btn btn-info btn-sm no-radius" ng-hide="modalBox.editMode" ng-click="saveTransaction()">
                                         <span class="glyphicon glyphicon-hand-right"></span>
-                                        Proceed to Enquire
+                                        Save
                                     </button>
                                     <button ng-click="saveTransaction()"
                                             class="btn btn-success btn-sm no-radius" ng-show="modalBox.editMode"
-                                            title="(salesPermissionConf.txUpdate) ? 'Update sales enquiry' : 'You do not have editing permission'"
-                                            ng-disabled="(!salesPermissionConf.txUpdate)">
+                                            title="(resumePermissionConf.txUpdate) ? 'Update resume application' : 'You do not have editing permission'"
+                                            ng-disabled="(!resumePermissionConf.txUpdate)">
                                         <span class="glyphicon glyphicon-ok-circle"></span>
-                                        Update Enquiry
+                                        Update Resume Application Form
                                     </button>
                                     <button class="btn btn-danger btn-sm no-radius" ng-click="toggleModalBox()">
                                         <span class="glyphicon glyphicon-remove"></span>

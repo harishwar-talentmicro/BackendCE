@@ -39,7 +39,7 @@
             /**
              * Logged in user cannot use this module as he is not having the required permissions for it
              */
-            var moduleIndex = $scope.modules.indexOfWhere('type','sales');
+            var moduleIndex = $scope.modules.indexOfWhere('type','resume');
             var permission = parseInt($scope.modules[moduleIndex].permission);
             if(permission.isNaN || permission === 0 )
             {
@@ -999,7 +999,7 @@
                     NextAction : ($scope.modalBox.tx.nextAction) ? $scope.modalBox.tx.nextAction : 0,
                     NextActionDateTime : ($scope.modalBox.tx.nextActionDateTime) ? $scope.modalBox.tx.nextActionDateTime : moment().format('YYYY-MM-DD hh:mm:ss'),
                     ItemsList: JSON.stringify($scope.modalBox.tx.itemList),
-                    item_list_type : $rootScope._userInfo.SalesItemListType,
+                    item_list_type : 0,
                     DeliveryAddress : (!editMode) ?
                         makeAddress() : $scope.modalBox.tx.deliveryAddress
                 };
@@ -1103,7 +1103,7 @@
                      * listType becomes 0 but to restore the actual list type in $rootScope
                      * this will reassign the values to _userInfo.SalesItemListType
                      */
-                    $rootScope._userInfo.SalesItemListType = $scope._tempSalesItemListType;
+                    //$rootScope._userInfo.SalesItemListType = $scope._tempSalesItemListType;
                 }
             );
 

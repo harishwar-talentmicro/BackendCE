@@ -102,7 +102,7 @@
              * @todo
              * salesItemListTpe : To be loaded from server but currently no API call is available for this
              */
-            $scope.salesItemListType = 0;
+            $scope.resumeItemListType = 0;
             $scope.editPermission = true;
             $scope.editMode = true;
 
@@ -137,7 +137,7 @@
              * @type {{title: string, class: string, editMode: boolean, locationList: Array, tx: {orderAmount: number, trnNo: string, ezeidTid: number, TID: number, functionType: number, ezeid: string, statusType: number, notes: string, locId: string, country: string, state: string, city: string, area: string, contactInfo: string, deliveryAddress: string, nextAction: number, nextActionDateTime: string, taskDateTime: string, folderRule: number, message: string, messageType: *, latitude: number, longitude: number, duration: number, durationScale: number, itemList: Array}}}
              */
             $scope.modalBox = {
-                title : 'Transaction Details',
+                title : 'Resume Application Form',
                 class : 'business-manager-modal',
                 editMode : false,
                 locationList : [],
@@ -147,7 +147,7 @@
                     ezeidTid : 0,
 
                     TID : 0,
-                    functionType : 0, // Function Type will be 0 for sales
+                    functionType : 4, // Function Type will be 0 for sales
                     ezeid : '',
                     statusType : 0,
                     notes : '',
@@ -163,7 +163,7 @@
                     taskDateTime : '',
                     folderRule : 0,
                     message : '',
-                    messageType : ($rootScope._userInfo.SalesItemListType) ? $rootScope._userInfo.SalesItemListType : 0,
+                    messageType : ($rootScope._userInfo.ResumeItemListType) ? $rootScope._userInfo.ResumeItemListType : 0,
                     latitude : 0,
                     longitude : 0,
                     duration : 0,
@@ -287,7 +287,7 @@
              */
             $scope.resetModalBox = function(){
                 $scope.modalBox = {
-                    title : 'Transaction Details',
+                    title : 'Resume Application Form',
                     class : 'business-manager-modal',
                     locationList : [],
                     editMode : false,
@@ -297,7 +297,7 @@
                         ezeidTid : 0,
 
                         TID : 0,
-                        functionType : 0, // Function Type will be 0 for sales
+                        functionType : 4, // Function Type will be 0 for sales
                         ezeid : '',
                         statusType : 0,
                         notes : '',
@@ -313,7 +313,7 @@
                         taskDateTime : '',
                         folderRule : 0,
                         message : '',
-                        messageType : ($rootScope._userInfo.SalesItemListType) ? $rootScope._userInfo.SalesItemListType : 0,
+                        messageType : ($rootScope._userInfo.ResumeItemListType) ? $rootScope._userInfo.ResumeItemListType : 0,
                         latitude : 0,
                         longitude : 0,
                         duration : 0,
@@ -336,7 +336,7 @@
             /**
              * Watches the open and close property of sales modal
              */
-            $scope.$watch('_showSalesModal',function(newVal,oldVal){
+            $scope.$watch('_showResumeModal',function(newVal,oldVal){
                 if(!newVal){
                     $scope.resetModalBox();
                 }
@@ -378,8 +378,7 @@
                 }).success(function (resp) {
                     if (resp && resp != 'null' && resp.length > 0) {
                         $scope.masterUser = resp[0];
-                        $scope.salesItemListType = ($scope.masterUser.SalesItemListType &&
-                        (!isNaN(parseInt($scope.masterUser.SalesItemListType)))) ? parseInt($scope.masterUser.SalesItemListType) : 0 ;
+                        $scope.resumeItemListType =  0 ;
                         //$scope._salesModalTitle = ($scope.masterUser.SalesModuleTitle) ? $scope.masterUser.SalesModuleTitle : 'Sales Enquiry';
                     }
                     defer.resolve();
@@ -396,7 +395,17 @@
              * @returns {*}
              */
             $scope.getModuleItemList = function(){
+
+
                 var defer = $q.defer();
+
+                if(true){
+                    $timeout(function(){
+                        defer.resolve([]);
+                    },500);
+                    return defer.promise;
+                }
+
                 $http({
                     url : GURL + 'ewtGetItemListForEZEID',
                     method : 'GET',
@@ -471,7 +480,7 @@
                     State : $scope.modalBox.tx.state,
                     City : $scope.modalBox.tx.city,
                     Area : $scope.modalBox.tx.area,
-                    FunctionType : 0,   // For sales
+                    FunctionType : 4,   // For sales
                     Latitude : $scope.modalBox.tx.latitude,
                     Longitude : $scope.modalBox.tx.longitude,
                     EZEID : $rootScope._userInfo.ezeid,
@@ -545,7 +554,7 @@
                     flag *= false;
                 }
 
-                if(tx.itemList.length < 1 && $scope.salesItemListType > 0 && $scope.moduleItems.length > 0){
+                if(tx.itemList.length < 1 && $scope.resumeItemListType){
                     $scope.txerror.items = true;
                     flag *= false;
                 }
@@ -579,13 +588,13 @@
                     return ;
                 }
 
-                if($scope.modalBox.tx.itemList.length <  1 && $scope.salesItemListType > 0){
+                if($scope.modalBox.tx.itemList.length <  1 && $scope.resumeItemListType){
                     Notification.error({ message : 'Please select items for the enquiry',delay : MsgDelay});
                     return ;
                 }
 
 
-                if($scope.modalBox.tx.message.length < 1 && $scope.salesItemListType > 0){
+                if($scope.modalBox.tx.message.length < 1 && $scope.resumeItemListType){
                     var itemList = [];
                     try{
                         itemList = JSON.parse(data.ItemsList);
