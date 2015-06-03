@@ -98,7 +98,6 @@
                                         <div title="{{getTime($index,cols,true)}}" ng-repeat="block in blockArr track by $index"
                                              class="notes-section blk blk-content wrap-text text-center" ng-init="blockId = getBlockId($index,cols)" ng-class="[blockColor[$index],'block-'+blockId,heightClass]"
                                              ng-click="reservationClickEventHandler(blockId)">
-
                                         </div>
                                     </div>
                                 </div>
@@ -114,7 +113,20 @@
     </div>
 
     <!-- Modal box to make a reservation -->
-
+    <modal mtitle="modal.title" mclass="modal.class" visible="modalVisible">
+        <div class="row width-75">
+            <div class="reservation-form">
+                <div class="col-lg-4 text-right">
+                    <p class="text-black">Service</p>
+                </div>
+                <div class="col-lg-8">
+                    <select class="form-control">
+                        <option>Blood Test</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </modal>
 
     <!-- Reservation module ends here -->
 </section>
