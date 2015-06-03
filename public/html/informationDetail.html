@@ -327,8 +327,8 @@
                                        ng-href="{{SearchInfo.CVURL}}"
                                        target="_blank"
                                        title="Send CV"
-                                       ng-click="(SearchInfo.CVURL) ? '' : ($event.preventDefault())(openCVForm())"
-                                       ng-show="SearchInfo.EZEIDVerifiedID == '2' && showSendCv == 1">
+                                       ng-click="(SearchInfo.CVURL) ? '' : ($event.preventDefault())(_toggleResumeModal())"
+                                       ng-show="SearchInfo.EZEIDVerifiedID == '2' && _userInfo.IDTypeID == 1 && showSendCv == 1">
                                         <img src="../images/new_send_cv.png">
                                         Send CV
                                     </a>

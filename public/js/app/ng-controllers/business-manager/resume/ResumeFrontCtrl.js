@@ -411,7 +411,7 @@
                     method : 'GET',
                     params : {
                         Token: $rootScope._userInfo.Token,
-                        FunctionType: 0,
+                        FunctionType: 4,
                         EZEID: $scope.SearchInfo.EZEID
                     }
                 }).success(function(resp){
@@ -558,9 +558,26 @@
                     $scope.txerror.items = true;
                     flag *= false;
                 }
+
+
+
                 return flag;
             };
 
+
+            /**
+             * Checks that resume is uploaded by the logged in user or not who is actually submitting the
+             * resume application
+             * @returns {boolean}
+             */
+            var checkResumeAttached = function(){
+
+                /**
+                 * @todo Check if resume attached or not for a person who is applying for this job
+                 *
+                 */
+                return false;
+            };
             /**
              * Saving transaction in
              * @param editMode
@@ -579,6 +596,20 @@
                 if(!validateTransaction($scope.modalBox.tx)){
                     Notification.error({ message : 'Please check all the errors', delay : MsgDelay});
                     return false;
+                }
+
+
+                /**
+                 * @todo Check if the resume of the user applying is uploaded or not
+                 * and then only allow him to apply for the job else throw an error and
+                 * say him a message to upload the resume
+                 */
+                $scope.isResumeAttached = true;
+                if(checkResumeAttached()){
+                    $scope.isResumeAttached = false;
+                    Notification.error({ message : 'Please attach resume before submitting the resume application',
+                        delay : MsgDelay});
+                    return;
                 }
 
                 var data = prepareSaveTransaction($scope.modalBox.editMode);
@@ -625,18 +656,18 @@
                 }).success(function(resp){
                     if(resp && resp.hasOwnProperty('IsSuccessfull')){
                         if(resp.IsSuccessfull){
-                            var msg = 'Enquiry is posted successfully';
+                            var msg = 'Your resume application is submitted successfully';
 
                             Notification.success({ message : msg, delay : MsgDelay});
                             $scope._toggleSalesModal();
                             $scope.resetModalBox();
                         }
                         else{
-                            Notification.error({ message : 'An error occurred while placing enquiry', delay : MsgDelay});
+                            Notification.error({ message : 'An error occurred while submitting application', delay : MsgDelay});
                         }
                     }
                     else{
-                        Notification.error({ message : 'An error occurred while placing enquiry', delay : MsgDelay});
+                        Notification.error({ message : 'An error occurred while submitting application', delay : MsgDelay});
                     }
 
                     $scope.$emit('$preLoaderStop');
