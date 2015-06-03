@@ -22,7 +22,8 @@
         '/profile-manager',
         '/profile-manager/:subview',
         '/service-reservation',
-        '/outbox'
+        '/outbox',
+        '/access-history'
     ]);
 
     /**
@@ -118,7 +119,7 @@
                 controller : 'LandingPageCtrl'
             })
             .when('/messages',{templateUrl: 'html/messages.html'})
-            .when('/acchist',{templateUrl: 'html/accesshistory.html'})
+            .when('/access-history',{templateUrl: 'html/accesshistory.html'})
             .when('/busslist',{templateUrl: 'html/businesslist.html'})
             .when('/terms',{templateUrl: 'html/terms.html'})
             .when('/help',{templateUrl: 'html/help.html'})
