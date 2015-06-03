@@ -424,4 +424,8 @@ var res = angular.module('ezeidApp').
                 var isReserved = $('.block-'+blockId).hasClass('reserved');
 
             }
+
+            /* hide the glyphicon */
+            $('.input-group-addon').addClass('hidden');
+
         }]);
