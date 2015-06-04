@@ -113,6 +113,7 @@ var res = angular.module('ezeidApp').
 
             getResource($scope.searchedEzeid);
             getServicesData($scope.searchedEzeid);
+            getServiceResourceMapping($scope.searchedEzeid,6);
 
             /**
              * Get resources of this EZE ID
@@ -216,10 +217,11 @@ var res = angular.module('ezeidApp').
                     url : GURL + 'reservation_maped_services',
                     method : "GET",
                     params :{
-                        ezeid : ezeid
+                        ezeid : ezeid,
+                        resourceid:resourceId
                     }
                 }).success(function(resp){
-
+                    console.log(resp);
                     $scope.$emit('$preLoaderStop');
                     if(resp.data.length>0)
                     {
@@ -439,7 +441,7 @@ var res = angular.module('ezeidApp').
              * ->remove background color
              */
             $scope.unmergeBlock = function (startBlock, endBlock, text, height) {
-                
+
             }
 
             /* get the block ids based on the range */
