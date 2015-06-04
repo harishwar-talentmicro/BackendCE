@@ -413,54 +413,19 @@ angular.module('ezeidApp').
                 $('#HomeDelivery_popup').slideUp();
             };
 
-            //open Reservation form
-            $scope.openReservationForm = function (_Ezeid)
-            {
-                document.getElementById("reservationMessage").className = "form-control fixTextArea emptyBox";
-                if($rootScope._userInfo.Token == 2)
-                {
-                    $('#SignIn_popup').slideDown();
-                }
-                else
-                {
-                    var params = '?ezeid='+_Ezeid;
-                    $location.url('/service-reservation'+params);
-                }
-            };
-
-        //Send Reservation
-        $scope.sendReservation = function (messageType) {
-                if ($rootScope._userInfo.IsAuthenticate == true) {
-
-                    /**
-                     * Converting LOCAL Time to UTC Time
-                     */
-                    var dateTime = moment($scope.ReservationDateTime,"DD-MMM-YYYY hh:mm A").utc().format('DD-MMM-YYYY hh:mm A');
-                    var currentTaskDate = moment().format('DD-MMM-YYYY hh:mm A');
-                    $http({ method: 'post', url: GURL + 'ewtSaveMessage', data: { TokenNo: $rootScope._userInfo.Token, ToMasterID: $scope.SearchInfo.TID, MessageType: messageType, Message: $scope.ReservationMessage, TaskDateTime: dateTime, LocID :$scope.SearchInfo.LocID,CurrentTaskDate: currentTaskDate } }).success(function (data) {
-                        if (data.IsSuccessfull) {
-                            document.getElementById("reservationMessage").className = "form-control fixTextArea emptyBox";
-                            $scope.ReservationMessage = "";
-                            $scope.ReservationDateTime = "";
-                            Notification.success({ message: 'Message send success', delay: MsgDelay });
-                            $('#Reservation_popup').slideUp();
-                        }
-                        else {
-                            Notification.error({ message: 'Sorry..! Message not send ', delay: MsgDelay });
-                        }
-                    });
-                }
-                else {
-                    //Redirect to Login page
-                    $('#SignIn_popup').slideDown();
-                }
-            };
-
-        // Close Reservation Form
-        $scope.closeReservationForm = function () {
-            $('#Reservation_popup').slideUp();
+        //open Reservation form
+        $scope.openReservationForm = function (_Ezeid)
+        {
             document.getElementById("reservationMessage").className = "form-control fixTextArea emptyBox";
-            $scope.ReservationDateTime = "";
+            if($rootScope._userInfo.Token == 2)
+            {
+                $('#SignIn_popup').slideDown();
+            }
+            else
+            {
+                var params = '?ezeid='+_Ezeid;
+                $location.url('/service-reservation'+params);
+            }
         };
 
         //open Service Request form

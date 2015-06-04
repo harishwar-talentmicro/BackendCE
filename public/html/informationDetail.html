@@ -58,46 +58,6 @@
                     </form>
                 </div>
             </div>
-            <div class="Popup_window form_style map_popup_iconActions" id="Reservation_popup">
-                <div class="window_page Maping_popup">
-                    <span class="closelink" ng-click="closeReservationForm()">X</span>
-                    <span style="margin-top:-2px;float:right; border:1px solid #000000;background:#FAA9A3;color:#000000;">
-                        <span>Mandatory</span>
-                    </span>
-                    <form name="reservationForm" ng-submit="reservationForm.$valid && sendReservation(SearchInfo.IDTypeID==1 ? '6' : '3')" novalidate>
-                        <h3 ng-show="SearchInfo.IDTypeID==1" class="marB15px">Appointment</h3>
-                        <h3 ng-show="SearchInfo.IDTypeID==2" class="marB15px">Reservation</h3>
-
-                        <div class="form-group">
-                            <p>
-                                <label>
-                                    <span ng-show="SearchInfo.IDTypeID==2"> Reservation Date & Time:</span>
-                                    <span ng-show="SearchInfo.IDTypeID==1"> Appointment Date & Time:</span>
-                                    <span ng-show="SearchInfo.IDTypeID==3"> Appointment Date & Time:</span>
-                                </label>
-                            <span style="width:60%;display:block;">
-                               <date-time-picker recipient="ReservationDateTime" settings='{
-                                                                    "format" : "d-M-Y",
-                                                                    "timepicker" : false,
-                                                                    "mask" : false,
-                                                                    "hours12" : false,
-                                                                    "minDate" : "+1970/01/01"
-                                                                    }'></date-time-picker>
-                            </span>
-                            </p>
-                        <textarea id="reservationMessage" name="reservationMessage"
-                                  ng-class="reservationForm.reservationMessage.$touched && !ReservationMessage.length ? 'mandatoryTextBox' : ''"
-                                  class="form-control fixTextArea emptyBox" name="reservationMessage" ng-model="ReservationMessage"
-                                  placeholder="{{reservationPlaceHolder}}" required>
-                        </textarea>
-                        </div>
-                        <div class="form-group">
-                            <input type="submit" ng-disabled="!ReservationDateTime || !ReservationMessage" class="btn btn-primary appoint_marT" value="Send" />
-                            <input type="reset" ng-click="closeReservationForm()" class="btn btn-primary marR10px cancelEnq appoint_marT" value="Close" />
-                        </div>
-                    </form>
-                </div>
-            </div>
             <div class="Popup_window form_style map_popup_iconActions" id="ServiceRequest_popup">
                 <div class="window_page Maping_popup">
                     <span class="closelink" ng-click="closeServiceRequestForm()">X</span>
