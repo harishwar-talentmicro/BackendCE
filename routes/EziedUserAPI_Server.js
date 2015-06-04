@@ -10944,7 +10944,7 @@ exports.FnGetReservResourceServiceMap = function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
-        var Token = req.query.Token;
+        var ezeid = req.query.ezeid;
         var responseMessage = {
             status: false,
             data: null,
@@ -10952,12 +10952,9 @@ exports.FnGetReservResourceServiceMap = function (req, res) {
             Message:''
         };
         
-        if (Token) {
-            FnValidateToken(Token, function (err, Result) {
-                if (!err) {
-                    if (Result != null) {
-
-                        db.query('CALL pGetResResourceServiceMap(' + db.escape(Token) + ')', function (err, GetResult) {
+        if (ezeid) {
+           
+                        db.query('CALL pGetResResourceServiceMap(' + db.escape(ezeid) + ')', function (err, GetResult) {
                             if (!err) {
                                 if (GetResult != null) {
                                     if (GetResult[0].length > 0) {
@@ -10995,28 +10992,15 @@ exports.FnGetReservResourceServiceMap = function (req, res) {
                                 res.status(500).json(responseMessage);
                             }
                         });
-                    }
-                    else {
-                        responseMessage.message = 'Invalid Token';
-                        responseMessage.error = {};
-                        res.status(401).json(responseMessage);
-                        console.log('FnGetReservResourceServiceMap: Invalid Token');
-                    }
-                } else {
-                    responseMessage.error = {};
-                    responseMessage.message = 'Error in validating token';
-                    res.status(500).json(responseMessage);
-                    console.log('FnGetReservResourceServiceMap: Error in validating token:  ' + err);
-                }
-            });
+                    
         }
         else {
-            if (!Token) {
-                responseMessage.message = 'Invalid Token';            
+            if (!ezeid) {
+                responseMessage.message = 'Invalid ezeid';            
                 responseMessage.error = {
-                    Token : 'Invalid Token'
+                    ezeid : 'Invalid ezeid'
                 };
-                console.log('FnGetReservResourceServiceMap: Token is mandatory field');
+                console.log('FnGetReservResourceServiceMap: ezeid is mandatory field');
             }
            
             res.status(401).json(responseMessage);
