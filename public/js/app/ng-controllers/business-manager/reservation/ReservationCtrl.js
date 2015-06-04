@@ -84,11 +84,17 @@ var res = angular.module('ezeidApp').
             /* resources array */
             $scope.resources = [];//FORMAT: 'tid':1,'title':'Dr. Meet','status':1
 
+            /* service array to store all service details under this EZE ID */
+            $scope.services = [];
+
             /* active resource id */
             $scope.activeResourceId = '';
 
             /* set the date for which calendar is shown */
             $scope.activeDate = moment().format('DD-MM-YYYY');
+
+            /* flag bit for checking if there is no resources */
+            $scope.isNoResource = false;
 
             /* SETTINGS ENDS HERE======================================== */
 
@@ -106,25 +112,28 @@ var res = angular.module('ezeidApp').
             $scope.searchedEzeid = 'krunalpaid';
 
             getResource($scope.searchedEzeid);
+            getServicesData($scope.searchedEzeid);
+
             /**
              * Get resources of this EZE ID
              * @param ezeid of the searched org.
              */
             function getResource(ezeid)
             {
+                $scope.$emit('$preLoaderStart');
                 $http({
                     url : GURL + 'reservation_resource',
-                    method : "GET",
-                    params :{
+                        method : "GET",
+                        params :{
                         ezeid : ezeid,
-                        Token : $rootScope._userInfo.Token
+                            Token : $rootScope._userInfo.Token
                     }
                 }).success(function(resp){
 
                     $scope.$emit('$preLoaderStop');
                     if(resp.data.length>0)
                     {
-                        createResourceArray(resp.data);
+                        setResources(resp.data);
                     }
                 }).error(function(err){
                     $scope.$emit('$preLoaderStop');
@@ -136,12 +145,13 @@ var res = angular.module('ezeidApp').
              * Create the resource array for Front End
              * @param array from HTTP request
              */
-            function createResourceArray(array)
+            function setResources(array)
             {
                 var tempArr = [];
                 $scope.resources = [];
                 for(var obj in array)
                 {
+                    $scope.isNoResource = true;
                     if($scope.activeResourceId == '')
                     {
                         $scope.activeResourceId = array[obj].tid;
@@ -158,15 +168,73 @@ var res = angular.module('ezeidApp').
                 }
             }
 
+            /**
+             * Get all services of THIS EZE ID
+             */
+            function getServicesData(ezeid)
+            {
+                $scope.$emit('$preLoaderStart');
+                $http({
+                    url : GURL + 'reservation_service',
+                    method : "GET",
+                    params :{
+                        ezeid : ezeid
+                    }
+                }).success(function(resp){
+
+                    $scope.$emit('$preLoaderStop');
+                    if(resp.data.length>0)
+                    {
+                        setServices(resp.data);
+                    }
+                }).error(function(err){
+                    $scope.$emit('$preLoaderStop');
+                    Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
+                });
+            }
+
+            /**
+             * Set all the services for this EZE ID
+             */
+            function setServices(data)
+            {
+                var tempArr = [];
+                $scope.service = [];
+                for(var obj in data)
+                {
+                    /* set the services */
+                }
+            }
+
+            /**
+             * Get service-resource mapping for a resource
+             */
+            function getServiceResourceMapping(ezeid,resourceId)
+            {
+                $scope.$emit('$preLoaderStart');
+                $http({
+                    url : GURL + 'reservation_maped_services',
+                    method : "GET",
+                    params :{
+                        ezeid : ezeid
+                    }
+                }).success(function(resp){
+
+                    $scope.$emit('$preLoaderStop');
+                    if(resp.data.length>0)
+                    {
+                        console.log(resp.data);
+                    }
+                }).error(function(err){
+                    $scope.$emit('$preLoaderStop');
+                    Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
+                });
+            }
+
+
 
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-
-            /**
-             * All HTTP request goes here -----------------------
-             * @returns {string}
-             */
 
 
             /////////////////////////////////////////////////////////
@@ -371,7 +439,7 @@ var res = angular.module('ezeidApp').
              * ->remove background color
              */
             $scope.unmergeBlock = function (startBlock, endBlock, text, height) {
-
+                
             }
 
             /* get the block ids based on the range */
@@ -554,6 +622,7 @@ var res = angular.module('ezeidApp').
                 var tid = $scope.activeResourceId;
                 var date = $scope.activeDate;
                 /* http request for getting the new calendar data */
+
             }
 
         }]);
