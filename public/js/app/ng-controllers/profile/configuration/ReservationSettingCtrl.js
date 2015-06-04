@@ -29,7 +29,7 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',[
 
     resetResourceValue();
     getUserDetails();
-    getAllResources();
+   // getAllResources();
 
     function resetResourceValue()
     {
@@ -157,6 +157,7 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',[
         }).success(function(resp){
                 if(resp.length>0){
                     $scope.masterUser = resp[0];
+                    getAllResources();
                 }
             }).error(function(err){
                 Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
@@ -170,7 +171,7 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',[
             url : GURL + 'reservation_resource',
             method : "GET",
             params :{
-                Token : $rootScope._userInfo.Token
+                ezeid : $scope.masterUser.EZEID
             }
         }).success(function(resp){
                 $scope.$emit('$preLoaderStop');
@@ -294,7 +295,7 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',[
             url : GURL + 'reservation_service',
             method : "GET",
             params :{
-                Token : $rootScope._userInfo.Token
+                ezeid : $scope.masterUser.EZEID
             }
         }).success(function(resp){
                 $scope.$emit('$preLoaderStop');
@@ -425,7 +426,6 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',[
                         mappingData[nCount].ServicesArray = JSON.parse("[" + res + "]");
                     }
                     $scope.AllMappingData = mappingData;
-
                 }
             }).error(function(err){
                 $scope.$emit('$preLoaderStop');

@@ -221,14 +221,14 @@
     </modal>
 
 
-    <div ng-show="true">
+    <div ng-show="false">
         <h1>
             <span class="glyphicon glyphicon-calendar"></span> Coming Soon !
         </h1>
     </div>
 
 
-    <div class="panel-body" ng-show="false">
+    <div class="panel-body" ng-show="true">
 
         <div role="tabpanel">
             <!-- Nav tabs -->
@@ -242,7 +242,7 @@
                             <a class="btn-link" ng-class="{'tab-active': selectedTab == 2}" ng-click="selectedTab = 2; reservationServiceTabSelected()">Reservation Service</a>
                         </li>
                         <li class="setWidthThird" role="presentation" ng-class="{active: selectedTab == 3}">
-                            <a class="btn-link" ng-class="{'tab-active': selectedTab == 3}" ng-click="selectedTab = 3;  reservationServiceMapTabSelected()">Resource <span class="glyphicon glyphicon-transfer setLeftRightMarginFivePX"></span> Service</a>
+                            <a class="btn-link" ng-class="{'tab-active': selectedTab == 3}" ng-click="selectedTab = 3; reservationServiceMapTabSelected()">Resource <span class="glyphicon glyphicon-transfer setLeftRightMarginFivePX"></span> Service</a>
                         </li>
                     </ul>
                 </div>
