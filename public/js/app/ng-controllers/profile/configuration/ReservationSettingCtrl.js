@@ -30,6 +30,84 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',[
     resetResourceValue();
     getUserDetails();
 
+
+        getReservationTransactionData();
+
+        /**
+         * Function for converting UTC time from server to LOCAL timezone
+         */
+        var convertTimeToLocal = function(timeFromServer,dateFormat,returnFormat){
+            if(!dateFormat){
+                dateFormat = 'DD-MMM-YYYY hh:mm A';
+            }
+            if(!returnFormat){
+                returnFormat = dateFormat;
+            }
+            var x = new Date(timeFromServer);
+            var mom1 = moment(x);
+            return mom1.add((mom1.utcOffset()),'m').format(returnFormat);
+        };
+
+        function selectedTimeUtcToLocal(selectedTime)
+        {
+            var x = new Date();
+            var today = moment(x.toISOString()).utc().format('DD-MMM-YYYY');
+
+            var currentTaskDate = moment(today+' '+selectedTime).format('DD-MMM-YYYY H:mm');
+            return convertTimeToLocal(currentTaskDate,'DD-MMM-YYYY H:mm',"H:mm");
+        }
+
+        function getReservationTransactionData(){
+            $scope.$emit('$preLoaderStart');
+            $http({
+                url : GURL + 'reservation_transaction',
+                method : "GET",
+                params :{
+                    resourceid : 6,
+                    date : '26 Mar 2015 12:27:00 PM',
+                    toEzeid : "krunalpaid"
+                }
+            }).success(function(resp){
+
+                    $scope.$emit('$preLoaderStop');
+                    if(resp.status){
+
+                        getFormatedTransactionData(resp);
+                    }
+                }).error(function(err){
+                    $scope.$emit('$preLoaderStop');
+                    Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
+                });
+        };
+
+        function getFormatedTransactionData(_data)
+        {
+            var formatedData = [];
+            var times = new Array
+                                (
+                                    selectedTimeUtcToLocal(_data.data[0]['W1']),
+                                    selectedTimeUtcToLocal(_data.data[0]['W2']),
+                                    selectedTimeUtcToLocal(_data.data[0]['W3']),
+                                    selectedTimeUtcToLocal(_data.data[0]['W4'])
+                                );
+
+            var reserved = new Array(   _data.data[0]['Starttime'],
+                                        _data.data[0]['endtime'],
+                                        _data.data[0]['reserverName'],
+                                        _data.data[0]['reserverId'],
+                                        _data.data[0]['service'],
+                                        _data.data[0]['Status']
+                                    );
+
+            formatedData['working'] = times;
+            formatedData['reserved'] = reserved;
+
+            console.log(formatedData);
+        };
+
+
+
+
     function resetResourceValue()
     {
         $scope.modalBox = {
