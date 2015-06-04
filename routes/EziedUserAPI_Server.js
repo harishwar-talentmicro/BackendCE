@@ -10944,7 +10944,7 @@ exports.FnGetReservResourceServiceMap = function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
-        var Token = req.query.Token;
+        var ezeid = req.query.ezeid;
         var responseMessage = {
             status: false,
             data: null,
@@ -10952,12 +10952,9 @@ exports.FnGetReservResourceServiceMap = function (req, res) {
             Message:''
         };
         
-        if (Token) {
-            FnValidateToken(Token, function (err, Result) {
-                if (!err) {
-                    if (Result != null) {
-
-                        db.query('CALL pGetResResourceServiceMap(' + db.escape(Token) + ')', function (err, GetResult) {
+        if (ezeid) {
+           
+                        db.query('CALL pGetResResourceServiceMap(' + db.escape(ezeid) + ')', function (err, GetResult) {
                             if (!err) {
                                 if (GetResult != null) {
                                     if (GetResult[0].length > 0) {
@@ -10995,28 +10992,15 @@ exports.FnGetReservResourceServiceMap = function (req, res) {
                                 res.status(500).json(responseMessage);
                             }
                         });
-                    }
-                    else {
-                        responseMessage.message = 'Invalid Token';
-                        responseMessage.error = {};
-                        res.status(401).json(responseMessage);
-                        console.log('FnGetReservResourceServiceMap: Invalid Token');
-                    }
-                } else {
-                    responseMessage.error = {};
-                    responseMessage.message = 'Error in validating token';
-                    res.status(500).json(responseMessage);
-                    console.log('FnGetReservResourceServiceMap: Error in validating token:  ' + err);
-                }
-            });
+                    
         }
         else {
-            if (!Token) {
-                responseMessage.message = 'Invalid Token';            
+            if (!ezeid) {
+                responseMessage.message = 'Invalid ezeid';            
                 responseMessage.error = {
-                    Token : 'Invalid Token'
+                    ezeid : 'Invalid ezeid'
                 };
-                console.log('FnGetReservResourceServiceMap: Token is mandatory field');
+                console.log('FnGetReservResourceServiceMap: ezeid is mandatory field');
             }
            
             res.status(401).json(responseMessage);
@@ -11369,17 +11353,16 @@ exports.FnSaveReservTask = function(req, res){
     }
 };
 
-//method to get reservation transaction
+//method to get reservation maped services
 exports.FnGetMapedServices = function (req, res) {
-    console.log('Reservation Resouce details');
+    
     try {
 
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
-        var Token = req.query.Token;
+        var ezeid = req.query.ezeid;
         var resourceid = req.query.resourceid;
-        var date = new Date(req.query.date);
 
         var responseMessage = {
             status: false,
@@ -11388,27 +11371,23 @@ exports.FnGetMapedServices = function (req, res) {
             Message:''
         };
         
-        if (Token) {
-            FnValidateToken(Token, function (err, Result) {
-                if (!err) {
-                    if (Result != null) {
-
-                        db.query('CALL pgetMapedservices(' + db.escape(Token) + ',' + db.escape(resourceid) + ')', function (err, GetResult) {
+        if (ezeid) {
+            db.query('CALL pgetMapedservices(' + db.escape(ezeid) + ',' + db.escape(resourceid) + ')', function (err, GetResult) {
                             if (!err) {
                                 if (GetResult != null) {
                                     if (GetResult[0].length > 0) {
                                         responseMessage.status = true;
                                         responseMessage.data = GetResult[0] ;
                                         responseMessage.error = null;
-                                        responseMessage.message = 'Resource Task details Send successfully';
-                                        console.log('FnGetMapedServices: Resource Task details Send successfully');
+                                        responseMessage.message = 'service Maped details Send successfully';
+                                        console.log('FnGetMapedServices: service Maped details Send successfully');
                                         res.status(200).json(responseMessage);
                                     }
                                     else {
                                         
                                         responseMessage.error = {};
-                                        responseMessage.message = 'No founded Resource Task details';
-                                        console.log('FnGetMapedServices: No founded Resource Task details');
+                                        responseMessage.message = 'No founded service Maped details';
+                                        console.log('FnGetMapedServices: No founded service Maped details');
                                         res.json(responseMessage);
                                     }
                                 }
@@ -11416,8 +11395,8 @@ exports.FnGetMapedServices = function (req, res) {
 
                                     
                                     responseMessage.error = {};
-                                    responseMessage.message = 'No founded Resource Task details';
-                                    console.log('FnGetMapedServices: No founded Resource Task details');
+                                    responseMessage.message = 'No founded service Maped details';
+                                    console.log('FnGetMapedServices: No founded service Maped details');
                                     res.json(responseMessage);
                                 }
 
@@ -11426,33 +11405,20 @@ exports.FnGetMapedServices = function (req, res) {
                                 
                                 responseMessage.data = null ;
                                 responseMessage.error = {};
-                                responseMessage.message = 'Error in getting Resource Task details';
-                                console.log('FnGetMapedServices: error in getting Resource Task details' + err);
+                                responseMessage.message = 'Error in getting service Maped details';
+                                console.log('FnGetMapedServices: error in getting service Maped details' + err);
                                 res.status(500).json(responseMessage);
                             }
                         });
-                    }
-                    else {
-                        responseMessage.message = 'Invalid Token';
-                        responseMessage.error = {};
-                        res.status(401).json(responseMessage);
-                        console.log('FnGetMapedServices: Invalid Token');
-                    }
-                } else {
-                    responseMessage.error = {};
-                    responseMessage.message = 'Error in validating token';
-                    res.status(500).json(responseMessage);
-                    console.log('FnGetMapedServices: Error in validating token:  ' + err);
-                }
-            });
+                    
         }
         else {
-            if (!Token) {
-                responseMessage.message = 'Invalid Token';            
+            if (!ezeid) {
+                responseMessage.message = 'Invalid ezeid';            
                 responseMessage.error = {
-                    Token : 'Invalid Token'
+                    ezeid : 'Invalid ezeid'
                 };
-                console.log('FnGetMapedServices: Token is mandatory field');
+                console.log('FnGetMapedServices: ezeid is mandatory field');
             }
            
             res.status(401).json(responseMessage);
@@ -11466,6 +11432,88 @@ exports.FnGetMapedServices = function (req, res) {
         res.status(400).json(responseMessage);
     }
 };
+
+//method to get reservation task
+exports.FnGetReservTask = function (req, res) {
+    
+    try {
+
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var resourceid = req.query.resourceid;
+        var date = new Date(req.query.date);
+        var toEzeid = req.query.toEzeid;
+
+        var responseMessage = {
+            status: false,
+            data: null,
+            error:{},
+            Message:''
+        };
+        
+        if (resourceid) {
+            db.query('CALL pGetResTrans(' + db.escape(resourceid) + ',' + db.escape(date) + ',' + db.escape(toEzeid) + ')', function (err, GetResult) {
+                            if (!err) {
+                                if (GetResult != null) {
+                                    if (GetResult[0].length > 0) {
+                                        responseMessage.status = true;
+                                        responseMessage.data = GetResult[0] ;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Reservation Task details Send successfully';
+                                        console.log('FnGetReservTask: service Maped details Send successfully');
+                                        res.status(200).json(responseMessage);
+                                    }
+                                    else {
+                                        
+                                        responseMessage.error = {};
+                                        responseMessage.message = 'No founded Reservation Task details';
+                                        console.log('FnGetReservTask: No founded Reservation Task details');
+                                        res.json(responseMessage);
+                                    }
+                                }
+                                else {
+
+                                    
+                                    responseMessage.error = {};
+                                    responseMessage.message = 'No founded Reservation Task details';
+                                    console.log('FnGetReservTask: No founded Reservation Task details');
+                                    res.json(responseMessage);
+                                }
+
+                            }
+                            else {
+                                
+                                responseMessage.data = null ;
+                                responseMessage.error = {};
+                                responseMessage.message = 'Error in getting Reservation Task details';
+                                console.log('FnGetReservTask: error in getting Reservation Task details' + err);
+                                res.status(500).json(responseMessage);
+                            }
+                        });
+                    }
+                    
+        else {
+            if (!resourceid) {
+                responseMessage.message = 'Invalid resourceid';            
+                responseMessage.error = {
+                    resourceid : 'Invalid resourceid'
+                };
+                console.log('FnGetReservTask: resourceid is mandatory field');
+            }
+           
+            res.status(401).json(responseMessage);
+        }
+    }
+     catch (ex) {
+        responseMessage.error = {};
+        responseMessage.message = 'An error occured !'
+        console.log('FnGetReservTask:error ' + ex.description);
+        throw new Error(ex);
+        res.status(400).json(responseMessage);
+    }
+};
+
 
 
 //EZEIDAP Parts
