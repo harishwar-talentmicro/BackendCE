@@ -10553,7 +10553,7 @@ exports.FnGetReservationResource = function (req, res) {
             status: false,
             data: null,
             error:{},
-            Message:''
+            message:''
         };
         
         if (ezeid) {
@@ -10873,7 +10873,7 @@ exports.FnGetReservationService = function (req, res) {
             status: false,
             data: null,
             error:{},
-            Message:''
+            message:''
         };
         
         if (ezeid) {
@@ -11368,7 +11368,7 @@ exports.FnGetMapedServices = function (req, res) {
             status: false,
             data: null,
             error:{},
-            Message:''
+            message:''
         };
         
         if (ezeid) {
@@ -11449,7 +11449,7 @@ exports.FnGetReservTask = function (req, res) {
             status: false,
             data: null,
             error:{},
-            Message:''
+            message:''
         };
         
         if (resourceid) {
@@ -11461,7 +11461,7 @@ exports.FnGetReservTask = function (req, res) {
                                         responseMessage.data = GetResult[0] ;
                                         responseMessage.error = null;
                                         responseMessage.message = 'Reservation Task details Send successfully';
-                                        console.log('FnGetReservTask: service Maped details Send successfully');
+                                        console.log('FnGetReservTask: Reservation Task details Send successfully');
                                         res.status(200).json(responseMessage);
                                     }
                                     else {
