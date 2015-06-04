@@ -29,7 +29,6 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',[
 
     resetResourceValue();
     getUserDetails();
-   // getAllResources();
 
     function resetResourceValue()
     {
@@ -419,9 +418,6 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',[
                 $scope.$emit('$preLoaderStop');
                 if(resp.status){
                     var mappingData = resp.data;
-
-                    console.log(mappingData);
-
                     var nCount, nServicCount;
                     for (nCount = 0; nCount < mappingData.length; nCount++)
                     {
@@ -482,5 +478,4 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',[
     };
 
 
-
-}]);
+    }]);
