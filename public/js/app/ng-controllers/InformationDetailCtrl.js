@@ -172,19 +172,9 @@ angular.module('ezeidApp').
                 url: GURL + 'ewtGetSearchInformation?Token=' + $rootScope._userInfo.Token + '&TID=' + _TID + '&SearchType=' + _SearchType + '&CurrentDate=' + currentDate}).success(function (data) {
 
                 $rootScope.$broadcast('$preLoaderStop');
-
-                //console.log(data);
-
                 if (data && data != 'null')
                 {
-                  //  $scope.showDetailsModal = true;
-                  /*  $scope.$watch('showDetailsModal',function(newVal,oldVal){
-                        if(!newVal){
-                            $window.history.back();
-                        }
-                    });*/
-
-                    $timeout(function () {
+                  $timeout(function () {
                         $scope.SearchInfo = data[0];
                         $scope.showDetailsModal = true;
                         $scope.$watch('showDetailsModal',function(newVal,oldVal){
@@ -204,8 +194,6 @@ angular.module('ezeidApp').
                         {
                             $scope.showNoticeText = false;
                         }
-
-                        console.log($scope.SearchInfo.VisibleModules);
 
                         $scope.showSalesEnquiry = $scope.SearchInfo.VisibleModules[0];
                         $scope.shoReserVation = $scope.SearchInfo.VisibleModules[1];
@@ -357,8 +345,6 @@ angular.module('ezeidApp').
                 }
             };
 
-
-
             $scope.sendSalesEnquiry = function () {
                 if ($rootScope._userInfo.IsAuthenticate == true) {
                     var currentTaskDate = moment().format('DD-MMM-YYYY hh:mm A');
@@ -437,11 +423,8 @@ angular.module('ezeidApp').
                 }
                 else
                 {
-                    var params = '?EZEID='+_Ezeid;
-                        console.log(_Ezeid);
-                         //$location.url('/service-reservation'+params);
-                        //  $location.url('/service-reservation');
-                        // $('#Reservation_popup').slideDown();
+                    var params = '?ezeid='+_Ezeid;
+                    $location.url('/service-reservation'+params);
                 }
             };
 
@@ -581,7 +564,6 @@ angular.module('ezeidApp').
 
         $scope.getdirections = function (data) {
 
-            //console.log(data);
             $scope.activeTemplate = "html/mapPopView.html";
             $scope.showMapPopupModel = true;
 
