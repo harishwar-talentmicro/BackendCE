@@ -99,6 +99,9 @@ var res = angular.module('ezeidApp').
                 [selfReservedColor,'Your Appointment'],
             ];
 
+            /* Flag status for opening or close modal box */
+            $scope.modalVisible = false;
+
             ///////////////////////////////////////GET DEFAULT CALENDAR/////////////////////////////////////////////////
             $scope.searchedEzeid = 'krunalpaid';
 
@@ -268,7 +271,8 @@ var res = angular.module('ezeidApp').
                     var endRange = data[1] - 1;//As we don't want last block to be filled
 
                     /* color all the blocks */
-                    $scope.colorBlocks(startRange, endRange, availabilityColor);
+                    var addCss = 'available';
+                    $scope.colorBlocks(startRange, endRange, availabilityColor, addCss);
                 }
             };
 
@@ -378,14 +382,19 @@ var res = angular.module('ezeidApp').
             };
 
             /* Color the blocks */
-            $scope.colorBlocks = function (startBlock, endBlock, color) {
-                for (var j = startBlock; j <= endBlock; j++) {
-                    $('.block-' + j).css('background-color', color);
+                $scope.colorBlocks = function (startBlock, endBlock, color, addCss) {
+                    var css = '';
+                    if(typeof(addCss) != 'undefined')
+                    {
+                        css = addCss;
+                    }
+                    for (var j = startBlock; j <= endBlock; j++) {
+                        $('.block-' + j).css('background-color', color).addClass(css);
+                    }
                 }
-            }
 
-            var getRandomNumber = function (len) {
-                return Math.floor(Math.random() * len);
+                var getRandomNumber = function (len) {
+                    return Math.floor(Math.random() * len);
             };
 
             /* select random color */
@@ -464,8 +473,47 @@ var res = angular.module('ezeidApp').
             {
                 /* check if the block is already reserved */
                 var isReserved = $('.block-'+blockId).hasClass('reserved');
+                var isAvailable = $('.block-'+blockId).hasClass('available');
+                changeModalTitle(isReserved);
+                /* show error if the working hour is not in working hour */
+                if(isReserved || isAvailable)
+                {
+                    $scope.modalVisibility();
+                }
+                else
+                {
+                    Notification.error({ message: "You can't make a reservation in non-working hours", delay: MsgDelay });
+                }
 
             }
+
+            /**
+             * Change modal box Title
+             */
+            function changeModalTitle(isReserved)
+            {
+                if(!isReserved)
+                {
+                    $scope.modal.title = 'Make a reservation';
+                }
+                else
+                {
+                    $scope.modal.title = 'Edit reservation';
+                }
+            }
+
+            /**
+             * Modal box to make a reservation
+             */
+            $scope.modal = {
+                title: 'Make a reservation',
+                class: 'business-manager-modal'
+            };
+
+            /* toggle modal visibility */
+            $scope.modalVisibility = function () {
+                $scope.modalVisible = !$scope.modalVisible;
+            };
 
             /* hide the glyphicon */
             $('.input-group-addon').addClass('hidden');
