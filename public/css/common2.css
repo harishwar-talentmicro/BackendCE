@@ -1896,3 +1896,9 @@ margin-bottom: 10px;
     padding-bottom: 5px;
     text-align: center;
 }
+
+.rw .reservation-form p
+{
+    font-size: larger;
+    padding-top: 4px;
+}

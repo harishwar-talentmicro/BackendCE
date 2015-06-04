@@ -69,7 +69,7 @@ var res = angular.module('ezeidApp').
                 [960, 1200]
             ];
 
-            /* Reserved hours *///[Start Minute, End Minute, Reserver Name, Reserver ID, services]
+            /* Reserved hours *///[Start Minute, End Minute, Reserver Name, Reserver ID, services, status]
             $scope.reservedTime = [
                 [550, 600, 'sandeep',3,'service1'],
                 [700, 810, 'rahul',12,'service2'],
@@ -140,20 +140,21 @@ var res = angular.module('ezeidApp').
             {
                 var tempArr = [];
                 $scope.resources = [];
-                for(var i = 0;i < array[0].length; i++)
+                for(var obj in array)
                 {
                     if($scope.activeResourceId == '')
                     {
-                        $scope.activeResourceId = array[0][i].tid;
+                        $scope.activeResourceId = array[obj].tid;
                     }
                     tempArr =
-                        {
-                            'tid' : array[0][i].tid,
-                            'title' : array[0][i].title,
-                            'status' : array[0][i].status,
-                            'description':array[0][i].description
-                        };
+                    {
+                        'tid' : array[obj].tid,
+                        'title' : array[obj].title,
+                        'status' : array[obj].status,
+                        'description':array[obj].description
+                    };
                     $scope.resources.push(tempArr);
+
                 }
             }
 
