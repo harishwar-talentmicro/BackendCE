@@ -416,8 +416,7 @@ angular.module('ezeidApp').
         //open Reservation form
         $scope.openReservationForm = function (_Ezeid)
         {
-            document.getElementById("reservationMessage").className = "form-control fixTextArea emptyBox";
-            if($rootScope._userInfo.Token == 2)
+           if($rootScope._userInfo.Token == 2)
             {
                 $('#SignIn_popup').slideDown();
             }

@@ -413,12 +413,15 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',[
             url : GURL + 'reservation_resource_service_map',
             method : "GET",
             params :{
-                Token : $rootScope._userInfo.Token
+                ezeid : $scope.masterUser.EZEID
             }
         }).success(function(resp){
                 $scope.$emit('$preLoaderStop');
                 if(resp.status){
                     var mappingData = resp.data;
+
+                    console.log(mappingData);
+
                     var nCount, nServicCount;
                     for (nCount = 0; nCount < mappingData.length; nCount++)
                     {
