@@ -11369,7 +11369,7 @@ exports.FnSaveReservTask = function(req, res){
     }
 };
 
-//method to get reservation transaction
+//method to get reservation maped services
 exports.FnGetMapedServices = function (req, res) {
     
     try {
@@ -11377,7 +11377,7 @@ exports.FnGetMapedServices = function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
-        var Token = req.query.Token;
+        var ezeid = req.query.ezeid;
         var resourceid = req.query.resourceid;
 
         var responseMessage = {
@@ -11387,12 +11387,8 @@ exports.FnGetMapedServices = function (req, res) {
             Message:''
         };
         
-        if (Token) {
-            FnValidateToken(Token, function (err, Result) {
-                if (!err) {
-                    if (Result != null) {
-
-                        db.query('CALL pgetMapedservices(' + db.escape(Token) + ',' + db.escape(resourceid) + ')', function (err, GetResult) {
+        if (ezeid) {
+            db.query('CALL pgetMapedservices(' + db.escape(ezeid) + ',' + db.escape(resourceid) + ')', function (err, GetResult) {
                             if (!err) {
                                 if (GetResult != null) {
                                     if (GetResult[0].length > 0) {
@@ -11430,28 +11426,15 @@ exports.FnGetMapedServices = function (req, res) {
                                 res.status(500).json(responseMessage);
                             }
                         });
-                    }
-                    else {
-                        responseMessage.message = 'Invalid Token';
-                        responseMessage.error = {};
-                        res.status(401).json(responseMessage);
-                        console.log('FnGetMapedServices: Invalid Token');
-                    }
-                } else {
-                    responseMessage.error = {};
-                    responseMessage.message = 'Error in validating token';
-                    res.status(500).json(responseMessage);
-                    console.log('FnGetMapedServices: Error in validating token:  ' + err);
-                }
-            });
+                    
         }
         else {
-            if (!Token) {
-                responseMessage.message = 'Invalid Token';            
+            if (!ezeid) {
+                responseMessage.message = 'Invalid ezeid';            
                 responseMessage.error = {
-                    Token : 'Invalid Token'
+                    ezeid : 'Invalid ezeid'
                 };
-                console.log('FnGetMapedServices: Token is mandatory field');
+                console.log('FnGetMapedServices: ezeid is mandatory field');
             }
            
             res.status(401).json(responseMessage);
@@ -11475,7 +11458,7 @@ exports.FnGetReservTask = function (req, res) {
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
         var resourceid = req.query.resourceid;
-        var date = new Date(req.query.Token);
+        var date = new Date(req.query.date);
         var toEzeid = req.query.toEzeid;
 
         var responseMessage = {
@@ -11546,8 +11529,6 @@ exports.FnGetReservTask = function (req, res) {
         res.status(400).json(responseMessage);
     }
 };
-
-
 
 
 
