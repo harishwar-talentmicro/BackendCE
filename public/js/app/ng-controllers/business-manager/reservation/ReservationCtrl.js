@@ -378,8 +378,8 @@ var res = angular.module('ezeidApp').
                     );
 
                     reserved[nCount] = new Array(
-                        _data.data[nCount]['Starttime'],
-                        _data.data[nCount]['endtime'],
+                        convertHoursToMinutes(_data.data[nCount]['Starttime']),
+                        convertHoursToMinutes(_data.data[nCount]['endtime']),
                         _data.data[nCount]['reserverName'],
                         _data.data[nCount]['reserverId'],
                         _data.data[nCount]['service'],
@@ -389,17 +389,36 @@ var res = angular.module('ezeidApp').
                     formatedData['working'] = times;
                     formatedData['reserved'] = reserved;
                 }
-                console.log(formatedData);
-
 
                 /* put the formatted service in the scope variables */
                 $scope.workingHrs = [
                     [convertHoursToMinutes(formatedData['working'][0]), convertHoursToMinutes(formatedData['working'][1])],
                     [convertHoursToMinutes(formatedData['working'][2]), convertHoursToMinutes(formatedData['working'][3])]
                 ];
-                /* color working hours */
+
+                /* put reserver data scope */
+                $scope.reservedTime = [
+                    [550, 600, 'sandeep',3,'service1'],
+                    [700, 810, 'rahul',12,'service2'],
+                    [1000, 1140, 'shrey',5,'service3']
+                ];
+                $scope.reservedTime = [];
+                for(var i = 0;i< formatedData['reserved'].length; i++)
+                {
+                    $scope.reservedTime.push(formatedData['reserved'][i]);
+                }
+
+                /* reload calendar */
 
             };
+
+            function reloadWorkingHours()
+            {
+                /* clean reserved slot */
+
+                /* reload reserved slot */
+                $scope.alreadyReserveSlot();
+            }
 
 
 
@@ -527,6 +546,7 @@ var res = angular.module('ezeidApp').
              * 2b...Call mergeBlockMaster to merge and also write text
              */
             $scope.alreadyReserveSlot = function () {
+                console.log($scope.reservedTime);
                 for (var i = 0; i < $scope.reservedTime.length; i++) {
                     /* get blocks coming under this range */
                     var data = getBlockRange($scope.reservedTime[i][0], $scope.reservedTime[i][1]);
