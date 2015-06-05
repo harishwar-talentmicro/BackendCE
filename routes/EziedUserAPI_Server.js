@@ -11400,7 +11400,7 @@ exports.FnSearchBusListing = function(req,res,next){
 };
 
 //method to save reservation transaction
-exports.FnSaveReservTask = function(req, res){
+exports.FnSaveReservTransaction = function(req, res){
     try{
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
