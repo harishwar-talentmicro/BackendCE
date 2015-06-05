@@ -385,12 +385,13 @@ var res = angular.module('ezeidApp').
 
                 formatedData['working'] = times;
                 formatedData['reserved'] = reserved;
-
                 /* put the formatted service in the scope variables */
                 $scope.workingHrs = [
                     [convertHoursToMinutes(formatedData['working'][0]), convertHoursToMinutes(formatedData['working'][1])],
                     [convertHoursToMinutes(formatedData['working'][2]), convertHoursToMinutes(formatedData['working'][3])]
                 ];
+                /* color working hours */
+
             };
 
 
@@ -491,6 +492,10 @@ var res = angular.module('ezeidApp').
             /* color working hours */
             $scope.colorWorkingHours = function () {
                 var workingHrs = $scope.workingHrs;
+
+                /* clean the calendar's working hour */
+                $('.available').removeAttr('style').removeClass('available');
+
                 /* traverse through the individual time slot and color them */
                 for (var i = 0; i < workingHrs.length; i++) {
                     var startTimeMins = workingHrs[i][0];
@@ -830,7 +835,7 @@ var res = angular.module('ezeidApp').
                 var tid = $scope.activeResourceId;
                 var date = $scope.activeDate;
                 /* http request for getting the new calendar data */
-
+                getReservationTransactionData($scope.activeResourceId,$scope.activeDate,$scope.searchedEzeid);
             }
 
             /**
@@ -878,13 +883,15 @@ var res = angular.module('ezeidApp').
                         res_datetime:convertTimeToUTC(makeDateTime,'DD-MMM-YYYY hh:mm'),
                         duration:$scope.duration,
                         status:0,
-                        serviceid:$('#service').val()
+                        serviceid:$('#service').val()+','
                     }
                 }).success(function(resp){
-                    console.log(resp);
                     $scope.$emit('$preLoaderStop');
                     if(resp.status){
-
+                        Notification.success({ message: "Reservation made successfully", delay: MsgDelay });
+                        /* reset service select option */
+                        /* close modal box */
+                        /* reload calendar */
                     }
                     else
                     {
