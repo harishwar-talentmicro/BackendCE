@@ -376,14 +376,14 @@ var res = angular.module('ezeidApp').
                         selectedTimeUtcToLocal(_data.data[nCount]['W3']),
                         selectedTimeUtcToLocal(_data.data[nCount]['W4'])
                     );
-
                     reserved[nCount] = new Array(
                         convertHoursToMinutes(_data.data[nCount]['Starttime']),
                         convertHoursToMinutes(_data.data[nCount]['endtime']),
                         _data.data[nCount]['reserverName'],
                         _data.data[nCount]['reserverId'],
                         _data.data[nCount]['service'],
-                        _data.data[nCount]['Status']
+                        _data.data[nCount]['Status'],
+                        _data.data[nCount]['TID']
                     );
 
                     formatedData['working'] = times;
@@ -409,7 +409,7 @@ var res = angular.module('ezeidApp').
                 }
 
                 /* reload calendar */
-
+                console.log(_data.data);
             };
 
             function reloadWorkingHours()
@@ -554,10 +554,10 @@ var res = angular.module('ezeidApp').
                     var text = $scope.getReservedBlockText($scope.loggedInUid,$scope.reservedTime[i][3],$scope.reservedTime[i][2]);
                     var color = $scope.getReservedBlockColor($scope.loggedInUid,$scope.reservedTime[i][3]);
 
-                    // [1000, 1140, 'shrey',5,'service3']
                     var title = $scope.getTitleText($scope.loggedInUid,$scope.reservedTime[i][3],$scope.reservedTime[i][2]
                         ,$scope.reservedTime[i][0],$scope.reservedTime[i][1],$scope.reservedTime[i][4]);
-                    $scope.mergeBlockMaster(data[0], data[1], text, $scope.height,color,title);
+                    var tid = $scope.reservedTime[i][6];
+                    $scope.mergeBlockMaster(data[0], data[1], text, $scope.height,color,title,tid);
                     /* color the block */
                 }
             };
@@ -569,7 +569,7 @@ var res = angular.module('ezeidApp').
              * ->hide all the other blocks in the range
              * ->write text
              */
-            $scope.mergeBlockMaster = function (startBlock, endBlock, text, height,color,title) {
+            $scope.mergeBlockMaster = function (startBlock, endBlock, text, height,color,title,tid) {
                 var realRange = refineRange(startBlock, endBlock);
                 for (var i = 0; i < realRange.length; i++) {
                     var startRange = realRange[i][0];
@@ -579,7 +579,7 @@ var res = angular.module('ezeidApp').
                     /* commence merging process */
                     $scope.colorBlocks(startRange, endRange, color);
                     /* add a flag to the first block for making it reserved */
-                    $('.block-'+startRange).addClass('reserved').attr('title',title);
+                    $('.block-'+startRange).addClass('reserved').attr('title',title).attr('data-tid',tid);
                 }
             }
 
@@ -754,6 +754,12 @@ var res = angular.module('ezeidApp').
                 var isReserved = $('.block-'+blockId).hasClass('reserved');
                 var isAvailable = $('.block-'+blockId).hasClass('available');
                 changeModalTitle(isReserved);
+
+                /* get TID and fetch the data for this reservation */
+                var tid = $('.block-'+blockId).data('tid');
+                getReservationData(tid);
+
+
                 /* show error if the working hour is not in working hour */
                 if(isReserved || isAvailable)
                 {
@@ -781,6 +787,28 @@ var res = angular.module('ezeidApp').
                 {
                     Notification.error({ message: "You can't make a reservation in non-working hours", delay: MsgDelay });
                 }
+            }
+
+            /**
+             * get reservation data
+             */
+            function getReservationData(tid)
+            {
+                $scope.$emit('$preLoaderStart');
+                $http({
+                    url : GURL + 'reservation_trans_details',
+                    method : "GET",
+                    params :{
+                        TID : tid
+                    }
+                }).success(function(resp){
+
+                    $scope.$emit('$preLoaderStop');
+                    console.log(resp.data);
+                }).error(function(err){
+                    $scope.$emit('$preLoaderStop');
+                    Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
+                });
             }
 
             /**
