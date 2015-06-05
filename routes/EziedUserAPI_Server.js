@@ -3148,7 +3148,7 @@ exports.FnSaveCVInfo = function (req, res) {
                                          
                                          else
                                          {
-                                             var query = db.query("UPDATE tskills set ? WHERE TID = ? ",[skills,skillDetails.TID], function (err, result) {
+                                             var query = db.query('UPDATE tskills set skillID='+resultvalue+',expertlevel='+db.escape(skills.expertiseLevel)+',expyrs='+db.escape(skills.exp)+',skillstatusid='+db.escape(skills.active)+',cvid='+db.escape(skills.cvid)+'  WHERE TID =' + tid + ' ', function (err, result) {
                                             
                                             console.log(result);
                                             if (!err) {
@@ -3227,10 +3227,12 @@ exports.FnGetCVInfo = function (req, res) {
                     if (Result != null) {
                         db.query('CALL pgetCVInfo(' + db.escape(Token) + ')', function (err, MessagesResult) {
                             if (!err) {
-                                //  console.log(MessagesResult);
+                                console.log(MessagesResult);
+                                
                                 if (MessagesResult[0] != null) {
                                     if (MessagesResult[0].length > 0) {
-                                        res.send(MessagesResult[0]);
+                                        
+                                        res.send(MessagesResult[1]);
                                         console.log('FnGetCVInfo: CV Info sent successfully');
                                     }
                                     else {
@@ -11412,6 +11414,13 @@ exports.FnSaveReservTask = function(req, res){
         var duration = req.body.duration;
         var status = req.body.status;
         var serviceid = req.body.serviceid;
+        var ID=''
+        if(serviceid){
+            ID = serviceid + ',' + ID;
+            serviceid =ID.slice(0,-1);
+            console.log(serviceid);
+            }
+        
         
         var responseMessage = {
             status: false,
@@ -11453,13 +11462,7 @@ exports.FnSaveReservTask = function(req, res){
             FnValidateToken(Token, function (err, result) {
                 if (!err) {
                     if (result != null) {
-                        if (serviceid.endsWith(","))
-                        {
-                            serviceid=serviceid;
-                        }
-                        else{
-                            serviceid=serviceid+",";
-                        }
+                        
                         var query = db.escape(TID) + ',' + db.escape(Token) + ',' + db.escape(contactinfo) + ',' + db.escape(toEzeid) + ',' + db.escape(resourceid) + ',' + db.escape(res_datetime) + ',' + db.escape(duration) + ',' + db.escape(status) + ',' + db.escape(serviceid);
                          console.log(query);
                         db.query('CALL pSaveResTrans(' + query + ')', function (err, insertResult) {
