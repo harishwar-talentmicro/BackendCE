@@ -326,6 +326,16 @@ var res = angular.module('ezeidApp').
                 return defer.promise;
             };
 
+            /**
+             * Function for converting LOCAL time (local timezone) to server time
+             */
+            var convertTimeToUTC = function(localTime,dateFormat){
+                if(!dateFormat){
+                    dateFormat = 'DD-MMM-YYYY hh:mm A';
+                }
+                return moment(localTime).utc().format(dateFormat);
+            };
+
 
             /**
              * Function for converting UTC time from server to LOCAL timezone
@@ -375,6 +385,7 @@ var res = angular.module('ezeidApp').
 
                 formatedData['working'] = times;
                 formatedData['reserved'] = reserved;
+
                 /* put the formatted service in the scope variables */
                 $scope.workingHrs = [
                     [convertHoursToMinutes(formatedData['working'][0]), convertHoursToMinutes(formatedData['working'][1])],
@@ -854,6 +865,7 @@ var res = angular.module('ezeidApp').
             $scope.saveReservation = function()
             {
                 var makeDateTime = $scope.activeDate+' '+$scope.startTime;
+
                 $http({
                     url : GURL + 'reservation_transaction',
                     method : "POST",
@@ -863,7 +875,7 @@ var res = angular.module('ezeidApp').
                         contactinfo:$('#userMobile').val(),
                         toEzeid:$scope.searchedEzeid,
                         resourceid:$scope.activeResourceId,
-                        res_datetime:makeDateTime,
+                        res_datetime:convertTimeToUTC(makeDateTime,'DD-MMM-YYYY hh:mm'),
                         duration:$scope.duration,
                         status:0,
                         serviceid:$('#service').val()
