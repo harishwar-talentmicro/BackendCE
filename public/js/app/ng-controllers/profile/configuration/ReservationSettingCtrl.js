@@ -64,14 +64,14 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',[
                 method : "GET",
                 params :{
                     resourceid : 6,
-                    date : '26 Mar 2015 12:27:00 PM',
+                    date : '05 Jun 2015 09:42:00 AM',
                     toEzeid : "krunalpaid"
                 }
             }).success(function(resp){
 
                     $scope.$emit('$preLoaderStop');
                     if(resp.status){
-
+                        //  set formated result for reservation listing
                         getFormatedTransactionData(resp);
                     }
                 }).error(function(err){
@@ -82,6 +82,7 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',[
 
         function getFormatedTransactionData(_data)
         {
+            console.log(_data);
             var formatedData = [];
             var times = new Array
                                 (
@@ -101,8 +102,10 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',[
 
             formatedData['working'] = times;
             formatedData['reserved'] = reserved;
-
             console.log(formatedData);
+            console.log("Sai");
+            console.log(formatedData['working']);
+            return formatedData;
         };
 
 
