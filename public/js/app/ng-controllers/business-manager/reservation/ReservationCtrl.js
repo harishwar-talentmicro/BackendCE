@@ -857,7 +857,7 @@ var res = angular.module('ezeidApp').
                 $http({
                     url : GURL + 'reservation_transaction',
                     method : "POST",
-                    params :{
+                    data :{
                         Token:$rootScope._userInfo.Token,
                         TID:0,
                         contactinfo:$('#userMobile').val(),
