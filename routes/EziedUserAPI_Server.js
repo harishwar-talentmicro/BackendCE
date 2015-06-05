@@ -3061,6 +3061,7 @@ exports.FnSaveCVInfo = function (req, res) {
         var skillMatrix = req.body.skillMatrix;
         var resultvalue;
         skillMatrix = JSON.parse(skillMatrix);
+        console.log(skillMatrix);
         
         var RtnMessage = {
             IsSuccessfull: false
@@ -3095,11 +3096,11 @@ exports.FnSaveCVInfo = function (req, res) {
                                                 skillname: skillDetails.skillname,
                                                 expertiseLevel: skillDetails.expertiseLevel,
                                                 exp: skillDetails.exp,
-                                                active: skillDetails.active,
+                                                active_status: skillDetails.active_status,
                                                 cvid : InsertResult[0][0].ID
                                                 
                                             };
-                                
+                                console.log(skills);
                                      var query1 = db.query('Select SkillID from mskill where SkillTitle like ' + db.escape(skills.skillname),function (err, result1){
                                  
                                          if(result1[0] == null){
@@ -3124,9 +3125,9 @@ exports.FnSaveCVInfo = function (req, res) {
                                          }
                                     
                                 if(tid == 0){
-                                    
-                                            var query = db.query('INSERT INTO tskills(skillID,expertlevel,expyrs,skillstatusid, cvid) values ('+resultvalue+','+db.escape(skills.expertiseLevel)+','+db.escape(skills.exp)+','+db.escape(skills.active)+','+db.escape(skills.cvid)+' )',function (err, result) {
-                                                //console.log(err);
+                                    console.log('INSERT INTO tskills(skillID,expertlevel,expyrs,skillstatusid, cvid) values ('+resultvalue+','+db.escape(skills.expertiseLevel)+','+db.escape(skills.exp)+','+db.escape(skills.active_status)+','+db.escape(skills.cvid)+' )');
+                                            var query = db.query('INSERT INTO tskills(skillID,expertlevel,expyrs,skillstatusid, cvid) values ('+resultvalue+','+db.escape(skills.expertiseLevel)+','+db.escape(skills.exp)+','+db.escape(skills.active_status)+','+db.escape(skills.cvid)+' )',function (err, result) {
+                                                console.log(err);
                                                 if (!err) {
                                                     if (result != null) {
                                                         if (result.affectedRows > 0) {
@@ -3148,7 +3149,7 @@ exports.FnSaveCVInfo = function (req, res) {
                                          
                                          else
                                          {
-                                             var query = db.query('UPDATE tskills set skillID='+resultvalue+',expertlevel='+db.escape(skills.expertiseLevel)+',expyrs='+db.escape(skills.exp)+',skillstatusid='+db.escape(skills.active)+',cvid='+db.escape(skills.cvid)+'  WHERE TID =' + tid + ' ', function (err, result) {
+                                             var query = db.query('UPDATE tskills set skillID='+resultvalue+',expertlevel='+db.escape(skills.expertiseLevel)+',expyrs='+db.escape(skills.exp)+',skillstatusid='+db.escape(skills.active_status)+',cvid='+db.escape(skills.cvid)+'  WHERE TID =' + tid + ' ', function (err, result) {
                                             
                                             console.log(result);
                                             if (!err) {
@@ -3220,6 +3221,14 @@ exports.FnGetCVInfo = function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         var Token = req.query.TokenNo;
+            
+            var responseMessage = {
+            status: false,
+            data: null,
+            skillMatrix : null,
+            error:{},
+            message:''
+        };
 
         if (Token != null) {
             FnValidateToken(Token, function (err, Result) {
@@ -3232,49 +3241,57 @@ exports.FnGetCVInfo = function (req, res) {
                                 if (MessagesResult[0] != null) {
                                     if (MessagesResult[0].length > 0) {
                                         
-                                        res.send(MessagesResult[1]);
+                                        responseMessage.status = true;
+                                        responseMessage.data = MessagesResult[0];
+                                        responseMessage.skillMatrix = MessagesResult[1];
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Cv info send successfully';
+                                        res.status(200).json(responseMessage);
                                         console.log('FnGetCVInfo: CV Info sent successfully');
                                     }
                                     else {
                                         console.log('FnGetCVInfo: No CV Info  available');
-                                        res.send('null');
+                                        responseMessage.message = 'Cv info not send successfully';
+                                        res.json(responseMessage);
                                     }
                                 }
                                 else {
                                     console.log('FnGetCVInfo: No CV Info  available');
-                                    res.send('null');
+                                    responseMessage.message = 'Cv info not send successfully';
+                                        res.json(responseMessage);
                                 }
                             }
                             else {
                                 console.log('FnGetCVInfo: Error in sending Messages: ' + err);
-                                res.statusCode = 500;
-                                res.send('null');
+                                responseMessage.message = 'Error in sending CV info';
+                                        res.status(500).json(responseMessage);
                             }
                         });
                     }
                     else {
                         console.log('FnGetCVInfo: Invalid Token');
-                        res.statusCode = 401;
-                        res.send('null');
+                        responseMessage.message = 'invalid token';
+                                        res.status(401).json(responseMessage);
                     }
                 }
                 else {
                     console.log('FnGetCVInfo: Token error: ' + err);
-                    res.statusCode = 500;
-                    res.send('null');
+                    responseMessage.message = 'error in validating token';
+                                        res.status(500).json(responseMessage);
                 }
             });
         }
         else {
 
             console.log('FnGetCVInfo: Token is empty');
-            res.statusCode = 400;
-            res.send('null');
+            responseMessage.message = 'Token is empty';
+                                        res.status(400).json(responseMessage);
         }
     }
     catch (ex) {
         console.log('FnGetCVInfo error:' + ex.description);
         throw new Error(ex);
+        res.status(400).json(responseMessage);
     }
 };
 
@@ -11433,11 +11450,6 @@ exports.FnSaveReservTransaction = function(req, res){
         };
         var validateStatus = true;
         
-        if(!TID){
-            responseMessage.error['TID'] = 'Invalid TID';
-            validateStatus *= false;
-        }
-        
         if(!toEzeid){
             responseMessage.error['toEzeid'] = 'Invalid toEzeid';
             validateStatus *= false;
@@ -11641,6 +11653,7 @@ exports.FnGetReservTask = function (req, res) {
         };
         
         if (resourceid) {
+            console.log('CALL pGetResTrans(' + db.escape(resourceid) + ',' + db.escape(date) + ',' + db.escape(toEzeid) + ')');
             db.query('CALL pGetResTrans(' + db.escape(resourceid) + ',' + db.escape(date) + ',' + db.escape(toEzeid) + ')', function (err, GetResult) {
                             if (!err) {
                                 if (GetResult != null) {
