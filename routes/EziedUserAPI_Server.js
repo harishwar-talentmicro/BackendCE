@@ -11399,8 +11399,9 @@ exports.FnSearchBusListing = function(req,res,next){
     }
 };
 
+
 //method to save reservation transaction
-exports.FnSaveReservTask = function(req, res){
+exports.FnSaveReservTransaction = function(req, res){
     try{
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -11414,13 +11415,15 @@ exports.FnSaveReservTask = function(req, res){
         var duration = req.body.duration;
         var status = req.body.status;
         var serviceid = req.body.serviceid;
-        var ID=''
+		
+		var ID=''
         if(serviceid){
             ID = serviceid + ',' + ID;
             serviceid =ID.slice(0,-1);
             console.log(serviceid);
             }
         
+		
         
         var responseMessage = {
             status: false,
@@ -11452,7 +11455,7 @@ exports.FnSaveReservTask = function(req, res){
         
         
         if(!validateStatus){
-            console.log('FnSaveReservTask  error : ' + JSON.stringify(responseMessage.error));
+            console.log('FnSaveReservTransaction  error : ' + JSON.stringify(responseMessage.error));
             responseMessage.message = 'Unable to save resource transaction ! Please check the errors';
             res.status(200).json(responseMessage);
             return;
@@ -11462,9 +11465,11 @@ exports.FnSaveReservTask = function(req, res){
             FnValidateToken(Token, function (err, result) {
                 if (!err) {
                     if (result != null) {
-                        
+
                         var query = db.escape(TID) + ',' + db.escape(Token) + ',' + db.escape(contactinfo) + ',' + db.escape(toEzeid) + ',' + db.escape(resourceid) + ',' + db.escape(res_datetime) + ',' + db.escape(duration) + ',' + db.escape(status) + ',' + db.escape(serviceid);
-                         console.log(query);
+						console.log(query);
+						console.log('CALL pSaveResTrans(' + query + ')');
+						
                         db.query('CALL pSaveResTrans(' + query + ')', function (err, insertResult) {
                             console.log(insertResult);
                             console.log(err);
@@ -11472,20 +11477,20 @@ exports.FnSaveReservTask = function(req, res){
                                 if (insertResult.affectedRows > 0) {
                                     responseMessage.status = true;
                                     responseMessage.error = null;
-                                    responseMessage.message = 'Resource Task details save successfully';
+                                    responseMessage.message = 'Resource Transaction details save successfully';
                                     responseMessage.data = {
                                         resourceid : req.body.resourceid,
-                                        serviceids : serviceid
+                                        serviceid : serviceid
                                     };
                                     res.status(200).json(responseMessage);
-                                    console.log('FnSaveReservTask: Resource Task details save successfully');
+                                    console.log('FnSaveReservTransaction: Resource Transaction details save successfully');
                                     
                                 }
                                 else {
                                     responseMessage.message = insertResult[0][0];
                                     responseMessage.error = {};
                                     res.status(400).json(responseMessage);
-                                    console.log('FnSaveReservTask:No save Resource Task details');
+                                    console.log('FnSaveReservTransaction:No save Resource Transaction details');
                                 }
                             }
 
@@ -11493,7 +11498,7 @@ exports.FnSaveReservTask = function(req, res){
                                 responseMessage.message = 'An error occured ! Please try again';
                                 responseMessage.error = {};
                                 res.status(500).json(responseMessage);
-                                console.log('FnSaveReservTask: error in saving Resource Transaction details:' + err);
+                                console.log('FnSaveReservTransaction: error in saving Resource Transaction details:' + err);
                             }
                         });
                     }
@@ -11502,14 +11507,14 @@ exports.FnSaveReservTask = function(req, res){
                         responseMessage.error = {}; 
                         responseMessage.data = null;
                         res.status(401).json(responseMessage);
-                        console.log('FnSaveReservTask: Invalid token');
+                        console.log('FnSaveReservTransaction: Invalid token');
                                             }
                 }
                 else {
                     responseMessage.error= {};
                     responseMessage.message = 'Error in validating Token'; 
                     res.status(500).json(responseMessage);
-                    console.log('FnSaveReservTask:Error in processing Token' + err);
+                    console.log('FnSaveReservTransaction:Error in processing Token' + err);
                 }
             });
 
@@ -11520,7 +11525,7 @@ exports.FnSaveReservTask = function(req, res){
             {  
                 responseMessage.message = 'Invalid Token';            
                 responseMessage.error = {Token : 'Invalid Token'};
-                console.log('FnSaveReservTask: Token is mandatory field');
+                console.log('FnSaveReservTransaction: Token is mandatory field');
             }
             
             res.status(401).json(responseMessage);
@@ -11530,7 +11535,7 @@ exports.FnSaveReservTask = function(req, res){
     catch (ex) {
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
-        console.log('FnSaveReservTask:error ' + ex.description);
+        console.log('FnSaveReservTransaction:error ' + ex.description);
         throw new Error(ex);
         res.status(400).json(responseMessage);
     }
