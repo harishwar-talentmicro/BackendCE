@@ -366,25 +366,32 @@ var res = angular.module('ezeidApp').
             function getFormatedTransactionData(_data)
             {
                 var formatedData = [];
-                var times = new Array
-                (
-                    selectedTimeUtcToLocal(_data.data[0]['W1']),
-                    selectedTimeUtcToLocal(_data.data[0]['W2']),
-                    selectedTimeUtcToLocal(_data.data[0]['W3']),
-                    selectedTimeUtcToLocal(_data.data[0]['W4'])
-                );
+                var reserved = [];
 
-                var reserved = new Array(
-                    _data.data[0]['Starttime'],
-                    _data.data[0]['endtime'],
-                    _data.data[0]['reserverName'],
-                    _data.data[0]['reserverId'],
-                    _data.data[0]['service'],
-                    _data.data[0]['Status']
-                );
+                for(var nCount = 0; nCount < _data.data.length; nCount++){
+                    var times = new Array
+                    (
+                        selectedTimeUtcToLocal(_data.data[nCount]['W1']),
+                        selectedTimeUtcToLocal(_data.data[nCount]['W2']),
+                        selectedTimeUtcToLocal(_data.data[nCount]['W3']),
+                        selectedTimeUtcToLocal(_data.data[nCount]['W4'])
+                    );
 
-                formatedData['working'] = times;
-                formatedData['reserved'] = reserved;
+                    reserved[nCount] = new Array(
+                        _data.data[nCount]['Starttime'],
+                        _data.data[nCount]['endtime'],
+                        _data.data[nCount]['reserverName'],
+                        _data.data[nCount]['reserverId'],
+                        _data.data[nCount]['service'],
+                        _data.data[nCount]['Status']
+                    );
+
+                    formatedData['working'] = times;
+                    formatedData['reserved'] = reserved;
+                }
+                console.log(formatedData);
+
+
                 /* put the formatted service in the scope variables */
                 $scope.workingHrs = [
                     [convertHoursToMinutes(formatedData['working'][0]), convertHoursToMinutes(formatedData['working'][1])],
