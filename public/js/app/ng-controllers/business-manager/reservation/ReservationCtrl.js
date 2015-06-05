@@ -366,31 +366,39 @@ var res = angular.module('ezeidApp').
             function getFormatedTransactionData(_data)
             {
                 var formatedData = [];
-                var times = new Array
-                (
-                    selectedTimeUtcToLocal(_data.data[0]['W1']),
-                    selectedTimeUtcToLocal(_data.data[0]['W2']),
-                    selectedTimeUtcToLocal(_data.data[0]['W3']),
-                    selectedTimeUtcToLocal(_data.data[0]['W4'])
-                );
+                var reserved = [];
 
-                var reserved = new Array(
-                    _data.data[0]['Starttime'],
-                    _data.data[0]['endtime'],
-                    _data.data[0]['reserverName'],
-                    _data.data[0]['reserverId'],
-                    _data.data[0]['service'],
-                    _data.data[0]['Status']
-                );
+                for(var nCount = 0; nCount < _data.data.length; nCount++){
+                    var times = new Array
+                    (
+                        selectedTimeUtcToLocal(_data.data[nCount]['W1']),
+                        selectedTimeUtcToLocal(_data.data[nCount]['W2']),
+                        selectedTimeUtcToLocal(_data.data[nCount]['W3']),
+                        selectedTimeUtcToLocal(_data.data[nCount]['W4'])
+                    );
 
-                formatedData['working'] = times;
-                formatedData['reserved'] = reserved;
+                    reserved[nCount] = new Array(
+                        _data.data[nCount]['Starttime'],
+                        _data.data[nCount]['endtime'],
+                        _data.data[nCount]['reserverName'],
+                        _data.data[nCount]['reserverId'],
+                        _data.data[nCount]['service'],
+                        _data.data[nCount]['Status']
+                    );
+
+                    formatedData['working'] = times;
+                    formatedData['reserved'] = reserved;
+                }
+                console.log(formatedData);
+
 
                 /* put the formatted service in the scope variables */
                 $scope.workingHrs = [
                     [convertHoursToMinutes(formatedData['working'][0]), convertHoursToMinutes(formatedData['working'][1])],
                     [convertHoursToMinutes(formatedData['working'][2]), convertHoursToMinutes(formatedData['working'][3])]
                 ];
+                /* color working hours */
+
             };
 
 
@@ -491,6 +499,10 @@ var res = angular.module('ezeidApp').
             /* color working hours */
             $scope.colorWorkingHours = function () {
                 var workingHrs = $scope.workingHrs;
+
+                /* clean the calendar's working hour */
+                $('.available').removeAttr('style').removeClass('available');
+
                 /* traverse through the individual time slot and color them */
                 for (var i = 0; i < workingHrs.length; i++) {
                     var startTimeMins = workingHrs[i][0];
@@ -830,7 +842,7 @@ var res = angular.module('ezeidApp').
                 var tid = $scope.activeResourceId;
                 var date = $scope.activeDate;
                 /* http request for getting the new calendar data */
-
+                getReservationTransactionData($scope.activeResourceId,$scope.activeDate,$scope.searchedEzeid);
             }
 
             /**
@@ -878,13 +890,15 @@ var res = angular.module('ezeidApp').
                         res_datetime:convertTimeToUTC(makeDateTime,'DD-MMM-YYYY hh:mm'),
                         duration:$scope.duration,
                         status:0,
-                        serviceid:$('#service').val()
+                        serviceid:$('#service').val()+','
                     }
                 }).success(function(resp){
-                    console.log(resp);
                     $scope.$emit('$preLoaderStop');
                     if(resp.status){
-
+                        Notification.success({ message: "Reservation made successfully", delay: MsgDelay });
+                        /* reset service select option */
+                        /* close modal box */
+                        /* reload calendar */
                     }
                     else
                     {
