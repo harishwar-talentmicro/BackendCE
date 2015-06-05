@@ -2968,7 +2968,7 @@ exports.FnUpdateProfilePicture = function (req, res) {
 };
 
 //need to change in server
-exports.FnSaveCVInfo = function (req, res) {
+exports.FnSaveCVInfoOld = function (req, res) {
     try {
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -3044,7 +3044,7 @@ exports.FnSaveCVInfo = function (req, res) {
 };
 
 
-exports.FnSaveCVInfoNew = function (req, res) {
+exports.FnSaveCVInfo = function (req, res) {
     try {
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -3059,11 +3059,9 @@ exports.FnSaveCVInfoNew = function (req, res) {
         var Pin = req.body.Pin;
         var Token = req.body.TokenNo;
         var skillMatrix = req.body.skillMatrix;
-        var resultvalue='';
+        var resultvalue;
         skillMatrix = JSON.parse(skillMatrix);
-        console.log('--------------------');
-        console.log(req.body);
-        console.log('--------------------');
+        
         var RtnMessage = {
             IsSuccessfull: false
         };
@@ -3085,7 +3083,7 @@ exports.FnSaveCVInfoNew = function (req, res) {
                         var query = db.escape(FunctionID) + ',' + db.escape(RoleID) + ',' + db.escape(KeySkills) + ',' + db.escape(Status) + ',' + db.escape(Pin) + ',' + db.escape(Token);
                         //console.log(query);
                         db.query('CALL pSaveCVInfo(' + query + ')', function (err, InsertResult) {
-                            
+                            console.log(InsertResult);
                             if (!err) {
                                 RtnMessage.IsSuccessfull = true;
                                 console.log('FnSaveCVInfo: CV Info Saved successfully');
@@ -3098,40 +3096,37 @@ exports.FnSaveCVInfoNew = function (req, res) {
                                                 expertiseLevel: skillDetails.expertiseLevel,
                                                 exp: skillDetails.exp,
                                                 active: skillDetails.active,
-                                                cvid : InsertResult[0].ID
+                                                cvid : InsertResult[0][0].ID
                                                 
                                             };
-                                //console.log(skills);
-                                     var query1 = db.query('Select SkillID from mskill where SkillTitle=' + db.escape(skills.skillname),function (err, result1){
-//                                         console.log('------------------------------------------');
-//                                         console.log(result1);
-//                                         console.log('-------------------------------------------');
-                                         if(!err){
-                                             var query2 = db.query('insert into mskill (SkillTitle) values ("'+ db.escape(skills.skillname) +'")', function (err, result2){
-//                                        console.log('result 2 ------------------------------------------');
-//                                        console.log(result2);
-//                                        console.log('-------------------------------------------');
+                                
+                                     var query1 = db.query('Select SkillID from mskill where SkillTitle like ' + db.escape(skills.skillname),function (err, result1){
+                                 
+                                         if(result1[0] == null){
+                                             var query2 = db.query('insert into mskill (SkillTitle) values ('+ db.escape(skills.skillname) +')', function (err, result2){
+                                        
                                                  if(!err){
-                                                     var query3 = db.query('select max(skillID) as skillID from mskill',function (err, result3){
-                                                         resultvalue = result3;
-                                                         console.log(resultvalue);
-                                                     
+                                                     var query3 = db.query('select max(skillID) as SkillID from mskill',function (err, result3){
+                                                         if(!err){
+                                                         resultvalue = result3[0].SkillID;
+                                                         
+                                                        }
+                                                         else{console.log(err);}
                                                      });
                                                  }
-                                                 
-                                             });
-                                         }
+                                                 else{console.log(err);}
+                                         });
+                                        }
                                          else
                                          {
-                                            resultvalue = result1;
-                                             console.log(resultvalue);
+                                            resultvalue = result1[0].SkillID;
+                                              
                                          }
-                                             
-                                         
-                                     });
+                                    
                                 if(tid == 0){
-                                            var query = db.query('INSERT INTO tskills(skillID, expertlevel, expyrs,skillstatusid, cvid) values ('+resultvalue+','+skills.expertiseLevel+','+skills.exp+','+skills.active+','+skills.cvid+' )',function (err, result) {
-                                                //console.log(query);
+                                    
+                                            var query = db.query('INSERT INTO tskills(skillID,expertlevel,expyrs,skillstatusid, cvid) values ('+resultvalue+','+db.escape(skills.expertiseLevel)+','+db.escape(skills.exp)+','+db.escape(skills.active)+','+db.escape(skills.cvid)+' )',function (err, result) {
+                                                //console.log(err);
                                                 if (!err) {
                                                     if (result != null) {
                                                         if (result.affectedRows > 0) {
@@ -3149,9 +3144,42 @@ exports.FnSaveCVInfoNew = function (req, res) {
                                                     console.log('FnSaveCv: error in saving skill matrix' + err);
                                                 }
                                             });
-                                
-                            }
                                 }
+                                         
+                                         else
+                                         {
+                                             var query = db.query("UPDATE tskills set ? WHERE TID = ? ",[skills,skillDetails.TID], function (err, result) {
+                                            
+                                            console.log(result);
+                                            if (!err) {
+                                                if(result != null){
+                                                    if(result.affectedRows > 0){
+
+                                                            console.log('FnupdateSkill: skill matrix Updated successfully');
+                                                    }
+                                                    else
+                                                    {
+                                                        console.log('FnupdateSkill:  skill matrix not updated');
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    console.log('FnupdateSkill:  skill matrix not updated')
+                                                }
+                                            }
+                                            else 
+                                                {
+                                                    console.log('FnupdateSkill: error in saving  skill matrix:' +err);
+                                                }
+                                            
+                                
+                                         });
+                                    }
+                                         
+                                });
+                                } // for loop end
+                            
+                            
                             }
                             else {
                                 res.send(RtnMessage);
@@ -11425,7 +11453,15 @@ exports.FnSaveReservTask = function(req, res){
             FnValidateToken(Token, function (err, result) {
                 if (!err) {
                     if (result != null) {
+                        if (serviceid.endsWith(","))
+                        {
+                            serviceid=serviceid;
+                        }
+                        else{
+                            serviceid=serviceid+",";
+                        }
                         var query = db.escape(TID) + ',' + db.escape(Token) + ',' + db.escape(contactinfo) + ',' + db.escape(toEzeid) + ',' + db.escape(resourceid) + ',' + db.escape(res_datetime) + ',' + db.escape(duration) + ',' + db.escape(status) + ',' + db.escape(serviceid);
+                         console.log(query);
                         db.query('CALL pSaveResTrans(' + query + ')', function (err, insertResult) {
                             console.log(insertResult);
                             console.log(err);
