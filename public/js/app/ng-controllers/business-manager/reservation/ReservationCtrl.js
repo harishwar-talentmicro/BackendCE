@@ -85,7 +85,10 @@ var res = angular.module('ezeidApp').
             $scope.resources = [];//FORMAT: 'tid':1,'title':'Dr. Meet','status':1
 
             /* service array to store all service details under this EZE ID */
-            $scope.services = [];
+            $scope.allServices = [];
+            $scope.mappedServices = [];
+            $scope.finalServiceArray = [];
+            $scope.currentServiceArray = [];//***********************************
 
             /* active resource id */
             $scope.activeResourceId = '';
@@ -112,8 +115,15 @@ var res = angular.module('ezeidApp').
             $scope.searchedEzeid = 'krunalpaid';
 
             getResource($scope.searchedEzeid);
-            getServicesData($scope.searchedEzeid);
-            getServiceResourceMapping($scope.searchedEzeid,6);
+
+            //getServicesData($scope.searchedEzeid);
+            getServicesData($scope.searchedEzeid).then(function(){
+                getServiceResourceMapping($scope.searchedEzeid).then(function(){
+                    setFinalMappedServices(6);
+                });
+            });
+
+            //getReservationData(6,$scope.activeDate,$scope.searchedEzeid);
 
             /**
              * Get resources of this EZE ID
@@ -124,10 +134,10 @@ var res = angular.module('ezeidApp').
                 $scope.$emit('$preLoaderStart');
                 $http({
                     url : GURL + 'reservation_resource',
-                        method : "GET",
-                        params :{
+                    method : "GET",
+                    params :{
                         ezeid : ezeid,
-                            Token : $rootScope._userInfo.Token
+                        Token : $rootScope._userInfo.Token
                     }
                 }).success(function(resp){
 
@@ -174,6 +184,7 @@ var res = angular.module('ezeidApp').
              */
             function getServicesData(ezeid)
             {
+                var defer = $q.defer();
                 $scope.$emit('$preLoaderStart');
                 $http({
                     url : GURL + 'reservation_service',
@@ -186,52 +197,212 @@ var res = angular.module('ezeidApp').
                     $scope.$emit('$preLoaderStop');
                     if(resp.data.length>0)
                     {
-                        setServices(resp.data);
+                        setAllServices(resp.data);
                     }
+                    defer.resolve();
                 }).error(function(err){
                     $scope.$emit('$preLoaderStop');
                     Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
+                    defer.resolve();
                 });
+                return defer.promise;
             }
 
             /**
-             * Set all the services for this EZE ID
+             * Set all Services of this EZE ID
              */
-            function setServices(data)
+            function setAllServices(data)
             {
-                var tempArr = [];
-                $scope.service = [];
+                $scope.allServices = [];
                 for(var obj in data)
                 {
-                    /* set the services */
+                    $scope.allServices[data[obj].tid] = data[obj];
                 }
             }
 
             /**
              * Get service-resource mapping for a resource
              */
-            function getServiceResourceMapping(ezeid,resourceId)
+            function getServiceResourceMapping(ezeid)
             {
+                var defer = $q.defer();
                 $scope.$emit('$preLoaderStart');
                 $http({
-                    url : GURL + 'reservation_maped_services',
+                    url : GURL + 'reservation_resource_service_map',
                     method : "GET",
                     params :{
-                        ezeid : ezeid,
-                        resourceid:resourceId
+                        ezeid : ezeid
                     }
                 }).success(function(resp){
-                    console.log(resp);
                     $scope.$emit('$preLoaderStop');
                     if(resp.data.length>0)
                     {
-                        console.log(resp.data);
+                        setMappedServices(resp.data);
                     }
+                    defer.resolve();
                 }).error(function(err){
                     $scope.$emit('$preLoaderStop');
-                    Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
+                    Notification.error({ message: "Something went wrong! Check your internet connection", delay: MsgDelay });
+                    defer.resolve();
                 });
+                return defer.promise;
             }
+
+            /**
+             * Set all the services for this EZE ID
+             */
+            function setMappedServices(data)
+            {
+                var tempArr = [];
+                $scope.mappedServices = [];
+                for(var obj in data)
+                {
+                    /* set the services */
+                    $scope.mappedServices[data[obj].ResourceID] = data[obj].serviceID;
+                }
+            }
+
+
+            /**
+             * Get all the service details of a paritcular resource
+             */
+            function setFinalMappedServices(resourceId)
+            {
+
+                var serviceArray = [];
+                for(var obj in $scope.mappedServices)
+                {
+                    var arr = $scope.mappedServices[obj].split(',');
+                    var array = [];
+                    for(var i=0; i < arr.length; i++)
+                    {
+                        tempArr  = {
+                            'tid' : $scope.allServices[arr[i]].tid,
+                            'title' : $scope.allServices[arr[i]].title,
+                            'duration' : $scope.allServices[arr[i]].duration,
+                            'status' : $scope.allServices[arr[i]].status
+                        }
+                        array.push(tempArr);
+                    }
+                    serviceArray[obj] = array;
+                }
+                $scope.finalServiceArray = serviceArray;
+                $scope.currentServiceArray = serviceArray[$scope.activeResourceId];
+                $scope.reservationService = $scope.currentServiceArray[0].tid;
+            }
+
+            /**
+             * Get the reservation and working hours service CALL
+             */
+//            function getReservationData(resourceid,date,toEzeid)
+//            {
+//                var defer = $q.defer();
+//                function getReservationTransactionData(){
+//                    console.log("SAi3221");
+//                    $scope.$emit('$preLoaderStart');
+//                    $http({
+//                        url : GURL + 'reservation_transaction',
+//                        method : "GET",
+//                        params :{
+//                            resourceid : 6,
+//                            date : '26 Mar 2015 12:27:00 PM',
+//                            toEzeid : "krunalpaid"
+//                        }
+//                    }).success(function(resp){
+//                        console.log(resp);
+//                        $scope.$emit('$preLoaderStop');
+//                        if(resp.status){
+//                        }
+//                        defer.resolve();
+//                    }).error(function(err){
+//                        $scope.$emit('$preLoaderStop');
+//                        Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
+//                        defer.resolve();
+//                    });
+//                    return defer.promise;
+//                };
+//            }
+
+
+            /**
+             * Master function for getting all calendar data and reservatiom
+             */
+            function getReservationTransactionData(){
+                $scope.$emit('$preLoaderStart');
+                $http({
+                    url : GURL + 'reservation_transaction',
+                    method : "GET",
+                    params :{
+                        resourceid : 6,
+                        date : '05 Jun 2015 09:42:00 AM',
+                        toEzeid : "krunalpaid"
+                    }
+                }).success(function(resp){
+
+                        $scope.$emit('$preLoaderStop');
+                        if(resp.status){
+                            //  set formated result for reservation listing
+                            getFormatedTransactionData(resp);
+                        }
+                    }).error(function(err){
+                        $scope.$emit('$preLoaderStop');
+                        Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
+                    });
+            };
+
+
+            /**
+             * Function for converting UTC time from server to LOCAL timezone
+             */
+            var convertTimeToLocal = function(timeFromServer,dateFormat,returnFormat){
+                if(!dateFormat){
+                    dateFormat = 'DD-MMM-YYYY hh:mm A';
+                }
+                if(!returnFormat){
+                    returnFormat = dateFormat;
+                }
+                var x = new Date(timeFromServer);
+                var mom1 = moment(x);
+                return mom1.add((mom1.utcOffset()),'m').format(returnFormat);
+            };
+
+            function selectedTimeUtcToLocal(selectedTime)
+            {
+                var x = new Date();
+                var today = moment(x.toISOString()).utc().format('DD-MMM-YYYY');
+
+                var currentTaskDate = moment(today+' '+selectedTime).format('DD-MMM-YYYY H:mm');
+                return convertTimeToLocal(currentTaskDate,'DD-MMM-YYYY H:mm',"H:mm");
+            }
+
+
+            function getFormatedTransactionData(_data)
+            {
+                var formatedData = [];
+                var times = new Array
+                (
+                    selectedTimeUtcToLocal(_data.data[0]['W1']),
+                    selectedTimeUtcToLocal(_data.data[0]['W2']),
+                    selectedTimeUtcToLocal(_data.data[0]['W3']),
+                    selectedTimeUtcToLocal(_data.data[0]['W4'])
+                );
+
+                var reserved = new Array(   _data.data[0]['Starttime'],
+                    _data.data[0]['endtime'],
+                    _data.data[0]['reserverName'],
+                    _data.data[0]['reserverId'],
+                    _data.data[0]['service'],
+                    _data.data[0]['Status']
+                );
+
+                formatedData['working'] = times;
+                formatedData['reserved'] = reserved;
+                console.log(formatedData);
+                console.log("Result");
+                console.log(formatedData['working']);
+                return formatedData;
+            };
+
 
 
 
@@ -453,19 +624,19 @@ var res = angular.module('ezeidApp').
             };
 
             /* Color the blocks */
-                $scope.colorBlocks = function (startBlock, endBlock, color, addCss) {
-                    var css = '';
-                    if(typeof(addCss) != 'undefined')
-                    {
-                        css = addCss;
-                    }
-                    for (var j = startBlock; j <= endBlock; j++) {
-                        $('.block-' + j).css('background-color', color).addClass(css);
-                    }
+            $scope.colorBlocks = function (startBlock, endBlock, color, addCss) {
+                var css = '';
+                if(typeof(addCss) != 'undefined')
+                {
+                    css = addCss;
                 }
+                for (var j = startBlock; j <= endBlock; j++) {
+                    $('.block-' + j).css('background-color', color).addClass(css);
+                }
+            }
 
-                var getRandomNumber = function (len) {
-                    return Math.floor(Math.random() * len);
+            var getRandomNumber = function (len) {
+                return Math.floor(Math.random() * len);
             };
 
             /* select random color */
@@ -537,6 +708,11 @@ var res = angular.module('ezeidApp').
             ////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////////////////////
 
+            $scope.clickedBlockId = 0;
+            $scope.currentBlockMinute = 0;
+            $scope.startTime = '00:00';
+            $scope.duration = 0;
+            $scope.endTime = '00:00';
             /**
              * On Click event handler for whole of the reservation module
              */
@@ -549,13 +725,30 @@ var res = angular.module('ezeidApp').
                 /* show error if the working hour is not in working hour */
                 if(isReserved || isAvailable)
                 {
+                    if(!$scope.currentServiceArray.length > 0)
+                    {
+                        Notification.error({ message: "No Services available for this resource!", delay: MsgDelay });
+                        return;
+                    }
+                    $scope.clickedBlockId = blockId;
+                    $scope.startTime = convertBlockIdToTime(blockId);
+                    $scope.currentBlockMinute = convertBlockIdToMinute(blockId);
+                    if(typeof($scope.currentServiceArray[0]) != 'undefined')
+                    {
+                        $scope.duration = $scope.currentServiceArray[0].duration;
+                    }
+                    else
+                    {
+                        $scope.duration = 0;
+                    }
+
+                    $scope.endTime = $scope.convertTime($scope.currentBlockMinute + $scope.duration);
                     $scope.modalVisibility();
                 }
                 else
                 {
                     Notification.error({ message: "You can't make a reservation in non-working hours", delay: MsgDelay });
                 }
-
             }
 
             /**
@@ -612,8 +805,21 @@ var res = angular.module('ezeidApp').
                 $scope.activeResourceId = tid;
                 $('.resource-btn').removeClass('active');
                 $('.resource-'+tid).addClass('active');
-                /* reload calendar */
+
+                if($scope.finalServiceArray[$scope.activeResourceId])
+                {
+                    $scope.currentServiceArray = $scope.finalServiceArray[$scope.activeResourceId];
+                    $scope.reservationService = $scope.currentServiceArray[0].tid;
+                    /* reload calendar */
+                    $scope.reloadCalander();
+                    return;
+                }
+
+                Notification.error({ message: "No Services available for this resource!", delay: MsgDelay });
+                $scope.currentServiceArray = [];
+                $scope.reservationService = [];
                 $scope.reloadCalander();
+                return;
             }
 
             /**
@@ -625,6 +831,80 @@ var res = angular.module('ezeidApp').
                 var date = $scope.activeDate;
                 /* http request for getting the new calendar data */
 
+            }
+
+            /**
+             * Update the reservation form data
+             */
+            $scope.updateReservationFormData = function(val)
+            {
+                var index = $('.reservation-service').find(':selected').data('id');//reservation-service
+                $scope.duration = $scope.currentServiceArray[index].duration;
+                $scope.endTime = $scope.convertTime($scope.currentBlockMinute + $scope.duration);
+            }
+
+            /**
+             * Convert blockId into Minutes
+             */
+            function convertBlockIdToMinute(blockId)
+            {
+                return blockId*5;
+            }
+
+            /**
+             * Convert BlockId to time
+             */
+            function convertBlockIdToTime(blockId)
+            {
+                return $scope.convertTime(convertBlockIdToMinute(blockId));
+            }
+
+            /**
+             * Save Reservation
+             */
+            $scope.saveReservation = function()
+            {
+                var param = {
+                    Token:$rootScope._userInfo.Token,
+                    TID:0,
+                    contactinfo:$('#userMobile').val(),
+                    toEzeid:$scope.searchedEzeid,
+                    resourceid:$scope.activeResourceId,
+                    res_datetime:$scope.startTime,
+                    duration:$scope.duration,
+                    status:0,
+                    serviceid:$('#service').val()
+                };
+
+
+                $http({
+                    url : GURL + 'reservation_transaction',
+                    method : "POST",
+                    params :{
+                        Token:$rootScope._userInfo.Token,
+                        TID:0,
+                        contactinfo:$('#userMobile').val(),
+                        toEzeid:$scope.searchedEzeid,
+                        resourceid:$scope.activeResourceId,
+                        res_datetime:$scope.startTime,
+                        duration:$scope.duration,
+                        status:0,
+                        serviceid:$('#service').val()
+                    }
+                }).success(function(resp){
+                    console.log(resp);
+                    $scope.$emit('$preLoaderStop');
+                    if(resp.status){
+
+                    }
+                    else
+                    {
+                        Notification.error({ message: "Unable to save the reservation, please try again later", delay: MsgDelay });
+                    }
+                }).error(function(err){
+                    $scope.$emit('$preLoaderStop');
+                    Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
+                });
             }
 
         }]);
