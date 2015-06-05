@@ -3043,6 +3043,150 @@ exports.FnSaveCVInfo = function (req, res) {
     }
 };
 
+
+exports.FnSaveCVInfoNew = function (req, res) {
+    try {
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        // In tFunctionID Int,In tRoleID Int, In tKeySkills varchar(250), In tCVDoc longtext, In tCVDocFile varchar(250), In iStatus int, In tPin varchar(15), In tToken varchar(15)
+
+        var FunctionID = req.body.FunctionID;
+        var RoleID = req.body.RoleID;
+        var KeySkills = req.body.KeySkills;
+        //  var CVDoc = req.body.CVDoc;
+        // var CVDocFile = req.body.CVDocFile;
+        var Status = parseInt(req.body.Status);
+        var Pin = req.body.Pin;
+        var Token = req.body.TokenNo;
+        var skillMatrix = req.body.skillMatrix;
+        var resultvalue='';
+        skillMatrix = JSON.parse(skillMatrix);
+        console.log('--------------------');
+        console.log(req.body);
+        console.log('--------------------');
+        var RtnMessage = {
+            IsSuccessfull: false
+        };
+        var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
+
+        if (Token != null) {
+            FnValidateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+                        // console.log(datechange);
+                        //var fileName = '';
+                        //if (CVDocFile != null) {
+                        //    fileName = CVDocFile.split('.').pop();
+                        //}
+                        if (Pin == '') {
+                            Pin = null;
+                        }
+
+                        var query = db.escape(FunctionID) + ',' + db.escape(RoleID) + ',' + db.escape(KeySkills) + ',' + db.escape(Status) + ',' + db.escape(Pin) + ',' + db.escape(Token);
+                        //console.log(query);
+                        db.query('CALL pSaveCVInfo(' + query + ')', function (err, InsertResult) {
+                            
+                            if (!err) {
+                                RtnMessage.IsSuccessfull = true;
+                                console.log('FnSaveCVInfo: CV Info Saved successfully');
+                                res.send(RtnMessage);
+                                for(var i=0; i < skillMatrix.length; i++) {
+                                            var skillDetails = skillMatrix[i];
+                                          var tid= skillDetails.tid
+                                            var skills = {
+                                                skillname: skillDetails.skillname,
+                                                expertiseLevel: skillDetails.expertiseLevel,
+                                                exp: skillDetails.exp,
+                                                active: skillDetails.active,
+                                                cvid : InsertResult[0].ID
+                                                
+                                            };
+                                //console.log(skills);
+                                     var query1 = db.query('Select SkillID from mskill where SkillTitle=' + db.escape(skills.skillname),function (err, result1){
+//                                         console.log('------------------------------------------');
+//                                         console.log(result1);
+//                                         console.log('-------------------------------------------');
+                                         if(!err){
+                                             var query2 = db.query('insert into mskill (SkillTitle) values ("'+ db.escape(skills.skillname) +'")', function (err, result2){
+//                                        console.log('result 2 ------------------------------------------');
+//                                        console.log(result2);
+//                                        console.log('-------------------------------------------');
+                                                 if(!err){
+                                                     var query3 = db.query('select max(skillID) as skillID from mskill',function (err, result3){
+                                                         resultvalue = result3;
+                                                         console.log(resultvalue);
+                                                     
+                                                     });
+                                                 }
+                                                 
+                                             });
+                                         }
+                                         else
+                                         {
+                                            resultvalue = result1;
+                                             console.log(resultvalue);
+                                         }
+                                             
+                                         
+                                     });
+                                if(tid == 0){
+                                            var query = db.query('INSERT INTO tskills(skillID, expertlevel, expyrs,skillstatusid, cvid) values ('+resultvalue+','+skills.expertiseLevel+','+skills.exp+','+skills.active+','+skills.cvid+' )',function (err, result) {
+                                                //console.log(query);
+                                                if (!err) {
+                                                    if (result != null) {
+                                                        if (result.affectedRows > 0) {
+                                                            console.log('FnSaveCv: skill matrix saved successfully');
+                                                        }
+                                                        else {
+                                                            console.log('FnSaveCv: skill matrix not saved');
+                                                        }
+                                                    }
+                                                    else {
+                                                        console.log('FnSaveCv: skill matrix not saved');
+                                                    }
+                                                }
+                                                else {
+                                                    console.log('FnSaveCv: error in saving skill matrix' + err);
+                                                }
+                                            });
+                                
+                            }
+                                }
+                            }
+                            else {
+                                res.send(RtnMessage);
+                                res.statusCode = 500;
+                                console.log('FnSaveCVInfo: Error in saving CV Info  : ' + err);
+                            }
+                        });
+                    }
+                    else {
+                        console.log('FnSaveCVInfo: Invalid Token');
+                        res.statusCode = 401;
+                        res.send(RtnMessage);
+                    }
+                }
+                else {
+                    console.log('FnSaveCVInfo: Token error: ' + err);
+                    res.statusCode = 500;
+                    res.send(RtnMessage);
+                }
+            });
+
+        }
+        else {
+            console.log('FnSaveCVInfo: Token is empty');
+            res.statusCode = 400;
+            res.send(RtnMessage);
+        }
+
+    }
+    catch (ex) {
+        console.log('FnSaveCVInfo error:' + ex.description);
+        throw new Error(ex);
+    }
+};
+
 exports.FnGetCVInfo = function (req, res) {
     try {
         res.setHeader("Access-Control-Allow-Origin", "*");
@@ -11283,10 +11427,10 @@ exports.FnSaveReservTask = function(req, res){
                     if (result != null) {
                         var query = db.escape(TID) + ',' + db.escape(Token) + ',' + db.escape(contactinfo) + ',' + db.escape(toEzeid) + ',' + db.escape(resourceid) + ',' + db.escape(res_datetime) + ',' + db.escape(duration) + ',' + db.escape(status) + ',' + db.escape(serviceid);
                         db.query('CALL pSaveResTrans(' + query + ')', function (err, insertResult) {
-                            console.log('Result is..........:'+result);
+                            console.log(insertResult);
                             console.log(err);
                              if (!err){
-                                if (result != null) {
+                                if (insertResult.affectedRows > 0) {
                                     responseMessage.status = true;
                                     responseMessage.error = null;
                                     responseMessage.message = 'Resource Task details save successfully';
@@ -11299,7 +11443,7 @@ exports.FnSaveReservTask = function(req, res){
                                     
                                 }
                                 else {
-                                    responseMessage.message = 'An error occured ! Please try again';
+                                    responseMessage.message = insertResult[0][0];
                                     responseMessage.error = {};
                                     res.status(400).json(responseMessage);
                                     console.log('FnSaveReservTask:No save Resource Task details');
