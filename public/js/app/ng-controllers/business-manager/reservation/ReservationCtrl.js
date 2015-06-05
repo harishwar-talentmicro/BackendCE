@@ -120,6 +120,7 @@ var res = angular.module('ezeidApp').
             getServicesData($scope.searchedEzeid).then(function(){
                 getServiceResourceMapping($scope.searchedEzeid).then(function(){
                     setFinalMappedServices(6);
+                    getReservationTransactionData($scope.activeResourceId,'05 Jun 2015 09:42:00 AM',$scope.searchedEzeid);
                 });
             });
 
@@ -292,50 +293,17 @@ var res = angular.module('ezeidApp').
             }
 
             /**
-             * Get the reservation and working hours service CALL
-             */
-//            function getReservationData(resourceid,date,toEzeid)
-//            {
-//                var defer = $q.defer();
-//                function getReservationTransactionData(){
-//                    console.log("SAi3221");
-//                    $scope.$emit('$preLoaderStart');
-//                    $http({
-//                        url : GURL + 'reservation_transaction',
-//                        method : "GET",
-//                        params :{
-//                            resourceid : 6,
-//                            date : '26 Mar 2015 12:27:00 PM',
-//                            toEzeid : "krunalpaid"
-//                        }
-//                    }).success(function(resp){
-//                        console.log(resp);
-//                        $scope.$emit('$preLoaderStop');
-//                        if(resp.status){
-//                        }
-//                        defer.resolve();
-//                    }).error(function(err){
-//                        $scope.$emit('$preLoaderStop');
-//                        Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
-//                        defer.resolve();
-//                    });
-//                    return defer.promise;
-//                };
-//            }
-
-
-            /**
              * Master function for getting all calendar data and reservatiom
              */
-            function getReservationTransactionData(){
+            function getReservationTransactionData(resourceId,date,searchedEzeid){
                 $scope.$emit('$preLoaderStart');
                 $http({
                     url : GURL + 'reservation_transaction',
                     method : "GET",
                     params :{
-                        resourceid : 6,
-                        date : '05 Jun 2015 09:42:00 AM',
-                        toEzeid : "krunalpaid"
+                        resourceid : resourceId,
+                        date : date,//'05 Jun 2015 09:42:00 AM',
+                        toEzeid : searchedEzeid
                     }
                 }).success(function(resp){
 
@@ -387,7 +355,8 @@ var res = angular.module('ezeidApp').
                     selectedTimeUtcToLocal(_data.data[0]['W4'])
                 );
 
-                var reserved = new Array(   _data.data[0]['Starttime'],
+                var reserved = new Array(
+                    _data.data[0]['Starttime'],
                     _data.data[0]['endtime'],
                     _data.data[0]['reserverName'],
                     _data.data[0]['reserverId'],
@@ -397,10 +366,8 @@ var res = angular.module('ezeidApp').
 
                 formatedData['working'] = times;
                 formatedData['reserved'] = reserved;
-                console.log(formatedData);
-                console.log("Result");
-                console.log(formatedData['working']);
-                return formatedData;
+
+
             };
 
 
