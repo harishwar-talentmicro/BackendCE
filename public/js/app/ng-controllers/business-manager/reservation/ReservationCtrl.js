@@ -65,15 +65,15 @@ var res = angular.module('ezeidApp').
              * Working Hours[in minutes of the day]
              */
             $scope.workingHrs = [
-                [540, 840],
-                [960, 1200]
+                //[540, 840],
+                //[960, 1200]
             ];
 
             /* Reserved hours *///[Start Minute, End Minute, Reserver Name, Reserver ID, services, status]
             $scope.reservedTime = [
-                [550, 600, 'sandeep',3,'service1'],
-                [700, 810, 'rahul',12,'service2'],
-                [1000, 1140, 'shrey',5,'service3']
+                //[550, 600, 'sandeep',3,'service1'],
+                //[700, 810, 'rahul',12,'service2'],
+                //[1000, 1140, 'shrey',5,'service3']
             ];
             /* Set the logged in user */
             $scope.loggedInUid = 12;
@@ -94,7 +94,7 @@ var res = angular.module('ezeidApp').
             $scope.activeResourceId = '';
 
             /* set the date for which calendar is shown */
-            $scope.activeDate = moment().format('DD-MM-YYYY');
+            $scope.activeDate = moment().format('DD-MMM-YYYY');
 
             /* flag bit for checking if there is no resources */
             $scope.isNoResource = false;
@@ -125,8 +125,6 @@ var res = angular.module('ezeidApp').
                 getServiceResourceMapping($scope.searchedEzeid).then(function () {
                     setFinalMappedServices(6);
                     getReservationTransactionData($scope.activeResourceId, '05 Jun 2015 09:42:00 AM', $scope.searchedEzeid).then(function () {
-
-                        $scope.colorWorkingHours();
                     });
                 });
             });
@@ -339,6 +337,7 @@ var res = angular.module('ezeidApp').
                 if(!returnFormat){
                     returnFormat = dateFormat;
                 }
+
                 var x = new Date(timeFromServer);
                 var mom1 = moment(x);
                 return mom1.add((mom1.utcOffset()),'m').format(returnFormat);
@@ -376,13 +375,11 @@ var res = angular.module('ezeidApp').
 
                 formatedData['working'] = times;
                 formatedData['reserved'] = reserved;
-                console.log(formatedData);
                 /* put the formatted service in the scope variables */
                 $scope.workingHrs = [
-                    [formatedData['working'][0], formatedData['working'][1]],
-                    [formatedData['working'][2], formatedData['working'][3]]
+                    [convertHoursToMinutes(formatedData['working'][0]), convertHoursToMinutes(formatedData['working'][1])],
+                    [convertHoursToMinutes(formatedData['working'][2]), convertHoursToMinutes(formatedData['working'][3])]
                 ];
-
             };
 
 
@@ -482,13 +479,11 @@ var res = angular.module('ezeidApp').
 
             /* color working hours */
             $scope.colorWorkingHours = function () {
-
                 var workingHrs = $scope.workingHrs;
                 /* traverse through the individual time slot and color them */
                 for (var i = 0; i < workingHrs.length; i++) {
                     var startTimeMins = workingHrs[i][0];
                     var endTimeMins = workingHrs[i][1];
-
                     /* identify the block id which comes in range */
                     var data = getBlockRange(startTimeMins, endTimeMins);
                     var startRange = data[0];
@@ -607,6 +602,7 @@ var res = angular.module('ezeidApp').
 
             /* Color the blocks */
             $scope.colorBlocks = function (startBlock, endBlock, color, addCss) {
+
                 var css = '';
                 if(typeof(addCss) != 'undefined')
                 {
@@ -683,6 +679,17 @@ var res = angular.module('ezeidApp').
                     $('.color-index-label-'+i).html('<small>'+$scope.colorIndex[i][1]+'</small>');
                 }
             };
+
+            /**
+             * Convert to minutes of the day
+             */
+            function convertHoursToMinutes(hours)
+            {
+                var minsArray = hours.split(":");
+                var hours = minsArray[0];
+                var mins = minsArray[1];
+                return (parseInt(hours)*60) + parseInt(mins);
+            }
 
             ////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////////////////////
@@ -767,10 +774,10 @@ var res = angular.module('ezeidApp').
             /**
              * onChange - reload the working hours and reserved our
              */
-            $scope.currentDateTime = moment().format('DD-MM-YYYY');
+            $scope.currentDateTime = moment().format('DD-MMM-YYYY');
             $scope.$watch('currentDateTime',function(newVal,oldVal){
                 if(oldVal !== newVal){
-                    $scope.activeDate = moment(newVal).format('DD-MM-YYYY');
+                    $scope.activeDate = moment(newVal).format('DD-MMM-YYYY');
                     /* reload calendar */
                     $scope.reloadCalander();
                 }
@@ -846,6 +853,7 @@ var res = angular.module('ezeidApp').
              */
             $scope.saveReservation = function()
             {
+                var makeDateTime = $scope.activeDate+' '+$scope.startTime;
                 $http({
                     url : GURL + 'reservation_transaction',
                     method : "POST",
@@ -855,7 +863,7 @@ var res = angular.module('ezeidApp').
                         contactinfo:$('#userMobile').val(),
                         toEzeid:$scope.searchedEzeid,
                         resourceid:$scope.activeResourceId,
-                        res_datetime:$scope.startTime,
+                        res_datetime:makeDateTime,
                         duration:$scope.duration,
                         status:0,
                         serviceid:$('#service').val()
