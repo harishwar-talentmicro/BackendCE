@@ -111,19 +111,26 @@ var res = angular.module('ezeidApp').
             /* Flag status for opening or close modal box */
             $scope.modalVisible = false;
 
-            ///////////////////////////////////////GET DEFAULT CALENDAR/////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            ///////////////////////////////////////GET DEFAULT CALENDAR DATA////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             $scope.searchedEzeid = 'krunalpaid';
 
             getResource($scope.searchedEzeid);
 
-            //getServicesData($scope.searchedEzeid);
-            getServicesData($scope.searchedEzeid).then(function(){
-                getServiceResourceMapping($scope.searchedEzeid).then(function(){
+
+            getServicesData($scope.searchedEzeid).then(function () {
+                getServiceResourceMapping($scope.searchedEzeid).then(function () {
                     setFinalMappedServices(6);
+                    getReservationTransactionData($scope.activeResourceId, '05 Jun 2015 09:42:00 AM', $scope.searchedEzeid).then(function () {
+
+                        $scope.colorWorkingHours();
+                    });
                 });
             });
 
-            //getReservationData(6,$scope.activeDate,$scope.searchedEzeid);
 
             /**
              * Get resources of this EZE ID
@@ -292,62 +299,33 @@ var res = angular.module('ezeidApp').
             }
 
             /**
-             * Get the reservation and working hours service CALL
-             */
-//            function getReservationData(resourceid,date,toEzeid)
-//            {
-//                var defer = $q.defer();
-//                function getReservationTransactionData(){
-//                    console.log("SAi3221");
-//                    $scope.$emit('$preLoaderStart');
-//                    $http({
-//                        url : GURL + 'reservation_transaction',
-//                        method : "GET",
-//                        params :{
-//                            resourceid : 6,
-//                            date : '26 Mar 2015 12:27:00 PM',
-//                            toEzeid : "krunalpaid"
-//                        }
-//                    }).success(function(resp){
-//                        console.log(resp);
-//                        $scope.$emit('$preLoaderStop');
-//                        if(resp.status){
-//                        }
-//                        defer.resolve();
-//                    }).error(function(err){
-//                        $scope.$emit('$preLoaderStop');
-//                        Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
-//                        defer.resolve();
-//                    });
-//                    return defer.promise;
-//                };
-//            }
-
-
-            /**
              * Master function for getting all calendar data and reservatiom
              */
-            function getReservationTransactionData(){
+            function getReservationTransactionData(resourceId,date,searchedEzeid){
+                var defer = $q.defer();
                 $scope.$emit('$preLoaderStart');
                 $http({
                     url : GURL + 'reservation_transaction',
                     method : "GET",
                     params :{
-                        resourceid : 6,
-                        date : '05 Jun 2015 09:42:00 AM',
-                        toEzeid : "krunalpaid"
+                        resourceid : resourceId,
+                        date : date,//'05 Jun 2015 09:42:00 AM',
+                        toEzeid : searchedEzeid
                     }
                 }).success(function(resp){
 
-                        $scope.$emit('$preLoaderStop');
-                        if(resp.status){
-                            //  set formated result for reservation listing
-                            getFormatedTransactionData(resp);
-                        }
-                    }).error(function(err){
-                        $scope.$emit('$preLoaderStop');
-                        Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
-                    });
+                    $scope.$emit('$preLoaderStop');
+                    if(resp.status){
+                        //  set formated result for reservation listing
+                        getFormatedTransactionData(resp);
+                    }
+                    defer.resolve();
+                }).error(function(err){
+                    $scope.$emit('$preLoaderStop');
+                    Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
+                    defer.resolve();
+                });
+                return defer.promise;
             };
 
 
@@ -387,7 +365,8 @@ var res = angular.module('ezeidApp').
                     selectedTimeUtcToLocal(_data.data[0]['W4'])
                 );
 
-                var reserved = new Array(   _data.data[0]['Starttime'],
+                var reserved = new Array(
+                    _data.data[0]['Starttime'],
                     _data.data[0]['endtime'],
                     _data.data[0]['reserverName'],
                     _data.data[0]['reserverId'],
@@ -398,9 +377,12 @@ var res = angular.module('ezeidApp').
                 formatedData['working'] = times;
                 formatedData['reserved'] = reserved;
                 console.log(formatedData);
-                console.log("Result");
-                console.log(formatedData['working']);
-                return formatedData;
+                /* put the formatted service in the scope variables */
+                $scope.workingHrs = [
+                    [formatedData['working'][0], formatedData['working'][1]],
+                    [formatedData['working'][2], formatedData['working'][3]]
+                ];
+
             };
 
 
@@ -864,19 +846,6 @@ var res = angular.module('ezeidApp').
              */
             $scope.saveReservation = function()
             {
-                var param = {
-                    Token:$rootScope._userInfo.Token,
-                    TID:0,
-                    contactinfo:$('#userMobile').val(),
-                    toEzeid:$scope.searchedEzeid,
-                    resourceid:$scope.activeResourceId,
-                    res_datetime:$scope.startTime,
-                    duration:$scope.duration,
-                    status:0,
-                    serviceid:$('#service').val()
-                };
-
-
                 $http({
                     url : GURL + 'reservation_transaction',
                     method : "POST",
