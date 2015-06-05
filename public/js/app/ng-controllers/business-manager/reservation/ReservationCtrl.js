@@ -103,9 +103,9 @@ var res = angular.module('ezeidApp').
 
             /* All the set color's INDEX with their title */
             $scope.colorIndex = [
-                [availabilityColor,'Available'],
-                [reservedColorArray[0],'Reserved'],
-                [selfReservedColor,'Your Appointment'],
+                [availabilityColor, 'Available'],
+                [reservedColorArray[0], 'Reserved'],
+                [selfReservedColor, 'Your Appointment'],
             ];
 
             /* Flag status for opening or close modal box */
@@ -134,26 +134,24 @@ var res = angular.module('ezeidApp').
              * Get resources of this EZE ID
              * @param ezeid of the searched org.
              */
-            function getResource(ezeid)
-            {
+            function getResource(ezeid) {
                 $scope.$emit('$preLoaderStart');
                 $http({
-                    url : GURL + 'reservation_resource',
-                    method : "GET",
-                    params :{
-                        ezeid : ezeid,
-                        Token : $rootScope._userInfo.Token
+                    url: GURL + 'reservation_resource',
+                    method: "GET",
+                    params: {
+                        ezeid: ezeid,
+                        Token: $rootScope._userInfo.Token
                     }
-                }).success(function(resp){
+                }).success(function (resp) {
 
                     $scope.$emit('$preLoaderStop');
-                    if(resp.data.length>0)
-                    {
+                    if (resp.data.length > 0) {
                         setResources(resp.data);
                     }
-                }).error(function(err){
+                }).error(function (err) {
                     $scope.$emit('$preLoaderStop');
-                    Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
+                    Notification.error({message: "Something went wrong! Check your connection", delay: MsgDelay});
                 });
             }
 
@@ -161,23 +159,20 @@ var res = angular.module('ezeidApp').
              * Create the resource array for Front End
              * @param array from HTTP request
              */
-            function setResources(array)
-            {
+            function setResources(array) {
                 var tempArr = [];
                 $scope.resources = [];
-                for(var obj in array)
-                {
+                for (var obj in array) {
                     $scope.isNoResource = true;
-                    if($scope.activeResourceId == '')
-                    {
+                    if ($scope.activeResourceId == '') {
                         $scope.activeResourceId = array[obj].tid;
                     }
                     tempArr =
                     {
-                        'tid' : array[obj].tid,
-                        'title' : array[obj].title,
-                        'status' : array[obj].status,
-                        'description':array[obj].description
+                        'tid': array[obj].tid,
+                        'title': array[obj].title,
+                        'status': array[obj].status,
+                        'description': array[obj].description
                     };
                     $scope.resources.push(tempArr);
 
@@ -187,27 +182,25 @@ var res = angular.module('ezeidApp').
             /**
              * Get all services of THIS EZE ID
              */
-            function getServicesData(ezeid)
-            {
+            function getServicesData(ezeid) {
                 var defer = $q.defer();
                 $scope.$emit('$preLoaderStart');
                 $http({
-                    url : GURL + 'reservation_service',
-                    method : "GET",
-                    params :{
-                        ezeid : ezeid
+                    url: GURL + 'reservation_service',
+                    method: "GET",
+                    params: {
+                        ezeid: ezeid
                     }
-                }).success(function(resp){
+                }).success(function (resp) {
 
                     $scope.$emit('$preLoaderStop');
-                    if(resp.data.length>0)
-                    {
+                    if (resp.data.length > 0) {
                         setAllServices(resp.data);
                     }
                     defer.resolve();
-                }).error(function(err){
+                }).error(function (err) {
                     $scope.$emit('$preLoaderStop');
-                    Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
+                    Notification.error({message: "Something went wrong! Check your connection", delay: MsgDelay});
                     defer.resolve();
                 });
                 return defer.promise;
@@ -216,11 +209,9 @@ var res = angular.module('ezeidApp').
             /**
              * Set all Services of this EZE ID
              */
-            function setAllServices(data)
-            {
+            function setAllServices(data) {
                 $scope.allServices = [];
-                for(var obj in data)
-                {
+                for (var obj in data) {
                     $scope.allServices[data[obj].tid] = data[obj];
                 }
             }
@@ -228,26 +219,27 @@ var res = angular.module('ezeidApp').
             /**
              * Get service-resource mapping for a resource
              */
-            function getServiceResourceMapping(ezeid)
-            {
+            function getServiceResourceMapping(ezeid) {
                 var defer = $q.defer();
                 $scope.$emit('$preLoaderStart');
                 $http({
-                    url : GURL + 'reservation_resource_service_map',
-                    method : "GET",
-                    params :{
-                        ezeid : ezeid
+                    url: GURL + 'reservation_resource_service_map',
+                    method: "GET",
+                    params: {
+                        ezeid: ezeid
                     }
-                }).success(function(resp){
+                }).success(function (resp) {
                     $scope.$emit('$preLoaderStop');
-                    if(resp.data.length>0)
-                    {
+                    if (resp.data.length > 0) {
                         setMappedServices(resp.data);
                     }
                     defer.resolve();
-                }).error(function(err){
+                }).error(function (err) {
                     $scope.$emit('$preLoaderStop');
-                    Notification.error({ message: "Something went wrong! Check your internet connection", delay: MsgDelay });
+                    Notification.error({
+                        message: "Something went wrong! Check your internet connection",
+                        delay: MsgDelay
+                    });
                     defer.resolve();
                 });
                 return defer.promise;
@@ -256,12 +248,10 @@ var res = angular.module('ezeidApp').
             /**
              * Set all the services for this EZE ID
              */
-            function setMappedServices(data)
-            {
+            function setMappedServices(data) {
                 var tempArr = [];
                 $scope.mappedServices = [];
-                for(var obj in data)
-                {
+                for (var obj in data) {
                     /* set the services */
                     $scope.mappedServices[data[obj].ResourceID] = data[obj].serviceID;
                 }
@@ -271,21 +261,18 @@ var res = angular.module('ezeidApp').
             /**
              * Get all the service details of a paritcular resource
              */
-            function setFinalMappedServices(resourceId)
-            {
+            function setFinalMappedServices(resourceId) {
 
                 var serviceArray = [];
-                for(var obj in $scope.mappedServices)
-                {
+                for (var obj in $scope.mappedServices) {
                     var arr = $scope.mappedServices[obj].split(',');
                     var array = [];
-                    for(var i=0; i < arr.length; i++)
-                    {
-                        tempArr  = {
-                            'tid' : $scope.allServices[arr[i]].tid,
-                            'title' : $scope.allServices[arr[i]].title,
-                            'duration' : $scope.allServices[arr[i]].duration,
-                            'status' : $scope.allServices[arr[i]].status
+                    for (var i = 0; i < arr.length; i++) {
+                        tempArr = {
+                            'tid': $scope.allServices[arr[i]].tid,
+                            'title': $scope.allServices[arr[i]].title,
+                            'duration': $scope.allServices[arr[i]].duration,
+                            'status': $scope.allServices[arr[i]].status
                         }
                         array.push(tempArr);
                     }
@@ -299,28 +286,28 @@ var res = angular.module('ezeidApp').
             /**
              * Master function for getting all calendar data and reservatiom
              */
-            function getReservationTransactionData(resourceId,date,searchedEzeid){
+            function getReservationTransactionData(resourceId, date, searchedEzeid) {
                 var defer = $q.defer();
                 $scope.$emit('$preLoaderStart');
                 $http({
-                    url : GURL + 'reservation_transaction',
-                    method : "GET",
-                    params :{
-                        resourceid : resourceId,
-                        date : date,//'05 Jun 2015 09:42:00 AM',
-                        toEzeid : searchedEzeid
+                    url: GURL + 'reservation_transaction',
+                    method: "GET",
+                    params: {
+                        resourceid: resourceId,
+                        date: date,//'05 Jun 2015 09:42:00 AM',
+                        toEzeid: searchedEzeid
                     }
-                }).success(function(resp){
+                }).success(function (resp) {
 
                     $scope.$emit('$preLoaderStop');
-                    if(resp.status){
+                    if (resp.status) {
                         //  set formated result for reservation listing
                         getFormatedTransactionData(resp);
                     }
                     defer.resolve();
-                }).error(function(err){
+                }).error(function (err) {
                     $scope.$emit('$preLoaderStop');
-                    Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
+                    Notification.error({message: "Something went wrong! Check your connection", delay: MsgDelay});
                     defer.resolve();
                 });
                 return defer.promise;
@@ -329,8 +316,8 @@ var res = angular.module('ezeidApp').
             /**
              * Function for converting LOCAL time (local timezone) to server time
              */
-            var convertTimeToUTC = function(localTime,dateFormat){
-                if(!dateFormat){
+            var convertTimeToUTC = function (localTime, dateFormat) {
+                if (!dateFormat) {
                     dateFormat = 'DD-MMM-YYYY hh:mm A';
                 }
                 return moment(localTime).utc().format(dateFormat);
@@ -340,35 +327,33 @@ var res = angular.module('ezeidApp').
             /**
              * Function for converting UTC time from server to LOCAL timezone
              */
-            var convertTimeToLocal = function(timeFromServer,dateFormat,returnFormat){
-                if(!dateFormat){
+            var convertTimeToLocal = function (timeFromServer, dateFormat, returnFormat) {
+                if (!dateFormat) {
                     dateFormat = 'DD-MMM-YYYY hh:mm A';
                 }
-                if(!returnFormat){
+                if (!returnFormat) {
                     returnFormat = dateFormat;
                 }
 
                 var x = new Date(timeFromServer);
                 var mom1 = moment(x);
-                return mom1.add((mom1.utcOffset()),'m').format(returnFormat);
+                return mom1.add((mom1.utcOffset()), 'm').format(returnFormat);
             };
 
-            function selectedTimeUtcToLocal(selectedTime)
-            {
+            function selectedTimeUtcToLocal(selectedTime) {
                 var x = new Date();
                 var today = moment(x.toISOString()).utc().format('DD-MMM-YYYY');
 
-                var currentTaskDate = moment(today+' '+selectedTime).format('DD-MMM-YYYY H:mm');
-                return convertTimeToLocal(currentTaskDate,'DD-MMM-YYYY H:mm',"H:mm");
+                var currentTaskDate = moment(today + ' ' + selectedTime).format('DD-MMM-YYYY H:mm');
+                return convertTimeToLocal(currentTaskDate, 'DD-MMM-YYYY H:mm', "H:mm");
             }
 
 
-            function getFormatedTransactionData(_data)
-            {
+            function getFormatedTransactionData(_data) {
                 var formatedData = [];
                 var reserved = [];
 
-                for(var nCount = 0; nCount < _data.data.length; nCount++){
+                for (var nCount = 0; nCount < _data.data.length; nCount++) {
                     var times = new Array
                     (
                         selectedTimeUtcToLocal(_data.data[nCount]['W1']),
@@ -376,15 +361,20 @@ var res = angular.module('ezeidApp').
                         selectedTimeUtcToLocal(_data.data[nCount]['W3']),
                         selectedTimeUtcToLocal(_data.data[nCount]['W4'])
                     );
-                    reserved[nCount] = new Array(
-                        convertHoursToMinutes(_data.data[nCount]['Starttime']),
-                        convertHoursToMinutes(_data.data[nCount]['endtime']),
-                        _data.data[nCount]['reserverName'],
-                        _data.data[nCount]['reserverId'],
-                        _data.data[nCount]['service'],
-                        _data.data[nCount]['Status'],
-                        _data.data[nCount]['TID']
-                    );
+                    if (_data.data[nCount]['TID'] != null) {
+                        reserved[nCount] = new Array(
+                            convertHoursToMinutes(_data.data[nCount]['Starttime']),
+                            convertHoursToMinutes(_data.data[nCount]['endtime']),
+                            _data.data[nCount]['reserverName'],
+                            _data.data[nCount]['reserverId'],
+                            _data.data[nCount]['service'],
+                            _data.data[nCount]['Status'],
+                            _data.data[nCount]['TID']
+                        );
+                    }
+                    else {
+                        reserved[nCount] = [];
+                    }
 
                     formatedData['working'] = times;
                     formatedData['reserved'] = reserved;
@@ -398,22 +388,19 @@ var res = angular.module('ezeidApp').
 
                 /* put reserver data scope */
                 $scope.reservedTime = [
-                    [550, 600, 'sandeep',3,'service1'],
-                    [700, 810, 'rahul',12,'service2'],
-                    [1000, 1140, 'shrey',5,'service3']
+                    [550, 600, 'sandeep', 3, 'service1'],
+                    [700, 810, 'rahul', 12, 'service2'],
+                    [1000, 1140, 'shrey', 5, 'service3']
                 ];
                 $scope.reservedTime = [];
-                for(var i = 0;i< formatedData['reserved'].length; i++)
-                {
+                for (var i = 0; i < formatedData['reserved'].length; i++) {
                     $scope.reservedTime.push(formatedData['reserved'][i]);
                 }
 
                 /* reload calendar */
-                console.log(_data.data);
             };
 
-            function reloadWorkingHours()
-            {
+            function reloadWorkingHours() {
                 /* clean reserved slot */
 
                 /* reload reserved slot */
@@ -421,10 +408,7 @@ var res = angular.module('ezeidApp').
             }
 
 
-
-
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 
 
             /////////////////////////////////////////////////////////
@@ -531,11 +515,25 @@ var res = angular.module('ezeidApp').
                     var startRange = data[0];
                     var endRange = data[1] - 1;//As we don't want last block to be filled
 
+                    /* clear all text */
+                    $('.reserved').html('').removeAttr('style');
+                    /* remove merging */
+                    removeMerge();
+
                     /* color all the blocks */
                     var addCss = 'available';
                     $scope.colorBlocks(startRange, endRange, availabilityColor, addCss);
+
                 }
             };
+
+            /**
+             * Remove merging from blocks
+             */
+            function removeMerge()
+            {
+                $('.blk-content').removeClass('hidden');
+            }
 
             /* color already reserved time */
             /**
@@ -546,7 +544,6 @@ var res = angular.module('ezeidApp').
              * 2b...Call mergeBlockMaster to merge and also write text
              */
             $scope.alreadyReserveSlot = function () {
-                console.log($scope.reservedTime);
                 for (var i = 0; i < $scope.reservedTime.length; i++) {
                     /* get blocks coming under this range */
                     var data = getBlockRange($scope.reservedTime[i][0], $scope.reservedTime[i][1]);
@@ -757,8 +754,16 @@ var res = angular.module('ezeidApp').
 
                 /* get TID and fetch the data for this reservation */
                 var tid = $('.block-'+blockId).data('tid');
+                /* get modal status for isUpdate */
+                if(tid > 0)
+                {
+                    $scope.modal.isUpdate = true;
+                }
+                else
+                {
+                    $scope.modal.isUpdate = false;
+                }
                 getReservationData(tid);
-
 
                 /* show error if the working hour is not in working hour */
                 if(isReserved || isAvailable)
@@ -794,6 +799,10 @@ var res = angular.module('ezeidApp').
              */
             function getReservationData(tid)
             {
+                if(!tid > 0)
+                {
+                    return;
+                }
                 $scope.$emit('$preLoaderStart');
                 $http({
                     url : GURL + 'reservation_trans_details',
@@ -804,7 +813,14 @@ var res = angular.module('ezeidApp').
                 }).success(function(resp){
 
                     $scope.$emit('$preLoaderStop');
-                    console.log(resp.data);
+                    if(resp.status)
+                    {
+                        $scope.reserverMobile = resp.data[0].ContactInfo;
+                        $scope.reservationService = resp.data[0].serviceids;
+                        $scope.startTime = resp.data[0].Starttime.substr(0,5);
+                        $scope.duration = resp.data[0].duration;
+                        $scope.endTime = convertBlockIdToTime((convertHoursToMinutes($scope.startTime) + $scope.duration)/5);
+                    }
                 }).error(function(err){
                     $scope.$emit('$preLoaderStop');
                     Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
@@ -831,7 +847,8 @@ var res = angular.module('ezeidApp').
              */
             $scope.modal = {
                 title: 'Make a reservation',
-                class: 'business-manager-modal'
+                class: 'business-manager-modal',
+                isUpdate: false
             };
 
             /* toggle modal visibility */
@@ -891,6 +908,10 @@ var res = angular.module('ezeidApp').
                 var date = $scope.activeDate;
                 /* http request for getting the new calendar data */
                 getReservationTransactionData($scope.activeResourceId,$scope.activeDate,$scope.searchedEzeid);
+                /* recolor working hours */
+                $scope.colorWorkingHours();
+                /* color reserved hours */
+
             }
 
             /**
@@ -924,6 +945,13 @@ var res = angular.module('ezeidApp').
              */
             $scope.saveReservation = function()
             {
+                var tid = 0;
+                if($scope.modal.isUpdate)
+                {
+                    var minutes = convertHoursToMinutes($scope.startTime);
+                    var blockId = minutes/5;
+                    tid = $('.block-'+blockId).data('tid');
+                }
                 var makeDateTime = $scope.activeDate+' '+$scope.startTime;
 
                 $http({
@@ -931,7 +959,7 @@ var res = angular.module('ezeidApp').
                     method : "POST",
                     data :{
                         Token:$rootScope._userInfo.Token,
-                        TID:0,
+                        TID:tid,
                         contactinfo:$('#userMobile').val(),
                         toEzeid:$scope.searchedEzeid,
                         resourceid:$scope.activeResourceId,
