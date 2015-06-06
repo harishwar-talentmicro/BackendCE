@@ -164,8 +164,8 @@
                     <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 text-right">
                         &nbsp;
                     </div>
-                    <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 text-right">
-                        <button class="btn btn-primary" ng-class="reserverMobile.length > 9?'':'disabled'" ng-click="saveReservation()"><i class="fa fa-check-circle"></i> Save</button>
+                    <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 text-right" ng-hide="">
+                        <button class="btn btn-primary" ng-class="reserverMobile.length > 9?'':'disabled'" ng-click="saveReservation()"><i class="fa fa-check-circle"></i> {{modal.isUpdate?'Update':'Save'}}</button>
                     </div>
                 </div>
             </div>
