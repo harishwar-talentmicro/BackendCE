@@ -134,50 +134,51 @@ angular.module('ezeidApp').controller('CVAttachController',[
 
            $scope.skillMatrix[nCount].active_status = ($scope.skillMatrix[nCount].active_status == true) ? 1 : 0;
            console.log($scope.skillMatrix[nCount].active_status);
-           console.log($scope.skillMatrix[nCount].$$hashKey);
        }
+
 
 
 
         CVAttachCtrl._CVInfo.skillMatrix = $scope.skillMatrix;
 
         if(isValidate())
-     {
-        CVAttachCtrl._CVInfo.TokenNo = $rootScope._userInfo.Token;
-        CVAttachCtrl._CVInfo.Status = parseInt(CVAttachCtrl._CVInfo.Status);
-        $http({
-            method: "POST",
-            url: GURL + 'ewtSaveCVInfo',
-            data: JSON.stringify(CVAttachCtrl._CVInfo),
-            headers: { 'Content-Type': 'application/json' }
-        }).success(function (data) {
-                if(data.IsSuccessfull) {
-                    Notification.success({message: "Saved..", delay: MsgDelay});
-                    getCVInfo();
-                }else{
-                    Notification.error({message: "Sorry..! not saved", delay: MsgDelay});
-                }
-            });
+         {
+            CVAttachCtrl._CVInfo.TokenNo = $rootScope._userInfo.Token;
+            CVAttachCtrl._CVInfo.Status = parseInt(CVAttachCtrl._CVInfo.Status);
+            console.log(CVAttachCtrl._CVInfo);
+            $http({
+                method: "POST",
+                url: GURL + 'ewtSaveCVInfo',
+                data: CVAttachCtrl._CVInfo
+//                headers: { 'Content-Type': 'application/json' }
+            }).success(function (data) {
+                    if(data.IsSuccessfull) {
+                        Notification.success({message: "Saved..", delay: MsgDelay});
+                        getCVInfo();
+                    }else{
+                        Notification.error({message: "Sorry..! not saved", delay: MsgDelay});
+                    }
+                });
 
-        if($scope.DocumentToUpload)
-        {
-            CVAttachCtrl._CVInfo.CVDocFile = $scope.DocumentToUpload[0].name;
-            var $file = $scope.DocumentToUpload[0];
-            var formData = new FormData();
-            formData.append('file', $file);
-            formData.append('TokenNo', $rootScope._userInfo.Token);
-            formData.append('RefType', 7);
+            if($scope.DocumentToUpload)
+            {
+                CVAttachCtrl._CVInfo.CVDocFile = $scope.DocumentToUpload[0].name;
+                var $file = $scope.DocumentToUpload[0];
+                var formData = new FormData();
+                formData.append('file', $file);
+                formData.append('TokenNo', $rootScope._userInfo.Token);
+                formData.append('RefType', 7);
 
-            $http({ method: 'POST', url: '/ewTUploadDoc/', data: formData,
-                headers: { 'Content-Type': undefined }, transformRequest: angular.identity })
-                .success(function (data, status, headers, config) {
-                   // $location.path('/');
-                })
-              .error(function(data, status, headers, config) {
-                    Notification.error({message: "An error occurred..", delay: MsgDelay});
-             });
+                $http({ method: 'POST', url: '/ewTUploadDoc/', data: formData,
+                    headers: { 'Content-Type': undefined }, transformRequest: angular.identity })
+                    .success(function (data, status, headers, config) {
+                       // $location.path('/');
+                    })
+                  .error(function(data, status, headers, config) {
+                        Notification.error({message: "An error occurred..", delay: MsgDelay});
+                 });
+            }
         }
-    }
     };
 
     this.download = function(){
@@ -192,11 +193,12 @@ angular.module('ezeidApp').controller('CVAttachController',[
             params : {
                 TokenNo : $rootScope._userInfo.Token
             }
-        }).success(function (res) {
-
-              if(res.status)
+        }).success(function (res)
+           {
+                if(res.status)
                 {
                     CVAttachCtrl._CVInfo = res.data[0];
+                    $scope.skillMatrix = res.skillMatrix;
 
                     if(CVAttachCtrl._CVInfo.Pin)
                     {
@@ -219,7 +221,7 @@ angular.module('ezeidApp').controller('CVAttachController',[
                 {   CVAttachCtrl._CVInfo.Status= 1;
                     $scope.showLink = false;
                 }
-            });
+           });
     };
 
     this.closeCVDocInfo=function(cvForm){
