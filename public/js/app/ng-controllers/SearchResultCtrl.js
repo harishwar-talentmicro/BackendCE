@@ -164,6 +164,7 @@ var res = angular.module('ezeidApp').
             {
                 $scope.showLoginText = true;
                 Notification.error({ message : 'Please login to search for EZEID', delay : MsgDelay});
+                $scope.$emit('$preLoaderStop');
             }
             else
             {

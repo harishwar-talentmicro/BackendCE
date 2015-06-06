@@ -35,7 +35,6 @@ angular.module('ezeidApp').controller('CVAttachController',[
                 Type:'',
                 Icon:''
             };
-            alert('Sorry..! Browser does not support');
             window.location.href = "index.html";
         }
     }
@@ -55,13 +54,12 @@ angular.module('ezeidApp').controller('CVAttachController',[
         CVAttachCtrl.Functions = data;
     });
 
-    this.getRoleForFunction=function(_functionId){
+   /* this.getRoleForFunction=function(_functionId){
         $http({ method: 'get', url: GURL + 'ewmGetRoles?LangID=1&FunctionID='+_functionId}).success(function (data) {
 
             CVAttachCtrl.RoleTypes = data;
         });
     };
-
     $http({ method: 'get', url: GURL + 'ewmGetCountry?LangID=1' }).success(function (data) {
         var _obj = { CountryID: 0, CountryName: '--Country--', ISDCode: '' };
         data.splice(0, 0, _obj);
@@ -78,7 +76,7 @@ angular.module('ezeidApp').controller('CVAttachController',[
             var _obj = { CityD: 0, CityName: '--City--' };
             CVAttachCtrl.cities = data;
         });
-    };
+    };*/
 
     //if secure pin checkbox is uncheck remove PIN Value
     this.securePinCliked = function () {
@@ -128,46 +126,59 @@ angular.module('ezeidApp').controller('CVAttachController',[
     this.saveCVDocInfo=function(){
 
         console.log($scope.skillMatrix);
-        console.log("SSAi");
+        console.log("SSAi1234");
+
+       for (var nCount = 0; nCount < $scope.skillMatrix.length; nCount++) {
+           // $scope.skillMatrix[nCount].tid = ($scope.skillMatrix[nCount].tid  push(formatedData['reserved'][i]);
+          //  $scope.skillMatrix[nCount].tid = 0;
+
+           $scope.skillMatrix[nCount].active_status = ($scope.skillMatrix[nCount].active_status == true) ? 1 : 0;
+           console.log($scope.skillMatrix[nCount].active_status);
+       }
 
 
-   if(isValidate())
-    {
-        CVAttachCtrl._CVInfo.TokenNo = $rootScope._userInfo.Token;
-        CVAttachCtrl._CVInfo.Status = parseInt(CVAttachCtrl._CVInfo.Status);
-        $http({
-            method: "POST",
-            url: GURL + 'ewtSaveCVInfo',
-            data: JSON.stringify(CVAttachCtrl._CVInfo),
-            headers: { 'Content-Type': 'application/json' }
-        }).success(function (data) {
-                if(data.IsSuccessfull) {
-                    Notification.success({message: "Saved..", delay: MsgDelay});
-                    getCVInfo();
-                }else{
-                    Notification.error({message: "Sorry..! not saved", delay: MsgDelay});
-                }
-            });
 
-        if($scope.DocumentToUpload)
-        {
-            CVAttachCtrl._CVInfo.CVDocFile = $scope.DocumentToUpload[0].name;
-            var $file = $scope.DocumentToUpload[0];
-            var formData = new FormData();
-            formData.append('file', $file);
-            formData.append('TokenNo', $rootScope._userInfo.Token);
-            formData.append('RefType', 7);
 
-            $http({ method: 'POST', url: '/ewTUploadDoc/', data: formData,
-                headers: { 'Content-Type': undefined }, transformRequest: angular.identity })
-                .success(function (data, status, headers, config) {
-                   // $location.path('/');
-                })
-              .error(function(data, status, headers, config) {
-                    Notification.error({message: "An error occurred..", delay: MsgDelay});
-             });
+        CVAttachCtrl._CVInfo.skillMatrix = $scope.skillMatrix;
+
+        if(isValidate())
+         {
+            CVAttachCtrl._CVInfo.TokenNo = $rootScope._userInfo.Token;
+            CVAttachCtrl._CVInfo.Status = parseInt(CVAttachCtrl._CVInfo.Status);
+            console.log(CVAttachCtrl._CVInfo);
+            $http({
+                method: "POST",
+                url: GURL + 'ewtSaveCVInfo',
+                data: CVAttachCtrl._CVInfo
+//                headers: { 'Content-Type': 'application/json' }
+            }).success(function (data) {
+                    if(data.IsSuccessfull) {
+                        Notification.success({message: "Saved..", delay: MsgDelay});
+                        getCVInfo();
+                    }else{
+                        Notification.error({message: "Sorry..! not saved", delay: MsgDelay});
+                    }
+                });
+
+            if($scope.DocumentToUpload)
+            {
+                CVAttachCtrl._CVInfo.CVDocFile = $scope.DocumentToUpload[0].name;
+                var $file = $scope.DocumentToUpload[0];
+                var formData = new FormData();
+                formData.append('file', $file);
+                formData.append('TokenNo', $rootScope._userInfo.Token);
+                formData.append('RefType', 7);
+
+                $http({ method: 'POST', url: '/ewTUploadDoc/', data: formData,
+                    headers: { 'Content-Type': undefined }, transformRequest: angular.identity })
+                    .success(function (data, status, headers, config) {
+                       // $location.path('/');
+                    })
+                  .error(function(data, status, headers, config) {
+                        Notification.error({message: "An error occurred..", delay: MsgDelay});
+                 });
+            }
         }
-    }
     };
 
     this.download = function(){
@@ -178,16 +189,16 @@ angular.module('ezeidApp').controller('CVAttachController',[
     function getCVInfo(){
        $http({
             method: 'get',
-//            url: GURL + 'ewtGetCVInfo?TokenNo=' + $rootScope._userInfo.Token
             url : GURL + 'ewtGetCVInfo',
             params : {
                 TokenNo : $rootScope._userInfo.Token
             }
-        }).success(function (data) {
-              if(data && data !== 'null' && data.length > 0)
+        }).success(function (res)
+           {
+                if(res.status)
                 {
-                    CVAttachCtrl._CVInfo = data[0];
-                    CVAttachCtrl.getRoleForFunction(data[0].FunctionID);
+                    CVAttachCtrl._CVInfo = res.data[0];
+                    $scope.skillMatrix = res.skillMatrix;
 
                     if(CVAttachCtrl._CVInfo.Pin)
                     {
@@ -198,7 +209,7 @@ angular.module('ezeidApp').controller('CVAttachController',[
                         CVAttachCtrl.EnablePin = false;
                     }
 
-                    if(data[0].CVDocFile == "")
+                    if(res.data[0].CVDocFile == "")
                     {
                         $scope.showLink = false;
                     }else
@@ -210,7 +221,7 @@ angular.module('ezeidApp').controller('CVAttachController',[
                 {   CVAttachCtrl._CVInfo.Status= 1;
                     $scope.showLink = false;
                 }
-            });
+           });
     };
 
     this.closeCVDocInfo=function(cvForm){
@@ -228,17 +239,18 @@ angular.module('ezeidApp').controller('CVAttachController',[
         $scope.skillMatrix.push(skill);
         if(nRowCount != 0)
         {
-                $scope.skillMatrix[nRowCount].expertiesLevel = 0;
-            $scope.skillMatrix[nRowCount].activeSkill = true;
+            $scope.skillMatrix[nRowCount].tid = 0;
+            $scope.skillMatrix[nRowCount].expertiseLevel = 0;
+            $scope.skillMatrix[nRowCount].active_status = true;
             nRowCount = nRowCount + 1;
         }
         else
         {
-            $scope.skillMatrix[nRowCount].expertiesLevel = 0;
-            $scope.skillMatrix[nRowCount].activeSkill = true;
+            $scope.skillMatrix[nRowCount].tid = 0;
+            $scope.skillMatrix[nRowCount].expertiseLevel = 0;
+            $scope.skillMatrix[nRowCount].active_status = true;
             nRowCount = nRowCount + 1;
         }
-        console.log($scope.skillMatrix);
     };
 
         $scope.availableTags = [
@@ -271,7 +283,7 @@ angular.module('ezeidApp').controller('CVAttachController',[
             });
 
             $("#tags"+_index ).on( "autocompleteselect", function( event, ui ) {
-               $scope.skillMatrix[_index].skillTitle = inputData=ui.item.value;
+               $scope.skillMatrix[_index].skillname = inputData=ui.item.value;
             } );
         }
 
