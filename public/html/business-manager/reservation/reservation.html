@@ -65,7 +65,7 @@
                                 </div>
                                 <div class="col-lg-6">
                                     <div class="ezeid-title">
-                                        Appolo Hospital
+                                        {{headTitle}}
                                     </div>
                                 </div>
                                 <hr>
@@ -140,7 +140,7 @@
                         <p class="text-black">Start Time</p>
                     </div>
                     <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8">
-                        <input id="start-time" type="text" ng-model="startTime" class="form-control" ng-disabled="!modal.isUpdate" />
+                        <input id="start-time" ng-blur="changeEndTime()" type="text" ng-model="startTime" class="form-control" ng-disabled="!modal.isUpdate" />
                     </div>
                 </div>
                 <div class="row">
@@ -148,7 +148,7 @@
                         <p class="text-black">Approx. End Time</p>
                     </div>
                     <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8">
-                        <input type="text" class="form-control" disabled value="{{endTime}}" />
+                        <input id="end-time" type="text" class="form-control" disabled value="{{endTime}}" />
                     </div>
                 </div>
                 <div class="row">
@@ -156,7 +156,7 @@
                         <p class="text-black">Approx. Duration</p>
                     </div>
                     <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8">
-                        <input type="text" class="form-control" disabled value="{{duration}} mins" />
+                        <input id="duration" data-duration="{{duration}}" type="text" class="form-control" disabled value="{{duration}} mins" />
                     </div>
                 </div>
                 <div class="row">

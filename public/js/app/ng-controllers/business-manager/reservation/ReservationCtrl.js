@@ -111,14 +111,14 @@ var res = angular.module('ezeidApp').
             /* Flag status for opening or close modal box */
             $scope.modalVisible = false;
 
+            /* name of the ezeid */
+            $scope.headTitle = 'Appolo Hospital';
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ///////////////////////////////////////GET DEFAULT CALENDAR DATA////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             $scope.searchedEzeid = 'krunalpaid';
-
-
 
             getResource($scope.searchedEzeid).then(function () {
                 getServicesData($scope.searchedEzeid).then(function () {
@@ -567,7 +567,6 @@ var res = angular.module('ezeidApp').
                     var tid = $scope.reservedTime[i][6];
                     $scope.mergeBlockMaster(data[0], data[1], text, $scope.height,color,title,tid);
                     /* color the block */
-                    console.log($scope.reservedTime);
                 }
             };
 
@@ -1036,5 +1035,47 @@ var res = angular.module('ezeidApp').
                 //$scope.colorWorkingHours();
                 /* relaod calendar */
                 $scope.reloadCalander();
+            }
+
+            $scope.$watch('startTime',function(newV){
+                console.log('startTime : '+newV);
+            });
+
+
+            /**
+             * Update end time on change in end time
+             */
+            $scope.changeEndTime = function()
+            {
+                var startTime = $('#start-time').val();
+                /* round of start time */
+                startTime = $scope.roundOfTime(startTime);
+                $('#start-time').val(startTime);
+
+                var duration = $('#duration').data('duration');
+                var endTimeMins = parseInt(convertHoursToMinutes(startTime)) + parseInt(duration);
+                var time = $scope.convertMinutesToTime(endTimeMins);
+                $('#end-time').val(time);
+                if(time == 'NaN:NaN')
+                {
+                    $('#end-time').val('');
+                }
+            }
+
+            /* round of Time */
+            $scope.roundOfTime = function(startTime)
+            {
+                var mins = convertHoursToMinutes(startTime);
+                if((mins % 5) > 2)
+                {
+                    /* upper value */
+                    mins = mins + (5 - (mins%5));
+                }
+                else
+                {
+                    /* lower value */
+                    mins = mins - (mins%5);
+                }
+                return $scope.convertMinutesToTime(mins);
             }
         }]);
