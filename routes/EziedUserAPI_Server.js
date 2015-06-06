@@ -3051,7 +3051,7 @@ exports.FnSaveCVInfo = function (req, res) {
         // In tFunctionID Int,In tRoleID Int, In tKeySkills varchar(250), In tCVDoc longtext, In tCVDocFile varchar(250), In iStatus int, In tPin varchar(15), In tToken varchar(15)
 
         var FunctionID = req.body.FunctionID;
-        var RoleID = req.body.RoleID;
+        //var RoleID = req.body.RoleID ? req.body.RoleID : 0;
         var KeySkills = req.body.KeySkills;
         //  var CVDoc = req.body.CVDoc;
         // var CVDocFile = req.body.CVDocFile;
@@ -3081,8 +3081,8 @@ exports.FnSaveCVInfo = function (req, res) {
                             Pin = null;
                         }
 
-                        var query = db.escape(FunctionID) + ',' + db.escape(RoleID) + ',' + db.escape(KeySkills) + ',' + db.escape(Status) + ',' + db.escape(Pin) + ',' + db.escape(Token);
-                        //console.log(query);
+                        var query = db.escape(FunctionID) + ',' + db.escape(0) + ',' + db.escape(KeySkills) + ',' + db.escape(Status) + ',' + db.escape(Pin) + ',' + db.escape(Token);
+                        console.log('CALL pSaveCVInfo(' + query + ')');
                         db.query('CALL pSaveCVInfo(' + query + ')', function (err, InsertResult) {
                             console.log(InsertResult);
                             if (!err) {
