@@ -3060,9 +3060,9 @@ exports.FnSaveCVInfo = function (req, res) {
         var Token = req.body.TokenNo;
         var skillMatrix1 = req.body.skillMatrix;
         var resultvalue;
-        console.log(skillMatrix1);
+        //console.log(skillMatrix1);
 //        skillMatrix1 = JSON.parse(skillMatrix1);
-        var skillMatrix = {};
+        var skillMatrix = [];
         var allowedParam = [
             'tid',
             'active_status',
@@ -3071,13 +3071,14 @@ exports.FnSaveCVInfo = function (req, res) {
             'skillname'
         ];
 
-        for(var prop in skillMatrix1){
-            if(skillMatrix1.hasOwnProperty(prop) && allowedParam.indexOf(prop)){
-                skillMatrix[prop] = skillMatrix1[prop];
+        for(var cn = 0; cn < skillMatrix1.length ; cn++){
+            skillMatrix[cn] = {};
+                for(var prop in skillMatrix1[cn]){
+                    if(skillMatrix1[cn].hasOwnProperty(prop) && (allowedParam.indexOf(prop) !== -1)){
+                        skillMatrix[cn][prop] = skillMatrix1[cn][prop];
+                    }
+                }
             }
-        }
-
-        console.log(skillMatrix);
         
         var RtnMessage = {
             IsSuccessfull: false
@@ -3100,14 +3101,16 @@ exports.FnSaveCVInfo = function (req, res) {
                         var query = db.escape(FunctionID) + ',' + db.escape(0) + ',' + db.escape(KeySkills) + ',' + db.escape(Status) + ',' + db.escape(Pin) + ',' + db.escape(Token);
                         console.log('CALL pSaveCVInfo(' + query + ')');
                         db.query('CALL pSaveCVInfo(' + query + ')', function (err, InsertResult) {
-                            console.log(InsertResult);
+                            
                             if (!err) {
                                 RtnMessage.IsSuccessfull = true;
                                 console.log('FnSaveCVInfo: CV Info Saved successfully');
                                 res.send(RtnMessage);
+                                
                                 for(var i=0; i < skillMatrix.length; i++) {
                                             var skillDetails = skillMatrix[i];
-                                          var tid= skillDetails.tid
+                                    
+                                          var tid= skillDetails.tid;
                                             var skills = {
                                                 skillname: skillDetails.skillname,
                                                 expertiseLevel: skillDetails.expertiseLevel,
@@ -3116,7 +3119,7 @@ exports.FnSaveCVInfo = function (req, res) {
                                                 cvid : InsertResult[0][0].ID
                                                 
                                             };
-                                console.log(skills);
+                                   
                                      var query1 = db.query('Select SkillID from mskill where SkillTitle like ' + db.escape(skills.skillname),function (err, result1){
                                  
                                          if(result1[0] == null){
@@ -3165,7 +3168,13 @@ exports.FnSaveCVInfo = function (req, res) {
                                          
                                          else
                                          {
-                                             var query = db.query('UPDATE tskills set skillID='+resultvalue+',expertlevel='+db.escape(skills.expertiseLevel)+',expyrs='+db.escape(skills.exp)+',skillstatusid='+db.escape(skills.active_status)+',cvid='+db.escape(skills.cvid)+'  WHERE TID =' + tid + ' ', function (err, result) {
+                                             console.log(tid);
+                                             var quer = 'UPDATE tskills set skillID='+
+                                                 resultvalue+',expertlevel='+db.escape(skills.expertiseLevel)+', expyrs='+
+                                                                  db.escape(skills.exp)+', skillstatusid='+db.escape(skills.active_status)+
+                                                                  ',cvid='+db.escape(skills.cvid)+'  WHERE TID =' + tid + ' ';
+                                             console.log(quer);
+                                             db.query(quer, function (err, result) {
                                             
                                             console.log(result);
                                             if (!err) {
