@@ -14651,8 +14651,8 @@ exports.FnChangeReservationStatus = function(req,res){
                         responseMsg['error'] = null;
                         responseMsg['message'] = 'Status changed successfully';
                         responseMsg['data'] = {
-                            tid : req.body.tid,
-                            status : req.body.status
+                            tid : tid,
+                            status : status
                         };
                         res.status(200).json(responseMsg);
                     }
