@@ -984,7 +984,8 @@
             <h5 class="text-primary text-left font-open-sans data">
                 <select class="form-control" ng-model="editLocationDetails.TemplateID" name="primaryLocationForm.TemplateID">
                     <option value="0">--Select Working Hours Template--</option>
-                    <option ng-repeat="template in workingHoursTemplateMap" value="{{template.TID}}">{{template.TemplateName}}</option>
+                    <option ng-repeat="template in workingHoursTemplateMap"
+                            value="{{template.TID}}">{{template.TemplateName}}</option>
                 </select>
             </h5>
         </div>
