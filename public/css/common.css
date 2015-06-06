@@ -452,6 +452,7 @@ body{
 body > div.viewport{
     min-height: 100%;
     height: 100%;
+    overflow : auto;
 }
 body > div.viewport > div#wrapper{
     min-height: 94%;
