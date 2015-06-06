@@ -789,14 +789,27 @@ var res = angular.module('ezeidApp').
                 /* show error if the working hour is not in working hour */
                 if(isReserved || isAvailable)
                 {
+                    /* check if the resource is available for this resource */
                     if(!$scope.currentServiceArray.length > 0)
                     {
                         Notification.error({ message: "No Services available for this resource!", delay: MsgDelay });
+                        $scope.disableCalendar();
                         return;
                     }
+
                     $scope.clickedBlockId = blockId;
                     $scope.startTime = convertBlockIdToTime(blockId);
                     $scope.currentBlockMinute = convertBlockIdToMinute(blockId);
+
+                    /* Check for checking if reservation is in past */
+                    var selectedTime = $scope.convertMinutesToTime($scope.currentBlockMinute);
+                    var activeDate = moment($scope.activeDate).format('YYYY-MM-DD');
+                    if(!checkIfPastDate(activeDate))
+                    {
+                        Notification.error({ message: "Your reservation can't be in the past", delay: MsgDelay });
+                        return;
+                    }
+
                     if(typeof($scope.currentServiceArray[0]) != 'undefined')
                     {
                         $scope.duration = $scope.currentServiceArray[0].duration;
@@ -812,6 +825,23 @@ var res = angular.module('ezeidApp').
                 else
                 {
                     Notification.error({ message: "You can't make a reservation in non-working hours", delay: MsgDelay });
+                }
+            }
+
+            /**
+             * Check if the reservation is in past
+             */
+            function checkIfPastDate(date)
+            {
+                var now = moment().format('YYYY-MM-DD');
+                
+                if(activeDate >= now)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
                 }
             }
 
@@ -1077,5 +1107,14 @@ var res = angular.module('ezeidApp').
                     mins = mins - (mins%5);
                 }
                 return $scope.convertMinutesToTime(mins);
+            }
+
+            /**
+             * Disable the whole calendar in case of NO SERVICE
+             */
+            $scope.disableCalendar = function()
+            {
+                /* remove all the available slots */
+                $('.blk-content').removeClass('available').removeAttr('style');
             }
         }]);
