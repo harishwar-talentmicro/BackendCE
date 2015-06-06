@@ -1068,7 +1068,7 @@ var res = angular.module('ezeidApp').
             }
 
             $scope.$watch('startTime',function(newV){
-                console.log('startTime : '+newV);
+                //console.log('startTime : '+newV);
             });
 
 

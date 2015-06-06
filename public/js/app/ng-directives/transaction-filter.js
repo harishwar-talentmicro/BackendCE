@@ -78,7 +78,7 @@
                 scope.popOverContent += '<option value="'+ scope.filterList[i].TID +'">'+ scope.filterList[i].StatusTitle +'</option>';
             }
 
-            //////console.log(scope.popOverContent);
+            ////////console.log(scope.popOverContent);
 
             element.html(htmlTemplate).show();
             element.find('button').popover({

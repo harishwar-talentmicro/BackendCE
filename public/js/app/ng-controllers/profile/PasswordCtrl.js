@@ -96,7 +96,7 @@ angular.module('ezeidApp').controller('PasswordCtrl',[
                             delay : MsgDelay
                         });
                     }
-                // //////console.log(resp);
+                // ////////console.log(resp);
             }).error(function(err){
                 Notification.error({
                     message : 'An error occured ! Please try again',

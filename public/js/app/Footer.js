@@ -64,7 +64,7 @@ FooterApp.directive('footerSection', function () {
         controllerAs: 'FooterCtrl',
         link: function () {
             $('#legal-link').click(function(){
-                //////console.log("sai");
+                ////////console.log("sai");
                 $('#Legal_popup').slideDown();
             });
             $('#legal-popup-close').click(function(){

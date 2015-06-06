@@ -552,7 +552,7 @@
              */
             $scope.removeItem = function(txItem){
                 var txItemIndex  = $scope.modalBox.tx.itemList.indexOfWhere('ItemID',txItem.ItemID);
-                //////console.log(txItemIndex);
+                ////////console.log(txItemIndex);
                 $scope.modalBox.tx.itemList.splice(txItemIndex,1);
             };
 
@@ -700,7 +700,7 @@
                         FunctionType : 2    // For home delivery
                     }
                 }).success(function(resp){
-                    ////console.log(resp);
+                    //////console.log(resp);
                     if(resp && resp !== 'null' && resp.hasOwnProperty('Result')){
 
                         if(resp.Result && resp.Result.length > 0){
@@ -888,7 +888,7 @@
 
             var init = function(){
                 $scope.loadfilterStatusTypes().then(function(resp){
-                    //////console.log(resp);
+                    ////////console.log(resp);
                     $scope.loadTxActionTypes().then(function(){
                         $scope.loadTxStatusTypes().then(function(){
                             $scope.loadTransaction(1,-1).then(function(){
@@ -1019,7 +1019,7 @@
                         itemList = JSON.parse(data.ItemsList);
                     }
                     catch(ex){
-                        ////console.log(ex);
+                        //////console.log(ex);
                     }
                     var msg = '';
                     for(var ct = 0; ct < itemList.length; ct++){

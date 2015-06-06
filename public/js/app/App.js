@@ -251,7 +251,7 @@
             /**
              * Fetching userInfo From local storage here if userInfo is not found in $rootScope
              */
-            console.log($queryLsToken);
+            //console.log($queryLsToken);
             if(!$rootScope._userInfo){
                 $rootScope._userInfo = $queryLsToken;
             }
