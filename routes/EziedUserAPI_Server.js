@@ -3061,7 +3061,7 @@ exports.FnSaveCVInfo = function (req, res) {
         var skillMatrix1 = req.body.skillMatrix;
         var resultvalue;
         skillMatrix1 = JSON.parse(skillMatrix);
-        skillMatrix = {};
+        var skillMatrix = {};
         var allowedParam = [
             'tid',,
             'active_status',
