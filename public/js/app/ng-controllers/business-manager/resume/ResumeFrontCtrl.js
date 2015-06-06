@@ -572,7 +572,7 @@
              * @returns {boolean}
              */
             var checkResumeAttached = function(){
-                var promise = $q.defer;
+                var promise = $q.defer();
                 /**
                  * @todo Check if resume attached or not for a person who is applying for this job
                  *
@@ -604,6 +604,9 @@
              * Saving transaction in
              * @param editMode
              */
+
+            $scope.isResumeAttached = true;
+
             $scope.saveTransaction = function(){
 
                 $scope.txerror = {
@@ -626,7 +629,7 @@
                  * and then only allow him to apply for the job else throw an error and
                  * say him a message to upload the resume
                  */
-                $scope.isResumeAttached = true;
+
                 checkResumeAttached().then(function(attached){
                     if(!attached){
                         $scope.isResumeAttached = false;

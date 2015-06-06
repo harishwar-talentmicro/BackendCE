@@ -677,7 +677,7 @@ angular.module('ezeidApp').
             {
                 $('#SignIn_popup').slideDown();
             }
-            else if($rootScope._userInfo.IDTypeID == 1){
+            else {
                 $scope._showResumeModal = !$scope._showResumeModal;
             }
         };
