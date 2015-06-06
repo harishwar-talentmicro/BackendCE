@@ -3051,7 +3051,7 @@ exports.FnSaveCVInfo = function (req, res) {
         // In tFunctionID Int,In tRoleID Int, In tKeySkills varchar(250), In tCVDoc longtext, In tCVDocFile varchar(250), In iStatus int, In tPin varchar(15), In tToken varchar(15)
 
         var FunctionID = req.body.FunctionID;
-        var RoleID = req.body.RoleID;
+        //var RoleID = req.body.RoleID ? req.body.RoleID : 0;
         var KeySkills = req.body.KeySkills;
         //  var CVDoc = req.body.CVDoc;
         // var CVDocFile = req.body.CVDocFile;
@@ -3081,8 +3081,8 @@ exports.FnSaveCVInfo = function (req, res) {
                             Pin = null;
                         }
 
-                        var query = db.escape(FunctionID) + ',' + db.escape(RoleID) + ',' + db.escape(KeySkills) + ',' + db.escape(Status) + ',' + db.escape(Pin) + ',' + db.escape(Token);
-                        //console.log(query);
+                        var query = db.escape(FunctionID) + ',' + db.escape(0) + ',' + db.escape(KeySkills) + ',' + db.escape(Status) + ',' + db.escape(Pin) + ',' + db.escape(Token);
+                        console.log('CALL pSaveCVInfo(' + query + ')');
                         db.query('CALL pSaveCVInfo(' + query + ')', function (err, InsertResult) {
                             console.log(InsertResult);
                             if (!err) {
@@ -11653,7 +11653,7 @@ exports.FnGetReservTask = function (req, res) {
         };
         
         if (resourceid) {
-            console.log('CALL pGetResTrans(' + db.escape(resourceid) + ',' + db.escape(date) + ',' + db.escape(toEzeid) + ')');
+            
             db.query('CALL pGetResTrans(' + db.escape(resourceid) + ',' + db.escape(date) + ',' + db.escape(toEzeid) + ')', function (err, GetResult) {
                             if (!err) {
                                 if (GetResult != null) {
@@ -11710,6 +11710,86 @@ exports.FnGetReservTask = function (req, res) {
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
         console.log('FnGetReservTask:error ' + ex.description);
+        throw new Error(ex);
+        res.status(400).json(responseMessage);
+    }
+};
+
+//method to get trans details
+exports.FnGetResTransDetails = function (req, res) {
+    
+    try {
+
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var TID = req.query.TID;
+
+        var responseMessage = {
+            status: false,
+            data: null,
+            error:{},
+            message:''
+        };
+        
+        if (TID) {
+            
+            db.query('CALL pGetResTransDetails(' + db.escape(TID) + ')', function (err, GetResult) {
+                            if (!err) {
+                                if (GetResult != null) {
+                                    if (GetResult[0].length > 0) {
+                                        responseMessage.status = true;
+                                        responseMessage.data = GetResult[0] ;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Reservation Trans details Send successfully';
+                                        console.log('FnGetResTransDetails: Reservation Trans details Send successfully');
+                                        res.status(200).json(responseMessage);
+                                    }
+                                    else {
+                                        
+                                        responseMessage.error = {};
+                                        responseMessage.message = 'No founded Reservation Trans details';
+                                        console.log('FnGetResTransDetails: No founded Reservation Trans details');
+                                        res.json(responseMessage);
+                                    }
+                                }
+                                else {
+
+                                    
+                                    responseMessage.error = {};
+                                    responseMessage.message = 'No founded Reservation Trans details';
+                                    console.log('FnGetResTransDetails: No founded Reservation Trans details');
+                                    res.json(responseMessage);
+                                }
+
+                            }
+                            else {
+                                
+                                responseMessage.data = null ;
+                                responseMessage.error = {};
+                                responseMessage.message = 'Error in getting Reservation Task details';
+                                console.log('FnGetResTransDetails: error in getting Reservation Task details' + err);
+                                res.status(500).json(responseMessage);
+                            }
+                        });
+                    }
+                    
+        else {
+            if (!TID) {
+                responseMessage.message = 'Invalid TID';            
+                responseMessage.error = {
+                    resourceid : 'Invalid TID'
+                };
+                console.log('FnGetResTransDetails: TID is mandatory field');
+            }
+           
+            res.status(401).json(responseMessage);
+        }
+    }
+     catch (ex) {
+        responseMessage.error = {};
+        responseMessage.message = 'An error occured !'
+        console.log('FnGetResTransDetails:error ' + ex.description);
         throw new Error(ex);
         res.status(400).json(responseMessage);
     }
