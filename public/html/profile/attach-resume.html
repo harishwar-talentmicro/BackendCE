@@ -116,6 +116,7 @@
                 <tbody>
                 <tr ng-repeat="skill in skillMatrix">
                     <td class="panelPd5px msg_pos">
+
                         <div class="ui-widget">
                           <!--  <input class="form-control" type="text" ng-model="skillMatrix[$index].tid" />-->
                             <input class="form-control" type="text" id="tags{{$index}}" ng-keyup="complete($index)" ng-model="skillMatrix[$index].skillname" placeholder="Type skill here"/>
@@ -130,13 +131,13 @@
                         </select>
                     </td>
                     <td class="panelPd5px msg_pos">
-                        <input type="text" name="experienceYear" numbers-only ng-model="skillMatrix[$index].exp" class="form-control" placeholder="Ex. 5.00"/>
+                       <input type="text" name="experienceYear" numbers-only ng-model="skillMatrix[$index].exp" class="form-control" placeholder="Ex. 5.00"/>
                     </td>
                     <td class="panelPd5px msg_pos">
                         <input type="checkbox" checked="checked" ng-model="skillMatrix[$index].active_status"/>
                     </td>
                     <td class="panelPd5px msg_pos">
-                        <label class="btn btn-primary panelTextSize" ng-click="deleteSkilFromMartix($index)">Delete</label>
+                        <label class="btn btn-primary panelTextSize" ng-click="deleteSkilFromMartix($index,skillMatrix[$index].tid)">Delete</label>
                     </td>
                 </tr>
                 </tbody>
