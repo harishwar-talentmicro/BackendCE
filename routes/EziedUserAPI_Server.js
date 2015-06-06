@@ -14638,7 +14638,7 @@ exports.FnChangeReservationStatus = function(req,res){
             return;
         }
         else{
-            var queryParam = db.escape(tid) + ',' + db.escape(status) + ',' + db.escape(TID);
+            var queryParam = db.escape(tid) + ',' + db.escape(status);
             db.query('CALL PUpdateResTransStatus(' + queryParam + ')', function (err, updateRes) {
                 if(err){
                     responseMsg.message = 'An error occurred ! Please try again';
@@ -14646,15 +14646,28 @@ exports.FnChangeReservationStatus = function(req,res){
                     res.status(400).json(responseMsg);
                 }
                 else{
-                    responseMsg['status'] = true;
-                    responseMsg['error'] = null;
-                    responseMsg['message'] = 'Status changed successfully';
-                    responseMsg['data'] = {
-                        tid : req.body.tid,
-                        status : req.body.status,
-                        updateRes : updateRes
-                    };
-                    res.status(200).json(responseMsg);
+                    if(updateRes.affectedRows > 0){
+                        responseMsg['status'] = true;
+                        responseMsg['error'] = null;
+                        responseMsg['message'] = 'Status changed successfully';
+                        responseMsg['data'] = {
+                            tid : req.body.tid,
+                            status : req.body.status
+                        };
+                        res.status(200).json(responseMsg);
+                    }
+                    else{
+                        responseMsg['status'] = false;
+                        responseMsg['error'] = {server : 'An error occurred'};
+                        responseMsg['message'] = 'Unable to update ! Please try again';
+                        responseMsg['data'] = {
+                            tid : req.body.tid,
+                            status : req.body.status
+                        };
+                        res.status(400).json(responseMsg);
+                    }
+
+
                 }
             });
         }
