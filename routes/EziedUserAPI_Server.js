@@ -3058,9 +3058,24 @@ exports.FnSaveCVInfo = function (req, res) {
         var Status = parseInt(req.body.Status);
         var Pin = req.body.Pin;
         var Token = req.body.TokenNo;
-        var skillMatrix = req.body.skillMatrix;
+        var skillMatrix1 = req.body.skillMatrix;
         var resultvalue;
-        skillMatrix = JSON.parse(skillMatrix);
+        skillMatrix1 = JSON.parse(skillMatrix);
+        skillMatrix = {};
+        var allowedParam = [
+            'tid',,
+            'active_status',
+            'exp',
+            'expertiseLevel',
+            'skillname'
+        ];
+
+        for(var prop in skillMatrix1){
+            if(skillMatrix1.hasOwnProperty(prop) && allowedParam.indexOf(prop)){
+                skillMatrix[prop] = skillMatrix1[prop];
+            }
+        }
+
         console.log(skillMatrix);
         
         var RtnMessage = {
@@ -5790,6 +5805,9 @@ exports.FnCreateSubUser = function(req, res){
         var ServiceRules = req.body.ServiceRules;
         var ResumeRules = req.body.ResumeRules;
         var MasterID = req.body.PersonalID;
+        var templateID = parseInt(req.body.templateID);
+        if(templateID.toString() == 'NaN')
+            templateID =0;  
 
         var RtnMessage = {
             IsSuccessfull: false,
@@ -5806,7 +5824,7 @@ exports.FnCreateSubUser = function(req, res){
                     var query = db.escape(Token) + ',' + db.escape(TID) + ',' + db.escape(UserName) + ',' +db.escape(Status) + ',' +db.escape(FirstName) + ',' +db.escape(LastName)
                         + ',' + db.escape(AccessRights) + ',' + db.escape(SalesEmail) + ',' + db.escape(ReservationEmail) + ',' +db.escape(HomeDeliveryEmail)
                         + ',' + db.escape(ServiceEmail) + ',' + db.escape(ResumeEmail) + ',' + db.escape(SalesRules) + ',' +db.escape(ReservationRules)
-                        + ',' + db.escape(HomeDeliveryRules) + ',' + db.escape(ServiceRules) + ',' + db.escape(ResumeRules) + ',' + db.escape(MasterID);
+                        + ',' + db.escape(HomeDeliveryRules) + ',' + db.escape(ServiceRules) + ',' + db.escape(ResumeRules) + ',' + db.escape(MasterID) + ',' + db.escape(templateID);
                     console.log(query);
                     db.query('CALL pCreateSubUser(' + query + ')', function (err, InsertResult) {
                         if (!err){
