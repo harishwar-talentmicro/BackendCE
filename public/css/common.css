@@ -449,7 +449,13 @@ body{
     min-height: 100%;
     height: 100%;
 }
-body > div.viewport{
+body > div.ezeid-app-container {
+    min-height: 100%;
+    height: 100%;
+    overflow : auto;
+}
+
+body > div.ezeid-app-container > div.viewport{
     min-height: 100%;
     height: 100%;
     overflow : auto;
