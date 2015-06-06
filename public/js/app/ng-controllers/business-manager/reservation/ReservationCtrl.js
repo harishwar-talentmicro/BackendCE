@@ -804,11 +804,13 @@ var res = angular.module('ezeidApp').
                     /* Check for checking if reservation is in past */
                     var selectedTime = $scope.convertMinutesToTime($scope.currentBlockMinute);
                     var activeDate = moment($scope.activeDate).format('YYYY-MM-DD');
-                    if(!checkIfPastDate(activeDate))
+
+                    if(!checkIfPastDateTime(activeDate,$scope.currentBlockMinute))
                     {
-                        Notification.error({ message: "Your reservation can't be in the past", delay: MsgDelay });
+                        Notification.error({ message: "You can't save or edit a reservation in the past", delay: MsgDelay });
                         return;
                     }
+                    /* check if the reservation slot is available or not */
 
                     if(typeof($scope.currentServiceArray[0]) != 'undefined')
                     {
@@ -829,13 +831,26 @@ var res = angular.module('ezeidApp').
             }
 
             /**
+             * Check if the reservation slot is available or not
+             */
+            function isReservationSlotAvailable(startTimeMins,duratiion)
+            {
+                /* get start block id */
+                /* based on the duration get last block id */
+
+                /* traverse all the blocks and check if the block is having class:'available', && not class:'reserved' */
+            }
+
+            /**
              * Check if the reservation is in past
              */
-            function checkIfPastDate(date)
+            function checkIfPastDateTime(selectedDate,selectedTimeMins)
             {
                 var now = moment().format('YYYY-MM-DD');
-                
-                if(activeDate >= now)
+                var time = moment().format('HH:mm');
+                var mins = convertHoursToMinutes(time);
+                //if((selectedDate >= now) && (selectedTimeMins >= (mins - 5)))
+                if(selectedDate >= now)
                 {
                     return true;
                 }
