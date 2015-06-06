@@ -177,13 +177,20 @@ angular.module('ezeidApp').
                   $timeout(function () {
                         $scope.SearchInfo = data[0];
                         $scope.showDetailsModal = true;
-                        $scope.$watch('showDetailsModal',function(newVal,oldVal){
-                            if(!newVal){
-                                //Below line is for Loading img
-                                $scope.$emit('$preLoaderStart');
-                                $window.history.back();
-                            }
-                        });
+
+                            $scope.$watch('showDetailsModal',function(newVal,oldVal){
+                                if(!newVal){
+                                    //Below line is for Loading img
+                                    if(!$scope.businessModalOpen){
+                                        $scope.$emit('$preLoaderStart');
+                                        $timeout(function(){
+
+                                            $window.history.back();
+                                        },500);
+
+                                    }
+                                }
+                            });
 
                         if($scope.SearchInfo.IDTypeID == 2)
                         {
@@ -622,8 +629,12 @@ angular.module('ezeidApp').
             {
                 $('#SignIn_popup').slideDown();
             }
-            else{
-                $scope._showSalesModal = !$scope._showSalesModal;
+            else {
+                $scope.businessModalOpen = true;
+                $scope.showDetailsModal = false;
+                $timeout(function () {
+                    $scope._showSalesModal = !$scope._showSalesModal;
+                }, 500);
             }
         };
 
@@ -646,7 +657,11 @@ angular.module('ezeidApp').
                 $('#SignIn_popup').slideDown();
             }
             else{
-                $scope._showHomeDeliveryModal = !$scope._showHomeDeliveryModal;
+                $scope.businessModalOpen = true;
+                $scope.showDetailsModal = false;
+                $timeout(function() {
+                    $scope._showHomeDeliveryModal = !$scope._showHomeDeliveryModal;
+                },500);
             }
         };
 
@@ -662,7 +677,11 @@ angular.module('ezeidApp').
                 $('#SignIn_popup').slideDown();
             }
             else{
-                $scope._showServiceModal = !$scope._showServiceModal;
+                $scope.businessModalOpen = true;
+                $scope.showDetailsModal = false;
+                $timeout(function() {
+                    $scope._showServiceModal = !$scope._showServiceModal;
+                },500);
             }
         };
 
@@ -678,10 +697,44 @@ angular.module('ezeidApp').
                 $('#SignIn_popup').slideDown();
             }
             else {
-                $scope._showResumeModal = !$scope._showResumeModal;
+                $scope.businessModalOpen = true;
+                $scope.showDetailsModal = false;
+                $timeout(function(){
+                    $scope._showResumeModal = !$scope._showResumeModal;
+                },500);
+
             }
         };
 
+        $scope.businessModalOpen = false;
+
+        $scope.$watch('_showSalesModal',function(n){
+            if(!n){
+                $scope.businessModalOpen = false;
+                $scope.showDetailsModal = true;
+            }
+        });
+
+        $scope.$watch('_showHomeDeliveryModal',function(n){
+            if(!n){
+                $scope.businessModalOpen = false;
+                $scope.showDetailsModal = true;
+            }
+        });
+
+        $scope.$watch('_showServiceModal',function(n){
+            if(!n){
+                $scope.businessModalOpen = false;
+                $scope.showDetailsModal = true;
+            }
+        });
+
+        $scope.$watch('_showResumeModal',function(n){
+            if(!n){
+                $scope.businessModalOpen = false;
+                $scope.showDetailsModal = true;
+            }
+        });
 
     }
 ]);
