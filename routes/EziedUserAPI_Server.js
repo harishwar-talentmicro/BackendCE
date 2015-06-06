@@ -1,6 +1,7 @@
 var DbHelper = require('./../helpers/DatabaseHandler'),
 db = DbHelper.getDBContext();
 
+
 function error(err, req, res, next) {
     // log it
     console.error(err.stack);
@@ -2967,89 +2968,12 @@ exports.FnUpdateProfilePicture = function (req, res) {
     }
 };
 
-//need to change in server
-exports.FnSaveCVInfoOld = function (req, res) {
-    try {
-        res.setHeader("Access-Control-Allow-Origin", "*");
-        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-        // In tFunctionID Int,In tRoleID Int, In tKeySkills varchar(250), In tCVDoc longtext, In tCVDocFile varchar(250), In iStatus int, In tPin varchar(15), In tToken varchar(15)
-
-        var FunctionID = req.body.FunctionID;
-        var RoleID = req.body.RoleID;
-        var KeySkills = req.body.KeySkills;
-        //  var CVDoc = req.body.CVDoc;
-        // var CVDocFile = req.body.CVDocFile;
-        var Status = parseInt(req.body.Status);
-        var Pin = req.body.Pin;
-        var Token = req.body.TokenNo;
-
-        var RtnMessage = {
-            IsSuccessfull: false
-        };
-        var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
-
-        if (Token != null) {
-            FnValidateToken(Token, function (err, Result) {
-                if (!err) {
-                    if (Result != null) {
-                        // console.log(datechange);
-                        //var fileName = '';
-                        //if (CVDocFile != null) {
-                        //    fileName = CVDocFile.split('.').pop();
-                        //}
-                        if (Pin == '') {
-                            Pin = null;
-                        }
-
-                        var query = db.escape(FunctionID) + ',' + db.escape(RoleID) + ',' + db.escape(KeySkills) + ',' + db.escape(Status) + ',' + db.escape(Pin) + ',' + db.escape(Token);
-                        //console.log(query);
-                        db.query('CALL pSaveCVInfo(' + query + ')', function (err, InsertResult) {
-                            if (!err) {
-                                RtnMessage.IsSuccessfull = true;
-                                console.log('FnSaveCVInfo: CV Info Saved successfully');
-                                res.send(RtnMessage);
-                            }
-                            else {
-                                res.send(RtnMessage);
-                                res.statusCode = 500;
-                                console.log('FnSaveCVInfo: Error in saving CV Info  : ' + err);
-                            }
-                        });
-                    }
-                    else {
-                        console.log('FnSaveCVInfo: Invalid Token');
-                        res.statusCode = 401;
-                        res.send(RtnMessage);
-                    }
-                }
-                else {
-                    console.log('FnSaveCVInfo: Token error: ' + err);
-                    res.statusCode = 500;
-                    res.send(RtnMessage);
-                }
-            });
-
-        }
-        else {
-            console.log('FnSaveCVInfo: Token is empty');
-            res.statusCode = 400;
-            res.send(RtnMessage);
-        }
-
-    }
-    catch (ex) {
-        console.log('FnSaveCVInfo error:' + ex.description);
-        throw new Error(ex);
-    }
-};
-
-
 exports.FnSaveCVInfo = function (req, res) {
     try {
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         // In tFunctionID Int,In tRoleID Int, In tKeySkills varchar(250), In tCVDoc longtext, In tCVDocFile varchar(250), In iStatus int, In tPin varchar(15), In tToken varchar(15)
-
+         var ids = req.body.skillsTid;
         var FunctionID = req.body.FunctionID;
         //var RoleID = req.body.RoleID ? req.body.RoleID : 0;
         var KeySkills = req.body.KeySkills;
@@ -3059,9 +2983,7 @@ exports.FnSaveCVInfo = function (req, res) {
         var Pin = req.body.Pin;
         var Token = req.body.TokenNo;
         var skillMatrix1 = req.body.skillMatrix;
-        var resultvalue;
-        //console.log(skillMatrix1);
-//        skillMatrix1 = JSON.parse(skillMatrix1);
+
         var skillMatrix = [];
         var allowedParam = [
             'tid',
@@ -3070,16 +2992,16 @@ exports.FnSaveCVInfo = function (req, res) {
             'expertiseLevel',
             'skillname'
         ];
-
+        var resultvalue='';
         for(var cn = 0; cn < skillMatrix1.length ; cn++){
             skillMatrix[cn] = {};
-                for(var prop in skillMatrix1[cn]){
-                    if(skillMatrix1[cn].hasOwnProperty(prop) && (allowedParam.indexOf(prop) !== -1)){
-                        skillMatrix[cn][prop] = skillMatrix1[cn][prop];
-                    }
+            for(var prop in skillMatrix1[cn]){
+                if(skillMatrix1[cn].hasOwnProperty(prop) && (allowedParam.indexOf(prop) !== -1)){
+                    skillMatrix[cn][prop] = skillMatrix1[cn][prop];
                 }
             }
-        
+        }
+
         var RtnMessage = {
             IsSuccessfull: false
         };
@@ -3089,64 +3011,58 @@ exports.FnSaveCVInfo = function (req, res) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
-                        // console.log(datechange);
-                        //var fileName = '';
-                        //if (CVDocFile != null) {
-                        //    fileName = CVDocFile.split('.').pop();
-                        //}
+
                         if (Pin == '') {
                             Pin = null;
                         }
-
-                        var query = db.escape(FunctionID) + ',' + db.escape(0) + ',' + db.escape(KeySkills) + ',' + db.escape(Status) + ',' + db.escape(Pin) + ',' + db.escape(Token);
-                        console.log('CALL pSaveCVInfo(' + query + ')');
+                        var query = db.escape(FunctionID) + ',' + db.escape(0) + ',' + db.escape(KeySkills) + ',' + db.escape(Status) + ',' + db.escape(Pin) + ',' + db.escape(Token) + ',' + db.escape(ids) ;
                         db.query('CALL pSaveCVInfo(' + query + ')', function (err, InsertResult) {
-                            
                             if (!err) {
                                 RtnMessage.IsSuccessfull = true;
                                 console.log('FnSaveCVInfo: CV Info Saved successfully');
+                                console.log(skillMatrix.length);
                                 res.send(RtnMessage);
-                                
                                 for(var i=0; i < skillMatrix.length; i++) {
                                             var skillDetails = skillMatrix[i];
-                                    
-                                          var tid= skillDetails.tid;
+                                          var tid= skillDetails.tid
                                             var skills = {
                                                 skillname: skillDetails.skillname,
                                                 expertiseLevel: skillDetails.expertiseLevel,
                                                 exp: skillDetails.exp,
                                                 active_status: skillDetails.active_status,
                                                 cvid : InsertResult[0][0].ID
-                                                
                                             };
-                                   
+                                    console.log(skills);
+                                    console.log(skills.skillname);
                                      var query1 = db.query('Select SkillID from mskill where SkillTitle like ' + db.escape(skills.skillname),function (err, result1){
-                                 
-                                         if(result1[0] == null){
+
+                                         if(result1[0] == null)
+                                         {
+                                             console.log('Insert');
                                              var query2 = db.query('insert into mskill (SkillTitle) values ('+ db.escape(skills.skillname) +')', function (err, result2){
-                                        
                                                  if(!err){
                                                      var query3 = db.query('select max(skillID) as SkillID from mskill',function (err, result3){
                                                          if(!err){
                                                          resultvalue = result3[0].SkillID;
-                                                         
                                                         }
-                                                         else{console.log(err);}
+                                                         else{console.log('FnSaveCVInfo error in processinig: '+err);}
                                                      });
                                                  }
-                                                 else{console.log(err);}
+                                                 else{console.log('FnSaveCVInfo error in processinig: '+err);}
                                          });
                                         }
                                          else
                                          {
+                                             console.log('Update');
+                                             console.log(result1[0].SkillID);
                                             resultvalue = result1[0].SkillID;
-                                              
+
                                          }
-                                    
-                                if(tid == 0){
-                                    console.log('INSERT INTO tskills(skillID,expertlevel,expyrs,skillstatusid, cvid) values ('+resultvalue+','+db.escape(skills.expertiseLevel)+','+db.escape(skills.exp)+','+db.escape(skills.active_status)+','+db.escape(skills.cvid)+' )');
+
+                                if(tid == 0)
+                                {
+                                    console.log(resultvalue);
                                             var query = db.query('INSERT INTO tskills(skillID,expertlevel,expyrs,skillstatusid, cvid) values ('+resultvalue+','+db.escape(skills.expertiseLevel)+','+db.escape(skills.exp)+','+db.escape(skills.active_status)+','+db.escape(skills.cvid)+' )',function (err, result) {
-                                                console.log(err);
                                                 if (!err) {
                                                     if (result != null) {
                                                         if (result.affectedRows > 0) {
@@ -3165,22 +3081,13 @@ exports.FnSaveCVInfo = function (req, res) {
                                                 }
                                             });
                                 }
-                                         
-                                         else
+                                 else
                                          {
-                                             console.log(tid);
-                                             var quer = 'UPDATE tskills set skillID='+
-                                                 resultvalue+',expertlevel='+db.escape(skills.expertiseLevel)+', expyrs='+
-                                                                  db.escape(skills.exp)+', skillstatusid='+db.escape(skills.active_status)+
-                                                                  ',cvid='+db.escape(skills.cvid)+'  WHERE TID =' + tid + ' ';
-                                             console.log(quer);
-                                             db.query(quer, function (err, result) {
-                                            
-                                            console.log(result);
+                                             console.log(resultvalue);
+                                             var query = db.query('UPDATE tskills set skillID='+resultvalue+',expertlevel='+db.escape(skills.expertiseLevel)+',expyrs='+db.escape(skills.exp)+',skillstatusid='+db.escape(skills.active_status)+',cvid='+db.escape(skills.cvid)+'  WHERE TID =' + tid + ' ', function (err, result) {
                                             if (!err) {
                                                 if(result != null){
                                                     if(result.affectedRows > 0){
-
                                                             console.log('FnupdateSkill: skill matrix Updated successfully');
                                                     }
                                                     else
@@ -3197,15 +3104,10 @@ exports.FnSaveCVInfo = function (req, res) {
                                                 {
                                                     console.log('FnupdateSkill: error in saving  skill matrix:' +err);
                                                 }
-                                            
-                                
                                          });
                                     }
-                                         
                                 });
                                 } // for loop end
-                            
-                            
                             }
                             else {
                                 res.send(RtnMessage);
@@ -3237,7 +3139,6 @@ exports.FnSaveCVInfo = function (req, res) {
     }
     catch (ex) {
         console.log('FnSaveCVInfo error:' + ex.description);
-        console.log(ex);
         throw new Error(ex);
     }
 };
@@ -3262,8 +3163,7 @@ exports.FnGetCVInfo = function (req, res) {
                     if (Result != null) {
                         db.query('CALL pgetCVInfo(' + db.escape(Token) + ')', function (err, MessagesResult) {
                             if (!err) {
-                                console.log(MessagesResult);
-                                
+
                                 if (MessagesResult[0] != null) {
                                     if (MessagesResult[0].length > 0) {
                                         

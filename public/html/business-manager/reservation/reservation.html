@@ -31,14 +31,19 @@
                         </div>
                         <!-- Daily Appointments goes here -->
                         <div class="notes-content border-bottom-gray p-top-7" ng-repeat="rtime in reservedTime track by $index">
-                            <i>{{reservedTime[$index][2]}}</i>
-                            <small>for <b> {{reservedTime[$index][4]}}</b> ({{convertTime(reservedTime[$index][0])}} - {{convertTime(reservedTime[$index][1])}})</small>
-                            <br>
-                            <div class="text-right p-bottom-3">
-                                <button title="Close" class="btn btn-xs btn-primary"><i class="fa fa-user-times"></i> No Show</button>
-                                <button title="Close" class="btn btn-xs btn-primary"><i class="fa fa-check-square-o"></i> Close</button>
-                                <button title="cancel" class="btn btn-xs btn-primary p-bottom-3"><i class="fa fa-times-circle"></i> Cancel</button>
+                            <!--<div ng-show="reservedTime[$index][2].length > 0">-->
+                            <div ng-show="reservedTime[$index][2].length > 0">
+                                <i>{{reservedTime[$index][2]}}</i>
+                                <small>for <b> {{reservedTime[$index][4]}}</b> ({{convertMinutesToTime(reservedTime[$index][0])}} - {{convertMinutesToTime(reservedTime[$index][1])}})</small>
+                                <br>
+                                <div class="text-right p-bottom-3">
+                                    <button title="Close" class="btn btn-xs btn-primary"><i class="fa fa-user-times"></i> No Show</button>
+                                    <button title="Close" class="btn btn-xs btn-primary"><i class="fa fa-check-square-o"></i> Close</button>
+                                    <button title="cancel" class="btn btn-xs btn-primary p-bottom-3"><i class="fa fa-times-circle"></i> Cancel</button>
+                                </div>
                             </div>
+                            <!-- No Appointment message -->
+                            <p ng-hide="reservedTime[$index][2].length > 0">No Appointments Available</p>
                         </div>
                     </div>
 
@@ -60,18 +65,20 @@
                                 </div>
                                 <div class="col-lg-6">
                                     <div class="ezeid-title">
-                                        Appolo Hospital
+                                        {{headTitle}}
                                     </div>
                                 </div>
                                 <hr>
                                 <div class="ezeid-resource">
                                     <div class="buttons">
-                                        <button ng-repeat="res in resources track by $index"
+                                        <span ng-repeat="res in resources track by $index">
+                                        <button ng-show="resources[$index].title.length > 0"
                                                 ng-click="activateResource(resources[$index].tid)"
                                                 class="btn btn-default resource-btn" ng-class="['resource-'+resources[$index].tid,$index == 0?'active':'']"
                                                 title="{{resources[$index].description}}">
                                             {{resources[$index].title}}
                                         </button>
+                                            </span>
                                     </div>
                                 </div>
                             </div>
@@ -133,7 +140,7 @@
                         <p class="text-black">Start Time</p>
                     </div>
                     <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8">
-                        <input type="text" class="form-control" disabled value="{{startTime}}" />
+                        <input id="start-time" ng-blur="changeEndTime()" type="text" ng-model="startTime" class="form-control" ng-disabled="!modal.isUpdate" />
                     </div>
                 </div>
                 <div class="row">
@@ -141,7 +148,7 @@
                         <p class="text-black">Approx. End Time</p>
                     </div>
                     <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8">
-                        <input type="text" class="form-control" disabled value="{{endTime}}" />
+                        <input id="end-time" type="text" class="form-control" disabled value="{{endTime}}" />
                     </div>
                 </div>
                 <div class="row">
@@ -149,7 +156,7 @@
                         <p class="text-black">Approx. Duration</p>
                     </div>
                     <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8">
-                        <input type="text" class="form-control" disabled value="{{duration}} mins" />
+                        <input id="duration" data-duration="{{duration}}" type="text" class="form-control" disabled value="{{duration}} mins" />
                     </div>
                 </div>
                 <div class="row">
@@ -165,7 +172,11 @@
                         &nbsp;
                     </div>
                     <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 text-right" ng-hide="">
-                        <button class="btn btn-primary" ng-class="reserverMobile.length > 9?'':'disabled'" ng-click="saveReservation()"><i class="fa fa-check-circle"></i> {{modal.isUpdate?'Update':'Save'}}</button>
+                        <button class="btn btn-primary"
+                                ng-class="reserverMobile.length > 9?'':'disabled'"
+                                ng-click="saveReservation()">
+                            <i class="fa fa-check-circle"></i> {{modal.isUpdate?'Update':'Save'}}
+                        </button>
                     </div>
                 </div>
             </div>
