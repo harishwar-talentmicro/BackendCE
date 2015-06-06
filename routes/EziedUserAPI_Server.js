@@ -3058,9 +3058,24 @@ exports.FnSaveCVInfo = function (req, res) {
         var Status = parseInt(req.body.Status);
         var Pin = req.body.Pin;
         var Token = req.body.TokenNo;
-        var skillMatrix = req.body.skillMatrix;
+        var skillMatrix1 = req.body.skillMatrix;
         var resultvalue;
-        skillMatrix = JSON.parse(skillMatrix);
+        skillMatrix1 = JSON.parse(skillMatrix);
+        skillMatrix = {};
+        var allowedParam = [
+            'tid',,
+            'active_status',
+            'exp',
+            'expertiseLevel',
+            'skillname'
+        ];
+
+        for(var prop in skillMatrix1){
+            if(skillMatrix1.hasOwnProperty(prop) && allowedParam.indexOf(prop)){
+                skillMatrix[prop] = skillMatrix1[prop];
+            }
+        }
+
         console.log(skillMatrix);
         
         var RtnMessage = {
