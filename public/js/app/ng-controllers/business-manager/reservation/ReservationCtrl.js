@@ -118,13 +118,15 @@ var res = angular.module('ezeidApp').
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             $scope.searchedEzeid = 'krunalpaid';
 
-            getResource($scope.searchedEzeid);
 
 
-            getServicesData($scope.searchedEzeid).then(function () {
-                getServiceResourceMapping($scope.searchedEzeid).then(function () {
-                    setFinalMappedServices(6);
-                    getReservationTransactionData($scope.activeResourceId, '05 Jun 2015 09:42:00 AM', $scope.searchedEzeid).then(function () {
+            getResource($scope.searchedEzeid).then(function () {
+                getServicesData($scope.searchedEzeid).then(function () {
+                    getServiceResourceMapping($scope.searchedEzeid).then(function () {
+                        setFinalMappedServices(6);
+                        var date = moment().format('DD MMM YYYY h:mm:ss a');
+                        getReservationTransactionData($scope.activeResourceId, date, $scope.searchedEzeid).then(function () {
+                        });
                     });
                 });
             });
@@ -135,6 +137,7 @@ var res = angular.module('ezeidApp').
              * @param ezeid of the searched org.
              */
             function getResource(ezeid) {
+                var defer = $q.defer();
                 $scope.$emit('$preLoaderStart');
                 $http({
                     url: GURL + 'reservation_resource',
@@ -149,10 +152,13 @@ var res = angular.module('ezeidApp').
                     if (resp.data.length > 0) {
                         setResources(resp.data);
                     }
+                    defer.resolve();
                 }).error(function (err) {
                     $scope.$emit('$preLoaderStop');
                     Notification.error({message: "Something went wrong! Check your connection", delay: MsgDelay});
+                    defer.resolve();
                 });
+                return defer.promise;
             }
 
             /**
@@ -262,9 +268,13 @@ var res = angular.module('ezeidApp').
              * Get all the service details of a paritcular resource
              */
             function setFinalMappedServices(resourceId) {
-
                 var serviceArray = [];
                 for (var obj in $scope.mappedServices) {
+                    if(typeof($scope.mappedServices[obj]) == 'undefined')
+                    {
+                        break;
+                    }
+
                     var arr = $scope.mappedServices[obj].split(',');
                     var array = [];
                     for (var i = 0; i < arr.length; i++) {
@@ -363,8 +373,8 @@ var res = angular.module('ezeidApp').
                     );
                     if (_data.data[nCount]['TID'] != null) {
                         reserved[nCount] = new Array(
-                            convertHoursToMinutes(_data.data[nCount]['Starttime']),
-                            convertHoursToMinutes(_data.data[nCount]['endtime']),
+                            convertHoursToMinutes(selectedTimeUtcToLocal(_data.data[nCount]['Starttime'])),
+                            convertHoursToMinutes(selectedTimeUtcToLocal(_data.data[nCount]['endtime'])),
                             _data.data[nCount]['reserverName'],
                             _data.data[nCount]['reserverId'],
                             _data.data[nCount]['service'],
@@ -375,7 +385,6 @@ var res = angular.module('ezeidApp').
                     else {
                         reserved[nCount] = [];
                     }
-
                     formatedData['working'] = times;
                     formatedData['reserved'] = reserved;
                 }
@@ -388,9 +397,9 @@ var res = angular.module('ezeidApp').
 
                 /* put reserver data scope */
                 $scope.reservedTime = [
-                    [550, 600, 'sandeep', 3, 'service1'],
-                    [700, 810, 'rahul', 12, 'service2'],
-                    [1000, 1140, 'shrey', 5, 'service3']
+                    //[550, 600, 'sandeep', 3, 'service1'],
+                    //[700, 810, 'rahul', 12, 'service2'],
+                    //[1000, 1140, 'shrey', 5, 'service3']
                 ];
                 $scope.reservedTime = [];
                 for (var i = 0; i < formatedData['reserved'].length; i++) {
@@ -491,7 +500,7 @@ var res = angular.module('ezeidApp').
                 /* get no. of minutes in day */
                 var mins = row * 5 + col * 360;
                 /* get time */
-                return $scope.convertTime(mins);
+                return $scope.convertMinutesToTime(mins);
             }
 
             /* get block id */
@@ -499,14 +508,20 @@ var res = angular.module('ezeidApp').
                 return 72 * col + row;
             }
 
-            /* color working hours */
+            /* color WORKING hours */
             $scope.colorWorkingHours = function () {
                 var workingHrs = $scope.workingHrs;
 
+                /* RESET CALENDAR */////////////////////////////////////////////////////////
                 /* clean the calendar's working hour */
-                $('.available').removeAttr('style').removeClass('available');
+                $('.available').removeAttr('style').removeClass('available').attr('title');
+                /* clear all text */
+                $('.reserved').html('').removeAttr('style');
+                /* remove merging */
+                removeMerge();
+                ////////////////////////////////////////////////////////////////////////////
 
-                /* traverse through the individual time slot and color them */
+                /* traverse through the individual time slot for WORKING HOURS and color them */
                 for (var i = 0; i < workingHrs.length; i++) {
                     var startTimeMins = workingHrs[i][0];
                     var endTimeMins = workingHrs[i][1];
@@ -515,15 +530,9 @@ var res = angular.module('ezeidApp').
                     var startRange = data[0];
                     var endRange = data[1] - 1;//As we don't want last block to be filled
 
-                    /* clear all text */
-                    $('.reserved').html('').removeAttr('style');
-                    /* remove merging */
-                    removeMerge();
-
                     /* color all the blocks */
                     var addCss = 'available';
                     $scope.colorBlocks(startRange, endRange, availabilityColor, addCss);
-
                 }
             };
 
@@ -544,6 +553,8 @@ var res = angular.module('ezeidApp').
              * 2b...Call mergeBlockMaster to merge and also write text
              */
             $scope.alreadyReserveSlot = function () {
+                /* clear the title */
+                $('.reserved').attr('title','');
                 for (var i = 0; i < $scope.reservedTime.length; i++) {
                     /* get blocks coming under this range */
                     var data = getBlockRange($scope.reservedTime[i][0], $scope.reservedTime[i][1]);
@@ -556,8 +567,18 @@ var res = angular.module('ezeidApp').
                     var tid = $scope.reservedTime[i][6];
                     $scope.mergeBlockMaster(data[0], data[1], text, $scope.height,color,title,tid);
                     /* color the block */
+                    console.log($scope.reservedTime);
                 }
             };
+
+            /**
+             * reset title of reserved status
+             */
+            function resetReservedBlockTitle()
+            {
+
+            }
+
 
             /**
              * Block Merging
@@ -589,7 +610,7 @@ var res = angular.module('ezeidApp').
                 /* add text */
                 $('.block-' + startBlock).html('<p>' + text + '</p>');
                 /* add padding to the text to make it in center */
-                $('.block-'+startBlock).css('padding-top',(totalHeight/2.3)+'em');
+                //$('.block-'+startBlock).css('padding-top',(totalHeight/2.3)+'em');
 
                 /* hide the remaining block */
                 for (var i = startBlock + 1; i <= endBlock; i++) {
@@ -695,13 +716,13 @@ var res = angular.module('ezeidApp').
                     }
                 }
                 /* return the complete string as title */
-                return text+' for '+service+' ('+$scope.convertTime(startTime)+' - '+$scope.convertTime(endTime)+')';
+                return text+' for '+service+' ('+$scope.convertMinutesToTime(startTime)+' - '+$scope.convertMinutesToTime(endTime)+')';
             }
 
             /**
              * Convert to minutes to time
              */
-            $scope.convertTime = function(mins)
+            $scope.convertMinutesToTime = function(mins)
             {
                 var hours = Math.floor(mins / (60));
                 var minutes = mins % 60;
@@ -754,16 +775,17 @@ var res = angular.module('ezeidApp').
 
                 /* get TID and fetch the data for this reservation */
                 var tid = $('.block-'+blockId).data('tid');
+
                 /* get modal status for isUpdate */
-                if(tid > 0)
+                if(parseInt(tid) > 0)
                 {
                     $scope.modal.isUpdate = true;
+                    getReservationData(tid);
                 }
                 else
                 {
                     $scope.modal.isUpdate = false;
                 }
-                getReservationData(tid);
 
                 /* show error if the working hour is not in working hour */
                 if(isReserved || isAvailable)
@@ -784,9 +806,9 @@ var res = angular.module('ezeidApp').
                     {
                         $scope.duration = 0;
                     }
-
-                    $scope.endTime = $scope.convertTime($scope.currentBlockMinute + $scope.duration);
+                    $scope.endTime = $scope.convertMinutesToTime($scope.currentBlockMinute + $scope.duration);
                     $scope.modalVisibility();
+                    $('#start-time').val($scope.startTime);
                 }
                 else
                 {
@@ -817,7 +839,7 @@ var res = angular.module('ezeidApp').
                     {
                         $scope.reserverMobile = resp.data[0].ContactInfo;
                         $scope.reservationService = resp.data[0].serviceids;
-                        $scope.startTime = resp.data[0].Starttime.substr(0,5);
+                        $scope.startTime = selectedTimeUtcToLocal(resp.data[0].Starttime).substr(0,5);
                         $scope.duration = resp.data[0].duration;
                         $scope.endTime = convertBlockIdToTime((convertHoursToMinutes($scope.startTime) + $scope.duration)/5);
                     }
@@ -889,6 +911,7 @@ var res = angular.module('ezeidApp').
                     $scope.reservationService = $scope.currentServiceArray[0].tid;
                     /* reload calendar */
                     $scope.reloadCalander();
+
                     return;
                 }
 
@@ -921,7 +944,7 @@ var res = angular.module('ezeidApp').
             {
                 var index = $('.reservation-service').find(':selected').data('id');//reservation-service
                 $scope.duration = $scope.currentServiceArray[index].duration;
-                $scope.endTime = $scope.convertTime($scope.currentBlockMinute + $scope.duration);
+                $scope.endTime = $scope.convertMinutesToTime($scope.currentBlockMinute + $scope.duration);
             }
 
             /**
@@ -937,7 +960,16 @@ var res = angular.module('ezeidApp').
              */
             function convertBlockIdToTime(blockId)
             {
-                return $scope.convertTime(convertBlockIdToMinute(blockId));
+                return $scope.convertMinutesToTime(convertBlockIdToMinute(blockId));
+            }
+
+            /**
+             * convert the time[Hours] to minutes
+             */
+            $scope.calculateEndTime = function(startTime,duration)
+            {
+                var minutes = parseInt(convertHoursToMinutes(startTime)) + parseInt(duration);
+                $scope.endTime = $scope.convertMinutesToTime(minutes);
             }
 
             /**
@@ -946,14 +978,18 @@ var res = angular.module('ezeidApp').
             $scope.saveReservation = function()
             {
                 var tid = 0;
+                var blockId = 0;
                 if($scope.modal.isUpdate)
                 {
+                    /* get TID */
                     var minutes = convertHoursToMinutes($scope.startTime);
-                    var blockId = minutes/5;
+                    blockId = minutes/5;
                     tid = $('.block-'+blockId).data('tid');
                 }
-                var makeDateTime = $scope.activeDate+' '+$scope.startTime;
+                $scope.startTime = $('#start-time').val();
 
+                var makeDateTime = $scope.activeDate+' '+$scope.startTime;
+                /* check if the reservation could be made or not */
                 $http({
                     url : GURL + 'reservation_transaction',
                     method : "POST",
@@ -974,7 +1010,10 @@ var res = angular.module('ezeidApp').
                         Notification.success({ message: "Reservation made successfully", delay: MsgDelay });
                         /* reset service select option */
                         /* close modal box */
-                        /* reload calendar */
+                        $scope.modalVisible = !$scope.modalVisible;
+
+                        /* reload reservation hours */
+                        updateReservationHoursBlocks(blockId);
                     }
                     else
                     {
@@ -986,4 +1025,16 @@ var res = angular.module('ezeidApp').
                 });
             }
 
+            /**
+             * Reload reservation Hours
+             */
+            function updateReservationHoursBlocks(blockId)
+            {
+                /* clean the old div [clear title,put the available color] */
+                $('.block-'+blockId).attr('title','').css('background-color',availabilityColor);
+                /* color working hours */
+                //$scope.colorWorkingHours();
+                /* relaod calendar */
+                $scope.reloadCalander();
+            }
         }]);
