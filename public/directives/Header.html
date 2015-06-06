@@ -198,7 +198,8 @@
                                 <li class="disabled" ng-show="$root._userInfo.Type == 2 && $root._userInfo.Verified !== 2" class="disabled">
                                     <a ng-click="$event.preventDefault()"><i class="fa fa-briefcase"></i> Business Manager</a></li>
                                 <!-- Message -->
-                                <li><a href="/messages"><i class="fa fa-envelope"></i> Messages</a></li>
+                                <!--<li><a href="/messages"><i class="fa fa-envelope"></i> Messages</a></li>-->
+                                <li class="disabled"><a ng-click="$event.preventDefault()"><i class="fa fa-envelope"></i> Messages</a></li>
                                 <!-- Access History -->
                                 <li><a href="/access-history"><i class="fa fa-calendar"></i> Access History</a></li>
                                 <!-- Whitelist & Blacklist -->
@@ -208,9 +209,9 @@
                                     <a href="/bulksalesenquiry"><i class="fa fa-server"></i> Bulk Mailer</a>
                                 </li>
                                 <!-- Outbox -->
-                                <li>
-                                    <a href="/outbox"><i class="fa fa-check-square-o"></i> Your Transactions</a>
-                                </li>
+                                <!--<li>-->
+                                    <!--<a href="/outbox"><i class="fa fa-check-square-o"></i> Your Transactions</a>-->
+                                <!--</li>-->
                                 <!-- Change Password -->
                                 <li>
                                     <a href="/profile-manager/password"><i class="fa fa-warning"></i> Change Password</a>
