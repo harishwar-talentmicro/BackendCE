@@ -203,6 +203,7 @@ app.post('/reservation_transaction',LocationManager.FnSaveReservTransaction);
 app.get('/reservation_maped_services',LocationManager.FnGetMapedServices);
 app.get('/reservation_transaction',LocationManager.FnGetReservTask);
 app.get('/reservation_trans_details',LocationManager.FnGetResTransDetails);
+app.put('/reservation_transaction',LocationManager.FnChangeReservationStatus);
 
 //below service are for EZEIDAP
 app.post('/ewLoginAP', LocationManager.FnLoginAP);
@@ -250,6 +251,9 @@ app.get('/:page/:subpage',function(req,res){
     res.sendFile(__dirname + '/public/html/index.html');
 });
 
+
+
+
 /**
  * When user is not logged in then also let him navigate to searchInformation page of front end
  */
@@ -283,5 +287,6 @@ app.use(function(req, res, next) {
         res.send('');
     }
 });
+
 
 module.exports = app;

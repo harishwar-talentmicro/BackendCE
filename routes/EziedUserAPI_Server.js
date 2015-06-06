@@ -14591,3 +14591,75 @@ exports.FnSaveCitysVES = function(req, res){
         throw new Error(ex);
     }
 };
+
+
+
+
+
+exports.FnChangeReservationStatus = function(req,res){
+
+    var token = (req.body.Token && req.body.Token !== 2) ? req.body.Token : null;
+    var tid = (req.body.tid && parseInt(req.body.tid) !== NaN) ? parseInt(req.body.tid) : null;
+    var status = (req.body.status && parseInt(req.body.status) !== NaN) ? parseInt(req.body.status) : null;
+
+    var responseMsg = {
+        status : false,
+        data : null,
+        message : 'Please login to continue',
+        error : {
+            Token : 'Invalid Token'
+        }
+    }
+
+    var validationFlag = true;
+    if(!token){
+        responseMsg.error['Token'] = 'Invalid Token';
+        validationFlag *= false;
+    }
+
+    if(!tid){
+        responseMsg.error['tid'] = 'Reservation Slot is empty';
+        validationFlag *= false;
+    }
+
+    if(!status){
+        responseMsg.error['status'] = 'Status cannot be empty';
+        validationFlag *= false;
+    }
+
+    if(!validationFlag){
+        res.status(401).json(responseMsg);
+        return;
+    }
+
+    FnValidateToken(token,function(err,tokenRes){
+        if(err || (!tokenRes)){
+            res.status(401).json(responseMsg);
+            return;
+        }
+        else{
+            var queryParam = db.escape(tid) + ',' + db.escape(status) + ',' + db.escape(TID);
+            db.query('CALL PUpdateResTransStatus(' + queryParam + ')', function (err, updateRes) {
+                if(err){
+                    responseMsg.message = 'An error occurred ! Please try again';
+                    responseMsg.error['server'] = 'Internal Server Error';
+                    res.status(400).json(responseMsg);
+                }
+                else{
+                    responseMsg['status'] = true;
+                    responseMsg['error'] = null;
+                    responseMsg['message'] = 'Status changed successfully';
+                    responseMsg['data'] = {
+                        tid : req.body.tid,
+                        status : req.body.status,
+                        updateRes : updateRes
+                    };
+                    res.status(200).json(responseMsg);
+                }
+            });
+        }
+    });
+};
+
+
+
