@@ -5173,7 +5173,7 @@ exports.FnGetStatusType = function (req, res) {
                     }
                 } else {
 
-                    res.statusCode = 500;
+                    res.statusCode = 401;
                     res.send('null');
                     console.log('FnGetStatusType: Error in validating token:  ' + err);
                 }
@@ -5187,7 +5187,7 @@ exports.FnGetStatusType = function (req, res) {
                 console.log('FnGetStatusType: FunctionType is empty');
             }
 
-            res.statusCode=400;
+            res.statusCode=401;
             res.send('null');
         }
     }
