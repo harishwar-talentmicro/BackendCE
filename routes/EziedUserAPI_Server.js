@@ -3060,10 +3060,11 @@ exports.FnSaveCVInfo = function (req, res) {
         var Token = req.body.TokenNo;
         var skillMatrix1 = req.body.skillMatrix;
         var resultvalue;
-        skillMatrix1 = JSON.parse(skillMatrix);
+        console.log(skillMatrix1);
+//        skillMatrix1 = JSON.parse(skillMatrix1);
         var skillMatrix = {};
         var allowedParam = [
-            'tid',,
+            'tid',
             'active_status',
             'exp',
             'expertiseLevel',
@@ -3227,6 +3228,7 @@ exports.FnSaveCVInfo = function (req, res) {
     }
     catch (ex) {
         console.log('FnSaveCVInfo error:' + ex.description);
+        console.log(ex);
         throw new Error(ex);
     }
 };
