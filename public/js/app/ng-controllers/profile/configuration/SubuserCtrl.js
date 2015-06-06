@@ -62,6 +62,7 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$htt
 
     $scope.rules = [];
 
+    $scope.workingHoursTemplateMap = [];
 
     /**
      * Subuser list (to be replaced with data from server)
@@ -104,7 +105,8 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$htt
             reservationEmail : "",
             homeDeliveryEmail : "",
             serviceEmail : "",
-            resumeEmail : ""
+            resumeEmail : "",
+            templateId : 0
         }
     };
 
@@ -190,7 +192,8 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$htt
                 reservationEmail : "",
                 homeDeliveryEmail : "",
                 serviceEmail : "",
-                resumeEmail : ""
+                resumeEmail : "",
+                templateId : 0
             }
         };
     };
@@ -339,6 +342,8 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$htt
             Status : $scope.modalBox.subuser.status,
             FirstName : $scope.modalBox.subuser.firstName,
             LastName : $scope.modalBox.subuser.lastName,
+            templateID : ($scope.modalBox.subuser.templateId && parseInt($scope.modalBox.subuser.templateId) !== NaN)
+                ? parseInt($scope.modalBox.subuser.templateId) : 0,
 
             AccessRights :
                 $scope.modalBox.subuser.accessRights.sales + '' +
@@ -468,8 +473,8 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$htt
                         reservationEmail : resp[i].ReservationMailID,
                         homeDelivery : resp[i].HomeDeliveryMailID,
                         serviceEmail : resp[i].ServiceMailID,
-                        resumeEmail : resp[i].CVMailID
-
+                        resumeEmail : resp[i].CVMailID,
+                        templateId : (resp[i].TemplateID && parseInt(resp[i].TemplateID !== NaN)) ? resp[i].TemplateID : 0
                     };
                     $scope.subusers.push(subuser);
                 }
@@ -513,6 +518,25 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$htt
      * Initial Function call after controller initialization
      * Will call loadAllRules()
      */
-    $scope.getMasterUserDetails();
+
+    $scope.loadWorkingHoursTemplate = function(){
+        $http({
+            url : GURL + 'ewtWorkingHours',
+            method : 'GET',
+            params : {
+                Token : $rootScope._userInfo.Token
+            }
+        }).success(function(resp){
+            if(resp && resp.length > 0 && resp !== 'null'){
+                console.log('yes');
+                $scope.workingHoursTemplateMap = resp;
+            }
+            $scope.getMasterUserDetails();
+        }).error(function(err){
+            $scope.getMasterUserDetails();
+        });
+    };
+
+    $scope.loadWorkingHoursTemplate();
 
 }]);
