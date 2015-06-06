@@ -5790,6 +5790,9 @@ exports.FnCreateSubUser = function(req, res){
         var ServiceRules = req.body.ServiceRules;
         var ResumeRules = req.body.ResumeRules;
         var MasterID = req.body.PersonalID;
+        var templateID = parseInt(req.body.templateID);
+        if(templateID.toString() == 'NaN')
+            templateID =0;  
 
         var RtnMessage = {
             IsSuccessfull: false,
@@ -5806,7 +5809,7 @@ exports.FnCreateSubUser = function(req, res){
                     var query = db.escape(Token) + ',' + db.escape(TID) + ',' + db.escape(UserName) + ',' +db.escape(Status) + ',' +db.escape(FirstName) + ',' +db.escape(LastName)
                         + ',' + db.escape(AccessRights) + ',' + db.escape(SalesEmail) + ',' + db.escape(ReservationEmail) + ',' +db.escape(HomeDeliveryEmail)
                         + ',' + db.escape(ServiceEmail) + ',' + db.escape(ResumeEmail) + ',' + db.escape(SalesRules) + ',' +db.escape(ReservationRules)
-                        + ',' + db.escape(HomeDeliveryRules) + ',' + db.escape(ServiceRules) + ',' + db.escape(ResumeRules) + ',' + db.escape(MasterID);
+                        + ',' + db.escape(HomeDeliveryRules) + ',' + db.escape(ServiceRules) + ',' + db.escape(ResumeRules) + ',' + db.escape(MasterID) + ',' + db.escape(templateID);
                     console.log(query);
                     db.query('CALL pCreateSubUser(' + query + ')', function (err, InsertResult) {
                         if (!err){
