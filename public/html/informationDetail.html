@@ -288,7 +288,7 @@
                                        target="_blank"
                                        title="Send CV"
                                        ng-click="(SearchInfo.CVURL) ? '' : ($event.preventDefault())(_toggleResumeModal())"
-                                       ng-show="SearchInfo.EZEIDVerifiedID == '2' && _userInfo.IDTypeID == 1 && showSendCv == 1">
+                                       ng-show="SearchInfo.EZEIDVerifiedID == 2 && _userInfo.Type == 1 && showSendCv == 1">
                                         <img src="../images/new_send_cv.png">
                                         Send CV
                                     </a>
@@ -1128,7 +1128,7 @@
 
                             <div class="row top-clearfix-padding-half bottom-clearfix">
 
-                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                     <button class="btn btn-info btn-sm no-radius" ng-click="saveTransaction()">
                                         <span class="glyphicon glyphicon-hand-right"></span>
                                         Submit resume application
