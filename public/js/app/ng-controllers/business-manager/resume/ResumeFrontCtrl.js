@@ -561,6 +561,7 @@
 
 
 
+
                 return flag;
             };
 
@@ -571,12 +572,33 @@
              * @returns {boolean}
              */
             var checkResumeAttached = function(){
-
+                var promise = $q.defer;
                 /**
                  * @todo Check if resume attached or not for a person who is applying for this job
                  *
                  */
-                return false;
+                $http({
+                    url : GURL + 'ewtGetCVInfo',
+                    params : {
+                        TokenNo : $rootScope._userInfo.Token
+                    },
+                    method : 'GET'
+                }).success(function(resp){
+                    if(resp && resp.length > 0 && resp !== 'null'){
+                        if(resp[0].CVDocFile){
+                            (resp[0].CVDocFile.trim().length > 0) ? promise.resolve(true) : promise.resolve(false);
+                        }
+                        else{
+                            promise.resolve(false);
+                        }
+                    }
+                    else{
+                        promise.resolve(false);
+                    }
+                }).error(function(resp){
+                    promise.resolve(false);
+                });
+                return promise.promise;
             };
             /**
              * Saving transaction in
@@ -605,76 +627,80 @@
                  * say him a message to upload the resume
                  */
                 $scope.isResumeAttached = true;
-                if(checkResumeAttached()){
-                    $scope.isResumeAttached = false;
-                    Notification.error({ message : 'Please attach resume before submitting the resume application',
-                        delay : MsgDelay});
-                    return;
-                }
-
-                var data = prepareSaveTransaction($scope.modalBox.editMode);
-
-                if(!data.ContactInfo){
-                    Notification.error({ message : 'Please enter contact information for customer',delay : MsgDelay});
-                    return ;
-                }
-
-                if($scope.modalBox.tx.itemList.length <  1 && $scope.resumeItemListType){
-                    Notification.error({ message : 'Please select items for the enquiry',delay : MsgDelay});
-                    return ;
-                }
-
-
-                if($scope.modalBox.tx.message.length < 1 && $scope.resumeItemListType){
-                    var itemList = [];
-                    try{
-                        itemList = JSON.parse(data.ItemsList);
+                checkResumeAttached().then(function(attached){
+                    if(!attached){
+                        $scope.isResumeAttached = false;
+                        Notification.error({ message : 'Please attach resume before submitting the resume application',
+                            delay : MsgDelay});
+                        return;
                     }
-                    catch(ex){
-                        ////console.log(ex);
+
+
+                    var data = prepareSaveTransaction($scope.modalBox.editMode);
+
+                    if(!data.ContactInfo){
+                        Notification.error({ message : 'Please enter contact information for customer',delay : MsgDelay});
+                        return ;
                     }
-                    var msg = '';
-                    for(var ct = 0; ct < itemList.length; ct++){
-                        msg += itemList[ct]['ItemName'];
-                        if(itemList[ct]['Qty']){
-                            msg += ' ('+ itemList[ct]['Qty'] + ')';
+
+                    if($scope.modalBox.tx.itemList.length <  1 && $scope.resumeItemListType){
+                        Notification.error({ message : 'Please select items for the enquiry',delay : MsgDelay});
+                        return ;
+                    }
+
+
+                    if($scope.modalBox.tx.message.length < 1 && $scope.resumeItemListType){
+                        var itemList = [];
+                        try{
+                            itemList = JSON.parse(data.ItemsList);
                         }
-                        if(itemList[ct]['Amount']){
-                            msg += ' : '+ itemList[ct]['Amount'];
+                        catch(ex){
+                            ////console.log(ex);
                         }
-                        msg += ', ';
+                        var msg = '';
+                        for(var ct = 0; ct < itemList.length; ct++){
+                            msg += itemList[ct]['ItemName'];
+                            if(itemList[ct]['Qty']){
+                                msg += ' ('+ itemList[ct]['Qty'] + ')';
+                            }
+                            if(itemList[ct]['Amount']){
+                                msg += ' : '+ itemList[ct]['Amount'];
+                            }
+                            msg += ', ';
+                        }
+                        msg = msg.substring(0, msg.length - 2);
+                        data.MessageText = msg;
                     }
-                    msg = msg.substring(0, msg.length - 2);
-                    data.MessageText = msg;
-                }
 
-                $scope.$emit('$preLoaderStart');
-                $http({
-                    url : GURL + 'ewtSaveTranscation',
-                    method : 'POST',
-                    data : data
-                }).success(function(resp){
-                    if(resp && resp.hasOwnProperty('IsSuccessfull')){
-                        if(resp.IsSuccessfull){
-                            var msg = 'Your resume application is submitted successfully';
+                    $scope.$emit('$preLoaderStart');
+                    $http({
+                        url : GURL + 'ewtSaveTranscation',
+                        method : 'POST',
+                        data : data
+                    }).success(function(resp){
+                        if(resp && resp.hasOwnProperty('IsSuccessfull')){
+                            if(resp.IsSuccessfull){
+                                var msg = 'Your resume application is submitted successfully';
 
-                            Notification.success({ message : msg, delay : MsgDelay});
-                            $scope._toggleSalesModal();
-                            $scope.resetModalBox();
+                                Notification.success({ message : msg, delay : MsgDelay});
+                                $scope._toggleSalesModal();
+                                $scope.resetModalBox();
+                            }
+                            else{
+                                Notification.error({ message : 'An error occurred while submitting application', delay : MsgDelay});
+                            }
                         }
                         else{
                             Notification.error({ message : 'An error occurred while submitting application', delay : MsgDelay});
                         }
-                    }
-                    else{
-                        Notification.error({ message : 'An error occurred while submitting application', delay : MsgDelay});
-                    }
 
-                    $scope.$emit('$preLoaderStop');
-                }).error(function(err){
-                    $scope.$emit('$preLoaderStop');
-                    Notification.error({ message : err, delay : MsgDelay});
+                        $scope.$emit('$preLoaderStop');
+                    }).error(function(err){
+                        $scope.$emit('$preLoaderStop');
+                        Notification.error({ message : err, delay : MsgDelay});
+                    });
                 });
+
             };
 
         }
