@@ -14593,7 +14593,39 @@ exports.FnSaveCitysVES = function(req, res){
 };
 
 
+exports.FnPGetSkills = function(req,res){
+    var responseMsg = {
+        status : false,
+        data : [],
+        message : 'Unable to load skills ! Please try again',
+        error : {
+            server : 'An internal server error'
+        }
+    };
 
+    try{
+        db.query('CALL PGetSkills()',function(err,result){
+            if(err){
+                console.log('Error : FnPGetSkills ');
+                res.status(400).json(responseMsg);
+            }
+            else{
+                responseMsg.status = true;
+                responseMsg.message = 'Skills loaded successfully';
+                responseMsg.error = null;
+                responseMsg.data = result[0];
+
+                res.status(200).json(responseMsg);
+            }
+        });
+    }
+
+    catch(ex){
+        res.status(500).json(responseMsg);
+        console.log('Error : FnPGetSkills '+ ex.description);
+        throw new Error('Error in FnPGetSkills');
+    }
+};
 
 
 exports.FnChangeReservationStatus = function(req,res){
@@ -14609,7 +14641,7 @@ exports.FnChangeReservationStatus = function(req,res){
         error : {
             Token : 'Invalid Token'
         }
-    }
+    };
 
     var validationFlag = true;
     if(!token){
