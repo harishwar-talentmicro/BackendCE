@@ -96,18 +96,18 @@
             <div class="form-group">
                 <div class="input-group" data-toggle="tooltip" title="Subuser Username" data-placement="right">
                     <span class="input-group-addon" id="basic-addon3">{{masterUser.EZEID}}.</span>
-                    <input type="text" capitalize ng-disabled="modalBox.ezeidExists" ng-model="modalBox.subuser.userName" class="form-control" placeholder="Username" aria-describedby="basic-addon1">
+                    <input maxlength="4" type="text" capitalize ng-disabled="modalBox.ezeidExists" ng-model="modalBox.subuser.userName" class="form-control" placeholder="Username" aria-describedby="basic-addon1">
                 </div>
             </div>
         </div>
         <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 bottom-clearfix">
             <div class="form-group" data-toggle="tooltip" title="Subuser First Name" data-placement="right">
-                <input type="text" class="form-control" placeholder="First Name" ng-model="modalBox.subuser.firstName" aria-describedby="basic-addon1">
+                <input maxlength="30" type="text" class="form-control" placeholder="First Name" ng-model="modalBox.subuser.firstName" aria-describedby="basic-addon1">
             </div>
         </div>
         <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 bottom-clearfix">
             <div class="form-group" data-toggle="tooltip" title="Subuser Last Name" data-placement="right">
-                <input type="text" class="form-control" placeholder="Last Name" ng-model="modalBox.subuser.lastName" aria-describedby="basic-addon1">
+                <input maxlength="30" type="text" class="form-control" placeholder="Last Name" ng-model="modalBox.subuser.lastName" aria-describedby="basic-addon1">
             </div>
         </div>
     </div>
@@ -191,7 +191,7 @@
             <div class="form-group">
                 <div class="input-group">
                     <span class="input-group-addon" id="basic-addon4">@</span>
-                    <input type="text" ng-model="modalBox.subuser.salesEmail" class="form-control" placeholder="Sales Email" aria-describedby="basic-addon1">
+                    <input maxlength="150" type="text" ng-model="modalBox.subuser.salesEmail" class="form-control" placeholder="Sales Email" aria-describedby="basic-addon1">
                 </div>
             </div>
         </div>
@@ -199,7 +199,7 @@
             <div class="form-group">
                 <div class="input-group">
                     <span class="input-group-addon" id="basic-addon5">@</span>
-                    <input type="text" ng-model="modalBox.subuser.reservationEmail" class="form-control" placeholder="Reservation Email" aria-describedby="basic-addon1">
+                    <input maxlength="150" type="text" ng-model="modalBox.subuser.reservationEmail" class="form-control" placeholder="Reservation Email" aria-describedby="basic-addon1">
                 </div>
             </div>
         </div>
@@ -207,7 +207,7 @@
             <div class="form-group">
                 <div class="input-group">
                     <span class="input-group-addon" id="basic-addon6">@</span>
-                    <input type="text" ng-model="modalBox.subuser.homeDeliveryEmail" class="form-control" placeholder="Home Delivery Email" aria-describedby="basic-addon1">
+                    <input maxlength="150" type="text" ng-model="modalBox.subuser.homeDeliveryEmail" class="form-control" placeholder="Home Delivery Email" aria-describedby="basic-addon1">
                 </div>
             </div>
         </div>
@@ -215,7 +215,7 @@
             <div class="form-group">
                 <div class="input-group">
                     <span class="input-group-addon" id="basic-addon7">@</span>
-                    <input type="text" ng-model="modalBox.subuser.serviceEmail" class="form-control" placeholder="Help Desk Email" aria-describedby="basic-addon1">
+                    <input maxlength="150" type="text" ng-model="modalBox.subuser.serviceEmail" class="form-control" placeholder="Help Desk Email" aria-describedby="basic-addon1">
                 </div>
             </div>
         </div>
@@ -223,7 +223,7 @@
             <div class="form-group">
                 <div class="input-group">
                     <span class="input-group-addon" id="basic-addon8">@</span>
-                    <input type="text" ng-model="modalBox.subuser.resumeEmail" class="form-control" placeholder="Resume Email" aria-describedby="basic-addon1">
+                    <input maxlength="150" type="text" ng-model="modalBox.subuser.resumeEmail" class="form-control" placeholder="Resume Email" aria-describedby="basic-addon1">
                 </div>
             </div>
         </div>
