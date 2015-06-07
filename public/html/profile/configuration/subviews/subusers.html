@@ -18,7 +18,7 @@
             <th>Username</th>
             <th>EZEID</th>
             <th>Access Rights</th>
-            <th>Rules</th>
+            <th>Folders</th>
             <th>Status</th>
         </tr>
         </thead>
@@ -59,7 +59,7 @@
 
             </td>
             <td>
-                <a class="btn-link" data-index="{{$index}}" ng-click="toggleModalBox($event)">See Rules</a>
+                <a class="btn-link" data-index="{{$index}}" ng-click="toggleModalBox($event)">See Folders</a>
             </td>
             <td>
                 <button class="btn" ng-class="(subusers[$index].status == 2)?'btn-danger':'btn-success'">{{(subusers[$index].status==2)?'Inactive':'Active'}}</button>
@@ -232,7 +232,7 @@
 
     <!---------------- Rules row ----------------------------->
     <div class="row" ng-show="modalBox.isEzeidAvailable">
-        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 bottom-clearfix text-left">Rules</div>
+        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 bottom-clearfix text-left">Folders</div>
 
         <!---------- SALES Rules ---------------------------------------------->
         <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 bottom-clearfix text-left">
