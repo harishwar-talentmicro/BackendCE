@@ -615,6 +615,42 @@ angular.module('ezeidApp').
                         {
                             Token : token,
                             TID : 0,
+                            StatusTitle : 'Close',
+                            MasterID : masterId,
+                            FunctionType : 1,
+                            ProgressPercent : 100,
+                            Status : 1,
+                            NotificationMsg : 'Your reservation is closed successfully',
+                            NotificationMailMsg: 'Your reservation is closed successfully',
+                            StatusValue : 10
+                        },
+                        {
+                            Token : token,
+                            TID : 0,
+                            StatusTitle : 'Cancelled',
+                            MasterID : masterId,
+                            FunctionType : 1,
+                            ProgressPercent : 100,
+                            Status : 1,
+                            NotificationMsg : 'Your reservation is cancelled',
+                            NotificationMailMsg: 'Your reservation is cancelled',
+                            StatusValue : 11
+                        },
+                        {
+                            Token : token,
+                            TID : 0,
+                            StatusTitle : 'No Show',
+                            MasterID : masterId,
+                            FunctionType : 1,
+                            ProgressPercent : 100,
+                            Status : 1,
+                            NotificationMsg : 'Your reservation was unattended by you',
+                            NotificationMailMsg: 'Your reservation was unattended by you',
+                            StatusValue : 12
+                        },
+                        {
+                            Token : token,
+                            TID : 0,
                             StatusTitle : 'Accepted',
                             MasterID : masterId,
                             FunctionType : 0,
