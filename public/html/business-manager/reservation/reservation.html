@@ -37,9 +37,9 @@
                                 <small>for <b> {{reservedTime[$index][4]}}</b> ({{convertMinutesToTime(reservedTime[$index][0])}} - {{convertMinutesToTime(reservedTime[$index][1])}})</small>
                                 <br>
                                 <div class="text-right p-bottom-3">
-                                    <button title="Close" class="btn btn-xs btn-primary"><i class="fa fa-user-times"></i> No Show</button>
-                                    <button title="Close" class="btn btn-xs btn-primary"><i class="fa fa-check-square-o"></i> Close</button>
-                                    <button title="cancel" class="btn btn-xs btn-primary p-bottom-3"><i class="fa fa-times-circle"></i> Cancel</button>
+                                    <button title="Close" ng-disabled="reservedTime[$index][5] == 12" ng-class="[reservedTime[$index][5] == 12?'btn-danger':'btn-primary','btn-'+reservedTime[$index][6]+'-'+12,'btn-'+reservedTime[$index][6]]" ng-click="changeStatus(reservedTime[$index][6],12)" class="btn btn-xs"><i class="fa fa-user-times"></i> No Show</button>
+                                    <button title="Close" ng-disabled="reservedTime[$index][5] == 10" ng-class="[reservedTime[$index][5] == 10?'btn-danger':'btn-primary','btn-'+reservedTime[$index][6]+'-'+10,'btn-'+reservedTime[$index][6]]" ng-click="changeStatus(reservedTime[$index][6],10)" class="btn btn-xs"><i class="fa fa-check-square-o"></i> Close</button>
+                                    <button title="cancel" ng-disabled="reservedTime[$index][5] == 11" ng-class="[reservedTime[$index][5] == 11?'btn-danger':'btn-primary','btn-'+reservedTime[$index][6]+'-'+11,'btn-'+reservedTime[$index][6]]" ng-click="changeStatus(reservedTime[$index][6],11)" class="btn btn-xs p-bottom-3"><i class="fa fa-times-circle"></i> Cancel</button>
                                 </div>
                             </div>
                             <!-- No Appointment message -->

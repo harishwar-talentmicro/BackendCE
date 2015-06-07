@@ -362,7 +362,7 @@ var res = angular.module('ezeidApp').
             function getFormatedTransactionData(_data) {
                 var formatedData = [];
                 var reserved = [];
-
+                console.log(_data.data);
                 for (var nCount = 0; nCount < _data.data.length; nCount++) {
                     var times = new Array
                     (
@@ -1131,5 +1131,48 @@ var res = angular.module('ezeidApp').
             {
                 /* remove all the available slots */
                 $('.blk-content').removeClass('available').removeAttr('style');
+            }
+
+            /**
+             * Change status of the appointment
+             */
+            $scope.changeStatus = function(tid,status)
+            {
+                /* http request for chaanging the status */
+                $scope.$emit('$preLoaderStart');
+                $http({
+                    url : GURL + 'reservation_transaction',
+                    method : "PUT",
+                    data :{
+                        Token:$rootScope._userInfo.Token,
+                        tid:tid,
+                        status:status
+                    }
+                }).success(function(resp){
+                    $scope.$emit('$preLoaderStop');
+                    if(resp.status){
+                        /* change status button status */
+                        chnageStatusButton(tid,status);
+                        Notification.success({ message: "Reservation status changed successfully", delay: MsgDelay });
+                    }
+                    else
+                    {
+                        Notification.error({ message: "Unable to change the status of the reservation, Please try again later", delay: MsgDelay });
+                    }
+                }).error(function(err){
+                    $scope.$emit('$preLoaderStop');
+                    Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
+                });
+            }
+
+            /**
+             * Change the status and color of the button
+             */
+            function chnageStatusButton(tid,status)
+            {
+                /* make all other button blue */
+                $('.btn-'+tid).removeClass('btn-danger').addClass('btn-primary').removeAttr('disabled');
+                /* make the clicked button to red */
+                $('.btn-'+tid+'-'+status).removeClass('btn-primary').addClass('btn-danger').attr('disabled','');
             }
         }]);
