@@ -10,9 +10,9 @@
                 <li role="presentation" ng-class="{active: selectedTab == 1}">
                     <a class="btn-link" ng-class="{'tab-active': selectedTab == 1}" ng-click="selectedTab = 1">Sales</a>
                 </li>
-                <li role="presentation" ng-class="{active: selectedTab == 2}">
-                    <a class="btn-link" ng-class="{'tab-active': selectedTab == 2}" ng-click="selectedTab = 2">Reservation</a>
-                </li>
+                <!--<li role="presentation" ng-class="{active: selectedTab == 2}">-->
+                    <!--<a class="btn-link" ng-class="{'tab-active': selectedTab == 2}" ng-click="selectedTab = 2">Reservation</a>-->
+                <!--</li>-->
                 <li role="presentation" ng-class="{active: selectedTab == 3}">
                     <a class="btn-link" ng-class="{'tab-active': selectedTab == 3}" ng-click="selectedTab = 3">Home Delivery</a>
                 </li>
@@ -331,7 +331,7 @@
                         <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix" ng-show="modalBox.rule.RuleType == 1">
                             <div class="form-group">
                                 <small>Proximity from current marker position</small>
-                                <input type="text" numbers-only class="form-control"
+                                <input maxlength="8" type="text" numbers-only class="form-control"
                                        name="proximity"
                                        ng-model="modalBox.rule.Proximity"
                                        placeholder="Proximity (in Kms)" />
@@ -344,7 +344,7 @@
                                 <label>Enter EZEID(s) : </label>
                                 <small class="text-info tiny">You can also put comma separated multiple EZEIDs at once</small>
                                 <br/>
-                                <input type="text" class="form-control" ng-model="modalBox.tempMappedName"/>
+                                <input maxlength="5000" type="text" class="form-control" ng-model="modalBox.tempMappedName"/>
                                 <br/>
                                 <button class="btn btn-sm btn-success no-radius" ng-click="addMappedEzeid()"> Add Current EZEID</button>
                             </div>
