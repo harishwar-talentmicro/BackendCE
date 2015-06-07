@@ -25,7 +25,7 @@
                                                                     "maxDate" : "2029/01/01"
                                                                     }'></date-time-picker>
                     <!-- Notes section goes here[Shown only to resource] -->
-                    <div class="notes-block">
+                    <div ng-show="isResource" class="notes-block">
                         <div class="notes-heading">
                             <i class="fa fa-list"></i> Appointments
                         </div>
@@ -110,7 +110,7 @@
                                 </div>
                             </div>
                             <!-- coloring for availability : For executing coloring the table post-DOM rendering -->
-                            <div>{{(colorWorkingHours())(alreadyReserveSlot())(appendColorIndex())}}</div>
+                            <div>{{(colorWorkingHours())(alreadyReserveSlot())(appendColorIndex()(removeWasteColoredCells()))}}</div>
                             <!-- main container of day - calender end here -->
                         </div>
                     </div>

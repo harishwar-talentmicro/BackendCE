@@ -430,7 +430,7 @@ angular.module('ezeidApp').
             else
             {
                 var params = '?ezeid='+_Ezeid;
-                $location.url('/service-reservation'+params);
+                $location.url('/service-reservation'+params+'&name='+$scope.SearchInfo.CompanyName);
             }
         };
 
