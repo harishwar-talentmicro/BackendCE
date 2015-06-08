@@ -247,7 +247,7 @@ angular.module('ezeidApp').controller('RulesCtrl',['$scope','$interval','$http',
 
 
         $scope.modalBox = {
-            title : 'Add New Rule',
+            title : 'Add New Folder',
             editMode : false,
             tempMappedName : '',
             rule : {
@@ -447,11 +447,11 @@ angular.module('ezeidApp').controller('RulesCtrl',['$scope','$interval','$http',
             }
 
             if($scope.modalBox.rule.RuleType === ''){
-                error.push('rule type');
+                error.push('folder type');
             }
 
             if(!$scope.modalBox.rule.FolderStatus){
-                error.push('rule status');
+                error.push('folder status');
             }
 
             if($scope.modalBox.rule.RuleType !== 1){
@@ -500,22 +500,22 @@ angular.module('ezeidApp').controller('RulesCtrl',['$scope','$interval','$http',
                         },function(){
                             $scope.$emit('$preLoaderStop');
                         });
-                        Notification.success({ message : 'Rule added successfully', delay : MsgDelay});
+                        Notification.success({ message : 'Folder added successfully', delay : MsgDelay});
                         $scope.toggleModalBox();
                     }
                     else{
                         $scope.$emit('$preLoaderStop');
-                        Notification.error({ message : 'An error occurred while adding rule', delay : MsgDelay});
+                        Notification.error({ message : 'An error occurred while adding folder', delay : MsgDelay});
                     }
                 }
                 else{
                     $scope.$emit('$preLoaderStop');
-                    Notification.error({ message : 'An error occurred while adding rule', delay : MsgDelay});
+                    Notification.error({ message : 'An error occurred while adding folder', delay : MsgDelay});
                 }
 
             }).error(function(err){
                 $scope.$emit('$preLoaderStop');
-                Notification.error({ message : 'An error occurred while adding rule', delay : MsgDelay});
+                Notification.error({ message : 'An error occurred while adding folder', delay : MsgDelay});
             });
         };
 
