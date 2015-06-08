@@ -8,6 +8,7 @@ angular.module('ezeidApp').controller('CVAttachController',[
     // Add more skills
     $scope.skillMatrix = [];
     var skillsTid = [];
+    $scope.availableTags = [];
 
     if ($rootScope._userInfo) {
     }
@@ -46,6 +47,7 @@ angular.module('ezeidApp').controller('CVAttachController',[
     $scope.$watch('_userInfo.IsAuthenticate', function () {
         if ($rootScope._userInfo.IsAuthenticate == true) {
             getCVInfo();
+            getAllSkills();
         } else {
             $location.path('/');
             CVAttachCtrl._CVInfo.Status = 1;
@@ -129,6 +131,8 @@ angular.module('ezeidApp').controller('CVAttachController',[
 
     this.saveCVDocInfo=function(){
 
+        $scope.$emit('$preLoaderStart');
+
        for (var nCount = 0; nCount < $scope.skillMatrix.length; nCount++) {
            $scope.skillMatrix[nCount].active_status = ($scope.skillMatrix[nCount].active_status == true) ? 1 : 0;
        }
@@ -148,7 +152,14 @@ angular.module('ezeidApp').controller('CVAttachController',[
             }).success(function (data) {
                     if(data.IsSuccessfull) {
                         Notification.success({message: "Saved..", delay: MsgDelay});
-                        getCVInfo();
+
+                        $timeout(function()
+                        {
+                            getCVInfo();
+                            $scope.$emit('$preLoaderStop');
+                        },2000);
+
+
                     }else{
                         Notification.error({message: "Sorry..! not saved", delay: MsgDelay});
                     }
@@ -234,6 +245,8 @@ angular.module('ezeidApp').controller('CVAttachController',[
     var nRowCount = 0;
     $scope.addMoreSkill = function()
     {
+
+        console.log("Sai1");
         if($scope.skillMatrix.length)
         {
             nRowCount = $scope.skillMatrix.length;
@@ -257,54 +270,51 @@ angular.module('ezeidApp').controller('CVAttachController',[
         }
     };
 
-        $scope.availableTags = [
-            "ActionScript",
-            "AppleScript",
-            "Asp",
-            "BASIC",
-            "C",
-            "C++",
-            "Clojure",
-            "COBOL",
-            "ColdFusion",
-            "Erlang",
-            "Fortran",
-            "Groovy",
-            "Haskell",
-            "Java",
-            "JavaScript",
-            "Lisp",
-            "Perl",
-            "PHP",
-            "Python",
-            "Ruby",
-            "Scala",
-            "Scheme"
-        ];
-        $scope.complete=function(_index){
-            $( "#tags"+_index ).autocomplete({
-                source: $scope.availableTags
-            });
+    function getAllSkills(){
+        $scope.$emit('$preLoaderStart');
+        $http({
+            method: 'get',
+            url : GURL + 'skill_list'
 
-            $("#tags"+_index ).on( "autocompleteselect", function( event, ui ) {
-               $scope.skillMatrix[_index].skillname = inputData=ui.item.value;
-            } );
-        }
-
-        $scope.deleteSkilFromMartix=function(_index, _tid)
-        {
-            if (_index > -1) {
-                $scope.skillMatrix.splice(_index, 1);
-                nRowCount = nRowCount - 1;
-                skillsTid.splice(_index,1);
-            }
-            if($scope.skillMatrix.length == 0)
+        }).success(function (res)
             {
-                $scope.skillMatrix = [];
-                nRowCount = 0;
-                skillsTid = [];
-            }
+                $scope.$emit('$preLoaderStop');
+                if(res.status)
+                {
+                    for (var nCount = 0; nCount < res.data.length; nCount++)
+                    {
+                        $scope.availableTags.push(res.data[nCount].SkillTitle);
+                    }
+                }
+           }).error(function(err){
+                $scope.$emit('$preLoaderStop');
+            });
+    };
+
+    $scope.complete=function(_index){
+        $( "#tags"+_index ).autocomplete({
+            source: $scope.availableTags
+        });
+
+        $("#tags"+_index ).on( "autocompleteselect", function( event, ui ) {
+           $scope.skillMatrix[_index].skillname = inputData=ui.item.value;
+        } );
+    }
+
+    $scope.deleteSkilFromMartix=function(_index, _tid)
+    {
+        if (_index > -1) {
+            $scope.skillMatrix.splice(_index, 1);
+            nRowCount = nRowCount - 1;
+            skillsTid.splice(_index,1);
         }
+        if($scope.skillMatrix.length == 0)
+        {
+            $scope.skillMatrix = [];
+            nRowCount = 0;
+            skillsTid = [];
+        }
+    }
 
 
     }]);
