@@ -31,6 +31,7 @@
             $route) {
 
 
+            $scope.$emit('$preLoaderStart');
             if($rootScope._userInfo.Verified !== 2){
                 $scope.$emit('$preLoaderStop');
                 Notification.error({ message : 'Please be verified by EZEID Area Partner before accessing this area', delay : MsgDelay});
@@ -111,6 +112,7 @@
                     $scope.dataProgressLoader.dataLoadComplete = true;
                     loadCompanyProfile();
                 },function(){
+                    Notification.error({ message : 'Something went wrong ! Please refresh the page', delay : MsgDelay});
                     $scope.dataProgressLoader.dataLoadInProgress = false;
                     $scope.dataProgressLoader.dataLoadError = true;
                     $scope.dataProgressLoader.dataLoadComplete = false;
@@ -126,6 +128,7 @@
                         Token : $rootScope._userInfo.Token
                     }
                 }).success(function(resp){
+                    $scope.$emit('$preLoaderStart');
                     ////////console.log(resp);
                     if(resp && resp !== 'null' && resp.hasOwnProperty('Result')){
                         if(resp.Result.length > 0){
@@ -141,6 +144,7 @@
                         Notification.error({ message : 'Unable to load your company profile information', delay : MsgDelay});
                     }
                 }).error(function(err){
+                    $scope.$emit('$preLoaderStart');
                     Notification.error({ message : 'Unable to load your company profile information', delay : MsgDelay});
                 });
             };
