@@ -128,7 +128,7 @@
                         Token : $rootScope._userInfo.Token
                     }
                 }).success(function(resp){
-                    $scope.$emit('$preLoaderStart');
+                    $scope.$emit('$preLoaderStop');
                     ////////console.log(resp);
                     if(resp && resp !== 'null' && resp.hasOwnProperty('Result')){
                         if(resp.Result.length > 0){
@@ -144,7 +144,7 @@
                         Notification.error({ message : 'Unable to load your company profile information', delay : MsgDelay});
                     }
                 }).error(function(err){
-                    $scope.$emit('$preLoaderStart');
+                    $scope.$emit('$preLoaderStop');
                     Notification.error({ message : 'Unable to load your company profile information', delay : MsgDelay});
                 });
             };
