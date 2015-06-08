@@ -74,18 +74,95 @@
     padding-top: 140px;
 }
 
+.hpw .display-in-full-screen
+{
+    display: inherit !important;
+}
+
+.hpw .display-in-desktop
+{
+    display: none !important;
+}
+
+.hpw .display-in-tablet
+{
+    display: none !important;
+}
+
+.hpw .display-in-mobile
+{
+    display: none !important;
+}
+
+.hpw .mobile-view-buttons
+{
+    display: none;
+}
+
+.hpw .keyword-btn-radius
+{
+    border-top-left-radius: 0px;
+    border-bottom-left-radius: 0px;
+}
+
+.hpw .normal-view-buttons
+{
+    display:inherit;
+}
+
+
 @media screen and (max-width: 1320px) {
     .srw .tile-frame-padding-top
     {
         padding-top: 158px;
     }
 
-    .hpw .hidden-md
+
+    .hpw .mobile-view-buttons
     {
         display: none;
     }
 
+    .hpw .normal-view-buttons
+    {
+        display:inherit;
+    }
 
+    .hpw .keyword-btn-radius
+    {
+        border-top-left-radius: 0px;
+        border-bottom-left-radius: 0px;
+    }
+
+    .hpw .hidden-md
+    {
+        display: none !important;
+    }
+
+    .hpw .display-in-full-screen
+    {
+        display: inherit !important;
+    }
+
+    .hpw .hide-in-full-screen
+    {
+        display: none !important;
+    }
+
+    .hpw .display-in-desktop
+    {
+        display: none !important;
+    }
+
+    .hpw .display-in-tablet
+    {
+        display: none !important;
+    }
+
+    .hpw .display-in-mobile
+    {
+        display: none !important;
+    }
 
 }
 
@@ -93,7 +170,23 @@
 {
     .hpw .hidden-1200
     {
-        display: none;
+        display: none !important;
+    }
+
+    .hpw .mobile-view-buttons
+    {
+        display: inherit;
+    }
+
+    .hpw .keyword-btn-radius
+    {
+        border-top-left-radius: 4px !important;
+        border-bottom-left-radius: 4px !important;
+    }
+
+    .hpw .normal-view-buttons
+    {
+        display:none;
     }
 
     .hpw .search-result-page-padding
@@ -101,6 +194,31 @@
         padding-top: 185px;
     }
 
+    .hpw .display-in-full-screen
+    {
+        display: none !important;
+    }
+
+    .hpw .display-in-desktop
+    {
+        display: inherit !important;
+    }
+
+    .hpw .hide-in-desktop
+    {
+        display: none !important;
+    }
+
+
+    .hpw .display-in-tablet
+    {
+        display: none !important;
+    }
+
+    .hpw .display-in-mobile
+    {
+        display: none !important;
+    }
 }
 
 @media screen and (max-width: 874px) {
@@ -109,9 +227,25 @@
         padding-top: 148px;
     }
 
-    .hpw .hidden-sm
+    .hpw .mobile-view-buttons
+    {
+        display:inherit;
+    }
+
+    .hpw .keyword-btn-radius
+    {
+        border-top-left-radius: 4px !important;
+        border-bottom-left-radius: 4px !important;
+    }
+
+    .hpw .normal-view-buttons
     {
         display: none;
+    }
+
+    .hpw .hidden-sm
+    {
+        display: none !important;
     }
 
 
@@ -119,17 +253,58 @@
     {
         padding-top: 185px;
     }
+
+    .hpw .display-in-full-screen
+    {
+        display: none !important;
+    }
+
+    .hpw .display-in-desktop
+    {
+        display: none !important;
+    }
+
+    .hpw .display-in-tablet
+    {
+        display: inherit !important;
+    }
+
+    .hpw .hide-in-tablet
+    {
+        display: none !important;
+    }
+
+    .hpw .display-in-mobile
+    {
+        display: none !important;
+    }
 }
 
 @media screen and (max-width: 768px) {
     .hpw .search-type
     {
-        display:none;
+        display:none !important;
+    }
+
+    .hpw .mobile-view-buttons
+    {
+        display:inherit;
+    }
+
+    .hpw .keyword-btn-radius
+    {
+        border-top-left-radius: 4px !important;
+        border-bottom-left-radius: 4px !important;
+    }
+
+    .hpw .normal-view-buttons
+    {
+        display: none;
     }
 
     .hpw .hidden-xs
     {
-        display: none;
+        display: none !important;
     }
 
     .hpw .logo {
@@ -158,6 +333,32 @@
     {
         padding-top: 2% !important;
     }
+
+    .hpw .display-in-full-screen
+    {
+        display: none !important;
+    }
+
+    .hpw .display-in-desktop
+    {
+        display: none !important;
+    }
+
+    .hpw .display-in-tablet
+    {
+        display: none !important;
+    }
+
+    .hpw .display-in-mobile
+    {
+        display: inherit !important;
+    }
+
+    .hpw .hide-in-mobile
+    {
+        display: none !important;
+    }
+
 }
 
 .hpw .header-item
@@ -167,7 +368,7 @@
 
 .hpw .header
 {
-    background: none;
+    background: none !important;
     position: absolute;
     font-size: 14px;
     min-width: 1024px;
