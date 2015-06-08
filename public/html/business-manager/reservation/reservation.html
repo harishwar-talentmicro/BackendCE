@@ -50,9 +50,9 @@
                 </div>
                 <!-- Main content goes here -->
                 <div class="col-lg-9 col-md-8 col-sm-12 col-xs-12 ">
-
+                    <h5 class="text-primary" ng-hide="resources.length > 0">No Resoure Available</h5>
                     <!-- RESERVATION MODULE goes here -->
-                    <div class="reservation-module rm">
+                    <div class="reservation-module rm" ng-show="resources.length > 0">
                         <div class="col-lg-12">
                             <!-- MAIN CALENDAR of day - calender -->
                             <div class="reservation-title">
@@ -65,20 +65,20 @@
                                 </div>
                                 <div class="col-lg-6">
                                     <div class="ezeid-title">
-                                        {{headTitle}}
+                                        {{headTitle.length>0?headTitle:'&nbsp;'}}
                                     </div>
                                 </div>
                                 <hr>
                                 <div class="ezeid-resource">
-                                    <div class="buttons">
+                                    <div class="buttons">&nbsp;
                                         <span ng-repeat="res in resources track by $index">
-                                        <button ng-show="resources[$index].title.length > 0"
-                                                ng-click="activateResource(resources[$index].tid)"
-                                                class="btn btn-default resource-btn" ng-class="['resource-'+resources[$index].tid,$index == 0?'active':'']"
-                                                title="{{resources[$index].description}}">
-                                            {{resources[$index].title}}
-                                        </button>
-                                            </span>
+                                            <button ng-show="resources[$index].title.length > 0"
+                                                    ng-click="activateResource(resources[$index].tid)"
+                                                    class="btn btn-default resource-btn" ng-class="['resource-'+resources[$index].tid,$index == 0?'active':'']"
+                                                    title="{{resources[$index].description}}">
+                                                {{resources[$index].title}}
+                                            </button>
+                                        </span>
                                     </div>
                                 </div>
                             </div>

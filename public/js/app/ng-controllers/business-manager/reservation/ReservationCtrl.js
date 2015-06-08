@@ -369,7 +369,14 @@ var res = angular.module('ezeidApp').
             function getFormatedTransactionData(_data) {
                 var formatedData = [];
                 var reserved = [];
+                var error = '';
                 for (var nCount = 0; nCount < _data.data.length; nCount++) {
+
+                    if(_data.data[nCount]['W1'] == 'null')
+                    {
+                        error = 'No service hour found for this resource';
+                    }
+
                     var times = new Array
                     (
                         selectedTimeUtcToLocal(_data.data[nCount]['W1']),
@@ -390,6 +397,11 @@ var res = angular.module('ezeidApp').
                     }
                     else {
                         reserved[nCount] = [];
+                    }
+
+                    if(error.length > 0)
+                    {
+                        Notification.error({ message: error, delay: MsgDelay });
                     }
                     formatedData['working'] = times;
                     formatedData['reserved'] = reserved;
@@ -1229,4 +1241,9 @@ var res = angular.module('ezeidApp').
             {
                 $('.blk-content:not(.building-block .available)').removeAttr('style');
             }
+
+            /**
+             *
+             *
+             */
         }]);
