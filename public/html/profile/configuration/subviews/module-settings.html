@@ -448,7 +448,8 @@
                 </div>
                 <div class="text-center col-lg-3 col-md-3 col-sm-3 col-xs-6 bottom-clearfix col-lg-offset-0 col-md-offset-0 col-sm-offset-0 col-xs-offset-0">
                     <div class="hidden-lg hidden-print hidden-sm hidden-xs hidden-md hidden-desktop hidden-phone">
-                        <input type="file" id="brochure-file-upload" onchange="angular.element(this).scope().uploadBrochure()" />
+                        <input type="file" id="brochure-file-upload" accept="application/msword,application/vnd.ms-excel,application/vnd.ms-powerpoint,
+text/plain,application/pdf,image/*" onchange="angular.element(this).scope().uploadBrochure()" />
                     </div>
 
                     <div class="thumbnail text-center no-radius">
@@ -456,10 +457,12 @@
                             <span class="glyphicon glyphicon-paperclip"></span>
                         </buttton>
                         <img ng-src="{{brochureImage}}" alt="brochure" />
-                        <button class="btn btn-primary btn-xs" ng-show="(brochureImage !== inactiveBrochureImage)" title="Download brochure">
+                        <a ng-href="{{brochureDownloadLink}}" target="_blank"
+                           class="btn btn-primary btn-xs" ng-show="(brochureImage !== inactiveBrochureImage)"
+                           title="Download brochure">
                             <span class="glyphicon glyphicon-download"></span>
                             Download
-                        </button>
+                        </a>
                     </div>
                 </div>
             </div>

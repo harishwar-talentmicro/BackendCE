@@ -106,6 +106,9 @@ var res = angular.module('ezeidApp').
             /* flag bit for checking if there is no resources */
             $scope.isNoResource = false;
 
+            /* Re-setting VIEW of the complete calendar structure in case its: tablet or mobile */
+            reseetBlock();
+
             /* SETTINGS ENDS HERE======================================== */
 
             /* All the set color's INDEX with their title */
@@ -166,6 +169,25 @@ var res = angular.module('ezeidApp').
                     defer.resolve();
                 });
                 return defer.promise;
+            }
+
+            /**
+             * in tablet and mobile view make the blocks in the following order
+             * 1.head-title-block
+             * 2.notes-block
+             * 3.calendar-block
+             */
+            function reseetBlock()
+            {
+                var screenWidth = $(window).width();
+                if(screenWidth < 992)
+                {
+                    /* exchange head-title-block and calendar block */
+                    var calendarHtml = $('.calendar-block').html('');
+                    var headHtml = $('.head-title-block').html('');
+                    //document.getElementsByClassName("calendar-block").innerHTML = headHtml;
+                    //document.getElementsByClassName("head-title-block").innerHTML = calendarHtml;
+                }
             }
 
             /**
@@ -369,7 +391,14 @@ var res = angular.module('ezeidApp').
             function getFormatedTransactionData(_data) {
                 var formatedData = [];
                 var reserved = [];
+                var error = '';
                 for (var nCount = 0; nCount < _data.data.length; nCount++) {
+
+                    if(_data.data[nCount]['W1'] == 'null')
+                    {
+                        error = 'No service hour found for this resource';
+                    }
+
                     var times = new Array
                     (
                         selectedTimeUtcToLocal(_data.data[nCount]['W1']),
@@ -390,6 +419,11 @@ var res = angular.module('ezeidApp').
                     }
                     else {
                         reserved[nCount] = [];
+                    }
+
+                    if(error.length > 0)
+                    {
+                        Notification.error({ message: error, delay: MsgDelay });
                     }
                     formatedData['working'] = times;
                     formatedData['reserved'] = reserved;
@@ -1049,12 +1083,14 @@ var res = angular.module('ezeidApp').
             {
                 var tid = 0;
                 var blockId = 0;
+                var saveType = 'save';
                 if($scope.modal.isUpdate)
                 {
                     /* get TID */
                     var minutes = convertHoursToMinutes($scope.startTime);
                     blockId = minutes/5;
                     tid = $('.block-'+blockId).data('tid');
+                    saveType = 'update';
                 }
                 $scope.startTime = $('#start-time').val();
 
@@ -1087,11 +1123,11 @@ var res = angular.module('ezeidApp').
                     }
                     else
                     {
-                        Notification.error({ message: "Unable to save the reservation, please try again later", delay: MsgDelay });
+                        Notification.error({ message: "Failed to "+saveType+" your reservation. <br>Probable Reason: "+resp.message, delay: MsgDelay });
                     }
                 }).error(function(err){
                     $scope.$emit('$preLoaderStop');
-                    Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
+                    Notification.error({ message: "Something went wrong! try again later", delay: MsgDelay });
                 });
             }
 
@@ -1229,4 +1265,9 @@ var res = angular.module('ezeidApp').
             {
                 $('.blk-content:not(.building-block .available)').removeAttr('style');
             }
+
+            /**
+             *
+             *
+             */
         }]);
