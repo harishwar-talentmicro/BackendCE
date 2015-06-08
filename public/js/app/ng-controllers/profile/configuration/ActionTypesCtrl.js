@@ -116,8 +116,13 @@ angular.module('ezeidApp').controller('ActionTypesCtrl',['$scope','$rootScope','
                     $scope.masterUser = resp[0];
                     $scope.loadTxActionTypes();
                 }
+                else{
+                    $scope.$emit('$preLoaderStop');
+                    Notification.error({ message : 'Something went wrong ! Please refresh the page'});
+                }
             }).error(function(err){
-                Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
+                $scope.$emit('$preLoaderStop');
+                Notification.error({ message: "Something went wrong ! Please refresh the page", delay: MsgDelay });
             });
 
     };
@@ -197,7 +202,7 @@ angular.module('ezeidApp').controller('ActionTypesCtrl',['$scope','$rootScope','
                 MasterID : ($scope._userInfo.MasterID) ? $scope._userInfo.MasterID : $scope.masterUser.MasterID
             }
         }).success(function(resp){
-
+                $scope.$emit('$preLoaderStop');
 
                 /**
                  * If functionType is set in function, it will be called once only
@@ -242,11 +247,11 @@ angular.module('ezeidApp').controller('ActionTypesCtrl',['$scope','$rootScope','
                     }
                 }
             }).error(function(err){
-                // ////////console.log(err);
+                $scope.$emit('$preLoaderStop');
             });
     };
 
-
+    $scope.$emit('$preLoaderStart');
     $scope.getMasterUserDetails();
 
 }]);

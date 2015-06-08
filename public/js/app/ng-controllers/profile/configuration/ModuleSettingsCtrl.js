@@ -354,29 +354,27 @@ angular.module('ezeidApp').controller('ModuleSettingsCtrl',[
     };
 
     $scope.uploadBrochure = function(){
-        /**
-         * @todo Write code for brochure upload
-         * @type {files|*|files|FileList|files}
-         */
-       var file =  $("#brochure-file-upload")[0].files;
-       // ////////console.log('I am executing');
-        // ////////console.log(file);
-            // ////////console.log('Then executing');
-            var formData = new FormData();
-            formData.append('file', file);
-            formData.append('Token',$rootScope._userInfo.Token);
-            formData.append('RefType',6);
-
-           $http({
-               url : GURL + 'ewTUploadDoc',
-               method : "POST",
-               data : formData
-           }).success(function(resp){
-                // ////////console.log(resp);
-           }).error(function(err){
-
-           });
-
+        var file =  $("#brochure-file-upload")[0].files[0];
+        var formData = new FormData();
+        formData.append('file', file);
+        formData.append('TokenNo',$rootScope._userInfo.Token);
+        formData.append('RefType',6);
+        $http({
+           url : GURL + 'ewtUploadDoc',
+           method : "POST",
+           data : formData,
+           headers: {'Content-Type': undefined  },
+           transformRequest: angular.identity
+        }).success(function(resp){
+            if(resp && resp != 'null' && resp.IsSuccessfull){
+                Notification.success({ message : 'Brochure Uploaded successfully', delay : MsgDelay});
+            }
+           else{
+                Notification.error({ message : 'An error occured while uploading brochure', delay : MsgDelay});
+            }
+        }).error(function(err){
+           Notification.error({ message : 'An error occured while uploading brochure', delay : MsgDelay});
+        });
     };
 
 
@@ -406,32 +404,10 @@ angular.module('ezeidApp').controller('ModuleSettingsCtrl',[
             });
     };
 
-
-    /**
-     * Converts a binary file into base64
-     * @param file
-     * @returns {promise|*}
-     */
-    $scope.fileToBase64 = function(file){
-        var deferred = $q.defer();
-        try{
-            var fileReader = new FileReader();
-            fileReader.onload = function(){
-                deferred.resolve(fileReader.result);
-            };
-            fileReader.readAsDataURL(file[0]);
-        } catch(ex){
-            //Error with fileReader
-        }
-        return deferred.promise;
-    };
-
-
-
-
     $scope.loadCategories();
     $scope.loadSettings();
 
+        $scope.brochureDownloadLink = '/ewTgetDocument?TokenNo='+$rootScope._userInfo.Token + '&RefType=6';
 
 
     /**
