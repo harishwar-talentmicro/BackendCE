@@ -144,7 +144,9 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$htt
             $scope.modalBox.isEzeidAvailable = true;
             var callback = function(){
                 $scope.modalBox.subuser = $scope.subusers[userIndex];
+                $scope.$emit('$preLoaderStop');
             };
+            $scope.$emit('$preLoaderStart');
             $scope.checkAvailability(callback);
             // ////////console.log($scope.modalBox.subuser);
         }
@@ -474,7 +476,7 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$htt
                         homeDelivery : resp[i].HomeDeliveryMailID,
                         serviceEmail : resp[i].ServiceMailID,
                         resumeEmail : resp[i].CVMailID,
-                        templateId : (resp[i].TemplateID && parseInt(resp[i].TemplateID !== NaN)) ? resp[i].TemplateID : 0
+                        templateId : (resp[i].templateID && parseInt(resp[i].templateID) !== NaN) ? parseInt(resp[i].templateID) : 0
                     };
                     $scope.subusers.push(subuser);
                 }
