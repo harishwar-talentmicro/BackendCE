@@ -107,7 +107,7 @@ var res = angular.module('ezeidApp').
             $scope.isNoResource = false;
 
             /* Re-setting VIEW of the complete calendar structure in case its: tablet or mobile */
-            reseetBlock();
+            //reseetBlock();
 
             /* SETTINGS ENDS HERE======================================== */
 
@@ -182,9 +182,11 @@ var res = angular.module('ezeidApp').
                 var screenWidth = $(window).width();
                 if(screenWidth < 992)
                 {
+                    $('#calendar-block').html($('#head-title-block').html());
                     /* exchange head-title-block and calendar block */
-                    var calendarHtml = $('.calendar-block').html('');
-                    var headHtml = $('.head-title-block').html('');
+                    //var calendarHtml = $('#calendar-block').html();
+                    //var headHtml = $('#head-title-block').html();
+                    //$('#calendar-block').html(headHtml);
                     //document.getElementsByClassName("calendar-block").innerHTML = headHtml;
                     //document.getElementsByClassName("head-title-block").innerHTML = calendarHtml;
                 }
