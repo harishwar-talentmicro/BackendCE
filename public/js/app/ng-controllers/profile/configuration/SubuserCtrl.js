@@ -3,7 +3,9 @@
  */
 
 
-angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$http','Notification','$filter','MsgDelay','$interval','GURL',function($scope,$rootScope,$http,Notification,$filter,MsgDelay,$interval,GURL){
+angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope',
+    '$http','Notification','$filter','MsgDelay','$interval',
+    'GURL','$q',function($scope,$rootScope,$http,Notification,$filter,MsgDelay,$interval,GURL,$q){
     $(document).on('click','.popover-close',function(){
         $('*[data-toggle="popover"]').popover('hide');
     });
@@ -324,9 +326,30 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$htt
      * Validates subuser data
      */
     $scope.validateSubUser = function(){
-        /**
-         * @todo Validates subuser data before saving
-         */
+        var defer = $q.defer();
+        $http({
+            url : GURL + 'ewtEZEIDPrimaryDetails',
+            params : {
+                EZEID : $scope.modalBox.subuser.ezeid,
+                Token : $rootScope._userInfo.Token
+            },
+            method : "GET"
+        }).success(function(resp) {
+            if (resp.length > 0) {
+                if (resp[0].hasOwnProperty('TID')) {
+                    defer.resolve(true);
+                }
+                else{
+                    defer.resolve(false);
+                }
+            }
+            else{
+                defer.resolve(false);
+            }
+        }).error(function(err){
+            defer.resolve(false);
+        });
+        return defer.promise;
     };
 
     /**
@@ -334,59 +357,72 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope','$htt
      */
     $scope.saveSubUser = function(){
         // ////////console.log($scope.modalBox.subuser);
-        var data = {
-            Token : $rootScope._userInfo.Token,
+        $scope.$emit('$preLoaderStart');
+        $scope.validateSubUser().then(function(isValid){
+            if(!isValid){
+                $scope.$emit('$preLoaderStop');
+                Notification.error({ message : 'We were unable to find personal EZEID of this subuser !' +
+                ' Please register him to add as a subuser', delay : MsgDelay});
 
-            PersonalID : $scope.modalBox.subuser.ezeid,
+            }
+            else{
+                var data = {
+                    Token : $rootScope._userInfo.Token,
 
-            TID : $scope.modalBox.subuser.TID,
-            UserName  : ($rootScope.PersonalID !== $scope.modalBox.subuser.userName) ? ($scope.masterUser.EZEID+'.'+$scope.modalBox.subuser.userName) : $scope.masterUser.EZEID,
-            Status : $scope.modalBox.subuser.status,
-            FirstName : $scope.modalBox.subuser.firstName,
-            LastName : $scope.modalBox.subuser.lastName,
-            templateID : ($scope.modalBox.subuser.templateId && parseInt($scope.modalBox.subuser.templateId) !== NaN)
-                ? parseInt($scope.modalBox.subuser.templateId) : 0,
+                    PersonalID : $scope.modalBox.subuser.ezeid,
 
-            AccessRights :
-                $scope.modalBox.subuser.accessRights.sales + '' +
-                $scope.modalBox.subuser.accessRights.reservation + '' +
-                $scope.modalBox.subuser.accessRights.homeDelivery + '' +
-                $scope.modalBox.subuser.accessRights.service + '' +
-                $scope.modalBox.subuser.accessRights.resume,
+                    TID : $scope.modalBox.subuser.TID,
+                    UserName  : ($rootScope.PersonalID !== $scope.modalBox.subuser.userName) ? ($scope.masterUser.EZEID+'.'+$scope.modalBox.subuser.userName) : $scope.masterUser.EZEID,
+                    Status : $scope.modalBox.subuser.status,
+                    FirstName : $scope.modalBox.subuser.firstName,
+                    LastName : $scope.modalBox.subuser.lastName,
+                    templateID : ($scope.modalBox.subuser.templateId && parseInt($scope.modalBox.subuser.templateId) !== NaN)
+                        ? parseInt($scope.modalBox.subuser.templateId) : 0,
 
-            SalesEmail : $scope.modalBox.subuser.salesEmail,
-            ReservationEmail : $scope.modalBox.subuser.reservationEmail,
-            HomeDeliveryEmail : $scope.modalBox.subuser.homeDeliveryEmail,
-            ServiceEmail :  $scope.modalBox.subuser.serviceEmail,
-            ResumeEmail : $scope.modalBox.subuser.resumeEmail,
-            SalesRules : $scope.modalBox.subuser.rules.sales.join(','),
-            ReservationRules : $scope.modalBox.subuser.rules.reservation.join(','),
-            HomeDeliveryRules : $scope.modalBox.subuser.rules.homeDelivery.join(','),
-            ServiceRules : $scope.modalBox.subuser.rules.service.join(','),
-            ResumeRules : $scope.modalBox.subuser.rules.resume.join(',')
-        };
-        // ////////console.log(data);
+                    AccessRights :
+                    $scope.modalBox.subuser.accessRights.sales + '' +
+                    $scope.modalBox.subuser.accessRights.reservation + '' +
+                    $scope.modalBox.subuser.accessRights.homeDelivery + '' +
+                    $scope.modalBox.subuser.accessRights.service + '' +
+                    $scope.modalBox.subuser.accessRights.resume,
 
-        $http({
-            url : GURL + 'ewtCreateSubUser',
-            method : "POST",
-            data : data
-        }).success(function(resp){
-                if(resp && resp.hasOwnProperty("IsSuccessfull")){
-                    Notification.success({ message : "User saved successfully", delay : MsgDelay});
-                    /**
-                     * Reloading all users once again to fetch the TID of newly added user (for updating purposes)
-                     *
-                     */
-                    $scope.toggleModalBox();
-                    $scope.loadSubuserList();
-                }
-                else{
+                    SalesEmail : $scope.modalBox.subuser.salesEmail,
+                    ReservationEmail : $scope.modalBox.subuser.reservationEmail,
+                    HomeDeliveryEmail : $scope.modalBox.subuser.homeDeliveryEmail,
+                    ServiceEmail :  $scope.modalBox.subuser.serviceEmail,
+                    ResumeEmail : $scope.modalBox.subuser.resumeEmail,
+                    SalesRules : $scope.modalBox.subuser.rules.sales.join(','),
+                    ReservationRules : $scope.modalBox.subuser.rules.reservation.join(','),
+                    HomeDeliveryRules : $scope.modalBox.subuser.rules.homeDelivery.join(','),
+                    ServiceRules : $scope.modalBox.subuser.rules.service.join(','),
+                    ResumeRules : $scope.modalBox.subuser.rules.resume.join(',')
+                };
+
+                $http({
+                    url : GURL + 'ewtCreateSubUser',
+                    method : "POST",
+                    data : data
+                }).success(function(resp){
+                    $scope.$emit('$preLoaderStop');
+                    if(resp && resp.hasOwnProperty("IsSuccessfull")){
+                        Notification.success({ message : "User saved successfully", delay : MsgDelay});
+                        /**
+                         * Reloading all users once again to fetch the TID of newly added user (for updating purposes)
+                         *
+                         */
+                        $scope.toggleModalBox();
+                        $scope.loadSubuserList();
+                    }
+                    else{
+                        Notification.error({ message : "An error occured while saving user !", delay : MsgDelay});
+                    }
+                }).error(function(err){
+                    $scope.$emit('$preLoaderStop');
                     Notification.error({ message : "An error occured while saving user !", delay : MsgDelay});
-                }
-        }).error(function(err){
-                Notification.error({ message : "An error occured while saving user !", delay : MsgDelay});
+                });
+            }
         });
+
     };
 
 
