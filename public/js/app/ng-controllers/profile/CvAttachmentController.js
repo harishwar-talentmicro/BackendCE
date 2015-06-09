@@ -9,6 +9,8 @@ angular.module('ezeidApp').controller('CVAttachController',[
     $scope.skillMatrix = [];
     var skillsTid = [];
     $scope.availableTags = [];
+    var nRowCount = 0;
+
 
     if ($rootScope._userInfo) {
     }
@@ -54,35 +56,12 @@ angular.module('ezeidApp').controller('CVAttachController',[
         }
     });
 
+
+    addNewRowForSkill();
+
     $http({ method: 'get', url: GURL + 'ewmGetFunctions?LangID=1'}).success(function (data) {
-        // var _obj = { FunctionID:0, FunctionName: '--Select Function--' };
-        //data.splice(0, 0, _obj);
-        CVAttachCtrl.Functions = data;
+       CVAttachCtrl.Functions = data;
     });
-
-   /* this.getRoleForFunction=function(_functionId){
-        $http({ method: 'get', url: GURL + 'ewmGetRoles?LangID=1&FunctionID='+_functionId}).success(function (data) {
-
-            CVAttachCtrl.RoleTypes = data;
-        });
-    };
-    $http({ method: 'get', url: GURL + 'ewmGetCountry?LangID=1' }).success(function (data) {
-        var _obj = { CountryID: 0, CountryName: '--Country--', ISDCode: '' };
-        data.splice(0, 0, _obj);
-        CVAttachCtrl.countries = data;
-    });
-    this.getStates = function (CountryID) {
-        $http({ method: 'get', url: GURL + 'ewmGetState?LangID=1&CountryID=' + CountryID }).success(function (data) {
-            var _obj = { StateID: 0, StateName: '--State--' };
-            CVAttachCtrl.states = data;
-        });
-    };
-    this.getCities = function (StateID) {
-        $http({ method: 'get', url: GURL + 'ewmGetCity?LangID=1&StateID=' + StateID }).success(function (data) {
-            var _obj = { CityD: 0, CityName: '--City--' };
-            CVAttachCtrl.cities = data;
-        });
-    };*/
 
     //if secure pin checkbox is uncheck remove PIN Value
     this.securePinCliked = function () {
@@ -242,7 +221,7 @@ angular.module('ezeidApp').controller('CVAttachController',[
     };
 
 
-    var nRowCount = 0;
+    //var nRowCount = 0;
     $scope.addMoreSkill = function()
     {
 
