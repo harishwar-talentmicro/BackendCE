@@ -43,14 +43,14 @@ var res = angular.module('ezeidApp').
             $document
         ) {
 
-
+            $scope.$emit('$preLoaderStart');
             /* SETTINGS GOES HERE======================================== */
 
             /* for resources availability background color */
             var availabilityColor = 'rgb(64, 242, 168)';
 
             /* color array for already reserved time slot */
-            var reservedColorArray = ['rgb(255, 163, 73)'];
+            var reservedColorArray = ['rgb(255, 180, 63)'];
 
             /* self reserved color */
             var selfReservedColor = 'rgb(250, 253, 117)';
@@ -129,7 +129,7 @@ var res = angular.module('ezeidApp').
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             $scope.searchedEzeid = $routeParams.ezeid;
-
+            $scope.$emit('$preLoaderStart');
             getResource($scope.searchedEzeid).then(function () {
                 getServicesData($scope.searchedEzeid).then(function () {
                     getServiceResourceMapping($scope.searchedEzeid).then(function () {
@@ -140,6 +140,7 @@ var res = angular.module('ezeidApp').
                     });
                 });
             });
+            $scope.$emit('$preLoaderStop');
 
 
             /**
@@ -197,6 +198,7 @@ var res = angular.module('ezeidApp').
              * @param array from HTTP request
              */
             function setResources(array) {
+                $scope.$emit('$preLoaderStart');
                 var tempArr = [];
                 $scope.resources = [];
                 for (var obj in array) {
@@ -214,6 +216,7 @@ var res = angular.module('ezeidApp').
                     $scope.resources.push(tempArr);
 
                 }
+                $scope.$emit('$preLoaderStop');
             }
 
             /**
@@ -584,6 +587,7 @@ var res = angular.module('ezeidApp').
             function removeMerge()
             {
                 $('.blk-content').removeClass('hidden');
+                $('.blk-content').css('height','');
             }
 
             /* color already reserved time */
@@ -1107,7 +1111,7 @@ var res = angular.module('ezeidApp').
                         contactinfo: $('#userMobile').val(),
                         toEzeid:$scope.searchedEzeid,
                         resourceid:$scope.activeResourceId,
-                        res_datetime:convertTimeToUTC(makeDateTime,'DD-MMM-YYYY hh:mm'),
+                        res_datetime:convertTimeToUTC(makeDateTime,'DD-MMM-YYYY HH:mm'),
                         duration:$scope.duration,
                         status:0,
                         serviceid:$('#service').val()+','
@@ -1205,7 +1209,7 @@ var res = angular.module('ezeidApp').
             $scope.changeStatus = function(tid,status)
             {
                 /* http request for chaanging the status */
-                $scope.$emit('$preLoaderStart');;
+                $scope.$emit('$preLoaderStart');
                 $http({
                     url : GURL + 'reservation_transaction',
                     method : "PUT",
