@@ -1104,7 +1104,7 @@ var res = angular.module('ezeidApp').
                     data :{
                         Token:$rootScope._userInfo.Token,
                         TID:tid,
-                        contactinfo:$('#userMobile').val(),
+                        contactinfo: $('#userMobile').val(),
                         toEzeid:$scope.searchedEzeid,
                         resourceid:$scope.activeResourceId,
                         res_datetime:convertTimeToUTC(makeDateTime,'DD-MMM-YYYY hh:mm'),
@@ -1125,11 +1125,18 @@ var res = angular.module('ezeidApp').
                     }
                     else
                     {
-                        Notification.error({ message: "Failed to "+saveType+" your reservation. <br>Probable Reason: "+resp.message, delay: MsgDelay });
+                        Notification.error({ message: "Failed to "+saveType+" your reservation. Probable Reason: "+resp.message, delay: MsgDelay });
                     }
-                }).error(function(err){
+                }).error(function(err,status){
                     $scope.$emit('$preLoaderStop');
-                    Notification.error({ message: "Something went wrong! try again later", delay: MsgDelay });
+                    console.log(err);
+                    console.log(status);
+                    var message = 'An error occured ! Please try again';
+                    if(status === 400){
+                        message = 'Slot is not available';
+                    }
+
+                    Notification.error({ message: message, delay: MsgDelay });
                 });
             }
 
