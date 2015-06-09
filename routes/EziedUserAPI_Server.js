@@ -11787,6 +11787,119 @@ exports.FnGetResTransDetails = function (req, res) {
     }
 };
 
+exports.FnPGetSkills = function(req,res){
+    var responseMsg = {
+        status : false,
+        data : [],
+        message : 'Unable to load skills ! Please try again',
+        error : {
+            server : 'An internal server error'
+        }
+    };
+
+    try{
+        db.query('CALL PGetSkills()',function(err,result){
+            if(err){
+                console.log('Error : FnPGetSkills ');
+                res.status(400).json(responseMsg);
+            }
+            else{
+                responseMsg.status = true;
+                responseMsg.message = 'Skills loaded successfully';
+                responseMsg.error = null;
+                responseMsg.data = result[0];
+
+                res.status(200).json(responseMsg);
+            }
+        });
+    }
+
+    catch(ex){
+        res.status(500).json(responseMsg);
+        console.log('Error : FnPGetSkills '+ ex.description);
+        throw new Error('Error in FnPGetSkills');
+    }
+};
+
+
+exports.FnChangeReservationStatus = function(req,res){
+
+    var token = (req.body.Token && req.body.Token !== 2) ? req.body.Token : null;
+    var tid = (req.body.tid && parseInt(req.body.tid) !== NaN) ? parseInt(req.body.tid) : null;
+    var status = (req.body.status && parseInt(req.body.status) !== NaN) ? parseInt(req.body.status) : null;
+
+    var responseMsg = {
+        status : false,
+        data : null,
+        message : 'Please login to continue',
+        error : {
+            Token : 'Invalid Token'
+        }
+    };
+
+    var validationFlag = true;
+    if(!token){
+        responseMsg.error['Token'] = 'Invalid Token';
+        validationFlag *= false;
+    }
+
+    if(!tid){
+        responseMsg.error['tid'] = 'Reservation Slot is empty';
+        validationFlag *= false;
+    }
+
+    if(!status){
+        responseMsg.error['status'] = 'Status cannot be empty';
+        validationFlag *= false;
+    }
+
+    if(!validationFlag){
+        res.status(401).json(responseMsg);
+        return;
+    }
+
+    FnValidateToken(token,function(err,tokenRes){
+        if(err || (!tokenRes)){
+            res.status(401).json(responseMsg);
+            return;
+        }
+        else{
+            var queryParam = db.escape(tid) + ',' + db.escape(status);
+            db.query('CALL PUpdateResTransStatus(' + queryParam + ')', function (err, updateRes) {
+                if(err){
+                    responseMsg.message = 'An error occurred ! Please try again';
+                    responseMsg.error['server'] = 'Internal Server Error';
+                    res.status(400).json(responseMsg);
+                }
+                else{
+                    if(updateRes.affectedRows > 0){
+                        responseMsg['status'] = true;
+                        responseMsg['error'] = null;
+                        responseMsg['message'] = 'Status changed successfully';
+                        responseMsg['data'] = {
+                            tid : tid,
+                            status : status
+                        };
+                        res.status(200).json(responseMsg);
+                    }
+                    else{
+                        responseMsg['status'] = false;
+                        responseMsg['error'] = {server : 'An error occurred'};
+                        responseMsg['message'] = 'Unable to update ! Please try again';
+                        responseMsg['data'] = {
+                            tid : req.body.tid,
+                            status : req.body.status
+                        };
+                        res.status(400).json(responseMsg);
+                    }
+
+
+                }
+            });
+        }
+    });
+};
+
 
 
 //EZEIDAP Parts
@@ -12199,10 +12312,12 @@ exports.FnChangePasswordAP = function (req, res) {
                     } else {
                         res.send(RtnMessage);
                         console.log('FnChangePassword:pChangePassword: Invalid Token');
+                       res.statusCode=401;
                     }
                 } else {
                     res.send(RtnMessage);
                     console.log('FnChangePassword:pChangePassword: Error in validating token:  ' + err);
+                    res.statusCode=500;
                 }
             });
         }
@@ -12362,10 +12477,12 @@ exports.FnGetEZEIDDetailsAP = function (req, res) {
                     } else {
                         res.send(RtnMessage);
                         console.log('FnGetEZEIDDetailsAP: Invalid Token');
+                        res.statusCode=401;
                     }
                 } else {
                     res.send(RtnMessage);
                     console.log('FnGetEZEIDDetailsAP: Error in validating token:  ' + err);
+                    res.statusCode=500;
                 }
             });
         }
@@ -12549,11 +12666,13 @@ exports.FnSaveAPEZEIDPicture = function (req, res) {
                     else {
                         console.log('FnSaveAPEZEIDPicture: Invalid Token')
                         res.send(RtnMessage);
+                        res.statusCode=401;
                     }
                 }
                 else {
                     console.log('FnSaveAPEZEIDPicture: Error in processing Token' + err);
                     res.send(RtnMessage);
+                    res.statusCode=500;
                 }
             });
         }
@@ -12691,10 +12810,12 @@ exports.FnGetAPEZEIDPicture = function (req, res) {
                     } else {
                         res.send('null');
                         console.log('FnGetAPEZEIDPicture: Invalid Token');
+                        res.statusCode=401;
                     }
                 } else {
                     res.send('null');
                     console.log('FnGetAPEZEIDPicture: Error in validating token:  ' + err);
+                    res.statusCode=500;
                 }
             });
         }
@@ -14654,120 +14775,4 @@ exports.FnSaveCitysVES = function(req, res){
         throw new Error(ex);
     }
 };
-
-
-exports.FnPGetSkills = function(req,res){
-    var responseMsg = {
-        status : false,
-        data : [],
-        message : 'Unable to load skills ! Please try again',
-        error : {
-            server : 'An internal server error'
-        }
-    };
-
-    try{
-        db.query('CALL PGetSkills()',function(err,result){
-            if(err){
-                console.log('Error : FnPGetSkills ');
-                res.status(400).json(responseMsg);
-            }
-            else{
-                responseMsg.status = true;
-                responseMsg.message = 'Skills loaded successfully';
-                responseMsg.error = null;
-                responseMsg.data = result[0];
-
-                res.status(200).json(responseMsg);
-            }
-        });
-    }
-
-    catch(ex){
-        res.status(500).json(responseMsg);
-        console.log('Error : FnPGetSkills '+ ex.description);
-        throw new Error('Error in FnPGetSkills');
-    }
-};
-
-
-exports.FnChangeReservationStatus = function(req,res){
-
-    var token = (req.body.Token && req.body.Token !== 2) ? req.body.Token : null;
-    var tid = (req.body.tid && parseInt(req.body.tid) !== NaN) ? parseInt(req.body.tid) : null;
-    var status = (req.body.status && parseInt(req.body.status) !== NaN) ? parseInt(req.body.status) : null;
-
-    var responseMsg = {
-        status : false,
-        data : null,
-        message : 'Please login to continue',
-        error : {
-            Token : 'Invalid Token'
-        }
-    };
-
-    var validationFlag = true;
-    if(!token){
-        responseMsg.error['Token'] = 'Invalid Token';
-        validationFlag *= false;
-    }
-
-    if(!tid){
-        responseMsg.error['tid'] = 'Reservation Slot is empty';
-        validationFlag *= false;
-    }
-
-    if(!status){
-        responseMsg.error['status'] = 'Status cannot be empty';
-        validationFlag *= false;
-    }
-
-    if(!validationFlag){
-        res.status(401).json(responseMsg);
-        return;
-    }
-
-    FnValidateToken(token,function(err,tokenRes){
-        if(err || (!tokenRes)){
-            res.status(401).json(responseMsg);
-            return;
-        }
-        else{
-            var queryParam = db.escape(tid) + ',' + db.escape(status);
-            db.query('CALL PUpdateResTransStatus(' + queryParam + ')', function (err, updateRes) {
-                if(err){
-                    responseMsg.message = 'An error occurred ! Please try again';
-                    responseMsg.error['server'] = 'Internal Server Error';
-                    res.status(400).json(responseMsg);
-                }
-                else{
-                    if(updateRes.affectedRows > 0){
-                        responseMsg['status'] = true;
-                        responseMsg['error'] = null;
-                        responseMsg['message'] = 'Status changed successfully';
-                        responseMsg['data'] = {
-                            tid : tid,
-                            status : status
-                        };
-                        res.status(200).json(responseMsg);
-                    }
-                    else{
-                        responseMsg['status'] = false;
-                        responseMsg['error'] = {server : 'An error occurred'};
-                        responseMsg['message'] = 'Unable to update ! Please try again';
-                        responseMsg['data'] = {
-                            tid : req.body.tid,
-                            status : req.body.status
-                        };
-                        res.status(400).json(responseMsg);
-                    }
-
-
-                }
-            });
-        }
-    });
-};
-
-
 
