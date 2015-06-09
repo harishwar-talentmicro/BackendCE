@@ -7,10 +7,9 @@ angular.module('ezeidApp').controller('CVAttachController',[
     var MsgDelay = 2000;
     // Add more skills
     $scope.skillMatrix = [];
+
     var skillsTid = [];
     $scope.availableTags = [];
-    var nRowCount = 0;
-
 
     if ($rootScope._userInfo) {
     }
@@ -55,9 +54,6 @@ angular.module('ezeidApp').controller('CVAttachController',[
             CVAttachCtrl._CVInfo.Status = 1;
         }
     });
-
-
-    addNewRowForSkill();
 
     $http({ method: 'get', url: GURL + 'ewmGetFunctions?LangID=1'}).success(function (data) {
        CVAttachCtrl.Functions = data;
@@ -124,20 +120,20 @@ angular.module('ezeidApp').controller('CVAttachController',[
             CVAttachCtrl._CVInfo.TokenNo = $rootScope._userInfo.Token;
             CVAttachCtrl._CVInfo.Status = parseInt(CVAttachCtrl._CVInfo.Status);
            $http({
-                method: "POST",
-                url: GURL + 'ewtSaveCVInfo',
-                data: CVAttachCtrl._CVInfo
-//                headers: { 'Content-Type': 'application/json' }
-            }).success(function (data) {
+                    method: "POST",
+                    url: GURL + 'ewtSaveCVInfo',
+                    data: CVAttachCtrl._CVInfo
+                 }).success(function (data) {
                     if(data.IsSuccessfull) {
                         Notification.success({message: "Saved..", delay: MsgDelay});
+                        $scope.skillMatrix = [];
+                        skillsTid = [];
 
                         $timeout(function()
                         {
                             getCVInfo();
                             $scope.$emit('$preLoaderStop');
-                        },2000);
-
+                        },3000);
 
                     }else{
                         Notification.error({message: "Sorry..! not saved", delay: MsgDelay});
@@ -179,13 +175,40 @@ angular.module('ezeidApp').controller('CVAttachController',[
             }
         }).success(function (res)
            {
-               if(res.status)
+                if(res.status)
                 {
                     CVAttachCtrl._CVInfo = res.data[0];
+                    if(res.skillMatrix.length == 0)
+                    {
+                        $scope.skillMatrix = [
+                            {
+                                "tid":0,
+                                "skillname":"",
+                                "expertiseLevel":0,
+                                "exp":"",
+                                "active_status":1
+                            }
+                        ];
+                    }
+                    else
+                    {
+                        $scope.skillMatrix.push(
+                            {
+                                "tid":0,
+                                "skillname":"",
+                                "expertiseLevel":0,
+                                "exp":"",
+                                "active_status":1
+                            }
+                        );
 
-                    $scope.skillMatrix = res.skillMatrix;
+                        for (var nCount = 0; nCount < res.skillMatrix.length; nCount++)
+                        {
+                            $scope.skillMatrix.push(res.skillMatrix[nCount]);
+                        }
+                    }
 
-                    for (var nCount = 0; nCount < res.skillMatrix.length; nCount++) {
+                    for (var nCount = 0; nCount < $scope.skillMatrix.length; nCount++) {
                         $scope.skillMatrix[nCount].active_status = ($scope.skillMatrix[nCount].active_status == 1) ? true : false;
                         skillsTid.push($scope.skillMatrix[nCount].tid);
                     }
@@ -202,7 +225,8 @@ angular.module('ezeidApp').controller('CVAttachController',[
                     if(res.data[0].CVDocFile == "")
                     {
                         $scope.showLink = false;
-                    }else
+                    }
+                    else
                     {
                         $scope.showLink = true;
                     }
@@ -220,32 +244,17 @@ angular.module('ezeidApp').controller('CVAttachController',[
         }
     };
 
-
-    //var nRowCount = 0;
     $scope.addMoreSkill = function()
     {
-
-        console.log("Sai1");
-        if($scope.skillMatrix.length)
+        if(($scope.skillMatrix[0].skillname) && ($scope.skillMatrix[0].skillname))
         {
-            nRowCount = $scope.skillMatrix.length;
-        }
-
-        var skill = {};
-        $scope.skillMatrix.push(skill);
-        if(nRowCount != 0)
-        {
-            $scope.skillMatrix[nRowCount].tid = 0;
-            $scope.skillMatrix[nRowCount].expertiseLevel = 0;
-            $scope.skillMatrix[nRowCount].active_status = true;
-            nRowCount = nRowCount + 1;
-        }
-        else
-        {
-            $scope.skillMatrix[nRowCount].tid = 0;
-            $scope.skillMatrix[nRowCount].expertiseLevel = 0;
-            $scope.skillMatrix[nRowCount].active_status = true;
-            nRowCount = nRowCount + 1;
+           $scope.skillMatrix.splice(0, 0, {
+                "tid":0,
+                "skillname":"",
+                "expertiseLevel":0,
+                "exp":"",
+                "active_status":true
+            });
         }
     };
 
@@ -284,13 +293,11 @@ angular.module('ezeidApp').controller('CVAttachController',[
     {
         if (_index > -1) {
             $scope.skillMatrix.splice(_index, 1);
-            nRowCount = nRowCount - 1;
             skillsTid.splice(_index,1);
         }
         if($scope.skillMatrix.length == 0)
         {
             $scope.skillMatrix = [];
-            nRowCount = 0;
             skillsTid = [];
         }
     }
