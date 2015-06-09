@@ -2046,8 +2046,9 @@ margin-bottom: 10px;
 {
     word-wrap: break-word;
     padding: 2px;
-    font-weight: 600;
-    font-style:italic;
+    /*font-weight: 600;*/
+    /*font-style:italic;*/
+    font-size: smaller;
 }
 
 .rw .notes-heading
@@ -2102,4 +2103,9 @@ margin-bottom: 10px;
 {
     font-size: larger;
     padding-top: 4px;
+}
+
+.hpw .strike-text
+{
+    text-decoration: line-through;
 }
