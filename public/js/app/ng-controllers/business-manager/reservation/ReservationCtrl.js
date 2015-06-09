@@ -42,8 +42,6 @@ var res = angular.module('ezeidApp').
             UtilityService,
             $document
         ) {
-
-            $scope.$emit('$preLoaderStart');
             /* SETTINGS GOES HERE======================================== */
 
             /* for resources availability background color */

@@ -17,7 +17,7 @@
                 <div class="col-lg-3 col-md-4 col-sm-12 col-xs-12 menu-style no-padding">
 
                     <!-- Calender goes here -->
-                    <div id="calendar-block">
+                    <div id="calendar-block" ng-show="resources.length > 0">
                         <date-time-picker recipient="currentDateTime" settings='{
                                                                     "format" : "Y-m-d",
                                                                     "timepicker" : false,
@@ -30,7 +30,7 @@
                         </date-time-picker>
                     </div>
                     <!-- Notes section goes here[Shown only to resource] -->
-                    <div ng-show="isResource" id="notes-block">
+                    <div ng-show="isResource && resources.length > 0" id="notes-block">
                         <div class="notes-heading">
                             <i class="fa fa-list"></i> Appointments
                         </div>
