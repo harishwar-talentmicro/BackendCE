@@ -53,6 +53,8 @@ angular.module('ezeidApp').
         //Below line is for Loading img
         $scope.$emit('$preLoaderStart');
 
+        var destroyModalDetailsWatcher = null;
+
         $scope.SearchInfo = {};
         var currentBanner = 1;
         var Miliseconds = 8000;
@@ -178,7 +180,7 @@ angular.module('ezeidApp').
                         $scope.SearchInfo = data[0];
                         $scope.showDetailsModal = true;
 
-                            $scope.$watch('showDetailsModal',function(newVal,oldVal){
+                      destroyModalDetailsWatcher = $scope.$watch('showDetailsModal',function(newVal,oldVal){
                                 if(!newVal){
                                     //Below line is for Loading img
                                     if(!$scope.businessModalOpen){
@@ -430,7 +432,11 @@ angular.module('ezeidApp').
             else
             {
                 var params = '?ezeid='+_Ezeid;
-                $location.url('/service-reservation'+params+'&name='+$scope.SearchInfo.CompanyName);
+                $timeout(function(){
+                    $location.url('/service-reservation'+params+'&name='+$scope.SearchInfo.CompanyName);
+                },500);
+                destroyModalDetailsWatcher();
+                $scope.showDetailsModal = false;
             }
         };
 
