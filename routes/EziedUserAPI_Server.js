@@ -4027,6 +4027,7 @@ exports.FnGetSearchDocuments = function (req, res) {
                             }
                         }
                         var SearchQuery = db.escape(EZEID) + ',' + db.escape(Pin) + ',' + db.escape(DocType);
+                        console.log('CALL  PGetSearchDocuments(' + SearchQuery + ')');
                         db.query('CALL  PGetSearchDocuments(' + SearchQuery + ')', function (err, SearchResult) {
                             // db.query(searchQuery, function (err, SearchResult) {
                             if (!err) {
@@ -4064,7 +4065,9 @@ exports.FnGetSearchDocuments = function (req, res) {
                                             });
                                         }
                                     else {
-                                        res.send('null');
+                                        res.json(null);
+                                        
+                                        
                                         console.log('FnGetSearchDocuments: tmaster: no search found');
                                     }
                                 }
