@@ -11830,30 +11830,30 @@ exports.FnChangeReservationStatus = function(req,res){
     var token = (req.body.Token && req.body.Token !== 2) ? req.body.Token : null;
     var tid = (req.body.tid && parseInt(req.body.tid) !== NaN) ? parseInt(req.body.tid) : null;
     var status = (req.body.status && parseInt(req.body.status) !== NaN) ? parseInt(req.body.status) : null;
-
+    
     var responseMsg = {
         status : false,
         data : null,
-        message : 'Please login to continue',
-        error : {
-            Token : 'Invalid Token'
-        }
+        message : '',
+        error :{}
     };
 
     var validationFlag = true;
     if(!token){
         responseMsg.error['Token'] = 'Invalid Token';
         validationFlag *= false;
+        
     }
 
     if(!tid){
         responseMsg.error['tid'] = 'Reservation Slot is empty';
         validationFlag *= false;
     }
-
+   
     if(!status){
         responseMsg.error['status'] = 'Status cannot be empty';
         validationFlag *= false;
+        
     }
 
     if(!validationFlag){

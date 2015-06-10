@@ -42,8 +42,6 @@ var res = angular.module('ezeidApp').
             UtilityService,
             $document
         ) {
-
-            $scope.$emit('$preLoaderStart');
             /* SETTINGS GOES HERE======================================== */
 
             /* for resources availability background color */
@@ -450,7 +448,6 @@ var res = angular.module('ezeidApp').
                 for (var i = 0; i < formatedData['reserved'].length; i++) {
                     $scope.reservedTime.push(formatedData['reserved'][i]);
                 }
-
                 /* reload calendar */
             };
 
@@ -603,30 +600,22 @@ var res = angular.module('ezeidApp').
                 $('.reserved').attr('title','');
 
 
-                    for (var i = 0; i < $scope.reservedTime.length; i++) {
-                        /* get blocks coming under this range */
-                        var data = getBlockRange($scope.reservedTime[i][0], $scope.reservedTime[i][1]);
-                        /* initiate merging process */
-                        var text = $scope.getReservedBlockText($scope.loggedInUid,$scope.reservedTime[i][3],$scope.reservedTime[i][2]);
-                        var color = $scope.getReservedBlockColor($scope.loggedInUid,$scope.reservedTime[i][3]);
+                for (var i = 0; i < $scope.reservedTime.length; i++) {
+                    /* get blocks coming under this range */
+                    var data = getBlockRange($scope.reservedTime[i][0], $scope.reservedTime[i][1]);
+                    /* initiate merging process */
+                    var text = $scope.getReservedBlockText($scope.loggedInUid,$scope.reservedTime[i][3],$scope.reservedTime[i][2]);
+                    var color = $scope.getReservedBlockColor($scope.loggedInUid,$scope.reservedTime[i][3]);
 
-                        var title = $scope.getTitleText($scope.loggedInUid,$scope.reservedTime[i][3],$scope.reservedTime[i][2]
-                            ,$scope.reservedTime[i][0],$scope.reservedTime[i][1],$scope.reservedTime[i][4]);
-                        var tid = $scope.reservedTime[i][6];
-                        var reserverId = $scope.reservedTime[i][3];
-                        $scope.mergeBlockMaster(data[0], data[1], text, $scope.height,color,title,tid,reserverId);
-                        /* color the block */
-                    }
-
+                    var title = $scope.getTitleText($scope.loggedInUid,$scope.reservedTime[i][3],$scope.reservedTime[i][2]
+                        ,$scope.reservedTime[i][0],$scope.reservedTime[i][1],$scope.reservedTime[i][4]);
+                    var tid = $scope.reservedTime[i][6];
+                    var reserverId = $scope.reservedTime[i][3];
+                    $scope.mergeBlockMaster(data[0], data[1], text, $scope.height,color,title,tid,reserverId);
+                    /* strike the text if the status is closed */
+                    strikeText($scope.reservedTime[i][6],$scope.reservedTime[i][5]);
+                }
             };
-
-            /**
-             * reset title of reserved status
-             */
-            function resetReservedBlockTitle()
-            {
-
-            }
 
 
             /**
@@ -662,7 +651,6 @@ var res = angular.module('ezeidApp').
                 $('.block-' + startBlock).html('<p>' + text + '</p>');
                 /* add padding to the text to make it in center */
                 //$('.block-'+startBlock).css('padding-top',(totalHeight/2.3)+'em');
-
                 if(startBlock == endBlock)
                 {
                     return;
@@ -842,6 +830,8 @@ var res = angular.module('ezeidApp').
                 {
                     $scope.modal.isUpdate = false;
                 }
+
+                /*  */
 
                 /* show error if the working hour is not in working hour */
                 if(isReserved || isAvailable)
@@ -1222,7 +1212,7 @@ var res = angular.module('ezeidApp').
                     $scope.$emit('$preLoaderStop');
                     if(resp.status){
                         /* change status button status */
-                        chnageStatusButton(tid,status);
+                        chnageStatusButtonAndStrikeText(tid,status);
                         Notification.success({ message: "Reservation status changed successfully", delay: MsgDelay });
                     }
                     else
@@ -1238,12 +1228,15 @@ var res = angular.module('ezeidApp').
             /**
              * Change the status and color of the button
              */
-            function chnageStatusButton(tid,status)
+            function chnageStatusButtonAndStrikeText(tid,status)
             {
                 /* make all other button blue */
                 $('.btn-'+tid).removeClass('btn-danger').addClass('btn-primary').removeAttr('disabled');
                 /* make the clicked button to red */
                 $('.btn-'+tid+'-'+status).removeClass('btn-primary').addClass('btn-danger').attr('disabled','');
+                /* if status = 10; strike the text in calendar */
+                removeStrikeText(tid);
+                strikeText(tid,status);
             }
 
             /**
@@ -1280,7 +1273,39 @@ var res = angular.module('ezeidApp').
             }
 
             /**
-             *
-             *
+             * Strike a text if its status is CLOSED
              */
+            function strikeText(tid,status)
+            {
+                if(typeof(status) != 'undefined' && typeof(tid) != 'undefined' && parseInt(status) == 10)
+                {
+                    $('div').find("[data-tid="+tid+"]").addClass('strike-text');
+                    return ;
+                }
+                else if(typeof(status) != 'undefined' && typeof(tid) != 'undefined' && parseInt(status) != 10)
+                {
+                    removeStrikeText(tid);
+                }
+                else if(typeof(tid) != 'undefined' && typeof(status) == 'undefined')
+                {
+                    $('div').find("[data-tid="+tid+"]").addClass('strike-text');
+                    return ;
+                }
+            }
+
+            /**
+             * remove a striked text
+             */
+            function removeStrikeText(tid)
+            {
+                if(typeof(tid) != 'undefined')
+                {
+                    $('div').find("[data-tid="+tid+"]").removeClass('strike-text');
+                    return ;
+                }
+                else
+                {
+                    $('.blk-content').removeClass('strike-text');
+                }
+            }
         }]);
