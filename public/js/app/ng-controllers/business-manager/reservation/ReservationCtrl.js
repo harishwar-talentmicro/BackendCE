@@ -23,6 +23,7 @@ var res = angular.module('ezeidApp').
         '$route',
         'UtilityService',
         '$document',
+        '$sce',
         function (
             $rootScope,
             $scope,
@@ -40,10 +41,13 @@ var res = angular.module('ezeidApp').
             GoogleMap,
             $route,
             UtilityService,
-            $document
-        ) {
-            /* SETTINGS GOES HERE======================================== */
+            $document,
+            $sce
 
+        ) {
+
+            $scope.$emit('$preLoaderStart');
+            /* SETTINGS GOES HERE======================================== */
             /* for resources availability background color */
             var availabilityColor = 'rgb(64, 242, 168)';
 
@@ -76,7 +80,11 @@ var res = angular.module('ezeidApp').
                 //[1000, 1140, 'shrey',5,'service3']
             ];
             /* Set the logged in user */
-            setUserLoggedInId();
+            setUserLoggedInId().then(function(){
+                init();
+            },function(){
+                $location.path('/');
+            });
 
             /* Flag for resources */
             $scope.isResource = false;
@@ -104,9 +112,6 @@ var res = angular.module('ezeidApp').
             /* flag bit for checking if there is no resources */
             $scope.isNoResource = false;
 
-            /* Re-setting VIEW of the complete calendar structure in case its: tablet or mobile */
-            //reseetBlock();
-
             /* SETTINGS ENDS HERE======================================== */
 
             /* All the set color's INDEX with their title */
@@ -128,17 +133,21 @@ var res = angular.module('ezeidApp').
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             $scope.searchedEzeid = $routeParams.ezeid;
             $scope.$emit('$preLoaderStart');
-            getResource($scope.searchedEzeid).then(function () {
-                getServicesData($scope.searchedEzeid).then(function () {
-                    getServiceResourceMapping($scope.searchedEzeid).then(function () {
-                        setFinalMappedServices(6);
-                        var date = moment().format('DD MMM YYYY h:mm:ss a');
-                        getReservationTransactionData($scope.activeResourceId, date, $scope.searchedEzeid).then(function () {
+            function init(){
+                getResource($scope.searchedEzeid).then(function () {
+                    getServicesData($scope.searchedEzeid).then(function () {
+                        getServiceResourceMapping($scope.searchedEzeid).then(function () {
+                            setFinalMappedServices(6);
+                            var date = moment().format('DD MMM YYYY h:mm:ss a');
+                            getReservationTransactionData($scope.activeResourceId, date, $scope.searchedEzeid).then(function () {
+                                $scope.$emit('$preLoaderStop');
+                                /* Re-setting VIEW of the complete calendar structure in case its: tablet or mobile */
+                                resetBlock();
+                            });
                         });
                     });
                 });
-            });
-            $scope.$emit('$preLoaderStop');
+            };
 
 
             /**
@@ -176,19 +185,23 @@ var res = angular.module('ezeidApp').
              * 2.notes-block
              * 3.calendar-block
              */
-            function reseetBlock()
+            function resetBlock()
             {
                 var screenWidth = $(window).width();
                 if(screenWidth < 992)
                 {
-                    $('#calendar-block').html($('#head-title-block').html());
-                    /* exchange head-title-block and calendar block */
-                    //var calendarHtml = $('#calendar-block').html();
-                    //var headHtml = $('#head-title-block').html();
-                    //$('#calendar-block').html(headHtml);
-                    //document.getElementsByClassName("calendar-block").innerHTML = headHtml;
-                    //document.getElementsByClassName("head-title-block").innerHTML = calendarHtml;
+                    var calendarHtml = $('#calendar-block').html();
+                    var headHtml = $('#head-title-block').html();
+                    $scope.head = getSafeText(headHtml);
+                    $scope.calendar = getSafeText(calendarHtml);
+                    $('#calendar-block').html('');
+                    $('#head-title-block').html('');
                 }
+            }
+
+            function getSafeText(text)
+            {
+                return $sce.trustAsHtml(text);
             }
 
             /**
@@ -999,6 +1012,7 @@ var res = angular.module('ezeidApp').
              */
             $scope.activateResource = function(tid)
             {
+                console.log('hello');
                 $scope.activeResourceId = tid;
                 /** check if the logged in uid and this resource id is same
                  * for enabling or disabling the appointment list
@@ -1116,10 +1130,12 @@ var res = angular.module('ezeidApp').
 
                         /* reload reservation hours */
                         updateReservationHoursBlocks(blockId);
+                        $scope.$emit('$preLoaderStop');
                     }
                     else
                     {
                         Notification.error({ message: "Failed to "+saveType+" your reservation. Probable Reason: "+resp.message, delay: MsgDelay });
+                        $scope.$emit('$preLoaderStop');
                     }
                 }).error(function(err,status){
                     $scope.$emit('$preLoaderStop');
@@ -1253,13 +1269,13 @@ var res = angular.module('ezeidApp').
                         Token:$rootScope._userInfo.Token
                     }
                 }).success(function(resp){
-                    $scope.$emit('$preLoaderStop');
+                    //$scope.$emit('$preLoaderStop');
                     $scope.loggedInUid =  resp[0].MasterID;
                     defer.resolve();
                 }).error(function(err){
-                    $scope.$emit('$preLoaderStop');
+                    //$scope.$emit('$preLoaderStop');
                     Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
-                    defer.resolve();
+                    defer.reject();
                 });
                 return defer.promise;
             }
