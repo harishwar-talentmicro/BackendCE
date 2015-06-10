@@ -839,17 +839,21 @@
             };
 
 
-            $scope.$watch('pageNumber',function(newVal,oldVal){
-                if(newVal !== oldVal)
-                {
-                    $scope.$broadcast('$preLoaderStart');
-                    $scope.loadTransaction(newVal,$scope.filterStatus).then(function(){
-                        $scope.$broadcast('$preLoaderStop');
-                    },function(){
-                        $scope.$broadcast('$preLoaderStop');
-                    });
-                }
-            });
+
+            var watchPageNumber = function(){
+                $scope.$watch('pageNumber',function(newVal,oldVal){
+                    if(newVal !== oldVal)
+                    {
+                        $scope.$broadcast('$preLoaderStart');
+                        $scope.loadTransaction(newVal,$scope.filterStatus).then(function(){
+                            $scope.$broadcast('$preLoaderStop');
+                        },function(){
+                            $scope.$broadcast('$preLoaderStop');
+                        });
+                    }
+                });
+            };
+
 
             /**
              * Load transaction items
@@ -892,6 +896,7 @@
                     $scope.loadTxActionTypes().then(function(){
                         $scope.loadTxStatusTypes().then(function(){
                             $scope.loadTransaction(1,-1).then(function(){
+                                watchPageNumber();
                                 $scope.loadItemList().then(function(){
                                     $scope.loadFolderRules().then(function(){
                                         $scope.$emit('$preLoaderStop');
