@@ -7233,6 +7233,7 @@ exports.FnGetTranscation = function (req, res) {
         var FunctionType = parseInt(req.query.FunctionType);
         var Page = parseInt(req.query.Page);
         var Status = (req.query.Status) ? req.query.Status : null;
+        var searchkeyword = req.query.searchkeyword;
         
        var RtnMessage = {
             TotalPage:'',
@@ -7252,7 +7253,7 @@ exports.FnGetTranscation = function (req, res) {
                         }
                                               
                         var query = 'CALL pGetMessagesNew('+ db.escape(Token) + ',' + db.escape(FunctionType) + ',' 
-                        + db.escape(Status) + ',' + db.escape(FromPage) + ',' + db.escape(ToPage) +')';
+                        + db.escape(Status) + ',' + db.escape(FromPage) + ',' + db.escape(ToPage) + ',' + db.escape(searchkeyword) +')';
                         
                             //var parameters = db.escape(Token) + ',' + db.escape(FunctionType);;
                         //console.log(parameters);
