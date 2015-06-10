@@ -657,13 +657,10 @@ var res = angular.module('ezeidApp').
                 /* calculate total height  */
 
                 var totalHeight = endBlock - startBlock + 1;
-                /* increase the first block's height to totalHeight */
-                //$('.block-' + startBlock).css('height','');
-                $('.block-' + startBlock).css('height', $scope.height * totalHeight + 'em');
                 /* add text */
                 $('.block-' + startBlock).html('<p>' + text + '</p>');
-                /* add padding to the text to make it in center */
-                //$('.block-'+startBlock).css('padding-top',(totalHeight/2.3)+'em');
+                /* increase the first block's height to totalHeight */
+                textStylerAndHeightSetter(startBlock,totalHeight);
                 if(startBlock == endBlock)
                 {
                     return;
@@ -675,7 +672,27 @@ var res = angular.module('ezeidApp').
                 }
             }
 
-            /* partition the block range based on 4 different time of day: i.e early,morning,evening,night */
+
+            /**
+             * Set the height of the block and change the text size in case its a smaller block
+             * @param startBlock : start block from where the slot is starting
+             * @param totalHeight : total height of the slot
+             */
+            function textStylerAndHeightSetter(startBlock,totalHeight)
+            {
+                $('.block-' + startBlock).css('height', $scope.height * totalHeight + 'em');
+                if(totalHeight == 1)
+                {
+                    $('.block-' + startBlock+' > p').css("font-weight",'bolder').css("font-size",'0.6em');
+                }
+            }
+
+            /**
+             * partition the block range based on 4 different time of day: i.e early,morning,evening,night
+             * @param startRange: start block of the slot
+             * @param endRange: end block of the slot
+             * @returns {*}
+             */
             function refineRange(startRange, endRange) {
                 var endBlockArray = [71, 143, 215, 287];
                 var data = [];
@@ -1012,7 +1029,6 @@ var res = angular.module('ezeidApp').
              */
             $scope.activateResource = function(tid)
             {
-                console.log('hello');
                 $scope.activeResourceId = tid;
                 /** check if the logged in uid and this resource id is same
                  * for enabling or disabling the appointment list
