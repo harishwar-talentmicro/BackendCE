@@ -11252,8 +11252,7 @@ exports.FnSaveReservResourceServiceMap = function(req, res){
                     if (result != null) {
                         var query = db.escape(resourceid) + ',' + db.escape(service_id);
                         db.query('CALL pSaveResResourceServiceMap(' + query + ')', function (err, insertResult) {
-                            console.log('Result is..........:'+result);
-                            console.log(err);
+                           
                              if (!err){
                                 if (result != null) {
                                     responseMessage.status = true;
@@ -11831,30 +11830,30 @@ exports.FnChangeReservationStatus = function(req,res){
     var token = (req.body.Token && req.body.Token !== 2) ? req.body.Token : null;
     var tid = (req.body.tid && parseInt(req.body.tid) !== NaN) ? parseInt(req.body.tid) : null;
     var status = (req.body.status && parseInt(req.body.status) !== NaN) ? parseInt(req.body.status) : null;
-    
+
     var responseMsg = {
         status : false,
         data : null,
-        message : '',
-        error :{}
+        message : 'Please login to continue',
+        error : {
+            Token : 'Invalid Token'
+        }
     };
 
     var validationFlag = true;
     if(!token){
         responseMsg.error['Token'] = 'Invalid Token';
         validationFlag *= false;
-        
     }
 
     if(!tid){
         responseMsg.error['tid'] = 'Reservation Slot is empty';
         validationFlag *= false;
     }
-   
+
     if(!status){
         responseMsg.error['status'] = 'Status cannot be empty';
         validationFlag *= false;
-        
     }
 
     if(!validationFlag){
@@ -11874,6 +11873,8 @@ exports.FnChangeReservationStatus = function(req,res){
                     responseMsg.message = 'An error occurred ! Please try again';
                     responseMsg.error['server'] = 'Internal Server Error';
                     res.status(400).json(responseMsg);
+                    console.log('FnChangeReservationStatus: An error occurred ! Please try again');
+                    
                 }
                 else{
                     if(updateRes.affectedRows > 0){
@@ -11885,6 +11886,7 @@ exports.FnChangeReservationStatus = function(req,res){
                             status : status
                         };
                         res.status(200).json(responseMsg);
+                        console.log('FnChangeReservationStatus: Status changed successfully');
                     }
                     else{
                         responseMsg['status'] = false;
@@ -11895,6 +11897,7 @@ exports.FnChangeReservationStatus = function(req,res){
                             status : req.body.status
                         };
                         res.status(400).json(responseMsg);
+                        console.log('FnChangeReservationStatus: Unable to update ! Please try again');
                     }
 
 
@@ -11903,6 +11906,7 @@ exports.FnChangeReservationStatus = function(req,res){
         }
     });
 };
+
 
 
 
