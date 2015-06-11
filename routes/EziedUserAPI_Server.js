@@ -7233,6 +7233,7 @@ exports.FnGetTranscation = function (req, res) {
         var FunctionType = parseInt(req.query.FunctionType);
         var Page = parseInt(req.query.Page);
         var Status = (req.query.Status) ? req.query.Status : null;
+        var searchkeyword = req.query.searchkeyword;
         
        var RtnMessage = {
             TotalPage:'',
@@ -7252,7 +7253,7 @@ exports.FnGetTranscation = function (req, res) {
                         }
                                               
                         var query = 'CALL pGetMessagesNew('+ db.escape(Token) + ',' + db.escape(FunctionType) + ',' 
-                        + db.escape(Status) + ',' + db.escape(FromPage) + ',' + db.escape(ToPage) +')';
+                        + db.escape(Status) + ',' + db.escape(FromPage) + ',' + db.escape(ToPage) + ',' + db.escape(searchkeyword) +')';
                         
                             //var parameters = db.escape(Token) + ',' + db.escape(FunctionType);;
                         //console.log(parameters);
@@ -11251,8 +11252,7 @@ exports.FnSaveReservResourceServiceMap = function(req, res){
                     if (result != null) {
                         var query = db.escape(resourceid) + ',' + db.escape(service_id);
                         db.query('CALL pSaveResResourceServiceMap(' + query + ')', function (err, insertResult) {
-                            console.log('Result is..........:'+result);
-                            console.log(err);
+                           
                              if (!err){
                                 if (result != null) {
                                     responseMessage.status = true;
@@ -11873,6 +11873,8 @@ exports.FnChangeReservationStatus = function(req,res){
                     responseMsg.message = 'An error occurred ! Please try again';
                     responseMsg.error['server'] = 'Internal Server Error';
                     res.status(400).json(responseMsg);
+                    console.log('FnChangeReservationStatus: An error occurred ! Please try again');
+                    
                 }
                 else{
                     if(updateRes.affectedRows > 0){
@@ -11884,6 +11886,7 @@ exports.FnChangeReservationStatus = function(req,res){
                             status : status
                         };
                         res.status(200).json(responseMsg);
+                        console.log('FnChangeReservationStatus: Status changed successfully');
                     }
                     else{
                         responseMsg['status'] = false;
@@ -11894,6 +11897,7 @@ exports.FnChangeReservationStatus = function(req,res){
                             status : req.body.status
                         };
                         res.status(400).json(responseMsg);
+                        console.log('FnChangeReservationStatus: Unable to update ! Please try again');
                     }
 
 
@@ -11902,6 +11906,7 @@ exports.FnChangeReservationStatus = function(req,res){
         }
     });
 };
+
 
 
 

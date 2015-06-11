@@ -34,7 +34,7 @@
             ) {
 
             $scope._tempSalesItemListType = $rootScope._userInfo.SalesItemListType;
-
+            $scope.txSearchTerm = '';
 
             /**
              * Logged in user cannot use this module as he is not having the required permissions for it
@@ -628,7 +628,7 @@
              */
             $scope.triggerStatusFilter = function(pageNo,statusType){
                 $scope.$emit('$preLoaderStart');
-                $scope.loadTransaction(pageNo,statusType).then(function(){
+                $scope.loadTransaction(pageNo,statusType,$scope.txSearchTerm).then(function(){
                     $scope.$emit('$preLoaderStop');
                 },function(){
                     $scope.$emit('$preLoaderStop');
@@ -641,7 +641,7 @@
              * @param statusType
              * @returns {*}
              */
-            $scope.loadTransaction = function(pageNo,statusType){
+            $scope.loadTransaction = function(pageNo,statusType,txSearchKeyword){
                 var defer = $q.defer();
                 if(!pageNo){
                     pageNo = 1;
@@ -656,7 +656,8 @@
                         Token : $rootScope._userInfo.Token,
                         Page : pageNo,
                         Status : (statusType) ? statusType : '',
-                        FunctionType : 0    // For Sales
+                        FunctionType : 0,    // For Sales
+                        searchkeyword : txSearchKeyword
                     }
                 }).success(function(resp){
                     if(resp && resp !== 'null'){
@@ -839,17 +840,21 @@
             };
 
 
-            $scope.$watch('pageNumber',function(newVal,oldVal){
-                if(newVal !== oldVal)
-                {
-                    $scope.$broadcast('$preLoaderStart');
-                    $scope.loadTransaction(newVal,$scope.filterStatus).then(function(){
-                        $scope.$broadcast('$preLoaderStop');
-                    },function(){
-                        $scope.$broadcast('$preLoaderStop');
-                    });
-                }
-            });
+
+            var watchPageNumber = function(){
+                $scope.$watch('pageNumber',function(newVal,oldVal){
+                    if(newVal !== oldVal)
+                    {
+                        $scope.$broadcast('$preLoaderStart');
+                        $scope.loadTransaction(newVal,$scope.filterStatus,$scope.txSearchTerm).then(function(){
+                            $scope.$broadcast('$preLoaderStop');
+                        },function(){
+                            $scope.$broadcast('$preLoaderStop');
+                        });
+                    }
+                });
+            };
+
 
             /**
              * Load transaction items
@@ -891,7 +896,8 @@
 
                     $scope.loadTxActionTypes().then(function(){
                         $scope.loadTxStatusTypes().then(function(){
-                            $scope.loadTransaction(1,-1).then(function(){
+                            $scope.loadTransaction(1,-1,$scope.txSearchTerm).then(function(){
+                                watchPageNumber();
                                 $scope.loadItemList().then(function(){
                                     $scope.loadFolderRules().then(function(){
                                         $scope.$emit('$preLoaderStop');
@@ -1058,7 +1064,12 @@
                             }
                             $scope.resetModalBox();
                             $scope.toggleAllEditMode();
-                            $scope.loadTransaction(1,$scope.statusType);
+                            $scope.$emit('$preLoaderStart');
+                            $scope.loadTransaction(1,$scope.statusType,$scope.txSearchTerm).then(function(){
+                                $scope.$emit('$preLoaderStop');
+                            },function(){
+                                $scope.$emit('$preLoaderStop');
+                            });
                         }
                         else{
                             Notification.error({ message : 'An error occurred while placing enquiry', delay : MsgDelay});
