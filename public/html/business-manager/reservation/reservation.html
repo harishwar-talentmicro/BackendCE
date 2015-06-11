@@ -37,7 +37,7 @@
                         <!-- Daily Appointments goes here -->
                         <div class="notes-content border-bottom-gray p-top-7" ng-repeat="rtime in reservedTime track by $index">
                             <!--<div ng-show="reservedTime[$index][2].length > 0">-->
-                            <div ng-show="reservedTime[$index][2].length > 0">
+                            <div ng-show="reservedTime[$index][2].length > 0" ng-click="flashEffect(reservedTime[$index][6])">
                                 <i>{{reservedTime[$index][2]}}</i>
                                 <small>for <b> {{reservedTime[$index][4]}}</b> ({{convertMinutesToTime(reservedTime[$index][0])}} - {{convertMinutesToTime(reservedTime[$index][1])}})</small>
                                 <br>
@@ -105,7 +105,7 @@
                                 <!-- Building block: repeated for 72 times (6Hours x 60 = 360mins/5(individual block mins) = 72 Blocks) -->
                                 <div class="building-block" >
                                     <!-- Time Label goes here -->
-                                    <div class="col-lg-4 col-md-3 col-sm-3 col-xs-4 p-left-5 no-padding">
+                                    <div ng-init="counter()" class="col-lg-4 col-md-3 col-sm-3 col-xs-4 p-left-5 no-padding">
                                         <div ng-repeat="block in blockArr track by $index" class="title-section blk blk-time" ng-class="[blockColor[$index],'time-block-'+getBlockId($index,cols),heightClass]">
                                             <b>{{getTime($index,cols)}}</b>
                                         </div>
@@ -121,7 +121,7 @@
                                 </div>
                             </div>
                             <!-- coloring for availability : For executing coloring the table post-DOM rendering -->
-                            <div>{{(colorWorkingHours())(alreadyReserveSlot())(appendColorIndex()(removeWasteColoredCells()))}}</div>
+                            <div>{{reservationMooduleStarter()}}</div>
                             <!-- main container of day - calender end here -->
                         </div>
                     </div>

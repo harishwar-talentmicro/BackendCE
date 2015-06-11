@@ -57,6 +57,9 @@ var res = angular.module('ezeidApp').
             /* self reserved color */
             var selfReservedColor = 'rgb(250, 253, 117)';
 
+            /* color of the flash on clicking of the appointment list */
+            var flashColor = "yellow";
+
             /* default height of the block in 'em' */
             var defaultHeightClass = 'blk-1-1';//default height class::||Don't Change||
             $scope.height = 1.1;//default height::||Don't Change||
@@ -562,11 +565,13 @@ var res = angular.module('ezeidApp').
             $scope.getBlockId = function (row, col) {
                 return 72 * col + row;
             }
-
             /* color WORKING hours */
             $scope.colorWorkingHours = function () {
                 var workingHrs = $scope.workingHrs;
-
+                if(workingHrs.length == 0)
+                {
+                    return;
+                }
                 /* RESET CALENDAR */////////////////////////////////////////////////////////
                 /* clean the calendar's working hour */
                 $('.available').attr('background-color','').removeClass('available').attr('title');
@@ -611,7 +616,10 @@ var res = angular.module('ezeidApp').
             $scope.alreadyReserveSlot = function () {
                 /* clear the title */
                 $('.reserved').attr('title','');
-
+                if($scope.reservedTime.length == 0)
+                {
+                    return;
+                }
 
                 for (var i = 0; i < $scope.reservedTime.length; i++) {
                     /* get blocks coming under this range */
@@ -1339,5 +1347,41 @@ var res = angular.module('ezeidApp').
                 {
                     $('.blk-content').removeClass('strike-text');
                 }
+            }
+
+
+            /**
+             * Flash Effect in calendar on the hover / click of the list
+             */
+            $scope.flashEffect = function(tid)
+            {
+                var presentColor = $('div').find("[data-tid="+tid+"]").css('background-color');
+                if(presentColor == flashColor)
+                {
+                    return;
+                }
+                setTimeout(function() {
+                    $('div').find("[data-tid="+tid+"]").css('background-color',flashColor);
+                    setTimeout(function() {
+                        $('div').find("[data-tid="+tid+"]").css('background-color',presentColor);
+                    }, 2000);
+                }, 0);
+            }
+
+            /**
+             * Reservationmodule starter
+             */
+            $scope.reservationInitFlag = false;
+            $scope.reservationMooduleStarter = function()
+            {
+                if($scope.reservationInitFlag)
+                {
+                    //return;
+                }
+                $scope.reservationInitFlag = true;
+                $scope.colorWorkingHours();//Checks Done
+                $scope.alreadyReserveSlot();
+                $scope.appendColorIndex();
+                $scope.removeWasteColoredCells();
             }
         }]);
