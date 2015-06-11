@@ -574,7 +574,8 @@ var res = angular.module('ezeidApp').
                 }
                 /* RESET CALENDAR */////////////////////////////////////////////////////////
                 /* clean the calendar's working hour */
-                $('.available').attr('background-color','').removeClass('available').attr('title');
+                //$('.available').attr('background-color','').removeClass('available').attr('title');
+                cleanCalendarData();
                 /* clear all text */
                 $('.reserved').html('').attr('background-color','');
                 /* remove merging */
@@ -595,6 +596,21 @@ var res = angular.module('ezeidApp').
                     $scope.colorBlocks(startRange, endRange, availabilityColor, addCss);
                 }
             };
+
+            function cleanCalendarData()
+            {
+                $('.available').each(function(){
+                    if($(this).hasClass('reserved'))
+                    {
+                        $(this).removeClass('reserved')
+                            .removeAttr('data-reserver')
+                            .removeAttr('data-tid')
+                            .removeAttr('title')
+                            .html('');
+                    }
+                    $(this).removeClass('available');
+                });
+            }
 
             /**
              * Remove merging from blocks
