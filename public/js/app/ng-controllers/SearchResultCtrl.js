@@ -61,6 +61,7 @@ var res = angular.module('ezeidApp').
 
             $scope.activeTemplate = "";
             $scope.showMapPopupModel = false;
+            $scope.showDetailsModal1 = false;
 
             $scope.modalBox = {
                 title : 'EZEID Map',
@@ -72,6 +73,8 @@ var res = angular.module('ezeidApp').
             {
                 $scope.searchStars[index] = !$scope.searchStars[index];
             }
+
+
 
             /* dummy array for creating star rating STARS */
             $scope.searchStarArr = [
@@ -641,6 +644,22 @@ var res = angular.module('ezeidApp').
                 $window.localStorage.setItem("selectedTids", JSON.stringify($scope.selectedList));
             });
 
+            /*open detail information popup*/
+            $scope.openDetailInfoBox = function(_tid)
+            {
+                console.log("sai",$routeParams);
+                $scope.showDetailsModal1 = true;
+
+
+
+                var params = $routeParams;
+
+                params += '&TID='+_tid;
+
+                console.log(params);
+
+            }
+
             /* redirect to full details page */
             $scope.redirectFullPage = function(searchType,tid,sales,reservation,homeDelivery,service,resume)
             {
@@ -664,7 +683,9 @@ var res = angular.module('ezeidApp').
                     params += '&resume=true';
                 }
 
-                $location.url('/searchDetails'+params);
+                console.log("Sai22211");
+                $scope.showDetailsModal1 = true;
+                // $location.url('/searchDetails'+params);
             }
 
             /**

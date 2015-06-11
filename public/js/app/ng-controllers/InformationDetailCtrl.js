@@ -115,7 +115,7 @@ angular.module('ezeidApp').
         else
         {
             $scope.showLoginText = false;
-            getSearchInformation(TID,$scope.SearchType).then(function(){
+          /*  getSearchInformation(TID,$scope.SearchType).then(function(){
                 var visibleStr = ($scope.SearchInfo.VisibleModules) ? $scope.SearchInfo.VisibleModules.toString() : null;
                 var visibleModules = (visibleStr) ? ((visibleStr.length == 5) ? visibleStr : '22222') : '22222';
                 if($routeParams['sales'] && (visibleModules[0] == 1)){
@@ -153,7 +153,7 @@ angular.module('ezeidApp').
                 }
 
 
-            });
+            });*/
         }
         //Below function is for getting search information
         function getSearchInformation(_TID,_SearchType)
