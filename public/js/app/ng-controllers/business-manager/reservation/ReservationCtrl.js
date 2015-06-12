@@ -168,7 +168,7 @@ var res = angular.module('ezeidApp').
                     method: "GET",
                     params: {
                         ezeid: ezeid,
-                        Token: $rootScope._userInfo.Token
+                        type:1
                     }
                 }).success(function (resp) {
 
