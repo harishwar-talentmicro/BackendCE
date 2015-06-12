@@ -4143,6 +4143,7 @@ exports.FnSearchByKeywords = function (req, res) {
         var isPagination = req.body.isPagination ? parseInt(req.body.isPagination) : 0 ;
         var pagesize = req.body.pagesize ? parseInt(req.body.pagesize) : 0;
         var pagecount = req.body.pagecount ? parseInt(req.body.pagecount) : 0;
+        var total = req.body.total ? parseInt(req.body.total) : 0; 
         
         console.log(req.body);
 
@@ -4230,7 +4231,7 @@ exports.FnSearchByKeywords = function (req, res) {
                             + ',' + db.escape(Longitude) +',' + db.escape(EZEID) + ',' + db.escape(LocSeqNo) + ',' + db.escape(Pin) + ',' + db.escape(SearchType) + ',' + db.escape(DocType) 
                                 + ',' + db.escape("0") + ',' + db.escape("0") + ',' + db.escape("0") + ',' + db.escape(token) 
                                 + ',' + db.escape(HomeDelivery) + ',' + db.escape(CurrentDate) + ',' + db.escape(isPagination) + ',' + 
-                                db.escape(pagesize) + ',' + db.escape(pagecount) ;
+                                db.escape(pagesize) + ',' + db.escape(pagecount) + ',' + db.escape(total) ;
                             
                             console.log('CALL pSearchResultNew(' + SearchQuery + ')');
                             db.query('CALL pSearchResultNew(' + SearchQuery + ')', function (err, SearchResult) {
@@ -4333,7 +4334,7 @@ exports.FnSearchByKeywords = function (req, res) {
                     + ',' + db.escape(Longitude) + ',' + db.escape('') + ',' + db.escape(0) + ',' + db.escape(0) + ',' + db.escape(1) 
                     + ',' + db.escape('') + ',' + db.escape(ParkingStatus) + ',' + db.escape(OpenCloseStatus) + ',' + db.escape(Rating) 
                     + ',' + db.escape(token) + ',' + db.escape(HomeDelivery)+ ',' + db.escape(CurrentDate) + ',' + db.escape(isPagination) + ',' + 
-                                db.escape(pagesize) + ',' + db.escape(pagecount) ;
+                                db.escape(pagesize) + ',' + db.escape(pagecount)+ ',' + db.escape(total) ;
                 console.log('CALL pSearchResultNew(' + InsertQuery + ')');
                 //var link = 'CALL pSearchResult(' + InsertQuery + ')';
                 db.query('CALL pSearchResultNew(' + InsertQuery + ')', function (err, SearchResult) {
@@ -4397,7 +4398,7 @@ exports.FnSearchByKeywords = function (req, res) {
                     + ',' + db.escape(Longitude) + ',' + db.escape('') + ',' + db.escape(0) + ',' + db.escape(0) + ',' + db.escape(3) 
                     + ',' + db.escape('') + ',' + db.escape(ParkingStatus) + ',' + db.escape(OpenCloseStatus) + ',' + db.escape(Rating) 
                     + ',' + db.escape(token)  + ',' + db.escape(HomeDelivery)+ ',' + db.escape(CurrentDate) + ',' + db.escape(isPagination) + ',' + 
-                                db.escape(pagesize) + ',' + db.escape(pagecount);
+                                db.escape(pagesize) + ',' + db.escape(pagecount)+ ',' + db.escape(total);
                 console.log('SearchQuery: ' + InsertQuery);
                 db.query('CALL pSearchResultNew(' + InsertQuery + ')', function (err, SearchResult) {
                     if (!err) {
