@@ -175,7 +175,7 @@
             </div>
         </modal>
 
-        <div ng-controller="InformationDetailCtrl">
+        <div>
             <!---- Modal box for information details  start ---->
 
             <div class="Popup_window form_style map_popup_iconActions" id="SalesEnquiryRequest_popup" style="height: 103%;">
@@ -260,14 +260,14 @@
 
             <div class="infoModal">
                 <modal showheader="false" mtitle="''" visible="showDetailsModal1" mclass="modalBox.class">
-            <div class="row bottom-clearfix">&nbsp;</div>
-            <div ng-hide="(SearchInfo.Redflagstatus == 1)">
-                <div class="alert alert-warning" role="alert" ng-show="showNoticeText">
-                    <strong>Note: </strong> The business you are requesting has insufficient information and hence displaying the closest matching company.
-                </div>
-            </div>
+                    <div class="row bottom-clearfix">&nbsp;</div>
+                    <div ng-hide="(SearchInfo.Redflagstatus == 1)">
+                        <div class="alert alert-warning" role="alert" ng-show="showNoticeText">
+                            <strong>Note: </strong> The business you are requesting has insufficient information and hence displaying the closest matching company.
+                        </div>
+                    </div>
 
-            <section id="main-content">
+                    <section id="main-content">
             <div class="row setRowLeftRightMarginZero text-center">
                 <div class="col-lg-5 col-md-5 col-sm-5 col-xs-12 setPaddingLeftRight0">
                     <div class="row setRowLeftRightMarginZero">
@@ -484,7 +484,7 @@
                 </div>
             </div>
             </section>
-            </modal>
+                 </modal>
             </div>
 
             <modal mtitle="'Working Hours'" visible="showWorkingHourModel" class="workingHours">

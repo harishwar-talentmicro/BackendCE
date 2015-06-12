@@ -103,7 +103,7 @@ angular.module('ezeidApp').
             class : 'business-manager-modal'
         };
 
-        var TID =  $routeParams.TID;
+       // var TID =  $routeParams.TID;
         $scope.SearchType = $routeParams.searchType;
 
         if(($scope.SearchType == 1) && (!$rootScope._userInfo.IsAuthenticate))
@@ -115,6 +115,12 @@ angular.module('ezeidApp').
         else
         {
             $scope.showLoginText = false;
+            if($scope.TID)
+            {
+                getSearchInformation($scope.TID,$scope.SearchType);
+            }
+
+
           /*  getSearchInformation(TID,$scope.SearchType).then(function(){
                 var visibleStr = ($scope.SearchInfo.VisibleModules) ? $scope.SearchInfo.VisibleModules.toString() : null;
                 var visibleModules = (visibleStr) ? ((visibleStr.length == 5) ? visibleStr : '22222') : '22222';
@@ -174,11 +180,13 @@ angular.module('ezeidApp').
                 url: GURL + 'ewtGetSearchInformation?Token=' + $rootScope._userInfo.Token + '&TID=' + _TID + '&SearchType=' + _SearchType + '&CurrentDate=' + currentDate}).success(function (data) {
 
                 $rootScope.$broadcast('$preLoaderStop');
+                    console.log("search inform",data);
                 if (data && data != 'null')
                 {
                   $timeout(function () {
                         $scope.SearchInfo = data[0];
-                        $scope.showDetailsModal = true;
+                        $scope.showDetailsModal1 = true;
+                        //  $scope.showDetailsModal = true;
 
                       destroyModalDetailsWatcher = $scope.$watch('showDetailsModal',function(newVal,oldVal){
                                 if(!newVal){

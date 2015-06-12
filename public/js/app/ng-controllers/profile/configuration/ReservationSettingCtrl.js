@@ -421,7 +421,8 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',[
             }
         }).success(function(resp){
                 $scope.$emit('$preLoaderStop');
-                if(resp.status){
+                if(resp.status)
+                {
                     var mappingData = resp.data;
                     var nCount, nServicCount;
                     for (nCount = 0; nCount < mappingData.length; nCount++)
@@ -429,7 +430,7 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',[
                         var res = mappingData[nCount].serviceID.split(",");
                         mappingData[nCount].ServicesArray = JSON.parse("[" + res + "]");
                     }
-                    $scope.AllMappingData = mappingData;
+                        $scope.AllMappingData = mappingData;
                 }
             }).error(function(err){
                 $scope.$emit('$preLoaderStop');
@@ -460,11 +461,7 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',[
                         }
                         resetMappingValue();
                         getAllServices();
-                        $timeout(function(){
-                            getAllMappingData();
-                        },2000);
-
-
+                        getAllMappingData();
 
                     }).error(function(err){
                         $scope.$emit('$preLoaderStop');
@@ -477,14 +474,19 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',[
     $scope.getServicesOfResource = function(_ResourceId){
         var ResourceId = parseInt(_ResourceId);
         var nCount;
-        for (nCount = 0; nCount < $scope.AllMappingData.length; nCount++)
+
+        if($scope.AllMappingData)
         {
-            if((parseInt(_ResourceId)) == $scope.AllMappingData[nCount].ResourceID)
+            for (nCount = 0; nCount < $scope.AllMappingData.length; nCount++)
             {
-                var servicesIdArray = JSON.parse("[" + $scope.AllMappingData[nCount].serviceID + "]");
-                $scope.selectedTID = servicesIdArray;
+                if((parseInt(_ResourceId)) == $scope.AllMappingData[nCount].ResourceID)
+                {
+                    var servicesIdArray = JSON.parse("[" + $scope.AllMappingData[nCount].serviceID + "]");
+                    $scope.selectedTID = servicesIdArray;
+                }
             }
         }
+
     };
 
 

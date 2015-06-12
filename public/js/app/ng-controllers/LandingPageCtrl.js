@@ -87,6 +87,8 @@ angular.module('ezeidApp').
                 "Type Job Skill Keywords to locate employers"
             ];
 
+            console.log("Url",$location.absUrl());
+
             $scope.placeHolderText = placeHolder;
 
             $scope.searchParams = {

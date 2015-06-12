@@ -63,6 +63,12 @@ var res = angular.module('ezeidApp').
             $scope.showMapPopupModel = false;
             $scope.showDetailsModal1 = false;
 
+            var AutoRefresh = true;
+            var currentBanner = 1;
+            var Miliseconds = 8000;
+            var RefreshTime = Miliseconds;
+            var destroyModalDetailsWatcher = null;
+
             $scope.modalBox = {
                 title : 'EZEID Map',
                 class : 'business-manager-modal'
@@ -75,7 +81,6 @@ var res = angular.module('ezeidApp').
             }
 
 
-
             /* dummy array for creating star rating STARS */
             $scope.searchStarArr = [
                 ["a"],
@@ -85,8 +90,6 @@ var res = angular.module('ezeidApp').
                 ["a","b","c","d","e"],
             ];
 
-
-
             var placeHolder = [
                 "Type EZEID here",
                 "Type keywords to locate products and services",
@@ -95,8 +98,17 @@ var res = angular.module('ezeidApp').
             var searchTypeArr = ["EZEID", "Keywords", "Job Keywords"];
 
             $scope.searchType = searchTypeArr;
-
             $scope.placeHolderText = placeHolder;
+
+            /**
+             * Function for converting LOCAL time (local timezone) to server time
+             */
+            var convertTimeToUTC = function(localTime,dateFormat){
+                if(!dateFormat){
+                    dateFormat = 'DD-MMM-YYYY hh:mm A';
+                }
+                return moment(localTime).utc().format(dateFormat);
+            };
 
             /* convert star ratings to comma seperated string */
             $scope.getSearchStars = function()
@@ -116,7 +128,8 @@ var res = angular.module('ezeidApp').
             $scope.$emit('$preLoaderStart');
 
             //To Call current url, after login from current page
-            if($rootScope._userInfo){
+            if($rootScope._userInfo)
+            {
                 if(!$rootScope._userInfo.IsAuthenticate){
                     var unregister = $rootScope.$watch('_userInfo',function(newVal,oldVal){
                         if(newVal){
@@ -173,8 +186,18 @@ var res = angular.module('ezeidApp').
             {
                 $scope.showDownloadLink = false;
                 $scope.showLoginText = false;
-                // To get search key result
+
                 getSearchKeyWord($scope.params);
+                if($scope.params.TID)
+                {
+                    //call for search information
+                    $scope.TID = $scope.params.TID;
+                }
+                /*else
+                {
+                    // To get search key result
+                    getSearchKeyWord($scope.params);
+                }*/
             }
 
             /* // To get search key result
@@ -220,15 +243,19 @@ var res = angular.module('ezeidApp').
                     OpenStatus:_filterValue.openStatus,
                     Rating:_filterValue.rating,
                     HomeDelivery:_filterValue.homeDelivery,
-                    CurrentDate:CurrentDate
+                    CurrentDate:convertTimeToUTC(CurrentDate,'YYYY-MM-DD HH:mm:ss')
+
                 } }).success(function (data) {
-                    $rootScope.$broadcast('$preLoaderStop');
+                     if(!$scope.TID)
+                     {
+                         $rootScope.$broadcast('$preLoaderStop');
+                     }
+
 
                     /* put the maps coordinates in array */
                     $scope.coordinatesArr = [];
                     /* count the result */
                     var count = 0;
-                    //////console.log(data);
                     if(data != 'null'){
                         var link = '';
                         var searchType = $routeParams.searchType;
@@ -277,7 +304,6 @@ var res = angular.module('ezeidApp').
                     /* put a little delay */
                     $timeout(function(){
                         $scope.$emit('$preLoaderStop');
-
                     },1500);
 
                 }).error(function(){
@@ -625,18 +651,18 @@ var res = angular.module('ezeidApp').
                     }
                 }
                 else{
-                    var index = $scope.selectedList.indexOf(val);
-                    $scope.selectedList.splice(index,1);
+                        var index = $scope.selectedList.indexOf(val);
+                        $scope.selectedList.splice(index,1);
 
-                    if($scope.selectedList.length === $scope.searchResult.length)
-                    {
-                        $scope._selectAll = true;
+                        if($scope.selectedList.length === $scope.searchResult.length)
+                        {
+                            $scope._selectAll = true;
+                        }
+                        else
+                        {
+                            $scope._selectAll = false;
+                        }
                     }
-                    else
-                    {
-                        $scope._selectAll = false;
-                    }
-                }
                 $scope.selectAll = $scope._selectAll;
             };
 
@@ -647,17 +673,52 @@ var res = angular.module('ezeidApp').
             /*open detail information popup*/
             $scope.openDetailInfoBox = function(_tid)
             {
-                console.log("sai",$routeParams);
-                $scope.showDetailsModal1 = true;
+                $scope.SearchInfo = {};
+                $scope.nextButton = true;
+                $scope.previousButton =  true;
 
+                $scope.activeTemplate = "";
+                $scope.showWorkingHourModel = false;
+                $scope.showMapPopupModel = false;
+                $scope.showDetailsModal = false;
+                $scope.showNoticeText = true;
+                $scope.form_rating = 0;
+                $scope.showLoginText = false;
+                $scope.showNotFound = false;
+                $scope.showDetailsModal1 = false;
 
+                console.log($routeParams.searchType);
+                console.log($rootScope._userInfo);
 
-                var params = $routeParams;
+                if(($routeParams.searchType == 1) && (!$rootScope._userInfo.IsAuthenticate))
+                {
+                    console.log("sai12");
+                    $scope.showLoginText = true;
+                    $scope.$emit('$preLoaderStop');
+                    Notification.error({ message : 'Please login to search for EZEID', delay : MsgDelay});
+                }
+                else
+                {
+                    console.log("sai12334");
 
-                params += '&TID='+_tid;
+                    $scope.showLoginText = false;
+                    getSearchInformation(_tid,$routeParams.searchType);
+                }
 
-                console.log(params);
+                // Call search info function
+              //  getSearchInformation(_tid,$routeParams.searchType);
 
+               /* var params = '?searchType='+$routeParams.searchType+'&TID='+_tid;
+                params += '&searchTerm='+$routeParams.searchTerm;
+                params += '&proximity='+$routeParams.proximity;
+                params += '&rating='+$routeParams.rating;
+                params += '&homeDelivery='+$routeParams.homeDelivery;
+                params += '&parkingStatus='+$routeParams.parkingStatus;
+                params += '&openStatus='+$routeParams.openStatus;
+                params += '&lat='+$routeParams.lat;
+                params += '&lng='+$routeParams.lng;
+
+                $location.url('/searchResult'+params);*/
             }
 
             /* redirect to full details page */
@@ -682,8 +743,6 @@ var res = angular.module('ezeidApp').
                 else if(resume){
                     params += '&resume=true';
                 }
-
-                console.log("Sai22211");
                 $scope.showDetailsModal1 = true;
                 // $location.url('/searchDetails'+params);
             }
@@ -941,5 +1000,196 @@ var res = angular.module('ezeidApp').
                 });
 
             };
+
+            //Below function is for getting search information
+            function getSearchInformation(_TID,_SearchType)
+            {
+                $scope.$emit('$preLoaderStart');
+
+                var defer = $q.defer();
+                $scope.SearchInfo = {};
+                $scope.AddressForInfoTab = "";
+                AutoRefresh = false;
+                if(!$rootScope._userInfo)
+                {
+                    $rootScope._userInfo = {};
+                }
+                if(!$rootScope._userInfo.IsAuthenticate){
+                    $rootScope._userInfo.Token = 2;
+                    $scope.Token = 2;
+                }
+
+                var CurrentDate = moment().format('YYYY-MM-DD HH:mm:ss');
+
+                $http({ method: 'get',
+                    url: GURL + 'ewtGetSearchInformation?Token=' + $rootScope._userInfo.Token + '&TID=' + _TID + '&SearchType=' + _SearchType + '&CurrentDate=' + convertTimeToUTC(CurrentDate,'YYYY-MM-DD HH:mm:ss')}).success(function (data) {
+                        $rootScope.$broadcast('$preLoaderStop');
+                        if (data && data != 'null')
+                        {
+                            console.log("Detail",data);
+                            $timeout(function () {
+                                $scope.SearchInfo = data[0];
+                                $scope.showDetailsModal1 = true;
+
+                                if($scope.SearchInfo.IDTypeID == 2)
+                                {
+                                    getAboutComapny();
+                                }
+
+                                if(_TID == $scope.SearchInfo.LocID)
+                                {
+                                    $scope.showNoticeText = false;
+                                }
+
+                                $scope.showSalesEnquiry = $scope.SearchInfo.VisibleModules[0];
+                                $scope.shoReserVation = $scope.SearchInfo.VisibleModules[1];
+                                $scope.showHomeDelivery = $scope.SearchInfo.VisibleModules[2];
+                                $scope.showServiceRequest = $scope.SearchInfo.VisibleModules[3];
+                                $scope.showSendCv = $scope.SearchInfo.VisibleModules[4];
+
+                                //Below lines are to show address in info tab
+                                $scope.AddressForInfoTab = ($scope.SearchInfo.AddressLine1 != "") ? $scope.SearchInfo.AddressLine1 +', ' : "";
+                                $scope.AddressForInfoTab += ($scope.SearchInfo.AddressLine2 != "") ? $scope.SearchInfo.AddressLine2 +', ' : "";
+                                $scope.AddressForInfoTab += ($scope.SearchInfo.CityTitle != "") ? $scope.SearchInfo.CityTitle +', ' : "";
+                                $scope.AddressForInfoTab += ($scope.SearchInfo.CountryTitle != "") ? $scope.SearchInfo.CountryTitle +', ' : "";
+                                $scope.AddressForInfoTab += ($scope.SearchInfo.PostalCode != "") ? $scope.SearchInfo.PostalCode : "";
+
+                                $window.localStorage.setItem("myLocation",$scope.SearchInfo.Latitude+","+$scope.SearchInfo.Longitude );
+
+                                if($scope.SearchInfo.ParkingStatus==0)
+                                {
+                                    $scope.parkingTitle = "Parking Status";
+                                }
+                                if($scope.SearchInfo.ParkingStatus==1)
+                                {
+                                    $scope.parkingTitle = "Public Parking";
+                                }
+                                if($scope.SearchInfo.ParkingStatus==2)
+                                {
+                                    $scope.parkingTitle = "Vallet Parking";
+                                }
+                                if($scope.SearchInfo.ParkingStatus==3)
+                                {
+                                    $scope.parkingTitle = "No parking";
+                                }
+
+                                $scope.form_rating = data[0].Rating;
+
+                                //Call for banner
+                                AutoRefresh = true;
+                                getBanner(1);
+
+                                if($scope.SearchInfo.IDTypeID == 2)
+                                {
+                                    $scope.reservationPlaceHolder = "Reservation requirement details";
+                                }
+                                else
+                                {
+                                    $scope.reservationPlaceHolder = "Appointment requirement details";
+                                }
+                               // defer.resolve();
+                            });
+                        }
+                        else
+                        {
+                            $scope.showNotFound = true;
+                          //  defer.reject();
+                       }
+                    })
+                    .error(function(data, status, headers, config) {
+                     //   defer.reject();
+                        $rootScope.$broadcast('$preLoaderStop');
+                    });
+              //  return defer.promise;
+            }
+
+            //Below function is for getting about company
+            function getAboutComapny()
+            {
+                $http({ method: 'get', url: GURL + 'ewtCompanyProfile?TID=' + $scope.SearchInfo.TID}).success(function (data) {
+                    if (data.Result.length > 0) {
+                        $scope.companyTagLine = data.Result[0].TagLine;
+                    }
+                });
+            }
+
+            //Auto refresh Banner
+            $interval(function() {
+
+                if(AutoRefresh == true && $scope.SearchInfo.Banners != 1)
+                {
+                    currentBanner = currentBanner + 1;
+                    if(currentBanner <= $scope.SearchInfo.Banners)
+                    {
+                        getBanner(currentBanner);
+                    }
+                    else
+                    {
+                        currentBanner = 1;
+                        getBanner(currentBanner);
+                    }
+                }
+            },RefreshTime);
+
+            //False when navigate to other page
+            $scope.$on('$locationChangeStart', function( event ) {
+                AutoRefresh = false;
+            });
+
+            // To get banner
+            function getBanner(_requestedBannerValue)
+            {
+                $http({ method: 'get', url: GURL + 'ewtGetBannerPicture?SeqNo='+_requestedBannerValue+'&Ezeid='+$scope.SearchInfo.EZEID+'&StateTitle='+ $scope.SearchInfo.StateTitle+'&LocID='+$scope.SearchInfo.LocID}).success(function (data) {
+
+                    if (data.Picture != 'null') {
+                        $scope.SearchInfo.BannerImage = data.Picture;
+                        if(currentBanner >= $scope.SearchInfo.Banners)
+                        {
+                            //Disable next button
+                            $scope.nextButton = false;
+                        }
+                        else
+                        {
+                            //Enable next button
+                            $scope.nextButton = true;
+                        }
+
+                        if(currentBanner <= 1)
+                        {
+                            //Disabled previous button
+                            $scope.previousButton = false;
+                        }
+                        else
+                        {   //Enable previous button
+                            $scope.previousButton = true;
+                        }
+                    }
+                    else
+                    {
+                        Notification.error({ message: "No Banner found..!", delay: MsgDelay });
+                    }
+                });
+            }
+
+            //call for previous banner
+            $scope.getPreviousBanner = function(){
+                currentBanner = currentBanner - 1;
+                if(currentBanner >= 1)
+                {
+                    getBanner(currentBanner);
+                    RefreshTime = Miliseconds;
+                }
+            };
+
+            //call for next banner
+            $scope.getNextBanner = function () {
+                currentBanner = currentBanner + 1;
+                if(currentBanner <= $scope.SearchInfo.Banners)
+                {
+                    getBanner(currentBanner);
+                    RefreshTime = Miliseconds;
+                }
+            };
+
         }
     ]);
