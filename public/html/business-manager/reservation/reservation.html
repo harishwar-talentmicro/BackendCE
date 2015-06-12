@@ -30,7 +30,7 @@
                         </date-time-picker>
                     </div>
                     <!-- Notes section goes here[Shown only to resource] -->
-                    <div ng-show="isResource && resources.length > 0" id="notes-block">
+                    <div ng-show="accessRight && resources.length > 0" id="notes-block">
                         <div class="notes-heading">
                             <i class="fa fa-list"></i> Appointments
                         </div>
@@ -103,10 +103,10 @@
                                     </div>
                                 </div>
                                 <!-- Building block: repeated for 72 times (6Hours x 60 = 360mins/5(individual block mins) = 72 Blocks) -->
-                                <div class="building-block" >
+                                <div class="building-block">
                                     <!-- Time Label goes here -->
-                                    <div ng-init="counter()" class="col-lg-4 col-md-3 col-sm-3 col-xs-4 p-left-5 no-padding">
-                                        <div ng-repeat="block in blockArr track by $index" class="title-section blk blk-time" ng-class="[blockColor[$index],'time-block-'+getBlockId($index,cols),heightClass]">
+                                    <div class="col-lg-4 col-md-3 col-sm-3 col-xs-4 p-left-5 no-padding">
+                                        <div ng-init="counterFun()" ng-repeat="block in blockArr track by $index" class="title-section blk blk-time" ng-class="[blockColor[$index],'time-block-'+getBlockId($index,cols),heightClass]">
                                             <b>{{getTime($index,cols)}}</b>
                                         </div>
                                     </div>
