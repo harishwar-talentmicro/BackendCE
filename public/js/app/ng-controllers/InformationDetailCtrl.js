@@ -749,6 +749,5 @@ angular.module('ezeidApp').
                 $scope.showDetailsModal = true;
             }
         });
-
     }
 ]);

@@ -63,7 +63,7 @@ var res = angular.module('ezeidApp').
             $scope.showMapPopupModel = false;
             $scope.showDetailsModal1 = false;
 
-            var AutoRefresh = true;
+            var AutoRefresh = false;
             var currentBanner = 1;
             var Miliseconds = 8000;
             var RefreshTime = Miliseconds;
