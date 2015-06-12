@@ -17,9 +17,9 @@
                         <div class="input-group p-bottom-3">
                             <div class="input-group-btn">
                                 <!-- Change Location btn -->
-                                <button type="button" ng-click="modalVisibility()" class="btn btn-info normal-view-buttons" title="Click to change Search Location"><i class="fa fa-map-marker"></i> <b>Location</b></button>
+                                <button  data-toggle="tooltip" type="button" ng-click="modalVisibility()" class="btn btn-info" title="Click to change Search Location"><i class="fa fa-map-marker"></i> <b class="normal-view-buttons">Location</b></button>
                                 <!-- Searc type button -->
-                                <button title="Search by" type="button" class="btn btn-default dropdown-toggle keyword-btn-radius" data-toggle="dropdown"><b>{{searchType[searchParams.searchType - 1]}}</b> <span class="caret"></span></button>
+                                <button  data-toggle="tooltip" title="Search by" type="button" class="btn btn-default dropdown-toggle keyword-btn-radius" data-toggle="dropdown"><b>{{searchType[searchParams.searchType - 1]}}</b> <span class="caret"></span></button>
                                 <ul class="dropdown-menu" role="menu">
                                     <li class="btn-link" ng-repeat="search in searchType track by $index">
                                         <!-- Index incremented by 1: As the array's default index is [0,1,2] & searchType's value is [1,2,3] -->
@@ -30,35 +30,35 @@
                             <input type="text" ng-keypress="checkEnterKey($event)" placeholder="{{placeHolderText[searchParams.searchType - 1]}}" ng-model="searchParams.searchTerm" ng-class="(searchParams.searchType === 1) ? 'text-uppercase' : ''" class="form-control" aria-label="...">
                             <div class="input-group-btn">
                                 <!-- Filter BTN -->
-                                <button  ng-click="toggleFilterContainer($event,true)" ng-disabled="searchParams.searchType === 1"
-                                         type="button" class="btn no-radius btn-default dropdown-toggle btn-advanced-filter normal-view-buttons" data-toggle="dropdown" title="Click to choose Search Options"><i class="fa fa-filter"></i> <b>Filter</b></button>
+                                <button  data-toggle="tooltip"  ng-click="toggleFilterContainer($event,true)" ng-disabled="searchParams.searchType === 1"
+                                         type="button" class="btn no-radius btn-default dropdown-toggle btn-advanced-filter" data-toggle="dropdown" title="Click to choose Search Options"><i class="fa fa-filter"></i> <b class="normal-view-buttons">Filter</b></button>
                                 <!-- Search BTN -->
-                                <button type="button" class="btn btn-warning" title="search" ng-click="triggerSearch()"><i class="fa fa-search"></i> <b>Search</b></b></button>
+                                <button  data-toggle="tooltip" type="button" class="btn btn-warning" title="search" ng-click="triggerSearch()"><i class="fa fa-search"></i> <b>Search</b></b></button>
                             </div>
                         </div>
 
                         <!-- Filter buttons goes here in MOBILE VIEW-->
-                        <div class="mobile-view-buttons text-center">
-                            <div class="input-group">
-                                <div class="btn-group">
-                                    <button type="button"
-                                            ng-click="modalVisibility()"
-                                            class="btn btn-info "
-                                            title="Click to change Search Location">
-                                        <i class="fa fa-map-marker"></i> <b>Location</b>
-                                    </button>
-                                    <button ng-click="toggleFilterContainer($event,true)"
-                                            ng-disabled="searchParams.searchType === 1"
-                                            type="button"
-                                            class="btn btn-warning
-                                             dropdown-toggle btn-advanced-filter"
-                                            data-toggle="dropdown"
-                                            title="Click to choose Search Options">
-                                        <i class="fa fa-filter"></i> <b>Filter</b>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
+                        <!--<div class="mobile-view-buttons text-center">-->
+                            <!--<div class="input-group">-->
+                                <!--<div class="btn-group">-->
+                                    <!--<button type="button"-->
+                                            <!--ng-click="modalVisibility()"-->
+                                            <!--class="btn btn-info "-->
+                                            <!--title="Click to change Search Location">-->
+                                        <!--<i class="fa fa-map-marker"></i> <b>Location</b>-->
+                                    <!--</button>-->
+                                    <!--<button ng-click="toggleFilterContainer($event,true)"-->
+                                            <!--ng-disabled="searchParams.searchType === 1"-->
+                                            <!--type="button"-->
+                                            <!--class="btn btn-warning-->
+                                             <!--dropdown-toggle btn-advanced-filter"-->
+                                            <!--data-toggle="dropdown"-->
+                                            <!--title="Click to choose Search Options">-->
+                                        <!--<i class="fa fa-filter"></i> <b>Filter</b>-->
+                                    <!--</button>-->
+                                <!--</div>-->
+                            <!--</div>-->
+                        <!--</div>-->
                         <!-- User's present location goes here -->
                         <div class="current-location text-center">
                             <p class="text-white">

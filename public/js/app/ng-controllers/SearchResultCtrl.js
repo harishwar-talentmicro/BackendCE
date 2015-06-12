@@ -219,7 +219,8 @@ var res = angular.module('ezeidApp').
             function getSearchKeyWord(_filterValue)
             {
                 $scope.showDownloadLink = false;
-                var CurrentDate = moment().format('YYYY-MM-DD HH:mm:ss');
+                var today = moment().format('YYYY-MM-DD HH:mm:ss');
+                var CurrentDate = UtilityService.convertTimeToUTC(today);
                 if(!$rootScope._userInfo){
                     $rootScope._userInfo = {};
                 }
