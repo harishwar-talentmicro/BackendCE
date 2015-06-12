@@ -4141,8 +4141,8 @@ exports.FnSearchByKeywords = function (req, res) {
             type = 0;
         
         var isPagination = req.body.isPagination ? parseInt(req.body.isPagination) : 0 ;
-        var pagesize = parseInt(req.body.pagesize);
-        var pagecount = parseInt(req.body.pagecount);
+        var pagesize = req.body.pagesize ? parseInt(req.body.pagesize) : 0;
+        var pagecount = req.body.pagecount ? parseInt(req.body.pagecount) : 0;
         
         console.log(req.body);
 
@@ -4323,7 +4323,7 @@ exports.FnSearchByKeywords = function (req, res) {
         }
         else if (type == "2") {
            
-            if (find != null && find != '' && Proximity.toString() != 'NaN' && Latitude.toString() != 'NaN' && Longitude.toString() != 'NaN' && CategoryID != null && CurrentDate != null) {
+            if (find != null && find != '' && Proximity.toString() != 'NaN' && Latitude.toString() != 'NaN' && Longitude.toString() != 'NaN' && CategoryID != null && CurrentDate != null && pagesize != null && pagecount != null) {
                 
                 if (ParkingStatus == 0) {
                     ParkingStatus = "1,2,3";
@@ -4334,7 +4334,7 @@ exports.FnSearchByKeywords = function (req, res) {
                     + ',' + db.escape('') + ',' + db.escape(ParkingStatus) + ',' + db.escape(OpenCloseStatus) + ',' + db.escape(Rating) 
                     + ',' + db.escape(token) + ',' + db.escape(HomeDelivery)+ ',' + db.escape(CurrentDate) + ',' + db.escape(isPagination) + ',' + 
                                 db.escape(pagesize) + ',' + db.escape(pagecount) ;
-                //console.log('SearchQuery: ' + InsertQuery);
+                console.log('CALL pSearchResultNew(' + InsertQuery + ')');
                 //var link = 'CALL pSearchResult(' + InsertQuery + ')';
                 db.query('CALL pSearchResultNew(' + InsertQuery + ')', function (err, SearchResult) {
                     if (!err) {
@@ -4376,6 +4376,12 @@ exports.FnSearchByKeywords = function (req, res) {
                 }
                 else if (Longitude == 'NaN') {
                     console.log('FnSearchByKeywords: Proximity is empty');
+                }
+                else if (pagesize == null) {
+                    console.log('FnSearchByKeywords: pagesize is empty');
+                }
+                else if (pagecount == null) {
+                    console.log('FnSearchByKeywords: pagecount is empty');
                 }
                 res.statusCode = 400;
                 res.send('null');
