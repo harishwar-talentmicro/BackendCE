@@ -4134,15 +4134,21 @@ exports.FnSearchByKeywords = function (req, res) {
         var Rating = req.body.Rating;
         var HomeDelivery = req.body.HomeDelivery;
         var CurrentDate = req.body.CurrentDate;
+        
         if(CurrentDate != null)
              CurrentDate = new Date(CurrentDate);
          if(type.toString() == 'NaN')
             type = 0;
-        //console.log(token);
+        
+        var isPagination = req.body.isPagination ? parseInt(req.body.isPagination) : 0 ;
+        var pagesize = parseInt(req.body.pagesize);
+        var pagecount = parseInt(req.body.pagecount);
+        
+        console.log(req.body);
 
         if (type == "1") {
             
-            if (find != null && find != '' && CategoryID != null && token != null && token != '' && CurrentDate != null) {
+            if (find != null && find != '' && CategoryID != null && token != null && token != '' && CurrentDate != null && pagesize != null && pagecount != null) {
                 FnValidateToken(token, function (err, Result) {
                     if (!err) {
                         if (Result != null) {
@@ -4223,7 +4229,8 @@ exports.FnSearchByKeywords = function (req, res) {
                             var SearchQuery = db.escape('') + ',' + db.escape(CategoryID) + ',' + db.escape(0) + ',' + db.escape(Latitude) 
                             + ',' + db.escape(Longitude) +',' + db.escape(EZEID) + ',' + db.escape(LocSeqNo) + ',' + db.escape(Pin) + ',' + db.escape(SearchType) + ',' + db.escape(DocType) 
                                 + ',' + db.escape("0") + ',' + db.escape("0") + ',' + db.escape("0") + ',' + db.escape(token) 
-                                + ',' + db.escape(HomeDelivery) + ',' + db.escape(CurrentDate);
+                                + ',' + db.escape(HomeDelivery) + ',' + db.escape(CurrentDate) + ',' + db.escape(isPagination) + ',' + 
+                                db.escape(pagesize) + ',' + db.escape(pagecount) ;
                             
                             console.log('CALL pSearchResultNew(' + SearchQuery + ')');
                             db.query('CALL pSearchResultNew(' + SearchQuery + ')', function (err, SearchResult) {
@@ -4304,6 +4311,12 @@ exports.FnSearchByKeywords = function (req, res) {
                 else if (CurrentDate == null || CurrentDate == '') {
                     console.log('FnSearchByKeywords: CurrentDate is empty');
                 }
+                else if (pagesize == null) {
+                    console.log('FnSearchByKeywords: pagesize is empty');
+                }
+                else if (pagecount == null) {
+                    console.log('FnSearchByKeywords: pagecount is empty');
+                }
                 res.statusCode = 400;
                 res.send('null');
             }
@@ -4319,7 +4332,8 @@ exports.FnSearchByKeywords = function (req, res) {
                 var InsertQuery = db.escape(find) + ',' + db.escape(CategoryID) + ',' + db.escape(Proximity) + ',' + db.escape(Latitude) 
                     + ',' + db.escape(Longitude) + ',' + db.escape('') + ',' + db.escape(0) + ',' + db.escape(0) + ',' + db.escape(1) 
                     + ',' + db.escape('') + ',' + db.escape(ParkingStatus) + ',' + db.escape(OpenCloseStatus) + ',' + db.escape(Rating) 
-                    + ',' + db.escape(token) + ',' + db.escape(HomeDelivery)+ ',' + db.escape(CurrentDate);
+                    + ',' + db.escape(token) + ',' + db.escape(HomeDelivery)+ ',' + db.escape(CurrentDate) + ',' + db.escape(isPagination) + ',' + 
+                                db.escape(pagesize) + ',' + db.escape(pagecount) ;
                 //console.log('SearchQuery: ' + InsertQuery);
                 //var link = 'CALL pSearchResult(' + InsertQuery + ')';
                 db.query('CALL pSearchResultNew(' + InsertQuery + ')', function (err, SearchResult) {
@@ -4376,7 +4390,8 @@ exports.FnSearchByKeywords = function (req, res) {
                 var InsertQuery = db.escape(find) + ',' + db.escape(CategoryID) + ',' + db.escape(Proximity) + ',' + db.escape(Latitude) 
                     + ',' + db.escape(Longitude) + ',' + db.escape('') + ',' + db.escape(0) + ',' + db.escape(0) + ',' + db.escape(3) 
                     + ',' + db.escape('') + ',' + db.escape(ParkingStatus) + ',' + db.escape(OpenCloseStatus) + ',' + db.escape(Rating) 
-                    + ',' + db.escape(token)  + ',' + db.escape(HomeDelivery)+ ',' + db.escape(CurrentDate);
+                    + ',' + db.escape(token)  + ',' + db.escape(HomeDelivery)+ ',' + db.escape(CurrentDate) + ',' + db.escape(isPagination) + ',' + 
+                                db.escape(pagesize) + ',' + db.escape(pagecount);
                 console.log('SearchQuery: ' + InsertQuery);
                 db.query('CALL pSearchResultNew(' + InsertQuery + ')', function (err, SearchResult) {
                     if (!err) {
