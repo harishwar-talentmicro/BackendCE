@@ -10736,6 +10736,10 @@ exports.FnGetReservationResource = function (req, res) {
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
         var ezeid = req.query.ezeid;
+        var type = req.query.type ? req.query.type : 0 ;
+        
+        console.log(req.query);
+
         var responseMessage = {
             status: false,
             data: null,
@@ -10744,7 +10748,10 @@ exports.FnGetReservationResource = function (req, res) {
         };
         
         if (ezeid) {
-                db.query('CALL pGetResource(' + db.escape(ezeid) + ')', function (err, GetResult) {
+             var query = db.escape(ezeid) + ', ' + db.escape(type);
+            console.log(query);
+                        db.query('CALL pGetResource(' + query + ')', function (err, GetResult) {
+                
                             if (!err) {
                                 if (GetResult != null) {
                                     if (GetResult[0].length > 0) {
@@ -11639,7 +11646,7 @@ exports.FnGetReservTask = function (req, res) {
         var resourceid = req.query.resourceid;
         var date = new Date(req.query.date);
         var toEzeid = req.query.toEzeid;
-
+        
         var responseMessage = {
             status: false,
             data: null,
