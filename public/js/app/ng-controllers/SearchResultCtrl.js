@@ -244,6 +244,10 @@ var res = angular.module('ezeidApp').
                     OpenStatus:_filterValue.openStatus,
                     Rating:_filterValue.rating,
                     HomeDelivery:_filterValue.homeDelivery,
+                    isPagination:0,
+                    pagesize:0,
+                    pagecount:0,
+                    total:0,
                     CurrentDate:convertTimeToUTC(CurrentDate,'YYYY-MM-DD HH:mm:ss')
 
                 } }).success(function (data) {
