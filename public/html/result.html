@@ -14,13 +14,22 @@
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
+                    <!-- next and previous button for pagination -->
+                    <div class="navbar-form navbar-left">
+                        <button class="btn btn-primary" ng-click="getPreviousResultPage()" ng-disabled="!paginationPrevious">
+                            Previous <i class="fa fa-arrow-circle-left"></i>
+                        </button>
+                        <button class="btn btn-primary" ng-click="getNextResultPage()" ng-disabled="!paginationNext">
+                            <i class="fa fa-arrow-circle-right"></i> Next
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Collect the nav links, forms, and other content for toggling -->
                 <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                    <div class="row text-center search-bar-center">
+                    <div class="row text-left search-bar-center">
+                        <!-- Search Bar and advance filter goes here -->
                         <div class="navbar-form navbar-left no-border " role="search">
-                            <!-- Search Bar and advance filter goes here -->
                             <div class="input-group">
                                 <div class="input-group-btn">
                                     <!-- Change Location btn -->
@@ -57,7 +66,7 @@
                         </ul>
                     </div>
                     <div class="dropdown">
-                        <p ng-show="searchCount > 0" class="text-center"><i>{{searchCount}} Items found for <b>{{defaultSearchTerm}}</b></i> | Your Location: {{location}}</p>
+                        <p ng-show="searchCount > 0" class="text-center"><i>Showing {{currentStartResultId+1}} - {{currentStartResultId+searchCount}} of {{totalResult}} Items for <b>{{defaultSearchTerm}}</b></i> | Your Location: {{location}}</p>
                     </div>
                 </div><!-- /.navbar-collapse -->
             </div><!-- /.container-fluid -->
