@@ -608,6 +608,7 @@
                     resp.LastName  +
                         ((resp.MobileNumber && resp.MobileNumber !== 'null') ? ', ' + resp.MobileNumber : '');
                     $scope.modalBox.tx.ezeidTid = resp.TID;
+                    $scope.modalBox.tx.companyName = (resp.IDTypeID == 1) ? resp.FirstName : resp.CompanyName;
                     $scope.loadLocationListForEzeid(resp.TID).then(function(){
                         $scope.$emit('$preLoaderStop');
                     },function(){
@@ -997,7 +998,8 @@
                     ItemsList: JSON.stringify($scope.modalBox.tx.itemList),
                     item_list_type : $rootScope._userInfo.SalesItemListType,
                     DeliveryAddress : (!editMode) ?
-                        makeAddress() : $scope.modalBox.tx.deliveryAddress
+                        makeAddress() : $scope.modalBox.tx.deliveryAddress,
+                    companyName : $scope.modalBox.tx.companyName
                 };
                 return preparedTx;
             };
