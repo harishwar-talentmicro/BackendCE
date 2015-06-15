@@ -10,7 +10,7 @@ var mysql = require('mysql'),
  db_server = "104.199.128.226",//Name of the Server.
 db_port = 3306, //Integers please.
     //db_collection = "ezeid"; //Name of DB Collection
-    db_collection = "EzeidTestdb"; //Name of DB Collection
+    db_collection = "test_ezeid"; //Name of DB Collection
 
 
 
