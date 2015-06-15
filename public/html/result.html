@@ -1,740 +1,326 @@
 <div class="search-result hpw">
-    <section id="result-page-menu-wrapper" class=" rpw" sg-controller="">
-        <!-- New header menu goes here -->
-        <header-section></header-section>
+<section id="result-page-menu-wrapper" class=" rpw" sg-controller="">
+    <!-- New header menu goes here -->
+    <header-section></header-section>
 
-        <!-- Navbar header menu for search result goes here -->
-        <nav class="navbar navbar-default m-bottom-0 no-radius">
-            <div class="container-fluid">
-                <!-- Brand and toggle get grouped for better mobile display -->
-                <div class="navbar-header">
-                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-                        <span class="sr-only">Toggle navigation</span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
+    <!-- Navbar header menu for search result goes here -->
+    <nav class="navbar navbar-default m-bottom-0 no-radius">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <!-- next and previous button for pagination -->
+                <div class="navbar-form navbar-left">
+                    <button class="btn btn-primary" ng-click="getPreviousResultPage()" ng-disabled="!paginationPrevious">
+                        Previous <i class="fa fa-arrow-circle-left"></i>
                     </button>
-                    <!-- next and previous button for pagination -->
-                    <div class="navbar-form navbar-left">
-                        <button class="btn btn-primary" ng-click="getPreviousResultPage()" ng-disabled="!paginationPrevious">
-                            Previous <i class="fa fa-arrow-circle-left"></i>
-                        </button>
-                        <button class="btn btn-primary" ng-click="getNextResultPage()" ng-disabled="!paginationNext">
-                            <i class="fa fa-arrow-circle-right"></i> Next
-                        </button>
-                    </div>
+                    <button class="btn btn-primary" ng-click="getNextResultPage()" ng-disabled="!paginationNext">
+                        <i class="fa fa-arrow-circle-right"></i> Next
+                    </button>
                 </div>
+            </div>
 
-                <!-- Collect the nav links, forms, and other content for toggling -->
-                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                    <div class="row text-left search-bar-center">
-                        <div class="navbar-form navbar-left no-border " role="search">
-                        <!-- Search Bar and advance filter goes here -->
-                        <div class="navbar-form navbar-left no-border " role="search">
-                            <div class="input-group">
-                                <div class="input-group-btn">
-                                    <!-- Change Location btn -->
-                                    <button type="button" ng-click="modalVisibility()" class="btn btn-info" title="Click to change Search Location"><i class="fa fa-map-marker"></i> <b class="normal-view-buttons">Location</b></button>
-                                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-                                        <!-- Index subtracted by 1: As searchType's value is [1,2,3] the array's default index is [0,1,2] -->
-                                        <b>{{searchType[params.searchType - 1]}}</b> <span class="caret"></span></button>
-                                    <ul class="dropdown-menu" role="menu">
-                                        <li class="btn-link" ng-repeat="search in searchType track by $index">
-                                            <a class="btn-link" ng-click="($event.preventDefault())(params.searchType = $index + 1) (params.searchTerm = '')">{{search}}</a>
-                                        </li>
-                                    </ul>
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <div class="row text-left search-bar-center">
+                    <!-- Search Bar and advance filter goes here -->
+                    <div class="navbar-form navbar-left no-border " role="search">
+                        <div class="input-group">
+                            <div class="input-group-btn">
+                                <!-- Change Location btn -->
+                                <button type="button" ng-click="modalVisibility()" class="btn btn-info" title="Click to change Search Location"><i class="fa fa-map-marker"></i> <b class="normal-view-buttons">Location</b></button>
+                                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                                    <!-- Index subtracted by 1: As searchType's value is [1,2,3] the array's default index is [0,1,2] -->
+                                    <b>{{searchType[params.searchType - 1]}}</b> <span class="caret"></span></button>
+                                <ul class="dropdown-menu" role="menu">
+                                    <li class="btn-link" ng-repeat="search in searchType track by $index">
+                                        <a class="btn-link" ng-click="($event.preventDefault())(params.searchType = $index + 1) (params.searchTerm = '')">{{search}}</a>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <input type="text" ng-keypress="(searchKey($event))" placeholder="{{placeHolderText[params.searchType - 1]}}" ng-model="params.searchTerm" ng-class="(params.searchType === 1) ? 'text-uppercase' : ''" class="form-control" aria-label="...">
+                            <div class="input-group-btn">
+                                <!-- Advance Search BTN -->
+                                <button ng-disabled="params.searchType === 1"  ng-click="(toggleFilterContainer($event,true))(isFilterOptionsShown = false)" type="button" class="btn btn-default dropdown-toggle btn-advanced-filter no-radius" data-toggle="dropdown" title="Click to choose Search Options"><i class="fa fa-filter"></i> Filter</Filter></button>
+                                <!-- Search BTN -->
+                                <button type="button" class="btn btn-warning" title="search" ng-click="initiateSearch()"><i class="fa fa-search"></i> </button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Toggle buttons for switching betweeen maps and list -->
+                    <ul class="nav navbar-nav navbar-right">
+                        <li class="dropdown p8">
+                            <!-- Select All BTN -->
+                            <button class="btn btn-primary" ng-click="toggleCheckboxAll()"><i class="fa " ng-class="selectAll?'fa-check-square':'fa-square'"></i> Select All</button>
+                            <div class="btn-group">
+                                <button class="btn btn-default" ng-disabled="!searchListData" ng-click="toggleMapView(false)"><i class="fa fa-list"></i> List View</button>
+                                <button class="btn btn-default" ng-disabled="!searchListData" ng-click="toggleMapView(true)"><i class="fa fa-map-marker"></i> Map View</button>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <div class="dropdown">
+                    <p ng-show="searchCount > 0" class="text-center"><i>Showing {{currentStartResultId+1}} - {{currentStartResultId+searchCount}} of {{totalResult}} Items for <b>{{defaultSearchTerm}}</b></i> | Your Location: {{location}}</p>
+                </div>
+            </div><!-- /.navbar-collapse -->
+        </div><!-- /.container-fluid -->
+        <div class="no-result" ng-show="isResultNumber == 0">
+            <hr class="style-two">
+            <h3 class="text text-center font-open-sans-light"><i class="fa fa-warning"></i> Nothing Found, Try again with different keywords</h3>
+        </div>
+    </nav>
+
+    <div ng-show="showLoginText">
+        <h1 class="font-open-sans-light text-center top-clearfix">Please login to continue</h1>
+        <p class="font-open-sans-light text-center text-warning"><a href="/">Go Back</a></p>
+    </div>
+
+    <div class="row setTopMargin setRowLeftRightMarginZero centerAlign" ng-show="showDownloadLink">
+        <div class="col-md-12">
+            <a target="_blank" href="/ewtGetSearchDocuments?Token={{_userInfo.Token}}&&Keywords={{params.searchTerm}}"><u>Click here to download: [<b> {{downloadData.Filename}} </b>]</u></a>
+            <br/>
+        </div>
+        <div class="col-md-12">
+            <span> NO: {{downloadData.No}}  {{downloadData.date != "" ? "| Expiry Date:"+downloadData.date : ""}}</span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 col-lg-offset-5 col-md-offset-5 col-sm-offset-5 col-xs-offset-0">
+            <div class="filter-container animation-slideup" ng-show="isFilterShown">
+                <div class="container text text-center filter-text-highlight">
+                    <i>Search Options</i>
+                </div>
+                <!-- Main contents of advance filters -->
+                <div class="advance-filter-content border-style-bottom">
+                    <div class="container">
+                        <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12 p-bottom-3 filter-item-border">
+                            <div class="text-left text-primary"><b>Proximity:</b></div>
+                            <div class="form-group">
+                                <select name="proximity" ng-model="params.proximity" class="form-control proximity">
+                                    <option ng-selected="params.proximity == 1"  value="1">1 mile (1.6 km)</option>
+                                    <option ng-selected="params.proximity == 2" value="2">2 mile (3.2 km)</option>
+                                    <option ng-selected="params.proximity == 5" value="5">5 mile (8 km)</option>
+                                    <option ng-selected="params.proximity == 10" value="10">10 mile (16 km)</option>
+                                    <option ng-selected="params.proximity == 25" value="25">25 mile (40 km)</option>
+                                    <option ng-selected="params.proximity == 50" value="50">50 mile (80 km)</option>
+                                    <option ng-selected="params.proximity == 0" value="0">Any</option>
+                                </select>
+                            </div>
+
+                            <!-- Filter Contents -->
+                            <div class="p-top-10 text-left">
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 select-items">
+                                    <input type="checkbox" id="item1" ng-checked="params.parkingStatus == 1" class="chkShowParking filter"  ng-model="params.parkingStatus" name="parking" >
+                                    &nbsp;
+                                    <label  for="item1"> Parking Required</label>
                                 </div>
-
-                                <input type="text" ng-keypress="(searchKey($event))" placeholder="{{placeHolderText[params.searchType - 1]}}" ng-model="params.searchTerm" ng-class="(params.searchType === 1) ? 'text-uppercase' : ''" class="form-control" aria-label="...">
-                                <div class="input-group-btn">
-                                    <!-- Advance Search BTN -->
-                                    <button ng-disabled="params.searchType === 1"  ng-click="(toggleFilterContainer($event,true))(isFilterOptionsShown = false)" type="button" class="btn btn-default dropdown-toggle btn-advanced-filter no-radius" data-toggle="dropdown" title="Click to choose Search Options"><i class="fa fa-filter"></i> Filter</Filter></button>
-                                    <!-- Search BTN -->
-                                    <button type="button" class="btn btn-warning" title="search" ng-click="initiateSearch()"><i class="fa fa-search"></i> </button>
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 select-items">
+                                    <input type="checkbox" id="item2" class="chkHomeDelivery filter" ng-checked="params.homeDelivery == 1" ng-model="params.homeDelivery" name="homeDelivery" >
+                                    &nbsp;
+                                    <label  for="item2">Need home delivery</label>
+                                </div>
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 select-items">
+                                    <input type="checkbox" id="item3" class="chkOpenStatus filter" ng-checked="params.openStatus == 1" ng-model="params.openStatus" name="openStatus" >
+                                    &nbsp;
+                                    <label  for="item3">Open business only</label>
                                 </div>
                             </div>
                         </div>
-                        <!-- Toggle buttons for switching betweeen maps and list -->
-                        <ul class="nav navbar-nav navbar-right">
-                            <li class="dropdown p8">
-                                <!-- Select All BTN -->
-                                <button class="btn btn-primary" ng-click="toggleCheckboxAll()"><i class="fa " ng-class="selectAll?'fa-check-square':'fa-square'"></i> Select All</button>
-                                <div class="btn-group">
-                                    <button class="btn btn-default" ng-disabled="!searchListData" ng-click="toggleMapView(false)"><i class="fa fa-list"></i> List View</button>
-                                    <button class="btn btn-default" ng-disabled="!searchListData" ng-click="toggleMapView(true)"><i class="fa fa-map-marker"></i> Map View</button>
-                                </div>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="dropdown">
-                        <p ng-show="searchCount > 0" class="text-center"><i>Showing {{currentStartResultId+1}} - {{currentStartResultId+searchCount}} of {{totalResult}} Items for <b>{{defaultSearchTerm}}</b></i> | Your Location: {{location}}</p>
-                    </div>
-                </div><!-- /.navbar-collapse -->
-            </div><!-- /.container-fluid -->
-            <div class="no-result" ng-show="isResultNumber == 0">
-                <hr class="style-two">
-                <h3 class="text text-center font-open-sans-light"><i class="fa fa-warning"></i> Nothing Found, Try again with different keywords</h3>
-            </div>
-        </nav>
 
-        <div ng-show="showLoginText">
-            <h1 class="font-open-sans-light text-center top-clearfix">Please login to continue</h1>
-            <p class="font-open-sans-light text-center text-warning"><a href="/">Go Back</a></p>
-        </div>
+                        <br>
 
-        <div class="row setTopMargin setRowLeftRightMarginZero centerAlign" ng-show="showDownloadLink">
-            <div class="col-md-12">
-                <a target="_blank" href="/ewtGetSearchDocuments?Token={{_userInfo.Token}}&&Keywords={{params.searchTerm}}"><u>Click here to download: [<b> {{downloadData.Filename}} </b>]</u></a>
-                <br/>
-            </div>
-            <div class="col-md-12">
-                <span> NO: {{downloadData.No}}  {{downloadData.date != "" ? "| Expiry Date:"+downloadData.date : ""}}</span>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 col-lg-offset-5 col-md-offset-5 col-sm-offset-5 col-xs-offset-0">
-                <div class="filter-container animation-slideup" ng-show="isFilterShown">
-                    <div class="container text text-center filter-text-highlight">
-                        <i>Search Options</i>
-                    </div>
-                    <!-- Main contents of advance filters -->
-                    <div class="advance-filter-content border-style-bottom">
-                        <div class="container">
-                            <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12 p-bottom-3 filter-item-border">
-                                <div class="text-left text-primary"><b>Proximity:</b></div>
-                                <div class="form-group">
-                                    <select name="proximity" ng-model="params.proximity" class="form-control proximity">
-                                        <option ng-selected="params.proximity == 1"  value="1">1 mile (1.6 km)</option>
-                                        <option ng-selected="params.proximity == 2" value="2">2 mile (3.2 km)</option>
-                                        <option ng-selected="params.proximity == 5" value="5">5 mile (8 km)</option>
-                                        <option ng-selected="params.proximity == 10" value="10">10 mile (16 km)</option>
-                                        <option ng-selected="params.proximity == 25" value="25">25 mile (40 km)</option>
-                                        <option ng-selected="params.proximity == 50" value="50">50 mile (80 km)</option>
-                                        <option ng-selected="params.proximity == 0" value="0">Any</option>
-                                    </select>
-                                </div>
-
-                                <!-- Filter Contents -->
-                                <div class="p-top-10 text-left">
-                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 select-items">
-                                        <input type="checkbox" id="item1" ng-checked="params.parkingStatus == 1" class="chkShowParking filter"  ng-model="params.parkingStatus" name="parking" >
-                                        &nbsp;
-                                        <label  for="item1"> Parking Required</label>
-                                    </div>
-                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 select-items">
-                                        <input type="checkbox" id="item2" class="chkHomeDelivery filter" ng-checked="params.homeDelivery == 1" ng-model="params.homeDelivery" name="homeDelivery" >
-                                        &nbsp;
-                                        <label  for="item2">Need home delivery</label>
-                                    </div>
-                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 select-items">
-                                        <input type="checkbox" id="item3" class="chkOpenStatus filter" ng-checked="params.openStatus == 1" ng-model="params.openStatus" name="openStatus" >
-                                        &nbsp;
-                                        <label  for="item3">Open business only</label>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <br>
-
-                            <div class="row">
-                                <div class="text-left">
-                                    <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 p-top-10 text-warning">
-                                        <span class="text text-info text-bolder">Filter by ratings:</span>
-                                        <!--<input id="range_29" />-->
-                                        <div class="star-ratings text-left">
-                                            <div class="searchStars" ng-repeat="star in searchStars track by $index">
+                        <div class="row">
+                            <div class="text-left">
+                                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 p-top-10 text-warning">
+                                    <span class="text text-info text-bolder">Filter by ratings:</span>
+                                    <!--<input id="range_29" />-->
+                                    <div class="star-ratings text-left">
+                                        <div class="searchStars" ng-repeat="star in searchStars track by $index">
                                                         <span ng-click="selectSearchStar($index)">
                                                             <input type="checkbox" class="star-filter" ng-model="searchStars[$index]" ng-change="selectSearchStar($index)" />
                                                         </span>
-                                                &nbsp;
-                                                <i ng-repeat="str in searchStarArr[$index]" class="fa fa-star text-yellow"></i>
-                                            </div>
+                                            &nbsp;
+                                            <i ng-repeat="str in searchStarArr[$index]" class="fa fa-star text-yellow"></i>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="done-btn text-right p-5">
-                            <button class="btn btn-warning btn-sm text-right" ng-click="resetFilter()"><i class="fa fa-recycle"></i> Reset</button>
-                            <button class="btn btn-info btn-sm" ng-click="isFilterShown = !isFilterShown">OK</button>
-                        </div>
+                    </div>
+                    <div class="done-btn text-right p-5">
+                        <button class="btn btn-warning btn-sm text-right" ng-click="resetFilter()"><i class="fa fa-recycle"></i> Reset</button>
+                        <button class="btn btn-info btn-sm" ng-click="isFilterShown = !isFilterShown">OK</button>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <div class="mapModal">
-            <modal id="mapPOPUP" showheader="false" mtitle="modalBox.title" visible="showMapPopupModel" mclass="modalBox.class">
-                <section id="map-content">
-                    <div class="row setRowLeftRightMarginZero">
-                        <div ng-include="activeTemplate"></div>
-                    </div>
-                </section>
-            </modal>
-        </div>
-
-        <!-- Modal Box content for map -->
-        <modal mtitle="modal.title" mclass="modal.class" visible="modalVisible">
-            <div class="row">
-                <!-- Map goes here -->
-                <div id="modal-map-ctrl" class="col-lg-12"></div>
-                <!-- Map ends here -->
-                <div class="col-lg-12 text-right">
-                    <button class="btn btn-info text-right" ng-click="modalVisibility()">OK</button>
+    <div class="mapModal">
+        <modal id="mapPOPUP" showheader="false" mtitle="modalBox.title" visible="showMapPopupModel" mclass="modalBox.class">
+            <section id="map-content">
+                <div class="row setRowLeftRightMarginZero">
+                    <div ng-include="activeTemplate"></div>
                 </div>
-            </div>
+            </section>
         </modal>
+    </div>
 
-        <div>
-            <!---- Modal box for information details  start ---->
-
-            <div class="Popup_window form_style map_popup_iconActions" id="SalesEnquiryRequest_popup" style="height: 103%;">
-                <div class="window_page Maping_popup">
-                    <span class="closelink" ng-click="closeSalesEnquiryForm()">X</span>
-                    <form name="salesEnquiryForm" ng-submit="salesEnquiryForm.$valid && sendSalesEnquiry()" novalidate>
-                        <h3 class="marB15px">Sales Enquiry</h3>
-                        <div class="col-md-12">
-                            <p style="margin-top:-7px;">
-                                Enter your Requirement (You do not need to submit your contacts numbers, instead we
-                                will send your EZE ID Card)
-                            </p>
-                        </div>
-                        <div class="form-group" style="float: left;">
-                            <textarea class="form-control fixTextArea emptyBox" name="salesMessage" ng-model="salesMessage" placeholder="Type Message here" required></textarea><br/>
-                        </div>
-                        <div class="form-group">
-                            <input type="submit" ng-disabled="!salesMessage" class="btn btn-primary text_Box" value="Send" />
-                            <input type="reset" class="btn btn-primary marR10px cancelEnq text_Box" ng-click="closeSalesEnquiryForm()" value="Close" />
-                        </div>
-                    </form>
-                </div>
+    <!-- Modal Box content for map -->
+    <modal mtitle="modal.title" mclass="modal.class" visible="modalVisible">
+        <div class="row">
+            <!-- Map goes here -->
+            <div id="modal-map-ctrl" class="col-lg-12"></div>
+            <!-- Map ends here -->
+            <div class="col-lg-12 text-right">
+                <button class="btn btn-info text-right" ng-click="modalVisibility()">OK</button>
             </div>
-            <div class="Popup_window form_style map_popup_iconActions" id="HomeDelivery_popup">
-                <div class="window_page Maping_popup">
-                    <span class="closeHomeDelivery" ng-click="closeHomeDeliverForm()">X</span>
-                    <form name="homeDeliverForm" ng-submit="homeDeliverForm.$valid && sendHomeDelivery()" novalidate>
-                        <h3 class="marB15px">Home Delivery</h3>
-                        <div class="col-md-12">
-                            <p style="margin-top:-7px;">
-                                Enter your Requirement (You do not need to submit your contacts numbers, instead we
-                                will send your EZE ID Card)
-                            </p>
-                        </div>
-                        <div class="form-group" style="float: left;">
-                            <textarea class="form-control fixTextArea emptyBox" name="homeDeliverMessage" ng-model="HomeDeliverMessage" placeholder="Type here" required></textarea>
-                        </div>
-                        <div class="form-group">
-                            <input type="submit" ng-disabled="!HomeDeliverMessage" class="btn btn-primary text_BoxHome" value="Send" />
-                            <input type="reset" ng-click="closeHomeDeliverForm()" class="btn btn-primary marR10px cancelEnq text_BoxHome" value="Close" />
-                        </div>
-                    </form>
-                </div>
-            </div>
-            <div class="Popup_window form_style map_popup_iconActions" id="ServiceRequest_popup">
-                <div class="window_page Maping_popup">
-                    <span class="closelink" ng-click="closeServiceRequestForm()">X</span>
-                    <form name="serviceRequestForm" ng-submit="serviceRequestForm.$valid && sendServiceRequest()" novalidate>
-                        <h3 class="marB15px">Service Request</h3>
-                        <div class="col-md-12">
-                            <p>
-                                Enter your Requirement (You do not need to submit your contacts numbers, instead we
-                                will send your EZE ID Card)
-                            </p>
-                        </div>
-                        <div class="form-group" style="float: left;">
-                            <textarea class="form-control fixTextArea emptyBox" name="serviceRequestMessage" ng-model="ServiceRequestMessage" placeholder="Type here" required></textarea>
-                        </div>
-                        <div class="form-group">
-                            <input type="submit" ng-disabled="!ServiceRequestMessage" class="btn btn-primary" value="Send" />
-                            <input type="reset" ng-click="closeServiceRequestForm()" class="btn btn-primary marR10px cancelEnq" value="Close" />
-                        </div>
-                    </form>
-                </div>
-            </div>
-            <div class="Popup_window form_style map_popup_iconActions" id="CV_popup">
-                <div class="window_page Maping_popup">
-                    <span class="closeCV" ng-click="closeCVForm()">X</span>
-                    <form name="cvRequestForm" novalidate>
-                        <h3 class="marB15px">CV Confirm</h3>
-                        <div class="col-md-12">
-                            Are you want to send your CV to Company
-                        </div><br /><br />
-
-                        <div class="form-group">
-                            <input type="button" class="btn btn-primary" ng-click="checkForCVAvailability()" value="Yes" />
-                            <input type="reset" ng-click="closeCVForm()" class="btn btn-primary marR10px cancelEnq" value="Close" />
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-            <div class="infoModal">
-                <modal showheader="false" mtitle="''" visible="showDetailsModal1" mclass="modalBox.class">
-                    <div class="row bottom-clearfix">&nbsp;</div>
-                    <div ng-hide="(SearchInfo.Redflagstatus == 1)">
-                        <div class="alert alert-warning" role="alert" ng-show="showNoticeText">
-                            <strong>Note: </strong> The business you are requesting has insufficient information and hence displaying the closest matching company.
-                        </div>
-                    </div>
-
-                    <section id="main-content">
-            <div class="row setRowLeftRightMarginZero text-center">
-                <div class="col-lg-5 col-md-5 col-sm-5 col-xs-12 setPaddingLeftRight0">
-                    <div class="row setRowLeftRightMarginZero">
-                        <div ng-hide="(SearchInfo.Redflagstatus == 1)">
-                            <div ng-show="SearchInfo.BannerImage">
-                                <img class="bannerContainerBorder" width="356px" height="356px" ng-src="{{SearchInfo.BannerImage}}" />
-
-                                <img class="imgLeft showPointer" ng-show="previousButton == true" ng-click="getPreviousBanner()" src="images/arrow_left.png" />
-                                <img class="imgRight showPointer" ng-show="nextButton == true" ng-click="getNextBanner()" src="images/arrow_right.png" />
-                            </div>
-                            <!-- <div class="text-center setPaddingLeftRight0 noticeTextContainer" ng-show="showNoticeText">
-                                 The business you are requesting has insufficient information and hence displaying the closest matching company.
-                             </div>-->
-                            <div ng-hide="SearchInfo.BannerImage">
-                                <img class="bannerContainerBorder" width="356px" height="356px" ng-src="images/new_banner.gif" />
-                            </div>
-                        </div>
-
-                        <div class="bannerContainerBorder newRedBanner" ng-show="(SearchInfo.Redflagstatus == 1)">
-                            <div class="row setRowLeftRightMarginZero searchProximityRange bewareTextSize" style="margin-top: 42%;">
-                                <b> BEWARE !!! </b>
-                            </div>
-                            <div class="row setRowLeftRightMarginZero searchProximityRange bewareTextMessage">
-                                This person is blacklisted due to violation of conduct
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-                <div class="col-lg-7 col-md-7 col-sm-7 col-xs-12 setPaddingLeftRight0">
-                    <div class="row setRowLeftRightMarginZero">
-                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setPaddingLeftRight0">
-                            <div ng-show="SearchInfo.Picture">
-                                <div ng-show="SearchInfo.IDTypeID == 1" class="row addItemRowUserEzeid1 marginTopBottom1">
-                                    <img class="profilePicBorder" width="148px" height="148px" ng-src="{{SearchInfo.Picture}}">
-                                </div>
-                                <div ng-hide="SearchInfo.IDTypeID == 1" class="row addItemRowUserEzeid1 marginTopBottom1">
-                                    <img class="profilePicBorder" width="315px" height="155px" ng-src="{{SearchInfo.Picture}}">
-                                </div>
-                            </div>
-                            <div ng-hide="SearchInfo.Picture">
-                                <div ng-show="SearchInfo.IDTypeID == 1" class="row addItemRowUserEzeid1">
-                                    <img class="profilePicBorder" width="148px" height="148px" ng-src="../images/new_individual.png">
-                                </div>
-                                <div ng-hide="SearchInfo.IDTypeID == 1" class="row addItemRowUserEzeid1">
-                                    <img class="profilePicBorder" width="315px" height="155px" ng-src="../images/business_profile_pic.png">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row setRowLeftRightMarginZero">
-                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setPaddingLeftRight0">
-                            <div class="row addItemRowUserEzeid">
-                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                    <span class="ezeidTitle"><b> {{SearchInfo.EZEID}} </b></span>
-                                </div>
-                            </div>
-
-                            <div ng-show="SearchInfo.CompanyName || SearchInfo.AboutCompany">
-                                <div class="row companyInfo searchButtonMarginSet">
-                                    <span><b>{{SearchInfo.CompanyName}} </b></span>
-                                </div>
-                                <div class="row centerAlign searchButtonMarginSet">
-                                    <span title="{{SearchInfo.AboutCompany}}">{{SearchInfo.AboutCompany}}</span>
-                                </div>
-                            </div>
-
-                            <div class="row centerAlign searchButtonMarginSet">
-                                {{ AddressForInfoTab }}
-                            </div>
-
-                            <div class="row centerAlign searchButtonMarginSet">
-                                <div class="row centerAlign searchButtonMarginSet">
-                                    {{SearchInfo.MobileNumber != '' ?  SearchInfo.ISDMobileNumber +'-'+ SearchInfo.MobileNumber + ' ' : ''}}{{SearchInfo.PhoneNumber != '' ? '| ' + SearchInfo.ISDPhoneNumber +'-'+ SearchInfo.PhoneNumber : ''}}
-                                </div>
-                                <div class="row centerAlign searchButtonMarginSet">
-                                    <a href="mailto:{{SearchInfo.EMailID}}" target="_blank">{{SearchInfo.EMailID +' '}}</a>  <span ng-show="SearchInfo.Website"> | <a target="_blank" href="http://{{SearchInfo.Website}}">{{' '+SearchInfo.Website}}</a> </span>
-                                </div>
-                            </div>
-
-                            <div class="row centerAlign searchButtonMarginSet">
-                                <div title="Working hours" class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer setLeftRightPaddingZero" ng-hide="(SearchInfo.IDTypeID == 1)">
-                                    <img src="../images/open_big.png" ng-click="openWorkingHourPopup()" ng-show="SearchInfo.OpenStatus==1">
-                                    <img src="../images/close_big.png" ng-click="openWorkingHourPopup()" ng-hide="SearchInfo.OpenStatus==1">
-                                </div>
-                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer setLeftRightPaddingZero" ng-hide="(SearchInfo.IDTypeID == 1)">
-                                    <div class="" ng-hide="SearchInfo.ParkingStatus==3">
-                                        <img title="{{parkingTitle}}" src="../images/parking_new.png">
-                                    </div>
-                                    <div class="" ng-show="SearchInfo.ParkingStatus==3">
-                                        <img title="{{parkingTitle}}" src="../images/new_no_parking.png">
-                                    </div>
-                                </div>
-                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setLeftRightPaddingZero">
-                                    <img title="Verified" ng-show="(SearchInfo.EZEIDVerifiedID == 2)" src="images/verified_32.png"/>
-                                    <img title="Not verified" ng-hide="(SearchInfo.EZEIDVerifiedID == 2)" src="images/not_verified_32.png"/>
-                                </div>
-                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 setLeftRightPaddingZero defaultRatingBox">
-                                    <div class="starRating">
-                                        <div>
-                                            <div>
-                                                <div>
-                                                    <div>
-                                                        <input id="rating1" disabled type="radio" name="form_rating" ng-model="form_rating" value="1">
-                                                        <label for="rating1"><span>1</span></label>
-                                                    </div>
-                                                    <input id="rating2" disabled type="radio" name="form_rating" ng-model="form_rating" value="2">
-                                                    <label for="rating2"><span>2</span></label>
-                                                </div>
-                                                <input id="rating3" disabled type="radio" name="form_rating" ng-model="form_rating" value="3">
-                                                <label for="rating3"><span>3</span></label>
-                                            </div>
-                                            <input id="rating4" disabled type="radio" name="form_rating" ng-model="form_rating" value="4">
-                                            <label for="rating4"><span>4</span></label>
-                                        </div>
-                                        <input id="rating5" disabled type="radio" name="form_rating" ng-model="form_rating" value="5">
-                                        <label for="rating5"><span>5</span></label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row setRowLeftRightMarginZero">
-                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setPaddingLeftRight0 searchHeaderAlignment newMsgButtonContainer" ng-hide="(SearchInfo.IDTypeID == 1)">
-                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setLeftRightPaddingZero">
-                        <a class="showPointer removePadding keyWordText boxMessaageBackgroun text-white"
-                           ng-href="{{SearchInfo.SalesURL}}"
-                           target="_blank"
-                           ng-show="SearchInfo.EZEIDVerifiedID == '2' && showSalesEnquiry == 1"
-                           title="Sales Enquiry"
-                           ng-click="(SearchInfo.SalesURL) ? '' : ($event.preventDefault())(_toggleSalesModal())">
-                            <img src="../images/new_sales_icon.png">
-                            Sales Enquiry
-                        </a>
-                    </div>
-                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setLeftRightPaddingZero">
-                        <a class="showPointer removePadding keyWordText boxMessaageBackgroun text-white"
-                           ng-href="{{SearchInfo.HomeDeliveryURL}}"
-                           target="_blank"
-                           ng-show="SearchInfo.EZEIDVerifiedID == '2' && showHomeDelivery == 1"
-                           title="Home Delivery"
-                           ng-click="(SearchInfo.HomeDeliveryURL) ? '' : ($event.preventDefault())(_toggleHomeDeliveryModal())">
-                            <img src="../images/new_home_delivery.png">
-                            Home Delivery
-                        </a>
-                    </div>
-                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setLeftRightPaddingZero">
-                        <a class="showPointer removePadding keyWordText boxMessaageBackgroun text-white"
-                           ng-href="{{SearchInfo.ReservationURL}}"
-                           target="_blank"
-                           ng-show="SearchInfo.EZEIDVerifiedID == '2' && shoReserVation == 1"
-                           title="Reservation"
-                           ng-click="(SearchInfo.ReservationURL) ? '' : ($event.preventDefault())(openReservationForm(SearchInfo.EZEID))">
-                            <img src="../images/new_reservations.png">
-                            Reservation
-                        </a>
-                    </div>
-                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setLeftRightPaddingZero">
-                        <a class="showPointer removePadding keyWordText boxMessaageBackgroun text-white"
-                           ng-href="{{SearchInfo.ServiceURL}}"
-                           target="_blank"
-                           ng-show="SearchInfo.EZEIDVerifiedID == '2' && showServiceRequest == 1"
-                           title="Support Request"
-                           ng-click="(SearchInfo.ServiceURL) ? '' : ($event.preventDefault())(_toggleServiceModal())">
-                            <img src="../images/new_service_request.png">
-                            Help Desk
-                        </a>
-                    </div>
-                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setLeftRightPaddingZero">
-                        <a class="showPointer removePadding keyWordText boxMessaageBackgroun text-white"
-                           ng-href="{{SearchInfo.CVURL}}"
-                           target="_blank"
-                           title="Send CV"
-                           ng-click="(SearchInfo.CVURL) ? '' : ($event.preventDefault())(_toggleResumeModal())"
-                           ng-show="SearchInfo.EZEIDVerifiedID == 2 && _userInfo.Type == 1 && showSendCv == 1">
-                            <img src="../images/new_send_cv.png">
-                            Send CV
-                        </a>
-                    </div>
-                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setLeftRightPaddingZero">
-                        <div class="showPointer removePadding keyWordText boxMessaageBackgroun"
-                             ng-click="getdirections(SearchInfo)" title="Map">
-                            <img src="../images/map_32.png">
-                            <span>Map</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 newMsgButtonContainer setPaddingLeftRight0 searchHeaderAlignment msgButtonContainer messageButtonContainer" ng-show="(SearchInfo.IDTypeID == 1)">
-                    <div class="showPointer removePadding keyWordText boxMessaageBackgroun pull-right"
-                         ng-click="getdirections(SearchInfo)" title="Map" class="boxMessaageBackgroun">
-                        <img src="../images/map_32.png">
-                        <span>Map</span>
-                    </div>
-                </div>
-            </div>
-            <div ng-show="companyTagLine">
-                <div ng-show="(SearchType == 2)" class="row setRowLeftRightMarginZero aboutcontainerFrame">
-                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setPaddingLeftRight0 text-center">
-                        <div class="row setRowLeftRightMarginZero text-center boxMessaageBackgroun">
-                            <span class="text-bolder">About Company</span>
-                        </div>
-                        <div class="row setRowLeftRightMarginZero aboutCompanyTextContainer">
-                            {{companyTagLine}}
-                        </div>
-                    </div>
-                </div>
-            </div>
-    </section>
-                 </modal>
-            </div>
-
-            <modal mtitle="'Working Hours'" visible="showWorkingHourModel" class="workingHours">
-                <div class="container-fluid">
-                    <div class="row">
-                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                            <div class="row">
-                                <table class="panel panel-default" border="1" st-table="rowCollection" class="table table-striped">
-                                    <thead>
-                                    <tr style="background:#2791BA; color:#000000;">
-                                        <th class="panelPd5px eze_idSize leftBlackBorder rightBlackBorder">Mon</th>
-                                        <th class="panelPd5px name_size rightBlackBorder">Tue</th>
-                                        <th class="panelPd5px city_size rightBlackBorder">Wed</th>
-                                        <th class="panelPd5px city_size rightBlackBorder">Thu</th>
-                                        <th class="panelPd5px city_size rightBlackBorder">Fri</th>
-                                        <th class="panelPd5px city_size rightBlackBorder">Sat</th>
-                                        <th class="panelPd5px dateeze_size rightBlackBorder">Sun</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    <tr>
-                                        <td class="panelPd5px" ng-class=" !Mo1.length ? 'emptyCell' : ''">{{Mo1}}</td>
-                                        <td class="panelPd5px" ng-class=" !Tu1.length ? 'emptyCell' : ''">{{Tu1}}</td>
-                                        <td class="panelPd5px" ng-class=" !We1.length ? 'emptyCell' : ''">{{We1}}</td>
-                                        <td class="panelPd5px" ng-class=" !Th1.length ? 'emptyCell' : ''">{{Th1}}</td>
-                                        <td class="panelPd5px" ng-class=" !Fr1.length ? 'emptyCell' : ''">{{Fr1}}</td>
-                                        <td class="panelPd5px" ng-class=" !Sa1.length ? 'emptyCell' : ''">{{Sa1}}</td>
-                                        <td class="panelPd5px" ng-class=" !Su1.length ? 'emptyCell' : ''">{{Su1}}</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="panelPd5px" ng-class=" !Mo2.length ? 'emptyCell' : ''">{{Mo2}}</td>
-                                        <td class="panelPd5px" ng-class=" !Tu2.length ? 'emptyCell' : ''">{{Tu2}}</td>
-                                        <td class="panelPd5px" ng-class=" !We2.length ? 'emptyCell' : ''">{{We2}}</td>
-                                        <td class="panelPd5px" ng-class=" !Th2.length ? 'emptyCell' : ''">{{Th2}}</td>
-                                        <td class="panelPd5px" ng-class=" !Fr2.length ? 'emptyCell' : ''">{{Fr2}}</td>
-                                        <td class="panelPd5px" ng-class=" !Sa2.length ? 'emptyCell' : ''">{{Sa2}}</td>
-                                        <td class="panelPd5px" ng-class=" !Su2.length ? 'emptyCell' : ''">{{Su2}}</td>
-                                    </tr>
-                                    <tr>
-                                        <td style="background: #bfbfbf; color: #000000; height: 15px;" colspan="7">
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="panelPd5px" ng-class=" !Mo3.length ? 'emptyCell' : ''">{{Mo3}}</td>
-                                        <td class="panelPd5px" ng-class=" !Tu3.length ? 'emptyCell' : ''">{{Tu3}}</td>
-                                        <td class="panelPd5px" ng-class=" !We3.length ? 'emptyCell' : ''" >{{We3}}</td>
-                                        <td class="panelPd5px" ng-class=" !Th3.length ? 'emptyCell' : ''" >{{Th3}}</td>
-                                        <td class="panelPd5px" ng-class=" !Fr3.length ? 'emptyCell' : ''" >{{Fr3}}</td>
-                                        <td class="panelPd5px" ng-class=" !Sa3.length ? 'emptyCell' : ''" >{{Sa3}}</td>
-                                        <td class="panelPd5px" ng-class=" !Su3.length ? 'emptyCell' : ''">{{Su3}}</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="panelPd5px" ng-class=" !Mo4.length ? 'emptyCell' : ''">{{Mo4}}</td>
-                                        <td class="panelPd5px" ng-class=" !Tu4.length ? 'emptyCell' : ''">{{Tu4}}</td>
-                                        <td class="panelPd5px" ng-class=" !We4.length ? 'emptyCell' : ''" >{{We4}}</td>
-                                        <td class="panelPd5px" ng-class=" !Th4.length ? 'emptyCell' : ''">{{Th4}}</td>
-                                        <td class="panelPd5px" ng-class=" !Fr4.length ? 'emptyCell' : ''">{{Fr4}}</td>
-                                        <td class="panelPd5px" ng-class=" !Sa4.length ? 'emptyCell' : ''" >{{Sa4}}</td>
-                                        <td class="panelPd5px" ng-class=" !Su4.length ? 'emptyCell' : ''" >{{Su4}}</td>
-                                    </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div class="row keyWordText" >
-                                <h4>Holidays</h4>
-                            </div>
-                            <div class="row keyWordText">
-                                <div style="height: 30px; overflow-y:hidden;">
-                                    <table class="setWidthHundred" border="1" style="width: 100%">
-                                        <thead>
-                                        <tr class="tableHeaderBackground">
-                                            <th style="width: 25%" class="panelPd5px leftBlackBorder rightBlackBorder holidayDateCol">Date</th>
-                                            <th style="width: 75%" class="panelPd5px name_size rightBlackBorder holidayCalender">Holiday Purpose</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        <tr>
-                                            <td class="panelPd5px" style="width: 25%; text-align: left;"></td>
-                                            <td class="panelPd5px" style="width: 75%; text-align: left;"></td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                                <div style="height:160px; overflow-y:scroll;">
-                                    <table class="setWidthHundred" border="1" style="width: 100%">
-                                        <tbody>
-                                        <tr ng-repeat="_item in holiday">
-                                            <td class="panelPd5px" style="width: 25%; text-align: left;">{{_item.HolidayDate}}</td>
-                                            <td class="panelPd5px" style="width: 72.5%; text-align: left;">{{_item.HolidayTitle}}</td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                            <div ui-calendar="uiConfig.calendar" class="span8 calendar" ng-model="eventSources"></div>
-                        </div>
-                    </div>
-                </div>
-            </modal>
-
-            <!---- Modal box for information details ends hear  ---->
         </div>
+    </modal>
+</section>
+
+<!-- Search result wrapper -->
+<section id="search-result-wrapper" class="hpw srw">
+    <div class="metro-ui-wrapper">
+        <!-- main-tiles-frame -->
+        <div class="main-tiles-frame tile-frame-paddisg-top font-roboto">
+            <!-- All such results goes here -->
+            <!-- <div class="row p-top-30" sg-hide="showDownloadLink">-->
+            <div class="row search-result-page-padding">
+
+                <!-- Maps goes here -->
+                <div id="map-ctrl" class="col-lg-12" ng-show="searchListMapFlag"></div>
+                <!-- Maps ends here -->
 
 
-    </section>
+                <!-- FLIPPING TILES Start Here =======================================-->
 
-    <!-- Search result wrapper -->
-    <section id="search-result-wrapper" class="hpw srw">
-        <div class="metro-ui-wrapper">
-            <!-- main-tiles-frame -->
-            <div class="main-tiles-frame tile-frame-paddisg-top font-roboto">
-                <!-- All such results goes here -->
-                <!-- <div class="row p-top-30" sg-hide="showDownloadLink">-->
-                <div class="row search-result-page-padding">
-
-                    <!-- Maps goes here -->
-                    <div id="map-ctrl" class="col-lg-12" ng-show="searchListMapFlag"></div>
-                    <!-- Maps ends here -->
+                <!-- Flipping tiles starts here -->
+                <div class="filppisg-tiles t1"  ng-hide="searchListMapFlag && !showDownloadLink" >
+                    <div class="master-tile">
+                        <div class="mobile-parent-tile flip row p-top-10">
 
 
-                    <!-- FLIPPING TILES Start Here =======================================-->
+                            <!-- Here Goes the Individual Tiles -->
 
-                    <!-- Flipping tiles starts here -->
-                    <div class="filppisg-tiles t1"  ng-hide="searchListMapFlag && !showDownloadLink" >
-                        <div class="master-tile">
-                            <div class="mobile-parent-tile flip row p-top-10">
+                            <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12 flip-card bottom-clearfix pointer" ng-init="color = random();tempVal = $index"
+                                 ng-click="redirectFullPage(params.searchType,search.TID)" ng-repeat="search in searchListData track by $index">
 
-
-                                <!-- Here Goes the Individual Tiles -->
-
-                                <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12 flip-card bottom-clearfix pointer" ng-init="color = random();tempVal = $index"
-                                     ng-click="redirectFullPage(params.searchType,search.TID)" ng-repeat="search in searchListData track by $index">
-
-                                    <!-- Initial Tile goes here[FRONT] -->
-                                    <div class="text-center text-white front height-128" ng-class="color">
-                                        <!-- Row 1 -->
-                                        <div class="tile-row-1 p-5">
-                                            <div class="col-lg-4 col-md-6 col-sm-6 col-xs-6 text-left text-0-8">
-                                                {{distanceFilter(search.distance)}} Km
-                                            </div>
-                                            <div class="col-lg-8 col-md-6 col-sm-6 col-xs-6 text-right">
-                                                <p class="text-bolder text-uppercase">{{search.EZEID}}</p>
-                                            </div>
+                                <!-- Initial Tile goes here[FRONT] -->
+                                <div class="text-center text-white front height-128" ng-class="color">
+                                    <!-- Row 1 -->
+                                    <div class="tile-row-1 p-5">
+                                        <div class="col-lg-4 col-md-6 col-sm-6 col-xs-6 text-left text-0-8">
+                                            {{distanceFilter(search.distance)}} Km
                                         </div>
-                                        <!-- Row 2 -->
-                                        <div class="tile-row-2">
-                                            <p class="text-bolder">{{search.CompanyName != ''?search.CompanyName:'___'}}</p>
-                                            <hr class="style-two">
-                                            <small>
+                                        <div class="col-lg-8 col-md-6 col-sm-6 col-xs-6 text-right">
+                                            <p class="text-bolder text-uppercase">{{search.EZEID}}</p>
+                                        </div>
+                                    </div>
+                                    <!-- Row 2 -->
+                                    <div class="tile-row-2">
+                                        <p class="text-bolder">{{search.CompanyName != ''?search.CompanyName:'___'}}</p>
+                                        <hr class="style-two">
+                                        <small>
+                                            <!-- Mobile Number -->
+                                            {{(search.MobileNumber.trim() && search.MobileNumber !== 'null')?search.CountryCode+' '+search.MobileNumber:'&nbsp;'}}
+                                            <!-- Seperator -->
+                                            <i class="{{((search.MobileNumber.trim() && search.MobileNumber !== 'null') && (search.PhoneNumber.trim() && search.PhoneNumber !== 'null'))?'fa fa-minus fa-rotate-90 text-info':''}}"></i>
+                                            <!-- Telephone Number -->
+                                            {{(search.PhoneNumber.trim() && search.PhoneNumber !== 'null')?search.CountryCode+' '+search.PhoneNumber:''}}
+                                        </small>
+                                    </div>
+                                    <!-- Row 3 -->
+                                    <div class="row white p-top-10 no-margin">
+                                        <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1">
+                                            <i class="si si si-big" ng-class="search.OpenStatus == 2?'si-closed':'si-open'"></i>
+                                        </div>
+                                        <div class="col-lg-1  col-md-1 col-sm-1 col-xs-1">
+                                            <i class="si si si-big" ng-class="search.ParkingStatus == 2?'si-parkisg-no':'si-parking'"></i>
+                                        </div>
+                                        <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1">
+                                            <i class="si si si-big" ng-class="search.EZEIDVerifiedID == 2?'si-verified-document':'si-not-verified-document'"></i>
+                                        </div>
+                                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+
+                                            <i ng-repeat="n in [1,2,3,4,5] track by $index"  class="fa fa-star" ng-class="($index < search.Rating)?'text-info':''"></i>
+
+                                        </div>
+                                        <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1">
+                                            <i class="si si-big" ng-class="checkBoxStatus[tempVal]?'si-verified':'si-checkbox-unchecked'"></i>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+
+                                <!-- On-Hover Tile Goes here[BACK] -->
+                                <div class="textbox back metro-bg-default no-box-shadow text-white height-128">
+
+                                    <div class="flip-tile-row-1 p-top-10">
+                                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 text-left" ng-click="$event.stopPropagation()">
+                                            <i ng-click="showDirectionMapPopup(search.Latitude,search.Longitude,search.IDTypeID)" title="directions" class="fa fa-map-marker direction-btn"></i>
+                                        </div>
+                                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 text-right" ng-click="$event.stopPropagation()">
+                                            <input data-tid="{{search.MasterID}}" data-id="{{tempVal}}" type="checkbox" class="result-checkbox" name="companyID" ng-click="toggleCheckbox($event)" />
+                                        </div>
+                                    </div>
+                                    <div class="flip-tile-row-2 p-top-10">
+                                        <div class="col-lg-12 text-center">
+                                            <small>{{search.TagLine | truncate:40}}</small>
+                                            <br>
+                                            <small title="{{search.AddressLine1+', '+search.AddressLine2+', '+search.city}}">{{makeAddress(search.AddressLine1,search.AddressLine2,search.city)}}</small>
+                                            <p> <small>
                                                 <!-- Mobile Number -->
-                                                {{(search.MobileNumber.trim() && search.MobileNumber !== 'null')?search.CountryCode+' '+search.MobileNumber:'&nbsp;'}}
+                                                {{(search.MobileNumber.trim() && search.MobileNumber !== 'null')?search.CountryCode+' '+search.MobileNumber:''}}
                                                 <!-- Seperator -->
                                                 <i class="{{((search.MobileNumber.trim() && search.MobileNumber !== 'null') && (search.PhoneNumber.trim() && search.PhoneNumber !== 'null'))?'fa fa-minus fa-rotate-90 text-info':''}}"></i>
                                                 <!-- Telephone Number -->
-                                                {{(search.PhoneNumber.trim() && search.PhoneNumber !== 'null')?search.CountryCode+' '+search.PhoneNumber:''}}
-                                            </small>
-                                        </div>
-                                        <!-- Row 3 -->
-                                        <div class="row white p-top-10 no-margin">
-                                            <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1">
-                                                <i class="si si si-big" ng-class="search.OpenStatus == 2?'si-closed':'si-open'"></i>
-                                            </div>
-                                            <div class="col-lg-1  col-md-1 col-sm-1 col-xs-1">
-                                                <i class="si si si-big" ng-class="search.ParkingStatus == 2?'si-parkisg-no':'si-parking'"></i>
-                                            </div>
-                                            <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1">
-                                                <i class="si si si-big" ng-class="search.EZEIDVerifiedID == 2?'si-verified-document':'si-not-verified-document'"></i>
-                                            </div>
-                                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
-
-                                                <i ng-repeat="n in [1,2,3,4,5] track by $index"  class="fa fa-star" ng-class="($index < search.Rating)?'text-info':''"></i>
-
-                                            </div>
-                                            <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1">
-                                                <i class="si si-big" ng-class="checkBoxStatus[tempVal]?'si-verified':'si-checkbox-unchecked'"></i>
-                                            </div>
+                                                {{(search.PhoneNumber.trim() && search.PhoneNumber !== 'null')?search.CountryCode+' '+search.PhoneNumber:''}}</small></p>
                                         </div>
                                     </div>
+                                    <div class="flip-tile-row-3 p-5 text-center" ng-click="$event.stopPropagation()">
+                                        <button ng-show="search.IDTypeID == 2 && search.EZEIDVerifiedID == 2 && search.VisibleModules[0] == 1"
+                                                class="btn btn-default btn-xs" ng-click="redirectFullPage(params.searchType,search.TID,true)">
+                                            <i class="fa fa-user"></i> Sales
+                                        </button>
+                                        <button ng-show="search.IDTypeID == 2 && search.EZEIDVerifiedID == 2 && search.VisibleModules[2] == 1"
+                                                class="btn btn-default btn-xs" ng-click="redirectFullPage(params.searchType,search.TID,false,false,true)">
+                                            <i class="fa fa-truck"></i> Home Delivery
+                                        </button>
+                                        <button ng-show="search.IDTypeID == 2 && search.EZEIDVerifiedID == 2 && search.VisibleModules[3] == 1"
+                                                class="btn btn-default btn-xs" ng-click="redirectFullPage(params.searchType,search.TID,false,false,false,true)">
+                                            <i class="fa fa-gears"></i> Help Desk
+                                        </button>
 
-
-
-                                    <!-- On-Hover Tile Goes here[BACK] -->
-                                    <div class="textbox back metro-bg-default no-box-shadow text-white height-128">
-
-                                        <div class="flip-tile-row-1 p-top-10">
-                                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 text-left" ng-click="$event.stopPropagation()">
-                                                <i ng-click="showDirectionMapPopup(search.Latitude,search.Longitude,search.IDTypeID)" title="directions" class="fa fa-map-marker direction-btn"></i>
-                                            </div>
-                                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 text-right" ng-click="$event.stopPropagation()">
-                                                <input data-tid="{{search.MasterID}}" data-id="{{tempVal}}" type="checkbox" class="result-checkbox" name="companyID" ng-click="toggleCheckbox($event)" />
-                                            </div>
-                                        </div>
-                                        <div class="flip-tile-row-2 p-top-10">
-                                            <div class="col-lg-12 text-center">
-                                                <small>{{search.TagLine | truncate:40}}</small>
-                                                <br>
-                                                <small title="{{search.AddressLine1+', '+search.AddressLine2+', '+search.city}}">{{makeAddress(search.AddressLine1,search.AddressLine2,search.city)}}</small>
-                                                <p> <small>
-                                                    <!-- Mobile Number -->
-                                                    {{(search.MobileNumber.trim() && search.MobileNumber !== 'null')?search.CountryCode+' '+search.MobileNumber:''}}
-                                                    <!-- Seperator -->
-                                                    <i class="{{((search.MobileNumber.trim() && search.MobileNumber !== 'null') && (search.PhoneNumber.trim() && search.PhoneNumber !== 'null'))?'fa fa-minus fa-rotate-90 text-info':''}}"></i>
-                                                    <!-- Telephone Number -->
-                                                    {{(search.PhoneNumber.trim() && search.PhoneNumber !== 'null')?search.CountryCode+' '+search.PhoneNumber:''}}</small></p>
-                                            </div>
-                                        </div>
-                                        <div class="flip-tile-row-3 p-5 text-center" ng-click="$event.stopPropagation()">
-                                            <button ng-show="search.IDTypeID == 2 && search.EZEIDVerifiedID == 2 && search.VisibleModules[0] == 1"
-                                                    class="btn btn-default btn-xs" ng-click="redirectFullPage(params.searchType,search.TID,true)">
-                                                <i class="fa fa-user"></i> Sales
-                                            </button>
-                                            <button ng-show="search.IDTypeID == 2 && search.EZEIDVerifiedID == 2 && search.VisibleModules[2] == 1"
-                                                    class="btn btn-default btn-xs" ng-click="redirectFullPage(params.searchType,search.TID,false,false,true)">
-                                                <i class="fa fa-truck"></i> Home Delivery
-                                            </button>
-                                            <button ng-show="search.IDTypeID == 2 && search.EZEIDVerifiedID == 2 && search.VisibleModules[3] == 1"
-                                                    class="btn btn-default btn-xs" ng-click="redirectFullPage(params.searchType,search.TID,false,false,false,true)">
-                                                <i class="fa fa-gears"></i> Help Desk
-                                            </button>
-
-                                        </div>
                                     </div>
-                                    <!-- Warning: Don't change the function[responsible for flipping tiles] -->
-                                    <div ng-init="($index == searchListData.length -1) ? flipping_card() : ''"></div>
-
                                 </div>
-                                <!-- Individual Tiles ends here -->
+                                <!-- Warning: Don't change the function[responsible for flipping tiles] -->
+                                <div ng-init="($index == searchListData.length -1) ? flipping_card() : ''"></div>
 
                             </div>
+                            <!-- Individual Tiles ends here -->
+
                         </div>
                     </div>
-                    <!-- flipping tiles ends here -->
-
-                    <!-- FLIPPING TILES ENDS -->
                 </div>
+                <!-- flipping tiles ends here -->
+
+                <!-- FLIPPING TILES ENDS -->
             </div>
-            <!-- main-tiles-frame-ends -->
         </div>
+        <!-- main-tiles-frame-ends -->
+    </div>
 
-    </section>
-    <!-- Footer goes here -->
+</section>
+<!-- Footer goes here -->
 
-    <!-- Calling Flipping-card : For executing flipping post-DOM rendering -->
-    <footer-section></footer-section>
+<!-- Calling Flipping-card : For executing flipping post-DOM rendering -->
+<footer-section></footer-section>
 </div>

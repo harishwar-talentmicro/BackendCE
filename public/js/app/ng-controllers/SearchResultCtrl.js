@@ -44,8 +44,9 @@ var res = angular.module('ezeidApp').
             GoogleMap,
             $route,
             UtilityService
-        )
+            )
         {
+            $scope.resultPerPage = 20;
             var selectAll = false;
             var isResultNumber = 1; /* 1: Results,0:no results */
             var coordinatesArr = [];
@@ -61,13 +62,6 @@ var res = angular.module('ezeidApp').
 
             $scope.activeTemplate = "";
             $scope.showMapPopupModel = false;
-            $scope.showDetailsModal1 = false;
-
-            var AutoRefresh = false;
-            var currentBanner = 1;
-            var Miliseconds = 8000;
-            var RefreshTime = Miliseconds;
-            var destroyModalDetailsWatcher = null;
 
             $scope.modalBox = {
                 title : 'EZEID Map',
@@ -80,7 +74,6 @@ var res = angular.module('ezeidApp').
                 $scope.searchStars[index] = !$scope.searchStars[index];
             }
 
-
             /* dummy array for creating star rating STARS */
             $scope.searchStarArr = [
                 ["a"],
@@ -90,6 +83,8 @@ var res = angular.module('ezeidApp').
                 ["a","b","c","d","e"],
             ];
 
+
+
             var placeHolder = [
                 "Type EZEID here",
                 "Type keywords to locate products and services",
@@ -98,42 +93,8 @@ var res = angular.module('ezeidApp').
             var searchTypeArr = ["EZEID", "Keywords", "Job Keywords"];
 
             $scope.searchType = searchTypeArr;
+
             $scope.placeHolderText = placeHolder;
-
-            /**
-             * Function for converting LOCAL time (local timezone) to server time
-             */
-            var convertTimeToUTC = function(localTime,dateFormat){
-                if(!dateFormat){
-                    dateFormat = 'DD-MMM-YYYY hh:mm A';
-                }
-                return moment(localTime).utc().format(dateFormat);
-            };
-
-            /**
-             * Function for converting UTC time from server to LOCAL timezone
-             */
-            var convertTimeToLocal = function(timeFromServer,dateFormat,returnFormat){
-                if(!dateFormat){
-                    dateFormat = 'DD-MMM-YYYY hh:mm A';
-                }
-                if(!returnFormat){
-                    returnFormat = dateFormat;
-                }
-                var x = new Date(timeFromServer);
-                var mom1 = moment(x);
-                return mom1.add((mom1.utcOffset()),'m').format(returnFormat);
-            };
-
-            function selectedTimeUtcToLocal(selectedTime)
-            {
-                var x = new Date();
-                var today = moment(x.toISOString()).utc().format('DD-MMM-YYYY');
-
-                var currentTaskDate = moment(today+' '+selectedTime).format('DD-MMM-YYYY H:mm');
-                return convertTimeToLocal(currentTaskDate,'DD-MMM-YYYY H:mm',"H:mm");
-            }
-
 
             /* convert star ratings to comma seperated string */
             $scope.getSearchStars = function()
@@ -153,8 +114,7 @@ var res = angular.module('ezeidApp').
             $scope.$emit('$preLoaderStart');
 
             //To Call current url, after login from current page
-            if($rootScope._userInfo)
-            {
+            if($rootScope._userInfo){
                 if(!$rootScope._userInfo.IsAuthenticate){
                     var unregister = $rootScope.$watch('_userInfo',function(newVal,oldVal){
                         if(newVal){
@@ -177,6 +137,7 @@ var res = angular.module('ezeidApp').
             }
             $scope.changeOpenStatus = function()
             {
+
                 $scope.params.openStatus = $scope.params.openStatus == 0?1:0;
             }
             $scope.changeHomeDelivery = function()
@@ -210,21 +171,14 @@ var res = angular.module('ezeidApp').
             {
                 $scope.showDownloadLink = false;
                 $scope.showLoginText = false;
-
+                // To get search key result
                 getSearchKeyWord($scope.params);
-
-                console.log($scope.params);
-
-                if(($scope.params.TID) && ($scope.params.TID != 0))
-                {
-                    //call for search information
-                    $scope.TID = $scope.params.TID;
-
-                    getSearchInformation($scope.params.TID,$scope.params.searchType);
-                }
             }
 
-            // find out range of the ratings
+            /* // To get search key result
+             getSearchKeyWord($scope.params);*/
+
+            //find out range of the ratings
             var initialVal = $routeParams.rating[0]?$routeParams.rating[0]:1;
             var finalVal = 5;
             for(var i=0; i < $routeParams.rating.length; i++)
@@ -235,9 +189,28 @@ var res = angular.module('ezeidApp').
             var initial = initialVal;
             var final = finalVal;
 
+
             //Below function is for getting key word search result
-            function getSearchKeyWord(_filterValue)
+            function getSearchKeyWord(_filterValue,isTotalNumberRequired)
             {
+                var defer = $q.defer();
+                /* check for the flag [isTotalNumberRequired] */
+                var total = 0;
+                var totalStatus = false;
+                /* setting the parameters for getting the total number of result */
+                if(typeof(isTotalNumberRequired) != undefined && isTotalNumberRequired > 0)
+                {
+                    totalStatus = true;
+                    total = 1;/* It would only fetch the total result */
+                }
+
+                /* setting the parameter for implementing pagination */
+                var pagecount = 0;
+                if($scope.currentStartResultId > 0)
+                {
+                    pagecount = $scope.currentStartResultId;
+                }
+
                 $scope.showDownloadLink = false;
                 var today = moment().format('YYYY-MM-DD HH:mm:ss');
                 var CurrentDate = UtilityService.convertTimeToUTC(today);
@@ -248,7 +221,6 @@ var res = angular.module('ezeidApp').
                 {
                     $rootScope._userInfo.Token = 2;
                 }
-
                 /* set the value of the search term */
                 $scope.defaultSearchTerm = _filterValue.searchTerm;
                 $scope.$emit('$preLoaderStart');
@@ -264,76 +236,82 @@ var res = angular.module('ezeidApp').
                     OpenStatus:_filterValue.openStatus,
                     Rating:_filterValue.rating,
                     HomeDelivery:_filterValue.homeDelivery,
-                    isPagination:0,
-                    pagesize:0,
-                    pagecount:0,
-                    total:0,
-                    CurrentDate:convertTimeToUTC(CurrentDate,'YYYY-MM-DD HH:mm:ss')
-
+                    CurrentDate:CurrentDate,
+                    total:total,
+                    pagecount:pagecount,
+                    isPagination:1,
+                    pagesize:$scope.resultPerPage
                 } }).success(function (data) {
-                     if(!$scope.TID)
-                     {
-                         $rootScope.$broadcast('$preLoaderStop');
-                     }
-
-                    /* put the maps coordinates in array */
-                    $scope.coordinatesArr = [];
-                    /* count the result */
-                    var count = 0;
-                    if(data != 'null'){
-                        var link = '';
-                        var searchType = $routeParams.searchType;
-                        for(var i=0; i<data.length; i++)
+                        $rootScope.$broadcast('$preLoaderStop');
+                        /* just return the result if only the total result have been demanded */
+                        if(totalStatus)
                         {
-                            count++;
-                            link = "/searchDetails?searchType="+searchType+"&TID="+data[i].TID;
-                            coordinates.push([data[i].Latitude,data[i].Longitude,data[i].CompanyName,link]);
-                            $scope.checkBoxStatus.push(false);
+                            $scope.totalResult = data[0].Count;
+                            defer.resolve();
+                            return defer.promise;
                         }
-                        $scope.coordinatesArr = coordinates;
-                    }
-                    $scope.searchCount = count;
+                        /* put the maps coordinates in array */
+                        $scope.coordinatesArr = [];
+                        /* count the result */
+                        var count = 0;
+                        //////console.log(data);
+                        if(data != 'null'){
+                            var link = '';
+                            var searchType = $routeParams.searchType;
+                            for(var i=0; i<data.length; i++)
+                            {
+                                count++;
+                                link = "/searchDetails?searchType="+searchType+"&TID="+data[i].TID;
+                                coordinates.push([data[i].Latitude,data[i].Longitude,data[i].CompanyName,link]);
+                                $scope.checkBoxStatus.push(false);
+                            }
+                            $scope.coordinatesArr = coordinates;
+                        }
+                        $scope.searchCount = count;
 
-                    /* status to check if there is some result */
-                    $scope.isResultNumber = (data == 'null') ?0 : 1;
+                        /* status to check if there is some result */
+                        $scope.isResultNumber = (data == 'null') ?0 : 1;
 
-                    $scope.searchListData = (data == 'null') ? [] : data;
-                    if (data != 'null' && data.length>0)
-                    {
-                        $scope.SearchResultCount = data.length;
-                        $window.localStorage.setItem("searchResult", JSON.stringify(data));
-                        if(data[0].Filename)
+                        $scope.searchListData = (data == 'null') ? [] : data;
+                        if (data != 'null' && data.length>0)
                         {
-                            if(($rootScope._userInfo.IsAuthenticate == true) && (data[0].IDTypeID == 1))
+                            $scope.SearchResultCount = data.length;
+                            $window.localStorage.setItem("searchResult", JSON.stringify(data));
+                            if(data[0].Filename)
                             {
-                                $scope.showDownloadLink = true;
-                                $scope.downloadData = data[0];
+                                if(($rootScope._userInfo.IsAuthenticate == true) && (data[0].IDTypeID == 1))
+                                {
+                                    $scope.showDownloadLink = true;
+                                    $scope.downloadData = data[0];
 
-                                var downloadUrl = "/ewtGetSearchDocuments?Token="+$rootScope._userInfo.Token+"&&Keywords="+_filterValue.searchTerm;
-                                $window.open(downloadUrl, '_blank');
+                                    var downloadUrl = "/ewtGetSearchDocuments?Token="+$rootScope._userInfo.Token+"&&Keywords="+_filterValue.searchTerm;
+                                    $window.open(downloadUrl, '_blank');
+                                }
+                                else
+                                {
+                                    //Redirect to Login page
+                                    $('#SignIn_popup').slideDown();
+                                    $rootScope.defer = $q.defer();
+                                    var prom = $rootScope.defer.promise;
+                                    prom.then(function(d){
+                                    });
+                                }
+                                $scope.searchListData = null;
+                                $scope.searchCount = 0;
                             }
-                            else
-                            {
-                                //Redirect to Login page
-                                $('#SignIn_popup').slideDown();
-                                $rootScope.defer = $q.defer();
-                                var prom = $rootScope.defer.promise;
-                                prom.then(function(d){
-                                });
-                            }
-                            $scope.searchListData = null;
-                            $scope.searchCount = 0;
                         }
-                    }
-                    /* put a little delay */
-                    $timeout(function(){
-                       // $scope.$emit('$preLoaderStop');
-                    },1500);
+                        /* put a little delay */
+                        $timeout(function(){
+                            $scope.$emit('$preLoaderStop');
 
-                }).error(function(){
-                    Notification.error({ message : 'An error occurred', delay : MsgDelay});
-                    $scope.$emit('$preLoaderStop');
-                });
+                        },1500);
+                        defer.resolve();
+                    }).error(function(){
+                        Notification.error({ message : 'An error occurred', delay : MsgDelay});
+                        $scope.$emit('$preLoaderStop');
+                        defer.resolve();
+                    });
+                return defer.promise;
             }
 
             /**
@@ -366,7 +344,6 @@ var res = angular.module('ezeidApp').
                 /* update the coordinates */
                 $scope.params.lat = $rootScope.coordinatesLat;
                 $scope.params.lng = $rootScope.coordinatesLng;
-                $scope.params.TID = 0;
 
                 var modifyValue = [
                     'homeDelivery',
@@ -676,91 +653,24 @@ var res = angular.module('ezeidApp').
                     }
                 }
                 else{
-                        var index = $scope.selectedList.indexOf(val);
-                        $scope.selectedList.splice(index,1);
+                    var index = $scope.selectedList.indexOf(val);
+                    $scope.selectedList.splice(index,1);
 
-                        if($scope.selectedList.length === $scope.searchResult.length)
-                        {
-                            $scope._selectAll = true;
-                        }
-                        else
-                        {
-                            $scope._selectAll = false;
-                        }
+                    if($scope.selectedList.length === $scope.searchResult.length)
+                    {
+                        $scope._selectAll = true;
                     }
+                    else
+                    {
+                        $scope._selectAll = false;
+                    }
+                }
                 $scope.selectAll = $scope._selectAll;
             };
 
             $rootScope.$on('$locationChangeStart',function(){
                 $window.localStorage.setItem("selectedTids", JSON.stringify($scope.selectedList));
             });
-
-            /*open detail information popup*/
-            $scope.openDetailInfoBox = function(_tid)
-            {
-                $scope.SearchInfo = {};
-                $scope.nextButton = true;
-                $scope.previousButton =  true;
-
-                $scope.activeTemplate = "";
-                $scope.showWorkingHourModel = false;
-                $scope.showMapPopupModel = false;
-                $scope.showDetailsModal = false;
-                $scope.showNoticeText = true;
-                $scope.form_rating = 0;
-                $scope.showLoginText = false;
-                $scope.showNotFound = false;
-                $scope.showDetailsModal1 = false;
-
-                if(($routeParams.searchType == 1) && (!$rootScope._userInfo.IsAuthenticate))
-                {
-                    $scope.showLoginText = true;
-                    $scope.$emit('$preLoaderStop');
-                    Notification.error({ message : 'Please login to search for EZEID', delay : MsgDelay});
-                }
-                else
-                {
-                    // $scope.showLoginText = false;
-
-                  /*  var ams = {
-                        searchType: $routeParams.searchType,
-                        TID: _tid,
-                        searchTerm: $routeParams.searchTerm,
-                        proximity: $routeParams.proximity,
-                        rating: $routeParams.rating,
-                        homeDelivery: $routeParams.homeDelivery,
-                        parkingStatus: $routeParams.parkingStatus,
-                        openStatus: $routeParams.openStatus,
-                        lat: $routeParams.lat,
-                        lng: $routeParams.lng
-                    };
-
-                    console.log("sai555");
-                    console.log(ams);
-
-                    $routeParams = ams;
-
-                    console.log("sai888");
-                    console.log($routeParams);*/
-
-                  //  getSearchInformation(_tid,$routeParams.searchType);
-
-
-                     var params = '?searchType='+$routeParams.searchType+'&TID='+_tid;
-                     params += '&searchTerm='+$routeParams.searchTerm;
-                     params += '&proximity='+$routeParams.proximity;
-                     params += '&rating='+$routeParams.rating;
-                     params += '&homeDelivery='+$routeParams.homeDelivery;
-                     params += '&parkingStatus='+$routeParams.parkingStatus;
-                     params += '&openStatus='+$routeParams.openStatus;
-                     params += '&lat='+$routeParams.lat;
-                     params += '&lng='+$routeParams.lng;
-
-                     $location.url('/searchResult'+params);
-                }
-
-
-            }
 
             /* redirect to full details page */
             $scope.redirectFullPage = function(searchType,tid,sales,reservation,homeDelivery,service,resume)
@@ -784,8 +694,8 @@ var res = angular.module('ezeidApp').
                 else if(resume){
                     params += '&resume=true';
                 }
-                $scope.showDetailsModal1 = true;
-                // $location.url('/searchDetails'+params);
+
+                $location.url('/searchDetails'+params);
             }
 
             /**
@@ -801,7 +711,7 @@ var res = angular.module('ezeidApp').
                 "metro-bg-5",
                 "metro-bg-6",
                 "metro-bg-7",
-                "metro-bg-8"
+                "metro-bg-8",
             ];
             $scope.oldColorValue = 0;
             /* generate a random color string */
@@ -881,7 +791,7 @@ var res = angular.module('ezeidApp').
 
                 $scope.activeTemplate = "html/mapPopView.html";
                 $scope.showMapPopupModel = true;
-f
+
                 var userLoc = {
                     endLat : Latitude,
                     endLong : Longitude,
@@ -1042,265 +952,86 @@ f
 
             };
 
-            //Below function is for getting search information
-            function getSearchInformation(_TID,_SearchType)
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            /////////////////////////////////Implement Pagination///////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            /* pagination settings goes here */
+            $scope.totalResult = 0;
+            $scope.currentStartResultId = 0;
+            $scope.isPagination = 1;//Want pagination
+            $scope.paginationNext = true;
+            $scope.paginationPrevious = true;
+
+            /**
+             * Get the total result of the searched parameters
+             */
+            getSearchKeyWord($scope.params,1).then(function()
             {
-                $scope.$emit('$preLoaderStart');
-
-                var defer = $q.defer();
-                $scope.SearchInfo = {};
-                $scope.AddressForInfoTab = "";
-                AutoRefresh = false;
-                if(!$rootScope._userInfo)
+                /* @action */
+                if($scope.totalResult <= 20)
                 {
-                    $rootScope._userInfo = {};
-                }
-                if(!$rootScope._userInfo.IsAuthenticate){
-                    $rootScope._userInfo.Token = 2;
-                    $scope.Token = 2;
-                }
-
-                var CurrentDate = moment().format('YYYY-MM-DD HH:mm:ss');
-
-                $http({ method: 'get',
-                    url: GURL + 'ewtGetSearchInformation?Token=' + $rootScope._userInfo.Token + '&TID=' + _TID + '&SearchType=' + _SearchType + '&CurrentDate=' + convertTimeToUTC(CurrentDate,'YYYY-MM-DD HH:mm:ss')}).success(function (data) {
-                        console.log("SAi123");
-                        $rootScope.$broadcast('$preLoaderStop');
-                        if (data && data != 'null')
-                        {
-                            console.log("Detail",data);
-                            $timeout(function () {
-                                $scope.SearchInfo = data[0];
-                                $scope.showDetailsModal1 = true;
-
-                                if($scope.SearchInfo.IDTypeID == 2)
-                                {
-                                    getAboutComapny();
-                                }
-
-                                if(_TID == $scope.SearchInfo.LocID)
-                                {
-                                    $scope.showNoticeText = false;
-                                }
-
-                                $scope.showSalesEnquiry = $scope.SearchInfo.VisibleModules[0];
-                                $scope.shoReserVation = $scope.SearchInfo.VisibleModules[1];
-                                $scope.showHomeDelivery = $scope.SearchInfo.VisibleModules[2];
-                                $scope.showServiceRequest = $scope.SearchInfo.VisibleModules[3];
-                                $scope.showSendCv = $scope.SearchInfo.VisibleModules[4];
-
-                                //Below lines are to show address in info tab
-                                $scope.AddressForInfoTab = ($scope.SearchInfo.AddressLine1 != "") ? $scope.SearchInfo.AddressLine1 +', ' : "";
-                                $scope.AddressForInfoTab += ($scope.SearchInfo.AddressLine2 != "") ? $scope.SearchInfo.AddressLine2 +', ' : "";
-                                $scope.AddressForInfoTab += ($scope.SearchInfo.CityTitle != "") ? $scope.SearchInfo.CityTitle +', ' : "";
-                                $scope.AddressForInfoTab += ($scope.SearchInfo.CountryTitle != "") ? $scope.SearchInfo.CountryTitle +', ' : "";
-                                $scope.AddressForInfoTab += ($scope.SearchInfo.PostalCode != "") ? $scope.SearchInfo.PostalCode : "";
-
-                                $window.localStorage.setItem("myLocation",$scope.SearchInfo.Latitude+","+$scope.SearchInfo.Longitude );
-
-                                if($scope.SearchInfo.ParkingStatus==0)
-                                {
-                                    $scope.parkingTitle = "Parking Status";
-                                }
-                                if($scope.SearchInfo.ParkingStatus==1)
-                                {
-                                    $scope.parkingTitle = "Public Parking";
-                                }
-                                if($scope.SearchInfo.ParkingStatus==2)
-                                {
-                                    $scope.parkingTitle = "Vallet Parking";
-                                }
-                                if($scope.SearchInfo.ParkingStatus==3)
-                                {
-                                    $scope.parkingTitle = "No parking";
-                                }
-
-                                $scope.form_rating = data[0].Rating;
-
-                                //Call for banner
-                                AutoRefresh = true;
-                                getBanner(1);
-
-                                if($scope.SearchInfo.IDTypeID == 2)
-                                {
-                                    $scope.reservationPlaceHolder = "Reservation requirement details";
-                                }
-                                else
-                                {
-                                    $scope.reservationPlaceHolder = "Appointment requirement details";
-                                }
-                               // defer.resolve();
-                            });
-                        }
-                        else
-                        {
-                            $scope.showNotFound = true;
-                          //  defer.reject();
-                       }
-                    })
-                    .error(function(data, status, headers, config) {
-                     //   defer.reject();
-                        $rootScope.$broadcast('$preLoaderStop');
-                    });
-              //  return defer.promise;
-            }
-
-            //Below function is for getting about company
-            function getAboutComapny()
-            {
-                $http({ method: 'get', url: GURL + 'ewtCompanyProfile?TID=' + $scope.SearchInfo.TID}).success(function (data) {
-                    if (data.Result.length > 0) {
-                        $scope.companyTagLine = data.Result[0].TagLine;
-                    }
-                });
-            }
-
-            //Auto refresh Banner
-            $interval(function() {
-
-                if(AutoRefresh == true && $scope.SearchInfo.Banners != 1)
-                {
-                    currentBanner = currentBanner + 1;
-                    if(currentBanner <= $scope.SearchInfo.Banners)
-                    {
-                        getBanner(currentBanner);
-                    }
-                    else
-                    {
-                        currentBanner = 1;
-                        getBanner(currentBanner);
-                    }
-                }
-            },RefreshTime);
-
-            //False when navigate to other page
-            $scope.$on('$locationChangeStart', function( event ) {
-                AutoRefresh = false;
-            });
-
-            // To get banner
-            function getBanner(_requestedBannerValue)
-            {
-                $http({ method: 'get', url: GURL + 'ewtGetBannerPicture?SeqNo='+_requestedBannerValue+'&Ezeid='+$scope.SearchInfo.EZEID+'&StateTitle='+ $scope.SearchInfo.StateTitle+'&LocID='+$scope.SearchInfo.LocID}).success(function (data) {
-
-                    if (data.Picture != 'null') {
-                        $scope.SearchInfo.BannerImage = data.Picture;
-                        if(currentBanner >= $scope.SearchInfo.Banners)
-                        {
-                            //Disable next button
-                            $scope.nextButton = false;
-                        }
-                        else
-                        {
-                            //Enable next button
-                            $scope.nextButton = true;
-                        }
-
-                        if(currentBanner <= 1)
-                        {
-                            //Disabled previous button
-                            $scope.previousButton = false;
-                        }
-                        else
-                        {   //Enable previous button
-                            $scope.previousButton = true;
-                        }
-                    }
-                    else
-                    {
-                        Notification.error({ message: "No Banner found..!", delay: MsgDelay });
-                    }
-                });
-            }
-
-            //call for previous banner
-            $scope.getPreviousBanner = function(){
-                currentBanner = currentBanner - 1;
-                if(currentBanner >= 1)
-                {
-                    getBanner(currentBanner);
-                    RefreshTime = Miliseconds;
-                }
-            };
-
-            //call for next banner
-            $scope.getNextBanner = function () {
-                currentBanner = currentBanner + 1;
-                if(currentBanner <= $scope.SearchInfo.Banners)
-                {
-                    getBanner(currentBanner);
-                    RefreshTime = Miliseconds;
-                }
-            };
-
-            //open working hour popup
-            $scope.openWorkingHourPopup = function () {
-                $scope.$emit('$preLoaderStart');
-                if($rootScope._userInfo.Token == 2)
-                {
-                    $('#SignIn_popup').slideDown();
-                    $scope.$emit('$preLoaderStop');
+                    $scope.paginationNext = false;
+                    $scope.paginationPrevious = false;
                 }
                 else
                 {
-
-                    $http({ method: 'get', url: GURL + 'ewtGetWorkingHrsHolidayList?Token=' + $rootScope._userInfo.Token + '&LocID=' + $scope.SearchInfo.LocID }).success(function (data)
-                    {
-                        $scope.$emit('$preLoaderStop');
-                        $scope.showWorkingHourModel = true;
-                        if (data != 'null')
-                        {
-                            if(data.WorkingHours != "")
-                            {
-                                $scope.Mo1 = (data.WorkingHours[0].MO1 == "00:00") ? '08:00' : selectedTimeUtcToLocal(data.WorkingHours[0].MO1);
-                                $scope.Mo2 = (data.WorkingHours[0].MO2 == "00:00") ? '13:00' : selectedTimeUtcToLocal(data.WorkingHours[0].MO2);
-                                $scope.Mo3 = (data.WorkingHours[0].MO3 == "00:00") ? '13:00' : selectedTimeUtcToLocal(data.WorkingHours[0].MO3);
-                                $scope.Mo4 = (data.WorkingHours[0].MO4 == "00:00") ? '21:00' : selectedTimeUtcToLocal(data.WorkingHours[0].MO4);
-
-                                $scope.Tu1 = (data.WorkingHours[0].TU1 == "00:00") ? '08:00' : selectedTimeUtcToLocal(data.WorkingHours[0].TU1);
-                                $scope.Tu2 = (data.WorkingHours[0].TU2 == "00:00") ? '13:00' : selectedTimeUtcToLocal(data.WorkingHours[0].TU2);
-                                $scope.Tu3 = (data.WorkingHours[0].TU3 == "00:00") ? '13:00' : selectedTimeUtcToLocal(data.WorkingHours[0].TU3);
-                                $scope.Tu4 = (data.WorkingHours[0].TU4 == "00:00") ? '21:00' : selectedTimeUtcToLocal(data.WorkingHours[0].TU4);
-
-                                $scope.We1 = (data.WorkingHours[0].WE1 == "00:00") ? '08:00' : selectedTimeUtcToLocal(data.WorkingHours[0].WE1);
-                                $scope.We2 = (data.WorkingHours[0].WE2 == "00:00") ? '13:00' : selectedTimeUtcToLocal(data.WorkingHours[0].WE2);
-                                $scope.We3 = (data.WorkingHours[0].WE3 == "00:00") ? '13:00' : selectedTimeUtcToLocal(data.WorkingHours[0].WE3);
-                                $scope.We4 = (data.WorkingHours[0].WE4 == "00:00") ? '21:00' : selectedTimeUtcToLocal(data.WorkingHours[0].WE4);
-
-                                $scope.Th1 = (data.WorkingHours[0].TH1 == "00:00") ? '08:00' : selectedTimeUtcToLocal(data.WorkingHours[0].TH1);
-                                $scope.Th2 = (data.WorkingHours[0].TH2 == "00:00") ? '13:00' : selectedTimeUtcToLocal(data.WorkingHours[0].TH2);
-                                $scope.Th3 = (data.WorkingHours[0].TH3 == "00:00") ? '13:00' : selectedTimeUtcToLocal(data.WorkingHours[0].TH3);
-                                $scope.Th4 = (data.WorkingHours[0].TH4 == "00:00") ? '21:00' : selectedTimeUtcToLocal(data.WorkingHours[0].TH4);
-
-                                $scope.Fr1 = (data.WorkingHours[0].FR1 == "00:00") ? '08:00' : selectedTimeUtcToLocal(data.WorkingHours[0].FR1);
-                                $scope.Fr2 = (data.WorkingHours[0].FR2 == "00:00") ? '13:00' : selectedTimeUtcToLocal(data.WorkingHours[0].FR2);
-                                $scope.Fr3 = (data.WorkingHours[0].FR3 == "00:00") ? '13:00' : selectedTimeUtcToLocal(data.WorkingHours[0].FR3);
-                                $scope.Fr4 = (data.WorkingHours[0].FR4 == "00:00") ? '21:00' : selectedTimeUtcToLocal(data.WorkingHours[0].FR4);
-
-                                $scope.Sa1 = (data.WorkingHours[0].SA1 == "00:00") ? '08:00' : selectedTimeUtcToLocal(data.WorkingHours[0].SA1);
-                                $scope.Sa2 = (data.WorkingHours[0].SA2 == "00:00") ? '13:00' : selectedTimeUtcToLocal(data.WorkingHours[0].SA2);
-                                $scope.Sa3 = (data.WorkingHours[0].SA3 == "00:00") ? '13:00' : selectedTimeUtcToLocal(data.WorkingHours[0].SA3);
-                                $scope.Sa4 = (data.WorkingHours[0].SA4 == "00:00") ? '21:00' : selectedTimeUtcToLocal(data.WorkingHours[0].SA4);
-
-                                $scope.Su1 = (data.WorkingHours[0].SU1 == "00:00") ? '08:00' : selectedTimeUtcToLocal(data.WorkingHours[0].SU1);
-                                $scope.Su2 = (data.WorkingHours[0].SU2 == "00:00") ? '13:00' : selectedTimeUtcToLocal(data.WorkingHours[0].SU2);
-                                $scope.Su3 = (data.WorkingHours[0].SU3 == "00:00") ? '13:00' : selectedTimeUtcToLocal(data.WorkingHours[0].SU3);
-                                $scope.Su4 = (data.WorkingHours[0].SU4 == "00:00") ? '21:00' : selectedTimeUtcToLocal(data.WorkingHours[0].SU4);
-                            }
-
-                            if(data.HolidayList != "")
-                            {
-                                $scope.holiday = data.HolidayList;
-                            }
-                        }
-                        else
-                        {
-                            // Notification.error({ message: 'Invalid key or not found…', delay: MsgDelay });
-                        }
-                    });
+                    $scope.paginationPrevious = false;
+                    $scope.paginationNext = true;
                 }
-            };
 
+                /**
+                 * Temporary fix
+                 */
+                if($routeParams.searchType == 1)
+                {
+                    $scope.paginationNext = false;
+                    $scope.paginationPrevious = false;
+                }
+                console.log($scope.paginationPrevious,$scope.paginationNext);
+            });
 
+            /**
+             * pagination: show next 20 result
+             */
+            $scope.getNextResultPage = function()
+            {
+                $scope.currentStartResultId += 20;
+                /* just get the next result */
+                getSearchKeyWord($scope.params);
+                reConfigurePaginationButton();
+            }
+
+            /**
+             * Pagination: show previous 20 results
+             */
+            $scope.getPreviousResultPage = function()
+            {
+                $scope.currentStartResultId -= 20;
+                /* just get the next result */
+                getSearchKeyWord($scope.params);
+                reConfigurePaginationButton();
+            }
+
+            /**
+             * Reset the status of the pagination button
+             */
+            function reConfigurePaginationButton()
+            {
+                if(($scope.currentStartResultId+20) > $scope.totalResult)
+                {
+                    $scope.paginationNext = false;
+                    $scope.paginationPrevious = true;
+                }
+                else if(($scope.currentStartResultId+20) < $scope.totalResult && ($scope.currentStartResultId+20) > 20)
+                {
+                    $scope.paginationNext = true;
+                    $scope.paginationPrevious = true;
+                }
+                else
+                {
+                    $scope.paginationNext = true;
+                    $scope.paginationPrevious = false;
+                }
+            }
         }
     ]);
