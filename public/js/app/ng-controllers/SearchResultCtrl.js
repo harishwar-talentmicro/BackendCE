@@ -46,6 +46,7 @@ var res = angular.module('ezeidApp').
             UtilityService
         )
         {
+            $scope.resultPerPage = 20;
             var selectAll = false;
             var isResultNumber = 1; /* 1: Results,0:no results */
             var coordinatesArr = [];
@@ -190,10 +191,29 @@ var res = angular.module('ezeidApp').
 
 
             //Below function is for getting key word search result
-            function getSearchKeyWord(_filterValue)
+            function getSearchKeyWord(_filterValue,isTotalNumberRequired)
             {
+                var defer = $q.defer();
+                /* check for the flag [isTotalNumberRequired] */
+                var total = 0;
+                var totalStatus = false;
+                /* setting the parameters for getting the total number of result */
+                if(typeof(isTotalNumberRequired) != undefined && isTotalNumberRequired > 0)
+                {
+                    totalStatus = true;
+                    total = 1;/* It would only fetch the total result */
+                }
+
+                /* setting the parameter for implementing pagination */
+                var pagecount = 0;
+                if($scope.currentStartResultId > 0)
+                {
+                    pagecount = $scope.currentStartResultId;
+                }
+
                 $scope.showDownloadLink = false;
-                var CurrentDate = moment().format('YYYY-MM-DD HH:mm:ss');
+                var today = moment().format('YYYY-MM-DD HH:mm:ss');
+                var CurrentDate = UtilityService.convertTimeToUTC(today);
                 if(!$rootScope._userInfo){
                     $rootScope._userInfo = {};
                 }
@@ -201,7 +221,6 @@ var res = angular.module('ezeidApp').
                 {
                     $rootScope._userInfo.Token = 2;
                 }
-
                 /* set the value of the search term */
                 $scope.defaultSearchTerm = _filterValue.searchTerm;
                 $scope.$emit('$preLoaderStart');
@@ -217,10 +236,20 @@ var res = angular.module('ezeidApp').
                     OpenStatus:_filterValue.openStatus,
                     Rating:_filterValue.rating,
                     HomeDelivery:_filterValue.homeDelivery,
-                    CurrentDate:CurrentDate
+                    CurrentDate:CurrentDate,
+                    total:total,
+                    pagecount:pagecount,
+                    isPagination:1,
+                    pagesize:$scope.resultPerPage
                 } }).success(function (data) {
                     $rootScope.$broadcast('$preLoaderStop');
-
+                    /* just return the result if only the total result have been demanded */
+                    if(totalStatus)
+                    {
+                        $scope.totalResult = data[0].Count;
+                        defer.resolve();
+                        return defer.promise;
+                    }
                     /* put the maps coordinates in array */
                     $scope.coordinatesArr = [];
                     /* count the result */
@@ -276,11 +305,13 @@ var res = angular.module('ezeidApp').
                         $scope.$emit('$preLoaderStop');
 
                     },1500);
-
+                    defer.resolve();
                 }).error(function(){
                     Notification.error({ message : 'An error occurred', delay : MsgDelay});
                     $scope.$emit('$preLoaderStop');
+                    defer.resolve();
                 });
+                return defer.promise;
             }
 
             /**
@@ -920,5 +951,87 @@ var res = angular.module('ezeidApp').
                 });
 
             };
+
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            /////////////////////////////////Implement Pagination///////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            /* pagination settings goes here */
+            $scope.totalResult = 0;
+            $scope.currentStartResultId = 0;
+            $scope.isPagination = 1;//Want pagination
+            $scope.paginationNext = true;
+            $scope.paginationPrevious = true;
+
+            /**
+             * Get the total result of the searched parameters
+             */
+            getSearchKeyWord($scope.params,1).then(function()
+            {
+                /* @action */
+                if($scope.totalResult <= 20)
+                {
+                    $scope.paginationNext = false;
+                    $scope.paginationPrevious = false;
+                }
+                else
+                {
+                    $scope.paginationPrevious = false;
+                    $scope.paginationNext = true;
+                }
+
+                /**
+                 * Temporary fix
+                 */
+                if($routeParams.searchType == 1)
+                {
+                    $scope.paginationNext = false;
+                    $scope.paginationPrevious = false;
+                }
+                console.log($scope.paginationPrevious,$scope.paginationNext);
+            });
+
+            /**
+             * pagination: show next 20 result
+             */
+            $scope.getNextResultPage = function()
+            {
+                $scope.currentStartResultId += 20;
+                /* just get the next result */
+                getSearchKeyWord($scope.params);
+                reConfigurePaginationButton();
+            }
+
+            /**
+             * Pagination: show previous 20 results
+             */
+            $scope.getPreviousResultPage = function()
+            {
+                $scope.currentStartResultId -= 20;
+                /* just get the next result */
+                getSearchKeyWord($scope.params);
+                reConfigurePaginationButton();
+            }
+
+            /**
+             * Reset the status of the pagination button
+             */
+            function reConfigurePaginationButton()
+            {
+                if(($scope.currentStartResultId+20) > $scope.totalResult)
+                {
+                    $scope.paginationNext = false;
+                    $scope.paginationPrevious = true;
+                }
+                else if(($scope.currentStartResultId+20) < $scope.totalResult && ($scope.currentStartResultId+20) > 20)
+                {
+                    $scope.paginationNext = true;
+                    $scope.paginationPrevious = true;
+                }
+                else
+                {
+                    $scope.paginationNext = true;
+                    $scope.paginationPrevious = false;
+                }
+            }
         }
     ]);

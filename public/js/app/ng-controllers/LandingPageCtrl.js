@@ -39,6 +39,7 @@ angular.module('ezeidApp').
             GoogleMap,
             $routeParams
         ) {
+
             /**
              * searchType
              * 0 : EZEID
@@ -509,5 +510,9 @@ angular.module('ezeidApp').
                 $('.proximity').val('0');
             }
 
+            /**
+             * Initiate tool tip
+             */
+            $('[data-toggle="tooltip"]').tooltip();
         }]);
 

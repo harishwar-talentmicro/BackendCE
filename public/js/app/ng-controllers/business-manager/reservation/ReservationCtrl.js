@@ -23,6 +23,7 @@ var res = angular.module('ezeidApp').
         '$route',
         'UtilityService',
         '$document',
+        '$sce',
         function (
             $rootScope,
             $scope,
@@ -40,10 +41,13 @@ var res = angular.module('ezeidApp').
             GoogleMap,
             $route,
             UtilityService,
-            $document
-        ) {
-            /* SETTINGS GOES HERE======================================== */
+            $document,
+            $sce
 
+        ) {
+
+            $scope.$emit('$preLoaderStart');
+            /* SETTINGS GOES HERE======================================== */
             /* for resources availability background color */
             var availabilityColor = 'rgb(64, 242, 168)';
 
@@ -52,6 +56,9 @@ var res = angular.module('ezeidApp').
 
             /* self reserved color */
             var selfReservedColor = 'rgb(250, 253, 117)';
+
+            /* color of the flash on clicking of the appointment list */
+            var flashColor = "yellow";
 
             /* default height of the block in 'em' */
             var defaultHeightClass = 'blk-1-1';//default height class::||Don't Change||
@@ -76,10 +83,17 @@ var res = angular.module('ezeidApp').
                 //[1000, 1140, 'shrey',5,'service3']
             ];
             /* Set the logged in user */
-            setUserLoggedInId();
+            setUserLoggedInId().then(function(){
+                init();
+            },function(){
+                $location.path('/');
+            });
 
             /* Flag for resources */
             $scope.isResource = false;
+            /* Access Rights of the reservation module */
+            $scope.accessRight = false;//no access rights
+
             if($routeParams.ezeid == $rootScope._userInfo.ezeid)
             {
                 $scope.isResource = true;
@@ -104,9 +118,6 @@ var res = angular.module('ezeidApp').
             /* flag bit for checking if there is no resources */
             $scope.isNoResource = false;
 
-            /* Re-setting VIEW of the complete calendar structure in case its: tablet or mobile */
-            //reseetBlock();
-
             /* SETTINGS ENDS HERE======================================== */
 
             /* All the set color's INDEX with their title */
@@ -128,17 +139,21 @@ var res = angular.module('ezeidApp').
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             $scope.searchedEzeid = $routeParams.ezeid;
             $scope.$emit('$preLoaderStart');
-            getResource($scope.searchedEzeid).then(function () {
-                getServicesData($scope.searchedEzeid).then(function () {
-                    getServiceResourceMapping($scope.searchedEzeid).then(function () {
-                        setFinalMappedServices(6);
-                        var date = moment().format('DD MMM YYYY h:mm:ss a');
-                        getReservationTransactionData($scope.activeResourceId, date, $scope.searchedEzeid).then(function () {
+            function init(){
+                getResource($scope.searchedEzeid).then(function () {
+                    getServicesData($scope.searchedEzeid).then(function () {
+                        getServiceResourceMapping($scope.searchedEzeid).then(function () {
+                            setFinalMappedServices(6);
+                            var date = moment().format('DD MMM YYYY h:mm:ss a');
+                            getReservationTransactionData($scope.activeResourceId, date, $scope.searchedEzeid).then(function () {
+                                $scope.$emit('$preLoaderStop');
+                                /* Re-setting VIEW of the complete calendar structure in case its: tablet or mobile */
+                                resetBlock();
+                            });
                         });
                     });
                 });
-            });
-            $scope.$emit('$preLoaderStop');
+            };
 
 
             /**
@@ -153,7 +168,7 @@ var res = angular.module('ezeidApp').
                     method: "GET",
                     params: {
                         ezeid: ezeid,
-                        Token: $rootScope._userInfo.Token
+                        type:1
                     }
                 }).success(function (resp) {
 
@@ -176,19 +191,23 @@ var res = angular.module('ezeidApp').
              * 2.notes-block
              * 3.calendar-block
              */
-            function reseetBlock()
+            function resetBlock()
             {
                 var screenWidth = $(window).width();
                 if(screenWidth < 992)
                 {
-                    $('#calendar-block').html($('#head-title-block').html());
-                    /* exchange head-title-block and calendar block */
-                    //var calendarHtml = $('#calendar-block').html();
-                    //var headHtml = $('#head-title-block').html();
-                    //$('#calendar-block').html(headHtml);
-                    //document.getElementsByClassName("calendar-block").innerHTML = headHtml;
-                    //document.getElementsByClassName("head-title-block").innerHTML = calendarHtml;
+                    var calendarHtml = $('#calendar-block').html();
+                    var headHtml = $('#head-title-block').html();
+                    $scope.head = getSafeText(headHtml);
+                    $scope.calendar = getSafeText(calendarHtml);
+                    $('#calendar-block').html('');
+                    $('#head-title-block').html('');
                 }
+            }
+
+            function getSafeText(text)
+            {
+                return $sce.trustAsHtml(text);
             }
 
             /**
@@ -549,14 +568,24 @@ var res = angular.module('ezeidApp').
             $scope.getBlockId = function (row, col) {
                 return 72 * col + row;
             }
-
             /* color WORKING hours */
+            $scope.colorWorkingHoursFlag = false;
             $scope.colorWorkingHours = function () {
                 var workingHrs = $scope.workingHrs;
+                if(workingHrs.length == 0)
+                {
+                    return;
+                }
 
+                if($scope.colorWorkingHoursFlag)
+                {
+                    return;
+                }
+                console.log('colorWorkingHoursFlag');
+                //$scope.colorWorkingHoursFlag = true;
                 /* RESET CALENDAR */////////////////////////////////////////////////////////
                 /* clean the calendar's working hour */
-                $('.available').attr('background-color','').removeClass('available').attr('title');
+                cleanCalendarData();
                 /* clear all text */
                 $('.reserved').html('').attr('background-color','');
                 /* remove merging */
@@ -578,6 +607,21 @@ var res = angular.module('ezeidApp').
                 }
             };
 
+            function cleanCalendarData()
+            {
+                $('.available').each(function(){
+                    if($(this).hasClass('reserved'))
+                    {
+                        $(this).removeClass('reserved')
+                            .removeAttr('data-reserver')
+                            .removeAttr('data-tid')
+                            .removeAttr('title')
+                            .html('');
+                    }
+                    $(this).removeClass('available');
+                });
+            }
+
             /**
              * Remove merging from blocks
              */
@@ -595,10 +639,21 @@ var res = angular.module('ezeidApp').
              * 2a...Get the block id which falls under the present range
              * 2b...Call mergeBlockMaster to merge and also write text
              */
+            $scope.alreadyReserveSlotFlag = false;
             $scope.alreadyReserveSlot = function () {
                 /* clear the title */
                 $('.reserved').attr('title','');
+                if($scope.reservedTime.length == 0)
+                {
+                    return;
+                }
 
+                if($scope.alreadyReserveSlotFlag)
+                {
+                    return;
+                }
+                console.log('alreadyReserveSlotFlag;');
+                //$scope.alreadyReserveSlotFlag = true;
 
                 for (var i = 0; i < $scope.reservedTime.length; i++) {
                     /* get blocks coming under this range */
@@ -644,13 +699,10 @@ var res = angular.module('ezeidApp').
                 /* calculate total height  */
 
                 var totalHeight = endBlock - startBlock + 1;
-                /* increase the first block's height to totalHeight */
-                //$('.block-' + startBlock).css('height','');
-                $('.block-' + startBlock).css('height', $scope.height * totalHeight + 'em');
                 /* add text */
                 $('.block-' + startBlock).html('<p>' + text + '</p>');
-                /* add padding to the text to make it in center */
-                //$('.block-'+startBlock).css('padding-top',(totalHeight/2.3)+'em');
+                /* increase the first block's height to totalHeight */
+                textStylerAndHeightSetter(startBlock,totalHeight);
                 if(startBlock == endBlock)
                 {
                     return;
@@ -662,7 +714,27 @@ var res = angular.module('ezeidApp').
                 }
             }
 
-            /* partition the block range based on 4 different time of day: i.e early,morning,evening,night */
+
+            /**
+             * Set the height of the block and change the text size in case its a smaller block
+             * @param startBlock : start block from where the slot is starting
+             * @param totalHeight : total height of the slot
+             */
+            function textStylerAndHeightSetter(startBlock,totalHeight)
+            {
+                $('.block-' + startBlock).css('height', $scope.height * totalHeight + 'em');
+                if(totalHeight == 1)
+                {
+                    $('.block-' + startBlock+' > p').css("font-weight",'bolder').css("font-size",'0.6em');
+                }
+            }
+
+            /**
+             * partition the block range based on 4 different time of day: i.e early,morning,evening,night
+             * @param startRange: start block of the slot
+             * @param endRange: end block of the slot
+             * @returns {*}
+             */
             function refineRange(startRange, endRange) {
                 var endBlockArray = [71, 143, 215, 287];
                 var data = [];
@@ -777,7 +849,19 @@ var res = angular.module('ezeidApp').
             /**
              * Append the color index at the bottom
              */
+            $scope.appendColorIndexFlag = false;
             $scope.appendColorIndex = function() {
+                if($scope.colorIndex.length == 0)
+                {
+                    return;
+                }
+
+                if($scope.appendColorIndexFlag)
+                {
+                    return;
+                }
+                console.log('appendColorIndexFlag');
+                //$scope.appendColorIndexFlag = true;
                 for (var i = 0; i < $scope.colorIndex.length; i++)
                 {
                     $('.color-index-'+i).css('color',$scope.colorIndex[i][0]);
@@ -987,6 +1071,7 @@ var res = angular.module('ezeidApp').
                 if(oldVal !== newVal){
                     $scope.activeDate = moment(newVal).format('DD-MMM-YYYY');
                     /* reload calendar */
+                    //resetStaterFunction();
                     $scope.reloadCalander();
                 }
             });
@@ -1116,10 +1201,12 @@ var res = angular.module('ezeidApp').
 
                         /* reload reservation hours */
                         updateReservationHoursBlocks(blockId);
+                        $scope.$emit('$preLoaderStop');
                     }
                     else
                     {
                         Notification.error({ message: "Failed to "+saveType+" your reservation. Probable Reason: "+resp.message, delay: MsgDelay });
+                        $scope.$emit('$preLoaderStop');
                     }
                 }).error(function(err,status){
                     $scope.$emit('$preLoaderStop');
@@ -1253,13 +1340,13 @@ var res = angular.module('ezeidApp').
                         Token:$rootScope._userInfo.Token
                     }
                 }).success(function(resp){
-                    $scope.$emit('$preLoaderStop');
+                    //$scope.$emit('$preLoaderStop');
                     $scope.loggedInUid =  resp[0].MasterID;
                     defer.resolve();
                 }).error(function(err){
-                    $scope.$emit('$preLoaderStop');
+                    //$scope.$emit('$preLoaderStop');
                     Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
-                    defer.resolve();
+                    defer.reject();
                 });
                 return defer.promise;
             }
@@ -1306,6 +1393,75 @@ var res = angular.module('ezeidApp').
                 else
                 {
                     $('.blk-content').removeClass('strike-text');
+                }
+            }
+
+
+            /**
+             * Flash Effect in calendar on the hover / click of the list
+             */
+            $scope.flashEffect = function(tid)
+            {
+                var presentColor = $('div').find("[data-tid="+tid+"]").css('background-color');
+                if(presentColor == flashColor)
+                {
+                    return;
+                }
+                setTimeout(function() {
+                    $('div').find("[data-tid="+tid+"]").css('background-color',flashColor);
+                    setTimeout(function() {
+                        $('div').find("[data-tid="+tid+"]").css('background-color',presentColor);
+                    }, 2000);
+                }, 0);
+            }
+
+            /**
+             * Reservationmodule starter
+             */
+            $scope.reservationMooduleStarter = function()
+            {
+                $scope.colorWorkingHours();//Checks Done
+                $scope.alreadyReserveSlot();
+                $scope.appendColorIndex();
+                $scope.removeWasteColoredCells();
+            }
+
+            /**
+             * Reset reservation starter function
+             */
+            function resetStaterFunction()
+            {
+                $scope.colorWorkingHoursFlag = false;
+                $scope.alreadyReserveSlotFlag = false;
+                $scope.appendColorIndexFlag = false;
+            }
+
+            $scope.counter = 1;
+            $scope.counterFun = function()
+            {
+                console.log($scope.counter++);
+            }
+
+            /**
+             * Set the access rights of the reservation module
+             *
+             * False: No write rights / Just a normal user
+             * 0: Super user: Reasd-only rights
+             * 1-*: Resource: Read/Write permission only to its own module
+             */
+            function setAccessRights()
+            {
+                if($routeParams.ezeid == $rootScope._userInfo.ezeid)
+                {
+                    $scope.accessRight = 0;//Super User
+                }
+                else if($rootScope._userInfo.ezeid == $scope.activeResourceEzeid)//@todo
+                {
+                    $scope.accessRight = $scope.activeResourceEzeid;
+                }
+                else
+                {
+                    $scope.accessRight = false;
                 }
             }
         }]);

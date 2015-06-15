@@ -61,6 +61,17 @@ angular.module('ezeidApp').service('UtilityService',['$q',function($q){
             var mom1 = moment(timeFromServer,dateFormat);
             var ret =  mom1.add((mom1.utcOffset()),'m').format(dateFormat);
             return ret;
+        },
+
+        /**
+         * Function for converting LOCAL time (local timezone) to server time
+         */
+        convertTimeToUTC : function(localTime, dateFormat) {
+            if (!dateFormat) {
+                dateFormat = 'YYYY-MM-DD HH:mm';
+            }
+            return moment(localTime).utc().format(dateFormat);
         }
+
     };
 }]);
