@@ -8746,7 +8746,9 @@ exports.FnSendBulkMailer = function (req, res) {
                             db.query(query, function (err, GetResult) {
                                 if (!err) {
                                     if (GetResult != null) {
-                                        console.log(GetResult);
+                                        
+                                        console.log(GetResult[0]);
+                                        
                                         if (GetResult.length > 0) {
                                             var templateQuery = 'Select * from mmailtemplate where TID = ' + db.escape(TemplateID);
                                             db.query(templateQuery, function (err, TemplateResult) {
@@ -8756,7 +8758,7 @@ exports.FnSendBulkMailer = function (req, res) {
                                                             console.log(TemplateResult);
                                                             RtnResponse.IsSent = true;
                                                             for (var i = 0; i < GetResult.length; i++) {
-                                                                if (GetResult[i].SalesMailID != null && GetResult[i].SalesMailID != '') {
+                                                                if (GetResult[i].SalesMailID != null && GetResult[i].SalesMailID != ' ') {
 
                                                                     var mailOptions = {
                                                                         replyto: (TemplateResult[0].FromMailID != 'undefined') ? TemplateResult[0].FromMailID : " ",
@@ -8768,7 +8770,7 @@ exports.FnSendBulkMailer = function (req, res) {
                                                                     mailOptions.html = mailOptions.html.replace("[LastName]", GetResult[0].LastName);
                                                                     mailOptions.html = mailOptions.html.replace("[CompanyName]", GetResult[0].CompanyName);
 
-                                                                    console.log(mailOptions.html);
+                                                                    //console.log(mailOptions.html);
                                                                     var post = {
                                                                         MessageType: 9,
                                                                         Priority: 5,
@@ -8793,7 +8795,7 @@ exports.FnSendBulkMailer = function (req, res) {
                                                                         }
                                                                     });
                                                                     console.log('FnSendBulkMailer:Mail details sent for processing');
-                                                                    console.log(mailOptions);
+                                                                    //console.log(mailOptions);
                                                                 }
                                                                 else {
                                                                     console.log('FnSendBulkMailer:Sales Mail Id is empty');
@@ -11935,7 +11937,6 @@ exports.FnChangeReservationStatus = function(req,res){
         }
     });
 };
-
 
 
 
