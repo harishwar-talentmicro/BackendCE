@@ -19,7 +19,7 @@
                                 <!-- Change Location btn -->
                                 <button  data-toggle="tooltip" type="button" ng-click="modalVisibility()" class="btn btn-info" title="Click to change Search Location"><i class="fa fa-map-marker"></i> <b class="normal-view-buttons">Location</b></button>
                                 <!-- Searc type button -->
-                                <button  data-toggle="tooltip" title="Search by" type="button" class="btn btn-default dropdown-toggle keyword-btn-radius" data-toggle="dropdown"><b>{{searchType[searchParams.searchType - 1]}}</b> <span class="caret"></span></button>
+                                <button title="Search by" type="button" class="btn btn-default dropdown-toggle keyword-btn-radius" data-toggle="dropdown"><b>{{searchType[searchParams.searchType - 1]}}</b> <span class="caret"></span></button>
                                 <ul class="dropdown-menu" role="menu">
                                     <li class="btn-link" ng-repeat="search in searchType track by $index">
                                         <!-- Index incremented by 1: As the array's default index is [0,1,2] & searchType's value is [1,2,3] -->
