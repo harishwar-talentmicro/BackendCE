@@ -164,6 +164,10 @@
                 templateUrl: 'html/outbox.html',
                 controller : 'outboxPageCtrl'
             })
+            .when('/payment',{
+                templateUrl: 'html/payment-api.html',
+                controller : 'paymentApiCtrl'
+            })
             .when('/:ezeid',{
                 templateUrl: 'html/landing.html',
                 controller : 'LandingPageCtrl'
