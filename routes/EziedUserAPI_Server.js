@@ -7255,7 +7255,7 @@ exports.FnGetTranscation = function (req, res) {
         var FunctionType = parseInt(req.query.FunctionType);
         var Page = parseInt(req.query.Page);
         var Status = (req.query.Status) ? req.query.Status : null;
-        var searchkeyword = req.query.searchkeyword;
+        var searchkeyword = req.query.searchkeyword ? req.query.searchkeyword : '';
         
        var RtnMessage = {
             TotalPage:'',
