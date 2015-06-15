@@ -1195,7 +1195,7 @@ span.smallCloselink {
 
 
 .modal-dialog.modal-lg.business-manager-modal .business-manager-item.selected {
-    border: 2px dotted #DFDFDF;
+    border: 1px solid #808080;
     box-shadow: 0px 0px 30px #D2D2D2;
     background: #FFFFFF;
     padding: 5px;
@@ -1230,8 +1230,13 @@ span.smallCloselink {
   padding:0px;
 }
 
+
+#cart-info{
+    margin-top: 5px;
+    padding: 6px;
+}
 #bus-item-list-container, #tx-item-list-container{
-    max-height: 300px;
+    height: 300px;
     overflow-y: scroll;
     border: 1px solid #ddd;
     border-left: none;

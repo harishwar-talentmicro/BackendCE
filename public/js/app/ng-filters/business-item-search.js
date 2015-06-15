@@ -14,6 +14,9 @@
                 if(regex.test(itemList[i].ItemName)){
                     returnList.push(itemList[i]);
                 }
+                else if(regex.test(itemList[i].ItemName.toUpperCase())){
+                    returnList.push(itemList[i]);
+                }
             }
             return returnList;
         };

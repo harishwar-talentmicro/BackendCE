@@ -1110,6 +1110,24 @@
                 }
             );
 
+
+
+            $scope.cartData = {
+                items : 0,
+                amount : 0.00
+            };
+
+
+            function _cartCalculateAmount(itemList){
+                for(var i = 0; i < itemList.length; i++){
+
+                }
+            };
+
+            function _cartCalculateItems(itemList){
+
+            }
+
         }]);
 
 })();

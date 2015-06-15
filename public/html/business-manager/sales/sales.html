@@ -640,7 +640,7 @@
 
                               <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                     <bussiness-item
-                                            ng-repeat="item in moduleItems | filter:businessItemSearch track by item.TID"
+                                            ng-repeat="item in moduleItems | filter:busItemSearch track by item.TID"
                                             item="item" item-list-type="_userInfo.SalesItemListType"
                                             add-item="addItem(item)" edit-permission="salesPermissionConf.txUpdate" edit-mode="modalBox.editMode">
                                     </bussiness-item>
@@ -671,6 +671,17 @@
                                   </transaction-item>
                               </div>
 
+                          </div>
+                          <div class="row">
+                              <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-show="modalBox.tx.itemList.length > 0 && _userInfo.SalesItemListType > 2">
+                                  <div id="cart-info" class="alert alert-info no-radius">
+                                      <i class="fa fa-shopping-cart"></i> {{modalBox.tx.itemList.length}} items are selected
+                                      <small
+                                              ng-show="modalBox.tx.itemList.length && _userInfo.SalesItemListType > 3"
+                                              class="text-success pull-right">{{calculateAmount()}}</small>
+                                  </div>
+
+                              </div>
                           </div>
 
                       </div>
