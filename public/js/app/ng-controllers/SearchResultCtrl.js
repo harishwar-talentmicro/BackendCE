@@ -110,6 +110,31 @@ var res = angular.module('ezeidApp').
                 return moment(localTime).utc().format(dateFormat);
             };
 
+            /**
+             * Function for converting UTC time from server to LOCAL timezone
+             */
+            var convertTimeToLocal = function(timeFromServer,dateFormat,returnFormat){
+                if(!dateFormat){
+                    dateFormat = 'DD-MMM-YYYY hh:mm A';
+                }
+                if(!returnFormat){
+                    returnFormat = dateFormat;
+                }
+                var x = new Date(timeFromServer);
+                var mom1 = moment(x);
+                return mom1.add((mom1.utcOffset()),'m').format(returnFormat);
+            };
+
+            function selectedTimeUtcToLocal(selectedTime)
+            {
+                var x = new Date();
+                var today = moment(x.toISOString()).utc().format('DD-MMM-YYYY');
+
+                var currentTaskDate = moment(today+' '+selectedTime).format('DD-MMM-YYYY H:mm');
+                return convertTimeToLocal(currentTaskDate,'DD-MMM-YYYY H:mm',"H:mm");
+            }
+
+
             /* convert star ratings to comma seperated string */
             $scope.getSearchStars = function()
             {
@@ -152,7 +177,6 @@ var res = angular.module('ezeidApp').
             }
             $scope.changeOpenStatus = function()
             {
-
                 $scope.params.openStatus = $scope.params.openStatus == 0?1:0;
             }
             $scope.changeHomeDelivery = function()
@@ -188,22 +212,19 @@ var res = angular.module('ezeidApp').
                 $scope.showLoginText = false;
 
                 getSearchKeyWord($scope.params);
-                if($scope.params.TID)
+
+                console.log($scope.params);
+
+                if(($scope.params.TID) && ($scope.params.TID != 0))
                 {
                     //call for search information
                     $scope.TID = $scope.params.TID;
+
+                    getSearchInformation($scope.params.TID,$scope.params.searchType);
                 }
-                /*else
-                {
-                    // To get search key result
-                    getSearchKeyWord($scope.params);
-                }*/
             }
 
-            /* // To get search key result
-             getSearchKeyWord($scope.params);*/
-
-            //find out range of the ratings
+            // find out range of the ratings
             var initialVal = $routeParams.rating[0]?$routeParams.rating[0]:1;
             var finalVal = 5;
             for(var i=0; i < $routeParams.rating.length; i++)
@@ -213,7 +234,6 @@ var res = angular.module('ezeidApp').
 
             var initial = initialVal;
             var final = finalVal;
-
 
             //Below function is for getting key word search result
             function getSearchKeyWord(_filterValue)
@@ -255,7 +275,6 @@ var res = angular.module('ezeidApp').
                      {
                          $rootScope.$broadcast('$preLoaderStop');
                      }
-
 
                     /* put the maps coordinates in array */
                     $scope.coordinatesArr = [];
@@ -308,7 +327,7 @@ var res = angular.module('ezeidApp').
                     }
                     /* put a little delay */
                     $timeout(function(){
-                        $scope.$emit('$preLoaderStop');
+                       // $scope.$emit('$preLoaderStop');
                     },1500);
 
                 }).error(function(){
@@ -347,6 +366,7 @@ var res = angular.module('ezeidApp').
                 /* update the coordinates */
                 $scope.params.lat = $rootScope.coordinatesLat;
                 $scope.params.lng = $rootScope.coordinatesLng;
+                $scope.params.TID = 0;
 
                 var modifyValue = [
                     'homeDelivery',
@@ -692,38 +712,54 @@ var res = angular.module('ezeidApp').
                 $scope.showNotFound = false;
                 $scope.showDetailsModal1 = false;
 
-                console.log($routeParams.searchType);
-                console.log($rootScope._userInfo);
-
                 if(($routeParams.searchType == 1) && (!$rootScope._userInfo.IsAuthenticate))
                 {
-                    console.log("sai12");
                     $scope.showLoginText = true;
                     $scope.$emit('$preLoaderStop');
                     Notification.error({ message : 'Please login to search for EZEID', delay : MsgDelay});
                 }
                 else
                 {
-                    console.log("sai12334");
+                    // $scope.showLoginText = false;
 
-                    $scope.showLoginText = false;
-                    getSearchInformation(_tid,$routeParams.searchType);
+                  /*  var ams = {
+                        searchType: $routeParams.searchType,
+                        TID: _tid,
+                        searchTerm: $routeParams.searchTerm,
+                        proximity: $routeParams.proximity,
+                        rating: $routeParams.rating,
+                        homeDelivery: $routeParams.homeDelivery,
+                        parkingStatus: $routeParams.parkingStatus,
+                        openStatus: $routeParams.openStatus,
+                        lat: $routeParams.lat,
+                        lng: $routeParams.lng
+                    };
+
+                    console.log("sai555");
+                    console.log(ams);
+
+                    $routeParams = ams;
+
+                    console.log("sai888");
+                    console.log($routeParams);*/
+
+                  //  getSearchInformation(_tid,$routeParams.searchType);
+
+
+                     var params = '?searchType='+$routeParams.searchType+'&TID='+_tid;
+                     params += '&searchTerm='+$routeParams.searchTerm;
+                     params += '&proximity='+$routeParams.proximity;
+                     params += '&rating='+$routeParams.rating;
+                     params += '&homeDelivery='+$routeParams.homeDelivery;
+                     params += '&parkingStatus='+$routeParams.parkingStatus;
+                     params += '&openStatus='+$routeParams.openStatus;
+                     params += '&lat='+$routeParams.lat;
+                     params += '&lng='+$routeParams.lng;
+
+                     $location.url('/searchResult'+params);
                 }
 
-                // Call search info function
-              //  getSearchInformation(_tid,$routeParams.searchType);
 
-               /* var params = '?searchType='+$routeParams.searchType+'&TID='+_tid;
-                params += '&searchTerm='+$routeParams.searchTerm;
-                params += '&proximity='+$routeParams.proximity;
-                params += '&rating='+$routeParams.rating;
-                params += '&homeDelivery='+$routeParams.homeDelivery;
-                params += '&parkingStatus='+$routeParams.parkingStatus;
-                params += '&openStatus='+$routeParams.openStatus;
-                params += '&lat='+$routeParams.lat;
-                params += '&lng='+$routeParams.lng;
-
-                $location.url('/searchResult'+params);*/
             }
 
             /* redirect to full details page */
@@ -765,7 +801,7 @@ var res = angular.module('ezeidApp').
                 "metro-bg-5",
                 "metro-bg-6",
                 "metro-bg-7",
-                "metro-bg-8",
+                "metro-bg-8"
             ];
             $scope.oldColorValue = 0;
             /* generate a random color string */
@@ -845,7 +881,7 @@ var res = angular.module('ezeidApp').
 
                 $scope.activeTemplate = "html/mapPopView.html";
                 $scope.showMapPopupModel = true;
-
+f
                 var userLoc = {
                     endLat : Latitude,
                     endLong : Longitude,
@@ -1028,6 +1064,7 @@ var res = angular.module('ezeidApp').
 
                 $http({ method: 'get',
                     url: GURL + 'ewtGetSearchInformation?Token=' + $rootScope._userInfo.Token + '&TID=' + _TID + '&SearchType=' + _SearchType + '&CurrentDate=' + convertTimeToUTC(CurrentDate,'YYYY-MM-DD HH:mm:ss')}).success(function (data) {
+                        console.log("SAi123");
                         $rootScope.$broadcast('$preLoaderStop');
                         if (data && data != 'null')
                         {
@@ -1195,6 +1232,75 @@ var res = angular.module('ezeidApp').
                     RefreshTime = Miliseconds;
                 }
             };
+
+            //open working hour popup
+            $scope.openWorkingHourPopup = function () {
+                $scope.$emit('$preLoaderStart');
+                if($rootScope._userInfo.Token == 2)
+                {
+                    $('#SignIn_popup').slideDown();
+                    $scope.$emit('$preLoaderStop');
+                }
+                else
+                {
+
+                    $http({ method: 'get', url: GURL + 'ewtGetWorkingHrsHolidayList?Token=' + $rootScope._userInfo.Token + '&LocID=' + $scope.SearchInfo.LocID }).success(function (data)
+                    {
+                        $scope.$emit('$preLoaderStop');
+                        $scope.showWorkingHourModel = true;
+                        if (data != 'null')
+                        {
+                            if(data.WorkingHours != "")
+                            {
+                                $scope.Mo1 = (data.WorkingHours[0].MO1 == "00:00") ? '08:00' : selectedTimeUtcToLocal(data.WorkingHours[0].MO1);
+                                $scope.Mo2 = (data.WorkingHours[0].MO2 == "00:00") ? '13:00' : selectedTimeUtcToLocal(data.WorkingHours[0].MO2);
+                                $scope.Mo3 = (data.WorkingHours[0].MO3 == "00:00") ? '13:00' : selectedTimeUtcToLocal(data.WorkingHours[0].MO3);
+                                $scope.Mo4 = (data.WorkingHours[0].MO4 == "00:00") ? '21:00' : selectedTimeUtcToLocal(data.WorkingHours[0].MO4);
+
+                                $scope.Tu1 = (data.WorkingHours[0].TU1 == "00:00") ? '08:00' : selectedTimeUtcToLocal(data.WorkingHours[0].TU1);
+                                $scope.Tu2 = (data.WorkingHours[0].TU2 == "00:00") ? '13:00' : selectedTimeUtcToLocal(data.WorkingHours[0].TU2);
+                                $scope.Tu3 = (data.WorkingHours[0].TU3 == "00:00") ? '13:00' : selectedTimeUtcToLocal(data.WorkingHours[0].TU3);
+                                $scope.Tu4 = (data.WorkingHours[0].TU4 == "00:00") ? '21:00' : selectedTimeUtcToLocal(data.WorkingHours[0].TU4);
+
+                                $scope.We1 = (data.WorkingHours[0].WE1 == "00:00") ? '08:00' : selectedTimeUtcToLocal(data.WorkingHours[0].WE1);
+                                $scope.We2 = (data.WorkingHours[0].WE2 == "00:00") ? '13:00' : selectedTimeUtcToLocal(data.WorkingHours[0].WE2);
+                                $scope.We3 = (data.WorkingHours[0].WE3 == "00:00") ? '13:00' : selectedTimeUtcToLocal(data.WorkingHours[0].WE3);
+                                $scope.We4 = (data.WorkingHours[0].WE4 == "00:00") ? '21:00' : selectedTimeUtcToLocal(data.WorkingHours[0].WE4);
+
+                                $scope.Th1 = (data.WorkingHours[0].TH1 == "00:00") ? '08:00' : selectedTimeUtcToLocal(data.WorkingHours[0].TH1);
+                                $scope.Th2 = (data.WorkingHours[0].TH2 == "00:00") ? '13:00' : selectedTimeUtcToLocal(data.WorkingHours[0].TH2);
+                                $scope.Th3 = (data.WorkingHours[0].TH3 == "00:00") ? '13:00' : selectedTimeUtcToLocal(data.WorkingHours[0].TH3);
+                                $scope.Th4 = (data.WorkingHours[0].TH4 == "00:00") ? '21:00' : selectedTimeUtcToLocal(data.WorkingHours[0].TH4);
+
+                                $scope.Fr1 = (data.WorkingHours[0].FR1 == "00:00") ? '08:00' : selectedTimeUtcToLocal(data.WorkingHours[0].FR1);
+                                $scope.Fr2 = (data.WorkingHours[0].FR2 == "00:00") ? '13:00' : selectedTimeUtcToLocal(data.WorkingHours[0].FR2);
+                                $scope.Fr3 = (data.WorkingHours[0].FR3 == "00:00") ? '13:00' : selectedTimeUtcToLocal(data.WorkingHours[0].FR3);
+                                $scope.Fr4 = (data.WorkingHours[0].FR4 == "00:00") ? '21:00' : selectedTimeUtcToLocal(data.WorkingHours[0].FR4);
+
+                                $scope.Sa1 = (data.WorkingHours[0].SA1 == "00:00") ? '08:00' : selectedTimeUtcToLocal(data.WorkingHours[0].SA1);
+                                $scope.Sa2 = (data.WorkingHours[0].SA2 == "00:00") ? '13:00' : selectedTimeUtcToLocal(data.WorkingHours[0].SA2);
+                                $scope.Sa3 = (data.WorkingHours[0].SA3 == "00:00") ? '13:00' : selectedTimeUtcToLocal(data.WorkingHours[0].SA3);
+                                $scope.Sa4 = (data.WorkingHours[0].SA4 == "00:00") ? '21:00' : selectedTimeUtcToLocal(data.WorkingHours[0].SA4);
+
+                                $scope.Su1 = (data.WorkingHours[0].SU1 == "00:00") ? '08:00' : selectedTimeUtcToLocal(data.WorkingHours[0].SU1);
+                                $scope.Su2 = (data.WorkingHours[0].SU2 == "00:00") ? '13:00' : selectedTimeUtcToLocal(data.WorkingHours[0].SU2);
+                                $scope.Su3 = (data.WorkingHours[0].SU3 == "00:00") ? '13:00' : selectedTimeUtcToLocal(data.WorkingHours[0].SU3);
+                                $scope.Su4 = (data.WorkingHours[0].SU4 == "00:00") ? '21:00' : selectedTimeUtcToLocal(data.WorkingHours[0].SU4);
+                            }
+
+                            if(data.HolidayList != "")
+                            {
+                                $scope.holiday = data.HolidayList;
+                            }
+                        }
+                        else
+                        {
+                            // Notification.error({ message: 'Invalid key or not found…', delay: MsgDelay });
+                        }
+                    });
+                }
+            };
+
 
         }
     ]);

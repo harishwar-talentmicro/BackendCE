@@ -35,7 +35,7 @@ angular.module('ezeidApp').
             $route
             )
     {
-        if($rootScope._userInfo){
+        /*if($rootScope._userInfo){
             if(!$rootScope._userInfo.IsAuthenticate){
                 var unregister = $rootScope.$watch('_userInfo',function(newVal,oldVal){
                     if(newVal){
@@ -48,14 +48,14 @@ angular.module('ezeidApp').
                     }
                 });
             }
-        }
+        }*/
 
         //Below line is for Loading img
-        $scope.$emit('$preLoaderStart');
+      //  $scope.$emit('$preLoaderStart');
 
         var destroyModalDetailsWatcher = null;
 
-        $scope.SearchInfo = {};
+      /*  $scope.SearchInfo = {};
         var currentBanner = 1;
         var Miliseconds = 8000;
         var RefreshTime = Miliseconds;
@@ -65,14 +65,15 @@ angular.module('ezeidApp').
         var currentDate = moment().format('YYYY-MM-DD HH:mm:ss');
         var x = new Date();
         var today = moment(x.toISOString()).utc().format('DD-MMM-YYYY hh:mm A');
+       */
         $scope.activeTemplate = "";
         $scope.showWorkingHourModel = false;
         $scope.showMapPopupModel = false;
-        $scope.showDetailsModal = false;
-        $scope.showNoticeText = true;
-        $scope.form_rating = 0;
-        $scope.showLoginText = false;
-        $scope.showNotFound = false;
+      //  $scope.showDetailsModal = false;
+      //  $scope.showNoticeText = true;
+     //   $scope.form_rating = 0;
+     //   $scope.showLoginText = false;
+     //   $scope.showNotFound = false;
 
         /**
          * Function for converting UTC time from server to LOCAL timezone
@@ -104,9 +105,9 @@ angular.module('ezeidApp').
         };
 
        // var TID =  $routeParams.TID;
-        $scope.SearchType = $routeParams.searchType;
+      //  $scope.SearchType = $routeParams.searchType;
 
-        if(($scope.SearchType == 1) && (!$rootScope._userInfo.IsAuthenticate))
+       /* if(($scope.SearchType == 1) && (!$rootScope._userInfo.IsAuthenticate))
         {
             $scope.showLoginText = true;
             $scope.$emit('$preLoaderStop');
@@ -121,7 +122,7 @@ angular.module('ezeidApp').
             }
 
 
-          /*  getSearchInformation(TID,$scope.SearchType).then(function(){
+          *//*  getSearchInformation(TID,$scope.SearchType).then(function(){
                 var visibleStr = ($scope.SearchInfo.VisibleModules) ? $scope.SearchInfo.VisibleModules.toString() : null;
                 var visibleModules = (visibleStr) ? ((visibleStr.length == 5) ? visibleStr : '22222') : '22222';
                 if($routeParams['sales'] && (visibleModules[0] == 1)){
@@ -159,10 +160,10 @@ angular.module('ezeidApp').
                 }
 
 
-            });*/
-        }
+            });*//*
+        }*/
         //Below function is for getting search information
-        function getSearchInformation(_TID,_SearchType)
+       /* function getSearchInformation(_TID,_SearchType)
         {
             var defer = $q.defer();
             $scope.SearchInfo = {};
@@ -272,10 +273,10 @@ angular.module('ezeidApp').
                     $rootScope.$broadcast('$preLoaderStop');
             });
             return defer.promise;
-        }
+        }*/
 
         //Below function is for getting about company
-        function getAboutComapny()
+      /*  function getAboutComapny()
         {
             $http({ method: 'get', url: GURL + 'ewtCompanyProfile?TID=' + $scope.SearchInfo.TID}).success(function (data) {
                 if (data.Result.length > 0) {
@@ -360,7 +361,7 @@ angular.module('ezeidApp').
                     getBanner(currentBanner);
                     RefreshTime = Miliseconds;
                 }
-            };
+            };*/
 
             $scope.sendSalesEnquiry = function () {
                 if ($rootScope._userInfo.IsAuthenticate == true) {
@@ -433,6 +434,7 @@ angular.module('ezeidApp').
         //open Reservation form
         $scope.openReservationForm = function (_Ezeid)
         {
+            console.log("SAi reseration form",_Ezeid);
            if($rootScope._userInfo.Token == 2)
             {
                 $('#SignIn_popup').slideDown();
@@ -443,7 +445,7 @@ angular.module('ezeidApp').
                 $timeout(function(){
                     $location.url('/service-reservation'+params+'&name='+$scope.SearchInfo.CompanyName);
                 },500);
-                destroyModalDetailsWatcher();
+              //  destroyModalDetailsWatcher();
                 $scope.showDetailsModal = false;
             }
         };
@@ -549,6 +551,7 @@ angular.module('ezeidApp').
 
         $scope.getdirections = function (data) {
 
+            console.log("map data",data);
             $scope.activeTemplate = "html/mapPopView.html";
             $scope.showMapPopupModel = true;
 
