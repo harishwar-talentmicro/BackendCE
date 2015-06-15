@@ -1190,6 +1190,7 @@ span.smallCloselink {
     background: #F2F2F2;
     padding: 5px;
     margin: 5px 0px 5px 0px;
+    padding-bottom: 0px;
 }
 
 
@@ -1232,6 +1233,9 @@ span.smallCloselink {
 #bus-item-list-container, #tx-item-list-container{
     max-height: 300px;
     overflow-y: scroll;
+    border: 1px solid #ddd;
+    border-left: none;
+    border-right: none;
 }
 
 .panel .jumbotron{

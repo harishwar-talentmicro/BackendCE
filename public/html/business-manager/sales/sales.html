@@ -525,7 +525,7 @@
                         <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
                             <div class="row">
                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                    <label>Transaction Message</label>
+                                    <label> Message</label>
                                 </div>
                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                     <textarea rows="2" class="form-control no-radius" ng-model="modalBox.tx.message" name="message"></textarea>
@@ -622,18 +622,24 @@
                         <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12 item-list-box">
                             <div class="row">
                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                    <h4 class="text-center font-roboto text-warning">Select Products</h4>
-                                    <h6 class="text-center font-robot text-info">
-                                        {{moduleItems.length}} products in list
-                                    </h6>
+                                    <h4 class="text-center font-roboto text-warning">Item List</h4>
+
+                                </div>
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
+                                    <div class="input-group form-group-sm">
+                                        <span class="input-group-addon">
+                                            <i class="fa fa-search"></i>
+                                        </span>
+                                        <input type="text" placeholder="Enter item name" class="form-control" ng-model="busItemSearch" />
+                                    </div>
                                 </div>
                             </div>
 
-                            <div class="row"   id="bus-item-list-container">
+                            <div class="row" id="bus-item-list-container">
 
                               <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                     <bussiness-item
-                                            ng-repeat="item in moduleItems track by item.TID"
+                                            ng-repeat="item in moduleItems | filter:businessItemSearch track by item.TID"
                                             item="item" item-list-type="_userInfo.SalesItemListType"
                                             add-item="addItem(item)" edit-permission="salesPermissionConf.txUpdate" edit-mode="modalBox.editMode">
                                     </bussiness-item>
@@ -646,15 +652,14 @@
                       <div class="col-lg-8 col-md-8 col-sm-6 col-xs-12">
                           <div class="row">
                               <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                  <h4 class="text-center font-roboto text-success">Products in your order list </h4>
-                                  <h6 class="text-center font-roboto text-info">{{modalBox.tx.itemList.length}} products in your enquiry list </h6>
+                                  <h4 class="text-center font-roboto text-success">Selected Items </h4>
                               </div>
                           </div>
 
                           <div class="row" id="tx-item-list-container">
 
                               <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-center" ng-hide="modalBox.tx.itemList.length > 0">
-                                  <small class="font-open-sans text-warning">Add products to your enquiry</small>
+                                  <small class="font-open-sans text-warning">No item selected</small>
                               </div>
 
                               <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12" ng-repeat="item in modalBox.tx.itemList track by item.ItemID">
@@ -846,38 +851,23 @@
 
 <!-- Template for Item having item name,description,picture,qty and rate -->
 <script type="text/ng-template" id="/tpl/bus-item-description-picture-qty-rate.html">
-    <div class="row business-manager-item">
+    <div class="row business-manager-item" title="{{item.Description}}">
 
         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 business-manager-item-details">
             <button ng-hide="(!editPermission) && editMode" class="btn btn-xs btn-success pull-right no-radius" ng-click="addItem(item)">
                 <span class="glyphicon glyphicon-plus-sign"></span>
-                Add Item
+                Add
             </button>
         </div>
 
         <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 business-manager-item-thumbnail bottom-clearfix">
-            <img height="64" width="64" class="img-circle" ng-src="{{item.Pic}}" />
+            <img height="50" width="50" class="img-circle" ng-src="{{item.Pic}}" />
         </div>
         <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 business-manager-item-details bottom-clearfix">
-            <h4 class="font-open-sans">{{item.ItemName}}
-
+            <h4 class="font-open-sans">
+                {{item.ItemName}}
             </h4>
-        </div>
-
-        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 business-manager-item-details">
-            <div class="row">
-                <div class="col-lg-offset-2 col-md-offset-2 col-sm-offset-2 col-xs-offset-2 col-lg-8 col-md-8 col-sm-8 col-xs-8">
-                    Rate : <span class="pull-right"> {{item.Rate | formatDecimal:'':2}}</span>
-                </div>
-
-            </div>
-
-        </div>
-
-        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 business-manager-item-details bottom-clearfix">
-            <small class="text-info" title="{{item.Description}}">
-                {{item.Description | truncate:150}}
-            </small>
+            Rate : <span class="pull-right"> {{item.Rate | formatDecimal:'':2}}</span>
         </div>
 
     </div>
@@ -885,40 +875,35 @@
 
 <!-- Template for Item having item name,description,picture and qty -->
 <script type="text/ng-template" id="/tpl/bus-item-description-picture-qty.html">
-    <div class="row business-manager-item">
+    <div class="row business-manager-item" title="{{item.Description}}">
         <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12">
             <button ng-hide="(!editPermission) && editMode" class="btn btn-xs btn-success pull-right no-radius" ng-click="addItem(item)">
                 <span class="glyphicon glyphicon-plus-sign"></span>
-                Add Item
+                Add
             </button>
         </div>
         <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 business-manager-item-thumbnail bottom-clearfix">
-            <img height="64" width="64" class="img-circle" ng-src="{{item.Pic}}" />
+            <img height="50" width="50" class="img-circle" ng-src="{{item.Pic}}" />
         </div>
         <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 business-manager-item-details bottom-clearfix">
             <h4 class="font-open-sans">{{item.ItemName}}
 
             </h4>
-        </div>
-        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 business-manager-item-details bottom-clearfix">
-            <small class="text-info" title="{{item.Description}}">
-                {{item.Description | truncate:150}}
-            </small>
         </div>
     </div>
 </script>
 
 <!-- Template for Item having item name,description and pic -->
 <script type="text/ng-template" id="/tpl/bus-item-description-picture.html">
-    <div class="row business-manager-item">
+    <div class="row business-manager-item" title="{{item.Description}}">
         <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12">
             <button ng-hide="(!editPermission) && editMode" class="btn btn-xs btn-success pull-right no-radius" ng-click="addItem(item)">
                 <span class="glyphicon glyphicon-plus-sign"></span>
-                Add Item
+                Add
             </button>
         </div>
         <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 business-manager-item-thumbnail bottom-clearfix">
-            <img height="64" width="64" class="img-circle" ng-src="{{item.Pic}}" />
+            <img height="50" width="50" class="img-circle" ng-src="{{item.Pic}}" />
         </div>
         <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 business-manager-item-details bottom-clearfix">
             <h4 class="font-open-sans">{{item.ItemName}}
@@ -926,23 +911,16 @@
             </h4>
         </div>
 
-
-
-        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 business-manager-item-details bottom-clearfix">
-            <small class="text-info" title="{{item.Description}}">
-                {{item.Description | truncate:150}}
-            </small>
-        </div>
     </div>
 </script>
 
 <!-- Template for Item having item name and description -->
 <script type="text/ng-template" id="/tpl/bus-item-description.html">
-    <div class="row business-manager-item">
+    <div class="row business-manager-item" title="{{item.Description}}">
         <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12">
             <button ng-hide="(!editPermission) && editMode" class="btn btn-xs btn-success pull-right no-radius" ng-click="addItem(item)">
                 <span class="glyphicon glyphicon-plus-sign"></span>
-                Add Item
+                Add
             </button>
         </div>
         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 business-manager-item-details bottom-clearfix">
@@ -950,11 +928,7 @@
 
             </h4>
         </div>
-        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 business-manager-item-details bottom-clearfix">
-           <small class="text-info" title="{{item.Description}}">
-               {{item.Description | truncate:150}}
-           </small>
-        </div>
+
     </div>
 </script>
 
