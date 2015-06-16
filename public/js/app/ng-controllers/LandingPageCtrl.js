@@ -126,11 +126,11 @@ angular.module('ezeidApp').
                 }
                 /* check if the user is logged in and the search type is 1[EZEID] */
 
-               /* if (!$rootScope._userInfo.IsAuthenticate && $scope.searchParams.searchType == 1) {
-                    *//* through error *//*
+                if (!$rootScope._userInfo.IsAuthenticate && $scope.searchParams.searchType == 1) {
+                    /* through error */
                     Notification.error({message: 'Please login to search for EZEID', delay: MsgDelay});
                     return false;
-                }*/
+                }
 
                 var modifyValue = [
                     'homeDelivery',
