@@ -1631,3 +1631,7 @@ table.rwd-table > tbody > tr > td.serachResultSelectAll
     color: #0072C3;
     font-size: 16px;
 }
+.setInfoBackGround
+{
+    background: linear-gradient(90deg, #50C9C3 10%, #96DEDA 90%);
+}

@@ -71,6 +71,18 @@ angular.module('ezeidApp').service('UtilityService',['$q',function($q){
                 dateFormat = 'YYYY-MM-DD HH:mm';
             }
             return moment(localTime).utc().format(dateFormat);
+        },
+
+        /**
+         * Check if the value is undefined
+         */
+        chkIfUndefined : function(val)
+        {
+            if(val != 'undefined')
+            {
+                return val;
+            }
+            return false;
         }
 
     };

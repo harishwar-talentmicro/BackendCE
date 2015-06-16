@@ -44,7 +44,7 @@ var res = angular.module('ezeidApp').
             GoogleMap,
             $route,
             UtilityService
-        )
+            )
         {
             $scope.resultPerPage = 20;
             var selectAll = false;
@@ -80,10 +80,8 @@ var res = angular.module('ezeidApp').
                 ["a","b"],
                 ["a","b","c"],
                 ["a","b","c","d"],
-                ["a","b","c","d","e"],
+                ["a","b","c","d","e"]
             ];
-
-
 
             var placeHolder = [
                 "Type EZEID here",
@@ -95,6 +93,16 @@ var res = angular.module('ezeidApp').
             $scope.searchType = searchTypeArr;
 
             $scope.placeHolderText = placeHolder;
+
+            /**
+             * Function for converting LOCAL time (local timezone) to server time
+             */
+            var convertTimeToUTC = function(localTime,dateFormat){
+                if(!dateFormat){
+                    dateFormat = 'DD-MMM-YYYY hh:mm A';
+                }
+                return moment(localTime).utc().format(dateFormat);
+            };
 
             /* convert star ratings to comma seperated string */
             $scope.getSearchStars = function()
@@ -214,6 +222,7 @@ var res = angular.module('ezeidApp').
                 $scope.showDownloadLink = false;
                 var today = moment().format('YYYY-MM-DD HH:mm:ss');
                 var CurrentDate = UtilityService.convertTimeToUTC(today);
+
                 if(!$rootScope._userInfo){
                     $rootScope._userInfo = {};
                 }
@@ -242,75 +251,75 @@ var res = angular.module('ezeidApp').
                     isPagination:1,
                     pagesize:$scope.resultPerPage
                 } }).success(function (data) {
-                    $rootScope.$broadcast('$preLoaderStop');
-                    /* just return the result if only the total result have been demanded */
-                    if(totalStatus)
-                    {
-                        $scope.totalResult = data[0].Count;
+                        $rootScope.$broadcast('$preLoaderStop');
+                        /* just return the result if only the total result have been demanded */
+                        if(totalStatus)
+                        {
+                            $scope.totalResult = data[0].Count;
+                            defer.resolve();
+                            return defer.promise;
+                        }
+                        /* put the maps coordinates in array */
+                        $scope.coordinatesArr = [];
+                        /* count the result */
+                        var count = 0;
+                        //////console.log(data);
+                        if(data != 'null'){
+                            var link = '';
+                            var searchType = $routeParams.searchType;
+                            for(var i=0; i<data.length; i++)
+                            {
+                                count++;
+                                link = "/searchDetails?searchType="+searchType+"&TID="+data[i].TID;
+                                coordinates.push([data[i].Latitude,data[i].Longitude,data[i].CompanyName,link]);
+                                $scope.checkBoxStatus.push(false);
+                            }
+                            $scope.coordinatesArr = coordinates;
+                        }
+                        $scope.searchCount = count;
+
+                        /* status to check if there is some result */
+                        $scope.isResultNumber = (data == 'null') ?0 : 1;
+
+                        $scope.searchListData = (data == 'null') ? [] : data;
+                        if (data != 'null' && data.length>0)
+                        {
+                            $scope.SearchResultCount = data.length;
+                            $window.localStorage.setItem("searchResult", JSON.stringify(data));
+                            if(data[0].Filename)
+                            {
+                                if(($rootScope._userInfo.IsAuthenticate == true) && (data[0].IDTypeID == 1))
+                                {
+                                    $scope.showDownloadLink = true;
+                                    $scope.downloadData = data[0];
+
+                                    var downloadUrl = "/ewtGetSearchDocuments?Token="+$rootScope._userInfo.Token+"&&Keywords="+_filterValue.searchTerm;
+                                    $window.open(downloadUrl, '_blank');
+                                }
+                                else
+                                {
+                                    //Redirect to Login page
+                                    $('#SignIn_popup').slideDown();
+                                    $rootScope.defer = $q.defer();
+                                    var prom = $rootScope.defer.promise;
+                                    prom.then(function(d){
+                                    });
+                                }
+                                $scope.searchListData = null;
+                                $scope.searchCount = 0;
+                            }
+                        }
+                        /* put a little delay */
+                        $timeout(function(){
+                            $scope.$emit('$preLoaderStop');
+
+                        },1500);
                         defer.resolve();
-                        return defer.promise;
-                    }
-                    /* put the maps coordinates in array */
-                    $scope.coordinatesArr = [];
-                    /* count the result */
-                    var count = 0;
-                    //////console.log(data);
-                    if(data != 'null'){
-                        var link = '';
-                        var searchType = $routeParams.searchType;
-                        for(var i=0; i<data.length; i++)
-                        {
-                            count++;
-                            link = "/searchDetails?searchType="+searchType+"&TID="+data[i].TID;
-                            coordinates.push([data[i].Latitude,data[i].Longitude,data[i].CompanyName,link]);
-                            $scope.checkBoxStatus.push(false);
-                        }
-                        $scope.coordinatesArr = coordinates;
-                    }
-                    $scope.searchCount = count;
-
-                    /* status to check if there is some result */
-                    $scope.isResultNumber = (data == 'null') ?0 : 1;
-
-                    $scope.searchListData = (data == 'null') ? [] : data;
-                    if (data != 'null' && data.length>0)
-                    {
-                        $scope.SearchResultCount = data.length;
-                        $window.localStorage.setItem("searchResult", JSON.stringify(data));
-                        if(data[0].Filename)
-                        {
-                            if(($rootScope._userInfo.IsAuthenticate == true) && (data[0].IDTypeID == 1))
-                            {
-                                $scope.showDownloadLink = true;
-                                $scope.downloadData = data[0];
-
-                                var downloadUrl = "/ewtGetSearchDocuments?Token="+$rootScope._userInfo.Token+"&&Keywords="+_filterValue.searchTerm;
-                                $window.open(downloadUrl, '_blank');
-                            }
-                            else
-                            {
-                                //Redirect to Login page
-                                $('#SignIn_popup').slideDown();
-                                $rootScope.defer = $q.defer();
-                                var prom = $rootScope.defer.promise;
-                                prom.then(function(d){
-                                });
-                            }
-                            $scope.searchListData = null;
-                            $scope.searchCount = 0;
-                        }
-                    }
-                    /* put a little delay */
-                    $timeout(function(){
+                    }).error(function(){
+                        Notification.error({ message : 'An error occurred', delay : MsgDelay});
                         $scope.$emit('$preLoaderStop');
-
-                    },1500);
-                    defer.resolve();
-                }).error(function(){
-                    Notification.error({ message : 'An error occurred', delay : MsgDelay});
-                    $scope.$emit('$preLoaderStop');
-                    defer.resolve();
-                });
+                        defer.resolve();
+                    });
                 return defer.promise;
             }
 
@@ -711,7 +720,7 @@ var res = angular.module('ezeidApp').
                 "metro-bg-5",
                 "metro-bg-6",
                 "metro-bg-7",
-                "metro-bg-8",
+                "metro-bg-8"
             ];
             $scope.oldColorValue = 0;
             /* generate a random color string */

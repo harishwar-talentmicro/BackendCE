@@ -23,7 +23,11 @@
         '/profile-manager/:subview',
         '/service-reservation',
         '/outbox',
-        '/access-history'
+        '/access-history',
+        '/sales',
+        '/home_delivery',
+        '/help_desk',
+        '/send_cv'
     ]);
 
     /**
@@ -167,6 +171,23 @@
             .when('/payment',{
                 templateUrl: 'html/payment-api.html',
                 controller : 'paymentApiCtrl'
+            })
+
+            .when('/sales',{
+                templateUrl: 'html/sales.html',
+                controller : 'SalesCtrl'
+            })
+            .when('/home_delivery',{
+                templateUrl: 'html/homeDelivery.html',
+                controller : 'HomeDeliveryCtrl'
+            })
+            .when('/help_desk',{
+                templateUrl: 'html/helpDesk.html',
+                controller : 'InformationDetailCtrl'
+            })
+            .when('/send_cv',{
+                templateUrl: 'html/sendCV.html',
+                controller : 'SendCVCtrl'
             })
             .when('/:ezeid',{
                 templateUrl: 'html/landing.html',

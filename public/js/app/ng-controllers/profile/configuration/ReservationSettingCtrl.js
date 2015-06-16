@@ -6,6 +6,7 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',[
     '$scope',
     '$rootScope',
     '$q',
+    '$timeout',
     '$http',
     'Notification',
     '$filter',
@@ -16,6 +17,7 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',[
         $scope,
         $rootScope,
         $q,
+        $timeout,
         $http,
         Notification,
         $filter,
@@ -28,6 +30,7 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',[
     $scope.selectedTID = [];
 
     resetResourceValue();
+    $scope.$emit('$preLoaderStart');
     getUserDetails();
 
     function resetResourceValue()
@@ -154,11 +157,13 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',[
                 Token : $rootScope._userInfo.Token
             }
         }).success(function(resp){
+                $rootScope.$broadcast('$preLoaderStop');
                 if(resp.length>0){
                     $scope.masterUser = resp[0];
                     getAllResources();
                 }
             }).error(function(err){
+                $rootScope.$broadcast('$preLoaderStop');
                 Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
             });
     };
@@ -416,7 +421,8 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',[
             }
         }).success(function(resp){
                 $scope.$emit('$preLoaderStop');
-                if(resp.status){
+                if(resp.status)
+                {
                     var mappingData = resp.data;
                     var nCount, nServicCount;
                     for (nCount = 0; nCount < mappingData.length; nCount++)
@@ -424,7 +430,7 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',[
                         var res = mappingData[nCount].serviceID.split(",");
                         mappingData[nCount].ServicesArray = JSON.parse("[" + res + "]");
                     }
-                    $scope.AllMappingData = mappingData;
+                        $scope.AllMappingData = mappingData;
                 }
             }).error(function(err){
                 $scope.$emit('$preLoaderStop');
@@ -456,6 +462,7 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',[
                         resetMappingValue();
                         getAllServices();
                         getAllMappingData();
+
                     }).error(function(err){
                         $scope.$emit('$preLoaderStop');
                         Notification.error({ message : 'An error occurred while saving Mapping! Please try again', delay : 2000});
@@ -467,14 +474,19 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',[
     $scope.getServicesOfResource = function(_ResourceId){
         var ResourceId = parseInt(_ResourceId);
         var nCount;
-        for (nCount = 0; nCount <  $scope.AllMappingData.length; nCount++)
+
+        if($scope.AllMappingData)
         {
-            if((parseInt(_ResourceId)) == $scope.AllMappingData[nCount].ResourceID)
+            for (nCount = 0; nCount < $scope.AllMappingData.length; nCount++)
             {
-                var servicesIdArray = JSON.parse("[" + $scope.AllMappingData[nCount].serviceID + "]");
-                $scope.selectedTID = servicesIdArray;
+                if((parseInt(_ResourceId)) == $scope.AllMappingData[nCount].ResourceID)
+                {
+                    var servicesIdArray = JSON.parse("[" + $scope.AllMappingData[nCount].serviceID + "]");
+                    $scope.selectedTID = servicesIdArray;
+                }
             }
         }
+
     };
 
 
