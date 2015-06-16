@@ -603,19 +603,19 @@ angular.module('ezeidApp').
                         {
                             Token : token,
                             TID : 0,
-                            StatusTitle : 'Under Review',
+                            StatusTitle : 'In-process',
                             MasterID : masterId,
                             FunctionType : 0,
                             ProgressPercent : 10,
                             Status : 1,
-                            NotificationMsg : 'Your enquiry is under review',
-                            NotificationMailMsg: 'Your enquiry is under review',
+                            NotificationMsg : 'Your enquiry is under process',
+                            NotificationMailMsg: 'Your enquiry is under process',
                             StatusValue : 1
                         },
                         {
                             Token : token,
                             TID : 0,
-                            StatusTitle : 'Close',
+                            StatusTitle : 'Closed',
                             MasterID : masterId,
                             FunctionType : 1,
                             ProgressPercent : 100,
@@ -627,7 +627,7 @@ angular.module('ezeidApp').
                         {
                             Token : token,
                             TID : 0,
-                            StatusTitle : 'Cancelled',
+                            StatusTitle : 'Dropped',
                             MasterID : masterId,
                             FunctionType : 1,
                             ProgressPercent : 100,
@@ -663,18 +663,6 @@ angular.module('ezeidApp').
                         {
                             Token : token,
                             TID : 0,
-                            StatusTitle : 'Under Process',
-                            MasterID : masterId,
-                            FunctionType : 0,
-                            ProgressPercent : 50,
-                            Status : 1,
-                            NotificationMsg : 'Your enquiry is under process !',
-                            NotificationMailMsg: 'Your enquiry is under process !',
-                            StatusValue : 5
-                        },
-                        {
-                            Token : token,
-                            TID : 0,
                             StatusTitle : 'Cancelled',
                             MasterID : masterId,
                             FunctionType : 0,
@@ -687,19 +675,7 @@ angular.module('ezeidApp').
                         {
                             Token : token,
                             TID : 0,
-                            StatusTitle : 'Delivery in Progress',
-                            MasterID : masterId,
-                            FunctionType : 2,
-                            ProgressPercent : 90,
-                            Status : 1,
-                            NotificationMsg : 'Your order is on the way !',
-                            NotificationMailMsg: 'Your order is on the way !',
-                            StatusValue : 9
-                        },
-                        {
-                            Token : token,
-                            TID : 0,
-                            StatusTitle : 'Under process',
+                            StatusTitle : 'In-process',
                             MasterID : masterId,
                             FunctionType : 2,
                             ProgressPercent : 40,
@@ -711,7 +687,7 @@ angular.module('ezeidApp').
                         {
                             Token : token,
                             TID : 0,
-                            StatusTitle : 'Cancelled',
+                            StatusTitle : 'Dropped',
                             MasterID : masterId,
                             FunctionType : 3,
                             ProgressPercent : 100,
@@ -735,7 +711,7 @@ angular.module('ezeidApp').
                         {
                             Token : token,
                             TID : 0,
-                            StatusTitle : 'Cancelled',
+                            StatusTitle : 'Dropped',
                             MasterID : masterId,
                             FunctionType : 2,
                             ProgressPercent : 100,
