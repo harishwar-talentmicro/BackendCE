@@ -414,12 +414,13 @@ body {
 }
 .newMsgButtonContainer
 {
-    border:solid 2px #FFFFFF;
+   /* border:solid 2px #FFFFFF;*/
     font-size: 10px;
     color: #ffffff;
     background: #09a2de;
    /* border: 1px solid green;*/
     margin-top: 1%;
+    border: 1px solid rgb(112, 115, 118);
 }
 .innerMsgButtonContainer
 {
@@ -1634,4 +1635,16 @@ table.rwd-table > tbody > tr > td.serachResultSelectAll
 .setInfoBackGround
 {
     background: linear-gradient(90deg, #50C9C3 10%, #96DEDA 90%);
+}
+.infoDetailsButton{
+    font-size: 14px;
+    color: #ffffff;
+}
+.infoDetailsButton:hover {
+    color: #ffffff;
+    text-decoration:none;
+}
+.newInfoBorder
+{
+    border: 1px solid #09a2de;
 }
