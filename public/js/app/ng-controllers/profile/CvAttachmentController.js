@@ -106,17 +106,36 @@ angular.module('ezeidApp').controller('CVAttachController',[
 
     this.saveCVDocInfo=function(){
 
-        $scope.$emit('$preLoaderStart');
+       $scope.$emit('$preLoaderStart');
 
        for (var nCount = 0; nCount < $scope.skillMatrix.length; nCount++) {
            $scope.skillMatrix[nCount].active_status = ($scope.skillMatrix[nCount].active_status == true) ? 1 : 0;
        }
 
+        console.log($scope.skillMatrix);
+
+        if(($scope.skillMatrix[0].skillname == "") && ($scope.skillMatrix[0].exp == ""))
+        {
+           // $scope.skillMatrix = [];
+
+            var index = 0;
+
+            if (index > -1) {
+                $scope.skillMatrix.splice(index, 1);
+                skillsTid.splice(index,1);
+            }
+            if($scope.skillMatrix.length == 0)
+            {
+                $scope.skillMatrix = [];
+                skillsTid = [];
+            }
+        }
+
         CVAttachCtrl._CVInfo.skillMatrix = $scope.skillMatrix;
         CVAttachCtrl._CVInfo.skillsTid = skillsTid.toString();
 
         if(isValidate())
-         {
+        {
             CVAttachCtrl._CVInfo.TokenNo = $rootScope._userInfo.Token;
             CVAttachCtrl._CVInfo.Status = parseInt(CVAttachCtrl._CVInfo.Status);
            $http({
@@ -246,7 +265,7 @@ angular.module('ezeidApp').controller('CVAttachController',[
 
     $scope.addMoreSkill = function()
     {
-        if(($scope.skillMatrix[0].skillname) && ($scope.skillMatrix[0].skillname))
+        if(($scope.skillMatrix[0].skillname) && ($scope.skillMatrix[0].exp))
         {
            $scope.skillMatrix.splice(0, 0, {
                 "tid":0,

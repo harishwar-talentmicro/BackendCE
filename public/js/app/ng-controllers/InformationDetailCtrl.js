@@ -18,6 +18,7 @@ angular.module('ezeidApp').
         '$location',
         '$routeParams',
         '$route',
+        'UtilityService',
         function (
             $rootScope,
             $scope,
@@ -32,258 +33,264 @@ angular.module('ezeidApp').
             MsgDelay,
             $location,
             $routeParams,
-            $route
+            $route,
+            UtilityService
             )
-    {
-        /*if($rootScope._userInfo){
-            if(!$rootScope._userInfo.IsAuthenticate){
-                var unregister = $rootScope.$watch('_userInfo',function(newVal,oldVal){
-                    if(newVal){
-                        if(newVal.hasOwnProperty('IsAuthenticate')){
-                            if(newVal.IsAuthenticate){
-                                unregister();
-                                $route.reload();
+        {
+            if($rootScope._userInfo){
+                if(!$rootScope._userInfo.IsAuthenticate){
+                    var unregister = $rootScope.$watch('_userInfo',function(newVal,oldVal){
+                        if(newVal){
+                            if(newVal.hasOwnProperty('IsAuthenticate')){
+                                if(newVal.IsAuthenticate){
+                                    unregister();
+                                    $route.reload();
+                                }
                             }
                         }
+                    });
+                }
+            }
+
+            //Below line is for Loading img
+            $scope.$emit('$preLoaderStart');
+
+            var destroyModalDetailsWatcher = null;
+
+            $scope.SearchInfo = {};
+            var currentBanner = 1;
+            var Miliseconds = 8000;
+            var RefreshTime = Miliseconds;
+            $scope.nextButton = true;
+            $scope.previousButton =  true;
+            var AutoRefresh = true;
+            var x = new Date();
+            var today = moment(x.toISOString()).utc().format('DD-MMM-YYYY hh:mm A');
+            $scope.activeTemplate = "";
+            $scope.showWorkingHourModel = false;
+            $scope.showMapPopupModel = false;
+            $scope.showDetailsModal = false;
+            $scope.showNoticeText = true;
+            $scope.form_rating = 0;
+            $scope.showLoginText = false;
+            $scope.showNotFound = false;
+
+            /**
+             * Function for converting UTC time from server to LOCAL timezone
+             */
+            var convertTimeToLocal = function(timeFromServer,dateFormat,returnFormat){
+                if(!dateFormat){
+                    dateFormat = 'DD-MMM-YYYY hh:mm A';
+                }
+                if(!returnFormat){
+                    returnFormat = dateFormat;
+                }
+                var x = new Date(timeFromServer);
+                var mom1 = moment(x);
+                return mom1.add((mom1.utcOffset()),'m').format(returnFormat);
+            };
+
+            function selectedTimeUtcToLocal(selectedTime)
+            {
+                var x = new Date();
+                var today = moment(x.toISOString()).utc().format('DD-MMM-YYYY');
+
+                var currentTaskDate = moment(today+' '+selectedTime).format('DD-MMM-YYYY H:mm');
+                return convertTimeToLocal(currentTaskDate,'DD-MMM-YYYY H:mm',"H:mm");
+            }
+
+            $scope.modalBox = {
+                title : 'EZEID Map',
+                class : 'business-manager-modal'
+            };
+
+            var TID =  $routeParams.TID;
+            $scope.SearchType = $routeParams.searchType;
+
+            console.log("SAi777");
+            console.log($rootScope._userInfo);
+
+            /*if(($scope.SearchType == 1) && (!$rootScope._userInfo.IsAuthenticate))*/
+            if(($scope.SearchType == 1) && (!$rootScope._userInfo))
+            {
+                $scope.showLoginText = true;
+                $scope.$emit('$preLoaderStop');
+                Notification.error({ message : 'Please login to search for EZEID', delay : MsgDelay});
+            }
+            else
+            {
+                $scope.showLoginText = false;
+                getSearchInformation(TID,$scope.SearchType).then(function(){
+                    var visibleStr = ($scope.SearchInfo.VisibleModules) ? $scope.SearchInfo.VisibleModules.toString() : null;
+                    var visibleModules = (visibleStr) ? ((visibleStr.length == 5) ? visibleStr : '22222') : '22222';
+                    if($routeParams['sales'] && (visibleModules[0] == 1)){
+                        $timeout(function(){
+                            $scope._salesModalTitle = $scope.SearchInfo.EZEID;
+                            $scope._toggleSalesModal();
+                        },1000);
                     }
+
+                    else if($routeParams['reservation'] && (visibleModules[1] == 1)){
+                        $timeout(function(){
+                            $scope._reservationModalTitle = $scope.SearchInfo.EZEID;
+                            $scope._toggleReservationModal();
+                        },1000);
+                    }
+
+                    else if($routeParams['homeDelivery'] && (visibleModules[2] == 1)){
+                        $timeout(function(){
+                            $scope._homeDeliveryTitle = $scope.SearchInfo.EZEID;
+                            $scope._toggleHomeDeliveryModal();
+                        },1000);
+                    }
+                    else if($routeParams['service'] && (visibleModules[3] == 1)){
+                        $timeout(function(){
+                            $scope._serviceModalTitle = $scope.SearchInfo.EZEID;
+                            $scope._toggleServiceModal();
+                        },1000);
+                    }
+
+                    else if($routeParams['resume'] && (visibleModules[4] == 1)){
+                        $timeout(function(){
+                            $scope._resumeModalTitle = $scope.SearchInfo.EZEID;
+                            $scope._toggleResumeModal();
+                        },1000);
+                    }
+
+
                 });
             }
-        }*/
 
-        //Below line is for Loading img
-      //  $scope.$emit('$preLoaderStart');
+            var convertTimeToUTC = function(localTime,dateFormat){
+                if(!dateFormat){
+                    dateFormat = 'DD-MMM-YYYY hh:mm A';
+                }
+                return moment(localTime).utc().format(dateFormat);
+            };
 
-        var destroyModalDetailsWatcher = null;
-
-      /*  $scope.SearchInfo = {};
-        var currentBanner = 1;
-        var Miliseconds = 8000;
-        var RefreshTime = Miliseconds;
-        $scope.nextButton = true;
-        $scope.previousButton =  true;
-        var AutoRefresh = true;
-        var currentDate = moment().format('YYYY-MM-DD HH:mm:ss');
-        var x = new Date();
-        var today = moment(x.toISOString()).utc().format('DD-MMM-YYYY hh:mm A');
-       */
-        $scope.activeTemplate = "";
-        $scope.showWorkingHourModel = false;
-        $scope.showMapPopupModel = false;
-      //  $scope.showDetailsModal = false;
-      //  $scope.showNoticeText = true;
-     //   $scope.form_rating = 0;
-     //   $scope.showLoginText = false;
-     //   $scope.showNotFound = false;
-
-        /**
-         * Function for converting UTC time from server to LOCAL timezone
-         */
-        var convertTimeToLocal = function(timeFromServer,dateFormat,returnFormat){
-            if(!dateFormat){
-                dateFormat = 'DD-MMM-YYYY hh:mm A';
-            }
-            if(!returnFormat){
-                returnFormat = dateFormat;
-            }
-            var x = new Date(timeFromServer);
-            var mom1 = moment(x);
-            return mom1.add((mom1.utcOffset()),'m').format(returnFormat);
-        };
-
-        function selectedTimeUtcToLocal(selectedTime)
-        {
-            var x = new Date();
-            var today = moment(x.toISOString()).utc().format('DD-MMM-YYYY');
-
-            var currentTaskDate = moment(today+' '+selectedTime).format('DD-MMM-YYYY H:mm');
-            return convertTimeToLocal(currentTaskDate,'DD-MMM-YYYY H:mm',"H:mm");
-        }
-
-        $scope.modalBox = {
-            title : 'EZEID Map',
-            class : 'business-manager-modal'
-        };
-
-       // var TID =  $routeParams.TID;
-      //  $scope.SearchType = $routeParams.searchType;
-
-       /* if(($scope.SearchType == 1) && (!$rootScope._userInfo.IsAuthenticate))
-        {
-            $scope.showLoginText = true;
-            $scope.$emit('$preLoaderStop');
-            Notification.error({ message : 'Please login to search for EZEID', delay : MsgDelay});
-        }
-        else
-        {
-            $scope.showLoginText = false;
-            if($scope.TID)
+            //Below function is for getting search information
+            function getSearchInformation(_TID,_SearchType)
             {
-                getSearchInformation($scope.TID,$scope.SearchType);
-            }
+                var today = moment().format('YYYY-MM-DD HH:mm:ss');
+                var CurrentDate = UtilityService.convertTimeToUTC(today);
 
-
-          *//*  getSearchInformation(TID,$scope.SearchType).then(function(){
-                var visibleStr = ($scope.SearchInfo.VisibleModules) ? $scope.SearchInfo.VisibleModules.toString() : null;
-                var visibleModules = (visibleStr) ? ((visibleStr.length == 5) ? visibleStr : '22222') : '22222';
-                if($routeParams['sales'] && (visibleModules[0] == 1)){
-                    $timeout(function(){
-                        $scope._salesModalTitle = $scope.SearchInfo.EZEID;
-                        $scope._toggleSalesModal();
-                    },1000);
-                }
-
-                else if($routeParams['reservation'] && (visibleModules[1] == 1)){
-                    $timeout(function(){
-                        $scope._reservationModalTitle = $scope.SearchInfo.EZEID;
-                        $scope._toggleReservationModal();
-                    },1000);
-                }
-
-                else if($routeParams['homeDelivery'] && (visibleModules[2] == 1)){
-                    $timeout(function(){
-                        $scope._homeDeliveryTitle = $scope.SearchInfo.EZEID;
-                        $scope._toggleHomeDeliveryModal();
-                    },1000);
-                }
-                else if($routeParams['service'] && (visibleModules[3] == 1)){
-                    $timeout(function(){
-                        $scope._serviceModalTitle = $scope.SearchInfo.EZEID;
-                        $scope._toggleServiceModal();
-                    },1000);
-                }
-
-                else if($routeParams['resume'] && (visibleModules[4] == 1)){
-                    $timeout(function(){
-                        $scope._resumeModalTitle = $scope.SearchInfo.EZEID;
-                        $scope._toggleResumeModal();
-                    },1000);
-                }
-
-
-            });*//*
-        }*/
-        //Below function is for getting search information
-       /* function getSearchInformation(_TID,_SearchType)
-        {
-            var defer = $q.defer();
-            $scope.SearchInfo = {};
-            $scope.AddressForInfoTab = "";
-            AutoRefresh = false;
-            if(!$rootScope._userInfo)
-            {
-                $rootScope._userInfo = {};
-            }
-            if(!$rootScope._userInfo.IsAuthenticate){
-                $rootScope._userInfo.Token = 2;
-                $scope.Token = 2;
-            }
-            $http({ method: 'get',
-                url: GURL + 'ewtGetSearchInformation?Token=' + $rootScope._userInfo.Token + '&TID=' + _TID + '&SearchType=' + _SearchType + '&CurrentDate=' + currentDate}).success(function (data) {
-
-                $rootScope.$broadcast('$preLoaderStop');
-                    console.log("search inform",data);
-                if (data && data != 'null')
+                var defer = $q.defer();
+                $scope.SearchInfo = {};
+                $scope.AddressForInfoTab = "";
+                AutoRefresh = false;
+                if(!$rootScope._userInfo)
                 {
-                  $timeout(function () {
-                        $scope.SearchInfo = data[0];
-                        $scope.showDetailsModal1 = true;
-                        //  $scope.showDetailsModal = true;
+                    $rootScope._userInfo = {};
+                }
+                if(!$rootScope._userInfo.IsAuthenticate){
+                    $rootScope._userInfo.Token = 2;
+                    $scope.Token = 2;
+                }
+                $http({ method: 'get',
+                    url: GURL + 'ewtGetSearchInformation?Token=' + $rootScope._userInfo.Token + '&TID=' + _TID + '&SearchType=' + _SearchType + '&CurrentDate=' + CurrentDate}).success(function (data) {
 
-                      destroyModalDetailsWatcher = $scope.$watch('showDetailsModal',function(newVal,oldVal){
-                                if(!newVal){
-                                    //Below line is for Loading img
-                                    if(!$scope.businessModalOpen){
-                                        $scope.$emit('$preLoaderStart');
-                                        $timeout(function(){
+                        $rootScope.$broadcast('$preLoaderStop');
+                        if (data && data != 'null')
+                        {
+                            $timeout(function () {
+                                $scope.SearchInfo = data[0];
+                                $scope.showDetailsModal = true;
 
-                                            $window.history.back();
-                                        },500);
+                                destroyModalDetailsWatcher = $scope.$watch('showDetailsModal',function(newVal,oldVal){
+                                    if(!newVal){
+                                        //Below line is for Loading img
+                                        if(!$scope.businessModalOpen){
+                                            $scope.$emit('$preLoaderStart');
+                                            $timeout(function(){
 
+                                                $window.history.back();
+                                            },500);
+
+                                        }
                                     }
+                                });
+
+                                if($scope.SearchInfo.IDTypeID == 2)
+                                {
+                                    getAboutComapny();
                                 }
+
+                                if(TID == $scope.SearchInfo.LocID)
+                                {
+                                    $scope.showNoticeText = false;
+                                }
+
+                                $scope.showSalesEnquiry = $scope.SearchInfo.VisibleModules[0];
+                                $scope.shoReserVation = $scope.SearchInfo.VisibleModules[1];
+                                $scope.showHomeDelivery = $scope.SearchInfo.VisibleModules[2];
+                                $scope.showServiceRequest = $scope.SearchInfo.VisibleModules[3];
+                                $scope.showSendCv = $scope.SearchInfo.VisibleModules[4];
+
+                                //Below lines are to show address in info tab
+                                $scope.AddressForInfoTab = ($scope.SearchInfo.AddressLine1 != "") ? $scope.SearchInfo.AddressLine1 +', ' : "";
+                                $scope.AddressForInfoTab += ($scope.SearchInfo.AddressLine2 != "") ? $scope.SearchInfo.AddressLine2 +', ' : "";
+                                $scope.AddressForInfoTab += ($scope.SearchInfo.CityTitle != "") ? $scope.SearchInfo.CityTitle +', ' : "";
+                                $scope.AddressForInfoTab += ($scope.SearchInfo.CountryTitle != "") ? $scope.SearchInfo.CountryTitle +', ' : "";
+                                $scope.AddressForInfoTab += ($scope.SearchInfo.PostalCode != "") ? $scope.SearchInfo.PostalCode : "";
+
+                                $window.localStorage.setItem("myLocation",$scope.SearchInfo.Latitude+","+$scope.SearchInfo.Longitude );
+
+                                if($scope.SearchInfo.ParkingStatus==0)
+                                {
+                                    $scope.parkingTitle = "Parking Status";
+                                }
+                                if($scope.SearchInfo.ParkingStatus==1)
+                                {
+                                    $scope.parkingTitle = "Public Parking";
+                                }
+                                if($scope.SearchInfo.ParkingStatus==2)
+                                {
+                                    $scope.parkingTitle = "Vallet Parking";
+                                }
+                                if($scope.SearchInfo.ParkingStatus==3)
+                                {
+                                    $scope.parkingTitle = "No parking";
+                                }
+
+                                $scope.form_rating = data[0].Rating;
+
+                                //Call for banner
+                                AutoRefresh = true;
+                                getBanner(1);
+
+                                if($scope.SearchInfo.IDTypeID == 2)
+                                {
+                                    $scope.reservationPlaceHolder = "Reservation requirement details";
+                                }
+                                else
+                                {
+                                    $scope.reservationPlaceHolder = "Appointment requirement details";
+                                }
+                                defer.resolve();
                             });
-
-                        if($scope.SearchInfo.IDTypeID == 2)
-                        {
-                            getAboutComapny();
-                        }
-
-                        if(TID == $scope.SearchInfo.LocID)
-                        {
-                            $scope.showNoticeText = false;
-                        }
-
-                        $scope.showSalesEnquiry = $scope.SearchInfo.VisibleModules[0];
-                        $scope.shoReserVation = $scope.SearchInfo.VisibleModules[1];
-                        $scope.showHomeDelivery = $scope.SearchInfo.VisibleModules[2];
-                        $scope.showServiceRequest = $scope.SearchInfo.VisibleModules[3];
-                        $scope.showSendCv = $scope.SearchInfo.VisibleModules[4];
-
-                        //Below lines are to show address in info tab
-                        $scope.AddressForInfoTab = ($scope.SearchInfo.AddressLine1 != "") ? $scope.SearchInfo.AddressLine1 +', ' : "";
-                        $scope.AddressForInfoTab += ($scope.SearchInfo.AddressLine2 != "") ? $scope.SearchInfo.AddressLine2 +', ' : "";
-                        $scope.AddressForInfoTab += ($scope.SearchInfo.CityTitle != "") ? $scope.SearchInfo.CityTitle +', ' : "";
-                        $scope.AddressForInfoTab += ($scope.SearchInfo.CountryTitle != "") ? $scope.SearchInfo.CountryTitle +', ' : "";
-                        $scope.AddressForInfoTab += ($scope.SearchInfo.PostalCode != "") ? $scope.SearchInfo.PostalCode : "";
-
-                        $window.localStorage.setItem("myLocation",$scope.SearchInfo.Latitude+","+$scope.SearchInfo.Longitude );
-
-                        if($scope.SearchInfo.ParkingStatus==0)
-                        {
-                            $scope.parkingTitle = "Parking Status";
-                        }
-                        if($scope.SearchInfo.ParkingStatus==1)
-                        {
-                            $scope.parkingTitle = "Public Parking";
-                        }
-                        if($scope.SearchInfo.ParkingStatus==2)
-                        {
-                            $scope.parkingTitle = "Vallet Parking";
-                        }
-                        if($scope.SearchInfo.ParkingStatus==3)
-                        {
-                            $scope.parkingTitle = "No parking";
-                        }
-
-                        $scope.form_rating = data[0].Rating;
-
-                        //Call for banner
-                        AutoRefresh = true;
-                        getBanner(1);
-
-                        if($scope.SearchInfo.IDTypeID == 2)
-                        {
-                            $scope.reservationPlaceHolder = "Reservation requirement details";
                         }
                         else
                         {
-                            $scope.reservationPlaceHolder = "Appointment requirement details";
+                            $scope.showNotFound = true;
+                            defer.reject();
                         }
-                        defer.resolve();
+                    })
+                    .error(function(data, status, headers, config) {
+                        defer.reject();
+                        $rootScope.$broadcast('$preLoaderStop');
                     });
-                }
-                else
-                {
-                    $scope.showNotFound = true;
-                    defer.reject();
-                }
-            })
-            .error(function(data, status, headers, config) {
-                    defer.reject();
-                    $rootScope.$broadcast('$preLoaderStop');
-            });
-            return defer.promise;
-        }*/
+                return defer.promise;
+            }
 
-        //Below function is for getting about company
-      /*  function getAboutComapny()
-        {
-            $http({ method: 'get', url: GURL + 'ewtCompanyProfile?TID=' + $scope.SearchInfo.TID}).success(function (data) {
-                if (data.Result.length > 0) {
-                    $scope.companyTagLine = data.Result[0].TagLine;
-                 }
-            });
-        }
+            //Below function is for getting about company
+            function getAboutComapny()
+            {
+                $http({ method: 'get', url: GURL + 'ewtCompanyProfile?TID=' + $scope.SearchInfo.TID}).success(function (data) {
+                    if (data.Result.length > 0) {
+                        $scope.companyTagLine = data.Result[0].TagLine;
+                    }
+                });
+            }
 
             //Auto refresh Banner
             $interval(function() {
@@ -323,22 +330,22 @@ angular.module('ezeidApp').
                         else
                         {
                             //Enable next button
-                             $scope.nextButton = true;
+                            $scope.nextButton = true;
                         }
 
                         if(currentBanner <= 1)
                         {
                             //Disabled previous button
-                             $scope.previousButton = false;
+                            $scope.previousButton = false;
                         }
                         else
                         {   //Enable previous button
-                             $scope.previousButton = true;
+                            $scope.previousButton = true;
                         }
                     }
                     else
                     {
-                       Notification.error({ message: "No Banner found..!", delay: MsgDelay });
+                        Notification.error({ message: "No Banner found..!", delay: MsgDelay });
                     }
                 });
             }
@@ -361,7 +368,7 @@ angular.module('ezeidApp').
                     getBanner(currentBanner);
                     RefreshTime = Miliseconds;
                 }
-            };*/
+            };
 
             $scope.sendSalesEnquiry = function () {
                 if ($rootScope._userInfo.IsAuthenticate == true) {
@@ -431,326 +438,339 @@ angular.module('ezeidApp').
                 $('#HomeDelivery_popup').slideUp();
             };
 
-        //open Reservation form
-        $scope.openReservationForm = function (_Ezeid)
-        {
-            console.log("SAi reseration form",_Ezeid);
-           if($rootScope._userInfo.Token == 2)
+            //open Reservation form
+            $scope.openReservationForm = function (_Ezeid)
             {
-                $('#SignIn_popup').slideDown();
-            }
-            else
-            {
-                var params = '?ezeid='+_Ezeid;
-                $timeout(function(){
-                    $location.url('/service-reservation'+params+'&name='+$scope.SearchInfo.CompanyName);
-                },500);
-              //  destroyModalDetailsWatcher();
-                $scope.showDetailsModal = false;
-            }
-        };
-
-        //open Service Request form
-        $scope.openServiceRequestForm = function () {
-            if($rootScope._userInfo.Token == 2)
-            {
-                $('#SignIn_popup').slideDown();
-            }
-            else
-            {
-                $('#ServiceRequest_popup').slideDown();
-            }
-        };
-
-        //Send Service Request
-        $scope.sendServiceRequest = function () {
-            if ($rootScope._userInfo.IsAuthenticate == true) {
-                var currentTaskDate = moment().format('DD-MMM-YYYY hh:mm A');
-                $http({ method: 'post', url: GURL + 'ewtSaveMessage', data: { TokenNo: $rootScope._userInfo.Token, ToMasterID: $scope.SearchInfo.TID, MessageType: 4, Message: $scope.ServiceRequestMessage, TaskDateTime: today, LocID :$scope.SearchInfo.LocID,CurrentTaskDate : currentTaskDate } }).success(function (data) {
-
-                    if (data.IsSuccessfull) {
-                        $('#ServiceRequest_popup').slideUp();
-                        $scope.ServiceRequestMessage = "";
-                        Notification.success({ message: 'Message send success', delay: MsgDelay });
-                    }
-                    else {
-                        Notification.error({ message: 'Sorry..! Message not send ', delay: MsgDelay });
-                    }
-                });
-            }else {
-                //Redirect to Login page
-                $('#SignIn_popup').slideDown();
-            }
-        };
-
-        // Close Service Request Form
-        $scope.closeServiceRequestForm = function () {
-            $('#ServiceRequest_popup').slideUp();
-            $scope.ServiceRequestMessage = "";
-        };
-
-        //open CV form
-        $scope.openCVForm = function() {
-            if($rootScope._userInfo.Token == 2)
-            {
-                $('#SignIn_popup').slideDown();
-            }
-            else
-            {
-                $('#CV_popup').slideDown();
-            }
-        };
-        //Send CV Request
-        function sendCV() {
-            if ($rootScope._userInfo.IsAuthenticate == true) {
-                var currentTaskDate = moment().format('DD-MMM-YYYY hh:mm A');
-                $http({ method: 'post', url: GURL + 'ewtSaveMessage', data: { TokenNo: $rootScope._userInfo.Token, ToMasterID: $scope.SearchInfo.TID, MessageType: 5, Message: "", TaskDateTime: today, LocID :$scope.SearchInfo.LocID, CurrentTaskDate: currentTaskDate } }).success(function (data) {
-
-                    if (data.IsSuccessfull) {
-                        $('#CV_popup').slideUp();
-                        Notification.success({ message: 'CV send success', delay: MsgDelay });
-                    }
-                    else {
-                        Notification.error({ message: 'Sorry..! Message not send ', delay: MsgDelay });
-                    }
-                });
-            }
-            else {
-                //Redirect to Login page
-                $('#SignIn_popup').slideDown();
-            }
-        };
-
-        //check for CV is uploaded by user or not
-        $scope.checkForCVAvailability = function () {
-            $scope.showCVSendButton = "";
-            if ($rootScope._userInfo.IsAuthenticate == true)
-            {
-                $http({ method: 'post', url: GURL + 'ewtCheckCV', data: { Token: $rootScope._userInfo.Token } }).success(function (data) {
-                    if (data.IsSuccessfull)
-                    {
-                        sendCV();
-                    }
-                    else
-                    {
-                        $('#CV_popup').slideUp();
-                        Notification.error({ message: 'Sorry..! CV is not uploaded... ', delay: MsgDelay });
-                    }
-                });
-            }
-            else {
-                //Redirect to Login page
-                $('#SignIn_popup').slideDown();
-            }
-        };
-
-        // Close CV Form
-        $scope.closeCVForm = function () {
-            $('#CV_popup').slideUp();
-        };
-
-        $scope.getdirections = function (data) {
-
-            console.log("map data",data);
-            $scope.activeTemplate = "html/mapPopView.html";
-            $scope.showMapPopupModel = true;
-
-            var end = new google.maps.LatLng(data.Latitude, data.Longitude);
-            var userLoc = {
-                endLat: data.Latitude,
-                endLong : data.Longitude,
-                IDTypeID : data.IDTypeID
+                if($rootScope._userInfo.Token == 2)
+                {
+                    $('#SignIn_popup').slideDown();
+                }
+                else
+                {
+                    var params = '?ezeid='+_Ezeid;
+                    $timeout(function(){
+                        $location.url('/service-reservation'+params+'&name='+$scope.SearchInfo.CompanyName);
+                    },500);
+                    destroyModalDetailsWatcher();
+                    $scope.showDetailsModal = false;
+                }
             };
 
-            $window.localStorage.setItem("myLocation", JSON.stringify(userLoc));
-        };
-
-        //open working hour popup
-        $scope.openWorkingHourPopup = function () {
-           if($rootScope._userInfo.Token == 2)
-            {
-                $('#SignIn_popup').slideDown();
-            }
-            else
-            {
-                $scope.showWorkingHourModel = true;
-                $http({ method: 'get', url: GURL + 'ewtGetWorkingHrsHolidayList?Token=' + $rootScope._userInfo.Token + '&LocID=' + $scope.SearchInfo.LocID }).success(function (data)
+            //open Service Request form
+            $scope.openServiceRequestForm = function () {
+                if($rootScope._userInfo.Token == 2)
                 {
+                    $('#SignIn_popup').slideDown();
+                }
+                else
+                {
+                    $('#ServiceRequest_popup').slideDown();
+                }
+            };
 
-                    if (data != 'null')
-                    {
-                        if(data.WorkingHours != "")
-                        {
-                            $scope.Mo1 = (data.WorkingHours[0].MO1 == "00:00") ? '08:00' : selectedTimeUtcToLocal(data.WorkingHours[0].MO1);
-                            $scope.Mo2 = (data.WorkingHours[0].MO2 == "00:00") ? '13:00' : selectedTimeUtcToLocal(data.WorkingHours[0].MO2);
-                            $scope.Mo3 = (data.WorkingHours[0].MO3 == "00:00") ? '13:00' : selectedTimeUtcToLocal(data.WorkingHours[0].MO3);
-                            $scope.Mo4 = (data.WorkingHours[0].MO4 == "00:00") ? '21:00' : selectedTimeUtcToLocal(data.WorkingHours[0].MO4);
+            //Send Service Request
+            $scope.sendServiceRequest = function () {
+                if ($rootScope._userInfo.IsAuthenticate == true) {
+                    var currentTaskDate = moment().format('DD-MMM-YYYY hh:mm A');
+                    $http({ method: 'post', url: GURL + 'ewtSaveMessage', data: { TokenNo: $rootScope._userInfo.Token, ToMasterID: $scope.SearchInfo.TID, MessageType: 4, Message: $scope.ServiceRequestMessage, TaskDateTime: today, LocID :$scope.SearchInfo.LocID,CurrentTaskDate : currentTaskDate } }).success(function (data) {
 
-                            $scope.Tu1 = (data.WorkingHours[0].TU1 == "00:00") ? '08:00' : selectedTimeUtcToLocal(data.WorkingHours[0].TU1);
-                            $scope.Tu2 = (data.WorkingHours[0].TU2 == "00:00") ? '13:00' : selectedTimeUtcToLocal(data.WorkingHours[0].TU2);
-                            $scope.Tu3 = (data.WorkingHours[0].TU3 == "00:00") ? '13:00' : selectedTimeUtcToLocal(data.WorkingHours[0].TU3);
-                            $scope.Tu4 = (data.WorkingHours[0].TU4 == "00:00") ? '21:00' : selectedTimeUtcToLocal(data.WorkingHours[0].TU4);
-
-                            $scope.We1 = (data.WorkingHours[0].WE1 == "00:00") ? '08:00' : selectedTimeUtcToLocal(data.WorkingHours[0].WE1);
-                            $scope.We2 = (data.WorkingHours[0].WE2 == "00:00") ? '13:00' : selectedTimeUtcToLocal(data.WorkingHours[0].WE2);
-                            $scope.We3 = (data.WorkingHours[0].WE3 == "00:00") ? '13:00' : selectedTimeUtcToLocal(data.WorkingHours[0].WE3);
-                            $scope.We4 = (data.WorkingHours[0].WE4 == "00:00") ? '21:00' : selectedTimeUtcToLocal(data.WorkingHours[0].WE4);
-
-                            $scope.Th1 = (data.WorkingHours[0].TH1 == "00:00") ? '08:00' : selectedTimeUtcToLocal(data.WorkingHours[0].TH1);
-                            $scope.Th2 = (data.WorkingHours[0].TH2 == "00:00") ? '13:00' : selectedTimeUtcToLocal(data.WorkingHours[0].TH2);
-                            $scope.Th3 = (data.WorkingHours[0].TH3 == "00:00") ? '13:00' : selectedTimeUtcToLocal(data.WorkingHours[0].TH3);
-                            $scope.Th4 = (data.WorkingHours[0].TH4 == "00:00") ? '21:00' : selectedTimeUtcToLocal(data.WorkingHours[0].TH4);
-
-                            $scope.Fr1 = (data.WorkingHours[0].FR1 == "00:00") ? '08:00' : selectedTimeUtcToLocal(data.WorkingHours[0].FR1);
-                            $scope.Fr2 = (data.WorkingHours[0].FR2 == "00:00") ? '13:00' : selectedTimeUtcToLocal(data.WorkingHours[0].FR2);
-                            $scope.Fr3 = (data.WorkingHours[0].FR3 == "00:00") ? '13:00' : selectedTimeUtcToLocal(data.WorkingHours[0].FR3);
-                            $scope.Fr4 = (data.WorkingHours[0].FR4 == "00:00") ? '21:00' : selectedTimeUtcToLocal(data.WorkingHours[0].FR4);
-
-                            $scope.Sa1 = (data.WorkingHours[0].SA1 == "00:00") ? '08:00' : selectedTimeUtcToLocal(data.WorkingHours[0].SA1);
-                            $scope.Sa2 = (data.WorkingHours[0].SA2 == "00:00") ? '13:00' : selectedTimeUtcToLocal(data.WorkingHours[0].SA2);
-                            $scope.Sa3 = (data.WorkingHours[0].SA3 == "00:00") ? '13:00' : selectedTimeUtcToLocal(data.WorkingHours[0].SA3);
-                            $scope.Sa4 = (data.WorkingHours[0].SA4 == "00:00") ? '21:00' : selectedTimeUtcToLocal(data.WorkingHours[0].SA4);
-
-                            $scope.Su1 = (data.WorkingHours[0].SU1 == "00:00") ? '08:00' : selectedTimeUtcToLocal(data.WorkingHours[0].SU1);
-                            $scope.Su2 = (data.WorkingHours[0].SU2 == "00:00") ? '13:00' : selectedTimeUtcToLocal(data.WorkingHours[0].SU2);
-                            $scope.Su3 = (data.WorkingHours[0].SU3 == "00:00") ? '13:00' : selectedTimeUtcToLocal(data.WorkingHours[0].SU3);
-                            $scope.Su4 = (data.WorkingHours[0].SU4 == "00:00") ? '21:00' : selectedTimeUtcToLocal(data.WorkingHours[0].SU4);
+                        if (data.IsSuccessfull) {
+                            $('#ServiceRequest_popup').slideUp();
+                            $scope.ServiceRequestMessage = "";
+                            Notification.success({ message: 'Message send success', delay: MsgDelay });
                         }
-
-                        if(data.HolidayList != "")
-                        {
-                            $scope.holiday = data.HolidayList;
+                        else {
+                            Notification.error({ message: 'Sorry..! Message not send ', delay: MsgDelay });
                         }
-                    }
-                    else
+                    });
+                }else {
+                    //Redirect to Login page
+                    $('#SignIn_popup').slideDown();
+                }
+            };
+
+            // Close Service Request Form
+            $scope.closeServiceRequestForm = function () {
+                $('#ServiceRequest_popup').slideUp();
+                $scope.ServiceRequestMessage = "";
+            };
+
+            //open CV form
+            $scope.openCVForm = function() {
+                if($rootScope._userInfo.Token == 2)
+                {
+                    $('#SignIn_popup').slideDown();
+                }
+                else
+                {
+                    $('#CV_popup').slideDown();
+                }
+            };
+            //Send CV Request
+            function sendCV() {
+                if ($rootScope._userInfo.IsAuthenticate == true) {
+                    var currentTaskDate = moment().format('DD-MMM-YYYY hh:mm A');
+                    $http({ method: 'post', url: GURL + 'ewtSaveMessage', data: { TokenNo: $rootScope._userInfo.Token, ToMasterID: $scope.SearchInfo.TID, MessageType: 5, Message: "", TaskDateTime: today, LocID :$scope.SearchInfo.LocID, CurrentTaskDate: currentTaskDate } }).success(function (data) {
+
+                        if (data.IsSuccessfull) {
+                            $('#CV_popup').slideUp();
+                            Notification.success({ message: 'CV send success', delay: MsgDelay });
+                        }
+                        else {
+                            Notification.error({ message: 'Sorry..! Message not send ', delay: MsgDelay });
+                        }
+                    });
+                }
+                else {
+                    //Redirect to Login page
+                    $('#SignIn_popup').slideDown();
+                }
+            };
+
+            //check for CV is uploaded by user or not
+            $scope.checkForCVAvailability = function () {
+                $scope.showCVSendButton = "";
+                if ($rootScope._userInfo.IsAuthenticate == true)
+                {
+                    $http({ method: 'post', url: GURL + 'ewtCheckCV', data: { Token: $rootScope._userInfo.Token } }).success(function (data) {
+                        if (data.IsSuccessfull)
+                        {
+                            sendCV();
+                        }
+                        else
+                        {
+                            $('#CV_popup').slideUp();
+                            Notification.error({ message: 'Sorry..! CV is not uploaded... ', delay: MsgDelay });
+                        }
+                    });
+                }
+                else {
+                    //Redirect to Login page
+                    $('#SignIn_popup').slideDown();
+                }
+            };
+
+            // Close CV Form
+            $scope.closeCVForm = function () {
+                $('#CV_popup').slideUp();
+            };
+
+            $scope.getdirections = function (data) {
+
+                $scope.activeTemplate = "html/mapPopView.html";
+                $scope.showMapPopupModel = true;
+
+                // var end = new google.maps.LatLng(data.Latitude, data.Longitude);
+                var userLoc = {
+                    endLat: data.Latitude,
+                    endLong : data.Longitude,
+                    IDTypeID : data.IDTypeID
+                };
+
+                $window.localStorage.setItem("myLocation", JSON.stringify(userLoc));
+
+
+               // var params = '?endLat='+data.Latitude+'&endLong='+data.Longitude+'&IDTypeID='+data.IDTypeID;
+
+              //  $location.url('/mapDirection'+params);
+            };
+
+            //open working hour popup
+            $scope.openWorkingHourPopup = function () {
+                if($rootScope._userInfo.Token == 2)
+                {
+                    $('#SignIn_popup').slideDown();
+                }
+                else
+                {
+                    $http({ method: 'get', url: GURL + 'ewtGetWorkingHrsHolidayList?Token=' + $rootScope._userInfo.Token + '&LocID=' + $scope.SearchInfo.LocID }).success(function (data)
                     {
-                        // Notification.error({ message: 'Invalid key or not found…', delay: MsgDelay });
-                    }
-                });
-                // $('#WorkingHour_popup').slideDown();
-            }
-        };
+                        $scope.showWorkingHourModel = true;
+                        if (data != 'null')
+                        {
+                            if(data.WorkingHours != "")
+                            {
+                                $scope.Mo1 = (data.WorkingHours[0].MO1 == "00:00") ? '08:00' : selectedTimeUtcToLocal(data.WorkingHours[0].MO1);
+                                $scope.Mo2 = (data.WorkingHours[0].MO2 == "00:00") ? '13:00' : selectedTimeUtcToLocal(data.WorkingHours[0].MO2);
+                                $scope.Mo3 = (data.WorkingHours[0].MO3 == "00:00") ? '13:00' : selectedTimeUtcToLocal(data.WorkingHours[0].MO3);
+                                $scope.Mo4 = (data.WorkingHours[0].MO4 == "00:00") ? '21:00' : selectedTimeUtcToLocal(data.WorkingHours[0].MO4);
 
-        /**
-         * @author Indrajeet
-         * @description New Sales Module Integration
-         */
-        $scope._salesModalTitle = 'Sales Enquiry Form';
-        $scope._showSalesModal = false;
-        $scope._toggleSalesModal = function(){
-            if(!$rootScope._userInfo.Token)
-            {
-                $('#SignIn_popup').slideDown();
-            }
-            else if($rootScope._userInfo.Token == 2)
-            {
-                $('#SignIn_popup').slideDown();
-            }
-            else {
-                $scope.businessModalOpen = true;
-                $scope.showDetailsModal = false;
-                $timeout(function () {
-                    $scope._showSalesModal = !$scope._showSalesModal;
-                }, 500);
-            }
-        };
+                                $scope.Tu1 = (data.WorkingHours[0].TU1 == "00:00") ? '08:00' : selectedTimeUtcToLocal(data.WorkingHours[0].TU1);
+                                $scope.Tu2 = (data.WorkingHours[0].TU2 == "00:00") ? '13:00' : selectedTimeUtcToLocal(data.WorkingHours[0].TU2);
+                                $scope.Tu3 = (data.WorkingHours[0].TU3 == "00:00") ? '13:00' : selectedTimeUtcToLocal(data.WorkingHours[0].TU3);
+                                $scope.Tu4 = (data.WorkingHours[0].TU4 == "00:00") ? '21:00' : selectedTimeUtcToLocal(data.WorkingHours[0].TU4);
 
-        $scope._toggleReservationModal = function(){
+                                $scope.We1 = (data.WorkingHours[0].WE1 == "00:00") ? '08:00' : selectedTimeUtcToLocal(data.WorkingHours[0].WE1);
+                                $scope.We2 = (data.WorkingHours[0].WE2 == "00:00") ? '13:00' : selectedTimeUtcToLocal(data.WorkingHours[0].WE2);
+                                $scope.We3 = (data.WorkingHours[0].WE3 == "00:00") ? '13:00' : selectedTimeUtcToLocal(data.WorkingHours[0].WE3);
+                                $scope.We4 = (data.WorkingHours[0].WE4 == "00:00") ? '21:00' : selectedTimeUtcToLocal(data.WorkingHours[0].WE4);
+
+                                $scope.Th1 = (data.WorkingHours[0].TH1 == "00:00") ? '08:00' : selectedTimeUtcToLocal(data.WorkingHours[0].TH1);
+                                $scope.Th2 = (data.WorkingHours[0].TH2 == "00:00") ? '13:00' : selectedTimeUtcToLocal(data.WorkingHours[0].TH2);
+                                $scope.Th3 = (data.WorkingHours[0].TH3 == "00:00") ? '13:00' : selectedTimeUtcToLocal(data.WorkingHours[0].TH3);
+                                $scope.Th4 = (data.WorkingHours[0].TH4 == "00:00") ? '21:00' : selectedTimeUtcToLocal(data.WorkingHours[0].TH4);
+
+                                $scope.Fr1 = (data.WorkingHours[0].FR1 == "00:00") ? '08:00' : selectedTimeUtcToLocal(data.WorkingHours[0].FR1);
+                                $scope.Fr2 = (data.WorkingHours[0].FR2 == "00:00") ? '13:00' : selectedTimeUtcToLocal(data.WorkingHours[0].FR2);
+                                $scope.Fr3 = (data.WorkingHours[0].FR3 == "00:00") ? '13:00' : selectedTimeUtcToLocal(data.WorkingHours[0].FR3);
+                                $scope.Fr4 = (data.WorkingHours[0].FR4 == "00:00") ? '21:00' : selectedTimeUtcToLocal(data.WorkingHours[0].FR4);
+
+                                $scope.Sa1 = (data.WorkingHours[0].SA1 == "00:00") ? '08:00' : selectedTimeUtcToLocal(data.WorkingHours[0].SA1);
+                                $scope.Sa2 = (data.WorkingHours[0].SA2 == "00:00") ? '13:00' : selectedTimeUtcToLocal(data.WorkingHours[0].SA2);
+                                $scope.Sa3 = (data.WorkingHours[0].SA3 == "00:00") ? '13:00' : selectedTimeUtcToLocal(data.WorkingHours[0].SA3);
+                                $scope.Sa4 = (data.WorkingHours[0].SA4 == "00:00") ? '21:00' : selectedTimeUtcToLocal(data.WorkingHours[0].SA4);
+
+                                $scope.Su1 = (data.WorkingHours[0].SU1 == "00:00") ? '08:00' : selectedTimeUtcToLocal(data.WorkingHours[0].SU1);
+                                $scope.Su2 = (data.WorkingHours[0].SU2 == "00:00") ? '13:00' : selectedTimeUtcToLocal(data.WorkingHours[0].SU2);
+                                $scope.Su3 = (data.WorkingHours[0].SU3 == "00:00") ? '13:00' : selectedTimeUtcToLocal(data.WorkingHours[0].SU3);
+                                $scope.Su4 = (data.WorkingHours[0].SU4 == "00:00") ? '21:00' : selectedTimeUtcToLocal(data.WorkingHours[0].SU4);
+                            }
+
+                            if(data.HolidayList != "")
+                            {
+                                $scope.holiday = data.HolidayList;
+                            }
+                        }
+                        else
+                        {
+                            // Notification.error({ message: 'Invalid key or not found…', delay: MsgDelay });
+                        }
+                    });
+                    // $('#WorkingHour_popup').slideDown();
+                }
+            };
+
             /**
-             * @todo
-             * Open Reservation Modal
+             * @author Indrajeet
+             * @description New Sales Module Integration
              */
-        };
+            $scope._salesModalTitle = 'Sales Enquiry Form';
+            $scope._showSalesModal = false;
+            $scope._toggleSalesModal = function(){
+                if(!$rootScope._userInfo.Token)
+                {
+                    $('#SignIn_popup').slideDown();
+                }
+                else if($rootScope._userInfo.Token == 2)
+                {
+                    $('#SignIn_popup').slideDown();
+                }
+                else {
+                    $scope.businessModalOpen = true;
+                    $scope.showDetailsModal = false;
+                    $timeout(function () {
+                        $scope._showSalesModal = !$scope._showSalesModal;
+                    }, 500);
+                }
 
-        $scope._homeDeliveryModalTitle = 'Home Delivery Order Form';
-        $scope._showHomeDeliveryModal = false;
-        $scope._toggleHomeDeliveryModal = function(){
-            if(!$rootScope._userInfo.Token)
-            {
-                $('#SignIn_popup').slideDown();
-            }
-            else if($rootScope._userInfo.Token == 2)
-            {
-                $('#SignIn_popup').slideDown();
-            }
-            else{
-                $scope.businessModalOpen = true;
-                $scope.showDetailsModal = false;
-                $timeout(function() {
-                    $scope._showHomeDeliveryModal = !$scope._showHomeDeliveryModal;
-                },500);
-            }
-        };
+               // $location.url('/sales?TID='+TID);
+            };
 
-        $scope._serviceModalTitle = 'Helpdesk Form';
-        $scope._showServiceModal = false;
-        $scope._toggleServiceModal = function(){
-            if(!$rootScope._userInfo.Token)
-            {
-                $('#SignIn_popup').slideDown();
-            }
-            else if($rootScope._userInfo.Token == 2)
-            {
-                $('#SignIn_popup').slideDown();
-            }
-            else{
-                $scope.businessModalOpen = true;
-                $scope.showDetailsModal = false;
-                $timeout(function() {
-                    $scope._showServiceModal = !$scope._showServiceModal;
-                },500);
-            }
-        };
+            $scope._toggleReservationModal = function(){
+                /**
+                 * @todo
+                 * Open Reservation Modal
+                 */
+            };
 
-        $scope._resumeModalTitle = 'Submit Resume Application';
-        $scope._showResumeModal = false;
-        $scope._toggleResumeModal = function(){
-            if(!$rootScope._userInfo.Token)
-            {
-                $('#SignIn_popup').slideDown();
-            }
-            else if($rootScope._userInfo.Token == 2)
-            {
-                $('#SignIn_popup').slideDown();
-            }
-            else {
-                $scope.businessModalOpen = true;
-                $scope.showDetailsModal = false;
-                $timeout(function(){
-                    $scope._showResumeModal = !$scope._showResumeModal;
-                },500);
+            $scope._homeDeliveryModalTitle = 'Home Delivery Order Form';
+            $scope._showHomeDeliveryModal = false;
+            $scope._toggleHomeDeliveryModal = function(){
+                if(!$rootScope._userInfo.Token)
+                {
+                    $('#SignIn_popup').slideDown();
+                }
+                else if($rootScope._userInfo.Token == 2)
+                {
+                    $('#SignIn_popup').slideDown();
+                }
+                else{
+                    $scope.businessModalOpen = true;
+                    $scope.showDetailsModal = false;
+                    $timeout(function() {
+                        $scope._showHomeDeliveryModal = !$scope._showHomeDeliveryModal;
+                    },500);
+                }
 
-            }
-        };
+                // $location.url('/homeDelivery?TID='+TID);
 
-        $scope.businessModalOpen = false;
+            };
 
-        $scope.$watch('_showSalesModal',function(n){
-            if(!n){
-                $scope.businessModalOpen = false;
-                $scope.showDetailsModal = true;
-            }
-        });
+            $scope._serviceModalTitle = 'Helpdesk Form';
+            $scope._showServiceModal = false;
+            $scope._toggleServiceModal = function(){
+                if(!$rootScope._userInfo.Token)
+                {
+                    $('#SignIn_popup').slideDown();
+                }
+                else if($rootScope._userInfo.Token == 2)
+                {
+                    $('#SignIn_popup').slideDown();
+                }
+                else{
+                    $scope.businessModalOpen = true;
+                    $scope.showDetailsModal = false;
+                    $timeout(function() {
+                        $scope._showServiceModal = !$scope._showServiceModal;
+                    },500);
+                }
 
-        $scope.$watch('_showHomeDeliveryModal',function(n){
-            if(!n){
-                $scope.businessModalOpen = false;
-                $scope.showDetailsModal = true;
-            }
-        });
+                // $location.url('/helpDesk?TID='+TID);
 
-        $scope.$watch('_showServiceModal',function(n){
-            if(!n){
-                $scope.businessModalOpen = false;
-                $scope.showDetailsModal = true;
-            }
-        });
+            };
 
-        $scope.$watch('_showResumeModal',function(n){
-            if(!n){
-                $scope.businessModalOpen = false;
-                $scope.showDetailsModal = true;
-            }
-        });
-    }
-]);
+            $scope._resumeModalTitle = 'Submit Resume Application';
+            $scope._showResumeModal = false;
+            $scope._toggleResumeModal = function(){
+                if(!$rootScope._userInfo.Token)
+                {
+                    $('#SignIn_popup').slideDown();
+                }
+                else if($rootScope._userInfo.Token == 2)
+                {
+                    $('#SignIn_popup').slideDown();
+                }
+                else {
+                    $scope.businessModalOpen = true;
+                    $scope.showDetailsModal = false;
+                    $timeout(function(){
+                        $scope._showResumeModal = !$scope._showResumeModal;
+                    },500);
+
+                }
+
+                // $location.url('/sendCV?TID='+TID);
+            };
+
+            $scope.businessModalOpen = false;
+
+            $scope.$watch('_showSalesModal',function(n){
+                if(!n){
+                    $scope.businessModalOpen = false;
+                    $scope.showDetailsModal = true;
+                }
+            });
+
+            $scope.$watch('_showHomeDeliveryModal',function(n){
+                if(!n){
+                    $scope.businessModalOpen = false;
+                    $scope.showDetailsModal = true;
+                }
+            });
+
+            $scope.$watch('_showServiceModal',function(n){
+                if(!n){
+                    $scope.businessModalOpen = false;
+                    $scope.showDetailsModal = true;
+                }
+            });
+
+            $scope.$watch('_showResumeModal',function(n){
+                if(!n){
+                    $scope.businessModalOpen = false;
+                    $scope.showDetailsModal = true;
+                }
+            });
+
+        }
+    ]);
