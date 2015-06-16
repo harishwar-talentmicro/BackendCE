@@ -6950,7 +6950,7 @@ exports.FnSaveTranscation = function(req, res){
         var ItemIDList='';
         var ToEZEID = req.body.ToEZEID;
         var item_list_type = 0;
-        
+        var companyName = req.body.companyName ? req.body.companyName : '' ;
         var RtnMessage = {
             IsSuccessfull: false,
             MessageID:0
@@ -6976,7 +6976,7 @@ exports.FnSaveTranscation = function(req, res){
                 if (!err) {
                     if (Result != null) {
 
-                        var query = db.escape(Token)+","+db.escape(FunctionType)+","+ db.escape(MessageText)+ "," + db.escape(Status) +"," + db.escape(TaskDateNew) + ","  + db.escape(Notes) + "," + db.escape(LocID)  + "," + db.escape(Country)   + "," + db.escape(State) + "," + db.escape(City)   + "," + db.escape(Area) + ","  + db.escape(Latitude)  + "," + db.escape(Longitude)  +  "," + db.escape(EZEID)  + "," + db.escape(ContactInfo)  + "," + db.escape(FolderRuleID)  + "," + db.escape(Duration)  + "," + db.escape(DurationScales) + "," + db.escape(NextAction) + "," + db.escape(NextActionDateTimeNew) + "," + db.escape(TID) + "," + db.escape(((ItemIDList != "") ? ItemIDList : "")) + "," + db.escape(DeliveryAddress) + "," + db.escape(ToEZEID) + "," + db.escape(item_list_type) ;
+                        var query = db.escape(Token)+","+db.escape(FunctionType)+","+ db.escape(MessageText)+ "," + db.escape(Status) +"," + db.escape(TaskDateNew) + ","  + db.escape(Notes) + "," + db.escape(LocID)  + "," + db.escape(Country)   + "," + db.escape(State) + "," + db.escape(City)   + "," + db.escape(Area) + ","  + db.escape(Latitude)  + "," + db.escape(Longitude)  +  "," + db.escape(EZEID)  + "," + db.escape(ContactInfo)  + "," + db.escape(FolderRuleID)  + "," + db.escape(Duration)  + "," + db.escape(DurationScales) + "," + db.escape(NextAction) + "," + db.escape(NextActionDateTimeNew) + "," + db.escape(TID) + "," + db.escape(((ItemIDList != "") ? ItemIDList : "")) + "," + db.escape(DeliveryAddress) + "," + db.escape(ToEZEID) + "," + db.escape(item_list_type) + "," + db.escape(companyName);
                         // db.escape(NextActionDateTime);
                         console.log('CALL pSaveTrans(' + query + ')');
                         db.query('CALL pSaveTrans(' + query + ')', function (err, InsertResult) {
@@ -11384,7 +11384,11 @@ exports.FnSearchBusListing = function(req,res,next){
         'profile-manager',
         'searchResult',
         'searchDetails',
-        'outbox'
+        'outbox',
+        'sales',
+        'home_delivery',
+        'help_desk',
+        'send_cv'
     ];
 
     var loginCookie = (req.cookies['login']) ? ((req.cookies['login'] === 'true') ? true : false ) : false;
@@ -11936,6 +11940,86 @@ exports.FnChangeReservationStatus = function(req,res){
             });
         }
     });
+};
+
+exports.FnGetTransAutoComplete = function (req, res) {
+    
+    try {
+
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var title = req.query.title;
+        var type = req.query.type;
+
+        var responseMessage = {
+            status: false,
+            data: null,
+            error:{},
+            message:''
+        };
+        
+        if (title) {
+            
+            db.query('CALL PgetTransAutocomplete(' + db.escape(title) + ',' + db.escape(type) + ')', function (err, GetResult) {
+                            if (!err) {
+                                if (GetResult != null) {
+                                    if (GetResult[0].length > 0) {
+                                        responseMessage.status = true;
+                                        responseMessage.data = GetResult[0] ;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Transaction details Send successfully';
+                                        console.log('FnGetTransAutoComplete: Transaction details Send successfully');
+                                        res.status(200).json(responseMessage);
+                                    }
+                                    else {
+                                        
+                                        responseMessage.error = {};
+                                        responseMessage.message = 'No founded Transaction details';
+                                        console.log('FnGetTransAutoComplete: No founded Transaction details');
+                                        res.json(responseMessage);
+                                    }
+                                }
+                                else {
+
+                                    
+                                    responseMessage.error = {};
+                                    responseMessage.message = 'No founded Transaction details';
+                                    console.log('FnGetTransAutoComplete: No founded Transaction details');
+                                    res.json(responseMessage);
+                                }
+
+                            }
+                            else {
+                                
+                                responseMessage.data = null ;
+                                responseMessage.error = {};
+                                responseMessage.message = 'Error in getting Transaction details';
+                                console.log('FnGetTransAutoComplete: error in getting Transaction details' + err);
+                                res.status(500).json(responseMessage);
+                            }
+                        });
+                    }
+                    
+        else {
+            if (!title) {
+                responseMessage.message = 'Invalid title';            
+                responseMessage.error = {
+                    title : 'Invalid title'
+                };
+                console.log('FnGetTransAutoComplete: title is mandatory field');
+            }
+           
+            res.status(401).json(responseMessage);
+        }
+    }
+     catch (ex) {
+        responseMessage.error = {};
+        responseMessage.message = 'An error occured !'
+        console.log('FnGetTransAutoComplete:error ' + ex.description);
+        throw new Error(ex);
+        res.status(400).json(responseMessage);
+    }
 };
 
 

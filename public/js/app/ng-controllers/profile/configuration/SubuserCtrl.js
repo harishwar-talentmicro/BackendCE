@@ -141,7 +141,7 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope',
             var userIndex = $(element).data('index');
             $scope.modalBox.userIndex = userIndex;
             $scope.modalBox.subuser = $scope.subusers[userIndex];
-            $scope.modalBox.title = "Update Subuser";
+            $scope.modalBox.title = "Update user";
             $scope.modalBox.ezeidExists = true;
             $scope.modalBox.isEzeidAvailable = true;
             var callback = function(){

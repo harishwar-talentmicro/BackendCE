@@ -483,7 +483,8 @@
                     NextActionDateTime : moment().format('DD MMM YYYY hh:mm:ss'),
                     ItemsList: JSON.stringify($scope.modalBox.tx.itemList),
                     DeliveryAddress : $scope.modalBox.tx.address + $scope.modalBox.tx.area + $scope.modalBox.tx.city +
-                    $scope.modalBox.tx.state + $scope.modalBox.tx.country
+                    $scope.modalBox.tx.state + $scope.modalBox.tx.country,
+                    companyName : ($scope.masterUser.IDTypeID == 1) ? $scope.masterUser.FirstName : $scope.masterUser.CompanyName
                 };
                 return preparedTx;
             };
