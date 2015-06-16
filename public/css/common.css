@@ -1585,7 +1585,7 @@ span.smallCloselink {
   background: #FFFFFF;
   margin-bottom: 5px;
   margin-top: 5px;
-  box-shadow: 0px 0px 10px #CACACA;
+  /*box-shadow: 0px 0px 10px #CACACA;*/
   border: 1px solid #BDBDBD;
   margin: 5px;
 }
@@ -1608,6 +1608,14 @@ span.smallCloselink {
 
 .top-clearfix-half{
     margin-top:50px;
+}
+.tx-row.even{
+    background-color: #DBFFF0;
+    border: 1px solid #8CEDD7;
+}
+.tx-row.odd{
+    background-color: #FFFFFF;
+    border: 1px solid #D0D0D0;
 }
 
 
