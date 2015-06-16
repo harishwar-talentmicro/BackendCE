@@ -174,20 +174,16 @@
             })
 
             .when('/sales',{
-                templateUrl: 'html/sales.html',
-                controller : 'SalesCtrl'
+                templateUrl: 'html/sales.html'
             })
             .when('/home_delivery',{
-                templateUrl: 'html/homeDelivery.html',
-                controller : 'HomeDeliveryCtrl'
+                templateUrl: 'html/homeDelivery.html'
             })
             .when('/help_desk',{
-                templateUrl: 'html/helpDesk.html',
-                controller : 'InformationDetailCtrl'
+                templateUrl: 'html/helpDesk.html'
             })
             .when('/send_cv',{
-                templateUrl: 'html/sendCV.html',
-                controller : 'SendCVCtrl'
+                templateUrl: 'html/sendCV.html'
             })
             .when('/:ezeid',{
                 templateUrl: 'html/landing.html',

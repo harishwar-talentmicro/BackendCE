@@ -169,6 +169,7 @@ var res = angular.module('ezeidApp').
                 $scope.searchStars[starRating[i]-1] = true;
             }
 
+
             if(($scope.params.searchType == 1) && (!$rootScope._userInfo.IsAuthenticate))
             {
                 $scope.showLoginText = true;
@@ -183,8 +184,14 @@ var res = angular.module('ezeidApp').
                 getSearchKeyWord($scope.params);
             }
 
-            /* // To get search key result
-             getSearchKeyWord($scope.params);*/
+
+
+          //  $scope.showDownloadLink = false;
+          //  $scope.showLoginText = false;
+            // To get search key result
+           // getSearchKeyWord($scope.params);
+
+
 
             //find out range of the ratings
             var initialVal = $routeParams.rating[0]?$routeParams.rating[0]:1;
@@ -251,6 +258,9 @@ var res = angular.module('ezeidApp').
                     isPagination:1,
                     pagesize:$scope.resultPerPage
                 } }).success(function (data) {
+                        console.log(data[0]);
+                        console.log($rootScope._userInfo.IsAuthenticate);
+                        console.log("sai77777");
                         $rootScope.$broadcast('$preLoaderStop');
                         /* just return the result if only the total result have been demanded */
                         if(totalStatus)
@@ -263,18 +273,26 @@ var res = angular.module('ezeidApp').
                         $scope.coordinatesArr = [];
                         /* count the result */
                         var count = 0;
-                        //////console.log(data);
                         if(data != 'null'){
-                            var link = '';
-                            var searchType = $routeParams.searchType;
-                            for(var i=0; i<data.length; i++)
+
+                            console.log("sai777778");
+                            console.log(data);
+                            /*if((data[0].IDTypeID == 2) || ($rootScope._userInfo.IsAuthenticate))*/
+                            if(data[0].IDTypeID == 2)
                             {
-                                count++;
-                                link = "/searchDetails?searchType="+searchType+"&TID="+data[i].TID;
-                                coordinates.push([data[i].Latitude,data[i].Longitude,data[i].CompanyName,link]);
-                                $scope.checkBoxStatus.push(false);
+                                console.log("SAi55555");
+
+                                var link = '';
+                                var searchType = $routeParams.searchType;
+                                for(var i=0; i<data.length; i++)
+                                {
+                                    count++;
+                                    link = "/searchDetails?searchType="+searchType+"&TID="+data[i].TID;
+                                    coordinates.push([data[i].Latitude,data[i].Longitude,data[i].CompanyName,link]);
+                                    $scope.checkBoxStatus.push(false);
+                                }
+                                $scope.coordinatesArr = coordinates;
                             }
-                            $scope.coordinatesArr = coordinates;
                         }
                         $scope.searchCount = count;
 
@@ -343,12 +361,12 @@ var res = angular.module('ezeidApp').
                     return false;
                 }
                 /* check if the user is logged in and the search type is 1[EZEID] */
-                if(!$rootScope._userInfo.IsAuthenticate && $scope.params.searchType == 1)
+                /*if(!$rootScope._userInfo.IsAuthenticate && $scope.params.searchType == 1)
                 {
-                    /* through error */
+                    *//* through error *//*
                     Notification.error({ message : 'Please login to search for EZEID', delay : MsgDelay});
                     return false;
-                }
+                }*/
 
                 /* update the coordinates */
                 $scope.params.lat = $rootScope.coordinatesLat;
@@ -996,7 +1014,6 @@ var res = angular.module('ezeidApp').
                     $scope.paginationNext = false;
                     $scope.paginationPrevious = false;
                 }
-                console.log($scope.paginationPrevious,$scope.paginationNext);
             });
 
             /**
