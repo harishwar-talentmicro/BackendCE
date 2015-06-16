@@ -4145,7 +4145,7 @@ exports.FnSearchByKeywords = function (req, res) {
         var pagecount = req.body.pagecount ? parseInt(req.body.pagecount) : 0;
         var total = req.body.total ? parseInt(req.body.total) : 0; 
         
-        console.log(req.body);
+        //console.log(req.body);
 
         if (type == "1") {
             
@@ -4342,7 +4342,9 @@ exports.FnSearchByKeywords = function (req, res) {
                         //console.log(SearchResult);
                         if (SearchResult[0] != null) {
                             if (SearchResult[0].length > 0) {
-                                res.send(SearchResult[0]);
+                                //res.send(SearchResult);
+                                
+                                res.json({totalcount:SearchResult[0][0].totalcount,Result:SearchResult[1]});
                                 console.log('FnSearchByKeywords:  tmaster:Search Found');
                             }
                             else {
