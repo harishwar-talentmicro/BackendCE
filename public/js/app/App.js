@@ -172,10 +172,7 @@
                 templateUrl: 'html/payment-api.html',
                 controller : 'paymentApiCtrl'
             })
-            .when('/:ezeid',{
-                templateUrl: 'html/landing.html',
-                controller : 'LandingPageCtrl'
-            })
+
             .when('/sales',{
                 templateUrl: 'html/sales.html',
                 controller : 'SalesCtrl'
@@ -191,6 +188,10 @@
             .when('/send_cv',{
                 templateUrl: 'html/sendCV.html',
                 controller : 'SendCVCtrl'
+            })
+            .when('/:ezeid',{
+                templateUrl: 'html/landing.html',
+                controller : 'LandingPageCtrl'
             })
             .otherwise({redirectTo : '/'});
     $locationProvider.html5Mode(true);

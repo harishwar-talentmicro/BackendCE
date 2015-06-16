@@ -16,7 +16,7 @@
 
 <!--Middle container-->
 <div style="min-height: 545px;">
-    <div class="Popup_window form_style map_popup_iconActions" id="SalesEnquiryRequest_popup" style="height: 103%;">
+    <!--<div class="Popup_window form_style map_popup_iconActions" id="SalesEnquiryRequest_popup" style="height: 103%;">
         <div class="window_page Maping_popup">
             <span class="closelink" ng-click="closeSalesEnquiryForm()">X</span>
             <form name="salesEnquiryForm" ng-submit="salesEnquiryForm.$valid && sendSalesEnquiry()" novalidate>
@@ -95,8 +95,8 @@
             </form>
         </div>
     </div>
-
-    <div class="infoModal">
+-->
+    <div class="infoModal" ng-hide="showLoginText">
 
         <div class="row bottom-clearfix">&nbsp;</div>
 
@@ -449,8 +449,8 @@
 <!--Middle container End-->
 
 
-<div class="sales-module-modal">
-    <!-- Modal Box starts -->
+<!--<div class="sales-module-modal">
+    &lt;!&ndash; Modal Box starts &ndash;&gt;
     <modal mtitle="_salesModalTitle" mclass="modalBox.class" visible="_showSalesModal">
         <div class="container-fluid" ng-controller="SalesFrontCtrl">
             <div class="row">
@@ -639,11 +639,11 @@
             </div>
         </div>
     </modal>
-    <!-- end: ModalBox ends -->
+    &lt;!&ndash; end: ModalBox ends &ndash;&gt;
 </div>
 
 <div class="home-delivery-module-modal">
-    <!-- Modal Box starts -->
+    &lt;!&ndash; Modal Box starts &ndash;&gt;
     <modal mtitle="_homeDeliveryModalTitle" mclass="modalBox.class" visible="_showHomeDeliveryModal">
         <div class="container-fluid" ng-controller="HomeDeliveryFrontCtrl">
             <div class="row">
@@ -832,14 +832,14 @@
             </div>
         </div>
     </modal>
-    <!-- end: ModalBox ends -->
+    &lt;!&ndash; end: ModalBox ends &ndash;&gt;
 
 
 
 </div>
 
 <div class="service-module-modal">
-    <!-- Modal Box starts -->
+    &lt;!&ndash; Modal Box starts &ndash;&gt;
     <modal mtitle="_serviceModalTitle" mclass="modalBox.class" visible="_showServiceModal">
         <div class="container-fluid" ng-controller="ServiceFrontCtrl">
             <div class="row">
@@ -1017,10 +1017,6 @@
                                 Cancel
                             </button>
                         </div>
-
-
-
-
                     </div>
 
                 </div>
@@ -1028,11 +1024,11 @@
             </div>
         </div>
     </modal>
-    <!-- end: ModalBox ends -->
+    &lt;!&ndash; end: ModalBox ends &ndash;&gt;
 </div>
 
 <div class="resume-module-modal">
-    <!-- Modal Box starts -->
+    &lt;!&ndash; Modal Box starts &ndash;&gt;
     <modal mtitle="_resumeModalTitle" mclass="modalBox.class" visible="_showResumeModal">
         <div class="container-fluid" ng-controller="ResumeFrontCtrl">
             <div class="row">
@@ -1046,8 +1042,6 @@
                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 transaction-details-box">
 
                     <div class="row">
-
-
                         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                             <div class="row">
                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
@@ -1162,8 +1156,8 @@
             </div>
         </div>
     </modal>
-    <!-- end: ModalBox ends -->
-</div>
+    &lt;!&ndash; end: ModalBox ends &ndash;&gt;
+</div>-->
 <!-- Footer goes here -->
 <footer-section></footer-section>
 <!-- Footer Ends here -->

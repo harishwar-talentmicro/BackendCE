@@ -107,15 +107,12 @@ angular.module('ezeidApp').
             var TID =  $routeParams.TID;
             $scope.SearchType = $routeParams.searchType;
 
-            console.log("SAi777");
-            console.log($rootScope._userInfo);
-
-            /*if(($scope.SearchType == 1) && (!$rootScope._userInfo.IsAuthenticate))*/
-            if(($scope.SearchType == 1) && (!$rootScope._userInfo))
+            if(($scope.SearchType == 1) && (!$rootScope._userInfo.IsAuthenticate))
             {
                 $scope.showLoginText = true;
                 $scope.$emit('$preLoaderStop');
                 Notification.error({ message : 'Please login to search for EZEID', delay : MsgDelay});
+                return false;
             }
             else
             {
@@ -156,7 +153,6 @@ angular.module('ezeidApp').
                             $scope._toggleResumeModal();
                         },1000);
                     }
-
 
                 });
             }
@@ -647,7 +643,7 @@ angular.module('ezeidApp').
             $scope._salesModalTitle = 'Sales Enquiry Form';
             $scope._showSalesModal = false;
             $scope._toggleSalesModal = function(){
-                if(!$rootScope._userInfo.Token)
+                /*if(!$rootScope._userInfo.Token)
                 {
                     $('#SignIn_popup').slideDown();
                 }
@@ -661,9 +657,20 @@ angular.module('ezeidApp').
                     $timeout(function () {
                         $scope._showSalesModal = !$scope._showSalesModal;
                     }, 500);
-                }
+                }*/
 
-               // $location.url('/sales?TID='+TID);
+                if(!$rootScope._userInfo.Token)
+                 {
+                    $('#SignIn_popup').slideDown();
+                 }
+                 else if($rootScope._userInfo.Token == 2)
+                 {
+                    $('#SignIn_popup').slideDown();
+                 }
+                 else
+                 {
+                    $location.url('/sales?TID='+TID);
+                 }
             };
 
             $scope._toggleReservationModal = function(){
@@ -676,7 +683,7 @@ angular.module('ezeidApp').
             $scope._homeDeliveryModalTitle = 'Home Delivery Order Form';
             $scope._showHomeDeliveryModal = false;
             $scope._toggleHomeDeliveryModal = function(){
-                if(!$rootScope._userInfo.Token)
+                /*if(!$rootScope._userInfo.Token)
                 {
                     $('#SignIn_popup').slideDown();
                 }
@@ -690,16 +697,25 @@ angular.module('ezeidApp').
                     $timeout(function() {
                         $scope._showHomeDeliveryModal = !$scope._showHomeDeliveryModal;
                     },500);
+                }*/
+
+                if(!$rootScope._userInfo.Token)
+                {
+                    $('#SignIn_popup').slideDown();
                 }
-
-                // $location.url('/homeDelivery?TID='+TID);
-
+                else if($rootScope._userInfo.Token == 2)
+                {
+                    $('#SignIn_popup').slideDown();
+                }
+                else{
+                    $location.url('/home_delivery?TID='+TID);
+                }
             };
 
             $scope._serviceModalTitle = 'Helpdesk Form';
             $scope._showServiceModal = false;
             $scope._toggleServiceModal = function(){
-                if(!$rootScope._userInfo.Token)
+               /* if(!$rootScope._userInfo.Token)
                 {
                     $('#SignIn_popup').slideDown();
                 }
@@ -713,16 +729,25 @@ angular.module('ezeidApp').
                     $timeout(function() {
                         $scope._showServiceModal = !$scope._showServiceModal;
                     },500);
+                }*/
+
+                if(!$rootScope._userInfo.Token)
+                {
+                    $('#SignIn_popup').slideDown();
                 }
-
-                // $location.url('/helpDesk?TID='+TID);
-
+                else if($rootScope._userInfo.Token == 2)
+                {
+                    $('#SignIn_popup').slideDown();
+                }
+                else{
+                    $location.url('/help_desk?TID='+TID);
+                }
             };
 
             $scope._resumeModalTitle = 'Submit Resume Application';
             $scope._showResumeModal = false;
             $scope._toggleResumeModal = function(){
-                if(!$rootScope._userInfo.Token)
+                /*if(!$rootScope._userInfo.Token)
                 {
                     $('#SignIn_popup').slideDown();
                 }
@@ -736,10 +761,20 @@ angular.module('ezeidApp').
                     $timeout(function(){
                         $scope._showResumeModal = !$scope._showResumeModal;
                     },500);
+                }*/
 
+                if(!$rootScope._userInfo.Token)
+                {
+                    $('#SignIn_popup').slideDown();
+                }
+                else if($rootScope._userInfo.Token == 2)
+                {
+                    $('#SignIn_popup').slideDown();
+                }
+                else {
+                    $location.url('/send_cv?TID='+TID);
                 }
 
-                // $location.url('/sendCV?TID='+TID);
             };
 
             $scope.businessModalOpen = false;
