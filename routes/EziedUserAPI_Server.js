@@ -11384,7 +11384,11 @@ exports.FnSearchBusListing = function(req,res,next){
         'profile-manager',
         'searchResult',
         'searchDetails',
-        'outbox'
+        'outbox',
+        'sales',
+        'home_delivery',
+        'help_desk',
+        'send_cv'
     ];
 
     var loginCookie = (req.cookies['login']) ? ((req.cookies['login'] === 'true') ? true : false ) : false;
