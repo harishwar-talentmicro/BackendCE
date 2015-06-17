@@ -44,7 +44,7 @@ var res = angular.module('ezeidApp').
             GoogleMap,
             $route,
             UtilityService
-            )
+        )
         {
             $scope.resultPerPage = 20;
             var selectAll = false;
@@ -243,81 +243,79 @@ var res = angular.module('ezeidApp').
                     Rating:_filterValue.rating,
                     HomeDelivery:_filterValue.homeDelivery,
                     CurrentDate:CurrentDate,
-                    total:total,
                     pagecount:pagecount,
                     isPagination:1,
                     pagesize:$scope.resultPerPage
                 } }).success(function (data) {
 
-                        $rootScope.$broadcast('$preLoaderStop');
-                        /* just return the result if only the total result have been demanded */
-                        if(totalStatus)
+                    /* set the total count */
+                    $scope.totalResult = data['totalcount'];
+                    var result = data['Result'];
+
+                    $rootScope.$broadcast('$preLoaderStop');
+                    /* put the maps coordinates in array */
+                    $scope.coordinatesArr = [];
+                    /* count the result */
+                    var count = 0;
+
+                    if(result && result !== 'null'){
+
+                        var link = '';
+                        var searchType = $routeParams.searchType;
+                        for(var i=0; i<result.length; i++)
                         {
-                            $scope.totalResult = data[0].Count;
-                            defer.resolve();
-                            return defer.promise;
+                            count++;
+                            link = "/searchDetails?searchType="+searchType+"&TID="+result[i].TID;
+                            coordinates.push([result[i].Latitude,result[i].Longitude,result[i].CompanyName,link]);
+                            $scope.checkBoxStatus.push(false);
                         }
-                        /* put the maps coordinates in array */
-                        $scope.coordinatesArr = [];
-                        /* count the result */
-                        var count = 0;
-                        if(data != 'null'){
+                        $scope.coordinatesArr = coordinates;
+                    }
+                    $scope.searchCount = count;
 
-                            var link = '';
-                            var searchType = $routeParams.searchType;
-                            for(var i=0; i<data.length; i++)
-                            {
-                                count++;
-                                link = "/searchDetails?searchType="+searchType+"&TID="+data[i].TID;
-                                coordinates.push([data[i].Latitude,data[i].Longitude,data[i].CompanyName,link]);
-                                $scope.checkBoxStatus.push(false);
-                            }
-                            $scope.coordinatesArr = coordinates;
-                        }
-                        $scope.searchCount = count;
+                    /* status to check if there is some result */
+                    $scope.isResultNumber = (result && result !== 'null') ? ((result.length > 0) ? 1 : 0) : 0;
 
-                        /* status to check if there is some result */
-                        $scope.isResultNumber = (data == 'null') ?0 : 1;
+                    $scope.searchListData = (result && result !== 'null') ? ((result.length > 0) ? result : []) : [];
 
-                        $scope.searchListData = (data == 'null') ? [] : data;
-                        if (data != 'null' && data.length>0)
+                    if (data != 'null' && data.length>0)
+                    {
+                        $scope.SearchResultCount = data.length;
+                        $window.localStorage.setItem("searchResult", JSON.stringify(data));
+                        if(data[0].Filename)
                         {
-                            $scope.SearchResultCount = data.length;
-                            $window.localStorage.setItem("searchResult", JSON.stringify(data));
-                            if(data[0].Filename)
+                            if(($rootScope._userInfo.IsAuthenticate == true) && (data[0].IDTypeID == 1))
                             {
-                                if(($rootScope._userInfo.IsAuthenticate == true) && (data[0].IDTypeID == 1))
-                                {
-                                    $scope.showDownloadLink = true;
-                                    $scope.downloadData = data[0];
+                                $scope.showDownloadLink = true;
+                                $scope.downloadData = data[0];
 
-                                    var downloadUrl = "/ewtGetSearchDocuments?Token="+$rootScope._userInfo.Token+"&&Keywords="+_filterValue.searchTerm;
-                                    $window.open(downloadUrl, '_blank');
-                                }
-                                else
-                                {
-                                    //Redirect to Login page
-                                    $('#SignIn_popup').slideDown();
-                                    $rootScope.defer = $q.defer();
-                                    var prom = $rootScope.defer.promise;
-                                    prom.then(function(d){
-                                    });
-                                }
-                                $scope.searchListData = null;
-                                $scope.searchCount = 0;
+                                var downloadUrl = "/ewtGetSearchDocuments?Token="+$rootScope._userInfo.Token+"&&Keywords="+_filterValue.searchTerm;
+                                $window.open(downloadUrl, '_blank');
                             }
+                            else
+                            {
+                                //Redirect to Login page
+                                $('#SignIn_popup').slideDown();
+                                $rootScope.defer = $q.defer();
+                                var prom = $rootScope.defer.promise;
+                                prom.then(function(d){
+                                });
+                            }
+                            $scope.searchListData = null;
+                            $scope.searchCount = 0;
                         }
-                        /* put a little delay */
-                        $timeout(function(){
-                            $scope.$emit('$preLoaderStop');
-
-                        },1500);
-                        defer.resolve();
-                    }).error(function(){
-                        Notification.error({ message : 'An error occurred', delay : MsgDelay});
+                    }
+                    /* put a little delay */
+                    $timeout(function(){
                         $scope.$emit('$preLoaderStop');
-                        defer.resolve();
-                    });
+
+                    },1500);
+                    defer.resolve();
+                }).error(function(){
+                    Notification.error({ message : 'An error occurred', delay : MsgDelay});
+                    $scope.$emit('$preLoaderStop');
+                    defer.resolve();
+                });
                 return defer.promise;
             }
 
@@ -342,11 +340,11 @@ var res = angular.module('ezeidApp').
                 }
                 /* check if the user is logged in and the search type is 1[EZEID] */
                 /*if(!$rootScope._userInfo.IsAuthenticate && $scope.params.searchType == 1)
-                {
-                    *//* through error *//*
-                    Notification.error({ message : 'Please login to search for EZEID', delay : MsgDelay});
-                    return false;
-                }*/
+                 {
+                 *//* through error *//*
+                 Notification.error({ message : 'Please login to search for EZEID', delay : MsgDelay});
+                 return false;
+                 }*/
 
                 /* update the coordinates */
                 $scope.params.lat = $rootScope.coordinatesLat;
@@ -400,45 +398,46 @@ var res = angular.module('ezeidApp').
 
             /* Load the map in the modal box */
             /* Google map integration */
-            var initializeMap = function () {
-                googleMap.setSettings({
-                    mapElementClass: "col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix class-map-ctrl-style1",
-                    searchElementClass: "form-control pull-left pac-input",
-                    currentLocationElementClass: "link-btn pac-loc",
-                    controlsContainerClass: "col-lg-6 col-md-6'"
-                });
-                googleMap.createMap("modal-map-ctrl", $scope, "findCurrentLocation()");
-
-                googleMap.renderMap();
-                googleMap.mapIdleListener().then(function () {
-                    googleMap.pushMapControls();
-                    googleMap.listenOnMapControls(getNewCoordinates, getNewCoordinates);
-
-                    /* place the present location marker on map */
-                    if($routeParams['lat']){
-                        googleMap.currentMarkerPosition.latitude = $routeParams['lat'];
-                        googleMap.currentMarkerPosition.longitude = $routeParams['lng'];
-                        googleMap.placeCurrentLocationMarker(getNewCoordinates);
-
-                        /* if this modal box map is opened from search result page: Add marker for additional */
-                        googleMap.resizeMap();
-                    }
-                    else{
-                        googleMap.getCurrentLocation().then(function (e) {
-
-                            googleMap.placeCurrentLocationMarker(getNewCoordinates);
-
-                            /* if this modal box map is opened from search result page: Add marker for additional */
-                            googleMap.resizeMap();
-                            googleMap.setMarkersInBounds();
-                        }, function () {
-
-                        });
-                    }
-
-
-                });
-            };
+            //var initializeMap = function () {
+            //    console.log('hello1');
+            //    googleMap.setSettings({
+            //        mapElementClass: "col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix class-map-ctrl-style1",
+            //        searchElementClass: "form-control pull-left pac-input",
+            //        currentLocationElementClass: "link-btn pac-loc",
+            //        controlsContainerClass: "col-lg-6 col-md-6'"
+            //    });
+            //    googleMap.createMap("modal-map-ctrl", $scope, "findCurrentLocation()");
+            //
+            //    googleMap.renderMap();
+            //    googleMap.mapIdleListener().then(function () {
+            //        googleMap.pushMapControls();
+            //        googleMap.listenOnMapControls(getNewCoordinates, getNewCoordinates);
+            //
+            //        /* place the present location marker on map */
+            //        if($routeParams['lat']){
+            //            googleMap.currentMarkerPosition.latitude = $routeParams['lat'];
+            //            googleMap.currentMarkerPosition.longitude = $routeParams['lng'];
+            //            googleMap.placeCurrentLocationMarker(getNewCoordinates);
+            //
+            //            /* if this modal box map is opened from search result page: Add marker for additional */
+            //            googleMap.resizeMap();
+            //        }
+            //        else{
+            //            googleMap.getCurrentLocation().then(function (e) {
+            //
+            //                googleMap.placeCurrentLocationMarker(getNewCoordinates);
+            //
+            //                /* if this modal box map is opened from search result page: Add marker for additional */
+            //                googleMap.resizeMap();
+            //                googleMap.setMarkersInBounds();
+            //            }, function () {
+            //
+            //            });
+            //        }
+            //
+            //
+            //    });
+            //};
 
             /* Get the current location string */
             var promise = googleMap.getCurrentLocation()
@@ -514,6 +513,7 @@ var res = angular.module('ezeidApp').
                 });
             };
 
+            /* Detailed map with all the search result markers */
             var initializeMap = function(){
                 googleMap.setSettings({
                     mapElementClass : "col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix class-map-ctrl",
@@ -858,7 +858,7 @@ var res = angular.module('ezeidApp').
              * Load map in the modal box to change the preferred search location
              * @type {boolean}
              */
-            var isMapInitialized = false;
+            var isModalMapInitialized = false;
             $scope.modalVisible = false;
             $scope.modalVisibility = function () {
                 /* toggle map visibility status */
@@ -868,10 +868,10 @@ var res = angular.module('ezeidApp').
             $scope.$watch('modalVisible', function (newVal, oldVal) {
                 if (newVal) {
                     /* check for the map initialzation */
-                    if (!isMapInitialized) {
+                    if (!isModalMapInitialized) {
                         /* initialize map */
                         initializeModalMap();
-                        isMapInitialized = true;
+                        isModalMapInitialized = true;
                     }
                     else {
                         $timeout(function () {
@@ -889,7 +889,7 @@ var res = angular.module('ezeidApp').
                 $scope.isFilterShown = !$scope.isFilterShown;
             };
 
-            /* load map in modal box for changing the searc */
+            /* load map in MODAL box for changing the searc */
             var initializeModalMap = function () {
                 googleMap.setSettings({
                     mapElementClass: "col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix class-map-ctrl-style1",
@@ -963,7 +963,7 @@ var res = angular.module('ezeidApp').
             /////////////////////////////////Implement Pagination///////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             /* pagination settings goes here */
-            $scope.totalResult = 0;
+            //$scope.totalResult = 0;
             $scope.currentStartResultId = 0;
             $scope.isPagination = 1;//Want pagination
             $scope.paginationNext = true;
@@ -972,29 +972,28 @@ var res = angular.module('ezeidApp').
             /**
              * Get the total result of the searched parameters
              */
-            getSearchKeyWord($scope.params,1).then(function()
-            {
-                /* @action */
-                if($scope.totalResult <= 20)
-                {
-                    $scope.paginationNext = false;
-                    $scope.paginationPrevious = false;
-                }
-                else
-                {
-                    $scope.paginationPrevious = false;
-                    $scope.paginationNext = true;
-                }
+            $scope.$watch('totalResult',function(n,v){
+                if(n !== v){
+                    if($scope.totalResult <= 20)
+                    {
+                        $scope.paginationNext = false;
+                        $scope.paginationPrevious = false;
+                    }
+                    else
+                    {
+                        $scope.paginationPrevious = false;
+                        $scope.paginationNext = true;
+                    }
 
-                /**
-                 * Temporary fix
-                 */
-                if($routeParams.searchType == 1)
-                {
-                    $scope.paginationNext = false;
-                    $scope.paginationPrevious = false;
+                    /**
+                     * Temporary fix
+                     */
+                    if($routeParams.searchType == 1)
+                    {
+                        $scope.paginationNext = false;
+                        $scope.paginationPrevious = false;
+                    }
                 }
-                console.log($scope.paginationPrevious,$scope.paginationNext);
             });
 
             /**
