@@ -7364,37 +7364,35 @@ exports.FnGetTranscation = function (req, res) {
                 if (!err) {
                     if (Result != null) {
                         
-                         var ToPage = 10 * Page;
+                       var ToPage = 10 * Page;
                         var FromPage = ToPage - 10;
 
                         if (FromPage <= 1) {
                             FromPage = 0;
                         }
                         
-                    var parameters = db.escape(Token) + ',' + db.escape(FunctionType) + ',' + db.escape(Status) + ',' + db.escape(FromPage) + ',' + db.escape(ToPage) + ',' + db.escape(searchkeyword) + ',' + db.escape(sortBy);
+                      var parameters = db.escape(Token) + ',' + db.escape(FunctionType) + ',' + db.escape(Status) + ',' + db.escape(FromPage) + ',' + db.escape(10) + ',' + db.escape(searchkeyword) + ',' + db.escape(sortBy);
                         console.log('CALL pGetMessagesNew(' + parameters + ')');
                       db.query('CALL pGetMessagesNew(' + parameters + ')', function (err, GetResult) {
+                          console.log(GetResult);
                             if (!err) {
                                 if (GetResult != null) {
                                     console.log('Length:'+GetResult[0].length);
                                     if (GetResult[0].length > 0) {
-                                        var totalRecord=GetResult[0].length;
+                                        var totalRecord=GetResult[0][0].TotalCount;
                                         var limit= 10;
                                         var PageValue = parseInt(totalRecord / limit);
                                         var PageMod = totalRecord % limit;
-                                        if (PageMod >= 0){
+                                        if (PageMod > 0){
                                             TotalPage = PageValue + 1;
                                             }
                                             else{
                                                 TotalPage = PageValue;
                                             }
-
-
-
-                                            TotalPage = parseInt(GetResult[0][0].TotalCount /10) + 1;
+                     
+                                            //TotalPage = parseInt(GetResult[0][0].TotalCount / 10) + 1;
                                             RtnMessage.TotalPage = TotalPage;
                                             RtnMessage.Result =GetResult[0];
-                                            console.log(GetResult[0]);
                                             res.send(RtnMessage);
                                             console.log('FnGetTranscation: Transaction details Send successfully');
                                     }
