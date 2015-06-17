@@ -6,6 +6,7 @@ angular.module('ezeidApp').controller('viewDirectionController',[
     'Notification',
     '$timeout',
     '$window',
+    '$routeParams',
     'GURL',
     function(
         $http,
@@ -15,6 +16,7 @@ angular.module('ezeidApp').controller('viewDirectionController',[
         Notification,
         $timeout,
         $window,
+        $routeParams,
         GURL
         )
     {
@@ -90,13 +92,9 @@ angular.module('ezeidApp').controller('viewDirectionController',[
 
             /*------------- Below code is for Drow Direction ------------*/
 
-          var userStartDirecttionLatLong = JSON.parse($window.localStorage.getItem("userCurrentLoc"));
-
-            directtionLatLong = JSON.parse($window.localStorage.getItem("myLocation"));
-
-            var request = {
-                origin: userStartDirecttionLatLong.startLat+","+userStartDirecttionLatLong.startLong,
-                destination: directtionLatLong.endLat+","+directtionLatLong.endLong,
+             var request = {
+                origin: $routeParams.startLat+","+$routeParams.startLong,
+                destination: $routeParams.endLat+","+$routeParams.endLong,
                 travelMode: google.maps.TravelMode.DRIVING
             };
 
@@ -107,8 +105,7 @@ angular.module('ezeidApp').controller('viewDirectionController',[
             });
 
             google.maps.event.addListener(directionsDisplay, 'directions_changed', function() {
-                // ... CALLBACK
-                    google.maps.event.addListener(map,'tilesloaded',function(){
+                   google.maps.event.addListener(map,'tilesloaded',function(){
                                 convertasbinaryimage().then(function(){
                                     $timeout(function(){
                                         $scope.isPrintEnabled = true;
@@ -139,7 +136,7 @@ angular.module('ezeidApp').controller('viewDirectionController',[
             /*-------------------- Direction Over --------------------------------*/
     }
 
-    function PlaceCurrentLocationMarker(location) {
+         function PlaceCurrentLocationMarker(location) {
         if (marker != undefined) {
             marker.setMap(null);
         }
@@ -155,13 +152,13 @@ angular.module('ezeidApp').controller('viewDirectionController',[
         map.setCenter(location);
     }
 
-    $scope.getMyLocation = function(){
+         $scope.getMyLocation = function(){
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(FindCurrentLocation);
         }
     };
 
-    function FindCurrentLocation(position) {
+         function FindCurrentLocation(position) {
         initialLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
         $rootScope.CLoc = {
             CLat: position.coords.latitude,
@@ -172,40 +169,39 @@ angular.module('ezeidApp').controller('viewDirectionController',[
 
 
 
-    function convertasbinaryimage()
-    {
-        var defer = $q.defer();
-        html2canvas(document.getElementById("googlemap"), {
-            useCORS: true,
-            proxy : '//maps.googlemaps.com',
-            onrendered: function(canvas) {
-                var img = canvas.toDataURL("image/jpg");
-                img = img.replace('data:image/png;base64,', '');
-                finalImageSrc = 'data:image/jpg;base64,' + img;
-                $('#googlemapbinary').attr('src', finalImageSrc);
-               // $rootScope.$broadcast('$preLoaderStop');
-                defer.resolve();
-                return false;
-            }
-        });
-        return defer.promise;
-    }
+        function convertasbinaryimage()
+        {
+            var defer = $q.defer();
+            html2canvas(document.getElementById("googlemap"), {
+                useCORS: true,
+                proxy : '//maps.googlemaps.com',
+                onrendered: function(canvas) {
+                    var img = canvas.toDataURL("image/jpg");
+                    img = img.replace('data:image/png;base64,', '');
+                    finalImageSrc = 'data:image/jpg;base64,' + img;
+                    $('#googlemapbinary').attr('src', finalImageSrc);
+                   // $rootScope.$broadcast('$preLoaderStop');
+                    defer.resolve();
+                    return false;
+                }
+            });
+            return defer.promise;
+        }
 
-    // EMail direction Html
-    viewDirection.emailHtml = function () {
-     if(!$rootScope._userInfo.IsAuthenticate)
-        {
-            $('#SignIn_popup').slideDown();
-        }
-        else
-        {
-            // $('#SalesEnquiryRequest_popup').slideDown();
-            $scope.showEmailForm = true;
-        }
+         // EMail direction Html
+            viewDirection.emailHtml = function () {
+            if(!$rootScope._userInfo.IsAuthenticate)
+            {
+                $('#SignIn_popup').slideDown();
+            }
+            else
+            {
+                $scope.showEmailForm = true;
+            }
     };
 
-    // Print direction Html
-    viewDirection.printHtml = function () {
+        // Print direction Html
+        viewDirection.printHtml = function () {
         $scope.showEmailForm = false;
 
         var printContents = document.getElementById("googlemapimage").innerHTML;
@@ -215,21 +211,20 @@ angular.module('ezeidApp').controller('viewDirectionController',[
         popupWin.document.close();
     };
 
-    //  Close EMail direction dialogue
-    viewDirection.closeEmailDialouge = function () {
+        //  Close EMail direction dialogue
+        viewDirection.closeEmailDialouge = function () {
         $scope.showEmailForm = false;
         document.getElementById("ToMailID").className = "form-control emptyBox";
         viewDirection._info.FromEmailID = "";
     };
 
-    //  EMail direction image
-    viewDirection.emailDirectionImage = function () {
+        //  EMail direction image
+        viewDirection.emailDirectionImage = function () {
         //Below line is for Loading img
         $scope.$emit('$preLoaderStart');
         $http({ method: 'post', url: GURL + 'ewtSendBulkMailer', data: { Token: $rootScope._userInfo.Token, TID: "", TemplateID: "", ToMailID: viewDirection._info.ToMailID, Attachment: finalImageSrc, AttachmentFileName :'ViewDirection.jpg'} }).success(function (data)
         {
             $rootScope.$broadcast('$preLoaderStop');
-            /* if (data != 'null')*/
             if(data)
             {
                 viewDirection._info.FromEmailID = "";
@@ -246,8 +241,9 @@ angular.module('ezeidApp').controller('viewDirectionController',[
         });
     };
 
-    // close view direction page
-    viewDirection.closeForm = function () {
+        // close view direction page
+    viewDirection.closeForm = function ()
+    {
         $window.location.href = "/";
     };
 }]);

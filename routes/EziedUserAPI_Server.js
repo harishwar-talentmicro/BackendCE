@@ -7124,6 +7124,7 @@ try{
     var folderRuleID = parseInt(req.body.folderRuleID);
     var nextAction = req.body.nextAction;
     var nextActionDateTime = new Date(req.body.nextActionDateTime);
+    var Token = req.body.Token;
     
     
     var responseMessage = {
@@ -7132,31 +7133,13 @@ try{
             message:'',
             data: null
         };
-        var validateStatus = true;
         
-        if(!TID){
-            responseMessage.error['TID'] = 'Invalid TID';
-            validateStatus *= false;
-        }
+    if(Token){
         
-        if(!status){
-            responseMessage.error['status'] = 'Invalid status';
-            validateStatus *= false;
-        }
-        
-        
-        if(!validateStatus){
-            console.log('FnUpdateTransaction  error : ' + JSON.stringify(responseMessage.error));
-            responseMessage.message = 'Unable to update transaction ! Please check the errors';
-            res.status(200).json(responseMessage);
-            return;
-        }
-    if(TID && status){
-        
-        var query = db.escape(TID) + ', ' + db.escape(status) + ',' + db.escape(folderRuleID) + ',' + db.escape(nextAction) + ',' + db.escape(nextActionDateTime);
+        var query = db.escape(TID) + ', ' + db.escape(status) + ',' + db.escape(folderRuleID) + ',' + db.escape(nextAction) + ',' + db.escape(nextActionDateTime)+ ', ' + db.escape(Token);
             db.query('CALL pUpdateTrans(' + query + ')', function (err, updateResult) {
                 if (!err){
-                    if (updateResult != null) {
+                    if (updateResult) {
                         responseMessage.status = true;
                         responseMessage.error = null;
                         responseMessage.message = 'Transaction details update successfully';
@@ -7180,19 +7163,13 @@ try{
             });
     }
         else {
-            if (!TID) 
+            if (!Token) 
             {  
-                responseMessage.message = 'Invalid TID';            
-                responseMessage.error = {TID : 'Invalid TID'};
-                console.log('FnUpdateTransaction: TID is mandatory field');
+                responseMessage.message = 'Invalid Token';            
+                responseMessage.error = {Token : 'Invalid Token'};
+                console.log('FnUpdateTransaction: Token is mandatory field');
             }
-            else if(!status)
-            {
-                responseMessage.message = 'Invalid status';            
-                responseMessage.error = {operatorid : 'Invalid status'};
-                console.log('FnUpdateTransaction: status is mandatory field');
-            }
-           
+            
             res.status(401).json(responseMessage);
         }  
 }
@@ -7237,6 +7214,7 @@ exports.FnSaveTranscationOld = function(req, res){
         var NextActionDateTime = req.body.NextActionDateTime;
         var  TaskDateNew = new Date(TaskDateTime);
         var NextActionDateTimeNew = new Date(NextActionDateTime);
+        var company_id = req.body.company_id ? req.body.company_id : 0;
         var RtnMessage = {
             IsSuccessfull: false
         };
@@ -7249,7 +7227,7 @@ exports.FnSaveTranscationOld = function(req, res){
                 if (!err) {
                     if (Result != null) {
 
-                        var query = db.escape(Token)+","+db.escape(MessageType)+","+ db.escape(MessageText)+ "," + db.escape(Status) +"," + db.escape(TaskDateNew) + ","  + db.escape(Notes) + "," + db.escape(LocID)  + "," + db.escape(Country)   + "," + db.escape(State) + "," + db.escape(City)   + "," + db.escape(Area)   + ","  + db.escape(Latitude)  + "," + db.escape(Longitude)  +  "," + db.escape(EZEID)  + "," + db.escape(ContactInfo)  + "," + db.escape(FolderRuleID)  + "," + db.escape(Duration)  + "," + db.escape(DurationScales) + "," + db.escape(NextAction) + "," + db.escape(NextActionDateTimeNew) + "," + db.escape(TID);
+                        var query = db.escape(Token)+","+db.escape(MessageType)+","+ db.escape(MessageText)+ "," + db.escape(Status) +"," + db.escape(TaskDateNew) + ","  + db.escape(Notes) + "," + db.escape(LocID)  + "," + db.escape(Country)   + "," + db.escape(State) + "," + db.escape(City)   + "," + db.escape(Area)   + ","  + db.escape(Latitude)  + "," + db.escape(Longitude)  +  "," + db.escape(EZEID)  + "," + db.escape(ContactInfo)  + "," + db.escape(FolderRuleID)  + "," + db.escape(Duration)  + "," + db.escape(DurationScales) + "," + db.escape(NextAction) + "," + db.escape(NextActionDateTimeNew) + "," + db.escape(TID) + "," + db.escape(company_id);
                         // db.escape(NextActionDateTime);
                         db.query('CALL pSaveTrans(' + query + ')', function (err, InsertResult) {
                             if (!err){
@@ -7364,37 +7342,35 @@ exports.FnGetTranscation = function (req, res) {
                 if (!err) {
                     if (Result != null) {
                         
-                         var ToPage = 10 * Page;
+                       var ToPage = 10 * Page;
                         var FromPage = ToPage - 10;
 
                         if (FromPage <= 1) {
                             FromPage = 0;
                         }
                         
-                    var parameters = db.escape(Token) + ',' + db.escape(FunctionType) + ',' + db.escape(Status) + ',' + db.escape(FromPage) + ',' + db.escape(ToPage) + ',' + db.escape(searchkeyword) + ',' + db.escape(sortBy);
+                      var parameters = db.escape(Token) + ',' + db.escape(FunctionType) + ',' + db.escape(Status) + ',' + db.escape(FromPage) + ',' + db.escape(10) + ',' + db.escape(searchkeyword) + ',' + db.escape(sortBy);
                         console.log('CALL pGetMessagesNew(' + parameters + ')');
                       db.query('CALL pGetMessagesNew(' + parameters + ')', function (err, GetResult) {
+                          console.log(GetResult);
                             if (!err) {
                                 if (GetResult != null) {
                                     console.log('Length:'+GetResult[0].length);
                                     if (GetResult[0].length > 0) {
-                                        var totalRecord=GetResult[0].length;
+                                        var totalRecord=GetResult[0][0].TotalCount;
                                         var limit= 10;
                                         var PageValue = parseInt(totalRecord / limit);
                                         var PageMod = totalRecord % limit;
-                                        if (PageMod >= 0){
+                                        if (PageMod > 0){
                                             TotalPage = PageValue + 1;
                                             }
                                             else{
                                                 TotalPage = PageValue;
                                             }
-
-
-
-                                            TotalPage = parseInt(GetResult[0][0].TotalCount /10) + 1;
+                     
+                                            //TotalPage = parseInt(GetResult[0][0].TotalCount / 10) + 1;
                                             RtnMessage.TotalPage = TotalPage;
                                             RtnMessage.Result =GetResult[0];
-                                            console.log(GetResult[0]);
                                             res.send(RtnMessage);
                                             console.log('FnGetTranscation: Transaction details Send successfully');
                                     }
@@ -12109,6 +12085,85 @@ exports.FnGetTransAutoComplete = function (req, res) {
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
         console.log('FnGetTransAutoComplete:error ' + ex.description);
+        throw new Error(ex);
+        res.status(400).json(responseMessage);
+    }
+};
+
+exports.FnGetCompanyDetails = function (req, res) {
+    
+    try {
+
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var ezeid = req.query.ezeid;
+
+        var responseMessage = {
+            status: false,
+            data: null,
+            error:{},
+            message:''
+        };
+        
+        if (title) {
+            
+            db.query('CALL pGetCompanyDetails(' + db.escape(ezeid) + ',' + db.escape(type) + ')', function (err, GetResult) {
+                            if (!err) {
+                                if (GetResult != null) {
+                                    if (GetResult[0].length > 0) {
+                                        responseMessage.status = true;
+                                        responseMessage.data = GetResult[0] ;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Company details Send successfully';
+                                        console.log('FnGetCompanyDetails: Company details Send successfully');
+                                        res.status(200).json(responseMessage);
+                                    }
+                                    else {
+                                        
+                                        responseMessage.error = {};
+                                        responseMessage.message = 'No founded Company details';
+                                        console.log('FnGetCompanyDetails: No founded Company details');
+                                        res.json(responseMessage);
+                                    }
+                                }
+                                else {
+
+                                    
+                                    responseMessage.error = {};
+                                    responseMessage.message = 'No founded Company details';
+                                    console.log('FnGetCompanyDetails: No founded Company details');
+                                    res.json(responseMessage);
+                                }
+
+                            }
+                            else {
+                                
+                                responseMessage.data = null ;
+                                responseMessage.error = {};
+                                responseMessage.message = 'Error in getting Company details';
+                                console.log('FnGetCompanyDetails: error in getting Company details' + err);
+                                res.status(500).json(responseMessage);
+                            }
+                        });
+                    }
+                    
+        else {
+            if (!ezeid) {
+                responseMessage.message = 'Invalid ezeid';            
+                responseMessage.error = {
+                    ezeid : 'Invalid ezeid'
+                };
+                console.log('FnGetCompanyDetails: ezeid is mandatory field');
+            }
+           
+            res.status(401).json(responseMessage);
+        }
+    }
+     catch (ex) {
+        responseMessage.error = {};
+        responseMessage.message = 'An error occured !'
+        console.log('FnGetCompanyDetails:error ' + ex.description);
         throw new Error(ex);
         res.status(400).json(responseMessage);
     }
