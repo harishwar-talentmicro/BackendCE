@@ -7124,7 +7124,7 @@ try{
     var folderRuleID = parseInt(req.body.folderRuleID);
     var nextAction = req.body.nextAction;
     var nextActionDateTime = new Date(req.body.nextActionDateTime);
-    var ezeid = req.body.ezeid;
+    var Token = req.body.Token;
     
     
     var responseMessage = {
@@ -7133,28 +7133,10 @@ try{
             message:'',
             data: null
         };
-        var validateStatus = true;
         
-        if(!TID){
-            responseMessage.error['TID'] = 'Invalid TID';
-            validateStatus *= false;
-        }
+    if(Token){
         
-        if(!status){
-            responseMessage.error['status'] = 'Invalid status';
-            validateStatus *= false;
-        }
-        
-        
-        if(!validateStatus){
-            console.log('FnUpdateTransaction  error : ' + JSON.stringify(responseMessage.error));
-            responseMessage.message = 'Unable to update transaction ! Please check the errors';
-            res.status(200).json(responseMessage);
-            return;
-        }
-    if(TID && status){
-        
-        var query = db.escape(TID) + ', ' + db.escape(status) + ',' + db.escape(folderRuleID) + ',' + db.escape(nextAction) + ',' + db.escape(nextActionDateTime)+ ', ' + db.escape(ezeid);
+        var query = db.escape(TID) + ', ' + db.escape(status) + ',' + db.escape(folderRuleID) + ',' + db.escape(nextAction) + ',' + db.escape(nextActionDateTime)+ ', ' + db.escape(Token);
             db.query('CALL pUpdateTrans(' + query + ')', function (err, updateResult) {
                 if (!err){
                     if (updateResult != null) {
@@ -7181,19 +7163,13 @@ try{
             });
     }
         else {
-            if (!TID) 
+            if (!Token) 
             {  
-                responseMessage.message = 'Invalid TID';            
-                responseMessage.error = {TID : 'Invalid TID'};
-                console.log('FnUpdateTransaction: TID is mandatory field');
+                responseMessage.message = 'Invalid Token';            
+                responseMessage.error = {Token : 'Invalid Token'};
+                console.log('FnUpdateTransaction: Token is mandatory field');
             }
-            else if(!status)
-            {
-                responseMessage.message = 'Invalid status';            
-                responseMessage.error = {operatorid : 'Invalid status'};
-                console.log('FnUpdateTransaction: status is mandatory field');
-            }
-           
+            
             res.status(401).json(responseMessage);
         }  
 }
@@ -12108,6 +12084,85 @@ exports.FnGetTransAutoComplete = function (req, res) {
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
         console.log('FnGetTransAutoComplete:error ' + ex.description);
+        throw new Error(ex);
+        res.status(400).json(responseMessage);
+    }
+};
+
+exports.FnGetCompanyDetails = function (req, res) {
+    
+    try {
+
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var ezeid = req.query.ezeid;
+
+        var responseMessage = {
+            status: false,
+            data: null,
+            error:{},
+            message:''
+        };
+        
+        if (title) {
+            
+            db.query('CALL pGetCompanyDetails(' + db.escape(ezeid) + ',' + db.escape(type) + ')', function (err, GetResult) {
+                            if (!err) {
+                                if (GetResult != null) {
+                                    if (GetResult[0].length > 0) {
+                                        responseMessage.status = true;
+                                        responseMessage.data = GetResult[0] ;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Company details Send successfully';
+                                        console.log('FnGetCompanyDetails: Company details Send successfully');
+                                        res.status(200).json(responseMessage);
+                                    }
+                                    else {
+                                        
+                                        responseMessage.error = {};
+                                        responseMessage.message = 'No founded Company details';
+                                        console.log('FnGetCompanyDetails: No founded Company details');
+                                        res.json(responseMessage);
+                                    }
+                                }
+                                else {
+
+                                    
+                                    responseMessage.error = {};
+                                    responseMessage.message = 'No founded Company details';
+                                    console.log('FnGetCompanyDetails: No founded Company details');
+                                    res.json(responseMessage);
+                                }
+
+                            }
+                            else {
+                                
+                                responseMessage.data = null ;
+                                responseMessage.error = {};
+                                responseMessage.message = 'Error in getting Company details';
+                                console.log('FnGetCompanyDetails: error in getting Company details' + err);
+                                res.status(500).json(responseMessage);
+                            }
+                        });
+                    }
+                    
+        else {
+            if (!ezeid) {
+                responseMessage.message = 'Invalid ezeid';            
+                responseMessage.error = {
+                    ezeid : 'Invalid ezeid'
+                };
+                console.log('FnGetCompanyDetails: ezeid is mandatory field');
+            }
+           
+            res.status(401).json(responseMessage);
+        }
+    }
+     catch (ex) {
+        responseMessage.error = {};
+        responseMessage.message = 'An error occured !'
+        console.log('FnGetCompanyDetails:error ' + ex.description);
         throw new Error(ex);
         res.status(400).json(responseMessage);
     }
