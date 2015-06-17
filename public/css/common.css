@@ -635,6 +635,7 @@ ng\:form {
 .ui-notification > .message {
     padding-left: 5px;
     color:#FFFFFF;
+    font-family: 'Open Sans',sans-serif;
 }
 
 .ui-notification.warning {
