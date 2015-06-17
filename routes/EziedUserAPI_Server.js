@@ -7139,7 +7139,7 @@ try{
         var query = db.escape(TID) + ', ' + db.escape(status) + ',' + db.escape(folderRuleID) + ',' + db.escape(nextAction) + ',' + db.escape(nextActionDateTime)+ ', ' + db.escape(Token);
             db.query('CALL pUpdateTrans(' + query + ')', function (err, updateResult) {
                 if (!err){
-                    if (updateResult != null) {
+                    if (updateResult) {
                         responseMessage.status = true;
                         responseMessage.error = null;
                         responseMessage.message = 'Transaction details update successfully';
