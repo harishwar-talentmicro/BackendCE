@@ -153,6 +153,7 @@
 
             $scope.totalPages = 1;
             $scope.filterStatus = -1;
+            $scope.sortBy = 0;
             $scope.filterStatusTypes = [];
             $scope.txStatusTypes = [];
             $scope.txActionTypes = [];
@@ -227,9 +228,11 @@
             /**
              * Copies the transaction properties to editMode Object
              * @param tx
+             * @changeUserDetails {boolean} if true then ezeid is not allocated to modalbox.tx.ezeid so that watcher doesn't execute
+             * saving one api call (loadUserDetails)
              * @return editModeTx
              */
-            var prepareEditTransaction = function(tx){
+            var prepareEditTransaction = function(tx,changeUserDetails){
 
                 var editModeTx =  {
                         orderAmount : (!isNaN(parseFloat(tx.Amount))) ? parseFloat(tx.Amount) : 0.00,
@@ -238,7 +241,7 @@
 
                         TID : tx.TID,
                         functionType : 0, // Function Type will be 0 for sales
-                        ezeid : tx.RequesterEZEID,
+                        ezeid : (changeUserDetails) ? '' :  tx.RequesterEZEID,
                         statusType : (tx.Status) ? tx.Status : 0,
                         notes : tx.Notes,
                         locId : tx.LocID,
@@ -265,10 +268,14 @@
             };
             /**
              * Toggles the edit mode for particular transaction
-             * Inline editing
              * @param index
+             * @param resolveGeolocation
+             * @param loadItems
+             * @param changeUserDetails (if true then it doesn't actually transfers the ezeid to modalBox.tx
+             * so that ezeid doesn't change and wathcer doesn't execute and therefore preventing any service call)
              */
-            $scope.toggleAllEditMode = function(index,resolveGeolocation,loadItems){
+
+            $scope.toggleAllEditMode = function(index,resolveGeolocation,loadItems,changeUserDetails){
                 $scope.$emit('$preLoaderStart');
                 if(typeof(index) === "undefined")
                 {
@@ -277,7 +284,7 @@
                 for(var c = 0; c < $scope.editModes.length; c++){
                     if(c === index){
                         $scope.resetModalBox();
-                        $scope.modalBox.tx = prepareEditTransaction($scope.txList[index]);
+                        $scope.modalBox.tx = prepareEditTransaction($scope.txList[index],changeUserDetails);
                         $scope.editModes[c] = true;
                     }
                     else{
@@ -309,6 +316,79 @@
                         }
                     });
                 }
+
+                /**
+                 * If both resolveGeolcation and loadItems are false then stop preloader
+                 */
+                if(!(resolveGeolocation || loadItems)){
+                    $scope.$emit('$preLoaderStop');
+                }
+            };
+
+
+            /**
+             * Updates transaction (without reloading items saving api call to load items)
+             */
+            $scope.updateTransaction = function(){
+                $scope.$emit('$preLoaderStart');
+                $http({
+                    url : GURL + 'update_transaction',
+                    method : 'PUT',
+                    data : {
+                        TID : $scope.modalBox.tx.TID,
+                        status : ($scope.modalBox.tx.statusType) ? $scope.modalBox.tx.statusType : 0,
+                        folderRuleID : ($scope.modalBox.tx.folderRule) ? $scope.modalBox.tx.folderRule : 0,
+                        nextAction : ($scope.modalBox.tx.nextAction) ? $scope.modalBox.tx.nextAction : 0,
+                        nextActionDateTime : ($scope.modalBox.tx.nextActionDateTime) ? $scope.modalBox.tx.nextActionDateTime : moment().format('YYYY-MM-DD hh:mm:ss'),
+                        Token : $rootScope._userInfo.Token
+                    }
+                }).success(function(resp){
+                    $scope.$emit('$preLoaderStop');
+                    if(resp && resp.status && resp!= 'null'){
+                        Notification.success({ message : 'Record updated successfully', delay : MsgDelay});
+                        $scope.resetModalBox();
+                        $scope.toggleAllEditMode();
+
+                        var id = $scope.txList.indexOfWhere('TID',parseInt(resp.data.TID));
+                        console.log($scope.txList[id]);
+                        $scope.txList[id].FolderRuleID = parseInt(resp.data.folderRuleID);
+                        $scope.txList[id].Status = parseInt(resp.data.status);
+
+                        $scope.txList[id].statustitle = ($scope.txStatusTypes.indexOfWhere('TID', parseInt(resp.data.status)) !== -1)
+                            ? $scope.txStatusTypes[$scope.txStatusTypes.indexOfWhere('TID', parseInt(resp.data.status))].StatusTitle : '',
+
+                        $scope.txList[id].FolderTitle = ($scope.txFolderRules.indexOfWhere('TID', parseInt(resp.data.folderRuleID)) !== -1)
+                            ? $scope.txFolderRules[$scope.txFolderRules.indexOfWhere('TID', parseInt(resp.data.folderRuleID))].FolderTitle : '',
+
+                        $scope.txList[id].ActionTitle = ($scope.txActionTypes.indexOfWhere('TID', parseInt(resp.data.nextAction)) !== -1)
+                            ? $scope.txActionTypes[$scope.txActionTypes.indexOfWhere('TID', parseInt(resp.data.nextAction))].ActionTitle : '',
+
+                        $scope.txList[id].NextActionID = (parseInt(resp.data.nextAction)!== NaN ) ? parseInt(resp.data.nextAction) : 0 ;
+                        var date = moment().format('DD MMM YYYY hh:mm');
+                        try{
+                            date = moment(resp.data.nextActionDateTime,'YYYY-MM-DD hh:mm:ss').format('DD MMM YYYY hh:mm');
+                        }
+                        catch(ex){
+
+                        }
+                        $scope.txList[id].NextActionDate = resp.data.nextActionDateTime;
+                    }
+                    else{
+                        var msg = 'Something went wrong! Please try again';
+                        Notification.error({ message : msg, delay : MsgDelay});
+                    }
+
+                }).error(function(err,statusCode){
+                    $scope.$emit('$preLoaderStop');
+                    var msg = 'Something went wrong! Please try again';
+                    if(statusCode === 403) {
+                        msg = 'You do not have permission to update this transaction';
+                    }
+                    if(statusCode === 0){
+                        msg = 'Unable to reach server ! Please check your connection';
+                    }
+                    Notification.error({ message : msg, delay : MsgDelay});
+                });
             };
 
             /**
@@ -629,12 +709,27 @@
              */
             $scope.triggerStatusFilter = function(pageNo,statusType){
                 $scope.$emit('$preLoaderStart');
-                $scope.loadTransaction(pageNo,statusType,$scope.txSearchTerm).then(function(){
+                $scope.loadTransaction(pageNo,statusType,$scope.txSearchTerm,$scope.sortBy).then(function(){
                     $scope.$emit('$preLoaderStop');
                 },function(){
                     $scope.$emit('$preLoaderStop');
                 });
             };
+
+
+            /**
+             * Clears the search term and load the results again
+             */
+            $scope.clearSearchTerm = function(pageNo,statusType){
+                $scope.txSearchTerm = '';
+                $scope.$emit('$preLoaderStart');
+                $scope.loadTransaction(pageNo,statusType,$scope.txSearchTerm,$scope.sortBy).then(function(){
+                    $scope.$emit('$preLoaderStop');
+                },function(){
+                    $scope.$emit('$preLoaderStop');
+                });
+            };
+
 
             /**
              * Loads all transactions
@@ -642,7 +737,7 @@
              * @param statusType
              * @returns {*}
              */
-            $scope.loadTransaction = function(pageNo,statusType,txSearchKeyword){
+            $scope.loadTransaction = function(pageNo,statusType,txSearchKeyword,sortBy){
                 var defer = $q.defer();
                 if(!pageNo){
                     pageNo = 1;
@@ -655,10 +750,11 @@
                     method : 'GET',
                     params : {
                         Token : $rootScope._userInfo.Token,
-                        Page : pageNo,
+                        Page : (pageNo) ? pageNo : 1,
                         Status : (statusType) ? statusType : '',
                         FunctionType : 0,    // For Sales
-                        searchkeyword : txSearchKeyword
+                        searchkeyword : txSearchKeyword,
+                        sort_by : (sortBy) ? sortBy : 0
                     }
                 }).success(function(resp){
                     if(resp && resp !== 'null'){
@@ -668,7 +764,7 @@
                          * 2. $scope.pageNumber
                          * 3. $scope.txList
                          */
-                        $scope.totalPages = resp.TotalPage;
+                        $scope.totalPages = parseInt(resp.TotalPage);
                         $scope.pageNumber = pageNo;
                         $scope.txList = resp.Result;
 
@@ -710,8 +806,10 @@
                         }
                     }
                     else{
-
-                        $scope.filterStatusTypes = [];
+                        $scope.filterStatusTypes = [
+                            {TID : -1, StatusTitle : 'All Open'},
+                            {TID : -2, StatusTitle : 'All'}
+                        ];
                     }
                     defer.resolve(resp);
                 }).error(function(err){
@@ -776,6 +874,12 @@
 
                         $scope.txStatusTypes = [];
                     }
+                    $scope.filterStatusTypes = [
+                        {TID : -2, StatusTitle : 'All'},
+                        {TID : -1, StatusTitle : 'All Open'}
+                    ];
+                    $scope.filterStatusTypes = $scope.filterStatusTypes.concat(resp);
+
                     defer.resolve(resp);
                 }).error(function(err){
                     defer.reject();
@@ -846,11 +950,25 @@
                 $scope.$watch('pageNumber',function(newVal,oldVal){
                     if(newVal !== oldVal)
                     {
-                        $scope.$broadcast('$preLoaderStart');
-                        $scope.loadTransaction(newVal,$scope.filterStatus,$scope.txSearchTerm).then(function(){
-                            $scope.$broadcast('$preLoaderStop');
+                        $scope.$emit('$preLoaderStart');
+                        $scope.loadTransaction(newVal,$scope.filterStatus,$scope.txSearchTerm,$scope.sortBy).then(function(){
+                            $scope.$emit('$preLoaderStop');
                         },function(){
-                            $scope.$broadcast('$preLoaderStop');
+                            $scope.$emit('$preLoaderStop');
+                        });
+                    }
+                });
+            };
+
+            var watchSortBy = function(){
+                $scope.$watch('sortBy',function(newVal,oldVal){
+                    if(newVal !== oldVal)
+                    {
+                        $scope.$emit('$preLoaderStart');
+                        $scope.loadTransaction($scope.pageNumber,$scope.filterStatus,$scope.txSearchTerm,$scope.sortBy).then(function(){
+                            $scope.$emit('$preLoaderStop');
+                        },function(){
+                            $scope.$emit('$preLoaderStop');
                         });
                     }
                 });
@@ -893,12 +1011,13 @@
 
 
             var init = function(){
-                $scope.loadfilterStatusTypes().then(function(resp){
+                //$scope.loadfilterStatusTypes().then(function(resp){
 
                     $scope.loadTxActionTypes().then(function(){
                         $scope.loadTxStatusTypes().then(function(){
-                            $scope.loadTransaction(1,-1,$scope.txSearchTerm).then(function(){
-                                watchPageNumber();
+                            $scope.loadTransaction(1,-1,$scope.txSearchTerm,$scope.sortBy).then(function(){
+                                    watchPageNumber();
+                                    watchSortBy();
                                 $scope.loadItemList().then(function(){
                                     $scope.loadFolderRules().then(function(){
                                         $scope.$emit('$preLoaderStop');
@@ -922,20 +1041,12 @@
                         $scope.$emit('$preLoaderStop');
                         Notification.error({message : 'Unable to load sales next actions list', delay : MsgDelay} );
                     });
-                },function(){
-                    $scope.$emit('$preLoaderStop');
-                    //Notification.error({message : 'Unable to load status types', delay : MsgDelay} );
-               });
-
+               // },function(){
+               //     $scope.$emit('$preLoaderStop');
+               //     //Notification.error({message : 'Unable to load status types', delay : MsgDelay} );
+               //});
             };
 
-            $rootScope.$on('$includeContentLoaded',function(){
-                $timeout(function(){
-                    $scope.$emit('$preLoaderStart');
-                    init();
-                },1000);
-
-            });
 
             var makeAddress = function(){
                 var address = [];
@@ -1067,7 +1178,7 @@
                             $scope.resetModalBox();
                             $scope.toggleAllEditMode();
                             $scope.$emit('$preLoaderStart');
-                            $scope.loadTransaction(1,$scope.statusType,$scope.txSearchTerm).then(function(){
+                            $scope.loadTransaction(1,$scope.statusType,$scope.txSearchTerm,$scope.sortBy).then(function(){
                                 $scope.$emit('$preLoaderStop');
                             },function(){
                                 $scope.$emit('$preLoaderStop');
@@ -1089,11 +1200,11 @@
             };
 
             $scope.incrementPage = function(){
-              $scope.pageNumber  += 1;
+              $scope.pageNumber = parseInt($scope.pageNumber)  + 1;
             };
 
             $scope.decrementPage = function(){
-                $scope.pageNumber  -= 1;
+                $scope.pageNumber  = parseInt($scope.pageNumber) - 1;
             };
 
 
@@ -1109,6 +1220,28 @@
                     $rootScope._userInfo.SalesItemListType = $scope._tempSalesItemListType;
                 }
             );
+
+
+            /**
+             * Dom loaded flag that if the dom is loaded the this flag is set true so that domLoaded function
+             * doesn't execute more than once
+             * @type {boolean}
+             * @private
+             */
+            var _domLoaded = false;
+
+            /**
+             * Function is executed once only when dom is loaded and ready
+             */
+            $scope.domLoaded = function(){
+                if(!_domLoaded){
+                    $timeout(function(){
+                        $scope.$emit('$preLoaderStart');
+                        init();
+                    },1000);
+                    _domLoaded = true;
+                }
+            };
 
 
 
