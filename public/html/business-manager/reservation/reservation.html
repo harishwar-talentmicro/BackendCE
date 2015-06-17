@@ -106,7 +106,7 @@
                                 <div class="building-block">
                                     <!-- Time Label goes here -->
                                     <div class="col-lg-4 col-md-3 col-sm-3 col-xs-4 p-left-5 no-padding">
-                                        <div ng-init="counterFun()" ng-repeat="block in blockArr track by $index" class="title-section blk blk-time" ng-class="[blockColor[$index],'time-block-'+getBlockId($index,cols),heightClass]">
+                                        <div ng-repeat="block in blockArr track by $index" class="title-section blk blk-time" ng-class="[blockColor[$index],'time-block-'+getBlockId($index,cols),heightClass]">
                                             <b>{{getTime($index,cols)}}</b>
                                         </div>
                                     </div>
@@ -120,9 +120,6 @@
                                     </div>
                                 </div>
                             </div>
-                            <!-- coloring for availability : For executing coloring the table post-DOM rendering -->
-                            <div>{{reservationMooduleStarter()}}</div>
-                            <!-- main container of day - calender end here -->
                         </div>
                     </div>
                 </div>
@@ -142,7 +139,8 @@
                     <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8">
                         <select id="service" ng-change="updateReservationFormData(reservationService)" class="form-control reservation-service"
                                 ng-model="reservationService">
-                            <option data-id="{{$index}}" value="{{currentServiceArray[$index].tid}}" ng-repeat="service in currentServiceArray track by $index">{{currentServiceArray[$index].title}}</option>
+                            <option data-id="{{$index}}" value="{{currentServiceArray[$index].tid}}"
+                                    ng-repeat="service in currentServiceArray track by $index">{{currentServiceArray[$index].title}}</option>
                         </select>
                     </div>
                 </div>
@@ -175,7 +173,7 @@
                         <p class="text-black">Mobile</p>
                     </div>
                     <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8">
-                        <input ng-model="reserverMobile" numbers-only maxlength="13" id="userMobile" class="form-control" value="" />
+                        <input ng-model="reserverMobile" ng-model-options="{updateOn : 'blur',debounce : { 'blur' : 0} }" numbers-only maxlength="13" id="userMobile" class="form-control" value="" />
                     </div>
                 </div>
                 <div class="row p-bottom-3">
@@ -200,6 +198,10 @@
         </div>
     </modal>
 
+
+    <!-- coloring for availability : For executing coloring the table post-DOM rendering -->
+    <div>{{reservationMooduleStarter();ifHtmlLoaded = true}}</div>
+    <!-- main container of day - calender end here -->
     <!-- Reservation module ends here -->
 
     <!-- Footer goes here -->
