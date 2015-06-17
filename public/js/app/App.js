@@ -131,6 +131,7 @@
             .when('/blackwhitelist',{templateUrl: 'html/blacklistwhitelist.html'})
             .when('/salesenquiry',{templateUrl: 'html/salesenquiry.html'})
             .when('/bulksalesenquiry',{templateUrl : 'html/bulksalesenquiry.html'})
+            .when('/mapView',{templateUrl : 'html/mapPopView.html'})
             .when('/viewdirection',{templateUrl : 'html/viewdirection.html'})
             .when('/service-reservation',{templateUrl : 'html/business-manager/reservation/reservation.html'})
             .when('/signup',{

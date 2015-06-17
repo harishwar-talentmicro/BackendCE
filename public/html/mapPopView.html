@@ -1,11 +1,31 @@
-   <div ng-controller="mapPopController as mapCtrl">
-       <div class="row">
-           <div id="map-ctrl" class="col-lg-12"></div>
-       </div>
-       <div class="row setRowLeftRightMarginZero mapButtonContainer">
-           <button ng-disabled="!userLat" class="btn btn-primary" type="button" ng-click="plotRoute()">Plot Route</button>
-           <button ng-disabled="!userLat" class="btn btn-primary" type="button" ng-click="showDirections()">Directions</button>
-       </div>
-       <div id="directionPannel" style="display: none;">
-       </div>
-   </div>
+<div id="wrapper">
+    <header-section></header-section>
+    <!-- Main jumbotron for a primary marketing message or call to action -->
+    <div class="container" style="padding-top:80px; position:relative;">
+        <!-- Example row of columns -->
+        <div class="row">
+            <div class="col-sm-8" style="margin: auto; float: none;">
+                <div class="panel panel-default" style="min-height: 367px;">
+                    <div class="panel-body">
+                        <h1 class="text-center font-open-sans-light" style="text-transform: uppercase;">Map View</h1>
+
+
+                        <div ng-controller="mapPopController as mapCtrl">
+                           <div class="row">
+                               <div id="map-ctrl" class="col-lg-12"></div>
+                           </div>
+                           <div class="row setRowLeftRightMarginZero mapButtonContainer">
+                               <button ng-disabled="!userLat" class="btn btn-primary" type="button" ng-click="plotRoute()">Plot Route</button>
+                               <button ng-disabled="!userLat" class="btn btn-primary" type="button" ng-click="showDirections()">Directions</button>
+                           </div>
+                           <div id="directionPannel" style="display: none;">
+                           </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+   <footer-section></footer-section>
+

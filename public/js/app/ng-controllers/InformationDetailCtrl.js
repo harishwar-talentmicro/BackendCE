@@ -553,22 +553,25 @@ angular.module('ezeidApp').
 
             $scope.getdirections = function (data) {
 
-                $scope.activeTemplate = "html/mapPopView.html";
-                $scope.showMapPopupModel = true;
+                /*
+                    $scope.activeTemplate = "html/mapPopView.html";
+                    $scope.showMapPopupModel = true;
 
-                // var end = new google.maps.LatLng(data.Latitude, data.Longitude);
+                    // var end = new google.maps.LatLng(data.Latitude, data.Longitude);
+
+                */
+
                 var userLoc = {
                     endLat: data.Latitude,
                     endLong : data.Longitude,
                     IDTypeID : data.IDTypeID
                 };
 
-                $window.localStorage.setItem("myLocation", JSON.stringify(userLoc));
+                //$window.localStorage.setItem("myLocation", JSON.stringify(userLoc));
 
+                var params = '?endLat='+data.Latitude+'&endLong='+data.Longitude+'&IDTypeID='+data.IDTypeID;
+                $location.url('/mapView'+params);
 
-               // var params = '?endLat='+data.Latitude+'&endLong='+data.Longitude+'&IDTypeID='+data.IDTypeID;
-
-              //  $location.url('/mapDirection'+params);
             };
 
             //open working hour popup
