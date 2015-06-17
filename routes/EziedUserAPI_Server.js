@@ -7214,6 +7214,7 @@ exports.FnSaveTranscationOld = function(req, res){
         var NextActionDateTime = req.body.NextActionDateTime;
         var  TaskDateNew = new Date(TaskDateTime);
         var NextActionDateTimeNew = new Date(NextActionDateTime);
+        var company_id = req.body.company_id ? req.body.company_id : 0;
         var RtnMessage = {
             IsSuccessfull: false
         };
@@ -7226,7 +7227,7 @@ exports.FnSaveTranscationOld = function(req, res){
                 if (!err) {
                     if (Result != null) {
 
-                        var query = db.escape(Token)+","+db.escape(MessageType)+","+ db.escape(MessageText)+ "," + db.escape(Status) +"," + db.escape(TaskDateNew) + ","  + db.escape(Notes) + "," + db.escape(LocID)  + "," + db.escape(Country)   + "," + db.escape(State) + "," + db.escape(City)   + "," + db.escape(Area)   + ","  + db.escape(Latitude)  + "," + db.escape(Longitude)  +  "," + db.escape(EZEID)  + "," + db.escape(ContactInfo)  + "," + db.escape(FolderRuleID)  + "," + db.escape(Duration)  + "," + db.escape(DurationScales) + "," + db.escape(NextAction) + "," + db.escape(NextActionDateTimeNew) + "," + db.escape(TID);
+                        var query = db.escape(Token)+","+db.escape(MessageType)+","+ db.escape(MessageText)+ "," + db.escape(Status) +"," + db.escape(TaskDateNew) + ","  + db.escape(Notes) + "," + db.escape(LocID)  + "," + db.escape(Country)   + "," + db.escape(State) + "," + db.escape(City)   + "," + db.escape(Area)   + ","  + db.escape(Latitude)  + "," + db.escape(Longitude)  +  "," + db.escape(EZEID)  + "," + db.escape(ContactInfo)  + "," + db.escape(FolderRuleID)  + "," + db.escape(Duration)  + "," + db.escape(DurationScales) + "," + db.escape(NextAction) + "," + db.escape(NextActionDateTimeNew) + "," + db.escape(TID) + "," + db.escape(company_id);
                         // db.escape(NextActionDateTime);
                         db.query('CALL pSaveTrans(' + query + ')', function (err, InsertResult) {
                             if (!err){
