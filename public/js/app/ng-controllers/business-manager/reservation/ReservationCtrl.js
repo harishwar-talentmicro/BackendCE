@@ -48,6 +48,10 @@ var res = angular.module('ezeidApp').
 
             $scope.$emit('$preLoaderStart');
             /* SETTINGS GOES HERE======================================== */
+
+            /* flag if is HTML loaded */
+            $scope.ifHtmlLoaded = false;
+
             /* for resources availability background color */
             var availabilityColor = 'rgb(64, 242, 168)';
 
@@ -77,11 +81,7 @@ var res = angular.module('ezeidApp').
 
 
             /* Reserved hours *///[Start Minute, End Minute, Reserver Name, Reserver ID, services, status]
-            $scope.reservedTime = [
-                //[550, 600, 'sandeep',3,'service1'],
-                //[700, 810, 'rahul',12,'service2'],
-                //[1000, 1140, 'shrey',5,'service3']
-            ];
+            $scope.reservedTime = [];
             /* Set the logged in user */
             setUserLoggedInId().then(function(){
                 init();
@@ -396,16 +396,14 @@ var res = angular.module('ezeidApp').
                     returnFormat = dateFormat;
                 }
 
-                var x = new Date(timeFromServer);
-                var mom1 = moment(x);
+                var mom1 = moment(timeFromServer,dateFormat);
                 return mom1.add((mom1.utcOffset()), 'm').format(returnFormat);
             };
 
             function selectedTimeUtcToLocal(selectedTime) {
-                var x = new Date();
-                var today = moment(x.toISOString()).utc().format('DD-MMM-YYYY');
 
-                var currentTaskDate = moment(today + ' ' + selectedTime).format('DD-MMM-YYYY H:mm');
+                var today = moment().utc().format('DD-MMM-YYYY');
+                var currentTaskDate = moment(today + ' ' + selectedTime,'DD-MMM-YYYY H:mm').format('DD-MMM-YYYY H:mm');
                 return convertTimeToLocal(currentTaskDate, 'DD-MMM-YYYY H:mm', "H:mm");
             }
 
@@ -654,7 +652,6 @@ var res = angular.module('ezeidApp').
                 }
                 console.log('alreadyReserveSlotFlag;');
                 //$scope.alreadyReserveSlotFlag = true;
-
                 for (var i = 0; i < $scope.reservedTime.length; i++) {
                     /* get blocks coming under this range */
                     var data = getBlockRange($scope.reservedTime[i][0], $scope.reservedTime[i][1]);
@@ -697,7 +694,6 @@ var res = angular.module('ezeidApp').
             /* Actual merging goes HERE */
             function mergeCells(startBlock, endBlock, text) {
                 /* calculate total height  */
-
                 var totalHeight = endBlock - startBlock + 1;
                 /* add text */
                 $('.block-' + startBlock).html('<p>' + text + '</p>');
@@ -707,11 +703,12 @@ var res = angular.module('ezeidApp').
                 {
                     return;
                 }
-
                 /* hide the remaining block */
                 for (var i = startBlock + 1; i <= endBlock; i++) {
                     $('.block-' + i).addClass('hidden');
                 }
+                /* un hide the start Block in case it has been hidden by the above code block */
+                $('.block-' + startBlock).removeClass('hidden');
             }
 
 
@@ -779,14 +776,14 @@ var res = angular.module('ezeidApp').
 
             /* Color the blocks */
             $scope.colorBlocks = function (startBlock, endBlock, color, addCss) {
-
                 var css = '';
                 if(typeof(addCss) != 'undefined')
                 {
                     css = addCss;
                 }
                 for (var j = startBlock; j <= endBlock; j++) {
-                    $('.block-' + j).css('background-color', color).addClass(css);
+                    $('.block-' + j).css({'background-color': color});
+                    $('.block-' + j).addClass(css);
                 }
             }
 
@@ -847,23 +844,26 @@ var res = angular.module('ezeidApp').
             }
 
             /**
-             * Append the color index at the bottom
+             * Append the color index at the bottom[*checked*]
              */
             $scope.appendColorIndexFlag = false;
             $scope.appendColorIndex = function() {
-                if($scope.colorIndex.length == 0)
+                console.log('----'+$scope.ifHtmlLoaded);
+                if(!$scope.ifHtmlLoaded)
                 {
-                    return;
+                    //return ;
                 }
 
                 if($scope.appendColorIndexFlag)
                 {
-                    return;
+                    //return;
                 }
-                console.log('appendColorIndexFlag');
-                //$scope.appendColorIndexFlag = true;
+
+
+                console.log('appendColorIndexFlag',$scope.colorIndex,$scope.ifHtmlLoaded);
                 for (var i = 0; i < $scope.colorIndex.length; i++)
                 {
+                    console.log('.color-index-'+i);
                     $('.color-index-'+i).css('color',$scope.colorIndex[i][0]);
                     $('.color-index-label-'+i).html('<small>'+$scope.colorIndex[i][1]+'</small>');
                 }
@@ -1210,8 +1210,6 @@ var res = angular.module('ezeidApp').
                     }
                 }).error(function(err,status){
                     $scope.$emit('$preLoaderStop');
-                    console.log(err);
-                    console.log(status);
                     var message = 'An error occured ! Please try again';
                     if(status === 400){
                         message = 'Slot is not available';
@@ -1420,9 +1418,9 @@ var res = angular.module('ezeidApp').
              */
             $scope.reservationMooduleStarter = function()
             {
-                $scope.colorWorkingHours();//Checks Done
+                $scope.colorWorkingHours();
                 $scope.alreadyReserveSlot();
-                $scope.appendColorIndex();
+                $scope.appendColorIndex();//Checks Done
                 $scope.removeWasteColoredCells();
             }
 
@@ -1433,7 +1431,6 @@ var res = angular.module('ezeidApp').
             {
                 $scope.colorWorkingHoursFlag = false;
                 $scope.alreadyReserveSlotFlag = false;
-                $scope.appendColorIndexFlag = false;
             }
 
             $scope.counter = 1;
