@@ -12,7 +12,8 @@ angular.module('ezeidApp').controller('mapPopController',[
     'GURL',
     '$routeParams',
     'GoogleMaps',
-    function($http,
+    function(
+             $http,
              $interval,
              $rootScope,
              $scope,
@@ -28,10 +29,6 @@ angular.module('ezeidApp').controller('mapPopController',[
 
         //Below line is for Loading img
         $scope.$emit('$preLoaderStart');
-
-       // console.log("sai35");
-       // console.log($routeParams);
-
 
         var directtionLatLong;
         /* integrate google map */
@@ -79,20 +76,9 @@ angular.module('ezeidApp').controller('mapPopController',[
                 });
             });
 
-
-
-            //directtionLatLong = JSON.parse($window.localStorage.getItem("myLocation"));
-
-
             var pos = null;
             var title = '';
             var containerElement = '';
-
-           /* pos = googleMap.createGMapPosition(
-                directtionLatLong.endLat,
-                directtionLatLong.endLong
-            );
-            */
 
             pos = googleMap.createGMapPosition(
                 $routeParams.endLat,
@@ -102,12 +88,10 @@ angular.module('ezeidApp').controller('mapPopController',[
             title = 'Primary Location';
             containerElement = 'map-location-0';
 
-           /* $scope.userLat = directtionLatLong.endLat;*/
             $scope.userLat = $routeParams.endLat;
 
             if($routeParams.endLat)
             {
-                /* var markerImage = directtionLatLong.IDTypeID == 1 ? 'images/Individual-Icon_48.png' : 'images/business-icon_48.png';*/
                 var markerImage = $routeParams.IDTypeID == 1 ? 'images/Individual-Icon_48.png' : 'images/business-icon_48.png';
                 var marker = googleMap.createMarker(pos,title,markerImage,false,null);
                 googleMap.placeMarker(marker);
@@ -126,8 +110,6 @@ angular.module('ezeidApp').controller('mapPopController',[
         $scope.plotRoute = function () {
             googleMap.clearAllMarkers();
 
-            // directtionLatLong = JSON.parse($window.localStorage.getItem("myLocation"));
-
             googleMap.renderDirection('directionPannel',googleMap.currentMarkerPosition.latitude,googleMap.currentMarkerPosition.longitude,$routeParams.endLat,$routeParams.endLong);
             googleMap.placeCurrentLocationMarker();
             googleMap.setMarkersInBounds();
@@ -135,16 +117,9 @@ angular.module('ezeidApp').controller('mapPopController',[
 
         //Show direction in view direction page
         $scope.showDirections = function () {
-            var userLoc = {
-                startLat: googleMap.currentMarkerPosition.latitude,
-                startLong : googleMap.currentMarkerPosition.longitude
-            };
-
-            console.log("Sai 143");
-            console.log(userLoc);
-
-            $window.localStorage.setItem("userCurrentLoc", JSON.stringify(userLoc));
-            $window.location.href = "/viewdirection";
+            var params = '?endLat='+$routeParams.endLat+'&endLong='+$routeParams.endLong+'&startLat='+googleMap.currentMarkerPosition.latitude+'&startLong='+googleMap.currentMarkerPosition.longitude;
+            $location.url('/viewdirection'+params);
         };
+
 
 }]);
