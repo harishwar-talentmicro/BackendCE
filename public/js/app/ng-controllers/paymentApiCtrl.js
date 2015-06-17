@@ -44,7 +44,7 @@ var res = angular.module('ezeidApp').
             /**
              * All citrus payment settings goes here
              */
-            $scope.merchantAccessKey = '3SVC4479O00000002S3';
+            $scope.merchantAccessKey = 'YRX3BRJBX71D5BMKXZUU';
             $scope.returnUrl = 'http://localhost:3001/payment/response';
             $scope.requestSignature = 'requestSignature';
             $scope.paramOne = 'one Value';

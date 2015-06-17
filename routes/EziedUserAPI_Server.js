@@ -4342,8 +4342,7 @@ exports.FnSearchByKeywords = function (req, res) {
                         //console.log(SearchResult);
                         if (SearchResult[0] != null) {
                             if (SearchResult[0].length > 0) {
-                                //res.send(SearchResult);
-                                
+                                //res.send(SearchResult[0]);
                                 res.json({totalcount:SearchResult[0][0].totalcount,Result:SearchResult[1]});
                                 console.log('FnSearchByKeywords:  tmaster:Search Found');
                             }
@@ -7113,6 +7112,98 @@ exports.FnSaveTranscation = function(req, res){
     }
 };
 
+exports.FnUpdateTransaction = function (req, res){
+try{
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    
+    var TID = parseInt(req.body.TID);
+    var status = req.body.status;
+    var folderRuleID = parseInt(req.body.folderRuleID);
+    var nextAction = req.body.nextAction;
+    var nextActionDateTime = new Date(req.body.nextActionDateTime);
+    
+    
+    var responseMessage = {
+            status: false,
+            error:{},
+            message:'',
+            data: null
+        };
+        var validateStatus = true;
+        
+        if(!TID){
+            responseMessage.error['TID'] = 'Invalid TID';
+            validateStatus *= false;
+        }
+        
+        if(!status){
+            responseMessage.error['status'] = 'Invalid status';
+            validateStatus *= false;
+        }
+        
+        
+        if(!validateStatus){
+            console.log('FnUpdateTransaction  error : ' + JSON.stringify(responseMessage.error));
+            responseMessage.message = 'Unable to update transaction ! Please check the errors';
+            res.status(200).json(responseMessage);
+            return;
+        }
+    if(TID && status){
+        
+        var query = db.escape(TID) + ', ' + db.escape(status) + ',' + db.escape(folderRuleID) + ',' + db.escape(nextAction) + ',' + db.escape(nextActionDateTime);
+            db.query('CALL pUpdateTrans(' + query + ')', function (err, updateResult) {
+                if (!err){
+                    if (updateResult != null) {
+                        responseMessage.status = true;
+                        responseMessage.error = null;
+                        responseMessage.message = 'Transaction details update successfully';
+                        responseMessage.data = {
+                            TID : req.body.TID,
+                            status : req.body.status,
+                            folderRuleID : req.body.folderRuleID,
+                            nextAction : req.body.nextAction,
+                            nextActionDateTime : req.body.nextActionDateTime
+                        };
+                        res.status(200).json(responseMessage);
+                        console.log('FnUpdateTransaction: Transaction details update successfully');
+                    }
+                    else {
+                        responseMessage.message = 'An error occured ! Please try again';
+                        responseMessage.error = {};
+                        res.status(400).json(responseMessage);
+                        console.log('FnUpdateTransaction:No update transaction details');
+                    }
+                }
+            });
+    }
+        else {
+            if (!TID) 
+            {  
+                responseMessage.message = 'Invalid TID';            
+                responseMessage.error = {TID : 'Invalid TID'};
+                console.log('FnUpdateTransaction: TID is mandatory field');
+            }
+            else if(!status)
+            {
+                responseMessage.message = 'Invalid status';            
+                responseMessage.error = {operatorid : 'Invalid status'};
+                console.log('FnUpdateTransaction: status is mandatory field');
+            }
+           
+            res.status(401).json(responseMessage);
+        }  
+}
+    catch (ex) {
+        responseMessage.error = {};
+        responseMessage.message = 'An error occured !'
+        console.log('FnUpdateTransaction:error ' + ex.description);
+        throw new Error(ex);
+        res.status(400).json(responseMessage);
+    }
+    
+};
+
 exports.FnSaveTranscationOld = function(req, res){
     try{
         res.setHeader("Access-Control-Allow-Origin", "*");
@@ -7258,6 +7349,8 @@ exports.FnGetTranscation = function (req, res) {
         var Page = parseInt(req.query.Page);
         var Status = (req.query.Status) ? req.query.Status : null;
         var searchkeyword = req.query.searchkeyword ? req.query.searchkeyword : '';
+        var sortBy = (parseInt(req.query.sort_by) !== NaN) ? parseInt(req.query.sort_by) : 0 ;
+        
         
        var RtnMessage = {
             TotalPage:'',
@@ -7275,15 +7368,10 @@ exports.FnGetTranscation = function (req, res) {
                         if (FromPage <= 1) {
                             FromPage = 0;
                         }
-                                              
-                        var query = 'CALL pGetMessagesNew('+ db.escape(Token) + ',' + db.escape(FunctionType) + ',' 
-                        + db.escape(Status) + ',' + db.escape(FromPage) + ',' + db.escape(ToPage) + ',' + db.escape(searchkeyword) +')';
                         
-                            //var parameters = db.escape(Token) + ',' + db.escape(FunctionType);;
-                        //console.log(parameters);
-                         
-                        console.log(query);
-                        db.query(query, function (err, GetResult) {
+                    var parameters = db.escape(Token) + ',' + db.escape(FunctionType) + ',' + db.escape(Status) + ',' + db.escape(FromPage) + ',' + db.escape(ToPage) + ',' + db.escape(searchkeyword) + ',' + db.escape(sortBy);
+                        console.log('CALL pGetMessagesNew(' + parameters + ')');
+                      db.query('CALL pGetMessagesNew(' + parameters + ')', function (err, GetResult) {
                             if (!err) {
                                 if (GetResult != null) {
                                     console.log('Length:'+GetResult[0].length);
