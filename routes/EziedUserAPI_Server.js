@@ -4239,7 +4239,8 @@ exports.FnSearchByKeywords = function (req, res) {
                                 if (!err) {
                                     if (SearchResult[0] != null) {
                                         if (SearchResult[0].length > 0) {
-                                            res.send(SearchResult[0]);
+                                            console.log(SearchResult);
+                                            res.json({totalcount:SearchResult[0][0].totalcount,Result:SearchResult[1]});
                                             console.log('FnSearchByKeywords: tmaster: Search result sent successfully');
                                             if (SearchType == 2){
                                             var getQuery = 'select TID from tmaster where Token='+db.escape(token);
@@ -4400,13 +4401,14 @@ exports.FnSearchByKeywords = function (req, res) {
                     + ',' + db.escape('') + ',' + db.escape(ParkingStatus) + ',' + db.escape(OpenCloseStatus) + ',' + db.escape(Rating) 
                     + ',' + db.escape(token)  + ',' + db.escape(HomeDelivery)+ ',' + db.escape(CurrentDate) + ',' + db.escape(isPagination) + ',' + 
                                 db.escape(pagesize) + ',' + db.escape(pagecount)+ ',' + db.escape(total);
-                console.log('SearchQuery: ' + InsertQuery);
+                console.log('CALL pSearchResultNew(' + InsertQuery + ')');
                 db.query('CALL pSearchResultNew(' + InsertQuery + ')', function (err, SearchResult) {
                     if (!err) {
-                        //console.log(SearchResult);
+                        console.log(SearchResult);
                         if (SearchResult[0] != null) {
                             if (SearchResult[0].length > 0) {
-                                res.send(SearchResult[0]);
+                                //res.send(SearchResult[0]);
+                                res.json({totalcount:SearchResult[0][0].totalcount,Result:SearchResult[1]});
                                 console.log('FnSearchByKeywords:  tmaster:Search Found');
                             }
                             else {
@@ -7351,7 +7353,7 @@ exports.FnGetTranscation = function (req, res) {
         var searchkeyword = req.query.searchkeyword ? req.query.searchkeyword : '';
         var sortBy = (parseInt(req.query.sort_by) !== NaN) ? parseInt(req.query.sort_by) : 0 ;
         
-        
+        console.log(req.query);
        var RtnMessage = {
             TotalPage:'',
             Result:''

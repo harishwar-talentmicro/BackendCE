@@ -46,7 +46,7 @@
 
 .rpw .search-bar-center
 {
-    padding-left: 35%;
+    padding-left: 30%;
 }
 
 .srw .tile-frame-padding-top
@@ -507,9 +507,9 @@
     padding-bottom: 3px;
 }
 
-.hpw .p-bottom-3
+.hpw .p-bottom-4
 {
-    padding-bottom: 3px;
+    padding-bottom: 4px;
 }
 
 .hpw .advance-filter-content
