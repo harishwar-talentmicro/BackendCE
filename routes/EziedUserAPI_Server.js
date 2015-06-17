@@ -7349,6 +7349,8 @@ exports.FnGetTranscation = function (req, res) {
         var Page = parseInt(req.query.Page);
         var Status = (req.query.Status) ? req.query.Status : null;
         var searchkeyword = req.query.searchkeyword ? req.query.searchkeyword : '';
+        var sortBy = (parseInt(req.query.sort_by) !== NaN) ? parseInt(req.query.sort_by) : 0 ;
+        
         
        var RtnMessage = {
             TotalPage:'',
@@ -7366,15 +7368,10 @@ exports.FnGetTranscation = function (req, res) {
                         if (FromPage <= 1) {
                             FromPage = 0;
                         }
-                                              
-                        var query = 'CALL pGetMessagesNew('+ db.escape(Token) + ',' + db.escape(FunctionType) + ',' 
-                        + db.escape(Status) + ',' + db.escape(FromPage) + ',' + db.escape(ToPage) + ',' + db.escape(searchkeyword) +')';
                         
-                            //var parameters = db.escape(Token) + ',' + db.escape(FunctionType);;
-                        //console.log(parameters);
-                         
-                        console.log(query);
-                        db.query(query, function (err, GetResult) {
+                    var parameters = db.escape(Token) + ',' + db.escape(FunctionType) + ',' + db.escape(Status) + ',' + db.escape(FromPage) + ',' + db.escape(ToPage) + ',' + db.escape(searchkeyword) + ',' + db.escape(sortBy);
+                        console.log('CALL pGetMessagesNew(' + parameters + ')');
+                      db.query('CALL pGetMessagesNew(' + parameters + ')', function (err, GetResult) {
                             if (!err) {
                                 if (GetResult != null) {
                                     console.log('Length:'+GetResult[0].length);
