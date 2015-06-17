@@ -553,6 +553,8 @@ angular.module('ezeidApp').
 
             $scope.getdirections = function (data) {
 
+                console.log(data);
+
                 /*
                     $scope.activeTemplate = "html/mapPopView.html";
                     $scope.showMapPopupModel = true;
