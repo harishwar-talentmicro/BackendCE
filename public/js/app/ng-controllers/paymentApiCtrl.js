@@ -41,12 +41,16 @@ var res = angular.module('ezeidApp').
             $route,
             UtilityService
         ) {
+
+            console.log($.citrus);
+            var citruspg = $.citrus.gateway($.citrus.env.sandbox);//calling the function in citrus.js [388]
+            var citruswallet = $.citrus.wallet($('#walletToken').val(), $.citrus.env.sandbox);//calling the function in citrus.js [519]
             /**
              * All citrus payment settings goes here
              */
             $scope.merchantAccessKey = 'YRX3BRJBX71D5BMKXZUU';
             $scope.returnUrl = 'http://localhost:3001/payment/response';
-            $scope.requestSignature = 'requestSignature';
+            $scope.requestSignature = '3670241785923f1d389a6e0a7a97820ddae40307';
             $scope.paramOne = 'one Value';
             $scope.secundo = 'online';
             $scope.currency = 'INR';
@@ -73,7 +77,7 @@ var res = angular.module('ezeidApp').
             /**
              * Ressponsible for the payment API initiation
              */
-             $scope.paynow = function() {
+             $scope.paynow = function(paymentType) {
                 // reset errors
                 $('#payerror').html('');
 
@@ -109,10 +113,8 @@ var res = angular.module('ezeidApp').
                     }
                 };
 
-                console.log(bill);
-                return;
                 // read payment options
-                var mode = $('input[type="radio"][name="paymentMode"]:checked').attr('id');
+                var mode = paymentType;
                 var paymentOptions = {
                     mode: mode,
                     token: $('input[type="radio"][name="walletToken"]:checked').attr('id'),
@@ -123,7 +125,7 @@ var res = angular.module('ezeidApp').
                     cardCvv: $('#cardCvv').val(),
                     bankCode: $('#bank option:selected').val()
                 };
-
+                console.log(bill,paymentOptions);
                 // make payment - calling the function defined in citrus.js [280]
                 citruspg.makePayment(
                     bill,

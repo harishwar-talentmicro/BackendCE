@@ -81,7 +81,7 @@
                                 <input type="text" required class="form-control" ng-model="addressState" placeholder="State">
                             </div>
                             <div class="text-right">
-                                <button ng-click="paynow()" class="btn btn-primary">Save <i class="fa fa-arrow-circle-right"></i></button>
+                                <button class="btn btn-primary">Save <i class="fa fa-arrow-circle-right"></i></button>
                             </div>
                         </div>
                     </form>
@@ -108,12 +108,12 @@
                                 <div id="collapseOne" class="panel-collapse collapse no-style-link" aria-expanded="false" style="height: 0px;">
                                     <div class="box-body">
                                         <span>Choose Bank</span>
-                                        <select class="form-control p-bottom-3">
+                                        <select id="bank" class="form-control p-bottom-3">
                                             <option ng-repeat="bank in bankLists track by $index | orderBy : toString()">{{bank}}</option>
                                         </select>
 
                                         <div class="buttons text-right p-top-10">
-                                            <button class="btn btn-success btn-sm">Pay <i class="fa fa-check-circle"></i></button>
+                                            <button ng-click="paynow('netbanking')" class="btn btn-success btn-sm">Pay <i class="fa fa-check-circle"></i></button>
                                         </div>
                                     </div>
                                 </div>
@@ -151,7 +151,7 @@
                                         </div>
                                         <br>
                                         <div class="buttons text-right">
-                                            <button class="btn btn-success btn-sm">Pay <i class="fa fa-check-circle"></i></button>
+                                            <button ng-click="paynow('card')" class="btn btn-success btn-sm">Pay <i class="fa fa-check-circle"></i></button>
                                         </div>
                                     </div>
                                 </div>
@@ -170,7 +170,7 @@
                                         <input type="text" class="form-control" placeholder="your citrus user name" />
 
                                         <div class="buttons text-right p-top-10">
-                                            <button class="btn btn-success btn-sm">Pay <i class="fa fa-check-circle"></i></button>
+                                            <button ng-click="paynow('prepaid')" class="btn btn-success btn-sm">Pay <i class="fa fa-check-circle"></i></button>
                                         </div>
                                     </div>
                                 </div>
