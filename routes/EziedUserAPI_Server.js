@@ -7124,6 +7124,7 @@ try{
     var folderRuleID = parseInt(req.body.folderRuleID);
     var nextAction = req.body.nextAction;
     var nextActionDateTime = new Date(req.body.nextActionDateTime);
+    var ezeid = req.body.ezeid;
     
     
     var responseMessage = {
@@ -7153,7 +7154,7 @@ try{
         }
     if(TID && status){
         
-        var query = db.escape(TID) + ', ' + db.escape(status) + ',' + db.escape(folderRuleID) + ',' + db.escape(nextAction) + ',' + db.escape(nextActionDateTime);
+        var query = db.escape(TID) + ', ' + db.escape(status) + ',' + db.escape(folderRuleID) + ',' + db.escape(nextAction) + ',' + db.escape(nextActionDateTime)+ ', ' + db.escape(ezeid);
             db.query('CALL pUpdateTrans(' + query + ')', function (err, updateResult) {
                 if (!err){
                     if (updateResult != null) {
