@@ -34,15 +34,27 @@ angular.module('ezeidApp').controller('viewDirectionController',[
         var finalImageSrc = "";
 
         //Below line is for Loading img
-       // $scope.$emit('$preLoaderStart');
+        $scope.$emit('$preLoaderStart');
 
             $timeout(function(){
                 initialize();
             },1000);
 
-       // initialize();
-
-
+        function convertasbinaryimage()
+        {
+            $rootScope.$broadcast('$preLoaderStop');
+            html2canvas(document.getElementById("googlemap"), {
+                useCORS: true,
+                onrendered: function(canvas)
+                {
+                    var img = canvas.toDataURL("image/jpg");
+                    img = img.replace('data:image/png;base64,', '');
+                    finalImageSrc = 'data:image/jpg;base64,' + img;
+                    $('#googlemapbinary').attr('src', finalImageSrc);
+                    return false;
+                }
+            });
+        }
 
         function initialize ()
         {
@@ -172,26 +184,12 @@ angular.module('ezeidApp').controller('viewDirectionController',[
         PlaceCurrentLocationMarker(initialLocation);
     }
 
-        function convertasbinaryimage()
-        {
-            html2canvas(document.getElementById("googlemap"), {
-                useCORS: true,
-                onrendered: function(canvas) {
 
-                    var img = canvas.toDataURL("image/jpg");
-                    img = img.replace('data:image/png;base64,', '');
-                    finalImageSrc = 'data:image/jpg;base64,' + img;
-
-                    $('#googlemapbinary').attr('src', finalImageSrc);
-                    return false;
-                }
-            });
-        }
 
 
 
         // EMail direction Html
-            viewDirection.emailHtml = function () {
+        viewDirection.emailHtml = function () {
             if(!$rootScope._userInfo.IsAuthenticate)
             {
                 $('#SignIn_popup').slideDown();
@@ -205,14 +203,14 @@ angular.module('ezeidApp').controller('viewDirectionController',[
         // Print direction Html
         viewDirection.printHtml = function () {
 
-            window.print();
-        /*$scope.showEmailForm = false;
+            //window.print();
+        $scope.showEmailForm = false;
 
         var printContents = document.getElementById("googlemapimage").innerHTML;
         var popupWin = window.open('', '_blank', 'width=700,height=700');
         popupWin.document.open();
         popupWin.document.write('<html><head><link rel="stylesheet" type="text/css" href="style.css" /></head><body onload="window.print()">' + printContents + '</html>');
-        popupWin.document.close();*/
+        popupWin.document.close();
     };
 
         //  Close EMail direction dialogue
