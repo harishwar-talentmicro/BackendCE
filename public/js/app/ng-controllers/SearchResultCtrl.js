@@ -47,6 +47,7 @@ var res = angular.module('ezeidApp').
         )
         {
             $scope.resultPerPage = 20;
+
             var selectAll = false;
             var isResultNumber = 1; /* 1: Results,0:no results */
             var coordinatesArr = [];

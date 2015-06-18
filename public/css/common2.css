@@ -221,6 +221,13 @@
     }
 }
 
+/*@media screen and (max-width: 844px) {*/
+    /*.hpw .search-result-page-padding*/
+    /*{*/
+        /*padding-top: 355px;*/
+    /*}*/
+/*}*/
+
 @media screen and (max-width: 874px) {
     .srw .tile-frame-padding-top
     {
@@ -1825,7 +1832,7 @@ hr.style-two {
     display: inline-block;
 }
 
- .hpw .front, .back {
+.hpw .front, .back {
     /*border: 2px gray solid;*/
     /*padding: 10px;*/
 }
@@ -1856,7 +1863,7 @@ hr.style-two {
 
 .hpw .metro-bg-1
 {
-   background-color: #ea6153;
+    background-color: #ea6153;
 }
 
 .hpw .metro-bg-2
@@ -1955,8 +1962,8 @@ hr.style-two {
     padding-bottom: 10px;
     border: 1px solid rgb(228, 228, 228);
     padding: 10px;
-height: auto;
-margin-bottom: 10px;
+    height: auto;
+    margin-bottom: 10px;
 }
 
 /* styles for Reservation Module */

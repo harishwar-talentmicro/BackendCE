@@ -207,6 +207,8 @@ app.put('/reservation_transaction',LocationManager.FnChangeReservationStatus);
 app.get('/skill_list',LocationManager.FnPGetSkills);
 app.get('/transaction_autocomplete',LocationManager.FnGetTransAutoComplete);
 app.put('/update_transaction',LocationManager.FnUpdateTransaction);
+app.get('/company_details',LocationManager.FnGetCompanyDetails);
+
 
 //below service are for EZEIDAP
 app.post('/ewLoginAP', LocationManager.FnLoginAP);
