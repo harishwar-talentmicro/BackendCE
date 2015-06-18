@@ -2183,3 +2183,46 @@ hr.style-two {
 {
     text-decoration: none;
 }
+
+.hpw .lbl-box2 {
+    display: inline-block;
+    height: 100px;
+    overflow: hidden;
+    position: absolute;
+    text-align: center;
+    top: -4px;
+    left: -4px;
+    width: 100px;
+    z-index: 99;
+    font-size: 14px;
+    line-height: 24px;
+    font-weight: bold;
+    color: #fff;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.hpw .lbl-box2 .newafter {
+    position: absolute;
+    right: -1px;
+    top: 0;
+    width: 7px;
+    height: 4px;
+}
+
+.hpw .lbl-box2 .new {
+    position: relative;
+    top: 28px;
+    left: -28px;
+    height: 24px;
+    width: 140px;
+    background: rgba(239, 227, 0, 0.82);
+    position: relative;
+    -webkit-transform: rotate(-45deg);
+    -o-transform: rotate(-45deg);
+    -moz-transform: rotate(-45deg);
+    -ms-transform: rotate(-45deg);
+    -kthtml-transform: rotate(-45deg);
+    transform: rotate(-45deg);
+}
