@@ -40,7 +40,7 @@ angular.module('ezeidApp').controller('viewDirectionController',[
                 initialize();
             },1000);
 
-       /// initialize();
+       // initialize();
 
 
 
@@ -87,10 +87,10 @@ angular.module('ezeidApp').controller('viewDirectionController',[
             directionsDisplay.setMap(map);
             directionsDisplay.setPanel(document.getElementById('directions-panel'));
 
-            $(window).resize(function() {
+          /*  $(window).resize(function() {
                 console.log("SAi88");
                 google.maps.event.trigger(map, "resize");
-            });
+            });*/
 
             //$rootScope.$broadcast('$preLoaderStop');
 
@@ -108,7 +108,7 @@ angular.module('ezeidApp').controller('viewDirectionController',[
 
                     $timeout(function(){
                        convertasbinaryimage();
-                    },9000);
+                    },8000);
                 }
             });
 
@@ -174,7 +174,7 @@ angular.module('ezeidApp').controller('viewDirectionController',[
 
         function convertasbinaryimage()
         {
-            html2canvas(document.getElementById("googlemap","#fff"), {
+            html2canvas(document.getElementById("googlemap"), {
                 useCORS: true,
                 onrendered: function(canvas) {
 
