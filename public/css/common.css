@@ -592,9 +592,106 @@ ng\:form {
 
 /* css/angular-ui-notification.min.css Starts from hear */
 
-.ui-notification{position:fixed;z-index:9999;top:-100px;right:10px;width:300px;cursor:pointer;-webkit-transition:all ease .5s;-o-transition:all ease .5s;transition:all ease .5s;color:#fff;background:#428bca;box-shadow:5px 5px 10px rgba(0,0,0,.3)}.ui-notification.killed{-webkit-transition:opacity ease 1s;-o-transition:opacity ease 1s;transition:opacity ease 1s;opacity:0}.ui-notification>h3{font-size:14px;font-weight:700;display:block;margin:10px 10px 0;padding:0 0 5px;text-align:left;border-bottom:1px solid rgba(255,255,255,.3)}.ui-notification a{color:#fff}.ui-notification a:hover{text-decoration:underline}.ui-notification>.message{margin:10px}.ui-notification.warning{color:#fff;background:#f0ad4e}.ui-notification.error{color:#000;background:#FF6600}.ui-notification.success{color:#fff;background:#5cb85c}.ui-notification.info{color:#fff;background:#5bc0de}.ui-notification:hover{opacity:.7}
+.ui-notification {
+    position: fixed;
+    z-index: 9999;
+    top: -100px;
+    right: 10px;
+    width: 300px;
+    cursor: pointer;
+    -webkit-transition: all ease .5s;
+    -o-transition: all ease .5s;
+    transition: all ease .5s;
+    color: #fff;
+    background: #428bca;
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, .3)
+}
 
+.ui-notification.killed {
+    -webkit-transition: opacity ease 1s;
+    -o-transition: opacity ease 1s;
+    transition: opacity ease 1s;
+    opacity: 0
+}
+
+.ui-notification > h3 {
+    font-size: 14px;
+    font-weight: 700;
+    color: #ffffff;
+    display: block;
+    margin: 0px 3px 0;
+    padding: 0 0 5px;
+    text-align: left;
+}
+
+.ui-notification a {
+    color: #fff
+}
+
+.ui-notification a:hover {
+    text-decoration: underline
+}
+
+.ui-notification > .message {
+    padding-left: 5px;
+    color:#FFFFFF;
+    font-family: 'Open Sans',sans-serif;
+}
+
+.ui-notification.warning {
+    color: #fff;
+    background: #f0ad4e
+}
+
+.ui-notification.error {
+    color: #000;
+    background: #FF6600
+}
+
+.ui-notification.success {
+    color: #fff;
+    background: #5cb85c
+}
+
+.ui-notification.info {
+    color: #fff;
+    background: #5bc0de
+}
+
+/*.ui-notification:hover {*/
+    /*opacity: .7*/
+/*}*/
+
+.ui-notification {
+    top: 10px;
+    right: 10px;
+    padding: 5px;
+    border: 1px solid #7C7E7E;
+    border-left: 15px solid #7C7E7E;
+    background: #889394;
+    border-radius: 5px;
+    font-family: 'Open Sans', sans-serif;
+}
+
+.ui-notification.success {
+    border: 1px solid #069E19;
+    border-left: 15px solid #069E19;
+    background: #57B809;
+}
+
+.ui-notification.warning{
+    border: 1px solid #E25701;
+    border-left: 15px solid #E25701;
+    background: #FA7300;
+}
+
+.ui-notification.error{
+    border: 1px solid #B00808;
+    border-left: 15px solid #B00808;
+    background: #DA1616;
+}
 /* css/angular-ui-notification.min.css End hear */
+
 
 /* css/jquery.datetimepicker.css Stars from hear */
 
@@ -1580,14 +1677,27 @@ span.smallCloselink {
 }
 
 .tx-row{
-  padding-top: 5px;
-  padding-bottom: 5px;
-  background: #FFFFFF;
-  margin-bottom: 5px;
-  margin-top: 5px;
-  /*box-shadow: 0px 0px 10px #CACACA;*/
-  border: 1px solid #BDBDBD;
-  margin: 5px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    background: #FFFFFF;
+    margin-bottom: 5px;
+    margin-top: 5px;
+    border: 1px solid #BDBDBD;
+    margin-top: 5px;
+    margin-bottom: 0px;
+}
+
+
+.tx-row > div{
+    padding-bottom: 0px;
+    margin-bottom:0px;
+}
+
+.tx-filter-container{
+    padding-left: 0px;
+    padding-right: 0px;
+    padding-top: 5px;
+    text-align: right;
 }
 
 @media (min-width: 992px) {
@@ -1610,16 +1720,39 @@ span.smallCloselink {
     margin-top:50px;
 }
 .tx-row.even{
-    background-color: #DBFFF0;
-    border: 1px solid #8CEDD7;
+    background-color: #EEFFD2;
+    border: 1px solid transparent;
 }
 .tx-row.odd{
-    background-color: #FFFFFF;
-    border: 1px solid #D0D0D0;
+    background-color: rgba(244, 244, 244, 1);
+    border: 1px solid transparent;
 }
 
+.tx-row.even:hover,
+.tx-row.even:active,
+.tx-row.even:focus,
+.tx-row.odd:hover,
+.tx-row.odd:active,
+.tx-row.odd:focus
+{
+    border:1px solid #449d44;
+}
+.tx-search-input-group > .form-control{
+    border-right: transparent;
+}
 
+.tx-search-input-group > .form-control:focus,
+.tx-search-input-group > .form-control:active{
+    box-shadow: none;
+    border-right: none;
+}
+.tx-search-input-group > .input-group-addon{
+    background-color: transparent;
+    border-color:#46b8da;
+    border-left: none;
+    border-right: none;
 
+}
 
 .preloader{
     display: table-cell;

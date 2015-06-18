@@ -568,8 +568,9 @@ var res = angular.module('ezeidApp').
             }
             /* color WORKING hours */
             $scope.colorWorkingHoursFlag = false;
-            $scope.colorWorkingHours = function () {
+            $scope.colorWorkingHours = function (reloadCalanderFlag,reservationMooduleStarterFlag) {
                 var workingHrs = $scope.workingHrs;
+                console.log(reloadCalanderFlag,reservationMooduleStarterFlag,workingHrs.length, $('.available').length);
                 if(workingHrs.length == 0)
                 {
                     return;
@@ -577,10 +578,16 @@ var res = angular.module('ezeidApp').
 
                 if($scope.colorWorkingHoursFlag)
                 {
-                    return;
+                    //return;
+                }
+
+
+                /* check if the html exists and working hours have been loaded */
+                if(reservationMooduleStarterFlag && workingHrs.length > 0 && $('.available').length > 0)
+                {
+                    $scope.colorWorkingHoursFlag = true;
                 }
                 console.log('colorWorkingHoursFlag');
-                //$scope.colorWorkingHoursFlag = true;
                 /* RESET CALENDAR */////////////////////////////////////////////////////////
                 /* clean the calendar's working hour */
                 cleanCalendarData();
@@ -652,6 +659,7 @@ var res = angular.module('ezeidApp').
                 }
                 console.log('alreadyReserveSlotFlag;');
                 //$scope.alreadyReserveSlotFlag = true;
+
                 for (var i = 0; i < $scope.reservedTime.length; i++) {
                     /* get blocks coming under this range */
                     var data = getBlockRange($scope.reservedTime[i][0], $scope.reservedTime[i][1]);
@@ -848,7 +856,7 @@ var res = angular.module('ezeidApp').
              */
             $scope.appendColorIndexFlag = false;
             $scope.appendColorIndex = function() {
-                console.log('----'+$scope.ifHtmlLoaded);
+
                 if(!$scope.ifHtmlLoaded)
                 {
                     //return ;
@@ -856,14 +864,16 @@ var res = angular.module('ezeidApp').
 
                 if($scope.appendColorIndexFlag)
                 {
-                    //return;
+                    return;
                 }
 
-
-                console.log('appendColorIndexFlag',$scope.colorIndex,$scope.ifHtmlLoaded);
+                if(typeof($('.color-index-2').attr('style')) != 'undefined')
+                {
+                    $scope.appendColorIndexFlag = true;
+                }
+                console.log('test');
                 for (var i = 0; i < $scope.colorIndex.length; i++)
                 {
-                    console.log('.color-index-'+i);
                     $('.color-index-'+i).css('color',$scope.colorIndex[i][0]);
                     $('.color-index-label-'+i).html('<small>'+$scope.colorIndex[i][1]+'</small>');
                 }
@@ -1071,7 +1081,7 @@ var res = angular.module('ezeidApp').
                 if(oldVal !== newVal){
                     $scope.activeDate = moment(newVal).format('DD-MMM-YYYY');
                     /* reload calendar */
-                    //resetStaterFunction();
+                    resetStaterFunction();
                     $scope.reloadCalander();
                 }
             });
@@ -1118,7 +1128,7 @@ var res = angular.module('ezeidApp').
                 /* http request for getting the new calendar data */
                 getReservationTransactionData($scope.activeResourceId,$scope.activeDate,$scope.searchedEzeid);
                 /* recolor working hours */
-                $scope.colorWorkingHours();
+                $scope.colorWorkingHours(true);
                 //removeWasteColoredCells();
             }
 
@@ -1414,11 +1424,11 @@ var res = angular.module('ezeidApp').
             }
 
             /**
-             * Reservationmodule starter
+             * Reservation module starter
              */
             $scope.reservationMooduleStarter = function()
             {
-                $scope.colorWorkingHours();
+                $scope.colorWorkingHours(false,true);
                 $scope.alreadyReserveSlot();
                 $scope.appendColorIndex();//Checks Done
                 $scope.removeWasteColoredCells();
