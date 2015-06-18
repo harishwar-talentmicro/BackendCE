@@ -6954,6 +6954,7 @@ exports.FnSaveTranscation = function(req, res){
         var ToEZEID = req.body.ToEZEID;
         var item_list_type = 0;
         var companyName = req.body.companyName ? req.body.companyName : '' ;
+        var company_id = req.body.company_id ? req.body.company_id : 0 ;
         var RtnMessage = {
             IsSuccessfull: false,
             MessageID:0
@@ -6979,7 +6980,7 @@ exports.FnSaveTranscation = function(req, res){
                 if (!err) {
                     if (Result != null) {
 
-                        var query = db.escape(Token)+","+db.escape(FunctionType)+","+ db.escape(MessageText)+ "," + db.escape(Status) +"," + db.escape(TaskDateNew) + ","  + db.escape(Notes) + "," + db.escape(LocID)  + "," + db.escape(Country)   + "," + db.escape(State) + "," + db.escape(City)   + "," + db.escape(Area) + ","  + db.escape(Latitude)  + "," + db.escape(Longitude)  +  "," + db.escape(EZEID)  + "," + db.escape(ContactInfo)  + "," + db.escape(FolderRuleID)  + "," + db.escape(Duration)  + "," + db.escape(DurationScales) + "," + db.escape(NextAction) + "," + db.escape(NextActionDateTimeNew) + "," + db.escape(TID) + "," + db.escape(((ItemIDList != "") ? ItemIDList : "")) + "," + db.escape(DeliveryAddress) + "," + db.escape(ToEZEID) + "," + db.escape(item_list_type) + "," + db.escape(companyName);
+                        var query = db.escape(Token)+","+db.escape(FunctionType)+","+ db.escape(MessageText)+ "," + db.escape(Status) +"," + db.escape(TaskDateNew) + ","  + db.escape(Notes) + "," + db.escape(LocID)  + "," + db.escape(Country)   + "," + db.escape(State) + "," + db.escape(City)   + "," + db.escape(Area) + ","  + db.escape(Latitude)  + "," + db.escape(Longitude)  +  "," + db.escape(EZEID)  + "," + db.escape(ContactInfo)  + "," + db.escape(FolderRuleID)  + "," + db.escape(Duration)  + "," + db.escape(DurationScales) + "," + db.escape(NextAction) + "," + db.escape(NextActionDateTimeNew) + "," + db.escape(TID) + "," + db.escape(((ItemIDList != "") ? ItemIDList : "")) + "," + db.escape(DeliveryAddress) + "," + db.escape(ToEZEID) + "," + db.escape(item_list_type) + "," + db.escape(companyName) + "," + db.escape(company_id);
                         // db.escape(NextActionDateTime);
                         console.log('CALL pSaveTrans(' + query + ')');
                         db.query('CALL pSaveTrans(' + query + ')', function (err, InsertResult) {
@@ -12098,6 +12099,7 @@ exports.FnGetCompanyDetails = function (req, res) {
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
         var ezeid = req.query.ezeid;
+        var type = req.query.type;
 
         var responseMessage = {
             status: false,
@@ -12164,6 +12166,102 @@ exports.FnGetCompanyDetails = function (req, res) {
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
         console.log('FnGetCompanyDetails:error ' + ex.description);
+        throw new Error(ex);
+        res.status(400).json(responseMessage);
+    }
+};
+
+exports.FnGetOutboxMessages = function (req, res) {
+    
+    try {
+
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.query.Token;
+
+        var responseMessage = {
+            status: false,
+            data: null,
+            error:{},
+            message:''
+        };
+        
+        if (Token) {
+            FnValidateToken(Token, function (err, result) {
+                if (!err) {
+                    if (result != null) {
+                        db.query('CALL pGetOutboxMessages(' + db.escape(Token) + ')', function (err, GetResult) {
+                            if (!err) {
+                                if (GetResult) {
+                                    if (GetResult[0].length > 0) {
+                                        responseMessage.status = true;
+                                        responseMessage.data = GetResult[0] ;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Company details Send successfully';
+                                        console.log('FnGetOutboxMessages: Company details Send successfully');
+                                        res.status(200).json(responseMessage);
+                                    }
+                                    else {
+                                        
+                                        responseMessage.error = {};
+                                        responseMessage.message = 'No founded Company details';
+                                        console.log('FnGetOutboxMessages: No founded Company details');
+                                        res.json(responseMessage);
+                                    }
+                                }
+                                else {
+
+                                    
+                                    responseMessage.error = {};
+                                    responseMessage.message = 'No founded Company details';
+                                    console.log('FnGetOutboxMessages: No founded Company details');
+                                    res.json(responseMessage);
+                                }
+
+                            }
+                            else {
+                                
+                                responseMessage.data = null ;
+                                responseMessage.error = {};
+                                responseMessage.message = 'Error in getting Company details';
+                                console.log('FnGetOutboxMessages: error in getting Company details' + err);
+                                res.status(500).json(responseMessage);
+                            }
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token'; 
+                        responseMessage.error = {}; 
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnGetOutboxMessages: Invalid token');
+                                            }
+                }
+                else {
+                    responseMessage.error= {};
+                    responseMessage.message = 'Error in validating Token'; 
+                    res.status(500).json(responseMessage);
+                    console.log('FnGetOutboxMessages:Error in processing Token' + err);
+                }
+            });
+        }
+        else {
+            if (!ezeid) {
+                responseMessage.message = 'Invalid ezeid';            
+                responseMessage.error = {
+                    ezeid : 'Invalid ezeid'
+                };
+                console.log('FnGetCompanyDetails: ezeid is mandatory field');
+            }
+           
+            res.status(401).json(responseMessage);
+        }
+    }
+     catch (ex) {
+        responseMessage.error = {};
+        responseMessage.message = 'An error occured !'
+        console.log('FnGetOutboxMessages:error ' + ex.description);
         throw new Error(ex);
         res.status(400).json(responseMessage);
     }
