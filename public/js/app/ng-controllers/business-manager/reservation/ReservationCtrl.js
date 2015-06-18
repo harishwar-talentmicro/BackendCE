@@ -571,8 +571,8 @@ var res = angular.module('ezeidApp').
             }
 
             /*
-            * restricting duplicate call
-            */
+             * restricting duplicate call
+             */
             var prevReloadCalanderFlag = 'x';
             var prevReservationMooduleStarterFlag  = 'x';
             var prevWorkingHrs  = 'x';
@@ -772,10 +772,9 @@ var res = angular.module('ezeidApp').
             function textStylerAndHeightSetter(startBlock,totalHeight)
             {
                 $('.block-' + startBlock).css('height', $scope.height * totalHeight + 'em');
-                if(totalHeight == 1)
-                {
-                    $('.block-' + startBlock+' > p').css("font-weight",'bolder').css("font-size",'0.6em');
-                }
+
+                $('.block-' + startBlock+' > p').css("font-weight",'bolder').css("font-size",'0.6em');
+
             }
 
             /**
