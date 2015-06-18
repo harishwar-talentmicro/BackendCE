@@ -31,7 +31,7 @@
                             <div class="input-group-btn">
                                 <!-- Filter BTN -->
                                 <button  data-toggle="tooltip"  ng-click="toggleFilterContainer($event,true)" ng-disabled="searchParams.searchType === 1"
-                                         type="button" class="btn no-radius btn-default dropdown-toggle btn-advanced-filter" data-toggle="dropdown" title="Click to choose Search Options"><i class="fa fa-filter"></i> <b class="normal-view-buttons">Filter</b></button>
+                                         type="button" class="btn no-radius btn-default dropdown-toggle btn-advanced-filter" data-toggle="dropdown" title="Click to choose Search Options"><i class="fa fa-check-square-o"></i> <b class="normal-view-buttons">Options</b></button>
                                 <!-- Search BTN -->
                                 <button  data-toggle="tooltip" type="button" class="btn btn-warning" title="search" ng-click="triggerSearch()"><i class="fa fa-search"></i> <b>Search</b></b></button>
                             </div>
@@ -95,17 +95,17 @@
                                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 select-items">
                                                 <input type="checkbox" id="item1" class="chkShowParking filter"  ng-model="searchParams.parkingStatus" name="parking" >
                                                 &nbsp;
-                                                <label  for="item1"> Parking Required</label>
+                                                <label  for="item1" class="text-0-9"> Parking Required</label>
                                             </div>
                                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 select-items">
                                                 <input type="checkbox" id="item2" class="chkShowParking filter" ng-model="searchParams.homeDelivery" name="homeDelivery" >
                                                 &nbsp;
-                                                <label  for="item2">Need home delivery</label>
+                                                <label  for="item2" class="text-0-9">Need home delivery</label>
                                             </div>
                                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 select-items">
                                                 <input type="checkbox" id="item3" class="chkShowParking filter" ng-model="searchParams.openStatus" name="openStatus" >
                                                 &nbsp;
-                                                <label  for="item3">Open business only</label>
+                                                <label  for="item3" class="text-0-9">Open business only</label>
                                             </div>
                                         </div>
                                     </div>
