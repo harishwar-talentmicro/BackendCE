@@ -7123,7 +7123,7 @@ try{
     var TID = parseInt(req.body.TID);
     var status = req.body.status;
     var folderRuleID = parseInt(req.body.folderRuleID);
-    var nextAction = req.body.nextAction;
+    var nextAction = (parseInt(req.body.nextAction) != NaN ) ? parseInt(req.body.nextAction) : 0;
     var nextActionDateTime = new Date(req.body.nextActionDateTime);
     var Token = req.body.Token;
     
@@ -7148,7 +7148,7 @@ try{
                             TID : req.body.TID,
                             status : req.body.status,
                             folderRuleID : req.body.folderRuleID,
-                            nextAction : req.body.nextAction,
+                            nextAction : (parseInt(req.body.nextAction) != NaN ) ? parseInt(req.body.nextAction) : 0,
                             nextActionDateTime : req.body.nextActionDateTime
                         };
                         res.status(200).json(responseMessage);
