@@ -228,11 +228,14 @@ var res = angular.module('ezeidApp').
                         'tid': array[obj].tid,
                         'title': array[obj].title,
                         'status': array[obj].status,
-                        'description': array[obj].description
+                        'description': array[obj].description,
+                        'ezeid': array[obj].EZEID,
+                        'operator': array[obj].operator
                     };
                     $scope.resources.push(tempArr);
-
                 }
+                setAccessRights($scope.resources[0].operator);
+                $scope.description = $scope.resources.length > 0?$scope.resources[0].description:'';
                 $scope.$emit('$preLoaderStop');
             }
 
@@ -851,6 +854,7 @@ var res = angular.module('ezeidApp').
             /* Get the text of for the reserved dates based on the user'is id */
             $scope.getReservedBlockText = function(loggedInUid,reserverId,text)
             {
+                console.log(loggedInUid,reserverId);
                 if(!$scope.isResource) {
                     if (loggedInUid != reserverId) {
                         return 'Reserved';
@@ -1000,7 +1004,7 @@ var res = angular.module('ezeidApp').
                     var reserverId = $('.block-'+blockId).data('reserver');
                     if(typeof(reserverId) != 'undefined' && loggedId != reserverId)
                     {
-                        Notification.error({ message: "You can't edit someone else's reservation", delay: MsgDelay });
+                        Notification.error({ title : "Warning", message: "You can't edit someone else's reservation", delay: MsgDelay });
                         return;
                     }
                     if(typeof($scope.currentServiceArray[0]) != 'undefined')
@@ -1130,7 +1134,12 @@ var res = angular.module('ezeidApp').
                 }
             });
 
-
+            $('#resource-dropdown').change(function(){
+                var resId = $scope.activateResource($(this).val());
+                $scope.description = $(this).children('option:selected').attr('data-desc');
+                var resid = $(this).children('option:selected').attr('data-resid');
+                setAccessRights($scope.resources[resid].operator);
+            });
             /**
              * onChange - reload the working hours and reserved our
              * Activate the button of this resource and inactive others
@@ -1503,22 +1512,25 @@ var res = angular.module('ezeidApp').
              * Set the access rights of the reservation module
              *
              * False: No write rights / Just a normal user
-             * 0: Super user: Reasd-only rights
-             * 1-*: Resource: Read/Write permission only to its own module
+             * 1: Super user: Reasd-only rights
+             * 2-*: Resource: Read/Write permission only to its own module
              */
-            function setAccessRights()
+            function setAccessRights(activatedResourceEzeid)
             {
                 if($routeParams.ezeid == $rootScope._userInfo.ezeid)
                 {
-                    $scope.accessRight = 0;//Super User
+                    $scope.accessRight = 1;//Super User
+                    $scope.isResource = true;
                 }
-                else if($rootScope._userInfo.ezeid == $scope.activeResourceEzeid)//@todo
+                else if($rootScope._userInfo.ezeid == activatedResourceEzeid)//@todo
                 {
-                    $scope.accessRight = $scope.activeResourceEzeid;
+                    $scope.accessRight = 2;
+                    $scope.isResource = true;
                 }
                 else
                 {
                     $scope.accessRight = false;
+                    $scope.isResource = false;
                 }
             }
         }]);

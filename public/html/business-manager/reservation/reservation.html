@@ -30,7 +30,7 @@
                         </date-time-picker>
                     </div>
                     <!-- Notes section goes here[Shown only to resource] -->
-                    <div ng-show="isResource && resources.length > 0" id="notes-block">
+                    <div ng-show="(isResource && resources.length > 0) && (accessRight == 1 || accessRight  == 2)" ng-hide="!accessRight" id="notes-block">
                         <div class="notes-heading">
                             <i class="fa fa-list"></i> Appointments
                         </div>
@@ -79,15 +79,19 @@
                                     <hr>
                                     <!-- Resource Buttons goes here -->
                                     <div class="ezeid-resource">
-                                        <div class="buttons">&nbsp;
-                                        <span ng-repeat="res in resources track by $index">
-                                            <button ng-show="resources[$index].title.length > 0"
-                                                    ng-click="activateResource(resources[$index].tid)"
-                                                    class="btn btn-default resource-btn" ng-class="['resource-'+resources[$index].tid,$index == 0?'active':'']"
-                                                    title="{{resources[$index].description}}">
-                                                {{resources[$index].title}}
-                                            </button>
-                                        </span>
+
+                                        <div class="row p-left-5">
+                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-left">
+                                                <span>Select Resources </span> <i class="fa fa-check-circle text-primary"></i> <small class="text-danger">{{description}}</small>
+                                            </div>
+                                            <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8">
+                                                <select class="form-control" id="resource-dropdown">
+                                                    <option ng-repeat="res in resources track by $index" data-resid = '{{$index}}' data-desc="{{resources[$index].description}}" value="{{resources[$index].tid}}">
+                                                        {{resources[$index].title}}
+                                                    </option>
+                                                </select>
+                                            </div>
+                                            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">&nbsp;</div>
                                         </div>
                                     </div>
                                 </div>
