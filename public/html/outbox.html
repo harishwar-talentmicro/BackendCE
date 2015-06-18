@@ -26,7 +26,9 @@
                         <!-- Transaction history goes here -->
 
                         <!-- Individual Strips starts here -->
-                        <transaction-history-item ng-to='xyz retailers' ng-message='abc' ng-quantity='d' ng-date='' ng-id='e'> </transaction-history-item>
+                        <div class="individual-transaction" ng-repeat="res in result.data track by $index">
+                            <transaction-history-item ng-to={{res.ToEzeid}} ng-message={{res.Message}} ng-quantity={{res.statustitle}} ng-date={{convertTimeToLocal(res.TaskDateTime)}} ng-id={{res.tid}} ng-status={{res.statustitle}} ng-udate={{convertTimeToLocal(res.updatedDate)}}> </transaction-history-item>
+                        </div>
                         <!-- Individual Strips ends here -->
                     </div>
                 </div>
@@ -34,9 +36,14 @@
             </div>
         </div>
     </div>
-
     <!-- details modal of the transaction history item goes here -->
+    <modal mtitle="modal.title" mclass="modal.class" visible="modalVisible">
+        <div class="row">
+            <!-- Detail goes here -->
 
+            <!-- Detail ends here -->
+        </div>
+    </modal>
     <!-- transaction history item modal ends here -->
 
     <!-- Footer goes here -->
