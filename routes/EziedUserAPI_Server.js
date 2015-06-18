@@ -10621,7 +10621,7 @@ exports.FnSaveReservationResource = function(req, res){
                         var query = db.escape(Token) + ', ' + db.escape(TID) + ',' + db.escape(picture) + ',' + db.escape(title) + ',' + db.escape(description) + ',' + db.escape(status)+ ',' + db.escape(operatorid);
                         db.query('CALL pSaveResource(' + query + ')', function (err, insertResult) {
                              if (!err){
-                                if (insertResult != null) {
+                                if (insertResult) {
                                     responseMessage.status = true;
                                     responseMessage.error = null;
                                     responseMessage.message = 'Resource details save successfully';
@@ -10845,7 +10845,7 @@ exports.FnGetReservationResource = function (req, res) {
                         db.query('CALL pGetResource(' + query + ')', function (err, GetResult) {
                 
                             if (!err) {
-                                if (GetResult != null) {
+                                if (GetResult) {
                                     if (GetResult[0].length > 0) {
                                         responseMessage.status = true;
                                         responseMessage.data = GetResult[0] ;
@@ -10956,7 +10956,7 @@ exports.FnSaveReservationService = function(req, res){
                         var query = db.escape(Token) + ', ' + db.escape(TID) + ',' + db.escape(title) + ',' + db.escape(duration) + ',' + db.escape(rate) + ',' + db.escape(status)+ ',' + db.escape(service_ids);
                         db.query('CALL pSaveResServices(' + query + ')', function (err, insertResult) {
                             if (!err){
-                                if (insertResult != null) {
+                                if (insertResult) {
                                     responseMessage.status = true;
                                     responseMessage.error = null;
                                     responseMessage.message = 'Service details save successfully';
@@ -11077,7 +11077,7 @@ exports.FnUpdateReservationService = function(req, res){
                         var query = db.escape(Token) + ', ' + db.escape(TID) + ',' + db.escape(title) + ',' + db.escape(duration) + ',' + db.escape(rate) + ',' + db.escape(status)+ ',' + db.escape(service_IDS);
                         db.query('CALL pSaveResServices(' + query + ')', function (err, insertResult) {
                             if (!err){
-                                if (insertResult != null) {
+                                if (insertResult) {
                                     responseMessage.status = true;
                                     responseMessage.error = null;
                                     responseMessage.message = 'Service details update successfully';
@@ -11165,7 +11165,7 @@ exports.FnGetReservationService = function (req, res) {
         if (ezeid) {
                     db.query('CALL pGetResServices(' + db.escape(ezeid) + ')', function (err, GetResult) {
                             if (!err) {
-                                if (GetResult != null) {
+                                if (GetResult) {
                                     if (GetResult[0].length > 0) {
                                         responseMessage.status = true;
                                         responseMessage.data = GetResult[0];
@@ -11242,7 +11242,7 @@ exports.FnGetReservResourceServiceMap = function (req, res) {
            
                         db.query('CALL pGetResResourceServiceMap(' + db.escape(ezeid) + ')', function (err, GetResult) {
                             if (!err) {
-                                if (GetResult != null) {
+                                if (GetResult) {
                                     if (GetResult[0].length > 0) {
                                         responseMessage.status = true;
                                         responseMessage.data = GetResult[0] ;
@@ -11353,7 +11353,7 @@ exports.FnSaveReservResourceServiceMap = function(req, res){
                         db.query('CALL pSaveResResourceServiceMap(' + query + ')', function (err, insertResult) {
                            
                              if (!err){
-                                if (result != null) {
+                                if (insertResult) {
                                     responseMessage.status = true;
                                     responseMessage.error = null;
                                     responseMessage.message = 'ResourceService Map details save successfully';
@@ -11672,7 +11672,7 @@ exports.FnGetMapedServices = function (req, res) {
         if (ezeid) {
             db.query('CALL pgetMapedservices(' + db.escape(ezeid) + ',' + db.escape(resourceid) + ')', function (err, GetResult) {
                             if (!err) {
-                                if (GetResult != null) {
+                                if (GetResult) {
                                     if (GetResult[0].length > 0) {
                                         responseMessage.status = true;
                                         responseMessage.data = GetResult[0] ;
@@ -11754,7 +11754,7 @@ exports.FnGetReservTask = function (req, res) {
             
             db.query('CALL pGetResTrans(' + db.escape(resourceid) + ',' + db.escape(date) + ',' + db.escape(toEzeid) + ')', function (err, GetResult) {
                             if (!err) {
-                                if (GetResult != null) {
+                                if (GetResult) {
                                     if (GetResult[0].length > 0) {
                                         responseMessage.status = true;
                                         responseMessage.data = GetResult[0] ;
@@ -11834,7 +11834,7 @@ exports.FnGetResTransDetails = function (req, res) {
             
             db.query('CALL pGetResTransDetails(' + db.escape(TID) + ')', function (err, GetResult) {
                             if (!err) {
-                                if (GetResult != null) {
+                                if (GetResult) {
                                     if (GetResult[0].length > 0) {
                                         responseMessage.status = true;
                                         responseMessage.data = GetResult[0] ;
@@ -12031,7 +12031,7 @@ exports.FnGetTransAutoComplete = function (req, res) {
             
             db.query('CALL PgetTransAutocomplete(' + db.escape(title) + ',' + db.escape(type) + ')', function (err, GetResult) {
                             if (!err) {
-                                if (GetResult != null) {
+                                if (GetResult) {
                                     if (GetResult[0].length > 0) {
                                         responseMessage.status = true;
                                         responseMessage.data = GetResult[0] ;
@@ -12110,7 +12110,7 @@ exports.FnGetCompanyDetails = function (req, res) {
             
             db.query('CALL pGetCompanyDetails(' + db.escape(ezeid) + ',' + db.escape(type) + ')', function (err, GetResult) {
                             if (!err) {
-                                if (GetResult != null) {
+                                if (GetResult) {
                                     if (GetResult[0].length > 0) {
                                         responseMessage.status = true;
                                         responseMessage.data = GetResult[0] ;
