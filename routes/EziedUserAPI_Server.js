@@ -12179,7 +12179,9 @@ exports.FnGetOutboxMessages = function (req, res) {
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
         var Token = req.query.Token;
-
+        var pagesize = req.query.pagesize;
+        var pagecount = req.query.pagecount;
+        
         var responseMessage = {
             status: false,
             data: null,
@@ -12191,7 +12193,7 @@ exports.FnGetOutboxMessages = function (req, res) {
             FnValidateToken(Token, function (err, result) {
                 if (!err) {
                     if (result != null) {
-                        db.query('CALL pGetOutboxMessages(' + db.escape(Token) + ')', function (err, GetResult) {
+                        db.query('CALL pGetOutboxMessages(' + db.escape(Token) + ',' + db.escape(pagesize) + ',' + db.escape(pagecount)+ ')', function (err, GetResult) {
                             if (!err) {
                                 if (GetResult) {
                                     if (GetResult[0].length > 0) {
