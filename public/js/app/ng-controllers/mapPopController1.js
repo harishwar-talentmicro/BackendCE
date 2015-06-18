@@ -1,4 +1,4 @@
-angular.module('ezeidApp').controller('mapPopController',[
+angular.module('ezeidApp').controller('mapPopController1',[
     '$http',
     '$interval',
     '$rootScope',
@@ -10,10 +10,8 @@ angular.module('ezeidApp').controller('mapPopController',[
     '$window',
     '$location',
     'GURL',
-    '$routeParams',
     'GoogleMaps',
-    function(
-             $http,
+    function($http,
              $interval,
              $rootScope,
              $scope,
@@ -24,7 +22,6 @@ angular.module('ezeidApp').controller('mapPopController',[
              $window,
              $location,
              GURL,
-             $routeParams,
              GoogleMaps){
 
         //Below line is for Loading img
@@ -76,23 +73,24 @@ angular.module('ezeidApp').controller('mapPopController',[
                 });
             });
 
+            directtionLatLong = JSON.parse($window.localStorage.getItem("myLocation"));
+
             var pos = null;
             var title = '';
             var containerElement = '';
 
             pos = googleMap.createGMapPosition(
-                $routeParams.endLat,
-                $routeParams.endLong
+                directtionLatLong.endLat,
+                directtionLatLong.endLong
             );
-
             title = 'Primary Location';
             containerElement = 'map-location-0';
 
-            $scope.userLat = $routeParams.endLat;
+            $scope.userLat = directtionLatLong.endLat;
 
-            if($routeParams.endLat)
+            if(directtionLatLong.endLat)
             {
-                var markerImage = $routeParams.IDTypeID == 1 ? 'images/Individual-Icon_48.png' : 'images/business-icon_48.png';
+                var markerImage = directtionLatLong.IDTypeID == 1 ? 'images/Individual-Icon_48.png' : 'images/business-icon_48.png';
                 var marker = googleMap.createMarker(pos,title,markerImage,false,null);
                 googleMap.placeMarker(marker);
             }
@@ -109,17 +107,22 @@ angular.module('ezeidApp').controller('mapPopController',[
         //To show route
         $scope.plotRoute = function () {
             googleMap.clearAllMarkers();
+            directtionLatLong = JSON.parse($window.localStorage.getItem("myLocation"));
 
-            googleMap.renderDirection('directionPannel',googleMap.currentMarkerPosition.latitude,googleMap.currentMarkerPosition.longitude,$routeParams.endLat,$routeParams.endLong);
+            googleMap.renderDirection('directionPannel',googleMap.currentMarkerPosition.latitude,googleMap.currentMarkerPosition.longitude,directtionLatLong.endLat,directtionLatLong.endLong);
             googleMap.placeCurrentLocationMarker();
             googleMap.setMarkersInBounds();
         };
 
+
         //Show direction in view direction page
-        $scope.showDirections = function () {
-            var params = '?endLat='+$routeParams.endLat+'&endLong='+$routeParams.endLong+'&startLat='+googleMap.currentMarkerPosition.latitude+'&startLong='+googleMap.currentMarkerPosition.longitude;
-            $location.url('/viewdirection'+params);
-        };
+       /* $scope.showDirections = function () {
+            var userLoc = {
+                startLat: googleMap.currentMarkerPosition.latitude,
+                startLong : googleMap.currentMarkerPosition.longitude
+            };
+            $window.localStorage.setItem("userCurrentLoc", JSON.stringify(userLoc));
+            $window.location.href = "/viewdirection";
+        };*/
 
-
-}]);
+    }]);
