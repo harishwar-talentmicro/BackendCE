@@ -208,6 +208,7 @@ app.get('/skill_list',LocationManager.FnPGetSkills);
 app.get('/transaction_autocomplete',LocationManager.FnGetTransAutoComplete);
 app.put('/update_transaction',LocationManager.FnUpdateTransaction);
 app.get('/company_details',LocationManager.FnGetCompanyDetails);
+app.get('/get_outboxMessages',LocationManager.FnGetOutboxMessages);
 
 
 //below service are for EZEIDAP

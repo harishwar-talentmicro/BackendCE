@@ -12099,6 +12099,7 @@ exports.FnGetCompanyDetails = function (req, res) {
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
         var ezeid = req.query.ezeid;
+        var type = req.query.type;
 
         var responseMessage = {
             status: false,
@@ -12165,6 +12166,102 @@ exports.FnGetCompanyDetails = function (req, res) {
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
         console.log('FnGetCompanyDetails:error ' + ex.description);
+        throw new Error(ex);
+        res.status(400).json(responseMessage);
+    }
+};
+
+exports.FnGetOutboxMessages = function (req, res) {
+    
+    try {
+
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.query.Token;
+
+        var responseMessage = {
+            status: false,
+            data: null,
+            error:{},
+            message:''
+        };
+        
+        if (Token) {
+            FnValidateToken(Token, function (err, result) {
+                if (!err) {
+                    if (result != null) {
+                        db.query('CALL pGetOutboxMessages(' + db.escape(Token) + ')', function (err, GetResult) {
+                            if (!err) {
+                                if (GetResult) {
+                                    if (GetResult[0].length > 0) {
+                                        responseMessage.status = true;
+                                        responseMessage.data = GetResult[0] ;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Company details Send successfully';
+                                        console.log('FnGetOutboxMessages: Company details Send successfully');
+                                        res.status(200).json(responseMessage);
+                                    }
+                                    else {
+                                        
+                                        responseMessage.error = {};
+                                        responseMessage.message = 'No founded Company details';
+                                        console.log('FnGetOutboxMessages: No founded Company details');
+                                        res.json(responseMessage);
+                                    }
+                                }
+                                else {
+
+                                    
+                                    responseMessage.error = {};
+                                    responseMessage.message = 'No founded Company details';
+                                    console.log('FnGetOutboxMessages: No founded Company details');
+                                    res.json(responseMessage);
+                                }
+
+                            }
+                            else {
+                                
+                                responseMessage.data = null ;
+                                responseMessage.error = {};
+                                responseMessage.message = 'Error in getting Company details';
+                                console.log('FnGetOutboxMessages: error in getting Company details' + err);
+                                res.status(500).json(responseMessage);
+                            }
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token'; 
+                        responseMessage.error = {}; 
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnGetOutboxMessages: Invalid token');
+                                            }
+                }
+                else {
+                    responseMessage.error= {};
+                    responseMessage.message = 'Error in validating Token'; 
+                    res.status(500).json(responseMessage);
+                    console.log('FnGetOutboxMessages:Error in processing Token' + err);
+                }
+            });
+        }
+        else {
+            if (!ezeid) {
+                responseMessage.message = 'Invalid ezeid';            
+                responseMessage.error = {
+                    ezeid : 'Invalid ezeid'
+                };
+                console.log('FnGetCompanyDetails: ezeid is mandatory field');
+            }
+           
+            res.status(401).json(responseMessage);
+        }
+    }
+     catch (ex) {
+        responseMessage.error = {};
+        responseMessage.message = 'An error occured !'
+        console.log('FnGetOutboxMessages:error ' + ex.description);
         throw new Error(ex);
         res.status(400).json(responseMessage);
     }
