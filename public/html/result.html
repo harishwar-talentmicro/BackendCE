@@ -47,7 +47,7 @@
                             <input type="text" ng-keypress="(searchKey($event))" placeholder="{{placeHolderText[params.searchType - 1]}}" ng-model="params.searchTerm" ng-class="(params.searchType === 1) ? 'text-uppercase' : ''" class="form-control" aria-label="...">
                             <div class="input-group-btn">
                                 <!-- Advance Search BTN -->
-                                <button ng-disabled="params.searchType === 1"  ng-click="(toggleFilterContainer($event,true))(isFilterOptionsShown = false)" type="button" class="btn btn-default dropdown-toggle btn-advanced-filter no-radius" data-toggle="dropdown" title="Click to choose Search Options"><i class="fa fa-filter"></i> Filter</Filter></button>
+                                <button ng-disabled="params.searchType === 1"  ng-click="(toggleFilterContainer($event,true))(isFilterOptionsShown = false)" type="button" class="btn btn-default dropdown-toggle btn-advanced-filter no-radius" data-toggle="dropdown" title="Click to choose Search Options"><i class="fa fa-check-square-o"></i> Options</Filter></button>
                                 <!-- Search BTN -->
                                 <button type="button" class="btn btn-warning" title="search" ng-click="initiateSearch()"><i class="fa fa-search"></i> </button>
                             </div>
@@ -118,17 +118,17 @@
                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 select-items">
                                     <input type="checkbox" id="item1" ng-checked="params.parkingStatus == 1" class="chkShowParking filter"  ng-model="params.parkingStatus" name="parking" >
                                     &nbsp;
-                                    <label  for="item1"> Parking Required</label>
+                                    <label  for="item1" class="text-0-9"> Parking Required</label>
                                 </div>
                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 select-items">
                                     <input type="checkbox" id="item2" class="chkHomeDelivery filter" ng-checked="params.homeDelivery == 1" ng-model="params.homeDelivery" name="homeDelivery" >
                                     &nbsp;
-                                    <label  for="item2">Need home delivery</label>
+                                    <label  for="item2" class="text-0-9">Need home delivery</label>
                                 </div>
                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 select-items">
                                     <input type="checkbox" id="item3" class="chkOpenStatus filter" ng-checked="params.openStatus == 1" ng-model="params.openStatus" name="openStatus" >
                                     &nbsp;
-                                    <label  for="item3">Open business only</label>
+                                    <label  for="item3" class="text-0-9">Open business only</label>
                                 </div>
                             </div>
                         </div>
@@ -212,8 +212,16 @@
                             <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12 flip-card bottom-clearfix pointer" ng-init="color = random();tempVal = $index"
                                  ng-click="redirectFullPage(params.searchType,search.TID)" ng-repeat="search in searchListData track by $index">
 
+
+
                                 <!-- Initial Tile goes here[FRONT] -->
                                 <div class="text-center text-white front height-128" ng-class="color">
+                                    <!-- code for sales -->
+                                    <div class="lbl-box2 hidden">
+                                        <div class="newafter"></div>
+                                        <div class="newbefore"></div>
+                                        <div class="new">50% OFF</div>
+                                    </div>
                                     <!-- Row 1 -->
                                     <div class="tile-row-1 p-5">
                                         <div class="col-lg-4 col-md-6 col-sm-6 col-xs-6 text-left text-0-8">

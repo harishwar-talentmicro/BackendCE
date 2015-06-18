@@ -797,7 +797,7 @@ var res = angular.module('ezeidApp').
             $scope.showDirectionMapPopup = function(Latitude,Longitude,IDTypeID){
 
 
-                $scope.activeTemplate = "html/mapPopView.html";
+                $scope.activeTemplate = "html/mapPopView1.html";
                 $scope.showMapPopupModel = true;
 
                 var userLoc = {

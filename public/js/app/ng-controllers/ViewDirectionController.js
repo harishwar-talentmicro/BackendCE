@@ -20,7 +20,6 @@ angular.module('ezeidApp').controller('viewDirectionController',[
         GURL
         )
     {
-
         var viewDirection = this;
         viewDirection._info = {};
         var MsgDelay = 2000;
@@ -37,12 +36,28 @@ angular.module('ezeidApp').controller('viewDirectionController',[
         //Below line is for Loading img
         $scope.$emit('$preLoaderStart');
 
-        $scope.isPrintEnabled = false;
             $timeout(function(){
                 initialize();
             },1000);
 
-         function initialize () {
+        function convertasbinaryimage()
+        {
+            $rootScope.$broadcast('$preLoaderStop');
+            html2canvas(document.getElementById("googlemap"), {
+                useCORS: true,
+                onrendered: function(canvas)
+                {
+                    var img = canvas.toDataURL("image/jpg");
+                    img = img.replace('data:image/png;base64,', '');
+                    finalImageSrc = 'data:image/jpg;base64,' + img;
+                    $('#googlemapbinary').attr('src', finalImageSrc);
+                    return false;
+                }
+            });
+        }
+
+        function initialize ()
+        {
             directionsDisplay = new google.maps.DirectionsRenderer();
             var currentLoc = new google.maps.LatLng(12.295810, 76.639381);
             var mapOptions = {
@@ -84,11 +99,12 @@ angular.module('ezeidApp').controller('viewDirectionController',[
             directionsDisplay.setMap(map);
             directionsDisplay.setPanel(document.getElementById('directions-panel'));
 
-            $(window).resize(function() {
+          /*  $(window).resize(function() {
+                console.log("SAi88");
                 google.maps.event.trigger(map, "resize");
-            });
+            });*/
 
-            $rootScope.$broadcast('$preLoaderStop');
+            //$rootScope.$broadcast('$preLoaderStop');
 
             /*------------- Below code is for Drow Direction ------------*/
 
@@ -101,20 +117,21 @@ angular.module('ezeidApp').controller('viewDirectionController',[
             directionsService.route(request, function(response, status) {
                 if (status == google.maps.DirectionsStatus.OK) {
                     directionsDisplay.setDirections(response);
+
+                    $timeout(function(){
+                       convertasbinaryimage();
+                    },8000);
                 }
             });
 
-            google.maps.event.addListener(directionsDisplay, 'directions_changed', function() {
+           /* google.maps.event.addListener(directionsDisplay, 'directions_changed', function() {
                    google.maps.event.addListener(map,'tilesloaded',function(){
-                                convertasbinaryimage().then(function(){
-                                    $timeout(function(){
-                                        $scope.isPrintEnabled = true;
-                                    },15000);
-                                });
+
+
                     }
                 );
 
-            });
+            });*/
 
             // Try W3C Geolocation (Preferred)
             if (navigator.geolocation) {
@@ -169,27 +186,10 @@ angular.module('ezeidApp').controller('viewDirectionController',[
 
 
 
-        function convertasbinaryimage()
-        {
-            var defer = $q.defer();
-            html2canvas(document.getElementById("googlemap"), {
-                useCORS: true,
-                proxy : '//maps.googlemaps.com',
-                onrendered: function(canvas) {
-                    var img = canvas.toDataURL("image/jpg");
-                    img = img.replace('data:image/png;base64,', '');
-                    finalImageSrc = 'data:image/jpg;base64,' + img;
-                    $('#googlemapbinary').attr('src', finalImageSrc);
-                   // $rootScope.$broadcast('$preLoaderStop');
-                    defer.resolve();
-                    return false;
-                }
-            });
-            return defer.promise;
-        }
 
-         // EMail direction Html
-            viewDirection.emailHtml = function () {
+
+        // EMail direction Html
+        viewDirection.emailHtml = function () {
             if(!$rootScope._userInfo.IsAuthenticate)
             {
                 $('#SignIn_popup').slideDown();
@@ -202,10 +202,12 @@ angular.module('ezeidApp').controller('viewDirectionController',[
 
         // Print direction Html
         viewDirection.printHtml = function () {
+
+            //window.print();
         $scope.showEmailForm = false;
 
         var printContents = document.getElementById("googlemapimage").innerHTML;
-        var popupWin = window.open('', '_blank', 'width=300,height=300');
+        var popupWin = window.open('', '_blank', 'width=700,height=700');
         popupWin.document.open();
         popupWin.document.write('<html><head><link rel="stylesheet" type="text/css" href="style.css" /></head><body onload="window.print()">' + printContents + '</html>');
         popupWin.document.close();
