@@ -46,15 +46,18 @@ angular.module('ezeidApp').
             $scope.paginationStatus = false;
             $scope.paginationNext = false;
             $scope.paginationPrevious = false;
-            $scope.activeDetailedTransaction = '';
-            $scope.activeDetailedTransactionContent = '';
+            $scope.activeTransactionBasicInfo = '';
+            $scope.activeTransactionDetailedInfo = '';
 
 
 
-            getTransactionHistory();
+            getTransactionHistory().then(function(){
+                reConfigurePaginationButton();
+            });
             /* http request to get all the transaction history */
             function getTransactionHistory()
             {
+                var defer = $q.defer();
                 $scope.$emit('$preLoaderStart');
                 $http({
                     url : GURL + 'get_outbox_messages',
@@ -69,24 +72,32 @@ angular.module('ezeidApp').
                     $scope.$emit('$preLoaderStop');
                     if(resp.status)
                     {
-                        if(!$scope.totalResult)
+                        if(!$scope.totalResult && resp.data.length > 0)
                         {
-                            totalResult = resp.data.count;
+                            $scope.totalResult = resp.data[0].count;
                             resetPaginationStatus();
                         }
 
                         $scope.result = resp.data;
+                        defer.resolve()
                     }
                 }).error(function(err){
                     $scope.$emit('$preLoaderStop');
                     Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
+                    defer.resolve();
                 });
+                return defer.promise;
 
             }
 
             $scope.convertTimeToLocal = function(dateTime)
             {
                 return UtilityService.convertTimeToLocal(dateTime)
+            }
+
+            $scope.checkIfEmpty = function(val,alternateText)
+            {
+                return UtilityService.checkIfEmpty(val,alternateText);
             }
 
             /* toggle modal visibility */
@@ -178,17 +189,16 @@ angular.module('ezeidApp').
                     url : GURL + 'ewtGetTranscationItems',
                     method : "GET",
                     cache: false,
-                        params :{
+                    params :{
                         Token : $rootScope._userInfo.Token,
                         MessageID: tid
                     }
                 }).success(function(resp){
 
                     $scope.$emit('$preLoaderStop');
-                    if(resp.status)
-                    {
-                        console.log(resp);
-                    }
+                    $scope.activeTransactionDetailedInfo = resp;
+                    console.log($scope.activeTransactionDetailedInfo);
+
                 }).error(function(err){
                     $scope.$emit('$preLoaderStop');
                     Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
@@ -198,9 +208,12 @@ angular.module('ezeidApp').
             /**
              * Set the details of the current selected
              */
-            function setBasicTransactionInfo()
+            function setBasicTransactionInfo(tid)
             {
-                
+                /* getting the index of the clicked transaction, with the given tid */
+                var selectedIndex = $scope.result.indexOfWhere('tid',tid);
+                /* set basic info based on the index */
+                $scope.activeTransactionBasicInfo = $scope.result[selectedIndex];
             }
 
         }]);
