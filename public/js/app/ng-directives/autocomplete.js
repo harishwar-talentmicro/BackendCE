@@ -30,6 +30,7 @@
             link : function(scope,element,attrs){
 
                 function recompile(alist){
+                    console.log(alist);
                     //console.log('hi');
                     var list = (alist) ? alist : [];
                     var genListTemp = '';
@@ -44,7 +45,7 @@
                     }
 
                     scope.listTemp = $sce.trustAsHtml(genListTemp);
-
+                    console.log(scope.listTemp);
                     element.find('li').bind('click',function(e){
                         console.log('li bind');
                         var elem = e.currentTarget;
@@ -58,22 +59,10 @@
                             scope.companyName = list[eIndex].name;
                         }
                     });
-
-
-                    element.find('input').bind('keypress',function(e){
-                        scope.companyId = 0;
-                        scope.companyName = angular.element(e.currentTarget).val();
-                        if(scope.companyName){
-                            scope.loadSuggestion(scope.companyName);
-                        }
-
-                    });
                 }
 
-
-
                 scope.$watch(function(){
-                    recompile(scope.list);
+                    //recompile(scope.list);
                     return scope.list;
                 });
 
@@ -82,6 +71,17 @@
 
                 element.html(templateHtml).show();
                 $compile(element.contents())(scope);
+
+                element.find('input').bind('keypress',function(e){
+                    console.log('input bind');
+                    scope.companyId = 0;
+                    scope.companyName = angular.element(e.currentTarget).val();
+                    if(scope.companyName){
+                        console.log('load autoc');
+                        var lst = scope.loadSuggestion(scope.companyName);
+                        recompile(lst);
+                    }
+                });
 
             }
 
