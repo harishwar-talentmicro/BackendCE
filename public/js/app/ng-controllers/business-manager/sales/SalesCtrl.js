@@ -1254,11 +1254,14 @@
             var companyList = [];
             $scope.companySuggestionList = [];
             $scope.loadSuggestion = function(companyName){
+                console.log('load ctlr :' + companyName);
                 if(companyName){
-                    $scope.companySuggestionList = $filter('filter')(companyList,companyName);
+                    console.log( $filter('filter')(companyList,companyName));
+                    console.log(companyList);
+                    return $filter('filter')(companyList,companyName);
                 }
                 else{
-                    $scope.companySuggestionList = [];
+                    return [];
                 }
             };
 
@@ -1276,11 +1279,16 @@
                     }
 
                 }).success(function(resp){
-                    if(resp && resp.length > 0 && resp != 'null'){
-                        console.log(resp);
-                        //$scope.companyList.push({
-                        //    id :
-                        //})
+                    if(resp && resp.status && resp.data){
+                            for(var a=0; a < resp.data.length; a++){
+                                var suggestion = {
+                                    id : resp.data[a].tid,
+                                    duration : resp.data[a].idledays,
+                                    user : resp.data[a].updateduser,
+                                    name : resp.data[a].company_name
+                                };
+                                companyList[a] = suggestion;
+                            }
                     }
                 }).error(function(err,statusCode){
                     var msg = '';
@@ -1292,6 +1300,13 @@
             };
 
             loadCompany();
+
+            /**
+             * Refreshes company data every 1 minute
+             */
+            $interval(function(){
+                loadCompany();
+            },60000);
 
 
             $scope.cartData = {

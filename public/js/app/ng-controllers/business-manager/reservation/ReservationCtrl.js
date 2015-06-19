@@ -94,7 +94,7 @@ var res = angular.module('ezeidApp').
             /* Access Rights of the reservation module */
             $scope.accessRight = false;//no access rights
 
-            if($routeParams.ezeid == $rootScope._userInfo.ezeid)
+            if($routeParams.ezeone == $rootScope._userInfo.ezeid)
             {
                 $scope.isResource = true;
             }
@@ -137,7 +137,7 @@ var res = angular.module('ezeidApp').
             ///////////////////////////////////////GET DEFAULT CALENDAR DATA////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            $scope.searchedEzeid = $routeParams.ezeid;
+            $scope.searchedEzeid = $routeParams.ezeone;
             $scope.$emit('$preLoaderStart');
             function init(){
                 getResource($scope.searchedEzeid).then(function () {
@@ -223,6 +223,12 @@ var res = angular.module('ezeidApp').
                     if ($scope.activeResourceId == '') {
                         $scope.activeResourceId = array[obj].tid;
                     }
+
+                    if(typeof(array[obj].description) == 'undefined')
+                    {
+                        continue;
+                    }
+
                     tempArr =
                     {
                         'tid': array[obj].tid,
@@ -234,6 +240,7 @@ var res = angular.module('ezeidApp').
                     };
                     $scope.resources.push(tempArr);
                 }
+                //console.log($scope.resources);
                 setAccessRights($scope.resources[0].operator);
                 $scope.description = $scope.resources.length > 0?$scope.resources[0].description:'';
                 $scope.$emit('$preLoaderStop');
@@ -1516,12 +1523,24 @@ var res = angular.module('ezeidApp').
              */
             function setAccessRights(activatedResourceEzeid)
             {
-                if($routeParams.ezeid == $rootScope._userInfo.ezeid)
+                console.log(activatedResourceEzeid);
+                console.log($rootScope._userInfo.ezeid);
+
+
+                var operatorArr = activatedResourceEzeid.split(',');
+
+                var isSubuser = false;
+                if(operatorArr.indexOf($rootScope._userInfo.ezeid) !== -1)
+                {
+                    isSubuser = true;
+                }
+
+                if($routeParams.ezeone == $rootScope._userInfo.ezeid)
                 {
                     $scope.accessRight = 1;//Super User
                     $scope.isResource = true;
                 }
-                else if($rootScope._userInfo.ezeid == activatedResourceEzeid)//@todo
+                else if(isSubuser)//@todo
                 {
                     $scope.accessRight = 2;
                     $scope.isResource = true;
