@@ -1526,6 +1526,19 @@ table.rwd-table > tbody > tr > td.serachResultSelectAll
     /*border-top-left-radius: 10px 5px;
     border-bottom-right-radius: 10% 5%;
     */
+    /*border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;*/
+    border-top-left-radius: 73px;
+    border-top-right-radius: 73px;
+    border-bottom-left-radius: 73px;
+    border-bottom-right-radius: 73px;
+
+}
+.profilePicBorderBusiness
+{
+    border:solid 2px #FFFFFF;
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
     border-bottom-left-radius: 10px;
@@ -1671,4 +1684,9 @@ table.rwd-table > tbody > tr > td.serachResultSelectAll
     color: #ffffff;
     background: #09a2de;
     border: 1px solid rgb(112, 115, 118);
+}
+.promoTextContainer
+{
+    border-radius: 0px;
+    background-color: #C9FFBA;
 }
