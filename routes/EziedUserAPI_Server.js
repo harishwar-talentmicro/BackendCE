@@ -12025,7 +12025,7 @@ exports.FnGetCompanyDetails = function (req, res) {
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
         var Token = req.query.Token;
-        
+        var FunctionType =  req.query.FunctionType;
         var responseMessage = {
             status: false,
             data: null,
@@ -12035,7 +12035,7 @@ exports.FnGetCompanyDetails = function (req, res) {
         
         if (Token) {
             
-            db.query('CALL pGetCompanyDetails(' + db.escape(Token) + ')', function (err, GetResult) {
+            db.query('CALL pGetCompanyDetails(' + db.escape(Token) + ',' + db.escape(FunctionType) + ')', function (err, GetResult) {
                             if (!err) {
                                 if (GetResult) {
                                     if (GetResult[0].length > 0) {
