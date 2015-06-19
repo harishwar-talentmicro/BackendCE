@@ -2217,7 +2217,7 @@ hr.style-two {
     left: -28px;
     height: 24px;
     width: 140px;
-    background: rgba(239, 227, 0, 0.82);
+    background: rgba(178, 0, 239, 0.82);
     position: relative;
     -webkit-transform: rotate(-45deg);
     -o-transform: rotate(-45deg);
@@ -2225,4 +2225,11 @@ hr.style-two {
     -ms-transform: rotate(-45deg);
     -kthtml-transform: rotate(-45deg);
     transform: rotate(-45deg);
+}
+
+.hpw .transaction-item
+{
+    padding: 5px;
+    text-align: center;
+    border: 1px solid grey;
 }

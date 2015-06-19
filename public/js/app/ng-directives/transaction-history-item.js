@@ -17,13 +17,14 @@
                 replace:true,
                 templateUrl: '../../../html/transaction-history-item.html',
                 scope:{//here we define all the parameters used in this template
-                    ngTo:'@',
-                    ngMessage:'@',
-                    ngQuantity:'@',
-                    ngDate:'@',
-                    ngId:'@',
-                    ngStatus:'@',
-                    ngUdate:'@'
+                    ngTo:'=',
+                    ngMessage:'=',
+                    ngQuantity:'=',
+                    ngDate:'=',
+                    ngId:'=',
+                    ngStatus:'=',
+                    ngUdate:'=',
+                    ngInitiateDetail:'&'
                 }
         }
     }]);

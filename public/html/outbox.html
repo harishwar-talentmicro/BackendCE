@@ -24,10 +24,20 @@
                 <div class="col-lg-9 col-md-8 col-sm-12 col-xs-12 ">
                     <div class="outbox-main-content">
                         <!-- Transaction history goes here -->
-
+                        <div class="pagination input-group text-right" ng-show="paginationStatus">
+                            <button ng-disabled="!paginationPrevious" class="btn btn-primary">Previous <i class="fa fa-arrow-circle-left"></i></button>
+                            <button ng-disabled="!paginationNext" class="btn btn-primary"><i class="fa fa-arrow-circle-right"></i> Next &nbsp;&nbsp;</button>
+                        </div>
                         <!-- Individual Strips starts here -->
-                        <div class="individual-transaction" ng-repeat="res in result.data track by $index">
-                            <transaction-history-item ng-to={{res.ToEzeid}} ng-message={{res.Message}} ng-quantity={{res.statustitle}} ng-date={{convertTimeToLocal(res.TaskDateTime)}} ng-id={{res.tid}} ng-status={{res.statustitle}} ng-udate={{convertTimeToLocal(res.updatedDate)}}> </transaction-history-item>
+                        <div class="individual-transaction" ng-repeat="res in result track by $index">
+                            <transaction-history-item ng-to="res.ToEzeid"
+                                                      ng-initiate-detail="initiateDetail(res.tid)"
+                                                      ng-message="res.Message"
+                                                      ng-quantity="res.statustitle"
+                                                      ng-date="convertTimeToLocal(res.TaskDateTime)"
+                                                      ng-id="res.tid"
+                                                      ng-status="res.statustitle"
+                                                      ng-udate="convertTimeToLocal(res.updatedDate)"> </transaction-history-item>
                         </div>
                         <!-- Individual Strips ends here -->
                     </div>
@@ -37,10 +47,52 @@
         </div>
     </div>
     <!-- details modal of the transaction history item goes here -->
-    <modal mtitle="modal.title" mclass="modal.class" visible="modalVisible">
+    <modal mtitle="modalBox.title" mclass="modalBox.class" visible="modalVisible">
         <div class="row">
             <!-- Detail goes here -->
+            <div class="container">
+                <!-- Start date goes here -->
+                <div class="start-date text-center text-bolder">13 May 2010, 05:50 AM</div>
+                <!-- main content -->
+                <div class="main-content">
+                    <p>To: <b>KRUNALPAID</b></p>
+                    <br>
+                    <p>Message:</p>
+                    <p>
+                        Lorem Ipsum is simply dummy text of the printing and typesetting industry.
+                        Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,
+                        when an unknown printer took a galley of type and scrambled.
+                    </p>
+                    <br>
+                    <p>Status: <b>Active</b></p>
+                    <p>Last Updated: <b>13 May 2010, 05:50 AM</b></p>
+                </div>
+            </div>
 
+            <!-- Item goes here -->
+            <div class="container">
+                <h4>Transaction Items</h4>
+
+                <div class="individual-transaction-items ">
+                    <!-- Individual items -->
+                    <table class="table table-striped">
+                        <tr>
+                            <th width="5%">Id</th>
+                            <th width="40%">Item</th>
+                            <th width="20%">Quantity</th>
+                            <th width="20%">Unit Price</th>
+                            <th width="20%">Total Price</th>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>Alpha Combs</td>
+                            <td>1</td>
+                            <td>120</td>
+                            <td>120</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
             <!-- Detail ends here -->
         </div>
     </modal>

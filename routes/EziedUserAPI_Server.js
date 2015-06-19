@@ -12024,9 +12024,8 @@ exports.FnGetCompanyDetails = function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
-        var ezeid = req.query.ezeid;
-        var type = req.query.type;
-
+        var Token = req.query.Token;
+        
         var responseMessage = {
             status: false,
             data: null,
@@ -12034,9 +12033,9 @@ exports.FnGetCompanyDetails = function (req, res) {
             message:''
         };
         
-        if (title) {
+        if (Token) {
             
-            db.query('CALL pGetCompanyDetails(' + db.escape(ezeid) + ',' + db.escape(type) + ')', function (err, GetResult) {
+            db.query('CALL pGetCompanyDetails(' + db.escape(Token) + ')', function (err, GetResult) {
                             if (!err) {
                                 if (GetResult) {
                                     if (GetResult[0].length > 0) {
@@ -12077,12 +12076,12 @@ exports.FnGetCompanyDetails = function (req, res) {
                     }
                     
         else {
-            if (!ezeid) {
-                responseMessage.message = 'Invalid ezeid';            
+            if (!Token) {
+                responseMessage.message = 'Invalid Token';            
                 responseMessage.error = {
-                    ezeid : 'Invalid ezeid'
+                    Token : 'Invalid Token'
                 };
-                console.log('FnGetCompanyDetails: ezeid is mandatory field');
+                console.log('FnGetCompanyDetails: Token is mandatory field');
             }
            
             res.status(401).json(responseMessage);
