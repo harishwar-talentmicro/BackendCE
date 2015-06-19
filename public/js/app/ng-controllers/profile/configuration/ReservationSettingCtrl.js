@@ -28,6 +28,7 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',[
     //Initially First Tab is selected
     $scope.selectedTab = 1;
     $scope.selectedTID = [];
+    $scope.operatorId = [];
 
     resetResourceValue();
     $scope.$emit('$preLoaderStart');
@@ -37,12 +38,13 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',[
     {
         $scope.modalBox = {
             item : {
-                operatorid : 0,
+                operatorid : "",
                 title : "",
                 status  : 1,
                 description: "",
                 picture : "",
-                TID: 0
+                TID: 0,
+                working_temp: 0
             }
         };
     }
@@ -50,6 +52,7 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',[
     function resetServicesValue()
     {
        $scope.selectedTID = [];
+       $scope.operatorId = [];
        $scope.modalBox = {
             servicesItem : {
                 title : "",
@@ -66,6 +69,7 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',[
     function resetMappingValue()
     {
         $scope.selectedTID = [];
+        $scope.operatorId = [];
         $scope.modalBox = {
             mapItem : {
                 resourceid : 0
@@ -75,9 +79,28 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',[
 
     $scope.reservationServiceTabSelected = function(){
         $scope.selectedTID = [];
+        $scope.operatorId = [];
         resetServicesValue();
         getAllServices();
     };
+
+    //To get All working hours template
+    function getTemplateList()
+    {
+        $http({ method: 'get', url: GURL + 'get_workinghours_list',
+            params : {
+                Token : $rootScope._userInfo.Token
+            }
+        }).success(function (data)
+            {
+                console.log("SAi123");
+                console.log(data);
+                if(data != 'null')
+                {
+                    $scope.TemplateData = data;
+                }
+            });
+    }
 
 
     /**
@@ -92,6 +115,7 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',[
     $scope.openResourceModalBox = function(item){
         $scope.showModal = true;
         resetResourceValue();
+        getTemplateList();
 
         loadSubuserList();
 
@@ -104,7 +128,9 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',[
                     status  : item.status,
                     description: item.description,
                     picture : item.picture,
-                    TID: item.tid
+                    TID: item.tid,
+                    working_temp: item.working_temp
+
                 }
             };
         }
@@ -377,6 +403,24 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',[
             var index = $scope.selectedTID.indexOf(val);
             $scope.selectedTID.splice(index,1);
         }
+    };
+
+
+    // To get and remove value of check box of sub user
+    $scope.toggleOperatorCheckbox = function(event){
+        var elem = event.currentTarget;
+
+        var val = $(elem).data('tid');
+        if($(elem).is(":checked")){
+           $scope.operatorId.push(val);
+        }
+        else
+        {
+            var index = $scope.operatorId.indexOf(val);
+            $scope.operatorId.splice(index,1);
+        }
+
+        console.log($scope.operatorId);
     };
 
     // Maping tab selection

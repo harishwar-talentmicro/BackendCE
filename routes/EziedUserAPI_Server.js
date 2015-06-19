@@ -12194,6 +12194,86 @@ exports.FnGetOutboxMessages = function (req, res) {
     }
 };
 
+exports.FnGetworkinghoursList = function (req, res) {
+    
+    try {
+
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.query.Token;
+        
+        var responseMessage = {
+            status: false,
+            data: null,
+            error:{},
+            message:''
+        };
+        
+        if (Token) {
+            
+            db.query('CALL PGetworkinghoursList(' + db.escape(Token) + ')', function (err, GetResult) {
+                console.log(GetResult)
+                            if (!err) {
+                                if (GetResult) {
+                                    if (GetResult[0].length > 0) {
+                                        responseMessage.status = true;
+                                        responseMessage.data = GetResult[0] ;
+                                        responseMessage.error = null;
+                                        responseMessage.message = ' Working hours list Send successfully';
+                                        console.log('FnGetworkinghoursList:Working hours list Send successfully');
+                                        res.status(200).json(responseMessage);
+                                    }
+                                    else {
+                                        
+                                        responseMessage.error = {};
+                                        responseMessage.message = 'No founded Working hours list';
+                                        console.log('FnGetworkinghoursList: No founded Working hours list');
+                                        res.json(responseMessage);
+                                    }
+                                }
+                                else {
+
+                                    
+                                    responseMessage.error = {};
+                                    responseMessage.message = 'No founded Working hours list';
+                                    console.log('FnGetworkinghoursList: No founded Working hours list');
+                                    res.json(responseMessage);
+                                }
+
+                            }
+                            else {
+                                
+                                responseMessage.data = null ;
+                                responseMessage.error = {};
+                                responseMessage.message = 'Error in getting Working hours list';
+                                console.log('FnGetworkinghoursList: error in getting Working hours list' + err);
+                                res.status(500).json(responseMessage);
+                            }
+                        });
+                    }
+                    
+        else {
+            if (!Token) {
+                responseMessage.message = 'Invalid Token';            
+                responseMessage.error = {
+                    Token : 'Invalid Token'
+                };
+                console.log('FnGetworkinghoursList: Token is mandatory field');
+            }
+           
+            res.status(401).json(responseMessage);
+        }
+    }
+     catch (ex) {
+        responseMessage.error = {};
+        responseMessage.message = 'An error occured !'
+        console.log('FnGetworkinghoursList:error ' + ex.description);
+        throw new Error(ex);
+        res.status(400).json(responseMessage);
+    }
+};
+
 
 
 //EZEIDAP Parts

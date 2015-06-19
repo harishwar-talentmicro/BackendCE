@@ -26,26 +26,27 @@
                                      <section id="main-content">
                                         <div class="row setRowLeftRightMarginZero">
                                              <div ng-hide="(SearchInfo.Redflagstatus == 1)">
-                                                 <div class="alert alert-warning setHeightFiftytwo" role="alert" ng-show="showNoticeText">
+                                                 <div class="alert alert-warning setHeightFiftytwo setBottomMargin0" role="alert" ng-show="showNoticeText">
                                                      <strong>Note: </strong> The business you are requesting has insufficient information and hence displaying the closest matching company.
                                                  </div>
                                              </div>
                                          </div>
 
-                                        <div class="row setRowLeftRightMarginZero   ">
-                                             <img class="promoImgContainer" ng-src="../images/tmp.png">
-                                        </div>
-
-                                        <div class="row setRowLeftRightMarginZero setHeightFiftytwo messgeButtonContainer">
-                                              <div class="alert alert-info" role="alert" ng-show="showNoticeText">
-                                                    <strong>Note: </strong> The business you are requesting has insufficient information and hence displaying the closest matching company.
-                                              </div>
+                                        <div ng-show="SearchInfo.dealenable == 1">
+                                            <div class="row setRowLeftRightMarginZero" ng-show="SearchInfo.dealbanner">
+                                                <img class="promoImgContainer" ng-src="{{SearchInfo.dealbanner}}">
+                                            </div>
+                                            <div class="row setRowLeftRightMarginZero setHeightFiftytwo"  ng-show="SearchInfo.dealdesc">
+                                                <div class="alert alert-info promoTextContainer" role="alert">
+                                                    {{SearchInfo.dealdesc}}
+                                                </div>
+                                            </div>
                                         </div>
 
                                         <div class="row setRowLeftRightMarginZero messgeButtonContainer">
                                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setPaddingLeftRight0 searchHeaderAlignment newMsgBtnContainer" ng-hide="(SearchInfo.IDTypeID == 1)">
                                                 <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setLeftRightPaddingZero">
-                                                    <a class="showPointer removePadding keyWordText boxMessaageBackgroun text-white infoDetailsButton"
+                                                    <a class="showPointer removePadding keyWordText boxMess aageBackgroun text-white infoDetailsButton"
                                                        ng-href="{{SearchInfo.SalesURL}}"
                                                        target="_blank"
                                                        ng-show="SearchInfo.EZEIDVerifiedID == '2' && showSalesEnquiry == 1"
@@ -151,7 +152,7 @@
                                                                 <img class="profilePicBorder" width="148px" height="148px" ng-src="{{SearchInfo.Picture}}">
                                                             </div>
                                                             <div ng-hide="SearchInfo.IDTypeID == 1" class="row addItemRowUserEzeid1">
-                                                                <img class="profilePicBorder" width="315px" height="155px" ng-src="{{SearchInfo.Picture}}">
+                                                                <img class="profilePicBorderBusiness" width="315px" height="155px" ng-src="{{SearchInfo.Picture}}">
                                                             </div>
                                                         </div>
                                                         <div ng-hide="SearchInfo.Picture">
@@ -159,7 +160,7 @@
                                                                 <img class="profilePicBorder" width="148px" height="148px" ng-src="../images/new_individual.png">
                                                             </div>
                                                             <div ng-hide="SearchInfo.IDTypeID == 1" class="row addItemRowUserEzeid1">
-                                                                <img class="profilePicBorder" width="315px" height="155px" ng-src="../images/business_profile_pic.png">
+                                                                <img class="profilePicBorderBusiness" width="315px" height="155px" ng-src="../images/business_profile_pic.png">
                                                             </div>
                                                         </div>
                                                     </div>
