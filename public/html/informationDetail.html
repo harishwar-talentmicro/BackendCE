@@ -23,210 +23,223 @@
                             <div class="infoModal" ng-hide="showLoginText">
 
                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                     <div ng-hide="(SearchInfo.Redflagstatus == 1)">
-                                        <div class="alert alert-warning" role="alert" ng-show="showNoticeText">
-                                            <strong>Note: </strong> The business you are requesting has insufficient information and hence displaying the closest matching company.
-                                        </div>
-                                     </div>
                                      <section id="main-content">
-                                            <div class="row setRowLeftRightMarginZero">
-                                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setPaddingLeftRight0 searchHeaderAlignment newMsgButtonContainer" ng-hide="(SearchInfo.IDTypeID == 1)">
-                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setLeftRightPaddingZero">
-                                                        <a class="showPointer removePadding keyWordText boxMessaageBackgroun text-white infoDetailsButton"
-                                                           ng-href="{{SearchInfo.SalesURL}}"
-                                                           target="_blank"
-                                                           ng-show="SearchInfo.EZEIDVerifiedID == '2' && showSalesEnquiry == 1"
-                                                           title="Sales Enquiry"
-                                                           ng-click="(SearchInfo.SalesURL) ? '' : ($event.preventDefault())(_toggleSalesModal())">
-                                                            <img src="../images/new_sales_icon.png">
-                                                            Sales Enquiry
-                                                        </a>
-                                                    </div>
-                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setLeftRightPaddingZero">
-                                                        <a class="showPointer removePadding keyWordText boxMessaageBackgroun infoDetailsButton text-white"
-                                                           ng-href="{{SearchInfo.HomeDeliveryURL}}"
-                                                           target="_blank"
-                                                           ng-show="SearchInfo.EZEIDVerifiedID == '2' && showHomeDelivery == 1"
-                                                           title="Home Delivery"
-                                                           ng-click="(SearchInfo.HomeDeliveryURL) ? '' : ($event.preventDefault())(_toggleHomeDeliveryModal())">
-                                                            <img src="../images/new_home_delivery.png">
-                                                            Home Delivery
-                                                        </a>
-                                                    </div>
-                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setLeftRightPaddingZero">
-                                                        <a class="showPointer removePadding keyWordText boxMessaageBackgroun infoDetailsButton text-white"
-                                                           ng-href="{{SearchInfo.ReservationURL}}"
-                                                           target="_blank"
-                                                           ng-show="SearchInfo.EZEIDVerifiedID == '2' && shoReserVation == 1"
-                                                           title="Reservation"
-                                                           ng-click="(SearchInfo.ReservationURL) ? '' : ($event.preventDefault())(openReservationForm(SearchInfo.EZEID))">
-                                                            <img src="../images/new_reservations.png">
-                                                            Reservation
-                                                        </a>
-                                                    </div>
-                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setLeftRightPaddingZero">
-                                                        <a class="showPointer removePadding keyWordText boxMessaageBackgroun infoDetailsButton text-white"
-                                                           ng-href="{{SearchInfo.ServiceURL}}"
-                                                           target="_blank"
-                                                           ng-show="SearchInfo.EZEIDVerifiedID == '2' && showServiceRequest == 1"
-                                                           title="Help Desk"
-                                                           ng-click="(SearchInfo.ServiceURL) ? '' : ($event.preventDefault())(_toggleServiceModal())">
-                                                            <img src="../images/new_service_request.png">
-                                                            Help Desk
-                                                        </a>
-                                                    </div>
-                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setLeftRightPaddingZero">
-                                                        <a class="showPointer removePadding keyWordText boxMessaageBackgroun infoDetailsButton text-white"
-                                                           ng-href="{{SearchInfo.CVURL}}"
-                                                           target="_blank"
-                                                           title="Send CV"
-                                                           ng-click="(SearchInfo.CVURL) ? '' : ($event.preventDefault())(_toggleResumeModal())"
-                                                           ng-show="SearchInfo.EZEIDVerifiedID == 2 && _userInfo.Type == 1 && showSendCv == 1">
-                                                            <img src="../images/new_send_cv.png">
-                                                            Send CV
-                                                        </a>
-                                                    </div>
-                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setLeftRightPaddingZero infoDetailsButton">
-                                                        <div class="showPointer removePadding  boxMessaageBackgroun"
-                                                             ng-click="getdirections(SearchInfo)" title="Map">
-                                                            <img src="../images/map_32.png">
-                                                            <span>Map</span>
-                                                        </div>
-                                                    </div>
+                                        <div class="row setRowLeftRightMarginZero">
+                                             <div ng-hide="(SearchInfo.Redflagstatus == 1)">
+                                                 <div class="alert alert-warning setHeightFiftytwo" role="alert" ng-show="showNoticeText">
+                                                     <strong>Note: </strong> The business you are requesting has insufficient information and hence displaying the closest matching company.
+                                                 </div>
+                                             </div>
+                                         </div>
+
+                                        <div class="row setRowLeftRightMarginZero   ">
+                                             <img class="promoImgContainer" ng-src="../images/tmp.png">
+                                        </div>
+
+                                        <div class="row setRowLeftRightMarginZero setHeightFiftytwo messgeButtonContainer">
+                                              <div class="alert alert-info" role="alert" ng-show="showNoticeText">
+                                                    <strong>Note: </strong> The business you are requesting has insufficient information and hence displaying the closest matching company.
+                                              </div>
+                                        </div>
+
+                                        <div class="row setRowLeftRightMarginZero messgeButtonContainer">
+                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setPaddingLeftRight0 searchHeaderAlignment newMsgBtnContainer" ng-hide="(SearchInfo.IDTypeID == 1)">
+                                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setLeftRightPaddingZero">
+                                                    <a class="showPointer removePadding keyWordText boxMessaageBackgroun text-white infoDetailsButton"
+                                                       ng-href="{{SearchInfo.SalesURL}}"
+                                                       target="_blank"
+                                                       ng-show="SearchInfo.EZEIDVerifiedID == '2' && showSalesEnquiry == 1"
+                                                       title="Sales Enquiry"
+                                                       ng-click="(SearchInfo.SalesURL) ? '' : ($event.preventDefault())(_toggleSalesModal())">
+                                                        <img src="../images/new_sales_icon.png">
+                                                        Sales Enquiry
+                                                    </a>
                                                 </div>
-                                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 newMsgButtonContainer infoDetailsButton setPaddingLeftRight0 searchHeaderAlignment msgButtonContainer messageButtonContainer" ng-show="(SearchInfo.IDTypeID == 1)">
-                                                    <div class="showPointer removePadding keyWordText boxMessaageBackgroun pull-right"
-                                                         ng-click="getdirections(SearchInfo)" title="Map" class="boxMessaageBackgroun">
+                                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setLeftRightPaddingZero">
+                                                    <a class="showPointer removePadding keyWordText boxMessaageBackgroun infoDetailsButton text-white"
+                                                       ng-href="{{SearchInfo.HomeDeliveryURL}}"
+                                                       target="_blank"
+                                                       ng-show="SearchInfo.EZEIDVerifiedID == '2' && showHomeDelivery == 1"
+                                                       title="Home Delivery"
+                                                       ng-click="(SearchInfo.HomeDeliveryURL) ? '' : ($event.preventDefault())(_toggleHomeDeliveryModal())">
+                                                        <img src="../images/new_home_delivery.png">
+                                                        Home Delivery
+                                                    </a>
+                                                </div>
+                                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setLeftRightPaddingZero">
+                                                    <a class="showPointer removePadding keyWordText boxMessaageBackgroun infoDetailsButton text-white"
+                                                       ng-href="{{SearchInfo.ReservationURL}}"
+                                                       target="_blank"
+                                                       ng-show="SearchInfo.EZEIDVerifiedID == '2' && shoReserVation == 1"
+                                                       title="Reservation"
+                                                       ng-click="(SearchInfo.ReservationURL) ? '' : ($event.preventDefault())(openReservationForm(SearchInfo.EZEID))">
+                                                        <img src="../images/new_reservations.png">
+                                                        Reservation
+                                                    </a>
+                                                </div>
+                                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setLeftRightPaddingZero">
+                                                    <a class="showPointer removePadding keyWordText boxMessaageBackgroun infoDetailsButton text-white"
+                                                       ng-href="{{SearchInfo.ServiceURL}}"
+                                                       target="_blank"
+                                                       ng-show="SearchInfo.EZEIDVerifiedID == '2' && showServiceRequest == 1"
+                                                       title="Help Desk"
+                                                       ng-click="(SearchInfo.ServiceURL) ? '' : ($event.preventDefault())(_toggleServiceModal())">
+                                                        <img src="../images/new_service_request.png">
+                                                        Help Desk
+                                                    </a>
+                                                </div>
+                                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setLeftRightPaddingZero">
+                                                    <a class="showPointer removePadding keyWordText boxMessaageBackgroun infoDetailsButton text-white"
+                                                       ng-href="{{SearchInfo.CVURL}}"
+                                                       target="_blank"
+                                                       title="Send CV"
+                                                       ng-click="(SearchInfo.CVURL) ? '' : ($event.preventDefault())(_toggleResumeModal())"
+                                                       ng-show="SearchInfo.EZEIDVerifiedID == 2 && _userInfo.Type == 1 && showSendCv == 1">
+                                                        <img src="../images/new_send_cv.png">
+                                                        Send CV
+                                                    </a>
+                                                </div>
+                                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setLeftRightPaddingZero infoDetailsButton">
+                                                    <div class="showPointer removePadding  boxMessaageBackgroun"
+                                                         ng-click="getdirections(SearchInfo)" title="Map">
                                                         <img src="../images/map_32.png">
                                                         <span>Map</span>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="row bottom-clearfix">&nbsp;</div>
-                                            <div class="row setRowLeftRightMarginZero text-center newInfoBorder">
-                                                <div class="col-lg-5 col-md-5 col-sm-5 col-xs-12 setPaddingLeftRight0">
-                                                    <div class="row setRowLeftRightMarginZero">
-                                                        <div ng-hide="(SearchInfo.Redflagstatus == 1)">
-                                                            <div ng-show="SearchInfo.BannerImage">
-                                                               <!-- <img class="" width="356px" height="356px" ng-src="{{SearchInfo.BannerImage}}" />-->
-                                                                <img width="348px" height="356px" ng-src="{{SearchInfo.BannerImage}}" />
+                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 newMsgBtnContainer infoDetailsButton setPaddingLeftRight0 searchHeaderAlignment msgButtonContainer messageButtonContainer" ng-show="(SearchInfo.IDTypeID == 1)">
+                                                <div class="showPointer removePadding keyWordText boxMessaageBackgroun pull-right"
+                                                     ng-click="getdirections(SearchInfo)" title="Map" class="boxMessaageBackgroun">
+                                                    <img src="../images/map_32.png">
+                                                    <span>Map</span>
+                                                </div>
+                                            </div>
+                                        </div>
 
-                                                                <img class="imgLeft showPointer" ng-show="previousButton == true" ng-click="getPreviousBanner()" src="images/arrow_left.png" />
-                                                                <img class="imgRight showPointer" ng-show="nextButton == true" ng-click="getNextBanner()" src="images/arrow_right.png" />
+                                        <div class="row setRowLeftRightMarginZero text-center newInfoBorder messgeButtonContainer">
+                                            <div class="col-lg-5 col-md-5 col-sm-5 col-xs-12 setPaddingLeftRight0">
+                                                <div class="row setRowLeftRightMarginZero">
+                                                    <div ng-hide="(SearchInfo.Redflagstatus == 1)">
+                                                        <div ng-show="SearchInfo.BannerImage">
+                                                           <!-- <img class="" width="356px" height="356px" ng-src="{{SearchInfo.BannerImage}}" />-->
+                                                            <img width="348px" height="356px" ng-src="{{SearchInfo.BannerImage}}" />
+
+                                                            <img class="imgLeft showPointer" ng-show="previousButton == true" ng-click="getPreviousBanner()" src="images/arrow_left.png" />
+                                                            <img class="imgRight showPointer" ng-show="nextButton == true" ng-click="getNextBanner()" src="images/arrow_right.png" />
+                                                        </div>
+                                                        <div ng-hide="SearchInfo.BannerImage">
+                                                            <img class="" width="348px" height="356px" ng-src="images/new_banner.gif" />
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="newRedBanner" ng-show="(SearchInfo.Redflagstatus == 1)">
+                                                        <div class="row setRowLeftRightMarginZero searchProximityRange bewareTextSize" style="margin-top: 42%;">
+                                                            <b> BEWARE !!! </b>
+                                                        </div>
+                                                        <div class="row setRowLeftRightMarginZero searchProximityRange bewareTextMessage">
+                                                            This person is blacklisted due to violation of conduct
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-7 col-md-7 col-sm-7 col-xs-12 setPaddingLeftRight0">
+                                                <div class="row setRowLeftRightMarginZero">
+                                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setPaddingLeftRight0">
+                                                        <div ng-show="SearchInfo.Picture">
+                                                            <div ng-show="SearchInfo.IDTypeID == 1" class="row addItemRowUserEzeid1">
+                                                                <img class="profilePicBorder" width="148px" height="148px" ng-src="{{SearchInfo.Picture}}">
                                                             </div>
-                                                            <div ng-hide="SearchInfo.BannerImage">
-                                                                <img class="" width="348px" height="356px" ng-src="images/new_banner.gif" />
+                                                            <div ng-hide="SearchInfo.IDTypeID == 1" class="row addItemRowUserEzeid1">
+                                                                <img class="profilePicBorder" width="315px" height="155px" ng-src="{{SearchInfo.Picture}}">
                                                             </div>
                                                         </div>
-
-                                                        <div class="newRedBanner" ng-show="(SearchInfo.Redflagstatus == 1)">
-                                                            <div class="row setRowLeftRightMarginZero searchProximityRange bewareTextSize" style="margin-top: 42%;">
-                                                                <b> BEWARE !!! </b>
+                                                        <div ng-hide="SearchInfo.Picture">
+                                                            <div ng-show="SearchInfo.IDTypeID == 1" class="row addItemRowUserEzeid1">
+                                                                <img class="profilePicBorder" width="148px" height="148px" ng-src="../images/new_individual.png">
                                                             </div>
-                                                            <div class="row setRowLeftRightMarginZero searchProximityRange bewareTextMessage">
-                                                                This person is blacklisted due to violation of conduct
+                                                            <div ng-hide="SearchInfo.IDTypeID == 1" class="row addItemRowUserEzeid1">
+                                                                <img class="profilePicBorder" width="315px" height="155px" ng-src="../images/business_profile_pic.png">
                                                             </div>
                                                         </div>
-
                                                     </div>
                                                 </div>
-                                                <div class="col-lg-7 col-md-7 col-sm-7 col-xs-12 setPaddingLeftRight0">
-                                                    <div class="row setRowLeftRightMarginZero">
-                                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setPaddingLeftRight0">
-                                                            <div ng-show="SearchInfo.Picture">
-                                                                <div ng-show="SearchInfo.IDTypeID == 1" class="row addItemRowUserEzeid1">
-                                                                    <img class="profilePicBorder" width="148px" height="148px" ng-src="{{SearchInfo.Picture}}">
-                                                                </div>
-                                                                <div ng-hide="SearchInfo.IDTypeID == 1" class="row addItemRowUserEzeid1">
-                                                                    <img class="profilePicBorder" width="315px" height="155px" ng-src="{{SearchInfo.Picture}}">
-                                                                </div>
-                                                            </div>
-                                                            <div ng-hide="SearchInfo.Picture">
-                                                                <div ng-show="SearchInfo.IDTypeID == 1" class="row addItemRowUserEzeid1">
-                                                                    <img class="profilePicBorder" width="148px" height="148px" ng-src="../images/new_individual.png">
-                                                                </div>
-                                                                <div ng-hide="SearchInfo.IDTypeID == 1" class="row addItemRowUserEzeid1">
-                                                                    <img class="profilePicBorder" width="315px" height="155px" ng-src="../images/business_profile_pic.png">
-                                                                </div>
+                                                <div class="row setRowLeftRightMarginZero">
+                                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setPaddingLeftRight0">
+                                                        <div class="row addItemRowUserEzeid">
+                                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                                <span class="ezeidTitle"><b> {{SearchInfo.EZEID}} </b></span>
                                                             </div>
                                                         </div>
-                                                    </div>
-                                                    <div class="row setRowLeftRightMarginZero">
-                                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setPaddingLeftRight0">
-                                                            <div class="row addItemRowUserEzeid">
-                                                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                                                    <span class="ezeidTitle"><b> {{SearchInfo.EZEID}} </b></span>
-                                                                </div>
-                                                            </div>
 
-                                                            <div ng-show="SearchInfo.CompanyName || SearchInfo.AboutCompany">
-                                                                <div class="row companyInfo searchButtonMarginSet">
-                                                                    <span><b>{{SearchInfo.CompanyName}} </b></span>
-                                                                </div>
-                                                                <div class="row centerAlign searchButtonMarginSet">
-                                                                    <span title="{{SearchInfo.AboutCompany}}">{{SearchInfo.AboutCompany}}</span>
-                                                                </div>
+                                                        <div ng-show="SearchInfo.CompanyName || SearchInfo.AboutCompany">
+                                                            <div class="row companyInfo searchButtonMarginSet">
+                                                                <span><b>{{SearchInfo.CompanyName}} </b></span>
                                                             </div>
-
                                                             <div class="row centerAlign searchButtonMarginSet">
-                                                                {{ AddressForInfoTab }}
+                                                                <span title="{{SearchInfo.AboutCompany}}">{{SearchInfo.AboutCompany}}</span>
                                                             </div>
+                                                        </div>
 
+                                                        <div class="row centerAlign searchButtonMarginSet">
+                                                            {{ AddressForInfoTab }}
+                                                        </div>
+
+                                                        <div class="row centerAlign searchButtonMarginSet">
                                                             <div class="row centerAlign searchButtonMarginSet">
-                                                                <div class="row centerAlign searchButtonMarginSet">
-                                                                    {{SearchInfo.MobileNumber != '' ?  SearchInfo.ISDMobileNumber +'-'+ SearchInfo.MobileNumber + ' ' : ''}}{{SearchInfo.PhoneNumber != '' ? '| ' + SearchInfo.ISDPhoneNumber +'-'+ SearchInfo.PhoneNumber : ''}}
+                                                                {{SearchInfo.MobileNumber != '' ?  SearchInfo.ISDMobileNumber +'-'+ SearchInfo.MobileNumber + ' ' : ''}}{{SearchInfo.PhoneNumber != '' ? '| ' + SearchInfo.ISDPhoneNumber +'-'+ SearchInfo.PhoneNumber : ''}}
+                                                            </div>
+                                                            <div class="row centerAlign searchButtonMarginSet">
+                                                                <a href="mailto:{{SearchInfo.EMailID}}" target="_blank">{{SearchInfo.EMailID +' '}}</a>  <span ng-show="SearchInfo.Website"> | <a target="_blank" href="http://{{SearchInfo.Website}}">{{' '+SearchInfo.Website}}</a> </span>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="row centerAlign searchButtonMarginSet">
+                                                            <div title="Working hours" class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer setLeftRightPaddingZero" ng-hide="(SearchInfo.IDTypeID == 1)">
+                                                                <img src="../images/open_big.png" ng-click="openWorkingHourPopup()" ng-show="SearchInfo.OpenStatus==1">
+                                                                <img src="../images/close_big.png" ng-click="openWorkingHourPopup()" ng-hide="SearchInfo.OpenStatus==1">
+                                                            </div>
+                                                            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer setLeftRightPaddingZero" ng-hide="(SearchInfo.IDTypeID == 1)">
+                                                                <div class="" ng-hide="SearchInfo.ParkingStatus==3">
+                                                                    <img title="{{parkingTitle}}" src="../images/parking_new.png">
                                                                 </div>
-                                                                <div class="row centerAlign searchButtonMarginSet">
-                                                                    <a href="mailto:{{SearchInfo.EMailID}}" target="_blank">{{SearchInfo.EMailID +' '}}</a>  <span ng-show="SearchInfo.Website"> | <a target="_blank" href="http://{{SearchInfo.Website}}">{{' '+SearchInfo.Website}}</a> </span>
+                                                                <div class="" ng-show="SearchInfo.ParkingStatus==3">
+                                                                    <img title="{{parkingTitle}}" src="../images/new_no_parking.png">
                                                                 </div>
                                                             </div>
-
-                                                            <div class="row centerAlign searchButtonMarginSet">
-                                                                <div title="Working hours" class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer setLeftRightPaddingZero" ng-hide="(SearchInfo.IDTypeID == 1)">
-                                                                    <img src="../images/open_big.png" ng-click="openWorkingHourPopup()" ng-show="SearchInfo.OpenStatus==1">
-                                                                    <img src="../images/close_big.png" ng-click="openWorkingHourPopup()" ng-hide="SearchInfo.OpenStatus==1">
-                                                                </div>
-                                                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer setLeftRightPaddingZero" ng-hide="(SearchInfo.IDTypeID == 1)">
-                                                                    <div class="" ng-hide="SearchInfo.ParkingStatus==3">
-                                                                        <img title="{{parkingTitle}}" src="../images/parking_new.png">
-                                                                    </div>
-                                                                    <div class="" ng-show="SearchInfo.ParkingStatus==3">
-                                                                        <img title="{{parkingTitle}}" src="../images/new_no_parking.png">
-                                                                    </div>
-                                                                </div>
-                                                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setLeftRightPaddingZero">
-                                                                    <img title="Verified" ng-show="(SearchInfo.EZEIDVerifiedID == 2)" src="images/verified_32.png"/>
-                                                                    <img title="Not verified" ng-hide="(SearchInfo.EZEIDVerifiedID == 2)" src="images/not_verified_32.png"/>
-                                                                </div>
-                                                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 setLeftRightPaddingZero defaultRatingBox">
-                                                                    <div class="starRating">
+                                                            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setLeftRightPaddingZero">
+                                                                <img title="Verified" ng-show="(SearchInfo.EZEIDVerifiedID == 2)" src="images/verified_32.png"/>
+                                                                <img title="Not verified" ng-hide="(SearchInfo.EZEIDVerifiedID == 2)" src="images/not_verified_32.png"/>
+                                                            </div>
+                                                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 setLeftRightPaddingZero defaultRatingBox">
+                                                                <div class="starRating">
+                                                                    <div>
                                                                         <div>
                                                                             <div>
                                                                                 <div>
-                                                                                    <div>
-                                                                                        <input id="rating1" disabled type="radio" name="form_rating" ng-model="form_rating" value="1">
-                                                                                        <label for="rating1"><span>1</span></label>
-                                                                                    </div>
-                                                                                    <input id="rating2" disabled type="radio" name="form_rating" ng-model="form_rating" value="2">
-                                                                                    <label for="rating2"><span>2</span></label>
+                                                                                    <input id="rating1" disabled type="radio" name="form_rating" ng-model="form_rating" value="1">
+                                                                                    <label for="rating1"><span>1</span></label>
                                                                                 </div>
-                                                                                <input id="rating3" disabled type="radio" name="form_rating" ng-model="form_rating" value="3">
-                                                                                <label for="rating3"><span>3</span></label>
+                                                                                <input id="rating2" disabled type="radio" name="form_rating" ng-model="form_rating" value="2">
+                                                                                <label for="rating2"><span>2</span></label>
                                                                             </div>
-                                                                            <input id="rating4" disabled type="radio" name="form_rating" ng-model="form_rating" value="4">
-                                                                            <label for="rating4"><span>4</span></label>
+                                                                            <input id="rating3" disabled type="radio" name="form_rating" ng-model="form_rating" value="3">
+                                                                            <label for="rating3"><span>3</span></label>
                                                                         </div>
-                                                                        <input id="rating5" disabled type="radio" name="form_rating" ng-model="form_rating" value="5">
-                                                                        <label for="rating5"><span>5</span></label>
+                                                                        <input id="rating4" disabled type="radio" name="form_rating" ng-model="form_rating" value="4">
+                                                                        <label for="rating4"><span>4</span></label>
                                                                     </div>
+                                                                    <input id="rating5" disabled type="radio" name="form_rating" ng-model="form_rating" value="5">
+                                                                    <label for="rating5"><span>5</span></label>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="row bottom-clearfix">&nbsp;</div>
-                                            <div ng-show="companyTagLine">
+                                        </div>
+
+                                        <div ng-show="companyTagLine" class="messgeButtonContainer">
                                                 <div ng-show="(SearchType == 2)" class="row setRowLeftRightMarginZero newInfoBorder ">
                                                     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setPaddingLeftRight0 text-center">
                                                         <div class="row setRowLeftRightMarginZero text-center boxMessaageBackgroun">
@@ -238,7 +251,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                        </section>
+                                    </section>
                                 </div>
                             </div>
                             <modal mtitle="'Working Hours'" visible="showWorkingHourModel" class="workingHours">
