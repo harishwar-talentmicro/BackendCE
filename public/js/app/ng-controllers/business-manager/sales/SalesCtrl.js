@@ -1251,28 +1251,47 @@
             };
 
 
-            $scope.companyList = [];
+            var companyList = [];
             $scope.companySuggestionList = [];
             $scope.loadSuggestion = function(companyName){
+                if(companyName){
+                    $scope.companySuggestionList = $filter('filter')(companyList,companyName);
+                }
+                else{
+                    $scope.companySuggestionList = [];
+                }
+            };
+
+            /**
+             * Loads company list for that particular ezeid
+             * Company Contact list according to functionType
+             */
+             var loadCompany = function(){
                 $http({
                     method : 'GET',
                     url : GURL + 'company_details',
                     params : {
-                        Token : $rootScope._userInfo.Token
+                        Token : $rootScope._userInfo.Token,
+                        functiontype : 0
                     }
 
                 }).success(function(resp){
                     if(resp && resp.length > 0 && resp != 'null'){
-                        $scope.companyList.push({
-                            id : 
-                        })
+                        console.log(resp);
+                        //$scope.companyList.push({
+                        //    id :
+                        //})
                     }
                 }).error(function(err,statusCode){
+                    var msg = '';
                     if(statusCode == 0){
                         msg = 'Unable to reach server ! Please check your connection';
+                        Notification.error({ title : 'No Connection', message : msg, delay : MsgDelay});
                     }
                 });
             };
+
+            loadCompany();
 
 
             $scope.cartData = {
