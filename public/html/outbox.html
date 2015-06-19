@@ -68,7 +68,7 @@
             </div>
 
             <!-- Item goes here -->
-            <div class="container">
+            <div class="container" ng-hide="accessRight == 0">
                 <h4>Transaction Items</h4>
 
                 <div class="individual-transaction-items ">
@@ -78,18 +78,18 @@
                         <tr>
                             <th width="5%">Id</th>
                             <th width="40%">Item</th>
-                            <th width="20%">Quantity</th>
-                            <th width="20%">Unit Price</th>
-                            <th width="20%">Total Price</th>
+                            <th width="20%" ng-hide="(accessRight == 1 || accessRight == 2)">Quantity</th>
+                            <th width="20%" ng-hide="(accessRight == 1 || accessRight == 2 || accessRight == 3)">Unit Price</th>
+                            <th width="20%" ng-hide="(accessRight == 1 || accessRight == 2 || accessRight == 3)">Total Price</th>
                         </tr>
                         </thead>
                         <tbody>
                         <tr ng-repeat="info in activeTransactionDetailedInfo track by $index">
                             <td>{{$index + 1}}</td>
                             <td>{{info.ItemName}}</td>
-                            <td>{{info.Qty}}</td>
-                            <td>{{info.Rate}}</td>
-                            <td>{{info.Amount}}</td>
+                            <td ng-hide="(accessRight == 1 || accessRight == 2)">{{info.Qty}}</td>
+                            <td ng-hide="(accessRight == 1 || accessRight == 2 || accessRight == 3)">{{info.Rate}}</td>
+                            <td ng-hide="(accessRight == 1 || accessRight == 2 || accessRight == 3)">{{info.Amount}}</td>
                         </tr>
                         </tbody>
                     </table>

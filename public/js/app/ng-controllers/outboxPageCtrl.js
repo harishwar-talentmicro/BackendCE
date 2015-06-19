@@ -48,6 +48,7 @@ angular.module('ezeidApp').
             $scope.paginationPrevious = false;
             $scope.activeTransactionBasicInfo = '';
             $scope.activeTransactionDetailedInfo = '';
+            $scope.permissiontype = '';
 
 
 
@@ -197,7 +198,6 @@ angular.module('ezeidApp').
 
                     $scope.$emit('$preLoaderStop');
                     $scope.activeTransactionDetailedInfo = resp;
-                    console.log($scope.activeTransactionDetailedInfo);
 
                 }).error(function(err){
                     $scope.$emit('$preLoaderStop');
@@ -214,6 +214,8 @@ angular.module('ezeidApp').
                 var selectedIndex = $scope.result.indexOfWhere('tid',tid);
                 /* set basic info based on the index */
                 $scope.activeTransactionBasicInfo = $scope.result[selectedIndex];
+                /* set access rights */
+                $scope.accessRight = $scope.activeTransactionBasicInfo.itemlisttype;
             }
 
         }]);
