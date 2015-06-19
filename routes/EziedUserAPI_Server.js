@@ -6540,6 +6540,10 @@ exports.FnSaveConfig = function(req, res){
         var HomeDeliveryURL = req.body.HomeDeliveryURL;
         var ServiceURL = req.body.ServiceURL;
         var ResumeURL = req.body.ResumeURL;
+        var deal_enable = (parseInt(req.body.deal_enable) != NaN) ? parseInt(req.body.deal_enable) : 2;
+        var deal_banner = req.body.deal_banner ? req.body.deal_banner : '';
+        var deal_title = req.body.deal_title ? req.body.deal_title : '';
+        var deal_desc = req.body.deal_desc ? req.body.deal_desc : '' ;
 
         var RtnMessage = {
             IsSuccessfull: false
@@ -6555,7 +6559,7 @@ exports.FnSaveConfig = function(req, res){
                             + ',' +db.escape(ResumeKeyword) + ',' +db.escape(Category) + ',' +db.escape(Keyword) + ',' +db.escape(ReservationDisplayFormat) + ',' +db.escape(DataRefreshInterval)
                             + ',' + db.escape(SalesFormMsg) + ',' + db.escape(ReservationFormMsg) + ',' + db.escape(HomeDeliveryFormMsg) + ',' +db.escape(ServiceFormMsg) + ',' +db.escape(ResumeFormMsg)
                             + ',' +db.escape(FreshersAccepted) + ',' +db.escape(SalesURL) + ',' +db.escape(ReservationURL)
-                            + ',' +db.escape(HomeDeliveryURL) + ',' +db.escape(ServiceURL) + ',' +db.escape(ResumeURL);
+                            + ',' +db.escape(HomeDeliveryURL) + ',' +db.escape(ServiceURL) + ',' +db.escape(ResumeURL)  + ',' +db.escape(deal_enable) + ',' +db.escape(deal_banner) + ',' +db.escape(deal_title) + ',' +db.escape(deal_desc);
 
                         db.query('CALL pSaveConfig(' + query + ')', function (err, InsertResult) {
                             if (!err){
