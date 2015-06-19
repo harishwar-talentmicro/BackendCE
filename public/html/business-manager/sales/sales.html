@@ -451,6 +451,11 @@
                                             ng-model-options="{updateOn : 'blur',debounce : {'blur': 0} }"/>
                                     </div>
                                 </div>
+                                <autocomplete
+                                        list="companySuggestionList"
+                                        company-id="modalBox.tx.companyId"
+                                        company-name="modalBox.tx.companyName"
+                                        load-suggestion="loadSuggestion"></autocomplete>
                             </div>
                         </div>
 
@@ -489,7 +494,7 @@
                             <!--</div>-->
                         <!--</div>-->
 
-                        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12" ng-if="modalBox.editMode" ng-show="modalBox.editMode">
                             <div class="row">
                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                     <label>Transaction Status</label>
@@ -506,7 +511,7 @@
                             </div>
                         </div>
 
-                        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12" ng-if="modalBox.editMode" ng-show="modalBox.editMode">
                             <div class="row">
                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                     <label>Next Action</label>
@@ -522,7 +527,7 @@
                             </div>
                         </div>
 
-                        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12" ng-if="modalBox.editMode" ng-show="modalBox.editMode">
                             <div class="row">
                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                     <label>Next Action Date and Time</label>
@@ -588,7 +593,7 @@
                         <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
                             <div class="row">
                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                    <label>Delivery Address</label>
+                                    <label> Address</label>
                                 </div>
                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-hide="modalBox.editMode">
                                     <div class="form-group form-group-sm ">
