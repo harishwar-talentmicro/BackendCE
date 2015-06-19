@@ -443,7 +443,7 @@ angular.module('ezeidApp').
                 }
                 else
                 {
-                    var params = '?ezeid='+_Ezeid;
+                    var params = '?ezeone='+_Ezeid;
                     $timeout(function(){
                         $location.url('/service-reservation'+params+'&name='+$scope.SearchInfo.CompanyName);
                     },500);
