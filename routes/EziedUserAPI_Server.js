@@ -6540,6 +6540,10 @@ exports.FnSaveConfig = function(req, res){
         var HomeDeliveryURL = req.body.HomeDeliveryURL;
         var ServiceURL = req.body.ServiceURL;
         var ResumeURL = req.body.ResumeURL;
+        var deal_enable = (parseInt(req.body.deal_enable) != NaN) ? parseInt(req.body.deal_enable) : 2;
+        var deal_banner = req.body.deal_banner ? req.body.deal_banner : '';
+        var deal_title = req.body.deal_title ? req.body.deal_title : '';
+        var deal_desc = req.body.deal_desc ? req.body.deal_desc : '' ;
 
         var RtnMessage = {
             IsSuccessfull: false
@@ -6555,7 +6559,7 @@ exports.FnSaveConfig = function(req, res){
                             + ',' +db.escape(ResumeKeyword) + ',' +db.escape(Category) + ',' +db.escape(Keyword) + ',' +db.escape(ReservationDisplayFormat) + ',' +db.escape(DataRefreshInterval)
                             + ',' + db.escape(SalesFormMsg) + ',' + db.escape(ReservationFormMsg) + ',' + db.escape(HomeDeliveryFormMsg) + ',' +db.escape(ServiceFormMsg) + ',' +db.escape(ResumeFormMsg)
                             + ',' +db.escape(FreshersAccepted) + ',' +db.escape(SalesURL) + ',' +db.escape(ReservationURL)
-                            + ',' +db.escape(HomeDeliveryURL) + ',' +db.escape(ServiceURL) + ',' +db.escape(ResumeURL);
+                            + ',' +db.escape(HomeDeliveryURL) + ',' +db.escape(ServiceURL) + ',' +db.escape(ResumeURL)  + ',' +db.escape(deal_enable) + ',' +db.escape(deal_banner) + ',' +db.escape(deal_title) + ',' +db.escape(deal_desc);
 
                         db.query('CALL pSaveConfig(' + query + ')', function (err, InsertResult) {
                             if (!err){
@@ -8069,85 +8073,6 @@ exports.FnGetUserwiseFolderList = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetUserwiseFolderList error:' + ex.description);
-        throw new Error(ex);
-    }
-};
-
-exports.FnSaveResourceItemMap = function(req, res){
-    try{
-        res.setHeader("Access-Control-Allow-Origin", "*");
-        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-
-        var Token = req.body.Token;
-        var TID = req.body.TID;
-        var ResourceID = req.body.ResourceID;
-        var ItemID = req.body.ItemID;
-               
-        var RtnMessage = {
-            IsSuccessfull: false
-        };
-       
-        if (Token != null && TID != null && ResourceID != null && ItemID != null) {
-            FnValidateToken(Token, function (err, Result) {
-                if (!err) {
-                    if (Result != null) {
-
-                        var query = db.escape(TID) + ',' + db.escape(ResourceID) + ',' + db.escape(ItemID);
-                        db.query('CALL pSaveResourceItemMap(' + query + ')', function (err, InsertResult) {
-                            if (!err){
-                                if (InsertResult.affectedRows > 0) {
-                                    RtnMessage.IsSuccessfull = true;
-                                    res.send(RtnMessage);
-                                    console.log('FnSaveResourceItemMap: Resource ItemMap details save successfully');
-                                }
-                                else {
-                                    console.log('FnSaveResourceItemMap:No Resource ItemMap details');
-                                    res.send(RtnMessage);
-                                }
-                            }
-
-                            else {
-                                console.log('FnSaveResourceItemMap: error in saving Resource ItemMap details' + err);
-                                res.statusCode = 500;
-                                res.send(RtnMessage);
-                            }
-                        });
-                    }
-                    else {
-                        console.log('FnSaveResourceItemMap: Invalid token');
-                        res.statusCode = 401;
-                        res.send(RtnMessage);
-                    }
-                }
-                else {
-                    console.log('FnSaveResourceItemMap:Error in processing Token' + err);
-                    res.statusCode = 500;
-                    res.send(RtnMessage);
-
-                }
-            });
-        }
-
-        else {
-            if (Token == null) {
-                console.log('FnSaveResourceItemMap: Token is empty');
-            }
-            else if (TID == null) {
-                console.log('FnSaveResourceItemMap: TID is empty');
-            }
-            else if (ResourceID == null) {
-                console.log('FnSaveResourceItemMap: ResourceID is empty');
-            }
-            else if (ItemID == null) {
-                console.log('FnSaveResourceItemMap: ItemID is empty');
-            }
-            res.statusCode=400;
-            res.send(RtnMessage);
-        }
-
-    }
-    catch (ex) {
-        console.log('FnSaveResourceItemMap:error ' + ex.description);
         throw new Error(ex);
     }
 };
@@ -10585,7 +10510,8 @@ exports.FnSaveReservationResource = function(req, res){
         var title = (req.body.title) ? ((req.body.title.trim().length > 0) ? req.body.title : null ) : null ;;
         var description = req.body.description;
         var status = (parseInt(req.body.status)=== 1 || parseInt(req.body.status) === 2) ? req.body.status : 1;
-        var operatorid = req.body.operatorid;
+        var operatorid = req.body.operatorid ? req.body.operatorid : '';
+        var workingtemp = req.body.working_temp ? req.body.working_temp : 0;
          if (TID.toString() == 'NaN')
             TID = 0;
         var responseMessage = {
@@ -10619,7 +10545,7 @@ exports.FnSaveReservationResource = function(req, res){
                 if (!err) {
                     if (result != null) {
 
-                        var query = db.escape(Token) + ', ' + db.escape(TID) + ',' + db.escape(picture) + ',' + db.escape(title) + ',' + db.escape(description) + ',' + db.escape(status)+ ',' + db.escape(operatorid);
+                        var query = db.escape(Token) + ', ' + db.escape(TID) + ',' + db.escape(picture) + ',' + db.escape(title) + ',' + db.escape(description) + ',' + db.escape(status)+ ',' + db.escape(operatorid) + ',' + db.escape(workingtemp);
                         db.query('CALL pSaveResource(' + query + ')', function (err, insertResult) {
                              if (!err){
                                 if (insertResult) {
