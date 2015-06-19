@@ -194,7 +194,9 @@
                   longitude : 0,
                   duration : 0,
                   durationScale : 0,
-                  itemList : []     // This is transaction item list
+                  itemList : [],     // This is transaction item list
+                  companyName : '',
+                  companyId : 0
               }
             };
 
@@ -569,7 +571,9 @@
                         longitude : 0,
                         duration : 0,
                         durationScale : 0,
-                        itemList : []
+                        itemList : [],
+                        companyName : '',
+                        companyId : 0
                     }
                 };
             };
@@ -1110,7 +1114,8 @@
                     item_list_type : $rootScope._userInfo.SalesItemListType,
                     DeliveryAddress : (!editMode) ?
                         makeAddress() : $scope.modalBox.tx.deliveryAddress,
-                    companyName : $scope.modalBox.tx.companyName
+                    companyName : $scope.modalBox.tx.companyName,
+                    company_id : $scope.modalBox.tx.companyId
                 };
                 return preparedTx;
             };

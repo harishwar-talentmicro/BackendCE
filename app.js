@@ -164,7 +164,6 @@ app.get('/ewtConfig',LocationManager.FnGetConfig);
 app.post('/ewtSaveTranscation',LocationManager.FnSaveTranscation);
 app.get('/ewtGetUserwiseFolderList',LocationManager.FnGetUserwiseFolderList);
 app.get('/ewtGetTranscation',LocationManager.FnGetTranscation);
-app.post('/ewtSaveResourceItemMap',LocationManager.FnSaveResourceItemMap);
 app.get('/ewtGetItemListForEZEID',LocationManager.FnGetItemListForEZEID);
 app.get('/ewtGetLocationList',LocationManager.FnGetLocationList);
 app.get('/ewtGetLoginDetails',LocationManager.FnGetLoginDetails);

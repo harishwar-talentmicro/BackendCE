@@ -50,7 +50,8 @@ var res = angular.module('ezeidApp').
              */
             $scope.merchantAccessKey = 'YRX3BRJBX71D5BMKXZUU';
             $scope.returnUrl = 'http://localhost:3001/payment/response';
-            $scope.requestSignature = '3670241785923f1d389a6e0a7a97820ddae40307';
+            $scope.requestSignature = '';
+            //Secret key:639be909a44882ee4d2816b126f3df869f84e44e
             $scope.paramOne = 'one Value';
             $scope.secundo = 'online';
             $scope.currency = 'INR';
