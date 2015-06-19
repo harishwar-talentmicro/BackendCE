@@ -83,6 +83,24 @@ angular.module('ezeidApp').service('UtilityService',['$q',function($q){
                 return val;
             }
             return false;
+        },
+
+        /**
+         * check if the value is empty
+         */
+        checkIfEmpty : function(val,alternateText)
+        {
+            if($.trim(val).length > 0)
+            {
+                return val;
+            }
+
+            if(typeof(alternateText) != 'undefined')
+            {
+                return alternateText;
+            }
+
+            return val;
         }
 
     };

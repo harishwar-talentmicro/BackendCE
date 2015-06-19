@@ -25,8 +25,8 @@
                     <div class="outbox-main-content">
                         <!-- Transaction history goes here -->
                         <div class="pagination input-group text-right" ng-show="paginationStatus">
-                            <button ng-disabled="!paginationPrevious" class="btn btn-primary">Previous <i class="fa fa-arrow-circle-left"></i></button>
-                            <button ng-disabled="!paginationNext" class="btn btn-primary"><i class="fa fa-arrow-circle-right"></i> Next &nbsp;&nbsp;</button>
+                            <button ng-disabled="!paginationPrevious" ng-click="getPreviousResultPage()" class="btn btn-primary">Previous <i class="fa fa-arrow-circle-left"></i></button>
+                            <button ng-disabled="!paginationNext" ng-click="getNextResultPage()" class="btn btn-primary"><i class="fa fa-arrow-circle-right"></i> Next &nbsp;&nbsp;</button>
                         </div>
                         <!-- Individual Strips starts here -->
                         <div class="individual-transaction" ng-repeat="res in result track by $index">
@@ -52,44 +52,46 @@
             <!-- Detail goes here -->
             <div class="container">
                 <!-- Start date goes here -->
-                <div class="start-date text-center text-bolder">13 May 2010, 05:50 AM</div>
+                <div class="start-date text-center text-bolder">{{convertTimeToLocal(activeTransactionBasicInfo.TaskDateTime)}}</div>
                 <!-- main content -->
                 <div class="main-content">
-                    <p>To: <b>KRUNALPAID</b></p>
+                    <p>To: <b>{{activeTransactionBasicInfo.ToEzeid}}</b></p>
                     <br>
                     <p>Message:</p>
                     <p>
-                        Lorem Ipsum is simply dummy text of the printing and typesetting industry.
-                        Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,
-                        when an unknown printer took a galley of type and scrambled.
+                        {{activeTransactionBasicInfo.Message}}
                     </p>
                     <br>
-                    <p>Status: <b>Active</b></p>
-                    <p>Last Updated: <b>13 May 2010, 05:50 AM</b></p>
+                    <p>Status: <b>{{checkIfEmpty(activeTransactionBasicInfo.statustitle,"New")}}</b></p>
+                    <p>Last Updated: <b>{{convertTimeToLocal(activeTransactionBasicInfo.updatedDate)}}</b></p>
                 </div>
             </div>
 
             <!-- Item goes here -->
-            <div class="container">
+            <div class="container" ng-hide="accessRight == 0">
                 <h4>Transaction Items</h4>
 
                 <div class="individual-transaction-items ">
                     <!-- Individual items -->
                     <table class="table table-striped">
+                        <thead>
                         <tr>
                             <th width="5%">Id</th>
                             <th width="40%">Item</th>
-                            <th width="20%">Quantity</th>
-                            <th width="20%">Unit Price</th>
-                            <th width="20%">Total Price</th>
+                            <th width="20%" ng-hide="(accessRight == 1 || accessRight == 2)">Quantity</th>
+                            <th width="20%" ng-hide="(accessRight == 1 || accessRight == 2 || accessRight == 3)">Unit Price</th>
+                            <th width="20%" ng-hide="(accessRight == 1 || accessRight == 2 || accessRight == 3)">Total Price</th>
                         </tr>
-                        <tr>
-                            <td>1</td>
-                            <td>Alpha Combs</td>
-                            <td>1</td>
-                            <td>120</td>
-                            <td>120</td>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="info in activeTransactionDetailedInfo track by $index">
+                            <td>{{$index + 1}}</td>
+                            <td>{{info.ItemName}}</td>
+                            <td ng-hide="(accessRight == 1 || accessRight == 2)">{{info.Qty}}</td>
+                            <td ng-hide="(accessRight == 1 || accessRight == 2 || accessRight == 3)">{{info.Rate}}</td>
+                            <td ng-hide="(accessRight == 1 || accessRight == 2 || accessRight == 3)">{{info.Amount}}</td>
                         </tr>
+                        </tbody>
                     </table>
                 </div>
             </div>

@@ -100,7 +100,6 @@ angular.module('ezeidApp').controller('viewDirectionController',[
             directionsDisplay.setPanel(document.getElementById('directions-panel'));
 
           /*  $(window).resize(function() {
-                console.log("SAi88");
                 google.maps.event.trigger(map, "resize");
             });*/
 
@@ -223,37 +222,28 @@ angular.module('ezeidApp').controller('viewDirectionController',[
     //  EMail direction image
     viewDirection.emailDirectionImage = function ()
     {
-
-        /*var htmlToMail = escape(document.getElementById('googlemapimage').innerHTML);*/
-        var htmlToMail = document.getElementById('mapContainer').innerHTML;
-
-       // $('#googlemapimage1').attr('src', htmlToMail);
-        document.getElementById("googlemapimage1").innerHTML = htmlToMail;
-
-        console.log(htmlToMail);
-
         //Below line is for Loading img
-      //  $scope.$emit('$preLoaderStart');
-       /* $http({ method: 'post', url: GURL + 'ewtSendBulkMailer', data: { Token: $rootScope._userInfo.Token, TID: "", TemplateID: "", ToMailID: viewDirection._info.ToMailID, Attachment: finalImageSrc, AttachmentFileName :'ViewDirection.jpg'} }).success(function (data)
-    {
-        $rootScope.$broadcast('$preLoaderStop');
-        if(data)
+        $scope.$emit('$preLoaderStart');
+        $http({ method: 'post', url: GURL + 'ewtSendBulkMailer', data: { Token: $rootScope._userInfo.Token, TID: "", TemplateID: "", ToMailID: viewDirection._info.ToMailID, Attachment: finalImageSrc, AttachmentFileName :'ViewDirection.jpg'} }).success(function (data)
         {
-            viewDirection._info.FromEmailID = "";
-            viewDirection._info.ToMailID = "";
-            Notification.success({message: "Mail are submitted for transmitted..", delay: MsgDelay});
-            $window.localStorage.removeItem("searchResult");
-            $scope.showEmailForm = false;
-        }
-        else
-        {
-            Notification.error({ message: 'Sorry..! Message not send ', delay: MsgDelay });
-            $window.localStorage.removeItem("searchResult");
-        }
-    });*/
+            $rootScope.$broadcast('$preLoaderStop');
+            if(data)
+            {
+                viewDirection._info.FromEmailID = "";
+                viewDirection._info.ToMailID = "";
+                Notification.success({message: "Mail are submitted for transmitted..", delay: MsgDelay});
+                $window.localStorage.removeItem("searchResult");
+                $scope.showEmailForm = false;
+            }
+            else
+            {
+                Notification.error({ message: 'Sorry..! Message not send ', delay: MsgDelay });
+                $window.localStorage.removeItem("searchResult");
+            }
+    });
     };
 
-        // close view direction page
+    // close view direction page
     viewDirection.closeForm = function ()
     {
         $window.location.href = "/";
