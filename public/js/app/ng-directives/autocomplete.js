@@ -63,7 +63,10 @@
                     element.find('input').bind('keypress',function(e){
                         scope.companyId = 0;
                         scope.companyName = angular.element(e.currentTarget).val();
-                        scope.loadSuggestion();
+                        if(scope.companyName){
+                            scope.loadSuggestion(scope.companyName);
+                        }
+
                     });
                 }
 
