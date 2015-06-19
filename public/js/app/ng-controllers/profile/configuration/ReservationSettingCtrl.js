@@ -93,11 +93,10 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',[
             }
         }).success(function (data)
             {
-                console.log("SAi123");
-                console.log(data);
-                if(data != 'null')
+
+                if(data.status)
                 {
-                    $scope.TemplateData = data;
+                    $scope.WorkingTemplate = data.data;
                 }
             });
     }
@@ -133,6 +132,12 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',[
 
                 }
             };
+
+            var strArr = (item.operatorid && item.operatorid.length > 0) ? item.operatorid.split(',') : [];
+            for(var a=0; a<strArr.length; a++){
+                $scope.operatorId.push(parseInt(strArr[a]));
+            }
+
         }
        // loadSubuserList();
     };
@@ -160,6 +165,7 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',[
                 if(resp && resp.length > 0 && resp !== 'null')
                 {
                     $scope.subusers = resp;
+
                 }
                 else{
                     //Notification.error({ message: "No subusers added ", delay : MsgDelay});
@@ -234,6 +240,7 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',[
      * @returns {boolean}
      */
     function validateItem(){
+
         var err = [];
         if($scope.modalBox.item.description.length < 1 ){
             err.push('Add description to this resource');
@@ -241,8 +248,11 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',[
         if(!$scope.modalBox.item.picture){
             err.push('Please select a picture for this resource');
         }
-        if($scope.modalBox.item.operatorid == 0){
+        if($scope.modalBox.item.operatorid == ""){
             err.push('Please select an operator for this resource');
+        }
+        if($scope.modalBox.item.working_temp == 0){
+            err.push('Please select an working template for this resource');
         }
         if($scope.modalBox.item.title.length < 1){
             err.push('Resource title is empty');
@@ -258,9 +268,14 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',[
 
     $scope.saveResource = function(){
 
+        $scope.modalBox.item.operatorid = $scope.operatorId.toString();
+
         if(validateItem())
         {
             $scope.modalBox.item.Token = $rootScope._userInfo.Token;
+
+
+
             $scope.$emit('$preLoaderStart');
             $http({
                 url : GURL + 'reservation_resource',
@@ -419,8 +434,6 @@ angular.module('ezeidApp').controller('ReservationSettingCtrl',[
             var index = $scope.operatorId.indexOf(val);
             $scope.operatorId.splice(index,1);
         }
-
-        console.log($scope.operatorId);
     };
 
     // Maping tab selection

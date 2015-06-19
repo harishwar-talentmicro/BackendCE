@@ -10633,11 +10633,12 @@ exports.FnUpdateReservationResource = function(req, res){
 
         var Token = req.body.Token ;
         var TID = parseInt(req.body.TID);
-        var picture = (req.body.picture) ? ((req.body.picture.trim().length > 0) ? req.body.picture : null ) : null ;;
-        var title = (req.body.title) ? ((req.body.title.trim().length > 0) ? req.body.title : null ) : null ;;
+        var picture = (req.body.picture) ? ((req.body.picture.trim().length > 0) ? req.body.picture : null ) : null ;
+        var title = (req.body.title) ? ((req.body.title.trim().length > 0) ? req.body.title : null ) : null ;
         var description = req.body.description;
         var status = (parseInt(req.body.status)=== 1 || parseInt(req.body.status) === 2) ? req.body.status : 1;
         var operatorid = req.body.operatorid;
+        var workingTemp = (parseInt(req.body.working_temp) !== NaN) ? parseInt(req.body.working_temp) : 0;
         
         var responseMessage = {
             status: false,
@@ -10670,7 +10671,10 @@ exports.FnUpdateReservationResource = function(req, res){
                 if (!err) {
                     if (result != null) {
 
-                        var query = db.escape(Token) + ', ' + db.escape(TID) + ',' + db.escape(picture) + ',' + db.escape(title) + ',' + db.escape(description) + ',' + db.escape(status) + ',' + db.escape(operatorid);
+                        var query = db.escape(Token) + ', ' +
+                            db.escape(TID) + ',' + db.escape(picture) +
+                            ',' + db.escape(title) + ',' + db.escape(description) +
+                            ',' + db.escape(status) + ',' + db.escape(operatorid) + ','+db.escape(workingTemp);
                         db.query('CALL pSaveResource(' + query + ')', function (err, updateResult) {
                             if (!err){
                                 if (updateResult.affectedRows > 0) {
@@ -10682,7 +10686,7 @@ exports.FnUpdateReservationResource = function(req, res){
                                         title : req.body.title,
                                         status : req.body.status,
                                         description : req.body.description,
-                                        picture : req.body.picture
+                                        picture : req.body.pictures
                                     };
                                     res.status(200).json(responseMessage);
                                     console.log('FnUpdateReservationResource: Resource details update successfully');

@@ -30,15 +30,14 @@
 
                     <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
                         <div class="form-group">
-                            <!--<select class="form-control emptyBox" ng-model="modalBox.item.operatorid">
-                                <option value="0"> -- Select Operator -- </option>
-                                <option ng-repeat="i in subusers" value="{{i.TID}}">{{i.EZEID}} (Select as operator)</option>
-                            </select>-->
 
-                            <select class="form-control" name="TitleSelect" ng-model="modalBox.item.operatorid"
-                                    ng-options="template.TID as template.EZEID for template in subusers" required>
-                                <option value = ""> -- Select Operator -- </option>
+
+                            <select class="form-control" name="TitleSelect" ng-model="modalBox.item.working_temp"
+                                    ng-options="template.TID as template.TemplateName for template in WorkingTemplate" required>
+                                <option value = ""> -- Select Template -- </option>
                             </select>
+
+
 
                         </div>
                     </div>
@@ -69,20 +68,23 @@
 
                     <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
                         <b>Select Operator</b>
-                        <div ng-repeat="_item in subusers">
-                            {{_item.TID}}
-                            <div class="row setRowLeftRightMarginZero">
-                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix setLeftRightPaddingZero SearchMarginLeft">
-                                    <input type="checkbox"
-                                           name="service"
-                                           data-tid="{{_item.TID}}"
-                                           ng-click="toggleOperatorCheckbox($event)"
-                                           ng-checked="operatorId.indexOf(_item.TID)!=-1"/>
-                                    {{_item.EZEID}}
+                        <div class="setBorderColor allServicesBox">
+                            <div ng-repeat="_item in subusers">
+                                <div class="row setRowLeftRightMarginZero">
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix setLeftRightPaddingZero SearchMarginLeft">
+                                        <input type="checkbox"
+                                               name="service"
+                                               data-tid="{{_item.TID}}"
+                                               id="id-{{_item.TID}}"
+                                               ng-click="toggleOperatorCheckbox($event)"
+                                               ng-checked="operatorId.indexOf(_item.TID)!=-1"/>
+                                        <label for="id-{{_item.TID}}">{{_item.EZEID}}</label>
+                                    </div>
                                 </div>
-                            </div>
 
+                            </div>
                         </div>
+
                     </div>
                 </div>
 
