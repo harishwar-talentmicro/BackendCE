@@ -1682,7 +1682,8 @@ table.rwd-table > tbody > tr > td.serachResultSelectAll
 {
     font-size: 10px;
     color: #ffffff;
-    background: #09a2de;
+    /*background: #09a2de;*/
+    background: #B5BDBA;
     border: 1px solid rgb(112, 115, 118);
 }
 .promoTextContainer
