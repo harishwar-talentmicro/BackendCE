@@ -163,7 +163,7 @@
 
             $scope.showModal = false;
             $scope.modalBox = {
-              title : 'Transaction Details',
+              title : 'Create New Lead',
               class : 'business-manager-modal',
               editMode : false,
               locationList : [],
@@ -438,12 +438,25 @@
                      * Fill the information of Current Transaction
                      */
                     $scope.modalBox.editMode = true;
-                    $scope.modalBox.tx = prepareEditTransaction($scope.txList[index]);
+                    var editTx = prepareEditTransaction($scope.txList[index]);
                     if($scope.moduleConf.listType > 0){
-                        loadTransactionItems($scope.modalBox.tx.TID).then(function(resp){
+                        $scope.$emit('$preLoaderStart');
+                        loadTransactionItems(editTx.TID).then(function(resp){
+                            editTx.itemList = resp;
                             $scope.showModal = !$scope.showModal;
+                            //UI updation is not happening properly because ui is not rendered, and model bind before it
+                            //therefore once again updating data after ui rendered
+                            $timeout(function(){
+                                $scope.modalBox.title = 'Update Lead';
+                                $scope.modalBox.tx = editTx;
+                                $scope.$emit('$preLoaderStop');
+                            },1500);
                         },function(){
                             $scope.showModal = !$scope.showModal;
+                            $timeout(function(){
+                                $scope.modalBox.tx = editTx;
+                                $scope.$emit('$preLoaderStop');
+                            },1500);
                         });
                     }
                     else{
@@ -542,7 +555,7 @@
 
             $scope.resetModalBox = function(){
                 $scope.modalBox = {
-                    title : 'Transaction Details',
+                    title : 'Create New Lead',
                     class : 'business-manager-modal',
                     locationList : [],
                     editMode : false,

@@ -507,10 +507,10 @@
                                 </div>
                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                     <div class="form-group form-group-sm ">
-                                        <select class="form-control" ng-model="modalBox.tx.statusType" name="statusType">
-                                            <option value="">--Select Status of Transaction--</option>
+                                        <select class="form-control" ng-model="modalBox.tx.statusType">
+                                            <!--<option value="">&#45;&#45;Select Status of Transaction&#45;&#45;</option>-->
                                             <option value="0">New</option>
-                                            <option ng-repeat="txStatus in txStatusTypes track by txStatus.TID" value="{{txStatus.TID}}">{{txStatus.StatusTitle}}</option>
+                                            <option ng-repeat="txStatus in txStatusTypes track by txStatus.TID" value="{{::txStatus.TID}}">{{::txStatus.StatusTitle}}</option>
                                         </select>
                                     </div>
                                 </div>
@@ -552,7 +552,7 @@
                             </div>
                         </div>
 
-                        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12" ng-hide="modalBox.tx.ezeidTid">
+                        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
                             <div class="row">
                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                     <label>Folder Rules</label>
