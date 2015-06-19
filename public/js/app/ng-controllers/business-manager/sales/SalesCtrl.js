@@ -263,7 +263,9 @@
                         longitude : 0,
                         duration : 0,
                         durationScale : 0,
-                        itemList : []
+                        itemList : [],
+                        companyId : tx.company_id,
+                        companyName : tx.company_name
                 };
                 return editModeTx;
 
@@ -1114,7 +1116,7 @@
                     item_list_type : $rootScope._userInfo.SalesItemListType,
                     DeliveryAddress : (!editMode) ?
                         makeAddress() : $scope.modalBox.tx.deliveryAddress,
-                    companyName : $scope.modalBox.tx.companyName,
+                    company_name : $scope.modalBox.tx.companyName,
                     company_id : $scope.modalBox.tx.companyId
                 };
                 return preparedTx;
@@ -1248,6 +1250,48 @@
                 }
             };
 
+
+            var companyList = [];
+            $scope.companySuggestionList = [];
+            $scope.loadSuggestion = function(companyName){
+                if(companyName){
+                    $scope.companySuggestionList = $filter('filter')(companyList,companyName);
+                }
+                else{
+                    $scope.companySuggestionList = [];
+                }
+            };
+
+            /**
+             * Loads company list for that particular ezeid
+             * Company Contact list according to functionType
+             */
+             var loadCompany = function(){
+                $http({
+                    method : 'GET',
+                    url : GURL + 'company_details',
+                    params : {
+                        Token : $rootScope._userInfo.Token,
+                        functiontype : 0
+                    }
+
+                }).success(function(resp){
+                    if(resp && resp.length > 0 && resp != 'null'){
+                        console.log(resp);
+                        //$scope.companyList.push({
+                        //    id :
+                        //})
+                    }
+                }).error(function(err,statusCode){
+                    var msg = '';
+                    if(statusCode == 0){
+                        msg = 'Unable to reach server ! Please check your connection';
+                        Notification.error({ title : 'No Connection', message : msg, delay : MsgDelay});
+                    }
+                });
+            };
+
+            loadCompany();
 
 
             $scope.cartData = {
