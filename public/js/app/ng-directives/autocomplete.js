@@ -6,14 +6,15 @@
  **/
 
 (function(){
-    angular.module('ezeidApp').directive('autocomplete',['$compile','$sce',function($compile,$sce){
+    angular.module('ezeidApp').directive('autocomplete',['$compile','$sce','$timeout',function($compile,$sce,$timeout){
         var listTemplate =  '<li class="ac-list-child" data-id="{{id}}">{{name}} ({{duration}} Days)</li>';
 
 
-        var templateHtml = '<div class="form-group autocomplete">' +
-            '<input type="text" class="form-control" maxlength="150" />' +
+        var templateHtml = '<div class="form-group form-group-sm autocomplete">' +
+            '<input type="text" class="form-control" maxlength="150" ng-model="companyName"/>' +
             '<div class="ac-suggestion-box">'+
-            '<ul class="ac-list" ng-bind-html="listTemp">'+
+            '<ul class="ac-list">'+
+            '<li class="ac-list-child" ng-repeat="l in list" ng-click="selectCompany($index)">{{l.name}} ({{l.duration}} Days)</li>'+
             '</ul>'+
             '</div>' +
             '</div>';
@@ -28,60 +29,45 @@
                 loadSuggestion : '='
             },
             link : function(scope,element,attrs){
-
-                function recompile(alist){
-                    console.log(alist);
-                    //console.log('hi');
-                    var list = (alist) ? alist : [];
-                    var genListTemp = '';
-                    for(var i=0; i<list.length;i++){
-                        var lt = listTemplate;
-                        //console.log(lt);
-                        lt = lt.replace('{{name}}',list[i].name);
-                        lt = lt.replace('{{duration}}',list[i].duration);
-                        lt = lt.replace('{{id}}',list[i].id);
-                        //console.log(lt);
-                        genListTemp = genListTemp + lt;
-                    }
-
-                    scope.listTemp = $sce.trustAsHtml(genListTemp);
-                    console.log(scope.listTemp);
-                    element.find('li').bind('click',function(e){
-                        console.log('li bind');
-                        var elem = e.currentTarget;
-
-                        var eid = parseInt(angular.element(elem).data('id'));
-
-                        var eIndex = list.indexOfWhere('id',eid);
-                        if(eIndex !== -1){
-                            element.find('input').val(list[eIndex]);
-                            scope.companyId = eid;
-                            scope.companyName = list[eIndex].name;
-                        }
-                    });
-                }
-
-                scope.$watch(function(){
-                    //recompile(scope.list);
-                    return scope.list;
-                });
-
-
-                recompile(scope.list);
-
+                var companyFlag = false;
+                scope.selectCompany = function(i){
+                    scope.companyName = scope.list[i].name;
+                    companyFlag = true;
+                    scope.companyId = scope.list[i].id;
+                    scope.list = [];
+                };
                 element.html(templateHtml).show();
                 $compile(element.contents())(scope);
 
-                element.find('input').bind('keypress',function(e){
-                    console.log('input bind');
-                    scope.companyId = 0;
-                    scope.companyName = angular.element(e.currentTarget).val();
-                    if(scope.companyName){
-                        console.log('load autoc');
-                        var lst = scope.loadSuggestion(scope.companyName);
-                        recompile(lst);
+                //element.find('input').bind('keypress',function(e){
+                //    scope.companyId = 0;
+                //    scope.companyName = angular.element(e.currentTarget).val();
+                //    if(scope.companyName){
+                //        scope.list = scope.loadSuggestion(scope.companyName);
+                //    }
+                //});
+
+                scope.$watch('companyName',function(n,v,scope){
+                    if(n !== v){
+                        if(n && !companyFlag){
+                            scope.list = scope.loadSuggestion(n);
+                            scope.companyId = 0;
+                        }
+                        if(!n){
+                            scope.companyId = 0;
+                        }
+                        companyFlag = false;
                     }
                 });
+
+                element.find('input').bind('focusout',function(){
+                    $timeout(function(){
+                        scope.list = [];
+                    },500);
+
+                });
+
+
 
             }
 

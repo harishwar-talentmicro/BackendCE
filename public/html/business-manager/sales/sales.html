@@ -440,9 +440,10 @@
                         <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
                             <div class="row">
                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                    <label>Company /Individual</label>
+                                    <label>Company</label>
                                 </div>
-                                <!--<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">-->
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12"
+                                     ng-if="!modalBox.editMode" ng-show="!modalBox.editMode">
                                     <!--<div class="form-group form-group-sm ">-->
                                         <!--<input type="text" class="form-control no-radius"-->
                                             <!--placeholder="Company Name"-->
@@ -450,12 +451,17 @@
                                                <!--ng-model="modalBox.tx.companyName"-->
                                             <!--ng-model-options="{updateOn : 'blur',debounce : {'blur': 0} }"/>-->
                                     <!--</div>-->
-                                <!--</div>-->
-                                <autocomplete
-                                        list="companySuggestionList"
-                                        company-id="modalBox.tx.companyId"
-                                        company-name="modalBox.tx.companyName"
-                                        load-suggestion="loadSuggestion"></autocomplete>
+                                    <autocomplete
+                                            list="companySuggestionList"
+                                            company-id="modalBox.tx.companyId"
+                                            company-name="modalBox.tx.companyName"
+                                            load-suggestion="loadSuggestion"></autocomplete>
+                                </div>
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-show="modalBox.editMode">
+                                    <div class="form-group form-group-sm">
+                                        <input class="form-control" disabled type="text" value="{{modalBox.tx.companyName}}"/>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -578,7 +584,7 @@
                             <!--</div>-->
                         <!--</div>-->
 
-                        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
                             <div class="row">
                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                     <label> Message</label>
@@ -588,6 +594,20 @@
                                 </div>
                             </div>
                         </div>
+
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
+                            <div class="row">
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <label>Notes</label>
+                                </div>
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+
+                                    <textarea rows="1" class="form-control no-radius" ng-model="modalBox.tx.notes" name="notes"></textarea>
+
+                                </div>
+                            </div>
+                        </div>
+
 
 
                         <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
@@ -644,18 +664,6 @@
                             </div>
                         </div>
 
-                        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
-                            <div class="row">
-                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                    <label>Notes</label>
-                                </div>
-                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-
-                                    <textarea rows="4" class="form-control no-radius" ng-model="modalBox.tx.notes" name="notes"></textarea>
-
-                                </div>
-                            </div>
-                        </div>
 
                         <!--<div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">-->
                             <!--<div class="row">-->

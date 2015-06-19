@@ -7335,7 +7335,7 @@ exports.FnGetTranscation = function (req, res) {
         var Status = (req.query.Status) ? req.query.Status : null;
         var searchkeyword = req.query.searchkeyword ? req.query.searchkeyword : '';
         var sortBy = (parseInt(req.query.sort_by) !== NaN) ? parseInt(req.query.sort_by) : 0 ;
-        var folderRules = (req.body.rules) ? req.body.rules : '';
+        var folderRules = (req.body.folder_rules) ? req.body.folder_rules : '';
         
         console.log(req.query);
        var RtnMessage = {
@@ -7355,7 +7355,7 @@ exports.FnGetTranscation = function (req, res) {
                             FromPage = 0;
                         }
                         
-                      var parameters = db.escape(Token) + ',' + db.escape(FunctionType) + ',' + db.escape(Status) + ',' + db.escape(FromPage) + ',' + db.escape(10) + ',' + db.escape(searchkeyword) + ',' + db.escape(sortBy) + db.escape(folderRules);
+                      var parameters = db.escape(Token) + ',' + db.escape(FunctionType) + ',' + db.escape(Status) + ',' + db.escape(FromPage) + ',' + db.escape(10) + ',' + db.escape(searchkeyword) + ',' + db.escape(sortBy) + ','+ db.escape(folderRules);
                         console.log('CALL pGetMessagesNew(' + parameters + ')');
                       db.query('CALL pGetMessagesNew(' + parameters + ')', function (err, GetResult) {
                           console.log(GetResult);

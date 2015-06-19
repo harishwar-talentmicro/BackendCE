@@ -2419,6 +2419,7 @@ form .row-error{
     border:1px solid #DDD;
     border-top:none;
     box-shadow:0px 4px 5px #EEE;
+    z-index: 3000;
 
 }
 
@@ -2448,6 +2449,7 @@ form .row-error{
     min-height:30px;
     font-weight:200;
     cursor : pointer;
+    background: #FFF;
 }
 
 .ac-list-child:hover{
