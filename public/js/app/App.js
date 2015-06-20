@@ -213,6 +213,22 @@
             .when('/send_cv',{
                 templateUrl: 'html/sendCV.html'
             })
+            .when('/:ezeid/sales',{
+                templateUrl : 'html/business-manager/sales/sales-front.html',
+                controller : 'SalesFrontCtrl'
+            })
+            .when('/:ezeid/home-delivery',{
+                templateUrl : 'html/business-manager/home-delivery/home-delivery-front.html',
+                controller : 'HomeDeliveryFrontCtrl'
+            })
+            .when('/:ezeid/helpdesk',{
+                templateUrl : 'html/business-manager/service/service-front.html',
+                controller : 'ServiceFrontCtrl'
+            })
+            .when('/:ezeid/resume',{
+                templateUrl : 'html/business-manager/resume/resume-front.html',
+                controller : 'ResumeFrontCtrl'
+            })
             .when('/:ezeid',{
                 templateUrl: 'html/landing.html',
                 controller : 'LandingPageCtrl'
