@@ -127,6 +127,13 @@ angular.module('ezeidApp').
 
                 if (!$rootScope._userInfo.IsAuthenticate && $scope.searchParams.searchType == 1) {
                     /* through error */
+                    /**
+                     * @todo
+                     * If user is  searching for EZEID then let him search if the search result comes as business
+                     * user without any pin and show him result else don't allow him to search
+                     */
+
+
                     Notification.error({message: 'Please login to search for EZEID', delay: MsgDelay});
                     return false;
                 }
