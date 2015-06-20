@@ -6155,6 +6155,7 @@ exports.FnSaveFolderRules = function(req, res){
                             + ',' +db.escape(Longitude) + ',' +db.escape(Proximity) + ',' +db.escape(DefaultFolder) + ',' +db.escape(FolderStatus) + ',' +db.escape(SeqNoFrefix);
                         db.query('CALL pSaveFolderRules(' + query + ')', function (err, InsertResult) {
                             if (!err){
+                                console.log(InsertResult);
                                 if (InsertResult.affectedRows > 0) {
                                     RtnMessage.IsSuccessfull = true;
                                     res.send(RtnMessage);

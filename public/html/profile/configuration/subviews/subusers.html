@@ -1,6 +1,6 @@
 <div class="panel panel-default" ng-controller="SubuserCtrl">
     <div class="panel-heading">
-        <h4>Subusers</h4>
+        <h4>Users</h4>
     </div>
     <div class="panel-body">
     <!------------- Content goes inside this region ---------------------->
@@ -72,7 +72,7 @@
     <!------------ Modal Box starts here -------------------------->
     <modal mtitle="modalBox.title" visible="showModal">
     <div class="container-fluid">
-    <form role="form">
+    <div role="form">
     <div class="row">
         <div class="col-lg-4 col-md-4 col-sm-4 col-xs-8 bottom-clearfix">
             <div class="input-group">
@@ -136,49 +136,59 @@
 
     <div class="row" ng-show="modalBox.isEzeidAvailable">
         <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 bottom-clearfix text-center"></div>
-        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 bottom-clearfix text-center"><h5>Sales</h5></div>
-        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 bottom-clearfix text-center"><h5>Reservation</h5></div>
-        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 bottom-clearfix text-center"><h5>Home Delivery</h5></div>
-        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 bottom-clearfix text-center"><h5>Help Desk</h5></div>
-        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 bottom-clearfix text-center"><h5>Resume</h5></div>
+        <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10">
+            <div class="row">
+
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 bottom-clearfix text-center bottom-clearfix text-center">
+                    <h5>Sales</h5>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 bottom-clearfix text-center bottom-clearfix text-center">
+                    <h5>Home Delivery</h5>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 bottom-clearfix text-center bottom-clearfix text-center">
+                    <h5>Help Desk</h5>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 bottom-clearfix text-center bottom-clearfix text-center">
+                    <h5>Resume</h5>
+                </div>
+            </div>
+        </div>
     </div>
     <div class="row" ng-show="modalBox.isEzeidAvailable">
         <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 bottom-clearfix text-center">
             <div class="text-left"> Access Rights</div>
         </div>
-        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 bottom-clearfix text-center">
-            <div class="form-group">
-                <select class="form-control" ng-model="modalBox.subuser.accessRights.sales">
-                    <option ng-repeat="right in accessRights" value="{{right.value}}">{{right.title}}</option>
-                </select>
-            </div>
-        </div>
-        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 bottom-clearfix text-center">
-            <div class="form-group">
-                <select class="form-control" ng-model="modalBox.subuser.accessRights.reservation">
-                    <option ng-repeat="right in accessRights" value="{{right.value}}">{{right.title}}</option>
-                </select>
-            </div>
-        </div>
-        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 bottom-clearfix text-center">
-            <div class="form-group">
-                <select class="form-control" ng-model="modalBox.subuser.accessRights.homeDelivery">
-                    <option ng-repeat="right in accessRights" value="{{right.value}}">{{right.title}}</option>
-                </select>
-            </div>
-        </div>
-        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 bottom-clearfix text-center">
-            <div class="form-group">
-                <select class="form-control" ng-model="modalBox.subuser.accessRights.service">
-                    <option ng-repeat="right in accessRights" value="{{right.value}}">{{right.title}}</option>
-                </select>
-            </div>
-        </div>
-        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 bottom-clearfix text-center">
-            <div class="form-group">
-                <select class="form-control"  ng-model="modalBox.subuser.accessRights.resume">
-                    <option ng-repeat="right in accessRights" value="{{right.value}}">{{right.title}}</option>
-                </select>
+        <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 bottom-clearfix text-center">
+                    <div class="form-group">
+                        <select class="form-control" ng-model="modalBox.subuser.accessRights.sales">
+                            <option ng-repeat="right in accessRights" value="{{right.value}}">{{right.title}}</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 bottom-clearfix text-center">
+                    <div class="form-group">
+                        <select class="form-control" ng-model="modalBox.subuser.accessRights.homeDelivery">
+                            <option ng-repeat="right in accessRights" value="{{right.value}}">{{right.title}}</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 bottom-clearfix text-center">
+                    <div class="form-group">
+                        <select class="form-control" ng-model="modalBox.subuser.accessRights.service">
+                            <option ng-repeat="right in accessRights" value="{{right.value}}">{{right.title}}</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 bottom-clearfix text-center">
+                    <div class="form-group">
+                        <select class="form-control"  ng-model="modalBox.subuser.accessRights.resume">
+                            <option ng-repeat="right in accessRights" value="{{right.value}}">{{right.title}}</option>
+                        </select>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -187,109 +197,110 @@
         <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 bottom-clearfix text-center">
             <div class="text-left"> Email</div>
         </div>
-        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 bottom-clearfix text-center">
-            <div class="form-group">
-                <div class="input-group">
-                    <span class="input-group-addon" id="basic-addon4">@</span>
-                    <input maxlength="150" type="text" ng-model="modalBox.subuser.salesEmail" class="form-control" placeholder="Sales Email" aria-describedby="basic-addon1">
+        <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10">
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 bottom-clearfix text-center">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon" id="basic-addon4">@</span>
+                            <input maxlength="150" type="text" ng-model="modalBox.subuser.salesEmail" class="form-control" placeholder="Sales Email" aria-describedby="basic-addon1">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 bottom-clearfix text-center">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon" id="basic-addon6">@</span>
+                            <input maxlength="150" type="text" ng-model="modalBox.subuser.homeDeliveryEmail" class="form-control" placeholder="Home Delivery Email" aria-describedby="basic-addon1">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 bottom-clearfix text-center">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon" id="basic-addon7">@</span>
+                            <input maxlength="150" type="text" ng-model="modalBox.subuser.serviceEmail" class="form-control" placeholder="Help Desk Email" aria-describedby="basic-addon1">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 bottom-clearfix text-center">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon" id="basic-addon8">@</span>
+                            <input maxlength="150" type="text" ng-model="modalBox.subuser.resumeEmail" class="form-control" placeholder="Resume Email" aria-describedby="basic-addon1">
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 bottom-clearfix text-center">
-            <div class="form-group">
-                <div class="input-group">
-                    <span class="input-group-addon" id="basic-addon5">@</span>
-                    <input maxlength="150" type="text" ng-model="modalBox.subuser.reservationEmail" class="form-control" placeholder="Reservation Email" aria-describedby="basic-addon1">
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 bottom-clearfix text-center">
-            <div class="form-group">
-                <div class="input-group">
-                    <span class="input-group-addon" id="basic-addon6">@</span>
-                    <input maxlength="150" type="text" ng-model="modalBox.subuser.homeDeliveryEmail" class="form-control" placeholder="Home Delivery Email" aria-describedby="basic-addon1">
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 bottom-clearfix text-center">
-            <div class="form-group">
-                <div class="input-group">
-                    <span class="input-group-addon" id="basic-addon7">@</span>
-                    <input maxlength="150" type="text" ng-model="modalBox.subuser.serviceEmail" class="form-control" placeholder="Help Desk Email" aria-describedby="basic-addon1">
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 bottom-clearfix text-center">
-            <div class="form-group">
-                <div class="input-group">
-                    <span class="input-group-addon" id="basic-addon8">@</span>
-                    <input maxlength="150" type="text" ng-model="modalBox.subuser.resumeEmail" class="form-control" placeholder="Resume Email" aria-describedby="basic-addon1">
-                </div>
-            </div>
-        </div>
+
     </div>
     <!---------------- Email Input row ends ---------------------->
 
     <!---------------- Rules row ----------------------------->
     <div class="row" ng-show="modalBox.isEzeidAvailable">
         <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 bottom-clearfix text-left">Folders</div>
-
-        <!---------- SALES Rules ---------------------------------------------->
-        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 bottom-clearfix text-left">
-            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-cleafix" ng-repeat="rule in (rules | ruleFilter:0)">
-                <div class="checkbox">
-                    <label>
-                        <input type="checkbox" ng-click="toggleRule($event,0)" ng-checked="findRuleForSubuser(rule.TID,0)" data-tid="{{rule.TID}}"> {{rule.FolderTitle}}
-                    </label>
+        <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10">
+            <div class="row">
+                <!---------- SALES Rules ---------------------------------------------->
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 bottom-clearfix text-left">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-cleafix" ng-repeat="rule in (rules | ruleFilter:0)">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" ng-click="toggleRule($event,0)" ng-checked="findRuleForSubuser(rule.TID,0)" data-tid="{{rule.TID}}"> {{rule.FolderTitle}}
+                            </label>
+                        </div>
+                    </div>
                 </div>
+                <!---------- SALES Rules ends ---------------------------------------------->
+                <!--&lt;!&ndash;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45; RESERVATTION Rules &#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&ndash;&gt;-->
+                <!--<div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 bottom-clearfix text-left">-->
+                    <!--<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-cleafix" ng-repeat="rule in (rules | ruleFilter:1)">-->
+                        <!--<div class="checkbox">-->
+                            <!--<label>-->
+                                <!--<input type="checkbox" ng-click="toggleRule($event,1)" ng-checked="findRuleForSubuser(rule.TID,1)" data-tid="{{rule.TID}}"> {{rule.FolderTitle}}-->
+                            <!--</label>-->
+                        <!--</div>-->
+                    <!--</div>-->
+                <!--</div>-->
+                <!--&lt;!&ndash;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45; RESERVATTION Rules ends &#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&ndash;&gt;-->
+                <!---------- HOME DELIVERY Rules ---------------------------------------------->
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 bottom-clearfix text-left">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-cleafix" ng-repeat="rule in (rules | ruleFilter:2)">
+                        <div class="checkbox">
+                            <label >
+                                <input type="checkbox" ng-click="toggleRule($event,2)"  ng-checked="findRuleForSubuser(rule.TID,2)" data-tid="{{rule.TID}}"> {{rule.FolderTitle}}
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <!---------- HOME DELIVERY Rules ends ---------------------------------------------->
+                <!---------- SERVICE Rules ---------------------------------------------->
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 bottom-clearfix text-left">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-cleafix" ng-repeat="rule in (rules | ruleFilter:3)">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" ng-click="toggleRule($event,3)"  ng-checked="findRuleForSubuser(rule.TID,3)" data-tid="{{rule.TID}}"> {{rule.FolderTitle}}
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <!---------- SERVICE Rules ends ---------------------------------------------->
+                <!---------- RESUME Rules ---------------------------------------------->
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 bottom-clearfix text-left">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-cleafix" ng-repeat="rule in (rules | ruleFilter:4)">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" ng-click="toggleRule($event,4)" ng-checked="findRuleForSubuser(rule.TID,4)" data-tid="{{rule.TID}}"> {{rule.FolderTitle}}
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            <!---------- RESUME Rules ends ---------------------------------------------->
+            <!---------------- Rules row ends ----------------------------->
             </div>
         </div>
-        <!---------- SALES Rules ends ---------------------------------------------->
-        <!---------- RESERVATTION Rules ---------------------------------------------->
-        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 bottom-clearfix text-left">
-            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-cleafix" ng-repeat="rule in (rules | ruleFilter:1)">
-                <div class="checkbox">
-                    <label>
-                        <input type="checkbox" ng-click="toggleRule($event,1)" ng-checked="findRuleForSubuser(rule.TID,1)" data-tid="{{rule.TID}}"> {{rule.FolderTitle}}
-                    </label>
-                </div>
-            </div>
-        </div>
-        <!---------- RESERVATTION Rules ends ---------------------------------------------->
-        <!---------- HOME DELIVERY Rules ---------------------------------------------->
-        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 bottom-clearfix text-left">
-            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-cleafix" ng-repeat="rule in (rules | ruleFilter:2)">
-                <div class="checkbox">
-                    <label >
-                        <input type="checkbox" ng-click="toggleRule($event,2)"  ng-checked="findRuleForSubuser(rule.TID,2)" data-tid="{{rule.TID}}"> {{rule.FolderTitle}}
-                    </label>
-                </div>
-            </div>
-        </div>
-        <!---------- HOME DELIVERY Rules ends ---------------------------------------------->
-        <!---------- SERVICE Rules ---------------------------------------------->
-        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 bottom-clearfix text-left">
-            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-cleafix" ng-repeat="rule in (rules | ruleFilter:3)">
-                <div class="checkbox">
-                    <label>
-                        <input type="checkbox" ng-click="toggleRule($event,3)"  ng-checked="findRuleForSubuser(rule.TID,3)" data-tid="{{rule.TID}}"> {{rule.FolderTitle}}
-                    </label>
-                </div>
-            </div>
-        </div>
-        <!---------- SERVICE Rules ends ---------------------------------------------->
-        <!---------- RESUME Rules ---------------------------------------------->
-        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 bottom-clearfix text-left">
-            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-cleafix" ng-repeat="rule in (rules | ruleFilter:4)">
-                <div class="checkbox">
-                    <label>
-                        <input type="checkbox" ng-click="toggleRule($event,4)" ng-checked="findRuleForSubuser(rule.TID,4)" data-tid="{{rule.TID}}"> {{rule.FolderTitle}}
-                    </label>
-                </div>
-            </div>
-        </div>
-        <!---------- RESUME Rules ends ---------------------------------------------->
-        <!---------------- Rules row ends ----------------------------->
     </div>
 
     <div class="row bottom-clearfix" ng-show="modalBox.isEzeidAvailable">

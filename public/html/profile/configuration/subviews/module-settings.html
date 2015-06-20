@@ -127,7 +127,7 @@
                 <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
                     <label>Reservation Weblink </label>
                     <br/>
-                    <small class="text-primary">(If you want the sales enquiry link to be redirected to your own website)</small>
+                    <small class="text-primary">(If you want the reservation(booking) link to be redirected to your own website)</small>
                 </div>
                 <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix">
                     <div class="form-group">
@@ -149,20 +149,20 @@
                     </div>
                 </div>
             </div>
-            <div class="row bottom-clearfix">
-                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
-                    <label>Scheduler Display Format</label>
-                    <br/>
-                    <small class="text-primary">(Schedules to be displayed in hours, days or months)</small>
-                </div>
-                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix">
-                    <div class="form-group">
-                        <select class="form-control" name="reservation-display-format" ng-model="settings.reservation.displayFormat">
-                            <option ng-repeat="format in reservationDisplayFormat" value="{{format.value}}">{{format.title}}</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
+            <!--<div class="row bottom-clearfix">-->
+                <!--<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">-->
+                    <!--<label>Scheduler Display Format</label>-->
+                    <!--<br/>-->
+                    <!--<small class="text-primary">(Schedules to be displayed in hours, days or months)</small>-->
+                <!--</div>-->
+                <!--<div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix">-->
+                    <!--<div class="form-group">-->
+                        <!--<select class="form-control" name="reservation-display-format" ng-model="settings.reservation.displayFormat">-->
+                            <!--<option ng-repeat="format in reservationDisplayFormat" value="{{format.value}}">{{format.title}}</option>-->
+                        <!--</select>-->
+                    <!--</div>-->
+                <!--</div>-->
+            <!--</div>-->
             <div class="row bottom-clearfix">
                 <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
                     <label>Reservation Message</label>
@@ -422,24 +422,24 @@
                     </div>
                 </div>
             </div>
-            <div class="row bottom-clearfix">
-                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
-                    <label>Data Refresh Interval</label>
-                    <br/>
-                    <small class="text-primary">(Interval in Minute to refresh data in any of the Views in Business ManagerInterval in Minute to refresh data in any of the Views in Business Manager)</small>
-                </div>
-                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix">
-                    <div class="form-group">
-                        <div class="input-group">
-                            <select class="form-control" name="business-category" ng-model="settings.business.dataRefreshInterval">
-                                <option value="0">--Select data refresh interval--</option>
-                                <option ng-repeat="refreshInterval in refreshIntervalList" value="{{refreshInterval}}">{{refreshInterval}}</option>
-                            </select>
-                            <span class="input-group-addon"> MINUTES </span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <!--<div class="row bottom-clearfix">-->
+                <!--<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">-->
+                    <!--<label>Data Refresh Interval</label>-->
+                    <!--<br/>-->
+                    <!--<small class="text-primary">(Interval in Minute to refresh data in any of the Views in Business ManagerInterval in Minute to refresh data in any of the Views in Business Manager)</small>-->
+                <!--</div>-->
+                <!--<div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix">-->
+                    <!--<div class="form-group">-->
+                        <!--<div class="input-group">-->
+                            <!--<select class="form-control" name="business-category" ng-model="settings.business.dataRefreshInterval">-->
+                                <!--<option value="0">&#45;&#45;Select data refresh interval&#45;&#45;</option>-->
+                                <!--<option ng-repeat="refreshInterval in refreshIntervalList" value="{{refreshInterval}}">{{refreshInterval}}</option>-->
+                            <!--</select>-->
+                            <!--<span class="input-group-addon"> MINUTES </span>-->
+                        <!--</div>-->
+                    <!--</div>-->
+                <!--</div>-->
+            <!--</div>-->
             <div class="row bottom-clearfix">
                 <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
                     <label>Brochure</label>
@@ -476,6 +476,89 @@ text/plain,application/pdf,image/*" onchange="angular.element(this).scope().uplo
                     <textarea class="form-control" placeholder="Keywords for Searching your business" ng-model="settings.business.keywords"></textarea>
                 </div>
             </div>
+        </div>
+
+
+        <!-------- Business Settings Module ------------------------------>
+        <div class="well well-settings">
+            <div class="row bottom-clearfix">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <h5>
+                        Sale/Promotions
+                    </h5>
+                </div>
+
+            </div>
+            <div class="row bottom-clearfix">
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+                    <label>Status</label>
+                    <br/>
+                    <small class="text-primary">(Promotion enabled to be displayed on tile)</small>
+                </div>
+                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix">
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox"
+                                   ng-model="settings.dealEnable" />
+                            {{(settings.dealEnable) ? ' Enabled' : ' Disabled'}}
+
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="row bottom-clearfix">
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+                    <label>Title</label>
+                    <br/>
+                    <small class="text-primary">(To be displayed on search tile)</small>
+                </div>
+                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix">
+                    <div class="form-group">
+                        <input type="text" maxlength="8" placeholder="Promotion Title"
+                               class="form-control"
+                               ng-model="settings.dealTitle" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="row bottom-clearfix">
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+                    <label>Description</label>
+                    <br/>
+                    <small class="text-primary">(Sales or promotion description)</small>
+                </div>
+                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix">
+                    <div class="form-group">
+                        <textarea type="text" maxlength="250" placeholder="Promotion Description"
+                                  class="form-control"
+                                  ng-model="settings.dealDesc"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="row bottom-clearfix">
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+                    <label>Promotional Banner</label>
+                    <br/>
+                    <small class="text-primary">(Company/business/organisation brochure)</small>
+                </div>
+                <div class="text-center col-lg-3 col-md-3 col-sm-3 col-xs-6 bottom-clearfix col-lg-offset-0 col-md-offset-0 col-sm-offset-0 col-xs-offset-0">
+                    <div class="hidden-lg hidden-print hidden-sm hidden-xs hidden-md hidden-desktop hidden-phone">
+                        <input type="file" id="deal-banner-upload" accept="image/*" onchange="angular.element(this).scope().uploadDealBanner()" />
+                    </div>
+                </div>
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
+                    <small class="text-info">* Image dimensions should be 840x100 px</small>
+                        <img src="images/grey-background.jpg" ng-hide="settings.dealBanner" height="50" width="420" />
+                        <img ng-src="{{settings.dealBanner}}" ng-show="settings.dealBanner" height="50" width="420" />
+
+                </div>
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
+                    <button class="btn btn-xs btn-info " ng-click="selectDealBanner()">
+                        <span class="glyphicon glyphicon-paperclip"></span> Attach Banner
+                    </button>
+                </div>
+            </div>
+
         </div>
         <div class="container-fluid">
             <div class="row">

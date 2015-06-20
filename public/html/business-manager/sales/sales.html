@@ -8,7 +8,7 @@
                 <div class="row bottom-clearfix">
 
 
-                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 bottom-clearfix">
                         <div class="input-group tx-search-input-group">
                             <input class="form-control" ng-model="txSearchTerm" type="text" placeholder="Search records based on EZEID or message"/>
                             <span class="input-group-addon btn-link" title="Clear" ng-show="txSearchTerm" ng-click="clearSearchTerm(1,statusType)">
@@ -23,13 +23,13 @@
                     </div>
 
 
-                    <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12  bottom-clearfix">
+                    <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12  bottom-clearfix">
                         <div class="row">
-                            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 bottom-clearfix tx-filter-container"
+                            <div class="col-lg-1 col-md-1 col-sm-6 col-xs-6 bottom-clearfix tx-filter-container"
                                  title="Order By">
                                 <label class="label label-danger">Order By</label>
                             </div>
-                            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 bottom-clearfix" title="Order By">
+                            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6 bottom-clearfix" title="Order By">
                                 <div class="form-group form-group-sm">
 
                                     <select class="form-control" ng-model="sortBy">
@@ -39,13 +39,28 @@
                                 </div>
                             </div>
 
-                            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 bottom-clearfix tx-filter-container" title="Order By">
+                            <div class="col-lg-1 col-md-1 col-sm-6 col-xs-6 bottom-clearfix tx-filter-container" title="Status">
                                 <label class="label label-danger">Status</label>
                             </div>
-                            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 bottom-clearfix" title="Status">
+                            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6 bottom-clearfix" title="Status">
                                 <div class="form-group form-group-sm">
                                     <select class="form-control" ng-model="filterStatus" ng-change="triggerStatusFilter(pageNumber,filterStatus)">
                                         <option ng-repeat="sfilter in filterStatusTypes track by $index" value="{{sfilter.TID}}">{{sfilter.StatusTitle}}</option>
+                                    </select>
+                                </div>
+                            </div>
+
+
+                            <div class="col-lg-1 col-md-1 col-sm-6 col-xs-6 bottom-clearfix tx-filter-container"
+                                 title="Folders">
+                                <label class="label label-danger">Folders</label>
+                            </div>
+                            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6 bottom-clearfix" title="Order By">
+                                <div class="form-group form-group-sm">
+
+                                    <select class="form-control" style="height:auto;max-height: 100px;;" multiple>
+                                        <option value="0"> All My Rules </option>
+                                        <option value="1"> By Action Date </option>
                                     </select>
                                 </div>
                             </div>
@@ -55,9 +70,30 @@
                     </div>
 
 
+                    <!--<div class="col-lg-2 col-md-2 col-sm-2 col-xs-12  bottom-clearfix">-->
+                        <!--<div class="row">-->
+                    <!--<div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 bottom-clearfix tx-filter-container"-->
+                         <!--title="Folders">-->
+                        <!--<label class="label label-danger">Folders</label>-->
+                    <!--</div>-->
+                    <!--<div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 bottom-clearfix" title="Order By">-->
+                        <!--<div class="form-group form-group-sm">-->
+
+                            <!--<select class="form-control" ng-model="sortBy">-->
+                                <!--<option value="0"> All My Rules </option>-->
+                                <!--<option value="1"> By Action Date </option>-->
+                            <!--</select>-->
+                        <!--</div>-->
+                    <!--</div>-->
+                            <!--</div>-->
+                        <!--</div>-->
 
 
-                    <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12 pull-right">
+
+
+
+
+                    <div class="col-lg-2 col-md-2 col-sm-6 col-xs-12 pull-right">
                         <div class="btn-group pull-right bottom-clearfix" role="group" aria-label="First group">
                             <button type="button" ng-disabled="pageNumber <= 1" class="btn btn-info bt-xs no-radius" ng-click="decrementPage()">
                                 <span class="glyphicon glyphicon-chevron-left"></span>

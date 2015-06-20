@@ -24,7 +24,6 @@ angular.module('ezeidApp').service('ScaleAndCropImage',['$q','GURL','$http','$ro
                  requestedData.append('required_width',requiredWidth);
                  requestedData.append('scale',true);
                  requestedData.append('crop',true);
-
                  $http({
                      headers: {'Content-Type': undefined },
                      transformRequest: angular.identity,

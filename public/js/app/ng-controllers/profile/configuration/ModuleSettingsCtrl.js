@@ -8,6 +8,7 @@ angular.module('ezeidApp').controller('ModuleSettingsCtrl',[
     '$filter',
     'GURL',
     'MsgDelay',
+    'ScaleAndCropImage',
     function(
         $q,
         $scope,
@@ -17,7 +18,8 @@ angular.module('ezeidApp').controller('ModuleSettingsCtrl',[
         $rootScope,
         $filter,
         GURL,
-        MsgDelay
+        MsgDelay,
+        ScaleAndCropImage
         ){
     $scope.inactiveBrochureImage = 'images/brochure-absent.png';
     $scope.activeBrochureImage = 'images/brochure-present.png';
@@ -208,8 +210,12 @@ angular.module('ezeidApp').controller('ModuleSettingsCtrl',[
                         $scope.settings.business.brochureFileData = "";
                         $scope.settings.business.keywords = "";
                         $scope.settings.business.category = (resp[0].BusinessCategoryID) ? resp[0].BusinessCategoryID : 0;
-                        $scope.settings.resume.freshersAccepted = (resp[0].FreshersAccepted === 1) ? true : false;
+                        $scope.settings.resume.freshersAccepted = (parseInt(resp[0].FreshersAccepted) === 1) ? true : false;
 
+                        $scope.settings.dealEnable = (parseInt(resp[0].dealenable) === 1) ? true : false;
+                        $scope.settings.dealTitle = resp[0].dealtitle;
+                        $scope.settings.dealDesc = resp[0].dealdesc;
+                        $scope.settings.dealBanner = resp[0].dealbanner;
                 }
                 else{
                     $scope.$emit('$preLoaderStop');
@@ -258,11 +264,25 @@ angular.module('ezeidApp').controller('ModuleSettingsCtrl',[
                 error.push('resume url');
             }
         }
+
+        if(data.deal_enable == 1){
+            if(!data.deal_title){
+                error.push('promotion(sale) title');
+            }
+            if(!data.deal_title){
+                error.push('promotion(sale) description');
+            }
+            if(!data.deal_banner){
+                error.push('promotional(sale) banner');
+            }
+        }
         if(error.length > 0){
             var msg = 'Please check '+ error.join(',');
             Notification.error({ message : msg, delay : MsgDelay});
             return false;
         }
+
+
         else{
             return true;
         }
@@ -296,12 +316,15 @@ angular.module('ezeidApp').controller('ModuleSettingsCtrl',[
             ServiceFormMsg : $scope.settings.service.defaultFormMsg ,
             ResumeFormMsg : $scope.settings.resume.defaultFormMsg,
             FreshersAccepted  : ($scope.settings.resume.freshersAccepted === true) ? 1 : 2,
-
             SalesURL : ($scope.settings.sales.url) ?  $scope.settings.sales.url : '',
             ReservationURL : ($scope.settings.reservation.url) ? $scope.settings.reservation.url : '',
             HomeDeliveryURL : ($scope.settings.homeDelivery.url) ? $scope.settings.homeDelivery.url : '',
             ServiceURL : ($scope.settings.service.url) ? $scope.settings.service.url : '',
-            ResumeURL : ($scope.settings.resume.url) ? $scope.settings.resume.url : ''
+            ResumeURL : ($scope.settings.resume.url) ? $scope.settings.resume.url : '',
+            deal_enable : ($scope.settings.dealEnable) ? 1 : 2,
+            deal_banner : ($scope.settings.dealBanner) ? $scope.settings.dealBanner : '',
+            deal_title : ($scope.settings.dealTitle) ? $scope.settings.dealTitle : 'SALE',
+            deal_desc : ($scope.settings.dealDesc) ? $scope.settings.dealDesc : 'Terms and Conditions Apply'
         };
 
         /**
@@ -324,8 +347,6 @@ angular.module('ezeidApp').controller('ModuleSettingsCtrl',[
                 $rootScope._userInfo.ServiceFormMsg = data.ServiceFormMsg;
                 $rootScope._userInfo.CVFormMsg = data.ResumeFormMsg;
                 $rootScope._userInfo.FreshersAccepted = data.FreshersAccepted;
-
-
                 $rootScope._userInfo.SalesItemListType = data.SalesItemListType;
 
 
@@ -339,16 +360,20 @@ angular.module('ezeidApp').controller('ModuleSettingsCtrl',[
 
         if($scope.validateSettings(data)){
             // ////////console.log(data);
+            $scope.$emit('$preLoaderStart');
             $http({
                 url : GURL + "ewtConfig",
                 method : "POST",
                 data : data
             }).success(function(resp){
                 updateRootUserInfo();
+                $scope.$emit('$preLoaderStop');
                 Notification.success({message : 'Configuration Saved Successfully', delay : MsgDelay});
             }).error(function(err){
                 // ////////console.log(err);
+                $scope.$emit('$preLoaderStop');
                 Notification.success({message : 'Error while saving configuration! Please try again', delay : MsgDelay});
+
             });
         }
     };
@@ -359,6 +384,7 @@ angular.module('ezeidApp').controller('ModuleSettingsCtrl',[
         formData.append('file', file);
         formData.append('TokenNo',$rootScope._userInfo.Token);
         formData.append('RefType',6);
+        $scope.$emit('$preLoaderStart');
         $http({
            url : GURL + 'ewtUploadDoc',
            method : "POST",
@@ -366,14 +392,16 @@ angular.module('ezeidApp').controller('ModuleSettingsCtrl',[
            headers: {'Content-Type': undefined  },
            transformRequest: angular.identity
         }).success(function(resp){
+            $scope.$emit('$preLoaderStop');
             if(resp && resp != 'null' && resp.IsSuccessfull){
                 Notification.success({ message : 'Brochure Uploaded successfully', delay : MsgDelay});
             }
            else{
-                Notification.error({ message : 'An error occured while uploading brochure', delay : MsgDelay});
+                Notification.error({ message : 'An error occurred while uploading brochure', delay : MsgDelay});
             }
         }).error(function(err){
-           Notification.error({ message : 'An error occured while uploading brochure', delay : MsgDelay});
+            $scope.$emit('$preLoaderStop');
+           Notification.error({ message : 'An error occurred while uploading brochure', delay : MsgDelay});
         });
     };
 
@@ -404,16 +432,36 @@ angular.module('ezeidApp').controller('ModuleSettingsCtrl',[
             });
     };
 
+        $scope.selectDealBanner = function(){
+            angular.element('#deal-banner-upload').trigger('click');
+        };
+
+    $scope.uploadDealBanner = function(event){
+        var image = $('#deal-banner-upload')[0].files[0];
+        var fileName = image.name;
+        var imageHeight = 100;
+        var imageWidth = 840;
+
+        $scope.$emit('$preLoaderStart');
+        ScaleAndCropImage.convertToBase64FromServer(image,imageHeight,imageWidth).then(function(imageUrl){
+            $scope.settings.dealBanner = imageUrl;
+            $scope.$emit('$preLoaderStop');
+        },function(err){
+            console.info('Server Cropping failed ! Falling back to browser croppping mode');
+            ScaleAndCropImage.covertToBase64(image).then(function(imageUrl){
+                var scaledImageUrl = ScaleAndCropImage.scalePropotional(imageUrl,imageHeight,imageWidth);
+                var finalImage = ScaleAndCropImage.cropImage(scaledImageUrl,imageHeight,imageWidth);
+                $scope.settings.dealBanner = finalImage;
+                $scope.$emit('$preLoaderStop');
+            },function(){
+                $scope.$emit('$preLoaderStop');
+            });
+        });
+    };
+
     $scope.loadCategories();
     $scope.loadSettings();
 
-        $scope.brochureDownloadLink = '/ewTgetDocument?TokenNo='+$rootScope._userInfo.Token + '&RefType=6';
-
-
-    /**
-     * @todo write method for brochure base64 conversion and upload option( in HTML view also)
-     //@todo Separate call is present for File upload(already separate API Service is present for file upload)
-     */
 
 
 }]);

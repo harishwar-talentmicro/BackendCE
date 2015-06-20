@@ -684,6 +684,58 @@
             };
 
 
+
+            var companyList = [];
+            $scope.companySuggestionList = [];
+            $scope.loadSuggestion = function(companyName){
+                if(companyName){
+                    return $filter('filter')(companyList,companyName);
+                }
+                else{
+                    return [];
+                }
+            };
+
+            /**
+             * Loads company list for that particular ezeid
+             * Company Contact list according to functionType
+             */
+            var loadCompany = function(){
+                $http({
+                    method : 'GET',
+                    url : GURL + 'company_details',
+                    params : {
+                        Token : $rootScope._userInfo.Token,
+                        functiontype : 0
+                    }
+
+                }).success(function(resp){
+                    if(resp && resp.status && resp.data){
+                        for(var a=0; a < resp.data.length; a++){
+                            var suggestion = {
+                                id : resp.data[a].tid,
+                                duration : resp.data[a].idledays,
+                                user : resp.data[a].updateduser,
+                                name : resp.data[a].company_name
+                            };
+                            companyList[a] = suggestion;
+                        }
+                    }
+                }).error(function(err,statusCode){
+                    var msg = '';
+                    if(statusCode == 0){
+                        msg = 'Unable to reach server ! Please check your connection';
+                        Notification.error({ title : 'No Connection', message : msg, delay : MsgDelay});
+                    }
+                });
+            };
+
+            /**
+             * Loads company list as soon as controller is initialized
+             */
+            loadCompany();
+
+
             $scope.$watch('modalBox.tx.ezeid',function(newVal,oldVal){
                 if(!newVal){
                     $scope.modalBox.tx.ezeid = '';
@@ -707,7 +759,16 @@
                     resp.LastName  +
                         ((resp.MobileNumber && resp.MobileNumber !== 'null') ? ', ' + resp.MobileNumber : '');
                     $scope.modalBox.tx.ezeidTid = resp.TID;
-                    $scope.modalBox.tx.companyName = (resp.IDTypeID == 1) ? resp.FirstName : resp.CompanyName;
+                    var cIndex = companyList.indexOf(resp.CompanyName)
+                    if(cIndex !== -1){
+                        $scope.modalBox.tx.companyId = companyList[cIndex].tid;
+                        $scope.modalBox.tx.companyName =  resp.CompanyName;
+                    }
+                    else{
+                        $scope.modalBox.tx.companyId = 0;
+                        $scope.modalBox.tx.companyName = resp.CompanyName;
+                    }
+
                     $scope.loadLocationListForEzeid(resp.TID).then(function(){
                         $scope.$emit('$preLoaderStop');
                     },function(){
@@ -1262,58 +1323,6 @@
                     _domLoaded = true;
                 }
             };
-
-
-            var companyList = [];
-            $scope.companySuggestionList = [];
-            $scope.loadSuggestion = function(companyName){
-                console.log('load ctlr :' + companyName);
-                if(companyName){
-                    console.log( $filter('filter')(companyList,companyName));
-                    console.log(companyList);
-                    return $filter('filter')(companyList,companyName);
-                }
-                else{
-                    return [];
-                }
-            };
-
-            /**
-             * Loads company list for that particular ezeid
-             * Company Contact list according to functionType
-             */
-             var loadCompany = function(){
-                $http({
-                    method : 'GET',
-                    url : GURL + 'company_details',
-                    params : {
-                        Token : $rootScope._userInfo.Token,
-                        functiontype : 0
-                    }
-
-                }).success(function(resp){
-                    if(resp && resp.status && resp.data){
-                            for(var a=0; a < resp.data.length; a++){
-                                var suggestion = {
-                                    id : resp.data[a].tid,
-                                    duration : resp.data[a].idledays,
-                                    user : resp.data[a].updateduser,
-                                    name : resp.data[a].company_name
-                                };
-                                companyList[a] = suggestion;
-                            }
-                    }
-                }).error(function(err,statusCode){
-                    var msg = '';
-                    if(statusCode == 0){
-                        msg = 'Unable to reach server ! Please check your connection';
-                        Notification.error({ title : 'No Connection', message : msg, delay : MsgDelay});
-                    }
-                });
-            };
-
-            loadCompany();
-
             /**
              * Refreshes company data every 1 minute
              */
