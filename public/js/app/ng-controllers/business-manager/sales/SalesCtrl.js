@@ -839,6 +839,18 @@
                     }
                     $scope.myFolders = fr;
                     folderRules = (fr.length > 0) ? fr.join(',') : '';
+
+                    if(parseInt($rootScope._userInfo.MasterID) == 0){
+                        folderRules = '';
+                    }
+                }
+
+                /**
+                 * If user is master user, then let him see default folder transaction also which actually
+                 * doesn't belong to any rule
+                 */
+                if($scope.myFolders.length === $scope.userFolders.length && parseInt($rootScope._userInfo.MasterID) == 0){
+                    folderRules = '';
                 }
 
                 /**
@@ -1063,18 +1075,34 @@
                 }
             };
 
-            $scope.$watch('myFolders',function(n,v){
-                console.log(n);
-               if(!n){
-                   console.log(n);
-                   for(var c=0;c<$scope.userFolders.length;c++){
-                       $scope.myFolders = $scope.userFolders[c].TID;
-                   }
-                   console.log($scope.myFolders);
-               }
+            var watchMyFolders = function(){
+                $scope.$watch('myFolders',function(n,v){
+                    console.log(n);
+                    if(!n){
+                        console.log(n);
+                        for(var c=0;c<$scope.userFolders.length;c++){
+                            $scope.myFolders = $scope.userFolders[c].TID;
+                        }
 
-            });
-
+                        $scope.$emit('$preLoaderStart');
+                        $scope.loadTransaction(1,$scope.filterStatus,$scope.txSearchTerm,$scope.sortBy).then(function(){
+                            $scope.$emit('$preLoaderStop');
+                        },function(){
+                            $scope.$emit('$preLoaderStop');
+                        });
+                    }
+                    else{
+                        if(n!==v){
+                            $scope.$emit('$preLoaderStart');
+                            $scope.loadTransaction(1,$scope.filterStatus,$scope.txSearchTerm,$scope.sortBy).then(function(){
+                                $scope.$emit('$preLoaderStop');
+                            },function(){
+                                $scope.$emit('$preLoaderStop');
+                            });
+                        }
+                    }
+                });
+            };
             /**
              * Loading user list to fetch rules that are specific to the subuser who logged in
              * (Folder list of logged in user can be fetched by selecting the logged in user from response
@@ -1236,6 +1264,7 @@
                                 $scope.loadTransaction(1,-1,$scope.txSearchTerm,$scope.sortBy).then(function(){
                                     watchPageNumber();
                                     watchSortBy();
+                                    watchMyFolders();
                                     $scope.loadItemList().then(function(){
                                         $scope.$emit('$preLoaderStop');
                                     },function(){

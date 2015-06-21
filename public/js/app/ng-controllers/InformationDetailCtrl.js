@@ -676,7 +676,7 @@ angular.module('ezeidApp').
                  }
                  else
                  {
-                    $location.url('/'+SearchInfo.EZEID+'/sales');
+                    $location.url('/'+$scope.SearchInfo.EZEID+'/sales');
                  }
             };
 
@@ -699,7 +699,7 @@ angular.module('ezeidApp').
                     $('#SignIn_popup').slideDown();
                 }
                 else{
-                    $location.url('/'+SearchInfo.EZEID+'/home_delivery');
+                    $location.url('/'+$scope.SearchInfo.EZEID+'/home_delivery');
                 }
             };
 
@@ -715,7 +715,7 @@ angular.module('ezeidApp').
                     $('#SignIn_popup').slideDown();
                 }
                 else{
-                    $location.url('/'+SearchInfo.EZEID+'/helpdesk');
+                    $location.url('/'+$scope.SearchInfo.EZEID+'/helpdesk');
                 }
             };
 
@@ -747,7 +747,7 @@ angular.module('ezeidApp').
                     $('#SignIn_popup').slideDown();
                 }
                 else {
-                    $location.url('/'+SearchInfo.EZEID+'/resume');
+                    $location.url('/'+$scope.SearchInfo.EZEID+'/resume');
                 }
 
             };

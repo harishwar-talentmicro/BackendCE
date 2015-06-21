@@ -334,6 +334,43 @@
 
             };
 
+            $scope.loggedInUser = {};
+
+
+            $scope.getLoggedInUserDetails = function(){
+                var defer = $q.defer();
+                $http({
+                    method: 'get',
+                    url: GURL + 'ewtEZEIDPrimaryDetails',
+                    params : {
+                        Token : $rootScope._userInfo.Token,
+                        /**
+                         * Change this variable to $routeParams.ezeone so that now /IND1/sales path can be supported
+                         */
+                        EZEID : $rootScope._userInfo.ezeid
+                    }
+                }).success(function (resp) {
+
+                   if (resp && resp != 'null' && resp.length > 0) {
+                        $scope.loggedInUser = resp[0];
+                        //$scope._salesModalTitle = ($scope.masterUser.SalesModuleTitle) ? $scope.masterUser.SalesModuleTitle : 'Sales Enquiry';
+                        defer.resolve();
+                    }
+                   else{
+                        defer.reject();
+                   }
+                }).error(function(err,statusCode) {
+                    if (statusCode == 0) {
+                        Notification.error({message: 'Unable to reach server! Please check your connection'});
+                        defer.reject(true);
+                    }
+                    else {
+                        defer.reject();
+                    }
+                });
+            };
+
+            $scope.getLoggedInUserDetails();
 
             /**
              * Loads logged in user details from server
@@ -395,7 +432,7 @@
                     params : {
                         Token: $rootScope._userInfo.Token,
                         FunctionType: 0,
-                        EZEID: $scope.SearchInfo.EZEID
+                        EZEID: $scope.ezeone
                     }
                 }).success(function(resp){
                     if(resp && resp.length > 0 && resp !== 'null'){
@@ -420,7 +457,7 @@
                     method : 'GET',
                     params : {
                         Token : $rootScope._userInfo.Token,
-                        TID :   $scope.masterUser.TID
+                        TID :   $scope.loggedInUser.TID
                     }
                 }).success(function(resp){
                     if(resp && resp !== 'null'){
@@ -434,6 +471,28 @@
                     defer.reject();
                 });
                 return defer.promise;
+            };
+
+
+            var makeAddress = function(){
+                var address = [];
+                if($scope.modalBox.tx.address){
+                    address.push($scope.modalBox.tx.address);
+                }
+                if($scope.modalBox.tx.area){
+                    address.push($scope.modalBox.tx.area);
+                }
+                if($scope.modalBox.tx.city){
+                    address.push($scope.modalBox.tx.city);
+                }
+
+                if($scope.modalBox.tx.state){
+                    address.push($scope.modalBox.tx.state);
+                }
+                if($scope.modalBox.tx.country){
+                    address.push($scope.modalBox.tx.country);
+                }
+                return address.join(', ');
             };
 
             /**
@@ -451,7 +510,7 @@
                  * @type {{TID: number, Token: *, MessageText: string, Status: number, TaskDateTime: string, Notes: string, LocID: *, Country: string, State: string, City: string, Area: string, FunctionType: number, Latitude: number, Longitude: number, EZEID: string, ContactInfo: string, FolderRuleID: number, Duration: number, DurationScales: number, NextAction: number, NextActionDateTime: string, ItemsList: Array, DeliveryAddress: string}}
                  */
                 var preparedTx = {
-                    ToEZEID : $scope.SearchInfo.EZEID,
+                    ToEZEID : $scope.ezeone,
                     TID : 0,
                     Token : $rootScope._userInfo.Token,
                     MessageText : $scope.modalBox.tx.message,
@@ -467,16 +526,16 @@
                     Latitude : $scope.modalBox.tx.latitude,
                     Longitude : $scope.modalBox.tx.longitude,
                     EZEID : $rootScope._userInfo.ezeid,
-                    ContactInfo : $scope.masterUser.FirstName + ' '+ $scope.masterUser.LastName + ', '+ $scope.masterUser.MobileNumber,
+                    ContactInfo : $rootScope._userInfo.FirstName + ' '+ $rootScope._userInfo.LastName + ', '+ $scope.masterUser.MobileNumber,
                     FolderRuleID : 0,
                     Duration : 0,
                     DurationScales : 0,
                     NextAction : 0,
                     NextActionDateTime : moment().format('DD MMM YYYY hh:mm:ss'),
                     ItemsList: JSON.stringify($scope.modalBox.tx.itemList),
-                    DeliveryAddress : $scope.modalBox.tx.address + $scope.modalBox.tx.area + $scope.modalBox.tx.city +
-                    $scope.modalBox.tx.state + $scope.modalBox.tx.country,
-                    companyName : ($scope.masterUser.IDTypeID == 1) ? $scope.masterUser.FirstName : $scope.masterUser.CompanyName
+                    DeliveryAddress : makeAddress(),
+                    company_name : $scope.loggedInUser.CompanyName,
+                    company_id : 0
                 };
                 return preparedTx;
             };
