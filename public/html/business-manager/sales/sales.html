@@ -55,12 +55,13 @@
                                  title="Folders">
                                 <label class="label label-danger">Folders</label>
                             </div>
-                            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6 bottom-clearfix" title="Order By">
+                            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6 bottom-clearfix" title="By Folders">
                                 <div class="form-group form-group-sm">
 
-                                    <select class="form-control" style="height:auto;max-height: 100px;;" multiple>
-                                        <option value="0"> All My Rules </option>
-                                        <option value="1"> By Action Date </option>
+                                    <select class="form-control"
+                                            ng-model="myFolders"
+                                            style="height:auto;max-height: 100px;;" multiple>
+                                        <option ng-repeat="userFolder in userFolders track by userFolder.TID" value="{{userFolder.TID}}">{{userFolder.FolderTitle}}</option>
                                     </select>
                                 </div>
                             </div>

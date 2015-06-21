@@ -996,6 +996,78 @@
                 return defer.promise;
             };
 
+            /**
+             * Folders which are assigned to logged in user and are selected by him
+             * to load transacation based on it
+             * @type {string}
+             */
+            $scope.myFolders = '';
+
+            /**
+             * Folders applicable to the user who logged in
+             * @type {Array}
+             */
+            $scope.userFolders = [];
+            var userFoldersList = [];
+            var userFoldersLoaded = false;
+            var allFoldersLoaded = false;
+
+
+            var assignUserFolders = function(){
+                for(var b=0; b < userFoldersList.length;b++){
+                    var _findex = $scope.txFolderRules.indexOfWhere('TID',userFoldersList[b]);
+                    if(_findex !== -1){
+                        var folder = angular.copy($scope.txFolderRules[_findex]);
+                        $scope.userFolders.push(folder);
+                    }
+                }
+            };
+
+            $scope.$watch('myFolders',function(n,v){
+               console.log(n);
+            });
+
+            /**
+             * Loading user list to fetch rules that are specific to the subuser who logged in
+             * (Folder list of logged in user can be fetched by selecting the logged in user from response
+             * and getting it's comma separated folder list)
+             */
+            var getSubUserList = function(){
+                var defer = $q.defer();
+                $http({
+                    url : GURL + 'ewtGetSubUserList',
+                    method : 'GET',
+                    params : {
+                        MasterID : $rootScope._userInfo.MasterID,
+                        Token : $rootScope._userInfo.Token
+                    }
+                }).success(function(resp){
+                    if(resp && resp.length > 0 && resp !== 'null'){
+                        var index = resp.indexOfWhere('EZEID',$rootScope._userInfo.ezeid);
+                        if(index !== -1){
+                            var userFolders = (resp[index].SalesIDs) ? resp[index].SalesIDs.split(',') : [];
+                            console.log(userFolders);
+                            for(var b=0;b<userFolders.length;b++){
+                                userFolders[b] = parseInt(userFolders[b]);
+                            }
+                            userFoldersList = userFolders;
+                            console.log(userFoldersList);
+                        }
+                    }
+                    userFoldersLoaded = true;
+                    if(allFoldersLoaded && userFoldersLoaded){
+                        assignUserFolders();
+                    }
+                    defer.resolve(resp);
+                }).error(function(err,statusCode){
+                    $scope.userFolders = [];
+                    userFoldersLoaded = true;
+                    if(allFoldersLoaded && userFoldersLoaded){
+                        assignUserFolders();
+                    }
+                    defer.resolve([]);
+                });
+            };
 
             /**
              * Loads FolderRules for Sales
@@ -1018,8 +1090,16 @@
                     else{
                         defer.resolve([]);
                     }
+                    allFoldersLoaded  = true;
+                    if(allFoldersLoaded && userFoldersLoaded){
+                        assignUserFolders();
+                    }
                 }).error(function(err){
                     defer.reject();
+                    allFoldersLoaded = true;
+                    if(allFoldersLoaded && userFoldersLoaded){
+                        assignUserFolders();
+                    }
                 });
                 return defer.promise;
             };
@@ -1092,36 +1172,51 @@
 
             var init = function(){
                 //$scope.loadfilterStatusTypes().then(function(resp){
+///
+//                $scope.loadFolderRules().then(function(){
+//                    $scope.$emit('$preLoaderStop');
+//                },function(){
+//                    $scope.$emit('$preLoaderStop');
+//                    Notification.error({message : 'Unable to load folder rules', delay : MsgDelay} );
+//                });
 
-                    $scope.loadTxActionTypes().then(function(){
-                        $scope.loadTxStatusTypes().then(function(){
-                            $scope.loadTransaction(1,-1,$scope.txSearchTerm,$scope.sortBy).then(function(){
+                ///
+                $scope.loadFolderRules().then(function(){
+                    getSubUserList().then(function(){
+                        $scope.loadTxActionTypes().then(function(){
+                            $scope.loadTxStatusTypes().then(function(){
+                                $scope.loadTransaction(1,-1,$scope.txSearchTerm,$scope.sortBy).then(function(){
                                     watchPageNumber();
                                     watchSortBy();
-                                $scope.loadItemList().then(function(){
-                                    $scope.loadFolderRules().then(function(){
+                                    $scope.loadItemList().then(function(){
                                         $scope.$emit('$preLoaderStop');
                                     },function(){
                                         $scope.$emit('$preLoaderStop');
-                                        Notification.error({message : 'Unable to load folder rules', delay : MsgDelay} );
+                                        Notification.error({message : 'Unable to load item list', delay : MsgDelay} );
                                     });
                                 },function(){
                                     $scope.$emit('$preLoaderStop');
-                                    Notification.error({message : 'Unable to load item list', delay : MsgDelay} );
+                                    Notification.error({message : 'Unable to load sales transaction list', delay : MsgDelay} );
                                 });
                             },function(){
                                 $scope.$emit('$preLoaderStop');
-                                Notification.error({message : 'Unable to load sales transaction list', delay : MsgDelay} );
+                                Notification.error({message : 'Unable to load sales transaction status types', delay : MsgDelay} );
                             });
                         },function(){
                             $scope.$emit('$preLoaderStop');
-                            Notification.error({message : 'Unable to load sales transaction status types', delay : MsgDelay} );
+                            Notification.error({message : 'Unable to load sales next actions list', delay : MsgDelay} );
                         });
                     },function(){
                         $scope.$emit('$preLoaderStop');
-                        Notification.error({message : 'Unable to load sales next actions list', delay : MsgDelay} );
                     });
-               // },function(){
+                },function(){
+                    $scope.$emit('$preLoaderStop');
+                    Notification.error({message : 'Unable to load folder rules', delay : MsgDelay} );
+                });
+
+
+
+                // },function(){
                //     $scope.$emit('$preLoaderStop');
                //     //Notification.error({message : 'Unable to load status types', delay : MsgDelay} );
                //});
