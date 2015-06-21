@@ -12,13 +12,13 @@ body{
 
 #wrapper > div.container-fluid,
 #wrapper > div.container{
-    padding-top: 70px;
+    padding-top: 0px;
 }
 
 #wrapper > div.container-fluid > div.row,
 #wrapper > div.container > div.row{
     background-color: #FFF;
-    padding-top: 40px;
+    padding-top: 20px;
     padding-bottom: 40px;
 }
 
