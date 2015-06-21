@@ -394,7 +394,7 @@
                     if (resp && resp != 'null' && resp.length > 0) {
                         $scope.masterUser = resp[0];
 
-                        if($scope.masterUser.IDTypeID !== 2){
+                        if(parseInt($scope.masterUser.IDTypeID) !== 2){
                             $window.location.replace('/'+$scope.ezeone);
                         }
                         var visibleModules = ($scope.masterUser.VisibleModules) ?
@@ -406,7 +406,7 @@
                          * Do not allow ohter user to see the module if the module is not visible
                          * so that he will not be able to do sales enquiry
                          */
-                        if(parseInt(visibleModules.split()[0]) !== 1){
+                        if(parseInt(visibleModules.split('')[0]) !== 1){
                             $window.location.replace('/'+$scope.ezeone);
                         }
 
