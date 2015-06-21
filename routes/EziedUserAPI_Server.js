@@ -7336,7 +7336,7 @@ exports.FnGetTranscation = function (req, res) {
         var Status = (req.query.Status) ? req.query.Status : null;
         var searchkeyword = req.query.searchkeyword ? req.query.searchkeyword : '';
         var sortBy = (parseInt(req.query.sort_by) !== NaN) ? parseInt(req.query.sort_by) : 0 ;
-        var folderRules = (req.body.folder_rules) ? req.body.folder_rules : '';
+        var folderRules = (req.query.folder_rules) ? req.query.folder_rules : '';
         
         console.log(req.query);
        var RtnMessage = {

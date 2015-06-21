@@ -825,41 +825,79 @@
                 if(!statusType){
                     statusType = null;
                 }
-                $http({
-                    url : GURL + 'ewtGetTranscation',
-                    method : 'GET',
-                    params : {
-                        Token : $rootScope._userInfo.Token,
-                        Page : (pageNo) ? pageNo : 1,
-                        Status : (statusType) ? statusType : '',
-                        FunctionType : 0,    // For Sales
-                        searchkeyword : txSearchKeyword,
-                        sort_by : (sortBy) ? sortBy : 0
-                    }
-                }).success(function(resp){
-                    if(resp && resp !== 'null'){
-                        /**
-                         * Change
-                         * 1. $scope.totalPages
-                         * 2. $scope.pageNumber
-                         * 3. $scope.txList
-                         */
-                        $scope.totalPages = parseInt(resp.TotalPage);
-                        $scope.pageNumber = pageNo;
-                        $scope.txList = resp.Result;
 
-                        for(var a = 0; a < resp.Result.length; a++){
-                            $scope.editModes.push(false);
-                        }
+                /**
+                 * If user has not selected any folders to display then by default select all the folders
+                 * which are assigned to him and assign them to the data model of myFolders also
+                 * to make ui and requested data consistent
+                 */
+                var folderRules = ($scope.myFolders) ? $scope.myFolders.join(',') : '';
+                if(!folderRules){
+                    var fr = [];
+                    for(var x=0; x<$scope.userFolders.length;x++){
+                        fr[x] = $scope.userFolders[x].TID.toString();
                     }
-                    else{
+                    $scope.myFolders = fr;
+                    folderRules = (fr.length > 0) ? fr.join(',') : '';
+                }
 
+                /**
+                 * If user is subuser and he is not having any rules assigned to him then don't allow him to
+                 * make any transaction load request and therefore show no transaction available for him
+                 * else let him see the transaction as he can see transaction of default folder also
+                 */
+                console.log($rootScope._userInfo.MasterID);
+                console.log(folderRules);
+                if($rootScope._userInfo.MasterID > 0 && (!folderRules)){
+                    $timeout(function(){
+                        defer.resolve([]);
                         $scope.txList = [];
-                    }
-                    defer.resolve(resp);
-                }).error(function(err){
-                    defer.reject();
-                });
+                        //$scope.totalPages = 1;
+                        //$scope.pageNumber = 1;
+                    },300);
+                }
+                else{
+                    $http({
+                        url : GURL + 'ewtGetTranscation',
+                        method : 'GET',
+                        params : {
+                            Token : $rootScope._userInfo.Token,
+                            Page : (pageNo) ? pageNo : 1,
+                            Status : (statusType) ? statusType : '',
+                            FunctionType : 0,    // For Sales
+                            searchkeyword : txSearchKeyword,
+                            sort_by : (sortBy) ? sortBy : 0,
+                            folder_rules : folderRules
+                        }
+                    }).success(function(resp){
+                        if(resp && resp !== 'null'){
+                            /**
+                             * Change
+                             * 1. $scope.totalPages
+                             * 2. $scope.pageNumber
+                             * 3. $scope.txList
+                             */
+                            $scope.totalPages = parseInt(resp.TotalPage);
+                            $scope.pageNumber = pageNo;
+                            $scope.txList = resp.Result;
+
+                            for(var a = 0; a < resp.Result.length; a++){
+                                $scope.editModes.push(false);
+                            }
+                        }
+                        else{
+
+                            $scope.txList = [];
+                            $scope.totalPages = 1;
+                            $scope.pageNumber = 1;
+                        }
+                        defer.resolve(resp);
+                    }).error(function(err){
+                        $scope.totalPages = 1;
+                        $scope.pageNumber = 1;
+                        defer.resolve([]);
+                    });
+                }
                 return defer.promise;
             };
 
@@ -1001,7 +1039,8 @@
              * to load transacation based on it
              * @type {string}
              */
-            $scope.myFolders = '';
+            $scope.myFolders = [];
+
 
             /**
              * Folders applicable to the user who logged in
@@ -1019,12 +1058,21 @@
                     if(_findex !== -1){
                         var folder = angular.copy($scope.txFolderRules[_findex]);
                         $scope.userFolders.push(folder);
+                        $scope.myFolders.push(folder.TID);
                     }
                 }
             };
 
             $scope.$watch('myFolders',function(n,v){
-               console.log(n);
+                console.log(n);
+               if(!n){
+                   console.log(n);
+                   for(var c=0;c<$scope.userFolders.length;c++){
+                       $scope.myFolders = $scope.userFolders[c].TID;
+                   }
+                   console.log($scope.myFolders);
+               }
+
             });
 
             /**
@@ -1051,7 +1099,6 @@
                                 userFolders[b] = parseInt(userFolders[b]);
                             }
                             userFoldersList = userFolders;
-                            console.log(userFoldersList);
                         }
                     }
                     userFoldersLoaded = true;
@@ -1067,6 +1114,7 @@
                     }
                     defer.resolve([]);
                 });
+                return defer.promise;
             };
 
             /**
