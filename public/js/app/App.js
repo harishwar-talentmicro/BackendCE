@@ -48,13 +48,13 @@
         '/business-manager/:subview',
         '/profile-manager',
         '/profile-manager/:subview',
-        '/service-reservation',
         '/outbox',
         '/access-history',
-        '/sales',
-        '/home_delivery',
-        '/help_desk',
-        '/send_cv'
+        '/:ezeond/sales',
+        '/:ezeone/home_delivery',
+        '/:ezeone/helpdesk',
+        '/:ezeone/resume',
+        '/:ezeone/reservation'
     ]);
 
     /**
@@ -160,7 +160,6 @@
             .when('/bulksalesenquiry',{templateUrl : 'html/bulksalesenquiry.html'})
             .when('/mapView',{templateUrl : 'html/mapPopView.html'})
             .when('/viewdirection',{templateUrl : 'html/viewdirection.html'})
-            .when('/service-reservation',{templateUrl : 'html/business-manager/reservation/reservation.html'})
             .when('/signup',{
                 templateUrl : 'html/profile/sign-up.html',
                 controller : 'SignUpCtrl'
@@ -201,31 +200,22 @@
                 controller : 'paymentApiCtrl'
             })
 
-            .when('/sales',{
-                templateUrl: 'html/sales.html'
-            })
-            .when('/home_delivery',{
-                templateUrl: 'html/homeDelivery.html'
-            })
-            .when('/help_desk',{
-                templateUrl: 'html/helpDesk.html'
-            })
-            .when('/send_cv',{
-                templateUrl: 'html/sendCV.html'
-            })
-            .when('/:ezeid/sales',{
+            .when('/:ezeone/sales',{
                 templateUrl : 'html/business-manager/sales/sales-front.html',
                 controller : 'SalesFrontCtrl'
             })
-            .when('/:ezeid/home-delivery',{
+            .when('/:ezeone/reservation',{
+                templateUrl : 'html/business-manager/reservation/reservation.html'
+            })
+            .when('/:ezeone/home_delivery',{
                 templateUrl : 'html/business-manager/home-delivery/home-delivery-front.html',
                 controller : 'HomeDeliveryFrontCtrl'
             })
-            .when('/:ezeid/helpdesk',{
+            .when('/:ezeone/helpdesk',{
                 templateUrl : 'html/business-manager/service/service-front.html',
                 controller : 'ServiceFrontCtrl'
             })
-            .when('/:ezeid/resume',{
+            .when('/:ezeone/resume',{
                 templateUrl : 'html/business-manager/resume/resume-front.html',
                 controller : 'ResumeFrontCtrl'
             })
@@ -313,6 +303,8 @@
          */
 
         $rootScope.$on('$routeChangeStart',function(event,next,current){
+            console.log(next);
+            console.log(next.$$route.originalPath);
             /**
              * Fetching userInfo From local storage here if userInfo is not found in $rootScope
              */

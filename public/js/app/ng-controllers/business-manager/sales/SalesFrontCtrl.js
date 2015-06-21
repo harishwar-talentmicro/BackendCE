@@ -31,6 +31,7 @@
                   $route,
                   GoogleMap) {
 
+            $scope.ezeone = $routeParams['ezeone'];
             /**
              * Returns index of Object from array based on Object Property
              * @param key
@@ -333,34 +334,6 @@
 
             };
 
-            /**
-             * Watches the open and close property of sales modal
-             */
-            $scope.$watch('_showSalesModal',function(newVal,oldVal){
-                if(!newVal){
-                    $scope.resetModalBox();
-                }
-                else{
-                    $scope.$emit('$preLoaderStart');
-                    $scope.getUserDetails().then(function(){
-                        $scope.getModuleItemList().then(function(){
-                            $scope.getLocationList().then(function(){
-                                $scope.$emit('$preLoaderStop');
-                            },function(){
-                                Notification.error({ message : 'An error occured ! Please try again', delay : MsgDelay});
-                                $scope.$emit('$preLoaderStop');
-                            });
-                        },function(){
-                            Notification.error({ message : 'An error occured ! Please try again', delay : MsgDelay});
-                            $scope.$emit('$preLoaderStop');
-                        });
-                    },function(){
-                        Notification.error({ message : 'An error occured ! Please try again', delay : MsgDelay});
-                        $scope.$emit('$preLoaderStop');
-                    });
-                }
-            });
-
 
             /**
              * Loads logged in user details from server
@@ -373,18 +346,37 @@
                     url: GURL + 'ewtEZEIDPrimaryDetails',
                     params : {
                         Token : $rootScope._userInfo.Token,
-                        EZEID : $scope.SearchInfo.EZEID
+                        /**
+                         * Change this variable to $routeParams.ezeone so that now /IND1/sales path can be supported
+                         */
+                        EZEID : $scope.ezeone
                     }
                 }).success(function (resp) {
+
+                    /**
+                     * @todo
+                     * Check whether sales module visibility is enabled or
+                     * not for the ezeid to which sales enquiry is posted
+                     */
                     if (resp && resp != 'null' && resp.length > 0) {
                         $scope.masterUser = resp[0];
                         $scope.salesItemListType = ($scope.masterUser.SalesItemListType &&
                         (!isNaN(parseInt($scope.masterUser.SalesItemListType)))) ? parseInt($scope.masterUser.SalesItemListType) : 0 ;
                         //$scope._salesModalTitle = ($scope.masterUser.SalesModuleTitle) ? $scope.masterUser.SalesModuleTitle : 'Sales Enquiry';
+                        defer.resolve();
                     }
-                    defer.resolve();
-                }).error(function(err){
-                    defer.resolve();
+                    else{
+                        defer.reject();
+                    }
+                }).error(function(err,statusCode){
+                    if(statusCode == 0){
+                        Notification.error({ message : 'Unable to reach server! Please check your connection'});
+                        defer.reject(true);
+                    }
+                    else{
+                        defer.reject();
+                    }
+
                 });
 
                 return defer.promise;
@@ -638,6 +630,34 @@
                 });
             };
 
+
+            var init = function(){
+                $scope.$emit('$preLoaderStart');
+                $scope.getUserDetails().then(function(){
+                    $scope.getModuleItemList().then(function(){
+                        $scope.getLocationList().then(function(){
+                            $scope.$emit('$preLoaderStop');
+                        },function(){
+                            Notification.error({ message : 'An error occured ! Please try again', delay : MsgDelay});
+                            $scope.$emit('$preLoaderStop');
+                        });
+                    },function(){
+                        Notification.error({ message : 'An error occured ! Please try again', delay : MsgDelay});
+                        $scope.$emit('$preLoaderStop');
+                    });
+                },function(noInternet){
+                    $scope.$emit('$preLoaderStop');
+                    if(!noInternet){
+                        Notification.error({ message : 'An error occured ! Please try again', delay : MsgDelay});
+                    }
+
+                });
+            };
+
+            init();
+
+            //    }
+            ////});
         }
     ]);
 })();

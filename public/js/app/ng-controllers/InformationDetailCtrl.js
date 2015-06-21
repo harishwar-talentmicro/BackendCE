@@ -429,7 +429,7 @@ angular.module('ezeidApp').
             };
 
             // Close HomeDeliver Form
-            $scope.closeHomeDeliverForm = function () {
+            $scope.closeHomeDeliverForm = function () {1
                 $scope.HomeDeliverMessage = "";
                 $('#HomeDelivery_popup').slideUp();
             };
@@ -445,7 +445,11 @@ angular.module('ezeidApp').
                 {
                     var params = '?ezeone='+_Ezeid;
                     $timeout(function(){
-                        $location.url('/service-reservation'+params+'&name='+$scope.SearchInfo.CompanyName);
+                        var url = '/'+_Ezeid+'/reservation'+'?name='+$scope.SearchInfo.CompanyName;
+                        console.log(url);
+                        //$location.url('/'+_Ezeid+'/service-reservation'+'&name='+$scope.SearchInfo.CompanyName);
+                        $location.url(url);
+                        //$location.url('/service-reservation'+params+'&name='+$scope.SearchInfo.CompanyName);
                     },500);
                     destroyModalDetailsWatcher();
                     $scope.showDetailsModal = false;
@@ -672,7 +676,7 @@ angular.module('ezeidApp').
                  }
                  else
                  {
-                    $location.url('/sales?TID='+TID);
+                    $location.url('/'+SearchInfo.EZEID+'/sales');
                  }
             };
 
@@ -686,22 +690,6 @@ angular.module('ezeidApp').
             $scope._homeDeliveryModalTitle = 'Home Delivery Order Form';
             $scope._showHomeDeliveryModal = false;
             $scope._toggleHomeDeliveryModal = function(){
-                /*if(!$rootScope._userInfo.Token)
-                {
-                    $('#SignIn_popup').slideDown();
-                }
-                else if($rootScope._userInfo.Token == 2)
-                {
-                    $('#SignIn_popup').slideDown();
-                }
-                else{
-                    $scope.businessModalOpen = true;
-                    $scope.showDetailsModal = false;
-                    $timeout(function() {
-                        $scope._showHomeDeliveryModal = !$scope._showHomeDeliveryModal;
-                    },500);
-                }*/
-
                 if(!$rootScope._userInfo.Token)
                 {
                     $('#SignIn_popup').slideDown();
@@ -711,29 +699,13 @@ angular.module('ezeidApp').
                     $('#SignIn_popup').slideDown();
                 }
                 else{
-                    $location.url('/home_delivery?TID='+TID);
+                    $location.url('/'+SearchInfo.EZEID+'/home_delivery');
                 }
             };
 
             $scope._serviceModalTitle = 'Helpdesk Form';
             $scope._showServiceModal = false;
             $scope._toggleServiceModal = function(){
-               /* if(!$rootScope._userInfo.Token)
-                {
-                    $('#SignIn_popup').slideDown();
-                }
-                else if($rootScope._userInfo.Token == 2)
-                {
-                    $('#SignIn_popup').slideDown();
-                }
-                else{
-                    $scope.businessModalOpen = true;
-                    $scope.showDetailsModal = false;
-                    $timeout(function() {
-                        $scope._showServiceModal = !$scope._showServiceModal;
-                    },500);
-                }*/
-
                 if(!$rootScope._userInfo.Token)
                 {
                     $('#SignIn_popup').slideDown();
@@ -743,7 +715,7 @@ angular.module('ezeidApp').
                     $('#SignIn_popup').slideDown();
                 }
                 else{
-                    $location.url('/help_desk?TID='+TID);
+                    $location.url('/'+SearchInfo.EZEID+'/helpdesk');
                 }
             };
 
@@ -775,7 +747,7 @@ angular.module('ezeidApp').
                     $('#SignIn_popup').slideDown();
                 }
                 else {
-                    $location.url('/send_cv?TID='+TID);
+                    $location.url('/'+SearchInfo.EZEID+'/resume');
                 }
 
             };
