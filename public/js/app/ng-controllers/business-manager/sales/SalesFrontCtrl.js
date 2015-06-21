@@ -164,7 +164,7 @@
                     taskDateTime : '',
                     folderRule : 0,
                     message : '',
-                    messageType : ($rootScope._userInfo.SalesItemListType) ? $rootScope._userInfo.SalesItemListType : 0,
+                    messageType : 0,
                     latitude : 0,
                     longitude : 0,
                     duration : 0,
@@ -314,7 +314,8 @@
                         taskDateTime : '',
                         folderRule : 0,
                         message : '',
-                        messageType : ($rootScope._userInfo.SalesItemListType) ? $rootScope._userInfo.SalesItemListType : 0,
+                        messageType : (parseInt($scope.masterUser.SalesItemListType) !== NaN) ?
+                            parseInt($scope.masterUser.SalesItemListType) : 0,
                         latitude : 0,
                         longitude : 0,
                         duration : 0,
@@ -397,6 +398,25 @@
                      */
                     if (resp && resp != 'null' && resp.length > 0) {
                         $scope.masterUser = resp[0];
+
+                        if($scope.masterUser.IDTypeID !== 2){
+                            $window.location.replace('/'+$scope.ezeone);
+                        }
+
+                        var visibleModules = ($scope.masterUser.VisibleModules) ?
+                            (($scope.masterUser.VisibleModules.length == 5) ? $scope.masterUser.VisibleModules : '22222')
+                            : '22222';
+
+
+                        /**
+                         * Do not allow ohter user to see the module if the module is not visible
+                         * so that he will not be able to do sales enquiry
+                         */
+                        if(parseInt(visibleModules.split()[0]) !== 1){
+                            $window.location.replace('/'+$scope.ezeone);
+                        }
+
+                        $scope.modalBox.tx.messageType = (parseInt($scope.masterUser.SalesItemListType) !== NaN) ? parseInt($scope.masterUser.SalesItemListType) : 0;
                         $scope.salesItemListType = ($scope.masterUser.SalesItemListType &&
                         (!isNaN(parseInt($scope.masterUser.SalesItemListType)))) ? parseInt($scope.masterUser.SalesItemListType) : 0 ;
                         //$scope._salesModalTitle = ($scope.masterUser.SalesModuleTitle) ? $scope.masterUser.SalesModuleTitle : 'Sales Enquiry';
@@ -671,7 +691,7 @@
                             var msg = 'Enquiry is posted successfully';
 
                             Notification.success({ message : msg, delay : MsgDelay});
-                            $scope._toggleSalesModal();
+                            //$scope._toggleSalesModal();
                             $scope.resetModalBox();
                         }
                         else{
@@ -711,6 +731,10 @@
                     }
 
                 });
+            };
+
+            $scope.closeForm = function(){
+                $window.location.replace('/'+$scope.ezeone);
             };
 
             init();

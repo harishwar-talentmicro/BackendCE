@@ -31,6 +31,7 @@
                   $route,
                   GoogleMap) {
 
+            $scope.ezeone = $routeParams['ezeone'];
             /**
              * Returns index of Object from array based on Object Property
              * @param key
@@ -163,7 +164,7 @@
                     taskDateTime : '',
                     folderRule : 0,
                     message : '',
-                    messageType : ($rootScope._userInfo.HomeDeliveryItemListType) ? $rootScope._userInfo.HomeDeliveryItemListType : 0,
+                    messageType :  0,
                     latitude : 0,
                     longitude : 0,
                     duration : 0,
@@ -313,7 +314,8 @@
                         taskDateTime : '',
                         folderRule : 0,
                         message : '',
-                        messageType : ($rootScope._userInfo.HomeDeliveryItemListType) ? $rootScope._userInfo.HomeDeliveryItemListType : 0,
+                        messageType : (parseInt($scope.masterUser.HomeDeliveryItemListType) !== NaN) ?
+                            parseInt($scope.masterUser.HomeDeliveryItemListType) : 0,
                         latitude : 0,
                         longitude : 0,
                         duration : 0,
@@ -333,34 +335,43 @@
 
             };
 
-            /**
-             * Watches the open and close property of homeDelivery modal
-             */
-            $scope.$watch('_showHomeDeliveryModal',function(newVal,oldVal){
-                if(!newVal){
-                    $scope.resetModalBox();
-                }
-                else{
-                    $scope.$emit('$preLoaderStart');
-                    $scope.getUserDetails().then(function(){
-                        $scope.getModuleItemList().then(function(){
-                            $scope.getLocationList().then(function(){
-                                $scope.$emit('$preLoaderStop');
-                            },function(){
-                                Notification.error({ message : 'An error occured ! Please try again', delay : MsgDelay});
-                                $scope.$emit('$preLoaderStop');
-                            });
-                        },function(){
-                            Notification.error({ message : 'An error occured ! Please try again', delay : MsgDelay});
-                            $scope.$emit('$preLoaderStop');
-                        });
-                    },function(){
-                        Notification.error({ message : 'An error occured ! Please try again', delay : MsgDelay});
-                        $scope.$emit('$preLoaderStop');
-                    });
-                }
-            });
+            $scope.loggedInUser = {};
 
+
+            $scope.getLoggedInUserDetails = function(){
+                var defer = $q.defer();
+                $http({
+                    method: 'get',
+                    url: GURL + 'ewtEZEIDPrimaryDetails',
+                    params : {
+                        Token : $rootScope._userInfo.Token,
+                        /**
+                         * Change this variable to $routeParams.ezeone so that now /IND1/homeDelivery path can be supported
+                         */
+                        EZEID : $rootScope._userInfo.ezeid
+                    }
+                }).success(function (resp) {
+
+                    if (resp && resp != 'null' && resp.length > 0) {
+                        $scope.loggedInUser = resp[0];
+                        //$scope._homeDeliveryModalTitle = ($scope.masterUser.homeDeliveryModuleTitle) ? $scope.masterUser.homeDeliveryModuleTitle : 'homeDelivery Enquiry';
+                        defer.resolve();
+                    }
+                    else{
+                        defer.reject();
+                    }
+                }).error(function(err,statusCode) {
+                    if (statusCode == 0) {
+                        Notification.error({message: 'Unable to reach server! Please check your connection'});
+                        defer.reject(true);
+                    }
+                    else {
+                        defer.reject();
+                    }
+                });
+            };
+
+            $scope.getLoggedInUserDetails();
 
             /**
              * Loads logged in user details from server
@@ -373,18 +384,51 @@
                     url: GURL + 'ewtEZEIDPrimaryDetails',
                     params : {
                         Token : $rootScope._userInfo.Token,
-                        EZEID : $scope.SearchInfo.EZEID
+                        /**
+                         * Change this variable to $routeParams.ezeone so that now /IND1/homeDelivery path can be supported
+                         */
+                        EZEID : $scope.ezeone
                     }
                 }).success(function (resp) {
+
                     if (resp && resp != 'null' && resp.length > 0) {
                         $scope.masterUser = resp[0];
+
+                        if($scope.masterUser.IDTypeID !== 2){
+                            $window.location.replace('/'+$scope.ezeone);
+                        }
+                        var visibleModules = ($scope.masterUser.VisibleModules) ?
+                            (($scope.masterUser.VisibleModules.length == 5) ? $scope.masterUser.VisibleModules : '22222')
+                            : '22222';
+
+
+                        /**
+                         * Do not allow ohter user to see the module if the module is not visible
+                         * so that he will not be able to do sales enquiry
+                         */
+                        if(parseInt(visibleModules.split()[0]) !== 1){
+                            $window.location.replace('/'+$scope.ezeone);
+                        }
+
+
+                        $scope.modalBox.tx.messageType = (parseInt($scope.masterUser.HomeDeliveryItemListType) !== NaN) ? parseInt($scope.masterUser.HomeDeliveryItemListType) : 0;
                         $scope.homeDeliveryItemListType = ($scope.masterUser.HomeDeliveryItemListType &&
                         (!isNaN(parseInt($scope.masterUser.HomeDeliveryItemListType)))) ? parseInt($scope.masterUser.HomeDeliveryItemListType) : 0 ;
                         //$scope._homeDeliveryModalTitle = ($scope.masterUser.homeDeliveryModuleTitle) ? $scope.masterUser.homeDeliveryModuleTitle : 'homeDelivery Enquiry';
+                        defer.resolve();
                     }
-                    defer.resolve();
-                }).error(function(err){
-                    defer.resolve();
+                    else{
+                        defer.reject();
+                    }
+                }).error(function(err,statusCode){
+                    if(statusCode == 0){
+                        Notification.error({ message : 'Unable to reach server! Please check your connection'});
+                        defer.reject(true);
+                    }
+                    else{
+                        defer.reject();
+                    }
+
                 });
 
                 return defer.promise;
@@ -403,7 +447,7 @@
                     params : {
                         Token: $rootScope._userInfo.Token,
                         FunctionType: 2,
-                        EZEID: $scope.SearchInfo.EZEID
+                        EZEID: $scope.ezeone
                     }
                 }).success(function(resp){
                     if(resp && resp.length > 0 && resp !== 'null'){
@@ -428,7 +472,7 @@
                     method : 'GET',
                     params : {
                         Token : $rootScope._userInfo.Token,
-                        TID :   $scope.masterUser.TID
+                        TID :   $scope.loggedInUser.TID
                     }
                 }).success(function(resp){
                     if(resp && resp !== 'null'){
@@ -442,6 +486,28 @@
                     defer.reject();
                 });
                 return defer.promise;
+            };
+
+
+            var makeAddress = function(){
+                var address = [];
+                if($scope.modalBox.tx.address){
+                    address.push($scope.modalBox.tx.address);
+                }
+                if($scope.modalBox.tx.area){
+                    address.push($scope.modalBox.tx.area);
+                }
+                if($scope.modalBox.tx.city){
+                    address.push($scope.modalBox.tx.city);
+                }
+
+                if($scope.modalBox.tx.state){
+                    address.push($scope.modalBox.tx.state);
+                }
+                if($scope.modalBox.tx.country){
+                    address.push($scope.modalBox.tx.country);
+                }
+                return address.join(', ');
             };
 
             /**
@@ -459,7 +525,7 @@
                  * @type {{TID: number, Token: *, MessageText: string, Status: number, TaskDateTime: string, Notes: string, LocID: *, Country: string, State: string, City: string, Area: string, FunctionType: number, Latitude: number, Longitude: number, EZEID: string, ContactInfo: string, FolderRuleID: number, Duration: number, DurationScales: number, NextAction: number, NextActionDateTime: string, ItemsList: Array, DeliveryAddress: string}}
                  */
                 var preparedTx = {
-                    ToEZEID : $scope.SearchInfo.EZEID,
+                    ToEZEID : $scope.ezeone,
                     TID : 0,
                     Token : $rootScope._userInfo.Token,
                     MessageText : $scope.modalBox.tx.message,
@@ -475,16 +541,16 @@
                     Latitude : $scope.modalBox.tx.latitude,
                     Longitude : $scope.modalBox.tx.longitude,
                     EZEID : $rootScope._userInfo.ezeid,
-                    ContactInfo : $scope.masterUser.FirstName + ' '+ $scope.masterUser.LastName + ', '+ $scope.masterUser.MobileNumber,
+                    ContactInfo : $rootScope._userInfo.FirstName + ' '+ $rootScope._userInfo.LastName + ', '+ $scope.masterUser.MobileNumber,
                     FolderRuleID : 0,
                     Duration : 0,
                     DurationScales : 0,
                     NextAction : 0,
                     NextActionDateTime : moment().format('DD MMM YYYY hh:mm:ss'),
                     ItemsList: JSON.stringify($scope.modalBox.tx.itemList),
-                    DeliveryAddress : $scope.modalBox.tx.address + $scope.modalBox.tx.area + $scope.modalBox.tx.city +
-                    $scope.modalBox.tx.state + $scope.modalBox.tx.country,
-                    companyName : ($scope.masterUser.IDTypeID == 1) ? $scope.masterUser.FirstName : $scope.masterUser.CompanyName
+                    DeliveryAddress : makeAddress(),
+                    company_name : $scope.loggedInUser.CompanyName,
+                    company_id : 0
                 };
                 return preparedTx;
             };
@@ -617,10 +683,10 @@
                 }).success(function(resp){
                     if(resp && resp.hasOwnProperty('IsSuccessfull')){
                         if(resp.IsSuccessfull){
-                            var msg = 'Order is placed successfully';
+                            var msg = 'Enquiry is posted successfully';
 
                             Notification.success({ message : msg, delay : MsgDelay});
-                            $scope._toggleHomeDeliveryModal();
+                            //$scope._toggleSalesModal();
                             $scope.resetModalBox();
                         }
                         else{
@@ -638,6 +704,38 @@
                 });
             };
 
+
+            var init = function(){
+                $scope.$emit('$preLoaderStart');
+                $scope.getUserDetails().then(function(){
+                    $scope.getModuleItemList().then(function(){
+                        $scope.getLocationList().then(function(){
+                            $scope.$emit('$preLoaderStop');
+                        },function(){
+                            Notification.error({ message : 'An error occured ! Please try again', delay : MsgDelay});
+                            $scope.$emit('$preLoaderStop');
+                        });
+                    },function(){
+                        Notification.error({ message : 'An error occured ! Please try again', delay : MsgDelay});
+                        $scope.$emit('$preLoaderStop');
+                    });
+                },function(noInternet){
+                    $scope.$emit('$preLoaderStop');
+                    if(!noInternet){
+                        Notification.error({ message : 'An error occured ! Please try again', delay : MsgDelay});
+                    }
+
+                });
+            };
+
+            $scope.closeForm = function(){
+                $window.location.replace('/'+$scope.ezeone);
+            };
+
+            init();
+
+            //    }
+            ////});
         }
     ]);
 })();

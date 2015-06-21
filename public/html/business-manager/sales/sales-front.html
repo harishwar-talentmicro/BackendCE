@@ -30,10 +30,8 @@
                                         <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12 item-list-box">
                                             <div class="row">
                                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
-                                                    <h4 class="text-center font-roboto text-warning">Select Products</h4>
-                                                    <h6 class="text-center font-robot text-info">
-                                                        {{moduleItems.length}} items in list
-                                                    </h6>
+                                                    <h4 class="text-center font-roboto text-warning">Select Items</h4>
+
                                                 </div>
                                             </div>
 
@@ -54,15 +52,14 @@
                                         <div class="col-lg-8 col-md-8 col-sm-6 col-xs-12">
                                             <div class="row">
                                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                                    <h4 class="text-center font-roboto text-success">Products in your order list </h4>
-                                                    <h6 class="text-center font-roboto text-info">{{modalBox.tx.itemList.length}} type products in your enquiry list </h6>
+                                                    <h4 class="text-center font-roboto text-success">Selected Items </h4>
                                                 </div>
                                             </div>
 
                                             <div class="row" id="tx-item-list-container">
 
                                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-center" ng-hide="modalBox.tx.itemList.length > 0">
-                                                    <small class="font-open-sans text-warning">Add products to your enquiry</small>
+                                                    <small class="font-open-sans text-warning">No items selected</small>
                                                 </div>
 
                                                 <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12" ng-repeat="item in modalBox.tx.itemList track by item.ItemID">
@@ -183,7 +180,7 @@
                                                 <span class="glyphicon glyphicon-hand-right"></span>
                                                 Proceed to Enquire
                                             </button>
-                                            <button class="btn btn-danger btn-sm no-radius" ng-click="_toggleSalesModal()">
+                                            <button class="btn btn-danger btn-sm no-radius" ng-click="closeForm()">
                                                 <span class="glyphicon glyphicon-remove"></span>
                                                 Cancel
                                             </button>
