@@ -1668,8 +1668,8 @@ table.rwd-table > tbody > tr > td.serachResultSelectAll
 }
 .info-btn:hover{
     border: 1px solid #FFF;
-    background-color: #3BB300;
-    color:#000;
+    background-color: #CED1D2;
+    color: #000;
 }
 .info-btn:focus{
     background-color: #e3e3e3;
