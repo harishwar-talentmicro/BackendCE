@@ -7,7 +7,9 @@
             <div class="col-sm-8" style="margin: auto; float: none;">
                 <div class="panel panel-default" style="min-height: 367px;">
                     <div class="panel-body">
-                        <h1 class="text-center font-open-sans-light" style="text-transform: uppercase;">{{SearchInfo.EZEID}}</h1>
+                        <h1 class="text-center font-roboto" style="text-transform: uppercase;font-size: 25px;font-weight: 400;color:#000;">
+                            {{SearchInfo.EZEID}}
+                        </h1>
                         <div ng-show="showLoginText">
                             <h1 class="font-open-sans-light text-center top-clearfix">Please login to continue</h1>
                             <p class="font-open-sans-light text-center text-warning"><a href="/">Go Back</a></p>
@@ -32,7 +34,7 @@
                                              </div>
                                          </div>
 
-                                        <div ng-show="SearchInfo.dealenable == 1">
+                                        <div ng-show="SearchInfo.dealenable == 1" class="bottom-clearfix">
                                             <div class="row setRowLeftRightMarginZero" ng-show="SearchInfo.dealbanner">
                                                 <img class="promoImgContainer" ng-src="{{SearchInfo.dealbanner}}">
                                             </div>
@@ -43,79 +45,152 @@
                                             </div>
                                         </div>
 
-                                        <div class="row setRowLeftRightMarginZero messgeButtonContainer">
-                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setPaddingLeftRight0 searchHeaderAlignment newMsgBtnContainer" ng-hide="(SearchInfo.IDTypeID == 1)">
-                                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setLeftRightPaddingZero">
-                                                    <a class="showPointer removePadding keyWordText boxMess aageBackgroun text-white infoDetailsButton"
-                                                       ng-href="{{SearchInfo.SalesURL}}"
-                                                       target="_blank"
-                                                       ng-show="SearchInfo.EZEIDVerifiedID == '2' && showSalesEnquiry == 1"
-                                                       title="Sales Enquiry"
-                                                       ng-click="(SearchInfo.SalesURL) ? '' : ($event.preventDefault())(_toggleSalesModal())">
-                                                        <img src="../images/new_sales_icon.png">
-                                                        Sales Enquiry
-                                                    </a>
-                                                </div>
-                                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setLeftRightPaddingZero">
-                                                    <a class="showPointer removePadding keyWordText boxMessaageBackgroun infoDetailsButton text-white"
-                                                       ng-href="{{SearchInfo.HomeDeliveryURL}}"
-                                                       target="_blank"
-                                                       ng-show="SearchInfo.EZEIDVerifiedID == '2' && showHomeDelivery == 1"
-                                                       title="Home Delivery"
-                                                       ng-click="(SearchInfo.HomeDeliveryURL) ? '' : ($event.preventDefault())(_toggleHomeDeliveryModal())">
-                                                        <img src="../images/new_home_delivery.png">
-                                                        Home Delivery
-                                                    </a>
-                                                </div>
-                                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setLeftRightPaddingZero">
-                                                    <a class="showPointer removePadding keyWordText boxMessaageBackgroun infoDetailsButton text-white"
-                                                       ng-href="{{SearchInfo.ReservationURL}}"
-                                                       target="_blank"
-                                                       ng-show="SearchInfo.EZEIDVerifiedID == '2' && shoReserVation == 1"
-                                                       title="Reservation"
-                                                       ng-click="(SearchInfo.ReservationURL) ? '' : ($event.preventDefault())(openReservationForm(SearchInfo.EZEID))">
-                                                        <img src="../images/new_reservations.png">
-                                                        Reservation
-                                                    </a>
-                                                </div>
-                                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setLeftRightPaddingZero">
-                                                    <a class="showPointer removePadding keyWordText boxMessaageBackgroun infoDetailsButton text-white"
-                                                       ng-href="{{SearchInfo.ServiceURL}}"
-                                                       target="_blank"
-                                                       ng-show="SearchInfo.EZEIDVerifiedID == '2' && showServiceRequest == 1"
-                                                       title="Help Desk"
-                                                       ng-click="(SearchInfo.ServiceURL) ? '' : ($event.preventDefault())(_toggleServiceModal())">
-                                                        <img src="../images/new_service_request.png">
-                                                        Help Desk
-                                                    </a>
-                                                </div>
-                                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setLeftRightPaddingZero">
-                                                    <a class="showPointer removePadding keyWordText boxMessaageBackgroun infoDetailsButton text-white"
-                                                       ng-href="{{SearchInfo.CVURL}}"
-                                                       target="_blank"
-                                                       title="Send CV"
-                                                       ng-click="(SearchInfo.CVURL) ? '' : ($event.preventDefault())(_toggleResumeModal())"
-                                                       ng-show="SearchInfo.EZEIDVerifiedID == 2 && _userInfo.Type == 1 && showSendCv == 1">
-                                                        <img src="../images/new_send_cv.png">
-                                                        Send CV
-                                                    </a>
-                                                </div>
-                                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setLeftRightPaddingZero infoDetailsButton">
-                                                    <div class="showPointer removePadding  boxMessaageBackgroun"
-                                                         ng-click="getdirections(SearchInfo)" title="Map">
-                                                        <img src="../images/map_32.png">
-                                                        <span>Map</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 newMsgBtnContainer infoDetailsButton setPaddingLeftRight0 searchHeaderAlignment msgButtonContainer messageButtonContainer" ng-show="(SearchInfo.IDTypeID == 1)">
-                                                <div class="showPointer removePadding keyWordText boxMessaageBackgroun pull-right"
-                                                     ng-click="getdirections(SearchInfo)" title="Map" class="boxMessaageBackgroun">
-                                                    <img src="../images/map_32.png">
-                                                    <span>Map</span>
-                                                </div>
-                                            </div>
-                                        </div>
+                                         <div class="row">
+                                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                 <div class="btn-group inform-btn-group">
+                                                     <a class="btn btn-warning info-btn sales-btn no-radius"
+                                                             ng-href="{{SearchInfo.SalesURL}}"
+                                                             target="_blank"
+                                                             ng-show="SearchInfo.EZEIDVerifiedID == '2' && showSalesEnquiry == 1"
+                                                             title="Sales Enquiry"
+                                                             ng-click="(SearchInfo.SalesURL) ? '' : ($event.preventDefault())(_toggleSalesModal())">
+                                                         <i class="fa fa-suitcase"></i>
+                                                         Sales
+                                                     </a>
+                                                     <a class="btn btn-warning info-btn reservation-btn no-radius"
+                                                             ng-href="{{SearchInfo.ReservationURL}}"
+                                                             target="_blank"
+                                                             ng-show="SearchInfo.EZEIDVerifiedID == '2' && shoReserVation == 1"
+                                                             title="Reservation"
+                                                             ng-click="(SearchInfo.ReservationURL) ? '' : ($event.preventDefault())(openReservationForm(SearchInfo.EZEID))">
+                                                         <i class="fa fa-clock-o"></i>
+                                                         Reservation
+                                                     </a>
+                                                     <a class="btn btn-warning info-btn home-delivery-btn no-radius"
+                                                             ng-href="{{SearchInfo.HomeDeliveryURL}}"
+                                                             target="_blank"
+                                                             ng-show="SearchInfo.EZEIDVerifiedID == '2' && showHomeDelivery == 1"
+                                                             title="Home Delivery"
+                                                             ng-click="(SearchInfo.HomeDeliveryURL) ? '' : ($event.preventDefault())(_toggleHomeDeliveryModal())">
+                                                         <i class="fa fa-truck"></i>
+                                                         Home Delivery
+                                                     </a>
+
+                                                     <a class="btn btn-warning info-btn helpdesk-btn no-radius"
+                                                             ng-href="{{SearchInfo.ServiceURL}}"
+                                                             target="_blank"
+                                                             ng-show="SearchInfo.EZEIDVerifiedID == '2' && showServiceRequest == 1"
+                                                             title="Help Desk"
+                                                             ng-click="(SearchInfo.ServiceURL) ? '' : ($event.preventDefault())(_toggleServiceModal())">
+                                                         <i class="fa fa-wrench"></i>
+                                                         Help Desk
+                                                     </a>
+
+                                                     <a class="btn btn-warning info-btn resume-btn  no-radius"
+                                                             ng-href="{{SearchInfo.CVURL}}"
+                                                             target="_blank"
+                                                             title="Send CV"
+                                                             ng-click="(SearchInfo.CVURL) ? '' : ($event.preventDefault())(_toggleResumeModal())"
+                                                             ng-show="SearchInfo.EZEIDVerifiedID == 2 && _userInfo.Type == 1 && showSendCv == 1">
+                                                         <i class="fa fa-file"></i>
+                                                         Resume
+                                                     </a>
+
+                                                     <button type="button"
+                                                             ng-click="getdirections(SearchInfo)" title="Map"
+                                                             class="btn btn-warning info-btn resume-btn  no-radius">
+                                                         <i class="fa fa-globe"></i> Map
+                                                     </button>
+
+                                                 </div>
+                                                 <!--<ul class="nav nav-pills information-detail-module-navigation">-->
+                                                     <!--<li role="presentation">-->
+                                                         <!--<a href="#"><i class="fa fa-area-chart"></i> Sales Enquiry</a>-->
+                                                     <!--</li>-->
+                                                     <!--<li role="presentation">-->
+                                                         <!--<a href="#"><i class="fa fa-clock-o"></i> Reservation</a>-->
+                                                     <!--</li>-->
+                                                     <!--<li role="presentation">-->
+                                                         <!--<a href="#"><i class="fa fa-truck"></i> Home Delivery</a>-->
+                                                     <!--</li>-->
+                                                 <!--</ul>-->
+                                             </div>
+                                         </div>
+
+                                        <!--<div class="row setRowLeftRightMarginZero messgeButtonContainer">-->
+                                            <!--<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setPaddingLeftRight0 searchHeaderAlignment newMsgBtnContainer" ng-hide="(SearchInfo.IDTypeID == 1)">-->
+                                                <!--<div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setLeftRightPaddingZero">-->
+                                                    <!--<a class="showPointer removePadding keyWordText boxMess aageBackgroun text-white infoDetailsButton"-->
+                                                       <!--ng-href="{{SearchInfo.SalesURL}}"-->
+                                                       <!--target="_blank"-->
+                                                       <!--ng-show="SearchInfo.EZEIDVerifiedID == '2' && showSalesEnquiry == 1"-->
+                                                       <!--title="Sales Enquiry"-->
+                                                       <!--ng-click="(SearchInfo.SalesURL) ? '' : ($event.preventDefault())(_toggleSalesModal())">-->
+                                                        <!--<img src="../images/new_sales_icon.png">-->
+                                                        <!--Sales Enquiry-->
+                                                    <!--</a>-->
+                                                <!--</div>-->
+                                                <!--<div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setLeftRightPaddingZero">-->
+                                                    <!--<a class="showPointer removePadding keyWordText boxMessaageBackgroun infoDetailsButton text-white"-->
+                                                       <!--ng-href="{{SearchInfo.HomeDeliveryURL}}"-->
+                                                       <!--target="_blank"-->
+                                                       <!--ng-show="SearchInfo.EZEIDVerifiedID == '2' && showHomeDelivery == 1"-->
+                                                       <!--title="Home Delivery"-->
+                                                       <!--ng-click="(SearchInfo.HomeDeliveryURL) ? '' : ($event.preventDefault())(_toggleHomeDeliveryModal())">-->
+                                                        <!--<img src="../images/new_home_delivery.png">-->
+                                                        <!--Home Delivery-->
+                                                    <!--</a>-->
+                                                <!--</div>-->
+                                                <!--<div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setLeftRightPaddingZero">-->
+                                                    <!--<a class="showPointer removePadding keyWordText boxMessaageBackgroun infoDetailsButton text-white"-->
+                                                       <!--ng-href="{{SearchInfo.ReservationURL}}"-->
+                                                       <!--target="_blank"-->
+                                                       <!--ng-show="SearchInfo.EZEIDVerifiedID == '2' && shoReserVation == 1"-->
+                                                       <!--title="Reservation"-->
+                                                       <!--ng-click="(SearchInfo.ReservationURL) ? '' : ($event.preventDefault())(openReservationForm(SearchInfo.EZEID))">-->
+                                                        <!--<img src="../images/new_reservations.png">-->
+                                                        <!--Reservation-->
+                                                    <!--</a>-->
+                                                <!--</div>-->
+                                                <!--<div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setLeftRightPaddingZero">-->
+                                                    <!--<a class="showPointer removePadding keyWordText boxMessaageBackgroun infoDetailsButton text-white"-->
+                                                       <!--ng-href="{{SearchInfo.ServiceURL}}"-->
+                                                       <!--target="_blank"-->
+                                                       <!--ng-show="SearchInfo.EZEIDVerifiedID == '2' && showServiceRequest == 1"-->
+                                                       <!--title="Help Desk"-->
+                                                       <!--ng-click="(SearchInfo.ServiceURL) ? '' : ($event.preventDefault())(_toggleServiceModal())">-->
+                                                        <!--<img src="../images/new_service_request.png">-->
+                                                        <!--Help Desk-->
+                                                    <!--</a>-->
+                                                <!--</div>-->
+                                                <!--<div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setLeftRightPaddingZero">-->
+                                                    <!--<a class="showPointer removePadding keyWordText boxMessaageBackgroun infoDetailsButton text-white"-->
+                                                       <!--ng-href="{{SearchInfo.CVURL}}"-->
+                                                       <!--target="_blank"-->
+                                                       <!--title="Send CV"-->
+                                                       <!--ng-click="(SearchInfo.CVURL) ? '' : ($event.preventDefault())(_toggleResumeModal())"-->
+                                                       <!--ng-show="SearchInfo.EZEIDVerifiedID == 2 && _userInfo.Type == 1 && showSendCv == 1">-->
+                                                        <!--<img src="../images/new_send_cv.png">-->
+                                                        <!--Send CV-->
+                                                    <!--</a>-->
+                                                <!--</div>-->
+                                                <!--<div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setLeftRightPaddingZero infoDetailsButton">-->
+                                                    <!--<div class="showPointer removePadding  boxMessaageBackgroun"-->
+                                                         <!--ng-click="getdirections(SearchInfo)" title="Map">-->
+                                                        <!--<img src="../images/map_32.png">-->
+                                                        <!--<span>Map</span>-->
+                                                    <!--</div>-->
+                                                <!--</div>-->
+                                            <!--</div>-->
+                                            <!--&lt;!&ndash; &ndash;&gt;-->
+                                            <!--<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 newMsgBtnContainer infoDetailsButton setPaddingLeftRight0 searchHeaderAlignment msgButtonContainer messageButtonContainer" ng-show="(SearchInfo.IDTypeID == 1)">-->
+                                                <!--<div class="showPointer removePadding keyWordText boxMessaageBackgroun pull-right"-->
+                                                     <!--ng-click="getdirections(SearchInfo)" title="Map" class="boxMessaageBackgroun">-->
+                                                    <!--<img src="../images/map_32.png">-->
+                                                    <!--<span>Map</span>-->
+                                                <!--</div>-->
+                                            <!--</div>-->
+                                        <!--</div>-->
 
                                         <div class="row setRowLeftRightMarginZero text-center newInfoBorder messgeButtonContainer">
                                             <div class="col-lg-5 col-md-5 col-sm-5 col-xs-12 setPaddingLeftRight0">

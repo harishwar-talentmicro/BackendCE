@@ -1337,6 +1337,17 @@ span.smallCloselink {
   padding:0px;
 }
 
+.information-detail-module-navigation{
+    background-color: #ECECEC;
+}
+.inform-btn-group{
+    width: 100%;
+}
+.inform-btn-group > button{
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    width: 20%;
+}
 
 #cart-info{
     margin-top: 5px;
