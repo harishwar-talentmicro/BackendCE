@@ -217,10 +217,10 @@
                                 <!-- Initial Tile goes here[FRONT] -->
                                 <div class="text-center text-white front height-128" ng-class="color">
                                     <!-- code for SALES -->
-                                    <div class="lbl-box2 hidden">
+                                    <div class="lbl-box2" ng-show="search.dealenable == 1">
                                         <div class="newafter"></div>
                                         <div class="newbefore"></div>
-                                        <div class="new">50% OFF</div>
+                                        <div class="new">{{search.dealtitle}}</div>
                                     </div>
                                     <!-- Row 1 -->
                                     <div class="tile-row-1 p-5">
