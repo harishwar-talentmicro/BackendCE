@@ -407,7 +407,7 @@
                          * Do not allow ohter user to see the module if the module is not visible
                          * so that he will not be able to do sales enquiry
                          */
-                        if(parseInt(visibleModules.split('')[0]) !== 1){
+                        if(parseInt(visibleModules.split('')[3]) !== 1){
                             $window.location.replace('/'+$scope.ezeone);
                         }
 

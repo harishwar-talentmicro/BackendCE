@@ -248,7 +248,7 @@
                                 <small class="text-danger" ng-hide="editModes[$index]"><b>{{(tx.statustitle) ? tx.statustitle : 'New' | uppercase}}</b></small>
                             </div>
                             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
-                                <b class="font-roboto" ng-class="{'hidden' : (!tx.RequesterEZEID)}">{{ (tx.RequesterEZEID) ? (tx.RequesterEZEID | uppercase) : "&lt; small &gt; EZEID is not available&lt;/ small &gt; "}}</b>
+                                <b class="font-roboto" ng-class="{'hidden' : (!tx.RequesterEZEID)}">{{ (tx.RequesterEZEID) ? (tx.RequesterEZEID | uppercase) : ''}}</b>
                                 <br/>
                                 <small class="text-info">
                                     {{(tx.RequesterEZEID) ? ((tx.ContactInfo.split(',').length > 1) ?

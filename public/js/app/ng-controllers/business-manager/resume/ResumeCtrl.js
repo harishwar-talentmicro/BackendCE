@@ -31,7 +31,7 @@
             $routeParams,
             $route,
             GoogleMap
-            ) {
+        ) {
 
             //$scope._tempSalesItemListType = $rootScope._userInfo.SalesItemListType;
             $scope.txSearchTerm = '';
@@ -153,6 +153,7 @@
 
             $scope.totalPages = 1;
             $scope.filterStatus = -1;
+            $scope.sortBy = 0;
             $scope.filterStatusTypes = [];
             $scope.txStatusTypes = [];
             $scope.txActionTypes = [];
@@ -162,39 +163,41 @@
 
             $scope.showModal = false;
             $scope.modalBox = {
-              title : 'Application Details',
-              class : 'business-manager-modal',
-              editMode : false,
-              locationList : [],
-              tx : {
-                  orderAmount : 0.00,
-                  trnNo : '',
-                  ezeidTid : 0,
+                title : 'Add Resume Application',
+                class : 'business-manager-modal',
+                editMode : false,
+                locationList : [],
+                tx : {
+                    orderAmount : 0.00,
+                    trnNo : '',
+                    ezeidTid : 0,
 
-                  TID : 0,
-                  functionType : 4, // Function Type will be 0 for sales
-                  ezeid : '',
-                  statusType : 0,
-                  notes : '',
-                  locId : '',
-                  country : '',
-                  state : '',
-                  city : '',
-                  area : '',
-                  contactInfo : '',
-                  deliveryAddress : '',
-                  nextAction : 0,
-                  nextActionDateTime : '',
-                  taskDateTime : '',
-                  folderRule : 0,
-                  message : '',
-                  messageType : 0,
-                  latitude : 0,
-                  longitude : 0,
-                  duration : 0,
-                  durationScale : 0,
-                  itemList : []     // This is transaction item list
-              }
+                    TID : 0,
+                    functionType : 4, // Function Type will be 0 for resume
+                    ezeid : '',
+                    statusType : 0,
+                    notes : '',
+                    locId : '',
+                    country : '',
+                    state : '',
+                    city : '',
+                    area : '',
+                    contactInfo : '',
+                    deliveryAddress : '',
+                    nextAction : 0,
+                    nextActionDateTime : '',
+                    taskDateTime : '',
+                    folderRule : 0,
+                    message : '',
+                    messageType : 0,
+                    latitude : 0,
+                    longitude : 0,
+                    duration : 0,
+                    durationScale : 0,
+                    itemList : [],     // This is transaction item list
+                    companyName : '',
+                    companyId : 0
+                }
             };
 
             $scope.editModes = [];
@@ -227,48 +230,56 @@
             /**
              * Copies the transaction properties to editMode Object
              * @param tx
+             * @changeUserDetails {boolean} if true then ezeid is not allocated to modalbox.tx.ezeid so that watcher doesn't execute
+             * saving one api call (loadUserDetails)
              * @return editModeTx
              */
-            var prepareEditTransaction = function(tx){
+            var prepareEditTransaction = function(tx,changeUserDetails){
 
                 var editModeTx =  {
-                        orderAmount : (!isNaN(parseFloat(tx.Amount))) ? parseFloat(tx.Amount) : 0.00,
-                        trnNo : tx.TrnNo,
-                        ezeidTid : (tx.EZEID) ? true : 0,
+                    orderAmount : (!isNaN(parseFloat(tx.Amount))) ? parseFloat(tx.Amount) : 0.00,
+                    trnNo : tx.TrnNo,
+                    ezeidTid : (tx.EZEID) ? true : 0,
 
-                        TID : tx.TID,
-                        functionType : 4, // Function Type will be 0 for resume
-                        ezeid : tx.RequesterEZEID,
-                        statusType : (tx.Status) ? tx.Status : 0,
-                        notes : tx.Notes,
-                        locId : tx.LocID,
-                        country : '',
-                        state : '',
-                        city : '',
-                        area : '',
-                        contactInfo : tx.ContactInfo,
-                        deliveryAddress : tx.DeliveryAddress,
-                        nextAction : (tx.NextActionID && tx.NextActionID !== 'null') ? tx.NextActionID : 0,
-                        nextActionDateTime : $filter('dateTimeFilter')(tx.NextActionDate,'DD MMM YYYY hh:mm:ss A','DD MMM YYYY hh:mm:ss A'),
-                        taskDateTime : tx.TaskDateTime,
-                        folderRule : (tx.FolderRuleID && tx.FolderRuleID !== 'null') ? tx.FolderRuleID : 0,
-                        message : tx.Message,
-                        messageType : 0,
-                        latitude : 0,
-                        longitude : 0,
-                        duration : 0,
-                        durationScale : 0,
-                        itemList : []
+                    TID : tx.TID,
+                    functionType : 4, // Function Type will be 0 for resume
+                    ezeid : (changeUserDetails) ? '' :  tx.RequesterEZEID,
+                    statusType : (tx.Status) ? tx.Status : 0,
+                    notes : tx.Notes,
+                    locId : tx.LocID,
+                    country : '',
+                    state : '',
+                    city : '',
+                    area : '',
+                    contactInfo : tx.ContactInfo,
+                    deliveryAddress : tx.DeliveryAddress,
+                    nextAction : (tx.NextActionID && tx.NextActionID !== 'null') ? tx.NextActionID : 0,
+                    nextActionDateTime : $filter('dateTimeFilter')(tx.NextActionDate,'DD MMM YYYY hh:mm:ss A','DD MMM YYYY hh:mm:ss A'),
+                    taskDateTime : tx.TaskDateTime,
+                    folderRule : (tx.FolderRuleID && tx.FolderRuleID !== 'null') ? tx.FolderRuleID : 0,
+                    message : tx.Message,
+                    messageType : 0,
+                    latitude : 0,
+                    longitude : 0,
+                    duration : 0,
+                    durationScale : 0,
+                    itemList : [],
+                    companyId : tx.company_id,
+                    companyName : tx.company_name
                 };
                 return editModeTx;
 
             };
             /**
              * Toggles the edit mode for particular transaction
-             * Inline editing
              * @param index
+             * @param resolveGeolocation
+             * @param loadItems
+             * @param changeUserDetails (if true then it doesn't actually transfers the ezeid to modalBox.tx
+             * so that ezeid doesn't change and wathcer doesn't execute and therefore preventing any service call)
              */
-            $scope.toggleAllEditMode = function(index,resolveGeolocation,loadItems){
+
+            $scope.toggleAllEditMode = function(index,resolveGeolocation,loadItems,changeUserDetails){
                 $scope.$emit('$preLoaderStart');
                 if(typeof(index) === "undefined")
                 {
@@ -277,7 +288,7 @@
                 for(var c = 0; c < $scope.editModes.length; c++){
                     if(c === index){
                         $scope.resetModalBox();
-                        $scope.modalBox.tx = prepareEditTransaction($scope.txList[index]);
+                        $scope.modalBox.tx = prepareEditTransaction($scope.txList[index],changeUserDetails);
                         $scope.editModes[c] = true;
                     }
                     else{
@@ -309,6 +320,79 @@
                         }
                     });
                 }
+
+                /**
+                 * If both resolveGeolcation and loadItems are false then stop preloader
+                 */
+                if(!(resolveGeolocation || loadItems)){
+                    $scope.$emit('$preLoaderStop');
+                }
+            };
+
+
+            /**
+             * Updates transaction (without reloading items saving api call to load items)
+             */
+            $scope.updateTransaction = function(){
+                $scope.$emit('$preLoaderStart');
+                $http({
+                    url : GURL + 'update_transaction',
+                    method : 'PUT',
+                    data : {
+                        TID : $scope.modalBox.tx.TID,
+                        status : ($scope.modalBox.tx.statusType) ? $scope.modalBox.tx.statusType : 0,
+                        folderRuleID : ($scope.modalBox.tx.folderRule) ? $scope.modalBox.tx.folderRule : 0,
+                        nextAction : ($scope.modalBox.tx.nextAction) ? $scope.modalBox.tx.nextAction : 0,
+                        nextActionDateTime : ($scope.modalBox.tx.nextActionDateTime) ? $scope.modalBox.tx.nextActionDateTime : moment().format('YYYY-MM-DD hh:mm:ss'),
+                        Token : $rootScope._userInfo.Token
+                    }
+                }).success(function(resp){
+                    $scope.$emit('$preLoaderStop');
+                    if(resp && resp.status && resp!= 'null'){
+                        Notification.success({ message : 'Record updated successfully', delay : MsgDelay});
+                        $scope.resetModalBox();
+                        $scope.toggleAllEditMode();
+
+                        var id = $scope.txList.indexOfWhere('TID',parseInt(resp.data.TID));
+                        console.log($scope.txList[id]);
+                        $scope.txList[id].FolderRuleID = parseInt(resp.data.folderRuleID);
+                        $scope.txList[id].Status = parseInt(resp.data.status);
+
+                        $scope.txList[id].statustitle = ($scope.txStatusTypes.indexOfWhere('TID', parseInt(resp.data.status)) !== -1)
+                            ? $scope.txStatusTypes[$scope.txStatusTypes.indexOfWhere('TID', parseInt(resp.data.status))].StatusTitle : '',
+
+                            $scope.txList[id].FolderTitle = ($scope.txFolderRules.indexOfWhere('TID', parseInt(resp.data.folderRuleID)) !== -1)
+                                ? $scope.txFolderRules[$scope.txFolderRules.indexOfWhere('TID', parseInt(resp.data.folderRuleID))].FolderTitle : '',
+
+                            $scope.txList[id].ActionTitle = ($scope.txActionTypes.indexOfWhere('TID', parseInt(resp.data.nextAction)) !== -1)
+                                ? $scope.txActionTypes[$scope.txActionTypes.indexOfWhere('TID', parseInt(resp.data.nextAction))].ActionTitle : '',
+
+                            $scope.txList[id].NextActionID = (parseInt(resp.data.nextAction)!== NaN ) ? parseInt(resp.data.nextAction) : 0 ;
+                        var date = moment().format('DD MMM YYYY hh:mm');
+                        try{
+                            date = moment(resp.data.nextActionDateTime,'YYYY-MM-DD hh:mm:ss').format('DD MMM YYYY hh:mm');
+                        }
+                        catch(ex){
+
+                        }
+                        $scope.txList[id].NextActionDate = resp.data.nextActionDateTime;
+                    }
+                    else{
+                        var msg = 'Something went wrong! Please try again';
+                        Notification.error({ message : msg, delay : MsgDelay});
+                    }
+
+                }).error(function(err,statusCode){
+                    $scope.$emit('$preLoaderStop');
+                    var msg = 'Something went wrong! Please try again';
+                    if(statusCode === 403) {
+                        msg = 'You do not have permission to update this transaction';
+                    }
+                    if(statusCode === 0){
+                        msg = 'Unable to reach server ! Please check your connection';
+                    }
+                    Notification.error({ message : msg, delay : MsgDelay});
+                });
             };
 
             /**
@@ -354,12 +438,25 @@
                      * Fill the information of Current Transaction
                      */
                     $scope.modalBox.editMode = true;
-                    $scope.modalBox.tx = prepareEditTransaction($scope.txList[index]);
+                    var editTx = prepareEditTransaction($scope.txList[index]);
                     if($scope.moduleConf.listType > 0){
-                        loadTransactionItems($scope.modalBox.tx.TID).then(function(resp){
+                        $scope.$emit('$preLoaderStart');
+                        loadTransactionItems(editTx.TID).then(function(resp){
+                            editTx.itemList = resp;
                             $scope.showModal = !$scope.showModal;
+                            //UI updation is not happening properly because ui is not rendered, and model bind before it
+                            //therefore once again updating data after ui rendered
+                            $timeout(function(){
+                                $scope.modalBox.title = 'Update Resume Application';
+                                $scope.modalBox.tx = editTx;
+                                $scope.$emit('$preLoaderStop');
+                            },1500);
                         },function(){
                             $scope.showModal = !$scope.showModal;
+                            $timeout(function(){
+                                $scope.modalBox.tx = editTx;
+                                $scope.$emit('$preLoaderStop');
+                            },1500);
                         });
                     }
                     else{
@@ -458,7 +555,7 @@
 
             $scope.resetModalBox = function(){
                 $scope.modalBox = {
-                    title : 'Transaction Details',
+                    title : 'Add Resume Application',
                     class : 'business-manager-modal',
                     locationList : [],
                     editMode : false,
@@ -484,12 +581,14 @@
                         taskDateTime : '',
                         folderRule : 0,
                         message : '',
-                        messageType : 0,
+                        messageType :  0,
                         latitude : 0,
                         longitude : 0,
                         duration : 0,
                         durationScale : 0,
-                        itemList : []
+                        itemList : [],
+                        companyName : '',
+                        companyId : 0
                     }
                 };
             };
@@ -585,6 +684,58 @@
             };
 
 
+
+            var companyList = [];
+            $scope.companySuggestionList = [];
+            $scope.loadSuggestion = function(companyName){
+                if(companyName){
+                    return $filter('filter')(companyList,companyName);
+                }
+                else{
+                    return [];
+                }
+            };
+
+            /**
+             * Loads company list for that particular ezeid
+             * Company Contact list according to functionType
+             */
+            var loadCompany = function(){
+                $http({
+                    method : 'GET',
+                    url : GURL + 'company_details',
+                    params : {
+                        Token : $rootScope._userInfo.Token,
+                        functiontype : 4
+                    }
+
+                }).success(function(resp){
+                    if(resp && resp.status && resp.data){
+                        for(var a=0; a < resp.data.length; a++){
+                            var suggestion = {
+                                id : resp.data[a].tid,
+                                duration : resp.data[a].idledays,
+                                user : resp.data[a].updateduser,
+                                name : resp.data[a].company_name
+                            };
+                            companyList[a] = suggestion;
+                        }
+                    }
+                }).error(function(err,statusCode){
+                    var msg = '';
+                    if(statusCode == 0){
+                        msg = 'Unable to reach server ! Please check your connection';
+                        Notification.error({ title : 'No Connection', message : msg, delay : MsgDelay});
+                    }
+                });
+            };
+
+            /**
+             * Loads company list as soon as controller is initialized
+             */
+            loadCompany();
+
+
             $scope.$watch('modalBox.tx.ezeid',function(newVal,oldVal){
                 if(!newVal){
                     $scope.modalBox.tx.ezeid = '';
@@ -605,9 +756,19 @@
                 $scope.getEzeidDetails(ezeid).then(function(resp){
                     $scope.modalBox.tx.ezeid = $filter('uppercase')(ezeid);
                     $scope.modalBox.tx.contactInfo = resp.FirstName + ' ' +
-                    resp.LastName  +
+                        resp.LastName  +
                         ((resp.MobileNumber && resp.MobileNumber !== 'null') ? ', ' + resp.MobileNumber : '');
                     $scope.modalBox.tx.ezeidTid = resp.TID;
+                    var cIndex = companyList.indexOf(resp.CompanyName)
+                    if(cIndex !== -1){
+                        $scope.modalBox.tx.companyId = companyList[cIndex].tid;
+                        $scope.modalBox.tx.companyName =  resp.CompanyName;
+                    }
+                    else{
+                        $scope.modalBox.tx.companyId = 0;
+                        $scope.modalBox.tx.companyName = resp.CompanyName;
+                    }
+
                     $scope.loadLocationListForEzeid(resp.TID).then(function(){
                         $scope.$emit('$preLoaderStop');
                     },function(){
@@ -628,12 +789,27 @@
              */
             $scope.triggerStatusFilter = function(pageNo,statusType){
                 $scope.$emit('$preLoaderStart');
-                $scope.loadTransaction(pageNo,statusType,$scope.txSearchTerm).then(function(){
+                $scope.loadTransaction(pageNo,statusType,$scope.txSearchTerm,$scope.sortBy).then(function(){
                     $scope.$emit('$preLoaderStop');
                 },function(){
                     $scope.$emit('$preLoaderStop');
                 });
             };
+
+
+            /**
+             * Clears the search term and load the results again
+             */
+            $scope.clearSearchTerm = function(pageNo,statusType){
+                $scope.txSearchTerm = '';
+                $scope.$emit('$preLoaderStart');
+                $scope.loadTransaction(pageNo,statusType,$scope.txSearchTerm,$scope.sortBy).then(function(){
+                    $scope.$emit('$preLoaderStop');
+                },function(){
+                    $scope.$emit('$preLoaderStop');
+                });
+            };
+
 
             /**
              * Loads all transactions
@@ -641,7 +817,7 @@
              * @param statusType
              * @returns {*}
              */
-            $scope.loadTransaction = function(pageNo,statusType,txSearchKeyword){
+            $scope.loadTransaction = function(pageNo,statusType,txSearchKeyword,sortBy){
                 var defer = $q.defer();
                 if(!pageNo){
                     pageNo = 1;
@@ -649,40 +825,91 @@
                 if(!statusType){
                     statusType = null;
                 }
-                $http({
-                    url : GURL + 'ewtGetTranscation',
-                    method : 'GET',
-                    params : {
-                        Token : $rootScope._userInfo.Token,
-                        Page : pageNo,
-                        Status : (statusType) ? statusType : '',
-                        FunctionType : 4,    // For resume,
-                        searchkeyword : txSearchKeyword
-                    }
-                }).success(function(resp){
-                    if(resp && resp !== 'null'){
-                        /**
-                         * Change
-                         * 1. $scope.totalPages
-                         * 2. $scope.pageNumber
-                         * 3. $scope.txList
-                         */
-                        $scope.totalPages = resp.TotalPage;
-                        $scope.pageNumber = pageNo;
-                        $scope.txList = resp.Result;
 
-                        for(var a = 0; a < resp.Result.length; a++){
-                            $scope.editModes.push(false);
-                        }
+                /**
+                 * If user has not selected any folders to display then by default select all the folders
+                 * which are assigned to him and assign them to the data model of myFolders also
+                 * to make ui and requested data consistent
+                 */
+                var folderRules = ($scope.myFolders) ? $scope.myFolders.join(',') : '';
+                if(!folderRules){
+                    var fr = [];
+                    for(var x=0; x<$scope.userFolders.length;x++){
+                        fr[x] = $scope.userFolders[x].TID.toString();
                     }
-                    else{
+                    $scope.myFolders = fr;
+                    folderRules = (fr.length > 0) ? fr.join(',') : '';
 
+                    if(parseInt($rootScope._userInfo.MasterID) == 0){
+                        folderRules = '';
+                    }
+                }
+
+                /**
+                 * If user is master user, then let him see default folder transaction also which actually
+                 * doesn't belong to any rule
+                 */
+                if($scope.myFolders.length === $scope.userFolders.length && parseInt($rootScope._userInfo.MasterID) == 0){
+                    folderRules = '';
+                }
+
+                /**
+                 * If user is subuser and he is not having any rules assigned to him then don't allow him to
+                 * make any transaction load request and therefore show no transaction available for him
+                 * else let him see the transaction as he can see transaction of default folder also
+                 */
+                console.log($rootScope._userInfo.MasterID);
+                console.log(folderRules);
+                if($rootScope._userInfo.MasterID > 0 && (!folderRules)){
+                    $timeout(function(){
+                        defer.resolve([]);
                         $scope.txList = [];
-                    }
-                    defer.resolve(resp);
-                }).error(function(err){
-                    defer.reject();
-                });
+                        //$scope.totalPages = 1;
+                        //$scope.pageNumber = 1;
+                    },300);
+                }
+                else{
+                    $http({
+                        url : GURL + 'ewtGetTranscation',
+                        method : 'GET',
+                        params : {
+                            Token : $rootScope._userInfo.Token,
+                            Page : (pageNo) ? pageNo : 1,
+                            Status : (statusType) ? statusType : '',
+                            FunctionType : 4,    // For resume
+                            searchkeyword : txSearchKeyword,
+                            sort_by : (sortBy) ? sortBy : 0,
+                            folder_rules : folderRules
+                        }
+                    }).success(function(resp){
+                        if(resp && resp !== 'null'){
+                            /**
+                             * Change
+                             * 1. $scope.totalPages
+                             * 2. $scope.pageNumber
+                             * 3. $scope.txList
+                             */
+                            $scope.totalPages = parseInt(resp.TotalPage);
+                            $scope.pageNumber = pageNo;
+                            $scope.txList = resp.Result;
+
+                            for(var a = 0; a < resp.Result.length; a++){
+                                $scope.editModes.push(false);
+                            }
+                        }
+                        else{
+
+                            $scope.txList = [];
+                            $scope.totalPages = 1;
+                            $scope.pageNumber = 1;
+                        }
+                        defer.resolve(resp);
+                    }).error(function(err){
+                        $scope.totalPages = 1;
+                        $scope.pageNumber = 1;
+                        defer.resolve([]);
+                    });
+                }
                 return defer.promise;
             };
 
@@ -709,8 +936,10 @@
                         }
                     }
                     else{
-
-                        $scope.filterStatusTypes = [];
+                        $scope.filterStatusTypes = [
+                            {TID : -1, StatusTitle : 'All Open'},
+                            {TID : -2, StatusTitle : 'All'}
+                        ];
                     }
                     defer.resolve(resp);
                 }).error(function(err){
@@ -730,7 +959,7 @@
                     method : 'GET',
                     params : {
                         Token : $rootScope._userInfo.Token,
-                        FunctionType : 4    // For resume
+                        FunctionType : 4   // For resume
                     }
                 }).success(function(resp){
                     if(resp && resp !== 'null' && resp.length > 0){
@@ -775,6 +1004,12 @@
 
                         $scope.txStatusTypes = [];
                     }
+                    $scope.filterStatusTypes = [
+                        {TID : -2, StatusTitle : 'All'},
+                        {TID : -1, StatusTitle : 'All Open'}
+                    ];
+                    $scope.filterStatusTypes = $scope.filterStatusTypes.concat(resp);
+
                     defer.resolve(resp);
                 }).error(function(err){
                     defer.reject();
@@ -789,17 +1024,6 @@
              */
             $scope.loadItemList = function(){
                 var defer = $q.defer();
-                //if($rootScope._userInfo.ServiceItemListType == 0){
-                /**
-                 * Hardcoding service item list type as message only
-                 * therefore items should not be loaded for it
-                 */
-                if(true){
-                    $timeout(function(){
-                        defer.resolve([]);
-                    },200);
-                    return defer.promise;
-                }
                 $http({
                     url : GURL + 'ewtGetItemList',
                     method : 'GET',
@@ -813,6 +1037,7 @@
                         defer.resolve(resp);
                     }
                     else{
+                        //$rootScope._userInfo.SalesItemListType = 0;
                         defer.resolve([]);
                     }
                 }).error(function(err){
@@ -821,6 +1046,104 @@
                 return defer.promise;
             };
 
+            /**
+             * Folders which are assigned to logged in user and are selected by him
+             * to load transacation based on it
+             * @type {string}
+             */
+            $scope.myFolders = [];
+
+
+            /**
+             * Folders applicable to the user who logged in
+             * @type {Array}
+             */
+            $scope.userFolders = [];
+            var userFoldersList = [];
+            var userFoldersLoaded = false;
+            var allFoldersLoaded = false;
+
+
+            var assignUserFolders = function(){
+                for(var b=0; b < userFoldersList.length;b++){
+                    var _findex = $scope.txFolderRules.indexOfWhere('TID',userFoldersList[b]);
+                    if(_findex !== -1){
+                        var folder = angular.copy($scope.txFolderRules[_findex]);
+                        $scope.userFolders.push(folder);
+                        $scope.myFolders.push(folder.TID);
+                    }
+                }
+            };
+
+            var watchMyFolders = function(){
+                $scope.$watch('myFolders',function(n,v){
+                    console.log(n);
+                    if(!n){
+                        console.log(n);
+                        for(var c=0;c<$scope.userFolders.length;c++){
+                            $scope.myFolders = $scope.userFolders[c].TID;
+                        }
+
+                        $scope.$emit('$preLoaderStart');
+                        $scope.loadTransaction(1,$scope.filterStatus,$scope.txSearchTerm,$scope.sortBy).then(function(){
+                            $scope.$emit('$preLoaderStop');
+                        },function(){
+                            $scope.$emit('$preLoaderStop');
+                        });
+                    }
+                    else{
+                        if(n!==v){
+                            $scope.$emit('$preLoaderStart');
+                            $scope.loadTransaction(1,$scope.filterStatus,$scope.txSearchTerm,$scope.sortBy).then(function(){
+                                $scope.$emit('$preLoaderStop');
+                            },function(){
+                                $scope.$emit('$preLoaderStop');
+                            });
+                        }
+                    }
+                });
+            };
+            /**
+             * Loading user list to fetch rules that are specific to the subuser who logged in
+             * (Folder list of logged in user can be fetched by selecting the logged in user from response
+             * and getting it's comma separated folder list)
+             */
+            var getSubUserList = function(){
+                var defer = $q.defer();
+                $http({
+                    url : GURL + 'ewtGetSubUserList',
+                    method : 'GET',
+                    params : {
+                        MasterID : $rootScope._userInfo.MasterID,
+                        Token : $rootScope._userInfo.Token
+                    }
+                }).success(function(resp){
+                    if(resp && resp.length > 0 && resp !== 'null'){
+                        var index = resp.indexOfWhere('EZEID',$rootScope._userInfo.ezeid);
+                        if(index !== -1){
+                            var userFolders = (resp[index].ResumeIDs) ? resp[index].ResumeIDs.split(',') : [];
+                            console.log(userFolders);
+                            for(var b=0;b<userFolders.length;b++){
+                                userFolders[b] = parseInt(userFolders[b]);
+                            }
+                            userFoldersList = userFolders;
+                        }
+                    }
+                    userFoldersLoaded = true;
+                    if(allFoldersLoaded && userFoldersLoaded){
+                        assignUserFolders();
+                    }
+                    defer.resolve(resp);
+                }).error(function(err,statusCode){
+                    $scope.userFolders = [];
+                    userFoldersLoaded = true;
+                    if(allFoldersLoaded && userFoldersLoaded){
+                        assignUserFolders();
+                    }
+                    defer.resolve([]);
+                });
+                return defer.promise;
+            };
 
             /**
              * Loads FolderRules for resume
@@ -843,26 +1166,50 @@
                     else{
                         defer.resolve([]);
                     }
+                    allFoldersLoaded  = true;
+                    if(allFoldersLoaded && userFoldersLoaded){
+                        assignUserFolders();
+                    }
                 }).error(function(err){
                     defer.reject();
+                    allFoldersLoaded = true;
+                    if(allFoldersLoaded && userFoldersLoaded){
+                        assignUserFolders();
+                    }
                 });
                 return defer.promise;
             };
+
 
 
             var watchPageNumber = function(){
                 $scope.$watch('pageNumber',function(newVal,oldVal){
                     if(newVal !== oldVal)
                     {
-                        $scope.$broadcast('$preLoaderStart');
-                        $scope.loadTransaction(newVal,$scope.filterStatus,$scope.txSearchTerm).then(function(){
-                            $scope.$broadcast('$preLoaderStop');
+                        $scope.$emit('$preLoaderStart');
+                        $scope.loadTransaction(newVal,$scope.filterStatus,$scope.txSearchTerm,$scope.sortBy).then(function(){
+                            $scope.$emit('$preLoaderStop');
                         },function(){
-                            $scope.$broadcast('$preLoaderStop');
+                            $scope.$emit('$preLoaderStop');
                         });
                     }
                 });
             };
+
+            var watchSortBy = function(){
+                $scope.$watch('sortBy',function(newVal,oldVal){
+                    if(newVal !== oldVal)
+                    {
+                        $scope.$emit('$preLoaderStart');
+                        $scope.loadTransaction($scope.pageNumber,$scope.filterStatus,$scope.txSearchTerm,$scope.sortBy).then(function(){
+                            $scope.$emit('$preLoaderStop');
+                        },function(){
+                            $scope.$emit('$preLoaderStop');
+                        });
+                    }
+                });
+            };
+
 
             /**
              * Load transaction items
@@ -900,49 +1247,59 @@
 
 
             var init = function(){
-                $scope.loadfilterStatusTypes().then(function(resp){
+                //$scope.loadfilterStatusTypes().then(function(resp){
+///
+//                $scope.loadFolderRules().then(function(){
+//                    $scope.$emit('$preLoaderStop');
+//                },function(){
+//                    $scope.$emit('$preLoaderStop');
+//                    Notification.error({message : 'Unable to load folder rules', delay : MsgDelay} );
+//                });
 
-                    $scope.loadTxActionTypes().then(function(){
-                        $scope.loadTxStatusTypes().then(function(){
-                            $scope.loadTransaction(1,-1,$scope.txSearchTerm).then(function(){
-                                watchPageNumber();
-                                $scope.loadItemList().then(function(){
-                                    $scope.loadFolderRules().then(function(){
-                                        $scope.$emit('$preLoaderStop');
-                                    },function(){
-                                        $scope.$emit('$preLoaderStop');
-                                        Notification.error({message : 'Unable to load folder rules', delay : MsgDelay} );
-                                    });
+                ///
+                $scope.loadFolderRules().then(function(){
+                    getSubUserList().then(function(){
+                        $scope.loadTxActionTypes().then(function(){
+                            $scope.loadTxStatusTypes().then(function(){
+                                $scope.loadTransaction(1,-1,$scope.txSearchTerm,$scope.sortBy).then(function(){
+                                    $scope.$emit('$preLoaderStop');
+                                    watchPageNumber();
+                                    watchSortBy();
+                                    watchMyFolders();
+                                    //$scope.loadItemList().then(function(){
+                                    //    $scope.$emit('$preLoaderStop');
+                                    //},function(){
+                                    //    $scope.$emit('$preLoaderStop');
+                                    //    Notification.error({message : 'Unable to load item list', delay : MsgDelay} );
+                                    //});
                                 },function(){
                                     $scope.$emit('$preLoaderStop');
-                                    Notification.error({message : 'Unable to load item list', delay : MsgDelay} );
+                                    Notification.error({message : 'Unable to load resume applications list', delay : MsgDelay} );
                                 });
                             },function(){
                                 $scope.$emit('$preLoaderStop');
-                                Notification.error({message : 'Unable to load resume applications list', delay : MsgDelay} );
+                                Notification.error({message : 'Unable to load resume applications status types', delay : MsgDelay} );
                             });
                         },function(){
                             $scope.$emit('$preLoaderStop');
-                            Notification.error({message : 'Unable to load resume applications\' status types', delay : MsgDelay} );
+                            Notification.error({message : 'Unable to load resume applications action list', delay : MsgDelay} );
                         });
                     },function(){
                         $scope.$emit('$preLoaderStop');
-                        Notification.error({message : 'Unable to load resume applications\' next actions list', delay : MsgDelay} );
                     });
                 },function(){
                     $scope.$emit('$preLoaderStop');
-                    //Notification.error({message : 'Unable to load status types', delay : MsgDelay} );
-               });
+                    Notification.error({message : 'Unable to load folder rules', delay : MsgDelay} );
+                });
 
+
+
+                // },function(){
+                //     $scope.$emit('$preLoaderStop');
+                //     //Notification.error({message : 'Unable to load status types', delay : MsgDelay} );
+                //});
             };
 
-            $rootScope.$on('$includeContentLoaded',function(){
-                $timeout(function(){
-                    $scope.$emit('$preLoaderStart');
-                    init();
-                },1000);
-
-            });
 
             var makeAddress = function(){
                 var address = [];
@@ -1003,9 +1360,11 @@
                     NextAction : ($scope.modalBox.tx.nextAction) ? $scope.modalBox.tx.nextAction : 0,
                     NextActionDateTime : ($scope.modalBox.tx.nextActionDateTime) ? $scope.modalBox.tx.nextActionDateTime : moment().format('YYYY-MM-DD hh:mm:ss'),
                     ItemsList: JSON.stringify($scope.modalBox.tx.itemList),
-                    item_list_type : 0,
+                    item_list_type : $rootScope._userInfo.SalesItemListType,
                     DeliveryAddress : (!editMode) ?
-                        makeAddress() : $scope.modalBox.tx.deliveryAddress
+                        makeAddress() : $scope.modalBox.tx.deliveryAddress,
+                    company_name : $scope.modalBox.tx.companyName,
+                    company_id : $scope.modalBox.tx.companyId
                 };
                 return preparedTx;
             };
@@ -1072,7 +1431,8 @@
                             }
                             $scope.resetModalBox();
                             $scope.toggleAllEditMode();
-                            $scope.loadTransaction(1,$scope.statusType,$scope.txSearchTerm).then(function(){
+                            $scope.$emit('$preLoaderStart');
+                            $scope.loadTransaction(1,$scope.statusType,$scope.txSearchTerm,$scope.sortBy).then(function(){
                                 $scope.$emit('$preLoaderStop');
                             },function(){
                                 $scope.$emit('$preLoaderStop');
@@ -1094,11 +1454,11 @@
             };
 
             $scope.incrementPage = function(){
-              $scope.pageNumber  += 1;
+                $scope.pageNumber = parseInt($scope.pageNumber)  + 1;
             };
 
             $scope.decrementPage = function(){
-                $scope.pageNumber  -= 1;
+                $scope.pageNumber  = parseInt($scope.pageNumber) - 1;
             };
 
 
@@ -1111,10 +1471,56 @@
                      * listType becomes 0 but to restore the actual list type in $rootScope
                      * this will reassign the values to _userInfo.SalesItemListType
                      */
-                    //$rootScope._userInfo.SalesItemListType = $scope._tempSalesItemListType;
+                    $rootScope._userInfo.SalesItemListType = $scope._tempSalesItemListType;
                 }
             );
+
+
+            /**
+             * Dom loaded flag that if the dom is loaded the this flag is set true so that domLoaded function
+             * doesn't execute more than once
+             * @type {boolean}
+             * @private
+             */
+            var _domLoaded = false;
+
+            /**
+             * Function is executed once only when dom is loaded and ready
+             */
+            $scope.domLoaded = function(){
+                if(!_domLoaded){
+                    $timeout(function(){
+                        $scope.$emit('$preLoaderStart');
+                        init();
+                    },1000);
+                    _domLoaded = true;
+                }
+            };
+            /**
+             * Refreshes company data every 1 minute
+             */
+            $interval(function(){
+                loadCompany();
+            },60000);
+
+
+            $scope.cartData = {
+                items : 0,
+                amount : 0.00
+            };
+
+
+            function _cartCalculateAmount(itemList){
+                for(var i = 0; i < itemList.length; i++){
+
+                }
+            };
+
+            function _cartCalculateItems(itemList){
+
+            }
 
         }]);
 
 })();
+
