@@ -227,7 +227,7 @@
         </div>
 
         <!------------ Modal Box starts here -------------------------->
-        <modal mtitle="modalBox.title" showheader="'true'" visible="showModal">
+        <modal mtitle="modalBox.title" showheader="'true'" visible="showRulesModal">
             <div class="container-fluid">
                 <form role="form">
 
@@ -375,6 +375,7 @@
 
                     </div>
 
+                    {{showRulesModal}}
                     <div class="row">
                         <div class="col-lg-2 col-md-2 col-sm-4 col-xs-12 bottom-clearfix">
                             <button class="btn btn-primary btn-block" ng-click="saveRule()">Save</button>

@@ -716,7 +716,8 @@
                                 id : resp.data[a].tid,
                                 duration : resp.data[a].idledays,
                                 user : resp.data[a].updateduser,
-                                name : resp.data[a].company_name
+                                name : resp.data[a].company_name,
+                                ezeid : resp.data[a].RequesterEZEID
                             };
                             companyList[a] = suggestion;
                         }
@@ -744,6 +745,17 @@
                 }
                 if(newVal !== oldVal){
                     $scope.checkEzeidInfo(newVal);
+                }
+            });
+            $scope.$watch('modalBox.tx.companyId',function(n,v){
+                console.log(n);
+                if(n){
+                    console.log(companyList);
+                    var indx = companyList.indexOfWhere('id',n);
+                    console.log(indx);
+                    if(indx !== -1){
+                        $scope.modalBox.tx.ezeid = companyList[indx].ezeid;
+                    }
                 }
             });
 

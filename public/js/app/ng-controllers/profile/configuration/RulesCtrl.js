@@ -13,7 +13,7 @@ angular.module('ezeidApp').controller('RulesCtrl',['$scope','$interval','$http',
 
         $scope.selectedTab = 1;
 
-        $scope.showModal = false;
+        $scope.showRulesModal = false;
         $scope.masterUser = null;
         $scope.rules = [];
         $scope.ruleFunctionTypes = [
@@ -69,11 +69,11 @@ angular.module('ezeidApp').controller('RulesCtrl',['$scope','$interval','$http',
                         }
                         else{
                             $scope.modalBox.tempMappedName = '';
-                            Notification.error({ message : 'Unable to detect location details',delay : MsgDelay});
+                            //Notification.error({ message : 'Unable to detect location details',delay : MsgDelay});
                         }
                     },function(){
                         $scope.modalBox.tempMappedName = '';
-                        Notification.error({ message : 'Unable to detect location details',delay : MsgDelay});
+                        //Notification.error({ message : 'Unable to detect location details',delay : MsgDelay});
                     });
                 }
             },500);
@@ -151,7 +151,7 @@ angular.module('ezeidApp').controller('RulesCtrl',['$scope','$interval','$http',
                     $scope.modalBox.title  = 'Edit Rule';
                 }
             }
-            $scope.showModal = !$scope.showModal;
+            $scope.showRulesModal = !$scope.showRulesModal;
             $timeout(function(){
                 createRuleMap();
             },2000);
@@ -160,7 +160,7 @@ angular.module('ezeidApp').controller('RulesCtrl',['$scope','$interval','$http',
         /**
          * Adding a watcher on showModal to remove MappedNames in case MatchAdminLevel changes
          */
-        $scope.$watch('showModal',function(newVal){
+        $scope.$watch('showRulesModal',function(newVal){
             var destroy = null;
             if(newVal){
                 $timeout(function(){

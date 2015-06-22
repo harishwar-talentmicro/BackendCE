@@ -34,18 +34,11 @@
                     scope.companyName = scope.list[i].name;
                     companyFlag = true;
                     scope.companyId = scope.list[i].id;
+
                     scope.list = [];
                 };
                 element.html(templateHtml).show();
                 $compile(element.contents())(scope);
-
-                //element.find('input').bind('keypress',function(e){
-                //    scope.companyId = 0;
-                //    scope.companyName = angular.element(e.currentTarget).val();
-                //    if(scope.companyName){
-                //        scope.list = scope.loadSuggestion(scope.companyName);
-                //    }
-                //});
 
                 scope.$watch('companyName',function(n,v,scope){
                     if(n !== v){
@@ -66,12 +59,7 @@
                     },500);
 
                 });
-
-
-
             }
-
-
 
         };
     }]);
