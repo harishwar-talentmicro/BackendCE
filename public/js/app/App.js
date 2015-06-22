@@ -237,6 +237,10 @@
             var dataProgress = false;
             var htmlProgress = false;
 
+            $rootScope.navigateHome = function(){
+                $location.path('/');
+            };
+
             //$rootScope.$on('$includeContentRequested',function(){
             //    $rootScope.$broadcast('$preLoaderStart');
             //});
