@@ -3,7 +3,7 @@
  */
 angular.module('ezeidApp').directive('modal', function () {
     return {
-        template: '<div class="modal fade">' +
+        template: '<div class="modal fade" data-backdrop="static">' +
             '<div class="modal-dialog modal-lg {{ mclass }}">' +
             '<button type="button" class="close up-btn" data-dismiss="modal" aria-hidden="true" ng-show="mclass && !showheader">×</button>' +
             '<div class="modal-content">' +

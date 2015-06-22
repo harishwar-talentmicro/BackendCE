@@ -1313,6 +1313,11 @@ span.smallCloselink {
     border: 1px solid #999;
 }
 
+.modal-backdrop.in {
+    overflow: hidden;
+    margin-right: 13pt;
+}
+
 .button.close{
     text-decoration: none;
 }

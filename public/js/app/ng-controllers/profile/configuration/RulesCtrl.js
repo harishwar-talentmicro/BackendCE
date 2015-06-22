@@ -151,7 +151,7 @@ angular.module('ezeidApp').controller('RulesCtrl',['$scope','$interval','$http',
                     $scope.modalBox.title  = 'Edit Rule';
                 }
             }
-            $scope.showModal = true;
+            $scope.showModal = !$scope.showModal;
             $timeout(function(){
                 createRuleMap();
             },2000);
