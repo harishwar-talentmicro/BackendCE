@@ -130,11 +130,11 @@ angular.module('ezeidApp').controller('WorkingHourCtrl',['$scope','$rootScope','
                     $scope.mInfo = {}
                     getWorkingHours();
                     $scope.showAddWorkingHourForm = false;
-                    Notification.success({message: "Saved...", delay: MsgDelay});
+                    Notification.success({message: "Working Hours saved successfully", delay: MsgDelay});
                 }
                 else
                 {
-                    Notification.error({ message: "Not Saved...", delay: MsgDelay });
+                    Notification.error({ message: "An error occurred while saving working hours! Please try again", delay: MsgDelay });
                 }
             });
          };

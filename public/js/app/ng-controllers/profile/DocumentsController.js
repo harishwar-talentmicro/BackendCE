@@ -111,7 +111,7 @@ angular.module('ezeidApp').controller('DocumentController',[
       if($scope.Pin<100 && $scope.Pin != "")
         {
             $scope.Pin = "";
-            Notification.error({ message: 'Pin should greater or equal 100 ', delay: MsgDelay });
+            Notification.error({ message: 'Pin should be greater or equal 100 ', delay: MsgDelay });
         }
         else
         {

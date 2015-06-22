@@ -250,7 +250,7 @@
                                     <option value="">--Select Folder type--</option>
                                     <option value="0">Area name based match</option>
                                     <option value="1">Proximity based match</option>
-                                    <option value="2">EZEID's linked</option>
+                                    <option value="2">EZEOne's linked</option>
                                 </select>
                             </div>
                         </div>
@@ -341,23 +341,23 @@
                         <div class="col-lg-2 col-md-2 col-sm-3 col-xs-4 bottom-clearfix" ng-show="modalBox.rule.RuleType == 2">
 
                             <div class="form-group">
-                                <label>Enter EZEID(s) : </label>
-                                <small class="text-info tiny">You can also put comma separated multiple EZEIDs at once</small>
+                                <label>Enter EZEOne(s) : </label>
+                                <small class="text-info tiny">You can also put comma separated multiple EZEOnes at once</small>
                                 <br/>
                                 <input maxlength="5000" type="text" class="form-control" ng-model="modalBox.tempMappedName"/>
                                 <br/>
-                                <button class="btn btn-sm btn-success no-radius" ng-click="addMappedEzeid()"> Add Current EZEID</button>
+                                <button class="btn btn-sm btn-success no-radius" ng-click="addMappedEzeid()"> Add Current EZEOne</button>
                             </div>
 
                             <div class="form-group">
-                                <label>Mapped EZEIDs</label>
+                                <label>Mapped EZEOnes</label>
 
                                 <button ng-repeat="mapName in modalBox.rule.MappedNames track by $index" class="btn btn-info btn-block btn-sm">{{mapName}}
                                     <i class="pull-right fa fa-remove" ng-click="removeMappedName($index)"></i>
                                 </button>
 
                                 <br/>
-                                <small class="text-warning tiny" ng-show="modalBox.rule.MappedNames.length < 1">No mapped ezeids added</small>
+                                <small class="text-warning tiny" ng-show="modalBox.rule.MappedNames.length < 1">No mapped EZEOnes added</small>
 
                             </div>
                         </div>

@@ -361,7 +361,7 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope',
         $scope.validateSubUser().then(function(isValid){
             if(!isValid){
                 $scope.$emit('$preLoaderStop');
-                Notification.error({ message : 'We were unable to find personal EZEID of this subuser !' +
+                Notification.error({ message : 'We were unable to find personal EZEOne of this subuser !' +
                 ' Please register him to add as a subuser', delay : MsgDelay});
 
             }

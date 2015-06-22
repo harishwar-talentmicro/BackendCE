@@ -173,7 +173,7 @@ var res = angular.module('ezeidApp').
             if(($scope.params.searchType == 1) && (!$rootScope._userInfo.IsAuthenticate))
             {
                 $scope.showLoginText = true;
-                Notification.error({ message : 'Please login to search for EZEID', delay : MsgDelay});
+                Notification.error({ message : 'Please login to search for EZEOne', delay : MsgDelay});
                 $scope.$emit('$preLoaderStop');
             }
             else

@@ -134,7 +134,7 @@ angular.module('ezeidApp').
                      */
 
 
-                    Notification.error({message: 'Please login to search for EZEID', delay: MsgDelay});
+                    Notification.error({message: 'Please login to search for EZEOne', delay: MsgDelay});
                     return false;
                 }
 

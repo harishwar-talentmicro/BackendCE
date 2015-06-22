@@ -82,11 +82,11 @@ angular.module('ezeidApp').controller('HolidayCalenderCtrl',['$scope','$rootScop
                     $scope.mInfo = {}
                     $scope.mInfo.TemplateID = $scope.saveInfo.TemplateID;
                     $scope.showAddHolidayForm = false;
-                    Notification.success({message: "Saved...", delay: MsgDelay});
+                    Notification.success({message: "Holiday calender saved successfully", delay: MsgDelay});
                 }
                 else
                 {
-                    Notification.error({ message: "Not Saved...", delay: MsgDelay });
+                    Notification.error({ message: "An error occurred while saving holiday calender! Please try again", delay: MsgDelay });
                 }
             });
          };

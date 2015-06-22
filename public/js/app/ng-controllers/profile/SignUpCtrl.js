@@ -991,13 +991,13 @@ angular.module('ezeidApp').
                                         $scope.$emit('$preLoaderStop');
                                         $rootScope._userInfo = sResp;
                                         $rootScope._userInfo.userName = sResp.userName;
-                                        Notification.success({ message : 'Your EZEID - '+$scope.ezeid + ' have been generated successfully ! Please fill up you details to proceed', delay : MsgDelay});
+                                        Notification.success({ message : 'Your EZEOne - '+$scope.ezeid + ' have been generated successfully ! Please fill up you details to proceed', delay : MsgDelay});
                                         $location.path('/profile-manager/user');
                                     },function(){
                                         $scope.$emit('$preLoaderStop');
                                         $rootScope._userInfo = sResp;
                                         $rootScope._userInfo.userName = sResp.userName;
-                                        Notification.success({ message : 'Your EZEID - '+$scope.ezeid + ' have been generated successfully ! Please fill up you details to proceed', delay : MsgDelay});
+                                        Notification.success({ message : 'Your EZEOne - '+$scope.ezeid + ' have been generated successfully ! Please fill up you details to proceed', delay : MsgDelay});
                                         $location.path('/profile-manager/user');
                                     });
                                 }
@@ -1005,7 +1005,7 @@ angular.module('ezeidApp').
                                     $scope.$emit('$preLoaderStop');
                                     $rootScope._userInfo = sResp;
                                     $rootScope._userInfo.userName = sResp.userName;
-                                    Notification.success({ message : 'Your EZEID - '+$scope.ezeid + ' have been generated successfully ! Please fill up you details to proceed', delay : MsgDelay});
+                                    Notification.success({ message : 'Your EZEOne - '+$scope.ezeid + ' have been generated successfully ! Please fill up you details to proceed', delay : MsgDelay});
                                     $location.path('/profile-manager/user');
                                 }
 

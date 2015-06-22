@@ -1331,9 +1331,10 @@ hr.style-two {
 .hpw .ezeid-id-style
 {
     color: #fff;
-    padding-left: 2px;
-    padding-right: 2px;
-    background-color: rgb(15, 199, 215);
+    /* padding-left: 2px; */
+    /* padding-right: 2px; */
+    background-color: #008B8B;
+    border: 1px solid #008B8B;
 }
 
 .hpw .text-dark-blue
@@ -1366,8 +1367,10 @@ hr.style-two {
 
 .hpw .ezeid-eze-style
 {
-    background-color: rgb(242, 248, 254);
+    background-color: rgb(255, 255, 255);
     padding-left: 5px;
+    border: 1px solid #008b8b;
+    color: #008b8b;
 }
 
 .hpw .mobile-title-content
@@ -2233,4 +2236,11 @@ hr.style-two {
     padding: 5px;
     text-align: center;
     border: 1px solid grey;
+}
+
+sup.tm{
+    top: -2em;
+    font-size: 8px;
+    padding-right: 3px;
+    margin-left: -9px;
 }

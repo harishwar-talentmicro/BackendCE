@@ -25,8 +25,8 @@
         <div class="window_page Maping_popup">
             <span class="closeCV" ng-click="blacklist.closeAddConfirmDialog()">X</span>
             <form name="addConfirmForm" novalidate>
-                <h3 ng-show="blacklist._info.List == 2" class="marB15px">EZEID you are trying to add to Blacklist is in Whitelist. Delete the same and try again.</h3>
-                <h3 ng-show="blacklist._info.List == 1" class="marB15px">EZEID you are trying to add to Whitelist is in Blacklist. Delete the same and try again.</h3>
+                <h3 ng-show="blacklist._info.List == 2" class="marB15px">EZEOne you are trying to add to Blacklist is in Whitelist. Delete the same and try again.</h3>
+                <h3 ng-show="blacklist._info.List == 1" class="marB15px">EZEOne you are trying to add to Whitelist is in Blacklist. Delete the same and try again.</h3>
                 <div class="col-md-12" style="margin-left: 30%;">
                     <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2" style="margin-left: 9%;">
                         <button ng-click="blacklist.closeAddConfirmDialog()" class="btn btn-block btn-primary pull-left" type="button">Ok</button>
@@ -65,10 +65,10 @@
                                         </select>
                                     </div>
                                     <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1 setLeftRightPaddingZero">
-                                        <span>EZE ID</span>
+                                        <span>EZEOne</span>
                                     </div>
                                     <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
-                                        <input id="EZEID" style='text-transform:uppercase' class="form-control" type="text" placeholder="EZEID"  ng-model="blacklist._info.EZEID" />
+                                        <input id="EZEID" style='text-transform:uppercase' class="form-control" type="text" placeholder="EZEOne"  ng-model="blacklist._info.EZEID" />
                                     </div>
                                     <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2" ng-show="blacklist._info.List == 1">
                                         <select class="form-control " name="tags" ng-model="blacklist._info.Tag"
@@ -87,7 +87,7 @@
                                     <th class="panelPd5px msg_pos">No.</th>
                                     <th class="panelPd5px date_size msg_pos">Type</th>
                                     <th class="panelPd5px from_size msg_pos">Relationship</th>
-                                    <th class="panelPd5px date_size msg_pos">EZE ID</th>
+                                    <th class="panelPd5px date_size msg_pos">EZEOne</th>
                                     <th class="panelPd5px statusSize msg_pos">Tag</th>
                                     <th class="panelPd5px msg_size msg_pos">Date</th>
                                     <th class="panelPd5px msg_size msg_pos">Action</th>

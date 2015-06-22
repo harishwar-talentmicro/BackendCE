@@ -2735,7 +2735,8 @@ exports.FnGetMessages = function (req, res) {
                         }
                       //  console.log('From Page: ' + FromPage);
                         //console.log('To Page: ' + ToPage);
-                        db.query('CALL pGetMessages(' + db.escape(Token) + ',' + db.escape(FromPage) + ',' + db.escape(ToPage) + ',' + db.escape(Status) + ',' + db.escape(MessageType) + ')', function (err, MessagesResult) {
+                        var getMessageQuery = 'CALL pGetMessages(' + db.escape(Token) + ',' + db.escape(FromPage) + ',' + db.escape(ToPage) + ',' + db.escape(Status) + ',' + db.escape(MessageType) + ')';
+                        db.query(getMessageQuery, function (err, MessagesResult) {
                             if (!err) {
                                 //  console.log(MessagesResult);
                                 if (MessagesResult != null) {
@@ -11385,11 +11386,7 @@ exports.FnSearchBusListing = function(req,res,next){
         'profile-manager',
         'searchResult',
         'searchDetails',
-        'outbox',
-        'sales',
-        'home_delivery',
-        'help_desk',
-        'send_cv'
+        'outbox'
     ];
 
     var loginCookie = (req.cookies['login']) ? ((req.cookies['login'] === 'true') ? true : false ) : false;

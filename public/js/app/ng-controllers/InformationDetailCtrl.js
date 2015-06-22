@@ -111,7 +111,7 @@ angular.module('ezeidApp').
             {
                 $scope.showLoginText = true;
                 $scope.$emit('$preLoaderStop');
-                Notification.error({ message : 'Please login to search for EZEID', delay : MsgDelay});
+                Notification.error({ message : 'Please login to search for EZEOne', delay : MsgDelay});
                 return false;
             }
             else
@@ -514,10 +514,10 @@ angular.module('ezeidApp').
 
                         if (data.IsSuccessfull) {
                             $('#CV_popup').slideUp();
-                            Notification.success({ message: 'CV send success', delay: MsgDelay });
+                            Notification.success({ message: 'Your Resume is posted successfully', delay: MsgDelay });
                         }
                         else {
-                            Notification.error({ message: 'Sorry..! Message not send ', delay: MsgDelay });
+                            Notification.error({ message: 'Sorry..! An error occured while sending your resume. Please try again ', delay: MsgDelay });
                         }
                     });
                 }
@@ -540,7 +540,7 @@ angular.module('ezeidApp').
                         else
                         {
                             $('#CV_popup').slideUp();
-                            Notification.error({ message: 'Sorry..! CV is not uploaded... ', delay: MsgDelay });
+                            Notification.error({ message: 'An error occurred while uploading resume! Please try again ', delay: MsgDelay });
                         }
                     });
                 }
