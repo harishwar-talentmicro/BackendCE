@@ -7,7 +7,7 @@ function error(err, req, res, next) {
     console.error(err.stack);
     console.log('Error Happened Please try Again..');
     // respond with 500 "Internal Server Error".
-    res.send(500, 'Error Happened');
+    res.send(500, 'Error Occurred');
 };
 //finding for which application the app is running ie whether cab or school
 
@@ -944,19 +944,19 @@ exports.FnGetCategory = function (req, res) {
                         console.log('FnGetCategory: mcategory: Category sent successfully');
                     }
                     else {
-                        res.send('null');
+                        res.json(null);
                         console.log('FnGetCategory: mcategory: No category found');
                     }
                 }
                 else {
-                    res.send('null');
+                    res.json(null);
                     res.statusCode = 500;
                     console.log('FnGetCategory: mcategory: ' + err);
                 }
             });
         }
         else {
-            res.send('null');
+            res.json(null);
             res.statusCode = 400;
             console.log('FnGetCategory: LangId is empty');
         }
@@ -984,12 +984,12 @@ exports.FnGetCity = function (req, res) {
                         console.log('FnGetCity: mcity: City sent successfully');
                     }
                     else {
-                        res.send('null');
+                        res.json(null);
                         console.log('FnGetCity: mcity: No category found');
                     }
                 }
                 else {
-                    res.send('null');
+                    res.json(null);
                     res.statusCode = 500;
                     console.log('FnGetCity: mcity: ' + err);
                 }
@@ -1003,7 +1003,7 @@ exports.FnGetCity = function (req, res) {
                 console.log('FnGetCity: StateID is empty');
             }
             res.statusCode = 400;
-            res.send('null');
+            res.json(null);
         }
     }
     catch (ex) {
@@ -1028,19 +1028,19 @@ exports.FnGetCountry = function (req, res) {
                         console.log('FnGetCountry: mcountry: Country sent successfully');
                     }
                     else {
-                        res.send('null');
+                        res.json(null);
                         console.log('FnGetCountry: mcountry: No Country found');
                     }
                 }
                 else {
-                    res.send('null');
+                    res.json(null);
                     res.statusCode = 500;
                     console.log('FnGetCountry: mcountry: ' + err);
                 }
             });
         }
         else {
-            res.send('null');
+            res.json(null);
             res.statusCode = 400;
             console.log('FnGetCountry: LangId is empty');
         }
@@ -1076,24 +1076,24 @@ exports.FnGetState = function (req, res) {
                                     console.log('FnGetState: mcountry: State sent successfully');
                                 }
                                 else {
-                                    res.send('null');
+                                    res.json(null);
                                     console.log('FnGetState: mcountry: No Country ISDCode found');
                                 }
                             }
                             else {
-                                res.send('null');
+                                res.json(null);
                                 console.log('FnGetState: mcountry:  No Country ISDCode found: ' + err);
                             }
                         });
 
                     }
                     else {
-                        res.send('null');
+                        res.json(null);
                         console.log('FnGetState: mstate: No state found');
                     }
                 }
                 else {
-                    res.send('null');
+                    res.json(null);
                     res.statusCode = 500;
                     console.log('FnGetState: mstate:' + err);
                 }
@@ -1107,7 +1107,7 @@ exports.FnGetState = function (req, res) {
                 console.log('CountryId is empty');
             }
             res.statusCode = 400;
-            res.send('null');
+            res.json(null);
         }
     }
     catch (ex) {
@@ -1130,13 +1130,13 @@ exports.FnGetFunctionRoleMap = function (req, res) {
                     console.log('FnGetFunctionRoleMap: mfunctionrolemap: Function Rolemap sent successfully');
                 }
                 else {
-                    res.send('null');
+                    res.json(null);
                     console.log('FnGetFunctionRoleMap: mfunctionrolemap: No function Rolemap found');
                 }
             }
             else {
 
-                res.send('null');
+                res.json(null);
                 res.statusCode = 500;
                 console.log('FnGetFunctionRoleMap: mfunctionrolemap: ' + err);
             }
@@ -1164,14 +1164,14 @@ exports.FnGetFunctions = function (req, res) {
                         console.log('FnGetFunctions: mfunctiontype: Functions sent successfully');
                     }
                     else {
-                        res.send('null');
+                        res.json(null);
                         res.statusCode = 500;
                         console.log('FnGetFunctions: mfunctiontype: No function  found');
                     }
                 }
                 else {
 
-                    res.send('null');
+                    res.json(null);
                     console.log('FnGetFunctions: mfunctiontype: ' + err);
                 }
             });
@@ -1179,7 +1179,7 @@ exports.FnGetFunctions = function (req, res) {
         else {
             console.log('FnGetFunctions: LangId is empty');
             res.statusCode = 400;
-            res.send('null');
+            res.json(null);
         }
 
     }
@@ -1207,14 +1207,14 @@ exports.FnGetRoles = function (req, res) {
                         console.log('FnGetRoles: mfunctiontype: Functions sent successfully');
                     }
                     else {
-                        res.send('null');
+                        res.json(null);
                         res.statusCode = 500;
                         console.log('FnGetRoles: mfunctiontype: No function  found');
                     }
                 }
                 else {
 
-                    res.send('null');
+                    res.json(null);
                     console.log('FnGetRoles: mfunctiontype: ' + err);
                 }
             });
@@ -1227,7 +1227,7 @@ exports.FnGetRoles = function (req, res) {
                 console.log('FnGetRoles: FunctionId is empty');
             }
             res.statusCode = 400;
-            res.send('null');
+            res.json(null);
         }
 
     }
@@ -1252,19 +1252,19 @@ exports.FnGetLanguage = function (req, res) {
                         console.log('FnGetLanguage: mlang: Language sent successfully');
                     }
                     else {
-                        res.send('null');
+                        res.json(null);
                         console.log('FnGetLanguage: mlang: No Language found');
                     }
                 }
                 else {
-                    res.send('null');
+                    res.json(null);
                     res.statusCode = 500;
                     console.log('FnGetLanguage: mlang: ' + err);
                 }
             });
         }
         else {
-            res.send('null');
+            res.json(null);
             res.statusCode = 400
             console.log('FnGetLanguage: LangId is empty');
         }
@@ -1291,19 +1291,19 @@ exports.FnGetRelationType = function (req, res) {
                         console.log('FnGetRelationType: mrelationtype: Relation Type sent successfully');
                     }
                     else {
-                        res.send('null');
+                        res.json(null);
                         res.statusCode = 500;
                         console.log('FnGetRelationType: mrelationtype: No Relation type found');
                     }
                 }
                 else {
-                    res.send('null');
+                    res.json(null);
                     console.log('FnGetRelationType: mrelationtype:' + err);
                 }
             });
         }
         else {
-            res.send('null');
+            res.json(null);
             res.statusCode = 400;
             console.log('FnGetRelationType: LangId is empty');
         }
@@ -1330,12 +1330,12 @@ exports.FnGetFunctionRoleMapping = function (req, res) {
                     console.log('FnGetRoleFunctionMapping: mfunctionrolemap: Function Role Map sent successfully');
                 }
                 else {
-                    res.send('null');
+                    res.json(null);
                     console.log('FnGetRoleFunctionMapping: mfunctionrolemap: No Function Role Map found');
                 }
             }
             else {
-                res.send('null');
+                res.json(null);
                 res.statusCode = 500;
                 console.log('FnGetRoleFunctionMapping: mfunctionrolemap:' + err);
             }
@@ -1363,19 +1363,19 @@ exports.FnGetRoleType = function (req, res) {
                         console.log('FnGetRoleType: mroletype: Role Type sent successfully');
                     }
                     else {
-                        res.send('null');
+                        res.json(null);
                         console.log('FnGetRoleType: mroletype: No Role Type found');
                     }
                 }
                 else {
-                    res.send('null');
+                    res.json(null);
                     res.statusCode = 500;
                     console.log('FnGetRoleType: mroletype:' + err);
                 }
             });
         }
         else {
-            res.send('null');
+            res.json(null);
             res.statusCode = 400;
             console.log('LangId is empty');
         }
@@ -1403,12 +1403,12 @@ exports.FnGetMTitle = function (req, res) {
                         console.log('FnGetMTitle: mtitle: MTitle sent successfully');
                     }
                     else {
-                        res.send('null');
+                        res.json(null);
                         console.log('FnGetMTitle: mtitle: No MTitle found');
                     }
                 }
                 else {
-                    res.send('null');
+                    res.json(null);
                     res.statusCode = 500;
                     console.log('FnGetMTitle: mtitle: ' + err);
                 }
@@ -1418,7 +1418,7 @@ exports.FnGetMTitle = function (req, res) {
 
             console.log('FnGetMTitle: LangId is empty');
             res.statusCode = 400;
-            res.send('null');
+            res.json(null);
         }
     }
     catch (ex) {
@@ -1442,19 +1442,19 @@ exports.FnGetProxmity = function (req, res) {
                         console.log('FnGetProxmity: mproximity: proximity sent successfully');
                     }
                     else {
-                        res.send('null');
+                        res.json(null);
                         console.log('FnGetProxmity: mproximity: No proximity found');
                     }
                 }
                 else {
-                    res.send('null');
+                    res.json(null);
                     res.statusCode = 500;
                     console.log('FnGetProxmity: mroletype:' + err);
                 }
             });
         }
         else {
-            res.send('null');
+            res.json(null);
             res.statusCode = 400;
             console.log('FnGetProxmity: LangId is empty');
         }
@@ -1532,18 +1532,18 @@ exports.FnGetUserDetails = function (req, res) {
                                         res.send(UserDetailsResult[0]);
                                     }
                                     else {
-                                        res.send('null');
+                                        res.json(null);
                                         console.log('FnGetUserDetails : tmaster: No User details found');
                                     }
                                 }
                                 else {
-                                    res.send('null');
+                                    res.json(null);
                                     console.log('FnGetUserDetails : tmaster: No User details found');
                                 }
 
                             }
                             else {
-                                res.send('null');
+                                res.json(null);
                                 res.statusCode = 500;
                                 console.log('FnGetUserDetails : tmaster:' + err);
                             }
@@ -1552,18 +1552,18 @@ exports.FnGetUserDetails = function (req, res) {
                     else {
                         console.log('FnGetUserDetails: Invalid token');
                         res.statusCode = 401;
-                        res.send('null');
+                        res.json(null);
                     }
                 }
                 else {
                     console.log('FnGetUserDetails: ' + err);
                     res.statusCode = 500;
-                    res.send('null');
+                    res.json(null);
                 }
             });
         }
         else {
-            res.send('null');
+            res.json(null);
             res.statusCode = 400;
             console.log('FnGetUserDetails :  token is empty');
         }
@@ -1595,18 +1595,18 @@ exports.FnGetSecondaryLocation = function (req, res) {
                                         res.send(SecondaryResult[0]);
                                     }
                                     else {
-                                        res.send('null');
+                                        res.json(null);
                                         console.log('FnGetSecondaryLocation : tmaster: No secondary location available');
                                     }
                                 }
                                 else {
-                                    res.send('null');
+                                    res.json(null);
                                     console.log('FnGetSecondaryLocation : tmaster: No secondary location found');
                                 }
 
                             }
                             else {
-                                res.send('null');
+                                res.json(null);
                                 res.statusCode = 500;
                                 console.log('FnGetSecondaryLocation : tmaster:' + err);
                             }
@@ -1615,18 +1615,18 @@ exports.FnGetSecondaryLocation = function (req, res) {
                     else {
                         console.log('FnGetSecondaryLocation: Invalid token');
                         res.statusCode = 401;
-                        res.send('null');
+                        res.json(null);
                     }
                 }
                 else {
                     console.log('FnGetSecondaryLocation: ' + err);
                     res.statusCode = 500;
-                    res.send('null');
+                    res.json(null);
                 }
             });
         }
         else {
-            res.send('null');
+            res.json(null);
             res.statusCode = 400;
             console.log('FnGetSecondaryLocation :  token is empty');
         }
@@ -2307,13 +2307,13 @@ exports.FnAddLocation = function (req, res) {
                     else {
                         console.log('FnAddLocation: Invalid token');
                         res.statusCode = 401;
-                        res.send('null');
+                        res.json(null);
                     }
                 }
                 else {
                     console.log('FnAddLocation: ' + err);
                     res.statusCode = 500;
-                    res.send('null');
+                    res.json(null);
                 }
             });
         }
@@ -2450,7 +2450,7 @@ exports.FnSendMail = function (req, res) {
                 //transporter.sendMail(mailOptions, function (error, info) {
                 //    if (error) {
                 //        console.log(error);
-                //        res.send('null');
+                //        res.json(null);
                 //    } else {
                 //        console.log('Message sent: ' + info.response);
                 //        FinalMsgJson.Message = 'Mail send';
@@ -2467,12 +2467,12 @@ exports.FnSendMail = function (req, res) {
                         }
                         else {
                             console.log('FnSendMail: Mail not Sent Successfully');
-                            res.send('null');
+                            res.json(null);
                         }
                     }
                     else {
                         console.log('FnSendMail: Error in sending mails' + err);
-                        res.send('null');
+                        res.json(null);
                     }
                 });
 
@@ -2544,17 +2544,17 @@ exports.FnGetAccessHistory = function (req, res) {
                                     }
                                     else {
                                         console.log('FnGetAccessHistory: History not available');
-                                        res.send('null');
+                                        res.json(null);
                                     }
 
                                 }
                                 else {
                                     console.log('FnGetAccessHistory: No History available');
-                                    res.send('null');
+                                    res.json(null);
                                 }
                             }
                             else {
-                                res.send('null');
+                                res.json(null);
                                 console.log('FnGetAccessHistory: Error in sending documents: ' + err);
                             }
                         });
@@ -2562,13 +2562,13 @@ exports.FnGetAccessHistory = function (req, res) {
                     else {
                         res.statusCode = 401;
                         console.log('FnGetAccessHistory: Invalid Token');
-                        res.send('null');
+                        res.json(null);
                     }
                 }
                 else {
                     res.statusCode = 500;
                     console.log('FnGetAccessHistory: Token error: ' + err);
-                    res.send('null');
+                    res.json(null);
                 }
             });
 
@@ -2581,7 +2581,7 @@ exports.FnGetAccessHistory = function (req, res) {
                 console.log('FnGetAccessHistory: Type is empty');
             }
             res.statusCode = 400;
-            res.send('null');
+            res.json(null);
         }
 
     }
@@ -2746,32 +2746,32 @@ exports.FnGetMessages = function (req, res) {
                                     }
                                     else {
                                         console.log('FnGetMessages: No Messages available');
-                                        res.send('null');
+                                        res.json(null);
                                     }
 
                                 }
                                 else {
                                     console.log('FnGetMessages: No Messages available');
-                                    res.send('null');
+                                    res.json(null);
                                 }
                             }
                             else {
                                 res.statusCode = 500;
                                 console.log('FnGetMessages: Error in sending Messages: ' + err);
-                                res.send('null');
+                                res.json(null);
                             }
                         });
                     }
                     else {
                         console.log('FnGetMessages: Invalid Token');
                         res.statusCode = 401;
-                        res.send('null');
+                        res.json(null);
                     }
                 }
                 else {
                     res.statusCode = 500;
                     console.log('FnGetMessages: Token error: ' + err);
-                    res.send('null');
+                    res.json(null);
                 }
             });
         }
@@ -2785,7 +2785,7 @@ exports.FnGetMessages = function (req, res) {
                 console.log('FnGetMessages: Sending page 0');
             }
             res.statusCode = 400;
-            res.send('null');
+            res.json(null);
         }
     }
     catch (ex) {
@@ -3375,38 +3375,38 @@ exports.FnGetDocPin = function (req, res) {
                                     }
                                     else {
                                         console.log('FnGetDocPin: Bussiness Pin is not avaiable');
-                                        res.send('null');
+                                        res.json(null);
                                     }
                                 }
                                 else {
                                     console.log('FnGetDocPin: Bussiness listing is not avaiable');
-                                    res.send('null');
+                                    res.json(null);
                                 }
                             }
                             else {
                                 console.log('FnGetDocPin: ' + err);
                                 res.statusCode = 500;
-                                res.send('null');
+                                res.json(null);
                             }
                         });
                     }
                     else {
                         console.log('FnGetDocPin: Invalid token');
                         res.statusCode = 401;
-                        res.send('null');
+                        res.json(null);
                     }
                 }
                 else {
                     console.log('FnGetDocPin: : ' + err);
                     res.statusCode = 500;
-                    res.send('null');
+                    res.json(null);
                 }
             });
         }
         else {
             console.log('FnGetDocPin: token is empty');
             res.statusCode = 400;
-            res.send('null');
+            res.json(null);
 
         }
     }
@@ -3603,18 +3603,18 @@ exports.FnGetDoc = function (req, res) {
                                     }
                                     else {
                                         console.log('FnGetDoc: No document available');
-                                        res.send('null');
+                                        res.json(null);
                                     }
 
                                 }
                                 else {
                                     console.log('FnGetDoc: No document available');
-                                    res.send('null');
+                                    res.json(null);
                                 }
                             }
                             else {
                                 res.statusCode = 500;
-                                res.send('null');
+                                res.json(null);
                                 console.log('FnGetDoc: Error in sending documents: ' + err);
                             }
                         });
@@ -3622,13 +3622,13 @@ exports.FnGetDoc = function (req, res) {
                     else {
                         console.log('FnGetDoc: Invalid Token');
                         res.statusCode = 401;
-                        res.send('null');
+                        res.json(null);
                     }
                 }
                 else {
                     console.log('FnGetDoc: Token error: ' + err);
                     res.statusCode = 500;
-                    res.send('null');
+                    res.json(null);
                 }
             });
 
@@ -3641,7 +3641,7 @@ exports.FnGetDoc = function (req, res) {
                 console.log('FnGetDoc: Type is empty');
             }
             res.statusCode = 400;
-            res.send('null');
+            res.json(null);
         }
 
     }
@@ -3746,38 +3746,38 @@ exports.FnGetBussinessListing = function (req, res) {
                                     }
                                     else {
                                         console.log('FnGetBussinessListing: Bussiness listing is not avaiable');
-                                        res.send('null');
+                                        res.json(null);
                                     }
                                 }
                                 else {
                                     console.log('FnGetBussinessListing: Bussiness listing is not avaiable');
-                                    res.send('null');
+                                    res.json(null);
                                 }
                             }
                             else {
                                 console.log('FnGetBussinessListing: ' + err);
                                 res.statusCode = 500;
-                                res.send('null');
+                                res.json(null);
                             }
                         });
                     }
                     else {
                         console.log('FnGetBussinessListing: Invalid token');
                         res.statusCode = 401;
-                        res.send('null');
+                        res.json(null);
                     }
                 }
                 else {
                     console.log('FnGetBussinessListing: : ' + err);
                     res.statusCode = 500;
-                    res.send('null');
+                    res.json(null);
                 }
             });
         }
         else {
             console.log('FnGetBussinessListing: token is empty');
             res.statusCode = 400;
-            res.send('null');
+            res.json(null);
 
         }
     }
@@ -3910,18 +3910,18 @@ exports.FnGetDocument = function (req, res) {
                                     }
                                     else {
                                         console.log('FnGetDocument: No document available');
-                                        res.send('null');
+                                        res.json(null);
                                     }
 
                                 }
                                 else {
                                     console.log('FnGetDocument: No document available');
-                                    res.send('null');
+                                    res.json(null);
                                 }
                             }
                             else {
                                 res.statusCode = 500;
-                                res.send('null');
+                                res.json(null);
                                 console.log('FnGetDocument: Error in sending documents: ' + err);
                             }
                         });
@@ -3929,13 +3929,13 @@ exports.FnGetDocument = function (req, res) {
                     else {
                         console.log('FnGetDocument: Invalid Token');
                         res.statusCode = 401;
-                        res.send('null');
+                        res.json(null);
                     }
                 }
                 else {
                     console.log('FnGetDocument: Token error: ' + err);
                     res.statusCode = 500;
-                    res.send('null');
+                    res.json(null);
                 }
             });
 
@@ -3948,7 +3948,7 @@ exports.FnGetDocument = function (req, res) {
                 console.log('FnGetDocument: Type is empty');
             }
             res.statusCode = 400;
-            res.send('null');
+            res.json(null);
         }
 
     }
@@ -4073,14 +4073,14 @@ exports.FnGetSearchDocuments = function (req, res) {
                                     }
                                 }
                                 else {
-                                    res.send('null');
+                                    res.json(null);
                                     console.log('FnGetSearchDocuments: tmaster: no search found');
                                 }
 
                             }
                             else {
                                 res.statusCode = 500;
-                                res.send('null');
+                                res.json(null);
                                 console.log('FnGetSearchDocuments: tmaster: ' + err);
                             }
                         });
@@ -4090,13 +4090,13 @@ exports.FnGetSearchDocuments = function (req, res) {
                     else {
                         console.log('FnGetSearchDocuments: Invalid token');
                         res.statusCode = 401;
-                        res.send('null');
+                        res.json(null);
                     }
                 }
                 else {
                     console.log('FnGetSearchDocuments: ' + err);
                     res.statusCode = 500;
-                    res.send('null');
+                    res.json(null);
                 }
             });
         }
@@ -4108,7 +4108,7 @@ exports.FnGetSearchDocuments = function (req, res) {
                 console.log('FnGetSearchDocuments: find is empty');
             }
             res.statusCode = 400;
-            res.send('null');
+            res.json(null);
 
         }
     }
@@ -4269,19 +4269,19 @@ exports.FnSearchByKeywords = function (req, res) {
                                         }
                                         }
                                         else {
-                                            res.send('null');
+                                            res.json(null);
                                             console.log('FnSearchByKeywords: tmaster: no search found');
                                         }
                                     }
                                     else {
-                                        res.send('null');
+                                        res.json(null);
                                         console.log('FnSearchByKeywords: tmaster: no search found');
                                     }
 
                                 }
                                 else {
                                     res.statusCode = 500;
-                                    res.send('null');
+                                    res.json(null);
                                     console.log('FnSearchByKeywords: tmaster: ' + err);
                                 }
                             });
@@ -4290,13 +4290,13 @@ exports.FnSearchByKeywords = function (req, res) {
                         else {
                             res.statusCode = 401;
                             console.log('FnSearchByKeywords: Invalid token');
-                            res.send('null');
+                            res.json(null);
                         }
                     }
                     else {
                         console.log('FnSearchByKeywords: ' + err);
                         res.statusCode = 500;
-                        res.send('null');
+                        res.json(null);
                     }
                 });
 
@@ -4321,7 +4321,7 @@ exports.FnSearchByKeywords = function (req, res) {
                     console.log('FnSearchByKeywords: pagecount is empty');
                 }
                 res.statusCode = 400;
-                res.send('null');
+                res.json(null);
             }
         }
         else if (type == "2") {
@@ -4349,18 +4349,18 @@ exports.FnSearchByKeywords = function (req, res) {
                                 console.log('FnSearchByKeywords:  tmaster:Search Found');
                             }
                             else {
-                                    res.send('null');
+                                    res.json(null);
                                     console.log('FnSearchByKeywords: tmaster: no search found');
                             }
                         }
                         else {
-                            res.send('null');
+                            res.json(null);
                             console.log('FnSearchByKeywords:  tmaster: no search found');
                         }
                     }
                     else {
                         res.statusCode = 500;
-                        res.send('null');
+                        res.json(null);
                         console.log('FnSearchByKeywords:  tmaster: ' + err);
                     }
                 });
@@ -4388,7 +4388,7 @@ exports.FnSearchByKeywords = function (req, res) {
                     console.log('FnSearchByKeywords: pagecount is empty');
                 }
                 res.statusCode = 400;
-                res.send('null');
+                res.json(null);
             }
         }
         else if (type == "3") {
@@ -4413,18 +4413,18 @@ exports.FnSearchByKeywords = function (req, res) {
                                 console.log('FnSearchByKeywords:  tmaster:Search Found');
                             }
                             else {
-                                    res.send('null');
+                                    res.json(null);
                                     console.log('FnSearchByKeywords: tmaster: no search found');
                             }
                         }
                         else {
-                            res.send('null');
+                            res.json(null);
                             console.log('FnSearchByKeywords:  tmaster: no search found');
                         }
                     }
                     else {
                         res.statusCode = 500;
-                        res.send('null');
+                        res.json(null);
                         console.log('FnSearchByKeywords:  tmaster: ' + err);
                     }
                 });
@@ -4446,13 +4446,13 @@ exports.FnSearchByKeywords = function (req, res) {
                     console.log('FnSearchByKeywords: Proximity is empty');
                 }
                 res.statusCode = 400;
-                res.send('null');
+                res.json(null);
             }
         }
         else {
             console.log('FnSearchByKeywords: Invalid Search type');
             res.statusCode = 400;
-            res.send('null');
+            res.json(null);
         }
 
 
@@ -4510,14 +4510,14 @@ exports.FnGetSearchInformation = function (req, res) {
                                                 }
                                                 else
                                                 {
-                                                    res.send('null');
+                                                    res.json(null);
                                                     console.log('FnSearchEzeid: tmaster: no re search infromation ');
                                                 }
 
                                             }
                                             else {
                                                 res.statusCode = 500;
-                                                res.send('null');
+                                                res.json(null);
                                                 console.log('FnSearchEzeid: tmaster: ' + err);
                                             }
                                         });
@@ -4525,7 +4525,7 @@ exports.FnGetSearchInformation = function (req, res) {
                                 }
                                 else {
                                     res.statusCode = 500;
-                                    res.send('null');
+                                    res.json(null);
                                     console.log('FnSearchEzeid: tmaster: ' + err);
                                 }
                             });
@@ -4558,13 +4558,13 @@ exports.FnGetSearchInformation = function (req, res) {
                                             }
                                             else
                                             {
-                                                res.send('null');
+                                                res.json(null);
                                                 console.log('FnSearchEzeid: tmaster: no re search infromation ');
                                             }
                                         }
                                         else {
                                             res.statusCode = 500;
-                                            res.send('null');
+                                            res.json(null);
                                             console.log('FnSearchEzeid: tmaster: ' + err);
                                         }
                                     });
@@ -4572,7 +4572,7 @@ exports.FnGetSearchInformation = function (req, res) {
                             }
                             else {
                                 res.statusCode = 500;
-                                res.send('null');
+                                res.json(null);
                                 console.log('FnSearchEzeid: tmaster: ' + err);
                             }
                         });
@@ -4581,13 +4581,13 @@ exports.FnGetSearchInformation = function (req, res) {
                     else {
                         console.log('FnGetSearchInformation: Invalid token');
                         res.statusCode = 401;
-                        res.send('null');
+                        res.json(null);
                     }
                 }
                 else {
                     console.log('FnGetSearchInformation: Token error: ' + err);
                     res.statusCode = 500;
-                    res.send('null');
+                    res.json(null);
 
                 }
             });
@@ -4605,7 +4605,7 @@ exports.FnGetSearchInformation = function (req, res) {
                 }
                 
                 res.statusCode = 400;
-                res.send('null');
+                res.json(null);
             }
         }
     catch (ex) {
@@ -4781,7 +4781,7 @@ exports.FnGetBannerPicture = function(req, res){
                                             console.log('FnGetBannerPicture: Default Banner sent successfully');
                                         }
                                         else {
-                                            res.send('null');
+                                            res.json(null);
                                             console.log('FnGetBannerPicture: Default Banner not available');
                                         }
                                     });
@@ -4790,13 +4790,13 @@ exports.FnGetBannerPicture = function(req, res){
                         }
                     }
                     else {
-                        res.send('null');
+                        res.json(null);
                         console.log('FnGetBannerPicture:tmaster: Registration Failed');
                     }
                 }
                 else {
                     res.statusCode = 500;
-                    res.send('null');
+                    res.json(null);
                     console.log('FnGetBannerPicture:tmaster:' + err);
                 }
             });
@@ -4812,7 +4812,7 @@ exports.FnGetBannerPicture = function(req, res){
                 console.log('FnGetBannerPicture: LocID is empty');
             }
             res.statusCode=400;
-            res.send('null');
+            res.json(null);
         }
 
     }
@@ -4929,13 +4929,13 @@ exports.FnGetWhiteBlackList = function (req, res) {
                                     else {
 
                                         console.log('FnGetWhiteBlackList:No white/black list details found');
-                                        res.send('null');
+                                        res.json(null);
                                     }
                                 }
                                 else {
 
                                     console.log('FnGetWhiteBlackList:No white/black list details found');
-                                    res.send('null');
+                                    res.json(null);
                                 }
 
                             }
@@ -4943,19 +4943,19 @@ exports.FnGetWhiteBlackList = function (req, res) {
 
                                 console.log('FnGetWhiteBlackList: error in getting white/black list' + err);
                                 res.statusCode = 500;
-                                res.send('null');
+                                res.json(null);
                             }
                         });
                     }
                     else {
                         res.statusCode = 401;
-                        res.send('null');
+                        res.json(null);
                         console.log('FnGetWhiteBlackList: Invalid Token');
                     }
                 } else {
 
                     res.statusCode = 500;
-                    res.send('null');
+                    res.json(null);
                     console.log('FnGetWhiteBlackList: Error in validating token:  ' + err);
                 }
             });
@@ -4966,7 +4966,7 @@ exports.FnGetWhiteBlackList = function (req, res) {
             }
 
             res.statusCode=400;
-            res.send('null');
+            res.json(null);
         }
     }
     catch (ex) {
@@ -5162,30 +5162,30 @@ exports.FnSearchForTracker = function (req, res) {
                                     }
                                     else {
                                         console.log('FnSearchForTracker:No Search found');
-                                        res.send('null');
+                                        res.json(null);
                                     }
                                 }
                                 else {
                                     console.log('FnSearchForTracker:No Search found');
-                                    res.send('null');
+                                    res.json(null);
                                 }
                             }
                             else {
 
                                 console.log('FnSearchForTracker: error in getting search result' + err);
                                 res.statusCode = 500;
-                                res.send('null');
+                                res.json(null);
                             }
                         });
                     }
                     else {
                         res.statusCode = 401;
-                        res.send('null');
+                        res.json(null);
                         console.log('FnSearchForTracker: Invalid Token');
                     }
                 } else {
                     res.statusCode = 500;
-                    res.send('null');
+                    res.json(null);
                     console.log('FnSearchForTracker: Error in validating token:  ' + err);
                 }
             });
@@ -5207,7 +5207,7 @@ exports.FnSearchForTracker = function (req, res) {
                 console.log('FnSearchForTracker: Proximity is empty');
             }
             res.statusCode=400;
-            res.send('null');
+            res.json(null);
         }
     }
     catch (ex) {
@@ -5242,31 +5242,31 @@ exports.FnGetStatusType = function (req, res) {
                                     else {
 
                                         console.log('FnGetStatusType:No Status type details found');
-                                        res.send('null');
+                                        res.json(null);
                                     }
                                 }
                                 else {
 
                                     console.log('FnGetStatusType:No Status type details found');
-                                    res.send('null');
+                                    res.json(null);
                                 }
                             }
                             else {
                                 console.log('FnGetStatusType: error in getting Status type details' + err);
                                 res.statusCode = 500;
-                                res.send('null');
+                                res.json(null);
                             }
                         });
                     }
                     else {
                         res.statusCode = 401;
-                        res.send('null');
+                        res.json(null);
                         console.log('FnGetStatusType: Invalid Token');
                     }
                 } else {
 
                     res.statusCode = 401;
-                    res.send('null');
+                    res.json(null);
                     console.log('FnGetStatusType: Error in validating token:  ' + err);
                 }
             });
@@ -5280,7 +5280,7 @@ exports.FnGetStatusType = function (req, res) {
             }
 
             res.statusCode=401;
-            res.send('null');
+            res.json(null);
         }
     }
     catch (ex) {
@@ -5428,32 +5428,32 @@ exports.FnGetActionType = function (req, res) {
                                     else {
 
                                         console.log('FnGetActionType:No Action Type details found');
-                                        res.send('null');
+                                        res.json(null);
                                     }
                                 }
                                 else {
 
                                     console.log('FnGetActionType:No Action type details found');
-                                    res.send('null');
+                                    res.json(null);
                                 }
                             }
                             else {
 
                                 console.log('FnGetActionType: error in getting Action Type details' + err);
                                 res.statusCode = 500;
-                                res.send('null');
+                                res.json(null);
                             }
                         });
                     }
                     else {
                         res.statusCode = 401;
-                        res.send('null');
+                        res.json(null);
                         console.log('FnGetActionType: Invalid Token');
                     }
                 } else {
 
                     res.statusCode = 500;
-                    res.send('null');
+                    res.json(null);
                     console.log('FnGetActionType: Error in validating token:  ' + err);
                 }
             });
@@ -5467,7 +5467,7 @@ exports.FnGetActionType = function (req, res) {
             }
 
             res.statusCode=400;
-            res.send('null');
+            res.json(null);
         }
     }
     catch (ex) {
@@ -5512,31 +5512,31 @@ exports.FnEZEIDPrimaryDetails = function (req, res) {
                                     }
                                     else {
                                         console.log('FnEZEIDPrimaryDetails:No EZEID Primary deatils found');
-                                        res.send('null');
+                                        res.json(null);
                                     }
                                 }
                                 else {
                                     console.log('FnEZEIDPrimaryDetails:No EZEID Primary deatils found');
-                                    res.send('null');
+                                    res.json(null);
                                 }
                             }
                             else {
                                 console.log('FnEZEIDPrimaryDetails: error in getting EZEID Primary deatils' + err);
                                 res.statusCode = 500;
-                                res.send('null');
+                                res.json(null);
                             }
                         });
                     }
                     else {
                         res.statusCode = 401;
-                        res.send('null');
+                        res.json(null);
                         console.log('FnEZEIDPrimaryDetails: Invalid Token');
                     }
                 }
                 else
                 {
                     res.statusCode = 500;
-                    res.send('null');
+                    res.json(null);
                     console.log('FnEZEIDPrimaryDetails: Error in validating token:  ' + err);
                 }
             });
@@ -5552,7 +5552,7 @@ exports.FnEZEIDPrimaryDetails = function (req, res) {
             }
 
             res.statusCode=400;
-            res.send('null');
+            res.json(null);
         }
     }
     catch (ex) {
@@ -5576,43 +5576,42 @@ exports.FnGetItemList = function (req, res) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
-
                         db.query('CALL pGetItemList(' + db.escape(Token) + ',' + db.escape(FunctionType) + ')', function (err, GetResult) {
                             if (!err) {
                                 if (GetResult[0] != null) {
                                     if (GetResult[0].length > 0) {
                                         console.log('FnGetItemList: Item list details Send successfully');
-                                        res.send(GetResult[0]);
+                                        res.json(GetResult[0]);
                                     }
                                     else {
 
                                         console.log('FnGetItemList:No Item list details found');
-                                        res.send('null');
+                                        res.json(null);
                                     }
                                 }
                                 else {
 
                                     console.log('FnGetItemList:No Item list details found');
-                                    res.send('null');
+                                    res.json(null);
                                 }
                             }
                             else {
 
                                 console.log('FnGetItemList: error in getting Item list details' + err);
                                 res.statusCode = 500;
-                                res.send('null');
+                                res.json(null);
                             }
                         });
                     }
                     else {
                         res.statusCode = 401;
-                        res.send('null');
+                        res.json(null);
                         console.log('FnGetItemList: Invalid Token');
                     }
                 } else {
 
                     res.statusCode = 500;
-                    res.send('null');
+                    res.json(null);
                     console.log('FnGetItemList: Error in validating token:  ' + err);
                 }
             });
@@ -5625,7 +5624,7 @@ exports.FnGetItemList = function (req, res) {
                 console.log('FnGetItemList: FunctionType is empty');
             }
             res.statusCode=400;
-            res.send('null');
+            res.json(null);
         }
     }
     catch (ex) {
@@ -5654,31 +5653,31 @@ exports.FnGetFolderList = function (req, res) {
                                     }
                                     else {
                                         console.log('FnGetRoleList:No Role list details found');
-                                        res.send('null');
+                                        res.json(null);
                                     }
                                 }
                                 else {
                                     console.log('FnGetRoleList:No Role list details found');
-                                    res.send('null');
+                                    res.json(null);
                                 }
                             }
                             else {
 
                                 console.log('FnGetRoleList: error in getting Role list details' + err);
                                 res.statusCode = 500;
-                                res.send('null');
+                                res.json(null);
                             }
                         });
                     }
                     else {
                         res.statusCode = 401;
-                        res.send('null');
+                        res.json(null);
                         console.log('FnGetRoleList: Invalid Token');
                     }
                 } else {
 
                     res.statusCode = 500;
-                    res.send('null');
+                    res.json(null);
                     console.log('FnGetRoleList: Error in validating token:  ' + err);
                 }
             });
@@ -5691,7 +5690,7 @@ exports.FnGetFolderList = function (req, res) {
                 console.log('FnGetRoleList: FunctionType is empty');
             }
             res.statusCode=400;
-            res.send('null');
+            res.json(null);
         }
     }
     catch (ex) {
@@ -5909,13 +5908,13 @@ exports.FnGetSubUserList = function (req, res) {
                                     else {
 
                                         console.log('FnGetSubUserList:No Sub user  list details found');
-                                        res.send('null');
+                                        res.json(null);
                                     }
                                 }
                                 else {
 
                                     console.log('FnGetSubUserList:No Sub user  list details found');
-                                    res.send('null');
+                                    res.json(null);
                                 }
 
                             }
@@ -5923,19 +5922,19 @@ exports.FnGetSubUserList = function (req, res) {
 
                                 console.log('FnGetSubUserList: error in getting Sub user  list details' + err);
                                 res.statusCode = 500;
-                                res.send('null');
+                                res.json(null);
                             }
                         });
                     }
                     else {
                         res.statusCode = 401;
-                        res.send('null');
+                        res.json(null);
                         console.log('FnGetSubUserList: Invalid Token');
                     }
                 } else {
 
                     res.statusCode = 500;
-                    res.send('null');
+                    res.json(null);
                     console.log('FnGetSubUserList: Error in validating token:  ' + err);
                 }
             });
@@ -5945,7 +5944,7 @@ exports.FnGetSubUserList = function (req, res) {
                 console.log('FnGetSubUserList: Token is empty');
             }
             res.statusCode=400;
-            res.send('null');
+            res.json(null);
         }
     }
     catch (ex) {
@@ -5980,13 +5979,13 @@ exports.FnGetTranscationItems = function (req, res) {
                                     else {
 
                                         console.log('FnGetTranscationItems:No transaction items details found');
-                                        res.send('null');
+                                        res.json(null);
                                     }
                                 }
                                 else {
 
                                     console.log('FnGetTranscationItems:No transaction items details found');
-                                    res.send('null');
+                                    res.json(null);
                                 }
 
                             }
@@ -5994,19 +5993,19 @@ exports.FnGetTranscationItems = function (req, res) {
 
                                 console.log('FnGetTranscationItems: error in getting transaction items details' + err);
                                 res.statusCode = 500;
-                                res.send('null');
+                                res.json(null);
                             }
                         });
                     }
                     else {
                         res.statusCode = 401;
-                        res.send('null');
+                        res.json(null);
                         console.log('FnGetTranscationItems: Invalid Token');
                     }
                 } else {
 
                     res.statusCode = 500;
-                    res.send('null');
+                    res.json(null);
                     console.log('FnGetTranscationItems: Error in validating token:  ' + err);
                 }
             });
@@ -6019,7 +6018,7 @@ exports.FnGetTranscationItems = function (req, res) {
                 console.log('FnGetTranscationItems: MessageID is empty');
             }
             res.statusCode=400;
-            res.send('null');
+            res.json(null);
         }
     }
     catch (ex) {
@@ -6396,32 +6395,32 @@ exports.FnItemList = function (req, res) {
                                     else {
 
                                         console.log('FnGetItemList:No Item list details found');
-                                        res.send('null');
+                                        res.json(null);
                                     }
                                 }
                                 else {
 
                                     console.log('FnGetItemList:No Item list details found');
-                                    res.send('null');
+                                    res.json(null);
                                 }
                             }
                             else {
 
                                 console.log('FnGetItemList: error in getting Item list details' + err);
                                 res.statusCode = 500;
-                                res.send('null');
+                                res.json(null);
                             }
                         });
                     }
                     else {
                         res.statusCode = 401;
-                        res.send('null');
+                        res.json(null);
                         console.log('FnGetItemList: Invalid Token');
                     }
                 } else {
 
                     res.statusCode = 500;
-                    res.send('null');
+                    res.json(null);
                     console.log('FnGetItemList: Error in validating token:  ' + err);
                 }
             });
@@ -6434,7 +6433,7 @@ exports.FnItemList = function (req, res) {
                 console.log('FnGetItemList: FunctionType is empty');
             }
             res.statusCode=400;
-            res.send('null');
+            res.json(null);
         }
     }
     catch (ex) {
@@ -6466,30 +6465,30 @@ exports.FnItemDetails = function (req, res) {
                                     else {
 
                                         console.log('FnItemDetails:No Item list details found');
-                                        res.send('null');
+                                        res.json(null);
                                     }
                                 }
                                 else {
                                     console.log('FnItemDetails:No Item list details found');
-                                    res.send('null');
+                                    res.json(null);
                                 }
                             }
                             else {
                                 console.log('FnItemDetails: error in getting Item list details' + err);
                                 res.statusCode = 500;
-                                res.send('null');
+                                res.json(null);
                             }
                         });
                     }
                     else {
                         res.statusCode = 401;
-                        res.send('null');
+                        res.json(null);
                         console.log('FnItemDetails: Invalid Token');
                     }
                 } else {
 
                     res.statusCode = 500;
-                    res.send('null');
+                    res.json(null);
                     console.log('FnItemDetails: Error in validating token:  ' + err);
                 }
             });
@@ -6503,7 +6502,7 @@ exports.FnItemDetails = function (req, res) {
             }
 
             res.statusCode=400;
-            res.send('null');
+            res.json(null);
         }
     }
     catch (ex) {
@@ -6644,13 +6643,13 @@ exports.FnGetConfig = function (req, res) {
                                     else {
 
                                         console.log('FnGetConfig:No Details found');
-                                        res.send('null');
+                                        res.json(null);
                                     }
                                 }
                                 else {
 
                                     console.log('FnGetConfig:No Details found');
-                                    res.send('null');
+                                    res.json(null);
                                 }
 
                             }
@@ -6658,19 +6657,19 @@ exports.FnGetConfig = function (req, res) {
 
                                 console.log('FnGetConfig: error in getting config details' + err);
                                 res.statusCode = 500;
-                                res.send('null');
+                                res.json(null);
                             }
                         });
                     }
                     else {
                         res.statusCode = 401;
-                        res.send('null');
+                        res.json(null);
                         console.log('FnGetConfig: Invalid Token');
                     }
                 } else {
 
                     res.statusCode = 500;
-                    res.send('null');
+                    res.json(null);
                     console.log('FnGetConfig: Error in validating token:  ' + err);
                 }
             });
@@ -6681,7 +6680,7 @@ exports.FnGetConfig = function (req, res) {
             }
 
             res.statusCode=400;
-            res.send('null');
+            res.json(null);
         }
     }
     catch (ex) {
@@ -6802,13 +6801,13 @@ exports.FnGetHolidayList = function (req, res) {
                                     else {
 
                                         console.log('FnGetHolidayList:No Holiday list found');
-                                        res.send('null');
+                                        res.json(null);
                                     }
                                 }
                                 else {
 
                                     console.log('FnGetHolidayList:No Holiday list found');
-                                    res.send('null');
+                                    res.json(null);
                                 }
 
                             }
@@ -6816,19 +6815,19 @@ exports.FnGetHolidayList = function (req, res) {
 
                                 console.log('FnGetHolidayList: error in getting Holiday list' + err);
                                 res.statusCode = 500;
-                                res.send('null');
+                                res.json(null);
                             }
                         });
                     }
                     else {
                         res.statusCode = 401;
-                        res.send('null');
+                        res.json(null);
                         console.log('FnGetHolidayList: Invalid Token');
                     }
                 } else {
 
                     res.statusCode = 500;
-                    res.send('null');
+                    res.json(null);
                     console.log('FnGetHolidayList: Error in validating token:  ' + err);
                 }
             });
@@ -6839,7 +6838,7 @@ exports.FnGetHolidayList = function (req, res) {
             }
 
             res.statusCode=400;
-            res.send('null');
+            res.json(null);
         }
     }
     catch (ex) {
@@ -7385,30 +7384,30 @@ exports.FnGetTranscation = function (req, res) {
                                     
                                     else {
                                         console.log('FnGetTranscation:No Transaction details found');
-                                        res.send('null');
+                                        res.json(null);
                                     }
                                 }
                                 else {
                                     console.log('FnGetTranscation:No transaction details found');
-                                    res.send('null');
+                                    res.json(null);
                                 }
                             }
                             else {
                                 console.log('FnGetTranscation: error in getting transaction details' + err);
                                 res.statusCode = 500;
-                                res.send('null');
+                                res.json(null);
                             }
                         });
                     }
                     else {
                         res.statusCode = 401;
-                        res.send('null');
+                        res.json(null);
                         console.log('FnGetTranscation: Invalid Token');
                     }
                 } else {
 
                     res.statusCode = 500;
-                    res.send('null');
+                    res.json(null);
                     console.log('FnGetTranscation: Error in validating token:  ' + err);
                 }
             });
@@ -7427,7 +7426,7 @@ exports.FnGetTranscation = function (req, res) {
                 console.log('FnGetMessages: Sending page 0');
             }
             res.statusCode=400;
-            res.send('null');
+            res.json(null);
         }
     }
     catch (ex) {
@@ -7642,13 +7641,13 @@ exports.FnGetWorkingHours = function (req, res) {
                                     else {
 
                                         console.log('FnGetWorkingHours:No Working Hours details found');
-                                        res.send('null');
+                                        res.json(null);
                                     }
                                 }
                                 else {
 
                                     console.log('FnGetWorkingHours:No Working Hours details found');
-                                    res.send('null');
+                                    res.json(null);
                                 }
 
                             }
@@ -7656,19 +7655,19 @@ exports.FnGetWorkingHours = function (req, res) {
 
                                 console.log('FnGetWorkingHours: error in getting Working Hours details' + err);
                                 res.statusCode = 500;
-                                res.send('null');
+                                res.json(null);
                             }
                         });
                     }
                     else {
                         res.statusCode = 401;
-                        res.send('null');
+                        res.json(null);
                         console.log('FnGetWorkingHours: Invalid Token');
                     }
                 } else {
 
                     res.statusCode = 500;
-                    res.send('null');
+                    res.json(null);
                     console.log('FnGetWorkingHours: Error in validating token:  ' + err);
                 }
             });
@@ -7679,7 +7678,7 @@ exports.FnGetWorkingHours = function (req, res) {
             }
 
             res.statusCode=400;
-            res.send('null');
+            res.json(null);
         }
     }
     catch (ex) {
@@ -8031,13 +8030,13 @@ exports.FnGetUserwiseFolderList = function (req, res) {
                                     else {
 
                                         console.log('FnGetUserwiseFolderList:No Folder list details found');
-                                        res.send('null');
+                                        res.json(null);
                                     }
                                 }
                                 else {
 
                                     console.log('FnGetUserwiseFolderList:No Folder list details found');
-                                    res.send('null');
+                                    res.json(null);
                                 }
 
                             }
@@ -8045,19 +8044,19 @@ exports.FnGetUserwiseFolderList = function (req, res) {
 
                                 console.log('FnGetUserwiseFolderList: error in getting Folder list details' + err);
                                 res.statusCode = 500;
-                                res.send('null');
+                                res.json(null);
                             }
                         });
                     }
                     else {
                         res.statusCode = 401;
-                        res.send('null');
+                        res.json(null);
                         console.log('FnGetUserwiseFolderList: Invalid Token');
                     }
                 } else {
 
                     res.statusCode = 500;
-                    res.send('null');
+                    res.json(null);
                     console.log('FnGetUserwiseFolderList: Error in validating token:  ' + err);
                 }
             });
@@ -8071,7 +8070,7 @@ exports.FnGetUserwiseFolderList = function (req, res) {
             }
 
             res.statusCode=400;
-            res.send('null');
+            res.json(null);
         }
     }
     catch (ex) {
@@ -8105,29 +8104,29 @@ exports.FnGetItemListForEZEID = function (req, res) {
                                     }
                                     else {
                                         console.log('FnGetItemListForEZEID:No Item list details found');
-                                        res.send('null');
+                                        res.json(null);
                                     }
                                 }
                                 else {
                                     console.log('FnGetItemListForEZEID:No Item list details found');
-                                    res.send('null');
+                                    res.json(null);
                                 }
                             }
                             else {
                                 console.log('FnGetItemListForEZEID: error in getting Item list details' + err);
                                 res.statusCode = 500;
-                                res.send('null');
+                                res.json(null);
                             }
                         });
                     }
                     else {
                         res.statusCode = 401;
-                        res.send('null');
+                        res.json(null);
                         console.log('FnGetItemListForEZEID: Invalid Token');
                     }
                 } else {
                     res.statusCode = 500;
-                    res.send('null');
+                    res.json(null);
                     console.log('FnGetItemListForEZEID: Error in validating token:  ' + err);
                 }
             });
@@ -8143,7 +8142,7 @@ exports.FnGetItemListForEZEID = function (req, res) {
                 console.log('FnGetItemListForEZEID: EZEID is empty');
             }
             res.statusCode=400;
-            res.send('null');
+            res.json(null);
         }
     }
     catch (ex) {
@@ -8176,13 +8175,13 @@ exports.FnGetLocationList = function (req, res) {
                                     else {
 
                                         console.log('FnGetLocationList:No Location List found');
-                                        res.send('null');
+                                        res.json(null);
                                     }
                                 }
                                 else {
 
                                     console.log('FnGetLocationList:No Location List found');
-                                    res.send('null');
+                                    res.json(null);
                                 }
 
                             }
@@ -8190,19 +8189,19 @@ exports.FnGetLocationList = function (req, res) {
 
                                 console.log('FnGetLocationList: error in getting Resource details' + err);
                                 res.statusCode = 500;
-                                res.send('null');
+                                res.json(null);
                             }
                         });
                     }
                     else {
                         res.statusCode = 401;
-                        res.send('null');
+                        res.json(null);
                         console.log('FnGetLocationList: Invalid Token');
                     }
                 } else {
 
                     res.statusCode = 500;
-                    res.send('null');
+                    res.json(null);
                     console.log('FnGetLocationList: Error in validating token:  ' + err);
                 }
             });
@@ -8212,7 +8211,7 @@ exports.FnGetLocationList = function (req, res) {
                 console.log('FnGetLocationList: Token is empty');
             }
             res.statusCode=400;
-            res.send('null');
+            res.json(null);
         }
     }
     catch (ex) {
@@ -8245,13 +8244,13 @@ exports.FnGetLoginDetails = function (req, res) {
                                     else {
 
                                         console.log('FnGetLoginDetails:No Login details found');
-                                        res.send('null');
+                                        res.json(null);
                                     }
                                 }
                                 else {
 
                                     console.log('FnGetLoginDetails:No Login details found');
-                                    res.send('null');
+                                    res.json(null);
                                 }
 
                             }
@@ -8259,19 +8258,19 @@ exports.FnGetLoginDetails = function (req, res) {
 
                                 console.log('FnGetLoginDetails: error in getting Login details' + err);
                                 res.statusCode = 500;
-                                res.send('null');
+                                res.json(null);
                             }
                         });
                     }
                     else {
                         res.statusCode = 401;
-                        res.send('null');
+                        res.json(null);
                         console.log('FnGetLoginDetails: Invalid Token');
                     }
                 } else {
 
                     res.statusCode = 500;
-                    res.send('null');
+                    res.json(null);
                     console.log('FnGetLoginDetails: Error in validating token:  ' + err);
                 }
             });
@@ -8281,7 +8280,7 @@ exports.FnGetLoginDetails = function (req, res) {
                 console.log('FnGetLoginDetails: Token is empty');
             }
             res.statusCode=400;
-            res.send('null');
+            res.json(null);
         }
     }
     catch (ex) {
@@ -8404,29 +8403,29 @@ exports.FnGetTemplateList = function (req, res) {
                                     }
                                     else {
                                         console.log('FnGetTemplateList:No Template list found');
-                                        res.send('null');
+                                        res.json(null);
                                     }
                                 }
                                 else {
                                     console.log('FnGetTemplateList:No Template list found');
-                                    res.send('null');
+                                    res.json(null);
                                 }
                             }
                             else {
                                 console.log('FnGetTemplateList: error in getting Template list' + err);
                                 res.statusCode = 500;
-                                res.send('null');
+                                res.json(null);
                             }
                         });
                     }
                     else {
                         res.statusCode = 401;
-                        res.send('null');
+                        res.json(null);
                         console.log('FnGetTemplateList: Invalid Token');
                     }
                 } else {
                     res.statusCode = 500;
-                    res.send('null');
+                    res.json(null);
                     console.log('FnGetTemplateList: Error in validating token:  ' + err);
                 }
             });
@@ -8436,7 +8435,7 @@ exports.FnGetTemplateList = function (req, res) {
                 console.log('FnGetTemplateList: Token is empty');
             }
             res.statusCode=400;
-            res.send('null');
+            res.json(null);
         }
     }
     catch (ex) {
@@ -8469,29 +8468,29 @@ exports.FnGetTemplateDetails = function (req, res) {
                                     }
                                     else {
                                         console.log('FnGetTemplateDetails:No Template Details found');
-                                        res.send('null');
+                                        res.json(null);
                                     }
                                 }
                                 else {
                                     console.log('FnGetTemplateDetails:No Template Details found');
-                                    res.send('null');
+                                    res.json(null);
                                 }
                             }
                             else {
                                 console.log('FnGetTemplateDetails: error in getting Template Details' + err);
                                 res.statusCode = 500;
-                                res.send('null');
+                                res.json(null);
                             }
                         });
                     }
                     else {
                         res.statusCode = 401;
-                        res.send('null');
+                        res.json(null);
                         console.log('FnGetTemplateDetails: Invalid Token');
                     }
                 } else {
                     res.statusCode = 500;
-                    res.send('null');
+                    res.json(null);
                     console.log('FnGetTemplateDetails: Error in validating token:  ' + err);
                 }
             });
@@ -8504,7 +8503,7 @@ exports.FnGetTemplateDetails = function (req, res) {
                 console.log('FnGetTemplateDetails: TID is empty');
             }
             res.statusCode=400;
-            res.send('null');
+            res.json(null);
         }
     }
     catch (ex) {
@@ -8587,7 +8586,7 @@ exports.FnSendBulkMailerOld = function (req, res) {
                                                         else
                                                         {
                                                             console.log('FnSendBulkMailer:Sales Mail Id is empty');
-                                                            //res.send('null');
+                                                            //res.json(null);
                                                         }
                                                     }
                                                         res.send(RtnResponse);
@@ -8596,47 +8595,47 @@ exports.FnSendBulkMailerOld = function (req, res) {
                                                     else
                                                     {
                                                         console.log('FnGetTemplateDetails:No Template Details found');
-                                                        res.send('null');
+                                                        res.json(null);
                                                     }
                                                 }
                                                 else
                                                 {
                                                     console.log('FnGetTemplateDetails:No Template Details found');
-                                                    res.send('null');
+                                                    res.json(null);
                                                 }
                                             }
                                             else
                                             {
                                                 console.log('FnGetTemplateDetails:Error in getting template '+ err);
-                                                res.send('null');
+                                                res.json(null);
                                             }
                                         });
                                     }
                                     else {
                                         console.log('FnGetTemplateDetails:User Details not available');
-                                        res.send('null');
+                                        res.json(null);
                                     }
                                 }
                                 else {
                                     console.log('FnGetTemplateDetails:No User Details not available');
-                                    res.send('null');
+                                    res.json(null);
                                 }
                             }
                             else {
                                 console.log('FnGetTemplateDetails: User Details not available' + err);
                                 res.statusCode = 500;
-                                res.send('null');
+                                res.json(null);
                             }
                         });
                     }
                     else {
                         res.statusCode = 401;
-                        res.send('null');
+                        res.json(null);
                         console.log('FnSendBulkMailer: Invalid Token');
                     }
                 } else {
                     res.statusCode = 500;
-                    res.send('null');
+                    res.json(null);
                     console.log('FnSendBulkMailer: Error in validating token:  ' + err);
                 }
             });
@@ -8677,12 +8676,12 @@ exports.FnSendBulkMailerOld = function (req, res) {
                     }
                     else {
                         res.statusCode = 401;
-                        res.send('null');
+                        res.json(null);
                         console.log('FnSendBulkMailer: Invalid Token');
                     }
                 } else {
                     res.statusCode = 500;
-                    res.send('null');
+                    res.json(null);
                     console.log('FnSendBulkMailer: Error in validating token:  ' + err);
                 }
             });
@@ -8702,7 +8701,7 @@ exports.FnSendBulkMailerOld = function (req, res) {
                 console.log('FnSendBulkMailer: AttachmentFileName is empty');
             }
             res.statusCode=400;
-            res.send('null');
+            res.json(null);
         }
     }
     }
@@ -8796,7 +8795,7 @@ exports.FnSendBulkMailer = function (req, res) {
                                                                 }
                                                                 else {
                                                                     console.log('FnSendBulkMailer:Sales Mail Id is empty');
-                                                                    //res.send('null');
+                                                                    //res.json(null);
                                                                 }
                                                             }
                                                             res.send(RtnResponse);
@@ -8804,45 +8803,45 @@ exports.FnSendBulkMailer = function (req, res) {
                                                         }
                                                         else {
                                                             console.log('FnGetTemplateDetails:No Template Details found');
-                                                            res.send('null');
+                                                            res.json(null);
                                                         }
                                                     }
                                                     else {
                                                         console.log('FnGetTemplateDetails:No Template Details found');
-                                                        res.send('null');
+                                                        res.json(null);
                                                     }
                                                 }
                                                 else {
                                                     console.log('FnGetTemplateDetails:Error in getting template ' + err);
-                                                    res.send('null');
+                                                    res.json(null);
                                                 }
                                             });
                                         }
                                         else {
                                             console.log('FnGetTemplateDetails:User Details not available');
-                                            res.send('null');
+                                            res.json(null);
                                         }
                                     }
                                     else {
                                         console.log('FnGetTemplateDetails:No User Details not available');
-                                        res.send('null');
+                                        res.json(null);
                                     }
                                 }
                                 else {
                                     console.log('FnGetTemplateDetails: User Details not available' + err);
                                     res.statusCode = 500;
-                                    res.send('null');
+                                    res.json(null);
                                 }
                             });
                         }
                         else {
                             res.statusCode = 401;
-                            res.send('null');
+                            res.json(null);
                             console.log('FnSendBulkMailer: Invalid Token');
                         }
                     } else {
                         res.statusCode = 500;
-                        res.send('null');
+                        res.json(null);
                         console.log('FnSendBulkMailer: Error in validating token:  ' + err);
                     }
                 });
@@ -8977,7 +8976,7 @@ exports.FnSendBulkMailer = function (req, res) {
                             
                                 }
                                 else {
-                                    res.send('null');
+                                    res.json(null);
                                 }
                             });
 
@@ -8987,12 +8986,12 @@ exports.FnSendBulkMailer = function (req, res) {
                     }
                         else {
                             res.statusCode = 401;
-                            res.send('null');
+                            res.json(null);
                             console.log('FnSendBulkMailer: Invalid Token');
                         }
                     } else {
                         res.statusCode = 500;
-                        res.send('null');
+                        res.json(null);
                         console.log('FnSendBulkMailer: Error in validating token:  ' + err);
 
                     }
@@ -9013,7 +9012,7 @@ exports.FnSendBulkMailer = function (req, res) {
                     console.log('FnSendBulkMailer: AttachmentFileName is empty');
                 }
                 res.statusCode = 400;
-                res.send('null');
+                res.json(null);
             }
         }
     }
@@ -9357,13 +9356,13 @@ exports.FnGetWebLink = function (req, res) {
                                     else {
 
                                         console.log('FnGetWebLink:No Web Links found');
-                                        res.send('null');
+                                        res.json(null);
                                     }
                                 }
                                 else {
 
                                     console.log('FnGetWebLink:No Web Links found');
-                                    res.send('null');
+                                    res.json(null);
                                 }
 
                             }
@@ -9371,19 +9370,19 @@ exports.FnGetWebLink = function (req, res) {
 
                                 console.log('FnGetWebLink: error in getting Web Links' + err);
                                 res.statusCode = 500;
-                                res.send('null');
+                                res.json(null);
                             }
                         });
                     }
                     else {
                         res.statusCode = 401;
-                        res.send('null');
+                        res.json(null);
                         console.log('FnGetWebLink: Invalid Token');
                     }
                 } else {
 
                     res.statusCode = 500;
-                    res.send('null');
+                    res.json(null);
                     console.log('FnGetWebLink: Error in validating token:  ' + err);
                 }
             });
@@ -9394,7 +9393,7 @@ exports.FnGetWebLink = function (req, res) {
             }
             
             res.statusCode=400;
-            res.send('null');
+            res.json(null);
         }
     }
     catch (ex) {
@@ -9571,13 +9570,13 @@ try{
                                 console.log('FnGetSearchItem:Items sent successfully');
                                 }
                                 else {
-                                    res.send('null');
+                                    res.json(null);
                                     console.log('FnGetSearchItem:No items found');
                                 }
                             }
                             else {
                                 res.statusCode = 500;
-                                res.send('null');
+                                res.json(null);
                                 console.log('FnGetSearchItem:Error in getting Search items' + err);
                             }
                         });
@@ -9585,13 +9584,13 @@ try{
                     else {
                         console.log('FnGetSearchItem: Invalid token');
                         res.statusCode = 401;
-                        res.send('null');
+                        res.json(null);
                     }
                 }
                 else {
                     console.log('FnGetSearchItem: Token error: ' + err);
                     res.statusCode = 500;
-                    res.send('null');
+                    res.json(null);
 
                 }
             });
@@ -9608,7 +9607,7 @@ try{
                 }
                 
                 res.statusCode = 400;
-                res.send('null');
+                res.json(null);
             }
         }
     catch (ex) {
@@ -9692,7 +9691,7 @@ try{
             console.log('FnSaveChatMessage:ToEZEID is empty');
         }
         res.statusCode = 400;
-        res.send('null');
+        res.json(null);
     }    
 }
 catch (ex) {
@@ -9762,7 +9761,7 @@ try{
             console.log('FnCreateGroup:GroupTitle is empty');
         }
         res.statusCode = 400;
-        res.send('null');
+        res.json(null);
     }
     
 }
@@ -9794,30 +9793,30 @@ try{
                                         }
                                         else {
                                             console.log('FnGetGroupList: No GroupList found');
-                                            res.send('null');
+                                            res.json(null);
                                         }
                                     }
                                     else {
                                         console.log('FnGetGroupList: No GroupList found');
-                                        res.send('null');
+                                        res.json(null);
                                     }
                                 }
                                 else {
                                     console.log('FnGetGroupList: error in getting GroupList' + err);
                                     res.statusCode = 500;
-                                    res.send('null');
+                                    res.json(null);
                                 }
                             });
                     }
                     else {
                         res.statusCode = 401;
-                        res.send('null');
+                        res.json(null);
                         console.log('FnGetGroupList: Invalid Token');
                     }
                 } else {
 
                     res.statusCode = 500;
-                    res.send('null');
+                    res.json(null);
                     console.log('FnGetGroupList: Error in validating token:  ' + err);
                 }
             });
@@ -9827,7 +9826,7 @@ try{
                 console.log('FnGetGroupList: Token is empty');
             }
             res.statusCode=400;
-            res.send('null');
+            res.json(null);
         }
     }
     catch (ex) {
@@ -9905,7 +9904,7 @@ try{
             console.log('FnSaveGroupMembers:EZEID is empty');
         }
         res.statusCode = 400;
-        res.send('null');
+        res.json(null);
     }
     
 }
@@ -9937,31 +9936,31 @@ try{
                                     }
                                     else {
                                         console.log('FnGetMembersList:No Members List found');
-                                        res.send('null');
+                                        res.json(null);
                                     }
                                 }
                                 else {
                                     console.log('FnGetMembersList:No Members List found');
-                                    res.send('null');
+                                    res.json(null);
                                 }
 
                             }
                             else {
                                 console.log('FnGetMembersList: error in getting group members list' + err);
                                 res.statusCode = 500;
-                                res.send('null');
+                                res.json(null);
                             }
                         });
                     }
                     else {
                         res.statusCode = 401;
-                        res.send('null');
+                        res.json(null);
                         console.log('FnGetMembersList: Invalid Token');
                     }
                 } else {
 
                     res.statusCode = 500;
-                    res.send('null');
+                    res.json(null);
                     console.log('FnGetMembersList: Error in validating token:  ' + err);
                 }
             });
@@ -9975,7 +9974,7 @@ try{
             }
             
             res.statusCode=400;
-            res.send('null');
+            res.json(null);
         }
     }
     catch (ex) {
@@ -10080,30 +10079,30 @@ try{
                                         }
                                         else {
                                             console.log('FnGetChatDetails: No Chat details found');
-                                            res.send('null');
+                                            res.json(null);
                                         }
                                     }
                                     else {
                                         console.log('FnGetChatDetails: No Chat details found');
-                                        res.send('null');
+                                        res.json(null);
                                     }
                                 }
                                 else {
                                     console.log('FnGetChatDetails: error in getting GroupList' + err);
                                     res.statusCode = 500;
-                                    res.send('null');
+                                    res.json(null);
                                 }
                             });
                     }
                     else {
                         res.statusCode = 401;
-                        res.send('null');
+                        res.json(null);
                         console.log('FnGetChatDetails: Invalid Token');
                     }
                 } else {
 
                     res.statusCode = 500;
-                    res.send('null');
+                    res.json(null);
                     console.log('FnGetChatDetails: Error in validating token:  ' + err);
                 }
             });
@@ -10119,7 +10118,7 @@ try{
                 console.log('FnGetChatDetails: ToMasterID is empty');
             }
             res.statusCode=400;
-            res.send('null');
+            res.json(null);
         }
     }
     catch (ex) {
@@ -10152,30 +10151,30 @@ try{
                                         }
                                         else {
                                             console.log('FnGetChatList: No Chat details found');
-                                            res.send('null');
+                                            res.json(null);
                                         }
                                     }
                                     else {
                                         console.log('FnGetChatList: No Chat details found');
-                                        res.send('null');
+                                        res.json(null);
                                     }
                                 }
                                 else {
                                     console.log('FnGetChatList: error in getting GroupList' + err);
                                     res.statusCode = 500;
-                                    res.send('null');
+                                    res.json(null);
                                 }
                             });
                     }
                     else {
                         res.statusCode = 401;
-                        res.send('null');
+                        res.json(null);
                         console.log('FnGetChatList: Invalid Token');
                     }
                 } else {
 
                     res.statusCode = 500;
-                    res.send('null');
+                    res.json(null);
                     console.log('FnGetChatList: Error in validating token:  ' + err);
                 }
             });
@@ -10191,7 +10190,7 @@ try{
                 console.log('FnGetChatList: ToMasterID is empty');
             }
             res.statusCode=400;
-            res.send('null');
+            res.json(null);
         }
     }
     catch (ex) {
@@ -10230,30 +10229,30 @@ try{
                                             }
                                             else {
                                             console.log('FnGetSearchPicture: No Picture send sucessfully');
-                                            res.send('null');
+                                            res.json(null);
                                         }
                                     }
                                     else {
                                         console.log('FnGetSearchPicture: No Picture send sucessfully');
-                                        res.send('null');
+                                        res.json(null);
                                     }
                                 }
                                 else {
                                     console.log('FnGetSearchPicture: error in getting picture result' + err);
                                     res.statusCode = 500;
-                                    res.send('null');
+                                    res.json(null);
                                 }
                             });
                     }
                     else {
                         res.statusCode = 401;
-                        res.send('null');
+                        res.json(null);
                         console.log('FnGetSearchPicture: Invalid Token');
                     }
                 } else {
 
                     res.statusCode = 500;
-                    res.send('null');
+                    res.json(null);
                     console.log('FnGetSearchPicture: Error in validating token:  ' + err);
                 }
             });
@@ -10266,7 +10265,7 @@ try{
                 console.log('FnGetSearchPicture: TID is empty');
             }
             res.statusCode=400;
-            res.send('null');
+            res.json(null);
         }
     }
     catch (ex) {
@@ -12468,40 +12467,40 @@ exports.FnGetUserDetailsAP = function (req, res) {
                             res.send(UserDetailsResult[0]);
                         }
                         else {
-                            res.send('null');
+                            res.json(null);
                             console.log('FnGetUserDetailsAP : tmaster: No User details found');
                         }
                     }
                     else {
-                        res.send('null');
+                        res.json(null);
                         console.log('FnGetUserDetailsAP : tmaster: No User details found');
                     }
 
                 }
                 else {
                                 res.statusCode=500;
-                    res.send('null');
+                    res.json(null);
                     console.log('FnGetUserDetailsAP : tmaster:' + err);
                 }
             });
         }
         else {
                         res.statusCode=401;
-                        res.send('null');
+                        res.json(null);
                         console.log("Invalid Token");
                     }
                 }
                 else
                 {
                     res.statusCode=500;
-                    res.send('null');
+                    res.json(null);
                     console.log("Error in validating the token: "+err);
                 }
             });
         }
         else {
             res.statusCode=400;
-            res.send('null');
+            res.json(null);
             console.log('FnGetUserDetailsAP :  EZEID is empty');
         }
     }
@@ -12836,18 +12835,18 @@ exports.FnGetEZEIDDetailsAP = function (req, res) {
                                         res.send(UserDetailsResult[0]);
                                     }
                                     else {
-                                        res.send('null');
+                                        res.json(null);
                                         console.log('FnGetEZEIDDetailsAP : tmaster: No User details found');
                                     }
                                 }
                                 else {
-                                    res.send('null');
+                                    res.json(null);
                                     console.log('FnGetEZEIDDetailsAP : tmaster: No User details found');
                                 }
 
                             }
                             else {
-                                res.send('null');
+                                res.json(null);
                                 console.log('FnGetEZEIDDetailsAP : tmaster:' + err);
                             }
                         });
@@ -12870,7 +12869,7 @@ exports.FnGetEZEIDDetailsAP = function (req, res) {
             else if (EZEID == null) {
                 console.log('FnGetEZEIDDetailsAP: EZEID is empty');
             }
-            res.send('null');
+            res.json(null);
 
         }
     }
@@ -13098,18 +13097,18 @@ exports.FnGetRealStateDataAP = function(req,res){
                                         console.log('FnGetRealStateDataAP: Realstate Data sent successfully');
                                     }
                                     else {
-                                        res.send('null');
+                                        res.json(null);
                                         console.log('FnGetRealStateDataAP:pGetRealEstateData: No real state data found');
                                     }
                                 }
                                 else {
-                                    res.send('null');
+                                    res.json(null);
                                     console.log('FnGetRealStateDataAP:pGetRealEstateData: No real state data found');
                                 }
                             }
                             else {
                                 res.statusCode=500;
-                                res.send('null');
+                                res.json(null);
                                 console.log('FnGetRealStateDataAP:pGetRealEstateData:' + err);
                             }
                         });
@@ -13118,14 +13117,14 @@ exports.FnGetRealStateDataAP = function(req,res){
                     {
                         console.log('FnGetRealStateDataAP: Invalid Token');
                         res.statusCode=401;
-                        res.send('null');
+                        res.json(null);
                     }
                 }
                 else
                 {
                     console.log('FnGetRealStateDataAP: Error in validating token: '+err);
                     res.statusCode=500;
-                    res.send('null');
+                    res.json(null);
                 }
                     });
         }
@@ -13138,7 +13137,7 @@ exports.FnGetRealStateDataAP = function(req,res){
                 console.log('FnGetRealStateDataAP: TID is empty');
             }
             res.statusCode=400;
-            res.send('null');
+            res.json(null);
         }
     }
     catch(ex){
@@ -13168,29 +13167,29 @@ exports.FnGetAPEZEIDPicture = function (req, res) {
                                         console.log('FnGetAPEZEIDPicture: Realstate Data sent successfully');
                                     }
                                     else {
-                                        res.send('null');
+                                        res.json(null);
                                         console.log('FnGetAPEZEIDPicture:pGetRealEstateData: No real state data found');
                                     }
                                 }
                                 else {
-                                    res.send('null');
+                                    res.json(null);
                                     console.log('FnGetAPEZEIDPicture:pGetRealEstateData: No real state data found');
                                 }
                             }
                             else {
 
-                                res.send('null');
+                                res.json(null);
                                 console.log('FnGetAPEZEIDPicture:pGetRealEstateData:' + err);
                             }
                         });
 
                     } else {
-                        res.send('null');
+                        res.json(null);
                         console.log('FnGetAPEZEIDPicture: Invalid Token');
                         res.statusCode=401;
                     }
                 } else {
-                    res.send('null');
+                    res.json(null);
                     console.log('FnGetAPEZEIDPicture: Error in validating token:  ' + err);
                     res.statusCode=500;
                 }
@@ -13203,7 +13202,7 @@ exports.FnGetAPEZEIDPicture = function (req, res) {
             else if (TID.toString() == 'NaN') {
                 console.log('FnGetAPEZEIDPicture: TID is empty');
             }
-            res.send('null');
+            res.json(null);
         }
     }
     catch (ex) {
@@ -13321,18 +13320,18 @@ exports.FnGetBannerPictureAP = function(req, res){
                                     }
                                     else
                                     {
-                                        res.send('null');
+                                        res.json(null);
                                         console.log('FnGetBannerPicsAP:tmaster: No Banner Picture send sucessfully ');
                                     }
                                 }
                                 else {
-                                    res.send('null');
+                                    res.json(null);
                                     console.log('FnGetBannerPicsAP:tmaster: No Banner Picture send sucessfully ');
                                 }
                             }
                             else {
                                 res.statusCode=500;
-                                res.send('null');
+                                res.json(null);
                                 console.log('FnGetBannerPicsAP:tmaster:' + err);
                             }
                         });
@@ -13340,13 +13339,13 @@ exports.FnGetBannerPictureAP = function(req, res){
                     else {
                         res.statusCode=401;
                         console.log('FnGetBannerPicsAP: Invalid Token')
-                        res.send('null');
+                        res.json(null);
                     }
                 }
                 else {
                     res.statusCode=500;
                     console.log('FnGetBannerPicsAP: Error in processing Token' + err);
-                    res.send('null');
+                    res.json(null);
                 }
             });
         }
@@ -13360,7 +13359,7 @@ exports.FnGetBannerPictureAP = function(req, res){
                 console.log('FnGetBannerPicsAP: Ezeid is empty');
             }
             res.statusCode=400;
-            res.send('null');
+            res.json(null);
         }
 
     }
@@ -13397,13 +13396,13 @@ exports.FnGetAllBannerPicsAP = function(req, res){
                                     }
                                     else
                                     {
-                                        res.send('null');
+                                        res.json(null);
                                         console.log('FnGetAllBannerPicsAP:tmaster: No Banner Picture send sucessfully ');
                                     }
                                 }
                             else {
                                 res.statusCode=500;
-                                res.send('null');
+                                res.json(null);
                                 console.log('FnGetAllBannerPicsAP:tmaster:' + err);
                             }
                         });
@@ -13411,13 +13410,13 @@ exports.FnGetAllBannerPicsAP = function(req, res){
                     else {
                         res.statusCode=401;
                         console.log('FnGetAllBannerPicsAP: Invalid Token')
-                        res.send('null');
+                        res.json(null);
                     }
                 }
                 else {
                     res.statusCode=500;
                     console.log('FnGetAllBannerPicsAP: Error in processing Token' + err);
-                    res.send('null');
+                    res.json(null);
                 }
             });
         }
@@ -13428,7 +13427,7 @@ exports.FnGetAllBannerPicsAP = function(req, res){
                 console.log('FnGetAllBannerPicsAP: Ezeid is empty');
             }
             res.statusCode=400;
-            res.send('null');
+            res.json(null);
         }
 
     }
@@ -13461,13 +13460,13 @@ exports.FnGetSecondaryLocationListAP = function(req, res){
                                 else
                                 {
                                     console.log("FnGetSecondaryLocationList: Location send failed");
-                                    res.send('null');
+                                    res.json(null);
                                 }
                             }
                             else
                             {
                                 res.statusCode=500;
-                                res.send('null');
+                                res.json(null);
                                 console.log('FnGetSecondaryLocationList: error in getting secondary location list'+err);
                             }
                         });
@@ -13476,20 +13475,20 @@ exports.FnGetSecondaryLocationListAP = function(req, res){
                     else {
                         res.statusCode=401;
                         console.log('FnGetSecondaryLocationList: Invalid Token')
-                        res.send('null');
+                        res.json(null);
                     }
                 }
                 else {
                     res.statusCode=500;
                     console.log('FnGetSecondaryLocationList: Error in processing Token' + err);
-                    res.send('null');
+                    res.json(null);
                 }
             });
         }
         else
         {
             res.statusCode=400;
-            res.send('null');
+            res.json(null);
             if(Token == null){
                 console.log('FnGetSecondaryLocationList: token is empty');
             }
@@ -13531,13 +13530,13 @@ exports.FnGetSecondaryLocationAP = function(req, res){
                                 else
                                 {
                                     console.log("FnGetSecondaryLocationListNew:Location send failed");
-                                    res.send('null');
+                                    res.json(null);
                                 }
                             }
                             else
                             {
                                 res.statusCode=500;
-                                res.send('null');
+                                res.json(null);
                                 console.log('FnGetSecondaryLocationAP: error in getting secondary locationAP'+err);
                             }
                         });
@@ -13545,20 +13544,20 @@ exports.FnGetSecondaryLocationAP = function(req, res){
                     else {
                         res.statusCode=401;
                         console.log('FnGetSecondaryLocationAP: Invalid Token')
-                        res.send('null');
+                        res.json(null);
                     }
                 }
                 else {
                     res.statusCode=500;
                     console.log('FnGetSecondaryLocationAP: Error in processing Token' + err);
-                    res.send('null');
+                    res.json(null);
                 }
             });
         }
         else
         {
             res.statusCode=400;
-            res.send('null');
+            res.json(null);
             if(Token == null){
                 console.log('FnGetSecondaryLocationAP: token is empty');
             }
@@ -13766,30 +13765,30 @@ exports.FnGetIdCardPrintAP = function (req, res) {
                                     }
                                     else {
                                         console.log('FnGetIdCardPrintAP:No ID Card Details found');
-                                        res.send('null');
+                                        res.json(null);
                                     }
                                 }
                                 else {
                                     console.log('FnGetIdCardPrintAP:No ID Card Details found');
-                                    res.send('null');
+                                    res.json(null);
                                 }
                             }
                             else {
                                 console.log('FnGetIdCardPrintAP: error in getting ID Card DetailsAP' + err);
                                 res.statusCode = 500;
-                                res.send('null');
+                                res.json(null);
                             }
                         });
                     }
                     else {
                         res.statusCode = 401;
-                        res.send('null');
+                        res.json(null);
                         console.log('FnGetIdCardPrintAP: Invalid Token');
                     }
                 } else {
 
                     res.statusCode = 500;
-                    res.send('null');
+                    res.json(null);
                     console.log('FnGetIdCardPrintAP: Error in validating token:  ' + err);
                 }
             });
@@ -13802,7 +13801,7 @@ exports.FnGetIdCardPrintAP = function (req, res) {
                 console.log('FnGetIdCardPrintAP: EZEID is empty');
             }
             res.statusCode=400;
-            res.send('null');
+            res.json(null);
         }
     }
     catch (ex) {
@@ -13877,19 +13876,19 @@ exports.FnSearchRealEstateAP = function(req, res){
                                     console.log('FnSearchRealEstateAP:Search result sent successfully');
                                 }
                                 else {
-                                    res.send('null');
+                                    res.json(null);
                                     console.log('FnSearchRealEstateAP: No search found');
                                 }
                             }
                             else {
-                                res.send('null');
+                                res.json(null);
                                 console.log('FnSearchRealEstateAP:No search found');
                             }
 
                         }
                         else {
                             res.statusCode = 500;
-                            res.send('null');
+                            res.json(null);
                             console.log('FnSearchRealEstateAP: error in getting search RealEstateData' + err);
                         }
                     });
@@ -13897,13 +13896,13 @@ exports.FnSearchRealEstateAP = function(req, res){
                 else {
                     res.statusCode = 401;
                     console.log('FnSearchRealEstateAP: Invalid token');
-                    res.send('null');
+                    res.json(null);
                 }
             }
             else {
                 console.log('FnSearchRealEstateAP: Error in validating token:' + err);
                 res.statusCode = 500;
-                res.send('null');
+                res.json(null);
             }
         });
     }
@@ -14409,18 +14408,18 @@ exports.FnLoginVES = function (req, res) {
                         }
                         else {
                             console.log('FnLoginVES:No LoginVES Details found');
-                            res.send('null');
+                            res.json(null);
                         }
                     }
                     else {
                         console.log('FnLoginVES:No LoginVES Details found');
-                        res.send('null');
+                        res.json(null);
                     }
                 }
                 else {
                     console.log('FnLoginVES: error in getting LoginVES details' + err);
                     res.statusCode = 500;
-                    res.send('null');
+                    res.json(null);
                 }
             });
         }
@@ -14432,7 +14431,7 @@ exports.FnLoginVES = function (req, res) {
                 console.log('FnLoginVES: Password is empty');
             }
             res.statusCode=400;
-            res.send('null');
+            res.json(null);
         }
     }
     catch (ex) {
@@ -14577,13 +14576,13 @@ exports.FnGetAllContactsVES = function (req, res) {
                                     else {
 
                                         console.log('FnGetAllContactsVES:No ContactsVES details found');
-                                        res.send('null');
+                                        res.json(null);
                                     }
                                 }
                                 else {
 
                                     console.log('FnGetAllContactsVES:No ContactsVES details found');
-                                    res.send('null');
+                                    res.json(null);
                                 }
 
                             }
@@ -14591,19 +14590,19 @@ exports.FnGetAllContactsVES = function (req, res) {
 
                                 console.log('FnGetAllContactsVES: error in getting ContactsVES details' + err);
                                 res.statusCode = 500;
-                                res.send('null');
+                                res.json(null);
                             }
                         });
                     }
                     else {
                         res.statusCode = 401;
-                        res.send('null');
+                        res.json(null);
                         console.log('FnGetAllContactsVES: Invalid Token');
                     }
                 } else {
 
                     res.statusCode = 500;
-                    res.send('null');
+                    res.json(null);
                     console.log('FnGetAllContactsVES: Error in validating token:  ' + err);
                 }
             });
@@ -14620,7 +14619,7 @@ exports.FnGetAllContactsVES = function (req, res) {
             }
             
             res.statusCode=400;
-            res.send('null');
+            res.json(null);
         }
     }
     catch (ex) {
@@ -14645,19 +14644,19 @@ exports.FnGetDepartmentVES = function (req, res) {
                         console.log('FnGetDepartmentVES: Departments details sent successfully');
                     }
                     else {
-                        res.send('null');
+                        res.json(null);
                         res.statusCode = 500;
                         console.log('FnGetDepartmentVES: No Departments details found');
                     }
                 }
                 else {
-                    res.send('null');
+                    res.json(null);
                     console.log('FnGetDepartmentVES: ' + err);
                 }
             });
         }
         else {
-            res.send('null');
+            res.json(null);
             res.statusCode = 400;
             console.log('FnGetDepartmentVES: MasterID is empty');
         }
@@ -14694,13 +14693,13 @@ exports.FnGetContactVES = function (req, res) {
                                     else {
 
                                         console.log('FnGetContactsVES:No ContactsVES details found');
-                                        res.send('null');
+                                        res.json(null);
                                     }
                                 }
                                 else {
 
                                     console.log('FnGetContactsVES:No ContactsVES details found');
-                                    res.send('null');
+                                    res.json(null);
                                 }
 
                             }
@@ -14708,19 +14707,19 @@ exports.FnGetContactVES = function (req, res) {
 
                                 console.log('FnGetContactsVES: error in getting ContactsVES details' + err);
                                 res.statusCode = 500;
-                                res.send('null');
+                                res.json(null);
                             }
                         });
                     }
                     else {
                         res.statusCode = 401;
-                        res.send('null');
+                        res.json(null);
                         console.log('FnGetContactsVES: Invalid Token');
                     }
                 } else {
 
                     res.statusCode = 500;
-                    res.send('null');
+                    res.json(null);
                     console.log('FnGetContactsVES: Error in validating token:  ' + err);
                 }
             });
@@ -14734,7 +14733,7 @@ exports.FnGetContactVES = function (req, res) {
             }
             
             res.statusCode=400;
-            res.send('null');
+            res.json(null);
         }
     }
     catch (ex) {
@@ -14772,13 +14771,13 @@ exports.FnSearchContactsVES = function (req, res) {
                                     console.log('FnSearchContactsVES: Search result sent successfully');
                                 }
                                 else {
-                                    res.send('null');
+                                    res.json(null);
                                     console.log('FnSearchContactsVES: No search found');
                                 }
                             }
                             else {
                                 res.statusCode = 500;
-                                res.send('null');
+                                res.json(null);
                                 console.log('FnSearchContactsVES: error in getting search contact' + err);
                             }
                         });
@@ -14787,13 +14786,13 @@ exports.FnSearchContactsVES = function (req, res) {
                     else {
                         console.log('FnSearchContactsVES: Invalid token');
                         res.statusCode = 401;
-                        res.send('null');
+                        res.json(null);
                     }
                 }
                 else {
                     console.log('FnSearchContactsVES: Token error: ' + err);
                     res.statusCode = 500;
-                    res.send('null');
+                    res.json(null);
 
                 }
             });
@@ -14820,7 +14819,7 @@ exports.FnSearchContactsVES = function (req, res) {
             }
             
             res.statusCode=400;
-            res.send('null');
+            res.json(null);
         }
     }
     catch (ex) {
@@ -14843,13 +14842,13 @@ exports.FnCheckPasswordVES  = function (req, res) {
                         console.log('FnCheckPasswordVES : Password check details sent successfully');
                     }
                     else {
-                        res.send('null');
+                        res.json(null);
                         res.statusCode = 500;
                         console.log('FnCheckPasswordVES : No Password check details found');
                     }
                 }
                 else {
-                    res.send('null');
+                    res.json(null);
                     console.log('FnCheckPasswordVES : error in getting check password' + err);
                 }
             });
@@ -14860,7 +14859,7 @@ exports.FnCheckPasswordVES  = function (req, res) {
             }
             
             res.statusCode=400;
-            res.send('null');
+            res.json(null);
         }
 
 
@@ -14885,19 +14884,19 @@ exports.FnGetGatesVES = function (req, res) {
                         console.log('FnGetGatesVES: GatesVES details sent successfully');
                     }
                     else {
-                        res.send('null');
+                        res.json(null);
                         res.statusCode = 500;
                         console.log('FnGetGatesVES: No GatesVES details found');
                     }
                 }
                 else {
-                    res.send('null');
+                    res.json(null);
                     console.log('FnGetGatesVES: ' + err);
                 }
             });
         }
         else {
-            res.send('null');
+            res.json(null);
             res.statusCode = 400;
             console.log('FnGetGatesVES: MasterID is empty');
         }

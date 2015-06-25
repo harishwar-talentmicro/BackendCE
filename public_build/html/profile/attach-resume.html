@@ -1,0 +1,160 @@
+<style type="text/css">
+    .btn-file {
+        position: relative;
+        overflow: hidden;
+    }
+    .btn-file input[type=file] {
+        position: absolute;
+        top: 0;
+        right: 0;
+        min-width: 100%;
+        min-height: 100%;
+        font-size: 100px;
+        text-align: right;
+        filter: alpha(opacity=0);
+        opacity: 0;
+        outline: none;
+        background: white;
+        cursor: inherit;
+        display: block;
+    }
+</style>
+
+<div  ng-controller="CVAttachController as CVAttachCtrl" style="min-height:290px">
+    <form name="cvForm" ng-submit="cvForm.$valid && CVAttachCtrl.saveCVDocInfo()" novalidate>
+        <div class="form_style">
+           <div ng-show="true">
+                <div class="panel panel-success">
+                    <div class="panel-heading">
+                        CV Attachment
+                    </div>
+                    <div class="panel-body profile-panel-body">
+                        <div class="row">
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 profile-details" ng-hide="profileEditMode">
+                                <div class="row">
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 cvBottomSpace label">
+                                        <h5 class="text-primary text-left">Function</h5>
+                                    </div>
+                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 cvBottomSpace">
+                                        <select class="form-control emptyBox" name="function" ng-model="CVAttachCtrl._CVInfo.FunctionID"
+                                                ng-options="Function.FunctionID as Function.FunctionName for Function in CVAttachCtrl.Functions"
+                                                ng-change="CVAttachCtrl.getRoleForFunction(CVAttachCtrl._CVInfo.FunctionID)" required>
+                                            <option value="" default selected> --Select Function-- </option>
+                                        </select>
+                                    </div>
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 cvBottomSpace label">
+                                        <h5 class="text-primary text-left">Key Skills</h5>
+                                    </div>
+                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 cvBottomSpace">
+                                        <input type="text"  ng-class="cvForm.keySkills.$touched && !CVAttachCtrl._CVInfo.KeySkills.length ? 'mandatoryTextBoxCV' : ''" name="keySkills" class="form-control emptyBox" ng-model="CVAttachCtrl._CVInfo.KeySkills" placeholder="Key Skills (Comma Separated)" required/>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 cvBottomSpaceMiddle label">
+                                        <h5 class="text-primary text-left">CV Upload</h5>
+                                    </div>
+                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 cvBottomSpaceMiddle">
+                                        <span class="btn btn-primary btn-file">
+                                               <span ng-show="showLink">
+                                                   Choose File (Selected)
+                                               </span>
+                                               <span ng-hide="showLink">
+                                                   Choose File (Empty)
+                                               </span>
+                                               <input type="file" onchange="angular.element(this).scope().uploadFile(this.files)">
+                                         </span>
+
+                                        <span ng-controller="DocumentController"
+                                              style="margin-top:8px;"
+                                              ng-show="showLink">
+                                                <a class="blue" target="_blank" href="/ewTgetDocument?TokenNo={{Token}}&&RefType=7">
+                                                    View
+                                                </a>
+                                        </span>
+                                    </div>
+
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 cvBottomSpaceMiddle label">
+                                        <h5 class="text-primary text-left">
+                                            <input type="checkbox" ng-click="CVAttachCtrl.securePinCliked()" ng-model="CVAttachCtrl.EnablePin"/>Enable PIN
+                                        </h5>
+                                    </div>
+                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 cvBottomSpaceMiddle">
+                                        <input ng-show="CVAttachCtrl.EnablePin" maxlength="3" onkeypress="return isNumberKey(event);" type="text" style="width: 22%;" class="form-control" ng-model="CVAttachCtrl._CVInfo.Pin" placeholder="Pin"/>
+                                    </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 cvBottomSpace label">
+                                    <h5 class="text-primary text-left">CV Status</h5>
+                                </div>
+                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-8 cvBottomSpace">
+                                    <input type="radio" name="CVStatus" ng-model="CVAttachCtrl._CVInfo.Status" id="Visible" class="check-box pull-left" value="1" style="margin-top: 0px;"/>
+                                    Active(Access is Active)
+                                </div>
+                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-8 cvBottomSpace" style="padding-left: 0px;">
+                                    <input type="radio" name="CVStatus" ng-model="CVAttachCtrl._CVInfo.Status" id="NotVisible" class="check-box pull-left" value="2" style="margin-top: 0px;"/>
+                                    Inactive(Access Denied/Not Looking for Change)
+                                </div>
+                            </div>
+
+    <div class="row setRowLeftRightMarginZero" ng-show="true">
+        <div class="row">
+            <span class="skillText">Skill Matrix ( To find best matching roles ) </span>
+            <button type="button" class="btn btn-primary btn-sm pull-right" ng-click="addMoreSkill()"><span class="glyphicon glyphicon-plus"></span> Add More </button>
+        </div>
+        <div class="row">
+            <table class="table table-striped skillMatrixTable" st-table="rowCollection">
+                <thead>
+                <tr style="background:#ECECEC;; color:#000000;">
+                    <th class="panelPd5px msg_pos">Skill</th>
+                    <th class="panelPd5px date_size msg_pos">Expertise Level</th>
+                    <th class="panelPd5px from_size msg_pos">Experience(Yrs.)</th>
+                    <th class="panelPd5px from_size msg_pos">Active Skills</th>
+                    <th class="panelPd5px statusSize msg_pos">Action</th>
+                </tr>
+                </thead>
+                <tbody>
+
+                    <tr ng-repeat="skill in skillMatrix">
+                        <td class="panelPd5px msg_pos">
+                            <div class="ui-widget">
+                                <input class="form-control" type="text" id="tags{{$index}}" ng-keyup="complete($index)" ng-model="skillMatrix[$index].skillname" placeholder="Type skill here"/>
+                            </div>
+                        </td>
+                        <td class="panelPd5px msg_pos">
+                            <select class="form-control" name="expertiesLevel" ng-model="skillMatrix[$index].expertiseLevel">
+                                <option value="0" default selected> Beginner </option>
+                                <option value="1"> Independent </option>
+                                <option value="2"> Expert </option>
+                                <option value="3"> Master </option>
+                            </select>
+                        </td>
+                        <td class="panelPd5px msg_pos">
+                           <input type="text" name="experienceYear" decimals-only maxlength="3" ng-model="skillMatrix[$index].exp" class="form-control" placeholder="Ex. 5.00"/>
+                        </td>
+                        <td class="panelPd5px msg_pos">
+                            <input type="checkbox" checked="checked" ng-model="skillMatrix[$index].active_status"/>
+                        </td>
+                        <td class="panelPd5px msg_pos">
+                            <label class="btn btn-primary panelTextSize" ng-disabled="$index == 0" ng-click="deleteSkilFromMartix($index,skillMatrix[$index].tid)">Delete</label>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="clearfix"></div>
+    </div>
+
+                            <div class="row">
+                                <input type="submit" class="btn btn-primary pull-left" value="Save"/>
+                                <input type="button" class="btn btn-primary pull-left" style="margin-left: 5px;" value="Close" onclick="window.location.href='/'"/>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+           </div>
+        </div>
+    </form>
+</div>
+

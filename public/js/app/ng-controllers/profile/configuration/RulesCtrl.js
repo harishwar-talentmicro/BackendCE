@@ -389,6 +389,7 @@ angular.module('ezeidApp').controller('RulesCtrl',['$scope','$interval','$http',
 
         $scope.loadAllRules = function(){
             var defer = $q.defer();
+            $scope.rules = [];
 
             var sLoad = false;
             var rLoad = false;

@@ -16,11 +16,15 @@
         <div class="Popup_window form_style" id="SignIn_popup">
             <div class="window_page wdLogin Maping_popup">
                 <span ng-click="SignInCtrl.reset(SignInForm)" class="closelink">X</span>
-                <div class="logo_style">
-                    <span class="logo_container">EZEID</span>
-                </div>
-                <div class="signIn_style">
-                    <span class="signIn">Sign In</span>
+                <h2 class="text-center hpw" style="margin-top:3px;font-family: 'Arial',sans-serif;cursor:pointer"
+                    ng-click="$root.navigateHome()"
+                    class="font-roboto text-black text-bolder">
+                    <span class="text-dark-blue ezeid-eze-style">EZE</span><span class="ezeid-id-style">One
+                    <sup class="tm">TM</sup>
+                </span>
+                </h2>
+                <div class="signIn_style" style="padding-left: 0px;">
+                    <span class="signIn" style="margin:0px auto;">Sign In</span>
                 </div>
 
                 <div class="row">
@@ -84,7 +88,7 @@
                 <ul style="padding-bottom: 11px!important;margin-bottom:8px!important;" class="pad0px">
                     <li class="dsp_block padT10px">
                         <div class="pull-left wd48p forget_padd">
-                            <input type="text" name="ezeid" class="form-control wd_forget wd_forgetP2 emptyBox" style='text-transform:uppercase' ng-model="SignInCtrl.EzeId" placeholder="Enter Your EZEID"required/>
+                            <input type="text" name="ezeid" class="form-control wd_forget wd_forgetP2 emptyBox" style='text-transform:uppercase' ng-model="SignInCtrl.EzeId" placeholder="Enter Your EZEOne"required/>
                         </div>
                     </li>
                     <div class="clearfix"></div>
@@ -149,7 +153,7 @@
         <div class="container-fluid">
             <!-- Brand and toggle get grouped for better mobile display -->
             <div class="navbar-header p-top-7">
-                <h2 style="margin-top:3px;font-family: 'Arial',sans-serif;"
+                <h2 style="margin-top:3px;font-family: 'Arial',sans-serif;cursor:pointer"
                     ng-click="$root.navigateHome()"
                     class="font-roboto text-black text-bolder">
                     <span class="text-dark-blue ezeid-eze-style">EZE</span><span class="ezeid-id-style">One

@@ -241,31 +241,24 @@
                 $location.path('/');
             };
 
-            //$rootScope.$on('$includeContentRequested',function(){
-            //    $rootScope.$broadcast('$preLoaderStart');
-            //});
-            //
-            //$rootScope.$on('$includeContentLoaded',function(){
-            //    $rootScope.$broadcast('$preLoaderStop');
-            //});
 
             $rootScope.$on('$includeContentRequested',function(){
-                htmlProgress = true;
                 if(!dataProgress){
                     if($('#progress-overlay').hasClass('hidden')){
                         $('#progress-overlay').removeClass('hidden');
                     }
                 }
+                htmlProgress = true;
             });
 
             $rootScope.$on('$includeContentLoaded',function(){
-                htmlProgress = false;
                 if(!dataProgress){
                     if(!$('#progress-overlay').hasClass('hidden')){
 
                         $('#progress-overlay').addClass('hidden');
                     }
                 }
+                htmlProgress = false;
             });
 
 
@@ -284,22 +277,21 @@
             //});
 
             $rootScope.$on('$preLoaderStart',function(){
-                dataProgress = true;
                 if(!htmlProgress){
                     if($('#progress-overlay').hasClass('hidden')){
                         $('#progress-overlay').removeClass('hidden');
                     }
                 }
+                dataProgress = true;
             });
 
             $rootScope.$on('$preLoaderStop',function(){
-                dataProgress = false;
                 if(!htmlProgress){
                     if(!$('#progress-overlay').hasClass('hidden')){
-
                         $('#progress-overlay').addClass('hidden');
                     }
                 }
+                dataProgress = false;
             });
 
         /**
@@ -307,8 +299,9 @@
          */
 
         $rootScope.$on('$routeChangeStart',function(event,next,current){
-            console.log(next);
-            console.log(next.$$route.originalPath);
+            if($('#progress-overlay').hasClass('hidden')){
+                $('#progress-overlay').removeClass('hidden');
+            }
             /**
              * Fetching userInfo From local storage here if userInfo is not found in $rootScope
              */

@@ -8,7 +8,7 @@
                 <div class="row bottom-clearfix">
 
 
-                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 bottom-clearfix">
+                    <div class="col-lg-3 col-md-5 col-sm-3 col-xs-12 bottom-clearfix">
                         <div class="input-group tx-search-input-group">
                             <input class="form-control" ng-model="txSearchTerm" type="text" placeholder="Search records based on EZEID or message"/>
                             <span class="input-group-addon btn-link" title="Clear" ng-show="txSearchTerm" ng-click="clearSearchTerm(1,statusType)">
@@ -23,7 +23,7 @@
                     </div>
 
 
-                    <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12  bottom-clearfix">
+                    <div class="col-lg-6 col-md-7 col-sm-12 col-xs-12  bottom-clearfix">
                         <div class="row">
                             <div class="col-lg-1 col-md-1 col-sm-6 col-xs-6 bottom-clearfix tx-filter-container"
                                  title="Order By">
@@ -59,7 +59,6 @@
                                 <!--{{myFolders}}-->
                                 <!--<br/>-->
                                 <div class="form-group form-group-sm">
-
                                     <select class="form-control"
                                             ng-model="myFolders"
                                             style="height:auto;max-height: 100px;;" multiple>
@@ -96,24 +95,24 @@
 
 
 
-                    <div class="col-lg-2 col-md-2 col-sm-6 col-xs-12 pull-right">
+                    <div class="col-lg-2 col-md-4 col-sm-6 col-xs-12 pull-right">
                         <div class="btn-group pull-right bottom-clearfix" role="group" aria-label="First group">
                             <button type="button" ng-disabled="pageNumber <= 1" class="btn btn-info bt-xs no-radius" ng-click="decrementPage()">
                                 <span class="glyphicon glyphicon-chevron-left"></span>
-                                Prev
+
                             </button>
                             <button type="button" class="btn btn-info bt-xs no-radius active">
                                 {{pageNumber}}
                             </button>
                             <button type="button" ng-disabled="(pageNumber >= totalPages)" class="btn btn-info bt-xs no-radius"  ng-click="incrementPage()">
                                 <span class="glyphicon glyphicon-chevron-right"></span>
-                                Next
+
                             </button>
                         </div>
                     </div>
 
 
-                    <div class="col-lg-1 col-md-1 col-sm-6 col-xs-12 bottom-clearfix pull-right">
+                    <div class="col-lg-1 col-md-2 col-sm-6 col-xs-12 bottom-clearfix pull-right">
                         <button class="btn btn-sm btn-success no-radius"
                                 ng-show="salesPermissionConf.txCreate"
                                 ng-click="toggleModalBox()"
@@ -234,7 +233,7 @@
               <div class="row tx-row {{(($index%2) == 0) ? 'even' : 'odd'}}" ng-class="(editModes[$index]) ? 'edit' : ''" tabindex="{{$index+1}}">
                 <!---------- Single Transaction Entry ---------------------->
 
-                    <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12 bottom-clearfix">
+                    <div class="col-lg-3 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
                         <div class="row">
                             <!--<div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">-->
                                 <!--<small>{{tx.TrnNo}}</small>-->
@@ -264,13 +263,13 @@
                         <!--<small>{{tx.DeliveryAddress}}</small>-->
                     <!--</div>-->
 
-                    <div class="col-lg-2  col-md-2 col-sm-12 col-xs-12 bottom-clearfix" title="{{tx.Message}}" style="word-wrap:break-word;">
+                    <div class="col-lg-2  col-md-12 col-sm-12 col-xs-12 bottom-clearfix" title="{{tx.Message}}" style="word-wrap:break-word;">
                         <small class="text-success">
                             <b>{{tx.Message | truncate:100:'...'}}</b>
                         </small>
                     </div>
 
-                    <div class="col-lg-1 col-md-1 col-sm-12 col-xs-12 bottom-clearfix"
+                    <div class="col-lg-1 col-md-12 col-sm-12 col-xs-12 bottom-clearfix"
                          ng-hide="editModes[$index]" ng-dblclick="((salesPermissionConf.txUpdate) ? toggleAllEditMode($index,false,false,true) : 0)">
                         <div class="row">
                             <div ng-show="moduleConf.listType == 4" class="col-lg-12 col-md-12 col-sm-12 col-xs-12"
@@ -280,7 +279,7 @@
                         </div>
                     </div>
 
-                    <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12 bottom-clearfix"
+                    <div class="col-lg-3 col-md-12 col-sm-12 col-xs-12 bottom-clearfix"
                          title="{{(salesPermissionConf.txUpdate) ? 'Double click to edit' : 'Do not have permission to edit'}}"
                          ng-hide="editModes[$index]"
                          ng-dblclick="(salesPermissionConf.txUpdate) ? toggleAllEditMode($index,false,false,true) : 0">
@@ -300,7 +299,7 @@
 
 
                     <!-- Edit Mode -->
-                    <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12 bottom-clearfix" ng-show="editModes[$index]">
+                    <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12 bottom-clearfix" ng-show="editModes[$index]">
                         <div class="row">
                             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
                                 <label class="tiny">Transaction Status</label>
@@ -377,7 +376,7 @@
 
                             <!--</div>-->
 
-                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6" ng-hide="editModes[$index]">
+                            <div class="col-lg-6 col-md-3 col-sm-4 col-xs-6" ng-hide="editModes[$index]">
                                 <button class="btn btn-xs btn-block btn-info no-radius"
                                         data-toggle="tooltip" title="View Details" ng-click="toggleModalBox($event,$index)">
                                     <span class="glyphicon glyphicon-fullscreen"></span>
@@ -386,7 +385,7 @@
 
                             </div>
 
-                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6" ng-show="editModes[$index]">
+                            <div class="col-lg-6 col-md-3 col-sm-4 col-xs-6" ng-show="editModes[$index]">
 
                                 <button ng-click="updateTransaction()"
 
@@ -396,13 +395,13 @@
                                 </button>
                             </div>
 
-                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6" ng-show="editModes[$index]">
+                            <div class="col-lg-6 col-md-3 col-sm-4 col-xs-6" ng-show="editModes[$index]">
                                 <button  ng-click="(editModes[$index] = false)(resetModalBox())" class="btn btn-xs btn-block btn-danger no-radius" data-toggle="tooltip" title="Save">
                                     <span class="glyphicon glyphicon-remove"></span>
                                     Cancel
                                 </button>
                             </div>
-                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6" ng-hide="editModes[$index]">
+                            <div class="col-lg-6 col-md-3 col-sm-4 col-xs-6" ng-hide="editModes[$index]">
                                 <button  ng-disabled="!salesPermissionConf.txUpdate"
                                         title="{{(salesPermissionConf.txUpdate) ? 'Edit' : 'You do not have permission to edit'}}"
                                         ng-click="(salesPermissionConf.txUpdate) ? (toggleAllEditMode($index,false,false,true)) : 0" class="btn btn-xs btn-block btn-warning no-radius">
@@ -433,14 +432,14 @@
                         <div class="btn-group pull-right" role="group" aria-label="First group">
                             <button type="button" ng-disabled="pageNumber <= 1" class="btn btn-info bt-xs no-radius" ng-click="decrementPage()">
                                 <span class="glyphicon glyphicon-chevron-left"></span>
-                                Prev
+
                             </button>
                             <button type="button" class="btn btn-info bt-xs no-radius active">
                                 {{pageNumber}}
                             </button>
                             <button type="button" ng-disabled="(pageNumber >= totalPages)" class="btn btn-info bt-xs no-radius"  ng-click="incrementPage()">
                                 <span class="glyphicon glyphicon-chevron-right"></span>
-                                Next
+
                             </button>
                         </div>
                     </div>

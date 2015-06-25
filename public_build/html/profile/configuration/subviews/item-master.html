@@ -1,0 +1,255 @@
+<div class="panel panel-default" ng-controller="ItemMasterCtrl">
+    <div class="panel-heading">
+        <h4>Item Master</h4>
+    </div>
+    <div class="panel-body">
+
+        <div role="tabpanel">
+
+            <!-- Nav tabs -->
+            <ul class="nav nav-tabs" role="tablist">
+                <li role="presentation" ng-class="{active: selectedTab == 1}">
+                    <a class="btn-link" ng-class="{'tab-active': selectedTab == 1}" ng-click="selectedTab = 1">Sales</a>
+                </li>
+                <!--<li role="presentation" ng-class="{active: selectedTab == 2}">-->
+                    <!--<a class="btn-link" ng-class="{'tab-active': selectedTab == 2}" ng-click="selectedTab = 2">Reservation</a>-->
+                <!--</li>-->
+                <li role="presentation" ng-class="{active: selectedTab == 3}">
+                    <a class="btn-link" ng-class="{'tab-active': selectedTab == 3}" ng-click="selectedTab = 3">Home Delivery</a>
+                </li>
+                <!--<li role="presentation" ng-class="{active: selectedTab == 4}">-->
+                    <!--<a class="btn-link" ng-class="{'tab-active': selectedTab == 4}" ng-click="selectedTab = 4">Service</a>-->
+                <!--</li>-->
+                <li role="presentation" ng-class="{active: selectedTab == 5}">
+                    <a class="btn-link"  ng-class="{'tab-active': selectedTab == 5}" ng-click="selectedTab = 5">Resume</a>
+                </li>
+            </ul>
+
+            <!-- Tab panes -->
+            <div class="tab-content">
+                <!------- Sales Tab ends ---------------------->
+                <div role="tabpanel" class="tab-pane" id="sales-tb" ng-show="selectedTab === 1" ng-class="{'active':selectedTab ===1}">
+                    <div class="container-fluid">
+                        <div class="row bottom-clearfix"></div>
+                        <div class="row bottom-clearfix">
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                <button ng-hide="(globalConfig.itemListType[0] < 1)" class="btn btn-sm btn-primary" ng-click="toggleModalBox(0)"><span class="glyphicon glyphicon-plus"></span> Add</button>
+                            </div>
+                        </div>
+                        <div class="row" ng-show="globalConfig.itemListType[0] > 0">
+                            <content-item ng-repeat="item in items.sales" content="item" index="$index" toggle-modal-box="toggleModalBox(type,itemIndex)" template-type="{{globalConfig.itemListType[0]}}"></content-item>
+                        </div>
+                        <div class="row" ng-hide="globalConfig.itemListType[0] > 0">
+                            <h3>Your Sales enquiry Item list type is message only, therefore items are not applicable</h3>
+                        </div>
+                    </div>
+                </div>
+                <!------- Sales Tab ends ---------------------->
+
+                <!------- Reservation Tab ---------------------->
+                <!--<div role="tabpanel" class="tab-pane" id="reservation-tb" ng-show="selectedTab === 2" ng-class="{'active':selectedTab ===2}">-->
+                    <!--<div class="container-fluid">-->
+                        <!--<div class="row bottom-clearfix"></div>-->
+                        <!--<div class="row bottom-clearfix">-->
+                            <!--<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">-->
+                                <!--<button ng-hide="(globalConfig.itemListType[1] < 1)" class="btn btn-sm btn-primary" ng-click="toggleModalBox(1)"><span class="glyphicon glyphicon-plus"></span> Add</button>-->
+                            <!--</div>-->
+                        <!--</div>-->
+                    <!--</div>-->
+                <!--</div>-->
+                <!------- Reservation Tab ends ---------------------->
+
+                <!------- Home Delivery Tab  ---------------------->
+                <div role="tabpanel" class="tab-pane" id="home-delivery-tb" ng-show="selectedTab === 3" ng-class="{'active':selectedTab ===3}">
+                    <div class="container-fluid">
+                        <div class="row bottom-clearfix"></div>
+                        <div class="row bottom-clearfix">
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                <button ng-hide="(globalConfig.itemListType[2] < 1)" class="btn btn-sm btn-primary" ng-click="toggleModalBox(2)"><span class="glyphicon glyphicon-plus"></span> Add</button>
+                            </div>
+                        </div>
+                        <div class="row" ng-show="globalConfig.itemListType[2] > 0">
+                            <content-item ng-repeat="item in items.homeDelivery" content="item" index="$index" toggle-modal-box="toggleModalBox(type,itemIndex)"  template-type="{{globalConfig.itemListType[2]}}"></content-item>
+                        </div>
+                        <div class="row" ng-hide="globalConfig.itemListType[2] > 0">
+                            <h3>Your Home Delivery Item list type is message only, therefore items are not applicable</h3>
+                        </div>
+                    </div>
+                </div>
+                <!------- Home Delivery Tab ends ---------------------->
+
+                <!------- Service Tab  ---------------------->
+                <div role="tabpanel" class="tab-pane" id="service-tb" ng-show="selectedTab === 4" ng-class="{'active':selectedTab ===4}">
+                    <div class="container-fluid">
+                        <div class="row bottom-clearfix"></div>
+                        <div class="row bottom-clearfix">
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                <button ng-hide="(globalConfig.itemListType[3] < 1)" class="btn btn-sm btn-primary" ng-click="toggleModalBox(3)"><span class="glyphicon glyphicon-plus"></span> Add</button>
+                            </div>
+                        </div>
+                        <div class="row" ng-show="globalConfig.itemListType[3] > 0">
+                            <content-item ng-repeat="item in items.service" content="item" index="$index" toggle-modal-box="toggleModalBox(type,itemIndex)"  template-type="{{globalConfig.itemListType[3]}}"></content-item>
+                        </div>
+                        <div class="row" ng-hide="globalConfig.itemListType[3] > 0">
+                            <h3>Your Home Delivery Item list type is message only, therefore items are not applicable</h3>
+                        </div>
+                    </div>
+                </div>
+                <!------- Service Tab ends ---------------------->
+
+                <!------- Resume Tab  ---------------------->
+                <div role="tabpanel" class="tab-pane" id="resume-tb" ng-show="selectedTab === 5" ng-class="{'active':selectedTab ===5}">
+                    <div class="container-fluid">
+                        <div class="row bottom-clearfix"></div>
+                        <div class="row bottom-clearfix">
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                <button ng-hide="(globalConfig.itemListType[4] < 1)" class="btn btn-sm btn-primary" ng-click="toggleModalBox(4)" ><span class="glyphicon glyphicon-plus"></span> Add</button>
+                            </div>
+                        </div>
+                        <div class="row" ng-show="globalConfig.itemListType[4] > 0">
+                            <content-item ng-repeat="item in items.resume" content="item" index="$index"toggle-modal-box="toggleModalBox(type,itemIndex)"  template-type="{{globalConfig.itemListType[4]}}"></content-item>
+                        </div>
+                        <div class="row" ng-hide="globalConfig.itemListType[4] > 0">
+                            <h3>Your Home Delivery Item list type is message only, therefore items are not applicable</h3>
+                        </div>
+                    </div>
+                </div>
+                <!------- Resume Tab ends ---------------------->
+            </div>
+        </div>
+
+
+        <!------------ Modal Box starts here -------------------------->
+        <modal mtitle="modalBox.title" visible="showModal">
+            <div class="container-fluid">
+
+                    <form role="form">
+
+                        <div class="row">
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
+                                    <h5>{{itemTypes[modalBox.item.type]}}</h5>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+                                <div class="form-group">
+                                    <input class="form-control" placeholder="Item Title" maxlength="50" ng-model="modalBox.item.title" id="tx-status-title"/>
+                                </div>
+                            </div>
+
+
+                            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+                                <div class="form-group">
+                                    <select class="form-control" placeholder="Item Status" ng-model="modalBox.item.status" id="tx-status-status">
+                                        <option value="1">Active</option>
+                                        <option value="2">Inactive</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix" ng-show="globalConfig.itemListType[modalBox.item.type] > 2">
+                                <div class="form-group">
+                                    <input maxlength="12" class="form-control" type="text" decimals-only placeholder="Rate" ng-model="modalBox.item.rate"/>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix"  ng-show="globalConfig.itemListType[modalBox.item.type] > 0">
+                                <div class="form-group">
+                                    <textarea class="form-control" maxlength="250" ng-model="modalBox.item.description" placeholder="Item Description (Max 250 characters)" rows="14"></textarea>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix"  ng-show="globalConfig.itemListType[modalBox.item.type] > 1">
+                                <div class="thumbnail">
+                                    <span class="glyphicon glyphicon-paperclip picture-attach"
+                                          data-toggle="tooltip" title=""
+                                          data-placement="right"
+                                          data-original-title="Attach Picture"
+                                          ng-click="selectItemImage()"></span>
+                                    <img src="images/grey-background.jpg" ng-hide="modalBox.item.picture" />
+                                    <img ng-src="{{modalBox.item.picture}}" ng-show="modalBox.item.picture" />
+                                    <input class="hidden" type="file" name="itemImage" id="modal-box-item-image" accept="image/*" onchange="angular.element(this).scope().uploadItemImage()" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-lg-2 col-md-2 col-sm-4 col-xs-12 bottom-clearfix">
+                                <button class="btn btn-primary btn-block" ng-click="saveItem()">Save</button>
+                            </div>
+                            <div class="col-lg-2 col-md-2 col-sm-4 col-xs-12 bottom-clearfix">
+                                <button class="btn btn-primary btn-block" ng-click="toggleModalBox()">Close</button>
+                            </div>
+                        </div>
+                    </form>
+            </div>
+
+        </modal>
+        <!------------ Modal Box starts here -------------------------->
+
+        <!-------------------------------- Templates for Item List Types ----------------------------------------->
+        <!---------- Only message template --------------------------->
+        <script type="text/ng-template" id="/only-message-tpl.html">
+            <p class="text-center text-danger">Your list type is only message. Therefore, no item could be added</p>
+        </script>
+        <!---------- Only item template --------------------------->
+        <script type="text/ng-template" id="/only-item-tpl.html">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12 bottom-clearfix">
+                <div class="business-item">
+                    <div class="thumbnail">
+                        <span class="glyphicon glyphicon-edit" data-toggle="tooltip" title="" data-placement="right" data-original-title="Edit Item" ng-click="toggleModalBox({type : content.FunctionType, itemIndex : index})"></span>
+                        <div class="caption">
+                            <h4 class="text-primary">{{content.ItemName}}
+                                <span ng-show="content.Status == 1" class="glyphicon glyphicon-ok-circle text-success" data-toggle="tooltip" title="" data-placement="right" data-original-title="Item Status"></span>
+                                <span ng-show="content.Status == 2" class="glyphicon glyphicon-remove-circle text-danger" data-toggle="tooltip" title="" data-placement="right" data-original-title="Item Status"></span>
+                            </h4>
+                            <p class="item-description" data-toggle="tooltip" title="" data-original-title="{{content.Description}}" data-placement="right">{{content.Description | textLength:50}}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </script>
+        <!---------- Item and picture template --------------------------->
+        <script type="text/ng-template" id="/item-picture-tpl.html">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12 bottom-clearfix">
+                <div class="business-item">
+                    <div class="thumbnail">
+                        <span class="glyphicon glyphicon-edit" data-toggle="tooltip" title="" data-placement="right" data-original-title="Edit Item"   ng-click="toggleModalBox({type : content.FunctionType, itemIndex : index})"></span>
+                        <img ng-src="{{content.Pic}}" alt="No picture available"/>
+                        <div class="caption">
+                            <h4 class="text-primary">{{content.ItemName}}
+                                <span ng-show="content.Status == 1" class="glyphicon glyphicon-ok-circle text-success" data-toggle="tooltip" title="" data-placement="right" data-original-title="Item Status"></span>
+                                <span ng-show="content.Status == 2" class="glyphicon glyphicon-remove-circle text-danger" data-toggle="tooltip" title="" data-placement="right" data-original-title="Item Status"></span>
+                            </h4>
+                            <p class="item-description" data-toggle="tooltip" title="" data-original-title="{{content.Description}}" data-placement="right">{{content.Description | textLength:50}}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </script>
+
+
+        <!--------------------------- Templates for Item List Types ends here ------------------------------------>
+        <!---------- Item, picture and rate template --------------------------->
+        <script type="text/ng-template" id="/item-picture-rate-tpl.html">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12 bottom-clearfix">
+                <div class="business-item">
+                    <div class="thumbnail">
+                        <span class="glyphicon glyphicon-edit" data-toggle="tooltip" title="" data-placement="right" data-original-title="Edit Item" ng-click="toggleModalBox({type : content.FunctionType, itemIndex : index})"></span>
+                        <img ng-src="{{content.Pic}}" alt="No picture available"/>
+                        <div class="caption">
+                            <h4 class="text-primary">{{content.ItemName}}
+                                <span ng-show="content.Status == 1" class="glyphicon glyphicon-ok-circle text-success" data-toggle="tooltip" title="" data-placement="right" data-original-title="Item Status"></span>
+                                <span ng-show="content.Status == 2" class="glyphicon glyphicon-remove-circle text-danger" data-toggle="tooltip" title="" data-placement="right" data-original-title="Item Status"></span>
+                            </h4>
+                            <p class="text-primary">Rate : {{content.Rate}}/-</p>
+                            <p class="item-description" data-toggle="tooltip" title="" data-original-title="{{content.Description}}" data-placement="right">{{content.Description | textLength:50}}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </script>
+        <!--------------------------- Templates for Item List Types ends here ------------------------------------>
+
+    </div>
+</div>

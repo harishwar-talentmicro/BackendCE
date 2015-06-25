@@ -152,7 +152,7 @@
             $scope.moduleItems = [];
 
             $scope.totalPages = 1;
-            $scope.filterStatus = -1;
+            $scope.filterStatus = -2;   // Show all at first
             $scope.sortBy = 0;
             $scope.filterStatusTypes = [];
             $scope.txStatusTypes = [];
@@ -1275,7 +1275,7 @@
                     getSubUserList().then(function(){
                         $scope.loadTxActionTypes().then(function(){
                             $scope.loadTxStatusTypes().then(function(){
-                                $scope.loadTransaction(1,-1,$scope.txSearchTerm,$scope.sortBy).then(function(){
+                                $scope.loadTransaction(1,-2,$scope.txSearchTerm,$scope.sortBy).then(function(){
                                     watchPageNumber();
                                     watchSortBy();
                                     watchMyFolders();

@@ -49,7 +49,7 @@ angular.module('ezeidApp').
              */
 
             var placeDetail = [];
-            var searchTypeArr = ["EZEID", "Keywords", "Job Keywords"];
+            var searchTypeArr = ["EZEOne ID", "Keywords", "Job Keywords"];
             var mapLatitude;
             var mapLongitude;
 
@@ -83,7 +83,7 @@ angular.module('ezeidApp').
             $scope.searchType = searchTypeArr;
 
             var placeHolder = [
-                "Type EZEID here",
+                "Type EZEOne ID here",
                 "Type keywords to locate products and services",
                 "Type Job Skill Keywords to locate employers"
             ];
