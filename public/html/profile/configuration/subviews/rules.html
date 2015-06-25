@@ -346,11 +346,11 @@
                                 <br/>
                                 <input maxlength="5000" type="text" class="form-control" ng-model="modalBox.tempMappedName"/>
                                 <br/>
-                                <button class="btn btn-sm btn-success no-radius" ng-click="addMappedEzeid()"> Add Current EZEOne</button>
+                                <button class="btn btn-sm btn-success no-radius" ng-click="addMappedEzeid()"> Add Current EZEOne ID</button>
                             </div>
 
                             <div class="form-group">
-                                <label>Mapped EZEOnes</label>
+                                <label>Mapped EZEOne IDs</label>
 
                                 <button ng-repeat="mapName in modalBox.rule.MappedNames track by $index" class="btn btn-info btn-block btn-sm">{{mapName}}
                                     <i class="pull-right fa fa-remove" ng-click="removeMappedName($index)"></i>
