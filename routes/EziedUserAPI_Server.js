@@ -4034,7 +4034,7 @@ exports.FnSearchByKeywords = function (req, res) {
         var pagecount = req.body.pagecount ? parseInt(req.body.pagecount) : 0;
         var total = req.body.total ? parseInt(req.body.total) : 0; 
         
-        //console.log(req.body);
+        console.log(req.body);
 
         if (type == "1") {
             
@@ -4128,9 +4128,17 @@ exports.FnSearchByKeywords = function (req, res) {
                                 if (!err) {
                                     if (SearchResult[0] != null) {
                                         if (SearchResult[0].length > 0) {
-                                            console.log(SearchResult);
-                                            res.json({totalcount:SearchResult[0][0].totalcount,Result:SearchResult[1]});
-                                            console.log('FnSearchByKeywords: tmaster: Search result sent successfully');
+                                            if (SearchResult[0][0].totalcount == 1)
+                                            {
+                                                res.json({totalcount:SearchResult[0][0].totalcount,Result:SearchResult[1]});
+                                                console.log('FnSearchByKeywords: tmaster: Search result sent successfully');
+                                            }
+                                            else
+                                            {
+                                                res.send(SearchResult[0]);
+                                                console.log('FnSearchByKeywords: tmaster: Search result sent successfully');
+                                            }
+
                                             if (SearchType == 2){
                                             var getQuery = 'select TID from tmaster where Token='+db.escape(token);
                                             db.query(getQuery, function (err, getResult) {
