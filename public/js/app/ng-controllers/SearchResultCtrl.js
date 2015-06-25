@@ -65,7 +65,7 @@ var res = angular.module('ezeidApp').
             $scope.showMapPopupModel = false;
 
             $scope.modalBox = {
-                title : 'EZEID Map',
+                title : 'EZEOne Map',
                 class : 'business-manager-modal'
             };
 
@@ -89,7 +89,7 @@ var res = angular.module('ezeidApp').
                 "Type keywords to locate products and services",
                 "Type Job Skill Keywords to locate employers"
             ];
-            var searchTypeArr = ["EZEID", "Keywords", "Job Keywords"];
+            var searchTypeArr = ["EZEOne ID", "Keywords", "Job Keywords"];
 
             $scope.searchType = searchTypeArr;
 
