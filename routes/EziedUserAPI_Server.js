@@ -1962,7 +1962,7 @@ exports.FnRegistration = function (req, res) {
                 db.query('CALL pSaveEZEIDData(' + InsertQuery + ')', function (err, InsertResult) {
                     if (!err) {
                         // console.log('InsertResult: ' + InsertResult);
-                        if (InsertResult != null) {
+                        if (!InsertResult) {
                             //  console.log(InsertResult);
                             if (InsertResult[0].length > 0) {
                                  var RegResult = InsertResult[0];
@@ -2096,119 +2096,7 @@ exports.FnRegistration = function (req, res) {
     }
 };
 
-//method for quick registration
-exports.FnQuickRegistration = function (req, res) {
-    try {
-        res.setHeader("Access-Control-Allow-Origin", "*");
-        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
-        var EZEID = req.body.EZEID;
-        var MobileNumber = req.body.MobileNumber;
-        var EMailID = req.body.EMailID;
-        var FirstName = req.body.FirstName;
-        var LastName = req.body.LastName;
-        var Password = req.body.Password;
-
-        var RtnMessage = {
-            Token: '',
-            IsAuthenticate: false,
-            FirstName: '',
-            Type: 1,
-            Icon: ''
-        };
-        var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
-
-        if (EZEID != null && MobileNumber != null && EMailID != null && FirstName != null && LastName != null && Password != null) {
-            var Encrypt = FnGenerateToken();
-            // var EncryptPWD = FnEncryptPassword(Password);
-            var InsertQuery = db.escape(EZEID) + ',' + db.escape(MobileNumber) + ',' + db.escape(EMailID) + ',' + db.escape(FirstName) + ',' + db.escape(LastName) + ',' + db.escape(Password) + ',' + db.escape(Encrypt);
-            db.query('CALL pSaveQuickEZEIDData(' + InsertQuery + ')', function (err, InsertResult) {
-                if (!err) {
-                    if (InsertResult != null) {
-                        RtnMessage.Token = Encrypt;
-                        RtnMessage.IsAuthenticate = true;
-                        RtnMessage.FirstName = FirstName;
-                        console.log('FnQuickRegistration: Successfully done');
-                        if (EMailID != null || EMailID != '') {
-                            var fs = require('fs');
-                            fs.readFile("RegTemplate.txt", "utf8", function (err, data) {
-                                if (err) throw err;
-                                data = data.replace("[Firstname]", FirstName);
-                                data = data.replace("[Lastname]", LastName);
-                                data = data.replace("[EZEID]", EZEID);
-                                //console.log('Body:' + data);
-                                var mailOptions = {
-                                    from: 'noreply@ezeid.com',
-                                    to: EMailID,
-                                    subject: 'Welcome to Ezeid',
-                                    html: data // html body
-                                };
-                                FnSendMailEzeid(mailOptions, function (err, Result) {
-                                    if (!err) {
-                                        if (Result != null) {
-                                            console.log('FnQuickRegistration: Mail Sent Successfully');
-                                            res.send(RtnMessage);
-                                        }
-                                        else {
-                                            console.log('FnQuickRegistration: Mail not Sent Successfully');
-                                            res.send(RtnMessage);
-                                        }
-                                    }
-                                    else {
-                                        console.log('FnQuickRegistration:Error in sending mails' + err);
-                                        res.send(RtnMessage);
-                                    }
-                                });
-
-                            });
-
-                        }
-                        else {
-                            res.send(RtnMessage);
-                            console.log('FnQuickRegistration: resgistration success but email is empty');
-                        }
-
-                    }
-                    else {
-                        res.send(RtnMessage);
-                        console.log('FnQuickRegistration: resgistration failed');
-                    }
-                }
-                else {
-                    res.send(RtnMessage);
-                    res.statusCode = 500;
-                    console.log('FnQuickRegistration: mcity: ' + err);
-                }
-            });
-        }
-        else {
-            if (EZEID == null) {
-                console.log('FnQuickRegistration: EZEID is empty');
-            }
-            else if (MobileNumber == null) {
-                console.log('FnQuickRegistration: MobileNumber is empty');
-            }
-            else if (EMailID == null) {
-                console.log('FnQuickRegistration: EMailID is empty');
-            }
-            else if (FirstName == null) {
-                console.log('FnQuickRegistration: FirstName is empty');
-            }
-            else if (LastName == null) {
-                console.log('FnQuickRegistration: LastName is empty');
-            }
-            else if (Password == null) {
-                console.log('FnQuickRegistration: Password is empty');
-            }
-            res.statusCode = 400;
-            res.send(RtnMessage);
-        }
-    }
-    catch (ex) {
-        console.log('FnQuickRegistration error:' + ex.description);
-        throw new Error(ex);
-    }
-};
 
 //method for adding secondary locations
 exports.FnAddLocation = function (req, res) {

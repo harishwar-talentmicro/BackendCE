@@ -17,9 +17,15 @@
                         <div class="input-group p-bottom-3">
                             <div class="input-group-btn">
                                 <!-- Change Location btn -->
-                                <button  data-toggle="tooltip" type="button" ng-click="modalVisibility()" class="btn btn-info" title="Click to change Search Location"><i class="fa fa-map-marker"></i> <b class="normal-view-buttons">Location</b></button>
+                                <button  data-toggle="tooltip"
+                                         type="button" ng-click="modalVisibility()" class="btn btn-info"
+                                         title="Click to change Search Location"><i class="fa fa-map-marker"></i>
+                                    <b class="normal-view-buttons">Location</b>
+                                </button>
                                 <!-- Searc type button -->
-                                <button title="Search by" type="button" class="btn btn-default dropdown-toggle keyword-btn-radius" data-toggle="dropdown"><b>{{searchType[searchParams.searchType - 1]}}</b> <span class="caret"></span></button>
+                                <button title="Search by" type="button" class="btn btn-default dropdown-toggle keyword-btn-radius" data-toggle="dropdown">
+                                    <b>{{searchType[searchParams.searchType - 1]}}</b>
+                                    <span class="caret"></span></button>
                                 <ul class="dropdown-menu" role="menu">
                                     <li class="btn-link" ng-repeat="search in searchType track by $index">
                                         <!-- Index incremented by 1: As the array's default index is [0,1,2] & searchType's value is [1,2,3] -->
@@ -33,7 +39,10 @@
                                 <button  data-toggle="tooltip"  ng-click="toggleFilterContainer($event,true)" ng-disabled="searchParams.searchType === 1"
                                          type="button" class="btn no-radius btn-default dropdown-toggle btn-advanced-filter" data-toggle="dropdown" title="Click to choose Search Options"><i class="fa fa-check-square-o"></i> <b class="normal-view-buttons">Options</b></button>
                                 <!-- Search BTN -->
-                                <button  data-toggle="tooltip" type="button" class="btn btn-warning" title="search" ng-click="triggerSearch()"><i class="fa fa-search"></i> <b>Search</b></b></button>
+                                <button  data-toggle="tooltip" type="button" class="btn btn-warning"
+                                         title="search" ng-click="triggerSearch()">
+                                    <i class="fa fa-search"></i> <b class="normal-view-buttons">Search</b>
+                                    </b></button>
                             </div>
                         </div>
 

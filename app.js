@@ -4,7 +4,7 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser'), cors = require('cors'),
-    LocationManager = require('./routes/EziedUserAPI_Server');
+LocationManager = require('./routes/EziedUserAPI_Server');
 var compress = require('compression');
 
 var app = express();
@@ -85,7 +85,6 @@ app.post('/ewLogin', LocationManager.FnLogin);
 app.get('/ewLogout', LocationManager.FnLogout);
 app.post('/ewSavePrimaryEZEData', LocationManager.FnRegistration);
 //app.post('/ewSavePrimaryEZEData', LocationManager.FnRegistration);
-app.post('/ewSaveQucikEZEData', LocationManager.FnQuickRegistration);
 app.get('/ewmGetCategory', LocationManager.FnGetCategory);
 app.get('/ewmGetCity', LocationManager.FnGetCity);
 app.get('/ewmGetCountry', LocationManager.FnGetCountry);
