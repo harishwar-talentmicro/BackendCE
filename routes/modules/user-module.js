@@ -484,7 +484,7 @@ User.prototype.register = function(req,res,next){
     }
     catch (ex) {
         console.log('FnRegistration error:' + ex.description);
-        throw new Error(ex);
+           
     }
 };
 
@@ -546,7 +546,7 @@ User.prototype.login = function(req,res,next){
             // console.log(Query);
             _this.db.query('CALL PLogin(' + Query + ')', function (err, loginResult) {
                 if (!err) {
-                    if(loginResult != null) {
+                    if(loginResult) {
                         if (loginResult[0].length > 0) {
                             // console.log('loginResult: ' + loginResult);
                             var Encrypt = FnGenerateToken();
@@ -634,7 +634,7 @@ User.prototype.login = function(req,res,next){
     }
     catch (ex) {
         console.log('FnLogin error:' + ex.description);
-        throw new Error(ex);
+           
     }
 };
 
@@ -696,7 +696,7 @@ User.prototype.logout = function(req,res,next){
     }
     catch (ex) {
         console.log('FnLogout error:' + ex.description);
-        throw new Error(ex);
+           
     }
 };
 
@@ -745,7 +745,7 @@ User.prototype.getCountry = function(req,res,next){
     }
     catch (ex) {
         console.log('FnGetCountry error:' + ex.description);
-        throw new Error(ex);
+           
     }
 };
 
@@ -819,7 +819,7 @@ User.prototype.getState = function(req,res,next){
     }
     catch (ex) {
         console.log('FnGetState error:' + ex.description);
-        throw new Error(ex);
+           
     }
 };
 
@@ -873,7 +873,7 @@ User.prototype.getCity = function(req,res,next){
     }
     catch (ex) {
         console.log('FnGetCity error:' + ex.description);
-        throw new Error(ex);
+           
     }
 };
 
@@ -897,10 +897,10 @@ User.prototype.getUserDetails = function(req,res,next){
         if (Token != null && Token != '') {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
-                    if (Result != null) {
+                    if (Result) {
                         _this.db.query('CALL pGetEZEIDDetails(' + _this.db.escape(Token) + ')', function (err, UserDetailsResult) {
                             if (!err) {
-                                if (UserDetailsResult[0] != null) {
+                                if (UserDetailsResult[0]) {
                                     if (UserDetailsResult[0].length > 0) {
                                         // console.log('FnGetUserDetails: Token: ' + Token);
                                         console.log('FnGetUserDetails : tmaster: User details sent successfully');
@@ -945,7 +945,7 @@ User.prototype.getUserDetails = function(req,res,next){
     }
     catch (ex) {
         console.log('FnGetUserDetails error:' + ex.description);
-        throw new Error(ex);
+           
     }
 };
 
@@ -1000,7 +1000,7 @@ User.prototype.checkEzeid = function(req,res,next){
     }
     catch (ex) {
         console.log('FnCheckEzeid error:' + ex.description);
-        throw new Error(ex);
+           
     }
 };
 
@@ -1029,14 +1029,14 @@ User.prototype.changePassword = function(req,res,next){
         if (OldPassword != null && OldPassword != '' && NewPassword != null && NewPassword != '' && TokenNo != null) {
             FnValidateToken(TokenNo, function (err, Result) {
                 if (!err) {
-                    if (Result != null) {
+                    if (Result) {
                         var EncryptOldPWD = FnEncryptPassword(OldPassword);
                         var EncryptNewPWD = FnEncryptPassword(NewPassword);
                         var Query = _this.db.escape(TokenNo) + ',' + _this.db.escape(EncryptOldPWD) + ',' + _this.db.escape(EncryptNewPWD);
                         _this.db.query('CALL pChangePassword(' + Query + ')', function (err, ChangePasswordResult) {
                             if (!err) {
                                 //console.log(ChangePasswordResult);
-                                if (ChangePasswordResult != null) {
+                                if (ChangePasswordResult) {
                                     if (ChangePasswordResult.affectedRows > 0) {
                                         RtnMessage.IsChanged = true;
                                         res.send(RtnMessage);
@@ -1086,7 +1086,7 @@ User.prototype.changePassword = function(req,res,next){
     }
     catch (ex) {
         console.log('FnChangePassword error:' + ex.description);
-        throw new Error(ex);
+           
     }
 };
 
@@ -1124,7 +1124,7 @@ User.prototype.getCompanyProfile = function(req,res,next){
             console.log('CALL pGetTagLine(' + _this.db.escape(TID)+ ',' + _this.db.escape(Token) + ')');
             _this.db.query('CALL pGetTagLine(' + _this.db.escape(TID)+ ',' + _this.db.escape(Token) + ')', function (err, GetResult) {
                 if (!err) {
-                    if (GetResult[0] != null) {
+                    if (GetResult[0]) {
                         if (GetResult[0].length > 0) {
                             RtnMessage.Result=GetResult[0];
                             RtnMessage.Message = 'About Company Profile sent successfully';
@@ -1163,7 +1163,7 @@ User.prototype.getCompanyProfile = function(req,res,next){
     }
     catch (ex) {
         console.log('FnGetCompanyProfile error:' + ex.description);
-        throw new Error(ex);
+           
     }
 };
 
@@ -1194,7 +1194,7 @@ User.prototype.saveCompanyProfile = function(req,res,next){
         if(Token !=  null && CompanyProfile != null){
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
-                    if (Result != null) {
+                    if (Result) {
                         var query = _this.db.escape(Token)+ ',' + _this.db.escape(CompanyProfile);
                         _this.db.query('CALL pSaveTagLine(' + query + ')', function (err, InsertResult) {
                             console.log(InsertResult[0]);
@@ -1249,7 +1249,7 @@ User.prototype.saveCompanyProfile = function(req,res,next){
     }
     catch (ex) {
         console.log('FnSaveCompanyProfile: Error:' + ex.description);
-        throw new Error(ex);
+           
     }
 };
 
@@ -1275,11 +1275,11 @@ User.prototype.getWebLink = function(req,res,next){
         if (Token != null) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
-                    if (Result != null) {
+                    if (Result) {
 
                         _this.db.query('CALL pGetWebLink(' + _this.db.escape(Token) + ')', function (err, GetResult) {
                             if (!err) {
-                                if (GetResult != null) {
+                                if (GetResult) {
                                     if (GetResult[0].length > 0) {
                                         console.log('FnGetWebLink: Web Links Send successfully');
                                         res.send(GetResult[0]);
@@ -1329,7 +1329,7 @@ User.prototype.getWebLink = function(req,res,next){
     }
     catch (ex) {
         console.log('FnGetWebLink error:' + ex.description);
-        throw new Error(ex);
+           
     }
 };
 
@@ -1364,7 +1364,7 @@ User.prototype.saveWebLink = function(req,res,next){
         if (Token != null && URL != null && URL != '' && URLNumber != null) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
-                    if (Result != null) {
+                    if (Result) {
                         console.log(Token,URL,URLNumber);
                         var query = _this.db.escape(Token) + ',' + _this.db.escape(URL) + ',' + _this.db.escape(URLNumber) ;
                         _this.db.query('CALL pSaveWebLinks(' + query + ')', function (err, InsertResult) {
@@ -1424,7 +1424,7 @@ User.prototype.saveWebLink = function(req,res,next){
     }
     catch (ex) {
         console.log('FnSaveWebLink:error ' + ex.description);
-        throw new Error(ex);
+           
     }
 };
 
@@ -1454,7 +1454,7 @@ User.prototype.deleteWebLink = function(req,res,next){
         if (Token !=null && TID != null) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
-                    if (Result != null) {
+                    if (Result) {
                         //console.log('CALL pDeleteWorkinghours(' + _this.db.escape(TID) + ')');
                         _this.db.query('CALL pDeleteWebLink(' + _this.db.escape(TID) + ')', function (err, deleteResult) {
                             if (!err){
@@ -1503,7 +1503,7 @@ User.prototype.deleteWebLink = function(req,res,next){
     }
     catch (ex) {
         console.log('FnDeleteWebLink:error ' + ex.description);
-        throw new Error(ex);
+           
     }
 };
 
@@ -1527,7 +1527,7 @@ User.prototype.getEzeidDetails = function(req,res,next){
         if (Token != null && EZEID != null ) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
-                    if (Result != null) {
+                    if (Result) {
                         var LocSeqNo = 0;
                         var FindArray =EZEID.split('.');
                         if (FindArray.length > 0) {
@@ -1545,7 +1545,7 @@ User.prototype.getEzeidDetails = function(req,res,next){
                         }
                         _this.db.query('CALL pEZEIDPrimaryDetails(' + _this.db.escape(EZEID) + ',' + _this.db.escape(LocSeqNo) + ')', function (err, GetResult) {
                             if (!err) {
-                                if (GetResult[0] != null) {
+                                if (GetResult[0]) {
                                     if (GetResult[0].length > 0) {
                                         console.log('FnEZEIDPrimaryDetails: EZEID Primary deatils Send successfully');
                                         res.send(GetResult[0]);
@@ -1597,7 +1597,7 @@ User.prototype.getEzeidDetails = function(req,res,next){
     }
     catch (ex) {
         console.log('FnEZEIDDetails error:' + ex.description);
-        throw new Error(ex);
+           
     }
 };
 
@@ -1628,11 +1628,11 @@ User.prototype.getResume = function(req,res,next){
         if (Token != null) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
-                    if (Result != null) {
+                    if (Result) {
                         _this.db.query('CALL pgetCVInfo(' + _this.db.escape(Token) + ')', function (err, MessagesResult) {
                             if (!err) {
 
-                                if (MessagesResult[0] != null) {
+                                if (MessagesResult[0]) {
                                     if (MessagesResult[0].length > 0) {
 
                                         responseMessage.status = true;
@@ -1684,7 +1684,7 @@ User.prototype.getResume = function(req,res,next){
     }
     catch (ex) {
         console.log('FnGetCVInfo error:' + ex.description);
-        throw new Error(ex);
+           
         res.status(400).json(responseMessage);
     }
 };
@@ -1733,7 +1733,7 @@ User.prototype.saveResume = function(req,res,next){
         if (Token != null) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
-                    if (Result != null) {
+                    if (Result) {
 
                         if (Pin == '') {
                             Pin = null;
@@ -1741,7 +1741,7 @@ User.prototype.saveResume = function(req,res,next){
                         var query = _this.db.escape(FunctionID) + ',' + _this.db.escape(0) + ',' + _this.db.escape(KeySkills) + ',' + _this.db.escape(Status) + ',' + _this.db.escape(Pin) + ',' + _this.db.escape(Token) + ',' + _this.db.escape(ids);
                         _this.db.query('CALL pSaveCVInfo(' + query + ')', function (err, InsertResult) {
                             if (!err) {
-                                if (InsertResult[0] != null) {
+                                if (InsertResult[0]) {
                                     var async = require('async');
                                     var count = skillMatrix1.length;
                                     console.log(count);
@@ -1759,7 +1759,7 @@ User.prototype.saveResume = function(req,res,next){
                                         };
                                         FnSaveSkills(skills, function (err, Result) {
                                             if (!err) {
-                                                if (Result != null) {
+                                                if (Result) {
                                                     resultvalue = Result.SkillID
                                                     var SkillItems = {
                                                         skillID: resultvalue,
@@ -1772,7 +1772,7 @@ User.prototype.saveResume = function(req,res,next){
                                                     if (parseInt(skills.tid) != 0) {
                                                         var query = _this.db.query('UPDATE tskills set ? WHERE TID = ? ',[SkillItems,tid], function (err, result) {
                                                             if (!err) {
-                                                                if (result != null) {
+                                                                if (result) {
                                                                     if (result.affectedRows > 0) {
                                                                         console.log('FnupdateSkill: skill matrix Updated successfully');
                                                                     }
@@ -1792,7 +1792,7 @@ User.prototype.saveResume = function(req,res,next){
                                                     else {
                                                         var query = _this.db.query('INSERT INTO tskills  SET ?', SkillItems , function (err, result) {
                                                             if (!err) {
-                                                                if (result != null) {
+                                                                if (result) {
                                                                     if (result.affectedRows > 0) {
                                                                         console.log('FnSaveCv: skill matrix saved successfully');
                                                                     }
@@ -1866,7 +1866,7 @@ User.prototype.saveResume = function(req,res,next){
     }
     catch (ex) {
         console.log('FnSaveCVInfo error:' + ex.description);
-        throw new Error(ex);
+           
     }
 };
 
@@ -1885,7 +1885,7 @@ function FnSaveSkills(skill, CallBack) {
 
             _this.db.query('Select SkillID from mskill where SkillTitle like ' + _this.db.escape(skill.skillname), function (err, SkillResult) {
                 if ((!err)) {
-                    if (SkillResult[0] != null) {
+                    if (SkillResult[0]) {
                         console.log(SkillResult);
                         console.log('Skill value:' + SkillResult[0].SkillID);
                         console.log('Skill exists');
@@ -1899,7 +1899,7 @@ function FnSaveSkills(skill, CallBack) {
                                 if (skillInsertResult.affectedRows > 0) {
                                     _this.db.query('select SkillID from mskill where SkillTitle like ' + _this.db.escape(skill.skillname), function (err, SkillMaxResult) {
                                         if (!err) {
-                                            if (SkillMaxResult[0] != null) {
+                                            if (SkillMaxResult[0]) {
                                                 console.log('New Skill');
                                                 RtnResponse.SkillID = SkillMaxResult[0].SkillID;
                                                 CallBack(null, RtnResponse);
@@ -1931,7 +1931,7 @@ function FnSaveSkills(skill, CallBack) {
     }
     catch (ex) {
         console.log('OTP FnSendMailEzeid error:' + ex.description);
-        throw new Error(ex);
+           
         return 'error'
     }
 };
