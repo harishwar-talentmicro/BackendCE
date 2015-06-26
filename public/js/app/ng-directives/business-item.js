@@ -32,7 +32,25 @@
                 templateType = 0;
             }
 
+
+
             element.html(getTemplate(templateType)).show();
+            var itemIndex = parseInt(scope.itemIndex);
+            var elemClass = '';
+            var btnClass = 'btn-orange';
+            if(itemIndex%3 == 1){
+                elemClass = 'purple';
+                btnClass = 'btn-blue'
+            }
+            else if(itemIndex % 3 == 2){
+                elemClass = 'orange';
+                btnClass = 'btn-green';
+            }
+            //element.find('.business-manager-item').addClass(elemClass);
+            console.log(element);
+            console.log(elemClass);
+            element.find('div.business-manager-item').addClass(elemClass);
+            element.find('.btn-xs').addClass(btnClass);
             $compile(element.contents())(scope);
         }
 
@@ -46,7 +64,8 @@
                 item : '=',
                 addItem : '&',
                 editPermission : '=',
-                editMode : '='
+                editMode : '=',
+                itemIndex : '='
             }
         };
     }]);

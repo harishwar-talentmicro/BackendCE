@@ -29,7 +29,7 @@
 
                                         <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12 item-list-box">
                                             <div class="row">
-                                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
+                                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                                     <h4 class="text-center font-roboto text-warning">Select Items</h4>
 
                                                 </div>
@@ -40,7 +40,7 @@
                                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                                     <bussiness-item
                                                             ng-repeat="item in moduleItems track by item.TID"
-                                                            item="item" item-list-type="salesItemListType"
+                                                            item="item" item-index="$index" item-list-type="salesItemListType"
                                                             add-item="addItem(item)" edit-permission="editPermission" edit-mode="editMode">
                                                     </bussiness-item>
                                                 </div>
@@ -208,47 +208,38 @@
 <!-- Template for Item having item name,description,picture,qty and rate -->
 <script type="text/ng-template" id="/tpl/tx-item-description-picture-qty-rate.html">
     <div class="row business-manager-item selected">
-        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 no-padding">
-            <button ng-hide="(!editPermission) && editMode" class="btn btn-xs btn-danger pull-right no-radius"  ng-click="removeItem(item)">
+
+        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 business-manager-item-thumbnail bottom-clearfix">
+            <img height="32" width="32" class="img-circle" ng-src="{{item.Pic}}" />
+        </div>
+
+        <div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 bottom-clearfix">
+            <b class="font-roboto wrap-text no-margin">
+                {{item.ItemName}}
+            </b>
+        </div>
+        <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1 no-padding">
+            <button ng-hide="(!editPermission) && editMode"
+                    class="btn btn-xs btn-danger pull-right no-radius business-manager-trash-btn"
+                    ng-click="removeItem(item)">
                 <span class="glyphicon glyphicon-trash"></span>
             </button>
         </div>
-        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 business-manager-item-thumbnail bottom-clearfix">
-            <img height="64" width="64" class="img-circle" ng-src="{{item.Pic}}" />
-        </div>
-        <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 business-manager-item-details bottom-clearfix">
-            <h4 class="font-open-sans">{{item.ItemName}}
 
-            </h4>
-        </div>
 
-        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 business-manager-item-details">
-            <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 business-manager-item-details business-manager-input-control">
 
-                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <input class="text-right text-info" type="text" value="{{item.Rate | formatDecimal:'':2}}" disabled/>
+            x
 
-                    <div class="input-group form-group-sm bottom-clearfix">
-                        <span class="input-group-addon">
-                            Rate &nbsp; &nbsp;&nbsp;&nbsp;
-                        </span>
-                        <input class="form-control text-right" type="text" value="{{item.Rate | formatDecimal:'':2}}" disabled/>
-                    </div>
-                    <div class="input-group form-group-sm bottom-clearfix">
-                        <span class="input-group-addon">
-                            Quantity
-                        </span>
-                        <input  ng-disabled="!(editPermission && editMode)" class="form-control text-right" numbers-only type="number" ng-model="item.Qty" ng-change="(!item.Qty) ? (item.Qty = 1) : ''" min="1" max="10000000000"/>
-                    </div>
-                    <div class="input-group form-group-sm bottom-clearfix">
-                        <span class="input-group-addon">
-                                Amount &nbsp;
-                        </span>
-                        <input class="form-control text-right"  type="text" value="{{(item.Rate * item.Qty) | formatDecimal:'':2}}" disabled/>
+            <input  ng-disabled="!(editPermission && editMode)" class="text-right text-info"
+                    numbers-only type="number"
+                    ng-model="item.Qty" ng-change="(!item.Qty) ? (item.Qty = 1) : ''" min="1"
+                    max="10000000000"/>
+            =
+            <input class="text-right text-info"  type="text" value="{{(item.Rate * item.Qty) | formatDecimal:'':2}}" disabled/>
 
-                    </div>
 
-                </div>
-            </div>
 
         </div>
 

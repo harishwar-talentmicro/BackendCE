@@ -1290,23 +1290,60 @@ span.smallCloselink {
 
 .modal-dialog.modal-lg.business-manager-modal .business-manager-item,
 .business-manager-item{
-    background-color: #008B8B;
-    border: 1px solid #BBB;
+    background-color: #0078B6;
     padding: 5px;
     margin: 5px 0px 5px 0px;
     padding-bottom: 0px;
+    box-shadow: 0px 0px 15px #DDD;
+}
+
+.modal-dialog.modal-lg.business-manager-modal.business-manager-item.purple,
+.business-manager-item.purple{
+    background-color: #6B0A8C;
+}
+
+.modal-dialog.modal-lg.business-manager-modal.business-manager-item.orange,
+.business-manager-item.orange{
+    background-color: #E45600;
 }
 
 
-.modal-dialog.modal-lg.business-manager-modal .business-manager-item.selected,
-.business-manager-item .selected {
-    border: 1px solid #808080;
-    box-shadow: 0px 0px 30px #D2D2D2;
+.modal-dialog.modal-lg.business-manager-modal.business-manager-item.selected,
+.business-manager-item.selected {
+    border: 1px solid #817B7B;
+    box-shadow: none;
     background: #FFFFFF;
     padding: 5px;
     margin: 5px 0px 5px 0px;
 }
 
+.business-manager-trash-btn{
+    height: auto;
+    width: auto;
+    padding: 3px;
+    padding-top: 1px;
+    padding-bottom: 0px;
+    font-size: 12px;
+    background-color: #FF5B06;
+    border: 1px solid #FFF;
+}
+
+.business-manager-input-control > input{
+    outline: none;
+    border-radius: 0px!important;
+    min-width: 10%;
+    max-width: 28%;
+    width: 6em;
+    font-size: 12px;
+    background-color: #FFF;
+    margin-bottom: 4px;
+    padding: 2px;
+    border: 1px solid #757575;
+}
+
+.business-manager-input-control > input[disabled]{
+    border: 1px solid #DDD;
+}
 .modal-dialog.modal-lg.business-manager-modal label{
     font-family: 'Roboto', sans-serif;
     font-weight: normal;
@@ -1328,6 +1365,11 @@ span.smallCloselink {
     text-decoration: none;
 }
 
+.business-manager-item img{
+    border:1px solid rgba(255, 255, 255, 0.78);
+}
+
+
 .modal-dialog.modal-lg.business-manager-modal .business-manager-item > div.business-manager-item-thumbnail,
 .business-manager-item > div.business-manager-item-thumbnail{
   padding:0px;
@@ -1337,9 +1379,8 @@ span.smallCloselink {
 .business-manager-item > div.business-manager-item-details{
     padding: 0px;
     font-size: 12px;
-    font-family: roboto;
-
-
+    font-family: 'Roboto',sans-serif;
+    line-height: 0.5;
 }
 .modal-dialog.modal-lg.business-manager-modal .business-manager-item > div.business-manager-item-details > h4,
 .business-manager-item > div.business-manager-item-details > h4{
@@ -1353,13 +1394,31 @@ span.smallCloselink {
     color: #FFF;
 }
 
+.business-manager-item > div.business-manager-item-details.selected > h5{
+    color:#006600;
+}
 .business-manager-item-details .btn-orange{
     background-color: #EA8E00;
     border: 1px solid #FFF;
     color:#FFFFFF;
 }
 
-.business-manager-item-details .btn-orange:hover{
+
+.business-manager-item-details .btn-blue{
+    background-color: #0072AD;
+    border: 1px solid #FFF;
+    color:#FFFFFF;
+}
+
+.business-manager-item-details .btn-green{
+    background-color: #0F9600;;
+    border: 1px solid #F3FF3A;
+    color: #FFFFFF;
+}
+
+.business-manager-item-details .btn-orange:hover,
+.business-manager-item-details .btn-blue:hover,
+.business-manager-item-details .btn-green:hover{
     background-color: #EA3500;
     border: 1px solid #F3FF3A;
     color: #FFFFFF;
