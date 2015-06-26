@@ -1,5 +1,82 @@
 var DbHelper = require('./../helpers/DatabaseHandler'),
-db = DbHelper.getDBContext();
+    db = DbHelper.getDBContext();
+
+var User = require('./user-module.js');
+var userModule = new User(db);
+exports.FnRegistration = userModule.register;
+exports.FnLogin = userModule.login;
+exports.FnLogout = userModule.logout;
+exports.FnGetCountry = userModule.getCountry;
+exports.FnGetState = userModule.getState;
+exports.FnGetCity = userModule.getCity;
+exports.FnGetUserDetails = userModule.getUserDetails;
+exports.FnCheckEzeid = userModule.checkEzeid;
+exports.FnChangePassword = userModule.changePassword;
+exports.FnGetCompanyProfile = userModule.getCompanyProfile;
+exports.FnSaveCompanyProfile = userModule.saveCompanyProfile;
+exports.FnGetWebLink = userModule.getWebLink;
+exports.FnSaveWebLink = userModule.saveWebLink;
+exports.FnDeleteWebLink = userModule.deleteWebLink;
+exports.FnEZEIDPrimaryDetails = userModule.getEzeidDetails;
+exports.FnGetCVInfo = userModule.getResume;
+exports.FnSaveCVInfo = userModule.saveResume;
+
+var Audit = require('./audit-module.js');
+var auditModule = new Audit(db);
+exports.FnGetAccessHistory = auditModule.getAccessHistory;
+
+var Location = require('./location-module.js');
+var locationModule = new Location(db);
+exports.FnGetSecondaryLocation = locationModule.getAll;
+exports.FnAddLocation = locationModule.save;
+exports.FnGetLocationListForEZEID = locationModule.getAllForEzeid;
+
+var BusinessManager = require('./business-module.js');
+var businessManager = new BusinessManager(db);
+exports.FnGetTransaction = businessManager.getTransactions;
+exports.FnSaveTransaction = businessManager.saveTransaction;
+exports.FnUpdateTransaction = businessManager.updateTransaction;
+exports.FnGetTransactionItems = businessManager.getTransactionItems;
+exports.FnGetOutboxMessages = businessManager.getOutboxTransactions;
+
+var Configuration = require('./configuration-module.js');
+var configurationModule = new Configuration(db);
+exports.FnSaveConfig = configurationModule.save;
+exports.FnGetConfig = configurationModule.get;
+exports.FnGetCategory = configurationModule.getBusinessCategories;
+exports.FnGetStatusType = configurationModule.getStatusTypes;
+exports.FnSaveStatusType = configurationModule.saveStatusType;
+exports.FnGetActionType = configurationModule.getActionTypes;
+exports.FnSaveActionType = configurationModule.saveActionType;
+exports.FnGetItemList = configurationModule.getItems;
+exports.FnSaveItem = configurationModule.saveItems;
+exports.FnGetFolderList = configurationModule.getFolders;
+exports.FnSaveFolderRules = configurationModule.saveFolder;
+exports.FnGetSubUserList = configurationModule.getSubusers;
+exports.FnCreateSubUser = configurationModule.createSubuser;
+exports.FnGetReservationResource = configurationModule.getReservationResources;
+exports.FnSaveReservationResource = configurationModule.saveReservationResource;
+exports.FnUpdateReservationResource = configurationModule.updateReservationResource;
+exports.FnGetReservationService = configurationModule.getReservationServices;
+exports.FnSaveReservationService = configurationModule.saveReservationService;
+exports.FnUpdateReservationService = configurationModule.updateReservationService;
+exports.FnGetReservResourceServiceMap = configurationModule.getResourceServiceMaps;
+exports.FnSaveReservResourceServiceMap = configurationModule.saveResourceServiceMap;
+exports.FnGetWorkingHours = configurationModule.getWorkingHoursTemplates;
+exports.FnSaveWorkingHours = configurationModule.saveWorkingHoursTemplate;
+exports.FnGetHolidayList = configurationModule.getHolidays;
+exports.FnSaveHolidayCalendar = configurationModule.saveHoliday;
+exports.FnDeleteHolidayList = configurationModule.deleteHoliday;
+
+var Search = require('./search-module.js');
+var searchModule = new Search(db);
+exports.FnSearchByKeywords = searchModule.searchKeyword;
+exports.FnGetSearchInformation = searchModule.searchInformation;
+
+var Image = require('./image-module.js');
+var imageModule = new Image(db);
+exports.FnCropImage = imageModule.cropImage;
+
 
 
 function error(err, req, res, next) {
@@ -35,8 +112,8 @@ function FnGenerateToken() {
         }
 
         var crypto = require('crypto'),
-        algorithm = 'aes-256-ctr',
-        key = 'hire@123';
+            algorithm = 'aes-256-ctr',
+            key = 'hire@123';
 
         var cipher = crypto.createCipher(algorithm, key)
         var crypted = cipher.update(text, 'utf8', 'hex')
@@ -72,8 +149,8 @@ function FnEncryptPassword(Password) {
     try {
         //var text = "";
         var crypto = require('crypto'),
-        algorithm = 'aes-256-ctr',
-        key = 'ezeid@123';
+            algorithm = 'aes-256-ctr',
+            key = 'ezeid@123';
 
         var cipher = crypto.createCipher(algorithm, key)
         var crypted = cipher.update(Password, 'utf8', 'hex')
@@ -105,25 +182,25 @@ function FnDecrypt(EncryptPassword){
 }
 
 exports.FnDecryptPassword = function(req,res){
-try {
+    try {
 //res.setHeader("Access-Control-Allow-Origin", "*");
 //res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    res.header('Access-Control-Allow-Credentials', true);
-    res.header('Access-Control-Allow-Origin', "*");
-    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
-    res.header('Access-Control-Allow-Headers', 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept');
+        res.header('Access-Control-Allow-Credentials', true);
+        res.header('Access-Control-Allow-Origin', "*");
+        res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+        res.header('Access-Control-Allow-Headers', 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept');
 
-    var password = req.query.Password;
+        var password = req.query.Password;
 
-    var RtnMessage = {
-        Password : ''
-    };
-    RtnMessage.Password = FnDecrypt(password);
-    console.log(RtnMessage.Password);
-    res.send(RtnMessage);
+        var RtnMessage = {
+            Password : ''
+        };
+        RtnMessage.Password = FnDecrypt(password);
+        console.log(RtnMessage.Password);
+        res.send(RtnMessage);
 
 
-}
+    }
     catch(ex){
         console.log('FnDecrypterror:' + ex.description);
         throw new Error(ex);
@@ -179,7 +256,7 @@ function FnSendMailEzeid(MailContent, CallBack) {
 
 function FnMessageMail(MessageContent, CallBack) {
     try {
-        
+
         //below query to check token exists for the users or not.
         if (MessageContent != null) {
             var RtnMessage = {
@@ -206,41 +283,41 @@ function FnMessageMail(MessageContent, CallBack) {
                 if (!err) {
                     if (MessageContentResult[0] != null) {
                         if (MessageContentResult[0].length > 0) {
-                            
+
                             if (MessageContentResult[0].ToMailID != '') {
-                               /* if (MessageContent.MessageType == 0) {
-                                    fs.readFile("Individual.txt", "utf8", function (err, data) {
-                                        if (err) throw err;
-                                        // console.log(MessageContentResult);
-                                        data = data.replace('[IsVerified]', MessageContentResult[0].EZEIDVerifiedID);
-                                        data = data.replace("[EZEID]", MessageContentResult[0].EZEID);
-                                        data = data.replace("[Message]", MessageContent.Message);
-                                        data = data.replace("[https://www.ezeid.com?ID=]", 'https://www.ezeid.com?ID=' + MessageContentResult[0].EZEID);
-                                        // console.log('Body:' + data);
-                                        //  console.log(MessageContentResult[0].ToMailID);
-                                        var TomailOptions = {
-                                            from: 'noreply@ezeid.com',
-                                            to: MessageContentResult[0].ToMailID,
-                                            subject: 'Message from ' + MessageContentResult[0].EZEID,
-                                            html: data // html body
-                                        };
-                                        //console.log(TomailOptions);
-                                        var post = { MessageType: db.escape(MessageContent.MessageType), ToMailID: MessageContentResult[0].ToMailID, Subject: TomailOptions.subject, Body: TomailOptions.html };
-                                        //  console.log(post);
-                                        var query = db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
-                                            // Neat!
-                                            if (!err) {
-                                                console.log('FnMessageMail: Mail saved Successfully');
-                                                CallBack(null, RtnMessage);
-                                            }
-                                            else {
-                                                console.log('FnMessageMail: mail not saved Successfully: ' + err);
-                                                CallBack(null, null);
-                                            }
-                                        });
-                                    });
-                                }
-                                else */
+                                /* if (MessageContent.MessageType == 0) {
+                                 fs.readFile("Individual.txt", "utf8", function (err, data) {
+                                 if (err) throw err;
+                                 // console.log(MessageContentResult);
+                                 data = data.replace('[IsVerified]', MessageContentResult[0].EZEIDVerifiedID);
+                                 data = data.replace("[EZEID]", MessageContentResult[0].EZEID);
+                                 data = data.replace("[Message]", MessageContent.Message);
+                                 data = data.replace("[https://www.ezeid.com?ID=]", 'https://www.ezeid.com?ID=' + MessageContentResult[0].EZEID);
+                                 // console.log('Body:' + data);
+                                 //  console.log(MessageContentResult[0].ToMailID);
+                                 var TomailOptions = {
+                                 from: 'noreply@ezeid.com',
+                                 to: MessageContentResult[0].ToMailID,
+                                 subject: 'Message from ' + MessageContentResult[0].EZEID,
+                                 html: data // html body
+                                 };
+                                 //console.log(TomailOptions);
+                                 var post = { MessageType: db.escape(MessageContent.MessageType), ToMailID: MessageContentResult[0].ToMailID, Subject: TomailOptions.subject, Body: TomailOptions.html };
+                                 //  console.log(post);
+                                 var query = db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
+                                 // Neat!
+                                 if (!err) {
+                                 console.log('FnMessageMail: Mail saved Successfully');
+                                 CallBack(null, RtnMessage);
+                                 }
+                                 else {
+                                 console.log('FnMessageMail: mail not saved Successfully: ' + err);
+                                 CallBack(null, null);
+                                 }
+                                 });
+                                 });
+                                 }
+                                 else */
                                 if (MessageContent.MessageType == 1) {
                                     fs.readFile("SalesEnquiry.txt", "utf8", function (err, data) {
                                         if (err) throw err;
@@ -381,7 +458,7 @@ function FnMessageMail(MessageContent, CallBack) {
                                         data = data.replace("[Roles]", MessageContentResult[0].Role);
                                         data = data.replace("[Keyskills]", MessageContentResult[0].KeySkills);
                                         data = data.replace("[https://www.ezeid.com/]", 'https://www.ezeid.com/' + MessageContentResult[0].EZEID);
-                                        
+
                                         if (MessageContentResult[0].DocPin == '') {
                                             data = data.replace("[PIN]", MessageContentResult[0].DocPin);
                                         }
@@ -397,7 +474,7 @@ function FnMessageMail(MessageContent, CallBack) {
                                             html: data // html body
                                         };
                                         var post = { MessageType: MessageContent.MessageType,Priority: 3, ToMailID: MessageContentResult[0].ToMailID, Subject: mailOptions.subject, Body: mailOptions.html,SentbyMasterID: MessageContent.TID };
-                                         console.log(post);
+                                        console.log(post);
                                         var query = db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
                                             // Neat!
                                             if (!err) {
@@ -412,46 +489,46 @@ function FnMessageMail(MessageContent, CallBack) {
                                     });
                                 }
                                 /*else if (MessageContent.MessageType == 6) {
-                                    fs.readFile("Appointment.txt", "utf8", function (err, data) {
-                                        if (err) throw err;
-                                        var moment = require('moment');
-                                        if (MessageContent.TaskDateTime != null) {
-                                            MessageContent.TaskDateTime = moment(new Date(MessageContent.TaskDateTime)).format('DD-MMM-YYYY HH:MM a');
-                                        }
-                                        else {
-                                            MessageContent.TaskDateTime = '';
-                                        }
-                                        data = data.replace("[IsVerified]", MessageContentResult[0].EZEIDVerifiedID);
-                                        data = data.replace("[EZEID]", MessageContentResult[0].EZEID);
-                                        data = data.replace("[Message]", MessageContent.Message);
-                                        var moment = require('moment');
-                                        // console.log(moment(dateconvert).format('DD-MMM-YYYY HH:MM a'));
+                                 fs.readFile("Appointment.txt", "utf8", function (err, data) {
+                                 if (err) throw err;
+                                 var moment = require('moment');
+                                 if (MessageContent.TaskDateTime != null) {
+                                 MessageContent.TaskDateTime = moment(new Date(MessageContent.TaskDateTime)).format('DD-MMM-YYYY HH:MM a');
+                                 }
+                                 else {
+                                 MessageContent.TaskDateTime = '';
+                                 }
+                                 data = data.replace("[IsVerified]", MessageContentResult[0].EZEIDVerifiedID);
+                                 data = data.replace("[EZEID]", MessageContentResult[0].EZEID);
+                                 data = data.replace("[Message]", MessageContent.Message);
+                                 var moment = require('moment');
+                                 // console.log(moment(dateconvert).format('DD-MMM-YYYY HH:MM a'));
 
-                                        data = data.replace("[ActionDate]", MessageContent.TaskDateTime);
-                                        data = data.replace("[https://www.ezeid.com?ID=]", 'https://www.ezeid.com?ID=' + MessageContentResult[0].EZEID);
-                                        // console.log('Body:' + data);
-                                        // console.log(MessageContentResult[0].ToMailID);
-                                        var mailOptions = {
-                                            from: 'noreply@ezeid.com',
-                                            to: MessageContentResult[0].ToMailID,
-                                            subject: 'Appointment Request from  ' + MessageContentResult[0].EZEID,
-                                            html: data // html body
-                                        };
-                                        var post = { MessageType: MessageContent.MessageType,Priority: 3, ToMailID: MessageContentResult[0].ToMailID, Subject: mailOptions.subject, Body: mailOptions.html,SentbyMasterID: MessageContent.TID };
-                                        // console.log(post);
-                                        var query = db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
-                                            // Neat!
-                                            if (!err) {
-                                                console.log('FnMessageMail: Mail saved Successfully');
-                                                CallBack(null, RtnMessage);
-                                            }
-                                            else {
-                                                console.log('FnMessageMail: Mail not Saved Successfully');
-                                                CallBack(null, null);
-                                            }
-                                        });
-                                    });
-                                }*/
+                                 data = data.replace("[ActionDate]", MessageContent.TaskDateTime);
+                                 data = data.replace("[https://www.ezeid.com?ID=]", 'https://www.ezeid.com?ID=' + MessageContentResult[0].EZEID);
+                                 // console.log('Body:' + data);
+                                 // console.log(MessageContentResult[0].ToMailID);
+                                 var mailOptions = {
+                                 from: 'noreply@ezeid.com',
+                                 to: MessageContentResult[0].ToMailID,
+                                 subject: 'Appointment Request from  ' + MessageContentResult[0].EZEID,
+                                 html: data // html body
+                                 };
+                                 var post = { MessageType: MessageContent.MessageType,Priority: 3, ToMailID: MessageContentResult[0].ToMailID, Subject: mailOptions.subject, Body: mailOptions.html,SentbyMasterID: MessageContent.TID };
+                                 // console.log(post);
+                                 var query = db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
+                                 // Neat!
+                                 if (!err) {
+                                 console.log('FnMessageMail: Mail saved Successfully');
+                                 CallBack(null, RtnMessage);
+                                 }
+                                 else {
+                                 console.log('FnMessageMail: Mail not Saved Successfully');
+                                 CallBack(null, null);
+                                 }
+                                 });
+                                 });
+                                 }*/
                             }
                             else {
                                 console.log('FnMessageMail: Email  is empty');
@@ -494,27 +571,27 @@ function FnValidateToken(Token, CallBack) {
         //below query to check token exists for the users or not.
         if (Token != null && Token != '') {
             if(Token != 2){
-                 var Query = 'select TID,Token from tmaster where Token=' + db.escape(Token);
-            //var Query = 'select Token from tmaster';
-            //70084b50d3c43822fbef
-            db.query(Query, function (err, Result) {
-                if (!err) {
-                    if (Result.length > 0) {
-                        // console.log(Result);
-                        console.log('FnValidateToken: Token found');
-                        CallBack(null, Result[0]);
+                var Query = 'select TID,Token from tmaster where Token=' + db.escape(Token);
+                //var Query = 'select Token from tmaster';
+                //70084b50d3c43822fbef
+                db.query(Query, function (err, Result) {
+                    if (!err) {
+                        if (Result.length > 0) {
+                            // console.log(Result);
+                            console.log('FnValidateToken: Token found');
+                            CallBack(null, Result[0]);
+                        }
+                        else {
+                            CallBack(null, null);
+                            console.log('FnValidateToken:No Token found');
+                        }
                     }
                     else {
-                        CallBack(null, null);
-                        console.log('FnValidateToken:No Token found');
-                    }
-                }
-                else {
-                    CallBack(err, null);
-                    console.log('FnValidateToken:' + err);
+                        CallBack(err, null);
+                        console.log('FnValidateToken:' + err);
 
-                }
-            });
+                    }
+                });
             }
             else{
                 CallBack(null, 'Pass');
@@ -598,8 +675,8 @@ exports.FnLogin = function (req, res) {
             var FindArray = UserName.split('.');
             var Query
             //console.log('findarray: ' + FindArray.length);
-          var Query = db.escape(UserName)+','+ db.escape(EncryptPWD);
-           // console.log(Query);
+            var Query = db.escape(UserName)+','+ db.escape(EncryptPWD);
+            // console.log(Query);
             db.query('CALL PLogin(' + Query + ')', function (err, loginResult) {
                 if (!err) {
                     if(loginResult != null) {
@@ -616,7 +693,7 @@ exports.FnLogin = function (req, res) {
 
                                     if (TokenResult.affectedRows > 0) {
                                         //res.setHeader('Cookie','Token='+Encrypt);
-                                       // console.log(loginDetails[0]);
+                                        // console.log(loginDetails[0]);
                                         res.cookie('Token', Encrypt, { maxAge: 900000, httpOnly: true });
                                         RtnMessage.Token = Encrypt;
                                         RtnMessage.IsAuthenticate = true;
@@ -860,7 +937,7 @@ exports.FnForgetPassword = function (req, res) {
                                         data = data.replace("[Firstname]", UserResult[0].FirstName);
                                         data = data.replace("[Lastname]", UserResult[0].LastName);
                                         data = data.replace("[Password]", Password);
-                                       
+
                                         console.log(UserResult);
                                         //console.log('Body:' + data);
                                         var mailOptions = {
@@ -869,7 +946,7 @@ exports.FnForgetPassword = function (req, res) {
                                             subject: 'Password reset request',
                                             html: data // html body
                                         };
-                                        
+
                                         // send mail with defined transport object
                                         //message Type 7 - Forgot password mails service
                                         var post = { MessageType: 7, Priority: 2, ToMailID: mailOptions.to, Subject: mailOptions.subject, Body: mailOptions.html,SentbyMasterID: UserResult[0].TID};
@@ -1061,7 +1138,7 @@ exports.FnGetState = function (req, res) {
 
         if (CountryID.toString() != 'NaN' && LangID.toString() != 'NaN') {
             var Query = 'Select StateID, StateName  from mstate where LangID=' + db.escape(LangID) + ' and CountryID=' + db.escape(CountryID);
-           // console.log(Query);
+            // console.log(Query);
             db.query(Query, function (err, StateResult) {
                 if (!err) {
                     if (StateResult.length > 0) {
@@ -1069,8 +1146,8 @@ exports.FnGetState = function (req, res) {
                         db.query(Query, function (err, CountryResult) {
                             if (!err) {
                                 if (CountryResult.length) {
-                                   // console.log(CountryResult);
-                                  //  console.log(CountryResult[0].ISDCode);
+                                    // console.log(CountryResult);
+                                    //  console.log(CountryResult[0].ISDCode);
                                     res.setHeader('ISDCode', CountryResult[0].ISDCode);
                                     res.send(StateResult);
                                     console.log('FnGetState: mcountry: State sent successfully');
@@ -1649,11 +1726,11 @@ exports.FnRegistration = function (req, res) {
         if(SelectionTypes.toString() == 'NaN'){
             SelectionTypes = 0;
         }
-            console.log(SelectionTypes);
+        console.log(SelectionTypes);
         var IDTypeID = req.body.IDTypeID;
         var EZEID = req.body.EZEID;
-       if(EZEID != null)
-           EZEID = EZEID.toUpperCase();
+        if(EZEID != null)
+            EZEID = EZEID.toUpperCase();
         var Password = req.body.Password;
         var FirstName = req.body.FirstName;
         var LastName = req.body.LastName;
@@ -1730,8 +1807,8 @@ exports.FnRegistration = function (req, res) {
         }
         var TemplateID = parseInt(req.body.TemplateID);
         if(TemplateID.toString() == 'NaN')
-            TemplateID =0;          
-        
+            TemplateID =0;
+
         var RtnMessage = {
             Token: '',
             IsAuthenticate: false,
@@ -1778,107 +1855,107 @@ exports.FnRegistration = function (req, res) {
                     + db.escape(StatusID) + ',' + db.escape(Icon) + ',' + db.escape(IconFileName) + ',' + db.escape(ISDPhoneNumber) + ',' + db.escape(ISDMobileNumber) + ','
                     + db.escape(Gender) + ',' + db.escape(DOBDate) + ',' + db.escape(IPAddress) + ',' + db.escape(SelectionTypes) + ',' + db.escape(ParkingStatus)+ ',' + db.escape(TemplateID)  + ',' + db.escape(CategoryID);
 
-                 
+
                 //console.log(InsertQuery);
 
                 db.query('CALL pSaveEZEIDData(' + InsertQuery + ')', function (err, InsertResult) {
                     if (!err) {
-                         //console.log('InsertResult: ' + InsertResult);
+                        //console.log('InsertResult: ' + InsertResult);
                         if (InsertResult != null) {
-                             console.log(InsertResult[0].length);
+                            console.log(InsertResult[0].length);
                             if (InsertResult[0].length > 0) {
                                 var RegResult = InsertResult[0];
                                 if(RegResult[0].TID != 0)
                                 {
-                                     if(IDTypeID == 2)
-                                RtnMessage.FirstName=CompanyName;
-                                else
-                                RtnMessage.FirstName = FirstName;
+                                    if(IDTypeID == 2)
+                                        RtnMessage.FirstName=CompanyName;
+                                    else
+                                        RtnMessage.FirstName = FirstName;
 
-                                RtnMessage.IsAuthenticate = true;
-                                RtnMessage.Token = TokenNo;
-                                RtnMessage.Type = IDTypeID;
-                                RtnMessage.Icon = Icon;
-                                if (CompanyName == null)
-                                    CompanyName='';
-                                if (Operation == 'I') {
-                                    console.log('FnRegistration:tmaster: Registration success');
-                                    //res.send(RtnMessage);
-                                    if (EMailID != '' && EMailID != null) {
-                                        var Templatefilename = null;
-                                        if(IDTypeID == 1)
-                                            Templatefilename="RegTemplate.txt";
-                                        else if(IDTypeID == 2)
-                                            Templatefilename = "RegBussinessTemplate.txt";
-                                        else
-                                        Templatefilename = "RegPublicTemplate.txt";
-
-                                        var fs = require('fs');
-                                        fs.readFile(Templatefilename, "utf8", function (err, data) {
-                                            if (err) throw err;
-                                            data = data.replace("[Firstname]", FirstName);
-                                            data = data.replace("[Lastname]", LastName);
-                                            data = data.replace("[EZEID]", EZEID);
-                                            data = data.replace("[EZEID]", EZEID);  //REG Detials
-                                            data = data.replace("[EZEID]", EZEID); //L1
-                                            data = data.replace("[EZEID]", EZEID); //L2
-                                            data = data.replace("[EZEID]", EZEID); //CV
-                                            data = data.replace("[EZEID]", EZEID); //ID
-                                            data = data.replace("[EZEID]", EZEID); //DL
-                                            data = data.replace("[EZEID]", EZEID); //PP
-                                            data = data.replace("[CompanyName]",CompanyName);
-
-                                            if(PIN == null){
-                                                data = data.replace(".PIN","");
-                                            }
+                                    RtnMessage.IsAuthenticate = true;
+                                    RtnMessage.Token = TokenNo;
+                                    RtnMessage.Type = IDTypeID;
+                                    RtnMessage.Icon = Icon;
+                                    if (CompanyName == null)
+                                        CompanyName='';
+                                    if (Operation == 'I') {
+                                        console.log('FnRegistration:tmaster: Registration success');
+                                        //res.send(RtnMessage);
+                                        if (EMailID != '' && EMailID != null) {
+                                            var Templatefilename = null;
+                                            if(IDTypeID == 1)
+                                                Templatefilename="RegTemplate.txt";
+                                            else if(IDTypeID == 2)
+                                                Templatefilename = "RegBussinessTemplate.txt";
                                             else
-                                            {
-                                                data = data.replace("PIN",PIN);
-                                            }
+                                                Templatefilename = "RegPublicTemplate.txt";
 
-                                            //  console.log(data);
-                                            var mailOptions = {
-                                                from: 'noreply@ezeid.com',
-                                                to: EMailID,
-                                                subject: 'Welcome to EZEID',
-                                                html: data // html body
-                                            };
-                                            //console.log('Mail Option:' + mailOptions);
-                                            // send mail with defined transport object
-                                            var post = { MessageType: 8, Priority: 3,ToMailID: mailOptions.to, Subject: mailOptions.subject, Body: mailOptions.html,SentbyMasterID:RegResult[0].TID };
-                                            // console.log(post);
-                                            var query = db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
-                                                // Neat!
-                                                if (!err) {
-                                                    console.log('FnRegistration: Mail saved Successfully');
-                                                    res.send(RtnMessage);
+                                            var fs = require('fs');
+                                            fs.readFile(Templatefilename, "utf8", function (err, data) {
+                                                if (err) throw err;
+                                                data = data.replace("[Firstname]", FirstName);
+                                                data = data.replace("[Lastname]", LastName);
+                                                data = data.replace("[EZEID]", EZEID);
+                                                data = data.replace("[EZEID]", EZEID);  //REG Detials
+                                                data = data.replace("[EZEID]", EZEID); //L1
+                                                data = data.replace("[EZEID]", EZEID); //L2
+                                                data = data.replace("[EZEID]", EZEID); //CV
+                                                data = data.replace("[EZEID]", EZEID); //ID
+                                                data = data.replace("[EZEID]", EZEID); //DL
+                                                data = data.replace("[EZEID]", EZEID); //PP
+                                                data = data.replace("[CompanyName]",CompanyName);
+
+                                                if(PIN == null){
+                                                    data = data.replace(".PIN","");
                                                 }
-                                                else {
-                                                    console.log('FnRegistration: Mail not Saved Successfully' + err);
-                                                    res.send(RtnMessage);
+                                                else
+                                                {
+                                                    data = data.replace("PIN",PIN);
                                                 }
+
+                                                //  console.log(data);
+                                                var mailOptions = {
+                                                    from: 'noreply@ezeid.com',
+                                                    to: EMailID,
+                                                    subject: 'Welcome to EZEID',
+                                                    html: data // html body
+                                                };
+                                                //console.log('Mail Option:' + mailOptions);
+                                                // send mail with defined transport object
+                                                var post = { MessageType: 8, Priority: 3,ToMailID: mailOptions.to, Subject: mailOptions.subject, Body: mailOptions.html,SentbyMasterID:RegResult[0].TID };
+                                                // console.log(post);
+                                                var query = db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
+                                                    // Neat!
+                                                    if (!err) {
+                                                        console.log('FnRegistration: Mail saved Successfully');
+                                                        res.send(RtnMessage);
+                                                    }
+                                                    else {
+                                                        console.log('FnRegistration: Mail not Saved Successfully' + err);
+                                                        res.send(RtnMessage);
+                                                    }
+                                                });
                                             });
-                                        });
+                                        }
+                                        else {
+                                            console.log('FnRegistration: tmaster: registration success but email is empty so mail not sent');
+                                            console.log(RtnMessage);
+                                            res.send(RtnMessage);
+                                        }
                                     }
                                     else {
-                                        console.log('FnRegistration: tmaster: registration success but email is empty so mail not sent');
+                                        console.log('FnRegistration: tmaster: Update operation success');
                                         console.log(RtnMessage);
                                         res.send(RtnMessage);
                                     }
                                 }
-                                else {
-                                    console.log('FnRegistration: tmaster: Update operation success');
-                                    console.log(RtnMessage);
-                                    res.send(RtnMessage);
-                                }
-                                }
                                 else
                                 {
                                     console.log(RtnMessage);
-                                res.send(RtnMessage);
-                                console.log('FnRegistration:tmaster: Registration Failed');
+                                    res.send(RtnMessage);
+                                    console.log('FnRegistration:tmaster: Registration Failed');
                                 }
-                               
+
                             }
                             else {
                                 console.log(RtnMessage);
@@ -1958,113 +2035,113 @@ exports.FnRegistration = function (req, res) {
                     + ',' + db.escape(StatusID) + ',' + db.escape(Icon) + ',' + db.escape(IconFileName) + ',' + db.escape(ISDPhoneNumber) + ',' + db.escape(ISDMobileNumber)
                     + ',' + db.escape(Gender) + ',' + db.escape(DOBDate) + ',' + db.escape(IPAddress) + ',' + db.escape(SelectionTypes)+ ',' + db.escape(ParkingStatus) + ',' + db.escape(TemplateID) + ',' + db.escape(CategoryID);
 
-                 // console.log(InsertQuery);
+                // console.log(InsertQuery);
                 db.query('CALL pSaveEZEIDData(' + InsertQuery + ')', function (err, InsertResult) {
                     if (!err) {
                         // console.log('InsertResult: ' + InsertResult);
                         if (!InsertResult) {
                             //  console.log(InsertResult);
                             if (InsertResult[0].length > 0) {
-                                 var RegResult = InsertResult[0];
+                                var RegResult = InsertResult[0];
                                 if(RegResult[0].TID != 0)
                                 {
-                                   if(IDTypeID == 2)
-                                RtnMessage.FirstName=CompanyName;
-                                else
-                                RtnMessage.FirstName = FirstName;
-                                RtnMessage.IsAuthenticate = true;
-                                RtnMessage.Token = TokenNo;
-                                RtnMessage.Type = IDTypeID;
-                                RtnMessage.Icon = Icon;
-                                if (Operation == 'I') {
-                                    console.log('FnRegistration:tmaster: Registration success');
-                                    //res.send(RtnMessage);
-                                    if (EMailID != '' || EMailID != null) {
-                                        var fs = require('fs');
-                                        fs.readFile("RegTemplate.txt", "utf8", function (err, data) {
-                                            if (err) throw err;
-                                            data = data.replace("[Firstname]", FirstName);
-                                            data = data.replace("[Lastname]", LastName);
-                                            data = data.replace("[EZEID]", EZEID);
-                                            data = data.replace("[EZEID]", EZEID);  //REG Detials
-                                            data = data.replace("[EZEID]", EZEID); //L1
-                                            data = data.replace("[EZEID]", EZEID); //L2
-                                            data = data.replace("[EZEID]", EZEID); //CV
-                                            data = data.replace("[EZEID]", EZEID); //ID
-                                            data = data.replace("[EZEID]", EZEID); //DL
-                                            data = data.replace("[EZEID]", EZEID); //PP
+                                    if(IDTypeID == 2)
+                                        RtnMessage.FirstName=CompanyName;
+                                    else
+                                        RtnMessage.FirstName = FirstName;
+                                    RtnMessage.IsAuthenticate = true;
+                                    RtnMessage.Token = TokenNo;
+                                    RtnMessage.Type = IDTypeID;
+                                    RtnMessage.Icon = Icon;
+                                    if (Operation == 'I') {
+                                        console.log('FnRegistration:tmaster: Registration success');
+                                        //res.send(RtnMessage);
+                                        if (EMailID != '' || EMailID != null) {
+                                            var fs = require('fs');
+                                            fs.readFile("RegTemplate.txt", "utf8", function (err, data) {
+                                                if (err) throw err;
+                                                data = data.replace("[Firstname]", FirstName);
+                                                data = data.replace("[Lastname]", LastName);
+                                                data = data.replace("[EZEID]", EZEID);
+                                                data = data.replace("[EZEID]", EZEID);  //REG Detials
+                                                data = data.replace("[EZEID]", EZEID); //L1
+                                                data = data.replace("[EZEID]", EZEID); //L2
+                                                data = data.replace("[EZEID]", EZEID); //CV
+                                                data = data.replace("[EZEID]", EZEID); //ID
+                                                data = data.replace("[EZEID]", EZEID); //DL
+                                                data = data.replace("[EZEID]", EZEID); //PP
 
-                                            if(PIN == null){
-                                                data = data.replace(".PIN","");
-                                            }
-                                            else
-                                            {
-                                                data = data.replace("PIN",PIN);
-                                            }
+                                                if(PIN == null){
+                                                    data = data.replace(".PIN","");
+                                                }
+                                                else
+                                                {
+                                                    data = data.replace("PIN",PIN);
+                                                }
 
-                                            //  console.log(data);
-                                            var mailOptions = {
-                                                from: 'noreply@ezeid.com',
-                                                to: EMailID,
-                                                subject: 'Welcome to EZEID',
-                                                html: data // html body
-                                            };
-                                            //console.log('Mail Option:' + mailOptions);
-                                            // send mail with defined transport object
-                                            var post = { MessageType: 8, Priority: 3, ToMailID: mailOptions.to, Subject: mailOptions.subject, Body: mailOptions.html, SentbyMasterID:RegResult[0].TID };
-                                            // console.log(post);
-                                            var query = db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
-                                                // Neat!
-                                                if (!err) {
-                                                    console.log('FnRegistration: Mail saved Successfully');
-                                                    res.send(RtnMessage);
-                                                }
-                                                else {
-                                                    console.log('FnRegistration: Mail not Saved Successfully' + err);
-                                                    res.send(RtnMessage);
-                                                }
+                                                //  console.log(data);
+                                                var mailOptions = {
+                                                    from: 'noreply@ezeid.com',
+                                                    to: EMailID,
+                                                    subject: 'Welcome to EZEID',
+                                                    html: data // html body
+                                                };
+                                                //console.log('Mail Option:' + mailOptions);
+                                                // send mail with defined transport object
+                                                var post = { MessageType: 8, Priority: 3, ToMailID: mailOptions.to, Subject: mailOptions.subject, Body: mailOptions.html, SentbyMasterID:RegResult[0].TID };
+                                                // console.log(post);
+                                                var query = db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
+                                                    // Neat!
+                                                    if (!err) {
+                                                        console.log('FnRegistration: Mail saved Successfully');
+                                                        res.send(RtnMessage);
+                                                    }
+                                                    else {
+                                                        console.log('FnRegistration: Mail not Saved Successfully' + err);
+                                                        res.send(RtnMessage);
+                                                    }
+                                                });
                                             });
-                                        });
+                                        }
+                                        else {
+                                            console.log('FnRegistration: tmaster: registration success but email is empty so mail not sent');
+                                            console.log(RtnMessage);
+                                            res.send(RtnMessage);
+                                        }
                                     }
                                     else {
-                                        console.log('FnRegistration: tmaster: registration success but email is empty so mail not sent');
+                                        console.log('FnRegistration: tmaster: Update operation success');
                                         console.log(RtnMessage);
                                         res.send(RtnMessage);
                                     }
                                 }
                                 else {
-                                    console.log('FnRegistration: tmaster: Update operation success');
                                     console.log(RtnMessage);
                                     res.send(RtnMessage);
+                                    console.log('FnRegistration:tmaster: Registration Failed');
                                 }
                             }
-                            else {
+                            else{
                                 console.log(RtnMessage);
                                 res.send(RtnMessage);
                                 console.log('FnRegistration:tmaster: Registration Failed');
                             }
-                            }
-                                else{
-                                    console.log(RtnMessage);
-                                res.send(RtnMessage);
-                                console.log('FnRegistration:tmaster: Registration Failed');
-                                }
                         }
                         else{
-                                    console.log(RtnMessage);
-                                res.send(RtnMessage);
-                                console.log('FnRegistration:tmaster: Registration Failed');
-                                }
-                    }
-                            else {
-                            res.statusCode = 500;
+                            console.log(RtnMessage);
                             res.send(RtnMessage);
-                            console.log('FnRegistration:tmaster:' + err);
+                            console.log('FnRegistration:tmaster: Registration Failed');
                         }
+                    }
+                    else {
+                        res.statusCode = 500;
+                        res.send(RtnMessage);
+                        console.log('FnRegistration:tmaster:' + err);
+                    }
                 });
             }
             else {
-                    console.log('Update method validation');
+                console.log('Update method validation');
                 if (IDTypeID == null) {
                     console.log('FnRegistration: IDTypeID is empty');
                 } else if (EZEID == null) {
@@ -2124,7 +2201,7 @@ exports.FnAddLocation = function (req, res) {
         var Website = req.body.Website;
         var ISDPhoneNumber = req.body.ISDPhoneNumber;
         var ISDMobileNumber = req.body.ISDMobileNumber;
-        //below line of code is commented for phase 1        
+        //below line of code is commented for phase 1
         var ParkingStatus = parseInt(req.body.ParkingStatus);
         if (ParkingStatus.toString() == 'NaN') {
             ParkingStatus = 0;
@@ -2139,11 +2216,11 @@ exports.FnAddLocation = function (req, res) {
                 if (!err) {
                     if (Result != null) {
 
-                        var InsertQuery = db.escape(TID) + ',' + db.escape(Token) + ',' + db.escape(LocTitle) + ',' + db.escape(Latitude) 
-                        + ',' + db.escape(Longitude) + ',' + db.escape(Altitude) + ',' + db.escape(AddressLine1) + ',' + db.escape(AddressLine2) 
-                        + ',' + db.escape(CityName) + ',' + db.escape(StateID) + ',' + db.escape(CountryID) + ',' + db.escape(PostalCode) 
-                        + ',' + db.escape(PIN) + ',' + db.escape(PhoneNumber) + ',' + db.escape(MobileNumber)  + ',' + db.escape(Picture)
-                        + ',' + db.escape(PictureFileName) + ',' + db.escape(Website) + ',' +   db.escape(ISDPhoneNumber) + ',' + db.escape(ISDMobileNumber) + ',' + db.escape(ParkingStatus) + ',' + db.escape(TemplateID);
+                        var InsertQuery = db.escape(TID) + ',' + db.escape(Token) + ',' + db.escape(LocTitle) + ',' + db.escape(Latitude)
+                            + ',' + db.escape(Longitude) + ',' + db.escape(Altitude) + ',' + db.escape(AddressLine1) + ',' + db.escape(AddressLine2)
+                            + ',' + db.escape(CityName) + ',' + db.escape(StateID) + ',' + db.escape(CountryID) + ',' + db.escape(PostalCode)
+                            + ',' + db.escape(PIN) + ',' + db.escape(PhoneNumber) + ',' + db.escape(MobileNumber)  + ',' + db.escape(Picture)
+                            + ',' + db.escape(PictureFileName) + ',' + db.escape(Website) + ',' +   db.escape(ISDPhoneNumber) + ',' + db.escape(ISDMobileNumber) + ',' + db.escape(ParkingStatus) + ',' + db.escape(TemplateID);
 
                         db.query('CALL pInsertLocationData(' + InsertQuery + ')', function (err, InsertResult) {
                             if (!err) {
@@ -2261,7 +2338,7 @@ exports.FnDeleteLocation = function (req, res) {
                 if (!err) {
                     if (Result != null) {
                         var query = 'DELETE FROM tlocations where TID=' + db.escape(TID);
-                      //  console.log('FnDeleteLocation: DeleteQuery : ' + query);
+                        //  console.log('FnDeleteLocation: DeleteQuery : ' + query);
                         db.query(query, function (err, DeleteResult) {
                             if (!err) {
                                 console.log('DeleteQuery: ' + DeleteResult);
@@ -2515,7 +2592,7 @@ exports.FnSaveMessage = function (req, res) {
                         }
                         // console.log(datechange);
                         var query = db.escape(Token) + ',' + db.escape(MessageType) + ',' + db.escape(Message) + ',' + db.escape(Status) + ',' + db.escape(TaskDate) + ',' + db.escape(ToMasterID) + ',' + db.escape(Notes) + ',' + db.escape(LocID);
-                       console.log('CALL pSaveMessages(' + query + ')');
+                        console.log('CALL pSaveMessages(' + query + ')');
                         db.query('CALL pSaveMessages(' + query + ')', function (err, InsertResult) {
                             if (!err) {
                                 //console.log(InsertResult);
@@ -2621,7 +2698,7 @@ exports.FnGetMessages = function (req, res) {
                         if (FromPage <= 1) {
                             FromPage = 0;
                         }
-                      //  console.log('From Page: ' + FromPage);
+                        //  console.log('From Page: ' + FromPage);
                         //console.log('To Page: ' + ToPage);
                         var getMessageQuery = 'CALL pGetMessages(' + db.escape(Token) + ',' + db.escape(FromPage) + ',' + db.escape(ToPage) + ',' + db.escape(Status) + ',' + db.escape(MessageType) + ')';
                         db.query(getMessageQuery, function (err, MessagesResult) {
@@ -3047,12 +3124,12 @@ exports.FnSaveCVInfo = function (req, res) {
                                         });
                                     });
 
-                                        RtnMessage.IsSuccessfull = true;
-                                        console.log('FnSaveCVInfo: CV Info Saved successfully');
-                                        res.send(RtnMessage);
+                                    RtnMessage.IsSuccessfull = true;
+                                    console.log('FnSaveCVInfo: CV Info Saved successfully');
+                                    res.send(RtnMessage);
 
 
-                                                                    }
+                                }
                                 else {
                                     res.send(RtnMessage);
                                     res.statusCode = 500;
@@ -3100,8 +3177,8 @@ exports.FnGetCVInfo = function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         var Token = req.query.TokenNo;
-            
-            var responseMessage = {
+
+        var responseMessage = {
             status: false,
             data: null,
             skillMatrix : null,
@@ -3118,7 +3195,7 @@ exports.FnGetCVInfo = function (req, res) {
 
                                 if (MessagesResult[0] != null) {
                                     if (MessagesResult[0].length > 0) {
-                                        
+
                                         responseMessage.status = true;
                                         responseMessage.data = MessagesResult[0];
                                         responseMessage.skillMatrix = MessagesResult[1];
@@ -3136,26 +3213,26 @@ exports.FnGetCVInfo = function (req, res) {
                                 else {
                                     console.log('FnGetCVInfo: No CV Info  available');
                                     responseMessage.message = 'Cv info not send successfully';
-                                        res.json(responseMessage);
+                                    res.json(responseMessage);
                                 }
                             }
                             else {
                                 console.log('FnGetCVInfo: Error in sending Messages: ' + err);
                                 responseMessage.message = 'Error in sending CV info';
-                                        res.status(500).json(responseMessage);
+                                res.status(500).json(responseMessage);
                             }
                         });
                     }
                     else {
                         console.log('FnGetCVInfo: Invalid Token');
                         responseMessage.message = 'invalid token';
-                                        res.status(401).json(responseMessage);
+                        res.status(401).json(responseMessage);
                     }
                 }
                 else {
                     console.log('FnGetCVInfo: Token error: ' + err);
                     responseMessage.message = 'error in validating token';
-                                        res.status(500).json(responseMessage);
+                    res.status(500).json(responseMessage);
                 }
             });
         }
@@ -3163,7 +3240,7 @@ exports.FnGetCVInfo = function (req, res) {
 
             console.log('FnGetCVInfo: Token is empty');
             responseMessage.message = 'Token is empty';
-                                        res.status(400).json(responseMessage);
+            res.status(400).json(responseMessage);
         }
     }
     catch (ex) {
@@ -3186,7 +3263,7 @@ exports.FnUpdateDocPin = function (req, res) {
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
         if (tPin == '') {
             tPin = null;
-            }
+        }
         if (token != null && token != '') {
             FnValidateToken(token, function (err, Result) {
                 if (!err) {
@@ -3194,7 +3271,7 @@ exports.FnUpdateDocPin = function (req, res) {
                         var query = db.escape(token) + ',' + db.escape(tPin);
                         db.query('CALL pUpdateDocPIN(' + query + ')', function (err, UpdateResult) {
                             if (!err) {
-                              //  console.log(UpdateResult);
+                                //  console.log(UpdateResult);
                                 // console.log('FnUpdateMessageStatus: Update result' + UpdateResult);
                                 if (UpdateResult.affectedRows > 0) {
                                     RtnMessage.IsUpdated = true;
@@ -3678,11 +3755,11 @@ exports.FnGetBussinessListing = function (req, res) {
 var fs = require("fs");
 exports.FnUploadDocument = function (req, res) {
     try {
-        
+
         var deleteTempFile = function(){
-        fs.unlink('../bin/'+req.files.file.path);
+            fs.unlink('../bin/'+req.files.file.path);
         };
-        
+
         var RtnMessage = {
             IsSuccessfull: false
         };
@@ -3932,31 +4009,31 @@ exports.FnGetSearchDocuments = function (req, res) {
                                         res.writeHead('200', { 'Content-Type': docs.ContentType });
                                         res.end(docs.Docs, 'base64');
                                         console.log('FnGetSearchDocuments: tmaster: Search result sent successfully');
-                                        
-                                        
-                                            var getQuery = 'select TID from tmaster where Token='+db.escape(token);
-                                            db.query(getQuery, function (err, getResult) {
-                                                if(!err){
+
+
+                                        var getQuery = 'select TID from tmaster where Token='+db.escape(token);
+                                        db.query(getQuery, function (err, getResult) {
+                                            if(!err){
                                                 var tid = getResult[0].TID;
                                                 console.log(tid);
+                                            }
+                                            var query = db.escape(tid) + ',' + db.escape(EZEID) + ',' + db.escape(req.ip) + ',' + db.escape(type);
+                                            console.log('CALL pCreateAccessHistory(' + query + ')');
+
+                                            db.query('CALL pCreateAccessHistory(' + query + ')', function (err){
+                                                if(!err){
+                                                    console.log('FnSearchByKeywords:Access history is created');
                                                 }
-                                                var query = db.escape(tid) + ',' + db.escape(EZEID) + ',' + db.escape(req.ip) + ',' + db.escape(type);
-                                                console.log('CALL pCreateAccessHistory(' + query + ')');
-                                                 
-                                                    db.query('CALL pCreateAccessHistory(' + query + ')', function (err){
-                                                    if(!err){
-                                                        console.log('FnSearchByKeywords:Access history is created');
-                                                    }
-                                                    else {
-                                                        console.log('FnSearchByKeywords: tmaster: ' + err);
-                                                    }
-                                                });
+                                                else {
+                                                    console.log('FnSearchByKeywords: tmaster: ' + err);
+                                                }
                                             });
-                                        }
+                                        });
+                                    }
                                     else {
                                         res.json(null);
-                                        
-                                        
+
+
                                         console.log('FnGetSearchDocuments: tmaster: no search found');
                                     }
                                 }
@@ -4023,21 +4100,21 @@ exports.FnSearchByKeywords = function (req, res) {
         var Rating = req.body.Rating;
         var HomeDelivery = req.body.HomeDelivery;
         var CurrentDate = req.body.CurrentDate;
-        
+
         if(CurrentDate != null)
-             CurrentDate = new Date(CurrentDate);
-         if(type.toString() == 'NaN')
+            CurrentDate = new Date(CurrentDate);
+        if(type.toString() == 'NaN')
             type = 0;
-        
+
         var isPagination = req.body.isPagination ? parseInt(req.body.isPagination) : 0 ;
         var pagesize = req.body.pagesize ? parseInt(req.body.pagesize) : 0;
         var pagecount = req.body.pagecount ? parseInt(req.body.pagecount) : 0;
-        var total = req.body.total ? parseInt(req.body.total) : 0; 
-        
-        console.log(req.body);
+        var total = req.body.total ? parseInt(req.body.total) : 0;
+
+        //console.log(req.body);
 
         if (type == "1") {
-            
+
             if (find != null && find != '' && CategoryID != null && token != null && token != '' && CurrentDate != null && pagesize != null && pagecount != null) {
                 FnValidateToken(token, function (err, Result) {
                     if (!err) {
@@ -4051,16 +4128,14 @@ exports.FnSearchByKeywords = function (req, res) {
                             var SearchType = 0;
                             //console.log('findarray: ' + FindArray.length);
                             console.log(req.ip);
-                            
-                            
+
+
                             var logHistory = {
                                 searchTid : 0,  // who is searching
                                 ezeid : FindArray[0],
                                 ip : req.ip,
                                 type : 0
                             };
-                            console.log('FindArray');
-                            console.log(FindArray);
 
                             if (FindArray.length > 0) {
                                 EZEID = FindArray[0];
@@ -4079,7 +4154,7 @@ exports.FnSearchByKeywords = function (req, res) {
                                             SearchType = 2;
                                             DocType = 'DL';
                                             logHistory.type = 7;
-                                            
+
                                         }
                                         else if (FindArray[1].toUpperCase() == 'PP') {
                                             SearchType = 2;
@@ -4118,53 +4193,45 @@ exports.FnSearchByKeywords = function (req, res) {
                                     }
                                 }
                             }
-                            var SearchQuery = db.escape('') + ',' + db.escape(CategoryID) + ',' + db.escape(0) + ',' + db.escape(Latitude) 
-                            + ',' + db.escape(Longitude) +',' + db.escape(EZEID) + ',' + db.escape(LocSeqNo) + ',' + db.escape(Pin) + ',' + db.escape(SearchType) + ',' + db.escape(DocType) 
-                                + ',' + db.escape("0") + ',' + db.escape("0") + ',' + db.escape("0") + ',' + db.escape(token) 
-                                + ',' + db.escape(HomeDelivery) + ',' + db.escape(CurrentDate) + ',' + db.escape(isPagination) + ',' + 
+                            var SearchQuery = db.escape('') + ',' + db.escape(CategoryID) + ',' + db.escape(0) + ',' + db.escape(Latitude)
+                                + ',' + db.escape(Longitude) +',' + db.escape(EZEID) + ',' + db.escape(LocSeqNo) + ',' + db.escape(Pin) + ',' + db.escape(SearchType) + ',' + db.escape(DocType)
+                                + ',' + db.escape("0") + ',' + db.escape("0") + ',' + db.escape("0") + ',' + db.escape(token)
+                                + ',' + db.escape(HomeDelivery) + ',' + db.escape(CurrentDate) + ',' + db.escape(isPagination) + ',' +
                                 db.escape(pagesize) + ',' + db.escape(pagecount) + ',' + db.escape(total) ;
-                            
+
                             console.log('CALL pSearchResultNew(' + SearchQuery + ')');
                             db.query('CALL pSearchResultNew(' + SearchQuery + ')', function (err, SearchResult) {
                                 // db.query(searchQuery, function (err, SearchResult) {
                                 if (!err) {
                                     if (SearchResult[0] != null) {
                                         if (SearchResult[0].length > 0) {
-                                            if (SearchResult[0][0].totalcount == 1)
-                                            {
-                                                res.json({totalcount:SearchResult[0][0].totalcount,Result:SearchResult[1]});
-                                                console.log('FnSearchByKeywords: tmaster: Search result sent successfully');
-                                            }
-                                            else
-                                            {
-                                                res.send(SearchResult[0]);
-                                                console.log('FnSearchByKeywords: tmaster: Search result sent successfully');
-                                            }
-
+                                            console.log(SearchResult);
+                                            res.json({totalcount:SearchResult[0][0].totalcount,Result:SearchResult[1]});
+                                            console.log('FnSearchByKeywords: tmaster: Search result sent successfully');
                                             if (SearchType == 2){
-                                            var getQuery = 'select TID from tmaster where Token='+db.escape(token);
-                                            db.query(getQuery, function (err, getResult) {
-                                                if(!err){
-                                                var tid = getResult[0].TID;
-                                                console.log(tid);
-                                                }
-                                                var query = db.escape(tid) + ',' + db.escape(logHistory.ezeid) + ',' + db.escape(logHistory.ip) + ',' + db.escape(logHistory.type);
-                                                console.log('CALL pCreateAccessHistory(' + query + ')');
-                                                if(logHistory.type < 1){ 
-                                                    db.query('CALL pCreateAccessHistory(' + query + ')', function (err){
+                                                var getQuery = 'select TID from tmaster where Token='+db.escape(token);
+                                                db.query(getQuery, function (err, getResult) {
                                                     if(!err){
-                                                        console.log('FnSearchByKeywords:Access history is created');
+                                                        var tid = getResult[0].TID;
+                                                        console.log(tid);
                                                     }
-                                                    else {
-                                                        console.log('FnSearchByKeywords: tmaster: ' + err);
-                                                    }
-                                                });
-                                                    
-                                                    
-                                                }
+                                                    var query = db.escape(tid) + ',' + db.escape(logHistory.ezeid) + ',' + db.escape(logHistory.ip) + ',' + db.escape(logHistory.type);
+                                                    console.log('CALL pCreateAccessHistory(' + query + ')');
+                                                    if(logHistory.type < 1){
+                                                        db.query('CALL pCreateAccessHistory(' + query + ')', function (err){
+                                                            if(!err){
+                                                                console.log('FnSearchByKeywords:Access history is created');
+                                                            }
+                                                            else {
+                                                                console.log('FnSearchByKeywords: tmaster: ' + err);
+                                                            }
+                                                        });
 
-                                            });
-                                        }
+
+                                                    }
+
+                                                });
+                                            }
                                         }
                                         else {
                                             res.json(null);
@@ -4183,8 +4250,8 @@ exports.FnSearchByKeywords = function (req, res) {
                                     console.log('FnSearchByKeywords: tmaster: ' + err);
                                 }
                             });
-                        
-                    }
+
+                        }
                         else {
                             res.statusCode = 401;
                             console.log('FnSearchByKeywords: Invalid token');
@@ -4223,18 +4290,18 @@ exports.FnSearchByKeywords = function (req, res) {
             }
         }
         else if (type == "2") {
-           
+
             if (find != null && find != '' && Proximity.toString() != 'NaN' && Latitude.toString() != 'NaN' && Longitude.toString() != 'NaN' && CategoryID != null && CurrentDate != null && pagesize != null && pagecount != null) {
-                
+
                 if (ParkingStatus == 0) {
                     ParkingStatus = "1,2,3";
-                    }
+                }
 
-                var InsertQuery = db.escape(find) + ',' + db.escape(CategoryID) + ',' + db.escape(Proximity) + ',' + db.escape(Latitude) 
-                    + ',' + db.escape(Longitude) + ',' + db.escape('') + ',' + db.escape(0) + ',' + db.escape(0) + ',' + db.escape(1) 
-                    + ',' + db.escape('') + ',' + db.escape(ParkingStatus) + ',' + db.escape(OpenCloseStatus) + ',' + db.escape(Rating) 
-                    + ',' + db.escape(token) + ',' + db.escape(HomeDelivery)+ ',' + db.escape(CurrentDate) + ',' + db.escape(isPagination) + ',' + 
-                                db.escape(pagesize) + ',' + db.escape(pagecount)+ ',' + db.escape(total) ;
+                var InsertQuery = db.escape(find) + ',' + db.escape(CategoryID) + ',' + db.escape(Proximity) + ',' + db.escape(Latitude)
+                    + ',' + db.escape(Longitude) + ',' + db.escape('') + ',' + db.escape(0) + ',' + db.escape(0) + ',' + db.escape(1)
+                    + ',' + db.escape('') + ',' + db.escape(ParkingStatus) + ',' + db.escape(OpenCloseStatus) + ',' + db.escape(Rating)
+                    + ',' + db.escape(token) + ',' + db.escape(HomeDelivery)+ ',' + db.escape(CurrentDate) + ',' + db.escape(isPagination) + ',' +
+                    db.escape(pagesize) + ',' + db.escape(pagecount)+ ',' + db.escape(total) ;
                 console.log('CALL pSearchResultNew(' + InsertQuery + ')');
                 //var link = 'CALL pSearchResult(' + InsertQuery + ')';
                 db.query('CALL pSearchResultNew(' + InsertQuery + ')', function (err, SearchResult) {
@@ -4247,8 +4314,8 @@ exports.FnSearchByKeywords = function (req, res) {
                                 console.log('FnSearchByKeywords:  tmaster:Search Found');
                             }
                             else {
-                                    res.json(null);
-                                    console.log('FnSearchByKeywords: tmaster: no search found');
+                                res.json(null);
+                                console.log('FnSearchByKeywords: tmaster: no search found');
                             }
                         }
                         else {
@@ -4290,16 +4357,16 @@ exports.FnSearchByKeywords = function (req, res) {
             }
         }
         else if (type == "3") {
-           
+
             if (find != null && find != '' && Proximity.toString() != 'NaN' && Latitude.toString() != 'NaN' && Longitude.toString() != 'NaN' && CategoryID != null && CurrentDate != null) {
-                     if (ParkingStatus == 0) {
-                        ParkingStatus = "1,2,3";
-                    }
-                var InsertQuery = db.escape(find) + ',' + db.escape(CategoryID) + ',' + db.escape(Proximity) + ',' + db.escape(Latitude) 
-                    + ',' + db.escape(Longitude) + ',' + db.escape('') + ',' + db.escape(0) + ',' + db.escape(0) + ',' + db.escape(3) 
-                    + ',' + db.escape('') + ',' + db.escape(ParkingStatus) + ',' + db.escape(OpenCloseStatus) + ',' + db.escape(Rating) 
-                    + ',' + db.escape(token)  + ',' + db.escape(HomeDelivery)+ ',' + db.escape(CurrentDate) + ',' + db.escape(isPagination) + ',' + 
-                                db.escape(pagesize) + ',' + db.escape(pagecount)+ ',' + db.escape(total);
+                if (ParkingStatus == 0) {
+                    ParkingStatus = "1,2,3";
+                }
+                var InsertQuery = db.escape(find) + ',' + db.escape(CategoryID) + ',' + db.escape(Proximity) + ',' + db.escape(Latitude)
+                    + ',' + db.escape(Longitude) + ',' + db.escape('') + ',' + db.escape(0) + ',' + db.escape(0) + ',' + db.escape(3)
+                    + ',' + db.escape('') + ',' + db.escape(ParkingStatus) + ',' + db.escape(OpenCloseStatus) + ',' + db.escape(Rating)
+                    + ',' + db.escape(token)  + ',' + db.escape(HomeDelivery)+ ',' + db.escape(CurrentDate) + ',' + db.escape(isPagination) + ',' +
+                    db.escape(pagesize) + ',' + db.escape(pagecount)+ ',' + db.escape(total);
                 console.log('CALL pSearchResultNew(' + InsertQuery + ')');
                 db.query('CALL pSearchResultNew(' + InsertQuery + ')', function (err, SearchResult) {
                     if (!err) {
@@ -4311,8 +4378,8 @@ exports.FnSearchByKeywords = function (req, res) {
                                 console.log('FnSearchByKeywords:  tmaster:Search Found');
                             }
                             else {
-                                    res.json(null);
-                                    console.log('FnSearchByKeywords: tmaster: no search found');
+                                res.json(null);
+                                console.log('FnSearchByKeywords: tmaster: no search found');
                             }
                         }
                         else {
@@ -4373,22 +4440,70 @@ exports.FnGetSearchInformation = function (req, res) {
         var CurrentDate = req.query.CurrentDate;
         var SearchType = req.query.SearchType;
         var IPAddress = (req.headers['x-forwarded-for'] || req.connection.remoteAddress ||
-                                req.socket.remoteAddress || req.connection.socket.remoteAddress);
+        req.socket.remoteAddress || req.connection.socket.remoteAddress);
         var WorkingDate
         var moment = require('moment');
         if(CurrentDate != null)
-             var WorkingDate =  moment(new Date(CurrentDate)).format('YYYY-MM-DD HH:MM');
+            var WorkingDate =  moment(new Date(CurrentDate)).format('YYYY-MM-DD HH:MM');
         else
-             var WorkingDate = moment(new Date()).format('YYYY-MM-DD HH:MM');
+            var WorkingDate = moment(new Date()).format('YYYY-MM-DD HH:MM');
         //console.log(WorkingDate);
 
         if (Token != null && Token != '' && TID.toString() != 'NaN' && WorkingDate != null) {
             if(Token == 2){
 
-                            var SearchParameter = db.escape(TID) + ',' + db.escape(Token) + ',' + db.escape(WorkingDate)
-                                    + ',' + db.escape(SearchType)+ ',' + db.escape(0) + ',' + db.escape(IPAddress);
+                var SearchParameter = db.escape(TID) + ',' + db.escape(Token) + ',' + db.escape(WorkingDate)
+                    + ',' + db.escape(SearchType)+ ',' + db.escape(0) + ',' + db.escape(IPAddress);
+                // console.log('Search Information: ' +SearchParameter);
+                //     console.log('CALL pSearchInformation(' + SearchParameter + ')');
+                db.query('CALL pSearchInformation(' + SearchParameter + ')', function (err, UserInfoResult) {
+                    // db.query(searchQuery, function (err, SearchResult) {
+                    if (!err) {
+                        // console.log(UserInfoResult);
+                        if (UserInfoResult[0].length > 0) {
+                            res.send(UserInfoResult[0]);
+                            console.log('FnSearchEzeid: tmaster: Search result sent successfully');
+                        }
+                        else {
+                            var searchParams = db.escape(TID) + ',' + db.escape(Token) + ',' + db.escape(WorkingDate)
+                                + ',' + db.escape(SearchType)+ ',' + db.escape(1) + ',' + db.escape(IPAddress);
+                            db.query('CALL pSearchInformation('+ searchParams +')', function (err, UserInfoReResult) {
+                                if(!err){
+                                    if(UserInfoReResult[0].length > 0){
+                                        res.send(UserInfoReResult[0]);
+                                        console.log('FnSearchEzeid: tmaster: Search result re sent successfully');
+                                    }
+                                    else
+                                    {
+                                        res.json(null);
+                                        console.log('FnSearchEzeid: tmaster: no re search infromation ');
+                                    }
+
+                                }
+                                else {
+                                    res.statusCode = 500;
+                                    res.json(null);
+                                    console.log('FnSearchEzeid: tmaster: ' + err);
+                                }
+                            });
+                        }
+                    }
+                    else {
+                        res.statusCode = 500;
+                        res.json(null);
+                        console.log('FnSearchEzeid: tmaster: ' + err);
+                    }
+                });
+
+            }
+            else
+            {
+                FnValidateToken(Token, function (err, Result) {
+                    if (!err) {
+                        if (Result != null) {
+                            var SearchParameter = db.escape(TID) + ',' + db.escape(Token) + ',' + db.escape(WorkingDate)+ ',' + db.escape(SearchType)+',' + db.escape(0) + ',' + db.escape(IPAddress);
                             // console.log('Search Information: ' +SearchParameter);
-           //     console.log('CALL pSearchInformation(' + SearchParameter + ')');
+                            // console.log('CALL pSearchInformation(' + SearchParameter + ')');
                             db.query('CALL pSearchInformation(' + SearchParameter + ')', function (err, UserInfoResult) {
                                 // db.query(searchQuery, function (err, SearchResult) {
                                 if (!err) {
@@ -4411,7 +4526,6 @@ exports.FnGetSearchInformation = function (req, res) {
                                                     res.json(null);
                                                     console.log('FnSearchEzeid: tmaster: no re search infromation ');
                                                 }
-
                                             }
                                             else {
                                                 res.statusCode = 500;
@@ -4428,84 +4542,37 @@ exports.FnGetSearchInformation = function (req, res) {
                                 }
                             });
 
-            }
-            else
-            {
-            FnValidateToken(Token, function (err, Result) {
-                if (!err) {
-                    if (Result != null) {
-                        var SearchParameter = db.escape(TID) + ',' + db.escape(Token) + ',' + db.escape(WorkingDate)+ ',' + db.escape(SearchType)+',' + db.escape(0) + ',' + db.escape(IPAddress);
-                        // console.log('Search Information: ' +SearchParameter);
-                       // console.log('CALL pSearchInformation(' + SearchParameter + ')');
-                            db.query('CALL pSearchInformation(' + SearchParameter + ')', function (err, UserInfoResult) {
-                            // db.query(searchQuery, function (err, SearchResult) {
-                            if (!err) {
-                                // console.log(UserInfoResult);
-                                if (UserInfoResult[0].length > 0) {
-                                    res.send(UserInfoResult[0]);
-                                    console.log('FnSearchEzeid: tmaster: Search result sent successfully');
-                                }
-                                else {
-                                    var searchParams = db.escape(TID) + ',' + db.escape(Token) + ',' + db.escape(WorkingDate)
-                                        + ',' + db.escape(SearchType)+ ',' + db.escape(1) + ',' + db.escape(IPAddress);
-                                    db.query('CALL pSearchInformation('+ searchParams +')', function (err, UserInfoReResult) {
-                                        if(!err){
-                                            if(UserInfoReResult[0].length > 0){
-                                                res.send(UserInfoReResult[0]);
-                                                console.log('FnSearchEzeid: tmaster: Search result re sent successfully');
-                                            }
-                                            else
-                                            {
-                                                res.json(null);
-                                                console.log('FnSearchEzeid: tmaster: no re search infromation ');
-                                            }
-                                        }
-                                        else {
-                                            res.statusCode = 500;
-                                            res.json(null);
-                                            console.log('FnSearchEzeid: tmaster: ' + err);
-                                        }
-                                    });
-                                }
-                            }
-                            else {
-                                res.statusCode = 500;
-                                res.json(null);
-                                console.log('FnSearchEzeid: tmaster: ' + err);
-                            }
-                        });
-
+                        }
+                        else {
+                            console.log('FnGetSearchInformation: Invalid token');
+                            res.statusCode = 401;
+                            res.json(null);
+                        }
                     }
                     else {
-                        console.log('FnGetSearchInformation: Invalid token');
-                        res.statusCode = 401;
+                        console.log('FnGetSearchInformation: Token error: ' + err);
+                        res.statusCode = 500;
                         res.json(null);
-                    }
-                }
-                else {
-                    console.log('FnGetSearchInformation: Token error: ' + err);
-                    res.statusCode = 500;
-                    res.json(null);
 
-                }
-            });
-        }
-        }
-            else {
-                if (Token = null) {
-                    console.log('FnGetUserDetails: Token is empty');
-                }
-                else if (TID == 'NaN') {
-                    console.log('FnGetUserDetails: TID is empty');
-                }
-                else if (CurrentDate == null) {
-                    console.log('FnGetUserDetails: CurrentDate is empty');
-                }
-                
-                res.statusCode = 400;
-                res.json(null);
+                    }
+                });
             }
         }
+        else {
+            if (Token = null) {
+                console.log('FnGetUserDetails: Token is empty');
+            }
+            else if (TID == 'NaN') {
+                console.log('FnGetUserDetails: TID is empty');
+            }
+            else if (CurrentDate == null) {
+                console.log('FnGetUserDetails: CurrentDate is empty');
+            }
+
+            res.statusCode = 400;
+            res.json(null);
+        }
+    }
     catch (ex) {
         console.log('FnGetUserDetails error:' + ex.description);
         throw new Error(ex);
@@ -4530,7 +4597,7 @@ exports.FnUpdatePwdEncryption = function (req, res) {
                         var EncryptPWD = null;
                         if (typeof RegData.Password != 'undefined' && RegData.Password != '' && RegData.Password != null) {
                             EncryptPWD = FnEncryptPassword(RegData.Password);
-                           // console.log(EncryptPWD);
+                            // console.log(EncryptPWD);
                             var query = 'update tmaster set password= ' + db.escape(EncryptPWD) + ' where TID =' + db.escape(RegData.TID);
                             //console.log(query);
                             db.query(query, function (err, UpdateResult) {
@@ -4632,13 +4699,13 @@ exports.FnGetBannerPicture = function(req, res){
         var StateTitle = req.query.StateTitle;
         var Ezeid = req.query.Ezeid;
         var LocID = req.query.LocID;
-       // var TokenNo = req.query.Token;
+        // var TokenNo = req.query.Token;
 
         RtnMessage = {
             Picture: ''
         };
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
-            Ezeid = Ezeid.split(',').pop();
+        Ezeid = Ezeid.split(',').pop();
         if ( SeqNo.toString() != 'NaN' && Ezeid != null && LocID != null) {
             var Query = db.escape(Ezeid) + ',' + db.escape(SeqNo) + ',' + db.escape(0);
             //console.log(InsertQuery);
@@ -4706,7 +4773,7 @@ exports.FnGetBannerPicture = function(req, res){
             else if(Ezeid == null) {
                 console.log('FnGetBannerPicture: Ezeid is empty');
             }
-             else if(LocID == null) {
+            else if(LocID == null) {
                 console.log('FnGetBannerPicture: LocID is empty');
             }
             res.statusCode=400;
@@ -5128,7 +5195,7 @@ exports.FnGetStatusType = function (req, res) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
-                                             
+
                         var query = db.escape(Token) + ',' + db.escape(FunctionType);
                         db.query('CALL pGetStatusType(' + query + ')', function (err, StatusResult) {
                             if (!err) {
@@ -5204,32 +5271,32 @@ exports.FnStatusType = function (req, res) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
-                        var StatusAllOpen = 
-                            {
-                                        TID:'-1',
-                                        MasterID:'0',
-                                        StatusTitle:'All Open',
-                                        ProgressPercent:0,
-                                        Status:1,
-                                        NotificationMsg:"",
-                                        NotificationMailMsg:"",
-                                        StatusValue:"11"
-                                    };
-                            var StatusAll = {
-                                        TID:'-2',
-                                        MasterID:'0',
-                                        StatusTitle:'All',
-                                        ProgressPercent:0,
-                                        Status:1,
-                                        NotificationMsg:"",
-                                        NotificationMailMsg:"",
-                                        StatusValue:"12"
-                                    };
-                     
-                        
+                        var StatusAllOpen =
+                        {
+                            TID:'-1',
+                            MasterID:'0',
+                            StatusTitle:'All Open',
+                            ProgressPercent:0,
+                            Status:1,
+                            NotificationMsg:"",
+                            NotificationMailMsg:"",
+                            StatusValue:"11"
+                        };
+                        var StatusAll = {
+                            TID:'-2',
+                            MasterID:'0',
+                            StatusTitle:'All',
+                            ProgressPercent:0,
+                            Status:1,
+                            NotificationMsg:"",
+                            NotificationMailMsg:"",
+                            StatusValue:"12"
+                        };
+
+
                         var query = db.escape(Token) + ',' + db.escape(FunctionType);
                         db.query('CALL pGetStatusType(' + query + ')', function (err, StatusResult) {
-                            
+
                             if (!err) {
                                 if (StatusResult != null) {
                                     if (StatusResult[0].length > 0) {
@@ -5239,7 +5306,7 @@ exports.FnStatusType = function (req, res) {
                                         RtnMessage.Message = 'Status type details Send successfully';
                                         console.log('FnStatusType: Status type details Send successfully');
                                         res.send(RtnMessage);
-                                        
+
                                     }
                                     else {
 
@@ -5249,9 +5316,9 @@ exports.FnStatusType = function (req, res) {
                                     }
                                 }
                                 else {
-                                        console.log('FnGetStatusType:No Status type details found');
-                                        RtnMessage.Message ='No Status type details found';
-                                        res.send(RtnMessage);
+                                    console.log('FnGetStatusType:No Status type details found');
+                                    RtnMessage.Message ='No Status type details found';
+                                    res.send(RtnMessage);
                                 }
                             }
                             else {
@@ -5360,7 +5427,7 @@ exports.FnGetActionType = function (req, res) {
             if (Token == null) {
                 console.log('FnGetActionType: Token is empty');
             }
-           else if (FunctionType == null) {
+            else if (FunctionType == null) {
                 console.log('FnGetActionType: FunctionType is empty');
             }
 
@@ -5616,7 +5683,7 @@ exports.FnSaveItem = function(req, res){
             IsSuccessfull: false
         };
         if(Rate == null || Rate =="")
-        Rate=0.00;
+            Rate=0.00;
         if (Token != null  && FunctionType != null && ItemName !=null) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
@@ -5707,7 +5774,7 @@ exports.FnCreateSubUser = function(req, res){
         var MasterID = req.body.PersonalID;
         var templateID = parseInt(req.body.templateID);
         if(templateID.toString() == 'NaN')
-            templateID =0;  
+            templateID =0;
 
         var RtnMessage = {
             IsSuccessfull: false,
@@ -5852,7 +5919,7 @@ exports.FnGetSubUserList = function (req, res) {
 };
 
 //below method get transaction items list
-exports.FnGetTranscationItems = function (req, res) {
+exports.FnGetTransactionItems = function (req, res) {
     try {
 
         res.setHeader("Access-Control-Allow-Origin", "*");
@@ -5926,7 +5993,7 @@ exports.FnGetTranscationItems = function (req, res) {
 };
 
 //below method to save transaction items
-exports.FnSaveTranscationItems = function(req, res){
+exports.FnSaveTransactionItems = function(req, res){
     try{
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -5938,7 +6005,7 @@ exports.FnSaveTranscationItems = function(req, res){
         var Rate = req.body.Rate;
         var Amount = req.body.Amount;
         var Duration = req.body.Duration;
-        
+
 
         var RtnMessage = {
             IsSuccessfull: false
@@ -6103,6 +6170,7 @@ exports.FnSaveFolderRules = function(req, res){
     }
 };
 
+
 exports.FnSaveStatusType = function(req, res){
     try{
         res.setHeader("Access-Control-Allow-Origin", "*");
@@ -6127,37 +6195,37 @@ exports.FnSaveStatusType = function(req, res){
                 if (!err) {
                     if (Result != null) {
                         var query = db.escape(Token) + ',' + db.escape(TID) + ',' + db.escape(FunctionType) + ',' + db.escape(StatusTitle)
-                            + ',' +db.escape(ProgressPercent) + ',' +db.escape(Status) + ',' +db.escape(NotificationMsg) + ',' +db.escape(NotificationMailMsg) 
+                            + ',' +db.escape(ProgressPercent) + ',' +db.escape(Status) + ',' +db.escape(NotificationMsg) + ',' +db.escape(NotificationMailMsg)
                             + ',' + db.escape(StatusValue);
                         db.query('CALL pSaveStatusTypes(' + query + ')', function (err, result) {
-                                if (!err) {
-                                    if(result != null){
-                                        if(result.affectedRows > 0){
-                                            console.log('FnSaveStatusType: Status type saved successfully');
-                                            RtnMessage.IsSuccessfull = true;
-                                            res.send(RtnMessage);
-                                        }
-                                        else
-                                        {
-                                            console.log('FnSaveStatusType: Status type not saved');
-                                            res.send(RtnMessage);
-                                        }
+                            if (!err) {
+                                if(result != null){
+                                    if(result.affectedRows > 0){
+                                        console.log('FnSaveStatusType: Status type saved successfully');
+                                        RtnMessage.IsSuccessfull = true;
+                                        res.send(RtnMessage);
                                     }
                                     else
                                     {
-                                        console.log('FnSaveStatusType: Status type  not saved');
+                                        console.log('FnSaveStatusType: Status type not saved');
                                         res.send(RtnMessage);
                                     }
                                 }
-                                else {
-                                    console.log('FnSaveStatusType: error in saving Status type ' +err);
+                                else
+                                {
+                                    console.log('FnSaveStatusType: Status type  not saved');
                                     res.send(RtnMessage);
                                 }
-                            });
+                            }
+                            else {
+                                console.log('FnSaveStatusType: error in saving Status type ' +err);
+                                res.send(RtnMessage);
+                            }
+                        });
 
-                        }
-                       
-                    
+                    }
+
+
                     else {
                         console.log('FnSaveStatusType: Invalid token');
                         res.statusCode = 401;
@@ -6208,21 +6276,15 @@ exports.FnSaveActionType = function(req, res){
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
-                       var query = db.escape(Token) + ',' + db.escape(TID) + ',' + db.escape(FunctionType) + ',' + db.escape(ActionTitle)
+                        var query = db.escape(Token) + ',' + db.escape(TID) + ',' + db.escape(FunctionType) + ',' + db.escape(ActionTitle)
                             + ',' +db.escape(Status);
                         db.query('CALL pSaveActionTypes(' + query + ')', function (err, result) {
-                                if (!err) {
-                                    if(result != null){
-                                        if(result.affectedRows > 0){
-                                            console.log('FnSaveActionType: Action types saved successfully');
-                                            RtnMessage.IsSuccessfull = true;
-                                            res.send(RtnMessage);
-                                        }
-                                        else
-                                        {
-                                            console.log('FnSaveActionType:  Action types not saved');
-                                            res.send(RtnMessage);
-                                        }
+                            if (!err) {
+                                if(result != null){
+                                    if(result.affectedRows > 0){
+                                        console.log('FnSaveActionType: Action types saved successfully');
+                                        RtnMessage.IsSuccessfull = true;
+                                        res.send(RtnMessage);
                                     }
                                     else
                                     {
@@ -6230,14 +6292,20 @@ exports.FnSaveActionType = function(req, res){
                                         res.send(RtnMessage);
                                     }
                                 }
-                                else {
-                                    console.log('FnSaveActionType: error in saving  Action types' +err);
+                                else
+                                {
+                                    console.log('FnSaveActionType:  Action types not saved');
                                     res.send(RtnMessage);
                                 }
-                            });
+                            }
+                            else {
+                                console.log('FnSaveActionType: error in saving  Action types' +err);
+                                res.send(RtnMessage);
+                            }
+                        });
 
-                        }
-                       
+                    }
+
                     else {
                         console.log('FnSaveActionType: Invalid token');
                         res.statusCode = 401;
@@ -6597,7 +6665,7 @@ exports.FnSaveHolidayCalendar = function(req, res){
         var HolidayDate = req.body.HolidayDate;
         var HolidayTitle = req.body.HolidayTitle;
         var TemplateID = req.body.TemplateID;
-        
+
         var RtnMessage = {
             IsSuccessfull: false
         };
@@ -6656,7 +6724,7 @@ exports.FnSaveHolidayCalendar = function(req, res){
             else if (HolidayDate == null) {
                 console.log('FnSaveHolidayCalendar: HolidayDate is empty');
             }
-             else if (TemplateID == null) {
+            else if (TemplateID == null) {
                 console.log('FnSaveHolidayCalendar: TemplateID is empty');
             }
 
@@ -6743,7 +6811,7 @@ exports.FnGetHolidayList = function (req, res) {
         console.log('FnGetHolidayList error:' + ex.description);
         throw new Error(ex);
     }
-}; 
+};
 
 exports.FnDeleteHolidayList = function(req, res){
     try{
@@ -6819,14 +6887,14 @@ exports.FnDeleteHolidayList = function(req, res){
     }
 }
 
-exports.FnSaveTranscation = function(req, res){
+exports.FnSaveTransaction = function(req, res){
     try{
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
         var Token = req.body.Token;
         var TID = parseInt(req.body.TID);
-         
+
         var MessageText =req.body.MessageText;
         var Status = req.body.Status;
         var TaskDateTime = req.body.TaskDateTime;
@@ -6848,11 +6916,11 @@ exports.FnSaveTranscation = function(req, res){
         ItemsList = JSON.parse(ItemsList);
         var NextAction = req.body.NextAction;
         var NextActionDateTime = req.body.NextActionDateTime;
-            var  TaskDateNew = new Date(TaskDateTime);
-            var NextActionDateTimeNew = new Date(NextActionDateTime);
+        var  TaskDateNew = new Date(TaskDateTime);
+        var NextActionDateTimeNew = new Date(NextActionDateTime);
         var DeliveryAddress = req.body.DeliveryAddress;
-            if(DeliveryAddress == '')
-                DeliveryAddress = '';
+        if(DeliveryAddress == '')
+            DeliveryAddress = '';
         var ItemIDList='';
         var ToEZEID = req.body.ToEZEID;
         var item_list_type = 0;
@@ -6862,22 +6930,22 @@ exports.FnSaveTranscation = function(req, res){
             IsSuccessfull: false,
             MessageID:0
         };
-         
+
         if(TID.toString() == 'NaN')
             TID = 0;
-       
+
         if(TID != 0){
             for(var i=0; i < ItemsList.length; i++) {
                 if(ItemsList[i].TID != 0 )
                     ItemIDList = ItemsList[i].TID + ',' + ItemIDList  ;
-                   }
+            }
             console.log(ItemIDList);
             ItemIDList=ItemIDList.slice(0,-1)
             console.log('TID comma Values:'+ ItemIDList);
         }
         if(FolderRuleID.toString() == 'NaN')
             FolderRuleID=0;
-        
+
         if (Token != null && ItemsList != null) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
@@ -6908,77 +6976,77 @@ exports.FnSaveTranscation = function(req, res){
                                             console.log(items);
                                             console.log('TID:' +itemsDetails.TID);
                                             if(itemsDetails.TID == 0){
-                                            var query = db.query('INSERT INTO titems SET ?', items, function (err, result) {
-                                                // Neat!
-                                                if (!err) {
-                                                    if (result != null) {
-                                                        if (result.affectedRows > 0) {
-                                                            console.log('FnSaveFolderRules: Folder rules saved successfully');
+                                                var query = db.query('INSERT INTO titems SET ?', items, function (err, result) {
+                                                    // Neat!
+                                                    if (!err) {
+                                                        if (result != null) {
+                                                            if (result.affectedRows > 0) {
+                                                                console.log('FnSaveFolderRules: Folder rules saved successfully');
+                                                            }
+                                                            else {
+                                                                console.log('FnSaveFolderRules: Folder rule not saved');
+                                                            }
                                                         }
                                                         else {
                                                             console.log('FnSaveFolderRules: Folder rule not saved');
                                                         }
                                                     }
                                                     else {
-                                                        console.log('FnSaveFolderRules: Folder rule not saved');
+                                                        console.log('FnSaveFolderRules: error in saving folder rules' + err);
                                                     }
-                                                }
-                                                else {
-                                                    console.log('FnSaveFolderRules: error in saving folder rules' + err);
-                                                }
-                                            });
-     
+                                                });
+
                                             }
-                                            
+
                                             else{
                                                 var items = {
-                                               
-                                                ItemID: itemsDetails.ItemID,
-                                                Qty: itemsDetails.Qty,
-                                                Rate: itemsDetails.Rate,
-                                                Amount: itemsDetails.Amount,
-                                                Duration: itemsDetails.Durations
-                                            };
-                                              console.log('TID:' +itemsDetails.TID);  
-                                            var query = db.query("UPDATE titems set ? WHERE TID = ? ",[items,itemsDetails.TID], function (err, result) {
-                                            // Neat!
-                                            console.log(result);
-                                            if (!err) {
-                                                if(result != null){
-                                                    if(result.affectedRows > 0){
 
-                                                            console.log('FnSaveFolderRules: Folder rules Updated successfully');
+                                                    ItemID: itemsDetails.ItemID,
+                                                    Qty: itemsDetails.Qty,
+                                                    Rate: itemsDetails.Rate,
+                                                    Amount: itemsDetails.Amount,
+                                                    Duration: itemsDetails.Durations
+                                                };
+                                                console.log('TID:' +itemsDetails.TID);
+                                                var query = db.query("UPDATE titems set ? WHERE TID = ? ",[items,itemsDetails.TID], function (err, result) {
+                                                    // Neat!
+                                                    console.log(result);
+                                                    if (!err) {
+                                                        if(result != null){
+                                                            if(result.affectedRows > 0){
+
+                                                                console.log('FnSaveFolderRules: Folder rules Updated successfully');
+                                                            }
+                                                            else
+                                                            {
+                                                                console.log('FnSaveFolderRules: Folder rule not updated');
+                                                            }
+                                                        }
+                                                        else
+                                                        {
+                                                            console.log('FnSaveFolderRules: Folder rule not updated')
+                                                        }
                                                     }
                                                     else
                                                     {
-                                                        console.log('FnSaveFolderRules: Folder rule not updated');
+                                                        console.log('FnSaveFolderRules: error in saving folder rules' +err);
                                                     }
-                                                }
-                                                else
-                                                {
-                                                    console.log('FnSaveFolderRules: Folder rule not updated')
-                                                }
+                                                });
                                             }
-                                            else 
-                                                {
-                                                    console.log('FnSaveFolderRules: error in saving folder rules' +err);
-                                                }
-                                            });
                                         }
-                                    }
-                                    res.send(RtnMessage);
-                                    console.log('FnSaveTranscationItems: Transaction items details save successfully');
+                                        res.send(RtnMessage);
+                                        console.log('FnSaveTranscationItems: Transaction items details save successfully');
                                     }
                                     else
-                                        {
-                                            console.log('FnSaveTranscationItems:No Save Transaction items details');
-                                            res.send(RtnMessage);
-                                        }
-                                }
-                                    else {
-                                            console.log('FnSaveTranscationItems:No Save Transaction items details');
-                                            res.send(RtnMessage);
+                                    {
+                                        console.log('FnSaveTranscationItems:No Save Transaction items details');
+                                        res.send(RtnMessage);
                                     }
+                                }
+                                else {
+                                    console.log('FnSaveTranscationItems:No Save Transaction items details');
+                                    res.send(RtnMessage);
+                                }
                             }
 
                             else {
@@ -7005,7 +7073,7 @@ exports.FnSaveTranscation = function(req, res){
             if (Token == null) {
                 console.log('FnSaveTranscationItems: Token is empty');
             }
-            else 
+            else
                 console.log(RtnMessage);
 
             res.statusCode=400;
@@ -7019,28 +7087,28 @@ exports.FnSaveTranscation = function(req, res){
 };
 
 exports.FnUpdateTransaction = function (req, res){
-try{
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    
-    var TID = parseInt(req.body.TID);
-    var status = req.body.status;
-    var folderRuleID = parseInt(req.body.folderRuleID);
-    var nextAction = (parseInt(req.body.nextAction) != NaN ) ? parseInt(req.body.nextAction) : 0;
-    var nextActionDateTime = new Date(req.body.nextActionDateTime);
-    var Token = req.body.Token;
-    
-    
-    var responseMessage = {
+    try{
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var TID = parseInt(req.body.TID);
+        var status = req.body.status;
+        var folderRuleID = parseInt(req.body.folderRuleID);
+        var nextAction = (parseInt(req.body.nextAction) != NaN ) ? parseInt(req.body.nextAction) : 0;
+        var nextActionDateTime = new Date(req.body.nextActionDateTime);
+        var Token = req.body.Token;
+
+
+        var responseMessage = {
             status: false,
             error:{},
             message:'',
             data: null
         };
-        
-    if(Token){
-        
-        var query = db.escape(TID) + ', ' + db.escape(status) + ',' + db.escape(folderRuleID) + ',' + db.escape(nextAction) + ',' + db.escape(nextActionDateTime)+ ', ' + db.escape(Token);
+
+        if(Token){
+
+            var query = db.escape(TID) + ', ' + db.escape(status) + ',' + db.escape(folderRuleID) + ',' + db.escape(nextAction) + ',' + db.escape(nextActionDateTime)+ ', ' + db.escape(Token);
             db.query('CALL pUpdateTrans(' + query + ')', function (err, updateResult) {
                 if (!err){
                     if (updateResult) {
@@ -7065,18 +7133,18 @@ try{
                     }
                 }
             });
-    }
+        }
         else {
-            if (!Token) 
-            {  
-                responseMessage.message = 'Invalid Token';            
+            if (!Token)
+            {
+                responseMessage.message = 'Invalid Token';
                 responseMessage.error = {Token : 'Invalid Token'};
                 console.log('FnUpdateTransaction: Token is mandatory field');
             }
-            
+
             res.status(401).json(responseMessage);
-        }  
-}
+        }
+    }
     catch (ex) {
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
@@ -7084,7 +7152,7 @@ try{
         throw new Error(ex);
         res.status(400).json(responseMessage);
     }
-    
+
 };
 
 exports.FnSaveTranscationOld = function(req, res){
@@ -7142,7 +7210,7 @@ exports.FnSaveTranscationOld = function(req, res){
                                         var Message = InsertResult[0];
                                         console.log(Message);
                                         ItemsList.forEach(function(itemsDetails){
-                                             var items = {
+                                            var items = {
                                                 MessageID: Message[0].MessageID,
                                                 ItemID: itemsDetails.ItemID,
                                                 Qty: itemsDetails.Qty,
@@ -7170,7 +7238,7 @@ exports.FnSaveTranscationOld = function(req, res){
                                                     console.log('FnSaveFolderRules: error in saving folder rules' + err);
                                                 }
                                             });
-                                           });
+                                        });
 
                                         res.send(RtnMessage);
                                         console.log('FnSaveTranscationItems: Transaction items details save successfully');
@@ -7222,7 +7290,7 @@ exports.FnSaveTranscationOld = function(req, res){
     }
 };
 
-exports.FnGetTranscation = function (req, res) {
+exports.FnGetTransaction = function (req, res) {
     try {
 
         res.setHeader("Access-Control-Allow-Origin", "*");
@@ -7235,9 +7303,9 @@ exports.FnGetTranscation = function (req, res) {
         var searchkeyword = req.query.searchkeyword ? req.query.searchkeyword : '';
         var sortBy = (parseInt(req.query.sort_by) !== NaN) ? parseInt(req.query.sort_by) : 0 ;
         var folderRules = (req.query.folder_rules) ? req.query.folder_rules : '';
-        
+
         console.log(req.query);
-       var RtnMessage = {
+        var RtnMessage = {
             TotalPage:'',
             Result:''
         };
@@ -7246,18 +7314,18 @@ exports.FnGetTranscation = function (req, res) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
-                        
-                       var ToPage = 10 * Page;
+
+                        var ToPage = 10 * Page;
                         var FromPage = ToPage - 10;
 
                         if (FromPage <= 1) {
                             FromPage = 0;
                         }
-                        
-                      var parameters = db.escape(Token) + ',' + db.escape(FunctionType) + ',' + db.escape(Status) + ',' + db.escape(FromPage) + ',' + db.escape(10) + ',' + db.escape(searchkeyword) + ',' + db.escape(sortBy) + ','+ db.escape(folderRules);
+
+                        var parameters = db.escape(Token) + ',' + db.escape(FunctionType) + ',' + db.escape(Status) + ',' + db.escape(FromPage) + ',' + db.escape(10) + ',' + db.escape(searchkeyword) + ',' + db.escape(sortBy) + ','+ db.escape(folderRules);
                         console.log('CALL pGetMessagesNew(' + parameters + ')');
-                      db.query('CALL pGetMessagesNew(' + parameters + ')', function (err, GetResult) {
-                          console.log(GetResult);
+                        db.query('CALL pGetMessagesNew(' + parameters + ')', function (err, GetResult) {
+                            console.log(GetResult);
                             if (!err) {
                                 if (GetResult != null) {
                                     console.log('Length:'+GetResult[0].length);
@@ -7268,18 +7336,18 @@ exports.FnGetTranscation = function (req, res) {
                                         var PageMod = totalRecord % limit;
                                         if (PageMod > 0){
                                             TotalPage = PageValue + 1;
-                                            }
-                                            else{
-                                                TotalPage = PageValue;
-                                            }
-                     
-                                            //TotalPage = parseInt(GetResult[0][0].TotalCount / 10) + 1;
-                                            RtnMessage.TotalPage = TotalPage;
-                                            RtnMessage.Result =GetResult[0];
-                                            res.send(RtnMessage);
-                                            console.log('FnGetTranscation: Transaction details Send successfully');
+                                        }
+                                        else{
+                                            TotalPage = PageValue;
+                                        }
+
+                                        //TotalPage = parseInt(GetResult[0][0].TotalCount / 10) + 1;
+                                        RtnMessage.TotalPage = TotalPage;
+                                        RtnMessage.Result =GetResult[0];
+                                        res.send(RtnMessage);
+                                        console.log('FnGetTranscation: Transaction details Send successfully');
                                     }
-                                    
+
                                     else {
                                         console.log('FnGetTranscation:No Transaction details found');
                                         res.json(null);
@@ -7333,23 +7401,23 @@ exports.FnGetTranscation = function (req, res) {
     }
 };
 
-exports.FnDeleteTranscation = function(req,res){
-try{
-    
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    
-    var Token = req.query.Token;
-    var ItemTID = req.query.ItemTID;
-    
-    var RtnMessage = {
-        IsSuccessfull:false
-    };
-    if (Token != null && ItemTID != null){
-        FnValidateToken(Token, function (err, Result) {
+exports.FnDeleteTransaction = function(req,res){
+    try{
+
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.query.Token;
+        var ItemTID = req.query.ItemTID;
+
+        var RtnMessage = {
+            IsSuccessfull:false
+        };
+        if (Token != null && ItemTID != null){
+            FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
-                        
+
                         db.query('CALL pDeleteTransactionItems(' + db.escape(ItemTID) + ')', function (err, deleteResult) {
                             if (!err) {
                                 if (deleteResult.affectedRows > 0) {
@@ -7381,9 +7449,9 @@ try{
                     res.send(RtnMessage);
 
                 }
-        });
-    }
-    else {
+            });
+        }
+        else {
             if (Token == null) {
                 console.log('FnDeleteTranscation: Token is empty');
             }
@@ -7393,8 +7461,8 @@ try{
             res.statusCode=400;
             res.send(RtnMessage);
         }
-}
-catch (ex) {
+    }
+    catch (ex) {
         console.log('FnDeleteTranscation:error ' + ex.description);
         throw new Error(ex);
     }
@@ -7449,13 +7517,13 @@ exports.FnSaveWorkingHours = function(req, res){
                     if (Result != null) {
 
                         var query = db.escape(Token) + ',' + db.escape(SpilloverTime) + ',' + db.escape(MO1) + ',' + db.escape(MO2) + ',' + db.escape(MO3) + ',' + db.escape(MO4)
-                        + ',' + db.escape(TU1) + ',' + db.escape(TU2) + ',' + db.escape(TU3) + ',' + db.escape(TU4)
-                        + ',' + db.escape(WE1) + ',' + db.escape(WE2) + ',' + db.escape(WE3) + ',' + db.escape(WE4)
-                        + ',' + db.escape(TH1) + ',' + db.escape(TH2) + ',' + db.escape(TH3) + ',' + db.escape(TH4)
-                        + ',' + db.escape(FR1) + ',' + db.escape(FR2) + ',' + db.escape(FR3) + ',' + db.escape(FR4)
-                        + ',' + db.escape(SA1) + ',' + db.escape(SA2) + ',' + db.escape(SA3) + ',' + db.escape(SA4)
-                        + ',' + db.escape(SU1) + ',' + db.escape(SU2) + ',' + db.escape(SU3) + ',' + db.escape(SU4) 
-                        + ',' + db.escape(WorkingHrsTemplate) + ',' + db.escape(TID);
+                            + ',' + db.escape(TU1) + ',' + db.escape(TU2) + ',' + db.escape(TU3) + ',' + db.escape(TU4)
+                            + ',' + db.escape(WE1) + ',' + db.escape(WE2) + ',' + db.escape(WE3) + ',' + db.escape(WE4)
+                            + ',' + db.escape(TH1) + ',' + db.escape(TH2) + ',' + db.escape(TH3) + ',' + db.escape(TH4)
+                            + ',' + db.escape(FR1) + ',' + db.escape(FR2) + ',' + db.escape(FR3) + ',' + db.escape(FR4)
+                            + ',' + db.escape(SA1) + ',' + db.escape(SA2) + ',' + db.escape(SA3) + ',' + db.escape(SA4)
+                            + ',' + db.escape(SU1) + ',' + db.escape(SU2) + ',' + db.escape(SU3) + ',' + db.escape(SU4)
+                            + ',' + db.escape(WorkingHrsTemplate) + ',' + db.escape(TID);
                         db.query('CALL pSaveWorkingHours(' + query + ')', function (err, InsertResult) {
                             if (!err){
                                 if (InsertResult.affectedRows > 0) {
@@ -7605,12 +7673,12 @@ exports.FnDeleteWorkingHours = function(req, res){
                         //console.log('CALL pDeleteWorkinghours(' + db.escape(TID) + ')');
                         db.query('CALL pDeleteWorkinghours(' + db.escape(TID) + ')', function (err, deleteResult) {
                             if (!err){
-                                                                                    
-                                    RtnMessage.IsSuccessfull = true;
-                                    RtnMessage.Message = 'delete successfully';
-                                    res.send(RtnMessage);
-                                    console.log('FnDeleteWorkingHours:Working Hours delete successfully');
-                            }                               
+
+                                RtnMessage.IsSuccessfull = true;
+                                RtnMessage.Message = 'delete successfully';
+                                res.send(RtnMessage);
+                                console.log('FnDeleteWorkingHours:Working Hours delete successfully');
+                            }
                             else {
                                 console.log('FnDeleteWorkingHours: error in deleting Working Hours' + err);
                                 res.statusCode = 500;
@@ -7663,112 +7731,112 @@ exports.FnGetWorkingHrsHolidayList = function (req, res) {
             HolidayList:'',
             Result: false
         };
-        
+
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
         if(LocID == null)
-          LocID = 0;
+            LocID = 0;
         if (Token != null && LocID != null) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
                         var async = require('async');
                         async.parallel([ function FnWorkingHours(CallBack) {
-    try {
+                            try {
 
-             var query = db.escape(Token) + ',' + db.escape(LocID);
-                db.query('CALL pGetWorkingHours(' + query + ')', function (err, WorkingResult) {
-                    console.log('CALL pGetWorkingHours(' + query + ')');
-                     
-                     if (!err) {
-                        
-                        if(WorkingResult != null)
-                        {
-                            if(WorkingResult[0].length > 0 )
-                            {
-                            console.log('FnWorkingHours: Working Hours are available');
-                                RtnMessage.WorkingHours = WorkingResult[0];
-                                RtnMessage.Result = true;
-                                CallBack();
+                                var query = db.escape(Token) + ',' + db.escape(LocID);
+                                db.query('CALL pGetWorkingHours(' + query + ')', function (err, WorkingResult) {
+                                    console.log('CALL pGetWorkingHours(' + query + ')');
+
+                                    if (!err) {
+
+                                        if(WorkingResult != null)
+                                        {
+                                            if(WorkingResult[0].length > 0 )
+                                            {
+                                                console.log('FnWorkingHours: Working Hours are available');
+                                                RtnMessage.WorkingHours = WorkingResult[0];
+                                                RtnMessage.Result = true;
+                                                CallBack();
+                                            }
+                                            else
+                                            {
+                                                console.log('Fnworkinghours: no working hours avaiable');
+                                                RtnMessage.Result = true;
+                                                CallBack();
+                                            }
+                                        }
+                                        else{
+                                            console.log('Fnworkinghours: no working hours avaiable');
+                                            RtnMessage.Result = true;
+                                            CallBack();
+                                        }
+                                    }
+                                    else {
+                                        console.log('FnWorkingHours: sending workinghours error ' + error);
+                                        CallBack();
+                                    }
+                                });
                             }
-                            else
-                            {
-                            console.log('Fnworkinghours: no working hours avaiable');
-                                RtnMessage.Result = true;
-                   CallBack();
+                            catch (ex) {
+                                console.log('FnWorkingHours error:' + ex.description);
+                                throw new Error(ex);
+                                return 'error'
+                            }
+                        } ,function FnHolidayList(CallBack) {
+                            try {
+                                var query = db.escape(LocID) + ',' + db.escape(0);
+                                db.query('CALL pGetHolidayList(' + query + ')', function (err, HolidayResult) {
+                                    console.log('CALL pGetHolidayList(' + query + ')');
+
+                                    if (!err) {
+                                        if(HolidayResult != null)
+                                        {
+                                            if(HolidayResult[0].length > 0 )
+                                            {
+                                                console.log('FnHolidayList: Holiday List are available');
+                                                RtnMessage.HolidayList = HolidayResult[0]
+                                                RtnMessage.Result = true;
+                                                CallBack();
+                                            }
+                                            else
+                                            {
+                                                console.log('FnHolidayList: No Holiday List avaiable');
+                                                RtnMessage.Result = true;
+                                                CallBack();
+                                            }
+                                        }
+                                        else{
+                                            console.log('FnHolidayList: No Holiday List avaiable');
+                                            RtnMessage.Result = true;
+                                            CallBack();
+                                        }
+                                    }
+                                    else {
+                                        console.log('FnHolidayList: sending holiday list error ' + error);
+                                        CallBack();
+                                    }
+                                });
+                            }
+                            catch (ex) {
+                                console.log('FnHolidayList error:' + ex.description);
+                                throw new Error(ex);
+                                return 'error'
                             }
                         }
-                        else{
-                            console.log('Fnworkinghours: no working hours avaiable');
-                            RtnMessage.Result = true;
-                          CallBack();
-                        }
-                }
-                else {
-                    console.log('FnWorkingHours: sending workinghours error ' + error);
-                    CallBack();             
-                }
-            });
-    }
-    catch (ex) {
-        console.log('FnWorkingHours error:' + ex.description);
-        throw new Error(ex);
-        return 'error'
-    }
-} ,function FnHolidayList(CallBack) {
-    try {
-         var query = db.escape(LocID) + ',' + db.escape(0);
-                db.query('CALL pGetHolidayList(' + query + ')', function (err, HolidayResult) {
-                    console.log('CALL pGetHolidayList(' + query + ')');
-                     
-                     if (!err) {
-                        if(HolidayResult != null)
-                        {
-                            if(HolidayResult[0].length > 0 )
-                            {
-                            console.log('FnHolidayList: Holiday List are available');
-                               RtnMessage.HolidayList = HolidayResult[0]
-                               RtnMessage.Result = true;
-                            CallBack();
-                            }
-                            else
-                            {
-                            console.log('FnHolidayList: No Holiday List avaiable');
-                                RtnMessage.Result = true;
-                           CallBack();
-                            }
-                        }
-                        else{
-                            console.log('FnHolidayList: No Holiday List avaiable');
-                            RtnMessage.Result = true;
-                            CallBack();
-                        }
-                }
-                else {
-                    console.log('FnHolidayList: sending holiday list error ' + error);
-                   CallBack();                  
-                }
-            });
-    }
-    catch (ex) {
-        console.log('FnHolidayList error:' + ex.description);
-        throw new Error(ex);
-        return 'error'
-    }
-} 
-],function(err){
-                             if(!err){
+                        ],function(err){
+                            if(!err){
                                 console.log('GnGetWorkingHrs : data sent successfully');
-                                 res.send(RtnMessage);
-                               }
-                               else
-                               {
-                                   res.statusCode = 500;
-                               res.send(RtnMessage);
-                               console.log('error in parellel async callling' + err);
-                               }
-                            
+                                res.send(RtnMessage);
+                            }
+                            else
+                            {
+                                res.statusCode = 500;
+                                res.send(RtnMessage);
+                                console.log('error in parellel async callling' + err);
+                            }
+
                         });
-                       
+
                     }
                     else {
                         res.statusCode = 401;
@@ -7804,38 +7872,38 @@ exports.FnGetWorkingHrsHolidayList = function (req, res) {
 function FnWorkingHours(WorkingContent, CallBack) {
     try {
 
-       if (WorkingContent != null) {
-           
+        if (WorkingContent != null) {
+
             console.log('WorkingContent values');
-           console.log(WorkingContent);
-           
+            console.log(WorkingContent);
+
             var query = db.escape(WorkingContent.Token) + ',' + db.escape(WorkingContent.LocID);
-                db.query('CALL pGetWorkingHours(' + query + ')', function (err, WorkingResult) {
-                    console.log('CALL pGetWorkingHours(' + query + ')');
-                     
-                     if (!err) {
-                        
-                        if(WorkingResult != null)
+            db.query('CALL pGetWorkingHours(' + query + ')', function (err, WorkingResult) {
+                console.log('CALL pGetWorkingHours(' + query + ')');
+
+                if (!err) {
+
+                    if(WorkingResult != null)
+                    {
+                        if(WorkingResult[0].length > 0 )
                         {
-                            if(WorkingResult[0].length > 0 )
-                            {
                             console.log('FnWorkingHours: Working Hours are available');
                             CallBack(null, WorkingResult[0]);
-                            }
-                            else
-                            {
-                            console.log('Fnworkinghours: no working hours avaiable');
-                            CallBack(null,null);    
-                            }
                         }
-                        else{
+                        else
+                        {
                             console.log('Fnworkinghours: no working hours avaiable');
                             CallBack(null,null);
                         }
+                    }
+                    else{
+                        console.log('Fnworkinghours: no working hours avaiable');
+                        CallBack(null,null);
+                    }
                 }
                 else {
                     console.log('FnWorkingHours: sending workinghours error ' + error);
-                    CallBack(null, null);                   
+                    CallBack(null, null);
                 }
             });
         }
@@ -7850,43 +7918,43 @@ function FnWorkingHours(WorkingContent, CallBack) {
         throw new Error(ex);
         return 'error'
     }
-}; 
+};
 
 function FnHolidayList(HolidayContent, CallBack) {
     try {
 
-       if (HolidayContent != null) {
-           
+        if (HolidayContent != null) {
+
             console.log('HolidayContent values');
-           console.log(HolidayContent);
-           
+            console.log(HolidayContent);
+
             var query = db.escape(HolidayContent.LocID) + ',' + db.escape(0);
-                db.query('CALL pGetHolidayList(' + query + ')', function (err, HolidayResult) {
-                    console.log('CALL pGetHolidayList(' + query + ')');
-                     
-                     if (!err) {
-                        
-                        if(HolidayResult != null)
+            db.query('CALL pGetHolidayList(' + query + ')', function (err, HolidayResult) {
+                console.log('CALL pGetHolidayList(' + query + ')');
+
+                if (!err) {
+
+                    if(HolidayResult != null)
+                    {
+                        if(HolidayResult[0].length > 0 )
                         {
-                            if(HolidayResult[0].length > 0 )
-                            {
                             console.log('FnHolidayList: Holiday List are available');
                             CallBack(null, HolidayResult[0]);
-                            }
-                            else
-                            {
-                            console.log('FnHolidayList: No Holiday List avaiable');
-                            CallBack(null,null);    
-                            }
                         }
-                        else{
+                        else
+                        {
                             console.log('FnHolidayList: No Holiday List avaiable');
                             CallBack(null,null);
                         }
+                    }
+                    else{
+                        console.log('FnHolidayList: No Holiday List avaiable');
+                        CallBack(null,null);
+                    }
                 }
                 else {
                     console.log('FnHolidayList: sending holiday list error ' + error);
-                    CallBack(null, null);                   
+                    CallBack(null, null);
                 }
             });
         }
@@ -7902,7 +7970,7 @@ function FnHolidayList(HolidayContent, CallBack) {
         return 'error'
     }
 };
-            
+
 exports.FnGetUserwiseFolderList = function (req, res) {
     try {
 
@@ -8125,7 +8193,7 @@ exports.FnGetLoginDetails = function (req, res) {
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
         var Token = req.query.Token;
-        
+
         if (Token != null) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
@@ -8200,18 +8268,18 @@ exports.FnSaveMailTemplate = function(req, res){
         var BCCMailIDS = req.body.BCCMailIDS;
         var Subject  = req.body.Subject;
         var Body = req.body.Body;
-        
+
         var RtnMessage = {
             IsSuccessfull: false
         };
-       
+
         if (Token != null && Title != null && FromName != null && FromEmailID != null && Subject != null && Body != null ) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
 
-                    var query = db.escape(Token) + ', ' +db.escape(Title) + ',' + db.escape(FromName) + ',' + db.escape(FromEmailID) 
-                        + ',' + db.escape(CCMailIDS) + ',' + db.escape(BCCMailIDS) + ',' + db.escape(Subject) + ',' + db.escape(Body);
+                        var query = db.escape(Token) + ', ' +db.escape(Title) + ',' + db.escape(FromName) + ',' + db.escape(FromEmailID)
+                            + ',' + db.escape(CCMailIDS) + ',' + db.escape(BCCMailIDS) + ',' + db.escape(Subject) + ',' + db.escape(Body);
                         db.query('CALL pSaveMailTemplate(' + query + ')', function (err, InsertResult) {
                             if (!err){
                                 if (InsertResult.affectedRows > 0) {
@@ -8285,12 +8353,12 @@ exports.FnGetTemplateList = function (req, res) {
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
         var Token = req.query.Token;
-        
+
         if (Token != null) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
-                        
+
                         db.query('CALL pgetAllMailtemplate(' + db.escape(Token) + ')', function (err, GetResult) {
                             if (!err) {
                                 if (GetResult != null) {
@@ -8350,19 +8418,19 @@ exports.FnGetTemplateDetails = function (req, res) {
 
         var Token = req.query.Token;
         var TID = req.query.TID;
-        
+
         if (Token != null) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
-                        
+
                         //var query = db.escape(Token) + ', ' +db.escape(TID);
-                            db.query('CALL pgetMailtemplateDetails(' + db.escape(TID) + ')', function (err, GetResult) {
-                                if (!err) {
-                                    if (GetResult != null) {
-                                        if (GetResult[0].length > 0) {
-                                            console.log('FnGetTemplateDetails: Template Details Send successfully');
-                                            res.send(GetResult[0]);
+                        db.query('CALL pgetMailtemplateDetails(' + db.escape(TID) + ')', function (err, GetResult) {
+                            if (!err) {
+                                if (GetResult != null) {
+                                    if (GetResult[0].length > 0) {
+                                        console.log('FnGetTemplateDetails: Template Details Send successfully');
+                                        res.send(GetResult[0]);
                                     }
                                     else {
                                         console.log('FnGetTemplateDetails:No Template Details found');
@@ -8423,72 +8491,78 @@ exports.FnSendBulkMailerOld = function (req, res) {
         var Attachment = req.body.Attachment;
         var AttachmentFileName = req.body.AttachmentFileName;
         var ToMailID = req.body.ToMailID;
-       
+
         var RtnResponse = {
-                IsSent: false
-            };
+            IsSent: false
+        };
         if(TID != null) {
-            
-          if (Token != null && Token != ' ' && TID != null && TID != ' ' && TemplateID != null && TemplateID != ' ') {
-            FnValidateToken(Token, function (err, Result) {
-                if (!err) {
-                    if (Result != null) {
-                        //var query = db.escape(Token) + ', ' +db.escape(TID);
-                        var query ='Select FirstName, LastName, CompanyName,ifnull(SalesMailID,"shailesh.singh009@gmail.com") as SalesMailID from tmaster where TID in (' + TID + ')' ;
-                        console.log(query);
-                        db.query(query, function (err, GetResult) {
-                            if (!err) {
-                                if (GetResult != null) {
-                                    console.log(GetResult);
-                                    if (GetResult.length > 0)  {
-                                      var templateQuery = 'Select * from mmailtemplate where TID = ' + db.escape(TemplateID);
-                                        db.query(templateQuery, function(err, TemplateResult){
-                                            if(!err){
-                                                if(TemplateResult != null) {
-                                                    if(TemplateResult.length > 0){
-                                                        console.log(TemplateResult);
-                                                         RtnResponse.IsSent = true;
-                                                        for(var i = 0; i < GetResult.length; i++){
-                                                        if(GetResult[i].SalesMailID != null && GetResult[i].SalesMailID != ''){
-                                                                                                                       
-                                                            var mailOptions = {
-                                                                replyto: (TemplateResult[0].FromMailID != 'undefined') ?TemplateResult[0].FromMailID : " ",
-                                                                to: GetResult[i].SalesMailID,
-                                                                subject: TemplateResult[0].Subject,
-                                                                html: TemplateResult[0].Body, // html body
-                                                                };
-                                                            mailOptions.html = mailOptions.html.replace("[FirstName]", GetResult[0].FirstName);
-                                                            mailOptions.html = mailOptions.html.replace("[LastName]", GetResult[0].LastName);
-                                                            mailOptions.html = mailOptions.html.replace("[CompanyName]",GetResult[0].CompanyName);
-                                                           
-                                                            console.log(mailOptions.html);
-                                                            var post = { MessageType: 9, Priority: 5, ToMailID: GetResult[i].SalesMailID, Subject: mailOptions.subject, Body:mailOptions.html, Replyto:mailOptions.replyto };
-                                                            
-                                                            //console.log(post);
-                                                            var query = db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
-                                                                // Neat!
-                                                                if (!err) {
-                                                                    console.log(result);
-                                                                    console.log('FnSendBulkMailer: Mail saved Successfully');
-                                                                                                                                     
-                                                                    //CallBack(null, RtnMessage);
+
+            if (Token != null && Token != ' ' && TID != null && TID != ' ' && TemplateID != null && TemplateID != ' ') {
+                FnValidateToken(Token, function (err, Result) {
+                    if (!err) {
+                        if (Result != null) {
+                            //var query = db.escape(Token) + ', ' +db.escape(TID);
+                            var query ='Select FirstName, LastName, CompanyName,ifnull(SalesMailID,"shailesh.singh009@gmail.com") as SalesMailID from tmaster where TID in (' + TID + ')' ;
+                            console.log(query);
+                            db.query(query, function (err, GetResult) {
+                                if (!err) {
+                                    if (GetResult != null) {
+                                        console.log(GetResult);
+                                        if (GetResult.length > 0)  {
+                                            var templateQuery = 'Select * from mmailtemplate where TID = ' + db.escape(TemplateID);
+                                            db.query(templateQuery, function(err, TemplateResult){
+                                                if(!err){
+                                                    if(TemplateResult != null) {
+                                                        if(TemplateResult.length > 0){
+                                                            console.log(TemplateResult);
+                                                            RtnResponse.IsSent = true;
+                                                            for(var i = 0; i < GetResult.length; i++){
+                                                                if(GetResult[i].SalesMailID != null && GetResult[i].SalesMailID != ''){
+
+                                                                    var mailOptions = {
+                                                                        replyto: (TemplateResult[0].FromMailID != 'undefined') ?TemplateResult[0].FromMailID : " ",
+                                                                        to: GetResult[i].SalesMailID,
+                                                                        subject: TemplateResult[0].Subject,
+                                                                        html: TemplateResult[0].Body, // html body
+                                                                    };
+                                                                    mailOptions.html = mailOptions.html.replace("[FirstName]", GetResult[0].FirstName);
+                                                                    mailOptions.html = mailOptions.html.replace("[LastName]", GetResult[0].LastName);
+                                                                    mailOptions.html = mailOptions.html.replace("[CompanyName]",GetResult[0].CompanyName);
+
+                                                                    console.log(mailOptions.html);
+                                                                    var post = { MessageType: 9, Priority: 5, ToMailID: GetResult[i].SalesMailID, Subject: mailOptions.subject, Body:mailOptions.html, Replyto:mailOptions.replyto };
+
+                                                                    //console.log(post);
+                                                                    var query = db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
+                                                                        // Neat!
+                                                                        if (!err) {
+                                                                            console.log(result);
+                                                                            console.log('FnSendBulkMailer: Mail saved Successfully');
+
+                                                                            //CallBack(null, RtnMessage);
+                                                                        }
+                                                                        else {
+                                                                            console.log('FnSendBulkMailer: Mail not Saved Successfully');
+                                                                            // CallBack(null, null);
+                                                                        }
+                                                                    });
+                                                                    console.log('FnSendBulkMailer:Mail details sent for processing');
+                                                                    console.log(mailOptions);
                                                                 }
-                                                                else {
-                                                                    console.log('FnSendBulkMailer: Mail not Saved Successfully');
-                                                                   // CallBack(null, null);
+                                                                else
+                                                                {
+                                                                    console.log('FnSendBulkMailer:Sales Mail Id is empty');
+                                                                    //res.json(null);
                                                                 }
-                                                            });
-                                                            console.log('FnSendBulkMailer:Mail details sent for processing');
-                                                            console.log(mailOptions);
                                                             }
+                                                            res.send(RtnResponse);
+
+                                                        }
                                                         else
                                                         {
-                                                            console.log('FnSendBulkMailer:Sales Mail Id is empty');
-                                                            //res.json(null);
+                                                            console.log('FnGetTemplateDetails:No Template Details found');
+                                                            res.json(null);
                                                         }
-                                                    }
-                                                        res.send(RtnResponse);
-                                                
                                                     }
                                                     else
                                                     {
@@ -8498,63 +8572,57 @@ exports.FnSendBulkMailerOld = function (req, res) {
                                                 }
                                                 else
                                                 {
-                                                    console.log('FnGetTemplateDetails:No Template Details found');
+                                                    console.log('FnGetTemplateDetails:Error in getting template '+ err);
                                                     res.json(null);
                                                 }
-                                            }
-                                            else
-                                            {
-                                                console.log('FnGetTemplateDetails:Error in getting template '+ err);
-                                                res.json(null);
-                                            }
-                                        });
+                                            });
+                                        }
+                                        else {
+                                            console.log('FnGetTemplateDetails:User Details not available');
+                                            res.json(null);
+                                        }
                                     }
                                     else {
-                                        console.log('FnGetTemplateDetails:User Details not available');
+                                        console.log('FnGetTemplateDetails:No User Details not available');
                                         res.json(null);
                                     }
                                 }
                                 else {
-                                    console.log('FnGetTemplateDetails:No User Details not available');
+                                    console.log('FnGetTemplateDetails: User Details not available' + err);
+                                    res.statusCode = 500;
                                     res.json(null);
                                 }
-                            }
-                            else {
-                                console.log('FnGetTemplateDetails: User Details not available' + err);
-                                res.statusCode = 500;
-                                res.json(null);
-                            }
-                        });
-                    }
-                    else {
-                        res.statusCode = 401;
+                            });
+                        }
+                        else {
+                            res.statusCode = 401;
+                            res.json(null);
+                            console.log('FnSendBulkMailer: Invalid Token');
+                        }
+                    } else {
+                        res.statusCode = 500;
                         res.json(null);
-                        console.log('FnSendBulkMailer: Invalid Token');
+                        console.log('FnSendBulkMailer: Error in validating token:  ' + err);
                     }
-                } else {
-                    res.statusCode = 500;
-                    res.json(null);
-                    console.log('FnSendBulkMailer: Error in validating token:  ' + err);
-                }
-            });
-        }  
-    }
-    else
+                });
+            }
+        }
+        else
         {
             if (Token != null  && Attachment != null && AttachmentFileName != null && ToMailID != null) {
                 FnValidateToken(Token, function (err, Result) {
-                if (!err) {
-                    if (Result != null) {
-                                var mailOptions = {
-                                    To: ToMailID,
-                                    subject: 'test subject',
-                                    html: 'test body', // html body
-                                    Attachment:Attachment,
-                                    AttachmentFileName:AttachmentFileName
-                                };
-                               
-                        var post = { MessageType:10, Priority: 5,ToMailID: mailOptions.To, Subject: mailOptions.subject, Body: mailOptions.html, Attachment:mailOptions.Attachment,AttachmentFileName:mailOptions.AttachmentFileName};
-                                                            
+                    if (!err) {
+                        if (Result != null) {
+                            var mailOptions = {
+                                To: ToMailID,
+                                subject: 'test subject',
+                                html: 'test body', // html body
+                                Attachment:Attachment,
+                                AttachmentFileName:AttachmentFileName
+                            };
+
+                            var post = { MessageType:10, Priority: 5,ToMailID: mailOptions.To, Subject: mailOptions.subject, Body: mailOptions.html, Attachment:mailOptions.Attachment,AttachmentFileName:mailOptions.AttachmentFileName};
+
                             console.log(post);
                             var query = db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
                                 // Neat!
@@ -8569,39 +8637,39 @@ exports.FnSendBulkMailerOld = function (req, res) {
                                     res.send(RtnResponse);
                                 }
                             });
-                        console.log('FnSendBulkMailer:Mail details sent for processing');
-                        console.log(mailOptions);
-                    }
-                    else {
-                        res.statusCode = 401;
+                            console.log('FnSendBulkMailer:Mail details sent for processing');
+                            console.log(mailOptions);
+                        }
+                        else {
+                            res.statusCode = 401;
+                            res.json(null);
+                            console.log('FnSendBulkMailer: Invalid Token');
+                        }
+                    } else {
+                        res.statusCode = 500;
                         res.json(null);
-                        console.log('FnSendBulkMailer: Invalid Token');
+                        console.log('FnSendBulkMailer: Error in validating token:  ' + err);
                     }
-                } else {
-                    res.statusCode = 500;
-                    res.json(null);
-                    console.log('FnSendBulkMailer: Error in validating token:  ' + err);
+                });
+            }
+
+            else {
+                if (Token == null) {
+                    console.log('FnSendBulkMailer: Token is empty');
                 }
-            });
+                else if (ToMailID == null) {
+                    console.log('FnSendBulkMailer: ToMailID is empty');
+                }
+                else if (Attachment == null) {
+                    console.log('FnSendBulkMailer: Attachment is empty');
+                }
+                else if (AttachmentFileName == null) {
+                    console.log('FnSendBulkMailer: AttachmentFileName is empty');
+                }
+                res.statusCode=400;
+                res.json(null);
+            }
         }
-                    
-        else {
-            if (Token == null) {
-                console.log('FnSendBulkMailer: Token is empty');
-            }
-            else if (ToMailID == null) {
-                console.log('FnSendBulkMailer: ToMailID is empty');
-            }
-            else if (Attachment == null) {
-                console.log('FnSendBulkMailer: Attachment is empty');
-            }
-            else if (AttachmentFileName == null) {
-                console.log('FnSendBulkMailer: AttachmentFileName is empty');
-            }
-            res.statusCode=400;
-            res.json(null);
-        }
-    }
     }
     catch (ex) {
         console.log('FnGetTemplateDetails error:' + ex.description);
@@ -8624,7 +8692,7 @@ exports.FnSendBulkMailer = function (req, res) {
         var OutputFileName='';
         if (TID == '')
             TID = null;
-        
+
         var RtnResponse = {
             IsSent: false
         };
@@ -8640,9 +8708,9 @@ exports.FnSendBulkMailer = function (req, res) {
                             db.query(query, function (err, GetResult) {
                                 if (!err) {
                                     if (GetResult != null) {
-                                        
+
                                         console.log(GetResult[0]);
-                                        
+
                                         if (GetResult.length > 0) {
                                             var templateQuery = 'Select * from mmailtemplate where TID = ' + db.escape(TemplateID);
                                             db.query(templateQuery, function (err, TemplateResult) {
@@ -8745,7 +8813,7 @@ exports.FnSendBulkMailer = function (req, res) {
                 });
             }
             else{
-                 if (Token == null) {
+                if (Token == null) {
                     console.log('FnSendBulkMailer: Token is empty');
                 }
                 else if (TID == null) {
@@ -8758,7 +8826,7 @@ exports.FnSendBulkMailer = function (req, res) {
         }
         else {
             var fs = require('fs');
-            
+
             if (Token != null && Attachment != null && AttachmentFileName != null && ToMailID != null) {
                 FnValidateToken(Token, function (err, Result) {
                     if (!err) {
@@ -8766,122 +8834,122 @@ exports.FnSendBulkMailer = function (req, res) {
                             var query = db.escape(Token);
                             console.log('CALL pSendMailerDetails(' + query + ')');
                             db.query('CALL pSendMailerDetails(' + query + ')', function (err, Result) {
-                                
-                            if (!err) {
-                            if (Result.length > 0) {
-                                var output = Result[0];
-                                OutputFileName = output[0].Name;
-                                var EZEID = output[0].EZEID;
-                                
-                                console.log(OutputFileName+'.pdf');
-                                console.log('FnSendBulkMailer:UserDetails found..');
-                                
-                            }
-                            else{
-                                    console.log('FnSendBulkMailer:No EZEID NAME found..');
-                                    
+
+                                if (!err) {
+                                    if (Result.length > 0) {
+                                        var output = Result[0];
+                                        OutputFileName = output[0].Name;
+                                        var EZEID = output[0].EZEID;
+
+                                        console.log(OutputFileName+'.pdf');
+                                        console.log('FnSendBulkMailer:UserDetails found..');
+
+                                    }
+                                    else{
+                                        console.log('FnSendBulkMailer:No EZEID NAME found..');
+
+                                    }
                                 }
-                            }
-                            else{
+                                else{
                                     console.log('FnSendBulkMailer:Error in finding EZEID NAME');
-                                    
+
                                 }
                                 fs.readFile("./MailContentTemplate.txt/", "utf8", function (err, data) {
-                                        if (!err){
+                                    if (!err){
                                         data = data.replace("[EZEIDNAME]", OutputFileName);
                                         data = data.replace("[EZEID]", EZEID);
                                         console.log('FnSendBulkMailer:Replace name send successfully');
-                                            
-                                        }
-                                        else
-                                        {
-                                            console.log('FnSendBulkMailer:Error in getting template file');
-                                            
-                                            
-                                        }
-                          
-                            var pdfDocument = require('pdfkit');
-                            //var doc = new pdfDocument();
-                            var doc = new pdfDocument({
+
+                                    }
+                                    else
+                                    {
+                                        console.log('FnSendBulkMailer:Error in getting template file');
+
+
+                                    }
+
+                                    var pdfDocument = require('pdfkit');
+                                    //var doc = new pdfDocument();
+                                    var doc = new pdfDocument({
                                         size: 'A1',
                                         layout: 'portrait'
                                     });
-                            
-                            var bufferData = new Buffer(Attachment.replace(/^data:image\/(png|gif|jpeg|jpg);base64,/, ''), 'base64');							
-                            var pdfdoc = doc.image(bufferData);
-                            //console.log(bufferData);
-							
-                            var ws = fs.createWriteStream('./TempMapLocationFile/'+OutputFileName+'.pdf');
-                            var stream = doc.pipe(ws);
-                            doc.end();
-                            
-							doc.on('end',function(){
-								stream.end();
-							});
-							
-							stream.on('end',function(){
-								stream.close();
-							});
-							
-							stream.on('close',function(){
-								fs.exists('./TempMapLocationFile/'+OutputFileName+'.pdf', function (exists) {
-                                
-                                if (exists) {
-                                    var bufferPdfDoc = fs.readFileSync('./TempMapLocationFile/'+OutputFileName+'.pdf');
-									console.log(bufferPdfDoc);
-									// convert binary data to base64 encoded string                                   
-                                    var Base64PdfData = new Buffer(bufferPdfDoc).toString('base64');
-                                    //console.log(Base64PdfData);
-                                    //fs.writeFileSync('base64.txt', Base64PdfData);
-									fs.unlinkSync('TempMapLocationFile/'+OutputFileName+'.pdf');
-                                    console.log('successfully deleted TempMapLocationFile/'+OutputFileName+'.pdf');
-                                    
-                                    var mailOptions = {
-                                        To: ToMailID,
-                                        subject: 'Route Map',
-                                        html: data, // html body
-                                        Attachment: Base64PdfData,
-                                        AttachmentFileName: OutputFileName+'.pdf'
-                                    };
-                                    
-                                    var post = {
-                                        MessageType: 10,
-                                        Priority: 5,
-                                        ToMailID: mailOptions.To,
-                                        Subject: mailOptions.subject,
-                                        Body: mailOptions.html,
-                                        Attachment: mailOptions.Attachment,
-                                        AttachmentFileName: mailOptions.AttachmentFileName
-                                    };
 
-                                    //console.log(post);
-                                    var query = db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
-                                        // Neat!
-                                        if (!err) {
-                                            //console.log(result);
-                                            console.log('FnSendBulkMailer: Mail saved Successfully');
-                                            RtnResponse.IsSent = true;
-                                            res.send(RtnResponse);
-                                        }
-                                        else {
-                                            console.log('FnSendBulkMailer: Mail not Saved Successfully');
-                                            res.send(RtnResponse);
-                                        }
+                                    var bufferData = new Buffer(Attachment.replace(/^data:image\/(png|gif|jpeg|jpg);base64,/, ''), 'base64');
+                                    var pdfdoc = doc.image(bufferData);
+                                    //console.log(bufferData);
+
+                                    var ws = fs.createWriteStream('./TempMapLocationFile/'+OutputFileName+'.pdf');
+                                    var stream = doc.pipe(ws);
+                                    doc.end();
+
+                                    doc.on('end',function(){
+                                        stream.end();
                                     });
-                                    
-                                    console.log('FnSendBulkMailer:Mail details sent for processing');
-                                
-                            
-                                }
-                                else {
-                                    res.json(null);
-                                }
-                            });
 
-							});
-                        });
-                    });
-                    }
+                                    stream.on('end',function(){
+                                        stream.close();
+                                    });
+
+                                    stream.on('close',function(){
+                                        fs.exists('./TempMapLocationFile/'+OutputFileName+'.pdf', function (exists) {
+
+                                            if (exists) {
+                                                var bufferPdfDoc = fs.readFileSync('./TempMapLocationFile/'+OutputFileName+'.pdf');
+                                                console.log(bufferPdfDoc);
+                                                // convert binary data to base64 encoded string
+                                                var Base64PdfData = new Buffer(bufferPdfDoc).toString('base64');
+                                                //console.log(Base64PdfData);
+                                                //fs.writeFileSync('base64.txt', Base64PdfData);
+                                                fs.unlinkSync('TempMapLocationFile/'+OutputFileName+'.pdf');
+                                                console.log('successfully deleted TempMapLocationFile/'+OutputFileName+'.pdf');
+
+                                                var mailOptions = {
+                                                    To: ToMailID,
+                                                    subject: 'Route Map',
+                                                    html: data, // html body
+                                                    Attachment: Base64PdfData,
+                                                    AttachmentFileName: OutputFileName+'.pdf'
+                                                };
+
+                                                var post = {
+                                                    MessageType: 10,
+                                                    Priority: 5,
+                                                    ToMailID: mailOptions.To,
+                                                    Subject: mailOptions.subject,
+                                                    Body: mailOptions.html,
+                                                    Attachment: mailOptions.Attachment,
+                                                    AttachmentFileName: mailOptions.AttachmentFileName
+                                                };
+
+                                                //console.log(post);
+                                                var query = db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
+                                                    // Neat!
+                                                    if (!err) {
+                                                        //console.log(result);
+                                                        console.log('FnSendBulkMailer: Mail saved Successfully');
+                                                        RtnResponse.IsSent = true;
+                                                        res.send(RtnResponse);
+                                                    }
+                                                    else {
+                                                        console.log('FnSendBulkMailer: Mail not Saved Successfully');
+                                                        res.send(RtnResponse);
+                                                    }
+                                                });
+
+                                                console.log('FnSendBulkMailer:Mail details sent for processing');
+
+
+                                            }
+                                            else {
+                                                res.json(null);
+                                            }
+                                        });
+
+                                    });
+                                });
+                            });
+                        }
                         else {
                             res.statusCode = 401;
                             res.json(null);
@@ -8982,141 +9050,141 @@ exports.FnCropImage = function(req,res){
                 try{
                     console.log(req.files.image.path);
                     //var bitmap = fs.readFileSync('../bin/'+req.files.image.path);
-                    
+
                     fs.readFile('../bin/'+ req.files.image.path,function(err,data){
                         if(!err){
-                        var bitmap = data;
-                        var gm = require('gm').subClass({ imageMagick: true });
-                        gm(bitmap).size(function (err, size) {
-                        if (!err) {
-                            // Orientation landscape
-                            if(size.height < size.width){
-                                // scale++
-                                if(size.height < targetHeight || size.width < targetWidth){
-                                    if(targetHeight > targetWidth){
-										console.log("executing condition 1 : sOrient: landscape & scale++ & tOrient : potrait");
-                                        scaleHeight = targetHeight.toString();
-                                        ////
-                                        scaleWidth = (size.width * scaleHeight)/ size.height;
+                            var bitmap = data;
+                            var gm = require('gm').subClass({ imageMagick: true });
+                            gm(bitmap).size(function (err, size) {
+                                if (!err) {
+                                    // Orientation landscape
+                                    if(size.height < size.width){
+                                        // scale++
+                                        if(size.height < targetHeight || size.width < targetWidth){
+                                            if(targetHeight > targetWidth){
+                                                console.log("executing condition 1 : sOrient: landscape & scale++ & tOrient : potrait");
+                                                scaleHeight = targetHeight.toString();
+                                                ////
+                                                scaleWidth = (size.width * scaleHeight)/ size.height;
+                                            }
+                                            else{
+                                                console.log("executing condition 2 : sOrient: landscape & scale++ & tOrient : landscape");
+                                                scaleWidth = targetWidth.toString();
+                                                ////
+                                                scaleHeight = (size.height * scaleWidth) / size.width;
+                                            }
+                                        }
+                                        // scale--
+                                        else{
+                                            if(targetHeight > targetWidth){
+                                                console.log("executing condition 2 : sOrient: landscape & scale-- & tOrient : landscape");
+                                                scaleWidth = targetWidth.toString();
+                                                ////
+                                                scaleHeight = (scaleWidth * size.height)/ size.width;
+                                            }
+                                            else{
+
+                                                console.log("executing condition 2 : sOrient: landscape & scale-- & tOrient : potrait");
+                                                scaleHeight = targetHeight.toString();
+                                                ////
+                                                scaleWidth = (scaleHeight * size.width) / size.height;
+
+                                            }
+                                        }
                                     }
+
+                                    // Orientation is potrait
                                     else{
-										console.log("executing condition 2 : sOrient: landscape & scale++ & tOrient : landscape");
-                                        scaleWidth = targetWidth.toString();
-                                        ////
-                                        scaleHeight = (size.height * scaleWidth) / size.width;
+                                        //scale++
+                                        if(size.height < targetHeight || size.width < targetHeight){
+                                            if(targetHeight > targetWidth){
+                                                console.log('condition false');
+
+                                                scaleHeight = targetHeight.toString();
+                                                scaleWidth = (scaleHeight * size.width)/ size.height;
+
+
+                                            }
+                                            else{
+                                                scaleWidth = targetWidth.toString();
+                                                scaleHeight = (scaleWidth * size.height) / size.width;
+                                            }
+                                        }
+                                        else{
+                                            scaleWidth = targetWidth.toString();
+                                            ////
+                                            scaleHeight = (scaleWidth * size.height) / size.width;
+                                        }
+                                    }
+
+                                    var dimensions = {
+                                        originalHeight : size.height,
+                                        originalWidth : size.width,
+                                        scaleHeight : scaleHeight,
+                                        scaleWidth : scaleWidth,
+                                        targetHeight : targetHeight,
+                                        targetWidth : targetWidth
+                                    };
+
+                                    console.log(dimensions);
+
+                                    if(scaleFlag && cropFlag){
+                                        console.log('Scale and crop');
+                                        gm(bitmap)
+                                            .resize(scaleWidth,scaleHeight)
+                                            .crop(targetWidth,targetHeight,0,0).toBuffer(outputType.toUpperCase(),function(err,croppedBuff){
+                                                if(!err){
+                                                    var cdataUrl = new Buffer(croppedBuff).toString('base64');
+                                                    var picUrl = 'data:image/'+outputType+';base64,'+cdataUrl;
+                                                    res.status(200).json({status : true, picture : picUrl, message : 'Picture cropped successfully'});
+                                                }
+                                                else{
+                                                    res.status(400).json(respMsg);
+                                                }
+                                            });
+                                        console.log('FnCropImage:Picture cropped successfully...');
+                                        deleteTempFile();
+                                    }
+
+                                    else if(scaleFlag && !cropFlag){
+                                        gm(bitmap)
+                                            .resize(scaleWidth,scaleHeight).toBuffer(outputType.toUpperCase(),function(err,croppedBuff){
+                                                if(!err){
+                                                    var cdataUrl = new Buffer(croppedBuff).toString('base64');
+                                                    var picUrl = 'data:image/'+outputType+';base64,'+cdataUrl;
+                                                    res.status(200).json({status : true, picture : picUrl, message : 'Picture cropped successfully'});
+                                                    console.log('FnCropImage:Picture cropped successfully');
+                                                    deleteTempFile();
+                                                }
+                                                else{
+                                                    res.status(400).json(respMsg);
+                                                }
+                                            });
+
+                                    }
+
+                                    else if(!scaleFlag && cropFlag){
+                                        gm(bitmap)
+                                            .crop(targetWidth,targetHeight,0,0).toBuffer(outputType.toUpperCase(),function(err,croppedBuff){
+                                                if(!err){
+                                                    var cdataUrl = new Buffer(croppedBuff).toString('base64');
+                                                    var picUrl = 'data:image/'+outputType+';base64,'+cdataUrl;
+                                                    res.status(200).json({status : true, picture : picUrl, message : 'Picture cropped successfully'});
+                                                }
+                                                else{
+                                                    res.status(400).json(respMsg);
+                                                }
+                                            });
                                     }
                                 }
-                                // scale--
                                 else{
-                                    if(targetHeight > targetWidth){
-										console.log("executing condition 2 : sOrient: landscape & scale-- & tOrient : landscape");
-                                        scaleWidth = targetWidth.toString();
-                                        ////
-                                        scaleHeight = (scaleWidth * size.height)/ size.width;
-                                    }
-                                    else{
-										
-										console.log("executing condition 2 : sOrient: landscape & scale-- & tOrient : potrait");
-                                        scaleHeight = targetHeight.toString();
-                                        ////
-                                        scaleWidth = (scaleHeight * size.width) / size.height;
-
-                                    }
+                                    throw new Error('FnCropImage : '+ 'Invalid image file. Unable to find image size');
+                                    res.status(400).json(respMsg);
                                 }
-                            }
-
-                            // Orientation is potrait
-                            else{
-                                //scale++
-                                if(size.height < targetHeight || size.width < targetHeight){
-                                    if(targetHeight > targetWidth){
-                                        console.log('condition false');
-
-                                        scaleHeight = targetHeight.toString();
-                                        scaleWidth = (scaleHeight * size.width)/ size.height;
-
-
-                                    }
-                                    else{
-                                        scaleWidth = targetWidth.toString();
-                                        scaleHeight = (scaleWidth * size.height) / size.width;
-                                    }
-                                }
-                                else{
-                                    scaleWidth = targetWidth.toString();
-                                    ////
-                                    scaleHeight = (scaleWidth * size.height) / size.width;
-                                }
-                            }
-
-                            var dimensions = {
-                                originalHeight : size.height,
-                                originalWidth : size.width,
-                                scaleHeight : scaleHeight,
-                                scaleWidth : scaleWidth,
-                                targetHeight : targetHeight,
-                                targetWidth : targetWidth
-                            };
-							
-							console.log(dimensions);
-
-                            if(scaleFlag && cropFlag){
-								console.log('Scale and crop');
-                                gm(bitmap)
-                                    .resize(scaleWidth,scaleHeight)
-                                    .crop(targetWidth,targetHeight,0,0).toBuffer(outputType.toUpperCase(),function(err,croppedBuff){
-                                        if(!err){
-                                            var cdataUrl = new Buffer(croppedBuff).toString('base64');
-                                            var picUrl = 'data:image/'+outputType+';base64,'+cdataUrl;
-                                            res.status(200).json({status : true, picture : picUrl, message : 'Picture cropped successfully'});
-                                        }
-                                        else{
-                                            res.status(400).json(respMsg);
-                                        }
-                                    });
-                                console.log('FnCropImage:Picture cropped successfully...');
-                                deleteTempFile();
-                            }
-
-                            else if(scaleFlag && !cropFlag){
-                                gm(bitmap)
-                                    .resize(scaleWidth,scaleHeight).toBuffer(outputType.toUpperCase(),function(err,croppedBuff){
-                                        if(!err){
-                                            var cdataUrl = new Buffer(croppedBuff).toString('base64');
-                                            var picUrl = 'data:image/'+outputType+';base64,'+cdataUrl;
-                                            res.status(200).json({status : true, picture : picUrl, message : 'Picture cropped successfully'});
-                                            console.log('FnCropImage:Picture cropped successfully');
-                                            deleteTempFile();
-                                        }
-                                        else{
-                                            res.status(400).json(respMsg);
-                                        }
-                                    });
-
-                            }
-
-                            else if(!scaleFlag && cropFlag){
-                                gm(bitmap)
-                                    .crop(targetWidth,targetHeight,0,0).toBuffer(outputType.toUpperCase(),function(err,croppedBuff){
-                                        if(!err){
-                                            var cdataUrl = new Buffer(croppedBuff).toString('base64');
-                                            var picUrl = 'data:image/'+outputType+';base64,'+cdataUrl;
-                                            res.status(200).json({status : true, picture : picUrl, message : 'Picture cropped successfully'});
-                                        }
-                                        else{
-                                            res.status(400).json(respMsg);
-                                        }
-                                    });
-                            }
+                            });
                         }
                         else{
-                            throw new Error('FnCropImage : '+ 'Invalid image file. Unable to find image size');
                             res.status(400).json(respMsg);
-                        }
-                    });
-                        }
-                        else{
-                          res.status(400).json(respMsg);
                             throw new Error('FnCropImage : Error in reading file '+ ex.description);
                         }
                     });
@@ -9154,16 +9222,16 @@ exports.FnSaveWebLink = function(req, res){
         var Token = req.body.Token;
         var URL = req.body.URL;
         var URLNo = req.body.URLNo;
-        
+
         var RtnMessage = {
             IsSuccessfull: false,
             Message:''
         };
-       if(URLNo > 0 && URLNo < 100)
-           var URLNumber = URLNo;
+        if(URLNo > 0 && URLNo < 100)
+            var URLNumber = URLNo;
         else
             RtnMessage.Message = 'Please Enter a URLNumber 1 t0 99';
-        
+
         if (Token != null && URL != null && URL != '' && URLNumber != null) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
@@ -9173,7 +9241,7 @@ exports.FnSaveWebLink = function(req, res){
                         db.query('CALL pSaveWebLinks(' + query + ')', function (err, InsertResult) {
                             if (!err){
                                 if (InsertResult.affectedRows > 0) {
-                                    RtnMessage.IsSuccessfull = true;                                                                
+                                    RtnMessage.IsSuccessfull = true;
                                     RtnMessage.Message ='Save Successfully';
                                     res.send(RtnMessage);
                                     console.log('FnSaveWebLink: Web links save successfully');
@@ -9219,7 +9287,7 @@ exports.FnSaveWebLink = function(req, res){
             else if (URLNumber == null) {
                 console.log('FnSaveWebLink: URLNumber is empty');
             }
-            
+
             res.statusCode=400;
             res.send(RtnMessage);
         }
@@ -9238,7 +9306,7 @@ exports.FnGetWebLink = function (req, res) {
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
         var Token = req.query.Token;
-                
+
         if (Token != null) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
@@ -9289,7 +9357,7 @@ exports.FnGetWebLink = function (req, res) {
             if (Token == null) {
                 console.log('FnGetWebLink: Token is empty');
             }
-            
+
             res.statusCode=400;
             res.json(null);
         }
@@ -9320,7 +9388,7 @@ exports.FnDeleteWebLink = function(req, res){
                         //console.log('CALL pDeleteWorkinghours(' + db.escape(TID) + ')');
                         db.query('CALL pDeleteWebLink(' + db.escape(TID) + ')', function (err, deleteResult) {
                             if (!err){
-                                   if (deleteResult.affectedRows > 0) {
+                                if (deleteResult.affectedRows > 0) {
                                     RtnMessage.IsSuccessfull = true;
                                     RtnMessage.Message = 'Delete Successfully';
                                     res.send(RtnMessage);
@@ -9331,7 +9399,7 @@ exports.FnDeleteWebLink = function(req, res){
                                     RtnMessage.Message = 'No Deleted';
                                     res.send(RtnMessage);
                                 }
-                            }                   
+                            }
                             else {
                                 console.log('FnDeleteWebLink: error in deleting Web Links' + err);
                                 res.statusCode = 500;
@@ -9412,12 +9480,12 @@ exports.FnWebLinkRedirect = function(req,res,next){
                     if(!isNaN(urlSeqNumber)){
                         if(urlSeqNumber > 0 && urlSeqNumber < 100){
                             FnGetRedirectLink(ezeid,urlSeqNumber,function(url){
-                                
+
                                 if(url){
                                     res.redirect(url);
                                 }
                                 else{
-                                    
+
                                     next();
                                 }
                             });
@@ -9448,24 +9516,24 @@ exports.FnWebLinkRedirect = function(req,res,next){
 }
 
 exports.FnGetSearchItem = function(req,res){
-try{
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    
-    var Token = req.query.Token;
-    var FunctionType = req.query.FunctionType;
-    var ItemTitle = req.query.ItemTitle;
-    
-    if(Token != null && FunctionType != null && ItemTitle != null){    
-        FnValidateToken(Token, function (err, Result) {
-            if (!err) {
-                if (Result != null) {
-                    var SearchQuery = db.escape(Token) + ',' + db.escape(FunctionType) + ',' + db.escape(ItemTitle);
-                    db.query('CALL PGetItemAutocomplete(' + SearchQuery + ')', function (err, SearchResult) {  
-                        if (!err) {
-                            if (SearchResult[0].length > 0) {
-                                res.send(SearchResult[0]);
-                                console.log('FnGetSearchItem:Items sent successfully');
+    try{
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.query.Token;
+        var FunctionType = req.query.FunctionType;
+        var ItemTitle = req.query.ItemTitle;
+
+        if(Token != null && FunctionType != null && ItemTitle != null){
+            FnValidateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+                        var SearchQuery = db.escape(Token) + ',' + db.escape(FunctionType) + ',' + db.escape(ItemTitle);
+                        db.query('CALL PGetItemAutocomplete(' + SearchQuery + ')', function (err, SearchResult) {
+                            if (!err) {
+                                if (SearchResult[0].length > 0) {
+                                    res.send(SearchResult[0]);
+                                    console.log('FnGetSearchItem:Items sent successfully');
                                 }
                                 else {
                                     res.json(null);
@@ -9478,7 +9546,7 @@ try{
                                 console.log('FnGetSearchItem:Error in getting Search items' + err);
                             }
                         });
-                }
+                    }
                     else {
                         console.log('FnGetSearchItem: Invalid token');
                         res.statusCode = 401;
@@ -9494,20 +9562,20 @@ try{
             });
         }
         else {
-                if (Token = null) {
-                    console.log('FnGetSearchItem: Token is empty');
-                }
-                else if (FunctionType == null) {
-                    console.log('FnGetSearchItem:FunctionType is empty');
-                }
-                else if (ItemTitle == null) {
-                    console.log('FnGetSearchItem: ItemTitle is empty');
-                }
-                
-                res.statusCode = 400;
-                res.json(null);
+            if (Token = null) {
+                console.log('FnGetSearchItem: Token is empty');
             }
+            else if (FunctionType == null) {
+                console.log('FnGetSearchItem:FunctionType is empty');
+            }
+            else if (ItemTitle == null) {
+                console.log('FnGetSearchItem: ItemTitle is empty');
+            }
+
+            res.statusCode = 400;
+            res.json(null);
         }
+    }
     catch (ex) {
         console.log('FnGetSearchItem error:' + ex.description);
         throw new Error(ex);
@@ -9515,55 +9583,55 @@ try{
 };
 
 exports.FnSaveChatMessage = function(req, res){
-try{
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    
-    var Token = req.body.Token;
-    var ToEZEID = req.body.ToEZEID;
-    var Type = req.body.Type;
-    var MsgType = req.body.MsgType;
-    var Msg = req.body.Msg;
-    var GroupID = req.body.GroupID;
-    console.log(req.body);
-    if (!GroupID)
-       GroupID = 0;
-    var RtnMessage = {
+    try{
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.body.Token;
+        var ToEZEID = req.body.ToEZEID;
+        var Type = req.body.Type;
+        var MsgType = req.body.MsgType;
+        var Msg = req.body.Msg;
+        var GroupID = req.body.GroupID;
+        console.log(req.body);
+        if (!GroupID)
+            GroupID = 0;
+        var RtnMessage = {
             IsSuccessfull: false,
-            
+
         };
-        
+
         if(Token != null && ToEZEID != null && Type != null){
-        FnValidateToken(Token, function (err, Result) {
-            console.log(Result);
+            FnValidateToken(Token, function (err, Result) {
+                console.log(Result);
                 if (!err) {
                     if (Result != null) {
-                        var query = db.escape(Token) + ',' + db.escape(ToEZEID) + ',' + db.escape(Type) 
-                                        + ',' + db.escape(MsgType) + ',' + db.escape(Msg) + ',' + db.escape(GroupID);
-                                    console.log('CALL pSaveChatMsg(' + query + ')');
-                                    db.query('CALL pSaveChatMsg(' + query + ')', function (err, InsertResult) {
-                                        console.log(InsertResult);
-                                        console.log(err);
-                                        if (!err) {
-                                        if (InsertResult != null) {
-                                       
-                                        RtnMessage.IsSuccessfull = true;
-                                        
-                                        res.send(RtnMessage);
-                                        console.log('FnSaveChatMessage:Inserted sucessfully..');
-                                    }
-                                    else
-                                    {
-                                    console.log('FnSaveChatMessage:No Inserted sucessfully..');
-                                    res.send(RtnMessage);}
+                        var query = db.escape(Token) + ',' + db.escape(ToEZEID) + ',' + db.escape(Type)
+                            + ',' + db.escape(MsgType) + ',' + db.escape(Msg) + ',' + db.escape(GroupID);
+                        console.log('CALL pSaveChatMsg(' + query + ')');
+                        db.query('CALL pSaveChatMsg(' + query + ')', function (err, InsertResult) {
+                            console.log(InsertResult);
+                            console.log(err);
+                            if (!err) {
+                                if (InsertResult != null) {
+
+                                    RtnMessage.IsSuccessfull = true;
+
+                                    res.send(RtnMessage);
+                                    console.log('FnSaveChatMessage:Inserted sucessfully..');
                                 }
                                 else
-                                    {
-                                    console.log('FnSaveChatMessage:Error in Insert..');
-                                    res.send(RtnMessage);
-                                    }
-                                });
-               
+                                {
+                                    console.log('FnSaveChatMessage:No Inserted sucessfully..');
+                                    res.send(RtnMessage);}
+                            }
+                            else
+                            {
+                                console.log('FnSaveChatMessage:Error in Insert..');
+                                res.send(RtnMessage);
+                            }
+                        });
+
                     }
                     else {
                         res.statusCode = 401;
@@ -9579,65 +9647,65 @@ try{
             });
         }
         else{
-        if(Token == null){
-            console.log('FnSaveChatMessage:Token is empty');
+            if(Token == null){
+                console.log('FnSaveChatMessage:Token is empty');
+            }
+            else if (FromEZEID == null){
+                console.log('FnSaveChatMessage:FromEZEID is empty');
+            }
+            else if (ToEZEID == null){
+                console.log('FnSaveChatMessage:ToEZEID is empty');
+            }
+            res.statusCode = 400;
+            res.json(null);
         }
-        else if (FromEZEID == null){
-            console.log('FnSaveChatMessage:FromEZEID is empty');
-        }
-        else if (ToEZEID == null){
-            console.log('FnSaveChatMessage:ToEZEID is empty');
-        }
-        res.statusCode = 400;
-        res.json(null);
-    }    
-}
-catch (ex) {
+    }
+    catch (ex) {
         console.log('FnSaveChatMessage: error:' + ex.description);
         throw new Error(ex);
     }
 };
 
 exports.FnCreateGroup = function(req, res){
-try{
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    
-    var Token = req.body.Token;
-    var GroupTitle = req.body.GroupTitle;
-    
-    var RtnMessage = {
+    try{
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.body.Token;
+        var GroupTitle = req.body.GroupTitle;
+
+        var RtnMessage = {
             IsSuccessfull: false,
             GroupID:0
         };
         if(Token != null && GroupTitle != null){
-        FnValidateToken(Token, function (err, Result) {
+            FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
-                                var query = db.escape(Token) + ',' + db.escape(GroupTitle);
-                                        
-                                    console.log('CALL pCreateGroup(' + query + ')');
-                                    db.query('CALL pCreateGroup(' + query + ')', function (err, InsertResult) {
-                                        if (!err) {
-                                            if (InsertResult != null){   
-                                                var Temp = InsertResult[0];                                                
-                                                RtnMessage.IsSuccessfull = true;
-                                                RtnMessage.GroupID = Temp[0].GroupID;
-                                                res.send(RtnMessage);
-                                                console.log('FnCreateGroup:Inserted sucessfully..');
-                                            }
-                                            else                                             
-                                            {
-                                                console.log('FnCreateGroup:No Inserted sucessfully..');
-                                                res.send(RtnMessage);}
-                                        }
-                                        else
-                                        {
-                                            console.log('FnCreateGroup:Error in Insert..');
-                                            res.send(RtnMessage);
-                                        }
-                                    });
-                        }
+                        var query = db.escape(Token) + ',' + db.escape(GroupTitle);
+
+                        console.log('CALL pCreateGroup(' + query + ')');
+                        db.query('CALL pCreateGroup(' + query + ')', function (err, InsertResult) {
+                            if (!err) {
+                                if (InsertResult != null){
+                                    var Temp = InsertResult[0];
+                                    RtnMessage.IsSuccessfull = true;
+                                    RtnMessage.GroupID = Temp[0].GroupID;
+                                    res.send(RtnMessage);
+                                    console.log('FnCreateGroup:Inserted sucessfully..');
+                                }
+                                else
+                                {
+                                    console.log('FnCreateGroup:No Inserted sucessfully..');
+                                    res.send(RtnMessage);}
+                            }
+                            else
+                            {
+                                console.log('FnCreateGroup:Error in Insert..');
+                                res.send(RtnMessage);
+                            }
+                        });
+                    }
                     else {
                         res.statusCode = 401;
                         res.send(RtnMessage);
@@ -9651,18 +9719,18 @@ try{
                 }
             });
         }
-    else{
-        if(Token == null ){
-            console.log('FnCreateGroup:Token is empty');
+        else{
+            if(Token == null ){
+                console.log('FnCreateGroup:Token is empty');
+            }
+            else if(GroupTitle == null ){
+                console.log('FnCreateGroup:GroupTitle is empty');
+            }
+            res.statusCode = 400;
+            res.json(null);
         }
-        else if(GroupTitle == null ){
-            console.log('FnCreateGroup:GroupTitle is empty');
-        }
-        res.statusCode = 400;
-        res.json(null);
+
     }
-    
-}
     catch (ex) {
         console.log('FnSaveGroupChatList: Error:' + ex.description);
         throw new Error(ex);
@@ -9670,17 +9738,17 @@ try{
 };
 
 exports.FnGetGroupList = function(req, res){
-try{
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    
-    var Token = req.query.Token;
-    
-    if(Token !=  null){
-        FnValidateToken(Token, function (err, Result) {
+    try{
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.query.Token;
+
+        if(Token !=  null){
+            FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
-                        var Query = 
+                        var Query =
                             db.query('CALL pGetGroupList(' + db.escape(Token) + ')', function (err, GetResult) {
                                 if (!err) {
                                     console.log(GetResult);
@@ -9734,50 +9802,50 @@ try{
 };
 
 exports.FnSaveGroupMembers = function(req, res){
-try{
+    try{
 
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    
-    var Token = req.body.Token;
-    var GroupID = req.body.GroupID;
-    var EZEID = req.body.EZEID;
-        
-    var RtnMessage = {
-        IsSuccessfull:false,
-        MemberID:0
-    };
-    
-    if(Token !=  null && GroupID != null && EZEID != null){
-        FnValidateToken(Token, function (err, Result) {
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.body.Token;
+        var GroupID = req.body.GroupID;
+        var EZEID = req.body.EZEID;
+
+        var RtnMessage = {
+            IsSuccessfull:false,
+            MemberID:0
+        };
+
+        if(Token !=  null && GroupID != null && EZEID != null){
+            FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
-                                var query = db.escape(GroupID)+ ',' + db.escape(EZEID); 
-                                    console.log('CALL pSaveGroupMembers(' + query + ')');
-                                    db.query('CALL pSaveGroupMembers(' + query + ')', function (err, InsertResult) {
-                                        console.log(InsertResult[0]);
-                                        console.log(err);
-                                        if (!err) {
-                                        if (InsertResult[0] != null) {
-                                            console.log('err.........');
-                                            var Temp = InsertResult[0];
-                                            RtnMessage.IsSuccessfull = true;
-                                            RtnMessage.MemberID = Temp[0].MemberID;
-                                            res.send(RtnMessage);
-                                            console.log('FnSaveGroupMembers:Inserted sucessfully..');
-                                    }
-                                    else
-                                    {
-                                    console.log('FnSaveGroupMembers:No Inserted sucessfully..');
+                        var query = db.escape(GroupID)+ ',' + db.escape(EZEID);
+                        console.log('CALL pSaveGroupMembers(' + query + ')');
+                        db.query('CALL pSaveGroupMembers(' + query + ')', function (err, InsertResult) {
+                            console.log(InsertResult[0]);
+                            console.log(err);
+                            if (!err) {
+                                if (InsertResult[0] != null) {
+                                    console.log('err.........');
+                                    var Temp = InsertResult[0];
+                                    RtnMessage.IsSuccessfull = true;
+                                    RtnMessage.MemberID = Temp[0].MemberID;
                                     res.send(RtnMessage);
-                                    }
+                                    console.log('FnSaveGroupMembers:Inserted sucessfully..');
                                 }
                                 else
-                                    {
-                                    console.log('FnSaveGroupMembers:Error in getting insert group members..');
+                                {
+                                    console.log('FnSaveGroupMembers:No Inserted sucessfully..');
                                     res.send(RtnMessage);
-                                    }
-                                });
+                                }
+                            }
+                            else
+                            {
+                                console.log('FnSaveGroupMembers:Error in getting insert group members..');
+                                res.send(RtnMessage);
+                            }
+                        });
                     }
                     else {
                         res.statusCode = 401;
@@ -9791,21 +9859,21 @@ try{
                 }
             });
         }
-    else{
-        if(Token == null ){
-            console.log('FnSaveGroupMembers:Token is empty');
+        else{
+            if(Token == null ){
+                console.log('FnSaveGroupMembers:Token is empty');
+            }
+            else if(GroupID == null ){
+                console.log('FnSaveGroupMembers:GroupID is empty');
+            }
+            else if(EZEID == null ){
+                console.log('FnSaveGroupMembers:EZEID is empty');
+            }
+            res.statusCode = 400;
+            res.json(null);
         }
-        else if(GroupID == null ){
-            console.log('FnSaveGroupMembers:GroupID is empty');
-        }
-        else if(EZEID == null ){
-            console.log('FnSaveGroupMembers:EZEID is empty');
-        }
-        res.statusCode = 400;
-        res.json(null);
+
     }
-    
-}
     catch (ex) {
         console.log('FnSaveGroupMembers: Error:' + ex.description);
         throw new Error(ex);
@@ -9813,16 +9881,16 @@ try{
 };
 
 exports.FnGetMembersList = function(req, res){
-try{
+    try{
 
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    
-    var Token = req.query.Token;
-    var GroupID = req.query.GroupID;
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
-    if(Token !=  null && GroupID != null){
-        FnValidateToken(Token, function (err, Result) {
+        var Token = req.query.Token;
+        var GroupID = req.query.GroupID;
+
+        if(Token !=  null && GroupID != null){
+            FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
                         db.query('CALL pGetMembersList(' + db.escape(GroupID) + ')', function (err, GetResult) {
@@ -9870,7 +9938,7 @@ try{
             else if (GroupID == null) {
                 console.log('FnGetMembersList: GroupID is empty');
             }
-            
+
             res.statusCode=400;
             res.json(null);
         }
@@ -9882,13 +9950,13 @@ try{
 };
 
 exports.FnDeleteGroupMembers = function(req, res){
-try{
+    try{
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
         var Token = req.query.Token;
         var MemberID = req.query.MemberID;
-       
+
         var RtnMessage = {
             IsSuccessfull: false,
             Message:''
@@ -9902,9 +9970,9 @@ try{
                         var query = db.escape(MemberID);
                         console.log('CALL pDeleteGroupMembers(' + query + ')');
                         db.query('CALL pDeleteGroupMembers(' + query + ')', function (err, DeleteResult) {
-                    console.log(err);
+                            console.log(err);
                             if (!err){
-                                   if (DeleteResult.affectedRows > 0) {
+                                if (DeleteResult.affectedRows > 0) {
                                     RtnMessage.IsSuccessfull = true;
                                     RtnMessage.Message = 'Delete Successfully';
                                     res.send(RtnMessage);
@@ -9915,7 +9983,7 @@ try{
                                     RtnMessage.Message = 'No Deleted';
                                     res.send(RtnMessage);
                                 }
-                            }                   
+                            }
                             else {
                                 console.log('FnDeleteGroupMembers: error in deleting Group members' + err);
                                 res.statusCode = 500;
@@ -9954,31 +10022,26 @@ try{
 };
 
 exports.FnGetChatDetails = function(req, res){
-try{
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    
-    var Token = req.query.Token;
-    var ChatType = req.query.ChatType;
-    var ToEZEID = req.query.ToEZEID;
-    
-    if(Token !=  null){
-        FnValidateToken(Token, function (err, Result) {
+    try{
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.query.Token;
+        var ChatType = req.query.ChatType;
+        var ToEZEID = req.query.ToEZEID;
+
+        if(Token !=  null){
+            FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
                         var Query = db.escape(Token) + ',' + db.escape(ChatType) + ',' + db.escape(ToEZEID);
-                            db.query('CALL pGetChatDetails(' + Query + ')', function (err, GetResult) {
-                                if (!err) {
-                                    
-                                    if (GetResult != null) {
-                                        if (GetResult[0].length > 0) {
-                                            console.log('FnGetChatDetails: Chat details Send successfully');
-                                            res.send(GetResult[0]);
-                                        }
-                                        else {
-                                            console.log('FnGetChatDetails: No Chat details found');
-                                            res.json(null);
-                                        }
+                        db.query('CALL pGetChatDetails(' + Query + ')', function (err, GetResult) {
+                            if (!err) {
+
+                                if (GetResult != null) {
+                                    if (GetResult[0].length > 0) {
+                                        console.log('FnGetChatDetails: Chat details Send successfully');
+                                        res.send(GetResult[0]);
                                     }
                                     else {
                                         console.log('FnGetChatDetails: No Chat details found');
@@ -9986,11 +10049,16 @@ try{
                                     }
                                 }
                                 else {
-                                    console.log('FnGetChatDetails: error in getting GroupList' + err);
-                                    res.statusCode = 500;
+                                    console.log('FnGetChatDetails: No Chat details found');
                                     res.json(null);
                                 }
-                            });
+                            }
+                            else {
+                                console.log('FnGetChatDetails: error in getting GroupList' + err);
+                                res.statusCode = 500;
+                                res.json(null);
+                            }
+                        });
                     }
                     else {
                         res.statusCode = 401;
@@ -10026,31 +10094,26 @@ try{
 };
 
 exports.FnGetChatList = function(req, res){
-try{
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    
-    var Token = req.query.Token;
-    var ChatType = req.query.ChatType;
-    var ToEZEID = req.query.ToEZEID;
-    
-    if(Token !=  null){
-        FnValidateToken(Token, function (err, Result) {
+    try{
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.query.Token;
+        var ChatType = req.query.ChatType;
+        var ToEZEID = req.query.ToEZEID;
+
+        if(Token !=  null){
+            FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
                         var Query = db.escape(Token) + ',' + db.escape(ChatType) + ',' + db.escape(ToEZEID);
-                            db.query('CALL pGetChatList(' + Query + ')', function (err, GetResult) {
-                                if (!err) {
-                                    
-                                    if (GetResult != null) {
-                                        if (GetResult[0].length > 0) {
-                                            console.log('FnGetChatList: Chat details Send successfully');
-                                            res.send(GetResult[0]);
-                                        }
-                                        else {
-                                            console.log('FnGetChatList: No Chat details found');
-                                            res.json(null);
-                                        }
+                        db.query('CALL pGetChatList(' + Query + ')', function (err, GetResult) {
+                            if (!err) {
+
+                                if (GetResult != null) {
+                                    if (GetResult[0].length > 0) {
+                                        console.log('FnGetChatList: Chat details Send successfully');
+                                        res.send(GetResult[0]);
                                     }
                                     else {
                                         console.log('FnGetChatList: No Chat details found');
@@ -10058,11 +10121,16 @@ try{
                                     }
                                 }
                                 else {
-                                    console.log('FnGetChatList: error in getting GroupList' + err);
-                                    res.statusCode = 500;
+                                    console.log('FnGetChatList: No Chat details found');
                                     res.json(null);
                                 }
-                            });
+                            }
+                            else {
+                                console.log('FnGetChatList: error in getting GroupList' + err);
+                                res.statusCode = 500;
+                                res.json(null);
+                            }
+                        });
                     }
                     else {
                         res.statusCode = 401;
@@ -10098,37 +10166,32 @@ try{
 };
 
 exports.FnGetSearchPicture = function(req, res){
-try{
-    
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    
-    var Token = req.query.Token;
-    var TID = req.query.TID;
+    try{
+
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.query.Token;
+        var TID = req.query.TID;
         var ID=''
         if(TID != null){
-            
+
             ID = TID + ',' + ID;
             var IDS =ID.slice(0,-1);
             console.log('TID Values:'+ IDS);}
-    
+
         if (Token != null && IDS != null){
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
                         console.log('CALL pGetSearchPics(' + db.escape(IDS) + ')');
-                            db.query('CALL pGetSearchPics(' + db.escape(IDS) + ')', function (err, SearchResult) {
-                                    
-                                    if (!err) {
-                                        if (SearchResult != null) {
-                                            if (SearchResult[0] != null) {
-                                                console.log('FnGetSearchPicture:Picture send sucessfully..');
-                                                res.send(SearchResult[0]);
-                                            }
-                                            else {
-                                            console.log('FnGetSearchPicture: No Picture send sucessfully');
-                                            res.json(null);
-                                        }
+                        db.query('CALL pGetSearchPics(' + db.escape(IDS) + ')', function (err, SearchResult) {
+
+                            if (!err) {
+                                if (SearchResult != null) {
+                                    if (SearchResult[0] != null) {
+                                        console.log('FnGetSearchPicture:Picture send sucessfully..');
+                                        res.send(SearchResult[0]);
                                     }
                                     else {
                                         console.log('FnGetSearchPicture: No Picture send sucessfully');
@@ -10136,11 +10199,16 @@ try{
                                     }
                                 }
                                 else {
-                                    console.log('FnGetSearchPicture: error in getting picture result' + err);
-                                    res.statusCode = 500;
+                                    console.log('FnGetSearchPicture: No Picture send sucessfully');
                                     res.json(null);
                                 }
-                            });
+                            }
+                            else {
+                                console.log('FnGetSearchPicture: error in getting picture result' + err);
+                                res.statusCode = 500;
+                                res.json(null);
+                            }
+                        });
                     }
                     else {
                         res.statusCode = 401;
@@ -10192,35 +10260,35 @@ exports.FnGetCompanyProfile = function(req, res){
             Token = 0;
         }
         if(Token != null && TID != null ){
-                    console.log('CALL pGetTagLine(' + db.escape(TID)+ ',' + db.escape(Token) + ')');
-                        db.query('CALL pGetTagLine(' + db.escape(TID)+ ',' + db.escape(Token) + ')', function (err, GetResult) {
-                            if (!err) {
-                                if (GetResult[0] != null) {
-                                    if (GetResult[0].length > 0) {
-                                        RtnMessage.Result=GetResult[0];
-                                        RtnMessage.Message = 'About Company Profile sent successfully';
-                                        console.log('FnGetCompanyProfile: Company Profile  Send successfully');
-                                        res.send(RtnMessage);
-                                    }
-                                    else {
-                                        RtnMessage.Message = 'No Company Profile  found';
-                                        console.log('FnGetCompanyProfile: No Company Profile    found');
-                                        res.send(RtnMessage);
-                                    }
-                                }
-                                else {
-                                    RtnMessage.Message = 'No Company Profile found';
-                                    console.log('FnGetCompanyProfile: No Company Profile found');
-                                    res.send(RtnMessage);
-                                }
-                            }
-                            else {
-                                RtnMessage.Message = 'error in getting Company Profile ';
-                                console.log('FnGetCompanyProfile: error in getting Company Profile' + err);
-                                res.statusCode = 500;
-                                res.send(RtnMessage);
-                            }
-                        });
+            console.log('CALL pGetTagLine(' + db.escape(TID)+ ',' + db.escape(Token) + ')');
+            db.query('CALL pGetTagLine(' + db.escape(TID)+ ',' + db.escape(Token) + ')', function (err, GetResult) {
+                if (!err) {
+                    if (GetResult[0] != null) {
+                        if (GetResult[0].length > 0) {
+                            RtnMessage.Result=GetResult[0];
+                            RtnMessage.Message = 'About Company Profile sent successfully';
+                            console.log('FnGetCompanyProfile: Company Profile  Send successfully');
+                            res.send(RtnMessage);
+                        }
+                        else {
+                            RtnMessage.Message = 'No Company Profile  found';
+                            console.log('FnGetCompanyProfile: No Company Profile    found');
+                            res.send(RtnMessage);
+                        }
+                    }
+                    else {
+                        RtnMessage.Message = 'No Company Profile found';
+                        console.log('FnGetCompanyProfile: No Company Profile found');
+                        res.send(RtnMessage);
+                    }
+                }
+                else {
+                    RtnMessage.Message = 'error in getting Company Profile ';
+                    console.log('FnGetCompanyProfile: error in getting Company Profile' + err);
+                    res.statusCode = 500;
+                    res.send(RtnMessage);
+                }
+            });
 
         }
         else {
@@ -10249,7 +10317,7 @@ exports.FnSaveCompanyProfile = function(req, res){
 
         var RtnMessage = {
             IsSuccessfull : false,
-           Message: ''
+            Message: ''
         };
 
         if(Token !=  null && CompanyProfile != null){
@@ -10412,7 +10480,7 @@ exports.FnSaveReservationResource = function(req, res){
         var status = (parseInt(req.body.status)=== 1 || parseInt(req.body.status) === 2) ? req.body.status : 1;
         var operatorid = req.body.operatorid ? req.body.operatorid : '';
         var workingtemp = req.body.working_temp ? req.body.working_temp : 0;
-         if (TID.toString() == 'NaN')
+        if (TID.toString() == 'NaN')
             TID = 0;
         var responseMessage = {
             status: false,
@@ -10421,25 +10489,25 @@ exports.FnSaveReservationResource = function(req, res){
             data: null
         };
         var validateStatus = true;
-        
+
         if(!picture){
             responseMessage.error['picture'] = 'Invalid Picture';
             validateStatus *= false;
         }
-        
+
         if(!title){
             responseMessage.error['title'] = 'Invalid Title';
             validateStatus *= false;
         }
-        
-        
+
+
         if(!validateStatus){
             console.log('FnSaveReservationResource  error : ' + JSON.stringify(responseMessage.error));
             responseMessage.message = 'Unable to save resource ! Please check the errors';
             res.status(200).json(responseMessage);
             return;
         }
-        
+
         if (Token && operatorid) {
             FnValidateToken(Token, function (err, result) {
                 if (!err) {
@@ -10447,7 +10515,7 @@ exports.FnSaveReservationResource = function(req, res){
 
                         var query = db.escape(Token) + ', ' + db.escape(TID) + ',' + db.escape(picture) + ',' + db.escape(title) + ',' + db.escape(description) + ',' + db.escape(status)+ ',' + db.escape(operatorid) + ',' + db.escape(workingtemp);
                         db.query('CALL pSaveResource(' + query + ')', function (err, insertResult) {
-                             if (!err){
+                            if (!err){
                                 if (insertResult) {
                                     responseMessage.status = true;
                                     responseMessage.error = null;
@@ -10479,16 +10547,16 @@ exports.FnSaveReservationResource = function(req, res){
                         });
                     }
                     else {
-                        responseMessage.message = 'Invalid token'; 
-                        responseMessage.error = {}; 
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {};
                         responseMessage.data = null;
                         res.status(401).json(responseMessage);
                         console.log('FnSaveReservationResource: Invalid token');
-                                            }
+                    }
                 }
                 else {
                     responseMessage.error= {};
-                    responseMessage.message = 'Error in validating Token'; 
+                    responseMessage.message = 'Error in validating Token';
                     res.status(500).json(responseMessage);
                     console.log('FnSaveReservationResource:Error in processing Token' + err);
                 }
@@ -10497,19 +10565,19 @@ exports.FnSaveReservationResource = function(req, res){
         }
 
         else {
-            if (!Token) 
-            {  
-                responseMessage.message = 'Invalid Token';            
+            if (!Token)
+            {
+                responseMessage.message = 'Invalid Token';
                 responseMessage.error = {Token : 'Invalid Token'};
                 console.log('FnSaveReservationResource: Token is mandatory field');
             }
             else if(!operatorid)
             {
-                responseMessage.message = 'Invalid Operator ID';            
+                responseMessage.message = 'Invalid Operator ID';
                 responseMessage.error = {operatorid : 'Invalid Operator ID'};
                 console.log('FnSaveReservationResource: Operator ID is mandatory field');
             }
-           
+
             res.status(401).json(responseMessage);
         }
 
@@ -10525,7 +10593,7 @@ exports.FnSaveReservationResource = function(req, res){
 
 //method to update the reservation resource
 exports.FnUpdateReservationResource = function(req, res){
-    
+
     try{
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -10538,7 +10606,7 @@ exports.FnUpdateReservationResource = function(req, res){
         var status = (parseInt(req.body.status)=== 1 || parseInt(req.body.status) === 2) ? req.body.status : 1;
         var operatorid = req.body.operatorid;
         var workingTemp = (parseInt(req.body.working_temp) !== NaN) ? parseInt(req.body.working_temp) : 0;
-        
+
         var responseMessage = {
             status: false,
             error:{},
@@ -10546,25 +10614,25 @@ exports.FnUpdateReservationResource = function(req, res){
             data: null
         };
         var validateStatus = true;
-        
+
         if(!picture){
             responseMessage.error['picture'] = 'Invalid Picture';
             validateStatus *= false;
         }
-        
+
         if(!title){
             responseMessage.error['title'] = 'Invalid Title';
             validateStatus *= false;
         }
-        
-        
+
+
         if(!validateStatus){
             console.log('FnUpdateReservationResource  error : ' + JSON.stringify(responseMessage.error));
             responseMessage.message = 'Unable to update resource ! Please check the errors';
             res.status(200).json(responseMessage);
             return;
         }
-        
+
         if (Token && operatorid) {
             FnValidateToken(Token, function (err, result) {
                 if (!err) {
@@ -10607,16 +10675,16 @@ exports.FnUpdateReservationResource = function(req, res){
                         });
                     }
                     else {
-                        responseMessage.message = 'Invalid token'; 
-                        responseMessage.error = {}; 
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {};
                         responseMessage.data = null;
                         res.status(401).json(responseMessage);
                         console.log('FnUpdateReservationResource: Invalid token');
-                                            }
+                    }
                 }
                 else {
                     responseMessage.error= {};
-                    responseMessage.message = 'Error in processing Token'; 
+                    responseMessage.message = 'Error in processing Token';
                     res.status(500).json(responseMessage);
                     console.log('FnUpdateReservationResource:Error in processing Token' + err);
                 }
@@ -10625,19 +10693,19 @@ exports.FnUpdateReservationResource = function(req, res){
         }
 
         else {
-            if (!Token) 
-            {  
-                responseMessage.message = 'Invalid Token';            
+            if (!Token)
+            {
+                responseMessage.message = 'Invalid Token';
                 responseMessage.error = {Token : 'Invalid Token'};
                 console.log('FnUpdateReservationResource: Token is mandatory field');
             }
             else if(!operatorid)
             {
-                responseMessage.message = 'Invalid Operator ID';            
+                responseMessage.message = 'Invalid Operator ID';
                 responseMessage.error = {operatorid : 'Invalid Operator ID'};
                 console.log('FnUpdateReservationResource: Operator ID is mandatory field');
             }
-           
+
             res.status(401).json(responseMessage);
         }
 
@@ -10660,7 +10728,7 @@ exports.FnGetReservationResource = function (req, res) {
 
         var ezeid = req.query.ezeid;
         var type = req.query.type ? req.query.type : 0 ;
-        
+
         console.log(req.query);
 
         var responseMessage = {
@@ -10669,64 +10737,64 @@ exports.FnGetReservationResource = function (req, res) {
             error:{},
             message:''
         };
-        
+
         if (ezeid) {
-             var query = db.escape(ezeid) + ', ' + db.escape(type);
+            var query = db.escape(ezeid) + ', ' + db.escape(type);
             console.log(query);
-                        db.query('CALL pGetResource(' + query + ')', function (err, GetResult) {
-                
-                            if (!err) {
-                                if (GetResult) {
-                                    if (GetResult[0].length > 0) {
-                                        responseMessage.status = true;
-                                        responseMessage.data = GetResult[0] ;
-                                        responseMessage.error = null;
-                                        responseMessage.message = 'Resource details Send successfully';
-                                        console.log('FnGetReservationResource: Resource details Send successfully');
-                                        res.status(200).json(responseMessage);
-                                    }
-                                    else {
-                                        
-                                        responseMessage.error = {};
-                                        responseMessage.message = 'No founded Resource details';
-                                        console.log('FnGetReservationResource: No founded Resource details');
-                                        res.json(responseMessage);
-                                    }
-                                }
-                                else {
+            db.query('CALL pGetResource(' + query + ')', function (err, GetResult) {
 
-                                    
-                                    responseMessage.error = {};
-                                    responseMessage.message = 'No Resource details found';
-                                    console.log('FnGetReservationResource: No Resource details found');
-                                    res.json(responseMessage);
-                                }
+                if (!err) {
+                    if (GetResult) {
+                        if (GetResult[0].length > 0) {
+                            responseMessage.status = true;
+                            responseMessage.data = GetResult[0] ;
+                            responseMessage.error = null;
+                            responseMessage.message = 'Resource details Send successfully';
+                            console.log('FnGetReservationResource: Resource details Send successfully');
+                            res.status(200).json(responseMessage);
+                        }
+                        else {
 
-                            }
-                            else {
-                                
-                                responseMessage.data = null ;
-                                responseMessage.error = {};
-                                responseMessage.message = 'Error in getting Resource details';
-                                console.log('FnGetReservationResource: error in getting Resource details' + err);
-                                res.status(500).json(responseMessage);
-                            }
-                        });
+                            responseMessage.error = {};
+                            responseMessage.message = 'No founded Resource details';
+                            console.log('FnGetReservationResource: No founded Resource details');
+                            res.json(responseMessage);
+                        }
                     }
-                    
+                    else {
+
+
+                        responseMessage.error = {};
+                        responseMessage.message = 'No Resource details found';
+                        console.log('FnGetReservationResource: No Resource details found');
+                        res.json(responseMessage);
+                    }
+
+                }
+                else {
+
+                    responseMessage.data = null ;
+                    responseMessage.error = {};
+                    responseMessage.message = 'Error in getting Resource details';
+                    console.log('FnGetReservationResource: error in getting Resource details' + err);
+                    res.status(500).json(responseMessage);
+                }
+            });
+        }
+
         else {
             if (!Token) {
-                responseMessage.message = 'Invalid ezeid';            
+                responseMessage.message = 'Invalid ezeid';
                 responseMessage.error = {
                     ezeid : 'Invalid ezeid'
                 };
                 console.log('FnGetReservationResource: ezeid is mandatory field');
             }
-           
+
             res.status(401).json(responseMessage);
         }
     }
-     catch (ex) {
+    catch (ex) {
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
         console.log('FnGetReservationResource:error ' + ex.description);
@@ -10748,14 +10816,14 @@ exports.FnSaveReservationService = function(req, res){
         var rate = req.body.rate;
         var status = (parseInt(req.body.status)=== 1 || parseInt(req.body.status) === 2) ? req.body.status : 1;
         var service_ids = req.body.service_ids ? req.body.service_ids : 0;
-                
+
         var ID=''
         if(service_ids){
             ID = service_ids + ',' + ID;
             service_ids =ID.slice(0,-1);
             console.log('service_ids Values:'+ service_ids);
         }
-         
+
         var responseMessage = {
             status: false,
             error:{},
@@ -10763,23 +10831,23 @@ exports.FnSaveReservationService = function(req, res){
             data: null
         };
         var validateStatus = true;
-        
+
         if(!title){
             responseMessage.error['title'] = 'Invalid Title';
             validateStatus *= false;
         }
-        
-        
+
+
         if(!validateStatus){
             console.log('FnSaveReservationService  error : ' + JSON.stringify(responseMessage.error));
             responseMessage.message = 'Unable to save service ! Please check the errors';
             res.status(200).json(responseMessage);
             return;
         }
-        
-        
+
+
         if (Token) {
-            
+
             FnValidateToken(Token, function (err, result) {
                 if (!err) {
                     if (result != null) {
@@ -10819,16 +10887,16 @@ exports.FnSaveReservationService = function(req, res){
                         });
                     }
                     else {
-                        responseMessage.message = 'Invalid token'; 
-                        responseMessage.error = {}; 
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {};
                         responseMessage.data = null;
                         res.status(401).json(responseMessage);
                         console.log('FnSaveReservationService: Invalid token');
-                                            }
+                    }
                 }
                 else {
                     responseMessage.error= {};
-                    responseMessage.message = 'Error in validating Token'; 
+                    responseMessage.message = 'Error in validating Token';
                     res.status(500).json(responseMessage);
                     console.log('FnSaveReservationService:Error in processing Token' + err);
                 }
@@ -10837,12 +10905,12 @@ exports.FnSaveReservationService = function(req, res){
         }
 
         else {
-            if (!Token) 
-            {  
-                responseMessage.message = 'Invalid Token';            
+            if (!Token)
+            {
+                responseMessage.message = 'Invalid Token';
                 responseMessage.error = {Token : 'Invalid Token'};
                 console.log('FnSaveReservationService: Token is mandatory field hello');
-            }        
+            }
             res.status(401).json(responseMessage);
         }
 
@@ -10858,7 +10926,7 @@ exports.FnSaveReservationService = function(req, res){
 
 //method to update the reservation service
 exports.FnUpdateReservationService = function(req, res){
-    
+
     try{
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -10870,15 +10938,15 @@ exports.FnUpdateReservationService = function(req, res){
         var rate = req.body.rate;
         var status = (parseInt(req.body.status)=== 1 || parseInt(req.body.status) === 2) ? req.body.status : 1;
         var service_ids = req.body.service_ids;
-        
+
         var ID=''
         if(service_ids){
-            
+
             ID = service_ids + ',' + ID;
             var service_IDS =ID.slice(0,-1);
             console.log('service_ids Values:'+ service_IDS);
         }
-         
+
         var responseMessage = {
             status: false,
             error:{},
@@ -10886,20 +10954,20 @@ exports.FnUpdateReservationService = function(req, res){
             data: null
         };
         var validateStatus = true;
-        
+
         if(!title){
             responseMessage.error['title'] = 'Invalid Title';
             validateStatus *= false;
         }
-        
-        
+
+
         if(!validateStatus){
             console.log('FnUpdateReservationService  error : ' + JSON.stringify(responseMessage.error));
             responseMessage.message = 'Unable to update service ! Please check the errors';
             res.status(200).json(responseMessage);
             return;
         }
-        
+
         if (Token) {
             FnValidateToken(Token, function (err, result) {
                 if (!err) {
@@ -10940,16 +11008,16 @@ exports.FnUpdateReservationService = function(req, res){
                         });
                     }
                     else {
-                        responseMessage.message = 'Invalid token'; 
-                        responseMessage.error = {}; 
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {};
                         responseMessage.data = null;
                         res.status(401).json(responseMessage);
                         console.log('FnUpdateReservationService: Invalid token');
-                                            }
+                    }
                 }
                 else {
                     responseMessage.error= {};
-                    responseMessage.message = 'Error in validating Token'; 
+                    responseMessage.message = 'Error in validating Token';
                     res.status(500).json(responseMessage);
                     console.log('FnUpdateReservationService:Error in processing Token' + err);
                 }
@@ -10958,13 +11026,13 @@ exports.FnUpdateReservationService = function(req, res){
         }
 
         else {
-            if (!Token) 
-            {  
-                responseMessage.message = 'Invalid Token';            
+            if (!Token)
+            {
+                responseMessage.message = 'Invalid Token';
                 responseMessage.error = {Token : 'Invalid Token'};
                 console.log('FnUpdateReservationService: Token is mandatory field');
             }
-            
+
             res.status(401).json(responseMessage);
         }
 
@@ -10992,60 +11060,60 @@ exports.FnGetReservationService = function (req, res) {
             error:{},
             message:''
         };
-        
+
         if (ezeid) {
-                    db.query('CALL pGetResServices(' + db.escape(ezeid) + ')', function (err, GetResult) {
-                            if (!err) {
-                                if (GetResult) {
-                                    if (GetResult[0].length > 0) {
-                                        responseMessage.status = true;
-                                        responseMessage.data = GetResult[0];
-                                        responseMessage.error = null;
-                                        responseMessage.message = 'Service details Send successfully';
-                                        console.log('FnGetReservationService: Service details Send successfully');
-                                        res.status(200).json(responseMessage);
-                                    }
-                                    else {
-                                        
-                                        responseMessage.error = {};
-                                        responseMessage.message = 'No founded service details';
-                                        console.log('FnGetReservationService: No founded Service details');
-                                        res.json(responseMessage);
-                                    }
-                                }
-                                else {
+            db.query('CALL pGetResServices(' + db.escape(ezeid) + ')', function (err, GetResult) {
+                if (!err) {
+                    if (GetResult) {
+                        if (GetResult[0].length > 0) {
+                            responseMessage.status = true;
+                            responseMessage.data = GetResult[0];
+                            responseMessage.error = null;
+                            responseMessage.message = 'Service details Send successfully';
+                            console.log('FnGetReservationService: Service details Send successfully');
+                            res.status(200).json(responseMessage);
+                        }
+                        else {
 
-                                    
-                                    responseMessage.error = {};
-                                    responseMessage.message = 'No Service details found';
-                                    console.log('FnGetReservationService: No Service details found');
-                                    res.json(responseMessage);
-                                }
-
-                            }
-                            else {
-                                
-                                responseMessage.data = null ;
-                                responseMessage.error = {};
-                                responseMessage.message = 'Error in getting Service details';
-                                console.log('FnGetReservationService: error in getting Service details' + err);
-                                res.status(500).json(responseMessage);
-                            }
-                        });
+                            responseMessage.error = {};
+                            responseMessage.message = 'No founded service details';
+                            console.log('FnGetReservationService: No founded Service details');
+                            res.json(responseMessage);
+                        }
                     }
+                    else {
+
+
+                        responseMessage.error = {};
+                        responseMessage.message = 'No Service details found';
+                        console.log('FnGetReservationService: No Service details found');
+                        res.json(responseMessage);
+                    }
+
+                }
+                else {
+
+                    responseMessage.data = null ;
+                    responseMessage.error = {};
+                    responseMessage.message = 'Error in getting Service details';
+                    console.log('FnGetReservationService: error in getting Service details' + err);
+                    res.status(500).json(responseMessage);
+                }
+            });
+        }
         else {
             if (!Token) {
-                responseMessage.message = 'Invalid ezeid';            
+                responseMessage.message = 'Invalid ezeid';
                 responseMessage.error = {
                     ezeid : 'Invalid ezeid'
                 };
                 console.log('FnGetReservationService: ezeid is mandatory field');
             }
-           
+
             res.status(401).json(responseMessage);
         }
     }
-     catch (ex) {
+    catch (ex) {
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
         console.log('FnGetReservationService:error ' + ex.description);
@@ -11068,62 +11136,62 @@ exports.FnGetReservResourceServiceMap = function (req, res) {
             error:{},
             Message:''
         };
-        
+
         if (ezeid) {
-           
-                        db.query('CALL pGetResResourceServiceMap(' + db.escape(ezeid) + ')', function (err, GetResult) {
-                            if (!err) {
-                                if (GetResult) {
-                                    if (GetResult[0].length > 0) {
-                                        responseMessage.status = true;
-                                        responseMessage.data = GetResult[0] ;
-                                        responseMessage.error = null;
-                                        responseMessage.message = 'ResourceServiceMap details Send successfully';
-                                        console.log('FnGetReservResourceServiceMap: ResourceServiceMap details Send successfully');
-                                        res.status(200).json(responseMessage);
-                                    }
-                                    else {
-                                        
-                                        responseMessage.error = {};
-                                        responseMessage.message = 'No founded ResourceServiceMap details';
-                                        console.log('FnGetReservResourceServiceMap: No founded ResourceServiceMap details');
-                                        res.json(responseMessage);
-                                    }
-                                }
-                                else {
 
-                                    
-                                    responseMessage.error = {};
-                                    responseMessage.message = 'No ResourceServiceMap details found';
-                                    console.log('FnGetReservResourceServiceMap: No ResourceServiceMap details found');
-                                    res.json(responseMessage);
-                                }
+            db.query('CALL pGetResResourceServiceMap(' + db.escape(ezeid) + ')', function (err, GetResult) {
+                if (!err) {
+                    if (GetResult) {
+                        if (GetResult[0].length > 0) {
+                            responseMessage.status = true;
+                            responseMessage.data = GetResult[0] ;
+                            responseMessage.error = null;
+                            responseMessage.message = 'ResourceServiceMap details Send successfully';
+                            console.log('FnGetReservResourceServiceMap: ResourceServiceMap details Send successfully');
+                            res.status(200).json(responseMessage);
+                        }
+                        else {
 
-                            }
-                            else {
-                                
-                                responseMessage.data = null ;
-                                responseMessage.error = {};
-                                responseMessage.message = 'Error in getting ResourceServiceMap details';
-                                console.log('FnGetReservResourceServiceMap: error in getting ResourceServiceMap details' + err);
-                                res.status(500).json(responseMessage);
-                            }
-                        });
-                    
+                            responseMessage.error = {};
+                            responseMessage.message = 'No founded ResourceServiceMap details';
+                            console.log('FnGetReservResourceServiceMap: No founded ResourceServiceMap details');
+                            res.json(responseMessage);
+                        }
+                    }
+                    else {
+
+
+                        responseMessage.error = {};
+                        responseMessage.message = 'No ResourceServiceMap details found';
+                        console.log('FnGetReservResourceServiceMap: No ResourceServiceMap details found');
+                        res.json(responseMessage);
+                    }
+
+                }
+                else {
+
+                    responseMessage.data = null ;
+                    responseMessage.error = {};
+                    responseMessage.message = 'Error in getting ResourceServiceMap details';
+                    console.log('FnGetReservResourceServiceMap: error in getting ResourceServiceMap details' + err);
+                    res.status(500).json(responseMessage);
+                }
+            });
+
         }
         else {
             if (!ezeid) {
-                responseMessage.message = 'Invalid ezeid';            
+                responseMessage.message = 'Invalid ezeid';
                 responseMessage.error = {
                     ezeid : 'Invalid ezeid'
                 };
                 console.log('FnGetReservResourceServiceMap: ezeid is mandatory field');
             }
-           
+
             res.status(401).json(responseMessage);
         }
     }
-     catch (ex) {
+    catch (ex) {
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
         console.log('FnGetReservResourceServiceMap:error ' + ex.description);
@@ -11141,15 +11209,15 @@ exports.FnSaveReservResourceServiceMap = function(req, res){
         var Token = req.body.Token ;
         var resourceid = req.body.resourceid;
         var serviceids = req.body.serviceids;
-        
+
         var ID=''
         if(serviceids){
             ID = serviceids + ',' + ID;
             serviceids =ID.slice(0,-1);
             console.log(serviceids);
-            }
+        }
         service_id = serviceids.concat(',');
-            console.log('service_ids Values:'+ service_id);
+        console.log('service_ids Values:'+ service_id);
         var responseMessage = {
             status: false,
             error:{},
@@ -11157,33 +11225,33 @@ exports.FnSaveReservResourceServiceMap = function(req, res){
             data: null
         };
         var validateStatus = true;
-        
+
         if(!resourceid){
             responseMessage.error['resourceid'] = 'Invalid Resourceid';
             validateStatus *= false;
         }
-        
+
         if(!serviceids){
             responseMessage.error['serviceids'] = 'Invalid Service_ids';
             validateStatus *= false;
         }
-        
-        
+
+
         if(!validateStatus){
             console.log('FnSaveReservResServiceMap  error : ' + JSON.stringify(responseMessage.error));
             responseMessage.message = 'Unable to save resource and service ! Please check the errors';
             res.status(200).json(responseMessage);
             return;
         }
-        
+
         if (Token) {
             FnValidateToken(Token, function (err, result) {
                 if (!err) {
                     if (result != null) {
                         var query = db.escape(resourceid) + ',' + db.escape(service_id);
                         db.query('CALL pSaveResResourceServiceMap(' + query + ')', function (err, insertResult) {
-                           
-                             if (!err){
+
+                            if (!err){
                                 if (insertResult) {
                                     responseMessage.status = true;
                                     responseMessage.error = null;
@@ -11194,7 +11262,7 @@ exports.FnSaveReservResourceServiceMap = function(req, res){
                                     };
                                     res.status(200).json(responseMessage);
                                     console.log('FnSaveReservResServiceMap: ResourceService Map details save successfully');
-                                    
+
                                 }
                                 else {
                                     responseMessage.message = 'An error occured ! Please try again';
@@ -11213,16 +11281,16 @@ exports.FnSaveReservResourceServiceMap = function(req, res){
                         });
                     }
                     else {
-                        responseMessage.message = 'Invalid token'; 
-                        responseMessage.error = {}; 
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {};
                         responseMessage.data = null;
                         res.status(401).json(responseMessage);
                         console.log('FnSaveReservResServiceMap: Invalid token');
-                                            }
+                    }
                 }
                 else {
                     responseMessage.error= {};
-                    responseMessage.message = 'Error in validating Token'; 
+                    responseMessage.message = 'Error in validating Token';
                     res.status(500).json(responseMessage);
                     console.log('FnSaveReservResServiceMap:Error in processing Token' + err);
                 }
@@ -11231,13 +11299,13 @@ exports.FnSaveReservResourceServiceMap = function(req, res){
         }
 
         else {
-            if (!Token) 
-            {  
-                responseMessage.message = 'Invalid Token';            
+            if (!Token)
+            {
+                responseMessage.message = 'Invalid Token';
                 responseMessage.error = {Token : 'Invalid Token'};
                 console.log('FnSaveReservResServiceMap: Token is mandatory field');
             }
-            
+
             res.status(401).json(responseMessage);
         }
 
@@ -11357,16 +11425,16 @@ exports.FnSaveReservTransaction = function(req, res){
         var duration = req.body.duration;
         var status = req.body.status;
         var serviceid = req.body.serviceid;
-		
-		var ID=''
+
+        var ID=''
         if(serviceid){
             ID = serviceid + ',' + ID;
             serviceid =ID.slice(0,-1);
             console.log(serviceid);
-            }
-        
-		
-        
+        }
+
+
+
         var responseMessage = {
             status: false,
             error:{},
@@ -11374,43 +11442,43 @@ exports.FnSaveReservTransaction = function(req, res){
             data: null
         };
         var validateStatus = true;
-        
+
         if(!toEzeid){
             responseMessage.error['toEzeid'] = 'Invalid toEzeid';
             validateStatus *= false;
         }
-        
+
         if(!resourceid){
             responseMessage.error['resourceid'] = 'Invalid Resourceid';
             validateStatus *= false;
         }
-        
+
         if(!serviceid){
             responseMessage.error['serviceid'] = 'Invalid Service_ids';
             validateStatus *= false;
         }
-        
-        
+
+
         if(!validateStatus){
             console.log('FnSaveReservTransaction  error : ' + JSON.stringify(responseMessage.error));
             responseMessage.message = 'Unable to save resource transaction ! Please check the errors';
             res.status(200).json(responseMessage);
             return;
         }
-        
+
         if (Token) {
             FnValidateToken(Token, function (err, result) {
                 if (!err) {
                     if (result != null) {
 
                         var query = db.escape(TID) + ',' + db.escape(Token) + ',' + db.escape(contactinfo) + ',' + db.escape(toEzeid) + ',' + db.escape(resourceid) + ',' + db.escape(res_datetime) + ',' + db.escape(duration) + ',' + db.escape(status) + ',' + db.escape(serviceid);
-						console.log(query);
-						console.log('CALL pSaveResTrans(' + query + ')');
-						
+                        console.log(query);
+                        console.log('CALL pSaveResTrans(' + query + ')');
+
                         db.query('CALL pSaveResTrans(' + query + ')', function (err, insertResult) {
                             console.log(insertResult);
                             console.log(err);
-                             if (!err){
+                            if (!err){
                                 if (insertResult.affectedRows > 0) {
                                     responseMessage.status = true;
                                     responseMessage.error = null;
@@ -11421,7 +11489,7 @@ exports.FnSaveReservTransaction = function(req, res){
                                     };
                                     res.status(200).json(responseMessage);
                                     console.log('FnSaveReservTransaction: Resource Transaction details save successfully');
-                                    
+
                                 }
                                 else {
                                     responseMessage.message = insertResult[0][0];
@@ -11440,16 +11508,16 @@ exports.FnSaveReservTransaction = function(req, res){
                         });
                     }
                     else {
-                        responseMessage.message = 'Invalid token'; 
-                        responseMessage.error = {}; 
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {};
                         responseMessage.data = null;
                         res.status(401).json(responseMessage);
                         console.log('FnSaveReservTransaction: Invalid token');
-                                            }
+                    }
                 }
                 else {
                     responseMessage.error= {};
-                    responseMessage.message = 'Error in validating Token'; 
+                    responseMessage.message = 'Error in validating Token';
                     res.status(500).json(responseMessage);
                     console.log('FnSaveReservTransaction:Error in processing Token' + err);
                 }
@@ -11458,13 +11526,13 @@ exports.FnSaveReservTransaction = function(req, res){
         }
 
         else {
-            if (!Token) 
-            {  
-                responseMessage.message = 'Invalid Token';            
+            if (!Token)
+            {
+                responseMessage.message = 'Invalid Token';
                 responseMessage.error = {Token : 'Invalid Token'};
                 console.log('FnSaveReservTransaction: Token is mandatory field');
             }
-            
+
             res.status(401).json(responseMessage);
         }
 
@@ -11480,7 +11548,7 @@ exports.FnSaveReservTransaction = function(req, res){
 
 //method to get reservation maped services
 exports.FnGetMapedServices = function (req, res) {
-    
+
     try {
 
         res.setHeader("Access-Control-Allow-Origin", "*");
@@ -11495,61 +11563,61 @@ exports.FnGetMapedServices = function (req, res) {
             error:{},
             message:''
         };
-        
+
         if (ezeid) {
             db.query('CALL pgetMapedservices(' + db.escape(ezeid) + ',' + db.escape(resourceid) + ')', function (err, GetResult) {
-                            if (!err) {
-                                if (GetResult) {
-                                    if (GetResult[0].length > 0) {
-                                        responseMessage.status = true;
-                                        responseMessage.data = GetResult[0] ;
-                                        responseMessage.error = null;
-                                        responseMessage.message = 'service Maped details Send successfully';
-                                        console.log('FnGetMapedServices: service Maped details Send successfully');
-                                        res.status(200).json(responseMessage);
-                                    }
-                                    else {
-                                        
-                                        responseMessage.error = {};
-                                        responseMessage.message = 'No founded service Maped details';
-                                        console.log('FnGetMapedServices: No founded service Maped details');
-                                        res.json(responseMessage);
-                                    }
-                                }
-                                else {
+                if (!err) {
+                    if (GetResult) {
+                        if (GetResult[0].length > 0) {
+                            responseMessage.status = true;
+                            responseMessage.data = GetResult[0] ;
+                            responseMessage.error = null;
+                            responseMessage.message = 'service Maped details Send successfully';
+                            console.log('FnGetMapedServices: service Maped details Send successfully');
+                            res.status(200).json(responseMessage);
+                        }
+                        else {
 
-                                    
-                                    responseMessage.error = {};
-                                    responseMessage.message = 'No founded service Maped details';
-                                    console.log('FnGetMapedServices: No founded service Maped details');
-                                    res.json(responseMessage);
-                                }
+                            responseMessage.error = {};
+                            responseMessage.message = 'No founded service Maped details';
+                            console.log('FnGetMapedServices: No founded service Maped details');
+                            res.json(responseMessage);
+                        }
+                    }
+                    else {
 
-                            }
-                            else {
-                                
-                                responseMessage.data = null ;
-                                responseMessage.error = {};
-                                responseMessage.message = 'Error in getting service Maped details';
-                                console.log('FnGetMapedServices: error in getting service Maped details' + err);
-                                res.status(500).json(responseMessage);
-                            }
-                        });
-                    
+
+                        responseMessage.error = {};
+                        responseMessage.message = 'No founded service Maped details';
+                        console.log('FnGetMapedServices: No founded service Maped details');
+                        res.json(responseMessage);
+                    }
+
+                }
+                else {
+
+                    responseMessage.data = null ;
+                    responseMessage.error = {};
+                    responseMessage.message = 'Error in getting service Maped details';
+                    console.log('FnGetMapedServices: error in getting service Maped details' + err);
+                    res.status(500).json(responseMessage);
+                }
+            });
+
         }
         else {
             if (!ezeid) {
-                responseMessage.message = 'Invalid ezeid';            
+                responseMessage.message = 'Invalid ezeid';
                 responseMessage.error = {
                     ezeid : 'Invalid ezeid'
                 };
                 console.log('FnGetMapedServices: ezeid is mandatory field');
             }
-           
+
             res.status(401).json(responseMessage);
         }
     }
-     catch (ex) {
+    catch (ex) {
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
         console.log('FnGetReservTransaction:error ' + ex.description);
@@ -11560,7 +11628,7 @@ exports.FnGetMapedServices = function (req, res) {
 
 //method to get reservation task
 exports.FnGetReservTask = function (req, res) {
-    
+
     try {
 
         res.setHeader("Access-Control-Allow-Origin", "*");
@@ -11569,69 +11637,69 @@ exports.FnGetReservTask = function (req, res) {
         var resourceid = req.query.resourceid;
         var date = new Date(req.query.date);
         var toEzeid = req.query.toEzeid;
-        
+
         var responseMessage = {
             status: false,
             data: null,
             error:{},
             message:''
         };
-        
+
         if (resourceid) {
-            
+
             db.query('CALL pGetResTrans(' + db.escape(resourceid) + ',' + db.escape(date) + ',' + db.escape(toEzeid) + ')', function (err, GetResult) {
-                            if (!err) {
-                                if (GetResult) {
-                                    if (GetResult[0].length > 0) {
-                                        responseMessage.status = true;
-                                        responseMessage.data = GetResult[0] ;
-                                        responseMessage.error = null;
-                                        responseMessage.message = 'Reservation Task details Send successfully';
-                                        console.log('FnGetReservTask: Reservation Task details Send successfully');
-                                        res.status(200).json(responseMessage);
-                                    }
-                                    else {
-                                        
-                                        responseMessage.error = {};
-                                        responseMessage.message = 'No founded Reservation Task details';
-                                        console.log('FnGetReservTask: No founded Reservation Task details');
-                                        res.json(responseMessage);
-                                    }
-                                }
-                                else {
+                if (!err) {
+                    if (GetResult) {
+                        if (GetResult[0].length > 0) {
+                            responseMessage.status = true;
+                            responseMessage.data = GetResult[0] ;
+                            responseMessage.error = null;
+                            responseMessage.message = 'Reservation Task details Send successfully';
+                            console.log('FnGetReservTask: Reservation Task details Send successfully');
+                            res.status(200).json(responseMessage);
+                        }
+                        else {
 
-                                    
-                                    responseMessage.error = {};
-                                    responseMessage.message = 'No founded Reservation Task details';
-                                    console.log('FnGetReservTask: No founded Reservation Task details');
-                                    res.json(responseMessage);
-                                }
-
-                            }
-                            else {
-                                
-                                responseMessage.data = null ;
-                                responseMessage.error = {};
-                                responseMessage.message = 'Error in getting Reservation Task details';
-                                console.log('FnGetReservTask: error in getting Reservation Task details' + err);
-                                res.status(500).json(responseMessage);
-                            }
-                        });
+                            responseMessage.error = {};
+                            responseMessage.message = 'No founded Reservation Task details';
+                            console.log('FnGetReservTask: No founded Reservation Task details');
+                            res.json(responseMessage);
+                        }
                     }
-                    
+                    else {
+
+
+                        responseMessage.error = {};
+                        responseMessage.message = 'No founded Reservation Task details';
+                        console.log('FnGetReservTask: No founded Reservation Task details');
+                        res.json(responseMessage);
+                    }
+
+                }
+                else {
+
+                    responseMessage.data = null ;
+                    responseMessage.error = {};
+                    responseMessage.message = 'Error in getting Reservation Task details';
+                    console.log('FnGetReservTask: error in getting Reservation Task details' + err);
+                    res.status(500).json(responseMessage);
+                }
+            });
+        }
+
         else {
             if (!resourceid) {
-                responseMessage.message = 'Invalid resourceid';            
+                responseMessage.message = 'Invalid resourceid';
                 responseMessage.error = {
                     resourceid : 'Invalid resourceid'
                 };
                 console.log('FnGetReservTask: resourceid is mandatory field');
             }
-           
+
             res.status(401).json(responseMessage);
         }
     }
-     catch (ex) {
+    catch (ex) {
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
         console.log('FnGetReservTask:error ' + ex.description);
@@ -11642,7 +11710,7 @@ exports.FnGetReservTask = function (req, res) {
 
 //method to get trans details
 exports.FnGetResTransDetails = function (req, res) {
-    
+
     try {
 
         res.setHeader("Access-Control-Allow-Origin", "*");
@@ -11656,62 +11724,62 @@ exports.FnGetResTransDetails = function (req, res) {
             error:{},
             message:''
         };
-        
+
         if (TID) {
-            
+
             db.query('CALL pGetResTransDetails(' + db.escape(TID) + ')', function (err, GetResult) {
-                            if (!err) {
-                                if (GetResult) {
-                                    if (GetResult[0].length > 0) {
-                                        responseMessage.status = true;
-                                        responseMessage.data = GetResult[0] ;
-                                        responseMessage.error = null;
-                                        responseMessage.message = 'Reservation Trans details Send successfully';
-                                        console.log('FnGetResTransDetails: Reservation Trans details Send successfully');
-                                        res.status(200).json(responseMessage);
-                                    }
-                                    else {
-                                        
-                                        responseMessage.error = {};
-                                        responseMessage.message = 'No founded Reservation Trans details';
-                                        console.log('FnGetResTransDetails: No founded Reservation Trans details');
-                                        res.json(responseMessage);
-                                    }
-                                }
-                                else {
+                if (!err) {
+                    if (GetResult) {
+                        if (GetResult[0].length > 0) {
+                            responseMessage.status = true;
+                            responseMessage.data = GetResult[0] ;
+                            responseMessage.error = null;
+                            responseMessage.message = 'Reservation Trans details Send successfully';
+                            console.log('FnGetResTransDetails: Reservation Trans details Send successfully');
+                            res.status(200).json(responseMessage);
+                        }
+                        else {
 
-                                    
-                                    responseMessage.error = {};
-                                    responseMessage.message = 'No founded Reservation Trans details';
-                                    console.log('FnGetResTransDetails: No founded Reservation Trans details');
-                                    res.json(responseMessage);
-                                }
-
-                            }
-                            else {
-                                
-                                responseMessage.data = null ;
-                                responseMessage.error = {};
-                                responseMessage.message = 'Error in getting Reservation Task details';
-                                console.log('FnGetResTransDetails: error in getting Reservation Task details' + err);
-                                res.status(500).json(responseMessage);
-                            }
-                        });
+                            responseMessage.error = {};
+                            responseMessage.message = 'No founded Reservation Trans details';
+                            console.log('FnGetResTransDetails: No founded Reservation Trans details');
+                            res.json(responseMessage);
+                        }
                     }
-                    
+                    else {
+
+
+                        responseMessage.error = {};
+                        responseMessage.message = 'No founded Reservation Trans details';
+                        console.log('FnGetResTransDetails: No founded Reservation Trans details');
+                        res.json(responseMessage);
+                    }
+
+                }
+                else {
+
+                    responseMessage.data = null ;
+                    responseMessage.error = {};
+                    responseMessage.message = 'Error in getting Reservation Task details';
+                    console.log('FnGetResTransDetails: error in getting Reservation Task details' + err);
+                    res.status(500).json(responseMessage);
+                }
+            });
+        }
+
         else {
             if (!TID) {
-                responseMessage.message = 'Invalid TID';            
+                responseMessage.message = 'Invalid TID';
                 responseMessage.error = {
                     resourceid : 'Invalid TID'
                 };
                 console.log('FnGetResTransDetails: TID is mandatory field');
             }
-           
+
             res.status(401).json(responseMessage);
         }
     }
-     catch (ex) {
+    catch (ex) {
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
         console.log('FnGetResTransDetails:error ' + ex.description);
@@ -11804,7 +11872,7 @@ exports.FnChangeReservationStatus = function(req,res){
                     responseMsg.error['server'] = 'Internal Server Error';
                     res.status(400).json(responseMsg);
                     console.log('FnChangeReservationStatus: An error occurred ! Please try again');
-                    
+
                 }
                 else{
                     if(updateRes.affectedRows > 0){
@@ -11838,7 +11906,7 @@ exports.FnChangeReservationStatus = function(req,res){
 };
 
 exports.FnGetTransAutoComplete = function (req, res) {
-    
+
     try {
 
         res.setHeader("Access-Control-Allow-Origin", "*");
@@ -11853,62 +11921,62 @@ exports.FnGetTransAutoComplete = function (req, res) {
             error:{},
             message:''
         };
-        
+
         if (title) {
-            
+
             db.query('CALL PgetTransAutocomplete(' + db.escape(title) + ',' + db.escape(type) + ')', function (err, GetResult) {
-                            if (!err) {
-                                if (GetResult) {
-                                    if (GetResult[0].length > 0) {
-                                        responseMessage.status = true;
-                                        responseMessage.data = GetResult[0] ;
-                                        responseMessage.error = null;
-                                        responseMessage.message = 'Transaction details Send successfully';
-                                        console.log('FnGetTransAutoComplete: Transaction details Send successfully');
-                                        res.status(200).json(responseMessage);
-                                    }
-                                    else {
-                                        
-                                        responseMessage.error = {};
-                                        responseMessage.message = 'No founded Transaction details';
-                                        console.log('FnGetTransAutoComplete: No founded Transaction details');
-                                        res.json(responseMessage);
-                                    }
-                                }
-                                else {
+                if (!err) {
+                    if (GetResult) {
+                        if (GetResult[0].length > 0) {
+                            responseMessage.status = true;
+                            responseMessage.data = GetResult[0] ;
+                            responseMessage.error = null;
+                            responseMessage.message = 'Transaction details Send successfully';
+                            console.log('FnGetTransAutoComplete: Transaction details Send successfully');
+                            res.status(200).json(responseMessage);
+                        }
+                        else {
 
-                                    
-                                    responseMessage.error = {};
-                                    responseMessage.message = 'No founded Transaction details';
-                                    console.log('FnGetTransAutoComplete: No founded Transaction details');
-                                    res.json(responseMessage);
-                                }
-
-                            }
-                            else {
-                                
-                                responseMessage.data = null ;
-                                responseMessage.error = {};
-                                responseMessage.message = 'Error in getting Transaction details';
-                                console.log('FnGetTransAutoComplete: error in getting Transaction details' + err);
-                                res.status(500).json(responseMessage);
-                            }
-                        });
+                            responseMessage.error = {};
+                            responseMessage.message = 'No founded Transaction details';
+                            console.log('FnGetTransAutoComplete: No founded Transaction details');
+                            res.json(responseMessage);
+                        }
                     }
-                    
+                    else {
+
+
+                        responseMessage.error = {};
+                        responseMessage.message = 'No founded Transaction details';
+                        console.log('FnGetTransAutoComplete: No founded Transaction details');
+                        res.json(responseMessage);
+                    }
+
+                }
+                else {
+
+                    responseMessage.data = null ;
+                    responseMessage.error = {};
+                    responseMessage.message = 'Error in getting Transaction details';
+                    console.log('FnGetTransAutoComplete: error in getting Transaction details' + err);
+                    res.status(500).json(responseMessage);
+                }
+            });
+        }
+
         else {
             if (!title) {
-                responseMessage.message = 'Invalid title';            
+                responseMessage.message = 'Invalid title';
                 responseMessage.error = {
                     title : 'Invalid title'
                 };
                 console.log('FnGetTransAutoComplete: title is mandatory field');
             }
-           
+
             res.status(401).json(responseMessage);
         }
     }
-     catch (ex) {
+    catch (ex) {
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
         console.log('FnGetTransAutoComplete:error ' + ex.description);
@@ -11918,7 +11986,7 @@ exports.FnGetTransAutoComplete = function (req, res) {
 };
 
 exports.FnGetCompanyDetails = function (req, res) {
-    
+
     try {
 
         res.setHeader("Access-Control-Allow-Origin", "*");
@@ -11932,62 +12000,62 @@ exports.FnGetCompanyDetails = function (req, res) {
             error:{},
             message:''
         };
-        
+
         if (Token) {
-            
+
             db.query('CALL pGetCompanyDetails(' + db.escape(Token) + ',' + db.escape(functiontype) + ')', function (err, GetResult) {
-                            if (!err) {
-                                if (GetResult) {
-                                    if (GetResult[0].length > 0) {
-                                        responseMessage.status = true;
-                                        responseMessage.data = GetResult[0] ;
-                                        responseMessage.error = null;
-                                        responseMessage.message = 'Company details Send successfully';
-                                        console.log('FnGetCompanyDetails: Company details Send successfully');
-                                        res.status(200).json(responseMessage);
-                                    }
-                                    else {
-                                        
-                                        responseMessage.error = {};
-                                        responseMessage.message = 'No founded Company details';
-                                        console.log('FnGetCompanyDetails: No founded Company details');
-                                        res.json(responseMessage);
-                                    }
-                                }
-                                else {
+                if (!err) {
+                    if (GetResult) {
+                        if (GetResult[0].length > 0) {
+                            responseMessage.status = true;
+                            responseMessage.data = GetResult[0] ;
+                            responseMessage.error = null;
+                            responseMessage.message = 'Company details Send successfully';
+                            console.log('FnGetCompanyDetails: Company details Send successfully');
+                            res.status(200).json(responseMessage);
+                        }
+                        else {
 
-                                    
-                                    responseMessage.error = {};
-                                    responseMessage.message = 'No founded Company details';
-                                    console.log('FnGetCompanyDetails: No founded Company details');
-                                    res.json(responseMessage);
-                                }
-
-                            }
-                            else {
-                                
-                                responseMessage.data = null ;
-                                responseMessage.error = {};
-                                responseMessage.message = 'Error in getting Company details';
-                                console.log('FnGetCompanyDetails: error in getting Company details' + err);
-                                res.status(500).json(responseMessage);
-                            }
-                        });
+                            responseMessage.error = {};
+                            responseMessage.message = 'No founded Company details';
+                            console.log('FnGetCompanyDetails: No founded Company details');
+                            res.json(responseMessage);
+                        }
                     }
-                    
+                    else {
+
+
+                        responseMessage.error = {};
+                        responseMessage.message = 'No founded Company details';
+                        console.log('FnGetCompanyDetails: No founded Company details');
+                        res.json(responseMessage);
+                    }
+
+                }
+                else {
+
+                    responseMessage.data = null ;
+                    responseMessage.error = {};
+                    responseMessage.message = 'Error in getting Company details';
+                    console.log('FnGetCompanyDetails: error in getting Company details' + err);
+                    res.status(500).json(responseMessage);
+                }
+            });
+        }
+
         else {
             if (!Token) {
-                responseMessage.message = 'Invalid Token';            
+                responseMessage.message = 'Invalid Token';
                 responseMessage.error = {
                     Token : 'Invalid Token'
                 };
                 console.log('FnGetCompanyDetails: Token is mandatory field');
             }
-           
+
             res.status(401).json(responseMessage);
         }
     }
-     catch (ex) {
+    catch (ex) {
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
         console.log('FnGetCompanyDetails:error ' + ex.description);
@@ -11997,7 +12065,7 @@ exports.FnGetCompanyDetails = function (req, res) {
 };
 
 exports.FnGetOutboxMessages = function (req, res) {
-    
+
     try {
 
         res.setHeader("Access-Control-Allow-Origin", "*");
@@ -12006,14 +12074,14 @@ exports.FnGetOutboxMessages = function (req, res) {
         var Token = req.query.Token;
         var pagesize = req.query.pagesize;
         var pagecount = req.query.pagecount;
-        
+
         var responseMessage = {
             status: false,
             data: null,
             error:{},
             message:''
         };
-        
+
         if (Token) {
             FnValidateToken(Token, function (err, result) {
                 if (!err) {
@@ -12030,7 +12098,7 @@ exports.FnGetOutboxMessages = function (req, res) {
                                         res.status(200).json(responseMessage);
                                     }
                                     else {
-                                        
+
                                         responseMessage.error = {};
                                         responseMessage.message = 'No founded Company details';
                                         console.log('FnGetOutboxMessages: No founded Company details');
@@ -12039,7 +12107,7 @@ exports.FnGetOutboxMessages = function (req, res) {
                                 }
                                 else {
 
-                                    
+
                                     responseMessage.error = {};
                                     responseMessage.message = 'No founded Company details';
                                     console.log('FnGetOutboxMessages: No founded Company details');
@@ -12048,7 +12116,7 @@ exports.FnGetOutboxMessages = function (req, res) {
 
                             }
                             else {
-                                
+
                                 responseMessage.data = null ;
                                 responseMessage.error = {};
                                 responseMessage.message = 'Error in getting Company details';
@@ -12058,16 +12126,16 @@ exports.FnGetOutboxMessages = function (req, res) {
                         });
                     }
                     else {
-                        responseMessage.message = 'Invalid token'; 
-                        responseMessage.error = {}; 
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {};
                         responseMessage.data = null;
                         res.status(401).json(responseMessage);
                         console.log('FnGetOutboxMessages: Invalid token');
-                                            }
+                    }
                 }
                 else {
                     responseMessage.error= {};
-                    responseMessage.message = 'Error in validating Token'; 
+                    responseMessage.message = 'Error in validating Token';
                     res.status(500).json(responseMessage);
                     console.log('FnGetOutboxMessages:Error in processing Token' + err);
                 }
@@ -12075,17 +12143,17 @@ exports.FnGetOutboxMessages = function (req, res) {
         }
         else {
             if (!ezeid) {
-                responseMessage.message = 'Invalid ezeid';            
+                responseMessage.message = 'Invalid ezeid';
                 responseMessage.error = {
                     ezeid : 'Invalid ezeid'
                 };
                 console.log('FnGetCompanyDetails: ezeid is mandatory field');
             }
-           
+
             res.status(401).json(responseMessage);
         }
     }
-     catch (ex) {
+    catch (ex) {
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
         console.log('FnGetOutboxMessages:error ' + ex.description);
@@ -12095,77 +12163,77 @@ exports.FnGetOutboxMessages = function (req, res) {
 };
 
 exports.FnGetworkinghoursList = function (req, res) {
-    
+
     try {
 
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
         var Token = req.query.Token;
-        
+
         var responseMessage = {
             status: false,
             data: null,
             error:{},
             message:''
         };
-        
+
         if (Token) {
-            
+
             db.query('CALL PGetworkinghoursList(' + db.escape(Token) + ')', function (err, GetResult) {
                 console.log(GetResult)
-                            if (!err) {
-                                if (GetResult) {
-                                    if (GetResult[0].length > 0) {
-                                        responseMessage.status = true;
-                                        responseMessage.data = GetResult[0] ;
-                                        responseMessage.error = null;
-                                        responseMessage.message = ' Working hours list Send successfully';
-                                        console.log('FnGetworkinghoursList:Working hours list Send successfully');
-                                        res.status(200).json(responseMessage);
-                                    }
-                                    else {
-                                        
-                                        responseMessage.error = {};
-                                        responseMessage.message = 'No founded Working hours list';
-                                        console.log('FnGetworkinghoursList: No founded Working hours list');
-                                        res.json(responseMessage);
-                                    }
-                                }
-                                else {
+                if (!err) {
+                    if (GetResult) {
+                        if (GetResult[0].length > 0) {
+                            responseMessage.status = true;
+                            responseMessage.data = GetResult[0] ;
+                            responseMessage.error = null;
+                            responseMessage.message = ' Working hours list Send successfully';
+                            console.log('FnGetworkinghoursList:Working hours list Send successfully');
+                            res.status(200).json(responseMessage);
+                        }
+                        else {
 
-                                    
-                                    responseMessage.error = {};
-                                    responseMessage.message = 'No founded Working hours list';
-                                    console.log('FnGetworkinghoursList: No founded Working hours list');
-                                    res.json(responseMessage);
-                                }
-
-                            }
-                            else {
-                                
-                                responseMessage.data = null ;
-                                responseMessage.error = {};
-                                responseMessage.message = 'Error in getting Working hours list';
-                                console.log('FnGetworkinghoursList: error in getting Working hours list' + err);
-                                res.status(500).json(responseMessage);
-                            }
-                        });
+                            responseMessage.error = {};
+                            responseMessage.message = 'No founded Working hours list';
+                            console.log('FnGetworkinghoursList: No founded Working hours list');
+                            res.json(responseMessage);
+                        }
                     }
-                    
+                    else {
+
+
+                        responseMessage.error = {};
+                        responseMessage.message = 'No founded Working hours list';
+                        console.log('FnGetworkinghoursList: No founded Working hours list');
+                        res.json(responseMessage);
+                    }
+
+                }
+                else {
+
+                    responseMessage.data = null ;
+                    responseMessage.error = {};
+                    responseMessage.message = 'Error in getting Working hours list';
+                    console.log('FnGetworkinghoursList: error in getting Working hours list' + err);
+                    res.status(500).json(responseMessage);
+                }
+            });
+        }
+
         else {
             if (!Token) {
-                responseMessage.message = 'Invalid Token';            
+                responseMessage.message = 'Invalid Token';
                 responseMessage.error = {
                     Token : 'Invalid Token'
                 };
                 console.log('FnGetworkinghoursList: Token is mandatory field');
             }
-           
+
             res.status(401).json(responseMessage);
         }
     }
-     catch (ex) {
+    catch (ex) {
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
         console.log('FnGetworkinghoursList:error ' + ex.description);
@@ -12353,36 +12421,36 @@ exports.FnGetUserDetailsAP = function (req, res) {
             FnValidateTokenAP(TokenNo, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
-            //var Query = 'Select a.TID as MasterID, b.TID as LocationID,IDTypeID,a.EZEID,ifnull(EZEIDVerifiedID,0) as EZEIDVerifiedID,ifnull(EZEIDVerifiedByID,0) EZEIDVerifiedByID,ifnull(StatusID,0) as StatusID,FirstName,ifnull(LastName,"") as LastName,ifnull(CompanyName,"") as CompanyName,ifnull(CategoryID,0) as CategoryID,ifnull(FunctionID,0) as FunctionID,ifnull(RoleID,0) as RoleID,ifnull(JobTitle,"") as JobTitle,ifnull(NameTitleID,0) as NameTitleID,ifnull(AboutCompany,"") as AboutCompany,ifnull(LanguageID,1) as LanguageID,ifnull(Keywords,"") as Keywords,ifnull(LocTitle,"") as LocTitle,Latitude,Longitude,Altitude,ifnull(AddressLine1,"") as AddressLine1,ifnull(AddressLine2,"") as AddressLine2,CityID,StateID,CountryID,ifnull(PostalCode,"") as PostalCode,b.PIN,ifnull(EMailID,"") as EMailID,ifnull(EMailVerifiedID,"") as EMailVerifiedID,ifnull(PhoneNumber,"") as PhoneNumber, ifnull(MobileNumber,"") as MobileNumber,ifnull(LaptopSLNO,"") as LaptopSLNO,ifnull(VehicleNumber,"") as VehicleNumber,ifnull(Website,"") as Website,ifnull(Picture,"") as Picture,ifnull(PictureFileName,"") as PictureFileName ,ifnull((Select CityName from mcity where CityID=b.CityID and LangID=a.LanguageID),"") as CityTitle,ifnull((Select CountryName from mcountry where CountryID=b.CountryID and LangID=a.LanguageID),"") as CountryTitle,ifnull((Select StateName from mstate where StateID=b.StateID and LangID=a.LanguageID),"") as StateTitle,ifnull(d.ParkingStatus,1) as ParkingStatus,ifnull(d.OpenStatus,1) as OpenStatus,ifnull(d.WorkingHours,"") as WorkingHours,ifnull(d.SalesEnquiryButton,1) as SalesEnquiryButton ,ifnull(d.SalesEnquiryMailID,"") as SalesEnquiryMailID,ifnull(d.HomeDeliveryButton,1) as HomeDeliveryButton,ifnull(d.HomeDeliveryMailID,"") as HomeDeliveryMailID,ifnull(d.ReservationButton,1) as ReservationButton,ifnull(d.ReservationMailID,"") as ReservationMailID,ifnull(d.SupportButton,1) as SupportButton,ifnull(d.SupportMailID,"") as SupportMailID,ifnull(d.CVButton,1) as CVButton,ifnull(d.CVMailID,"") as CVMailID,ifnull((Select CategoryTitle from mcategory where CategoryID=a.CategoryID and LangID=a.LanguageID),"") as CategoryTitle, ifnull(a.Icon,"") as Icon, ifnull(a.IconFileName,"") as IconFileName  from tlocations b left outer Join tlcoationsettings d On b.TID=d.LocID,tmaster a left outer Join tDocs c On a.TID=c.MasterID where b.EZEID=a.EZEID and b.SeqNo=0  and a.EZEID= ' + db.escape(EZEID);
-             //   var Query ='Select a.TID as MasterID, b.TID as LocationID,IDTypeID,a.EZEID,ifnull(EZEIDVerifiedID,0) as EZEIDVerifiedID,ifnull(EZEIDVerifiedByID,0) EZEIDVerifiedByID,ifnull(StatusID,0) as StatusID,FirstName,ifnull(LastName,"") as LastName,ifnull(CategoryID,0) as CategoryID,ifnull(LanguageID,1) as LanguageID,ifnull(Keywords,"") as Keywords,ifnull(LocTitle,"") as LocTitle,Latitude,Longitude,Altitude,ifnull(Picture,"") as Picture,ifnull(PictureFileName,"") as PictureFileName, ifnull(a.Icon,"") as Icon, ifnull(a.IconFileName,"") as IconFileName,ifnull(doc.BRDocFilename,"") as BRDocFilename, ifnull(doc.BRDoc,"") as BRDoc,ifnull(doc.BRContentType,"") as BRContentType,b.Rating,ifnull(a.BusinessSize,0) as Size  from tmaster a left outer join tlocations b on a.TID = b.MasterID left outer Join tDocs c On a.TID=c.MasterID left outer join tdocs doc on a.TID= doc.MasterID where b.SeqNo=0  and a.EZEID=' + db.escape(EZEID);
-            db.query('Call pgetUserProfileAP('+db.escape(EZEID)+')', function (err, UserDetailsResult) {
-                if (!err) {
-                    if (UserDetailsResult != null) {
-                        if (UserDetailsResult[0].length > 0) {
-                            //console.log('FnGetUserDetails: Token: ' + Token);
-                            console.log('FnGetUserDetailsAP : pgetUserProfileAP: User details sent successfully');
-                          //  console.log(UserDetailsResult);
-                            res.send(UserDetailsResult[0]);
-                        }
-                        else {
-                            res.json(null);
-                            console.log('FnGetUserDetailsAP : tmaster: No User details found');
-                        }
+                        //var Query = 'Select a.TID as MasterID, b.TID as LocationID,IDTypeID,a.EZEID,ifnull(EZEIDVerifiedID,0) as EZEIDVerifiedID,ifnull(EZEIDVerifiedByID,0) EZEIDVerifiedByID,ifnull(StatusID,0) as StatusID,FirstName,ifnull(LastName,"") as LastName,ifnull(CompanyName,"") as CompanyName,ifnull(CategoryID,0) as CategoryID,ifnull(FunctionID,0) as FunctionID,ifnull(RoleID,0) as RoleID,ifnull(JobTitle,"") as JobTitle,ifnull(NameTitleID,0) as NameTitleID,ifnull(AboutCompany,"") as AboutCompany,ifnull(LanguageID,1) as LanguageID,ifnull(Keywords,"") as Keywords,ifnull(LocTitle,"") as LocTitle,Latitude,Longitude,Altitude,ifnull(AddressLine1,"") as AddressLine1,ifnull(AddressLine2,"") as AddressLine2,CityID,StateID,CountryID,ifnull(PostalCode,"") as PostalCode,b.PIN,ifnull(EMailID,"") as EMailID,ifnull(EMailVerifiedID,"") as EMailVerifiedID,ifnull(PhoneNumber,"") as PhoneNumber, ifnull(MobileNumber,"") as MobileNumber,ifnull(LaptopSLNO,"") as LaptopSLNO,ifnull(VehicleNumber,"") as VehicleNumber,ifnull(Website,"") as Website,ifnull(Picture,"") as Picture,ifnull(PictureFileName,"") as PictureFileName ,ifnull((Select CityName from mcity where CityID=b.CityID and LangID=a.LanguageID),"") as CityTitle,ifnull((Select CountryName from mcountry where CountryID=b.CountryID and LangID=a.LanguageID),"") as CountryTitle,ifnull((Select StateName from mstate where StateID=b.StateID and LangID=a.LanguageID),"") as StateTitle,ifnull(d.ParkingStatus,1) as ParkingStatus,ifnull(d.OpenStatus,1) as OpenStatus,ifnull(d.WorkingHours,"") as WorkingHours,ifnull(d.SalesEnquiryButton,1) as SalesEnquiryButton ,ifnull(d.SalesEnquiryMailID,"") as SalesEnquiryMailID,ifnull(d.HomeDeliveryButton,1) as HomeDeliveryButton,ifnull(d.HomeDeliveryMailID,"") as HomeDeliveryMailID,ifnull(d.ReservationButton,1) as ReservationButton,ifnull(d.ReservationMailID,"") as ReservationMailID,ifnull(d.SupportButton,1) as SupportButton,ifnull(d.SupportMailID,"") as SupportMailID,ifnull(d.CVButton,1) as CVButton,ifnull(d.CVMailID,"") as CVMailID,ifnull((Select CategoryTitle from mcategory where CategoryID=a.CategoryID and LangID=a.LanguageID),"") as CategoryTitle, ifnull(a.Icon,"") as Icon, ifnull(a.IconFileName,"") as IconFileName  from tlocations b left outer Join tlcoationsettings d On b.TID=d.LocID,tmaster a left outer Join tDocs c On a.TID=c.MasterID where b.EZEID=a.EZEID and b.SeqNo=0  and a.EZEID= ' + db.escape(EZEID);
+                        //   var Query ='Select a.TID as MasterID, b.TID as LocationID,IDTypeID,a.EZEID,ifnull(EZEIDVerifiedID,0) as EZEIDVerifiedID,ifnull(EZEIDVerifiedByID,0) EZEIDVerifiedByID,ifnull(StatusID,0) as StatusID,FirstName,ifnull(LastName,"") as LastName,ifnull(CategoryID,0) as CategoryID,ifnull(LanguageID,1) as LanguageID,ifnull(Keywords,"") as Keywords,ifnull(LocTitle,"") as LocTitle,Latitude,Longitude,Altitude,ifnull(Picture,"") as Picture,ifnull(PictureFileName,"") as PictureFileName, ifnull(a.Icon,"") as Icon, ifnull(a.IconFileName,"") as IconFileName,ifnull(doc.BRDocFilename,"") as BRDocFilename, ifnull(doc.BRDoc,"") as BRDoc,ifnull(doc.BRContentType,"") as BRContentType,b.Rating,ifnull(a.BusinessSize,0) as Size  from tmaster a left outer join tlocations b on a.TID = b.MasterID left outer Join tDocs c On a.TID=c.MasterID left outer join tdocs doc on a.TID= doc.MasterID where b.SeqNo=0  and a.EZEID=' + db.escape(EZEID);
+                        db.query('Call pgetUserProfileAP('+db.escape(EZEID)+')', function (err, UserDetailsResult) {
+                            if (!err) {
+                                if (UserDetailsResult != null) {
+                                    if (UserDetailsResult[0].length > 0) {
+                                        //console.log('FnGetUserDetails: Token: ' + Token);
+                                        console.log('FnGetUserDetailsAP : pgetUserProfileAP: User details sent successfully');
+                                        //  console.log(UserDetailsResult);
+                                        res.send(UserDetailsResult[0]);
+                                    }
+                                    else {
+                                        res.json(null);
+                                        console.log('FnGetUserDetailsAP : tmaster: No User details found');
+                                    }
+                                }
+                                else {
+                                    res.json(null);
+                                    console.log('FnGetUserDetailsAP : tmaster: No User details found');
+                                }
+
+                            }
+                            else {
+                                res.statusCode=500;
+                                res.json(null);
+                                console.log('FnGetUserDetailsAP : tmaster:' + err);
+                            }
+                        });
                     }
                     else {
-                        res.json(null);
-                        console.log('FnGetUserDetailsAP : tmaster: No User details found');
-                    }
-
-                }
-                else {
-                                res.statusCode=500;
-                    res.json(null);
-                    console.log('FnGetUserDetailsAP : tmaster:' + err);
-                }
-            });
-        }
-        else {
                         res.statusCode=401;
                         res.json(null);
                         console.log("Invalid Token");
@@ -12445,8 +12513,7 @@ exports.FnUpdateUserProfileAP = function (req, res) {
         var Rating = req.body.Rating;
         var Size = req.body.Size;
         var IDTypeId = req.body.IDTypeID;
-        var SelectionType = (req.body.SelectionType) ? req.body.SelectionType :
-            ((parseInt(req.body.IDTypeID) !== 2) ? 0 : ((parseInt(req.body.EZEIDVerifiedID) == 2) ? 2 : 1));
+        var SelectionType = req.body.SelectionType;
         var RtnMessage = {
             IsSuccessful: false
         };
@@ -12587,7 +12654,7 @@ exports.FnChangePasswordAP = function (req, res) {
                     } else {
                         res.send(RtnMessage);
                         console.log('FnChangePassword:pChangePassword: Invalid Token');
-                       res.statusCode=401;
+                        res.statusCode=401;
                     }
                 } else {
                     res.send(RtnMessage);
@@ -12628,7 +12695,7 @@ exports.FnForgetPasswordAP = function (req, res) {
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
         if (LoginID != null) {
             var Password = FnRandomPassword();
-             var EncryptPWD = FnEncryptPassword(Password);
+            var EncryptPWD = FnEncryptPassword(Password);
             var Query = 'Update tapuser set APPassword= ' + db.escape(EncryptPWD) + ' where APLoginID=' + db.escape(LoginID);
             // console.log('FnForgotPassword: ' + Query);
             db.query(Query, function (err, ForgetPasswordResult) {
@@ -12836,18 +12903,18 @@ exports.FnSaveAPEZEID = function (req, res) {
             if (!err) {
                 if (Result != null) {
                     //console.log('FnRegistration: Token: ' + TokenNo);
-                    var InsertQuery = db.escape(Type) + ',' + db.escape(Preffereduser) + ',' + db.escape(AreaSize) + ',' +db.escape(AreaUOM) 
+                    var InsertQuery = db.escape(Type) + ',' + db.escape(Preffereduser) + ',' + db.escape(AreaSize) + ',' +db.escape(AreaUOM)
                         + ','  + db.escape(Rate) + ',' + db.escape(Amount) + ',' + db.escape(SpaceQty) + ',' + db.escape(SpaceType)
-                        + ',' + db.escape(FunishedType) + ',' + db.escape(Description) + ',' + db.escape(Preferences) + ',' + db.escape(Rating) 
-                        + ',' +db.escape(EZEID) + ',' + db.escape(Status) + ',' + db.escape(Reason) + ',' + db.escape(tAvailableDate) + ',' + db.escape(Token) 
-                        + ',' + db.escape(APID) + ',' + db.escape(Latitude) + ',' + db.escape(Longitude) + ',' + db.escape(TID) + ',' + db.escape(Purpose) 
+                        + ',' + db.escape(FunishedType) + ',' + db.escape(Description) + ',' + db.escape(Preferences) + ',' + db.escape(Rating)
+                        + ',' +db.escape(EZEID) + ',' + db.escape(Status) + ',' + db.escape(Reason) + ',' + db.escape(tAvailableDate) + ',' + db.escape(Token)
+                        + ',' + db.escape(APID) + ',' + db.escape(Latitude) + ',' + db.escape(Longitude) + ',' + db.escape(TID) + ',' + db.escape(Purpose)
                         + ',' + db.escape(NoCarParking) + ',' + db.escape(NoBikeParking) + ',' + db.escape(OwnerPayment) + ',' + db.escape(AgeOfProperty)
-                        + ',' + db.escape(NoOfBathrooms) + ',' + db.escape(Gas) + ',' + db.escape(Lift) 
+                        + ',' + db.escape(NoOfBathrooms) + ',' + db.escape(Gas) + ',' + db.escape(Lift)
                         + ',' + db.escape(Gym) + ',' + db.escape(SwimmingPool) + ',' + db.escape(Security) + ',' + db.escape(UPS);
-                   // console.log(InsertQuery);
+                    // console.log(InsertQuery);
                     db.query('CALL psaveRealEstateData(' + InsertQuery + ')', function (err, InsertResult) {
                         if (!err) {
-                          //  console.log(InsertResult);
+                            //  console.log(InsertResult);
                             if (InsertResult != null) {
                                 if (InsertResult[0].length > 0) {
                                     var insert = InsertResult[0];
@@ -13025,7 +13092,7 @@ exports.FnGetRealStateDataAP = function(req,res){
                     res.statusCode=500;
                     res.json(null);
                 }
-                    });
+            });
         }
         else
         {
@@ -13059,7 +13126,7 @@ exports.FnGetAPEZEIDPicture = function (req, res) {
                     if (Result != null) {
                         db.query('CALL pGetRealEstatePicture(' + db.escape(TID) + ',' + db.escape(PicNo) + ')', function (err, PictuerResult) {
                             if (!err) {
-                               // console.log(PictuerResult);
+                                // console.log(PictuerResult);
                                 if (PictuerResult[0] != null) {
                                     if (PictuerResult[0].length > 0) {
                                         res.send(PictuerResult[0]);
@@ -13139,10 +13206,10 @@ exports.FnSaveBannerPictureAP = function(req, res){
                                 console.log(InsertResult);
                                 if (InsertResult != null) {
                                     var InsertData = InsertResult[0];
-                                        RtnMessage.IsSaved =true;
-                                        RtnMessage.TID=InsertData[0].TID;
-                                        console.log(RtnMessage);
-                                        res.send(RtnMessage);
+                                    RtnMessage.IsSaved =true;
+                                    RtnMessage.TID=InsertData[0].TID;
+                                    console.log(RtnMessage);
+                                    res.send(RtnMessage);
 
                                 }
                                 else {
@@ -13283,22 +13350,22 @@ exports.FnGetAllBannerPicsAP = function(req, res){
                         //console.log(InsertQuery);
                         db.query('CALL pGetAllBannerPics(' + Query + ')', function (err, BannerResult) {
                             console.log(err);
-                        
+
                             if (!err) {
                                 //console.log(InsertResult);
                                 if (BannerResult != null) {
                                     //if(BannerResult[0].length > 0){
-                                        //var Picture = BannerResult;
-                                        console.log('FnGetAllBannerPicsAP:tmaster: Banner Picture send sucessfully ');
-                                        //res.send(Picture);
-                                        res.send(BannerResult[0]);
-                                    }
-                                    else
-                                    {
-                                        res.json(null);
-                                        console.log('FnGetAllBannerPicsAP:tmaster: No Banner Picture send sucessfully ');
-                                    }
+                                    //var Picture = BannerResult;
+                                    console.log('FnGetAllBannerPicsAP:tmaster: Banner Picture send sucessfully ');
+                                    //res.send(Picture);
+                                    res.send(BannerResult[0]);
                                 }
+                                else
+                                {
+                                    res.json(null);
+                                    console.log('FnGetAllBannerPicsAP:tmaster: No Banner Picture send sucessfully ');
+                                }
+                            }
                             else {
                                 res.statusCode=500;
                                 res.json(null);
@@ -13747,7 +13814,7 @@ exports.FnSearchRealEstateAP = function(req, res){
         var SwimmingPool = req.body.SwimmingPool;
         var Security = req.body.Security;
         var UPS = req.body.UPS;
-                
+
 
 
         /*if (Status!=null && Purpose.toString() != 'NaN' && PropertyType!=null && PrefUser!=null && SpaceType !=null && SpaceQtyF !=null && SpaceQtyT !=null && RatingFrom !=null
@@ -13816,16 +13883,16 @@ exports.Base64Data = function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
-            var RtnResponse = {
-                IsSent: false
-            };
-            var RtnResponse = JSON.parse(JSON.stringify(RtnResponse));
-            //var path = path + StateTitle+'.jpg' ;
-            var bitmap = fs.readFileSync("D:\\images\\Product1.jpg");
-            // convert binary data to base64 encoded string
-            RtnResponse.Picture = new Buffer(bitmap).toString('base64');
-            res.send(RtnResponse);
-            console.log('Base64Data: Default Banner sent successfully');
+        var RtnResponse = {
+            IsSent: false
+        };
+        var RtnResponse = JSON.parse(JSON.stringify(RtnResponse));
+        //var path = path + StateTitle+'.jpg' ;
+        var bitmap = fs.readFileSync("D:\\images\\Product1.jpg");
+        // convert binary data to base64 encoded string
+        RtnResponse.Picture = new Buffer(bitmap).toString('base64');
+        res.send(RtnResponse);
+        console.log('Base64Data: Default Banner sent successfully');
 
     }
     catch (ex) {
@@ -13844,23 +13911,23 @@ exports.FnUpdateRedFlagAP = function(req, res){
         var FromEZEID =req.body.FromEZEID;
         var ToEZEID =req.body.ToEZEID;
         var Message =req.body.Message;
-        
-        
-         var RtnMessage = {
+
+
+        var RtnMessage = {
             IsUpdated: false
         };
-        
+
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
-        
+
         if (FromEZEID != null && ToEZEID != null && Token != null && RedFlag !=null && Message != null) {
             FnValidateTokenAP(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
-                        
-                var query = db.escape(FromEZEID) + ',' + db.escape(ToEZEID) + ',' + db.escape(Token) + ',' + db.escape(RedFlag) + ',' +db.escape(Message);
-                db.query('CALL pUpdateRedFlagAP(' + query + ')', function (err, UpdateRedflagResult) {
-                       if (!err){
-                           if (UpdateRedflagResult.affectedRows > 0) {
+
+                        var query = db.escape(FromEZEID) + ',' + db.escape(ToEZEID) + ',' + db.escape(Token) + ',' + db.escape(RedFlag) + ',' +db.escape(Message);
+                        db.query('CALL pUpdateRedFlagAP(' + query + ')', function (err, UpdateRedflagResult) {
+                            if (!err){
+                                if (UpdateRedflagResult.affectedRows > 0) {
                                     RtnMessage.IsUpdated = true;
                                     res.send(RtnMessage);
                                     console.log('FnUpdateRedFlagAP:Red flag history Update successfully');
@@ -13870,8 +13937,8 @@ exports.FnUpdateRedFlagAP = function(req, res){
                                     res.send(RtnMessage);
                                 }
                             }
-                             
-                                else {
+
+                            else {
                                 console.log('FnUpdateRedFlagAP: error in Updating Red FlagAP' + err);
                                 res.statusCode = 500;
                                 res.send(RtnMessage);
@@ -13893,7 +13960,7 @@ exports.FnUpdateRedFlagAP = function(req, res){
             });
 
         }
-                    
+
         else {
             if (RedFlag == null) {
                 console.log('FnUpdateRedFlagAP: Red flag is empty');
@@ -13910,7 +13977,7 @@ exports.FnUpdateRedFlagAP = function(req, res){
             else if (Message == null) {
                 console.log('FnUpdateRedFlagAP: Message is empty');
             }
-            
+
             res.statusCode=400;
             res.send(RtnMessage);
         }
@@ -13938,10 +14005,10 @@ exports.FnUpdateEZEIDAP = function (req, res) {
             FnValidateTokenAP(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
-                      var Query = db.escape(OldEZEID) + ',' + db.escape(NewEZEID) + ',' + db.escape(Token);
+                        var Query = db.escape(OldEZEID) + ',' + db.escape(NewEZEID) + ',' + db.escape(Token);
                         db.query('CALL pUpdateEZEIDAP(' + Query + ')', function (err, ChangeEZEIDResult) {
                             if (!err) {
-                                
+
                                 if (ChangeEZEIDResult != null) {
                                     if (ChangeEZEIDResult.affectedRows > 0) {
                                         RtnMessage.IsChanged = true;
@@ -14007,7 +14074,7 @@ exports.FnDeleteBannerPictureAP = function(req, res){
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
 
         if (Token !=null && EZEID != null && SeqNo !=null)  {
-           FnValidateTokenAP(Token, function (err, Result) {
+            FnValidateTokenAP(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
                         var query = db.escape(SeqNo) + ',' + db.escape(EZEID);
@@ -14050,7 +14117,7 @@ exports.FnDeleteBannerPictureAP = function(req, res){
             else if (EZEID == null) {
                 console.log('FnDeleteBannerPictureAP: EZEID is empty');
             }
-              else if (SeqNo == null) {
+            else if (SeqNo == null) {
                 console.log('FnDeleteBannerPictureAP: SeqNo is empty');
             }
             res.statusCode=400;
@@ -14125,138 +14192,138 @@ exports.FnCropImageAP = function(req,res){
                 try{
                     console.log(req.files.image.path);
                     //var bitmap = fs.readFileSync('../bin/'+req.files.image.path);
-                    
+
                     fs.readFile('../bin/'+ req.files.image.path,function(err,data){
                         if(!err){
-                        var bitmap = data;
-                        var gm = require('gm').subClass({ imageMagick: true });
-                        gm(bitmap).size(function (err, size) {
-                        if (!err) {
-                            // Orientation landscape
-                            if(size.height < size.width){
-                                // scale++
-                                if(size.height < targetHeight || size.width < targetWidth){
-                                    if(targetHeight > targetWidth){
-										console.log("executing condition 1 : sOrient: landscape & scale++ & tOrient : potrait");
-                                        scaleHeight = targetHeight.toString();
-                                        ////
-                                        scaleWidth = (size.width * scaleHeight)/ size.height;
+                            var bitmap = data;
+                            var gm = require('gm').subClass({ imageMagick: true });
+                            gm(bitmap).size(function (err, size) {
+                                if (!err) {
+                                    // Orientation landscape
+                                    if(size.height < size.width){
+                                        // scale++
+                                        if(size.height < targetHeight || size.width < targetWidth){
+                                            if(targetHeight > targetWidth){
+                                                console.log("executing condition 1 : sOrient: landscape & scale++ & tOrient : potrait");
+                                                scaleHeight = targetHeight.toString();
+                                                ////
+                                                scaleWidth = (size.width * scaleHeight)/ size.height;
+                                            }
+                                            else{
+                                                console.log("executing condition 2 : sOrient: landscape & scale++ & tOrient : landscape");
+                                                scaleWidth = targetWidth.toString();
+                                                ////
+                                                scaleHeight = (size.height * scaleWidth) / size.width;
+                                            }
+                                        }
+                                        // scale--
+                                        else{
+                                            if(targetHeight > targetWidth){
+                                                console.log("executing condition 2 : sOrient: landscape & scale-- & tOrient : landscape");
+                                                scaleWidth = targetWidth.toString();
+                                                ////
+                                                scaleHeight = (scaleWidth * size.height)/ size.width;
+                                            }
+                                            else{
+
+                                                console.log("executing condition 2 : sOrient: landscape & scale-- & tOrient : potrait");
+                                                scaleHeight = targetHeight.toString();
+                                                ////
+                                                scaleWidth = (scaleHeight * size.width) / size.height;
+
+                                            }
+                                        }
                                     }
+
+                                    // Orientation is potrait
                                     else{
-										console.log("executing condition 2 : sOrient: landscape & scale++ & tOrient : landscape");
-                                        scaleWidth = targetWidth.toString();
-                                        ////
-                                        scaleHeight = (size.height * scaleWidth) / size.width;
+                                        //scale++
+                                        if(size.height < targetHeight || size.width < targetHeight){
+                                            if(targetHeight > targetWidth){
+                                                console.log('condition false');
+
+                                                scaleHeight = targetHeight.toString();
+                                                scaleWidth = (scaleHeight * size.width)/ size.height;
+
+
+                                            }
+                                            else{
+                                                scaleWidth = targetWidth.toString();
+                                                scaleHeight = (scaleWidth * size.height) / size.width;
+                                            }
+                                        }
+                                        else{
+                                            scaleWidth = targetWidth.toString();
+                                            ////
+                                            scaleHeight = (scaleWidth * size.height) / size.width;
+                                        }
+                                    }
+
+                                    var dimensions = {
+                                        originalHeight : size.height,
+                                        originalWidth : size.width,
+                                        scaleHeight : scaleHeight,
+                                        scaleWidth : scaleWidth,
+                                        targetHeight : targetHeight,
+                                        targetWidth : targetWidth
+                                    };
+
+                                    console.log(dimensions);
+
+                                    if(scaleFlag && cropFlag){
+                                        console.log('Scale and crop');
+                                        gm(bitmap)
+                                            .resize(scaleWidth,scaleHeight)
+                                            .crop(targetWidth,targetHeight,0,0).toBuffer(outputType.toUpperCase(),function(err,croppedBuff){
+                                                if(!err){
+                                                    var cdataUrl = new Buffer(croppedBuff).toString('base64');
+                                                    var picUrl = 'data:image/'+outputType+';base64,'+cdataUrl;
+                                                    res.status(200).json({status : true, picture : picUrl, message : 'Picture cropped successfully'});
+                                                }
+                                                else{
+                                                    res.status(400).json(respMsg);
+                                                }
+                                            });
+
+                                    }
+
+                                    else if(scaleFlag && !cropFlag){
+                                        gm(bitmap)
+                                            .resize(scaleWidth,scaleHeight).toBuffer(outputType.toUpperCase(),function(err,croppedBuff){
+                                                if(!err){
+                                                    var cdataUrl = new Buffer(croppedBuff).toString('base64');
+                                                    var picUrl = 'data:image/'+outputType+';base64,'+cdataUrl;
+                                                    res.status(200).json({status : true, picture : picUrl, message : 'Picture cropped successfully'});
+                                                }
+                                                else{
+                                                    res.status(400).json(respMsg);
+                                                }
+                                            });
+
+                                    }
+
+                                    else if(!scaleFlag && cropFlag){
+                                        gm(bitmap)
+                                            .crop(targetWidth,targetHeight,0,0).toBuffer(outputType.toUpperCase(),function(err,croppedBuff){
+                                                if(!err){
+                                                    var cdataUrl = new Buffer(croppedBuff).toString('base64');
+                                                    var picUrl = 'data:image/'+outputType+';base64,'+cdataUrl;
+                                                    res.status(200).json({status : true, picture : picUrl, message : 'Picture cropped successfully'});
+                                                }
+                                                else{
+                                                    res.status(400).json(respMsg);
+                                                }
+                                            });
                                     }
                                 }
-                                // scale--
                                 else{
-                                    if(targetHeight > targetWidth){
-										console.log("executing condition 2 : sOrient: landscape & scale-- & tOrient : landscape");
-                                        scaleWidth = targetWidth.toString();
-                                        ////
-                                        scaleHeight = (scaleWidth * size.height)/ size.width;
-                                    }
-                                    else{
-										
-										console.log("executing condition 2 : sOrient: landscape & scale-- & tOrient : potrait");
-                                        scaleHeight = targetHeight.toString();
-                                        ////
-                                        scaleWidth = (scaleHeight * size.width) / size.height;
-
-                                    }
+                                    throw new Error('FnCropImage : '+ 'Invalid image file. Unable to find image size');
+                                    res.status(400).json(respMsg);
                                 }
-                            }
-
-                            // Orientation is potrait
-                            else{
-                                //scale++
-                                if(size.height < targetHeight || size.width < targetHeight){
-                                    if(targetHeight > targetWidth){
-                                        console.log('condition false');
-
-                                        scaleHeight = targetHeight.toString();
-                                        scaleWidth = (scaleHeight * size.width)/ size.height;
-
-
-                                    }
-                                    else{
-                                        scaleWidth = targetWidth.toString();
-                                        scaleHeight = (scaleWidth * size.height) / size.width;
-                                    }
-                                }
-                                else{
-                                    scaleWidth = targetWidth.toString();
-                                    ////
-                                    scaleHeight = (scaleWidth * size.height) / size.width;
-                                }
-                            }
-
-                            var dimensions = {
-                                originalHeight : size.height,
-                                originalWidth : size.width,
-                                scaleHeight : scaleHeight,
-                                scaleWidth : scaleWidth,
-                                targetHeight : targetHeight,
-                                targetWidth : targetWidth
-                            };
-							
-							console.log(dimensions);
-
-                            if(scaleFlag && cropFlag){
-								console.log('Scale and crop');
-                                gm(bitmap)
-                                    .resize(scaleWidth,scaleHeight)
-                                    .crop(targetWidth,targetHeight,0,0).toBuffer(outputType.toUpperCase(),function(err,croppedBuff){
-                                        if(!err){
-                                            var cdataUrl = new Buffer(croppedBuff).toString('base64');
-                                            var picUrl = 'data:image/'+outputType+';base64,'+cdataUrl;
-                                            res.status(200).json({status : true, picture : picUrl, message : 'Picture cropped successfully'});
-                                        }
-                                        else{
-                                            res.status(400).json(respMsg);
-                                        }
-                                    });
-
-                            }
-
-                            else if(scaleFlag && !cropFlag){
-                                gm(bitmap)
-                                    .resize(scaleWidth,scaleHeight).toBuffer(outputType.toUpperCase(),function(err,croppedBuff){
-                                        if(!err){
-                                            var cdataUrl = new Buffer(croppedBuff).toString('base64');
-                                            var picUrl = 'data:image/'+outputType+';base64,'+cdataUrl;
-                                            res.status(200).json({status : true, picture : picUrl, message : 'Picture cropped successfully'});
-                                        }
-                                        else{
-                                            res.status(400).json(respMsg);
-                                        }
-                                    });
-
-                            }
-
-                            else if(!scaleFlag && cropFlag){
-                                gm(bitmap)
-                                    .crop(targetWidth,targetHeight,0,0).toBuffer(outputType.toUpperCase(),function(err,croppedBuff){
-                                        if(!err){
-                                            var cdataUrl = new Buffer(croppedBuff).toString('base64');
-                                            var picUrl = 'data:image/'+outputType+';base64,'+cdataUrl;
-                                            res.status(200).json({status : true, picture : picUrl, message : 'Picture cropped successfully'});
-                                        }
-                                        else{
-                                            res.status(400).json(respMsg);
-                                        }
-                                    });
-                            }
+                            });
                         }
                         else{
-                            throw new Error('FnCropImage : '+ 'Invalid image file. Unable to find image size');
                             res.status(400).json(respMsg);
-                        }
-                    });
-                        }
-                        else{
-                          res.status(400).json(respMsg);
                             throw new Error('FnCropImage : Error in reading file '+ ex.description);
                         }
                     });
@@ -14372,14 +14439,14 @@ exports.FnSaveContactVES = function(req, res){
         var SyncedInout = req.body.SyncedInout;
         var ContactEZEID = req.body.ContactEZEID;
         var ContactName = req.body.ContactName;
-            var InTimeNew = new Date(InTime);
-            
+        var InTimeNew = new Date(InTime);
+
         if(OutTime != null){
             var OutTimeNew = new Date(OutTime);
-		   }
-		   else{
-			var OutTimeNew=null;
-		   }
+        }
+        else{
+            var OutTimeNew=null;
+        }
         var RtnMessage = {
             IsSuccessfull: false
         };
@@ -14455,16 +14522,16 @@ exports.FnGetAllContactsVES = function (req, res) {
         var Token = req.query.Token;
         var Date1 = req.query.Date1;
         var Date2 = req.query.Date2;
-          var DateNew1 = new Date(Date1);
-            var DateNew2 = new Date(Date2);
-       
+        var DateNew1 = new Date(Date1);
+        var DateNew2 = new Date(Date2);
+
         if (Token != null && DateNew1 !=null && DateNew2 != null) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
-                            var query = db.escape(Token) + ',' + db.escape(DateNew1) + ',' + db.escape(DateNew2);
-                            db.query('CALL pGetAllContactsVES(' + query + ')', function (err, GetResult) {
-                                
+                        var query = db.escape(Token) + ',' + db.escape(DateNew1) + ',' + db.escape(DateNew2);
+                        db.query('CALL pGetAllContactsVES(' + query + ')', function (err, GetResult) {
+
                             if (!err) {
                                 if (GetResult != null) {
                                     if (GetResult[0].length > 0) {
@@ -14510,13 +14577,13 @@ exports.FnGetAllContactsVES = function (req, res) {
             if (Token == null) {
                 console.log('FnGetAllContactsVES: Token is empty');
             }
-             else if (DateNew1 == null) {
+            else if (DateNew1 == null) {
                 console.log('FnGetAllContactsVES: Date1 is empty');
             }
             else if (DateNew2 == null) {
                 console.log('FnGetAllContactsVES: Date2 is empty');
             }
-            
+
             res.statusCode=400;
             res.json(null);
         }
@@ -14535,7 +14602,7 @@ exports.FnGetDepartmentVES = function (req, res) {
         if (MasterID != null) {
             var Query = 'Select TID,DeptName from mdept where MasterID=' + db.escape(MasterID);
             //var MaxQuery = 'Select max(TID) as ID from  mdept';
-            
+
             db.query(Query, function (err, DeptResult) {
                 if (!err) {
                     if (DeptResult.length > 0) {
@@ -14575,7 +14642,7 @@ exports.FnGetContactVES = function (req, res) {
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         var Token = req.query.Token;
         var TID = req.query.TID;
-        
+
         if (Token != null && TID != null) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
@@ -14630,7 +14697,7 @@ exports.FnGetContactVES = function (req, res) {
             else if (TID == null) {
                 console.log('FnGetContactsVES: TID is empty');
             }
-            
+
             res.statusCode=400;
             res.json(null);
         }
@@ -14653,19 +14720,19 @@ exports.FnSearchContactsVES = function (req, res) {
         var Status = req.query.Status;
         var Keywords = req.query.Keywords;
         var Type = req.query.Type;
-            var DateNew1 = new Date(Date1);
-            var DateNew2 = new Date(Date2);
+        var DateNew1 = new Date(Date1);
+        var DateNew2 = new Date(Date2);
 
         if (Token != null && DateNew1 !=null && DateNew2 != null && Status !=null && Keywords != null && Type !=null) {
-           
+
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
                         var SearchParameter = db.escape(Token) + ',' + db.escape(DateNew1) + ',' + db.escape(DateNew2) + ',' + db.escape(Status) + ',' + db.escape(Keywords) + ',' + db.escape(Type);
-                        
+
                         db.query('CALL pSearchContactsVES(' + SearchParameter + ')', function (err, Result) {
                             if (!err) {
-                              if (Result[0].length > 0) {
+                                if (Result[0].length > 0) {
                                     res.send(Result[0]);
                                     console.log('FnSearchContactsVES: Search result sent successfully');
                                 }
@@ -14696,7 +14763,7 @@ exports.FnSearchContactsVES = function (req, res) {
                 }
             });
         }
-        
+
         else {
             if (Token == null) {
                 console.log('FnSearchContactsVES: Token is empty');
@@ -14716,7 +14783,7 @@ exports.FnSearchContactsVES = function (req, res) {
             else if (Type == null) {
                 console.log('FnSearchContactsVES: Type is empty');
             }
-            
+
             res.statusCode=400;
             res.json(null);
         }
@@ -14756,7 +14823,7 @@ exports.FnCheckPasswordVES  = function (req, res) {
             if (Password == null) {
                 console.log('FnCheckPasswordVES: Password is empty');
             }
-            
+
             res.statusCode=400;
             res.json(null);
         }
@@ -14816,7 +14883,7 @@ exports.FnSaveDepartmentsVES = function(req, res){
         var Token = req.body.Token;
         var Name = req.body.Name;
         var TID = parseInt(req.body.TID);
-        
+
         var RtnMessage = {
             IsSuccessfull: false,
             TID:0
@@ -14830,48 +14897,48 @@ exports.FnSaveDepartmentsVES = function(req, res){
                     if (Result != null) {
                         var query = db.escape(Token) + ',' + db.escape(Name) + ',' + db.escape(TID);
                         db.query('CALL pSaveDepartments(' + query + ')', function (err, InsertResult) {
-                           if (!err) {
-                          //console.log(InsertResult);
-                            if (InsertResult != null) {
-                                if (InsertResult[0].length > 0) {
-                                    RtnMessage.IsSuccessfull = true;
+                            if (!err) {
+                                //console.log(InsertResult);
+                                if (InsertResult != null) {
+                                    if (InsertResult[0].length > 0) {
+                                        RtnMessage.IsSuccessfull = true;
                                         var Insert = InsertResult[0];
                                         RtnMessage.TID=Insert[0].TID;
                                         res.send(Insert);
                                         //res.send(RtnMessage);
-                                    console.log('FnSaveDepartmentsVES: DepartmentsVES details saved successfully');
+                                        console.log('FnSaveDepartmentsVES: DepartmentsVES details saved successfully');
+                                    }
+                                    else {
+                                        res.send(RtnMessage);
+                                        console.log('FnSaveDepartmentsVES: DepartmentsVES details Saving Failed');
+                                    }
                                 }
                                 else {
+                                    console.log(RtnMessage);
                                     res.send(RtnMessage);
-                                    console.log('FnSaveDepartmentsVES: DepartmentsVES details Saving Failed');
+                                    console.log('FnSaveDepartmentsVES: DepartmentsVES details saving Failed');
                                 }
                             }
                             else {
-                                console.log(RtnMessage);
+                                res.statusCode=500;
                                 res.send(RtnMessage);
-                                console.log('FnSaveDepartmentsVES: DepartmentsVES details saving Failed');
+                                console.log('FnSaveDepartmentsVES: Error in getting DepartmentsVES details' + err);
                             }
-                        }
-                        else {
-                            res.statusCode=500;
-                            res.send(RtnMessage);
-                            console.log('FnSaveDepartmentsVES: Error in getting DepartmentsVES details' + err);
-                        }
-                    });
-                        
+                        });
+
+                    }
+                    else {
+                        res.statusCode=401;
+                        console.log('FnSaveDepartmentsVES: Invalid Token')
+                        res.send(RtnMessage);
+                    }
                 }
                 else {
-                    res.statusCode=401;
-                    console.log('FnSaveDepartmentsVES: Invalid Token')
+                    res.statusCode=500;
+                    console.log('FnSaveDepartmentsVES: Error in processing Token' + err);
                     res.send(RtnMessage);
                 }
-            }
-            else {
-                res.statusCode=500;
-                console.log('FnSaveDepartmentsVES: Error in processing Token' + err);
-                res.send(RtnMessage);
-            }
-        });
+            });
 
         }
         else {
@@ -14902,7 +14969,7 @@ exports.FnSaveGatesVES = function(req, res){
         var Token = req.body.Token;
         var Name = req.body.Name;
         var TID = parseInt(req.body.TID);
-        
+
         var RtnMessage = {
             IsSuccessfull: false,
             TID:0
@@ -14917,46 +14984,46 @@ exports.FnSaveGatesVES = function(req, res){
                         var query = db.escape(Token) + ',' + db.escape(Name) + ',' + db.escape(TID);
                         db.query('CALL pSaveGates(' + query + ')', function (err, InsertResult) {
                             if (!err) {
-                          //  console.log(InsertResult);
-                            if (InsertResult != null) {
-                                if (InsertResult[0].length > 0) {
-                                    RtnMessage.IsSuccessfull = true;
+                                //  console.log(InsertResult);
+                                if (InsertResult != null) {
+                                    if (InsertResult[0].length > 0) {
+                                        RtnMessage.IsSuccessfull = true;
                                         var Insert = InsertResult[0];
                                         RtnMessage.TID=Insert[0].TID;
                                         res.send(Insert);
                                         //res.send(RtnMessage);
-                                    console.log('FnSaveGatesVES: GatesVES details saved successfully');
+                                        console.log('FnSaveGatesVES: GatesVES details saved successfully');
+                                    }
+                                    else {
+                                        res.send(RtnMessage);
+                                        console.log('FnSaveGatesVES: GatesVES details Saving Failed');
+                                    }
                                 }
                                 else {
+                                    console.log(RtnMessage);
                                     res.send(RtnMessage);
-                                    console.log('FnSaveGatesVES: GatesVES details Saving Failed');
+                                    console.log('FnSaveGatesVES: GatesVES details saving Failed');
                                 }
                             }
                             else {
-                                console.log(RtnMessage);
+                                res.statusCode=500;
                                 res.send(RtnMessage);
-                                console.log('FnSaveGatesVES: GatesVES details saving Failed');
+                                console.log('FnSaveGatesVES: Error in getting GatesVES etails' + err);
                             }
-                        }
-                        else {
-                            res.statusCode=500;
-                            res.send(RtnMessage);
-                            console.log('FnSaveGatesVES: Error in getting GatesVES etails' + err);
-                        }
-                    });
+                        });
+                    }
+                    else {
+                        res.statusCode=401;
+                        console.log('FnSaveGatesVES: Invalid Token')
+                        res.send(RtnMessage);
+                    }
                 }
                 else {
-                    res.statusCode=401;
-                    console.log('FnSaveGatesVES: Invalid Token')
+                    res.statusCode=500;
+                    console.log('FnSaveGatesVES: Error in processing Token' + err);
                     res.send(RtnMessage);
                 }
-            }
-            else {
-                res.statusCode=500;
-                console.log('FnSaveGatesVES: Error in processing Token' + err);
-                res.send(RtnMessage);
-            }
-        });
+            });
 
         }
         else {
@@ -14987,50 +15054,50 @@ exports.FnSaveCitysVES = function(req, res){
         var StateID = req.body.StateID;
         var CityTitle = req.body.CityTitle;
         var TID = parseInt(req.body.TID);
-        
+
         var RtnMessage = {
             IsSuccessfull: false,
             TID:0
         };
         if(TID.toString() == 'NaN')
             TID = 0;
-       
+
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
 
 
         if (StateID != null && CityTitle != null) {
             var Insertquery = db.escape(StateID) + ',' + db.escape(CityTitle) + ',' + db.escape(TID);
-                        db.query('CALL pSaveCitysVES(' + Insertquery + ')', function (err, InsertResult) {
-                        if (!err) {
-                          //  console.log(InsertResult);
-                            if (InsertResult != null) {
-                                if (InsertResult[0].length > 0) {
-                                    RtnMessage.IsSuccessfull = true;
-                                        var Insert = InsertResult[0];
-                                        RtnMessage.TID=Insert[0].TID;
-                                        res.send(Insert);
-                                        //res.send(RtnMessage);
-                                    console.log('FnSaveCitysVES: CitysVES details saved successfully');
-                                }
-                                else {
-                                    res.send(RtnMessage);
-                                    console.log('FnSaveCitysVES: CitysVES details Saving Failed');
-                                }
-                            }
-                            else {
-                                console.log(RtnMessage);
-                                res.send(RtnMessage);
-                                console.log('FnSaveCitysVES: CitysVES details saving Failed');
-                            }
+            db.query('CALL pSaveCitysVES(' + Insertquery + ')', function (err, InsertResult) {
+                if (!err) {
+                    //  console.log(InsertResult);
+                    if (InsertResult != null) {
+                        if (InsertResult[0].length > 0) {
+                            RtnMessage.IsSuccessfull = true;
+                            var Insert = InsertResult[0];
+                            RtnMessage.TID=Insert[0].TID;
+                            res.send(Insert);
+                            //res.send(RtnMessage);
+                            console.log('FnSaveCitysVES: CitysVES details saved successfully');
                         }
                         else {
-                            res.statusCode=500;
                             res.send(RtnMessage);
-                            console.log('FnSaveCitysVES: Error in getting CitysVES etails' + err);
+                            console.log('FnSaveCitysVES: CitysVES details Saving Failed');
                         }
-                    });
+                    }
+                    else {
+                        console.log(RtnMessage);
+                        res.send(RtnMessage);
+                        console.log('FnSaveCitysVES: CitysVES details saving Failed');
+                    }
                 }
-               
+                else {
+                    res.statusCode=500;
+                    res.send(RtnMessage);
+                    console.log('FnSaveCitysVES: Error in getting CitysVES etails' + err);
+                }
+            });
+        }
+
         else {
             if (StateID == null) {
                 console.log('FnSaveCitysVES: StateID is empty');
