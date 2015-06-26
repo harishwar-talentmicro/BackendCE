@@ -183,6 +183,12 @@
             $scope.resolveGeolocationAddress = function(){
                 var defer = $q.defer();
                 $scope.modalBox.tx.address = '';
+                $scope.modalBox.tx.area = '';
+                $scope.modalBox.tx.city = '';
+                $scope.modalBox.tx.state = '';
+                $scope.modalBox.tx.country = '';
+                $scope.modalBox.tx.pinCode = '';
+
                 if($scope.modalBox.tx.locId == ''){
                     $timeout(function(){
                         defer.resolve();
@@ -210,6 +216,7 @@
                                 $scope.modalBox.tx.state = data.state;
                                 $scope.modalBox.tx.country = data.country;
                                 $scope.modalBox.tx.area = data.area;
+                                $scope.modalBox.tx.pinCode = data.postalCode;
                                 //$scope.modalBox.tx.address = data.route + ', '+ data.sublocality3 + ', '+ data.sublocality2;
                                 $scope.modalBox.tx.address = googleMap.createAddressFromGeolocation(data,{
                                     route : true,
@@ -225,12 +232,12 @@
                             }
                             else{
                                 //$scope.$emit('$preLoaderStop');
-                                Notification.error({message : 'Please enable geolocation settings n your browser',delay : MsgDelay});
+                                Notification.error({message : 'Please enable geolocation settings in your browser',delay : MsgDelay});
                             }
                             defer.resolve();
 
                         },function(){
-                            Notification.error({message : 'Please enable geolocation settings n your browser',delay : MsgDelay});
+                            Notification.error({message : 'Please enable geolocation settings in your browser',delay : MsgDelay});
                             defer.resolve();
                         });
 
@@ -251,6 +258,9 @@
 
                     $scope.modalBox.tx.address = $scope.modalBox.locationList[locIndex].AddressLine1+' ' +
                         $scope.modalBox.locationList[locIndex].AddressLine2;
+                    $scope.modalBox.tx.pinCode = $scope.modalBox.locationList[locIndex].PostalCode;
+                    $scope.modalBox.tx.city = $scope.modalBox.locationList[locIndex].CityTitle;
+                    $scope.modalBox.tx.country = $scope.modalBox.locationList[locIndex].CountryTitle;
 
                     $scope.modalBox.tx.latitude = lat;
                     $scope.modalBox.tx.longitude = lng;
@@ -259,11 +269,10 @@
                         //$scope.$emit('$preLoaderStop');
                         if(resp.data){
                             var data = googleMap.parseReverseGeolocationData(resp.data);
-                            $scope.modalBox.tx.city = data.city;
-                            $scope.modalBox.tx.state = data.state;
-                            $scope.modalBox.tx.country = data.country;
-                            $scope.modalBox.tx.area = data.area;
 
+                            $scope.modalBox.tx.state = data.state;
+                            //$scope.modalBox.tx.country = data.country;
+                            $scope.modalBox.tx.area = data.area;
 
                         }
                         else{
@@ -320,7 +329,8 @@
                         longitude : 0,
                         duration : 0,
                         durationScale : 0,
-                        itemList : []
+                        itemList : [],
+                        pinCode : ''
                     }
                 };
 
@@ -513,7 +523,11 @@
                 if($scope.modalBox.tx.country){
                     address.push($scope.modalBox.tx.country);
                 }
-                return address.join(', ');
+                address =  address.join(', ');
+                if($scope.modalBox.tx.pinCode){
+                    address += (' - '+ $scope.modalBox.tx.pinCode);
+                }
+                return address;
             };
 
             /**

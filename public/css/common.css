@@ -2603,3 +2603,22 @@ form .row-error{
     text-wrap: normal;
     word-wrap: break-word;
 }
+
+.business-manager-modal ::-webkit-scrollbar-thumb,
+.business-manager-modal ::-webkit-scrollbar-thumb{
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+    background: rgba(0, 139, 139, 0.67);
+}
+
+.business-manager-modal ::-webkit-scrollbar,
+.business-manager-modal ::-webkit-scrollbar{
+    width: 6pt;
+}
+
+.business-manager-modal ::-webkit-scrollbar-track,
+.business-manager-modal ::-webkit-scrollbar-track {
+    background: rgba(0, 139, 139, 0.23);
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+}

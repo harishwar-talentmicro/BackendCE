@@ -25,7 +25,7 @@
 
                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 transaction-details-box">
 
-                                    <div ng-show="moduleItems.length" class="row bottom-clearfix">
+                                    <div ng-show="moduleItems.length > 0 && masterUser.SalesItemListType > 0" class="row bottom-clearfix">
 
                                         <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12 item-list-box">
                                             <div class="row">
@@ -111,55 +111,79 @@
                                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
                                                     <label> Address</label>
                                                 </div>
-                                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12" ng-hide="modalBox.editMode">
-                                                    <div class="form-group form-group-sm ">
-                                                        <select class="form-control" ng-model="modalBox.tx.locId" ng-change="resolveAddress()">
-                                                            <option value="">Other Location</option>
-                                                            <option value="0">Current Location</option>
-                                                            <option ng-repeat="location in modalBox.locationList track by location.TID" value="{{location.TID}}">{{location.LocTitle}}</option>
-                                                        </select>
+                                                <!--<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">-->
+                                                    <!--{{modalBox.tx.address}}-->
+                                                    <!--<br/>-->
+                                                    <!--{{modalBox.tx.area}}-->
+                                                    <!--<br/>-->
+                                                    <!--{{modalBox.tx.city}}-->
+                                                    <!--<br/>-->
+                                                    <!--{{modalBox.tx.state}}-->
+                                                    <!--<br/>-->
+                                                    <!--{{modalBox.tx.country}} - {{modalBox.tx.pinCode}}-->
+                                                <!--</div>-->
+                                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix" xg-show="addressChangeFlag">
+                                                    <div class="row">
+                                                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12" ng-hide="modalBox.editMode">
+                                                            <div class="form-group form-group-sm ">
+                                                                <select class="form-control" ng-model="modalBox.tx.locId" ng-change="resolveAddress()">
+                                                                    <option value="">Other Location</option>
+                                                                    <option value="0">Current Location</option>
+                                                                    <option ng-repeat="location in modalBox.locationList track by location.TID" value="{{location.TID}}">{{location.LocTitle}}</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                            <div class="form-group form-group-sm ">
+                                                                <input
+                                                                        ng-disabled="modalBox.tx.locId > 0"
+                                                                        type="text" placeholder="Address Line 1" class="form-control no-radius"  name="area" ng-model="modalBox.tx.address" />
+                                                                <small class="text-danger" ng-show="txerror.address">Please enter address line 1</small>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                            <div class="form-group form-group-sm ">
+                                                                <input type="text"
+                                                                       ng-disabled="modalBox.tx.locId"
+                                                                       placeholder="Address Line 2 (Locality)" class="form-control no-radius"  name="area" ng-model="modalBox.tx.area" />
+                                                                <small class="text-danger" ng-show="txerror.area">Please enter locality</small>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                                            <div class="form-group form-group-sm ">
+                                                                <input
+                                                                        ng-disabled="modalBox.tx.locId"
+                                                                        type="text" placeholder="City" class="form-control no-radius" name="city" ng-model="modalBox.tx.city" />
+                                                                <small class="text-danger" ng-show="txerror.city">Please enter city</small>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                                            <div class="form-group form-group-sm ">
+                                                                <input type="text"
+                                                                       ng-disabled="modalBox.tx.locId"
+                                                                       placeholder="State" class="form-control no-radius" name="state" ng-model="modalBox.tx.state" />
+                                                                <small class="text-danger" ng-show="txerror.state">Please enter state</small>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-8">
+                                                            <div class="form-group form-group-sm ">
+                                                                <input type="text"
+                                                                       ng-disabled="modalBox.tx.locId"
+                                                                       placeholder="Country" class="form-control no-radius"  name="country" ng-model="modalBox.tx.country" />
+                                                                <small class="text-danger" ng-show="txerror.country">Please enter country</small>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-4">
+                                                            <div class="form-group form-group-sm ">
+                                                                <input type="text"
+                                                                       ng-disabled="modalBox.tx.locId"
+                                                                       placeholder="PIN/ZIP" title="Pin Code/ Zip Code" class="form-control no-radius"  name="pinCode" ng-model="modalBox.tx.pinCode" />
+                                                                <small class="text-danger" ng-show="txerror.pinCode"></small>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                                                    <div class="form-group form-group-sm ">
-                                                        <input
-                                                                ng-disabled="modalBox.tx.locId > 0"
-                                                                type="text" placeholder="Address Line 1" class="form-control no-radius"  name="area" ng-model="modalBox.tx.address" />
-                                                        <small class="text-danger" ng-show="txerror.address">Please enter address line 1</small>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                                                    <div class="form-group form-group-sm ">
-                                                        <input type="text"
-                                                               ng-disabled="modalBox.tx.locId"
-                                                               placeholder="Locality" class="form-control no-radius"  name="area" ng-model="modalBox.tx.area" />
-                                                        <small class="text-danger" ng-show="txerror.area">Please enter locality</small>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                                                    <div class="form-group form-group-sm ">
-                                                        <input
-                                                                ng-disabled="modalBox.tx.locId"
-                                                                type="text" placeholder="City" class="form-control no-radius" name="city" ng-model="modalBox.tx.city" />
-                                                        <small class="text-danger" ng-show="txerror.city">Please enter city</small>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                                                    <div class="form-group form-group-sm ">
-                                                        <input type="text"
-                                                               ng-disabled="modalBox.tx.locId"
-                                                               placeholder="State" class="form-control no-radius" name="state" ng-model="modalBox.tx.state" />
-                                                        <small class="text-danger" ng-show="txerror.state">Please enter state</small>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                                                    <div class="form-group form-group-sm ">
-                                                        <input type="text"
-                                                               ng-disabled="modalBox.tx.locId"
-                                                               placeholder="Country" class="form-control no-radius"  name="country" ng-model="modalBox.tx.country" />
-                                                        <small class="text-danger" ng-show="txerror.country">Please enter country</small>
-                                                    </div>
-                                                </div>
+
                                             </div>
                                         </div>
 
@@ -220,6 +244,7 @@
         </div>
         <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1 no-padding">
             <button ng-hide="(!editPermission) && editMode"
+                    title="Remove"
                     class="btn btn-xs btn-danger pull-right no-radius business-manager-trash-btn"
                     ng-click="removeItem(item)">
                 <span class="glyphicon glyphicon-trash"></span>
@@ -229,18 +254,20 @@
 
         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 business-manager-item-details business-manager-input-control">
 
-            <input class="text-right text-info" type="text" value="{{item.Rate | formatDecimal:'':2}}" disabled/>
+            <input class="text-right text-info"
+                   title="Rate"
+                   type="text" value="{{item.Rate | formatDecimal:'':2}}" disabled/>
             x
 
             <input  ng-disabled="!(editPermission && editMode)" class="text-right text-info"
                     numbers-only type="number"
+                    title="Quantity"
                     ng-model="item.Qty" ng-change="(!item.Qty) ? (item.Qty = 1) : ''" min="1"
                     max="10000000000"/>
             =
-            <input class="text-right text-info"  type="text" value="{{(item.Rate * item.Qty) | formatDecimal:'':2}}" disabled/>
-
-
-
+            <input class="text-right text-info"
+                   title="Amount"
+                   type="text" value="{{(item.Rate * item.Qty) | formatDecimal:'':2}}" disabled/>
         </div>
 
     </div>
@@ -249,35 +276,35 @@
 <!-- Template for Item having item name,description,picture and qty -->
 <script type="text/ng-template" id="/tpl/tx-item-description-picture-qty.html">
     <div class="row business-manager-item selected">
-        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 no-padding">
-            <button  ng-hide="(!editPermission) && editMode" class="btn btn-xs btn-danger pull-right no-radius" ng-click="removeItem(item)" >
-                <span class="glyphicon glyphicon-trash"></span> Delete
+        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 business-manager-item-thumbnail bottom-clearfix">
+            <img height="32" width="32" class="img-circle" ng-src="{{item.Pic}}" />
+        </div>
+
+        <div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 bottom-clearfix">
+            <b class="font-roboto wrap-text no-margin">
+                {{item.ItemName}}
+            </b>
+        </div>
+        <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1 no-padding">
+            <button ng-hide="(!editPermission) && editMode"
+                    class="btn btn-xs btn-danger pull-right no-radius business-manager-trash-btn"
+                    title="Remove"
+                    ng-click="removeItem(item)">
+                <span class="glyphicon glyphicon-trash"></span>
             </button>
         </div>
 
-        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 business-manager-item-thumbnail bottom-clearfix">
-            <img height="64" width="64" class="img-circle" ng-src="{{item.Pic}}" />
-        </div>
-        <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 business-manager-item-details bottom-clearfix">
-            <h4 class="font-open-sans">{{item.ItemName}}
 
-            </h4>
-        </div>
-
-        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 business-manager-item-details">
-            <div class="row">
-                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 business-manager-item-details business-manager-input-control">
+            <span class="label" style="background: #B111CB; font-size:100%">Quantity</span>
+            <input  ng-disabled="!(editPermission && editMode)" class="text-right text-info"
+                    style="max-width:8em;width: 40%;"
+                    numbers-only type="number"
+                    title="Quantity"
+                    ng-model="item.Qty" ng-change="(!item.Qty) ? (item.Qty = 1) : ''" min="1"
+                    max="10000000000"/>
 
 
-                    <div class="input-group form-group-sm bottom-clearfix">
-                        <span class="input-group-addon">
-                            Quantity
-                        </span>
-                        <input class="form-control text-right" numbers-only type="number" ng-model="item.Qty" ng-change="(!item.Qty) ? (item.Qty = 1) : ''" min="1"/>
-                    </div>
-
-                </div>
-            </div>
 
         </div>
     </div>
@@ -286,27 +313,22 @@
 <!-- Template for Item having item name,description and pic -->
 <script type="text/ng-template" id="/tpl/tx-item-description-picture.html">
     <div class="row business-manager-item selected">
-        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 no-padding">
-            <button  ng-hide="(!editPermission) && editMode" class="btn btn-xs btn-danger pull-right no-radius" ng-click="removeItem(item)" >
-                <span class="glyphicon glyphicon-trash"></span> Delete
+        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 business-manager-item-thumbnail bottom-clearfix">
+            <img height="32" width="32" class="img-circle" ng-src="{{item.Pic}}" />
+        </div>
+
+        <div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 bottom-clearfix">
+            <b class="font-roboto wrap-text no-margin">
+                {{item.ItemName}}
+            </b>
+        </div>
+        <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1 no-padding">
+            <button ng-hide="(!editPermission) && editMode"
+                    class="btn btn-xs btn-danger pull-right no-radius business-manager-trash-btn"
+                    title="Remove"
+                    ng-click="removeItem(item)">
+                <span class="glyphicon glyphicon-trash"></span>
             </button>
-        </div>
-        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 business-manager-item-thumbnail bottom-clearfix">
-            <img height="64" width="64" class="img-circle" ng-src="{{item.Pic}}" />
-        </div>
-        <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 business-manager-item-details bottom-clearfix">
-            <h4 class="font-open-sans">{{item.ItemName}}
-
-            </h4>
-        </div>
-
-        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 business-manager-item-details">
-            <div class="row">
-                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-
-                </div>
-            </div>
-
         </div>
     </div>
 </script>
@@ -314,14 +336,19 @@
 <!-- Template for Item having item name and description -->
 <script type="text/ng-template" id="/tpl/tx-item-description.html">
     <div class="row business-manager-item selected">
-        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 no-padding">
-            <button  ng-hide="(!editPermission) && editMode" class="btn btn-xs btn-danger pull-right no-radius" ng-click="removeItem(item)" >
-                <span class="glyphicon glyphicon-trash"></span> Delete
-            </button>
+
+        <div class="col-lg-11 col-md-11 col-sm-11 col-xs-11 bottom-clearfix">
+            <b class="font-roboto wrap-text no-margin">
+                {{item.ItemName}}
+            </b>
         </div>
-        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 business-manager-item-details bottom-clearfix">
-            <h4 class="font-open-sans text-center">{{item.ItemName}}
-            </h4>
+        <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1 no-padding">
+            <button ng-hide="(!editPermission) && editMode"
+                    class="btn btn-xs btn-danger pull-right no-radius business-manager-trash-btn"
+                    title="Remove"
+                    ng-click="removeItem(item)">
+                <span class="glyphicon glyphicon-trash"></span>
+            </button>
         </div>
     </div>
 </script>
