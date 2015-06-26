@@ -1965,7 +1965,7 @@ Configuration.prototype.saveResourceServiceMap = function(req,res,next){
             serviceids =ID.slice(0,-1);
             console.log(serviceids);
         }
-        service_id = serviceids.concat(',');
+        var service_id = serviceids.concat(',');
         console.log('service_ids Values:'+ service_id);
         var responseMessage = {
             status: false,

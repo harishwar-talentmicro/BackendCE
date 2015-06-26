@@ -4059,7 +4059,9 @@ exports.FnSearchByKeywords = function (req, res) {
                                 ip : req.ip,
                                 type : 0
                             };
-                            
+                            console.log('FindArray');
+                            console.log(FindArray);
+
                             if (FindArray.length > 0) {
                                 EZEID = FindArray[0];
                                 //checking the fisrt condition
@@ -12443,7 +12445,8 @@ exports.FnUpdateUserProfileAP = function (req, res) {
         var Rating = req.body.Rating;
         var Size = req.body.Size;
         var IDTypeId = req.body.IDTypeID;
-        var SelectionType = req.body.SelectionType;
+        var SelectionType = (req.body.SelectionType) ? req.body.SelectionType :
+            ((parseInt(req.body.IDTypeID) !== 2) ? 0 : ((parseInt(req.body.EZEIDVerifiedID) == 2) ? 2 : 1));
         var RtnMessage = {
             IsSuccessful: false
         };

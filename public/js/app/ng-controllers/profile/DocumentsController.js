@@ -2,6 +2,7 @@ angular.module('ezeidApp').controller('DocumentController',[
     '$http', '$rootScope', '$scope', '$timeout', 'Notification', '$filter','$q','GURL','$location',
     function($http, $rootScope, $scope, $timeout, Notification, $filter,$q,GURL,$location) {
 
+    $scope.$emit('$preLoaderStart');
     var DocCtrl = this;
     $scope.fileSeclected = undefined;
     $scope.IdPlaceHolder = "Enter ID Card number";
@@ -90,6 +91,7 @@ angular.module('ezeidApp').controller('DocumentController',[
 
     $scope.$watch('_userInfo.IsAuthenticate', function () {
         if ($rootScope._userInfo.IsAuthenticate == true) {
+            console.log(Date.now());
             GetUserDetails();
         }
         else {
@@ -97,14 +99,30 @@ angular.module('ezeidApp').controller('DocumentController',[
         }
     });
 
+        var userDetailsLoaded = false;
+        var documentDetailsLoaded = false;
+
     function GetUserDetails() {
         //$rootScope.IsIdAvailable = true;
         $http({
             method: 'get',
             url: GURL + 'ewtGetDocPin?TokenNo=' + $rootScope._userInfo.Token
         }).success(function (data) {
+            console.log(data);
                $scope.Pin = data[0].DocPIN;
-            });
+                userDetailsLoaded = true;
+                if(userDetailsLoaded && documentDetailsLoaded){
+                    $scope.$emit('$preLoaderStop');
+                }
+            }).error(function(err,statusCode){
+                userDetailsLoaded = true;
+                if(userDetailsLoaded && documentDetailsLoaded){
+                    $scope.$emit('$preLoaderStop');
+                }
+                if(!statusCode){
+                    Notification.error({ titl : 'Error',message : 'Unable to reach server! Please check your connection', delay : MsgDelay});
+                }
+        });
     }
 
     $scope.ChangePin = function(){
@@ -152,10 +170,16 @@ angular.module('ezeidApp').controller('DocumentController',[
     function getDocumentDetails(option){
 
         $scope.form = original_form;
+        console.log(Date.now());
 
         if($rootScope._userInfo && $rootScope._userInfo.Token){
-            $http({ method: 'get', url: GURL + 'ewtGetDoc?TokenNo=' + $rootScope._userInfo.Token + '&&Type='+ option }).success(function (data) {
-
+            $http({
+                method: 'get', url: GURL + 'ewtGetDoc?TokenNo=' + $rootScope._userInfo.Token + '&&Type='+ option
+            }).success(function (data) {
+                documentDetailsLoaded = true;
+                if(userDetailsLoaded && documentDetailsLoaded){
+                    $scope.$emit('$preLoaderStop');
+                }
                  if(data && data.length > 0 && data[0].No != '' && data !='null'){
                     if($scope.OptionSelected==1){
                         $scope.IdPlaceHolder = "Enter ID Card number";
@@ -250,6 +274,10 @@ angular.module('ezeidApp').controller('DocumentController',[
                         }
                     }
             }).error( function(error){
+                documentDetailsLoaded = true;
+                if(userDetailsLoaded && documentDetailsLoaded){
+                    $scope.$emit('$preLoaderStop');
+                }
             });
         }
     }
@@ -297,6 +325,6 @@ angular.module('ezeidApp').controller('DocumentController',[
         }
     }
     $scope.closeDocument = function(){
-        window.location.href = "/";
+        $location.url('/');
     }
 }]);

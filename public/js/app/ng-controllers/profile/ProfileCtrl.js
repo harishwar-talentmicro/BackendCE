@@ -389,18 +389,19 @@ angular.module('ezeidApp').controller('ProfileCtrl',[
                     defer.resolve([]);
                 }
             }).error(function(err){
-                defer.reject();
+                defer.resolve([]);
             });
             return defer.promise;
         };
 
+        $scope.$emit('$preLoaderStart');
+        $scope.dataReloadAgain();
 
-        $scope.loadWorkingHourTemplates().then(function(){
-            $scope.$emit('$preLoaderStart');
-            $scope.dataReloadAgain();
-        },function(){
-            $scope.$emit('$preLoaderStop');
-        });
+        //$scope.loadWorkingHourTemplates().then(function(){
+        //    $scope.dataReloadAgain();
+        //},function(){
+        //    $scope.$emit('$preLoaderStop');
+        //});
 
 
 
