@@ -131,7 +131,7 @@ BusinessManager.prototype.getTransactions = function(req,res,next){
     }
     catch (ex) {
         console.log('FnGetTranscation error:' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -340,7 +340,7 @@ BusinessManager.prototype.saveTransaction = function(req,res,next){
     }
     catch (ex) {
         console.log('FnSaveTranscationItems:error ' + ex.description);
-        throw new Error(ex);
+          
     }
 
 };
@@ -418,7 +418,7 @@ BusinessManager.prototype.updateTransaction = function(req,res,next){
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
         console.log('FnUpdateTransaction:error ' + ex.description);
-        throw new Error(ex);
+          
         res.status(400).json(responseMessage);
     }
 };
@@ -503,7 +503,7 @@ BusinessManager.prototype.getTransactionItems = function(req,res,next){
     }
     catch (ex) {
         console.log('FnGetTranscationItems error:' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -610,7 +610,7 @@ BusinessManager.prototype.getOutboxTransactions = function(req,res,next){
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
         console.log('FnGetOutboxMessages:error ' + ex.description);
-        throw new Error(ex);
+          
         res.status(400).json(responseMessage);
     }
 

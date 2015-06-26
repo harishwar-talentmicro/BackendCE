@@ -32,11 +32,11 @@ Location.prototype.getAll = function(req,res,next){
         if (Token != null && Token != '') {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
-                    if (Result != null) {
+                    if (Result) {
                         _this._this.db.query('CALL pGetSecondaryLocationDetails(' + _this._this.db.escape(Token) + ')', function (err, SecondaryResult) {
                             if (!err) {
                                 // console.log(UserDetailsResult);
-                                if (SecondaryResult[0] != null) {
+                                if (SecondaryResult[0]) {
                                     if (SecondaryResult[0].length > 0) {
                                         // console.log('FnGetSecondaryLocation: Token: ' + Token);
                                         console.log('FnGetSecondaryLocation : tmaster: Secondary User details sent successfully');
@@ -81,7 +81,7 @@ Location.prototype.getAll = function(req,res,next){
     }
     catch (ex) {
         console.log('FnGetSecondaryLocation error:' + ex.description);
-        throw new Error(ex);
+
     }
 };
 
@@ -133,7 +133,7 @@ Location.prototype.save = function(req,res,next){
         if (TID.toString() != 'NaN' && Token != null && CityName != null && StateID.toString() != 'NaN' && CountryID.toString() != 'NaN' && LocTitle != null && AddressLine1 != null && Longitude.toString() != 'NaN' && Latitude.toString() != 'NaN') {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
-                    if (Result != null) {
+                    if (Result) {
 
                         var InsertQuery = _this.db.escape(TID) + ',' + _this.db.escape(Token) + ',' + _this.db.escape(LocTitle) + ',' + _this.db.escape(Latitude)
                             + ',' + _this.db.escape(Longitude) + ',' + _this.db.escape(Altitude) + ',' + _this.db.escape(AddressLine1) + ',' + _this.db.escape(AddressLine2)
@@ -143,7 +143,7 @@ Location.prototype.save = function(req,res,next){
 
                         _this.db.query('CALL pInsertLocationData(' + InsertQuery + ')', function (err, InsertResult) {
                             if (!err) {
-                                if (InsertResult != null) {
+                                if (InsertResult) {
                                     if (InsertResult.affectedRows > 0) {
                                         //res.send(InsertResult);
                                         // console.log(InsertResult);
@@ -236,7 +236,7 @@ Location.prototype.save = function(req,res,next){
     }
     catch (ex) {
         console.log('FnAddLocation error:' + ex.description);
-        throw new Error(ex);
+
     }
 };
 
@@ -267,11 +267,11 @@ Location.prototype.getAllForEzeid = function(req,res,next){
         if (Token && TID) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
-                    if (Result != null) {
+                    if (Result) {
                         //var Query ='select TID, MasterID,LocTitle, Latitude, Longitude,MobileNumber,ifnull((Select FirstName from tmaster where TID='+_this.db.escape(TID)+'),"") as FirstName,ifnull((Select LastName from tmaster where TID='+_this.db.escape(TID)+'),"")  as LastName from tlocations where MasterID='+_this.db.escape(TID);
                         _this.db.query('CALL pGetSubUserLocationList(' + _this.db.escape(TID) + ')', function (err, GetResult) {
                             if (!err) {
-                                if (GetResult[0] != null) {
+                                if (GetResult[0]) {
                                     if (GetResult[0].length > 0) {
                                         RtnMessage.Result = GetResult[0];
                                         RtnMessage.Message ='Location List Send successfully';
@@ -330,7 +330,7 @@ Location.prototype.getAllForEzeid = function(req,res,next){
     }
     catch (ex) {
         console.log('FnGetLocationListForEZEID error:' + ex.description);
-        throw new Error(ex);
+
     }
 };
 

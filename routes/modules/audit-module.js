@@ -32,7 +32,7 @@ Audit.prototype.getAccessHistory = function(req,res,next){
         if (Token != null && Page.toString() != 'NaN' && Page.toString() != '0') {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
-                    if (Result != null) {
+                    if (Result) {
                         var ToPage = 25 * Page;
                         var FromPage = ToPage - 24;
 
@@ -43,7 +43,7 @@ Audit.prototype.getAccessHistory = function(req,res,next){
                         _this.db.query('CALL pAccessHistory(' + _this.db.escape(Token) + ',' + _this.db.escape(FromPage) + ',' + _this.db.escape(ToPage) + ')', function (err, AccessHistoryResult) {
                             if (!err) {
                                 //    console.log(AccessHistoryResult);
-                                if (AccessHistoryResult[0] != null) {
+                                if (AccessHistoryResult[0]) {
                                     if (AccessHistoryResult[0].length > 0) {
                                         res.send(AccessHistoryResult[0]);
                                         console.log('FnGetAccessHistory: History sent successfully');
@@ -93,7 +93,7 @@ Audit.prototype.getAccessHistory = function(req,res,next){
     }
     catch (ex) {
         console.log('FnGetAccessHistory error:' + ex.description);
-        throw new Error(ex);
+           
     }
 };
 

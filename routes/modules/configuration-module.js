@@ -64,7 +64,7 @@ Configuration.prototype.save = function(req,res,next){
         if (Token != null && Keyword != null && Category != null) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
-                    if (Result != null) {
+                    if (Result) {
 
                         var query = _this.db.escape(Token) + ',' + _this.db.escape(SalesTitle) + ',' + _this.db.escape(ReservationTitle) + ',' + _this.db.escape(HomeDeliveryTitle) + ',' +_this.db.escape(ServiceTitle)
                             + ',' +_this.db.escape(ResumeTitle) + ',' +_this.db.escape(VisibleModules) + ',' +_this.db.escape(SalesItemListType) + ',' +_this.db.escape(HomeDeliveryItemListType)
@@ -127,7 +127,7 @@ Configuration.prototype.save = function(req,res,next){
     }
     catch (ex) {
         console.log('FnSaveConfig:error ' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -151,11 +151,11 @@ Configuration.prototype.get = function(req,res,next){
         if (Token != null) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
-                    if (Result != null) {
+                    if (Result) {
 
                         _this.db.query('CALL pGetconfiguration(' + _this.db.escape(Token) + ')', function (err, GetResult) {
                             if (!err) {
-                                if (GetResult != null) {
+                                if (GetResult) {
                                     if (GetResult[0].length > 0) {
 
                                         console.log('FnGetConfig: Details Send successfully');
@@ -206,7 +206,7 @@ Configuration.prototype.get = function(req,res,next){
     }
     catch (ex) {
         console.log('FnGetConfig error:' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -254,7 +254,7 @@ Configuration.prototype.getBusinessCategories = function(req,res,next){
     }
     catch (ex) {
         console.log('FnCategory error:' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -280,12 +280,12 @@ Configuration.prototype.getStatusTypes = function(req,res,next){
         if (Token != null  && FunctionType != null ) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
-                    if (Result != null) {
+                    if (Result) {
 
                         var query = _this.db.escape(Token) + ',' + _this.db.escape(FunctionType);
                         _this.db.query('CALL pGetStatusType(' + query + ')', function (err, StatusResult) {
                             if (!err) {
-                                if (StatusResult != null) {
+                                if (StatusResult) {
                                     if (StatusResult[0].length > 0) {
                                         console.log('FnGetStatusType: Status type details Send successfully');
                                         res.send(StatusResult[0]);
@@ -336,7 +336,7 @@ Configuration.prototype.getStatusTypes = function(req,res,next){
     }
     catch (ex) {
         console.log('FnGetStatusType error:' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -372,7 +372,7 @@ Configuration.prototype.saveStatusType = function(req,res,next){
         if (Token != null && TID.toString() != 'NaN') {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
-                    if (Result != null) {
+                    if (Result) {
                         var query = _this.db.escape(Token) + ',' + _this.db.escape(TID) + ',' + _this.db.escape(FunctionType) + ',' + _this.db.escape(StatusTitle)
                             + ',' +_this.db.escape(ProgressPercent) + ',' +_this.db.escape(Status) + ',' +_this.db.escape(NotificationMsg) + ',' +_this.db.escape(NotificationMailMsg)
                             + ',' + _this.db.escape(StatusValue);
@@ -432,7 +432,7 @@ Configuration.prototype.saveStatusType = function(req,res,next){
     }
     catch (ex) {
         console.log('FnSaveStatusType:error ' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -458,13 +458,13 @@ Configuration.prototype.getActionTypes = function(req,res,next){
         if (Token != null && FunctionType != null ) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
-                    if (Result != null) {
+                    if (Result) {
 
                         var query = _this.db.escape(Token) + ',' + _this.db.escape(FunctionType);
 
                         _this.db.query('CALL pGetActionType(' + query + ')', function (err, StatusResult) {
                             if (!err) {
-                                if (StatusResult != null) {
+                                if (StatusResult) {
                                     if (StatusResult[0].length > 0) {
 
                                         console.log('FnGetActionType: Action Type details Send successfully');
@@ -517,7 +517,7 @@ Configuration.prototype.getActionTypes = function(req,res,next){
     }
     catch (ex) {
         console.log('FnGetActionType error:' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -549,12 +549,12 @@ Configuration.prototype.saveActionType = function(req,res,next){
         if (Token != null && TID.toString() != 'NaN') {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
-                    if (Result != null) {
+                    if (Result) {
                         var query = _this.db.escape(Token) + ',' + _this.db.escape(TID) + ',' + _this.db.escape(FunctionType) + ',' + _this.db.escape(ActionTitle)
                             + ',' +_this.db.escape(Status);
                         _this.db.query('CALL pSaveActionTypes(' + query + ')', function (err, result) {
                             if (!err) {
-                                if(result != null){
+                                if(result){
                                     if(result.affectedRows > 0){
                                         console.log('FnSaveActionType: Action types saved successfully');
                                         RtnMessage.IsSuccessfull = true;
@@ -607,7 +607,7 @@ Configuration.prototype.saveActionType = function(req,res,next){
     }
     catch (ex) {
         console.log('FnSaveActionType :error ' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -634,10 +634,10 @@ Configuration.prototype.getItems = function(req,res,next){
         if (Token != null && FunctionType != null) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
-                    if (Result != null) {
+                    if (Result) {
                         _this.db.query('CALL pGetItemList(' + _this.db.escape(Token) + ',' + _this.db.escape(FunctionType) + ')', function (err, GetResult) {
                             if (!err) {
-                                if (GetResult[0] != null) {
+                                if (GetResult[0]) {
                                     if (GetResult[0].length > 0) {
                                         console.log('FnGetItemList: Item list details Send successfully');
                                         res.json(GetResult[0]);
@@ -688,7 +688,7 @@ Configuration.prototype.getItems = function(req,res,next){
     }
     catch (ex) {
         console.log('FnGetItemList error:' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -725,7 +725,7 @@ Configuration.prototype.saveItems = function(req,res,next){
         if (Token != null  && FunctionType != null && ItemName !=null) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
-                    if (Result != null) {
+                    if (Result) {
 
                         var query = _this.db.escape(TID) + ',' + _this.db.escape(Token) + ',' + _this.db.escape(FunctionType) + ',' + _this.db.escape(ItemName)
                             + ',' +_this.db.escape(ItemDescription) + ',' +_this.db.escape(Pic) + ',' +_this.db.escape(Rate) + ',' +_this.db.escape(Status) + ',' +_this.db.escape(ItemDuration);
@@ -783,7 +783,7 @@ Configuration.prototype.saveItems = function(req,res,next){
     }
     catch (ex) {
         console.log('FnSaveItem:error ' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -806,11 +806,11 @@ Configuration.prototype.getFolders = function(req,res,next){
         if (Token != null && FunctionType != null) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
-                    if (Result != null) {
+                    if (Result) {
 
                         _this.db.query('CALL pGetFolderList(' + _this.db.escape(Token) + ',' + _this.db.escape(FunctionType) + ')', function (err, GetResult) {
                             if (!err) {
-                                if (GetResult[0] != null) {
+                                if (GetResult[0]) {
                                     if (GetResult[0].length > 0) {
                                         console.log('FnGetRoleList: Role list details Send successfully');
                                         res.send(GetResult[0]);
@@ -859,7 +859,7 @@ Configuration.prototype.getFolders = function(req,res,next){
     }
     catch (ex) {
         console.log('FnGetRoleList error:' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -900,7 +900,7 @@ Configuration.prototype.saveFolder = function(req,res,next){
         if (Token != null && TID.toString() != 'NaN') {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
-                    if (Result != null) {
+                    if (Result) {
                         var query = _this.db.escape(Token) + ',' + _this.db.escape(TID) + ',' + _this.db.escape(FolderTitle) + ',' + _this.db.escape(RuleFunction)
                             + ',' +_this.db.escape(RuleType) + ',' +_this.db.escape(CountryID) + ',' +_this.db.escape(MatchAdminLevel) + ',' +_this.db.escape(MappedNames) + ',' + _this.db.escape(Latitude)
                             + ',' +_this.db.escape(Longitude) + ',' +_this.db.escape(Proximity) + ',' +_this.db.escape(DefaultFolder) + ',' +_this.db.escape(FolderStatus) + ',' +_this.db.escape(SeqNoFrefix);
@@ -952,7 +952,7 @@ Configuration.prototype.saveFolder = function(req,res,next){
     }
     catch (ex) {
         console.log('FnSaveFolderRules:error ' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -977,11 +977,11 @@ Configuration.prototype.getSubusers = function(req,res,next){
         if (Token != null) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
-                    if (Result != null) {
+                    if (Result) {
 
                         _this.db.query('CALL pGetSubUserList(' + _this.db.escape(Token) + ')', function (err, GetResult) {
                             if (!err) {
-                                if (GetResult != null) {
+                                if (GetResult) {
                                     if (GetResult[0].length > 0) {
 
                                         console.log('FnGetSubUserList: Sub user list details Send successfully');
@@ -1031,7 +1031,7 @@ Configuration.prototype.getSubusers = function(req,res,next){
     }
     catch (ex) {
         console.log('FnGetSubUserList error:' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -1082,7 +1082,7 @@ Configuration.prototype.createSubuser = function(req,res,next){
          && ReservationRules != null && HomeDeliveryRules != null && ServiceRules != null && ResumeRules != null) {*/
         FnValidateToken(Token, function (err, Result) {
             if (!err) {
-                if (Result != null) {
+                if (Result) {
                     console.log(Result);
                     var query = _this.db.escape(Token) + ',' + _this.db.escape(TID) + ',' + _this.db.escape(UserName) + ',' +_this.db.escape(Status) + ',' +_this.db.escape(FirstName) + ',' +_this.db.escape(LastName)
                         + ',' + _this.db.escape(AccessRights) + ',' + _this.db.escape(SalesEmail) + ',' + _this.db.escape(ReservationEmail) + ',' +_this.db.escape(HomeDeliveryEmail)
@@ -1091,7 +1091,7 @@ Configuration.prototype.createSubuser = function(req,res,next){
                     console.log(query);
                     _this.db.query('CALL pCreateSubUser(' + query + ')', function (err, InsertResult) {
                         if (!err){
-                            if (InsertResult[0] != null )
+                            if (InsertResult[0])
                             {
                                 if(InsertResult[0].length > 0)
                                 {
@@ -1141,7 +1141,7 @@ Configuration.prototype.createSubuser = function(req,res,next){
     }
     catch (ex) {
         console.log('FnCreateSubUser:error ' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -1233,7 +1233,7 @@ Configuration.prototype.getReservationResources = function(req,res,next){
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
         console.log('FnGetReservationResource:error ' + ex.description);
-        throw new Error(ex);
+          
         res.status(400).json(responseMessage);
     }
 };
@@ -1292,7 +1292,7 @@ Configuration.prototype.saveReservationResource = function(req,res,next){
         if (Token && operatorid) {
             FnValidateToken(Token, function (err, result) {
                 if (!err) {
-                    if (result != null) {
+                    if (result) {
 
                         var query = _this.db.escape(Token) + ', ' + _this.db.escape(TID) + ',' + _this.db.escape(picture) + ',' + _this.db.escape(title) + ',' + _this.db.escape(description) + ',' + _this.db.escape(status)+ ',' + _this.db.escape(operatorid) + ',' + _this.db.escape(workingtemp);
                         _this.db.query('CALL pSaveResource(' + query + ')', function (err, insertResult) {
@@ -1367,7 +1367,7 @@ Configuration.prototype.saveReservationResource = function(req,res,next){
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
         console.log('FnSaveReservationResource:error ' + ex.description);
-        throw new Error(ex);
+          
         res.status(400).json(responseMessage);
     }
 };
@@ -1425,7 +1425,7 @@ Configuration.prototype.updateReservationResource = function(req,res,next){
         if (Token && operatorid) {
             FnValidateToken(Token, function (err, result) {
                 if (!err) {
-                    if (result != null) {
+                    if (result) {
 
                         var query = _this.db.escape(Token) + ', ' +
                             _this.db.escape(TID) + ',' + _this.db.escape(picture) +
@@ -1503,7 +1503,7 @@ Configuration.prototype.updateReservationResource = function(req,res,next){
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
         console.log('FnUpdateReservationResource:error ' + ex.description);
-        throw new Error(ex);
+          
         res.status(400).json(responseMessage);
     }
 };
@@ -1588,7 +1588,7 @@ Configuration.prototype.getReservationServices = function(req,res,next){
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
         console.log('FnGetReservationService:error ' + ex.description);
-        throw new Error(ex);
+          
         res.status(400).json(responseMessage);
     }
 };
@@ -1649,7 +1649,7 @@ Configuration.prototype.saveReservationService = function(req,res,next){
 
             FnValidateToken(Token, function (err, result) {
                 if (!err) {
-                    if (result != null) {
+                    if (result) {
 
                         var query = _this.db.escape(Token) + ', ' + _this.db.escape(TID) + ',' + _this.db.escape(title) + ',' + _this.db.escape(duration) + ',' + _this.db.escape(rate) + ',' + _this.db.escape(status)+ ',' + _this.db.escape(service_ids);
                         _this.db.query('CALL pSaveResServices(' + query + ')', function (err, insertResult) {
@@ -1718,7 +1718,7 @@ Configuration.prototype.saveReservationService = function(req,res,next){
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
         console.log('FnSaveReservationService:error ' + ex.description);
-        throw new Error(ex);
+          
         res.status(400).json(responseMessage);
     }
 };
@@ -1778,7 +1778,7 @@ Configuration.prototype.updateReservationService = function(req,res,next){
         if (Token) {
             FnValidateToken(Token, function (err, result) {
                 if (!err) {
-                    if (result != null) {
+                    if (result  null) {
 
                         var query = _this.db.escape(Token) + ', ' + _this.db.escape(TID) + ',' + _this.db.escape(title) + ',' + _this.db.escape(duration) + ',' + _this.db.escape(rate) + ',' + _this.db.escape(status)+ ',' + _this.db.escape(service_IDS);
                         _this.db.query('CALL pSaveResServices(' + query + ')', function (err, insertResult) {
@@ -1848,7 +1848,7 @@ Configuration.prototype.updateReservationService = function(req,res,next){
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
         console.log('FnUpdateReservationService:error ' + ex.description);
-        throw new Error(ex);
+          
         res.status(400).json(responseMessage);
     }
 };
@@ -1935,7 +1935,7 @@ Configuration.prototype.getResourceServiceMaps = function(req,res,next){
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
         console.log('FnGetReservResourceServiceMap:error ' + ex.description);
-        throw new Error(ex);
+          
         res.status(400).json(responseMessage);
     }
 };
@@ -1996,7 +1996,7 @@ Configuration.prototype.saveResourceServiceMap = function(req,res,next){
         if (Token) {
             FnValidateToken(Token, function (err, result) {
                 if (!err) {
-                    if (result != null) {
+                    if (result    null) {
                         var query = _this.db.escape(resourceid) + ',' + _this.db.escape(service_id);
                         _this.db.query('CALL pSaveResResourceServiceMap(' + query + ')', function (err, insertResult) {
 
@@ -2063,7 +2063,7 @@ Configuration.prototype.saveResourceServiceMap = function(req,res,next){
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
         console.log('FnSaveReservResServiceMap:error ' + ex.description);
-        throw new Error(ex);
+          
         res.status(400).json(responseMessage);
     }
 };
@@ -2088,11 +2088,11 @@ Configuration.prototype.getWorkingHoursTemplates = function(req,res,next){
         if (Token != null) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
-                    if (Result != null) {
+                    if (Result) {
 
                         _this.db.query('CALL pGetWorkingHours(' + _this.db.escape(Token) +',' + _this.db.escape(0)+ ')', function (err, GetResult) {
                             if (!err) {
-                                if (GetResult != null) {
+                                if (GetResult) {
                                     if (GetResult[0].length > 0) {
 
                                         console.log('FnGetWorkingHours: Working Hours details Send successfully');
@@ -2143,7 +2143,7 @@ Configuration.prototype.getWorkingHoursTemplates = function(req,res,next){
     }
     catch (ex) {
         console.log('FnGetWorkingHours error:' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -2203,7 +2203,7 @@ Configuration.prototype.saveWorkingHoursTemplate = function(req,res,next){
         if (Token != null && SpilloverTime != null && WorkingHrsTemplate != null && TID != null ) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
-                    if (Result != null) {
+                    if (Result) {
 
                         var query = _this.db.escape(Token) + ',' + _this.db.escape(SpilloverTime) + ',' + _this.db.escape(MO1) + ',' + _this.db.escape(MO2) + ',' + _this.db.escape(MO3) + ',' + _this.db.escape(MO4)
                             + ',' + _this.db.escape(TU1) + ',' + _this.db.escape(TU2) + ',' + _this.db.escape(TU3) + ',' + _this.db.escape(TU4)
@@ -2269,7 +2269,7 @@ Configuration.prototype.saveWorkingHoursTemplate = function(req,res,next){
     }
     catch (ex) {
         console.log('FnSaveWorkingHours:error ' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -2298,11 +2298,11 @@ Configuration.prototype.getHolidays = function(req,res,next){
         if (Token != null) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
-                    if (Result != null) {
+                    if (Result) {
 
                         _this.db.query('CALL pGetHolidayList(' + _this.db.escape(LocID) + ',' + _this.db.escape(TemplateID)+ ')', function (err, GetResult) {
                             if (!err) {
-                                if (GetResult != null) {
+                                if (GetResult) {
                                     if (GetResult[0].length > 0) {
 
                                         console.log('FnGetHolidayList: Holiday list Send successfully');
@@ -2353,7 +2353,7 @@ Configuration.prototype.getHolidays = function(req,res,next){
     }
     catch (ex) {
         console.log('FnGetHolidayList error:' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -2385,7 +2385,7 @@ Configuration.prototype.saveHoliday = function(req,res,next){
         if (Token != null && TID != null && HolidayTitle != null  && HolidayDate != null && TemplateID != null ) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
-                    if (Result != null) {
+                    if (Result) {
                         var query = _this.db.escape(TID) + ',' + _this.db.escape(Token) + ',' + _this.db.escape(new Date(HolidayDate)) + ',' + _this.db.escape(HolidayTitle) + ',' + _this.db.escape(TemplateID);
                         _this.db.query('CALL pSaveHolidayCalendar(' + query + ')', function (err, InsertResult) {
                             if (!err){
@@ -2448,7 +2448,7 @@ Configuration.prototype.saveHoliday = function(req,res,next){
     }
     catch (ex) {
         console.log('FnSaveHolidayCalendar:error ' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -2480,7 +2480,7 @@ Configuration.prototype.deleteHoliday = function(req,res,next){
         if (Token !=null && TID != null) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
-                    if (Result != null) {
+                    if (Result) {
 
                         //var query = _this.db.escape(Token) + ',' + _this.db.escape(TID);
                         _this.db.query('CALL pDeleteHolidayList(' + _this.db.escape(TID) + ')', function (err, InsertResult) {
@@ -2532,7 +2532,7 @@ Configuration.prototype.deleteHoliday = function(req,res,next){
     }
     catch (ex) {
         console.log('FnDeleteHolidayList:error ' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 

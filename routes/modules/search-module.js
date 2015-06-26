@@ -57,7 +57,7 @@ Search.prototype.searchKeyword = function(req,res,next){
             if (find != null && find != '' && CategoryID != null && token != null && token != '' && CurrentDate != null && pagesize != null && pagecount != null) {
                 FnValidateToken(token, function (err, Result) {
                     if (!err) {
-                        if (Result != null) {
+                        if (Result) {
                             if(CurrentDate != null)
                                 CurrentDate = new Date(CurrentDate);
                             var LocSeqNo = 0;
@@ -142,7 +142,7 @@ Search.prototype.searchKeyword = function(req,res,next){
                             db.query('CALL pSearchResultNew(' + SearchQuery + ')', function (err, SearchResult) {
                                 // db.query(searchQuery, function (err, SearchResult) {
                                 if (!err) {
-                                    if (SearchResult[0] != null) {
+                                    if (SearchResult[0]) {
                                         if (SearchResult[0].length > 0) {
                                             if (SearchResult[0][0].totalcount == 1)
                                             {
@@ -318,7 +318,7 @@ Search.prototype.searchKeyword = function(req,res,next){
                 db.query('CALL pSearchResultNew(' + InsertQuery + ')', function (err, SearchResult) {
                     if (!err) {
                         console.log(SearchResult);
-                        if (SearchResult[0] != null) {
+                        if (SearchResult[0]) {
                             if (SearchResult[0].length > 0) {
                                 //res.send(SearchResult[0]);
                                 res.json({totalcount:SearchResult[0][0].totalcount,Result:SearchResult[1]});
@@ -371,7 +371,7 @@ Search.prototype.searchKeyword = function(req,res,next){
     }
     catch (ex) {
         console.log('FnSearchByKeywords error:' + ex.description);
-        throw new Error(ex);
+          
     }
 
 };
@@ -457,7 +457,7 @@ Search.prototype.searchInformation = function(req,res,next){
             {
                 FnValidateToken(Token, function (err, Result) {
                     if (!err) {
-                        if (Result != null) {
+                        if (Result) {
                             var SearchParameter = _this.db.escape(TID) + ',' + _this.db.escape(Token) + ',' + _this.db.escape(WorkingDate)+ ',' + _this.db.escape(SearchType)+',' + _this.db.escape(0) + ',' + _this.db.escape(IPAddress);
                             // console.log('Search Information: ' +SearchParameter);
                             // console.log('CALL pSearchInformation(' + SearchParameter + ')');
@@ -532,7 +532,7 @@ Search.prototype.searchInformation = function(req,res,next){
     }
     catch (ex) {
         console.log('FnGetUserDetails error:' + ex.description);
-        throw new Error(ex);
+          
     }
 
 
