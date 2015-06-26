@@ -672,7 +672,7 @@
                 }
 
 
-                if($scope.modalBox.tx.message.length < 1 && $scope.salesItemListType > 0){
+                if($scope.salesItemListType > 0){
                     var itemList = [];
                     try{
                         itemList = JSON.parse(data.ItemsList);
@@ -692,7 +692,8 @@
                         msg += ', ';
                     }
                     msg = msg.substring(0, msg.length - 2);
-                    data.MessageText = msg;
+                    msg = ' ------------------------------ ' + msg; // String 30 characters and 2 spaces
+                    data.MessageText = $scope.modalBox.tx.message + msg;
                 }
 
                 $scope.$emit('$preLoaderStart');

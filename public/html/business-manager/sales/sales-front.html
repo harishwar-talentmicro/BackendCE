@@ -388,19 +388,21 @@
 <!-- Template for Item having item name,description,picture and qty -->
 <script type="text/ng-template" id="/tpl/bus-item-description-picture-qty.html">
     <div class="row business-manager-item" title="{{item.Description}}">
-        <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12">
+        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 business-manager-item-thumbnail bottom-clearfix">
+            <img height="32" width="32" class="img-circle" ng-src="{{item.Pic}}" />
+        </div>
+
+        <div class="col-lg-7 col-md-7 col-sm-7 col-xs-7 business-manager-item-details bottom-clearfix text-white">
+            <h5 class="font-roboto text-left no-margin no-border wrap-text">
+                {{item.ItemName}}
+            </h5>
+        </div>
+
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 business-manager-item-details">
             <button ng-hide="(!editPermission) && editMode" class="btn btn-xs btn-orange pull-right no-radius" ng-click="addItem(item)">
                 <span class="glyphicon glyphicon-plus-sign"></span>
                 Add
             </button>
-        </div>
-        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 business-manager-item-thumbnail bottom-clearfix">
-            <img height="50" width="50" class="img-circle" ng-src="{{item.Pic}}" />
-        </div>
-        <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 business-manager-item-details bottom-clearfix text-white">
-            <h5 class="font-roboto text-center no-margin no-border">
-                {{item.ItemName}}
-            </h5>
         </div>
     </div>
 </script>
@@ -408,38 +410,39 @@
 <!-- Template for Item having item name,description and pic -->
 <script type="text/ng-template" id="/tpl/bus-item-description-picture.html">
     <div class="row business-manager-item" title="{{item.Description}}">
-        <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12">
+        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 business-manager-item-thumbnail bottom-clearfix">
+            <img height="32" width="32" class="img-circle" ng-src="{{item.Pic}}" />
+        </div>
+
+        <div class="col-lg-7 col-md-7 col-sm-7 col-xs-7 business-manager-item-details bottom-clearfix text-white">
+            <h5 class="font-roboto text-left no-margin no-border wrap-text">
+                {{item.ItemName}}
+            </h5>
+        </div>
+
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 business-manager-item-details">
             <button ng-hide="(!editPermission) && editMode" class="btn btn-xs btn-orange pull-right no-radius" ng-click="addItem(item)">
                 <span class="glyphicon glyphicon-plus-sign"></span>
                 Add
             </button>
         </div>
-        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 business-manager-item-thumbnail bottom-clearfix">
-            <img height="50" width="50" class="img-circle" ng-src="{{item.Pic}}" />
-        </div>
-        <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 business-manager-item-details bottom-clearfix text-white">
-            <h5 class="font-roboto text-center no-margin no-border">
-                {{item.ItemName}}
-            </h5>
-        </div>
-
     </div>
 </script>
 
 <!-- Template for Item having item name and description -->
 <script type="text/ng-template" id="/tpl/bus-item-description.html">
     <div class="row business-manager-item" title="{{item.Description}}">
-        <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12">
+        <div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 business-manager-item-details bottom-clearfix text-white">
+            <h5 class="font-roboto text-left no-margin no-border wrap-text">
+                {{item.ItemName}}
+            </h5>
+        </div>
+
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 business-manager-item-details">
             <button ng-hide="(!editPermission) && editMode" class="btn btn-xs btn-orange pull-right no-radius" ng-click="addItem(item)">
                 <span class="glyphicon glyphicon-plus-sign"></span>
                 Add
             </button>
         </div>
-        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 business-manager-item-details bottom-clearfix text-white">
-            <h5 class="font-roboto text-center no-margin no-border">
-                {{item.ItemName}}
-            </h5>
-        </div>
-
     </div>
 </script>
