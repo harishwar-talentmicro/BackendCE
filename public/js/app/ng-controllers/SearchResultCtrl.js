@@ -248,7 +248,7 @@ var res = angular.module('ezeidApp').
                     isPagination:1,
                     pagesize:$scope.resultPerPage
                 } }).success(function (data) {
-
+                    $scope.$emit('$preLoaderStop');
                     /* set the total count */
                     $scope.totalResult = data['totalcount'];
                     var result = data['Result'];
@@ -279,7 +279,7 @@ var res = angular.module('ezeidApp').
 
                     $scope.searchListData = (result && result !== 'null') ? ((result.length > 0) ? result : []) : [];
 
-                    if (data != 'null' && data.length>0)
+                    if ( data && data != 'null' && data.length>0)
                     {
                         $scope.SearchResultCount = data.length;
                         $window.localStorage.setItem("searchResult", JSON.stringify(data));
@@ -306,11 +306,13 @@ var res = angular.module('ezeidApp').
                             $scope.searchCount = 0;
                         }
                     }
+                    else{
+                        $timeout(function(){
+                            $scope.$emit('$preLoaderStop');
+                        },1500);
+                    }
                     /* put a little delay */
-                    $timeout(function(){
-                        $scope.$emit('$preLoaderStop');
 
-                    },1500);
                     defer.resolve();
                 }).error(function(){
                     Notification.error({ message : 'An error occurred', delay : MsgDelay});

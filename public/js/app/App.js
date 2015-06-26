@@ -243,22 +243,24 @@
 
 
             $rootScope.$on('$includeContentRequested',function(){
+                htmlProgress = true;
                 if(!dataProgress){
                     if($('#progress-overlay').hasClass('hidden')){
                         $('#progress-overlay').removeClass('hidden');
                     }
                 }
-                htmlProgress = true;
+
             });
 
             $rootScope.$on('$includeContentLoaded',function(){
+                htmlProgress = false;
                 if(!dataProgress){
                     if(!$('#progress-overlay').hasClass('hidden')){
 
                         $('#progress-overlay').addClass('hidden');
                     }
                 }
-                htmlProgress = false;
+
             });
 
 
@@ -277,21 +279,23 @@
             //});
 
             $rootScope.$on('$preLoaderStart',function(){
+                dataProgress = true;
                 if(!htmlProgress){
                     if($('#progress-overlay').hasClass('hidden')){
                         $('#progress-overlay').removeClass('hidden');
                     }
                 }
-                dataProgress = true;
+
             });
 
             $rootScope.$on('$preLoaderStop',function(){
+                dataProgress = false;
                 if(!htmlProgress){
                     if(!$('#progress-overlay').hasClass('hidden')){
                         $('#progress-overlay').addClass('hidden');
                     }
                 }
-                dataProgress = false;
+
             });
 
         /**
@@ -376,6 +380,12 @@
                 return;
             }
 
+        });
+
+        $rootScope.$on('$routeChangeSuccess',function(){
+            if($('#progress-overlay').hasClass('hidden')){
+                $('#progress-overlay').removeClass('hidden');
+            }
         });
 
 
