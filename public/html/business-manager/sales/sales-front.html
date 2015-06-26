@@ -7,16 +7,17 @@
 
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        <h2 class="text-info text-center">
-                            {{ezeone}}
-                        </h2>
+                        <h3 class="text-info text-center font-roboto no-margin no-padding">
+                            {{(masterUser.IDTypeID == 1) ? masterUser.FirstName + ' '+ masterUser.LastName : masterUser.CompanyName}}
+                            ({{masterUser.EZEID}})
+                        </h3>
                     </div>
                     <div class="panel-body profile-manager business-manager-modal">
                         <!-------------- Navigation for Profile Manager ------------------------>
                         <div class="container-fluid">
                             <div class="row">
                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-center bottom-clearfix">
-                                    <h3 class="font-roboto text-success">
+                                    <h3 class="font-roboto text-success no-margin no-padding">
                                         {{(masterUser.SalesModuleTitle) ? masterUser.SalesModuleTitle : 'Sales Enquiry Form'}}
                                     </h3>
 
@@ -168,7 +169,7 @@
 
                                     <div ng-show="txerror.items" class="row bottom-clearfix">
                                         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                            <small class="text-danger">Please choose a product</small>
+                                            <small class="text-danger">Please choose an item</small>
                                         </div>
                                     </div>
 
@@ -177,7 +178,7 @@
                                         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
                                             <button class="btn btn-info btn-sm no-radius" ng-click="saveTransaction()">
                                                 <span class="glyphicon glyphicon-hand-right"></span>
-                                                Proceed to Enquire
+                                                Submit
                                             </button>
                                             <button class="btn btn-danger btn-sm no-radius" ng-click="closeForm()">
                                                 <span class="glyphicon glyphicon-remove"></span>
@@ -203,10 +204,11 @@
 <footer-section></footer-section>
 
 
+
 <!-- Template for Item having item name,description,picture,qty and rate -->
 <script type="text/ng-template" id="/tpl/tx-item-description-picture-qty-rate.html">
     <div class="row business-manager-item selected">
-        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 no-padding">
             <button ng-hide="(!editPermission) && editMode" class="btn btn-xs btn-danger pull-right no-radius"  ng-click="removeItem(item)">
                 <span class="glyphicon glyphicon-trash"></span>
             </button>
@@ -256,7 +258,7 @@
 <!-- Template for Item having item name,description,picture and qty -->
 <script type="text/ng-template" id="/tpl/tx-item-description-picture-qty.html">
     <div class="row business-manager-item selected">
-        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 no-padding">
             <button  ng-hide="(!editPermission) && editMode" class="btn btn-xs btn-danger pull-right no-radius" ng-click="removeItem(item)" >
                 <span class="glyphicon glyphicon-trash"></span> Delete
             </button>
@@ -293,7 +295,7 @@
 <!-- Template for Item having item name,description and pic -->
 <script type="text/ng-template" id="/tpl/tx-item-description-picture.html">
     <div class="row business-manager-item selected">
-        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 no-padding">
             <button  ng-hide="(!editPermission) && editMode" class="btn btn-xs btn-danger pull-right no-radius" ng-click="removeItem(item)" >
                 <span class="glyphicon glyphicon-trash"></span> Delete
             </button>
@@ -321,7 +323,7 @@
 <!-- Template for Item having item name and description -->
 <script type="text/ng-template" id="/tpl/tx-item-description.html">
     <div class="row business-manager-item selected">
-        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 no-padding">
             <button  ng-hide="(!editPermission) && editMode" class="btn btn-xs btn-danger pull-right no-radius" ng-click="removeItem(item)" >
                 <span class="glyphicon glyphicon-trash"></span> Delete
             </button>
@@ -341,31 +343,27 @@
 <script type="text/ng-template" id="/tpl/bus-item-description-picture-qty-rate.html">
     <div class="row business-manager-item" title="{{item.Description}}">
 
-        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 business-manager-item-details">
-            <button ng-hide="(!editPermission) && editMode" class="btn btn-xs btn-success pull-right no-radius" ng-click="addItem(item)">
+        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 business-manager-item-thumbnail bottom-clearfix">
+            <img height="32" width="32" class="img-circle" ng-src="{{item.Pic}}" />
+        </div>
+
+        <div class="col-lg-7 col-md-7 col-sm-7 col-xs-7 business-manager-item-details bottom-clearfix text-white">
+            <h5 class="font-roboto text-left no-margin no-border wrap-text">
+                {{item.ItemName}}
+            </h5>
+            Rate : <span class="pull-right"> {{item.Rate | formatDecimal:'':2}}</span>
+        </div>
+
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 business-manager-item-details">
+            <button ng-hide="(!editPermission) && editMode" class="btn btn-xs btn-orange pull-right no-radius" ng-click="addItem(item)">
                 <span class="glyphicon glyphicon-plus-sign"></span>
-                Add Item
+                Add
             </button>
         </div>
 
-        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 business-manager-item-thumbnail bottom-clearfix">
-            <img height="64" width="64" class="img-circle" ng-src="{{item.Pic}}" />
-        </div>
-        <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 business-manager-item-details bottom-clearfix">
-            <h4 class="font-open-sans">{{item.ItemName}}
 
-            </h4>
-        </div>
 
-        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 business-manager-item-details">
-            <div class="row">
-                <div class="col-lg-offset-2 col-md-offset-2 col-sm-offset-2 col-xs-offset-2 col-lg-8 col-md-8 col-sm-8 col-xs-8">
-                    Rate : <span class="pull-right"> {{item.Rate | formatDecimal:'':2}}</span>
-                </div>
 
-            </div>
-
-        </div>
     </div>
 </script>
 
@@ -373,18 +371,18 @@
 <script type="text/ng-template" id="/tpl/bus-item-description-picture-qty.html">
     <div class="row business-manager-item" title="{{item.Description}}">
         <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12">
-            <button ng-hide="(!editPermission) && editMode" class="btn btn-xs btn-success pull-right no-radius" ng-click="addItem(item)">
+            <button ng-hide="(!editPermission) && editMode" class="btn btn-xs btn-orange pull-right no-radius" ng-click="addItem(item)">
                 <span class="glyphicon glyphicon-plus-sign"></span>
-                Add Item
+                Add
             </button>
         </div>
         <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 business-manager-item-thumbnail bottom-clearfix">
-            <img height="64" width="64" class="img-circle" ng-src="{{item.Pic}}" />
+            <img height="50" width="50" class="img-circle" ng-src="{{item.Pic}}" />
         </div>
-        <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 business-manager-item-details bottom-clearfix">
-            <h4 class="font-open-sans">{{item.ItemName}}
-
-            </h4>
+        <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 business-manager-item-details bottom-clearfix text-white">
+            <h5 class="font-roboto text-center no-margin no-border">
+                {{item.ItemName}}
+            </h5>
         </div>
     </div>
 </script>
@@ -393,19 +391,20 @@
 <script type="text/ng-template" id="/tpl/bus-item-description-picture.html">
     <div class="row business-manager-item" title="{{item.Description}}">
         <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12">
-            <button ng-hide="(!editPermission) && editMode" class="btn btn-xs btn-success pull-right no-radius" ng-click="addItem(item)">
+            <button ng-hide="(!editPermission) && editMode" class="btn btn-xs btn-orange pull-right no-radius" ng-click="addItem(item)">
                 <span class="glyphicon glyphicon-plus-sign"></span>
-                Add Item
+                Add
             </button>
         </div>
         <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 business-manager-item-thumbnail bottom-clearfix">
-            <img height="64" width="64" class="img-circle" ng-src="{{item.Pic}}" />
+            <img height="50" width="50" class="img-circle" ng-src="{{item.Pic}}" />
         </div>
-        <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 business-manager-item-details bottom-clearfix">
-            <h4 class="font-open-sans">{{item.ItemName}}
+        <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 business-manager-item-details bottom-clearfix text-white">
+            <h5 class="font-roboto text-center no-margin no-border">
+                {{item.ItemName}}
+            </h5>
+        </div>
 
-            </h4>
-        </div>
     </div>
 </script>
 
@@ -413,16 +412,16 @@
 <script type="text/ng-template" id="/tpl/bus-item-description.html">
     <div class="row business-manager-item" title="{{item.Description}}">
         <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12">
-            <button ng-hide="(!editPermission) && editMode" class="btn btn-xs btn-success pull-right no-radius" ng-click="addItem(item)">
+            <button ng-hide="(!editPermission) && editMode" class="btn btn-xs btn-orange pull-right no-radius" ng-click="addItem(item)">
                 <span class="glyphicon glyphicon-plus-sign"></span>
-                Add Item
+                Add
             </button>
         </div>
-        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 business-manager-item-details bottom-clearfix">
-            <h4 class="font-open-sans text-center">{{item.ItemName}}
-
-            </h4>
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 business-manager-item-details bottom-clearfix text-white">
+            <h5 class="font-roboto text-center no-margin no-border">
+                {{item.ItemName}}
+            </h5>
         </div>
+
     </div>
 </script>
-

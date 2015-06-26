@@ -265,7 +265,8 @@
                         durationScale : 0,
                         itemList : [],
                         companyId : tx.company_id,
-                        companyName : tx.company_name
+                        companyName : tx.company_name,
+                        amount : (parseFloat(tx.Amount) !== NaN) ? parseFloat(tx.Amount,2) : 0.00
                 };
                 return editModeTx;
 
@@ -1336,6 +1337,34 @@
             };
 
             /**
+             * Calculates the amount while saving any lead
+             * @param itemList
+             * @returns {number}
+             */
+            var calculateTxAmount = function(itemList){
+                if(!itemList){
+                    return 0.00;
+                }
+                if(parseInt($rootScope._userInfo.SalesItemListType) > 3){
+                    var amount = 0.00;
+                    for(var i=0; i<itemList.length; i++){
+                        var qty = parseInt(itemList[i].Qty);
+                        var rate = parseFloat(itemList[i].Rate,2);
+                        if(qty == NaN){
+                            qty = 1;
+                        }
+                        if(rate == NaN){
+                            rate = 0.00
+                        }
+                        amount += (qty*rate);
+                    }
+                    return amount;
+                }
+                else{
+                    return 0.00;
+                }
+            };
+            /**
              * Preparing data for saving transaction
              * @param tx
              * @param editMode
@@ -1377,7 +1406,10 @@
                     DeliveryAddress : (!editMode) ?
                         makeAddress() : $scope.modalBox.tx.deliveryAddress,
                     company_name : $scope.modalBox.tx.companyName,
-                    company_id : $scope.modalBox.tx.companyId
+                    company_id : $scope.modalBox.tx.companyId,
+                    Amount : (parseInt($rootScope._userInfo.SalesItemListType) < 4) ?
+                        ((parseFloat($scope.modalBox.tx.amount,2) !== NaN) ? parseFloat($scope.modalBox.tx.amount,2) : 0.00) :
+                        calculateTxAmount($scope.modalBox.tx.itemList)
                 };
                 return preparedTx;
             };

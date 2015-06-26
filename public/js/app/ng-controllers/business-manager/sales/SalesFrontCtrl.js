@@ -369,9 +369,10 @@
                         defer.reject();
                     }
                 });
+                return defer.promise;
             };
 
-            $scope.getLoggedInUserDetails();
+
 
             /**
              * Loads logged in user details from server
@@ -709,28 +710,62 @@
                 });
             };
 
+            var masterUserLoaded = false;
+            var loggedInUserLoaded = false;
+            var masterUserItemsLoaded = false;
+            var loggedInUserLocationsLoaded = false;
+
+            /**
+             * If all the three laoded parameters are true then preloader is stopped
+             */
+            var checkLoaded = function(){
+                if(masterUserLoaded && loggedInUserLoaded && masterUserItemsLoaded && loggedInUserLocationsLoaded){
+                    $scope.$emit('$preLoaderStop');
+                }
+            };
+
 
             var init = function(){
                 $scope.$emit('$preLoaderStart');
                 $scope.getUserDetails().then(function(){
-                    $scope.getModuleItemList().then(function(){
-                        $scope.getLocationList().then(function(){
-                            $scope.$emit('$preLoaderStop');
-                        },function(){
-                            Notification.error({ message : 'An error occured ! Please try again', delay : MsgDelay});
-                            $scope.$emit('$preLoaderStop');
-                        });
-                    },function(){
-                        Notification.error({ message : 'An error occured ! Please try again', delay : MsgDelay});
-                        $scope.$emit('$preLoaderStop');
-                    });
+                    masterUserLoaded = true;
+                    checkLoaded();
                 },function(noInternet){
-                    $scope.$emit('$preLoaderStop');
+                    masterUserLoaded = true;
                     if(!noInternet){
-                        Notification.error({ message : 'An error occured ! Please try again', delay : MsgDelay});
+                        Notification.error({ message : 'An error occurred ! Please try again', delay : MsgDelay});
                     }
+                    checkLoaded();
 
                 });
+
+                $scope.getModuleItemList().then(function(){
+                    masterUserItemsLoaded = true;
+                    checkLoaded();
+                },function(){
+                    masterUserItemsLoaded = true;
+                    Notification.error({ message : 'An error occurred ! Please try again', delay : MsgDelay});
+                    checkLoaded();
+                });
+
+
+
+                $scope.getLoggedInUserDetails().then(function(){
+                    loggedInUserLoaded = true;
+                    $scope.getLocationList().then(function(){
+                        loggedInUserLocationsLoaded = true;
+                        checkLoaded();
+                    },function(){
+                        loggedInUserLocationsLoaded = true;
+                        Notification.error({ message : 'An error occurred ! Please try again', delay : MsgDelay});
+                        checkLoaded();
+                    });
+                },function(){
+                    loggedInUserLoaded = true;
+                    Notification.error({ message : 'An error occurred ! Please try again', delay : MsgDelay});
+                    checkLoaded();
+                });
+
             };
 
             $scope.closeForm = function(){
@@ -739,8 +774,6 @@
 
             init();
 
-            //    }
-            ////});
         }
     ]);
 })();

@@ -335,14 +335,20 @@ angular.module('ezeidApp').controller('ItemMasterCtrl',[
                        if(resp.IsSuccessfull){
                            $scope.loadItems($scope.modalBox.item.type);
                            $scope.toggleModalBox();
-                           Notification.success({ message : 'Item added successfully', delay : 5000 });
+                           if(data.TID){
+                               Notification.success({ message : 'Item updated successfully', delay : 5000 });
+                           }
+                           else{
+                               Notification.success({ message : 'Item added successfully', delay : 5000 });
+                           }
+
                        }
                        else{
-                           Notification.error({ message : 'An error occured while saving item! Please try again', delay : 5000});
+                           Notification.error({ message : 'An error occurred while saving item! Please try again', delay : 5000});
                        }
                    }
                    else{
-                       Notification.error({ message : 'An error occured while saving item! Please try again', delay : 5000});
+                       Notification.error({ message : 'An error occurred while saving item! Please try again', delay : 5000});
                    }
                }).error(function(err){
                    Notification.error({ message : 'An error occured while saving item! Please try again', delay : 2000});

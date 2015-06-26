@@ -6,11 +6,12 @@
         <div class="row">
             <div class="col-sm-8" style="margin: auto; float: none;">
                 <div class="panel panel-default" style="min-height: 367px;">
-                    <div class="panel-heading">
-                        <h1 class="text-center font-roboto"
+                    <div class="panel-heading" ng-show="showNotFound">
+                        <h1 class="text-center font-roboto no-margin no-padding"
                             style="text-transform: uppercase;font-size: 25px;font-weight: bold;
                              color: #E08901;margin: 10px 0px 0px 0px;">
-                            {{SearchInfo.EZEID}}
+                            {{(SearchInfo.IDTypeID == 1) ? SearchInfo.FirstName + ' ' +SearchInfo.LastName : SearchInfo.CompanyName}}
+                            ({{SearchInfo.EZEID}})
                         </h1>
                     </div>
                     <div class="panel-body">

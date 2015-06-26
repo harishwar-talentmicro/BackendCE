@@ -39,10 +39,10 @@
                                 </div>
                             </div>
 
-                            <div class="col-lg-1 col-md-1 col-sm-6 col-xs-6 bottom-clearfix tx-filter-container" title="Status">
-                                <label class="label label-danger">Status</label>
+                            <div class="col-lg-1 col-md-1 col-sm-6 col-xs-6 bottom-clearfix tx-filter-container" title="Stages">
+                                <label class="label label-danger">Stages</label>
                             </div>
-                            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6 bottom-clearfix" title="Status">
+                            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6 bottom-clearfix" title="Stages">
                                 <div class="form-group form-group-sm">
                                     <select class="form-control" ng-model="filterStatus" ng-change="triggerStatusFilter(pageNumber,filterStatus)">
                                         <option ng-repeat="sfilter in filterStatusTypes track by $index" value="{{sfilter.TID}}">{{sfilter.StatusTitle}}</option>
@@ -244,7 +244,7 @@
                                     <!--{{tx.TaskDateTime | dateTimeFilter : "DD MMM YYYY hh:mm:ss A" : "hh:mm A"}}-->
                                 </small>
                                 <br/>
-                                <small class="text-danger" ng-hide="editModes[$index]"><b>{{(tx.statustitle) ? tx.statustitle : 'New' | uppercase}}</b></small>
+                                <small class="text-danger" ng-hide="editModes[$index]"><b>{{(tx.statustitle) ? tx.statustitle : '' | uppercase}}</b></small>
                             </div>
                             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
                                 <b class="font-roboto" ng-class="{'hidden' : (!tx.RequesterEZEID)}">{{ (tx.RequesterEZEID) ? (tx.RequesterEZEID | uppercase) : ''}}</b>
@@ -302,12 +302,11 @@
                     <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12 bottom-clearfix" ng-show="editModes[$index]">
                         <div class="row">
                             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
-                                <label class="tiny">Transaction Status</label>
+                                <label class="tiny">Transaction Stage</label>
                                 <br/>
                                 <div class="form-group form-group-sm">
                                     <select class="form-control" ng-model="modalBox.tx.statusType">
                                         <option value="0">New</option>
-                                        <option value="">--Select Status Type--</option>
                                         <option ng-repeat="txStatus in txStatusTypes track by txStatus.TID" value="{{txStatus.TID}}">{{txStatus.StatusTitle}}</option>
                                     </select>
                                 </div>
@@ -541,7 +540,7 @@
                         <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12" ng-if="modalBox.editMode" ng-show="modalBox.editMode">
                             <div class="row">
                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                    <label>Transaction Status</label>
+                                    <label>Transaction Stage</label>
                                 </div>
                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                     <div class="form-group form-group-sm ">
@@ -601,6 +600,22 @@
                                             <option value="0">--Select Folder Rule from list--</option>
                                             <option ng-repeat="txFolderRule in txFolderRules track by txFolderRule.TID" value="{{txFolderRule.TID}}">{{txFolderRule.FolderTitle}}</option>
                                         </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                            <div class="row">
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <label>Amount</label>
+                                </div>
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <div class="form-group form-group-sm ">
+                                        <input class="form-control"
+                                               type="text"
+                                               decimals-only
+                                               ng-model="modalBox.tx.amount" name="amount" />
                                     </div>
                                 </div>
                             </div>

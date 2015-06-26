@@ -136,6 +136,12 @@ angular.module('ezeidApp').controller('StatusTypesCtrl',['$scope','$rootScope','
 
     $scope.statusValueLimit = 10;
 
+    $scope.$watch('modalBox.txStatus.progress',function(n,v){
+       if(parseInt(n) == NaN || parseInt(n) < 0 || parseInt(n)> 100){
+            $scope.modalBox.txStatus.progress = 0;
+       };
+    });
+
     /**
      * For generating Status Values from 1 to 40
      * @param num
@@ -143,14 +149,40 @@ angular.module('ezeidApp').controller('StatusTypesCtrl',['$scope','$rootScope','
      */
     $scope.getNumber = function(num) {
         return new Array(num);
-    }
+    };
+
+    $scope.statusOptions = [
+            '0 (New)',
+            '1 (In process)',
+            '2 (In process)',
+            '3 (In process)',
+            '4 (In process)',
+            '5 (In process)',
+            '10 (Completed)',
+            '11 (Dropped)',
+            '12 (Cancelled)',
+        ];
 
 
     $scope.validateTxStatus = function(txStatus){
-        /**
-         * @todo Validate all fields and then allow saving of txStatus
-         */
-        return true;
+        var verror = [];
+        if(!txStatus.title){
+            verror.push('stage title');
+        }
+        if(txStatus.progress == ''){
+            verror.push('progress');
+        }
+        if(txStatus.statusValue == ''){
+            verror.push('stage value');
+        }
+        console.log(verror);
+        if(verror.length  > 0){
+            Notification.error({ title : 'Error', msg : 'Please check '+ verror.concat(', '), delay : MsgDelay});
+            return false;
+        }
+        else{
+            return true;
+        }
     };
 
     $scope.saveTxStatus = function(){
@@ -162,7 +194,7 @@ angular.module('ezeidApp').controller('StatusTypesCtrl',['$scope','$rootScope','
                 MasterID : $scope.masterUser.MasterID,
                 FunctionType : $scope.modalBox.txStatus.type,
                 ProgressPercent : $scope.modalBox.txStatus.progress,
-                Status : $scope.modalBox.txStatus.status,
+                Status : (parseInt($scope.modalBox.txStatus.status) !== NaN ) ? $scope.modalBox.txStatus.status : 1,
                 NotificationMsg : $scope.modalBox.txStatus.notificationMsg,
                 NotificationMailMsg: $scope.modalBox.txStatus.notificationMailMsg,
                 StatusValue : $scope.modalBox.txStatus.statusValue
@@ -221,8 +253,7 @@ angular.module('ezeidApp').controller('StatusTypesCtrl',['$scope','$rootScope','
             method : "GET",
             params : {
                 Token : $rootScope._userInfo.Token,
-                FunctionType : fType,
-                MasterID : ($scope._userInfo.MasterID) ? $scope._userInfo.MasterID : $scope.masterUser.MasterID
+                FunctionType : fType
             }
         }).success(function(resp){
 
@@ -272,13 +303,13 @@ angular.module('ezeidApp').controller('StatusTypesCtrl',['$scope','$rootScope','
                         }
                         // ////////console.log($scope.txStatuses);
                     }
-
-                    $scope.count += 1;
-                    if($scope.count < 5){
-                        $scope.loadItems();
-                    }
                 }
-            }).error(function(err){
+            }).error(function(err,statusCode){
+                var msg = "An error occurred while loading Status Types";
+                if(!statusCode){
+                    msg = "Unable to reach server ! Please check your connection";
+                }
+                Notification.error({ message : msg, delay : MsgDelay});
                 // ////////console.log(err);
             });
     };

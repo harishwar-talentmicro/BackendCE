@@ -20,9 +20,9 @@
                 <!--<li role="presentation" ng-class="{active: selectedTab == 4}">-->
                     <!--<a class="btn-link" ng-class="{'tab-active': selectedTab == 4}" ng-click="selectedTab = 4">Service</a>-->
                 <!--</li>-->
-                <li role="presentation" ng-class="{active: selectedTab == 5}">
-                    <a class="btn-link"  ng-class="{'tab-active': selectedTab == 5}" ng-click="selectedTab = 5">Resume</a>
-                </li>
+                <!--<li role="presentation" ng-class="{active: selectedTab == 5}">-->
+                    <!--<a class="btn-link"  ng-class="{'tab-active': selectedTab == 5}" ng-click="selectedTab = 5">Resume</a>-->
+                <!--</li>-->
             </ul>
 
             <!-- Tab panes -->
@@ -40,7 +40,7 @@
                             <content-item ng-repeat="item in items.sales" content="item" index="$index" toggle-modal-box="toggleModalBox(type,itemIndex)" template-type="{{globalConfig.itemListType[0]}}"></content-item>
                         </div>
                         <div class="row" ng-hide="globalConfig.itemListType[0] > 0">
-                            <h3>Your Sales enquiry Item list type is message only, therefore items are not applicable</h3>
+                            <h3>Your Sales Item list type is message only, therefore items are not applicable</h3>
                         </div>
                     </div>
                 </div>
@@ -72,7 +72,7 @@
                             <content-item ng-repeat="item in items.homeDelivery" content="item" index="$index" toggle-modal-box="toggleModalBox(type,itemIndex)"  template-type="{{globalConfig.itemListType[2]}}"></content-item>
                         </div>
                         <div class="row" ng-hide="globalConfig.itemListType[2] > 0">
-                            <h3>Your Home Delivery Item list type is message only, therefore items are not applicable</h3>
+                            <small>Your Home Delivery Item list type is message only, therefore items are not applicable</small>
                         </div>
                     </div>
                 </div>
@@ -91,7 +91,7 @@
                             <content-item ng-repeat="item in items.service" content="item" index="$index" toggle-modal-box="toggleModalBox(type,itemIndex)"  template-type="{{globalConfig.itemListType[3]}}"></content-item>
                         </div>
                         <div class="row" ng-hide="globalConfig.itemListType[3] > 0">
-                            <h3>Your Home Delivery Item list type is message only, therefore items are not applicable</h3>
+                            <small>Your Service Item list type is message only, therefore items are not applicable</small>
                         </div>
                     </div>
                 </div>
@@ -110,7 +110,7 @@
                             <content-item ng-repeat="item in items.resume" content="item" index="$index"toggle-modal-box="toggleModalBox(type,itemIndex)"  template-type="{{globalConfig.itemListType[4]}}"></content-item>
                         </div>
                         <div class="row" ng-hide="globalConfig.itemListType[4] > 0">
-                            <h3>Your Home Delivery Item list type is message only, therefore items are not applicable</h3>
+                            <small>Your Resume Item list type is message only, therefore items are not applicable</small>
                         </div>
                     </div>
                 </div>
@@ -203,7 +203,7 @@
                                 <span ng-show="content.Status == 1" class="glyphicon glyphicon-ok-circle text-success" data-toggle="tooltip" title="" data-placement="right" data-original-title="Item Status"></span>
                                 <span ng-show="content.Status == 2" class="glyphicon glyphicon-remove-circle text-danger" data-toggle="tooltip" title="" data-placement="right" data-original-title="Item Status"></span>
                             </h4>
-                            <p class="item-description" data-toggle="tooltip" title="" data-original-title="{{content.Description}}" data-placement="right">{{content.Description | textLength:50}}</p>
+                            <p class="item-description" title="{{content.Description}}" data-placement="right">{{content.Description | textLength:50}}</p>
                         </div>
                     </div>
                 </div>
@@ -221,7 +221,7 @@
                                 <span ng-show="content.Status == 1" class="glyphicon glyphicon-ok-circle text-success" data-toggle="tooltip" title="" data-placement="right" data-original-title="Item Status"></span>
                                 <span ng-show="content.Status == 2" class="glyphicon glyphicon-remove-circle text-danger" data-toggle="tooltip" title="" data-placement="right" data-original-title="Item Status"></span>
                             </h4>
-                            <p class="item-description" data-toggle="tooltip" title="" data-original-title="{{content.Description}}" data-placement="right">{{content.Description | textLength:50}}</p>
+                            <p class="item-description" title="{{content.Description}}" data-placement="right">{{content.Description | textLength:50}}</p>
                         </div>
                     </div>
                 </div>
@@ -243,7 +243,7 @@
                                 <span ng-show="content.Status == 2" class="glyphicon glyphicon-remove-circle text-danger" data-toggle="tooltip" title="" data-placement="right" data-original-title="Item Status"></span>
                             </h4>
                             <p class="text-primary">Rate : {{content.Rate}}/-</p>
-                            <p class="item-description" data-toggle="tooltip" title="" data-original-title="{{content.Description}}" data-placement="right">{{content.Description | textLength:50}}</p>
+                            <p class="item-description" title="{{content.Description}}" data-placement="right">{{content.Description | textLength:50}}</p>
                         </div>
                     </div>
                 </div>

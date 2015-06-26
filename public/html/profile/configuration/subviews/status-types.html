@@ -1,6 +1,6 @@
 <div class="panel panel-default" ng-controller="StatusTypesCtrl">
     <div class="panel-heading">
-        <h4>Status Types</h4>
+        <h4>Stages</h4>
     </div>
     <div class="panel-body">
 
@@ -42,13 +42,13 @@
                                     <div class="thumbnail">
                                         <span class="glyphicon glyphicon-edit" data-toggle="tooltip" title="" data-placement="right" data-original-title="Edit Item" data-index="{{$index}}" ng-click="toggleModalBox(0,$index)"></span>
                                         <div class="caption">
-                                            <h4 class="text-primary">{{item.title}}
-                                                <span ng-show="item.status == 1" class="glyphicon glyphicon-ok-circle text-success" data-toggle="tooltip" title="" data-placement="right" data-original-title="Item Status"></span>
-                                                <span ng-show="item.status == 2" class="glyphicon glyphicon-remove-circle text-danger" data-toggle="tooltip" title="" data-placement="right" data-original-title="Item Status"></span>
-                                            </h4>
-                                                <p class="text-primary">Progress : {{item.progress}}</p>
-                                                <p>Status Value : {{item.statusValue}}</p>
-
+                                            <b class="text-purple">{{item.title}}
+                                                <!--<span ng-show="item.status == 1" class="glyphicon glyphicon-ok-circle text-success" data-toggle="tooltip" title="" data-placement="right" data-original-title="Item Status"></span>-->
+                                                <!--<span ng-show="item.status == 2" class="glyphicon glyphicon-remove-circle text-danger" data-toggle="tooltip" title="" data-placement="right" data-original-title="Item Status"></span>-->
+                                            <!-- -->
+                                            </b>
+                                                <p class="text-primary">Progress : {{item.progress}} %</p>
+                                                <p>Stage Progress Value : {{item.statusValue}}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -75,12 +75,13 @@
                                     <div class="thumbnail">
                                         <span class="glyphicon glyphicon-edit" data-toggle="tooltip" title="" data-placement="right" data-original-title="Edit Item"  data-index="{{$index}}" ng-click="toggleModalBox(1,$index)"></span>
                                         <div class="caption">
-                                            <h4 class="text-primary">{{item.title}}
-                                                <span ng-show="item.status == 1" class="glyphicon glyphicon-ok-circle text-success" data-toggle="tooltip" title="" data-placement="right" data-original-title="Item Status"></span>
-                                                <span ng-show="item.status == 2" class="glyphicon glyphicon-remove-circle text-danger" data-toggle="tooltip" title="" data-placement="right" data-original-title="Item Status"></span>
-                                            </h4>
-                                            <p class="text-primary">Progress : {{item.progress}}</p>
-                                            <p>Status Value : {{item.statusValue}}</p>
+                                            <b class="text-purple">{{item.title}}
+                                                <!--<span ng-show="item.status == 1" class="glyphicon glyphicon-ok-circle text-success" data-toggle="tooltip" title="" data-placement="right" data-original-title="Item Status"></span>-->
+                                                <!--<span ng-show="item.status == 2" class="glyphicon glyphicon-remove-circle text-danger" data-toggle="tooltip" title="" data-placement="right" data-original-title="Item Status"></span>-->
+                                            <!-- -->
+                                            </b>
+                                            <p class="text-primary">Progress : {{item.progress}} %</p>
+                                            <p>Stage Progress Value : {{item.statusValue}}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -104,12 +105,13 @@
                                     <div class="thumbnail">
                                         <span class="glyphicon glyphicon-edit" data-toggle="tooltip" title="" data-placement="right" data-original-title="Edit Item"  data-index="{{$index}}" ng-click="toggleModalBox(2,$index)"></span>
                                         <div class="caption">
-                                            <h4 class="text-primary">{{item.title}}
-                                                <span ng-show="item.status == 1" class="glyphicon glyphicon-ok-circle text-success" data-toggle="tooltip" title="" data-placement="right" data-original-title="Item Status"></span>
-                                                <span ng-show="item.status == 2" class="glyphicon glyphicon-remove-circle text-danger" data-toggle="tooltip" title="" data-placement="right" data-original-title="Item Status"></span>
-                                            </h4>
-                                            <p class="text-primary">Progress : {{item.progress}}</p>
-                                            <p>Status Value : {{item.statusValue}}</p>
+                                            <b class="text-purple">{{item.title}}
+                                                <!--<span ng-show="item.status == 1" class="glyphicon glyphicon-ok-circle text-success" data-toggle="tooltip" title="" data-placement="right" data-original-title="Item Status"></span>-->
+                                                <!--<span ng-show="item.status == 2" class="glyphicon glyphicon-remove-circle text-danger" data-toggle="tooltip" title="" data-placement="right" data-original-title="Item Status"></span>-->
+                                            <!-- -->
+                                            </b>
+                                            <p class="text-primary">Progress : {{item.progress}} %</p>
+                                            <p>Stage Progress Value : {{item.statusValue}}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -133,12 +135,13 @@
                                     <div class="thumbnail">
                                         <span class="glyphicon glyphicon-edit" data-toggle="tooltip" title="" data-placement="right" data-original-title="Edit Item"  data-index="{{$index}}" ng-click="toggleModalBox(3,$index)"></span>
                                         <div class="caption">
-                                            <h4 class="text-primary">{{item.title}}
-                                                <span ng-show="item.status == 1" class="glyphicon glyphicon-ok-circle text-success" data-toggle="tooltip" title="" data-placement="right" data-original-title="Item Status"></span>
-                                                <span ng-show="item.status == 2" class="glyphicon glyphicon-remove-circle text-danger" data-toggle="tooltip" title="" data-placement="right" data-original-title="Item Status"></span>
-                                            </h4>
-                                            <p class="text-primary">Progress : {{item.progress}}</p>
-                                            <p>Status Value : {{item.statusValue}}</p>
+                                            <b class="text-purple">{{item.title}}
+                                                <!--<span ng-show="item.status == 1" class="glyphicon glyphicon-ok-circle text-success" data-toggle="tooltip" title="" data-placement="right" data-original-title="Item Status"></span>-->
+                                                <!--<span ng-show="item.status == 2" class="glyphicon glyphicon-remove-circle text-danger" data-toggle="tooltip" title="" data-placement="right" data-original-title="Item Status"></span>-->
+                                            <!-- -->
+                                            </b>
+                                            <p class="text-primary">Progress : {{item.progress}} %</p>
+                                            <p>Stage Progress Value : {{item.statusValue}}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -162,12 +165,13 @@
                                     <div class="thumbnail">
                                         <span class="glyphicon glyphicon-edit" data-toggle="tooltip" title="" data-placement="right" data-original-title="Edit Item"  data-index="{{$index}}" ng-click="toggleModalBox(4,$index)"></span>
                                         <div class="caption">
-                                            <h4 class="text-primary">{{item.title}}
-                                                <span ng-show="item.status == 1" class="glyphicon glyphicon-ok-circle text-success" data-toggle="tooltip" title="" data-placement="right" data-original-title="Item Status"></span>
-                                                <span ng-show="item.status == 2" class="glyphicon glyphicon-remove-circle text-danger" data-toggle="tooltip" title="" data-placement="right" data-original-title="Item Status"></span>
-                                            </h4>
-                                            <p class="text-primary">Progress : {{item.progress}}</p>
-                                            <p>Status Value : {{item.statusValue}}</p>
+                                            <b class="text-purple">{{item.title}}
+                                                <!--<span ng-show="item.status == 1" class="glyphicon glyphicon-ok-circle text-success" data-toggle="tooltip" title="" data-placement="right" data-original-title="Item Status"></span>-->
+                                                <!--<span ng-show="item.status == 2" class="glyphicon glyphicon-remove-circle text-danger" data-toggle="tooltip" title="" data-placement="right" data-original-title="Item Status"></span>-->
+                                            <!-- -->
+                                            </b>
+                                            <p class="text-primary">Progress : {{item.progress}} %</p>
+                                            <p>Stage Progress Value : {{item.statusValue}}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -197,27 +201,37 @@
                     <div class="row">
                         <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
                             <div class="form-group">
-                                <input class="form-control" maxlength="15" placeholder="Status Title" ng-model="modalBox.txStatus.title" id="item-title"/>
+                                <input class="form-control" maxlength="15" placeholder="StageTitle" ng-model="modalBox.txStatus.title" id="item-title"/>
                             </div>
                         </div>
 
 
-                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
-                            <div class="form-group">
-                                <select class="form-control" placeholder="Status" ng-model="modalBox.txStatus.status" id="item-status">
-                                    <option value="1">Active</option>
-                                    <option value="2">Inactive</option>
-                                </select>
-                            </div>
-                        </div>
+                        <!--<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">-->
+                            <!--<div class="form-group">-->
+                                <!--<select class="form-control" placeholder="Status" ng-model="modalBox.txStatus.status" id="item-status">-->
+                                    <!--<option value="1">Active</option>-->
+                                    <!--<option value="2">Inactive</option>-->
+                                <!--</select>-->
+                            <!--</div>-->
+                        <!--</div>-->
 
                         <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
-                            <div class="form-group">
-                                <select class="form-control" ng-model="modalBox.txStatus.progress">
-                                    <option value="">--Select Progress--</option>
-                                    <option ng-repeat="i in getNumber(101) track by $index" value="{{$index}}">{{$index}}</option>
-                                </select>
-                                <!--------- Integrate Progress bar here with 0-100 value ng-model="modalBox.txStatus.progress" -------------------->
+                            <!--<div class="form-group">-->
+                                <!--&lt;!&ndash;<select class="form-control" ng-model="modalBox.txStatus.progress">&ndash;&gt;-->
+                                    <!--&lt;!&ndash;<option value="0">&#45;&#45;Select Progress&#45;&#45;</option>&ndash;&gt;-->
+                                    <!--&lt;!&ndash;<option ng-repeat="i in getNumber(101) track by $index" value="{{$index}}">{{$index}}</option>&ndash;&gt;-->
+                                <!--&lt;!&ndash;</select>&ndash;&gt;-->
+                                <!--<div class="input-group">-->
+                                    <!--<input class="form-control" type="number" maxlength="3" max="100" min="0" numbers-only-->
+                                           <!--ng-model="modalBox.txStatus.progress" />-->
+                                    <!--<span class="input-group-addon">%</span>-->
+                                <!--</div>-->
+                                <!--&lt;!&ndash;-&#45;&#45;&#45;&#45;&#45;&#45; Integrate Progress bar here with 0-100 value ng-model="modalBox.txStatus.progress" &#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&ndash;&gt;-->
+                            <!--</div>-->
+                            <div class="input-group">
+                                <input class="form-control" type="number" maxlength="3" max="100" min="0" numbers-only
+                                       ng-model="modalBox.txStatus.progress" />
+                                <span class="input-group-addon">%</span>
                             </div>
                         </div>
 
@@ -226,8 +240,8 @@
 
                         <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
                             <div class="form-group">
-                                <select class="form-control" ng-model="modalBox.txStatus.statusValue" data-toggle="tooltip" title="Status Value(Completion Index)">
-                                    <option ng-repeat="i in getNumber(statusValueLimit) track by $index" value="{{$index+1}}">{{$index+1}}</option>
+                                <select class="form-control" ng-model="modalBox.txStatus.statusValue" data-toggle="tooltip" title="Stage Progress Value(Completion Index)">
+                                    <option ng-repeat="option in statusOptions track by $index" value="{{$index}}">{{option}}</option>
                                 </select>
                             </div>
                         </div>

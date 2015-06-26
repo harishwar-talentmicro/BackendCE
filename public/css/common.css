@@ -1224,11 +1224,18 @@ span.smallCloselink {
 
 .business-item{
     text-align: center;
-    min-height:250px;
+    min-height:30px;
     max-height:250px;
     font-size: 12px;
 }
 
+.text-warning{
+    color: #FC7C00
+}
+
+.text-purple{
+    color: #9e00fc
+}
 .business-item .item-description{
     word-wrap: normal;
 }
@@ -1283,9 +1290,8 @@ span.smallCloselink {
 
 .modal-dialog.modal-lg.business-manager-modal .business-manager-item,
 .business-manager-item{
-    border: 1px solid #D8D8D8;
-    box-shadow: 0px 0px 3px #DDD;
-    background: #F2F2F2;
+    background-color: #008B8B;
+    border: 1px solid #BBB;
     padding: 5px;
     margin: 5px 0px 5px 0px;
     padding-bottom: 0px;
@@ -1329,12 +1335,38 @@ span.smallCloselink {
 
 .modal-dialog.modal-lg.business-manager-modal .business-manager-item > div.business-manager-item-details,
 .business-manager-item > div.business-manager-item-details{
-  padding:0px;
+    padding: 0px;
+    font-size: 12px;
+    font-family: roboto;
+
+
 }
 .modal-dialog.modal-lg.business-manager-modal .business-manager-item > div.business-manager-item-details > h4,
 .business-manager-item > div.business-manager-item-details > h4{
-  margin:0px;
-  padding:0px;
+      margin:0px;
+      padding:0px;
+
+}
+.modal-dialog.modal-lg.business-manager-modal .business-manager-item > div.business-manager-item-details > h4,
+.business-manager-item > div.business-manager-item-details > h5{
+    border: none!important;
+    color: #FFF;
+}
+
+.business-manager-item-details .btn-orange{
+    background-color: #EA8E00;
+    border: 1px solid #FFF;
+    color:#FFFFFF;
+}
+
+.business-manager-item-details .btn-orange:hover{
+    background-color: #EA3500;
+    border: 1px solid #F3FF3A;
+    color: #FFFFFF;
+}
+
+.text-white{
+    color: #ffffff!important;
 }
 
 .information-detail-module-navigation{
@@ -1474,15 +1506,15 @@ span.smallCloselink {
 .business-item .glyphicon-edit, .picture-attach.glyphicon-paperclip{
     text-align: right;
     position: absolute;
-    color: #252525;
-    padding: 5px;
+    color: #EA5000;
+    padding: 2px;
     border-radius: 0px;
     font-size: 14px;
     margin: 0px 17px 0px 0px;
     right: 0;
     cursor: pointer;
-    background: #FFF;
-    border: 1px solid #9B9B9B;
+    background: #FFFFFF;
+    border: 1px solid #EA5000;
 }
 
 .salesItemImage
@@ -2496,4 +2528,19 @@ form .row-error{
 .ac-list-child:hover{
     background : #EFEFEF;
     color:#4AC304;
+}
+
+.no-margin{
+    margin:0px;
+}
+.no-padding{
+    padding:0px;
+}
+
+.no-border{
+    border:none;
+}
+.wrap-text{
+    text-wrap: normal;
+    word-wrap: break-word;
 }
