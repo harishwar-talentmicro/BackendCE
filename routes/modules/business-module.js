@@ -47,7 +47,7 @@ BusinessManager.prototype.getTransactions = function(req,res,next){
         if (Token != null && FunctionType.toString() != null && Page.toString() != 'NaN' && Page.toString() != 0) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
-                    if (Result != null) {
+                    if (Result) {
 
                         var ToPage = 10 * Page;
                         var FromPage = ToPage - 10;
@@ -61,7 +61,7 @@ BusinessManager.prototype.getTransactions = function(req,res,next){
                         db.query('CALL pGetMessagesNew(' + parameters + ')', function (err, GetResult) {
                             console.log(GetResult);
                             if (!err) {
-                                if (GetResult != null) {
+                                if (GetResult) {
                                     console.log('Length:'+GetResult[0].length);
                                     if (GetResult[0].length > 0) {
                                         var totalRecord=GetResult[0][0].TotalCount;
@@ -207,7 +207,7 @@ BusinessManager.prototype.saveTransaction = function(req,res,next){
         if (Token != null && ItemsList != null) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
-                    if (Result != null) {
+                    if (Result) {
 
                         var query = db.escape(Token)+","+db.escape(FunctionType)+","+ db.escape(MessageText)+ "," + db.escape(Status) +"," + db.escape(TaskDateNew) + ","  + db.escape(Notes) + "," + db.escape(LocID)  + "," + db.escape(Country)   + "," + db.escape(State) + "," + db.escape(City)   + "," + db.escape(Area) + ","  + db.escape(Latitude)  + "," + db.escape(Longitude)  +  "," + db.escape(EZEID)  + "," + db.escape(ContactInfo)  + "," + db.escape(FolderRuleID)  + "," + db.escape(Duration)  + "," + db.escape(DurationScales) + "," + db.escape(NextAction) + "," + db.escape(NextActionDateTimeNew) + "," + db.escape(TID) + "," + db.escape(((ItemIDList != "") ? ItemIDList : "")) + "," + db.escape(DeliveryAddress) + "," + db.escape(ToEZEID) + "," + db.escape(item_list_type) + "," + db.escape(companyName) + "," + db.escape(company_id);
                         // db.escape(NextActionDateTime);
@@ -215,7 +215,7 @@ BusinessManager.prototype.saveTransaction = function(req,res,next){
                         db.query('CALL pSaveTrans(' + query + ')', function (err, InsertResult) {
                             if (!err){
                                 console.log(InsertResult);
-                                if (InsertResult[0] != null) {
+                                if (InsertResult[0]) {
                                     if(InsertResult[0].length > 0){
                                         RtnMessage.IsSuccessfull = true;
                                         var Message = InsertResult[0];
@@ -237,7 +237,7 @@ BusinessManager.prototype.saveTransaction = function(req,res,next){
                                                 var query = db.query('INSERT INTO titems SET ?', items, function (err, result) {
                                                     // Neat!
                                                     if (!err) {
-                                                        if (result != null) {
+                                                        if (result) {
                                                             if (result.affectedRows > 0) {
                                                                 console.log('FnSaveFolderRules: Folder rules saved successfully');
                                                             }
@@ -270,7 +270,7 @@ BusinessManager.prototype.saveTransaction = function(req,res,next){
                                                     // Neat!
                                                     console.log(result);
                                                     if (!err) {
-                                                        if(result != null){
+                                                        if(result){
                                                             if(result.affectedRows > 0){
 
                                                                 console.log('FnSaveFolderRules: Folder rules Updated successfully');
@@ -446,11 +446,11 @@ BusinessManager.prototype.getTransactionItems = function(req,res,next){
         if (Token != null && MessageID != null) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
-                    if (Result != null) {
+                    if (Result) {
 
                         db.query('CALL pGetTranscationItems(' + db.escape(MessageID) + ')', function (err, GetResult) {
                             if (!err) {
-                                if (GetResult != null) {
+                                if (GetResult) {
                                     if (GetResult[0].length > 0) {
 
                                         console.log('FnGetTranscationItems: transaction items details Send successfully');
@@ -538,7 +538,7 @@ BusinessManager.prototype.getOutboxTransactions = function(req,res,next){
         if (Token) {
             FnValidateToken(Token, function (err, result) {
                 if (!err) {
-                    if (result != null) {
+                    if (result) {
                         db.query('CALL pGetOutboxMessages(' + db.escape(Token) + ',' + db.escape(pagesize) + ',' + db.escape(pagecount)+ ')', function (err, GetResult) {
                             if (!err) {
                                 if (GetResult) {

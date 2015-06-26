@@ -50,7 +50,7 @@ Search.prototype.searchKeyword = function(req,res,next){
         var pagecount = req.body.pagecount ? parseInt(req.body.pagecount) : 0;
         var total = req.body.total ? parseInt(req.body.total) : 0;
 
-        //console.log(req.body);
+        console.log(req.body);
 
         if (type == "1") {
 
@@ -132,32 +132,40 @@ Search.prototype.searchKeyword = function(req,res,next){
                                     }
                                 }
                             }
-                            var SearchQuery = _this.db.escape('') + ',' + _this.db.escape(CategoryID) + ',' + _this.db.escape(0) + ',' + _this.db.escape(Latitude)
-                                + ',' + _this.db.escape(Longitude) +',' + _this.db.escape(EZEID) + ',' + _this.db.escape(LocSeqNo) + ',' + _this.db.escape(Pin) + ',' + _this.db.escape(SearchType) + ',' + _this.db.escape(DocType)
-                                + ',' + _this.db.escape("0") + ',' + _this.db.escape("0") + ',' + _this.db.escape("0") + ',' + _this.db.escape(token)
-                                + ',' + _this.db.escape(HomeDelivery) + ',' + _this.db.escape(CurrentDate) + ',' + _this.db.escape(isPagination) + ',' +
-                                _this.db.escape(pagesize) + ',' + _this.db.escape(pagecount) + ',' + _this.db.escape(total) ;
+                            var SearchQuery = db.escape('') + ',' + db.escape(CategoryID) + ',' + db.escape(0) + ',' + db.escape(Latitude)
+                                + ',' + db.escape(Longitude) +',' + db.escape(EZEID) + ',' + db.escape(LocSeqNo) + ',' + db.escape(Pin) + ',' + db.escape(SearchType) + ',' + db.escape(DocType)
+                                + ',' + db.escape("0") + ',' + db.escape("0") + ',' + db.escape("0") + ',' + db.escape(token)
+                                + ',' + db.escape(HomeDelivery) + ',' + db.escape(CurrentDate) + ',' + db.escape(isPagination) + ',' +
+                                db.escape(pagesize) + ',' + db.escape(pagecount) + ',' + db.escape(total) ;
 
                             console.log('CALL pSearchResultNew(' + SearchQuery + ')');
-                            _this.db.query('CALL pSearchResultNew(' + SearchQuery + ')', function (err, SearchResult) {
-                                // _this.db.query(searchQuery, function (err, SearchResult) {
+                            db.query('CALL pSearchResultNew(' + SearchQuery + ')', function (err, SearchResult) {
+                                // db.query(searchQuery, function (err, SearchResult) {
                                 if (!err) {
                                     if (SearchResult[0] != null) {
                                         if (SearchResult[0].length > 0) {
-                                            console.log(SearchResult);
-                                            res.json({totalcount:SearchResult[0][0].totalcount,Result:SearchResult[1]});
-                                            console.log('FnSearchByKeywords: tmaster: Search result sent successfully');
+                                            if (SearchResult[0][0].totalcount == 1)
+                                            {
+                                                res.json({totalcount:SearchResult[0][0].totalcount,Result:SearchResult[1]});
+                                                console.log('FnSearchByKeywords: tmaster: Search result sent successfully');
+                                            }
+                                            else
+                                            {
+                                                res.send(SearchResult[0]);
+                                                console.log('FnSearchByKeywords: tmaster: Search result sent successfully');
+                                            }
+
                                             if (SearchType == 2){
-                                                var getQuery = 'select TID from tmaster where Token='+_this.db.escape(token);
-                                                _this.db.query(getQuery, function (err, getResult) {
+                                                var getQuery = 'select TID from tmaster where Token='+db.escape(token);
+                                                db.query(getQuery, function (err, getResult) {
                                                     if(!err){
                                                         var tid = getResult[0].TID;
                                                         console.log(tid);
                                                     }
-                                                    var query = _this.db.escape(tid) + ',' + _this.db.escape(logHistory.ezeid) + ',' + _this.db.escape(logHistory.ip) + ',' + _this.db.escape(logHistory.type);
+                                                    var query = db.escape(tid) + ',' + db.escape(logHistory.ezeid) + ',' + db.escape(logHistory.ip) + ',' + db.escape(logHistory.type);
                                                     console.log('CALL pCreateAccessHistory(' + query + ')');
                                                     if(logHistory.type < 1){
-                                                        _this.db.query('CALL pCreateAccessHistory(' + query + ')', function (err){
+                                                        db.query('CALL pCreateAccessHistory(' + query + ')', function (err){
                                                             if(!err){
                                                                 console.log('FnSearchByKeywords:Access history is created');
                                                             }
@@ -236,14 +244,14 @@ Search.prototype.searchKeyword = function(req,res,next){
                     ParkingStatus = "1,2,3";
                 }
 
-                var InsertQuery = _this.db.escape(find) + ',' + _this.db.escape(CategoryID) + ',' + _this.db.escape(Proximity) + ',' + _this.db.escape(Latitude)
-                    + ',' + _this.db.escape(Longitude) + ',' + _this.db.escape('') + ',' + _this.db.escape(0) + ',' + _this.db.escape(0) + ',' + _this.db.escape(1)
-                    + ',' + _this.db.escape('') + ',' + _this.db.escape(ParkingStatus) + ',' + _this.db.escape(OpenCloseStatus) + ',' + _this.db.escape(Rating)
-                    + ',' + _this.db.escape(token) + ',' + _this.db.escape(HomeDelivery)+ ',' + _this.db.escape(CurrentDate) + ',' + _this.db.escape(isPagination) + ',' +
-                    _this.db.escape(pagesize) + ',' + _this.db.escape(pagecount)+ ',' + _this.db.escape(total) ;
+                var InsertQuery = db.escape(find) + ',' + db.escape(CategoryID) + ',' + db.escape(Proximity) + ',' + db.escape(Latitude)
+                    + ',' + db.escape(Longitude) + ',' + db.escape('') + ',' + db.escape(0) + ',' + db.escape(0) + ',' + db.escape(1)
+                    + ',' + db.escape('') + ',' + db.escape(ParkingStatus) + ',' + db.escape(OpenCloseStatus) + ',' + db.escape(Rating)
+                    + ',' + db.escape(token) + ',' + db.escape(HomeDelivery)+ ',' + db.escape(CurrentDate) + ',' + db.escape(isPagination) + ',' +
+                    db.escape(pagesize) + ',' + db.escape(pagecount)+ ',' + db.escape(total) ;
                 console.log('CALL pSearchResultNew(' + InsertQuery + ')');
                 //var link = 'CALL pSearchResult(' + InsertQuery + ')';
-                _this.db.query('CALL pSearchResultNew(' + InsertQuery + ')', function (err, SearchResult) {
+                db.query('CALL pSearchResultNew(' + InsertQuery + ')', function (err, SearchResult) {
                     if (!err) {
                         //console.log(SearchResult);
                         if (SearchResult[0] != null) {
@@ -301,13 +309,13 @@ Search.prototype.searchKeyword = function(req,res,next){
                 if (ParkingStatus == 0) {
                     ParkingStatus = "1,2,3";
                 }
-                var InsertQuery = _this.db.escape(find) + ',' + _this.db.escape(CategoryID) + ',' + _this.db.escape(Proximity) + ',' + _this.db.escape(Latitude)
-                    + ',' + _this.db.escape(Longitude) + ',' + _this.db.escape('') + ',' + _this.db.escape(0) + ',' + _this.db.escape(0) + ',' + _this.db.escape(3)
-                    + ',' + _this.db.escape('') + ',' + _this.db.escape(ParkingStatus) + ',' + _this.db.escape(OpenCloseStatus) + ',' + _this.db.escape(Rating)
-                    + ',' + _this.db.escape(token)  + ',' + _this.db.escape(HomeDelivery)+ ',' + _this.db.escape(CurrentDate) + ',' + _this.db.escape(isPagination) + ',' +
-                    _this.db.escape(pagesize) + ',' + _this.db.escape(pagecount)+ ',' + _this.db.escape(total);
+                var InsertQuery = db.escape(find) + ',' + db.escape(CategoryID) + ',' + db.escape(Proximity) + ',' + db.escape(Latitude)
+                    + ',' + db.escape(Longitude) + ',' + db.escape('') + ',' + db.escape(0) + ',' + db.escape(0) + ',' + db.escape(3)
+                    + ',' + db.escape('') + ',' + db.escape(ParkingStatus) + ',' + db.escape(OpenCloseStatus) + ',' + db.escape(Rating)
+                    + ',' + db.escape(token)  + ',' + db.escape(HomeDelivery)+ ',' + db.escape(CurrentDate) + ',' + db.escape(isPagination) + ',' +
+                    db.escape(pagesize) + ',' + db.escape(pagecount)+ ',' + db.escape(total);
                 console.log('CALL pSearchResultNew(' + InsertQuery + ')');
-                _this.db.query('CALL pSearchResultNew(' + InsertQuery + ')', function (err, SearchResult) {
+                db.query('CALL pSearchResultNew(' + InsertQuery + ')', function (err, SearchResult) {
                     if (!err) {
                         console.log(SearchResult);
                         if (SearchResult[0] != null) {

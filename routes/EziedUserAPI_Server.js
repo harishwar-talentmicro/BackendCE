@@ -1962,7 +1962,7 @@ exports.FnRegistration = function (req, res) {
                 db.query('CALL pSaveEZEIDData(' + InsertQuery + ')', function (err, InsertResult) {
                     if (!err) {
                         // console.log('InsertResult: ' + InsertResult);
-                        if (!InsertResult) {
+                        if (InsertResult) {
                             //  console.log(InsertResult);
                             if (InsertResult[0].length > 0) {
                                  var RegResult = InsertResult[0];
