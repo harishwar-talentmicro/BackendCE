@@ -249,18 +249,30 @@ angular.module('ezeidApp').factory('GoogleMaps',['$q','$timeout','$compile',func
         this.searchBox = new google.maps.places.SearchBox((searchElem));
     };
 
-    GoogleMap.prototype.listenOnMapControls = function(locationChangeCallback,callback){
+    /**
+     * Adding google map search box control without adding google maps
+     * @param searchElementId
+     */
+    GoogleMap.prototype.addSearchBox = function(searchElementId){
+        var searchElem = (document.getElementById(searchElementId));
+        this.searchBox = new google.maps.places.SearchBox((searchElem));
+    };
+
+
+    GoogleMap.prototype.listenOnMapControls = function(locationChangeCallback,callback,isMap){
+        if(typeof(isMap) == "undefined"){
+            isMap = true;
+        }
         var _this = this;
         if(typeof(locationChangeCallback) == "undefined"){
             locationChangeCallback = null;
         }
+        console.log(_this.searchBox);
         google.maps.event.addListener(_this.searchBox,'places_changed',function(){
             var places = _this.searchBox.getPlaces();
             if (places.length == 0) {
                 return;
             }
-
-            _this.clearAllMarkers();
 
             var bounds = new google.maps.LatLngBounds();
             var place = places[0];
@@ -271,24 +283,32 @@ angular.module('ezeidApp').factory('GoogleMaps',['$q','$timeout','$compile',func
                 anchor: new google.maps.Point(17, 34),
                 scaledSize: new google.maps.Size(25, 25)
             };
-            //$scope.triggerLocationChange(place.geometry.location.lat(),place.geometry.location.lng());
-            var marker = _this.createMarker(place.geometry.location,place.name,'images/you_are_here.png',true,locationChangeCallback);
-            _this.markerList.push(marker);
-            _this.placeMarker(marker);
-            bounds.extend(place.geometry.location);
 
-            _this.map.fitBounds(bounds);
-            if(_this.map.getZoom() > 15){ _this.map.setZoom(14);}
+            if(isMap){
+                _this.clearAllMarkers();
+                //$scope.triggerLocationChange(place.geometry.location.lat(),place.geometry.location.lng());
+                var marker = _this.createMarker(place.geometry.location,place.name,'images/you_are_here.png',true,locationChangeCallback);
+                _this.markerList.push(marker);
+                _this.placeMarker(marker);
+                bounds.extend(place.geometry.location);
+
+                _this.map.fitBounds(bounds);
+                if(_this.map.getZoom() > 15){ _this.map.setZoom(14);}
+            }
+
             if(callback){
-                callback(marker.position.lat(),marker.position.lng());
+                callback(place.geometry.location.lat(),place.geometry.location.lng());
             }
         });
 
+        if(isMap){
+            google.maps.event.addListener(_this.map, 'bounds_changed', function() {
+                var bounds = _this.map.getBounds();
+                _this.searchBox.setBounds(bounds);
+            });
+        }
 
-        google.maps.event.addListener(_this.map, 'bounds_changed', function() {
-            var bounds = _this.map.getBounds();
-            _this.searchBox.setBounds(bounds);
-        });
+
     };
 
     GoogleMap.prototype.clearAllMarkers = function(){
@@ -477,6 +497,8 @@ angular.module('ezeidApp').factory('GoogleMaps',['$q','$timeout','$compile',func
             route : ''
         };
 
+        console.log(geocoderResults);
+
         if(geocoderResults && geocoderResults.length > 0){
 
             var results = geocoderResults[0]['address_components'];
@@ -517,6 +539,8 @@ angular.module('ezeidApp').factory('GoogleMaps',['$q','$timeout','$compile',func
                 console.error('Geolocation data parsing error : '+ ex);
             }
         }
+
+        console.log(returnObj);
 
         return returnObj;
     };

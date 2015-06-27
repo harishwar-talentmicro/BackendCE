@@ -265,7 +265,7 @@
 
                     <div class="col-lg-2  col-md-12 col-sm-12 col-xs-12 bottom-clearfix" title="{{tx.Message}}" style="word-wrap:break-word;">
                         <small class="text-success">
-                            <b>{{tx.Message | truncate:100:'...'}}</b>
+                            <b>{{tx.Message | truncate:60:'...'}}</b>
                         </small>
                     </div>
 
@@ -612,7 +612,7 @@
                                 </div>
                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                     <div class="form-group form-group-sm ">
-                                        <input class="form-control"
+                                        <input class="form-control text-right"
                                                type="text"
                                                decimals-only
                                                ng-model="modalBox.tx.amount" name="amount" />

@@ -144,5 +144,18 @@ input[type='text'],input[type='email'],input[type='url'],input[type='number'],in
 }
 
 
+#wrapper > div.container-fluid > div.row > div.front-business-form > div.panel-default > div.panel-heading,
+#wrapper > div.container > div.row > div.front-business-form > div.panel-default > div.panel-heading{
+    background-color: #19A8A8;
+    border: 0px;
+}
+
+#wrapper > div.container-fluid > div.row > div.front-business-form,
+#wrapper > div.container > div.row > div.front-business-form{
+    background: #FFF;
+     box-shadow: none;
+     border: none;
+    padding: 0px;
+}
 
 /***************************************** end :  Directly over container in currrent ***************************************/

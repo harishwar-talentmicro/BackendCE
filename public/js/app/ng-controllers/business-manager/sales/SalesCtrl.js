@@ -227,6 +227,28 @@
                 });
                 return defer.promise;
             };
+
+            /**
+             * Eliminates the rate and item description from the message
+             * so that it can be recalculated and saved when internal user changes or updates the order
+             * @param msg
+             * @usage parameter msg will be like
+             * msg = 'this is message text for this sales enquiry ------------------------------ Nuts(7), Bolts(6)
+             * alteredMsg = 'this is message text for this sales enquiry'
+             */
+            var alterTransactionMessageToEdit = function(msg){
+                var alteredMsg = '';
+                var str = '------------------------------'; //30 characters
+                var indexStr = msg.indexOf(str);
+                if(indexStr !== -1){
+                    alteredMsg = msg.substr(0,indexStr);
+                }
+                else{
+                    alteredMsg = msg;
+                }
+                return alteredMsg;
+            };
+
             /**
              * Copies the transaction properties to editMode Object
              * @param tx
@@ -257,7 +279,7 @@
                         nextActionDateTime : $filter('dateTimeFilter')(tx.NextActionDate,'DD MMM YYYY hh:mm:ss A','DD MMM YYYY hh:mm:ss A'),
                         taskDateTime : tx.TaskDateTime,
                         folderRule : (tx.FolderRuleID && tx.FolderRuleID !== 'null') ? tx.FolderRuleID : 0,
-                        message : tx.Message,
+                        message : alterTransactionMessageToEdit(tx.Message),
                         messageType : ($rootScope._userInfo.SalesItemListType) ? $rootScope._userInfo.SalesItemListType : 0,
                         latitude : 0,
                         longitude : 0,
@@ -1262,16 +1284,6 @@
 
 
             var init = function(){
-                //$scope.loadfilterStatusTypes().then(function(resp){
-///
-//                $scope.loadFolderRules().then(function(){
-//                    $scope.$emit('$preLoaderStop');
-//                },function(){
-//                    $scope.$emit('$preLoaderStop');
-//                    Notification.error({message : 'Unable to load folder rules', delay : MsgDelay} );
-//                });
-
-                ///
                 $scope.loadFolderRules().then(function(){
                     getSubUserList().then(function(){
                         $scope.loadTxActionTypes().then(function(){
@@ -1431,7 +1443,8 @@
                 }
 
 
-                if($scope.modalBox.tx.message.length < 1 && $scope.modules[moduleIndex].listType > 0){
+                if($scope.modules[moduleIndex].listType > 0){
+                    var separationStr = ' ------------------------------ ';
                     var itemList = [];
                     try{
                         itemList = JSON.parse(data.ItemsList);
@@ -1442,16 +1455,16 @@
                     var msg = '';
                     for(var ct = 0; ct < itemList.length; ct++){
                         msg += itemList[ct]['ItemName'];
-                        if(itemList[ct]['Qty']){
+                        if(itemList[ct]['Qty'] && $scope.modules[moduleIndex].listType > 2){
                             msg += ' ('+ itemList[ct]['Qty'] + ')';
                         }
-                        if(itemList[ct]['Amount']){
+                        if(itemList[ct]['Amount'] && $scope.modules[moduleIndex].listType > 3){
                             msg += ' : '+ itemList[ct]['Amount'];
                         }
                         msg += ', ';
                     }
                     msg = msg.substring(0, msg.length - 2);
-                    data.MessageText = msg;
+                    data.MessageText += (separationStr + msg);
                 }
 
                 $scope.$emit('$preLoaderStart');

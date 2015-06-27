@@ -1299,7 +1299,7 @@ span.smallCloselink {
 
 .modal-dialog.modal-lg.business-manager-modal.business-manager-item.purple,
 .business-manager-item.purple{
-    background-color: #6B0A8C;
+    background-color: #1ABA00;
 }
 
 .modal-dialog.modal-lg.business-manager-modal.business-manager-item.orange,
@@ -1342,7 +1342,8 @@ span.smallCloselink {
 }
 
 .business-manager-input-control > input[disabled]{
-    border: 1px solid #DDD;
+    border: #FFFFEF;
+    background-color: #FFEC89;
 }
 .modal-dialog.modal-lg.business-manager-modal label{
     font-family: 'Roboto', sans-serif;
@@ -2597,7 +2598,7 @@ form .row-error{
 }
 
 .no-border{
-    border:none;
+    border:none!important;
 }
 .wrap-text{
     text-wrap: normal;
@@ -2622,3 +2623,93 @@ form .row-error{
     -webkit-border-radius: 10px;
     border-radius: 10px;
 }
+
+.navbar{
+    margin-bottom: 0px;
+}
+
+.panel-default.front-business-form{
+    border: none;
+    background-color: #ffffff;
+}
+.panel-heading.profile-manager.business-manager-modal.front-business-form{
+    background-color: #19A8A8;
+    border: 0px;
+}
+.panel-body.profile-manager.business-manager-modal.front-business-form{
+    padding: 15px;
+    border: 1px solid #DDD;
+}
+
+#wrapper > div > div > div.front-business-form{
+    background: #FFF;
+    /* box-shadow: 0px 0px 50px #B0B2B5; */
+    /* border: 1px solid #C5C5C5; */
+    padding: 0px;
+}
+
+h4.front-business-form{
+    font-weight: 500;
+    font-family: 'Roboto',sans-serif;
+    color: #B0B0B0;
+    font-size: 18px;
+    background-color: #F0F0F0;
+    margin: -30px;
+    margin-top: -15px;
+    padding: 8px;
+    border: 0px;
+    border-bottom: 1px solid #DDD;
+    color: #000;
+    margin-bottom: 0px;
+}
+
+h4.front-business-form.warning-text{
+    background-color: #FFF877;
+    margin-top: -2px;
+    padding: 3px;
+    border: none;
+    font-size: 94%;
+}
+
+.front-business-form.selected-item-text{
+    font-weight: bold;
+    color: #407686;
+    font-family: 'Roboto',sans-serif;
+    font-size: 16px;
+}
+
+.front-business-form.unselected-item-text{
+    font-weight: bold;
+    color: #0eb5d2;
+    font-family: 'Roboto',sans-serif;
+    font-size: 16px;
+}
+
+@media (min-width: 1200px){
+    .front-business-form.col-lg-4 {
+        width: 33.33333333%;
+        width: 30%;
+        margin-right: 16px;
+    }
+}
+
+.item-list-box,.tx-item-list-box{
+    border: 1px solid #BABABA;
+    box-shadow: 0px 0px 10px #DDD;
+}
+
+.front-business-form.cart-details{
+    margin-left: -1.5%;
+    padding: 5px;
+    border: 1px solid #B3B3B3;
+    border-top: none;
+}
+
+/*label{*/
+    /*max-width: 100%;*/
+    /*margin-bottom: 5px;*/
+    /*font-weight: normal;*/
+    /*font-size: 13px;*/
+    /*color: #474747;*/
+    /*font-family: 'Open Sans',sans-serif;*/
+/*}*/

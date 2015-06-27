@@ -180,6 +180,10 @@
                 });
             };
 
+            var googleMap = new GoogleMap();
+            googleMap.addSearchBox('google-map-search-box');
+            googleMap.listenOnMapControls(null,null,false);
+
             $scope.resolveGeolocationAddress = function(){
                 var defer = $q.defer();
                 $scope.modalBox.tx.address = '';
@@ -195,8 +199,6 @@
                     },500);
                     return defer.promise;
                 }
-
-                var googleMap = new GoogleMap();
 
                 var lat = 0;
                 var lng = 0;
@@ -683,10 +685,10 @@
                     var msg = '';
                     for(var ct = 0; ct < itemList.length; ct++){
                         msg += itemList[ct]['ItemName'];
-                        if(itemList[ct]['Qty']){
+                        if(itemList[ct]['Qty'] && ($scope.salesItemListType == 3 || $scope.salesItemListType ==4)){
                             msg += ' ('+ itemList[ct]['Qty'] + ')';
                         }
-                        if(itemList[ct]['Amount']){
+                        if(itemList[ct]['Amount'] && $scope.salesItemListType ==4){
                             msg += ' : '+ itemList[ct]['Amount'];
                         }
                         msg += ', ';
@@ -788,6 +790,61 @@
             };
 
             init();
+
+
+            $scope.cartAmount = 0.00;
+            $scope.cartString = '';
+
+            function calculateCartDetails (){
+                var amount = 0.00;
+                var qty = 0;
+                for(var ct = 0; ct < $scope.modalBox.tx.itemList.length; ct++){
+                    if($scope.modalBox.tx.itemList[ct]['Qty'] && ($scope.salesItemListType == 3 || $scope.salesItemListType == 4)){
+                        var ab  = parseInt($scope.modalBox.tx.itemList[ct]['Qty']);
+                        if(ab !== NaN){
+                            qty += ab;
+                        }
+                        else{
+                            qty += 1;
+                        }
+                    }
+                    else{
+                        qty += 1;
+                    }
+                    if($scope.modalBox.tx.itemList[ct]['Amount'] && $scope.salesItemListType == 4){
+                        var am = 0.00;
+                        var qt = 1;
+                        var rt = parseFloat($scope.modalBox.tx.itemList[ct]['Rate']);
+                        if(rt !== NaN){
+                            qt = parseInt($scope.modalBox.tx.itemList[ct]['Qty']);
+                        }
+                        am = parseFloat(rt*qt);
+                        amount += am;
+                    }
+                }
+
+                var cartString = 'No items selected';
+                if(qty == 1){
+                    cartString = '1 item selected';
+                }
+                if(qty > 1){
+                    cartString = qty.toString() + ' items selected';
+                }
+
+                $scope.cartAmount = amount.toFixed(2);
+                $scope.cartItemString = cartString;
+            };
+
+            $interval(function(){
+                calculateCartDetails();
+            },700);
+
+            /**
+             * Selecting address selection method whether using EZEOne ID or other address
+             * @type {number} 0 : EZEOne ID location
+             * 1 : Other address (Google map autocomplete active)
+             */
+            $scope.addressSelectionType = 0;
 
         }
     ]);
