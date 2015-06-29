@@ -2672,16 +2672,16 @@ h4.front-business-form.warning-text{
 }
 
 .front-business-form.selected-item-text{
-    font-weight: bold;
-    color: #407686;
-    font-family: 'Roboto',sans-serif;
+    font-weight: 200;
+    color: #0015A3;
+    font-family: 'Open Sans',sans-serif;
     font-size: 16px;
 }
 
 .front-business-form.unselected-item-text{
-    font-weight: bold;
-    color: #0eb5d2;
-    font-family: 'Roboto',sans-serif;
+    font-weight: 200;
+    color: #000000;
+    font-family: 'Open Sans',sans-serif;
     font-size: 16px;
 }
 
@@ -2713,3 +2713,13 @@ h4.front-business-form.warning-text{
     /*color: #474747;*/
     /*font-family: 'Open Sans',sans-serif;*/
 /*}*/
+
+.btn-success-bright{
+    background-color: #1ABA00;
+    border: 1px solid #169E00;
+    color:#FFF;
+}
+
+.btn-wide{
+    min-width: 30%;
+}

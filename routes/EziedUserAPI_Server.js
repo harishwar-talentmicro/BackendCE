@@ -4601,6 +4601,160 @@ console.log('CALL pSearchInformationNew(' + SearchParameter + ')');
     }
 };
 
+/**
+ * @title FnGetEZEOneIDInfo
+ * @service /ezeoneid
+ * @server_param
+ *  1. ezeoneid <string> eg. IND1.L1.123, SANDEEP
+ *  2. token
+ * @desc Same as FnGetSearchInformationNew except it has only includes
+ * AddressLine1, AddressLine2, CityTitle, StateTitle, CountryTitle, Latitude, Longitude
+ * @usage Used to load user address information based on EZEOne ID Code
+ * @conditions Will load the result if no pin is there, else have to pass pin and location sequence as EZEONE.L2.123
+ * @param req
+ * @param res
+ * @param next
+ * @constructor
+ */
+exports.FnGetEZEOneIDInfo = function(req,res,next){
+    var ezeTerm = req.query['ezeoneid'];
+    var token = req.query['token'];
+    var locationSeq = 0;
+    var pin = null;
+    var ezeoneId = null;
+
+    var respMsg = {
+        status : false,
+        message : 'Please login to continue',
+        data : null,
+        error : null
+    };
+
+    var error = {};
+    var validationFlag = true;
+    if(!token){
+        error['token'] = 'Invalid Token';
+        validationFlag *= false;
+    }
+    if(!ezeTerm){
+        error['ezeoneid'] = 'EZEOne ID not found';
+        validationFlag *= false;
+    }
+
+    if(!validationFlag){
+        respMsg.message = 'Please check all the errors';
+        respMsg.error = error;
+        res.status(400).json(respMsg);
+        return;
+    }
+    else{
+        try{
+            FnValidateToken(token,function(err,tokenResult){
+                if(err){
+                    respMsg.status = false;
+                    respMsg.data = null;
+                    respMsg.message = 'Please check all the errors';
+                    respMsg.error = {token : 'Invalid Token'};
+                    res.status(401).json(respMsg);
+                }
+                else if(!tokenResult){
+                    respMsg.status  = false;
+                    respMsg.data = null;
+                    respMsg.message = 'Please check all the errors';
+                    respMsg.error = {token : 'Invalid Token'};
+                    res.status(401).json(respMsg);
+                }
+                else{
+                    var ezeArr = ezeTerm.split('.');
+                    ezeoneId = ezeArr;
+                    if(ezeArr.length > 1){
+                        ezeoneId = ezeArr[0];
+
+                        /**
+                         * Try to find if user has passed the location sequence number
+                         */
+                        if(ezeArr[1] && ezeArr[1].substr(0,1).toUpperCase() === 'L'){
+                            var seqNo = parseInt(ezeArr[1].substring(1));
+                            if(seqNo !== NaN && seqNo > -1){
+                                locationSeq = seqNo;
+                            }
+                        }
+
+                        /**
+                         * If location sequence number is not found assuming that user may have passed the pin
+                         * and therefore validating pin using standard rules
+                         */
+                        else if(parseInt(ezeArr[1]) !== NaN && parseInt(ezeArr[1]) > 99 && parseInt(ezeArr[1]) < 1000){
+                            pin = parseInt(ezeArr[1]).toString();
+                        }
+
+                        /**
+                         * If third element is also there in array then strictly assume it as a pin and then
+                         * assign it to pin
+                         */
+                        else if(ezeArr.length > 2){
+                            if(parseInt(ezeArr[2]) !== NaN && parseInt(ezeArr[2]) > 99 && parseInt(ezeArr[2]) < 1000){
+                                pin = parseInt(ezeArr[2]).toString();
+                            }
+                        }
+                    }
+
+                    var moment = require('moment');
+                    var dateTime = moment().format('YYYY-MM-DD HH:mm:ss');
+                    var ip = (req.headers['x-forwarded-for'] || req.connection.remoteAddress ||
+                    req.socket.remoteAddress || req.connection.socket.remoteAddress);
+
+                    var queryParams = db.escape(token) + ',' + db.escape(dateTime) + ',' + db.escape(ip) +
+                        ',' +db.escape(ezeoneId) + ',' + db.escape(locationSeq) + ',' + db.escape(pin);
+                    db.query('CALL pSearchinfnPinbased('+queryParams+')',function(err,result){
+                        if(err){
+                                console.log('Error FnGetEZEOneIDInfo :  '+err);
+                                respMsg.status  = false;
+                                respMsg.data = null;
+                                respMsg.message = 'An error occured';
+                                respMsg.error = {server : 'Internal Server Error'};
+                                res.status(400).json(respMsg);
+                                return;
+                        }
+
+
+                        else{
+                            if(result && result.length > 0){
+                                if(result[0].length > 0){
+                                    respMsg.status  = true;
+                                    respMsg.data = result[0][0];
+                                    respMsg.message = 'EZEOne ID found';
+                                    respMsg.error = null;
+                                    res.status(200).json(respMsg);
+                                    return;
+                                }
+                                else{
+                                    respMsg.status  = false;
+                                    respMsg.data = null;
+                                    respMsg.message = 'Nothing found';
+                                    respMsg.error = { ezeoneid : 'No results found'};
+                                    res.status(404).json(respMsg);
+                                }
+
+                            }
+                            else{
+                                respMsg.status  = false;
+                                respMsg.data = null;
+                                respMsg.message = 'Nothing found';
+                                respMsg.error = { ezeoneid : 'No results found'};
+                                res.status(404).json(respMsg);
+                            }
+                        }
+                    });
+
+                }
+            });
+        }
+        catch(ex){
+            console.log('Error : FnGetEZEOneIDInfo' + ex.description);
+        }
+    }
+};
 
 exports.FnUpdatePwdEncryption = function (req, res) {
     try {

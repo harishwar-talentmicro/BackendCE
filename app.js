@@ -210,6 +210,7 @@ app.put('/update_transaction',LocationManager.FnUpdateTransaction);
 app.get('/company_details',LocationManager.FnGetCompanyDetails);
 app.get('/get_outbox_messages',LocationManager.FnGetOutboxMessages);
 app.get('/get_workinghours_list',LocationManager.FnGetworkinghoursList);
+app.get('/ezeoneid',LocationManager.FnGetEZEOneIDInfo);
 
 
 //below service are for EZEIDAP

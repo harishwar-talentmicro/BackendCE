@@ -84,7 +84,7 @@ function error(err, req, res, next) {
     console.error(err.stack);
     console.log('Error Happened Please try Again..');
     // respond with 500 "Internal Server Error".
-    res.send(500, 'Error Occurred');
+    res.json(500,{ status : false, message : 'Internal Server Error', error : {server : 'Exception'}});
 };
 //finding for which application the app is running ie whether cab or school
 

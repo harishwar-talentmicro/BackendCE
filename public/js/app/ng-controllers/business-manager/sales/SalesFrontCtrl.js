@@ -32,6 +32,7 @@
                   GoogleMap) {
 
             $scope.ezeone = $routeParams['ezeone'];
+            $scope.isEnquiryPosted = false;
             /**
              * Returns index of Object from array based on Object Property
              * @param key
@@ -53,6 +54,32 @@
                     }
                 }
                 return resultIndex;
+            };
+
+
+            var makeAddress = function(){
+                var address = [];
+                if($scope.modalBox.tx.address){
+                    address.push($scope.modalBox.tx.address);
+                }
+                if($scope.modalBox.tx.area){
+                    address.push($scope.modalBox.tx.area);
+                }
+                if($scope.modalBox.tx.city){
+                    address.push($scope.modalBox.tx.city);
+                }
+
+                if($scope.modalBox.tx.state){
+                    address.push($scope.modalBox.tx.state);
+                }
+                if($scope.modalBox.tx.country){
+                    address.push($scope.modalBox.tx.country);
+                }
+                address =  address.join(', ');
+                if($scope.modalBox.tx.pinCode){
+                    address += (' - '+ $scope.modalBox.tx.pinCode);
+                }
+                return address;
             };
 
 
@@ -173,125 +200,158 @@
                 }
             };
 
-            $scope.resolveAddress = function(){
-                $scope.$emit('$preLoaderStart');
-                $scope.resolveGeolocationAddress().then(function(){
-                    $scope.$emit('$preLoaderStop');
-                });
-            };
+            //$scope.resolveAddress = function(){
+            //    $scope.$emit('$preLoaderStart');
+            //    $scope.resolveGeolocationAddress().then(function(){
+            //        $scope.$emit('$preLoaderStop');
+            //    });
+            //};
 
             var googleMap = new GoogleMap();
             googleMap.addSearchBox('google-map-search-box');
-            googleMap.listenOnMapControls(null,null,false);
-
-            $scope.resolveGeolocationAddress = function(){
-                var defer = $q.defer();
-                $scope.modalBox.tx.address = '';
-                $scope.modalBox.tx.area = '';
-                $scope.modalBox.tx.city = '';
-                $scope.modalBox.tx.state = '';
-                $scope.modalBox.tx.country = '';
-                $scope.modalBox.tx.pinCode = '';
-
-                if($scope.modalBox.tx.locId == ''){
-                    $timeout(function(){
-                        defer.resolve();
-                    },500);
-                    return defer.promise;
-                }
-
-                var lat = 0;
-                var lng = 0;
-                if($scope.modalBox.tx.locId == 0){
-                    googleMap.getCurrentLocation().then(function(){
-                        lat = googleMap.currentMarkerPosition.latitude;
-                        lng = googleMap.currentMarkerPosition.longitude;
-
-                        $scope.modalBox.tx.latitude = lat;
-                        $scope.modalBox.tx.longitude = lng;
-
-                        googleMap.getReverseGeolocation(lat,lng).then(function(resp){
-
-                            if(resp.data){
-                                var data = googleMap.parseReverseGeolocationData(resp.data);
-                                $scope.modalBox.tx.city = data.city;
-                                $scope.modalBox.tx.state = data.state;
-                                $scope.modalBox.tx.country = data.country;
-                                $scope.modalBox.tx.area = data.area;
-                                $scope.modalBox.tx.pinCode = data.postalCode;
-                                //$scope.modalBox.tx.address = data.route + ', '+ data.sublocality3 + ', '+ data.sublocality2;
-                                $scope.modalBox.tx.address = googleMap.createAddressFromGeolocation(data,{
-                                    route : true,
-                                    sublocality3 : true,
-                                    sublocality2 : true,
-                                    area : false,
-                                    city : false,
-                                    state : false,
-                                    country : false,
-                                    postalCode : false
-                                });
-
-                            }
-                            else{
-                                //$scope.$emit('$preLoaderStop');
-                                Notification.error({message : 'Please enable geolocation settings in your browser',delay : MsgDelay});
-                            }
-                            defer.resolve();
-
-                        },function(){
-                            Notification.error({message : 'Please enable geolocation settings in your browser',delay : MsgDelay});
-                            defer.resolve();
+            googleMap.listenOnMapControls(null,function(lat,lng){
+                $scope.modalBox.tx.latitude = lat;
+                $scope.modalBox.tx.longitude = lat;
+                googleMap.getReverseGeolocation(lat,lng).then(function(resp){
+                    if(resp.data){
+                        var data = googleMap.parseReverseGeolocationData(resp.data);
+                        $scope.modalBox.tx.city = data.city;
+                        $scope.modalBox.tx.state = data.state;
+                        $scope.modalBox.tx.country = data.country;
+                        $scope.modalBox.tx.area = data.area;
+                        $scope.modalBox.tx.pinCode = data.postalCode;
+                        $scope.modalBox.tx.address = googleMap.createAddressFromGeolocation(data,{
+                            route : true,
+                            sublocality3 : true,
+                            sublocality2 : true,
+                            area : false,
+                            city : false,
+                            state : false,
+                            country : false,
+                            postalCode : false
                         });
 
-                    });
-
-                }
-                else{
-                    var locIndex = $scope.modalBox.locationList.indexOfWhere("TID",parseInt($scope.modalBox.tx.locId));
-                    if(locIndex === -1){
-                        $timeout(function(){
-                            defer.resolve();
-                        },500);
-                        return defer.promise;
+                        $scope.modalBox.tx.DeliveryAddress = makeAddress();
                     }
-                    lat = $scope.modalBox.locationList[locIndex].Latitude;
-                    lng = $scope.modalBox.locationList[locIndex].Longitude;
+                    else{
+                        Notification.error({message : 'Please enable geolocation settings in your browser',delay : MsgDelay});
+                    }
 
 
-                    $scope.modalBox.tx.address = $scope.modalBox.locationList[locIndex].AddressLine1+' ' +
-                        $scope.modalBox.locationList[locIndex].AddressLine2;
-                    $scope.modalBox.tx.pinCode = $scope.modalBox.locationList[locIndex].PostalCode;
-                    $scope.modalBox.tx.city = $scope.modalBox.locationList[locIndex].CityTitle;
-                    $scope.modalBox.tx.country = $scope.modalBox.locationList[locIndex].CountryTitle;
+                },function(){
+                    Notification.error({message : 'Please enable geolocation settings in your browser',delay : MsgDelay});
+                    defer.resolve();
+                });
+            },false);
 
-                    $scope.modalBox.tx.latitude = lat;
-                    $scope.modalBox.tx.longitude = lng;
-
-                    googleMap.getReverseGeolocation(lat,lng).then(function(resp){
-                        //$scope.$emit('$preLoaderStop');
-                        if(resp.data){
-                            var data = googleMap.parseReverseGeolocationData(resp.data);
-
-                            $scope.modalBox.tx.state = data.state;
-                            //$scope.modalBox.tx.country = data.country;
-                            $scope.modalBox.tx.area = data.area;
-
-                        }
-                        else{
-                            //$scope.$emit('$preLoaderStop');
-                            Notification.error({message : 'Please enable geolocation settings n your browser',delay : MsgDelay});
-                        }
-                        defer.resolve();
-
-                    },function(){
-                        Notification.error({message : 'Please enable geolocation settings n your browser',delay : MsgDelay});
-                        //$scope.$emit('$preLoaderStop');
-                        defer.resolve();
-                    });
-                }
-
-                return defer.promise;
-            };
+            //$scope.resolveGeolocationAddress = function(){
+            //    var defer = $q.defer();
+            //    $scope.modalBox.tx.address = '';
+            //    $scope.modalBox.tx.area = '';
+            //    $scope.modalBox.tx.city = '';
+            //    $scope.modalBox.tx.state = '';
+            //    $scope.modalBox.tx.country = '';
+            //    $scope.modalBox.tx.pinCode = '';
+            //
+            //    if($scope.modalBox.tx.locId == ''){
+            //        $timeout(function(){
+            //            defer.resolve();
+            //        },500);
+            //        return defer.promise;
+            //    }
+            //
+            //    var lat = 0;
+            //    var lng = 0;
+            //    if($scope.modalBox.tx.locId == 0){
+            //        googleMap.getCurrentLocation().then(function(){
+            //            lat = googleMap.currentMarkerPosition.latitude;
+            //            lng = googleMap.currentMarkerPosition.longitude;
+            //
+            //            $scope.modalBox.tx.latitude = lat;
+            //            $scope.modalBox.tx.longitude = lng;
+            //
+            //            googleMap.getReverseGeolocation(lat,lng).then(function(resp){
+            //
+            //                if(resp.data){
+            //                    var data = googleMap.parseReverseGeolocationData(resp.data);
+            //                    $scope.modalBox.tx.city = data.city;
+            //                    $scope.modalBox.tx.state = data.state;
+            //                    $scope.modalBox.tx.country = data.country;
+            //                    $scope.modalBox.tx.area = data.area;
+            //                    $scope.modalBox.tx.pinCode = data.postalCode;
+            //                    //$scope.modalBox.tx.address = data.route + ', '+ data.sublocality3 + ', '+ data.sublocality2;
+            //                    $scope.modalBox.tx.address = googleMap.createAddressFromGeolocation(data,{
+            //                        route : true,
+            //                        sublocality3 : true,
+            //                        sublocality2 : true,
+            //                        area : false,
+            //                        city : false,
+            //                        state : false,
+            //                        country : false,
+            //                        postalCode : false
+            //                    });
+            //
+            //                }
+            //                else{
+            //                    //$scope.$emit('$preLoaderStop');
+            //                    Notification.error({message : 'Please enable geolocation settings in your browser',delay : MsgDelay});
+            //                }
+            //                defer.resolve();
+            //
+            //            },function(){
+            //                Notification.error({message : 'Please enable geolocation settings in your browser',delay : MsgDelay});
+            //                defer.resolve();
+            //            });
+            //
+            //        });
+            //
+            //    }
+            //    else{
+            //        var locIndex = $scope.modalBox.locationList.indexOfWhere("TID",parseInt($scope.modalBox.tx.locId));
+            //        if(locIndex === -1){
+            //            $timeout(function(){
+            //                defer.resolve();
+            //            },500);
+            //            return defer.promise;
+            //        }
+            //        lat = $scope.modalBox.locationList[locIndex].Latitude;
+            //        lng = $scope.modalBox.locationList[locIndex].Longitude;
+            //
+            //
+            //        $scope.modalBox.tx.address = $scope.modalBox.locationList[locIndex].AddressLine1+' ' +
+            //            $scope.modalBox.locationList[locIndex].AddressLine2;
+            //        $scope.modalBox.tx.pinCode = $scope.modalBox.locationList[locIndex].PostalCode;
+            //        $scope.modalBox.tx.city = $scope.modalBox.locationList[locIndex].CityTitle;
+            //        $scope.modalBox.tx.country = $scope.modalBox.locationList[locIndex].CountryTitle;
+            //
+            //        $scope.modalBox.tx.latitude = lat;
+            //        $scope.modalBox.tx.longitude = lng;
+            //
+            //        googleMap.getReverseGeolocation(lat,lng).then(function(resp){
+            //            //$scope.$emit('$preLoaderStop');
+            //            if(resp.data){
+            //                var data = googleMap.parseReverseGeolocationData(resp.data);
+            //
+            //                $scope.modalBox.tx.state = data.state;
+            //                //$scope.modalBox.tx.country = data.country;
+            //                $scope.modalBox.tx.area = data.area;
+            //
+            //            }
+            //            else{
+            //                //$scope.$emit('$preLoaderStop');
+            //                Notification.error({message : 'Please enable geolocation settings n your browser',delay : MsgDelay});
+            //            }
+            //            defer.resolve();
+            //
+            //        },function(){
+            //            Notification.error({message : 'Please enable geolocation settings n your browser',delay : MsgDelay});
+            //            //$scope.$emit('$preLoaderStop');
+            //            defer.resolve();
+            //        });
+            //    }
+            //
+            //    return defer.promise;
+            //};
 
 
             /**
@@ -480,57 +540,33 @@
                 return defer.promise;
             };
 
-            /**
-             * Get location list for logged in user
-             */
-            $scope.getLocationList = function(){
-                var defer = $q.defer();
-                $http({
-                    url : GURL + 'ewtGetLocationListForEZEID',
-                    method : 'GET',
-                    params : {
-                        Token : $rootScope._userInfo.Token,
-                        TID :   $scope.loggedInUser.TID
-                    }
-                }).success(function(resp){
-                    if(resp && resp !== 'null'){
-                        $scope.modalBox.locationList = resp.Result;
-                        defer.resolve(resp.Result);
-                    }
-                    else{
-                        defer.reject();
-                    }
-                }).error(function(err){
-                    defer.reject();
-                });
-                return defer.promise;
-            };
+            ///**
+            // * Get location list for logged in user
+            // */
+            //$scope.getLocationList = function(){
+            //    var defer = $q.defer();
+            //    $http({
+            //        url : GURL + 'ewtGetLocationListForEZEID',
+            //        method : 'GET',
+            //        params : {
+            //            Token : $rootScope._userInfo.Token,
+            //            TID :   $scope.loggedInUser.TID
+            //        }
+            //    }).success(function(resp){
+            //        if(resp && resp !== 'null'){
+            //            $scope.modalBox.locationList = resp.Result;
+            //            defer.resolve(resp.Result);
+            //        }
+            //        else{
+            //            defer.reject();
+            //        }
+            //    }).error(function(err){
+            //        defer.reject();
+            //    });
+            //    return defer.promise;
+            //};
 
 
-            var makeAddress = function(){
-                var address = [];
-                if($scope.modalBox.tx.address){
-                    address.push($scope.modalBox.tx.address);
-                }
-                if($scope.modalBox.tx.area){
-                    address.push($scope.modalBox.tx.area);
-                }
-                if($scope.modalBox.tx.city){
-                    address.push($scope.modalBox.tx.city);
-                }
-
-                if($scope.modalBox.tx.state){
-                    address.push($scope.modalBox.tx.state);
-                }
-                if($scope.modalBox.tx.country){
-                    address.push($scope.modalBox.tx.country);
-                }
-                address =  address.join(', ');
-                if($scope.modalBox.tx.pinCode){
-                    address += (' - '+ $scope.modalBox.tx.pinCode);
-                }
-                return address;
-            };
 
             /**
              * Preparing data for saving transaction
@@ -589,48 +625,53 @@
             var validateTransaction = function(tx){
 
                 var flag = true;
-                if(!tx.address){
+                //if(!tx.address){
+                //    $scope.txerror.address = true;
+                //    flag *= false;
+                //}
+                //if(tx.address && tx.address.trim().length < 1){
+                //    $scope.txerror.address = true;
+                //    flag *= false;
+                //}
+                //if(!tx.area){
+                //    $scope.txerror.area = true;
+                //    flag *= false;
+                //}
+                //if(tx.area && tx.area.trim().length < 1){
+                //    $scope.txerror.area = true;
+                //    flag *= false;
+                //}
+                //
+                //if(!tx.city){
+                //    $scope.txerror.city = true;
+                //    flag *= false;
+                //}
+                //
+                //if(tx.city && tx.city.trim().length < 1){
+                //    $scope.txerror.city = true;
+                //    flag *= false;
+                //}
+                //
+                //if(!tx.state){
+                //    $scope.txerror.state = true;
+                //    flag *= false;
+                //}
+                //if(tx.state && tx.state.trim().length < 1){
+                //    $scope.txerror.state = true;
+                //    flag *= false;
+                //}
+                //
+                //if(!tx.country){
+                //    $scope.txerror.country = true;
+                //    flag *= false;
+                //}
+                //if(tx.country && tx.country.trim().length < 1){
+                //    $scope.txerror.country = true;
+                //    flag *= false;
+                //}
+
+                if(!tx.DeliveryAddress){
                     $scope.txerror.address = true;
-                    flag *= false;
-                }
-                if(tx.address && tx.address.trim().length < 1){
-                    $scope.txerror.address = true;
-                    flag *= false;
-                }
-                if(!tx.area){
-                    $scope.txerror.area = true;
-                    flag *= false;
-                }
-                if(tx.area && tx.area.trim().length < 1){
-                    $scope.txerror.area = true;
-                    flag *= false;
-                }
-
-                if(!tx.city){
-                    $scope.txerror.city = true;
-                    flag *= false;
-                }
-
-                if(tx.city && tx.city.trim().length < 1){
-                    $scope.txerror.city = true;
-                    flag *= false;
-                }
-
-                if(!tx.state){
-                    $scope.txerror.state = true;
-                    flag *= false;
-                }
-                if(tx.state && tx.state.trim().length < 1){
-                    $scope.txerror.state = true;
-                    flag *= false;
-                }
-
-                if(!tx.country){
-                    $scope.txerror.country = true;
-                    flag *= false;
-                }
-                if(tx.country && tx.country.trim().length < 1){
-                    $scope.txerror.country = true;
                     flag *= false;
                 }
 
@@ -707,6 +748,7 @@
                     if(resp && resp.hasOwnProperty('IsSuccessfull')){
                         if(resp.IsSuccessfull){
                             var msg = 'Enquiry is posted successfully';
+                            $scope.isEnquiryPosted = true;
 
                             Notification.success({ message : msg, delay : MsgDelay});
                             //$scope._toggleSalesModal();
@@ -730,13 +772,13 @@
             var masterUserLoaded = false;
             var loggedInUserLoaded = false;
             var masterUserItemsLoaded = false;
-            var loggedInUserLocationsLoaded = false;
+            //var loggedInUserLocationsLoaded = true;
 
             /**
              * If all the three laoded parameters are true then preloader is stopped
              */
             var checkLoaded = function(){
-                if(masterUserLoaded && loggedInUserLoaded && masterUserItemsLoaded && loggedInUserLocationsLoaded){
+                if(masterUserLoaded && loggedInUserLoaded && masterUserItemsLoaded){
                     $scope.$emit('$preLoaderStop');
                 }
             };
@@ -769,14 +811,15 @@
 
                 $scope.getLoggedInUserDetails().then(function(){
                     loggedInUserLoaded = true;
-                    $scope.getLocationList().then(function(){
-                        loggedInUserLocationsLoaded = true;
-                        checkLoaded();
-                    },function(){
-                        loggedInUserLocationsLoaded = true;
-                        Notification.error({ message : 'An error occurred ! Please try again', delay : MsgDelay});
-                        checkLoaded();
-                    });
+                    //$scope.getLocationList().then(function(){
+                    //    loggedInUserLocationsLoaded = true;
+                    //    checkLoaded();
+                    //},function(){
+                    //    loggedInUserLocationsLoaded = true;
+                    //    Notification.error({ message : 'An error occurred ! Please try again', delay : MsgDelay});
+                    //    checkLoaded();
+                    //});
+                    checkLoaded();
                 },function(){
                     loggedInUserLoaded = true;
                     Notification.error({ message : 'An error occurred ! Please try again', delay : MsgDelay});
@@ -788,6 +831,104 @@
             $scope.closeForm = function(){
                 $window.location.replace('/'+$scope.ezeone);
             };
+
+
+            /**
+             * Selecting address selection method whether using EZEOne ID or other address
+             * @type {number} 0 : EZEOne ID location
+             * 1 : Other address (Google map autocomplete active)
+             */
+            $scope.addressSelectionType = 0;
+
+            /**
+             * EZEOne ID from which address will be fetched
+             * @type {string}
+             */
+            $scope.ezeoneAddressId = '';
+
+            $scope.$watch('ezeoneAddressId',function(n,v){
+                if(n && n !== v){
+                    console.log(angular.element('#ezeoneAddressId'));
+                    console.log(angular.element('#ezeoneAddressId').parent('.input-group'));
+                    angular.element('#ezeoneAddressId').parent('.input-group').removeClass('has-success').addClass('has-error');
+                    $scope.modalBox.tx.address = '';
+                    $scope.modalBox.tx.area = '';
+                    $scope.modalBox.tx.city = '';
+                    $scope.modalBox.tx.state = '';
+                    $scope.modalBox.tx.country = '';
+                    $scope.modalBox.tx.pinCode = '';
+                    $scope.modalBox.tx.latitude = 0;
+                    $scope.modalBox.tx.longitude = 0;
+                    $scope.modalBox.tx.DeliveryAddress = '';
+
+                    $scope.getEzeidLocationDetails(n);
+                }
+                else if(!n){
+                    angular.element('#ezeoneAddressId').parent('.input-group').removeClass('has-success').addClass('has-error');
+                    $scope.modalBox.tx.address = '';
+                    $scope.modalBox.tx.area = '';
+                    $scope.modalBox.tx.city = '';
+                    $scope.modalBox.tx.state = '';
+                    $scope.modalBox.tx.country = '';
+                    $scope.modalBox.tx.pinCode = '';
+                    $scope.modalBox.tx.latitude = 0;
+                    $scope.modalBox.tx.longitude = 0;
+                    $scope.modalBox.tx.DeliveryAddress ='';
+                }
+            });
+
+
+            /**
+             * To get the ezeid information such as Lat,Lng, AddressLine1, AddressLine2, City, State, Country
+             * @param ezeid
+             */
+
+            $scope.getEzeidLocationDetails = function(ezeoneId){
+                var defer = $q.defer();
+                $scope.$emit('$preLoaderStart');
+                $http({
+                    url : GURL + 'ezeoneid',
+                    method : 'GET',
+                    params : {
+                        ezeoneid : ezeoneId,
+                        token : $rootScope._userInfo.Token
+                    }
+                }).success(function(resp){
+                    $scope.$emit('$preLoaderStop');
+                    console.log(resp);
+                    if(resp && resp.status){
+                        angular.element('#ezeoneAddressId').parent('.input-group').removeClass('has-error').addClass('has-success');
+                        $scope.modalBox.tx.address = resp.data.AddressLine1;
+                        $scope.modalBox.tx.area = resp.data.AddressLine1;
+                        $scope.modalBox.tx.city = resp.data.CityTitle;
+                        $scope.modalBox.tx.state = resp.data.StateTitle;
+                        $scope.modalBox.tx.country = resp.data.CountryTitle;
+                        $scope.modalBox.tx.pinCode = resp.data.PostalCode;
+                        $scope.modalBox.tx.latitude = resp.data.Latitude;
+                        $scope.modalBox.tx.longitude = resp.data.Longitude;
+
+                        $scope.modalBox.tx.DeliveryAddress = makeAddress();
+                    }
+                    else{
+                        Notification.error({ title : 'Error', message : 'EZEOne ID not found', delay : MsgDelay});
+                    }
+
+                    defer.resolve(resp);
+                }).error(function(err,statusCode){
+                    $scope.$emit('$preLoaderStop');
+                    var msg = 'An error occurred ! Please try again';
+                    if(!statusCode){
+                        msg = 'Unable to reach the server ! Please check your connection';
+                    }
+                    if(statusCode == 400){
+                        Notification.error({ title : 'Error', message : msg, delay : MsgDelay});
+                    }
+
+                    defer.resolve(null);
+                });
+                return defer.promise;
+            };
+
 
             init();
 
@@ -839,12 +980,7 @@
                 calculateCartDetails();
             },700);
 
-            /**
-             * Selecting address selection method whether using EZEOne ID or other address
-             * @type {number} 0 : EZEOne ID location
-             * 1 : Other address (Google map autocomplete active)
-             */
-            $scope.addressSelectionType = 0;
+
 
         }
     ]);
