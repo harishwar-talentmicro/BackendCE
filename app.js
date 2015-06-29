@@ -106,6 +106,8 @@ app.get('/ewtGetSecondaryLoc', LocationManager.FnGetSecondaryLocation);
 //app.get('/ewSearchEzeidNew', LocationManager.FnSearchEzeidNew);
 app.post('/ewDeleteLocation', LocationManager.FnDeleteLocation);
 app.get('/ewtGetSearchInformation', LocationManager.FnGetSearchInformation);
+app.get('/ewtGetSearchInformationNew', LocationManager.FnGetSearchInformationNew);
+
 app.get('/ewmGetProxmity', LocationManager.FnGetProxmity);
 app.post('/ewtSendMail', LocationManager.FnSendMail);
 app.get('/ewtGetDoc', LocationManager.FnGetDoc);

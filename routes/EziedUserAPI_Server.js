@@ -4360,8 +4360,160 @@ exports.FnSearchByKeywords = function (req, res) {
     }
 };
 
-//method to get search result users details
+// get search infromation
 exports.FnGetSearchInformation = function (req, res) {
+    try {
+
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.query.Token;
+        var TID = parseInt(req.query.TID);
+        var CurrentDate = req.query.CurrentDate;
+        var SearchType = req.query.SearchType;
+        var IPAddress = (req.headers['x-forwarded-for'] || req.connection.remoteAddress ||
+        req.socket.remoteAddress || req.connection.socket.remoteAddress);
+        var WorkingDate
+        var moment = require('moment');
+        if(CurrentDate != null)
+            var WorkingDate =  moment(new Date(CurrentDate)).format('YYYY-MM-DD HH:MM');
+        else
+            var WorkingDate = moment(new Date()).format('YYYY-MM-DD HH:MM');
+        //console.log(WorkingDate);
+
+        if (Token != null && Token != '' && TID.toString() != 'NaN' && WorkingDate != null) {
+            if(Token == 2){
+
+                var SearchParameter = db.escape(TID) + ',' + db.escape(Token) + ',' + db.escape(WorkingDate)
+                    + ',' + db.escape(SearchType)+ ',' + db.escape(0) + ',' + db.escape(IPAddress);
+                // console.log('Search Information: ' +SearchParameter);
+                //     console.log('CALL pSearchInformation(' + SearchParameter + ')');
+                db.query('CALL pSearchInformation(' + SearchParameter + ')', function (err, UserInfoResult) {
+                    // db.query(searchQuery, function (err, SearchResult) {
+                    if (!err) {
+                        // console.log(UserInfoResult);
+                        if (UserInfoResult[0].length > 0) {
+                            res.send(UserInfoResult[0]);
+                            console.log('FnSearchEzeid: tmaster: Search result sent successfully');
+                        }
+                        else {
+                            var searchParams = db.escape(TID) + ',' + db.escape(Token) + ',' + db.escape(WorkingDate)
+                                + ',' + db.escape(SearchType)+ ',' + db.escape(1) + ',' + db.escape(IPAddress);
+                            db.query('CALL pSearchInformation('+ searchParams +')', function (err, UserInfoReResult) {
+                                if(!err){
+                                    if(UserInfoReResult[0].length > 0){
+                                        res.send(UserInfoReResult[0]);
+                                        console.log('FnSearchEzeid: tmaster: Search result re sent successfully');
+                                    }
+                                    else
+                                    {
+                                        res.send('null');
+                                        console.log('FnSearchEzeid: tmaster: no re search infromation ');
+                                    }
+
+                                }
+                                else {
+                                    res.statusCode = 500;
+                                    res.send('null');
+                                    console.log('FnSearchEzeid: tmaster: ' + err);
+                                }
+                            });
+                        }
+                    }
+                    else {
+                        res.statusCode = 500;
+                        res.send('null');
+                        console.log('FnSearchEzeid: tmaster: ' + err);
+                    }
+                });
+
+            }
+            else
+            {
+                FnValidateToken(Token, function (err, Result) {
+                    if (!err) {
+                        if (Result != null) {
+                            var SearchParameter = db.escape(TID) + ',' + db.escape(Token) + ',' + db.escape(WorkingDate)+ ',' + db.escape(SearchType)+',' + db.escape(0) + ',' + db.escape(IPAddress);
+                            // console.log('Search Information: ' +SearchParameter);
+                            // console.log('CALL pSearchInformation(' + SearchParameter + ')');
+                            db.query('CALL pSearchInformation(' + SearchParameter + ')', function (err, UserInfoResult) {
+                                // db.query(searchQuery, function (err, SearchResult) {
+                                if (!err) {
+                                    // console.log(UserInfoResult);
+                                    if (UserInfoResult[0].length > 0) {
+                                        res.send(UserInfoResult[0]);
+                                        console.log('FnSearchEzeid: tmaster: Search result sent successfully');
+                                    }
+                                    else {
+                                        var searchParams = db.escape(TID) + ',' + db.escape(Token) + ',' + db.escape(WorkingDate)
+                                            + ',' + db.escape(SearchType)+ ',' + db.escape(1) + ',' + db.escape(IPAddress);
+                                        db.query('CALL pSearchInformation('+ searchParams +')', function (err, UserInfoReResult) {
+                                            if(!err){
+                                                if(UserInfoReResult[0].length > 0){
+                                                    res.send(UserInfoReResult[0]);
+                                                    console.log('FnSearchEzeid: tmaster: Search result re sent successfully');
+                                                }
+                                                else
+                                                {
+                                                    res.send('null');
+                                                    console.log('FnSearchEzeid: tmaster: no re search infromation ');
+                                                }
+                                            }
+                                            else {
+                                                res.statusCode = 500;
+                                                res.send('null');
+                                                console.log('FnSearchEzeid: tmaster: ' + err);
+                                            }
+                                        });
+                                    }
+                                }
+                                else {
+                                    res.statusCode = 500;
+                                    res.send('null');
+                                    console.log('FnSearchEzeid: tmaster: ' + err);
+                                }
+                            });
+
+                        }
+                        else {
+                            console.log('FnGetSearchInformation: Invalid token');
+                            res.statusCode = 401;
+                            res.send('null');
+                        }
+                    }
+                    else {
+                        console.log('FnGetSearchInformation: Token error: ' + err);
+                        res.statusCode = 500;
+                        res.send('null');
+
+                    }
+                });
+            }
+        }
+        else {
+            if (Token = null) {
+                console.log('FnGetUserDetails: Token is empty');
+            }
+            else if (TID == 'NaN') {
+                console.log('FnGetUserDetails: TID is empty');
+            }
+            else if (CurrentDate == null) {
+                console.log('FnGetUserDetails: CurrentDate is empty');
+            }
+
+            res.statusCode = 400;
+            res.send('null');
+        }
+    }
+    catch (ex) {
+        console.log('FnGetUserDetails error:' + ex.description);
+        //throw new Error(ex);
+    }
+};
+
+
+//method to get search result users details
+exports.FnGetSearchInformationNew = function (req, res) {
     try {
 
         res.setHeader("Access-Control-Allow-Origin", "*");
@@ -4407,36 +4559,36 @@ exports.FnGetSearchInformation = function (req, res) {
                 }
             }
             var SearchParameter = db.escape(Token) + ',' + db.escape(WorkingDate) + ',' + db.escape(IPAddress) + ',' + db.escape(EZEID) + ',' + db.escape(LocSeqNo) + ',' + db.escape(Pin);
-console.log('CALL pSearchInformation(' + SearchParameter + ')');
-            db.query('CALL pSearchInformation(' + SearchParameter + ')', function (err, UserInfoResult) {
+console.log('CALL pSearchInformationNew(' + SearchParameter + ')');
+            db.query('CALL pSearchInformationNew(' + SearchParameter + ')', function (err, UserInfoResult) {
                 // db.query(searchQuery, function (err, SearchResult) {
                 if (!err) {
                     // console.log(UserInfoResult);
                     if (UserInfoResult[0].length > 0) {
                         res.send(UserInfoResult[0]);
-                        console.log('FnSearchEzeid: tmaster: Search result sent successfully');
+                        console.log('FnGetSearchInformationNew: tmaster: Search result sent successfully');
                     }
                     else {
                         res.send('null');
-                        console.log('FnSearchEzeid: tmaster: no re search infromation ');
+                        console.log('FnGetSearchInformationNew: tmaster: no re search infromation ');
                     }
 
                 }
                 else {
                     res.statusCode = 500;
                     res.send('null');
-                    console.log('FnSearchEzeid: tmaster: ' + err);
+                    console.log('FnGetSearchInformationNew: tmaster: ' + err);
                 }
             });
         }
 
             else {
                 if (Token = null) {
-                    console.log('FnGetUserDetails: Token is empty');
+                    console.log('FnGetSearchInformationNew: Token is empty');
                 }
 
                 else if (CurrentDate == null) {
-                    console.log('FnGetUserDetails: CurrentDate is empty');
+                    console.log('FnGetSearchInformationNew: CurrentDate is empty');
                 }
                 
                 res.statusCode = 400;
