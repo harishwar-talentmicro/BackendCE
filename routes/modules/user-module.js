@@ -2048,5 +2048,369 @@ function FnSaveSkills(skill, CallBack) {
     }
 };
 
+/**
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ */
+User.prototype.getDocPin = function(req,res,next) {
+    /**
+     * @todo FnGetDocPin
+     */
+    var _this = this;
+    try {
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        var token = req.query.TokenNo;
+        if (token != null) {
+            FnValidateToken(token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+                        _this.db.query('CALL pGetDocPIN(' + _this.db.escape(token) + ')', function (err, BussinessListingResult) {
+                            if (!err) {
+                                // console.log('FnUpdateMessageStatus: Update result' + UpdateResult);
+                                if (BussinessListingResult[0] != null) {
+                                    if (BussinessListingResult[0].length > 0) {
+                                        res.send(BussinessListingResult[0]);
+                                        console.log('FnGetDocPin: Bussiness Pin sent successfully');
+                                    }
+                                    else {
+                                        console.log('FnGetDocPin: Bussiness Pin is not avaiable');
+                                        res.json(null);
+                                    }
+                                }
+                                else {
+                                    console.log('FnGetDocPin: Bussiness listing is not avaiable');
+                                    res.json(null);
+                                }
+                            }
+                            else {
+                                console.log('FnGetDocPin: ' + err);
+                                res.statusCode = 500;
+                                res.json(null);
+                            }
+                        });
+                    }
+                    else {
+                        console.log('FnGetDocPin: Invalid token');
+                        res.statusCode = 401;
+                        res.json(null);
+                    }
+                }
+                else {
+                    console.log('FnGetDocPin: : ' + err);
+                    res.statusCode = 500;
+                    res.json(null);
+                }
+            });
+        }
+        else {
+            console.log('FnGetDocPin: token is empty');
+            res.statusCode = 400;
+            res.json(null);
+
+        }
+    }
+    catch (ex) {
+        console.log('FnGetDocPin:  error:' + ex.description);
+    }
+};
+
+/**
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ */
+User.prototype.getDoc = function(req,res,next) {
+    /**
+     * @todo FnGetDoc
+     */
+    var _this = this;
+try {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+    var Token = req.query.TokenNo;
+    var Type = parseInt(req.query.Type);
+
+    if (Token != null && Type.toString() != 'NaN' && Type.toString() != '0') {
+        FnValidateToken(Token, function (err, Result) {
+            if (!err) {
+                if (Result != null) {
+                    _this.db.query('CALL pGetDocs(' + _this.db.escape(Token) + ',' + _this.db.escape(Type) + ')', function (err, DocumentResult) {
+                        if (!err) {
+                            //console.log(DocumentResult);
+                            if (DocumentResult[0] != null) {
+                                if (DocumentResult[0].length > 0) {
+                                    res.send(DocumentResult[0]);
+                                    console.log('FnGetDoc: Document sent successfully');
+                                }
+                                else {
+                                    console.log('FnGetDoc: No document available');
+                                    res.json(null);
+                                }
+
+                            }
+                            else {
+                                console.log('FnGetDoc: No document available');
+                                res.json(null);
+                            }
+                        }
+                        else {
+                            res.statusCode = 500;
+                            res.json(null);
+                            console.log('FnGetDoc: Error in sending documents: ' + err);
+                        }
+                    });
+                }
+                else {
+                    console.log('FnGetDoc: Invalid Token');
+                    res.statusCode = 401;
+                    res.json(null);
+                }
+            }
+            else {
+                console.log('FnGetDoc: Token error: ' + err);
+                res.statusCode = 500;
+                res.json(null);
+            }
+        });
+
+    }
+    else {
+        if (Token == null) {
+            console.log('FnGetDoc: Token is empty');
+        }
+        else if (Type.toString() != 'NaN' || Type.toString() == '0') {
+            console.log('FnGetDoc: Type is empty');
+        }
+        res.statusCode = 400;
+        res.json(null);
+    }
+
+}
+catch (ex) {
+    console.log('FnGetDoc error:' + ex.description);
+
+}
+};
+
+/**
+ * Method : POST
+ * @param req
+ * @param res
+ * @param next
+ */
+User.prototype.updateDocPin = function(req,res,next) {
+    /**
+     * @todo FnUpdateDocPin
+     */
+    var _this = this;
+    try {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    var token = req.body.TokenNo;
+    var tPin = req.body.Pin;
+    var RtnMessage = {
+        IsUpdated: false
+    };
+    var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
+    if (tPin == '') {
+        tPin = null;
+    }
+    if (token != null && token != '') {
+        FnValidateToken(token, function (err, Result) {
+            if (!err) {
+                if (Result != null) {
+                    var query = _this.db.escape(token) + ',' + _this.db.escape(tPin);
+                    _this.db.query('CALL pUpdateDocPIN(' + query + ')', function (err, UpdateResult) {
+                        if (!err) {
+                            //  console.log(UpdateResult);
+                            // console.log('FnUpdateMessageStatus: Update result' + UpdateResult);
+                            if (UpdateResult.affectedRows > 0) {
+                                RtnMessage.IsUpdated = true;
+                                res.send(RtnMessage);
+                                console.log('FnUpdateDocPin:  Doc Pin updates successfully');
+                            }
+                            else {
+                                console.log('FnUpdateDocPin:  Doc Pin  is not updated');
+                                res.send(RtnMessage);
+                            }
+                        }
+                        else {
+                            console.log('FnUpdateDocPin: ' + err);
+                            res.statusCode = 500;
+                            res.send(RtnMessage);
+                        }
+                    });
+                }
+                else {
+                    console.log('FnUpdateDocPin: Invalid token');
+                    res.statusCode = 401;
+                    res.send(RtnMessage);
+                }
+            }
+            else {
+                console.log('FnUpdateDocPin: : ' + err);
+                res.statusCode = 500;
+                res.send(RtnMessage);
+
+            }
+        });
+
+    }
+    else {
+        if (token == null || token == '') {
+            console.log('FnUpdateDocPin: token is empty');
+        }
+
+        res.statusCode = 400;
+        res.send(RtnMessage);
+
+    }
+}
+catch (ex) {
+    console.log('FnUpdateDocPin:  error:' + ex.description);
+
+}
+};
+
+/**
+ * Method : POST
+ * @param req
+ * @param res
+ * @param next
+ */
+User.prototype.saveDoc = function(req,res,next) {
+    /**
+     * @todo FnSaveDoc
+     */
+    var _this = this;
+try {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    var Token = req.body.TokenNo;
+    var tRefNo = req.body.RefNo;
+    var tRefExpiryDate = req.body.RefExpiryDate;
+    var tRefType = parseInt(req.body.RefType);
+
+    var RtnMessage = {
+        IsSuccessfull: false
+    };
+    var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
+
+    if (Token != null) {
+        FnValidateToken(Token, function (err, Result) {
+            if (!err) {
+                if (Result != null && tRefType.toString() != 'NaN') {
+                    if (tRefExpiryDate != null) {
+                        tRefExpiryDate = new Date(tRefExpiryDate);
+                        //console.log(tRefExpiryDate);
+                    }
+                    var query = _this.db.escape(Token) + ',' + _this.db.escape(tRefNo) + ',' + _this.db.escape(tRefExpiryDate) + ',' + _this.db.escape(tRefType);
+                    //console.log('FnSaveDoc: Inserting data: ' + query);
+                    _this.db.query('CALL pSaveDocs(' + query + ')', function (err, InsertResult) {
+                        if (!err) {
+                            //console.log(InsertResult);
+                            if (InsertResult.affectedRows > 0) {
+                                RtnMessage.IsSuccessfull = true;
+                                console.log('Document Saved successfully');
+                                res.send(RtnMessage);
+                            }
+                            else {
+                                console.log('FnSaveDocs: Document not inserted');
+                                res.send(RtnMessage);
+                            }
+                        }
+                        else {
+                            res.statusCode = 500;
+                            res.send(RtnMessage);
+                            console.log('FnSaveDoc: Error in saving documents: ' + err);
+                        }
+                    });
+                }
+                else {
+                    if (tRefType.toString() == 'NaN') {
+                        console.log('FnSaveDoc: tRefType');
+                        res.statusCode = 400;
+                    }
+                    else {
+                        console.log('FnSaveDoc: Invalid Token');
+                        res.statusCode = 401;
+                    }
+                    res.send(RtnMessage);
+                }
+            }
+            else {
+                console.log('FnSaveDoc: Token error: ' + err);
+                res.statusCode = 500;
+                res.send(RtnMessage);
+            }
+        });
+
+    }
+    else {
+        console.log('FnSaveDoc: Token is empty');
+        res.statusCode = 400;
+        res.send(RtnMessage);
+    }
+
+}
+catch (ex) {
+    console.log('FnSaveDoc error:' + ex.description);
+}
+};
+
+/**
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ */
+User.prototype.getFunctions = function(req,res,next) {
+    /**
+     * @todo FnGetFunctions
+     */
+    var _this = this;
+    try {
+
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    var LangID = parseInt(req.query.LangID);
+    if (LangID.toString != 'NaN') {
+        var Query = 'select FunctionID, FunctionName  from mfunctiontype where LangID=' + _this.db.escape(LangID);
+        _this.db.query(Query, function (err, FunctionRoleMapResult) {
+            if (!err) {
+                if (FunctionRoleMapResult.length > 0) {
+                    res.send(FunctionRoleMapResult);
+                    console.log('FnGetFunctions: mfunctiontype: Functions sent successfully');
+                }
+                else {
+                    res.json(null);
+                    res.statusCode = 500;
+                    console.log('FnGetFunctions: mfunctiontype: No function  found');
+                }
+            }
+            else {
+
+                res.json(null);
+                console.log('FnGetFunctions: mfunctiontype: ' + err);
+            }
+        });
+    }
+    else {
+        console.log('FnGetFunctions: LangId is empty');
+        res.statusCode = 400;
+        res.json(null);
+    }
+
+}
+catch (ex) {
+    console.log('FnGetFunctions error:' + ex.description);
+
+}
+};
 
 module.exports = User;

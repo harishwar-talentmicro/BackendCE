@@ -32,6 +32,9 @@ HeaderApp.directive('headerSection',['Notification','$window' ,function (Notific
                                     form.$setPristine();
                                     form.$setUntouched();
                                 }
+                                if($rootScope.loginPromise){
+                                    $rootScope.loginPromise.resolve();
+                                }
                                 if($rootScope.defer){
                                     $rootScope.defer.resolve({message:'Search Done'});
                                 }

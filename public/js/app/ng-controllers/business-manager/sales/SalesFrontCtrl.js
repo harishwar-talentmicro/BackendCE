@@ -779,6 +779,10 @@
             var checkLoaded = function(){
                 if(masterUserLoaded && loggedInUserLoaded && masterUserItemsLoaded){
                     $scope.$emit('$preLoaderStop');
+                    return true;
+                }
+                else{
+                    return false;
                 }
             };
 
@@ -837,9 +841,10 @@
              * @type {string}
              */
             $scope.ezeoneAddressId = '';
-
+            var timeoutPromise = null;
             $scope.$watch('ezeoneAddressId',function(n,v){
                 if(n && n !== v){
+                    $timeout.cancel(timeoutPromise);
                     angular.element('#ezeoneAddressId').parent('.input-group').removeClass('has-success').addClass('has-error');
                     $scope.modalBox.tx.address = '';
                     $scope.modalBox.tx.area = '';
@@ -850,8 +855,10 @@
                     $scope.modalBox.tx.latitude = 0;
                     $scope.modalBox.tx.longitude = 0;
                     $scope.modalBox.tx.DeliveryAddress = '';
+                    timeoutPromise = $timeout(function(){
+                        $scope.getEzeidLocationDetails($scope.ezeoneAddressId);
+                    },1000);
 
-                    $scope.getEzeidLocationDetails(n);
                 }
                 else if(!n){
                     angular.element('#ezeoneAddressId').parent('.input-group').removeClass('has-success').addClass('has-error');
@@ -894,8 +901,9 @@
                         token : $rootScope._userInfo.Token
                     }
                 }).success(function(resp){
-                    $scope.$emit('$preLoaderStop');
-                    console.log(resp);
+                    if(checkLoaded()){
+                        $scope.$emit('$preLoaderStop');
+                    }
                     if(resp && resp.status){
                         angular.element('#ezeoneAddressId').parent('.input-group').removeClass('has-error').addClass('has-success');
                         $scope.modalBox.tx.address = resp.data.AddressLine1;
@@ -915,7 +923,10 @@
 
                     defer.resolve(resp);
                 }).error(function(err,statusCode){
-                    $scope.$emit('$preLoaderStop');
+                    if(checkLoaded()){
+                        $scope.$emit('$preLoaderStop');
+                    }
+
                     var msg = 'An error occurred ! Please try again';
                     if(!statusCode){
                         msg = 'Unable to reach the server ! Please check your connection';
