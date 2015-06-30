@@ -51,10 +51,11 @@ angular.module('ezeidApp').
             $scope.permissiontype = '';
 
 
-
+            /* initialization fot getting all the transaction history */
             getTransactionHistory().then(function(){
                 reConfigurePaginationButton();
             });
+
             /* http request to get all the transaction history */
             function getTransactionHistory()
             {
