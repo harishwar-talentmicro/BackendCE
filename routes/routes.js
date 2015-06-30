@@ -21,6 +21,12 @@ exports.FnDeleteWebLink = userModule.deleteWebLink;
 exports.FnEZEIDPrimaryDetails = userModule.getEzeidDetails;
 exports.FnGetCVInfo = userModule.getResume;
 exports.FnSaveCVInfo = userModule.saveResume;
+exports.FnPGetSkills = userModule.getSkills;
+exports.FnGetDocPin = userModule.getDocPin;
+exports.FnGetDoc = userModule.getDoc;
+exports.FnUpdateDocPin = userModule.updateDocPin;
+exports.FnSaveDoc = userModule.saveDoc;
+exports.FnGetFunctions = userModule.getFunctions;
 
 var Audit = require('./audit-module.js');
 var auditModule = new Audit(db);
@@ -31,7 +37,6 @@ var locationModule = new Location(db);
 exports.FnGetSecondaryLocation = locationModule.getAll;
 exports.FnAddLocation = locationModule.save;
 exports.FnDeleteLocation = locationModule.deleteLocation;
-
 exports.FnGetLocationListForEZEID = locationModule.getAllForEzeid;
 
 var BusinessManager = require('./business-module.js');
@@ -76,10 +81,27 @@ var Search = require('./search-module.js');
 var searchModule = new Search(db);
 exports.FnSearchByKeywords = searchModule.searchKeyword;
 exports.FnGetSearchInformation = searchModule.searchInformation;
+exports.FnGetWorkingHrsHolidayList = searchModule.getWorkingHrsHolidayList;
 
 var Image = require('./image-module.js');
 var imageModule = new Image(db);
 exports.FnCropImage = imageModule.cropImage;
+
+var List = require('./list-module.js');
+var listModule = new List(db);
+exports.FnSaveWhiteBlackList = listModule.saveList;
+exports.FnGetWhiteBlackList = listModule.getList;
+exports.FnDeleteWhiteBlackList = listModule.deleteList;
+exports.FnGetWhiteListCount = listModule.getListCount;
+exports.FnGetRelationType = listModule.getRelation;
+
+var Reservation = require('./reservation-module.js');
+var reservationModule = new Reservation(db);
+exports.FnSaveReservTransaction = reservationModule.SaveReservTrans;
+exports.FnGetReservTask = reservationModule.getList;
+exports.FnGetMapedServices = reservationModule.getMapedServices;
+exports.FnGetResTransDetails = reservationModule.getTransDetails;
+exports.FnChangeReservationStatus = reservationModule.changeReservStatus;
 
 
 
@@ -126,7 +148,7 @@ function FnGenerateToken() {
     }
     catch (ex) {
         console.log('OTP generate error:' + ex.description);
-        throw new Error(ex);
+          
         return 'error'
     }
 }
@@ -144,7 +166,7 @@ function FnRandomPassword() {
     }
     catch (ex) {
         console.log('OTP generate error:' + ex.description);
-        throw new Error(ex);
+          
         return 'error'
     }
 }
@@ -163,7 +185,7 @@ function FnEncryptPassword(Password) {
     }
     catch (ex) {
         console.log('OTP generate error:' + ex.description);
-        throw new Error(ex);
+          
         return 'error'
     }
 }
@@ -180,7 +202,7 @@ function FnDecrypt(EncryptPassword){
     }
     catch(ex){
         console.log('FnDecrypterror:' + ex.description);
-        throw new Error(ex);
+          
         return 'error'
     }
 }
@@ -207,7 +229,7 @@ exports.FnDecryptPassword = function(req,res){
     }
     catch(ex){
         console.log('FnDecrypterror:' + ex.description);
-        throw new Error(ex);
+          
         return 'error'
     }
 }
@@ -253,7 +275,7 @@ function FnSendMailEzeid(MailContent, CallBack) {
     }
     catch (ex) {
         console.log('OTP FnSendMailEzeid error:' + ex.description);
-        throw new Error(ex);
+          
         return 'error'
     }
 };
@@ -563,7 +585,7 @@ function FnMessageMail(MessageContent, CallBack) {
     }
     catch (ex) {
         console.log('OTP FnMessageMail error:' + ex.description);
-        throw new Error(ex);
+          
         return 'error'
     }
 };
@@ -609,7 +631,7 @@ function FnValidateToken(Token, CallBack) {
     }
     catch (ex) {
         console.log('OTP FnValidateToken error:' + ex.description);
-        throw new Error(ex);
+          
         return 'error'
     }
 };
@@ -630,7 +652,7 @@ exports.FnToken = function (req, res) {
     }
     catch (ex) {
         console.log('FnToken: OTP FnValidateToken error:' + ex.description);
-        throw new Error(ex);
+          
         return 'error'
     }
 };
@@ -663,48 +685,7 @@ exports.FnGetFunctionRoleMap = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetFunctionRoleMap error:' + ex.description);
-        throw new Error(ex);
-    }
-};
-
-//method to load functions
-exports.FnGetFunctions = function (req, res) {
-    try {
-
-        res.setHeader("Access-Control-Allow-Origin", "*");
-        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-        var LangID = parseInt(req.query.LangID);
-        if (LangID.toString != 'NaN') {
-            var Query = 'select FunctionID, FunctionName  from mfunctiontype where LangID=' + db.escape(LangID);
-            db.query(Query, function (err, FunctionRoleMapResult) {
-                if (!err) {
-                    if (FunctionRoleMapResult.length > 0) {
-                        res.send(FunctionRoleMapResult);
-                        console.log('FnGetFunctions: mfunctiontype: Functions sent successfully');
-                    }
-                    else {
-                        res.json(null);
-                        res.statusCode = 500;
-                        console.log('FnGetFunctions: mfunctiontype: No function  found');
-                    }
-                }
-                else {
-
-                    res.json(null);
-                    console.log('FnGetFunctions: mfunctiontype: ' + err);
-                }
-            });
-        }
-        else {
-            console.log('FnGetFunctions: LangId is empty');
-            res.statusCode = 400;
-            res.json(null);
-        }
-
-    }
-    catch (ex) {
-        console.log('FnGetFunctions error:' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -752,7 +733,7 @@ exports.FnGetRoles = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetFunctions error:' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -791,47 +772,7 @@ exports.FnGetLanguage = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetLanguage error:' + ex.description);
-        throw new Error(ex);
-    }
-};
-
-//method to load relation type
-exports.FnGetRelationType = function (req, res) {
-    try {
-        res.setHeader("Access-Control-Allow-Origin", "*");
-        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-        var LangID = parseInt(req.query.LangID);
-        if (LangID.toString != 'NaN') {
-            var Query = 'Select RelationID, RelationshipTitle from mrelationtype where LangID=' + db.escape(LangID);
-            db.query(Query, function (err, RelationTypeResult) {
-                if (!err) {
-                    if (RelationTypeResult.length > 0) {
-                        res.send(RelationTypeResult);
-                        console.log('FnGetRelationType: mrelationtype: Relation Type sent successfully');
-                    }
-                    else {
-                        res.json(null);
-                        res.statusCode = 500;
-                        console.log('FnGetRelationType: mrelationtype: No Relation type found');
-                    }
-                }
-                else {
-                    res.json(null);
-                    console.log('FnGetRelationType: mrelationtype:' + err);
-                }
-            });
-        }
-        else {
-            res.json(null);
-            res.statusCode = 400;
-            console.log('FnGetRelationType: LangId is empty');
-        }
-
-
-    }
-    catch (ex) {
-        console.log('FnGetRelationType error:' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -863,7 +804,7 @@ exports.FnGetFunctionRoleMapping = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetRoleFunctionMapping error:' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -901,7 +842,7 @@ exports.FnGetRoleType = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetRoleType error:' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -942,7 +883,7 @@ exports.FnGetMTitle = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetMTitle error:' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -980,7 +921,7 @@ exports.FnGetProxmity = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetProxmity error:' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -1072,85 +1013,9 @@ exports.FnSendMail = function (req, res) {
 
     catch (ex) {
         console.log('Logoin error:' + ex.description);
-        throw new Error(ex);
+          
     }
 
-};
-
-//method to get access history of users
-exports.FnGetAccessHistory = function (req, res) {
-    try {
-        res.setHeader("Access-Control-Allow-Origin", "*");
-        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-        var Token = req.query.TokenNo;
-        var Page = parseInt(req.query.Page);
-
-        if (Token != null && Page.toString() != 'NaN' && Page.toString() != '0') {
-            FnValidateToken(Token, function (err, Result) {
-                if (!err) {
-                    if (Result != null) {
-                        var ToPage = 25 * Page;
-                        var FromPage = ToPage - 24;
-
-                        if (FromPage <= 1) {
-                            FromPage = 0;
-                        }
-
-                        db.query('CALL pAccessHistory(' + db.escape(Token) + ',' + db.escape(FromPage) + ',' + db.escape(ToPage) + ')', function (err, AccessHistoryResult) {
-                            if (!err) {
-                                //    console.log(AccessHistoryResult);
-                                if (AccessHistoryResult[0] != null) {
-                                    if (AccessHistoryResult[0].length > 0) {
-                                        res.send(AccessHistoryResult[0]);
-                                        console.log('FnGetAccessHistory: History sent successfully');
-                                    }
-                                    else {
-                                        console.log('FnGetAccessHistory: History not available');
-                                        res.json(null);
-                                    }
-
-                                }
-                                else {
-                                    console.log('FnGetAccessHistory: No History available');
-                                    res.json(null);
-                                }
-                            }
-                            else {
-                                res.json(null);
-                                console.log('FnGetAccessHistory: Error in sending documents: ' + err);
-                            }
-                        });
-                    }
-                    else {
-                        res.statusCode = 401;
-                        console.log('FnGetAccessHistory: Invalid Token');
-                        res.json(null);
-                    }
-                }
-                else {
-                    res.statusCode = 500;
-                    console.log('FnGetAccessHistory: Token error: ' + err);
-                    res.json(null);
-                }
-            });
-
-        }
-        else {
-            if (Token == null) {
-                console.log('FnGetAccessHistory: Token is empty');
-            }
-            else if (Page.toString() != 'NaN') {
-                console.log('FnGetAccessHistory: Type is empty');
-            }
-            res.statusCode = 400;
-            res.json(null);
-        }
-
-    }
-    catch (ex) {
-        console.log('FnGetAccessHistory error:' + ex.description);
-        throw new Error(ex);
-    }
 };
 
 //method to save messages
@@ -1271,7 +1136,7 @@ exports.FnSaveMessage = function (req, res) {
     }
     catch (ex) {
         console.log('FnSaveMessage error:' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -1352,7 +1217,7 @@ exports.FnGetMessages = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetMessages error:' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -1431,7 +1296,7 @@ exports.FnUpdateMessageStatus = function (req, res) {
     }
     catch (ex) {
         console.log('FnUpdateMessageStatus:  error:' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -1527,138 +1392,7 @@ exports.FnUpdateProfilePicture = function (req, res) {
     }
     catch (ex) {
         console.log('FnUpdateProfilePicture error:' + ex.description);
-        throw new Error(ex);
-    }
-};
-
-exports.FnUpdateDocPin = function (req, res) {
-
-    try {
-        res.setHeader("Access-Control-Allow-Origin", "*");
-        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-        var token = req.body.TokenNo;
-        var tPin = req.body.Pin;
-        var RtnMessage = {
-            IsUpdated: false
-        };
-        var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
-        if (tPin == '') {
-            tPin = null;
-        }
-        if (token != null && token != '') {
-            FnValidateToken(token, function (err, Result) {
-                if (!err) {
-                    if (Result != null) {
-                        var query = db.escape(token) + ',' + db.escape(tPin);
-                        db.query('CALL pUpdateDocPIN(' + query + ')', function (err, UpdateResult) {
-                            if (!err) {
-                                //  console.log(UpdateResult);
-                                // console.log('FnUpdateMessageStatus: Update result' + UpdateResult);
-                                if (UpdateResult.affectedRows > 0) {
-                                    RtnMessage.IsUpdated = true;
-                                    res.send(RtnMessage);
-                                    console.log('FnUpdateDocPin:  Doc Pin updates successfully');
-                                }
-                                else {
-                                    console.log('FnUpdateDocPin:  Doc Pin  is not updated');
-                                    res.send(RtnMessage);
-                                }
-                            }
-                            else {
-                                console.log('FnUpdateDocPin: ' + err);
-                                res.statusCode = 500;
-                                res.send(RtnMessage);
-                            }
-                        });
-                    }
-                    else {
-                        console.log('FnUpdateDocPin: Invalid token');
-                        res.statusCode = 401;
-                        res.send(RtnMessage);
-                    }
-                }
-                else {
-                    console.log('FnUpdateDocPin: : ' + err);
-                    res.statusCode = 500;
-                    res.send(RtnMessage);
-
-                }
-            });
-
-        }
-        else {
-            if (token == null || token == '') {
-                console.log('FnUpdateDocPin: token is empty');
-            }
-
-            res.statusCode = 400;
-            res.send(RtnMessage);
-
-        }
-    }
-    catch (ex) {
-        console.log('FnUpdateMessageStatus:  error:' + ex.description);
-        throw new Error(ex);
-    }
-};
-
-exports.FnGetDocPin = function (req, res) {
-    try {
-        res.setHeader("Access-Control-Allow-Origin", "*");
-        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-        var token = req.query.TokenNo;
-        if (token != null) {
-            FnValidateToken(token, function (err, Result) {
-                if (!err) {
-                    if (Result != null) {
-                        db.query('CALL pGetDocPIN(' + db.escape(token) + ')', function (err, BussinessListingResult) {
-                            if (!err) {
-                                // console.log('FnUpdateMessageStatus: Update result' + UpdateResult);
-                                if (BussinessListingResult[0] != null) {
-                                    if (BussinessListingResult[0].length > 0) {
-                                        res.send(BussinessListingResult[0]);
-                                        console.log('FnGetDocPin: Bussiness Pin sent successfully');
-                                    }
-                                    else {
-                                        console.log('FnGetDocPin: Bussiness Pin is not avaiable');
-                                        res.json(null);
-                                    }
-                                }
-                                else {
-                                    console.log('FnGetDocPin: Bussiness listing is not avaiable');
-                                    res.json(null);
-                                }
-                            }
-                            else {
-                                console.log('FnGetDocPin: ' + err);
-                                res.statusCode = 500;
-                                res.json(null);
-                            }
-                        });
-                    }
-                    else {
-                        console.log('FnGetDocPin: Invalid token');
-                        res.statusCode = 401;
-                        res.json(null);
-                    }
-                }
-                else {
-                    console.log('FnGetDocPin: : ' + err);
-                    res.statusCode = 500;
-                    res.json(null);
-                }
-            });
-        }
-        else {
-            console.log('FnGetDocPin: token is empty');
-            res.statusCode = 400;
-            res.json(null);
-
-        }
-    }
-    catch (ex) {
-        console.log('FnGetDocPin:  error:' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -1745,155 +1479,7 @@ exports.FnCheckCV = function (req, res) {
     }
     catch (ex) {
         console.log('FnCheckCV error:' + ex.description);
-        throw new Error(ex);
-    }
-};
-//method to save documents
-exports.FnSaveDoc = function (req, res) {
-    try {
-        res.setHeader("Access-Control-Allow-Origin", "*");
-        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-        var Token = req.body.TokenNo;
-        var tRefNo = req.body.RefNo;
-        var tRefExpiryDate = req.body.RefExpiryDate;
-        var tRefType = parseInt(req.body.RefType);
-
-        var RtnMessage = {
-            IsSuccessfull: false
-        };
-        var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
-
-        if (Token != null) {
-            FnValidateToken(Token, function (err, Result) {
-                if (!err) {
-                    if (Result != null && tRefType.toString() != 'NaN') {
-                        if (tRefExpiryDate != null) {
-                            tRefExpiryDate = new Date(tRefExpiryDate);
-                            //console.log(tRefExpiryDate);
-                        }
-                        var query = db.escape(Token) + ',' + db.escape(tRefNo) + ',' + db.escape(tRefExpiryDate) + ',' + db.escape(tRefType);
-                        //console.log('FnSaveDoc: Inserting data: ' + query);
-                        db.query('CALL pSaveDocs(' + query + ')', function (err, InsertResult) {
-                            if (!err) {
-                                //console.log(InsertResult);
-                                if (InsertResult.affectedRows > 0) {
-                                    RtnMessage.IsSuccessfull = true;
-                                    console.log('Document Saved successfully');
-                                    res.send(RtnMessage);
-                                }
-                                else {
-                                    console.log('FnSaveDocs: Document not inserted');
-                                    res.send(RtnMessage);
-                                }
-                            }
-                            else {
-                                res.statusCode = 500;
-                                res.send(RtnMessage);
-                                console.log('FnSaveDoc: Error in saving documents: ' + err);
-                            }
-                        });
-                    }
-                    else {
-                        if (tRefType.toString() == 'NaN') {
-                            console.log('FnSaveDoc: tRefType');
-                            res.statusCode = 400;
-                        }
-                        else {
-                            console.log('FnSaveDoc: Invalid Token');
-                            res.statusCode = 401;
-                        }
-                        res.send(RtnMessage);
-                    }
-                }
-                else {
-                    console.log('FnSaveDoc: Token error: ' + err);
-                    res.statusCode = 500;
-                    res.send(RtnMessage);
-                }
-            });
-
-        }
-        else {
-            console.log('FnSaveDoc: Token is empty');
-            res.statusCode = 400;
-            res.send(RtnMessage);
-        }
-
-    }
-    catch (ex) {
-        console.log('FnSaveDoc error:' + ex.description);
-        throw new Error(ex);
-    }
-};
-
-//method to get documents
-exports.FnGetDoc = function (req, res) {
-    try {
-        res.setHeader("Access-Control-Allow-Origin", "*");
-        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-
-        var Token = req.query.TokenNo;
-        var Type = parseInt(req.query.Type);
-
-        if (Token != null && Type.toString() != 'NaN' && Type.toString() != '0') {
-            FnValidateToken(Token, function (err, Result) {
-                if (!err) {
-                    if (Result != null) {
-                        db.query('CALL pGetDocs(' + db.escape(Token) + ',' + db.escape(Type) + ')', function (err, DocumentResult) {
-                            if (!err) {
-                                //console.log(DocumentResult);
-                                if (DocumentResult[0] != null) {
-                                    if (DocumentResult[0].length > 0) {
-                                        res.send(DocumentResult[0]);
-                                        console.log('FnGetDoc: Document sent successfully');
-                                    }
-                                    else {
-                                        console.log('FnGetDoc: No document available');
-                                        res.json(null);
-                                    }
-
-                                }
-                                else {
-                                    console.log('FnGetDoc: No document available');
-                                    res.json(null);
-                                }
-                            }
-                            else {
-                                res.statusCode = 500;
-                                res.json(null);
-                                console.log('FnGetDoc: Error in sending documents: ' + err);
-                            }
-                        });
-                    }
-                    else {
-                        console.log('FnGetDoc: Invalid Token');
-                        res.statusCode = 401;
-                        res.json(null);
-                    }
-                }
-                else {
-                    console.log('FnGetDoc: Token error: ' + err);
-                    res.statusCode = 500;
-                    res.json(null);
-                }
-            });
-
-        }
-        else {
-            if (Token == null) {
-                console.log('FnGetDoc: Token is empty');
-            }
-            else if (Type.toString() != 'NaN' || Type.toString() == '0') {
-                console.log('FnGetDoc: Type is empty');
-            }
-            res.statusCode = 400;
-            res.json(null);
-        }
-
-    }
-    catch (ex) {
-        console.log('FnGetDoc error:' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -1969,7 +1555,7 @@ exports.FnUpdateBussinessListing = function (req, res) {
     }
     catch (ex) {
         console.log('FnUpdateMessageStatus:  error:' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -2029,7 +1615,7 @@ exports.FnGetBussinessListing = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetBussinessListing:  error:' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -2122,7 +1708,7 @@ exports.FnUploadDocument = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetDocument error:' + ex.description);
-        throw new Error(ex);
+          
         deleteTempFile();
     }
 };
@@ -2200,7 +1786,7 @@ exports.FnGetDocument = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetDocument error:' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -2360,7 +1946,7 @@ exports.FnGetSearchDocuments = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetSearchDocuments error:' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -2425,7 +2011,7 @@ exports.FnUpdatePwdEncryption = function (req, res) {
     }
     catch (ex) {
         console.log('FnUpdateUserProfileAP error:' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -2472,7 +2058,7 @@ exports.FnGetLoginCheck = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetUserDetails error:' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -2568,324 +2154,9 @@ exports.FnGetBannerPicture = function(req, res){
     }
     catch (ex) {
         console.log('FnGetBannerPicture error:' + ex.description);
-        throw new Error(ex);
+          
     }
 }
-
-exports.FnSaveWhiteBlackList = function(req, res){
-    try{
-        res.setHeader("Access-Control-Allow-Origin", "*");
-        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-
-        var List = req.body.List;
-        var RelationType =parseInt(req.body.RelationType);
-        var Tag = parseInt(req.body.Tag);
-        var EZEID = req.body.EZEID;
-        var Token = req.body.Token;
-
-        var RtnMessage = {
-            IsSuccessfull: false
-        };
-
-        var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
-        if (List!= null && RelationType.toString() != 'NaN' && Tag.toString() != 'NaN' && EZEID !=null && Token != null) {
-            FnValidateToken(Token, function (err, Result) {
-                if (!err) {
-                    if (Result != null) {
-                        var query = db.escape(List) + ',' + db.escape(RelationType) + ',' + db.escape(EZEID) + ',' + db.escape(Tag) + ',' +db.escape(Token);
-                        db.query('CALL pSavewhiteblacklist(' + query + ')', function (err, InsertResult) {
-                            if (!err){
-                                if (InsertResult.affectedRows > 0) {
-                                    RtnMessage.IsSuccessfull = true;
-                                    res.send(RtnMessage);
-                                    console.log('FnSaveWhiteBlackList: White/Black list details save successfully');
-                                }
-                                else {
-                                    console.log('FnSaveWhiteBlackList:No Save White/Black list details');
-                                    res.send(RtnMessage);
-                                }
-                            }
-                            else {
-                                console.log('FnSaveWhiteBlackList: error in Updating White/Black list' + err);
-                                res.statusCode = 500;
-                                res.send(RtnMessage);
-                            }
-                        });
-                    }
-                    else {
-                        console.log('FnSaveWhiteBlackList: Invalid token');
-                        res.statusCode = 401;
-                        res.send(RtnMessage);
-                    }
-                }
-                else {
-                    console.log('FnSaveWhiteBlackList:Error in processing Token' + err);
-                    res.statusCode = 500;
-                    res.send(RtnMessage);
-                }
-            });
-        }
-        else {
-            if (List == null) {
-                console.log('FnSaveWhiteBlackList: List is empty');
-            }
-            else if (RelationType == 'NaN') {
-                console.log('FnSaveWhiteBlackList: RelationType is empty');
-            }
-            else if (EZEID == null) {
-                console.log('FnSaveWhiteBlackList: Ezeid is empty');
-            }
-            else if (Tag == 'NaN') {
-                console.log('FnSaveWhiteBlackList: Tag is empty');
-            }
-            else if (Token == null) {
-                console.log('FnSaveWhiteBlackList: Token is empty');
-            }
-
-            res.statusCode=400;
-            res.send(RtnMessage);
-        }
-
-    }
-    catch (ex) {
-        console.log('FnSaveWhiteBlackList:error ' + ex.description);
-        throw new Error(ex);
-    }
-};
-
-exports.FnGetWhiteBlackList = function (req, res) {
-    try {
-
-        res.setHeader("Access-Control-Allow-Origin", "*");
-        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-
-        var Token = req.query.Token;
-        //var EZEID = req.query.EZEID;
-
-
-        if (Token != null) {
-            FnValidateToken(Token, function (err, Result) {
-                if (!err) {
-                    if (Result != null) {
-
-                        db.query('CALL pGetwhiteblacklist(' + db.escape(Token) + ')', function (err, GetResult) {
-                            if (!err) {
-                                if (GetResult != null) {
-                                    if (GetResult[0].length > 0) {
-
-                                        console.log('FnGetWhiteBlackList: white/black list details Sent successfully');
-                                        res.send(GetResult[0]);
-                                    }
-                                    else {
-
-                                        console.log('FnGetWhiteBlackList:No white/black list details found');
-                                        res.json(null);
-                                    }
-                                }
-                                else {
-
-                                    console.log('FnGetWhiteBlackList:No white/black list details found');
-                                    res.json(null);
-                                }
-
-                            }
-                            else {
-
-                                console.log('FnGetWhiteBlackList: error in getting white/black list' + err);
-                                res.statusCode = 500;
-                                res.json(null);
-                            }
-                        });
-                    }
-                    else {
-                        res.statusCode = 401;
-                        res.json(null);
-                        console.log('FnGetWhiteBlackList: Invalid Token');
-                    }
-                } else {
-
-                    res.statusCode = 500;
-                    res.json(null);
-                    console.log('FnGetWhiteBlackList: Error in validating token:  ' + err);
-                }
-            });
-        }
-        else {
-            if (Token == null) {
-                console.log('FnGetWhiteBlackList: Token is empty');
-            }
-
-            res.statusCode=400;
-            res.json(null);
-        }
-    }
-    catch (ex) {
-        console.log('FnGetWhiteBlackList error:' + ex.description);
-        throw new Error(ex);
-    }
-};
-
-exports.FnDeleteWhiteBlackList = function(req, res){
-    try{
-        res.setHeader("Access-Control-Allow-Origin", "*");
-        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-
-
-        var Token = req.body.Token;
-        var TID = req.body.TID;
-
-        var RtnMessage = {
-            IsSuccessfull: false
-        };
-
-        var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
-
-        if (TID !=null && Token != null) {
-            FnValidateToken(Token, function (err, Result) {
-                if (!err) {
-                    if (Result != null) {
-
-                        var query = db.escape(Token) + ',' + db.escape(TID);
-                        db.query('CALL pDeletewhiteblacklist(' + query + ')', function (err, InsertResult) {
-                            if (!err){
-                                if (InsertResult.affectedRows > 0) {
-                                    RtnMessage.IsSuccessfull = true;
-                                    res.send(RtnMessage);
-                                    console.log('FnDeleteWhiteBlackList: White/Black list details delete successfully');
-                                }
-                                else {
-                                    console.log('FnDeleteWhiteBlackList:No delete White/Black list details');
-                                    res.send(RtnMessage);
-                                }
-                            }
-
-                            else {
-                                console.log('FnDeleteWhiteBlackList: error in deleting White/Black list' + err);
-                                res.statusCode = 500;
-                                res.send(RtnMessage);
-                            }
-                        });
-                    }
-                    else {
-                        console.log('FnDeleteWhiteBlackList: Invalid token');
-                        res.statusCode = 401;
-                        res.send(RtnMessage);
-                    }
-                }
-                else {
-                    console.log('FnDeleteWhiteBlackList:Error in processing Token' + err);
-                    res.statusCode = 500;
-                    res.send(RtnMessage);
-
-                }
-            });
-
-        }
-
-        else {
-            if (Token == null) {
-                console.log('FnDeleteWhiteBlackList: Token is empty');
-            }
-            else if (TID == null) {
-                console.log('FnDeleteWhiteBlackList: TID is empty');
-            }
-
-
-            res.statusCode=400;
-            res.send(RtnMessage);
-        }
-
-    }
-    catch (ex) {
-        console.log('FnDeleteWhiteBlackList:error ' + ex.description);
-        throw new Error(ex);
-    }
-}
-
-exports.FnGetWhiteListCount = function (req, res) {
-    try {
-
-        res.setHeader("Access-Control-Allow-Origin", "*");
-        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-
-        var Token = req.query.Token;
-        var EZEID = req.query.EZEID;
-        var List=req.query.List;
-        var RtnMessage = {
-            WhiteListCount : 0
-        };
-
-        var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
-        if (Token != null && EZEID != null && List != null) {
-            FnValidateToken(Token, function (err, Result) {
-                if (!err) {
-                    if (Result != null) {
-
-                        var query = db.escape(Token) + ',' + db.escape(EZEID) + ',' + db.escape(List);
-
-                        db.query('CALL pGetWhiteListCount(' + query + ')', function (err, GetResult) {
-                            if (!err) {
-                                if (GetResult[0] != null) {
-                                    if (GetResult[0].length > 0) {
-                                        var WhiteListCount =GetResult[0];
-                                        RtnMessage.WhiteListCount=WhiteListCount[0].WhiteListCount;
-                                        console.log('FnGetWhiteListCount: white list count Sent successfully');
-                                        res.send(RtnMessage);
-                                    }
-                                    else {
-
-                                        console.log('FnGetWhiteListCount:No white list details found');
-                                        res.send(RtnMessage);
-                                    }
-                                }
-                                else {
-
-                                    console.log('FnGetWhiteListCount:No white list details found');
-                                    res.send(RtnMessage);
-                                }
-
-                            }
-                            else {
-
-                                console.log('FnGetWhiteListCount: error in getting white list' + err);
-                                res.statusCode = 500;
-                                res.send(RtnMessage);
-                            }
-                        });
-                    }
-                    else {
-                        res.statusCode = 401;
-                        res.send(RtnMessage);
-                        console.log('FnGetWhiteListCount: Invalid Token');
-                    }
-                } else {
-
-                    res.statusCode = 500;
-                    res.send(RtnMessage);
-                    console.log('FnGetWhiteListCount: Error in validating token:  ' + err);
-                }
-            });
-        }
-        else {
-            if (Token == null) {
-                console.log('FnGetWhiteListCount: Token is empty');
-            }
-            else if (EZEID == null) {
-                console.log('FnGetWhiteListCount: EZEID is empty');
-            }
-            else if (List == null) {
-                console.log('FnGetWhiteListCount: List is empty');
-            }
-
-            res.statusCode=400;
-            res.send(RtnMessage);
-        }
-    }
-    catch (ex) {
-        console.log('FnGetWhiteListCount error:' + ex.description);
-        throw new Error(ex);
-    }
-};
 
 exports.FnSearchForTracker = function (req, res) {
     try {
@@ -2962,153 +2233,7 @@ exports.FnSearchForTracker = function (req, res) {
     }
     catch (ex) {
         console.log('FnSearchForTracker error:' + ex.description);
-        throw new Error(ex);
-    }
-};
-
-//below method get item list details
-exports.FnGetItemList = function (req, res) {
-    try {
-
-        res.setHeader("Access-Control-Allow-Origin", "*");
-        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-
-        var Token = req.query.Token;
-        var FunctionType = req.query.FunctionType;
-        if(Token == "")
-            Token= null;
-        if (Token != null && FunctionType != null) {
-            FnValidateToken(Token, function (err, Result) {
-                if (!err) {
-                    if (Result != null) {
-                        db.query('CALL pGetItemList(' + db.escape(Token) + ',' + db.escape(FunctionType) + ')', function (err, GetResult) {
-                            if (!err) {
-                                if (GetResult[0] != null) {
-                                    if (GetResult[0].length > 0) {
-                                        console.log('FnGetItemList: Item list details Send successfully');
-                                        res.json(GetResult[0]);
-                                    }
-                                    else {
-
-                                        console.log('FnGetItemList:No Item list details found');
-                                        res.json(null);
-                                    }
-                                }
-                                else {
-
-                                    console.log('FnGetItemList:No Item list details found');
-                                    res.json(null);
-                                }
-                            }
-                            else {
-
-                                console.log('FnGetItemList: error in getting Item list details' + err);
-                                res.statusCode = 500;
-                                res.json(null);
-                            }
-                        });
-                    }
-                    else {
-                        res.statusCode = 401;
-                        res.json(null);
-                        console.log('FnGetItemList: Invalid Token');
-                    }
-                } else {
-
-                    res.statusCode = 500;
-                    res.json(null);
-                    console.log('FnGetItemList: Error in validating token:  ' + err);
-                }
-            });
-        }
-        else {
-            if (Token == null) {
-                console.log('FnGetItemList: Token is empty');
-            }
-            else if (FunctionType == null) {
-                console.log('FnGetItemList: FunctionType is empty');
-            }
-            res.statusCode=400;
-            res.json(null);
-        }
-    }
-    catch (ex) {
-        console.log('FnGetItemList error:' + ex.description);
-        throw new Error(ex);
-    }
-};
-
-//below method get transaction items list
-exports.FnGetTransactionItems = function (req, res) {
-    try {
-
-        res.setHeader("Access-Control-Allow-Origin", "*");
-        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-
-        var Token = req.query.Token;
-        var MessageID = req.query.MessageID;
-
-        if (Token != null && MessageID != null) {
-            FnValidateToken(Token, function (err, Result) {
-                if (!err) {
-                    if (Result != null) {
-
-                        db.query('CALL pGetTranscationItems(' + db.escape(MessageID) + ')', function (err, GetResult) {
-                            if (!err) {
-                                if (GetResult != null) {
-                                    if (GetResult[0].length > 0) {
-
-                                        console.log('FnGetTranscationItems: transaction items details Send successfully');
-                                        res.send(GetResult[0]);
-                                    }
-                                    else {
-
-                                        console.log('FnGetTranscationItems:No transaction items details found');
-                                        res.json(null);
-                                    }
-                                }
-                                else {
-
-                                    console.log('FnGetTranscationItems:No transaction items details found');
-                                    res.json(null);
-                                }
-
-                            }
-                            else {
-
-                                console.log('FnGetTranscationItems: error in getting transaction items details' + err);
-                                res.statusCode = 500;
-                                res.json(null);
-                            }
-                        });
-                    }
-                    else {
-                        res.statusCode = 401;
-                        res.json(null);
-                        console.log('FnGetTranscationItems: Invalid Token');
-                    }
-                } else {
-
-                    res.statusCode = 500;
-                    res.json(null);
-                    console.log('FnGetTranscationItems: Error in validating token:  ' + err);
-                }
-            });
-        }
-        else {
-            if (Token == null) {
-                console.log('FnGetTranscationItems: Token is empty');
-            }
-            else if (MessageID == null) {
-                console.log('FnGetTranscationItems: MessageID is empty');
-            }
-            res.statusCode=400;
-            res.json(null);
-        }
-    }
-    catch (ex) {
-        console.log('FnGetTranscationItems error:' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -3203,7 +2328,7 @@ exports.FnSaveTransactionItems = function(req, res){
     }
     catch (ex) {
         console.log('FnSaveTranscationItems:error ' + ex.description);
-        throw new Error(ex);
+          
     }
 }
 
@@ -3272,753 +2397,7 @@ exports.FnItemDetails = function (req, res) {
     }
     catch (ex) {
         console.log('FnItemDetails error:' + ex.description);
-        throw new Error(ex);
-    }
-};
-
-exports.FnSaveHolidayCalendar = function(req, res){
-    try{
-        res.setHeader("Access-Control-Allow-Origin", "*");
-        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-
-        var Token = req.body.Token;
-        var TID = req.body.TID;
-        var HolidayDate = req.body.HolidayDate;
-        var HolidayTitle = req.body.HolidayTitle;
-        var TemplateID = req.body.TemplateID;
-
-        var RtnMessage = {
-            IsSuccessfull: false
-        };
-
-        if (Token != null && TID != null && HolidayTitle != null  && HolidayDate != null && TemplateID != null ) {
-            FnValidateToken(Token, function (err, Result) {
-                if (!err) {
-                    if (Result != null) {
-                        var query = db.escape(TID) + ',' + db.escape(Token) + ',' + db.escape(new Date(HolidayDate)) + ',' + db.escape(HolidayTitle) + ',' + db.escape(TemplateID);
-                        db.query('CALL pSaveHolidayCalendar(' + query + ')', function (err, InsertResult) {
-                            if (!err){
-                                if (InsertResult.affectedRows > 0) {
-                                    RtnMessage.IsSuccessfull = true;
-                                    res.send(RtnMessage);
-                                    console.log('FnSaveHolidayCalendar: Holiday calander details save successfully');
-                                }
-                                else {
-                                    console.log('FnSaveHolidayCalendar:No Save Holiday calander details');
-                                    res.send(RtnMessage);
-                                }
-                            }
-
-                            else {
-                                console.log('FnSaveHolidayCalendar: error in saving Holiday calander details' + err);
-                                res.statusCode = 500;
-                                res.send(RtnMessage);
-                            }
-                        });
-                    }
-                    else {
-                        console.log('FnSaveHolidayCalendar: Invalid token');
-                        res.statusCode = 401;
-                        res.send(RtnMessage);
-                    }
-                }
-                else {
-                    console.log('FnSaveHolidayCalendar:Error in processing Token' + err);
-                    res.statusCode = 500;
-                    res.send(RtnMessage);
-
-                }
-            });
-
-        }
-
-        else {
-            if (Token == null) {
-                console.log('FnSaveHolidayCalendar: Token is empty');
-            }
-            else if (TID == null) {
-                console.log('FnSaveHolidayCalendar: TID is empty');
-            }
-            else if (HolidayTitle == null) {
-                console.log('FnSaveHolidayCalendar: HolidayTitle is empty');
-            }
-            else if (HolidayDate == null) {
-                console.log('FnSaveHolidayCalendar: HolidayDate is empty');
-            }
-            else if (TemplateID == null) {
-                console.log('FnSaveHolidayCalendar: TemplateID is empty');
-            }
-
-
-            res.statusCode=400;
-            res.send(RtnMessage);
-        }
-
-    }
-    catch (ex) {
-        console.log('FnSaveHolidayCalendar:error ' + ex.description);
-        throw new Error(ex);
-    }
-};
-
-exports.FnGetHolidayList = function (req, res) {
-    try {
-
-        res.setHeader("Access-Control-Allow-Origin", "*");
-        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-
-        var Token = req.query.Token;
-        var LocID = req.query.LocID;
-        var TemplateID = req.query.TemplateID;
-        if(LocID == null && LocID == '')
-            LocID=0;
-        if (Token != null) {
-            FnValidateToken(Token, function (err, Result) {
-                if (!err) {
-                    if (Result != null) {
-
-                        db.query('CALL pGetHolidayList(' + db.escape(LocID) + ',' + db.escape(TemplateID)+ ')', function (err, GetResult) {
-                            if (!err) {
-                                if (GetResult != null) {
-                                    if (GetResult[0].length > 0) {
-
-                                        console.log('FnGetHolidayList: Holiday list Send successfully');
-                                        res.send(GetResult[0]);
-                                    }
-                                    else {
-
-                                        console.log('FnGetHolidayList:No Holiday list found');
-                                        res.json(null);
-                                    }
-                                }
-                                else {
-
-                                    console.log('FnGetHolidayList:No Holiday list found');
-                                    res.json(null);
-                                }
-
-                            }
-                            else {
-
-                                console.log('FnGetHolidayList: error in getting Holiday list' + err);
-                                res.statusCode = 500;
-                                res.json(null);
-                            }
-                        });
-                    }
-                    else {
-                        res.statusCode = 401;
-                        res.json(null);
-                        console.log('FnGetHolidayList: Invalid Token');
-                    }
-                } else {
-
-                    res.statusCode = 500;
-                    res.json(null);
-                    console.log('FnGetHolidayList: Error in validating token:  ' + err);
-                }
-            });
-        }
-        else {
-            if (Token == null) {
-                console.log('FnGetHolidayList: Token is empty');
-            }
-
-            res.statusCode=400;
-            res.json(null);
-        }
-    }
-    catch (ex) {
-        console.log('FnGetHolidayList error:' + ex.description);
-        throw new Error(ex);
-    }
-};
-
-exports.FnDeleteHolidayList = function(req, res){
-    try{
-        res.setHeader("Access-Control-Allow-Origin", "*");
-        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-
-
-        var Token = req.query.Token;
-        var TID = req.query.TID;
-
-        var RtnMessage = {
-            IsSuccessfull: false
-        };
-
-        var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
-
-        if (Token !=null && TID != null) {
-            FnValidateToken(Token, function (err, Result) {
-                if (!err) {
-                    if (Result != null) {
-
-                        //var query = db.escape(Token) + ',' + db.escape(TID);
-                        db.query('CALL pDeleteHolidayList(' + db.escape(TID) + ')', function (err, InsertResult) {
-                            if (!err){
-                                if (InsertResult.affectedRows > 0) {
-                                    RtnMessage.IsSuccessfull = true;
-                                    res.send(RtnMessage);
-                                    console.log('FnDeleteHolidayList: Holiday list delete successfully');
-                                }
-                                else {
-                                    console.log('FnDeleteHolidayList:No delete Holiday list');
-                                    res.send(RtnMessage);
-                                }
-                            }
-
-                            else {
-                                console.log('FnDeleteHolidayList: error in deleting Holiday list' + err);
-                                res.statusCode = 500;
-                                res.send(RtnMessage);
-                            }
-                        });
-                    }
-                    else {
-                        console.log('FnDeleteHolidayList: Invalid token');
-                        res.statusCode = 401;
-                        res.send(RtnMessage);
-                    }
-                }
-                else {
-                    console.log('FnDeleteHolidayList:Error in processing Token' + err);
-                    res.statusCode = 500;
-                    res.send(RtnMessage);
-
-                }
-            });
-
-        }
-        else {
-            if (Token == null) {
-                console.log('FnDeleteHolidayList: Token is empty');
-            }
-            else if (TID == null) {
-                console.log('FnDeleteHolidayList: TID is empty');
-            }
-            res.statusCode=400;
-            res.send(RtnMessage);
-        }
-
-    }
-    catch (ex) {
-        console.log('FnDeleteHolidayList:error ' + ex.description);
-        throw new Error(ex);
-    }
-}
-
-exports.FnSaveTransaction = function(req, res){
-    try{
-        res.setHeader("Access-Control-Allow-Origin", "*");
-        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-
-        var Token = req.body.Token;
-        var TID = parseInt(req.body.TID);
-
-        var MessageText =req.body.MessageText;
-        var Status = req.body.Status;
-        var TaskDateTime = req.body.TaskDateTime;
-        var Notes = req.body.Notes;
-        var LocID = req.body.LocID;
-        var Country = req.body.Country;    //country short name
-        var State = req.body.State;         //admin level 1
-        var City = req.body.City;       //ADMIN level 2
-        var Area = req.body.Area;       //admin level 3
-        var FunctionType = req.body.FunctionType;
-        var Latitude = req.body.Latitude;
-        var Longitude = req.body.Longitude;
-        var EZEID = req.body.EZEID;
-        var ContactInfo = req.body.ContactInfo;
-        var FolderRuleID = parseInt(req.body.FolderRuleID);
-        var Duration = req.body.Duration;
-        var DurationScales = req.body.DurationScales;
-        var ItemsList = req.body.ItemsList;
-        ItemsList = JSON.parse(ItemsList);
-        var NextAction = req.body.NextAction;
-        var NextActionDateTime = req.body.NextActionDateTime;
-        var  TaskDateNew = new Date(TaskDateTime);
-        var NextActionDateTimeNew = new Date(NextActionDateTime);
-        var DeliveryAddress = req.body.DeliveryAddress;
-        if(DeliveryAddress == '')
-            DeliveryAddress = '';
-        var ItemIDList='';
-        var ToEZEID = req.body.ToEZEID;
-        var item_list_type = 0;
-        var companyName = req.body.companyName ? req.body.companyName : '' ;
-        var company_id = req.body.company_id ? req.body.company_id : 0 ;
-        var RtnMessage = {
-            IsSuccessfull: false,
-            MessageID:0
-        };
-
-        if(TID.toString() == 'NaN')
-            TID = 0;
-
-        if(TID != 0){
-            for(var i=0; i < ItemsList.length; i++) {
-                if(ItemsList[i].TID != 0 )
-                    ItemIDList = ItemsList[i].TID + ',' + ItemIDList  ;
-            }
-            console.log(ItemIDList);
-            ItemIDList=ItemIDList.slice(0,-1)
-            console.log('TID comma Values:'+ ItemIDList);
-        }
-        if(FolderRuleID.toString() == 'NaN')
-            FolderRuleID=0;
-
-        if (Token != null && ItemsList != null) {
-            FnValidateToken(Token, function (err, Result) {
-                if (!err) {
-                    if (Result != null) {
-
-                        var query = db.escape(Token)+","+db.escape(FunctionType)+","+ db.escape(MessageText)+ "," + db.escape(Status) +"," + db.escape(TaskDateNew) + ","  + db.escape(Notes) + "," + db.escape(LocID)  + "," + db.escape(Country)   + "," + db.escape(State) + "," + db.escape(City)   + "," + db.escape(Area) + ","  + db.escape(Latitude)  + "," + db.escape(Longitude)  +  "," + db.escape(EZEID)  + "," + db.escape(ContactInfo)  + "," + db.escape(FolderRuleID)  + "," + db.escape(Duration)  + "," + db.escape(DurationScales) + "," + db.escape(NextAction) + "," + db.escape(NextActionDateTimeNew) + "," + db.escape(TID) + "," + db.escape(((ItemIDList != "") ? ItemIDList : "")) + "," + db.escape(DeliveryAddress) + "," + db.escape(ToEZEID) + "," + db.escape(item_list_type) + "," + db.escape(companyName) + "," + db.escape(company_id);
-                        // db.escape(NextActionDateTime);
-                        console.log('CALL pSaveTrans(' + query + ')');
-                        db.query('CALL pSaveTrans(' + query + ')', function (err, InsertResult) {
-                            if (!err){
-                                console.log(InsertResult);
-                                if (InsertResult[0] != null) {
-                                    if(InsertResult[0].length > 0){
-                                        RtnMessage.IsSuccessfull = true;
-                                        var Message = InsertResult[0];
-                                        RtnMessage.MessageID=Message[0].MessageID;
-                                        console.log(Message);
-                                        for(var i=0; i < ItemsList.length; i++) {
-                                            var itemsDetails = ItemsList[i];
-                                            var items = {
-                                                MessageID: Message[0].MessageID,
-                                                ItemID: itemsDetails.ItemID,
-                                                Qty: itemsDetails.Qty,
-                                                Rate: itemsDetails.Rate,
-                                                Amount: itemsDetails.Amount,
-                                                Duration: itemsDetails.Durations
-                                            };
-                                            console.log(items);
-                                            console.log('TID:' +itemsDetails.TID);
-                                            if(itemsDetails.TID == 0){
-                                                var query = db.query('INSERT INTO titems SET ?', items, function (err, result) {
-                                                    // Neat!
-                                                    if (!err) {
-                                                        if (result != null) {
-                                                            if (result.affectedRows > 0) {
-                                                                console.log('FnSaveFolderRules: Folder rules saved successfully');
-                                                            }
-                                                            else {
-                                                                console.log('FnSaveFolderRules: Folder rule not saved');
-                                                            }
-                                                        }
-                                                        else {
-                                                            console.log('FnSaveFolderRules: Folder rule not saved');
-                                                        }
-                                                    }
-                                                    else {
-                                                        console.log('FnSaveFolderRules: error in saving folder rules' + err);
-                                                    }
-                                                });
-
-                                            }
-
-                                            else{
-                                                var items = {
-
-                                                    ItemID: itemsDetails.ItemID,
-                                                    Qty: itemsDetails.Qty,
-                                                    Rate: itemsDetails.Rate,
-                                                    Amount: itemsDetails.Amount,
-                                                    Duration: itemsDetails.Durations
-                                                };
-                                                console.log('TID:' +itemsDetails.TID);
-                                                var query = db.query("UPDATE titems set ? WHERE TID = ? ",[items,itemsDetails.TID], function (err, result) {
-                                                    // Neat!
-                                                    console.log(result);
-                                                    if (!err) {
-                                                        if(result != null){
-                                                            if(result.affectedRows > 0){
-
-                                                                console.log('FnSaveFolderRules: Folder rules Updated successfully');
-                                                            }
-                                                            else
-                                                            {
-                                                                console.log('FnSaveFolderRules: Folder rule not updated');
-                                                            }
-                                                        }
-                                                        else
-                                                        {
-                                                            console.log('FnSaveFolderRules: Folder rule not updated')
-                                                        }
-                                                    }
-                                                    else
-                                                    {
-                                                        console.log('FnSaveFolderRules: error in saving folder rules' +err);
-                                                    }
-                                                });
-                                            }
-                                        }
-                                        res.send(RtnMessage);
-                                        console.log('FnSaveTranscationItems: Transaction items details save successfully');
-                                    }
-                                    else
-                                    {
-                                        console.log('FnSaveTranscationItems:No Save Transaction items details');
-                                        res.send(RtnMessage);
-                                    }
-                                }
-                                else {
-                                    console.log('FnSaveTranscationItems:No Save Transaction items details');
-                                    res.send(RtnMessage);
-                                }
-                            }
-
-                            else {
-                                console.log('FnSaveTranscationItems: error in saving Transaction items' + err);
-                                res.statusCode = 500;
-                                res.send(RtnMessage);
-                            }
-                        });
-                    }
-                    else {
-                        console.log('FnSaveTranscationItems: Invalid token');
-                        res.statusCode = 401;
-                        res.send(RtnMessage);
-                    }
-                }
-                else {
-                    console.log('FnSaveTranscationItems:Error in processing Token' + err);
-                    res.statusCode = 500;
-                    res.send(RtnMessage);
-                }
-            });
-        }
-        else {
-            if (Token == null) {
-                console.log('FnSaveTranscationItems: Token is empty');
-            }
-            else
-                console.log(RtnMessage);
-
-            res.statusCode=400;
-            res.send(RtnMessage);
-        }
-    }
-    catch (ex) {
-        console.log('FnSaveTranscationItems:error ' + ex.description);
-        throw new Error(ex);
-    }
-};
-
-exports.FnUpdateTransaction = function (req, res){
-    try{
-        res.setHeader("Access-Control-Allow-Origin", "*");
-        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-
-        var TID = parseInt(req.body.TID);
-        var status = req.body.status;
-        var folderRuleID = parseInt(req.body.folderRuleID);
-        var nextAction = (parseInt(req.body.nextAction) != NaN ) ? parseInt(req.body.nextAction) : 0;
-        var nextActionDateTime = new Date(req.body.nextActionDateTime);
-        var Token = req.body.Token;
-
-
-        var responseMessage = {
-            status: false,
-            error:{},
-            message:'',
-            data: null
-        };
-
-        if(Token){
-
-            var query = db.escape(TID) + ', ' + db.escape(status) + ',' + db.escape(folderRuleID) + ',' + db.escape(nextAction) + ',' + db.escape(nextActionDateTime)+ ', ' + db.escape(Token);
-            db.query('CALL pUpdateTrans(' + query + ')', function (err, updateResult) {
-                if (!err){
-                    if (updateResult) {
-                        responseMessage.status = true;
-                        responseMessage.error = null;
-                        responseMessage.message = 'Transaction details update successfully';
-                        responseMessage.data = {
-                            TID : req.body.TID,
-                            status : req.body.status,
-                            folderRuleID : req.body.folderRuleID,
-                            nextAction : (parseInt(req.body.nextAction) != NaN ) ? parseInt(req.body.nextAction) : 0,
-                            nextActionDateTime : req.body.nextActionDateTime
-                        };
-                        res.status(200).json(responseMessage);
-                        console.log('FnUpdateTransaction: Transaction details update successfully');
-                    }
-                    else {
-                        responseMessage.message = 'An error occured ! Please try again';
-                        responseMessage.error = {};
-                        res.status(400).json(responseMessage);
-                        console.log('FnUpdateTransaction:No update transaction details');
-                    }
-                }
-            });
-        }
-        else {
-            if (!Token)
-            {
-                responseMessage.message = 'Invalid Token';
-                responseMessage.error = {Token : 'Invalid Token'};
-                console.log('FnUpdateTransaction: Token is mandatory field');
-            }
-
-            res.status(401).json(responseMessage);
-        }
-    }
-    catch (ex) {
-        responseMessage.error = {};
-        responseMessage.message = 'An error occured !'
-        console.log('FnUpdateTransaction:error ' + ex.description);
-        throw new Error(ex);
-        res.status(400).json(responseMessage);
-    }
-
-};
-
-exports.FnSaveTranscationOld = function(req, res){
-    try{
-        res.setHeader("Access-Control-Allow-Origin", "*");
-        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-
-        var Token = req.body.Token;
-        var TID = parseInt(req.body.TID);
-        var MessageText =req.body.MessageText;
-        var MessageType = req.body.MessageType;
-        var Status = req.body.Status;
-        var TaskDateTime = req.body.TaskDateTime;
-        var Notes = req.body.Notes;
-        var LocID = req.body.LocID;
-        var Country = req.body.Country;    //country short name
-        var State = req.body.State;         //admin level 1
-        var City = req.body.City;       //ADMIN level 2
-        var Area = req.body.Area;       //admin level 3
-        var FunctionType = req.body.FunctionType;
-        var Latitude = req.body.Latitude;
-        var Longitude = req.body.Longitude;
-        var EZEID = req.body.EZEID;
-        var ContactInfo = req.body.ContactInfo;
-        var FolderRuleID = parseInt(req.body.FolderRuleID);
-        var Duration = req.body.Duration;
-        var DurationScales = req.body.DurationScales;
-        var ItemsList = req.body.ItemsList;
-        ItemsList = JSON.parse(ItemsList);
-        var NextAction = req.body.NextAction;
-        var NextActionDateTime = req.body.NextActionDateTime;
-        var  TaskDateNew = new Date(TaskDateTime);
-        var NextActionDateTimeNew = new Date(NextActionDateTime);
-        var company_id = req.body.company_id ? req.body.company_id : 0;
-        var RtnMessage = {
-            IsSuccessfull: false
-        };
-        if(TID.toString() == 'NaN')
-            TID = 0;
-        if(FolderRuleID.toString() == 'NaN')
-            FolderRuleID=0;
-        if (Token != null ) {
-            FnValidateToken(Token, function (err, Result) {
-                if (!err) {
-                    if (Result != null) {
-
-                        var query = db.escape(Token)+","+db.escape(MessageType)+","+ db.escape(MessageText)+ "," + db.escape(Status) +"," + db.escape(TaskDateNew) + ","  + db.escape(Notes) + "," + db.escape(LocID)  + "," + db.escape(Country)   + "," + db.escape(State) + "," + db.escape(City)   + "," + db.escape(Area)   + ","  + db.escape(Latitude)  + "," + db.escape(Longitude)  +  "," + db.escape(EZEID)  + "," + db.escape(ContactInfo)  + "," + db.escape(FolderRuleID)  + "," + db.escape(Duration)  + "," + db.escape(DurationScales) + "," + db.escape(NextAction) + "," + db.escape(NextActionDateTimeNew) + "," + db.escape(TID) + "," + db.escape(company_id);
-                        // db.escape(NextActionDateTime);
-                        db.query('CALL pSaveTrans(' + query + ')', function (err, InsertResult) {
-                            if (!err){
-                                console.log(InsertResult);
-                                if (InsertResult[0] != null) {
-                                    if(InsertResult[0].length > 0){
-                                        RtnMessage.IsSuccessfull = true;
-                                        var Message = InsertResult[0];
-                                        console.log(Message);
-                                        ItemsList.forEach(function(itemsDetails){
-                                            var items = {
-                                                MessageID: Message[0].MessageID,
-                                                ItemID: itemsDetails.ItemID,
-                                                Qty: itemsDetails.Qty,
-                                                Rate: itemsDetails.Rate,
-                                                Amount: itemsDetails.Amount,
-                                                Duration: itemsDetails.Durations
-                                            };
-                                            console.log(items);
-                                            var query = db.query('INSERT INTO titems SET ?', items, function (err, result) {
-                                                // Neat!
-                                                if (!err) {
-                                                    if (result != null) {
-                                                        if (result.affectedRows > 0) {
-                                                            console.log('FnSaveFolderRules: Folder rules saved successfully');
-                                                        }
-                                                        else {
-                                                            console.log('FnSaveFolderRules: Folder rule not saved');
-                                                        }
-                                                    }
-                                                    else {
-                                                        console.log('FnSaveFolderRules: Folder rule not saved');
-                                                    }
-                                                }
-                                                else {
-                                                    console.log('FnSaveFolderRules: error in saving folder rules' + err);
-                                                }
-                                            });
-                                        });
-
-                                        res.send(RtnMessage);
-                                        console.log('FnSaveTranscationItems: Transaction items details save successfully');
-                                    }
-                                    else
-                                    {
-                                        console.log('FnSaveTranscationItems:No Save Transaction items details');
-                                        res.send(RtnMessage);
-                                    }
-                                }
-                                else {
-                                    console.log('FnSaveTranscationItems:No Save Transaction items details');
-                                    res.send(RtnMessage);
-                                }
-                            }
-
-                            else {
-                                console.log('FnSaveTranscationItems: error in saving Transaction items' + err);
-                                res.statusCode = 500;
-                                res.send(RtnMessage);
-                            }
-                        });
-                    }
-                    else {
-                        console.log('FnSaveTranscationItems: Invalid token');
-                        res.statusCode = 401;
-                        res.send(RtnMessage);
-                    }
-                }
-                else {
-                    console.log('FnSaveTranscationItems:Error in processing Token' + err);
-                    res.statusCode = 500;
-                    res.send(RtnMessage);
-                }
-            });
-        }
-        else {
-            if (Token == null) {
-                console.log('FnSaveTranscationItems: Token is empty');
-            }
-
-            res.statusCode=400;
-            res.send(RtnMessage);
-        }
-    }
-    catch (ex) {
-        console.log('FnSaveTranscationItems:error ' + ex.description);
-        throw new Error(ex);
-    }
-};
-
-exports.FnGetTransaction = function (req, res) {
-    try {
-
-        res.setHeader("Access-Control-Allow-Origin", "*");
-        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-
-        var Token = req.query.Token;
-        var FunctionType = parseInt(req.query.FunctionType);
-        var Page = parseInt(req.query.Page);
-        var Status = (req.query.Status) ? req.query.Status : null;
-        var searchkeyword = req.query.searchkeyword ? req.query.searchkeyword : '';
-        var sortBy = (parseInt(req.query.sort_by) !== NaN) ? parseInt(req.query.sort_by) : 0 ;
-        var folderRules = (req.query.folder_rules) ? req.query.folder_rules : '';
-
-        console.log(req.query);
-        var RtnMessage = {
-            TotalPage:'',
-            Result:''
-        };
-        var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
-        if (Token != null && FunctionType.toString() != null && Page.toString() != 'NaN' && Page.toString() != 0) {
-            FnValidateToken(Token, function (err, Result) {
-                if (!err) {
-                    if (Result != null) {
-
-                        var ToPage = 10 * Page;
-                        var FromPage = ToPage - 10;
-
-                        if (FromPage <= 1) {
-                            FromPage = 0;
-                        }
-
-                        var parameters = db.escape(Token) + ',' + db.escape(FunctionType) + ',' + db.escape(Status) + ',' + db.escape(FromPage) + ',' + db.escape(10) + ',' + db.escape(searchkeyword) + ',' + db.escape(sortBy) + ','+ db.escape(folderRules);
-                        console.log('CALL pGetMessagesNew(' + parameters + ')');
-                        db.query('CALL pGetMessagesNew(' + parameters + ')', function (err, GetResult) {
-                            console.log(GetResult);
-                            if (!err) {
-                                if (GetResult != null) {
-                                    console.log('Length:'+GetResult[0].length);
-                                    if (GetResult[0].length > 0) {
-                                        var totalRecord=GetResult[0][0].TotalCount;
-                                        var limit= 10;
-                                        var PageValue = parseInt(totalRecord / limit);
-                                        var PageMod = totalRecord % limit;
-                                        if (PageMod > 0){
-                                            TotalPage = PageValue + 1;
-                                        }
-                                        else{
-                                            TotalPage = PageValue;
-                                        }
-
-                                        //TotalPage = parseInt(GetResult[0][0].TotalCount / 10) + 1;
-                                        RtnMessage.TotalPage = TotalPage;
-                                        RtnMessage.Result =GetResult[0];
-                                        res.send(RtnMessage);
-                                        console.log('FnGetTranscation: Transaction details Send successfully');
-                                    }
-
-                                    else {
-                                        console.log('FnGetTranscation:No Transaction details found');
-                                        res.json(null);
-                                    }
-                                }
-                                else {
-                                    console.log('FnGetTranscation:No transaction details found');
-                                    res.json(null);
-                                }
-                            }
-                            else {
-                                console.log('FnGetTranscation: error in getting transaction details' + err);
-                                res.statusCode = 500;
-                                res.json(null);
-                            }
-                        });
-                    }
-                    else {
-                        res.statusCode = 401;
-                        res.json(null);
-                        console.log('FnGetTranscation: Invalid Token');
-                    }
-                } else {
-
-                    res.statusCode = 500;
-                    res.json(null);
-                    console.log('FnGetTranscation: Error in validating token:  ' + err);
-                }
-            });
-        }
-        else {
-            if (Token == null) {
-                console.log('FnGetTranscation: Token is empty');
-            }
-            else if (FunctionType == null) {
-                console.log('FnGetTranscation: FunctionType is empty');
-            }
-            else if (Page.toString() == 'NaN') {
-                console.log('FnGetMessages: Page is empty');
-            }
-            else if (Page.toString() == 0) {
-                console.log('FnGetMessages: Sending page 0');
-            }
-            res.statusCode=400;
-            res.json(null);
-        }
-    }
-    catch (ex) {
-        console.log('FnGetTranscation error:' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -4085,194 +2464,9 @@ exports.FnDeleteTransaction = function(req,res){
     }
     catch (ex) {
         console.log('FnDeleteTranscation:error ' + ex.description);
-        throw new Error(ex);
+          
     }
 }
-
-exports.FnSaveWorkingHours = function(req, res){
-    try{
-        res.setHeader("Access-Control-Allow-Origin", "*");
-        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-
-        var Token = req.body.Token;
-        var SpilloverTime = req.body.SpilloverTime;
-        var MO1 = req.body.MO1;
-        var MO2 = req.body.MO2;
-        var MO3 = req.body.MO3;
-        var MO4 = req.body.MO4;
-        var TU1 = req.body.TU1;
-        var TU2 = req.body.TU2;
-        var TU3 = req.body.TU3;
-        var TU4 = req.body.TU4;
-        var WE1 = req.body.WE1;
-        var WE2 = req.body.WE2;
-        var WE3 = req.body.WE3;
-        var WE4 = req.body.WE4;
-        var TH1 = req.body.TH1;
-        var TH2 = req.body.TH2;
-        var TH3 = req.body.TH3;
-        var TH4 = req.body.TH4;
-        var FR1 = req.body.FR1;
-        var FR2 = req.body.FR2;
-        var FR3 = req.body.FR3;
-        var FR4 = req.body.FR4;
-        var SA1 = req.body.SA1;
-        var SA2 = req.body.SA2;
-        var SA3 = req.body.SA3;
-        var SA4 = req.body.SA4;
-        var SU1 = req.body.SU1;
-        var SU2 = req.body.SU2;
-        var SU3 = req.body.SU3;
-        var SU4 = req.body.SU4;
-        var WorkingHrsTemplate = req.body.WorkingHrsTemplate;
-        var TID = req.body.TID;
-
-
-        var RtnMessage = {
-            IsSuccessfull: false
-        };
-
-        if (Token != null && SpilloverTime != null && WorkingHrsTemplate != null && TID != null ) {
-            FnValidateToken(Token, function (err, Result) {
-                if (!err) {
-                    if (Result != null) {
-
-                        var query = db.escape(Token) + ',' + db.escape(SpilloverTime) + ',' + db.escape(MO1) + ',' + db.escape(MO2) + ',' + db.escape(MO3) + ',' + db.escape(MO4)
-                            + ',' + db.escape(TU1) + ',' + db.escape(TU2) + ',' + db.escape(TU3) + ',' + db.escape(TU4)
-                            + ',' + db.escape(WE1) + ',' + db.escape(WE2) + ',' + db.escape(WE3) + ',' + db.escape(WE4)
-                            + ',' + db.escape(TH1) + ',' + db.escape(TH2) + ',' + db.escape(TH3) + ',' + db.escape(TH4)
-                            + ',' + db.escape(FR1) + ',' + db.escape(FR2) + ',' + db.escape(FR3) + ',' + db.escape(FR4)
-                            + ',' + db.escape(SA1) + ',' + db.escape(SA2) + ',' + db.escape(SA3) + ',' + db.escape(SA4)
-                            + ',' + db.escape(SU1) + ',' + db.escape(SU2) + ',' + db.escape(SU3) + ',' + db.escape(SU4)
-                            + ',' + db.escape(WorkingHrsTemplate) + ',' + db.escape(TID);
-                        db.query('CALL pSaveWorkingHours(' + query + ')', function (err, InsertResult) {
-                            if (!err){
-                                if (InsertResult.affectedRows > 0) {
-                                    RtnMessage.IsSuccessfull = true;
-                                    res.send(RtnMessage);
-                                    console.log('FnSaveWorkingHours: Working Hours details save successfully');
-                                }
-                                else {
-                                    console.log('FnSaveWorkingHours:No Save Working Hours details');
-                                    res.send(RtnMessage);
-                                }
-                            }
-
-                            else {
-                                console.log('FnSaveWorkingHours: error in saving Working Hours details' + err);
-                                res.statusCode = 500;
-                                res.send(RtnMessage);
-                            }
-                        });
-                    }
-                    else {
-                        console.log('FnSaveWorkingHours: Invalid token');
-                        res.statusCode = 401;
-                        res.send(RtnMessage);
-                    }
-                }
-                else {
-                    console.log('FnSaveWorkingHours:Error in processing Token' + err);
-                    res.statusCode = 500;
-                    res.send(RtnMessage);
-
-                }
-            });
-
-        }
-
-        else {
-            if (Token == null) {
-                console.log('FnSaveWorkingHours: Token is empty');
-            }
-            else if (SpilloverTime == null) {
-                console.log('FnSaveWorkingHours: SpilloverTime is empty');
-            }
-            else if (WorkingHrsTemplate == null) {
-                console.log('FnSaveWorkingHours: WorkingHrsTemplate is empty');
-            }
-            else if (TID == null) {
-                console.log('FnSaveWorkingHours: TID is empty');
-            }
-            res.statusCode=400;
-            res.send(RtnMessage);
-        }
-
-    }
-    catch (ex) {
-        console.log('FnSaveWorkingHours:error ' + ex.description);
-        throw new Error(ex);
-    }
-};
-
-exports.FnGetWorkingHours = function (req, res) {
-    try {
-
-        res.setHeader("Access-Control-Allow-Origin", "*");
-        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-
-        var Token = req.query.Token;
-        if (Token != null) {
-            FnValidateToken(Token, function (err, Result) {
-                if (!err) {
-                    if (Result != null) {
-
-                        db.query('CALL pGetWorkingHours(' + db.escape(Token) +',' + db.escape(0)+ ')', function (err, GetResult) {
-                            if (!err) {
-                                if (GetResult != null) {
-                                    if (GetResult[0].length > 0) {
-
-                                        console.log('FnGetWorkingHours: Working Hours details Send successfully');
-                                        res.send(GetResult[0]);
-                                    }
-                                    else {
-
-                                        console.log('FnGetWorkingHours:No Working Hours details found');
-                                        res.json(null);
-                                    }
-                                }
-                                else {
-
-                                    console.log('FnGetWorkingHours:No Working Hours details found');
-                                    res.json(null);
-                                }
-
-                            }
-                            else {
-
-                                console.log('FnGetWorkingHours: error in getting Working Hours details' + err);
-                                res.statusCode = 500;
-                                res.json(null);
-                            }
-                        });
-                    }
-                    else {
-                        res.statusCode = 401;
-                        res.json(null);
-                        console.log('FnGetWorkingHours: Invalid Token');
-                    }
-                } else {
-
-                    res.statusCode = 500;
-                    res.json(null);
-                    console.log('FnGetWorkingHours: Error in validating token:  ' + err);
-                }
-            });
-        }
-        else {
-            if (Token == null) {
-                console.log('FnGetWorkingHours: Token is empty');
-            }
-
-            res.statusCode=400;
-            res.json(null);
-        }
-    }
-    catch (ex) {
-        console.log('FnGetWorkingHours error:' + ex.description);
-        throw new Error(ex);
-    }
-};
 
 exports.FnDeleteWorkingHours = function(req, res){
     try{
@@ -4334,263 +2528,9 @@ exports.FnDeleteWorkingHours = function(req, res){
     }
     catch (ex) {
         console.log('FnDeleteWorkingHours:error ' + ex.description);
-        throw new Error(ex);
+          
     }
 }
-
-//method to get working hours and holiday list
-exports.FnGetWorkingHrsHolidayList = function (req, res) {
-    try {
-
-        res.setHeader("Access-Control-Allow-Origin", "*");
-        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-
-        var Token = req.query.Token;
-        var LocID = req.query.LocID;
-        var RtnMessage = {
-            WorkingHours: '',
-            HolidayList:'',
-            Result: false
-        };
-
-        var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
-        if(LocID == null)
-            LocID = 0;
-        if (Token != null && LocID != null) {
-            FnValidateToken(Token, function (err, Result) {
-                if (!err) {
-                    if (Result != null) {
-                        var async = require('async');
-                        async.parallel([ function FnWorkingHours(CallBack) {
-                            try {
-
-                                var query = db.escape(Token) + ',' + db.escape(LocID);
-                                db.query('CALL pGetWorkingHours(' + query + ')', function (err, WorkingResult) {
-                                    console.log('CALL pGetWorkingHours(' + query + ')');
-
-                                    if (!err) {
-
-                                        if(WorkingResult != null)
-                                        {
-                                            if(WorkingResult[0].length > 0 )
-                                            {
-                                                console.log('FnWorkingHours: Working Hours are available');
-                                                RtnMessage.WorkingHours = WorkingResult[0];
-                                                RtnMessage.Result = true;
-                                                CallBack();
-                                            }
-                                            else
-                                            {
-                                                console.log('Fnworkinghours: no working hours avaiable');
-                                                RtnMessage.Result = true;
-                                                CallBack();
-                                            }
-                                        }
-                                        else{
-                                            console.log('Fnworkinghours: no working hours avaiable');
-                                            RtnMessage.Result = true;
-                                            CallBack();
-                                        }
-                                    }
-                                    else {
-                                        console.log('FnWorkingHours: sending workinghours error ' + error);
-                                        CallBack();
-                                    }
-                                });
-                            }
-                            catch (ex) {
-                                console.log('FnWorkingHours error:' + ex.description);
-                                throw new Error(ex);
-                                return 'error'
-                            }
-                        } ,function FnHolidayList(CallBack) {
-                            try {
-                                var query = db.escape(LocID) + ',' + db.escape(0);
-                                db.query('CALL pGetHolidayList(' + query + ')', function (err, HolidayResult) {
-                                    console.log('CALL pGetHolidayList(' + query + ')');
-
-                                    if (!err) {
-                                        if(HolidayResult != null)
-                                        {
-                                            if(HolidayResult[0].length > 0 )
-                                            {
-                                                console.log('FnHolidayList: Holiday List are available');
-                                                RtnMessage.HolidayList = HolidayResult[0]
-                                                RtnMessage.Result = true;
-                                                CallBack();
-                                            }
-                                            else
-                                            {
-                                                console.log('FnHolidayList: No Holiday List avaiable');
-                                                RtnMessage.Result = true;
-                                                CallBack();
-                                            }
-                                        }
-                                        else{
-                                            console.log('FnHolidayList: No Holiday List avaiable');
-                                            RtnMessage.Result = true;
-                                            CallBack();
-                                        }
-                                    }
-                                    else {
-                                        console.log('FnHolidayList: sending holiday list error ' + error);
-                                        CallBack();
-                                    }
-                                });
-                            }
-                            catch (ex) {
-                                console.log('FnHolidayList error:' + ex.description);
-                                throw new Error(ex);
-                                return 'error'
-                            }
-                        }
-                        ],function(err){
-                            if(!err){
-                                console.log('GnGetWorkingHrs : data sent successfully');
-                                res.send(RtnMessage);
-                            }
-                            else
-                            {
-                                res.statusCode = 500;
-                                res.send(RtnMessage);
-                                console.log('error in parellel async callling' + err);
-                            }
-
-                        });
-
-                    }
-                    else {
-                        res.statusCode = 401;
-                        res.send(RtnMessage);
-                        console.log('FnGetWorkingHours: Invalid Token');
-                    }
-                } else {
-
-                    res.statusCode = 500;
-                    res.send(RtnMessage);
-                    console.log('FnGetWorkingHours: Error in validating token:  ' + err);
-                }
-            });
-        }
-        else {
-            if (Token == null) {
-                console.log('FnGetWorkingHours: Token is empty');
-            }
-            else if (LocID == null) {
-                console.log('FnGetWorkingHours: LocID is empty');
-            }
-
-            res.statusCode=400;
-            res.send(RtnMessage);
-        }
-    }
-    catch (ex) {
-        console.log('FnGetWorkingHours error:' + ex.description);
-        throw new Error(ex);
-    }
-};
-
-function FnWorkingHours(WorkingContent, CallBack) {
-    try {
-
-        if (WorkingContent != null) {
-
-            console.log('WorkingContent values');
-            console.log(WorkingContent);
-
-            var query = db.escape(WorkingContent.Token) + ',' + db.escape(WorkingContent.LocID);
-            db.query('CALL pGetWorkingHours(' + query + ')', function (err, WorkingResult) {
-                console.log('CALL pGetWorkingHours(' + query + ')');
-
-                if (!err) {
-
-                    if(WorkingResult != null)
-                    {
-                        if(WorkingResult[0].length > 0 )
-                        {
-                            console.log('FnWorkingHours: Working Hours are available');
-                            CallBack(null, WorkingResult[0]);
-                        }
-                        else
-                        {
-                            console.log('Fnworkinghours: no working hours avaiable');
-                            CallBack(null,null);
-                        }
-                    }
-                    else{
-                        console.log('Fnworkinghours: no working hours avaiable');
-                        CallBack(null,null);
-                    }
-                }
-                else {
-                    console.log('FnWorkingHours: sending workinghours error ' + error);
-                    CallBack(null, null);
-                }
-            });
-        }
-        else {
-            CallBack(null, null);
-            console.log('FnWorkingHours: Working content is empty');
-        }
-
-    }
-    catch (ex) {
-        console.log('FnWorkingHours error:' + ex.description);
-        throw new Error(ex);
-        return 'error'
-    }
-};
-
-function FnHolidayList(HolidayContent, CallBack) {
-    try {
-
-        if (HolidayContent != null) {
-
-            console.log('HolidayContent values');
-            console.log(HolidayContent);
-
-            var query = db.escape(HolidayContent.LocID) + ',' + db.escape(0);
-            db.query('CALL pGetHolidayList(' + query + ')', function (err, HolidayResult) {
-                console.log('CALL pGetHolidayList(' + query + ')');
-
-                if (!err) {
-
-                    if(HolidayResult != null)
-                    {
-                        if(HolidayResult[0].length > 0 )
-                        {
-                            console.log('FnHolidayList: Holiday List are available');
-                            CallBack(null, HolidayResult[0]);
-                        }
-                        else
-                        {
-                            console.log('FnHolidayList: No Holiday List avaiable');
-                            CallBack(null,null);
-                        }
-                    }
-                    else{
-                        console.log('FnHolidayList: No Holiday List avaiable');
-                        CallBack(null,null);
-                    }
-                }
-                else {
-                    console.log('FnHolidayList: sending holiday list error ' + error);
-                    CallBack(null, null);
-                }
-            });
-        }
-        else {
-            CallBack(null, null);
-            console.log('FnHolidayList: holiday list content is empty');
-        }
-
-    }
-    catch (ex) {
-        console.log('FnHolidayList error:' + ex.description);
-        throw new Error(ex);
-        return 'error'
-    }
-};
 
 exports.FnGetUserwiseFolderList = function (req, res) {
     try {
@@ -4662,7 +2602,7 @@ exports.FnGetUserwiseFolderList = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetUserwiseFolderList error:' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -4734,7 +2674,7 @@ exports.FnGetItemListForEZEID = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetItemListForEZEID error:' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -4803,7 +2743,7 @@ exports.FnGetLocationList = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetLocationList error:' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -4872,7 +2812,7 @@ exports.FnGetLoginDetails = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetLoginDetails error:' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -4963,7 +2903,7 @@ exports.FnSaveMailTemplate = function(req, res){
     }
     catch (ex) {
         console.log('FnSaveMailTemplate:error ' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -5027,7 +2967,7 @@ exports.FnGetTemplateList = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetTemplateList error:' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -5095,7 +3035,7 @@ exports.FnGetTemplateDetails = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetTemplateDetails error:' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -5294,7 +3234,7 @@ exports.FnSendBulkMailerOld = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetTemplateDetails error:' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -5605,7 +3545,7 @@ exports.FnSendBulkMailer = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetTemplateDetails error:' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -5750,7 +3690,7 @@ exports.FnGetSearchItem = function(req,res){
     }
     catch (ex) {
         console.log('FnGetSearchItem error:' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -5834,7 +3774,7 @@ exports.FnSaveChatMessage = function(req, res){
     }
     catch (ex) {
         console.log('FnSaveChatMessage: error:' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -5905,7 +3845,7 @@ exports.FnCreateGroup = function(req, res){
     }
     catch (ex) {
         console.log('FnSaveGroupChatList: Error:' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -5969,7 +3909,7 @@ exports.FnGetGroupList = function(req, res){
     }
     catch (ex) {
         console.log('FnGetGroupList error:' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -6048,7 +3988,7 @@ exports.FnSaveGroupMembers = function(req, res){
     }
     catch (ex) {
         console.log('FnSaveGroupMembers: Error:' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -6117,7 +4057,7 @@ exports.FnGetMembersList = function(req, res){
     }
     catch (ex) {
         console.log('FnGetMembersList error:' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -6189,7 +4129,7 @@ exports.FnDeleteGroupMembers = function(req, res){
     }
     catch (ex) {
         console.log('FnDeleteGroupMembers:error ' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -6261,7 +4201,7 @@ exports.FnGetChatDetails = function(req, res){
     }
     catch (ex) {
         console.log('FnGetChatDetails error:' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -6333,7 +4273,7 @@ exports.FnGetChatList = function(req, res){
     }
     catch (ex) {
         console.log('FnGetChatList error:' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -6408,650 +4348,10 @@ exports.FnGetSearchPicture = function(req, res){
     }
     catch (ex) {
         console.log('FnGetSearchPicture error:' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
-//mehtod to save the reservation resource
-exports.FnSaveReservationResource = function(req, res){
-    try{
-        res.setHeader("Access-Control-Allow-Origin", "*");
-        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-
-        var Token = req.body.Token ;
-        var TID = parseInt(req.body.TID);
-        var picture = (req.body.picture) ? ((req.body.picture.trim().length > 0) ? req.body.picture : null ) : null ;;
-        var title = (req.body.title) ? ((req.body.title.trim().length > 0) ? req.body.title : null ) : null ;;
-        var description = req.body.description;
-        var status = (parseInt(req.body.status)=== 1 || parseInt(req.body.status) === 2) ? req.body.status : 1;
-        var operatorid = req.body.operatorid ? req.body.operatorid : '';
-        var workingtemp = req.body.working_temp ? req.body.working_temp : 0;
-        if (TID.toString() == 'NaN')
-            TID = 0;
-        var responseMessage = {
-            status: false,
-            error:{},
-            message:'',
-            data: null
-        };
-        var validateStatus = true;
-
-        if(!picture){
-            responseMessage.error['picture'] = 'Invalid Picture';
-            validateStatus *= false;
-        }
-
-        if(!title){
-            responseMessage.error['title'] = 'Invalid Title';
-            validateStatus *= false;
-        }
-
-
-        if(!validateStatus){
-            console.log('FnSaveReservationResource  error : ' + JSON.stringify(responseMessage.error));
-            responseMessage.message = 'Unable to save resource ! Please check the errors';
-            res.status(200).json(responseMessage);
-            return;
-        }
-
-        if (Token && operatorid) {
-            FnValidateToken(Token, function (err, result) {
-                if (!err) {
-                    if (result != null) {
-
-                        var query = db.escape(Token) + ', ' + db.escape(TID) + ',' + db.escape(picture) + ',' + db.escape(title) + ',' + db.escape(description) + ',' + db.escape(status)+ ',' + db.escape(operatorid) + ',' + db.escape(workingtemp);
-                        db.query('CALL pSaveResource(' + query + ')', function (err, insertResult) {
-                            if (!err){
-                                if (insertResult) {
-                                    responseMessage.status = true;
-                                    responseMessage.error = null;
-                                    responseMessage.message = 'Resource details save successfully';
-                                    responseMessage.data = {
-                                        TID : insertResult[0][0].maxid,
-                                        title : req.body.title,
-                                        status : req.body.status,
-                                        description : req.body.description,
-                                        picture : req.body.picture
-                                    };
-                                    res.status(200).json(responseMessage);
-                                    console.log('FnSaveReservationResource: Resource details save successfully');
-                                }
-                                else {
-                                    responseMessage.message = 'An error occured ! Please try again';
-                                    responseMessage.error = {};
-                                    res.status(400).json(responseMessage);
-                                    console.log('FnSaveReservationResource:No save Resource details');
-                                }
-                            }
-
-                            else {
-                                responseMessage.message = 'An error occured ! Please try again';
-                                responseMessage.error = {};
-                                res.status(500).json(responseMessage);
-                                console.log('FnSaveReservationResource: error in saving Resource details:' + err);
-                            }
-                        });
-                    }
-                    else {
-                        responseMessage.message = 'Invalid token';
-                        responseMessage.error = {};
-                        responseMessage.data = null;
-                        res.status(401).json(responseMessage);
-                        console.log('FnSaveReservationResource: Invalid token');
-                    }
-                }
-                else {
-                    responseMessage.error= {};
-                    responseMessage.message = 'Error in validating Token';
-                    res.status(500).json(responseMessage);
-                    console.log('FnSaveReservationResource:Error in processing Token' + err);
-                }
-            });
-
-        }
-
-        else {
-            if (!Token)
-            {
-                responseMessage.message = 'Invalid Token';
-                responseMessage.error = {Token : 'Invalid Token'};
-                console.log('FnSaveReservationResource: Token is mandatory field');
-            }
-            else if(!operatorid)
-            {
-                responseMessage.message = 'Invalid Operator ID';
-                responseMessage.error = {operatorid : 'Invalid Operator ID'};
-                console.log('FnSaveReservationResource: Operator ID is mandatory field');
-            }
-
-            res.status(401).json(responseMessage);
-        }
-
-    }
-    catch (ex) {
-        responseMessage.error = {};
-        responseMessage.message = 'An error occured !'
-        console.log('FnSaveReservationResource:error ' + ex.description);
-        throw new Error(ex);
-        res.status(400).json(responseMessage);
-    }
-};
-
-//mehtod to save the reservation service
-exports.FnSaveReservationService = function(req, res){
-    try{
-        res.setHeader("Access-Control-Allow-Origin", "*");
-        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-
-        var Token = req.body.Token ;
-        var TID = 0;
-        var title = (req.body.title) ? ((req.body.title.trim().length > 0) ? req.body.title : null ) : null ;;
-        var duration = req.body.duration;
-        var rate = req.body.rate;
-        var status = (parseInt(req.body.status)=== 1 || parseInt(req.body.status) === 2) ? req.body.status : 1;
-        var service_ids = req.body.service_ids ? req.body.service_ids : 0;
-
-        var ID=''
-        if(service_ids){
-            ID = service_ids + ',' + ID;
-            service_ids =ID.slice(0,-1);
-            console.log('service_ids Values:'+ service_ids);
-        }
-
-        var responseMessage = {
-            status: false,
-            error:{},
-            message:'',
-            data: null
-        };
-        var validateStatus = true;
-
-        if(!title){
-            responseMessage.error['title'] = 'Invalid Title';
-            validateStatus *= false;
-        }
-
-
-        if(!validateStatus){
-            console.log('FnSaveReservationService  error : ' + JSON.stringify(responseMessage.error));
-            responseMessage.message = 'Unable to save service ! Please check the errors';
-            res.status(200).json(responseMessage);
-            return;
-        }
-
-
-        if (Token) {
-
-            FnValidateToken(Token, function (err, result) {
-                if (!err) {
-                    if (result != null) {
-
-                        var query = db.escape(Token) + ', ' + db.escape(TID) + ',' + db.escape(title) + ',' + db.escape(duration) + ',' + db.escape(rate) + ',' + db.escape(status)+ ',' + db.escape(service_ids);
-                        db.query('CALL pSaveResServices(' + query + ')', function (err, insertResult) {
-                            if (!err){
-                                if (insertResult) {
-                                    responseMessage.status = true;
-                                    responseMessage.error = null;
-                                    responseMessage.message = 'Service details save successfully';
-                                    responseMessage.data = {
-                                        TID : insertResult[0][0].maxid,
-                                        title : req.body.title,
-                                        status : req.body.status,
-                                        duration : req.body.duration,
-                                        rate : req.body.rate,
-                                        service_ids : req.body.service_ids
-                                    };
-                                    res.status(200).json(responseMessage);
-                                    console.log('FnSaveReservationService: Service details save successfully');
-                                }
-                                else {
-                                    responseMessage.message = 'An error occured ! Please try again';
-                                    responseMessage.error = {};
-                                    res.status(400).json(responseMessage);
-                                    console.log('FnSaveReservationService:No Service details saved');
-                                }
-                            }
-
-                            else {
-                                responseMessage.message = 'An error occured ! Please try again';
-                                responseMessage.error = {};
-                                res.status(500).json(responseMessage);
-                                console.log('FnSaveReservationService: error in saving Service details:' + err);
-                            }
-                        });
-                    }
-                    else {
-                        responseMessage.message = 'Invalid token';
-                        responseMessage.error = {};
-                        responseMessage.data = null;
-                        res.status(401).json(responseMessage);
-                        console.log('FnSaveReservationService: Invalid token');
-                    }
-                }
-                else {
-                    responseMessage.error= {};
-                    responseMessage.message = 'Error in validating Token';
-                    res.status(500).json(responseMessage);
-                    console.log('FnSaveReservationService:Error in processing Token' + err);
-                }
-            });
-
-        }
-
-        else {
-            if (!Token)
-            {
-                responseMessage.message = 'Invalid Token';
-                responseMessage.error = {Token : 'Invalid Token'};
-                console.log('FnSaveReservationService: Token is mandatory field hello');
-            }
-            res.status(401).json(responseMessage);
-        }
-
-    }
-    catch (ex) {
-        responseMessage.error = {};
-        responseMessage.message = 'An error occured !'
-        console.log('FnSaveReservationService:error ' + ex.description);
-        throw new Error(ex);
-        res.status(400).json(responseMessage);
-    }
-};
-
-//method to update the reservation service
-exports.FnUpdateReservationService = function(req, res){
-
-    try{
-        res.setHeader("Access-Control-Allow-Origin", "*");
-        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-
-        var Token = req.body.Token ;
-        var TID = parseInt(req.body.TID);
-        var title = (req.body.title) ? ((req.body.title.trim().length > 0) ? req.body.title : null ) : null ;;
-        var duration = req.body.duration;
-        var rate = req.body.rate;
-        var status = (parseInt(req.body.status)=== 1 || parseInt(req.body.status) === 2) ? req.body.status : 1;
-        var service_ids = req.body.service_ids;
-
-        var ID=''
-        if(service_ids){
-
-            ID = service_ids + ',' + ID;
-            var service_IDS =ID.slice(0,-1);
-            console.log('service_ids Values:'+ service_IDS);
-        }
-
-        var responseMessage = {
-            status: false,
-            error:{},
-            message:'',
-            data: null
-        };
-        var validateStatus = true;
-
-        if(!title){
-            responseMessage.error['title'] = 'Invalid Title';
-            validateStatus *= false;
-        }
-
-
-        if(!validateStatus){
-            console.log('FnUpdateReservationService  error : ' + JSON.stringify(responseMessage.error));
-            responseMessage.message = 'Unable to update service ! Please check the errors';
-            res.status(200).json(responseMessage);
-            return;
-        }
-
-        if (Token) {
-            FnValidateToken(Token, function (err, result) {
-                if (!err) {
-                    if (result != null) {
-
-                        var query = db.escape(Token) + ', ' + db.escape(TID) + ',' + db.escape(title) + ',' + db.escape(duration) + ',' + db.escape(rate) + ',' + db.escape(status)+ ',' + db.escape(service_IDS);
-                        db.query('CALL pSaveResServices(' + query + ')', function (err, insertResult) {
-                            if (!err){
-                                if (insertResult) {
-                                    responseMessage.status = true;
-                                    responseMessage.error = null;
-                                    responseMessage.message = 'Service details update successfully';
-                                    responseMessage.data = {
-                                        TID : req.body.TID,
-                                        title : req.body.title,
-                                        status : req.body.status,
-                                        duration : req.body.duration,
-                                        rate : req.body.rate,
-                                        service_ids : req.body.service_ids
-                                    };
-                                    res.status(200).json(responseMessage);
-                                    console.log('FnUpdateReservationService: Service details update successfully');
-                                }
-                                else {
-                                    responseMessage.message = 'An error occured ! Please try again';
-                                    responseMessage.error = {};
-                                    res.status(400).json(responseMessage);
-                                    console.log('FnUpdateReservationService:No Service details updated');
-                                }
-                            }
-
-                            else {
-                                responseMessage.message = 'An error occured ! Please try again';
-                                responseMessage.error = {};
-                                res.status(500).json(responseMessage);
-                                console.log('FnUpdateReservationService: error in saving Service details:' + err);
-                            }
-                        });
-                    }
-                    else {
-                        responseMessage.message = 'Invalid token';
-                        responseMessage.error = {};
-                        responseMessage.data = null;
-                        res.status(401).json(responseMessage);
-                        console.log('FnUpdateReservationService: Invalid token');
-                    }
-                }
-                else {
-                    responseMessage.error= {};
-                    responseMessage.message = 'Error in validating Token';
-                    res.status(500).json(responseMessage);
-                    console.log('FnUpdateReservationService:Error in processing Token' + err);
-                }
-            });
-
-        }
-
-        else {
-            if (!Token)
-            {
-                responseMessage.message = 'Invalid Token';
-                responseMessage.error = {Token : 'Invalid Token'};
-                console.log('FnUpdateReservationService: Token is mandatory field');
-            }
-
-            res.status(401).json(responseMessage);
-        }
-
-    }
-    catch (ex) {
-        responseMessage.error = {};
-        responseMessage.message = 'An error occured !'
-        console.log('FnUpdateReservationService:error ' + ex.description);
-        throw new Error(ex);
-        res.status(400).json(responseMessage);
-    }
-};
-
-//method to get reservation resource service details
-exports.FnGetReservationService = function (req, res) {
-    try {
-
-        res.setHeader("Access-Control-Allow-Origin", "*");
-        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-
-        var ezeid = req.query.ezeid;
-        var responseMessage = {
-            status: false,
-            data: null,
-            error:{},
-            message:''
-        };
-
-        if (ezeid) {
-            db.query('CALL pGetResServices(' + db.escape(ezeid) + ')', function (err, GetResult) {
-                if (!err) {
-                    if (GetResult) {
-                        if (GetResult[0].length > 0) {
-                            responseMessage.status = true;
-                            responseMessage.data = GetResult[0];
-                            responseMessage.error = null;
-                            responseMessage.message = 'Service details Send successfully';
-                            console.log('FnGetReservationService: Service details Send successfully');
-                            res.status(200).json(responseMessage);
-                        }
-                        else {
-
-                            responseMessage.error = {};
-                            responseMessage.message = 'No founded service details';
-                            console.log('FnGetReservationService: No founded Service details');
-                            res.json(responseMessage);
-                        }
-                    }
-                    else {
-
-
-                        responseMessage.error = {};
-                        responseMessage.message = 'No Service details found';
-                        console.log('FnGetReservationService: No Service details found');
-                        res.json(responseMessage);
-                    }
-
-                }
-                else {
-
-                    responseMessage.data = null ;
-                    responseMessage.error = {};
-                    responseMessage.message = 'Error in getting Service details';
-                    console.log('FnGetReservationService: error in getting Service details' + err);
-                    res.status(500).json(responseMessage);
-                }
-            });
-        }
-        else {
-            if (!Token) {
-                responseMessage.message = 'Invalid ezeid';
-                responseMessage.error = {
-                    ezeid : 'Invalid ezeid'
-                };
-                console.log('FnGetReservationService: ezeid is mandatory field');
-            }
-
-            res.status(401).json(responseMessage);
-        }
-    }
-    catch (ex) {
-        responseMessage.error = {};
-        responseMessage.message = 'An error occured !'
-        console.log('FnGetReservationService:error ' + ex.description);
-        throw new Error(ex);
-        res.status(400).json(responseMessage);
-    }
-};
-
-//method to get resource and service map
-exports.FnGetReservResourceServiceMap = function (req, res) {
-    try {
-
-        res.setHeader("Access-Control-Allow-Origin", "*");
-        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-
-        var ezeid = req.query.ezeid;
-        var responseMessage = {
-            status: false,
-            data: null,
-            error:{},
-            Message:''
-        };
-
-        if (ezeid) {
-
-            db.query('CALL pGetResResourceServiceMap(' + db.escape(ezeid) + ')', function (err, GetResult) {
-                if (!err) {
-                    if (GetResult) {
-                        if (GetResult[0].length > 0) {
-                            responseMessage.status = true;
-                            responseMessage.data = GetResult[0] ;
-                            responseMessage.error = null;
-                            responseMessage.message = 'ResourceServiceMap details Send successfully';
-                            console.log('FnGetReservResourceServiceMap: ResourceServiceMap details Send successfully');
-                            res.status(200).json(responseMessage);
-                        }
-                        else {
-
-                            responseMessage.error = {};
-                            responseMessage.message = 'No founded ResourceServiceMap details';
-                            console.log('FnGetReservResourceServiceMap: No founded ResourceServiceMap details');
-                            res.json(responseMessage);
-                        }
-                    }
-                    else {
-
-
-                        responseMessage.error = {};
-                        responseMessage.message = 'No ResourceServiceMap details found';
-                        console.log('FnGetReservResourceServiceMap: No ResourceServiceMap details found');
-                        res.json(responseMessage);
-                    }
-
-                }
-                else {
-
-                    responseMessage.data = null ;
-                    responseMessage.error = {};
-                    responseMessage.message = 'Error in getting ResourceServiceMap details';
-                    console.log('FnGetReservResourceServiceMap: error in getting ResourceServiceMap details' + err);
-                    res.status(500).json(responseMessage);
-                }
-            });
-
-        }
-        else {
-            if (!ezeid) {
-                responseMessage.message = 'Invalid ezeid';
-                responseMessage.error = {
-                    ezeid : 'Invalid ezeid'
-                };
-                console.log('FnGetReservResourceServiceMap: ezeid is mandatory field');
-            }
-
-            res.status(401).json(responseMessage);
-        }
-    }
-    catch (ex) {
-        responseMessage.error = {};
-        responseMessage.message = 'An error occured !'
-        console.log('FnGetReservResourceServiceMap:error ' + ex.description);
-        throw new Error(ex);
-        res.status(400).json(responseMessage);
-    }
-};
-
-//method to save the resource and service map
-exports.FnSaveReservResourceServiceMap = function(req, res){
-    try{
-        res.setHeader("Access-Control-Allow-Origin", "*");
-        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-
-        var Token = req.body.Token ;
-        var resourceid = req.body.resourceid;
-        var serviceids = req.body.serviceids;
-
-        var ID=''
-        if(serviceids){
-            ID = serviceids + ',' + ID;
-            serviceids =ID.slice(0,-1);
-            console.log(serviceids);
-        }
-        service_id = serviceids.concat(',');
-        console.log('service_ids Values:'+ service_id);
-        var responseMessage = {
-            status: false,
-            error:{},
-            message:'',
-            data: null
-        };
-        var validateStatus = true;
-
-        if(!resourceid){
-            responseMessage.error['resourceid'] = 'Invalid Resourceid';
-            validateStatus *= false;
-        }
-
-        if(!serviceids){
-            responseMessage.error['serviceids'] = 'Invalid Service_ids';
-            validateStatus *= false;
-        }
-
-
-        if(!validateStatus){
-            console.log('FnSaveReservResServiceMap  error : ' + JSON.stringify(responseMessage.error));
-            responseMessage.message = 'Unable to save resource and service ! Please check the errors';
-            res.status(200).json(responseMessage);
-            return;
-        }
-
-        if (Token) {
-            FnValidateToken(Token, function (err, result) {
-                if (!err) {
-                    if (result != null) {
-                        var query = db.escape(resourceid) + ',' + db.escape(service_id);
-                        db.query('CALL pSaveResResourceServiceMap(' + query + ')', function (err, insertResult) {
-
-                            if (!err){
-                                if (insertResult) {
-                                    responseMessage.status = true;
-                                    responseMessage.error = null;
-                                    responseMessage.message = 'ResourceService Map details save successfully';
-                                    responseMessage.data = {
-                                        resourceid : req.body.resourceid,
-                                        serviceids : service_id
-                                    };
-                                    res.status(200).json(responseMessage);
-                                    console.log('FnSaveReservResServiceMap: ResourceService Map details save successfully');
-
-                                }
-                                else {
-                                    responseMessage.message = 'An error occured ! Please try again';
-                                    responseMessage.error = {};
-                                    res.status(400).json(responseMessage);
-                                    console.log('FnSaveReservResServiceMap:No save Resource details');
-                                }
-                            }
-
-                            else {
-                                responseMessage.message = 'An error occured ! Please try again';
-                                responseMessage.error = {};
-                                res.status(500).json(responseMessage);
-                                console.log('FnSaveReservResServiceMap: error in saving Resource details:' + err);
-                            }
-                        });
-                    }
-                    else {
-                        responseMessage.message = 'Invalid token';
-                        responseMessage.error = {};
-                        responseMessage.data = null;
-                        res.status(401).json(responseMessage);
-                        console.log('FnSaveReservResServiceMap: Invalid token');
-                    }
-                }
-                else {
-                    responseMessage.error= {};
-                    responseMessage.message = 'Error in validating Token';
-                    res.status(500).json(responseMessage);
-                    console.log('FnSaveReservResServiceMap:Error in processing Token' + err);
-                }
-            });
-
-        }
-
-        else {
-            if (!Token)
-            {
-                responseMessage.message = 'Invalid Token';
-                responseMessage.error = {Token : 'Invalid Token'};
-                console.log('FnSaveReservResServiceMap: Token is mandatory field');
-            }
-
-            res.status(401).json(responseMessage);
-        }
-
-    }
-    catch (ex) {
-        responseMessage.error = {};
-        responseMessage.message = 'An error occured !'
-        console.log('FnSaveReservResServiceMap:error ' + ex.description);
-        throw new Error(ex);
-        res.status(400).json(responseMessage);
-    }
-};
 
 /**
  * Finds the user login status using a cookie login
@@ -7143,499 +4443,6 @@ exports.FnSearchBusListing = function(req,res,next){
     }
 };
 
-//method to save reservation transaction
-exports.FnSaveReservTransaction = function(req, res){
-    try{
-        res.setHeader("Access-Control-Allow-Origin", "*");
-        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-
-        var Token = req.body.Token ;
-        var TID = req.body.TID;
-        var contactinfo = req.body.contactinfo;
-        var toEzeid = req.body.toEzeid;
-        var resourceid = req.body.resourceid;
-        var res_datetime = new Date(req.body.res_datetime);
-        var duration = req.body.duration;
-        var status = req.body.status;
-        var serviceid = req.body.serviceid;
-
-        var ID=''
-        if(serviceid){
-            ID = serviceid + ',' + ID;
-            serviceid =ID.slice(0,-1);
-            console.log(serviceid);
-        }
-
-
-
-        var responseMessage = {
-            status: false,
-            error:{},
-            message:'',
-            data: null
-        };
-        var validateStatus = true;
-
-        if(!toEzeid){
-            responseMessage.error['toEzeid'] = 'Invalid toEzeid';
-            validateStatus *= false;
-        }
-
-        if(!resourceid){
-            responseMessage.error['resourceid'] = 'Invalid Resourceid';
-            validateStatus *= false;
-        }
-
-        if(!serviceid){
-            responseMessage.error['serviceid'] = 'Invalid Service_ids';
-            validateStatus *= false;
-        }
-
-
-        if(!validateStatus){
-            console.log('FnSaveReservTransaction  error : ' + JSON.stringify(responseMessage.error));
-            responseMessage.message = 'Unable to save resource transaction ! Please check the errors';
-            res.status(200).json(responseMessage);
-            return;
-        }
-
-        if (Token) {
-            FnValidateToken(Token, function (err, result) {
-                if (!err) {
-                    if (result != null) {
-
-                        var query = db.escape(TID) + ',' + db.escape(Token) + ',' + db.escape(contactinfo) + ',' + db.escape(toEzeid) + ',' + db.escape(resourceid) + ',' + db.escape(res_datetime) + ',' + db.escape(duration) + ',' + db.escape(status) + ',' + db.escape(serviceid);
-                        console.log(query);
-                        console.log('CALL pSaveResTrans(' + query + ')');
-
-                        db.query('CALL pSaveResTrans(' + query + ')', function (err, insertResult) {
-                            console.log(insertResult);
-                            console.log(err);
-                            if (!err){
-                                if (insertResult.affectedRows > 0) {
-                                    responseMessage.status = true;
-                                    responseMessage.error = null;
-                                    responseMessage.message = 'Resource Transaction details save successfully';
-                                    responseMessage.data = {
-                                        resourceid : req.body.resourceid,
-                                        serviceid : serviceid
-                                    };
-                                    res.status(200).json(responseMessage);
-                                    console.log('FnSaveReservTransaction: Resource Transaction details save successfully');
-
-                                }
-                                else {
-                                    responseMessage.message = insertResult[0][0];
-                                    responseMessage.error = {};
-                                    res.status(400).json(responseMessage);
-                                    console.log('FnSaveReservTransaction:No save Resource Transaction details');
-                                }
-                            }
-
-                            else {
-                                responseMessage.message = 'An error occured ! Please try again';
-                                responseMessage.error = {};
-                                res.status(500).json(responseMessage);
-                                console.log('FnSaveReservTransaction: error in saving Resource Transaction details:' + err);
-                            }
-                        });
-                    }
-                    else {
-                        responseMessage.message = 'Invalid token';
-                        responseMessage.error = {};
-                        responseMessage.data = null;
-                        res.status(401).json(responseMessage);
-                        console.log('FnSaveReservTransaction: Invalid token');
-                    }
-                }
-                else {
-                    responseMessage.error= {};
-                    responseMessage.message = 'Error in validating Token';
-                    res.status(500).json(responseMessage);
-                    console.log('FnSaveReservTransaction:Error in processing Token' + err);
-                }
-            });
-
-        }
-
-        else {
-            if (!Token)
-            {
-                responseMessage.message = 'Invalid Token';
-                responseMessage.error = {Token : 'Invalid Token'};
-                console.log('FnSaveReservTransaction: Token is mandatory field');
-            }
-
-            res.status(401).json(responseMessage);
-        }
-
-    }
-    catch (ex) {
-        responseMessage.error = {};
-        responseMessage.message = 'An error occured !'
-        console.log('FnSaveReservTransaction:error ' + ex.description);
-        throw new Error(ex);
-        res.status(400).json(responseMessage);
-    }
-};
-
-//method to get reservation maped services
-exports.FnGetMapedServices = function (req, res) {
-
-    try {
-
-        res.setHeader("Access-Control-Allow-Origin", "*");
-        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-
-        var ezeid = req.query.ezeid;
-        var resourceid = req.query.resourceid;
-
-        var responseMessage = {
-            status: false,
-            data: null,
-            error:{},
-            message:''
-        };
-
-        if (ezeid) {
-            db.query('CALL pgetMapedservices(' + db.escape(ezeid) + ',' + db.escape(resourceid) + ')', function (err, GetResult) {
-                if (!err) {
-                    if (GetResult) {
-                        if (GetResult[0].length > 0) {
-                            responseMessage.status = true;
-                            responseMessage.data = GetResult[0] ;
-                            responseMessage.error = null;
-                            responseMessage.message = 'service Maped details Send successfully';
-                            console.log('FnGetMapedServices: service Maped details Send successfully');
-                            res.status(200).json(responseMessage);
-                        }
-                        else {
-
-                            responseMessage.error = {};
-                            responseMessage.message = 'No founded service Maped details';
-                            console.log('FnGetMapedServices: No founded service Maped details');
-                            res.json(responseMessage);
-                        }
-                    }
-                    else {
-
-
-                        responseMessage.error = {};
-                        responseMessage.message = 'No founded service Maped details';
-                        console.log('FnGetMapedServices: No founded service Maped details');
-                        res.json(responseMessage);
-                    }
-
-                }
-                else {
-
-                    responseMessage.data = null ;
-                    responseMessage.error = {};
-                    responseMessage.message = 'Error in getting service Maped details';
-                    console.log('FnGetMapedServices: error in getting service Maped details' + err);
-                    res.status(500).json(responseMessage);
-                }
-            });
-
-        }
-        else {
-            if (!ezeid) {
-                responseMessage.message = 'Invalid ezeid';
-                responseMessage.error = {
-                    ezeid : 'Invalid ezeid'
-                };
-                console.log('FnGetMapedServices: ezeid is mandatory field');
-            }
-
-            res.status(401).json(responseMessage);
-        }
-    }
-    catch (ex) {
-        responseMessage.error = {};
-        responseMessage.message = 'An error occured !'
-        console.log('FnGetReservTransaction:error ' + ex.description);
-        throw new Error(ex);
-        res.status(400).json(responseMessage);
-    }
-};
-
-//method to get reservation task
-exports.FnGetReservTask = function (req, res) {
-
-    try {
-
-        res.setHeader("Access-Control-Allow-Origin", "*");
-        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-
-        var resourceid = req.query.resourceid;
-        var date = new Date(req.query.date);
-        var toEzeid = req.query.toEzeid;
-
-        var responseMessage = {
-            status: false,
-            data: null,
-            error:{},
-            message:''
-        };
-
-        if (resourceid) {
-
-            db.query('CALL pGetResTrans(' + db.escape(resourceid) + ',' + db.escape(date) + ',' + db.escape(toEzeid) + ')', function (err, GetResult) {
-                if (!err) {
-                    if (GetResult) {
-                        if (GetResult[0].length > 0) {
-                            responseMessage.status = true;
-                            responseMessage.data = GetResult[0] ;
-                            responseMessage.error = null;
-                            responseMessage.message = 'Reservation Task details Send successfully';
-                            console.log('FnGetReservTask: Reservation Task details Send successfully');
-                            res.status(200).json(responseMessage);
-                        }
-                        else {
-
-                            responseMessage.error = {};
-                            responseMessage.message = 'No founded Reservation Task details';
-                            console.log('FnGetReservTask: No founded Reservation Task details');
-                            res.json(responseMessage);
-                        }
-                    }
-                    else {
-
-
-                        responseMessage.error = {};
-                        responseMessage.message = 'No founded Reservation Task details';
-                        console.log('FnGetReservTask: No founded Reservation Task details');
-                        res.json(responseMessage);
-                    }
-
-                }
-                else {
-
-                    responseMessage.data = null ;
-                    responseMessage.error = {};
-                    responseMessage.message = 'Error in getting Reservation Task details';
-                    console.log('FnGetReservTask: error in getting Reservation Task details' + err);
-                    res.status(500).json(responseMessage);
-                }
-            });
-        }
-
-        else {
-            if (!resourceid) {
-                responseMessage.message = 'Invalid resourceid';
-                responseMessage.error = {
-                    resourceid : 'Invalid resourceid'
-                };
-                console.log('FnGetReservTask: resourceid is mandatory field');
-            }
-
-            res.status(401).json(responseMessage);
-        }
-    }
-    catch (ex) {
-        responseMessage.error = {};
-        responseMessage.message = 'An error occured !'
-        console.log('FnGetReservTask:error ' + ex.description);
-        throw new Error(ex);
-        res.status(400).json(responseMessage);
-    }
-};
-
-//method to get trans details
-exports.FnGetResTransDetails = function (req, res) {
-
-    try {
-
-        res.setHeader("Access-Control-Allow-Origin", "*");
-        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-
-        var TID = req.query.TID;
-
-        var responseMessage = {
-            status: false,
-            data: null,
-            error:{},
-            message:''
-        };
-
-        if (TID) {
-
-            db.query('CALL pGetResTransDetails(' + db.escape(TID) + ')', function (err, GetResult) {
-                if (!err) {
-                    if (GetResult) {
-                        if (GetResult[0].length > 0) {
-                            responseMessage.status = true;
-                            responseMessage.data = GetResult[0] ;
-                            responseMessage.error = null;
-                            responseMessage.message = 'Reservation Trans details Send successfully';
-                            console.log('FnGetResTransDetails: Reservation Trans details Send successfully');
-                            res.status(200).json(responseMessage);
-                        }
-                        else {
-
-                            responseMessage.error = {};
-                            responseMessage.message = 'No founded Reservation Trans details';
-                            console.log('FnGetResTransDetails: No founded Reservation Trans details');
-                            res.json(responseMessage);
-                        }
-                    }
-                    else {
-
-
-                        responseMessage.error = {};
-                        responseMessage.message = 'No founded Reservation Trans details';
-                        console.log('FnGetResTransDetails: No founded Reservation Trans details');
-                        res.json(responseMessage);
-                    }
-
-                }
-                else {
-
-                    responseMessage.data = null ;
-                    responseMessage.error = {};
-                    responseMessage.message = 'Error in getting Reservation Task details';
-                    console.log('FnGetResTransDetails: error in getting Reservation Task details' + err);
-                    res.status(500).json(responseMessage);
-                }
-            });
-        }
-
-        else {
-            if (!TID) {
-                responseMessage.message = 'Invalid TID';
-                responseMessage.error = {
-                    resourceid : 'Invalid TID'
-                };
-                console.log('FnGetResTransDetails: TID is mandatory field');
-            }
-
-            res.status(401).json(responseMessage);
-        }
-    }
-    catch (ex) {
-        responseMessage.error = {};
-        responseMessage.message = 'An error occured !'
-        console.log('FnGetResTransDetails:error ' + ex.description);
-        throw new Error(ex);
-        res.status(400).json(responseMessage);
-    }
-};
-
-exports.FnPGetSkills = function(req,res){
-    var responseMsg = {
-        status : false,
-        data : [],
-        message : 'Unable to load skills ! Please try again',
-        error : {
-            server : 'An internal server error'
-        }
-    };
-
-    try{
-        db.query('CALL PGetSkills()',function(err,result){
-            if(err){
-                console.log('Error : FnPGetSkills ');
-                res.status(400).json(responseMsg);
-            }
-            else{
-                responseMsg.status = true;
-                responseMsg.message = 'Skills loaded successfully';
-                responseMsg.error = null;
-                responseMsg.data = result[0];
-
-                res.status(200).json(responseMsg);
-            }
-        });
-    }
-
-    catch(ex){
-        res.status(500).json(responseMsg);
-        console.log('Error : FnPGetSkills '+ ex.description);
-        throw new Error('Error in FnPGetSkills');
-    }
-};
-
-exports.FnChangeReservationStatus = function(req,res){
-
-    var token = (req.body.Token && req.body.Token !== 2) ? req.body.Token : null;
-    var tid = (req.body.tid && parseInt(req.body.tid) !== NaN) ? parseInt(req.body.tid) : null;
-    var status = (req.body.status && parseInt(req.body.status) !== NaN) ? parseInt(req.body.status) : null;
-
-    var responseMsg = {
-        status : false,
-        data : null,
-        message : 'Please login to continue',
-        error : {
-            Token : 'Invalid Token'
-        }
-    };
-
-    var validationFlag = true;
-    if(!token){
-        responseMsg.error['Token'] = 'Invalid Token';
-        validationFlag *= false;
-    }
-
-    if(!tid){
-        responseMsg.error['tid'] = 'Reservation Slot is empty';
-        validationFlag *= false;
-    }
-
-    if(!status){
-        responseMsg.error['status'] = 'Status cannot be empty';
-        validationFlag *= false;
-    }
-
-    if(!validationFlag){
-        res.status(401).json(responseMsg);
-        return;
-    }
-
-    FnValidateToken(token,function(err,tokenRes){
-        if(err || (!tokenRes)){
-            res.status(401).json(responseMsg);
-            return;
-        }
-        else{
-            var queryParam = db.escape(tid) + ',' + db.escape(status);
-            db.query('CALL PUpdateResTransStatus(' + queryParam + ')', function (err, updateRes) {
-                if(err){
-                    responseMsg.message = 'An error occurred ! Please try again';
-                    responseMsg.error['server'] = 'Internal Server Error';
-                    res.status(400).json(responseMsg);
-                    console.log('FnChangeReservationStatus: An error occurred ! Please try again');
-
-                }
-                else{
-                    if(updateRes.affectedRows > 0){
-                        responseMsg['status'] = true;
-                        responseMsg['error'] = null;
-                        responseMsg['message'] = 'Status changed successfully';
-                        responseMsg['data'] = {
-                            tid : tid,
-                            status : status
-                        };
-                        res.status(200).json(responseMsg);
-                        console.log('FnChangeReservationStatus: Status changed successfully');
-                    }
-                    else{
-                        responseMsg['status'] = false;
-                        responseMsg['error'] = {server : 'An error occurred'};
-                        responseMsg['message'] = 'Unable to update ! Please try again';
-                        responseMsg['data'] = {
-                            tid : req.body.tid,
-                            status : req.body.status
-                        };
-                        res.status(400).json(responseMsg);
-                        console.log('FnChangeReservationStatus: Unable to update ! Please try again');
-                    }
-
-
-                }
-            });
-        }
-    });
-};
 
 exports.FnGetTransAutoComplete = function (req, res) {
 
@@ -7712,7 +4519,7 @@ exports.FnGetTransAutoComplete = function (req, res) {
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
         console.log('FnGetTransAutoComplete:error ' + ex.description);
-        throw new Error(ex);
+          
         res.status(400).json(responseMessage);
     }
 };
@@ -7791,105 +4598,7 @@ exports.FnGetCompanyDetails = function (req, res) {
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
         console.log('FnGetCompanyDetails:error ' + ex.description);
-        throw new Error(ex);
-        res.status(400).json(responseMessage);
-    }
-};
-
-exports.FnGetOutboxMessages = function (req, res) {
-
-    try {
-
-        res.setHeader("Access-Control-Allow-Origin", "*");
-        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-
-        var Token = req.query.Token;
-        var pagesize = req.query.pagesize;
-        var pagecount = req.query.pagecount;
-
-        var responseMessage = {
-            status: false,
-            data: null,
-            error:{},
-            message:''
-        };
-
-        if (Token) {
-            FnValidateToken(Token, function (err, result) {
-                if (!err) {
-                    if (result != null) {
-                        db.query('CALL pGetOutboxMessages(' + db.escape(Token) + ',' + db.escape(pagesize) + ',' + db.escape(pagecount)+ ')', function (err, GetResult) {
-                            if (!err) {
-                                if (GetResult) {
-                                    if (GetResult[0].length > 0) {
-                                        responseMessage.status = true;
-                                        responseMessage.data = GetResult[0] ;
-                                        responseMessage.error = null;
-                                        responseMessage.message = 'Company details Send successfully';
-                                        console.log('FnGetOutboxMessages: Company details Send successfully');
-                                        res.status(200).json(responseMessage);
-                                    }
-                                    else {
-
-                                        responseMessage.error = {};
-                                        responseMessage.message = 'No founded Company details';
-                                        console.log('FnGetOutboxMessages: No founded Company details');
-                                        res.json(responseMessage);
-                                    }
-                                }
-                                else {
-
-
-                                    responseMessage.error = {};
-                                    responseMessage.message = 'No founded Company details';
-                                    console.log('FnGetOutboxMessages: No founded Company details');
-                                    res.json(responseMessage);
-                                }
-
-                            }
-                            else {
-
-                                responseMessage.data = null ;
-                                responseMessage.error = {};
-                                responseMessage.message = 'Error in getting Company details';
-                                console.log('FnGetOutboxMessages: error in getting Company details' + err);
-                                res.status(500).json(responseMessage);
-                            }
-                        });
-                    }
-                    else {
-                        responseMessage.message = 'Invalid token';
-                        responseMessage.error = {};
-                        responseMessage.data = null;
-                        res.status(401).json(responseMessage);
-                        console.log('FnGetOutboxMessages: Invalid token');
-                    }
-                }
-                else {
-                    responseMessage.error= {};
-                    responseMessage.message = 'Error in validating Token';
-                    res.status(500).json(responseMessage);
-                    console.log('FnGetOutboxMessages:Error in processing Token' + err);
-                }
-            });
-        }
-        else {
-            if (!ezeid) {
-                responseMessage.message = 'Invalid ezeid';
-                responseMessage.error = {
-                    ezeid : 'Invalid ezeid'
-                };
-                console.log('FnGetCompanyDetails: ezeid is mandatory field');
-            }
-
-            res.status(401).json(responseMessage);
-        }
-    }
-    catch (ex) {
-        responseMessage.error = {};
-        responseMessage.message = 'An error occured !'
-        console.log('FnGetOutboxMessages:error ' + ex.description);
-        throw new Error(ex);
+          
         res.status(400).json(responseMessage);
     }
 };
@@ -7969,7 +4678,7 @@ exports.FnGetworkinghoursList = function (req, res) {
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
         console.log('FnGetworkinghoursList:error ' + ex.description);
-        throw new Error(ex);
+          
         res.status(400).json(responseMessage);
     }
 };
@@ -8012,7 +4721,7 @@ function FnValidateTokenAP(Token, CallBack) {
     }
     catch (ex) {
         console.log('OTP FnValidateToken error:' + ex.description);
-        throw new Error(ex);
+          
         return 'error'
     }
 };
@@ -8091,7 +4800,7 @@ exports.FnLoginAP = function (req, res) {
     }
     catch (ex) {
         console.log('FnLogin error:' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -8136,7 +4845,7 @@ exports.FnLogoutAP = function (req, res) {
     }
     catch (ex) {
         console.log('FnLogoutAP error:' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -8204,7 +4913,7 @@ exports.FnGetUserDetailsAP = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetUserDetails error:' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -8335,7 +5044,7 @@ exports.FnUpdateUserProfileAP = function (req, res) {
     }
     catch (ex) {
         console.log('FnUpdateUserProfileAP error:' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -8410,7 +5119,7 @@ exports.FnChangePasswordAP = function (req, res) {
     }
     catch (ex) {
         console.log('FnChangePassword error:' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -8508,7 +5217,7 @@ exports.FnForgetPasswordAP = function (req, res) {
     }
     catch (ex) {
         console.log('FnForgetPasswordAP error:' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -8573,7 +5282,7 @@ exports.FnGetEZEIDDetailsAP = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetEZEIDDetailsAP error:' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -8691,7 +5400,7 @@ exports.FnSaveAPEZEID = function (req, res) {
     }
     catch (ex) {
         console.log('psaveRealEstateData error:' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -8770,7 +5479,7 @@ exports.FnSaveAPEZEIDPicture = function (req, res) {
     }
     catch (ex) {
         console.log('FnSaveAPEZEIDPicture error:' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -8840,7 +5549,7 @@ exports.FnGetRealStateDataAP = function(req,res){
     }
     catch(ex){
         console.log('FnGetRealStateDataAP error: ' + ex.description);
-        throw new Error(ex);
+          
     }
 }
 
@@ -8905,7 +5614,7 @@ exports.FnGetAPEZEIDPicture = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetAPEZEIDPicture error:' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -8989,7 +5698,7 @@ exports.FnSaveBannerPictureAP = function(req, res){
     }
     catch (ex) {
         console.log('FnSaveBannerPicture error:' + ex.description);
-        throw new Error(ex);
+          
     }
 }
 
@@ -9063,7 +5772,7 @@ exports.FnGetBannerPictureAP = function(req, res){
     }
     catch (ex) {
         console.log('FnGetBannerPicsAP error:' + ex.description);
-        throw new Error(ex);
+          
     }
 }
 
@@ -9131,7 +5840,7 @@ exports.FnGetAllBannerPicsAP = function(req, res){
     }
     catch (ex) {
         console.log('FnGetAllBannerPicsAP error:' + ex.description);
-        throw new Error(ex);
+          
     }
 }
 
@@ -9200,7 +5909,7 @@ exports.FnGetSecondaryLocationListAP = function(req, res){
     }
     catch (ex) {
         console.log('FnGetSecondaryLocationList:' + ex.description);
-        throw new Error(ex);
+          
     }
 }
 
@@ -9272,7 +5981,7 @@ exports.FnGetSecondaryLocationAP = function(req, res){
     }
     catch (ex) {
         console.log('FnGetSecondaryLocationAP:' + ex.description);
-        throw new Error(ex);
+          
     }
 }
 
@@ -9367,7 +6076,7 @@ exports.FnUpdateSecondaryLocationAP = function(req, res){
     }
     catch (ex) {
         console.log('FnUpdateSecondaryLocationAP:' + ex.description);
-        throw new Error(ex);
+          
     }
 }
 
@@ -9439,7 +6148,7 @@ exports.FnUpdateIdCardPrintAP = function(req, res){
     }
     catch (ex) {
         console.log('FnUpdateIdCardPrintAP:error ' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -9504,7 +6213,7 @@ exports.FnGetIdCardPrintAP = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetEZEIDDetailsAP error:' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -9606,7 +6315,7 @@ exports.FnSearchRealEstateAP = function(req, res){
     }
     catch (ex) {
         console.log('FnSearchRealEstateAP error:' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -9629,7 +6338,7 @@ exports.Base64Data = function (req, res) {
     }
     catch (ex) {
         console.log('OTP fnCreateFile error:' + ex.description);
-        throw new Error(ex);
+          
         return 'error'
     }
 };
@@ -9717,7 +6426,7 @@ exports.FnUpdateRedFlagAP = function(req, res){
     }
     catch (ex) {
         console.log('FnUpdateRedFlagAP:error ' + ex.description);
-        throw new Error(ex);
+          
     }
 }
 
@@ -9788,7 +6497,7 @@ exports.FnUpdateEZEIDAP = function (req, res) {
     }
     catch (ex) {
         console.log('FnUpdateEZEIDAP error:' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -9859,7 +6568,7 @@ exports.FnDeleteBannerPictureAP = function(req, res){
     }
     catch (ex) {
         console.log('FnDeleteBannerPictureAP:error ' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -10134,7 +6843,7 @@ exports.FnLoginVES = function (req, res) {
     }
     catch (ex) {
         console.log('FnLoginVES error:' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -10242,7 +6951,7 @@ exports.FnSaveContactVES = function(req, res){
     }
     catch (ex) {
         console.log('FnSaveContactVES:error ' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -10322,7 +7031,7 @@ exports.FnGetAllContactsVES = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetAllContactsVES error:' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -10363,7 +7072,7 @@ exports.FnGetDepartmentVES = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetDepartmentVES error:' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -10436,7 +7145,7 @@ exports.FnGetContactVES = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetContactsVES error:' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -10522,7 +7231,7 @@ exports.FnSearchContactsVES = function (req, res) {
     }
     catch (ex) {
         console.log('FnSearchContactsVES error:' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -10564,7 +7273,7 @@ exports.FnCheckPasswordVES  = function (req, res) {
     }
     catch (ex) {
         console.log('FnCheckPasswordVES : error:' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -10603,7 +7312,7 @@ exports.FnGetGatesVES = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetGatesVES error:' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -10689,7 +7398,7 @@ exports.FnSaveDepartmentsVES = function(req, res){
     }
     catch (ex) {
         console.log('FnSaveContactVES:error ' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -10774,7 +7483,7 @@ exports.FnSaveGatesVES = function(req, res){
     }
     catch (ex) {
         console.log('FnSaveGatesVES:error ' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 
@@ -10846,7 +7555,7 @@ exports.FnSaveCitysVES = function(req, res){
     }
     catch (ex) {
         console.log('FnSaveCitysVES:error ' + ex.description);
-        throw new Error(ex);
+          
     }
 };
 

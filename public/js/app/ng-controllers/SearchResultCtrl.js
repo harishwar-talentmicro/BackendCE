@@ -278,7 +278,8 @@ var res = angular.module('ezeidApp').
                     $scope.isResultNumber = (result && result !== 'null') ? ((result.length > 0) ? 1 : 0) : 0;
 
                     $scope.searchListData = (result && result !== 'null') ? ((result.length > 0) ? result : []) : [];
-
+                    console.log('--------------');
+                    console.log($scope.searchListData);
                     if ( data && data != 'null' && data.length>0)
                     {
                         $scope.SearchResultCount = data.length;
@@ -809,6 +810,9 @@ var res = angular.module('ezeidApp').
                 };
 
                 $window.localStorage.setItem("myLocation", JSON.stringify(userLoc));
+
+
+
             };
 
 
@@ -1040,6 +1044,62 @@ var res = angular.module('ezeidApp').
                 {
                     $scope.paginationNext = true;
                     $scope.paginationPrevious = false;
+                }
+            }
+
+            /**
+             * refine the module visibility: if there are more then 3 modules are visible show only 3
+             * @param val: the original module visibility eg: 11111 or 11010
+             * @returns {string} 11100 or 10011 : the number of 1s can't be more than 3
+             */
+            $scope.refineModuleVisibility = function(val)
+            {
+                if(val != null) {
+                    val = val.split("");
+                    var count = 0;
+                    for(var i=0; i<val.length; i++)
+                    {
+                        if(val[i] == 1 && count < 3)
+                        {
+                            count++;
+                        }
+                        else
+                        {
+                            val[i] = 0;
+                        }
+                    }
+                    val = val.join(",");
+                    return val.replace(/,/g,'');
+                }
+            }
+
+            /**
+             * Function to redirect to desired url
+             */
+            $scope.redirectUrl = function(url){
+                if(!$rootScope._userInfo.Token || $rootScope._userInfo.Token == 2){
+                    angular.element('#SignIn_popup').slideUp();
+                    $rootScope.loginPromise = $q.defer();
+                    $rootScope.loginPromise.promise.then(function(){
+                        $location.url(url);
+                    });
+                    return;
+                }
+                $location.url(url);
+            };
+
+            /**
+             * Get appropriate company name or the user name, depending upon the search type
+             */
+            $scope.getCompanyOrIndividualName = function(companyName,name)
+            {
+                if($routeParams.searchType == 1)//its Ezeone ID
+                {
+                    return name != ''?name:'___';
+                }
+                else
+                {
+                    return companyName != ''?companyName:'___';
                 }
             }
         }

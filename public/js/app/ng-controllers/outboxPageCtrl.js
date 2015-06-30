@@ -37,6 +37,8 @@ angular.module('ezeidApp').
             UtilityService
         ) {
             $scope.result = '';
+            /* defaultly getting all the transactions for SALES module */
+            $scope.presentSelectedModule = 0;
 
 
             /* All Variable declaration goes here */
@@ -51,13 +53,15 @@ angular.module('ezeidApp').
             $scope.permissiontype = '';
 
 
-
+            /* initialization fot getting all the transaction history */
             getTransactionHistory().then(function(){
                 reConfigurePaginationButton();
             });
+
             /* http request to get all the transaction history */
             function getTransactionHistory()
             {
+                console.log('------------');
                 var defer = $q.defer();
                 $scope.$emit('$preLoaderStart');
                 $http({
@@ -66,7 +70,8 @@ angular.module('ezeidApp').
                     params :{
                         Token : $rootScope._userInfo.Token,
                         pagesize:$scope.resultPerPage,
-                        pagecount:$scope.nextResultId
+                        pagecount:$scope.nextResultId,
+                        functiontype:$scope.presentSelectedModule
                     }
                 }).success(function(resp){
 
@@ -80,7 +85,12 @@ angular.module('ezeidApp').
                         }
 
                         $scope.result = resp.data;
+
                         defer.resolve()
+                    }
+                    else
+                    {
+                        $scope.result = [];
                     }
                 }).error(function(err){
                     $scope.$emit('$preLoaderStop');
@@ -217,5 +227,19 @@ angular.module('ezeidApp').
                 /* set access rights */
                 $scope.accessRight = $scope.activeTransactionBasicInfo.itemlisttype;
             }
+
+            /**
+             * Change the result for the selected module
+             */
+            $scope.changeSelectedModule = function(moduleId)
+            {
+                /* change the present selected module */
+                $scope.presentSelectedModule = moduleId;
+                /* change the outbox result and reconfigure pagination button */
+                getTransactionHistory().then(function(){
+                    reConfigurePaginationButton();
+                });
+            }
+
 
         }]);
