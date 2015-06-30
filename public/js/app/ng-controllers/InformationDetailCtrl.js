@@ -104,17 +104,13 @@ angular.module('ezeidApp').
                 class : 'business-manager-modal'
             };
 
-            var TID = $routeParams.TID;
+           // var TID = $routeParams.TID;
 
-            console.log("SAi1111");
-            console.log($routeParams);
-            console.log($routeParams.ezeone);
 
             var ezeone = $routeParams.ezeone;
 
-            ezeone = "krunal";
 
-            $scope.SearchType = $routeParams.searchType;
+            //  $scope.SearchType = $routeParams.searchType;
 
             /*if(($scope.SearchType == 1) && (!$rootScope._userInfo.IsAuthenticate))
             {
@@ -187,6 +183,7 @@ angular.module('ezeidApp').
                 {
                     $rootScope._userInfo = {};
                 }
+
                 if(!$rootScope._userInfo.IsAuthenticate){
                     $rootScope._userInfo.Token = 2;
                     $scope.Token = 2;
@@ -198,9 +195,9 @@ angular.module('ezeidApp').
                 $http({ method: 'get',
                     url: GURL + 'ewtGetSearchInformationNew?Token=' + $rootScope._userInfo.Token + '&ezeTerm='+_ezeone+'&CurrentDate='+CurrentDate}).success(function (data) {
 
-                        $rootScope.$broadcast('$preLoaderStop');
                         if (data && data != 'null')
                         {
+                            $rootScope.$broadcast('$preLoaderStop');
                             $timeout(function () {
                                 $scope.SearchInfo = data[0];
                                 $scope.showDetailsModal = true;
@@ -280,15 +277,23 @@ angular.module('ezeidApp').
                         }
                         else
                         {
-                            //$scope.showNotFound = true;
-                            //defer.reject();
-
+                            $rootScope.$broadcast('$preLoaderStop');
                             $location.url('/');
                         }
                     })
                     .error(function(data, status, headers, config) {
+
+
                         defer.reject();
-                        $rootScope.$broadcast('$preLoaderStop');
+                        if ((data == 'null') || (!data))
+                        {
+                            console.log(data);
+                            $location.url('/');
+                        }
+                     //   else
+                       // {
+                            $rootScope.$broadcast('$preLoaderStop');
+                        //}
                     });
                 return defer.promise;
             }
@@ -358,7 +363,7 @@ angular.module('ezeidApp').
                     }
                     else
                     {
-                        Notification.error({ message: "No Banner found..!", delay: MsgDelay });
+                       // Notification.error({ message: "No Banner found..!", delay: MsgDelay });
                     }
                 });
             }
@@ -381,74 +386,6 @@ angular.module('ezeidApp').
                     getBanner(currentBanner);
                     RefreshTime = Miliseconds;
                 }
-            };
-
-            $scope.sendSalesEnquiry = function () {
-                if ($rootScope._userInfo.IsAuthenticate == true) {
-                    var currentTaskDate = moment().format('DD-MMM-YYYY hh:mm A');
-                    $http({ method: 'post', url: GURL + 'ewtSaveMessage', data: { TokenNo: $rootScope._userInfo.Token, ToMasterID: $scope.SearchInfo.TID, MessageType: 1, Message: $scope.salesMessage, TaskDateTime: today, LocID :$scope.SearchInfo.LocID,CurrentTaskDate: currentTaskDate } }).success(function (data) {
-                        if (data.IsSuccessfull) {
-                            $('#SalesEnquiryRequest_popup').slideUp();
-                            $scope.salesMessage = "";
-                            Notification.success({ message: 'Message send success', delay: MsgDelay });
-                        }
-                        else {
-                            Notification.error({ message: 'Sorry..! Message not send ', delay: MsgDelay });
-                        }
-                    });
-                }
-                else
-                {
-                    //Redirect to Login page
-                    $('#SignIn_popup').slideDown();
-                }
-            };
-
-            // Close Sales Enquiry Form
-            $scope.closeSalesEnquiryForm = function () {
-                $('#SalesEnquiryRequest_popup').slideUp();
-                $scope.salesMessage = "";
-            };
-
-            //open home delivery form
-            $scope.openHomeDeliverForm = function () {
-
-                if($rootScope._userInfo.Token == 2)
-                {
-                    $('#SignIn_popup').slideDown();
-                }
-                else
-                {
-                    $('#HomeDelivery_popup').slideDown();
-                }
-            };
-
-            //Send Home Delivery
-            $scope.sendHomeDelivery = function () {
-                if ($rootScope._userInfo.IsAuthenticate == true) {
-                    var currentTaskDate = moment().format('DD-MMM-YYYY hh:mm A');
-                    $http({ method: 'post', url: GURL + 'ewtSaveMessage', data: { TokenNo: $rootScope._userInfo.Token, ToMasterID: $scope.SearchInfo.TID, MessageType: 2, Message: $scope.HomeDeliverMessage, TaskDateTime: today, LocID :$scope.SearchInfo.LocID,CurrentTaskDate : currentTaskDate } }).success(function (data) {
-
-                        if (data.IsSuccessfull) {
-                            $('#HomeDelivery_popup').slideUp();
-                            $scope.HomeDeliverMessage = "";
-                            Notification.success({ message: 'Message send success', delay: MsgDelay });
-                        }
-                        else {
-                            Notification.error({ message: 'Sorry..! Message not send ', delay: MsgDelay });
-                        }
-                    });
-                }
-                else {
-                    //Redirect to Login page
-                    $('#SignIn_popup').slideDown();
-                }
-            };
-
-            // Close HomeDeliver Form
-            $scope.closeHomeDeliverForm = function () {1
-                $scope.HomeDeliverMessage = "";
-                $('#HomeDelivery_popup').slideUp();
             };
 
             //open Reservation form
@@ -476,104 +413,6 @@ angular.module('ezeidApp').
                 }
             };
 
-            //open Service Request form
-            $scope.openServiceRequestForm = function () {
-                if($rootScope._userInfo.Token == 2)
-                {
-                    $('#SignIn_popup').slideDown();
-                }
-                else
-                {
-                    $('#ServiceRequest_popup').slideDown();
-                }
-            };
-
-            //Send Service Request
-            $scope.sendServiceRequest = function () {
-                if ($rootScope._userInfo.IsAuthenticate == true) {
-                    var currentTaskDate = moment().format('DD-MMM-YYYY hh:mm A');
-                    $http({ method: 'post', url: GURL + 'ewtSaveMessage', data: { TokenNo: $rootScope._userInfo.Token, ToMasterID: $scope.SearchInfo.TID, MessageType: 4, Message: $scope.ServiceRequestMessage, TaskDateTime: today, LocID :$scope.SearchInfo.LocID,CurrentTaskDate : currentTaskDate } }).success(function (data) {
-
-                        if (data.IsSuccessfull) {
-                            $('#ServiceRequest_popup').slideUp();
-                            $scope.ServiceRequestMessage = "";
-                            Notification.success({ message: 'Message send success', delay: MsgDelay });
-                        }
-                        else {
-                            Notification.error({ message: 'Sorry..! Message not send ', delay: MsgDelay });
-                        }
-                    });
-                }else {
-                    //Redirect to Login page
-                    $('#SignIn_popup').slideDown();
-                }
-            };
-
-            // Close Service Request Form
-            $scope.closeServiceRequestForm = function () {
-                $('#ServiceRequest_popup').slideUp();
-                $scope.ServiceRequestMessage = "";
-            };
-
-            //open CV form
-            $scope.openCVForm = function() {
-                if($rootScope._userInfo.Token == 2)
-                {
-                    $('#SignIn_popup').slideDown();
-                }
-                else
-                {
-                    $('#CV_popup').slideDown();
-                }
-            };
-            //Send CV Request
-            function sendCV() {
-                if ($rootScope._userInfo.IsAuthenticate == true) {
-                    var currentTaskDate = moment().format('DD-MMM-YYYY hh:mm A');
-                    $http({ method: 'post', url: GURL + 'ewtSaveMessage', data: { TokenNo: $rootScope._userInfo.Token, ToMasterID: $scope.SearchInfo.TID, MessageType: 5, Message: "", TaskDateTime: today, LocID :$scope.SearchInfo.LocID, CurrentTaskDate: currentTaskDate } }).success(function (data) {
-
-                        if (data.IsSuccessfull) {
-                            $('#CV_popup').slideUp();
-                            Notification.success({ message: 'Your Resume is posted successfully', delay: MsgDelay });
-                        }
-                        else {
-                            Notification.error({ message: 'Sorry..! An error occured while sending your resume. Please try again ', delay: MsgDelay });
-                        }
-                    });
-                }
-                else {
-                    //Redirect to Login page
-                    $('#SignIn_popup').slideDown();
-                }
-            };
-
-            //check for CV is uploaded by user or not
-            $scope.checkForCVAvailability = function () {
-                $scope.showCVSendButton = "";
-                if ($rootScope._userInfo.IsAuthenticate == true)
-                {
-                    $http({ method: 'post', url: GURL + 'ewtCheckCV', data: { Token: $rootScope._userInfo.Token } }).success(function (data) {
-                        if (data.IsSuccessfull)
-                        {
-                            sendCV();
-                        }
-                        else
-                        {
-                            $('#CV_popup').slideUp();
-                            Notification.error({ message: 'An error occurred while uploading resume! Please try again ', delay: MsgDelay });
-                        }
-                    });
-                }
-                else {
-                    //Redirect to Login page
-                    $('#SignIn_popup').slideDown();
-                }
-            };
-
-            // Close CV Form
-            $scope.closeCVForm = function () {
-                $('#CV_popup').slideUp();
-            };
 
             $scope.getdirections = function (data) {
 
