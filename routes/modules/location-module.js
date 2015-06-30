@@ -313,8 +313,6 @@ Location.prototype.deleteLocation = function(req,res,next) {
     }
 };
 
-
-
 /**
  * Method : GET
  * @param req

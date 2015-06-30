@@ -1365,7 +1365,6 @@ User.prototype.saveCompanyProfile = function(req,res,next){
     }
 };
 
-
 /**
  * Method : GET
  * @param req
@@ -2047,6 +2046,51 @@ function FnSaveSkills(skill, CallBack) {
         return 'error'
     }
 };
+
+/**
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ */
+User.prototype.getSkills = function(req,res,next){
+    /**
+     * @todo FnPGetSkills
+     */
+    var _this = this;
+    var responseMsg = {
+        status : false,
+        data : [],
+        message : 'Unable to load skills ! Please try again',
+        error : {
+            server : 'An internal server error'
+        }
+    };
+
+    try{
+        _this.db.query('CALL PGetSkills()',function(err,result){
+            if(err){
+                console.log('Error : FnPGetSkills ');
+                res.status(400).json(responseMsg);
+            }
+            else{
+                responseMsg.status = true;
+                responseMsg.message = 'Skills loaded successfully';
+                responseMsg.error = null;
+                responseMsg.data = result[0];
+
+                res.status(200).json(responseMsg);
+            }
+        });
+    }
+
+    catch(ex){
+        res.status(500).json(responseMsg);
+        console.log('Error : FnPGetSkills '+ ex.description);
+
+    }
+};
+
 
 /**
  * Method : GET
