@@ -5866,17 +5866,30 @@ exports.FnSaveItem = function(req, res){
                 if (!err) {
                     if (Result != null) {
 
+                        var deleteFlag = false;
+
+                        if(parseInt(TID) !== NaN && parseInt(TID)> 0 && parseInt(Status) !== 1){
+                            deleteFlag = true;
+                        }
+
                         var query = db.escape(TID) + ',' + db.escape(Token) + ',' + db.escape(FunctionType) + ',' + db.escape(ItemName)
                             + ',' +db.escape(ItemDescription) + ',' +db.escape(Pic) + ',' +db.escape(Rate) + ',' +db.escape(Status) + ',' +db.escape(ItemDuration);
                         db.query('CALL pSaveItem(' + query + ')', function (err, InsertResult) {
                             if (!err){
                                 if (InsertResult.affectedRows > 0) {
                                     RtnMessage.IsSuccessfull = true;
+                                    console.log(InsertResult);
+                                    if(deleteFlag && InsertResult[0].deleted){
+                                        RtnMessage.deleted = true;
+                                    }
                                     res.send(RtnMessage);
                                     console.log('FnSaveItem: Item details save successfully');
                                 }
                                 else {
                                     console.log('FnSaveItem:No Save Item details');
+                                    if(deleteFlag){
+                                        RtnMessage.deleted = false;
+                                    }
                                     res.send(RtnMessage);
                                 }
                             }
@@ -6370,6 +6383,13 @@ exports.FnSaveStatusType = function(req, res){
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
+
+                        var deleteFlag = false;
+
+                        if(parseInt(TID) !== NaN && parseInt(TID)> 0 && parseInt(Status) !== 1){
+                            deleteFlag = true;
+                        }
+
                         var query = db.escape(Token) + ',' + db.escape(TID) + ',' + db.escape(FunctionType) + ',' + db.escape(StatusTitle)
                             + ',' +db.escape(ProgressPercent) + ',' +db.escape(Status) + ',' +db.escape(NotificationMsg) + ',' +db.escape(NotificationMailMsg) 
                             + ',' + db.escape(StatusValue);
@@ -6377,13 +6397,20 @@ exports.FnSaveStatusType = function(req, res){
                                 if (!err) {
                                     if(result != null){
                                         if(result.affectedRows > 0){
-                                            console.log('FnSaveStatusType: Status type saved successfully');
+                                            console.log(InsertResult);
                                             RtnMessage.IsSuccessfull = true;
+                                            console.log('FnSaveStatusType: Status type saved successfully');
+                                            if(deleteFlag && InsertResult[0].deleted){
+                                                RtnMessage.deleted = true;
+                                            }
                                             res.send(RtnMessage);
                                         }
                                         else
                                         {
                                             console.log('FnSaveStatusType: Status type not saved');
+                                            if(deleteFlag){
+                                                RtnMessage.deleted = false;
+                                            }
                                             res.send(RtnMessage);
                                         }
                                     }
@@ -6452,6 +6479,13 @@ exports.FnSaveActionType = function(req, res){
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
+
+                        var deleteFlag = false;
+
+                        if(parseInt(TID) !== NaN && parseInt(TID)> 0 && parseInt(Status) !== 1){
+                            deleteFlag = true;
+                        }
+
                        var query = db.escape(Token) + ',' + db.escape(TID) + ',' + db.escape(FunctionType) + ',' + db.escape(ActionTitle)
                             + ',' +db.escape(Status);
                         db.query('CALL pSaveActionTypes(' + query + ')', function (err, result) {
@@ -6460,11 +6494,17 @@ exports.FnSaveActionType = function(req, res){
                                         if(result.affectedRows > 0){
                                             console.log('FnSaveActionType: Action types saved successfully');
                                             RtnMessage.IsSuccessfull = true;
+                                            if(deleteFlag && InsertResult[0].deleted){
+                                                RtnMessage.deleted = true;
+                                            }
                                             res.send(RtnMessage);
                                         }
                                         else
                                         {
                                             console.log('FnSaveActionType:  Action types not saved');
+                                            if(deleteFlag){
+                                                RtnMessage.deleted = false;
+                                            }
                                             res.send(RtnMessage);
                                         }
                                     }

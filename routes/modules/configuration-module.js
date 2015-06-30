@@ -341,6 +341,128 @@ Configuration.prototype.getStatusTypes = function(req,res,next){
 };
 
 /**
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ */
+Configuration.prototype.StatusTypes = function(req,res,next){
+    /**
+     * @todo FnStatusType
+     */
+    var _this = this;
+    try {
+
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.query.Token;
+        var FunctionType = req.query.FunctionType;
+        var RtnMessage = {
+            Result: [],
+            Message: ''
+        };
+
+        if (Token != null  && FunctionType != null ) {
+            FnValidateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+                        var StatusAllOpen =
+                        {
+                            TID:'-1',
+                            MasterID:'0',
+                            StatusTitle:'All Open',
+                            ProgressPercent:0,
+                            Status:1,
+                            NotificationMsg:"",
+                            NotificationMailMsg:"",
+                            StatusValue:"11"
+                        };
+                        var StatusAll = {
+                            TID:'-2',
+                            MasterID:'0',
+                            StatusTitle:'All',
+                            ProgressPercent:0,
+                            Status:1,
+                            NotificationMsg:"",
+                            NotificationMailMsg:"",
+                            StatusValue:"12"
+                        };
+
+
+                        var query = _this.db.escape(Token) + ',' + _this.db.escape(FunctionType);
+                        _this.db.query('CALL pGetStatusType(' + query + ')', function (err, StatusResult) {
+
+                            if (!err) {
+                                if (StatusResult != null) {
+                                    if (StatusResult[0].length > 0) {
+                                        StatusResult[0].unshift(StatusAll);
+                                        StatusResult[0].unshift(StatusAllOpen);
+                                        RtnMessage.Result = StatusResult[0];
+                                        RtnMessage.Message = 'Status type details Send successfully';
+                                        console.log('FnStatusType: Status type details Send successfully');
+                                        res.send(RtnMessage);
+
+                                    }
+                                    else {
+
+                                        console.log('FnGetStatusType:No Status type details found');
+                                        RtnMessage.Message ='No Status type details found';
+                                        res.send(RtnMessage);
+                                    }
+                                }
+                                else {
+                                    console.log('FnStatusType:No Status type details found');
+                                    RtnMessage.Message ='No Status type details found';
+                                    res.send(RtnMessage);
+                                }
+                            }
+                            else {
+                                RtnMessage.Message = 'error in getting Status type details';
+                                console.log('FnStatusType: error in getting Status type details' + err);
+                                res.statusCode = 500;
+                                res.send(RtnMessage);
+                            }
+                        });
+                    }
+                    else {
+                        res.statusCode = 401;
+                        RtnMessage.Message = 'Invalid Token';
+                        res.send(RtnMessage);
+                        console.log('FnStatusType: Invalid Token');
+                    }
+                } else {
+
+                    res.statusCode = 500;
+                    RtnMessage.Message = 'Error in validating token';
+                    res.send(RtnMessage);
+                    console.log('FnStatusType: Error in validating token:  ' + err);
+                }
+            });
+        }
+        else {
+            if (Token == null) {
+                console.log('FnStatusType: Token is empty');
+                RtnMessage.Message ='Token is empty';
+            }
+            else if (FunctionType == null) {
+                console.log('FnStatusType: FunctionType is empty');
+                RtnMessage.Message ='FunctionType is empty';
+            }
+
+            res.statusCode=400;
+            res.send(RtnMessage);
+        }
+    }
+    catch (ex) {
+        console.log('FnGetStatusType error:' + ex.description);
+
+    }
+};
+
+
+
+/**
  * Method : POST
  * @param req
  * @param res
@@ -1380,7 +1502,7 @@ Configuration.prototype.saveReservationResource = function(req,res,next){
  */
 Configuration.prototype.updateReservationResource = function(req,res,next){
     /**
-     * @todo FnUpdateReseravtionResource
+     * @todo FnUpdateReservationResource
      */
     var _this = this;
     try{
