@@ -7,7 +7,7 @@
  */
 "use strict";
 
-function User(db){
+function List(db){
     this.db = db;
 };
 
@@ -18,7 +18,7 @@ function User(db){
  * @param res
  * @param next
  */
-User.prototype.saveList = function(req,res,next){
+List.prototype.saveList = function(req,res,next){
     /**
      * @todo FnSaveWhiteBlackList
      */
@@ -109,7 +109,7 @@ User.prototype.saveList = function(req,res,next){
  * @param res
  * @param next
  */
-User.prototype.getList = function(req,res,next){
+List.prototype.getList = function(req,res,next){
     /**
      * @todo FnGetWhiteBlackList
      */
@@ -191,7 +191,7 @@ User.prototype.getList = function(req,res,next){
  * @param res
  * @param next
  */
-User.prototype.deleteList = function(req,res,next){
+List.prototype.deleteList = function(req,res,next){
     /**
      * @todo FnDeleteWhiteBlackList
      */
@@ -278,7 +278,7 @@ User.prototype.deleteList = function(req,res,next){
  * @param res
  * @param next
  */
-User.prototype.getListCount = function(req,res,next){
+List.prototype.getListCount = function(req,res,next){
     /**
      * @todo FnGetWhiteListCount
      */
@@ -373,7 +373,7 @@ User.prototype.getListCount = function(req,res,next){
  * @param res
  * @param next
  */
-User.prototype.getRelation = function(req,res,next){
+List.prototype.getRelation = function(req,res,next){
     /**
      * @todo FnGetRelationType
      */

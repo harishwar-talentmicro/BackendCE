@@ -545,7 +545,7 @@ Search.prototype.searchInformation = function(req,res,next){
  * @param res
  * @param next
  */
-exports.getWorkingHrsHolidayList = function (req, res) {
+Search.prototype.getWorkingHrsHolidayList = function (req, res) {
     /**
      * @todo FnGetWorkingHrsHolidayList
      */
