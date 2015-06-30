@@ -1071,7 +1071,7 @@ var res = angular.module('ezeidApp').
             }
 
             /**
-             *
+             * Function to redirect to desired url
              */
             $scope.redirectUrl = function(url){
                 if(!$rootScope._userInfo.Token || $rootScope._userInfo.Token == 2){
@@ -1084,5 +1084,20 @@ var res = angular.module('ezeidApp').
                 }
                 $location.url(url);
             };
+
+            /**
+             * Get appropriate company name or the user name, depending upon the search type
+             */
+            $scope.getCompanyOrIndividualName = function(companyName,name)
+            {
+                if($routeParams.searchType == 1)//its Ezeone ID
+                {
+                    return name != ''?name:'___';
+                }
+                else
+                {
+                    return companyName != ''?companyName:'___';
+                }
+            }
         }
     ]);
