@@ -38,10 +38,51 @@ angular.module('ezeidApp').controller('ShowMapViewCtrl',[
         });
 
         console.log($routeParams);
+        getStaticMap();
+
+        function getStaticMap()
+        {
+
+           /* document.getElementById('my-image-id').src = "http://maps.google.com/staticmap?center=37.687,-122.407&zoom=8&size=450x300&maptype=terrain&key=&sensor=false";*/
+
+            document.getElementById('my-image-id').src = "https://maps.googleapis.com/maps/api/staticmap?zoom=6&size=400x400&markers=color:blue%7Clabel:S%"+lat+","+lng+"&markers=size:tiny%7Ccolor:green%7C"+ $routeParams.endLat +", " + $routeParams.endLong +"&markers=size:mid%7Ccolor:0xFFFF00%7Clabel:C%7CTok,AK%22";
+
+            return;
+
+
+           $http({
+                url: 'https://maps.googleapis.com/maps/api/staticmap',
+                method: "GET",
+                params: {
+                    zoom: 6,
+                    size: "400x400",
+                    markers: "color:blue%7Clabel:S%7C62.107723,-145.541056",
+                    markers: "color:green%7C62.107731,-145.541930",
+                    markers: "color:0xFFFF00%7Clabel:C%7CTok,AK"
+                }
+            }).success(function (resp) {
+                    console.log("SAi2");
+                    console.log(resp);
+                    if(resp)
+                    {
+                        $scope.mapImage = resp;
+                      //  $('#googlemapbinary').attr('src', resp);
+
+                       // document.getElementById('googlemapbinary').src = resp;
+
+                        document.getElementById('my-image-id').src = resp;
+                    }
+                   // $scope.$emit('$preLoaderStop');
+
+                }).error(function (err) {
+                    $scope.$emit('$preLoaderStop');
+                });
+        }
+
 
 
     //  EMail direction image
-    viewDirection.emailDirectionImage = function ()
+    /*viewDirection.emailDirectionImage = function ()
     {
         //Below line is for Loading img
         $scope.$emit('$preLoaderStart');
@@ -62,7 +103,7 @@ angular.module('ezeidApp').controller('ShowMapViewCtrl',[
                 $window.localStorage.removeItem("searchResult");
             }
     });
-    };
+    };*/
 
 
 }]);

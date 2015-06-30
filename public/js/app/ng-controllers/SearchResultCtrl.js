@@ -800,6 +800,7 @@ var res = angular.module('ezeidApp').
             $scope.showDirectionMapPopup = function(Latitude,Longitude,IDTypeID){
 
 
+
                 $scope.activeTemplate = "html/mapPopView1.html";
                 $scope.showMapPopupModel = true;
 
@@ -812,6 +813,9 @@ var res = angular.module('ezeidApp').
                 $window.localStorage.setItem("myLocation", JSON.stringify(userLoc));
 
 
+
+               // var params = '?endLat='+Latitude+'&endLong='+Longitude+'&IDTypeID='+IDTypeID;
+               // $location.url('/showmapview'+params);
 
             };
 
