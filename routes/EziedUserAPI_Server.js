@@ -2096,8 +2096,6 @@ exports.FnRegistration = function (req, res) {
     }
 };
 
-
-
 //method for adding secondary locations
 exports.FnAddLocation = function (req, res) {
     try {
@@ -2243,7 +2241,6 @@ exports.FnAddLocation = function (req, res) {
         //throw new Error(ex);
     }
 };
-
 
 //method for delete location
 exports.FnDeleteLocation = function (req, res) {
@@ -3093,7 +3090,6 @@ exports.FnSaveCVInfo = function (req, res) {
         //throw new Error(ex);
     }
 };
-
 
 exports.FnGetCVInfo = function (req, res) {
     try {
@@ -4519,7 +4515,7 @@ exports.FnGetSearchInformationNew = function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
-        var Token = req.query.Token;
+        var Token = req.query.Token ? req.query.Token : '';
         var ezeTerm = req.query.ezeTerm;
         var CurrentDate = req.query.CurrentDate;
         var IPAddress = req._remoteAddress; //(req.headers['x-forwarded-for'] || req.connection.remoteAddress)
@@ -4532,7 +4528,7 @@ exports.FnGetSearchInformationNew = function (req, res) {
              var WorkingDate = moment(new Date()).format('YYYY-MM-DD HH:MM');
         //console.log(WorkingDate);
 
-        if (Token) {
+        if (ezeTerm) {
             var LocSeqNo = 0;
             var EZEID, Pin = null;
             var FindArray = ezeTerm.split('.');
@@ -4583,14 +4579,9 @@ console.log('CALL pSearchInformationNew(' + SearchParameter + ')');
         }
 
             else {
-                if (Token = null) {
-                    console.log('FnGetSearchInformationNew: Token is empty');
+                if (ezeTerm = null) {
+                    console.log('FnGetSearchInformationNew: ezeTerm is empty');
                 }
-
-                else if (CurrentDate == null) {
-                    console.log('FnGetSearchInformationNew: CurrentDate is empty');
-                }
-                
                 res.statusCode = 400;
                 res.json(null);
             }
@@ -12037,7 +12028,6 @@ exports.FnPGetSkills = function(req,res){
         throw new Error('Error in FnPGetSkills');
     }
 };
-
 
 exports.FnChangeReservationStatus = function(req,res){
 

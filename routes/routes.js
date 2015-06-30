@@ -87,6 +87,11 @@ var Image = require('./image-module.js');
 var imageModule = new Image(db);
 exports.FnCropImage = imageModule.cropImage;
 
+var List = require('./list-module.js');
+var listModule = new List(db);
+exports.FnSaveWhiteBlackList = listModule.searchKeyword;
+exports.FnGetWhiteBlackList = listModule.searchInformation;
+
 
 
 function error(err, req, res, next) {
