@@ -22,8 +22,8 @@
                                         {{(masterUser.IDTypeID == 1) ? masterUser.FirstName + ' '+ masterUser.LastName : masterUser.CompanyName}}
                                         ({{masterUser.EZEID}})
                                     </h4>
-                                    <h4 ng-show="_userInfo.SalesFormMsg" class="font-roboto text-left text-success no-margin no-padding front-business-form warning-text">
-                                        <small class="tiny"><i>* {{_userInfo.SalesFormMsg}}</i></small>
+                                    <h4 ng-show="masterUser.SalesFormMsg" class="font-roboto text-left text-success no-margin no-padding front-business-form warning-text">
+                                        <small class="tiny"><i>* {{masterUser.SalesFormMsg}}</i></small>
                                     </h4>
 
                                 </div>
@@ -193,10 +193,12 @@
                                             <div class="input-group input-group-sm no-radius has-error">
                                                 <span class="input-group-addon">EZEOne ID</span>
                                                 <input type="text" class="form-control" maxlength="20" ng-model="ezeoneAddressId"
-                                                       ng-model-options="{updateOn : 'blur',debounce : { 'blur' : 0} }"
                                                        name="ezeoneAddressId"
                                                        id="ezeoneAddressId"
                                                        placeholder="EZEOne ID"/>
+                                                <span class="input-group-btn">
+                                                    <button class="btn btn-success">Go</button>
+                                                </span>
                                             </div>
                                         </div>
 
@@ -228,7 +230,7 @@
                                     <div class="row bottom-clearfix">
 
                                         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                                            <button class="btn btn-success-bright btn-sm no-radius btn-wide" ng-click="saveTransaction()">
+                                            <button ng-disabled="(!modalBox.tx.DeliveryAddress)" class="btn btn-success-bright btn-sm no-radius btn-wide" ng-click="saveTransaction()">
                                                 <span class="glyphicon glyphicon-hand-right"></span>
                                                 Submit
                                             </button>

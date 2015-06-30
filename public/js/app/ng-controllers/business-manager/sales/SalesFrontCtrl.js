@@ -162,7 +162,7 @@
 
             /**
              * Modal Box data model
-             * @type {{title: string, class: string, editMode: boolean, locationList: Array, tx: {orderAmount: number, trnNo: string, ezeidTid: number, TID: number, functionType: number, ezeid: string, statusType: number, notes: string, locId: string, country: string, state: string, city: string, area: string, contactInfo: string, deliveryAddress: string, nextAction: number, nextActionDateTime: string, taskDateTime: string, folderRule: number, message: string, messageType: *, latitude: number, longitude: number, duration: number, durationScale: number, itemList: Array}}}
+             * @type {{title: string, class: string, editMode: boolean, locationList: Array, tx: {orderAmount: number, trnNo: string, ezeidTid: number, TID: number, functionType: number, ezeid: string, statusType: number, notes: string, locId: string, country: string, state: string, city: string, area: string, contactInfo: string, DeliveryAddress: string, nextAction: number, nextActionDateTime: string, taskDateTime: string, folderRule: number, message: string, messageType: *, latitude: number, longitude: number, duration: number, durationScale: number, itemList: Array}}}
              */
             $scope.modalBox = {
                 title : 'Transaction Details',
@@ -185,7 +185,7 @@
                     city : '',
                     area : '',
                     contactInfo : '',
-                    deliveryAddress : '',
+                    DeliveryAddress : '',
                     nextAction : 0,
                     nextActionDateTime : '',
                     taskDateTime : '',
@@ -379,7 +379,7 @@
                         city : '',
                         area : '',
                         contactInfo : '',
-                        deliveryAddress : '',
+                        DeliveryAddress : '',
                         nextAction : 0,
                         nextActionDateTime : '',
                         taskDateTime : '',
@@ -465,7 +465,6 @@
                 }).success(function (resp) {
 
                     /**
-                     * @todo
                      * Check whether sales module visibility is enabled or
                      * not for the ezeid to which sales enquiry is posted
                      */
@@ -780,6 +779,10 @@
             var checkLoaded = function(){
                 if(masterUserLoaded && loggedInUserLoaded && masterUserItemsLoaded){
                     $scope.$emit('$preLoaderStop');
+                    return true;
+                }
+                else{
+                    return false;
                 }
             };
 
@@ -790,11 +793,12 @@
                     masterUserLoaded = true;
                     checkLoaded();
                 },function(noInternet){
-                    masterUserLoaded = true;
+                    masterUserLoaded = false;
                     if(!noInternet){
                         Notification.error({ message : 'An error occurred ! Please try again', delay : MsgDelay});
                     }
                     checkLoaded();
+                    $location.url('/'+$routeParams.ezeone);
 
                 });
 
@@ -811,14 +815,6 @@
 
                 $scope.getLoggedInUserDetails().then(function(){
                     loggedInUserLoaded = true;
-                    //$scope.getLocationList().then(function(){
-                    //    loggedInUserLocationsLoaded = true;
-                    //    checkLoaded();
-                    //},function(){
-                    //    loggedInUserLocationsLoaded = true;
-                    //    Notification.error({ message : 'An error occurred ! Please try again', delay : MsgDelay});
-                    //    checkLoaded();
-                    //});
                     checkLoaded();
                 },function(){
                     loggedInUserLoaded = true;
@@ -845,11 +841,10 @@
              * @type {string}
              */
             $scope.ezeoneAddressId = '';
-
+            var timeoutPromise = null;
             $scope.$watch('ezeoneAddressId',function(n,v){
                 if(n && n !== v){
-                    console.log(angular.element('#ezeoneAddressId'));
-                    console.log(angular.element('#ezeoneAddressId').parent('.input-group'));
+                    $timeout.cancel(timeoutPromise);
                     angular.element('#ezeoneAddressId').parent('.input-group').removeClass('has-success').addClass('has-error');
                     $scope.modalBox.tx.address = '';
                     $scope.modalBox.tx.area = '';
@@ -860,8 +855,10 @@
                     $scope.modalBox.tx.latitude = 0;
                     $scope.modalBox.tx.longitude = 0;
                     $scope.modalBox.tx.DeliveryAddress = '';
+                    timeoutPromise = $timeout(function(){
+                        $scope.getEzeidLocationDetails($scope.ezeoneAddressId);
+                    },1000);
 
-                    $scope.getEzeidLocationDetails(n);
                 }
                 else if(!n){
                     angular.element('#ezeoneAddressId').parent('.input-group').removeClass('has-success').addClass('has-error');
@@ -876,6 +873,16 @@
                     $scope.modalBox.tx.DeliveryAddress ='';
                 }
             });
+
+
+            /**
+             * After watcher code is executed and binded
+             * We are binding the current logged in user ezeid to ezeoneAddressId so that his current address can be fetched
+             */
+            $timeout(function(){
+                $scope.ezeoneAddressId = $rootScope._userInfo.ezeid;
+            },500);
+
 
 
             /**
@@ -894,8 +901,9 @@
                         token : $rootScope._userInfo.Token
                     }
                 }).success(function(resp){
-                    $scope.$emit('$preLoaderStop');
-                    console.log(resp);
+                    if(checkLoaded()){
+                        $scope.$emit('$preLoaderStop');
+                    }
                     if(resp && resp.status){
                         angular.element('#ezeoneAddressId').parent('.input-group').removeClass('has-error').addClass('has-success');
                         $scope.modalBox.tx.address = resp.data.AddressLine1;
@@ -915,7 +923,10 @@
 
                     defer.resolve(resp);
                 }).error(function(err,statusCode){
-                    $scope.$emit('$preLoaderStop');
+                    if(checkLoaded()){
+                        $scope.$emit('$preLoaderStop');
+                    }
+
                     var msg = 'An error occurred ! Please try again';
                     if(!statusCode){
                         msg = 'Unable to reach the server ! Please check your connection';

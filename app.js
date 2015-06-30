@@ -259,13 +259,6 @@ app.get('/:page/:subpage',function(req,res){
     res.sendFile(__dirname + '/public/html/index.html');
 });
 
-
-
-
-/**
- * When user is not logged in then also let him navigate to searchInformation page of front end
- */
-app.get('/:ezeid',LocationManager.FnSearchBusListing);
 /**
  * Used for WebLinks
  * eg. http://www.ezeid.com/TALENTMICRO.U12
