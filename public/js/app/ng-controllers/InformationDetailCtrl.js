@@ -104,7 +104,16 @@ angular.module('ezeidApp').
                 class : 'business-manager-modal'
             };
 
-            var TID =  $routeParams.TID;
+            var TID = $routeParams.TID;
+
+            console.log("SAi1");
+            console.log($routeParams);
+            console.log($routeParams.ezeone);
+
+
+
+
+
             $scope.SearchType = $routeParams.searchType;
 
             if(($scope.SearchType == 1) && (!$rootScope._userInfo.IsAuthenticate))
@@ -182,10 +191,14 @@ angular.module('ezeidApp').
                     $rootScope._userInfo.Token = 2;
                     $scope.Token = 2;
                 }
-                $http({ method: 'get',
+             /*   $http({ method: 'get',
                     url: GURL + 'ewtGetSearchInformation?Token=' + $rootScope._userInfo.Token + '&TID=' + _TID + '&SearchType=' + _SearchType + '&CurrentDate=' + CurrentDate}).success(function (data) {
+*/
 
-                        $rootScope.$broadcast('$preLoaderStop');
+                $http({ method: 'get',
+                    url: GURL + 'ewtGetSearchInformation?Token=' + $rootScope._userInfo.Token + '&ezeTerm =' + _TID + '&CurrentDate=' + CurrentDate}).success(function (data) {
+
+                                $rootScope.$broadcast('$preLoaderStop');
                         if (data && data != 'null')
                         {
                             $timeout(function () {
@@ -316,7 +329,9 @@ angular.module('ezeidApp').
             {
                 $http({ method: 'get', url: GURL + 'ewtGetBannerPicture?SeqNo='+_requestedBannerValue+'&Ezeid='+$scope.SearchInfo.EZEID+'&StateTitle='+ $scope.SearchInfo.StateTitle+'&LocID='+$scope.SearchInfo.LocID}).success(function (data) {
 
-                    if (data.Picture != 'null') {
+                   /* if (data.Picture != 'null') {*/
+                    if(data)
+                    {
                         $scope.SearchInfo.BannerImage = data.Picture;
                         if(currentBanner >= $scope.SearchInfo.Banners)
                         {
