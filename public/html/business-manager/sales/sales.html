@@ -769,7 +769,7 @@
 
                         </div>
 
-                      <div class="col-lg-8 col-md-8 col-sm-6 col-xs-12">
+                      <div class="col-lg-8 col-md-8 col-sm-6 col-xs-12 tx-item-list-box">
                           <div class="row">
                               <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                   <h4 class="text-center font-roboto text-success">Selected Items </h4>
@@ -792,14 +792,13 @@
 
                           </div>
                           <div class="row">
-                              <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-show="modalBox.tx.itemList.length > 0 && _userInfo.SalesItemListType > 2">
-                                  <div id="cart-info" class="alert alert-info no-radius">
-                                      <i class="fa fa-shopping-cart"></i> {{modalBox.tx.itemList.length}} items are selected
-                                      <small
-                                              ng-show="modalBox.tx.itemList.length && _userInfo.SalesItemListType > 3"
-                                              class="text-success pull-right">{{calculateAmount()}}</small>
-                                  </div>
-
+                              <div class="col-md-12 col-sm-12 col-xs-12 front-business-form cart-details" ng-show="modalBox.tx.itemList && modalBox.tx.itemList.length > 0">
+                                  <b><i class="fa fa-shopping-cart"></i> {{cartItemString}}
+                                                <span class="pull-right"
+                                                      ng-show="salesItemListType > 3">
+                                                    {{cartAmount}}
+                                                </span>
+                                  </b>
                               </div>
                           </div>
 
@@ -817,14 +816,14 @@
                           <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                           <button class="btn btn-info btn-sm no-radius" ng-hide="modalBox.editMode" ng-click="saveTransaction()">
                               <span class="glyphicon glyphicon-hand-right"></span>
-                              Proceed to Enquire
+                              Submit
                           </button>
                           <button ng-click="saveTransaction()"
                                   class="btn btn-success btn-sm no-radius" ng-show="modalBox.editMode"
                                   title="(salesPermissionConf.txUpdate) ? 'Update sales enquiry' : 'You do not have editing permission'"
                                   ng-disabled="(!salesPermissionConf.txUpdate)">
                               <span class="glyphicon glyphicon-ok-circle"></span>
-                              Update Enquiry
+                              Update
                           </button>
                           <button class="btn btn-danger btn-sm no-radius" ng-click="toggleModalBox()">
                               <span class="glyphicon glyphicon-remove"></span>

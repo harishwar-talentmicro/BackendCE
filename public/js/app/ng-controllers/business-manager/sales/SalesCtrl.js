@@ -571,6 +571,8 @@
 
 
             $scope.$watch('showModal',function(newVal,oldVal){
+                $scope.cartAmount = 0.00;
+                $scope.cartString = '';
                 if(!newVal){
                     $scope.resetModalBox();
                 }
@@ -614,6 +616,9 @@
                         companyId : 0
                     }
                 };
+
+                $scope.cartAmount = 0.00;
+                $scope.cartString = '';
             };
 
             /**
@@ -1562,21 +1567,56 @@
             },60000);
 
 
-            $scope.cartData = {
-                items : 0,
-                amount : 0.00
-            };
+            $scope.cartAmount = 0.00;
+            $scope.cartString = '';
 
-
-            function _cartCalculateAmount(itemList){
-                for(var i = 0; i < itemList.length; i++){
-
+            function calculateCartDetails (){
+                if(!$scope.showModal){
+                    return;
                 }
+                var amount = 0.00;
+                var qty = 0;
+                for(var ct = 0; ct < $scope.modalBox.tx.itemList.length; ct++){
+                    if($scope.modalBox.tx.itemList[ct]['Qty'] &&
+                        (parseInt($rootScope._userInfo.SalesItemListType) == 3 || parseInt($rootScope._userInfo.SalesItemListType) == 4)){
+                        var ab  = parseInt($scope.modalBox.tx.itemList[ct]['Qty']);
+                        if(ab !== NaN){
+                            qty += ab;
+                        }
+                        else{
+                            qty += 1;
+                        }
+                    }
+                    else{
+                        qty += 1;
+                    }
+                    if($scope.modalBox.tx.itemList[ct]['Amount'] && parseInt($rootScope._userInfo.SalesItemListType) == 4){
+                        var am = 0.00;
+                        var qt = 1;
+                        var rt = parseFloat($scope.modalBox.tx.itemList[ct]['Rate']);
+                        if(rt !== NaN){
+                            qt = parseInt($scope.modalBox.tx.itemList[ct]['Qty']);
+                        }
+                        am = parseFloat(rt*qt);
+                        amount += am;
+                    }
+                }
+
+                var cartString = 'No items selected';
+                if(qty == 1){
+                    cartString = '1 item selected';
+                }
+                if(qty > 1){
+                    cartString = qty.toString() + ' items selected';
+                }
+
+                $scope.cartAmount = amount.toFixed(2);
+                $scope.cartItemString = cartString;
             };
 
-            function _cartCalculateItems(itemList){
-
-            }
+            $interval(function(){
+                calculateCartDetails();
+            },700);
 
         }]);
 
