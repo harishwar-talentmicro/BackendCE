@@ -272,8 +272,8 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope',
      */
     $scope.toggleRule = function(event,type){
         var elem = $(event.currentTarget);
-        var ruleTid = elem.data('tid');
-        if(!elem[0].checked)
+        var ruleTid = elem.data('tid').toString();
+        if(!elem.is(':checked'))
         {
             // Will remove from the array list here
             switch(type){
@@ -319,6 +319,7 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope',
             }
 
         }
+        console.log($scope.modalBox.subuser.rules.sales);
     };
 
 

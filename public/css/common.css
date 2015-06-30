@@ -1290,29 +1290,35 @@ span.smallCloselink {
 
 .modal-dialog.modal-lg.business-manager-modal .business-manager-item,
 .business-manager-item{
-    background-color: #0078B6;
+    background-color: #FFFFFF;
     padding: 5px;
     margin: 5px 0px 5px 0px;
     padding-bottom: 0px;
     box-shadow: 0px 0px 15px #DDD;
 }
 
+.modal-dialog.modal-lg.business-manager-modal.business-manager-item.blue,
+.business-manager-item.blue{
+    background-color: #0078B6!important;
+}
+
+
 .modal-dialog.modal-lg.business-manager-modal.business-manager-item.purple,
 .business-manager-item.purple{
-    background-color: #1ABA00;
+    background-color: #1ABA00!important;
 }
 
 .modal-dialog.modal-lg.business-manager-modal.business-manager-item.orange,
 .business-manager-item.orange{
-    background-color: #E45600;
+    background-color: #E45600!important;
 }
 
 
-.modal-dialog.modal-lg.business-manager-modal.business-manager-item.selected,
-.business-manager-item.selected {
+.modal-dialog.modal-lg.business-manager-modal.business-manager-item .selected,
+.business-manager-item .selected {
     border: 1px solid #817B7B;
     box-shadow: none;
-    background: #FFFFFF;
+    background-color: #FFFFFF;
     padding: 5px;
     margin: 5px 0px 5px 0px;
 }

@@ -36,7 +36,7 @@
 
             element.html(getTemplate(templateType)).show();
             var itemIndex = parseInt(scope.itemIndex);
-            var elemClass = '';
+            var elemClass = 'blue';
             var btnClass = 'btn-orange';
             if(itemIndex%3 == 1){
                 elemClass = 'purple';
