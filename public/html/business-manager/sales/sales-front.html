@@ -38,13 +38,21 @@
                                                     <h5 class="text-left font-roboto text-warning no-border front-business-form unselected-item-text">Select Items</h5>
 
                                                 </div>
+                                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
+                                                    <div class="input-group form-group-sm">
+                                                        <span class="input-group-addon">
+                                                            <i class="fa fa-search"></i>
+                                                        </span>
+                                                        <input type="text" placeholder="Enter item name" class="form-control" ng-model="busItemSearch" />
+                                                    </div>
+                                                </div>
                                             </div>
 
                                             <div class="row" id="bus-item-list-container">
 
                                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                                     <bussiness-item
-                                                            ng-repeat="item in moduleItems track by item.TID"
+                                                            ng-repeat="item in moduleItems | filter:busItemSearch track by item.TID"
                                                             item="item" item-index="$index" item-list-type="salesItemListType"
                                                             add-item="addItem(item)" edit-permission="editPermission" edit-mode="editMode">
                                                     </bussiness-item>
