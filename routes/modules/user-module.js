@@ -1090,6 +1090,118 @@ User.prototype.changePassword = function(req,res,next){
     }
 };
 
+/**
+ * Method : POST
+ * @param req
+ * @param res
+ * @param next
+ */
+User.prototype.forgetPassword = function(req,res,next){
+    /**
+     * @todo FnForgetPassword
+     */
+    var _this = this;
+    try {
+
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        var EZEID = req.body.EZEID;
+        var RtnMessage = {
+            IsChanged: false
+        };
+        var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
+        if (EZEID != null) {
+            var Password = FnRandomPassword();
+            // console.log(Password);
+            var EncryptPWD = FnEncryptPassword(Password);
+            // console.log(EncryptPWD);
+            var Query = 'Update tmaster set Password= ' + _this.db.escape(EncryptPWD) + ' where EZEID=' + _this.db.escape(EZEID);
+            // console.log('FnForgotPassword: ' + Query);
+            _this.db..query(Query, function (err, ForgetPasswordResult) {
+                if (!err) {
+                    //console.log(InsertResult);
+                    if (ForgetPasswordResult != null) {
+                        if (ForgetPasswordResult.affectedRows > 0) {
+                            RtnMessage.IsChanged = true;
+                            var UserQuery = 'Select a.TID, ifnull(a.FirstName,"") as FirstName,ifnull(a.LastName,"") as LastName,a.Password,ifnull(b.EMailID,"") as EMailID from tmaster a,tlocations b where b.SeqNo=0 and b.EZEID=a.EZEID and a.EZEID=' + _this.db.escape(EZEID);
+                            //  console.log(UserQuery);
+                            _this.db..query(UserQuery, function (err, UserResult) {
+                                if (!err) {
+                                    //  console.log(UserResult);
+
+                                    var fs = require('fs');
+                                    fs.readFile("ForgetPasswordTemplate.txt", "utf8", function (err, data) {
+                                        if (err) throw err;
+                                        data = data.replace("[Firstname]", UserResult[0].FirstName);
+                                        data = data.replace("[Lastname]", UserResult[0].LastName);
+                                        data = data.replace("[Password]", Password);
+
+                                        console.log(UserResult);
+                                        //console.log('Body:' + data);
+                                        var mailOptions = {
+                                            from: EZEIDEmail,
+                                            to: UserResult[0].EMailID,
+                                            subject: 'Password reset request',
+                                            html: data // html body
+                                        };
+
+                                        // send mail with defined transport object
+                                        //message Type 7 - Forgot password mails service
+                                        var post = { MessageType: 7, Priority: 2, ToMailID: mailOptions.to, Subject: mailOptions.subject, Body: mailOptions.html,SentbyMasterID: UserResult[0].TID};
+                                        console.log(post);
+                                        var query = _this.db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
+                                            // Neat!
+                                            if (!err) {
+                                                console.log('FnRegistration: Mail saved Successfully');
+                                                res.send(RtnMessage);
+                                            }
+                                            else {
+                                                console.log('FnRegistration: Mail not Saved Successfully' + err);
+                                                res.send(RtnMessage);
+                                            }
+                                        });
+                                    });
+
+                                    console.log('FnForgetPassword:tmaster: Password reset successfully');
+                                }
+                                else {
+                                    res.statusCode = 500;
+                                    res.send(RtnMessage);
+                                    console.log('FnForgetPassword: Email sending Fails: ' + err);
+                                }
+                            });
+
+                        }
+                        else {
+                            res.send(RtnMessage);
+                            console.log('FnForgetPassword:tmaster: Password reset  Failed');
+                        }
+
+                    }
+                    else {
+                        res.send(RtnMessage);
+                        console.log('FnForgetPassword:tmaster: Password reset Failed');
+                    }
+                }
+                else {
+                    res.statusCode = 500;
+                    res.send(RtnMessage);
+                    console.log('FnForgetPassword:tmaster:' + err);
+                }
+            });
+
+        }
+        else {
+            console.log('FnForgetPassword: EZEID is empty')
+            res.statusCode = 400;
+            res.send(RtnMessage);
+        }
+    }
+    catch (ex) {
+        console.log('FnForgetPassword error:' + ex.description);
+    }
+};
+
 
 /**
  * Method : GET

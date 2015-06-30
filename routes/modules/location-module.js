@@ -241,6 +241,81 @@ Location.prototype.save = function(req,res,next){
 };
 
 /**
+ * Method : POST
+ * @param req
+ * @param res
+ * @param next
+ */
+Location.prototype.deleteLocation = function(req,res,next) {
+    /**
+     * @todo FnDeleteLocation
+     */
+    var _this = this;
+    try {
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        var token = req.body.Token;
+        var TID = parseInt(req.body.TID);
+        var RtnMessage = {
+            IsDeleted: false
+        };
+        var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
+        if (token != null && token != '' && TID.toString() != 'NaN') {
+            FnValidateToken(token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+                        var query = 'DELETE FROM tlocations where TID=' + _this.db.escape(TID);
+                        //  console.log('FnDeleteLocation: DeleteQuery : ' + query);
+                        _this.db.query(query, function (err, DeleteResult) {
+                            if (!err) {
+                                console.log('DeleteQuery: ' + DeleteResult);
+                                if (DeleteResult.affectedRows > 0) {
+                                    RtnMessage.IsDeleted = true;
+                                    res.send(RtnMessage);
+                                }
+                                else {
+                                    console.log('FnDeleteLocation: deleting item is not avaiable');
+                                    res.send(RtnMessage);
+                                }
+                            }
+                            else {
+                                console.log('FnDeleteLocation: ' + err);
+                                res.send(RtnMessage);
+                            }
+                        });
+                    }
+                    else {
+                        console.log('FnDeleteLocation: Invalid token');
+                        res.statusCode = 401;
+                        res.send(RtnMessage);
+                    }
+                }
+                else {
+                    console.log('FnDeleteLocation: ' + err);
+                    res.statusCode = 500;
+                    res.send(RtnMessage);
+                }
+            });
+        }
+        else {
+            if (token == null || token == '') {
+                console.log('FnDeleteLocation: token is empty');
+            }
+            if (TID.toString() == 'NaN') {
+                console.log('FnDeleteLocation: TID is empty');
+            }
+            res.statusCode = 400;
+            res.send(RtnMessage);
+        }
+    }
+    catch (ex) {
+        console.log('FnDeleteLocation error:' + ex.description);
+    }
+};
+
+
+
+/**
  * Method : GET
  * @param req
  * @param res
