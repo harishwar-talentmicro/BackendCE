@@ -197,6 +197,9 @@
                                                        name="ezeoneAddressId"
                                                        id="ezeoneAddressId"
                                                        placeholder="EZEOne ID"/>
+                                                <span class="input-group-btn">
+                                                    <button class="btn btn-success">Go</button>
+                                                </span>
                                             </div>
                                         </div>
 
@@ -228,7 +231,7 @@
                                     <div class="row bottom-clearfix">
 
                                         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                                            <button class="btn btn-success-bright btn-sm no-radius btn-wide" ng-click="saveTransaction()">
+                                            <button ng-disabled="(!modalBox.tx.DeliveryAddress)" class="btn btn-success-bright btn-sm no-radius btn-wide" ng-click="saveTransaction()">
                                                 <span class="glyphicon glyphicon-hand-right"></span>
                                                 Submit
                                             </button>
