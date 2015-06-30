@@ -1294,23 +1294,26 @@ span.smallCloselink {
     padding: 5px;
     margin: 5px 0px 5px 0px;
     padding-bottom: 0px;
-    box-shadow: 0px 0px 15px #DDD;
+    border: 1px solid #6F6F6F;
 }
 
 .modal-dialog.modal-lg.business-manager-modal.business-manager-item.blue,
 .business-manager-item.blue{
     background-color: #0078B6!important;
+    border:none;
 }
 
 
 .modal-dialog.modal-lg.business-manager-modal.business-manager-item.purple,
 .business-manager-item.purple{
     background-color: #1ABA00!important;
+    border:none;
 }
 
 .modal-dialog.modal-lg.business-manager-modal.business-manager-item.orange,
 .business-manager-item.orange{
     background-color: #E45600!important;
+    border:none;
 }
 
 
@@ -2705,10 +2708,11 @@ h4.front-business-form.warning-text{
 }
 
 .front-business-form.cart-details{
-    margin-left: -1.5%;
+    margin-left: 0%;
     padding: 5px;
     border: 1px solid #B3B3B3;
     border-top: none;
+    padding-bottom: 13px;
 }
 
 /*label{*/
