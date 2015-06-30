@@ -5859,27 +5859,28 @@ exports.FnSaveItem = function(req, res){
 
                         var deleteFlag = false;
 
-                        if(parseInt(TID) !== NaN && parseInt(TID)> 0 && parseInt(Status) !== 1){
+                        if(parseInt(TID) != NaN && parseInt(TID)> 0 && parseInt(Status) != 1){
                             deleteFlag = true;
                         }
 
                         var query = db.escape(TID) + ',' + db.escape(Token) + ',' + db.escape(FunctionType) + ',' + db.escape(ItemName)
                             + ',' +db.escape(ItemDescription) + ',' +db.escape(Pic) + ',' +db.escape(Rate) + ',' +db.escape(Status) + ',' +db.escape(ItemDuration);
+                        console.log('CALL pSaveItem(' + db.escape(TID) + ',' + db.escape(Token) + ',' + db.escape(FunctionType) + ',' + db.escape(ItemName)
+                            + ',' +db.escape(ItemDescription) + ',' +db.escape(Rate) + ',' +db.escape(Status) + ',' +db.escape(ItemDuration) + ')');
                         db.query('CALL pSaveItem(' + query + ')', function (err, InsertResult) {
+                            console.log(InsertResult);
                             if (!err){
                                 if (InsertResult.affectedRows > 0) {
                                     RtnMessage.IsSuccessfull = true;
-                                    console.log(InsertResult);
-                                    if(deleteFlag && InsertResult[0].deleted){
-                                        RtnMessage.deleted = true;
-                                    }
                                     res.send(RtnMessage);
                                     console.log('FnSaveItem: Item details save successfully');
                                 }
                                 else {
+
+                                    RtnMessage.IsSuccessfull = true;
                                     console.log('FnSaveItem:No Save Item details');
-                                    if(deleteFlag){
-                                        RtnMessage.deleted = false;
+                                    if(deleteFlag && InsertResult[0][0].deleted){
+                                        RtnMessage.deleted = true;
                                     }
                                     res.send(RtnMessage);
                                 }
@@ -12280,6 +12281,7 @@ exports.FnGetOutboxMessages = function (req, res) {
         var Token = req.query.Token;
         var pagesize = req.query.pagesize;
         var pagecount = req.query.pagecount;
+        var functiontype = req.query.functiontype;
         
         var responseMessage = {
             status: false,
@@ -12292,7 +12294,7 @@ exports.FnGetOutboxMessages = function (req, res) {
             FnValidateToken(Token, function (err, result) {
                 if (!err) {
                     if (result != null) {
-                        db.query('CALL pGetOutboxMessages(' + db.escape(Token) + ',' + db.escape(pagesize) + ',' + db.escape(pagecount)+ ')', function (err, GetResult) {
+                        db.query('CALL pGetOutboxMessages(' + db.escape(Token) + ',' + db.escape(pagesize) + ',' + db.escape(pagecount)+ ',' + db.escape(functiontype)+')', function (err, GetResult) {
                             if (!err) {
                                 if (GetResult) {
                                     if (GetResult[0].length > 0) {

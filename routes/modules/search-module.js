@@ -538,4 +538,268 @@ Search.prototype.searchInformation = function(req,res,next){
 
 };
 
+
+/**
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ */
+exports.getWorkingHrsHolidayList = function (req, res) {
+    /**
+     * @todo FnGetWorkingHrsHolidayList
+     */
+    var _this = this;
+    try {
+
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.query.Token;
+        var LocID = req.query.LocID;
+        var RtnMessage = {
+            WorkingHours: '',
+            HolidayList:'',
+            Result: false
+        };
+
+        var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
+        if(LocID == null)
+            LocID = 0;
+        if (Token != null && LocID != null) {
+            FnValidateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+                        var async = require('async');
+                        async.parallel([ function FnWorkingHours(CallBack) {
+                            try {
+
+                                var query = _this.db.escape(Token) + ',' + _this.db.escape(LocID);
+                                _this.db.query('CALL pGetWorkingHours(' + query + ')', function (err, WorkingResult) {
+                                    console.log('CALL pGetWorkingHours(' + query + ')');
+
+                                    if (!err) {
+
+                                        if(WorkingResult != null)
+                                        {
+                                            if(WorkingResult[0].length > 0 )
+                                            {
+                                                console.log('FnWorkingHours: Working Hours are available');
+                                                RtnMessage.WorkingHours = WorkingResult[0];
+                                                RtnMessage.Result = true;
+                                                CallBack();
+                                            }
+                                            else
+                                            {
+                                                console.log('Fnworkinghours: no working hours avaiable');
+                                                RtnMessage.Result = true;
+                                                CallBack();
+                                            }
+                                        }
+                                        else{
+                                            console.log('Fnworkinghours: no working hours avaiable');
+                                            RtnMessage.Result = true;
+                                            CallBack();
+                                        }
+                                    }
+                                    else {
+                                        console.log('FnWorkingHours: sending workinghours error ' + error);
+                                        CallBack();
+                                    }
+                                });
+                            }
+                            catch (ex) {
+                                console.log('FnWorkingHours error:' + ex.description);
+                                //throw new Error(ex);
+                                return 'error'
+                            }
+                        } ,function FnHolidayList(CallBack) {
+                            try {
+                                var query = _this.db.escape(LocID) + ',' + _this.db.escape(0);
+                                _this.db.query('CALL pGetHolidayList(' + query + ')', function (err, HolidayResult) {
+                                    console.log('CALL pGetHolidayList(' + query + ')');
+
+                                    if (!err) {
+                                        if(HolidayResult != null)
+                                        {
+                                            if(HolidayResult[0].length > 0 )
+                                            {
+                                                console.log('FnHolidayList: Holiday List are available');
+                                                RtnMessage.HolidayList = HolidayResult[0]
+                                                RtnMessage.Result = true;
+                                                CallBack();
+                                            }
+                                            else
+                                            {
+                                                console.log('FnHolidayList: No Holiday List avaiable');
+                                                RtnMessage.Result = true;
+                                                CallBack();
+                                            }
+                                        }
+                                        else{
+                                            console.log('FnHolidayList: No Holiday List avaiable');
+                                            RtnMessage.Result = true;
+                                            CallBack();
+                                        }
+                                    }
+                                    else {
+                                        console.log('FnHolidayList: sending holiday list error ' + error);
+                                        CallBack();
+                                    }
+                                });
+                            }
+                            catch (ex) {
+                                console.log('FnHolidayList error:' + ex.description);
+                                //throw new Error(ex);
+                                return 'error'
+                            }
+                        }
+                        ],function(err){
+                            if(!err){
+                                console.log('GnGetWorkingHrs : data sent successfully');
+                                res.send(RtnMessage);
+                            }
+                            else
+                            {
+                                res.statusCode = 500;
+                                res.send(RtnMessage);
+                                console.log('error in parellel async callling' + err);
+                            }
+
+                        });
+
+                    }
+                    else {
+                        res.statusCode = 401;
+                        res.send(RtnMessage);
+                        console.log('FnGetWorkingHours: Invalid Token');
+                    }
+                } else {
+
+                    res.statusCode = 500;
+                    res.send(RtnMessage);
+                    console.log('FnGetWorkingHours: Error in validating token:  ' + err);
+                }
+            });
+        }
+        else {
+            if (Token == null) {
+                console.log('FnGetWorkingHours: Token is empty');
+            }
+            else if (LocID == null) {
+                console.log('FnGetWorkingHours: LocID is empty');
+            }
+
+            res.statusCode=400;
+            res.send(RtnMessage);
+        }
+    }
+    catch (ex) {
+        console.log('FnGetWorkingHours error:' + ex.description);
+        //throw new Error(ex);
+    }
+};
+
+function FnWorkingHours(WorkingContent, CallBack) {
+    try {
+
+        if (WorkingContent != null) {
+
+            console.log('WorkingContent values');
+            console.log(WorkingContent);
+
+            var query = _this.db.escape(WorkingContent.Token) + ',' + _this.db.escape(WorkingContent.LocID);
+            _this.db.query('CALL pGetWorkingHours(' + query + ')', function (err, WorkingResult) {
+                console.log('CALL pGetWorkingHours(' + query + ')');
+
+                if (!err) {
+
+                    if(WorkingResult != null)
+                    {
+                        if(WorkingResult[0].length > 0 )
+                        {
+                            console.log('FnWorkingHours: Working Hours are available');
+                            CallBack(null, WorkingResult[0]);
+                        }
+                        else
+                        {
+                            console.log('Fnworkinghours: no working hours avaiable');
+                            CallBack(null,null);
+                        }
+                    }
+                    else{
+                        console.log('Fnworkinghours: no working hours avaiable');
+                        CallBack(null,null);
+                    }
+                }
+                else {
+                    console.log('FnWorkingHours: sending workinghours error ' + error);
+                    CallBack(null, null);
+                }
+            });
+        }
+        else {
+            CallBack(null, null);
+            console.log('FnWorkingHours: Working content is empty');
+        }
+
+    }
+    catch (ex) {
+        console.log('FnWorkingHours error:' + ex.description);
+        //throw new Error(ex);
+        return 'error'
+    }
+};
+
+function FnHolidayList(HolidayContent, CallBack) {
+    try {
+
+        if (HolidayContent != null) {
+
+            console.log('HolidayContent values');
+            console.log(HolidayContent);
+
+            var query = _this.db.escape(HolidayContent.LocID) + ',' + _this.db.escape(0);
+            _this.db.query('CALL pGetHolidayList(' + query + ')', function (err, HolidayResult) {
+                console.log('CALL pGetHolidayList(' + query + ')');
+
+                if (!err) {
+
+                    if(HolidayResult != null)
+                    {
+                        if(HolidayResult[0].length > 0 )
+                        {
+                            console.log('FnHolidayList: Holiday List are available');
+                            CallBack(null, HolidayResult[0]);
+                        }
+                        else
+                        {
+                            console.log('FnHolidayList: No Holiday List avaiable');
+                            CallBack(null,null);
+                        }
+                    }
+                    else{
+                        console.log('FnHolidayList: No Holiday List avaiable');
+                        CallBack(null,null);
+                    }
+                }
+                else {
+                    console.log('FnHolidayList: sending holiday list error ' + error);
+                    CallBack(null, null);
+                }
+            });
+        }
+        else {
+            CallBack(null, null);
+            console.log('FnHolidayList: holiday list content is empty');
+        }
+
+    }
+    catch (ex) {
+        console.log('FnHolidayList error:' + ex.description);
+        //throw new Error(ex);
+        return 'error'
+    }
+};
+
 module.exports = Search;
