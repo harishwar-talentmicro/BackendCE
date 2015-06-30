@@ -219,9 +219,13 @@
                 templateUrl : 'html/business-manager/resume/resume-front.html',
                 controller : 'ResumeFrontCtrl'
             })
-            .when('/:ezeid',{
-                templateUrl: 'html/landing.html',
-                controller : 'LandingPageCtrl'
+            //.when('/:ezeid',{
+            //    templateUrl: 'html/landing.html',
+            //    controller : 'LandingPageCtrl'
+            //})
+            .when('/:ezeone',{
+                templateUrl : 'html/informationDetail.html',
+                controller : 'InformationDetailCtrl'
             })
             .otherwise({redirectTo : '/'});
     $locationProvider.html5Mode(true);
