@@ -810,6 +810,9 @@ var res = angular.module('ezeidApp').
                 };
 
                 $window.localStorage.setItem("myLocation", JSON.stringify(userLoc));
+
+
+
             };
 
 

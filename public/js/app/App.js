@@ -159,6 +159,7 @@
             .when('/salesenquiry',{templateUrl: 'html/salesenquiry.html'})
             .when('/bulksalesenquiry',{templateUrl : 'html/bulksalesenquiry.html'})
             .when('/mapView',{templateUrl : 'html/mapPopView.html'})
+            .when('/showmapview',{templateUrl : 'html/showmapview.html'})
             .when('/viewdirection',{templateUrl : 'html/viewdirection.html'})
             .when('/signup',{
                 templateUrl : 'html/profile/sign-up.html',
