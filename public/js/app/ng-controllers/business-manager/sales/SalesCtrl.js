@@ -183,7 +183,7 @@
                   city : '',
                   area : '',
                   contactInfo : '',
-                  deliveryAddress : '',
+                  DeliveryAddress : '',
                   nextAction : 0,
                   nextActionDateTime : '',
                   taskDateTime : '',
@@ -204,29 +204,75 @@
 
 
 
-
-            $scope.loadLocationListForEzeid = function(tid){
+            $scope.getEzeidLocationDetails = function(ezeoneId){
                 var defer = $q.defer();
+                $scope.$emit('$preLoaderStart');
                 $http({
-                    url : GURL + 'ewtGetLocationListForEZEID',
+                    url : GURL + 'ezeoneid',
                     method : 'GET',
                     params : {
-                        Token : $rootScope._userInfo.Token,
-                        TID :   tid
+                        ezeoneid : ezeoneId,
+                        token : $rootScope._userInfo.Token
                     }
                 }).success(function(resp){
-                    if(resp && resp !== 'null'){
-                        $scope.modalBox.locationList = resp.Result;
-                        defer.resolve(resp.Result);
+                    $scope.$emit('$preLoaderStop');
+                    if(resp && resp.status){
+                        angular.element('#ezeoneAddressId').parent('.input-group').removeClass('has-error').addClass('has-success');
+                        $scope.modalBox.tx.address = resp.data.AddressLine1;
+                        $scope.modalBox.tx.area = resp.data.AddressLine1;
+                        $scope.modalBox.tx.city = resp.data.CityTitle;
+                        $scope.modalBox.tx.state = resp.data.StateTitle;
+                        $scope.modalBox.tx.country = resp.data.CountryTitle;
+                        $scope.modalBox.tx.pinCode = resp.data.PostalCode;
+                        $scope.modalBox.tx.latitude = resp.data.Latitude;
+                        $scope.modalBox.tx.longitude = resp.data.Longitude;
+
+                        $scope.modalBox.tx.DeliveryAddress = makeAddress();
                     }
                     else{
-                        defer.reject();
+                        Notification.error({ title : 'Error', message : 'EZEOne ID not found', delay : MsgDelay});
                     }
-                }).error(function(err){
-                    defer.reject();
+
+                    defer.resolve(resp);
+                }).error(function(err,statusCode){
+                    $scope.$emit('$preLoaderStop');
+                    var msg = 'EZEOne ID not found';
+                    if(!statusCode){
+                        msg = 'Unable to reach the server ! Please check your connection';
+                    }
+                    if(statusCode == 400){
+                        Notification.error({ title : 'Error', message : msg, delay : MsgDelay});
+                    }
+
+                    defer.resolve(null);
                 });
                 return defer.promise;
             };
+
+
+
+            //$scope.loadLocationListForEzeid = function(tid){
+            //    var defer = $q.defer();
+            //    $http({
+            //        url : GURL + 'ewtGetLocationListForEZEID',
+            //        method : 'GET',
+            //        params : {
+            //            Token : $rootScope._userInfo.Token,
+            //            TID :   tid
+            //        }
+            //    }).success(function(resp){
+            //        if(resp && resp !== 'null'){
+            //            $scope.modalBox.locationList = resp.Result;
+            //            defer.resolve(resp.Result);
+            //        }
+            //        else{
+            //            defer.reject();
+            //        }
+            //    }).error(function(err){
+            //        defer.reject();
+            //    });
+            //    return defer.promise;
+            //};
 
             /**
              * Eliminates the rate and item description from the message
@@ -274,7 +320,7 @@
                         city : '',
                         area : '',
                         contactInfo : tx.ContactInfo,
-                        deliveryAddress : tx.DeliveryAddress,
+                        DeliveryAddress : tx.DeliveryAddress,
                         nextAction : (tx.NextActionID && tx.NextActionID !== 'null') ? tx.NextActionID : 0,
                         nextActionDateTime : $filter('dateTimeFilter')(tx.NextActionDate,'DD MMM YYYY hh:mm:ss A','DD MMM YYYY hh:mm:ss A'),
                         taskDateTime : tx.TaskDateTime,
@@ -492,82 +538,172 @@
                 }
             };
 
-            /**
-             * Finds address using geolocation lat lng
-             * called on change of location
-             */
-            $scope.findAddress = function(){
-                $scope.$emit('$preLoaderStart');
-                $scope.resolveGeolocationAddress().then(function(){
-                    $scope.$emit('$preLoaderStop');
-                },function(){
-                    $scope.$emit('$preLoaderStop');
-                });
-            };
+            ///**
+            // * Finds address using geolocation lat lng
+            // * called on change of location
+            // */
+            //$scope.findAddress = function(){
+            //    $scope.$emit('$preLoaderStart');
+            //    $scope.resolveGeolocationAddress().then(function(){
+            //        $scope.$emit('$preLoaderStop');
+            //    },function(){
+            //        $scope.$emit('$preLoaderStop');
+            //    });
+            //};
 
-            /**
-             *  Resolves geolocation and sets geolocation address in modalbox for particular transaction
-             */
-            $scope.resolveGeolocationAddress = function(){
-                var defer = $q.defer();
-                $scope.modalBox.tx.address = '';
-                if(!$scope.modalBox.tx.locId){
-                    $timeout(function(){
-                        defer.resolve();
-                    },500);
-                    return defer.promise;
-                }
 
-                //$scope.$emit('$preLoaderStart');
-                var locIndex = $scope.modalBox.locationList.indexOfWhere("TID",parseInt($scope.modalBox.tx.locId));
-                if(locIndex === -1){
-                    $timeout(function(){
-                        defer.resolve();
-                    },500);
-                    return defer.promise;
-                }
-                var lat = $scope.modalBox.locationList[locIndex].Latitude;
-                var lng = $scope.modalBox.locationList[locIndex].Longitude;
 
-                $scope.modalBox.tx.latitude = lat;
-                $scope.modalBox.tx.longitude = lng;
-
-                $scope.modalBox.tx.address = $scope.modalBox.locationList[locIndex].AddressLine1+' ' +
-                    $scope.modalBox.locationList[locIndex].AddressLine2;
-
-                var googleMap = new GoogleMap();
-                try{
+            var googleMap = new GoogleMap();
+            $timeout(function(){
+                googleMap.addSearchBox('google-map-search-box');
+                googleMap.listenOnMapControls(null,function(lat,lng){
+                    $scope.modalBox.tx.latitude = lat;
+                    $scope.modalBox.tx.longitude = lat;
                     googleMap.getReverseGeolocation(lat,lng).then(function(resp){
-                        //$scope.$emit('$preLoaderStop');
                         if(resp.data){
                             var data = googleMap.parseReverseGeolocationData(resp.data);
                             $scope.modalBox.tx.city = data.city;
                             $scope.modalBox.tx.state = data.state;
                             $scope.modalBox.tx.country = data.country;
                             $scope.modalBox.tx.area = data.area;
+                            $scope.modalBox.tx.pinCode = data.postalCode;
+                            $scope.modalBox.tx.address = googleMap.createAddressFromGeolocation(data,{
+                                route : true,
+                                sublocality3 : true,
+                                sublocality2 : true,
+                                area : false,
+                                city : false,
+                                state : false,
+                                country : false,
+                                postalCode : false
+                            });
 
-
+                            $scope.modalBox.tx.DeliveryAddress = makeAddress();
                         }
                         else{
-                            //$scope.$emit('$preLoaderStop');
-                            Notification.error({message : 'Please enable geolocation settings n your browser',delay : MsgDelay});
+                            Notification.error({message : 'Please enable geolocation settings in your browser',delay : MsgDelay});
                         }
-                        defer.resolve();
 
                     },function(){
-                        Notification.error({message : 'Please enable geolocation settings n your browser',delay : MsgDelay});
-                        //$scope.$emit('$preLoaderStop');
+                        Notification.error({message : 'Please enable geolocation settings in your browser',delay : MsgDelay});
                         defer.resolve();
                     });
+                },false);
+            },3000);
+
+
+
+            /**
+             * Selecting address selection method whether using EZEOne ID or other address
+             * @type {number} 0 : EZEOne ID location
+             * 1 : Other address (Google map autocomplete active)
+             */
+            $scope.addressSelectionType = 0;
+
+            /**
+             * EZEOne ID from which address will be fetched
+             * @type {string}
+             */
+            $scope.ezeoneAddressId = '';
+            var timeoutPromise = null;
+            $scope.$watch('ezeoneAddressId',function(n,v){
+                if(n && n !== v){
+                    if(timeoutPromise){
+                        $timeout.cancel(timeoutPromise);
+                    }
+                    angular.element('#ezeoneAddressId').parent('.input-group').removeClass('has-success').addClass('has-error');
+                    $scope.modalBox.tx.address = '';
+                    $scope.modalBox.tx.area = '';
+                    $scope.modalBox.tx.city = '';
+                    $scope.modalBox.tx.state = '';
+                    $scope.modalBox.tx.country = '';
+                    $scope.modalBox.tx.pinCode = '';
+                    $scope.modalBox.tx.latitude = 0;
+                    $scope.modalBox.tx.longitude = 0;
+                    $scope.modalBox.tx.DeliveryAddress = '';
+                    timeoutPromise = $timeout(function(){
+                        $scope.getEzeidLocationDetails($scope.ezeoneAddressId);
+                    },2000);
+
                 }
-                catch(ex){
-                    $timeout(function(){
-                        Notification.error({message : 'Unable to resolve geolocation',delay : MsgDelay});
-                        defer.resolve();
-                    },400);
+                else if(!n){
+                    angular.element('#ezeoneAddressId').parent('.input-group').removeClass('has-success').addClass('has-error');
+                    $scope.modalBox.tx.address = '';
+                    $scope.modalBox.tx.area = '';
+                    $scope.modalBox.tx.city = '';
+                    $scope.modalBox.tx.state = '';
+                    $scope.modalBox.tx.country = '';
+                    $scope.modalBox.tx.pinCode = '';
+                    $scope.modalBox.tx.latitude = 0;
+                    $scope.modalBox.tx.longitude = 0;
+                    $scope.modalBox.tx.DeliveryAddress ='';
                 }
-                return defer.promise;
-            };
+            });
+
+
+            ///**
+            // *  Resolves geolocation and sets geolocation address in modalbox for particular transaction
+            // */
+            //$scope.resolveGeolocationAddress = function(){
+            //    var defer = $q.defer();
+            //    $scope.modalBox.tx.address = '';
+            //    if(!$scope.modalBox.tx.locId){
+            //        $timeout(function(){
+            //            defer.resolve();
+            //        },500);
+            //        return defer.promise;
+            //    }
+            //
+            //    //$scope.$emit('$preLoaderStart');
+            //    var locIndex = $scope.modalBox.locationList.indexOfWhere("TID",parseInt($scope.modalBox.tx.locId));
+            //    if(locIndex === -1){
+            //        $timeout(function(){
+            //            defer.resolve();
+            //        },500);
+            //        return defer.promise;
+            //    }
+            //    var lat = $scope.modalBox.locationList[locIndex].Latitude;
+            //    var lng = $scope.modalBox.locationList[locIndex].Longitude;
+            //
+            //    $scope.modalBox.tx.latitude = lat;
+            //    $scope.modalBox.tx.longitude = lng;
+            //
+            //    $scope.modalBox.tx.address = $scope.modalBox.locationList[locIndex].AddressLine1+' ' +
+            //        $scope.modalBox.locationList[locIndex].AddressLine2;
+            //
+            //    var googleMap = new GoogleMap();
+            //    try{
+            //        googleMap.getReverseGeolocation(lat,lng).then(function(resp){
+            //            //$scope.$emit('$preLoaderStop');
+            //            if(resp.data){
+            //                var data = googleMap.parseReverseGeolocationData(resp.data);
+            //                $scope.modalBox.tx.city = data.city;
+            //                $scope.modalBox.tx.state = data.state;
+            //                $scope.modalBox.tx.country = data.country;
+            //                $scope.modalBox.tx.area = data.area;
+            //
+            //
+            //            }
+            //            else{
+            //                //$scope.$emit('$preLoaderStop');
+            //                Notification.error({message : 'Please enable geolocation settings n your browser',delay : MsgDelay});
+            //            }
+            //            defer.resolve();
+            //
+            //        },function(){
+            //            Notification.error({message : 'Please enable geolocation settings n your browser',delay : MsgDelay});
+            //            //$scope.$emit('$preLoaderStop');
+            //            defer.resolve();
+            //        });
+            //    }
+            //    catch(ex){
+            //        $timeout(function(){
+            //            Notification.error({message : 'Unable to resolve geolocation',delay : MsgDelay});
+            //            defer.resolve();
+            //        },400);
+            //    }
+            //    return defer.promise;
+            //};
 
 
             $scope.$watch('showModal',function(newVal,oldVal){
@@ -600,7 +736,7 @@
                         city : '',
                         area : '',
                         contactInfo : '',
-                        deliveryAddress : '',
+                        DeliveryAddress : '',
                         nextAction : 0,
                         nextActionDateTime : '',
                         taskDateTime : '',
@@ -796,6 +932,7 @@
             $scope.checkEzeidInfo = function(ezeid){
                 $scope.$emit('$preLoaderStart');
                 $scope.getEzeidDetails(ezeid).then(function(resp){
+                    $scope.$emit('$preLoaderStop');
                     $scope.modalBox.tx.ezeid = $filter('uppercase')(ezeid);
                     $scope.modalBox.tx.contactInfo = resp.FirstName + ' ' +
                     resp.LastName  +
@@ -811,12 +948,12 @@
                         $scope.modalBox.tx.companyName = resp.CompanyName;
                     }
 
-                    $scope.loadLocationListForEzeid(resp.TID).then(function(){
-                        $scope.$emit('$preLoaderStop');
-                    },function(){
-                        $scope.$emit('$preLoaderStop');
-                        //Notification.error({ message : 'Unable to load location list for this user', delay : MsgDelay});
-                    });
+                    //$scope.loadLocationListForEzeid(resp.TID).then(function(){
+                    //    $scope.$emit('$preLoaderStop');
+                    //},function(){
+                    //    $scope.$emit('$preLoaderStop');
+                    //    //Notification.error({ message : 'Unable to load location list for this user', delay : MsgDelay});
+                    //});
 
                 },function(){
                     $scope.$emit('$preLoaderStop');
@@ -1350,7 +1487,11 @@
                 if($scope.modalBox.tx.country){
                     address.push($scope.modalBox.tx.country);
                 }
-                return address.join(', ');
+                address =  address.join(', ');
+                if($scope.modalBox.tx.pinCode){
+                    address += (' - '+ $scope.modalBox.tx.pinCode);
+                }
+                return address;
             };
 
             /**
@@ -1421,7 +1562,7 @@
                     ItemsList: JSON.stringify($scope.modalBox.tx.itemList),
                     item_list_type : $rootScope._userInfo.SalesItemListType,
                     DeliveryAddress : (!editMode) ?
-                        makeAddress() : $scope.modalBox.tx.deliveryAddress,
+                        makeAddress() : $scope.modalBox.tx.DeliveryAddress,
                     company_name : $scope.modalBox.tx.companyName,
                     company_id : $scope.modalBox.tx.companyId,
                     Amount : (parseInt($rootScope._userInfo.SalesItemListType) < 4) ?

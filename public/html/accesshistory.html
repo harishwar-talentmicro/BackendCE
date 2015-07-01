@@ -26,7 +26,7 @@
                                 <!--<tr ng-repeat="_item in msgCtrl.msgs | filter: {Status: msgCtrl.status,MessageTypeTitle:msgCtrl.type}">-->
                                 <tr ng-repeat="_item in historyCtrl.msgs" class="">
                                     <td class="panelPd5px">
-                                        <a class="showPointer" ng-click="(_item.LocID) ? redirectFullPage(_item.LocID) : ''">{{_item.EZEID}}</a>
+                                        <a class="showPointer" ng-click="(_item.EZEID) ? redirectFullPage(_item.EZEID) : ''">{{_item.EZEID}}</a>
                                         <small class="tiny text-danger" ng-hide="_item.EZEID">Unknown</small>
                                     </td>
                                     <td class="panelPd5px">

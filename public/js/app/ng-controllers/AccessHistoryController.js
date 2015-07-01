@@ -113,10 +113,10 @@ angular.module('ezeidApp').controller('HistoryController',[
     };
 
     /* redirect to full details page */
-    $scope.redirectFullPage = function(tid)
+    $scope.redirectFullPage = function(ezeoneId)
     {
         ////console.log(tid);
         /* redirect to full detail page */
-        $location.url('/searchDetails?searchType=1&TID='+tid);
+        $location.url('/'+ezeoneId);
     }
 }]);

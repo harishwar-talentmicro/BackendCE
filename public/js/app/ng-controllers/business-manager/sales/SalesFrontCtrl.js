@@ -857,7 +857,7 @@
                     $scope.modalBox.tx.DeliveryAddress = '';
                     timeoutPromise = $timeout(function(){
                         $scope.getEzeidLocationDetails($scope.ezeoneAddressId);
-                    },1000);
+                    },2000);
 
                 }
                 else if(!n){
