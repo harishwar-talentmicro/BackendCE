@@ -1105,9 +1105,9 @@ var res = angular.module('ezeidApp').
             /**
              * Get appropriate company name or the user name, depending upon the search type
              */
-            $scope.getCompanyOrIndividualName = function(companyName,name)
+            $scope.getCompanyOrIndividualName = function(companyName, name, idTypeId)
             {
-                if($routeParams.searchType == 1)//its Ezeone ID
+                if(parseInt($routeParams.searchType) == 1 && parseInt(idTypeId) == 1)//its Ezeone ID
                 {
                     return name != ''?name:'___';
                 }
