@@ -229,11 +229,12 @@
                                                 {{distanceFilter(search.distance)}} Km
                                             </div>
                                             <div class="col-lg-8 col-md-6 col-sm-6 col-xs-6 text-right">
-                                                <p class="text-bolder text-uppercase">{{search.EZEID}}</p>
+                                                <p class="text-bolder text-uppercase">{{search.EZEID+getSequenceNumber(search.SeqNo)}}</p>
                                             </div>
                                         </div>
                                         <!-- Row 2 -->
                                         <div class="tile-row-2 p-bottom-4">
+                                            <!-- company/individual name -->
                                             <p class="text-bolder">{{getCompanyOrIndividualName(search.CompanyName,search.Name,search.IDTypeID)}}</p>
                                             <hr class="style-two">
                                             <small>
