@@ -108,6 +108,7 @@ angular.module('ezeidApp').controller('mapPopController',[
 
         //To show route
         $scope.plotRoute = function () {
+
             googleMap.clearAllMarkers();
 
             googleMap.renderDirection('directionPannel',googleMap.currentMarkerPosition.latitude,googleMap.currentMarkerPosition.longitude,$routeParams.endLat,$routeParams.endLong);
@@ -117,7 +118,7 @@ angular.module('ezeidApp').controller('mapPopController',[
 
         //Show direction in view direction page
         $scope.showDirections = function () {
-            var params = '?endLat='+$routeParams.endLat+'&endLong='+$routeParams.endLong+'&startLat='+googleMap.currentMarkerPosition.latitude+'&startLong='+googleMap.currentMarkerPosition.longitude;
+            var params = '?endLat='+$routeParams.endLat+'&endLong='+$routeParams.endLong+'&startLat='+googleMap.currentMarkerPosition.latitude+'&startLong='+googleMap.currentMarkerPosition.longitude+'&showbasicmap=2';
             $location.url('/viewdirection'+params);
         };
 
