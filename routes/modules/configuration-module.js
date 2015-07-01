@@ -460,8 +460,6 @@ Configuration.prototype.StatusTypes = function(req,res,next){
     }
 };
 
-
-
 /**
  * Method : POST
  * @param req
@@ -2395,7 +2393,6 @@ Configuration.prototype.saveWorkingHoursTemplate = function(req,res,next){
     }
 };
 
-
 /**
  * Method : GET
  * @param req
@@ -2656,6 +2653,80 @@ Configuration.prototype.deleteHoliday = function(req,res,next){
         console.log('FnDeleteHolidayList:error ' + ex.description);
           
     }
+};
+
+/**
+ * Method : DELETE
+ * @param req
+ * @param res
+ * @param next
+ */
+Configuration.prototype.deleteWorkingHours = function(req,res,next){
+    /**
+     * @todo FnDeleteWorkingHours
+     */
+    var _this = this;
+    try{
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+    var Token = req.query.Token;
+    var TID = req.query.TID;
+    var RtnMessage = {
+        IsSuccessfull: false,
+        Message:''
+    };
+    var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
+
+    if (Token !=null && TID != null) {
+        FnValidateToken(Token, function (err, Result) {
+            if (!err) {
+                if (Result != null) {
+                    //console.log('CALL pDeleteWorkinghours(' + _this.db.escape(TID) + ')');
+                    _this.db.query('CALL pDeleteWorkinghours(' + _this.db.escape(TID) + ')', function (err, deleteResult) {
+                        if (!err){
+
+                            RtnMessage.IsSuccessfull = true;
+                            RtnMessage.Message = 'delete successfully';
+                            res.send(RtnMessage);
+                            console.log('FnDeleteWorkingHours:Working Hours delete successfully');
+                        }
+                        else {
+                            console.log('FnDeleteWorkingHours: error in deleting Working Hours' + err);
+                            res.statusCode = 500;
+                            RtnMessage.Message = 'Error in deleting';
+                            res.send(RtnMessage);
+                        }
+                    });
+                }
+                else {
+                    console.log('FnDeleteWorkingHours: Invalid token');
+                    res.statusCode = 401;
+                    res.send(RtnMessage);
+                }
+            }
+            else {
+                console.log('FnDeleteWorkingHours:Error in processing Token' + err);
+                res.statusCode = 500;
+                res.send(RtnMessage);
+            }
+        });
+    }
+    else {
+        if (Token == null) {
+            console.log('FnDeleteWorkingHours: Token is empty');
+        }
+        else if (TID == null) {
+            console.log('FnDeleteWorkingHours: TID is empty');
+        }
+        res.statusCode=400;
+        res.send(RtnMessage);
+    }
+}
+catch (ex) {
+    console.log('FnDeleteWorkingHours:error ' + ex.description);
+
+}
 };
 
 module.exports = Configuration;

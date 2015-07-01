@@ -47,8 +47,8 @@
                 btnClass = 'btn-green';
             }
             //element.find('.business-manager-item').addClass(elemClass);
-            console.log(element);
-            console.log(elemClass);
+            //console.log(element);
+            //console.log(elemClass);
             element.find('div.business-manager-item').addClass(elemClass);
             element.find('.btn-xs').addClass(btnClass);
             $compile(element.contents())(scope);

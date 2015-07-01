@@ -1090,5 +1090,17 @@ var res = angular.module('ezeidApp').
                     return companyName != ''?companyName:'___';
                 }
             }
+
+            /**
+             * Get the sequence number
+             */
+            $scope.getSequenceNumber = function(seqNo)
+            {
+                if(parseInt(seqNo) != 0)
+                {
+                    return '.L'+seqNo;
+                }
+                return '';
+            }
         }
     ]);
