@@ -606,7 +606,7 @@
                     NextActionDateTime : moment().format('DD MMM YYYY hh:mm:ss'),
                     ItemsList: JSON.stringify($scope.modalBox.tx.itemList),
                     DeliveryAddress : makeAddress(),
-                    company_name : $scope.loggedInUser.CompanyName,
+                    companyName : $scope.loggedInUser.CompanyName,
                     company_id : 0
                 };
                 return preparedTx;

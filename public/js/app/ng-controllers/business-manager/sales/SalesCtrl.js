@@ -1563,7 +1563,7 @@
                     item_list_type : $rootScope._userInfo.SalesItemListType,
                     DeliveryAddress : (!editMode) ?
                         makeAddress() : $scope.modalBox.tx.DeliveryAddress,
-                    company_name : $scope.modalBox.tx.companyName,
+                    companyName : $scope.modalBox.tx.companyName,
                     company_id : $scope.modalBox.tx.companyId,
                     Amount : (parseInt($rootScope._userInfo.SalesItemListType) < 4) ?
                         ((parseFloat($scope.modalBox.tx.amount,2) !== NaN) ? parseFloat($scope.modalBox.tx.amount,2) : 0.00) :
