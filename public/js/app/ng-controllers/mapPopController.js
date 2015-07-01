@@ -122,5 +122,4 @@ angular.module('ezeidApp').controller('mapPopController',[
             $location.url('/viewdirection'+params);
         };
 
-
 }]);

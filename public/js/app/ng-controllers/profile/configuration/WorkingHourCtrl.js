@@ -50,6 +50,7 @@ angular.module('ezeidApp').controller('WorkingHourCtrl',['$scope','$rootScope','
                 Token : $rootScope._userInfo.Token
             }
         }).success(function (data) {
+                console.log(data);
                if (data != 'null')
                 {
                    $scope.result = data;
@@ -126,7 +127,7 @@ angular.module('ezeidApp').controller('WorkingHourCtrl',['$scope','$rootScope','
                 url: GURL + 'ewtWorkingHours',
                 data:$scope.saveInfo
               }).success(function (data) {
-                if (data.IsSuccessfull) {
+                if(data.IsSuccessfull) {
                     $scope.mInfo = {}
                     getWorkingHours();
                     $scope.showAddWorkingHourForm = false;
@@ -151,6 +152,36 @@ angular.module('ezeidApp').controller('WorkingHourCtrl',['$scope','$rootScope','
                         getWorkingHours();
                     }
                 });
+        };
+
+        function getWorkingHourForEdit()
+        {
+            $http({ method: 'get', url: GURL + 'ewtWorkingHours',
+                params : {
+                    Token : $rootScope._userInfo.Token,
+                    
+                }
+            }).success(function (data)
+                {
+                    console.log(data);
+                    if (data != 'null')
+                    {
+                        $scope.result = data;
+                    }
+                    else
+                    {
+                        $scope.result = [];
+                    }
+                });
+        }
+
+        //Edit Working Hours
+        $scope.editWorkingHourTemplate = function(_TID){
+
+            console.log(_TID);
+            $scope.showAddWorkingHourForm = true;
+            getWorkingHourForEdit();
+
         };
 
 }]);

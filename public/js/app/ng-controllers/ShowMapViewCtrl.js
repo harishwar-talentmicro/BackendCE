@@ -42,7 +42,6 @@ angular.module('ezeidApp').controller('ShowMapViewCtrl',[
             $scope.$emit('$preLoaderStop');
         }
 
-
         googleMap.getCurrentLocation().then(function(){
             $scope.lat = googleMap.currentMarkerPosition.latitude;
             $scope.lng = googleMap.currentMarkerPosition.longitude;
@@ -152,7 +151,4 @@ angular.module('ezeidApp').controller('ShowMapViewCtrl',[
             var params = '?endLat='+$routeParams.endLat+'&endLong='+$routeParams.endLong+'&startLat='+googleMap.currentMarkerPosition.latitude+'&startLong='+googleMap.currentMarkerPosition.longitude+'&showbasicmap=1';
             $location.url('/viewdirection'+params);
         };
-
-
-
 }]);
