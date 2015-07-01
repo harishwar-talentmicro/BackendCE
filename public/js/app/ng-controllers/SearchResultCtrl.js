@@ -84,6 +84,8 @@ var res = angular.module('ezeidApp').
                 ["a","b","c","d","e"]
             ];
 
+            $scope.isSearchInProgress = false;
+
             var placeHolder = [
                 "Type EZEID here",
                 "Type keywords to locate products and services",
@@ -170,19 +172,19 @@ var res = angular.module('ezeidApp').
                 $scope.searchStars[starRating[i]-1] = true;
             }
 
-            if(($scope.params.searchType == 1) && (!$rootScope._userInfo.IsAuthenticate))
-            {
-                $scope.showLoginText = true;
-                Notification.error({ message : 'Please login to search for EZEOne', delay : MsgDelay});
-                $scope.$emit('$preLoaderStop');
-            }
-            else
-            {
+            //if(($scope.params.searchType == 1) && (!$rootScope._userInfo.IsAuthenticate))
+            //{
+            //    $scope.showLoginText = true;
+            //    Notification.error({ message : 'Please login to search for EZEOne', delay : MsgDelay});
+            //    $scope.$emit('$preLoaderStop');
+            //}
+            //else
+            //{
                 $scope.showDownloadLink = false;
                 $scope.showLoginText = false;
                 // To get search key result
                 getSearchKeyWord($scope.params);
-            }
+            //}
 
             //find out range of the ratings
             var initialVal = $routeParams.rating[0]?$routeParams.rating[0]:1;
@@ -231,6 +233,7 @@ var res = angular.module('ezeidApp').
                 /* set the value of the search term */
                 $scope.defaultSearchTerm = _filterValue.searchTerm;
                 $scope.$emit('$preLoaderStart');
+                $scope.isSearchInProgress = true;
                 $http({ method: 'post', url: GURL + 'ewSearchByKeywords', data: {
                     SearchType:_filterValue.searchType,
                     Keywords:_filterValue.searchTerm,
@@ -248,9 +251,52 @@ var res = angular.module('ezeidApp').
                     isPagination:1,
                     pagesize:$scope.resultPerPage
                 } }).success(function (data) {
+                    $scope.isSearchInProgress = false;
                     $scope.$emit('$preLoaderStop');
                     /* set the total count */
                     $scope.totalResult = data['totalcount'];
+
+                    if(parseInt(_filterValue.searchType) == 1 && (!$rootScope._userInfo.IsAuthenticate)) {
+                        if (data.hasOwnProperty('totalcount cond')) {
+                            if (parseInt(data.Result[0].IDTypeID) == 1) {
+                                console.log('totalcount cond');
+                                $('#SignIn_popup').css({'position':'fixed'});
+                                $('#SignIn_popup > .window_page').css({'position':'relative'});
+                                $('#SignIn_popup').slideDown();
+                                $rootScope.loginPromise = $q.defer();
+                                $rootScope.loginPromise.promise.then(function(){
+                                    getSearchKeyWord($scope.params);
+                                });
+                                Notification.error({
+                                    title: 'Login Required',
+                                    message: 'Please login to search individuals',
+                                    delay: MsgDelay
+                                });
+                                return;
+                            }
+                        }
+                        else if (data.length == 1) {
+                            console.log('ezeid_cond');
+                            if (parseInt(data[0].IDTypeID) == 1) {
+                                console.log('ezeid cond');
+                                $('#SignIn_popup').css({'position':'fixed'});
+                                $('#SignIn_popup > .window_page').css({'position':'relative'});
+                                $('#SignIn_popup').slideDown();
+                                $rootScope.loginPromise = $q.defer();
+                                $rootScope.loginPromise.promise.then(function(){
+                                    getSearchKeyWord($scope.params);
+                                });
+
+                                Notification.error({
+                                    title: 'Login Required',
+                                    message: 'Please login to search for individual documents',
+                                    delay: MsgDelay
+                                });
+                                return;
+                            }
+                        }
+                    }
+
                     var result = data['Result'];
 
                     $rootScope.$broadcast('$preLoaderStop');
@@ -278,14 +324,13 @@ var res = angular.module('ezeidApp').
                     $scope.isResultNumber = (result && result !== 'null') ? ((result.length > 0) ? 1 : 0) : 0;
 
                     $scope.searchListData = (result && result !== 'null') ? ((result.length > 0) ? result : []) : [];
-                    console.log('--------------');
-                    console.log($scope.searchListData);
                     if ( data && data != 'null' && data.length>0)
                     {
                         $scope.SearchResultCount = data.length;
                         $window.localStorage.setItem("searchResult", JSON.stringify(data));
                         if(data[0].Filename)
                         {
+                            $scope.isResultNumber = true;
                             if(($rootScope._userInfo.IsAuthenticate == true) && (data[0].IDTypeID == 1))
                             {
                                 $scope.showDownloadLink = true;
@@ -296,12 +341,16 @@ var res = angular.module('ezeidApp').
                             }
                             else
                             {
-                                //Redirect to Login page
-                                $('#SignIn_popup').slideDown();
-                                $rootScope.defer = $q.defer();
-                                var prom = $rootScope.defer.promise;
-                                prom.then(function(d){
-                                });
+                                $scope.showDownloadLink = true;
+                                $scope.downloadData = data[0];
+                                var downloadUrl = "/ewtGetSearchDocuments?Token="+$rootScope._userInfo.Token+"&&Keywords="+_filterValue.searchTerm;
+                                $window.open(downloadUrl, '_blank');
+                                ////Redirect to Login page
+                                //$('#SignIn_popup').slideDown();
+                                //$rootScope.defer = $q.defer();
+                                //var prom = $rootScope.defer.promise;
+                                //prom.then(function(d){
+                                //});
                             }
                             $scope.searchListData = null;
                             $scope.searchCount = 0;
@@ -316,6 +365,7 @@ var res = angular.module('ezeidApp').
 
                     defer.resolve();
                 }).error(function(){
+                    $scope.isSearchInProgress = false;
                     Notification.error({ message : 'An error occurred', delay : MsgDelay});
                     $scope.$emit('$preLoaderStop');
                     defer.resolve();
@@ -398,50 +448,6 @@ var res = angular.module('ezeidApp').
                     googleMap.placeCurrentLocationMarker(null,null,true);
                 });
             };
-
-
-            /* Load the map in the modal box */
-            /* Google map integration */
-            //var initializeMap = function () {
-            //    console.log('hello1');
-            //    googleMap.setSettings({
-            //        mapElementClass: "col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix class-map-ctrl-style1",
-            //        searchElementClass: "form-control pull-left pac-input",
-            //        currentLocationElementClass: "link-btn pac-loc",
-            //        controlsContainerClass: "col-lg-6 col-md-6'"
-            //    });
-            //    googleMap.createMap("modal-map-ctrl", $scope, "findCurrentLocation()");
-            //
-            //    googleMap.renderMap();
-            //    googleMap.mapIdleListener().then(function () {
-            //        googleMap.pushMapControls();
-            //        googleMap.listenOnMapControls(getNewCoordinates, getNewCoordinates);
-            //
-            //        /* place the present location marker on map */
-            //        if($routeParams['lat']){
-            //            googleMap.currentMarkerPosition.latitude = $routeParams['lat'];
-            //            googleMap.currentMarkerPosition.longitude = $routeParams['lng'];
-            //            googleMap.placeCurrentLocationMarker(getNewCoordinates);
-            //
-            //            /* if this modal box map is opened from search result page: Add marker for additional */
-            //            googleMap.resizeMap();
-            //        }
-            //        else{
-            //            googleMap.getCurrentLocation().then(function (e) {
-            //
-            //                googleMap.placeCurrentLocationMarker(getNewCoordinates);
-            //
-            //                /* if this modal box map is opened from search result page: Add marker for additional */
-            //                googleMap.resizeMap();
-            //                googleMap.setMarkersInBounds();
-            //            }, function () {
-            //
-            //            });
-            //        }
-            //
-            //
-            //    });
-            //};
 
             /* Get the current location string */
             var promise = googleMap.getCurrentLocation()
@@ -763,10 +769,8 @@ var res = angular.module('ezeidApp').
              */
             $scope.flipping_card = function()
             {
-                //console.log('flip');
 
                 $timeout(function(){
-                    //console.log('flip');
                     $(".flip-card").flip({
                         trigger: "hover"
                     });
@@ -1080,9 +1084,15 @@ var res = angular.module('ezeidApp').
             /**
              * Function to redirect to desired url
              */
-            $scope.redirectUrl = function(url){
+            $scope.redirectUrl = function(url,userTypeId){
+                if(userTypeId && (parseInt(userTypeId) == 2 || parseInt(userTypeId) == 3)){
+                    $location.url(url);
+                    return;
+                }
                 if(!$rootScope._userInfo.Token || $rootScope._userInfo.Token == 2){
-                    angular.element('#SignIn_popup').slideUp();
+                    $('#SignIn_popup').css({'position':'fixed'});
+                    $('#SignIn_popup > .window_page').css({'position':'relative'});
+                    $('#SignIn_popup').slideDown();
                     $rootScope.loginPromise = $q.defer();
                     $rootScope.loginPromise.promise.then(function(){
                         $location.url(url);
