@@ -195,7 +195,7 @@
         <!---------- Only item template --------------------------->
         <script type="text/ng-template" id="/only-item-tpl.html">
             <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12 bottom-clearfix">
-                <div class="business-item">
+                <div class="business-item" title="{{content.Description}}">
                     <div class="thumbnail">
                         <span class="glyphicon glyphicon-edit" data-toggle="tooltip" title="" data-placement="right" data-original-title="Edit Item" ng-click="toggleModalBox({type : content.FunctionType, itemIndex : index})"></span>
                         <div class="caption">
@@ -203,7 +203,8 @@
                                 <span ng-show="content.Status == 1" class="glyphicon glyphicon-ok-circle text-success" data-toggle="tooltip" title="" data-placement="right" data-original-title="Item Status"></span>
                                 <span ng-show="content.Status == 2" class="glyphicon glyphicon-remove-circle text-danger" data-toggle="tooltip" title="" data-placement="right" data-original-title="Item Status"></span>
                             </h4>
-                            <p class="item-description" title="{{content.Description}}" data-placement="right">{{content.Description | textLength:50}}</p>
+                            <p class="text-primary">&nbsp;</p>
+                            <!--<p class="item-description" title="{{content.Description}}" data-placement="right">{{content.Description | textLength:50}}</p>-->
                         </div>
                     </div>
                 </div>
@@ -212,7 +213,7 @@
         <!---------- Item and picture template --------------------------->
         <script type="text/ng-template" id="/item-picture-tpl.html">
             <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12 bottom-clearfix">
-                <div class="business-item">
+                <div class="business-item" title="{{content.Description}}">
                     <div class="thumbnail">
                         <span class="glyphicon glyphicon-edit" data-toggle="tooltip" title="" data-placement="right" data-original-title="Edit Item"   ng-click="toggleModalBox({type : content.FunctionType, itemIndex : index})"></span>
                         <img ng-src="{{content.Pic}}" alt="No picture available"/>
@@ -221,7 +222,8 @@
                                 <span ng-show="content.Status == 1" class="glyphicon glyphicon-ok-circle text-success" data-toggle="tooltip" title="" data-placement="right" data-original-title="Item Status"></span>
                                 <span ng-show="content.Status == 2" class="glyphicon glyphicon-remove-circle text-danger" data-toggle="tooltip" title="" data-placement="right" data-original-title="Item Status"></span>
                             </h4>
-                            <p class="item-description" title="{{content.Description}}" data-placement="right">{{content.Description | textLength:50}}</p>
+                            <p class="text-primary">&nbsp;</p>
+                            <!--<p class="item-description" title="{{content.Description}}" data-placement="right">{{content.Description | textLength:50}}</p>-->
                         </div>
                     </div>
                 </div>
@@ -233,7 +235,7 @@
         <!---------- Item, picture and rate template --------------------------->
         <script type="text/ng-template" id="/item-picture-rate-tpl.html">
             <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12 bottom-clearfix">
-                <div class="business-item">
+                <div class="business-item" title="{{content.Description}}">
                     <div class="thumbnail">
                         <span class="glyphicon glyphicon-edit" data-toggle="tooltip" title="" data-placement="right" data-original-title="Edit Item" ng-click="toggleModalBox({type : content.FunctionType, itemIndex : index})"></span>
                         <img ng-src="{{content.Pic}}" alt="No picture available"/>
@@ -243,7 +245,8 @@
                                 <span ng-show="content.Status == 2" class="glyphicon glyphicon-remove-circle text-danger" data-toggle="tooltip" title="" data-placement="right" data-original-title="Item Status"></span>
                             </h4>
                             <p class="text-primary">Rate : {{content.Rate}}/-</p>
-                            <p class="item-description" title="{{content.Description}}" data-placement="right">{{content.Description | textLength:50}}</p>
+
+                            <!--<p class="item-description" title="{{content.Description}}" data-placement="right">{{content.Description | textLength:50}}</p>-->
                         </div>
                     </div>
                 </div>

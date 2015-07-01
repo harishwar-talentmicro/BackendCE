@@ -267,7 +267,7 @@ angular.module('ezeidApp').factory('GoogleMaps',['$q','$timeout','$compile',func
         if(typeof(locationChangeCallback) == "undefined"){
             locationChangeCallback = null;
         }
-        console.log(_this.searchBox);
+        //console.log(_this.searchBox);
         google.maps.event.addListener(_this.searchBox,'places_changed',function(){
             var places = _this.searchBox.getPlaces();
             if (places.length == 0) {
@@ -497,7 +497,7 @@ angular.module('ezeidApp').factory('GoogleMaps',['$q','$timeout','$compile',func
             route : ''
         };
 
-        console.log(geocoderResults);
+        //console.log(geocoderResults);
 
         if(geocoderResults && geocoderResults.length > 0){
 
@@ -540,7 +540,7 @@ angular.module('ezeidApp').factory('GoogleMaps',['$q','$timeout','$compile',func
             }
         }
 
-        console.log(returnObj);
+        //console.log(returnObj);
 
         return returnObj;
     };

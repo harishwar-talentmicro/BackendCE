@@ -282,18 +282,11 @@ angular.module('ezeidApp').
                         }
                     })
                     .error(function(data, status, headers, config) {
-
-
                         defer.reject();
                         if ((data == 'null') || (!data))
                         {
-                            console.log(data);
-                            $location.url('/');
-                        }
-                     //   else
-                       // {
-                            $rootScope.$broadcast('$preLoaderStop');
-                        //}
+                           $location.url('/');
+                        }  $rootScope.$broadcast('$preLoaderStop');
                     });
                 return defer.promise;
             }
@@ -403,7 +396,6 @@ angular.module('ezeidApp').
                     var params = '?ezeone='+_Ezeid;
                     $timeout(function(){
                         var url = '/'+_Ezeid+'/reservation'+'?name='+$scope.SearchInfo.CompanyName;
-                        console.log(url);
                         //$location.url('/'+_Ezeid+'/service-reservation'+'&name='+$scope.SearchInfo.CompanyName);
                         $location.url(url);
                         //$location.url('/service-reservation'+params+'&name='+$scope.SearchInfo.CompanyName);
