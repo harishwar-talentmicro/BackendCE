@@ -206,7 +206,7 @@
                 controller : 'SalesFrontCtrl'
             })
             .when('/:ezeone/reservation',{
-                templateUrl : 'html/business-manager/reservation/reservation.html'
+                templateUrl : 'html/business-manager/reservation/reservation-front.html'
             })
             .when('/:ezeone/home_delivery',{
                 templateUrl : 'html/business-manager/home-delivery/home-delivery-front.html',
