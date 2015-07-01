@@ -805,7 +805,7 @@ var res = angular.module('ezeidApp').
 
 
 
-                $scope.activeTemplate = "html/mapPopView1.html";
+                /*$scope.activeTemplate = "html/mapPopView1.html";
                 $scope.showMapPopupModel = true;
 
                 var userLoc = {
@@ -814,12 +814,12 @@ var res = angular.module('ezeidApp').
                     IDTypeID : IDTypeID
                 };
 
-                $window.localStorage.setItem("myLocation", JSON.stringify(userLoc));
+                $window.localStorage.setItem("myLocation", JSON.stringify(userLoc));*/
 
 
 
-               // var params = '?endLat='+Latitude+'&endLong='+Longitude+'&IDTypeID='+IDTypeID;
-               // $location.url('/showmapview'+params);
+                var params = '?endLat='+Latitude+'&endLong='+Longitude+'&IDTypeID='+IDTypeID;
+                $location.url('/showmapview'+params);
 
             };
 

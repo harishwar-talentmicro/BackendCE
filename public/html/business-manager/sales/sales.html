@@ -916,15 +916,12 @@
 
         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 business-manager-item-details business-manager-input-control">
             <span class="label" style="background: #2FB501; font-size:100%">Quantity</span>
-            <input  ng-disabled="!(editPermission && editMode)" class="text-right text-info"
+            <input class="text-right text-info"
                     style="max-width:8em;width: 40%;"
                     numbers-only type="number"
                     title="Quantity"
                     ng-model="item.Qty" ng-change="(!item.Qty) ? (item.Qty = 1) : ''" min="1"
                     max="10000000000"/>
-
-
-
         </div>
     </div>
 </script>

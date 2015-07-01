@@ -37,31 +37,52 @@
             <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 col-lg-offset-2 col-md-offset-2 col-sm-offset-2 col-xs-offset-0">
                 <div class="panel panel-default" style="margin-bottom: 0px;">
                     <div class="panel-heading">
-                        <h4>View Direction</h4>
+                        <h4>Map View</h4>
                     </div>
                     <div class="panel-body setPanelPadding">
                        <div style="text-align: center"><br/>
                             <div class="well well-lg templateBoxContainer" id="googlemap">
-                                <div class="row setRowLeftRightMarginZero centerAlign">
-                                    <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8">
-                                        <div class="row setRowLeftRightMarginZero">
+                                <div ng-show="showMapWithMarker">
+                                    <div class="row setRowLeftRightMarginZero centerAlign">
+                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                             <div class="row setRowLeftRightMarginZero">
-                                               <!-- <img id="map-canvasH" ng-src="{{mapImage}}"/>-->
-                                                <img id="my-image-id"/>
+                                                <div class="row setRowLeftRightMarginZero">
+                                                    <!-- <img id="map-canvasH" ng-src="{{mapImage}}"/>-->
+                                                    <img id="my-image-id"/>
+                                                </div>
+                                            </div>
+                                            <div class="row setRowLeftRightMarginZero mapButtonContainer">
+                                               <!-- <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 searchHeaderAlignment">
+                                                    <button type="submit" class="btn btn-primary" ng-click="plotRoute()">Plot Route</button>
+                                                    <button type="button" class="btn btn-primary" ng-click="viewDirection.emailHtml()" >Directions</button>
+                                                    <button type="button" class="btn btn-primary" ng-click="viewDirection.closeForm()" >Close</button>
+                                                </div>-->
                                             </div>
                                         </div>
-                                        <div class="row setRowLeftRightMarginZero mapButtonContainer">
-                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 searchHeaderAlignment">
-                                                <button type="submit" class="btn btn-primary" ng-click="viewDirection.printHtml()">Print Map</button>
-                                                <button type="button" class="btn btn-primary" ng-click="viewDirection.emailHtml()" >Email</button>
-                                                <button type="button" class="btn btn-primary" ng-click="viewDirection.closeForm()" >Close</button>
+                                    </div><br/>
+                                </div>
+                                <div ng-hide="showMapWithMarker">
+                                    <div class="row setRowLeftRightMarginZero centerAlign">
+                                        <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8">
+                                            <div class="row setRowLeftRightMarginZero">
+                                                <div class="row setRowLeftRightMarginZero">
+                                                    <!-- <img id="map-canvasH" ng-src="{{mapImage}}"/>-->
+                                                   <!-- <img id="my-image-id"/>-->
+                                                </div>
+                                            </div>
+                                            <div class="row setRowLeftRightMarginZero mapButtonContainer">
+                                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 searchHeaderAlignment">
+                                                    <button type="submit" class="btn btn-primary" ng-click="viewDirection.printHtml()">Plot Route</button>
+                                                    <button type="button" class="btn btn-primary" ng-click="viewDirection.emailHtml()" >Directions</button>
+                                                    <button type="button" class="btn btn-primary" ng-click="viewDirection.closeForm()" >Close</button>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4" style="font-size: 10px;">
-                                        <div id="directions-panel"></div>
-                                    </div>
-                                </div><br/>
+                                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4" style="font-size: 10px;">
+                                            <div id="directions-panel"></div>
+                                        </div>
+                                    </div><br/>
+                                </div>
                            </div>
                        </div>
                     </div>

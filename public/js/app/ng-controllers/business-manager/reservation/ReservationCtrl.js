@@ -240,7 +240,7 @@ var res = angular.module('ezeidApp').
                     };
                     $scope.resources.push(tempArr);
                 }
-                //console.log($scope.resources);
+                ////console.log($scope.resources);
                 setAccessRights($scope.resources[0].operator);
                 $scope.description = $scope.resources.length > 0?$scope.resources[0].description:'';
                 $scope.$emit('$preLoaderStop');
@@ -602,7 +602,7 @@ var res = angular.module('ezeidApp').
                     prevAvailable = $('.available').length;
                 }
 
-                //console.log('COLOR WORKING HOURS - ',reloadCalanderFlag,reservationMooduleStarterFlag,workingHrs.length, $('.available').length);
+                ////console.log('COLOR WORKING HOURS - ',reloadCalanderFlag,reservationMooduleStarterFlag,workingHrs.length, $('.available').length);
 
                 if(workingHrs.length == 0)
                 {
@@ -620,7 +620,7 @@ var res = angular.module('ezeidApp').
                 {
                     $scope.colorWorkingHoursFlag = true;
                 }
-                //console.log('colorWorkingHoursFlag------------------------------------------');
+                ////console.log('colorWorkingHoursFlag------------------------------------------');
                 /* RESET CALENDAR */////////////////////////////////////////////////////////
                 /* clean the calendar's working hour */
                 cleanCalendarData();
@@ -705,9 +705,9 @@ var res = angular.module('ezeidApp').
                         prevReserved = $('.reserved').length;
                     }
                 }
-                //console.log('ALREADY RESERVED SLOT - ',reloadWorkingHoursFlag,reservationMooduleStarterFlag,
+                ////console.log('ALREADY RESERVED SLOT - ',reloadWorkingHoursFlag,reservationMooduleStarterFlag,
                 //    $scope.reservedTime.length,$('.reserved').length);
-                //console.log('alreadyReserveSlotFlag---------------------------------------------------------');
+                ////console.log('alreadyReserveSlotFlag---------------------------------------------------------');
                 //$scope.alreadyReserveSlotFlag = true;
                 for (var i = 0; i < $scope.reservedTime.length; i++) {
                     /* get blocks coming under this range */
@@ -723,7 +723,7 @@ var res = angular.module('ezeidApp').
                     $scope.mergeBlockMaster(data[0], data[1], text, $scope.height,color,title,tid,reserverId);
                     /* strike the text if the status is closed */
                     strikeText($scope.reservedTime[i][6],$scope.reservedTime[i][5]);
-                    //console.log($('.block-'+(data[0]+1)).attr('class'));
+                    ////console.log($('.block-'+(data[0]+1)).attr('class'));
                 }
             };
 
@@ -746,7 +746,7 @@ var res = angular.module('ezeidApp').
                     $scope.colorBlocks(startRange, endRange, color,'reserved');
                     /* add a flag to the first block for making it reserved */
                     $('.block-'+startRange).attr('title',title).attr('data-tid',tid).attr('data-reserver',reserverId);
-                    //console.log($('.block-'+(startRange+1)).attr('class'));
+                    ////console.log($('.block-'+(startRange+1)).attr('class'));
                 }
             }
 
@@ -834,7 +834,7 @@ var res = angular.module('ezeidApp').
 
             /* Color the blocks */
             $scope.colorBlocks = function (startBlock, endBlock, color, addCss) {
-                //console.log(startBlock, endBlock, color, addCss);
+                ////console.log(startBlock, endBlock, color, addCss);
                 var css = '';
                 if(typeof(addCss) != 'undefined')
                 {
@@ -844,7 +844,7 @@ var res = angular.module('ezeidApp').
                     $('.block-' + j).css('background-color', color);
                     $('.block-' + j).addClass(css);
                 }
-                //console.log($('.block-'+startBlock).attr('class'));
+                ////console.log($('.block-'+startBlock).attr('class'));
             }
 
             var getRandomNumber = function (len) {
@@ -860,7 +860,7 @@ var res = angular.module('ezeidApp').
             /* Get the text of for the reserved dates based on the user'is id */
             $scope.getReservedBlockText = function(loggedInUid,reserverId,text)
             {
-                console.log(loggedInUid,reserverId);
+                //console.log(loggedInUid,reserverId);
                 if(!$scope.isResource) {
                     if (loggedInUid != reserverId) {
                         return 'Reserved';
@@ -924,7 +924,7 @@ var res = angular.module('ezeidApp').
                 {
                     $scope.appendColorIndexFlag = true;
                 }
-                //console.log('test');
+                ////console.log('test');
                 for (var i = 0; i < $scope.colorIndex.length; i++)
                 {
                     $('.color-index-'+i).css('color',$scope.colorIndex[i][0]);
@@ -1131,7 +1131,7 @@ var res = angular.module('ezeidApp').
              */
             $scope.currentDateTime = moment().format('DD-MMM-YYYY');
             $scope.$watch('currentDateTime',function(newVal,oldVal){
-                //console.log('===========================================================================================');
+                ////console.log('===========================================================================================');
                 if(oldVal !== newVal){
                     $scope.activeDate = moment(newVal).format('DD-MMM-YYYY');
                     /* reload calendar */
@@ -1153,7 +1153,7 @@ var res = angular.module('ezeidApp').
              */
             $scope.activateResource = function(tid)
             {
-                //console.log('=========================================================================================');
+                ////console.log('=========================================================================================');
                 $scope.activeResourceId = tid;
                 /** check if the logged in uid and this resource id is same
                  * for enabling or disabling the appointment list
@@ -1183,7 +1183,7 @@ var res = angular.module('ezeidApp').
              */
             $scope.reloadCalander = function()
             {
-                //console.log('R E L O A D CALENDAR');
+                ////console.log('R E L O A D CALENDAR');
                 var tid = $scope.activeResourceId;
                 var date = $scope.activeDate;
                 /* http request for getting the new calendar data */
@@ -1511,7 +1511,7 @@ var res = angular.module('ezeidApp').
             $scope.counter = 1;
             $scope.counterFun = function()
             {
-                console.log($scope.counter++);
+                //console.log($scope.counter++);
             }
 
             /**
@@ -1523,8 +1523,8 @@ var res = angular.module('ezeidApp').
              */
             function setAccessRights(activatedResourceEzeid)
             {
-                console.log(activatedResourceEzeid);
-                console.log($rootScope._userInfo.ezeid);
+                //console.log(activatedResourceEzeid);
+                //console.log($rootScope._userInfo.ezeid);
 
 
                 var operatorArr = activatedResourceEzeid.split(',');

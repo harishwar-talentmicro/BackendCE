@@ -23,34 +23,36 @@ angular.module('ezeidApp').controller('ShowMapViewCtrl',[
         )
     {
         var viewDirection = this;
-
         var MsgDelay = 2000;
-        var lat = 0, lng = 0;
+        $scope.showMapWithMarker = true;
+        $scope.$emit('$preLoaderStart');
+
 
         var googleMap = new GoogleMap();
         googleMap.getCurrentLocation().then(function(){
-            var lat = googleMap.currentMarkerPosition.latitude;
-            var lng = googleMap.currentMarkerPosition.longitude;
+            $scope.lat = googleMap.currentMarkerPosition.latitude;
+            $scope.lng = googleMap.currentMarkerPosition.longitude;
 
-            console.log(lat);
-            console.log(lng);
+            getStaticMap();
 
         });
 
-        console.log($routeParams);
-        getStaticMap();
+       // console.log($routeParams);
+
 
         function getStaticMap()
         {
-
            /* document.getElementById('my-image-id').src = "http://maps.google.com/staticmap?center=37.687,-122.407&zoom=8&size=450x300&maptype=terrain&key=&sensor=false";*/
 
-            document.getElementById('my-image-id').src = "https://maps.googleapis.com/maps/api/staticmap?zoom=6&size=400x400&markers=color:blue%7Clabel:S%"+lat+","+lng+"&markers=size:tiny%7Ccolor:green%7C"+ $routeParams.endLat +", " + $routeParams.endLong +"&markers=size:mid%7Ccolor:0xFFFF00%7Clabel:C%7CTok,AK%22";
-
-            return;
+           /* document.getElementById('my-image-id').src = "https://maps.googleapis.com/maps/api/staticmap?zoom=6&size=400x400&markers=color:blue%7Clabel:S%"+lat+","+lng+"&markers=size:tiny%7Ccolor:green%7C"+ $routeParams.endLat +", " + $routeParams.endLong +"&markers=size:mid%7Ccolor:0xFFFF00%7Clabel:C%7CTok,AK%22";*/
 
 
-           $http({
+            document.getElementById('my-image-id').src = "https://maps.googleapis.com/maps/api/staticmap?zoom=12&size=800x500&markers=color:blue%7Clabel:C%7C"+$scope.lat+","+$scope.lng+"&markers=color:red%7Clabel:A%7C"+$routeParams.endLat+","+$routeParams.endLong;
+            $scope.$emit('$preLoaderStop');
+            //return;
+
+
+           /*$http({
                 url: 'https://maps.googleapis.com/maps/api/staticmap',
                 method: "GET",
                 params: {
@@ -76,8 +78,15 @@ angular.module('ezeidApp').controller('ShowMapViewCtrl',[
 
                 }).error(function (err) {
                     $scope.$emit('$preLoaderStop');
-                });
+                });*/
         }
+
+        $scope.plotRoute = function(){
+
+           // console.log("SAi5");
+
+
+        };
 
 
 

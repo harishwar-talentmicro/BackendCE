@@ -224,8 +224,8 @@ angular.module('ezeidApp').controller('ProfileCtrl',[
                     LangID : 1
                 }
             }).success(function(resp){
-                    // ////////console.log('Country List');
-                    // ////////console.log(JSON.stringify(resp));
+                    // //////////console.log('Country List');
+                    // //////////console.log(JSON.stringify(resp));
                     promiseResolved = true;
                     if(resp && resp.length > 0 && resp !== 'null'){
                         $scope.countryList = resp;
@@ -263,8 +263,8 @@ angular.module('ezeidApp').controller('ProfileCtrl',[
                     Token : $rootScope._userInfo.Token
                 }
             }).success(function(resp){
-                    // ////////console.log('Secondary Location List');
-                    // ////////console.log(JSON.stringify(resp));
+                    // //////////console.log('Secondary Location List');
+                    // //////////console.log(JSON.stringify(resp));
                     promiseResolved = true;
                     if(resp && resp.length > 0 && resp !== 'null'){
                         for(var i = 0; i < resp.length; i++){
