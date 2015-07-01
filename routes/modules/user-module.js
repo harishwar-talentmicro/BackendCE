@@ -1202,7 +1202,6 @@ User.prototype.forgetPassword = function(req,res,next){
     }
 };
 
-
 /**
  * Method : GET
  * @param req
@@ -2090,7 +2089,6 @@ User.prototype.getSkills = function(req,res,next){
 
     }
 };
-
 
 /**
  * Method : GET

@@ -81,11 +81,11 @@ Reservation.prototype.SaveReservTrans = function(req,res,next){
                 if (!err) {
                     if (result != null) {
 
-                        var query = db.escape(TID) + ',' + db.escape(Token) + ',' + db.escape(contactinfo) + ',' + db.escape(toEzeid) + ',' + db.escape(resourceid) + ',' + db.escape(res_datetime) + ',' + db.escape(duration) + ',' + db.escape(status) + ',' + db.escape(serviceid);
+                        var query = _this.db.escape(TID) + ',' + _this.db.escape(Token) + ',' + _this.db.escape(contactinfo) + ',' + _this.db.escape(toEzeid) + ',' + _this.db.escape(resourceid) + ',' + _this.db.escape(res_datetime) + ',' + _this.db.escape(duration) + ',' + _this.db.escape(status) + ',' + _this.db.escape(serviceid);
                         console.log(query);
                         console.log('CALL pSaveResTrans(' + query + ')');
 
-                        db.query('CALL pSaveResTrans(' + query + ')', function (err, insertResult) {
+                        _this.db.query('CALL pSaveResTrans(' + query + ')', function (err, insertResult) {
                             console.log(insertResult);
                             console.log(err);
                             if (!err){
@@ -185,7 +185,7 @@ Reservation.prototype.getReservTrans = function(req,res,next){
 
         if (resourceid) {
 
-            db.query('CALL pGetResTrans(' + db.escape(resourceid) + ',' + db.escape(date) + ',' + db.escape(toEzeid) + ')', function (err, GetResult) {
+            _this.db.query('CALL pGetResTrans(' + _this.db.escape(resourceid) + ',' + _this.db.escape(date) + ',' + _this.db.escape(toEzeid) + ')', function (err, GetResult) {
                 if (!err) {
                     if (GetResult) {
                         if (GetResult[0].length > 0) {
@@ -273,7 +273,7 @@ Reservation.prototype.getMapedServices = function(req,res,next){
         };
 
         if (ezeid) {
-            db.query('CALL pgetMapedservices(' + db.escape(ezeid) + ',' + db.escape(resourceid) + ')', function (err, GetResult) {
+            _this.db.query('CALL pgetMapedservices(' + _this.db.escape(ezeid) + ',' + _this.db.escape(resourceid) + ')', function (err, GetResult) {
                 if (!err) {
                     if (GetResult) {
                         if (GetResult[0].length > 0) {
@@ -361,7 +361,7 @@ Reservation.prototype.getTransDetails = function(req,res,next){
 
         if (TID) {
 
-            db.query('CALL pGetResTransDetails(' + db.escape(TID) + ')', function (err, GetResult) {
+            _this.db.query('CALL pGetResTransDetails(' + _this.db.escape(TID) + ')', function (err, GetResult) {
                 if (!err) {
                     if (GetResult) {
                         if (GetResult[0].length > 0) {
@@ -473,8 +473,8 @@ Reservation.prototype.changeReservStatus = function(req,res,next){
             return;
         }
         else{
-            var queryParam = db.escape(tid) + ',' + db.escape(status);
-            db.query('CALL PUpdateResTransStatus(' + queryParam + ')', function (err, updateRes) {
+            var queryParam = _this.db.escape(tid) + ',' + _this.db.escape(status);
+            _this.db.query('CALL PUpdateResTransStatus(' + queryParam + ')', function (err, updateRes) {
                 if(err){
                     responseMsg.message = 'An error occurred ! Please try again';
                     responseMsg.error['server'] = 'Internal Server Error';
@@ -511,6 +511,95 @@ Reservation.prototype.changeReservStatus = function(req,res,next){
             });
         }
     });
+};
+
+/**
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ */
+Reservation.prototype.getworkinghoursList = function(req,res,next){
+    /**
+     * @todo FnGetworkinghoursList
+     */
+    var _this = this;
+    try {
+
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.query.Token;
+
+        var responseMessage = {
+            status: false,
+            data: null,
+            error:{},
+            message:''
+        };
+
+        if (Token) {
+
+            _this.db.query('CALL PGetworkinghoursList(' + _this.db.escape(Token) + ')', function (err, GetResult) {
+                console.log(GetResult)
+                if (!err) {
+                    if (GetResult) {
+                        if (GetResult[0].length > 0) {
+                            responseMessage.status = true;
+                            responseMessage.data = GetResult[0] ;
+                            responseMessage.error = null;
+                            responseMessage.message = ' Working hours list Send successfully';
+                            console.log('FnGetworkinghoursList:Working hours list Send successfully');
+                            res.status(200).json(responseMessage);
+                        }
+                        else {
+
+                            responseMessage.error = {};
+                            responseMessage.message = 'No founded Working hours list';
+                            console.log('FnGetworkinghoursList: No founded Working hours list');
+                            res.json(responseMessage);
+                        }
+                    }
+                    else {
+
+
+                        responseMessage.error = {};
+                        responseMessage.message = 'No founded Working hours list';
+                        console.log('FnGetworkinghoursList: No founded Working hours list');
+                        res.json(responseMessage);
+                    }
+
+                }
+                else {
+
+                    responseMessage.data = null ;
+                    responseMessage.error = {};
+                    responseMessage.message = 'Error in getting Working hours list';
+                    console.log('FnGetworkinghoursList: error in getting Working hours list' + err);
+                    res.status(500).json(responseMessage);
+                }
+            });
+        }
+
+        else {
+            if (!Token) {
+                responseMessage.message = 'Invalid Token';
+                responseMessage.error = {
+                    Token : 'Invalid Token'
+                };
+                console.log('FnGetworkinghoursList: Token is mandatory field');
+            }
+
+            res.status(401).json(responseMessage);
+        }
+    }
+    catch (ex) {
+        responseMessage.error = {};
+        responseMessage.message = 'An error occured !'
+        console.log('FnGetworkinghoursList:error ' + ex.description);
+
+        res.status(400).json(responseMessage);
+    }
 };
 
 module.exports = Reservation;
