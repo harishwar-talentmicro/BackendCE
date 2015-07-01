@@ -68,7 +68,7 @@ angular.module('ezeidApp').controller('BusinessManagerCtrl',[
             },
             {
                 title : ($rootScope._userInfo.AppointmentModuleTitle) ? $rootScope._userInfo.AppointmentModuleTitle :'Reservation',
-                permission :  0,
+                permission :  1,
                 listType : ($rootScope._userInfo.ReservationItemListType) ? $rootScope._userInfo.ReservationItemListType : 0,
                 message : ($rootScope._userInfo.ReservationFormMsg) ? $rootScope._userInfo.ReservationFormMsg : '',
                 icon : 'glyphicon glyphicon-calendar',

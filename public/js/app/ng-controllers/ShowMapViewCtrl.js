@@ -6,6 +6,7 @@ angular.module('ezeidApp').controller('ShowMapViewCtrl',[
     'Notification',
     '$timeout',
     '$window',
+    '$location',
     '$routeParams',
     'GURL',
     'GoogleMaps',
@@ -17,102 +18,137 @@ angular.module('ezeidApp').controller('ShowMapViewCtrl',[
         Notification,
         $timeout,
         $window,
+        $location,
         $routeParams,
         GURL,
-        GoogleMap
+        GoogleMaps
         )
     {
         var viewDirection = this;
         var MsgDelay = 2000;
         $scope.showMapWithMarker = true;
+        var loadMapFirstTime = true;
+
+        var directionsDisplay;
+        var directtionLatLong;
+
+        /* integrate google map */
+        var googleMap = new GoogleMaps();
         $scope.$emit('$preLoaderStart');
 
+        function getStaticMap()
+        {
+            document.getElementById('my-image-id').src = "https://maps.googleapis.com/maps/api/staticmap?zoom=12&size=800x500&markers=color:blue%7Clabel:C%7C"+$scope.lat+","+$scope.lng+"&markers=color:red%7Clabel:A%7C"+$routeParams.endLat+","+$routeParams.endLong;
+            $scope.$emit('$preLoaderStop');
+        }
 
-        var googleMap = new GoogleMap();
         googleMap.getCurrentLocation().then(function(){
             $scope.lat = googleMap.currentMarkerPosition.latitude;
             $scope.lng = googleMap.currentMarkerPosition.longitude;
 
             getStaticMap();
-
         });
 
-       // console.log($routeParams);
+        $scope.userLat = $routeParams.endLat;
 
+        $scope.findCurrentLocation = function(){
+            googleMap.getCurrentLocation().then(function(){
+                googleMap.placeCurrentLocationMarker(null,null,true);
+            },function(){
+                googleMap.placeCurrentLocationMarker(null,null,true);
+            });
+        };
+        var initializeMap = function(){
 
-        function getStaticMap()
-        {
-           /* document.getElementById('my-image-id').src = "http://maps.google.com/staticmap?center=37.687,-122.407&zoom=8&size=450x300&maptype=terrain&key=&sensor=false";*/
+            googleMap.setSettings({
+                mapElementClass : "col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix class-map-ctrl",
+                searchElementClass : "form-control pull-left pac-input",
+                currentLocationElementClass : "link-btn pac-loc",
+                controlsContainerClass : "col-lg-6 col-md-6'"
+            });
+            googleMap.createMap("map-ctrl",$scope,"findCurrentLocation()");
+            googleMap.renderMap();
 
-           /* document.getElementById('my-image-id').src = "https://maps.googleapis.com/maps/api/staticmap?zoom=6&size=400x400&markers=color:blue%7Clabel:S%"+lat+","+lng+"&markers=size:tiny%7Ccolor:green%7C"+ $routeParams.endLat +", " + $routeParams.endLong +"&markers=size:mid%7Ccolor:0xFFFF00%7Clabel:C%7CTok,AK%22";*/
+            googleMap.mapIdleListener().then(function(){
+                googleMap.pushMapControls();
+                googleMap.listenOnMapControls(function(lat,lng){
+                    googleMap.currentMarkerPosition.latitude = lat;
+                    googleMap.currentMarkerPosition.longitude = lng;
+                },function(lat,lng){
+                    googleMap.currentMarkerPosition.latitude = lat;
+                    googleMap.currentMarkerPosition.longitude = lng;
+                });
+                googleMap.getCurrentLocation().then(function(){
+                    googleMap.resizeMap();
+                    googleMap.placeCurrentLocationMarker(function(lat,lng){
+                        googleMap.currentMarkerPosition.latitude = lat;
+                        googleMap.currentMarkerPosition.longitude = lng;
+                    },function(lat,lng){
+                        googleMap.currentMarkerPosition.latitude = lat;
+                        googleMap.currentMarkerPosition.longitude = lng;
+                        googleMap.setMarkersInBounds();
+                    },false);
 
+                },function(){
+                });
+            });
 
-            document.getElementById('my-image-id').src = "https://maps.googleapis.com/maps/api/staticmap?zoom=12&size=800x500&markers=color:blue%7Clabel:C%7C"+$scope.lat+","+$scope.lng+"&markers=color:red%7Clabel:A%7C"+$routeParams.endLat+","+$routeParams.endLong;
-            $scope.$emit('$preLoaderStop');
-            //return;
+            var pos = null;
+            var title = '';
+            var containerElement = '';
 
+            pos = googleMap.createGMapPosition(
+                $routeParams.endLat,
+                $routeParams.endLong
+            );
 
-           /*$http({
-                url: 'https://maps.googleapis.com/maps/api/staticmap',
-                method: "GET",
-                params: {
-                    zoom: 6,
-                    size: "400x400",
-                    markers: "color:blue%7Clabel:S%7C62.107723,-145.541056",
-                    markers: "color:green%7C62.107731,-145.541930",
-                    markers: "color:0xFFFF00%7Clabel:C%7CTok,AK"
-                }
-            }).success(function (resp) {
-                    console.log("SAi2");
-                    console.log(resp);
-                    if(resp)
-                    {
-                        $scope.mapImage = resp;
-                      //  $('#googlemapbinary').attr('src', resp);
+            title = 'Primary Location';
+            containerElement = 'map-location-0';
 
-                       // document.getElementById('googlemapbinary').src = resp;
+           // $scope.userLat = $routeParams.endLat;
 
-                        document.getElementById('my-image-id').src = resp;
-                    }
-                   // $scope.$emit('$preLoaderStop');
+            if($routeParams.endLat)
+            {
+                var markerImage = $routeParams.IDTypeID == 1 ? 'images/Individual-Icon_48.png' : 'images/business-icon_48.png';
+                var marker = googleMap.createMarker(pos,title,markerImage,false,null);
+                googleMap.placeMarker(marker);
+            }
 
-                }).error(function (err) {
-                    $scope.$emit('$preLoaderStop');
-                });*/
-        }
-
-        $scope.plotRoute = function(){
-
-           // console.log("SAi5");
-
-
+            $timeout(function(){
+                googleMap.setMarkersInBounds();
+                $rootScope.$broadcast('$preLoaderStop');
+            },1000);
         };
 
-
-
-    //  EMail direction image
-    /*viewDirection.emailDirectionImage = function ()
-    {
-        //Below line is for Loading img
-        $scope.$emit('$preLoaderStart');
-        $http({ method: 'post', url: GURL + 'ewtSendBulkMailer', data: { Token: $rootScope._userInfo.Token, TID: "", TemplateID: "", ToMailID: viewDirection._info.ToMailID, Attachment: finalImageSrc, AttachmentFileName :'ViewDirection.jpg'} }).success(function (data)
+        $scope.plotRoute = function()
         {
-            $rootScope.$broadcast('$preLoaderStop');
-            if(data)
+            $scope.showMapWithMarker = false;
+            $scope.$emit('$preLoaderStart');
+
+            if(loadMapFirstTime)
             {
-                viewDirection._info.FromEmailID = "";
-                viewDirection._info.ToMailID = "";
-                Notification.success({message: "Mail are submitted for transmitted..", delay: MsgDelay});
-                $window.localStorage.removeItem("searchResult");
-                $scope.showEmailForm = false;
+                loadMapFirstTime = false;
+                initializeMap();
             }
             else
             {
-                Notification.error({ message: 'Sorry..! Message not send ', delay: MsgDelay });
-                $window.localStorage.removeItem("searchResult");
+                $scope.$emit('$preLoaderStop');
             }
-    });
-    };*/
 
+            $timeout(function(){
+                googleMap.clearAllMarkers();
 
+                googleMap.renderDirection('directionPannel',googleMap.currentMarkerPosition.latitude,googleMap.currentMarkerPosition.longitude,$routeParams.endLat,$routeParams.endLong);
+                googleMap.placeCurrentLocationMarker();
+                googleMap.setMarkersInBounds();
+
+            },2000);
+
+        };
+
+        //Show direction in view direction page
+        $scope.showDirections = function () {
+            var params = '?endLat='+$routeParams.endLat+'&endLong='+$routeParams.endLong+'&startLat='+googleMap.currentMarkerPosition.latitude+'&startLong='+googleMap.currentMarkerPosition.longitude+'&showbasicmap=1';
+            $location.url('/viewdirection'+params);
+        };
 }]);

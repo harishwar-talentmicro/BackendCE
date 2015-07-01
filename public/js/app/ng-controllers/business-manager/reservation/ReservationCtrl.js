@@ -52,6 +52,10 @@ var res = angular.module('ezeidApp').
             /* flag if is HTML loaded */
             $scope.ifHtmlLoaded = false;
 
+            if($location.path() == '/business-manager/reservation'){
+                $routeParams.ezeone = $rootScope._userInfo.ezeid;
+            }
+
             /* for resources availability background color */
             var availabilityColor = 'rgb(64, 242, 168)';
 
@@ -137,7 +141,9 @@ var res = angular.module('ezeidApp').
             ///////////////////////////////////////GET DEFAULT CALENDAR DATA////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            console.log($routeParams);
             $scope.searchedEzeid = $routeParams.ezeone;
+            console.log($scope.searchedEzeid);
             $scope.$emit('$preLoaderStart');
             function init(){
                 getResource($scope.searchedEzeid).then(function () {
@@ -173,9 +179,12 @@ var res = angular.module('ezeidApp').
                 }).success(function (resp) {
 
                     $scope.$emit('$preLoaderStop');
-                    if (resp.data.length > 0) {
-                        setResources(resp.data);
+                    if(resp.data){
+                        if (resp.data.length > 0) {
+                            setResources(resp.data);
+                        }
                     }
+
                     defer.resolve();
                 }).error(function (err) {
                     $scope.$emit('$preLoaderStop');

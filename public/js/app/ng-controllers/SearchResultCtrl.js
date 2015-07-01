@@ -61,9 +61,6 @@ var res = angular.module('ezeidApp').
             /* check box status array */
             $scope.checkBoxStatus = [];
 
-            $scope.activeTemplate = "";
-            $scope.showMapPopupModel = false;
-
             $scope.modalBox = {
                 title : 'EZEOne Map',
                 class : 'business-manager-modal'
@@ -802,34 +799,11 @@ var res = angular.module('ezeidApp').
             }
 
             $scope.showDirectionMapPopup = function(Latitude,Longitude,IDTypeID){
-
-
-
-                /*$scope.activeTemplate = "html/mapPopView1.html";
-                $scope.showMapPopupModel = true;
-
-                var userLoc = {
-                    endLat : Latitude,
-                    endLong : Longitude,
-                    IDTypeID : IDTypeID
-                };
-
-                $window.localStorage.setItem("myLocation", JSON.stringify(userLoc));*/
-
-
-
                 var params = '?endLat='+Latitude+'&endLong='+Longitude+'&IDTypeID='+IDTypeID;
                 $location.url('/showmapview'+params);
-
             };
 
 
-            $('#mapPOPUP').on('hidden.bs.modal', function () {
-
-                $scope.showMapPopupModel = false;
-                $scope.activeTemplate = "";
-
-            })
 
             /* check and set the value of filter-checkboxes */
             $scope.checkAndSetFilterValues = function()

@@ -32,6 +32,8 @@ angular.module('ezeidApp').controller('viewDirectionController',[
         var marker;
         var initialLocation;
         var finalImageSrc = "";
+        //$scope.showButtons = false;
+        $scope.showButtons = ($routeParams.showbasicmap == 2) ? true : false;
 
         //Below line is for Loading img
         $scope.$emit('$preLoaderStart');

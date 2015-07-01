@@ -13,6 +13,7 @@ function Search(db){
     this.db = db;
 };
 
+var path ='D:\\EZEIDBanner\\';
 /**
  * Method : POST
  * @param req
@@ -384,7 +385,7 @@ Search.prototype.searchKeyword = function(req,res,next){
  */
 Search.prototype.searchInformation = function(req,res,next){
     /**
-     * @todo FnGetSearchInformation
+     * @todo FnGetSearchInformationNew
      */
     var _this = this;
     try {
@@ -392,12 +393,11 @@ Search.prototype.searchInformation = function(req,res,next){
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
-        var Token = req.query.Token;
-        var TID = parseInt(req.query.TID);
+        var Token = req.query.Token ? req.query.Token : '';
+        var ezeTerm = req.query.ezeTerm;
         var CurrentDate = req.query.CurrentDate;
-        var SearchType = req.query.SearchType;
-        var IPAddress = (req.headers['x-forwarded-for'] || req.connection.remoteAddress ||
-        req.socket.remoteAddress || req.connection.socket.remoteAddress);
+        var IPAddress = req._remoteAddress; //(req.headers['x-forwarded-for'] || req.connection.remoteAddress)
+        console.log(IPAddress);
         var WorkingDate
         var moment = require('moment');
         if(CurrentDate != null)
@@ -406,136 +406,68 @@ Search.prototype.searchInformation = function(req,res,next){
             var WorkingDate = moment(new Date()).format('YYYY-MM-DD HH:MM');
         //console.log(WorkingDate);
 
-        if (Token != null && Token != '' && TID.toString() != 'NaN' && WorkingDate != null) {
-            if(Token == 2){
+        if (ezeTerm) {
+            var LocSeqNo = 0;
+            var EZEID, Pin = null;
+            var FindArray = ezeTerm.split('.');
 
-                var SearchParameter = _this.db.escape(TID) + ',' + _this.db.escape(Token) + ',' + _this.db.escape(WorkingDate)
-                    + ',' + _this.db.escape(SearchType)+ ',' + _this.db.escape(0) + ',' + _this.db.escape(IPAddress);
-                // console.log('Search Information: ' +SearchParameter);
-                //     console.log('CALL pSearchInformation(' + SearchParameter + ')');
-                _this.db.query('CALL pSearchInformation(' + SearchParameter + ')', function (err, UserInfoResult) {
-                    // _this.db.query(searchQuery, function (err, SearchResult) {
-                    if (!err) {
-                        // console.log(UserInfoResult);
-                        if (UserInfoResult[0].length > 0) {
-                            res.send(UserInfoResult[0]);
-                            console.log('FnSearchEzeid: tmaster: Search result sent successfully');
+            if (FindArray.length > 0) {
+                EZEID = FindArray[0];
+                //checking the fisrt condition
+                if (FindArray.length > 1) {
+                    if (FindArray[1] != '') {
+                        if (FindArray[1].charAt(0).toUpperCase() == 'L') {
+                            LocSeqNo = FindArray[1].toString().substring(1, FindArray[1].length);
                         }
+
                         else {
-                            var searchParams = _this.db.escape(TID) + ',' + _this.db.escape(Token) + ',' + _this.db.escape(WorkingDate)
-                                + ',' + _this.db.escape(SearchType)+ ',' + _this.db.escape(1) + ',' + _this.db.escape(IPAddress);
-                            _this.db.query('CALL pSearchInformation('+ searchParams +')', function (err, UserInfoReResult) {
-                                if(!err){
-                                    if(UserInfoReResult[0].length > 0){
-                                        res.send(UserInfoReResult[0]);
-                                        console.log('FnSearchEzeid: tmaster: Search result re sent successfully');
-                                    }
-                                    else
-                                    {
-                                        res.json(null);
-                                        console.log('FnSearchEzeid: tmaster: no re search infromation ');
-                                    }
-
-                                }
-                                else {
-                                    res.statusCode = 500;
-                                    res.json(null);
-                                    console.log('FnSearchEzeid: tmaster: ' + err);
-                                }
-                            });
+                            LocSeqNo = 0;
+                            Pin = FindArray[1];
                         }
+                        //checking the second condition
+                        if (typeof FindArray[2] != 'undefined') {
+                            Pin = FindArray[2];
+                        }
+                        //checking the final condition
+                    }
+                }
+            }
+            var SearchParameter = _this.db.escape(Token) + ',' + _this.db.escape(WorkingDate) + ',' + _this.db.escape(IPAddress) + ',' + _this.db.escape(EZEID) + ',' + _this.db.escape(LocSeqNo) + ',' + _this.db.escape(Pin);
+            console.log('CALL pSearchInformationNew(' + SearchParameter + ')');
+            _this.db.query('CALL pSearchInformationNew(' + SearchParameter + ')', function (err, UserInfoResult) {
+                // _this.db.query(searchQuery, function (err, SearchResult) {
+                if (!err) {
+                    // console.log(UserInfoResult);
+                    if (UserInfoResult[0].length > 0) {
+                        res.send(UserInfoResult[0]);
+                        console.log('FnGetSearchInformationNew: tmaster: Search result sent successfully');
                     }
                     else {
-                        res.statusCode = 500;
-                        res.json(null);
-                        console.log('FnSearchEzeid: tmaster: ' + err);
+                        res.send('null');
+                        console.log('FnGetSearchInformationNew: tmaster: no re search infromation ');
                     }
-                });
 
-            }
-            else
-            {
-                FnValidateToken(Token, function (err, Result) {
-                    if (!err) {
-                        if (Result) {
-                            var SearchParameter = _this.db.escape(TID) + ',' + _this.db.escape(Token) + ',' + _this.db.escape(WorkingDate)+ ',' + _this.db.escape(SearchType)+',' + _this.db.escape(0) + ',' + _this.db.escape(IPAddress);
-                            // console.log('Search Information: ' +SearchParameter);
-                            // console.log('CALL pSearchInformation(' + SearchParameter + ')');
-                            _this.db.query('CALL pSearchInformation(' + SearchParameter + ')', function (err, UserInfoResult) {
-                                // _this.db.query(searchQuery, function (err, SearchResult) {
-                                if (!err) {
-                                    // console.log(UserInfoResult);
-                                    if (UserInfoResult[0].length > 0) {
-                                        res.send(UserInfoResult[0]);
-                                        console.log('FnSearchEzeid: tmaster: Search result sent successfully');
-                                    }
-                                    else {
-                                        var searchParams = _this.db.escape(TID) + ',' + _this.db.escape(Token) + ',' + _this.db.escape(WorkingDate)
-                                            + ',' + _this.db.escape(SearchType)+ ',' + _this.db.escape(1) + ',' + _this.db.escape(IPAddress);
-                                        _this.db.query('CALL pSearchInformation('+ searchParams +')', function (err, UserInfoReResult) {
-                                            if(!err){
-                                                if(UserInfoReResult[0].length > 0){
-                                                    res.send(UserInfoReResult[0]);
-                                                    console.log('FnSearchEzeid: tmaster: Search result re sent successfully');
-                                                }
-                                                else
-                                                {
-                                                    res.json(null);
-                                                    console.log('FnSearchEzeid: tmaster: no re search infromation ');
-                                                }
-                                            }
-                                            else {
-                                                res.statusCode = 500;
-                                                res.json(null);
-                                                console.log('FnSearchEzeid: tmaster: ' + err);
-                                            }
-                                        });
-                                    }
-                                }
-                                else {
-                                    res.statusCode = 500;
-                                    res.json(null);
-                                    console.log('FnSearchEzeid: tmaster: ' + err);
-                                }
-                            });
-
-                        }
-                        else {
-                            console.log('FnGetSearchInformation: Invalid token');
-                            res.statusCode = 401;
-                            res.json(null);
-                        }
-                    }
-                    else {
-                        console.log('FnGetSearchInformation: Token error: ' + err);
-                        res.statusCode = 500;
-                        res.json(null);
-
-                    }
-                });
-            }
+                }
+                else {
+                    res.statusCode = 500;
+                    res.send('null');
+                    console.log('FnGetSearchInformationNew: tmaster: ' + err);
+                }
+            });
         }
-        else {
-            if (Token = null) {
-                console.log('FnGetUserDetails: Token is empty');
-            }
-            else if (TID == 'NaN') {
-                console.log('FnGetUserDetails: TID is empty');
-            }
-            else if (CurrentDate == null) {
-                console.log('FnGetUserDetails: CurrentDate is empty');
-            }
 
+        else {
+            if (ezeTerm = null) {
+                console.log('FnGetSearchInformationNew: ezeTerm is empty');
+            }
             res.statusCode = 400;
             res.json(null);
         }
     }
     catch (ex) {
         console.log('FnGetUserDetails error:' + ex.description);
-          
+        //throw new Error(ex);
     }
-
-
 };
 
 
@@ -800,6 +732,111 @@ function FnHolidayList(HolidayContent, CallBack) {
         //throw new Error(ex);
         return 'error'
     }
+};
+
+/**
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ */
+Search.prototype.getBanner = function(req,res,next){
+    /**
+     * @todo FnGetBannerPicture
+     */
+    var _this = this;
+try{
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    var SeqNo = parseInt(req.query.SeqNo);
+    var StateTitle = req.query.StateTitle;
+    var Ezeid = req.query.Ezeid;
+    var LocID = req.query.LocID;
+    // var TokenNo = req.query.Token;
+
+    RtnMessage = {
+        Picture: ''
+    };
+    var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
+    Ezeid = Ezeid.split(',').pop();
+    if ( SeqNo.toString() != 'NaN' && Ezeid != null && LocID != null) {
+        var Query = _this.db.escape(Ezeid) + ',' + _this.db.escape(SeqNo) + ',' + _this.db.escape(0);
+        //console.log(InsertQuery);
+        _this.db.query('CALL PGetBannerPicsUsers(' + Query + ')', function (err, BannerResult) {
+            if (!err) {
+                //console.log(InsertResult);
+                if (BannerResult != null) {
+                    if (BannerResult[0].length > 0) {
+                        var Picture = BannerResult[0];
+                        console.log('FnGetBannerPicture: Banner picture sent successfully');
+                        res.setHeader('Cache-Control', 'public, max-age=150000');
+                        console.log('FnGetBannerPicture: Banner picture sent successfully');
+                        RtnMessage.Picture = Picture[0].Picture;
+                        res.send(RtnMessage);
+                    }
+                    else {
+                        fs = require('fs');
+                        //  var path = path + StateTitle+'.jpg' ;
+                        fs.exists(path + StateTitle + '.jpg', function (exists) {
+                            console.log(exists)
+                            if (exists) {
+                                var bitmap = fs.readFileSync(path + StateTitle + '.jpg');
+                                // convert binary data to base64 encoded string
+                                RtnMessage.Picture = new Buffer(bitmap).toString('base64');
+                                res.send(RtnMessage);
+                                console.log('FnGetBannerPicture: State Banner sent successfully');
+                            }
+                            else {
+                                // path ='D:\\Mail\\Default.jpg';
+                                fs.exists(path + StateTitle + '.jpg', function (exists) {
+                                    console.log(exists)
+                                    if (exists) {
+
+                                        var bitmap = fs.readFileSync(path + 'Default.jpg');
+                                        // convert binary data to base64 encoded string
+                                        RtnMessage.Picture = new Buffer(bitmap).toString('base64');
+                                        res.send(RtnMessage);
+                                        console.log('FnGetBannerPicture: Default Banner sent successfully');
+                                    }
+                                    else {
+                                        res.json(null);
+                                        console.log('FnGetBannerPicture: Default Banner not available');
+                                    }
+                                });
+                            }
+                        });
+                    }
+                }
+                else {
+                    res.json(null);
+                    console.log('FnGetBannerPicture:tmaster: Registration Failed');
+                }
+            }
+            else {
+                res.statusCode = 500;
+                res.json(null);
+                console.log('FnGetBannerPicture:tmaster:' + err);
+            }
+        });
+    }
+    else {
+        if (SeqNo.toString() == 'NaN') {
+            console.log('FnGetBannerPicture: SeqNo is empty');
+        }
+        else if(Ezeid == null) {
+            console.log('FnGetBannerPicture: Ezeid is empty');
+        }
+        else if(LocID == null) {
+            console.log('FnGetBannerPicture: LocID is empty');
+        }
+        res.statusCode=400;
+        res.json(null);
+    }
+
+}
+catch (ex) {
+    console.log('FnGetBannerPicture error:' + ex.description);
+}
 };
 
 module.exports = Search;
