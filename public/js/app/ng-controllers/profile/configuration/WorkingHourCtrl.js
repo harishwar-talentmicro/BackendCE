@@ -61,16 +61,15 @@ angular.module('ezeidApp').controller('WorkingHourCtrl',['$scope','$rootScope','
                 Token : $rootScope._userInfo.Token
             }
         }).success(function (data) {
-              //  //console.log(data);
-               if (data != 'null')
-                {
-                   $scope.result = data;
-                }
-                else
-                {
-                   $scope.result = [];
-                }
-            });
+           if (data != 'null')
+            {
+               $scope.result = data;
+            }
+            else
+            {
+               $scope.result = [];
+            }
+        });
     }
 
     $scope.openAddWorkingHourForm = function(){
@@ -197,11 +196,18 @@ angular.module('ezeidApp').controller('WorkingHourCtrl',['$scope','$rootScope','
                     TID: _TID
                 }
             }).success(function (data) {
-                    if(data.IsSuccessfull)
-                    {
-                        getWorkingHours();
-                    }
-                });
+                if(data.IsSuccessfull)
+                {
+                    getWorkingHours();
+                }
+                else
+                {
+                    Notification.error({ message: "Working hours template is in used !", delay: MsgDelay });
+                }
+            })
+            .error(function(data, status, headers, config) {
+               //console.log(data);
+            });
         };
 
         function getWorkingHourForEdit(_TID)

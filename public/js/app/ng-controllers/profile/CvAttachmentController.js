@@ -7,6 +7,14 @@ angular.module('ezeidApp').controller('CVAttachController',[
     var MsgDelay = 2000;
     // Add more skills
     $scope.skillMatrix = [];
+        $scope.editMode = [];
+        $scope.editSkill = {
+            "tid":0,
+            "skillname":"",
+            "expertiseLevel":0,
+            "exp":0.00,
+            "active_status":true
+        };
 
     var skillsTid = [];
     $scope.availableTags = [];
@@ -227,10 +235,24 @@ angular.module('ezeidApp').controller('CVAttachController',[
                         }
                     }
 
+                    for(var ct=0; ct < $scope.skillMatrix.length; ct++){
+                       if(ct == 0){
+                           $scope.editMode[ct] = true;
+                       }
+                        else{
+                           $scope.editMode[ct] = false;
+                       }
+                    }
+
+
+
                     for (var nCount = 0; nCount < $scope.skillMatrix.length; nCount++) {
                         $scope.skillMatrix[nCount].active_status = ($scope.skillMatrix[nCount].active_status == 1) ? true : false;
                         skillsTid.push($scope.skillMatrix[nCount].tid);
                     }
+
+                    $scope.editSkill = angular.copy($scope.skillMatrix[0]);
+
 
                     if(CVAttachCtrl._CVInfo.Pin)
                     {
@@ -256,6 +278,54 @@ angular.module('ezeidApp').controller('CVAttachController',[
                 }
            });
     };
+
+
+
+        var editSkill = {
+            "tid":0,
+            "skillname":"",
+            "expertiseLevel":0,
+            "exp":"",
+            "active_status":1
+        };
+
+        $scope.editSkillFn = function(index){
+            $scope.editSkill = angular.copy($scope.skillMatrix[index]);
+            for(var ct=0; ct < $scope.skillMatrix.length; ct++){
+                if($scope.editMode[ct] && ct !== index){
+                    $scope.editMode[ct] = false;
+                }
+                else if(ct == index){
+                    $scope.editMode[ct] = true;
+                }
+            }
+        };
+
+        $scope.$watch('editSkill.exp',function(n,v){
+            if(parseFloat(n) == NaN){
+                $scope.editSkill.exp = 0.0;
+            }
+            if(n && (n !== v)){
+                $scope.editSkill.exp = (parseFloat($scope.editSkill.exp) !== NaN &&
+                    parseFloat($scope.editSkill.exp) >= 0 && parseFloat($scope.editSkill.exp) < 51) ? (parseFloat($scope.editSkill.exp)).toFixed(1) : 0.0;
+            }
+        });
+
+        $scope.saveSkillFn = function(index){
+            if(index == 0){
+                var newSkill = angular.copy($scope.editSkill);
+                $scope.skillMatrix.push(newSkill);
+                $scope.editSkill = editSkill;
+            }
+            else{
+                $scope.skillMatrix[index] = angular.copy($scope.editSkill);
+                $scope.editMode[index] = false;
+            }
+
+            $scope.skillMatrix[0] = editSkill;
+            $scope.editSkill = editSkill;
+            $scope.editMode[0] = true;
+        };
 
     this.closeCVDocInfo=function(cvForm){
         if($rootScope._userInfo.IsAuthenticate==false){
@@ -304,9 +374,16 @@ angular.module('ezeidApp').controller('CVAttachController',[
         });
 
         $("#tags"+_index ).on( "autocompleteselect", function( event, ui ) {
-           $scope.skillMatrix[_index].skillname = inputData=ui.item.value;
+           $scope.editSkill.skillname = inputData=ui.item.value;
         } );
-    }
+    };
+
+        $scope.expertiseLevels = [
+            'Beginner',
+            'Independent',
+            'Expert',
+            'Master'
+        ];
 
     $scope.deleteSkilFromMartix=function(_index, _tid)
     {
@@ -319,7 +396,14 @@ angular.module('ezeidApp').controller('CVAttachController',[
             $scope.skillMatrix = [];
             skillsTid = [];
         }
-    }
+    };
+
+        $scope.checkExp = function(index){
+            if(parseFloat($scope.skillMatrix[index].exp) == NaN){
+                $scope.skillMatrix[index].exp = 0.00;
+            }
+            $scope.skillMatrix[index].exp = (parseFloat($scope.skillMatrix[index].exp)).toFixed(2);
+        };
 
 
     }]);

@@ -129,7 +129,7 @@
                                                         <div class="row">
 
                                                             <div class="col-lg-3 col-md-3 col-sm-3 col-xs-4 bottom-clearfix min-form-height">
-                                                                <div class="form-group">
+                                                                <div class="input-group">
                                                                     <!---
                                                                     Validation Added for ezeid input
                                                                     Constraints :
@@ -138,6 +138,7 @@
                                                                     3. Entering of unwanted characters is disbaled by using ezeid-only directive
                                                                     -->
 
+                                                                    <span class="input-group-addon">@</span>
                                                                     <input
                                                                         ng-model="ezeid"
                                                                         max-length="15"
@@ -148,6 +149,7 @@
                                                                         ng-change="isEzeidAvailabilityChecked = false"
                                                                         ng-class="(signUpForm.ezeid.$dirty && signUpForm.ezeid.$modelValue.length < 1) ? 'mandatoryTextBox' : ''"
                                                                     class="form-control emptyBox" />
+
                                                                 </div>
                                                             </div>
 

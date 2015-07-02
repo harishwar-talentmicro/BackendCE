@@ -234,7 +234,7 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope',
         $http({
             url : GURL + 'ewtEZEIDPrimaryDetails',
             params : {
-                EZEID : $scope.modalBox.subuser.ezeid,
+                EZEID : '@'+$scope.modalBox.subuser.ezeid,
                 Token : $rootScope._userInfo.Token
             },
             method : "GET"
@@ -331,7 +331,7 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope',
         $http({
             url : GURL + 'ewtEZEIDPrimaryDetails',
             params : {
-                EZEID : $scope.modalBox.subuser.ezeid,
+                EZEID : '@'+$scope.modalBox.subuser.ezeid,
                 Token : $rootScope._userInfo.Token
             },
             method : "GET"

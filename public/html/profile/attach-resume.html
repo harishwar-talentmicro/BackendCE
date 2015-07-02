@@ -21,7 +21,7 @@
 </style>
 
 <div  ng-controller="CVAttachController as CVAttachCtrl" style="min-height:290px">
-    <form name="cvForm" ng-submit="cvForm.$valid && CVAttachCtrl.saveCVDocInfo()" novalidate>
+    <!--<form name="cvForm" ng-submit="cvForm.$valid && CVAttachCtrl.saveCVDocInfo()" novalidate>-->
         <div class="form_style">
            <div ng-show="true">
                 <div class="panel panel-success">
@@ -115,28 +115,63 @@
                 </thead>
                 <tbody>
 
-                    <tr ng-repeat="skill in skillMatrix">
-                        <td class="panelPd5px msg_pos">
-                            <div class="ui-widget">
-                                <input class="form-control" type="text" id="tags{{$index}}" ng-keyup="complete($index)" ng-model="skillMatrix[$index].skillname" placeholder="Type skill here"/>
+                    <!--<tr ng-repeat="skill in skillMatrix">-->
+                        <!--<td class="panelPd5px msg_pos">-->
+                            <!--<div class="ui-widget">-->
+                                <!--<input class="form-control" type="text" id="tags{{$index}}" ng-keyup="complete($index)" ng-model="skillMatrix[$index].skillname" placeholder="Type skill here"/>-->
+                            <!--</div>-->
+                        <!--</td>-->
+                        <!--<td class="panelPd5px msg_pos">-->
+                            <!--<select class="form-control" name="expertiesLevel" ng-model="skillMatrix[$index].expertiseLevel">-->
+                                <!--<option value="0" default selected> Beginner </option>-->
+                                <!--<option value="1"> Independent </option>-->
+                                <!--<option value="2"> Expert </option>-->
+                                <!--<option value="3"> Master </option>-->
+                            <!--</select>-->
+                        <!--</td>-->
+                        <!--<td class="panelPd5px msg_pos">-->
+                           <!--<input type="text" name="experienceYear" decimals-only maxlength="4" ng-model="skillMatrix[$index].exp" ng-blur="checkExp($index)" class="form-control" placeholder="Ex. 5.00"/>-->
+                        <!--</td>-->
+                        <!--<td class="panelPd5px msg_pos">-->
+                            <!--<input type="checkbox" checked="checked" ng-model="skillMatrix[$index].active_status"/>-->
+                        <!--</td>-->
+                        <!--<td class="panelPd5px msg_pos">-->
+                            <!--<label class="btn btn-primary panelTextSize" ng-disabled="$index == 0" ng-click="deleteSkilFromMartix($index,skillMatrix[$index].tid)">Delete</label>-->
+                        <!--</td>-->
+                    <!--</tr>-->
+
+                    <tr ng-repeat="skill in skillMatrix" >
+                        <td class="panelPd5px msg_pos" ng-hide="(!editMode[$index]) && ($index == 0)">
+                            <span ng-hide="editMode[$index]">{{skillMatrix[$index].skillname}}</span>
+                            <div class="ui-widget" ng-show="editMode[$index]">
+                                <input class="form-control" type="text" id="tags{{$index}}" ng-keyup="complete($index)" ng-model="editSkill.skillname" placeholder="Type skill here"/>
                             </div>
                         </td>
-                        <td class="panelPd5px msg_pos">
-                            <select class="form-control" name="expertiesLevel" ng-model="skillMatrix[$index].expertiseLevel">
+                        <td class="panelPd5px msg_pos" ng-hide="(!editMode[$index]) && ($index == 0)">
+                            <span ng-hide="editMode[$index]">{{expertiseLevels[skillMatrix[$index].expertiseLevel]}}</span>
+                            <select class="form-control" name="expertiesLevel" ng-model="editSkill.expertiseLevel"
+                                    ng-show="editMode[$index]">
                                 <option value="0" default selected> Beginner </option>
                                 <option value="1"> Independent </option>
                                 <option value="2"> Expert </option>
                                 <option value="3"> Master </option>
                             </select>
                         </td>
-                        <td class="panelPd5px msg_pos">
-                           <input type="text" name="experienceYear" decimals-only maxlength="3" ng-model="skillMatrix[$index].exp" class="form-control" placeholder="Ex. 5.00"/>
+                        <td class="panelPd5px msg_pos" ng-hide="(!editMode[$index]) && ($index == 0)">
+                            <span ng-hide="editMode[$index]">{{skillMatrix[$index].exp}}</span>
+                            <input type="text"
+                                   ng-show="editMode[$index]"
+                                   ng-model-options="{ updateOn: 'default blur', debounce: { 'default': 1000, 'blur': 0 } }"
+                                   name="experienceYear" maxlength="4" ng-model="editSkill.exp" class="form-control" placeholder="Ex. 5.00"/>
                         </td>
-                        <td class="panelPd5px msg_pos">
-                            <input type="checkbox" checked="checked" ng-model="skillMatrix[$index].active_status"/>
+                        <td class="panelPd5px msg_pos" ng-hide="(!editMode[$index]) && ($index == 0)">
+                            <input type="checkbox" ng-hide="editMode[$index]" ng-disabled="1"  ng-model="skillMatrix[$index].active_status"/>
+                            <input ng-show="editMode[$index]" type="checkbox"  ng-checked="editSkill.active_status" ng-model="editSkill.active_status"/>
                         </td>
-                        <td class="panelPd5px msg_pos">
-                            <label class="btn btn-primary panelTextSize" ng-disabled="$index == 0" ng-click="deleteSkilFromMartix($index,skillMatrix[$index].tid)">Delete</label>
+                        <td class="panelPd5px msg_pos" ng-hide="(!editMode[$index]) && ($index == 0)">
+                            <button class="btn btn-success btn-xs" ng-show="editMode[$index]" ng-click="saveSkillFn($index)">Save</button>
+                            <button class="btn btn-warning btn-xs" ng-hide="editMode[$index]" ng-click="editSkillFn($index)">Edit</button>
+                            <button class="btn btn-primary btn-xs panelTextSize" ng-disabled="$index == 0" ng-click="deleteSkilFromMartix($index,skillMatrix[$index].tid)">Delete</button>
                         </td>
                     </tr>
                 </tbody>
@@ -146,7 +181,7 @@
     </div>
 
                             <div class="row">
-                                <input type="submit" class="btn btn-primary pull-left" value="Save"/>
+                                <button class="btn btn-primary pull-left" value="Save" ng-click="CVAttachCtrl.saveCVDocInfo()">Save </button>
                                 <input type="button" class="btn btn-primary pull-left" style="margin-left: 5px;" value="Close" onclick="window.location.href='/'"/>
                             </div>
                         </div>
@@ -155,6 +190,6 @@
                 </div>
            </div>
         </div>
-    </form>
+    <!--</form>-->
 </div>
 
