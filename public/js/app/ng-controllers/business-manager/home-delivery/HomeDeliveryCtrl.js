@@ -356,7 +356,7 @@
                         $scope.toggleAllEditMode();
 
                         var id = $scope.txList.indexOfWhere('TID',parseInt(resp.data.TID));
-                        //console.log($scope.txList[id]);
+                        ////console.log($scope.txList[id]);
                         $scope.txList[id].FolderRuleID = parseInt(resp.data.folderRuleID);
                         $scope.txList[id].Status = parseInt(resp.data.status);
 
@@ -655,7 +655,7 @@
              */
             $scope.removeItem = function(txItem){
                 var txItemIndex  = $scope.modalBox.tx.itemList.indexOfWhere('ItemID',txItem.ItemID);
-                //////////console.log(txItemIndex);
+                ////////////console.log(txItemIndex);
                 $scope.modalBox.tx.itemList.splice(txItemIndex,1);
             };
 
@@ -741,11 +741,11 @@
             loadCompany();
 
             $scope.$watch('modalBox.tx.companyId',function(n,v){
-                //console.log(n);
+                ////console.log(n);
                 if(n){
-                    //console.log(companyList);
+                    ////console.log(companyList);
                     var indx = companyList.indexOfWhere('id',n);
-                    //console.log(indx);
+                    ////console.log(indx);
                     if(indx !== -1){
                         $scope.modalBox.tx.ezeid = companyList[indx].ezeid;
                     }
@@ -876,8 +876,8 @@
                  * make any transaction load request and therefore show no transaction available for him
                  * else let him see the transaction as he can see transaction of default folder also
                  */
-                //console.log($rootScope._userInfo.MasterID);
-                //console.log(folderRules);
+                ////console.log($rootScope._userInfo.MasterID);
+                ////console.log(folderRules);
                 if($rootScope._userInfo.MasterID > 0 && (!folderRules)){
                     $timeout(function(){
                         defer.resolve([]);
@@ -946,7 +946,7 @@
                         FunctionType : 2    // For homeDelivery
                     }
                 }).success(function(resp){
-                    ////////console.log(resp);
+                    //////////console.log(resp);
                     if(resp && resp !== 'null' && resp.hasOwnProperty('Result')){
 
                         if(resp.Result && resp.Result.length > 0){
@@ -1095,9 +1095,9 @@
 
             var watchMyFolders = function(){
                 $scope.$watch('myFolders',function(n,v){
-                    //console.log(n);
+                    ////console.log(n);
                     if(!n){
-                        //console.log(n);
+                        ////console.log(n);
                         for(var c=0;c<$scope.userFolders.length;c++){
                             $scope.myFolders = $scope.userFolders[c].TID;
                         }
@@ -1140,7 +1140,7 @@
                         var index = resp.indexOfWhere('EZEID',$rootScope._userInfo.ezeid);
                         if(index !== -1){
                             var userFolders = (resp[index].HomeDeliveryIDs) ? resp[index].HomeDeliveryIDs.split(',') : [];
-                            //console.log(userFolders);
+                            ////console.log(userFolders);
                             for(var b=0;b<userFolders.length;b++){
                                 userFolders[b] = parseInt(userFolders[b]);
                             }
@@ -1409,7 +1409,7 @@
                         itemList = JSON.parse(data.ItemsList);
                     }
                     catch(ex){
-                        ////////console.log(ex);
+                        //////////console.log(ex);
                     }
                     var msg = '';
                     for(var ct = 0; ct < itemList.length; ct++){

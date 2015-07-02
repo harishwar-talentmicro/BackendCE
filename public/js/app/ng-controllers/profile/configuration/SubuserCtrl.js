@@ -150,14 +150,14 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope',
             };
             $scope.$emit('$preLoaderStart');
             $scope.checkAvailability(callback);
-            // //////////console.log($scope.modalBox.subuser);
+            // ////////////console.log($scope.modalBox.subuser);
         }
         else{
             $scope.resetModalData();
         }
-        // //////////console.log($scope.showModal);
+        // ////////////console.log($scope.showModal);
         $scope.showModal = !$scope.showModal;
-        // //////////console.log($scope.showModal);
+        // ////////////console.log($scope.showModal);
     };
 
 
@@ -319,7 +319,7 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope',
             }
 
         }
-        //console.log($scope.modalBox.subuser.rules.sales);
+        ////console.log($scope.modalBox.subuser.rules.sales);
     };
 
 
@@ -357,7 +357,7 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope',
      * Add and update subuser to server
      */
     $scope.saveSubUser = function(){
-        // //////////console.log($scope.modalBox.subuser);
+        // ////////////console.log($scope.modalBox.subuser);
         $scope.$emit('$preLoaderStart');
         $scope.validateSubUser().then(function(isValid){
             if(!isValid){
@@ -449,9 +449,9 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope',
         }).success(function(resp){
                 $scope.functionTypeCount += 1;
                 if(resp && resp.length > 0 && resp !== "null"){
-                    // //////////console.log(resp);
+                    // ////////////console.log(resp);
                         for(var i = 0; i < resp.length; i++){
-                            // //////////console.log(resp[i]);
+                            // ////////////console.log(resp[i]);
                             $scope.rules.push(resp[i]);
                         }
 
@@ -567,7 +567,7 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope',
             }
         }).success(function(resp){
             if(resp && resp.length > 0 && resp !== 'null'){
-                ////console.log('yes');
+                //////console.log('yes');
                 $scope.workingHoursTemplateMap = resp;
             }
             $scope.getMasterUserDetails();

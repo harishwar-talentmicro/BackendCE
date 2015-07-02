@@ -61,7 +61,7 @@ angular.module('ezeidApp').
             /* http request to get all the transaction history */
             function getTransactionHistory()
             {
-                //console.log('------------');
+                ////console.log('------------');
                 var defer = $q.defer();
                 $scope.$emit('$preLoaderStart');
                 $http({
