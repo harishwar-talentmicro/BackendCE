@@ -156,7 +156,7 @@
              */
             $scope.removeItem = function(txItem){
                 var txItemIndex  = $scope.modalBox.tx.itemList.indexOfWhere('ItemID',txItem.ItemID);
-                //////////console.log(txItemIndex);
+                ////////////console.log(txItemIndex);
                 $scope.modalBox.tx.itemList.splice(txItemIndex,1);
             };
 
@@ -606,7 +606,7 @@
                     NextActionDateTime : moment().format('DD MMM YYYY hh:mm:ss'),
                     ItemsList: JSON.stringify($scope.modalBox.tx.itemList),
                     DeliveryAddress : makeAddress(),
-                    company_name : $scope.loggedInUser.CompanyName,
+                    companyName : $scope.loggedInUser.CompanyName,
                     company_id : 0
                 };
                 return preparedTx;
@@ -720,7 +720,7 @@
                         itemList = JSON.parse(data.ItemsList);
                     }
                     catch(ex){
-                        ////////console.log(ex);
+                        //////////console.log(ex);
                     }
                     var msg = '';
                     for(var ct = 0; ct < itemList.length; ct++){
@@ -857,7 +857,7 @@
                     $scope.modalBox.tx.DeliveryAddress = '';
                     timeoutPromise = $timeout(function(){
                         $scope.getEzeidLocationDetails($scope.ezeoneAddressId);
-                    },1000);
+                    },2000);
 
                 }
                 else if(!n){

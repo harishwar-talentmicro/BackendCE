@@ -61,7 +61,7 @@ angular.module('ezeidApp').controller('WorkingHourCtrl',['$scope','$rootScope','
                 Token : $rootScope._userInfo.Token
             }
         }).success(function (data) {
-              //  console.log(data);
+              //  //console.log(data);
                if (data != 'null')
                 {
                    $scope.result = data;
@@ -219,7 +219,7 @@ angular.module('ezeidApp').controller('WorkingHourCtrl',['$scope','$rootScope','
                     $scope.$emit('$preLoaderStop');
                     if (data.status)
                     {
-                       // console.log(data.data[0]);
+                       // //console.log(data.data[0]);
                         workingHourData = data.data[0];
                         $scope.mInfo.WorkingHrsTemplate = workingHourData.TemplateName;
 

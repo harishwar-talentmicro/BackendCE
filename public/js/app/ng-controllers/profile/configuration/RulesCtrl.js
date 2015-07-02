@@ -110,7 +110,7 @@ angular.module('ezeidApp').controller('RulesCtrl',['$scope','$interval','$http',
                 }
             }
             catch(ex){
-                //////console.log(ex);
+                ////////console.log(ex);
                 Notification.error({ message : 'Error loading google maps', delay : MsgDelay});
             }
         };
@@ -190,7 +190,7 @@ angular.module('ezeidApp').controller('RulesCtrl',['$scope','$interval','$http',
 
         $scope.addMappedEzeid = function(){
             if(!$scope.modalBox.tempMappedName){
-                //////console.log('return false');
+                ////////console.log('return false');
                 return false;
             }
 
@@ -218,7 +218,7 @@ angular.module('ezeidApp').controller('RulesCtrl',['$scope','$interval','$http',
          */
         $scope.addMappedName = function(){
             if(!$scope.modalBox.tempMappedName){
-                //////console.log('return false');
+                ////////console.log('return false');
                 return false;
             }
             var currentMappedNames = ($scope.modalBox.rule.MappedNames) ? $scope.modalBox.rule.MappedNames : '';
@@ -375,7 +375,7 @@ angular.module('ezeidApp').controller('RulesCtrl',['$scope','$interval','$http',
                 }
             }).success(function(resp){
                 if(resp && resp !== 'null' && resp.length > 0){
-                    //////console.log(resp);
+                    ////////console.log(resp);
                     $scope.rules = $scope.rules.concat(resp);
                 }
                 defer.resolve();

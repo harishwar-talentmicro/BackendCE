@@ -19,7 +19,19 @@
        <tr ng-repeat="_item in result">
             <td>{{_item.TemplateName}}</td>
             <td>
-                <a class="btn-link ng-binding" data-index="0" ng-click="editWorkingHourTemplate(_item.TID)">Edit</a>
+                <!--<p class="text-info pull-right btn-link" ng-hide="profileEditMode" ng-click="toggleProfileEditMode()">
+                    <span class="glyphicon glyphicon-edit"></span> Edit
+                </p>-->
+               <!-- <a class="btn-link ng-binding glyphicon glyphicon-edit" data-index="0" ng-click="editWorkingHourTemplate(_item.TID)"> Edit</a>-->
+
+                <button
+                        data-toggle="tooltip"
+                        title="Edit"
+                        ng-click="editWorkingHourTemplate(_item.TID)"
+                        class="btn btn-xs btn-success no-radius">
+                    <span class="glyphicon glyphicon-edit"></span>
+                </button>
+
             </td>
             <td>
                 <button

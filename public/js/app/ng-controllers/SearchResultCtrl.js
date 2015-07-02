@@ -256,7 +256,7 @@ var res = angular.module('ezeidApp').
                     if(parseInt(_filterValue.searchType) == 1 && (!$rootScope._userInfo.IsAuthenticate)) {
                         if (data.hasOwnProperty('totalcount cond')) {
                             if (parseInt(data.Result[0].IDTypeID) == 1) {
-                                console.log('totalcount cond');
+                                //console.log('totalcount cond');
                                 $('#SignIn_popup').css({'position':'fixed'});
                                 $('#SignIn_popup > .window_page').css({'position':'relative'});
                                 $('#SignIn_popup').slideDown();
@@ -273,9 +273,9 @@ var res = angular.module('ezeidApp').
                             }
                         }
                         else if (data.length == 1) {
-                            console.log('ezeid_cond');
+                            //console.log('ezeid_cond');
                             if (parseInt(data[0].IDTypeID) == 1) {
-                                console.log('ezeid cond');
+                                //console.log('ezeid cond');
                                 $('#SignIn_popup').css({'position':'fixed'});
                                 $('#SignIn_popup > .window_page').css({'position':'relative'});
                                 $('#SignIn_popup').slideDown();
@@ -512,7 +512,7 @@ var res = angular.module('ezeidApp').
 
             /* Callback function for get current location functionality */
             $scope.findCurrentLocation = function(){
-                //////console.log(googleMap);
+                ////////console.log(googleMap);
                 googleMap.getCurrentLocation().then(function(){
                     googleMap.placeCurrentLocationMarker(null,null,false);
                 },function(){
