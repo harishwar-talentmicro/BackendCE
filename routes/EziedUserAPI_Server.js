@@ -11285,13 +11285,22 @@ exports.FnGetReservationService = function (req, res) {
                     db.query('CALL pGetResServices(' + db.escape(ezeid) + ')', function (err, GetResult) {
                             if (!err) {
                                 if (GetResult) {
-                                    if (GetResult[0].length > 0) {
-                                        responseMessage.status = true;
-                                        responseMessage.data = GetResult[0];
-                                        responseMessage.error = null;
-                                        responseMessage.message = 'Service details Send successfully';
-                                        console.log('FnGetReservationService: Service details Send successfully');
-                                        res.status(200).json(responseMessage);
+                                    if(GetResult[0]) {
+                                        if (GetResult[0].length > 0) {
+                                            responseMessage.status = true;
+                                            responseMessage.data = GetResult[0];
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'Service details Send successfully';
+                                            console.log('FnGetReservationService: Service details Send successfully');
+                                            res.status(200).json(responseMessage);
+                                        }
+                                        else {
+
+                                            responseMessage.error = {};
+                                            responseMessage.message = 'No founded service details';
+                                            console.log('FnGetReservationService: No founded Service details');
+                                            res.json(responseMessage);
+                                        }
                                     }
                                     else {
                                         
