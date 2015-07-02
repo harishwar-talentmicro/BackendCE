@@ -29,7 +29,7 @@ angular.module('ezeidApp').directive('contentItem', ['$compile','$templateCache'
 
     var linker = function(scope, element, attrs) {
         // scope.rootDirectory = 'images/';
-        // //////////console.log(attrs.templateType);
+        // ////////////console.log(attrs.templateType);
         var templateType = scope.$eval(attrs.templateType);
         element.html(getTemplate(templateType)).show();
         $compile(element.contents())(scope);
@@ -205,8 +205,8 @@ angular.module('ezeidApp').controller('ItemMasterCtrl',[
     //Open Modal box for user
     $scope.showModal = false;
     $scope.toggleModalBox = function(type,itemIndex){
-        // //////////console.log(type);
-        // //////////console.log(itemIndex);
+        // ////////////console.log(type);
+        // ////////////console.log(itemIndex);
         if(typeof(type) == "undefined"){
             type = 0;
         }
@@ -269,7 +269,7 @@ angular.module('ezeidApp').controller('ItemMasterCtrl',[
 //    };
 
     $scope.selectPicture = function(){
-        // //////////console.log($rootScope._userInfo);
+        // ////////////console.log($rootScope._userInfo);
         $("#picture-upload-input").trigger('click');
     };
 
@@ -410,13 +410,13 @@ angular.module('ezeidApp').controller('ItemMasterCtrl',[
 
                     $scope.count += 1;
                     if($scope.count < 5){
-                        // //////////console.log('Item load for '+ fType);
+                        // ////////////console.log('Item load for '+ fType);
                         $scope.loadItems();
                     }
                 }
         }).error(function(err){
             loadStatus.items = true;
-                // //////////console.log(err);
+                // ////////////console.log(err);
         });
     };
 
@@ -441,7 +441,7 @@ angular.module('ezeidApp').controller('ItemMasterCtrl',[
                     $scope.globalConfig.itemListType[4] = 1;
                 }
             }).error(function(err){
-                // //////////console.log(err);
+                // ////////////console.log(err);
             });
     };
 

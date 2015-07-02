@@ -42,7 +42,7 @@ var res = angular.module('ezeidApp').
             UtilityService
         ) {
 
-            //console.log($.citrus);
+            ////console.log($.citrus);
             var citruspg = $.citrus.gateway($.citrus.env.sandbox);//calling the function in citrus.js [388]
             var citruswallet = $.citrus.wallet($('#walletToken').val(), $.citrus.env.sandbox);//calling the function in citrus.js [519]
             /**
@@ -126,7 +126,7 @@ var res = angular.module('ezeidApp').
                     cardCvv: $('#cardCvv').val(),
                     bankCode: $('#bank option:selected').val()
                 };
-                //console.log(bill,paymentOptions);
+                ////console.log(bill,paymentOptions);
                 // make payment - calling the function defined in citrus.js [280]
                 citruspg.makePayment(
                     bill,

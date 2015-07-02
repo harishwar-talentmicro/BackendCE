@@ -83,7 +83,7 @@ angular.module('ezeidApp').controller('HistoryController',[
         $http({ method: 'get', url: GURL + 'ewtGetAccessHistory?TokenNo=' + $rootScope._userInfo.Token + '&Page='+_pageValue }).success(function (data) {
 
             if (data != 'null') {
-                ////console.log(data);
+                //////console.log(data);
                 for (var i = 0; i < data.length; i++) {
                     data[i].AccessDate = convertTimeToLocal(data[i].AccessDate,'DD-MMM-YYYY hh:mm A');
                     msgSen.msgs.push(data[i]);
@@ -115,7 +115,7 @@ angular.module('ezeidApp').controller('HistoryController',[
     /* redirect to full details page */
     $scope.redirectFullPage = function(ezeoneId)
     {
-        ////console.log(tid);
+        //////console.log(tid);
         /* redirect to full detail page */
         $location.url('/'+ezeoneId);
     }

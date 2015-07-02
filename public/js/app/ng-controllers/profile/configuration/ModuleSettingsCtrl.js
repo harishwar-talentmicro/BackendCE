@@ -221,7 +221,7 @@ angular.module('ezeidApp').controller('ModuleSettingsCtrl',[
                     $scope.$emit('$preLoaderStop');
                 }
             }).error(function(err){
-                // //////////console.log(err);
+                // ////////////console.log(err);
                 $scope.$emit('$preLoaderStop');
             });
     };
@@ -359,7 +359,7 @@ angular.module('ezeidApp').controller('ModuleSettingsCtrl',[
         };
 
         if($scope.validateSettings(data)){
-            // //////////console.log(data);
+            // ////////////console.log(data);
             $scope.$emit('$preLoaderStart');
             $http({
                 url : GURL + "ewtConfig",
@@ -370,7 +370,7 @@ angular.module('ezeidApp').controller('ModuleSettingsCtrl',[
                 $scope.$emit('$preLoaderStop');
                 Notification.success({message : 'Configuration Saved Successfully', delay : MsgDelay});
             }).error(function(err){
-                // //////////console.log(err);
+                // ////////////console.log(err);
                 $scope.$emit('$preLoaderStop');
                 Notification.success({message : 'Error while saving configuration! Please try again', delay : MsgDelay});
 
