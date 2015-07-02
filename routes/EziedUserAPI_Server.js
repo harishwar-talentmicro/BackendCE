@@ -2980,8 +2980,8 @@ exports.FnSaveCVInfo = function (req, res) {
                                         };
                                         FnSaveSkills(skills, function (err, Result) {
                                             if (!err) {
-                                                if (Result != null) {
-                                                    resultvalue = Result.SkillID
+                                                if (Result) {
+                                                    resultvalue = Result.SkillID;
                                                     var SkillItems = {
                                                         skillID: resultvalue,
                                                         expertlevel: skills.expertiseLevel,
@@ -3047,9 +3047,7 @@ exports.FnSaveCVInfo = function (req, res) {
                                         RtnMessage.IsSuccessfull = true;
                                         console.log('FnSaveCVInfo: CV Info Saved successfully');
                                         res.send(RtnMessage);
-
-
-                                                                    }
+                                }
                                 else {
                                     res.send(RtnMessage);
                                     res.statusCode = 500;
@@ -10958,13 +10956,22 @@ exports.FnGetReservationResource = function (req, res) {
                 
                             if (!err) {
                                 if (GetResult) {
-                                    if (GetResult[0].length > 0) {
-                                        responseMessage.status = true;
-                                        responseMessage.data = GetResult[0] ;
-                                        responseMessage.error = null;
-                                        responseMessage.message = 'Resource details Send successfully';
-                                        console.log('FnGetReservationResource: Resource details Send successfully');
-                                        res.status(200).json(responseMessage);
+                                    if(GetResult[0]){
+                                        if (GetResult[0].length > 0) {
+                                            responseMessage.status = true;
+                                            responseMessage.data = GetResult[0] ;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'Resource details Send successfully';
+                                            console.log('FnGetReservationResource: Resource details Send successfully');
+                                            res.status(200).json(responseMessage);
+                                        }
+                                        else {
+
+                                            responseMessage.error = {};
+                                            responseMessage.message = 'No founded Resource details';
+                                            console.log('FnGetReservationResource: No founded Resource details');
+                                            res.json(responseMessage);
+                                        }
                                     }
                                     else {
                                         

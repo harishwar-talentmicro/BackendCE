@@ -42,7 +42,8 @@ angular.module('ezeidApp').directive('contentItem', ['$compile','$templateCache'
         scope: {
             content:'=',
             index: '=',
-            toggleModalBox : '&'
+            toggleModalBox : '&',
+            removeItem : '&'
         }
     };
 }]);
