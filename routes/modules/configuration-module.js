@@ -2729,6 +2729,97 @@ catch (ex) {
 }
 };
 
+/**
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ */
+Configuration.prototype.getWorkingHoursDetails = function(req,res,next){
+    /**
+     * @todo FnWorkingHoursDetails
+     */
+    var _this = this;
+    try {
+
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+    var Token = req.query.Token;
+    var TID = req.query.TID;
+
+
+    var responseMessage = {
+        status: false,
+        data: null,
+        error:{},
+        message:''
+    };
+
+    if (TID) {
+
+        _this.db.query('CALL PGetworkinghourDetails(' + _this.db.escape(Token) + ',' + _this.db.escape(TID) + ')', function (err, GetResult) {
+            console.log(GetResult)
+            if (!err) {
+                if (GetResult) {
+                    if (GetResult[0].length > 0) {
+                        responseMessage.status = true;
+                        responseMessage.data = GetResult[0] ;
+                        responseMessage.error = null;
+                        responseMessage.message = ' Working hours Send successfully';
+                        console.log('FnWorkingHoursDetails:Working hours Send successfully');
+                        res.status(200).json(responseMessage);
+                    }
+                    else {
+
+                        responseMessage.error = {};
+                        responseMessage.message = 'No founded Working hours';
+                        console.log('FnWorkingHours: No founded Working hours');
+                        res.json(responseMessage);
+                    }
+                }
+                else {
+
+
+                    responseMessage.error = {};
+                    responseMessage.message = 'No founded Working hours list';
+                    console.log('FnWorkingHours: No founded Working hours list');
+                    res.json(responseMessage);
+                }
+
+            }
+            else {
+
+                responseMessage.data = null ;
+                responseMessage.error = {};
+                responseMessage.message = 'Error in getting Working hours list';
+                console.log('FnWorkingHours: error in getting Working hours list' + err);
+                res.status(500).json(responseMessage);
+            }
+        });
+    }
+
+    else {
+        if (!Token) {
+            responseMessage.message = 'Invalid Token';
+            responseMessage.error = {
+                Token : 'Invalid Token'
+            };
+            console.log('FnWorkingHours: Token is mandatory field');
+        }
+
+        res.status(401).json(responseMessage);
+    }
+}
+catch (ex) {
+    responseMessage.error = {};
+    responseMessage.message = 'An error occured !'
+    console.log('FnWorkingHours:error ' + ex.description);
+    //throw new Error(ex);
+    res.status(400).json(responseMessage);
+}
+};
+
 module.exports = Configuration;
 
 

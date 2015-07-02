@@ -6381,7 +6381,7 @@ exports.FnSaveStatusType = function(req, res){
                         if(parseInt(TID) !== NaN && parseInt(TID)> 0 && parseInt(Status) !== 1){
                             deleteFlag = true;
                         }
-
+                    console.log(deleteFlag);
                         var query = db.escape(Token) + ',' + db.escape(TID) + ',' + db.escape(FunctionType) + ',' + db.escape(StatusTitle)
                             + ',' +db.escape(ProgressPercent) + ',' +db.escape(Status) + ',' +db.escape(NotificationMsg) + ',' +db.escape(NotificationMailMsg) 
                             + ',' + db.escape(StatusValue);
@@ -6389,19 +6389,18 @@ exports.FnSaveStatusType = function(req, res){
                                 if (!err) {
                                     if(result != null){
                                         if(result.affectedRows > 0){
-                                            console.log(InsertResult);
+                                            console.log(result);
                                             RtnMessage.IsSuccessfull = true;
                                             console.log('FnSaveStatusType: Status type saved successfully');
-                                            if(deleteFlag && InsertResult[0].deleted){
-                                                RtnMessage.deleted = true;
-                                            }
+
                                             res.send(RtnMessage);
                                         }
                                         else
                                         {
+                                            RtnMessage.IsSuccessfull = true;
                                             console.log('FnSaveStatusType: Status type not saved');
-                                            if(deleteFlag){
-                                                RtnMessage.deleted = false;
+                                            if(deleteFlag && result[0][0].deleted){
+                                                RtnMessage.deleted = true;
                                             }
                                             res.send(RtnMessage);
                                         }
@@ -6486,16 +6485,14 @@ exports.FnSaveActionType = function(req, res){
                                         if(result.affectedRows > 0){
                                             console.log('FnSaveActionType: Action types saved successfully');
                                             RtnMessage.IsSuccessfull = true;
-                                            if(deleteFlag && InsertResult[0].deleted){
-                                                RtnMessage.deleted = true;
-                                            }
-                                            res.send(RtnMessage);
+                                             res.send(RtnMessage);
                                         }
                                         else
                                         {
+                                            RtnMessage.IsSuccessfull = true;
                                             console.log('FnSaveActionType:  Action types not saved');
-                                            if(deleteFlag){
-                                                RtnMessage.deleted = false;
+                                            if(deleteFlag && result[0][0].deleted){
+                                                RtnMessage.deleted = true;
                                             }
                                             res.send(RtnMessage);
                                         }

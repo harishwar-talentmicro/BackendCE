@@ -93,6 +93,7 @@ exports.FnGetHolidayList = configurationModule.getHolidays;
 exports.FnSaveHolidayCalendar = configurationModule.saveHoliday;
 exports.FnDeleteHolidayList = configurationModule.deleteHoliday;
 exports.FnDeleteWorkingHours = configurationModule.deleteWorkingHours;
+exports.FnWorkingHoursDetails = configurationModule.getWorkingHoursDetails;
 
 var Search = require('./search-module.js');
 var searchModule = new Search(db);
