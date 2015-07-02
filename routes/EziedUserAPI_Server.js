@@ -7876,8 +7876,9 @@ exports.FnDeleteWorkingHours = function(req, res){
                     if (Result != null) {
                         //console.log('CALL pDeleteWorkinghours(' + db.escape(TID) + ')');
                         db.query('CALL pDeleteWorkinghours(' + db.escape(TID) + ')', function (err, deleteResult) {
+                            console.log(deleteResult);
                             if (!err){
-                                if(deleteResult.affectedRows > 0){
+                                if(deleteResult[0][0].deleted == 1){
                                     RtnMessage.IsSuccessfull = true;
                                     RtnMessage.Message = 'delete successfully';
                                     res.send(RtnMessage);
