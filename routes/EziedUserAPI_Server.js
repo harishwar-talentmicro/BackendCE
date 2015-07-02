@@ -6381,7 +6381,7 @@ exports.FnSaveStatusType = function(req, res){
                         if(parseInt(TID) !== NaN && parseInt(TID)> 0 && parseInt(Status) !== 1){
                             deleteFlag = true;
                         }
-
+                    console.log(deleteFlag);
                         var query = db.escape(Token) + ',' + db.escape(TID) + ',' + db.escape(FunctionType) + ',' + db.escape(StatusTitle)
                             + ',' +db.escape(ProgressPercent) + ',' +db.escape(Status) + ',' +db.escape(NotificationMsg) + ',' +db.escape(NotificationMailMsg) 
                             + ',' + db.escape(StatusValue);
@@ -6389,19 +6389,17 @@ exports.FnSaveStatusType = function(req, res){
                                 if (!err) {
                                     if(result != null){
                                         if(result.affectedRows > 0){
-                                            console.log(InsertResult);
                                             RtnMessage.IsSuccessfull = true;
                                             console.log('FnSaveStatusType: Status type saved successfully');
-                                            if(deleteFlag && InsertResult[0].deleted){
-                                                RtnMessage.deleted = true;
-                                            }
+
                                             res.send(RtnMessage);
                                         }
                                         else
                                         {
+                                            RtnMessage.IsSuccessfull = true;
                                             console.log('FnSaveStatusType: Status type not saved');
-                                            if(deleteFlag){
-                                                RtnMessage.deleted = false;
+                                            if(deleteFlag && result[0][0].deleted){
+                                                RtnMessage.deleted = true;
                                             }
                                             res.send(RtnMessage);
                                         }
@@ -6486,16 +6484,14 @@ exports.FnSaveActionType = function(req, res){
                                         if(result.affectedRows > 0){
                                             console.log('FnSaveActionType: Action types saved successfully');
                                             RtnMessage.IsSuccessfull = true;
-                                            if(deleteFlag && InsertResult[0].deleted){
-                                                RtnMessage.deleted = true;
-                                            }
-                                            res.send(RtnMessage);
+                                             res.send(RtnMessage);
                                         }
                                         else
                                         {
+                                            RtnMessage.IsSuccessfull = true;
                                             console.log('FnSaveActionType:  Action types not saved');
-                                            if(deleteFlag){
-                                                RtnMessage.deleted = false;
+                                            if(deleteFlag && result[0][0].deleted){
+                                                RtnMessage.deleted = true;
                                             }
                                             res.send(RtnMessage);
                                         }
@@ -7881,11 +7877,19 @@ exports.FnDeleteWorkingHours = function(req, res){
                         //console.log('CALL pDeleteWorkinghours(' + db.escape(TID) + ')');
                         db.query('CALL pDeleteWorkinghours(' + db.escape(TID) + ')', function (err, deleteResult) {
                             if (!err){
-                                                                                    
+                                if(deleteResult.affectedRows > 0){
                                     RtnMessage.IsSuccessfull = true;
                                     RtnMessage.Message = 'delete successfully';
                                     res.send(RtnMessage);
                                     console.log('FnDeleteWorkingHours:Working Hours delete successfully');
+
+                                }
+                                else {
+
+                                    RtnMessage.Message = 'No deleted';
+                                    res.send(RtnMessage);
+                                    console.log('FnDeleteWorkingHours:No Working Hours delete successfully');
+                                }
                             }                               
                             else {
                                 console.log('FnDeleteWorkingHours: error in deleting Working Hours' + err);

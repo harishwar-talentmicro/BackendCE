@@ -839,4 +839,92 @@ catch (ex) {
 }
 };
 
+/**
+ * Method : POST
+ * @param req
+ * @param res
+ * @param next
+ */
+Search.prototype.searchTracker = function(req,res,next){
+    /**
+     * @todo FnSearchForTracker
+     */
+    var _this = this;
+try {
+
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    var Token = req.body.Token;
+    var Keyword = req.body.Keyword;
+    var Latitude = req.body.Latitude;
+    var Longitude = req.body.Longitude;
+    var Proximity = req.body.Proximity;
+
+    if (Token != null && Keyword != null && Latitude != null && Longitude != null && Proximity  != null) {
+        FnValidateToken(Token, function (err, Result) {
+            if (!err) {
+                if (Result != null) {
+                    var query = _this.db.escape(Keyword) + ','  + _this.db.escape(Latitude) + ',' + _this.db.escape(Longitude) + ',' + _this.db.escape(Proximity)+ ',' + _this.db.escape(Token);
+                    _this.db.query('CALL pTrackerSearch(' + query + ')', function (err, GetResult) {
+                        if (!err) {
+                            if (GetResult != null) {
+                                if (GetResult[0].length > 0) {
+                                    console.log('FnSearchForTracker: Search result sent successfully');
+                                    res.send(GetResult[0]);
+                                }
+                                else {
+                                    console.log('FnSearchForTracker:No Search found');
+                                    res.json(null);
+                                }
+                            }
+                            else {
+                                console.log('FnSearchForTracker:No Search found');
+                                res.json(null);
+                            }
+                        }
+                        else {
+
+                            console.log('FnSearchForTracker: error in getting search result' + err);
+                            res.statusCode = 500;
+                            res.json(null);
+                        }
+                    });
+                }
+                else {
+                    res.statusCode = 401;
+                    res.json(null);
+                    console.log('FnSearchForTracker: Invalid Token');
+                }
+            } else {
+                res.statusCode = 500;
+                res.json(null);
+                console.log('FnSearchForTracker: Error in validating token:  ' + err);
+            }
+        });
+    }
+    else {
+        if (Token == null) {
+            console.log('FnSearchForTracker: Token is empty');
+        }
+        else if (Keyword == null) {
+            console.log('FnSearchForTracker: Keyword is empty');
+        }
+        else if (Latitude == null) {
+            console.log('FnSearchForTracker: Latitude is empty');
+        }
+        else if (Longitude == null) {
+            console.log('FnSearchForTracker: Longitude is empty');
+        }
+        else if (Proximity == null) {
+            console.log('FnSearchForTracker: Proximity is empty');
+        }
+        res.statusCode=400;
+        res.json(null);
+    }
+}
+catch (ex) {
+    console.log('FnSearchForTracker error:' + ex.description);
+}
+};
+
 module.exports = Search;

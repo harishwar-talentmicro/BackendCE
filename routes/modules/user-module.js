@@ -1208,6 +1208,97 @@ User.prototype.forgetPassword = function(req,res,next){
  * @param res
  * @param next
  */
+User.prototype.decryptPassword = function(req,res,next){
+    /**
+     * @todo FnDecryptPassword
+     */
+    var _this = this;
+    try {
+//res.setHeader("Access-Control-Allow-Origin", "*");
+//res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    res.header('Access-Control-Allow-Credentials', true);
+    res.header('Access-Control-Allow-Origin', "*");
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+    res.header('Access-Control-Allow-Headers', 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept');
+
+    var password = req.query.Password;
+
+    var RtnMessage = {
+        Password : ''
+    };
+    RtnMessage.Password = FnDecrypt(password);
+    console.log(RtnMessage.Password);
+    res.send(RtnMessage);
+
+
+}
+catch(ex){
+    console.log('FnDecrypterror:' + ex.description);
+
+    return 'error'
+}
+}
+
+function FnRandomPassword() {
+    try {
+        var text = "";
+        var possible = "1234567890abcdefghjklmnopqrstuvwxyz!@#$%";
+
+        for (var i = 0; i < 7; i++) {
+
+            text += possible.charAt(Math.floor(Math.random() * possible.length));
+        }
+        return text;
+    }
+    catch (ex) {
+        console.log('OTP generate error:' + ex.description);
+
+        return 'error'
+    }
+}
+
+function FnEncryptPassword(Password) {
+    try {
+        //var text = "";
+        var crypto = require('crypto'),
+            algorithm = 'aes-256-ctr',
+            key = 'ezeid@123';
+
+        var cipher = crypto.createCipher(algorithm, key)
+        var crypted = cipher.update(Password, 'utf8', 'hex')
+        crypted += cipher.final('hex');
+        return crypted;
+    }
+    catch (ex) {
+        console.log('OTP generate error:' + ex.description);
+
+        return 'error'
+    }
+}
+
+function FnDecrypt(EncryptPassword){
+    try {
+        var crypto = require('crypto'),
+            algorithm = 'aes-256-ctr',
+            password = 'ezeid@123';
+        var decipher = crypto.createDecipher(algorithm,password)
+        var dec = decipher.update(EncryptPassword,'hex','utf8')
+        dec += decipher.final('utf8');
+        return dec;
+    }
+    catch(ex){
+        console.log('FnDecrypterror:' + ex.description);
+
+        return 'error'
+    }
+}
+
+/**
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ */
 User.prototype.getCompanyProfile = function(req,res,next){
     /**
      * @todo FnGetCompanyProfile

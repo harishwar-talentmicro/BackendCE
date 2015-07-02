@@ -13,6 +13,7 @@ exports.FnGetUserDetails = userModule.getUserDetails;
 exports.FnCheckEzeid = userModule.checkEzeid;
 exports.FnChangePassword = userModule.changePassword;
 exports.FnForgetPassword = userModule.forgetPassword;
+exports.FnDecryptPassword = userModule.decryptPassword;
 exports.FnGetCompanyProfile = userModule.getCompanyProfile;
 exports.FnSaveCompanyProfile = userModule.saveCompanyProfile;
 exports.FnGetWebLink = userModule.getWebLink;
@@ -92,6 +93,7 @@ exports.FnGetHolidayList = configurationModule.getHolidays;
 exports.FnSaveHolidayCalendar = configurationModule.saveHoliday;
 exports.FnDeleteHolidayList = configurationModule.deleteHoliday;
 exports.FnDeleteWorkingHours = configurationModule.deleteWorkingHours;
+exports.FnWorkingHoursDetails = configurationModule.getWorkingHoursDetails;
 
 var Search = require('./search-module.js');
 var searchModule = new Search(db);
@@ -99,6 +101,7 @@ exports.FnSearchByKeywords = searchModule.searchKeyword;
 exports.FnGetSearchInformationNew = searchModule.searchInformation;
 exports.FnGetWorkingHrsHolidayList = searchModule.getWorkingHrsHolidayList;
 exports.FnGetBannerPicture = searchModule.getBanner;
+exports.FnSearchForTracker = searchModule.searchTracker;
 
 var Image = require('./image-module.js');
 var imageModule = new Image(db);
@@ -112,8 +115,6 @@ exports.FnGetMapedServices = reservationModule.getMapedServices;
 exports.FnGetResTransDetails = reservationModule.getTransDetails;
 exports.FnChangeReservationStatus = reservationModule.changeReservStatus;
 exports.FnGetworkinghoursList = reservationModule.getworkinghoursList;
-
-
 
 function error(err, req, res, next) {
     // log it
@@ -158,87 +159,6 @@ function FnGenerateToken() {
     }
     catch (ex) {
         console.log('OTP generate error:' + ex.description);
-          
-        return 'error'
-    }
-}
-
-function FnRandomPassword() {
-    try {
-        var text = "";
-        var possible = "1234567890abcdefghjklmnopqrstuvwxyz!@#$%";
-
-        for (var i = 0; i < 7; i++) {
-
-            text += possible.charAt(Math.floor(Math.random() * possible.length));
-        }
-        return text;
-    }
-    catch (ex) {
-        console.log('OTP generate error:' + ex.description);
-          
-        return 'error'
-    }
-}
-
-function FnEncryptPassword(Password) {
-    try {
-        //var text = "";
-        var crypto = require('crypto'),
-            algorithm = 'aes-256-ctr',
-            key = 'ezeid@123';
-
-        var cipher = crypto.createCipher(algorithm, key)
-        var crypted = cipher.update(Password, 'utf8', 'hex')
-        crypted += cipher.final('hex');
-        return crypted;
-    }
-    catch (ex) {
-        console.log('OTP generate error:' + ex.description);
-          
-        return 'error'
-    }
-}
-
-function FnDecrypt(EncryptPassword){
-    try {
-        var crypto = require('crypto'),
-            algorithm = 'aes-256-ctr',
-            password = 'ezeid@123';
-        var decipher = crypto.createDecipher(algorithm,password)
-        var dec = decipher.update(EncryptPassword,'hex','utf8')
-        dec += decipher.final('utf8');
-        return dec;
-    }
-    catch(ex){
-        console.log('FnDecrypterror:' + ex.description);
-          
-        return 'error'
-    }
-}
-
-exports.FnDecryptPassword = function(req,res){
-    try {
-//res.setHeader("Access-Control-Allow-Origin", "*");
-//res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-        res.header('Access-Control-Allow-Credentials', true);
-        res.header('Access-Control-Allow-Origin', "*");
-        res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
-        res.header('Access-Control-Allow-Headers', 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept');
-
-        var password = req.query.Password;
-
-        var RtnMessage = {
-            Password : ''
-        };
-        RtnMessage.Password = FnDecrypt(password);
-        console.log(RtnMessage.Password);
-        res.send(RtnMessage);
-
-
-    }
-    catch(ex){
-        console.log('FnDecrypterror:' + ex.description);
           
         return 'error'
     }
@@ -2072,85 +1992,6 @@ exports.FnGetLoginCheck = function (req, res) {
     }
 };
 
-exports.FnSearchForTracker = function (req, res) {
-    try {
-
-        res.setHeader("Access-Control-Allow-Origin", "*");
-        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-        var Token = req.body.Token;
-        var Keyword = req.body.Keyword;
-        var Latitude = req.body.Latitude;
-        var Longitude = req.body.Longitude;
-        var Proximity = req.body.Proximity;
-
-        if (Token != null && Keyword != null && Latitude != null && Longitude != null && Proximity  != null) {
-            FnValidateToken(Token, function (err, Result) {
-                if (!err) {
-                    if (Result != null) {
-                        var query = db.escape(Keyword) + ','  + db.escape(Latitude) + ',' + db.escape(Longitude) + ',' + db.escape(Proximity)+ ',' + db.escape(Token);
-                        db.query('CALL pTrackerSearch(' + query + ')', function (err, GetResult) {
-                            if (!err) {
-                                if (GetResult != null) {
-                                    if (GetResult[0].length > 0) {
-                                        console.log('FnSearchForTracker: Search result sent successfully');
-                                        res.send(GetResult[0]);
-                                    }
-                                    else {
-                                        console.log('FnSearchForTracker:No Search found');
-                                        res.json(null);
-                                    }
-                                }
-                                else {
-                                    console.log('FnSearchForTracker:No Search found');
-                                    res.json(null);
-                                }
-                            }
-                            else {
-
-                                console.log('FnSearchForTracker: error in getting search result' + err);
-                                res.statusCode = 500;
-                                res.json(null);
-                            }
-                        });
-                    }
-                    else {
-                        res.statusCode = 401;
-                        res.json(null);
-                        console.log('FnSearchForTracker: Invalid Token');
-                    }
-                } else {
-                    res.statusCode = 500;
-                    res.json(null);
-                    console.log('FnSearchForTracker: Error in validating token:  ' + err);
-                }
-            });
-        }
-        else {
-            if (Token == null) {
-                console.log('FnSearchForTracker: Token is empty');
-            }
-            else if (Keyword == null) {
-                console.log('FnSearchForTracker: Keyword is empty');
-            }
-            else if (Latitude == null) {
-                console.log('FnSearchForTracker: Latitude is empty');
-            }
-            else if (Longitude == null) {
-                console.log('FnSearchForTracker: Longitude is empty');
-            }
-            else if (Proximity == null) {
-                console.log('FnSearchForTracker: Proximity is empty');
-            }
-            res.statusCode=400;
-            res.json(null);
-        }
-    }
-    catch (ex) {
-        console.log('FnSearchForTracker error:' + ex.description);
-          
-    }
-};
-
 exports.FnGetUserwiseFolderList = function (req, res) {
     try {
 
@@ -2440,73 +2281,6 @@ exports.FnWebLinkRedirect = function(req,res,next){
         next();
     }
 }
-
-exports.FnGetSearchItem = function(req,res){
-    try{
-        res.setHeader("Access-Control-Allow-Origin", "*");
-        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-
-        var Token = req.query.Token;
-        var FunctionType = req.query.FunctionType;
-        var ItemTitle = req.query.ItemTitle;
-
-        if(Token != null && FunctionType != null && ItemTitle != null){
-            FnValidateToken(Token, function (err, Result) {
-                if (!err) {
-                    if (Result != null) {
-                        var SearchQuery = db.escape(Token) + ',' + db.escape(FunctionType) + ',' + db.escape(ItemTitle);
-                        db.query('CALL PGetItemAutocomplete(' + SearchQuery + ')', function (err, SearchResult) {
-                            if (!err) {
-                                if (SearchResult[0].length > 0) {
-                                    res.send(SearchResult[0]);
-                                    console.log('FnGetSearchItem:Items sent successfully');
-                                }
-                                else {
-                                    res.json(null);
-                                    console.log('FnGetSearchItem:No items found');
-                                }
-                            }
-                            else {
-                                res.statusCode = 500;
-                                res.json(null);
-                                console.log('FnGetSearchItem:Error in getting Search items' + err);
-                            }
-                        });
-                    }
-                    else {
-                        console.log('FnGetSearchItem: Invalid token');
-                        res.statusCode = 401;
-                        res.json(null);
-                    }
-                }
-                else {
-                    console.log('FnGetSearchItem: Token error: ' + err);
-                    res.statusCode = 500;
-                    res.json(null);
-
-                }
-            });
-        }
-        else {
-            if (Token = null) {
-                console.log('FnGetSearchItem: Token is empty');
-            }
-            else if (FunctionType == null) {
-                console.log('FnGetSearchItem:FunctionType is empty');
-            }
-            else if (ItemTitle == null) {
-                console.log('FnGetSearchItem: ItemTitle is empty');
-            }
-
-            res.statusCode = 400;
-            res.json(null);
-        }
-    }
-    catch (ex) {
-        console.log('FnGetSearchItem error:' + ex.description);
-          
-    }
-};
 
 exports.FnGetSearchPicture = function(req, res){
     try{

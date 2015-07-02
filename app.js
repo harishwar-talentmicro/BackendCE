@@ -84,30 +84,25 @@ app.get('/legal.html',function(req,res,next){
 app.post('/ewLogin', LocationManager.FnLogin);
 app.get('/ewLogout', LocationManager.FnLogout);
 app.post('/ewSavePrimaryEZEData', LocationManager.FnRegistration);
-//app.post('/ewSavePrimaryEZEData', LocationManager.FnRegistration);
 app.get('/ewmGetCategory', LocationManager.FnGetCategory);
 app.get('/ewmGetCity', LocationManager.FnGetCity);
 app.get('/ewmGetCountry', LocationManager.FnGetCountry);
 app.get('/ewmGetFunctionRoleMap', LocationManager.FnGetFunctionRoleMap);
 app.get('/ewmGetFunctions', LocationManager.FnGetFunctions);
 app.get('/ewmGetRoles', LocationManager.FnGetRoles);
-
 app.get('/ewmGetLanguage', LocationManager.FnGetLanguage);
 app.get('/ewmGetRelationType', LocationManager.FnGetRelationType);
 app.get('/ewmGetRoleType', LocationManager.FnGetRoleType);
 app.get('/ewmGetState', LocationManager.FnGetState);
 app.get('/ewmGetMTitle', LocationManager.FnGetMTitle);
 app.get('/ewGetEZEID', LocationManager.FnCheckEzeid);
-//app.get('/ewSearchByKeywords', LocationManager.FnSearch);
 app.post('/ewmAddLocation', LocationManager.FnAddLocation);
 app.post('/ewSearchByKeywords', LocationManager.FnSearchByKeywords);
 app.get('/ewtGetUserDetails', LocationManager.FnGetUserDetails);
 app.get('/ewtGetSecondaryLoc', LocationManager.FnGetSecondaryLocation);
-//app.get('/ewSearchEzeidNew', LocationManager.FnSearchEzeidNew);
 app.post('/ewDeleteLocation', LocationManager.FnDeleteLocation);
 app.get('/ewtGetSearchInformation', LocationManager.FnGetSearchInformation);
 app.get('/ewtGetSearchInformationNew', LocationManager.FnGetSearchInformationNew);
-
 app.get('/ewmGetProxmity', LocationManager.FnGetProxmity);
 app.post('/ewtSendMail', LocationManager.FnSendMail);
 app.get('/ewtGetDoc', LocationManager.FnGetDoc);
