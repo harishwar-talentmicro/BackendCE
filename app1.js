@@ -101,6 +101,7 @@ app.post('/ewSearchByKeywords', LocationManager.FnSearchByKeywords);
 app.get('/ewtGetUserDetails', LocationManager.FnGetUserDetails);
 app.get('/ewtGetSecondaryLoc', LocationManager.FnGetSecondaryLocation);
 app.post('/ewDeleteLocation', LocationManager.FnDeleteLocation);
+app.get('/ewtGetSearchInformationNew', LocationManager.FnGetSearchInformationNew);
 app.get('/ewmGetProxmity', LocationManager.FnGetProxmity);
 app.post('/ewtSendMail', LocationManager.FnSendMail);
 app.get('/ewtGetDoc', LocationManager.FnGetDoc);
@@ -110,6 +111,7 @@ app.post('/ewtSaveMessage', LocationManager.FnSaveMessage);
 app.get('/ewtGetMessages', LocationManager.FnGetMessages);
 app.post('/ewtUpdateMessageStatus', LocationManager.FnUpdateMessageStatus);
 app.post('/ewtForgetPassword', LocationManager.FnForgetPassword);
+app.get('/ewtDecryptPassword', LocationManager.FnDecryptPassword);
 app.post('/ewtChangePassword', LocationManager.FnChangePassword);
 app.post('/ewtUpdateProfilePicture', LocationManager.FnUpdateProfilePicture);
 app.post('/ewtSaveCVInfo', LocationManager.FnSaveCVInfo);
@@ -171,7 +173,6 @@ app.post('/ewtWebLink',LocationManager.FnSaveWebLink);
 app.get('/ewtWebLink',LocationManager.FnGetWebLink);
 app.delete('/ewtwebLink',LocationManager.FnDeleteWebLink);
 app.delete('/ewtDeleteTranscation',LocationManager.FnDeleteTransaction);
-app.get('/ewtGetSearchItem',LocationManager.FnGetSearchItem);
 app.get('/ewtGetSearchPics', LocationManager.FnGetSearchPicture);
 app.get('/ewtCompanyProfile', LocationManager.FnGetCompanyProfile);
 app.post('/ewtCompanyProfile', LocationManager.FnSaveCompanyProfile);
@@ -195,6 +196,8 @@ app.put('/update_transaction',LocationManager.FnUpdateTransaction);
 app.get('/company_details',LocationManager.FnGetCompanyDetails);
 app.get('/get_outbox_messages',LocationManager.FnGetOutboxMessages);
 app.get('/get_workinghours_list',LocationManager.FnGetworkinghoursList);
+app.get('/ezeoneid',LocationManager.FnGetEZEOneIDInfo);
+app.get('/get_workinghours_details',LocationManager.FnWorkingHoursDetails);
 
 
 //below service are for EZEIDAP
