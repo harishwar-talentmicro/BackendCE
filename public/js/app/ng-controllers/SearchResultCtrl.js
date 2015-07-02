@@ -1083,28 +1083,11 @@ var res = angular.module('ezeidApp').
             {
                 if(parseInt($routeParams.searchType) == 1 && parseInt(idTypeId) == 1)//its Ezeone ID
                 {
-                    return name != ''?truncate(name):'___';
+                    return name != ''?UtilityService.truncate(name,38):'___';
                 }
                 else
                 {
-                    return companyName != ''?truncate(companyName):'___';
-                }
-            }
-
-            /**
-             * truncate the characters upto 38 characters
-             * @param str
-             * @returns {*}
-             */
-            function truncate(str)
-            {
-                if(str.length > 38)
-                {
-                    return str.substring(0,38)+"...";
-                }
-                else
-                {
-                    return str;
+                    return companyName != ''?UtilityService.truncate(companyName,38):'___';
                 }
             }
 

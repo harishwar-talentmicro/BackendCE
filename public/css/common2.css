@@ -123,7 +123,7 @@
 
     .hpw .width-search-bar
     {
-        width:293px !important;
+        width:220px !important;
     }
 
     .hpw .mobile-view-buttons
@@ -179,6 +179,11 @@
     .hpw .hidden-1200
     {
         display: none !important;
+    }
+
+    .hpw .width-search-bar
+    {
+        width:262px !important;
     }
 
     .hpw .mobile-view-buttons
@@ -295,6 +300,12 @@
     }
 }
 
+@media screen and (max-width: 790px) {
+    .hpw .width-search-bar
+    {
+        width:220px !important;
+    }
+}
 @media screen and (max-width: 768px) {
     .hpw .search-type
     {

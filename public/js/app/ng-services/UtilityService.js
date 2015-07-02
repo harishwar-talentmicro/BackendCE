@@ -101,6 +101,18 @@ angular.module('ezeidApp').service('UtilityService',['$q',function($q){
             }
 
             return val;
+        },
+
+        /**
+         * Truncate a string up to a certain character
+         */
+        truncate : function(str, limit)
+        {
+            if(toString(str).length > limit)
+            {
+                return str.substring(0,limit)+"...";
+            }
+            return str;
         }
 
     };
