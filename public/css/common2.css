@@ -110,6 +110,10 @@
 
 }
 
+.hpw .width-search-bar
+{
+    width:300px !important;
+}
 
 @media screen and (max-width: 1320px) {
     .srw .tile-frame-padding-top
@@ -117,6 +121,10 @@
         padding-top: 158px;
     }
 
+    .hpw .width-search-bar
+    {
+        width:293px !important;
+    }
 
     .hpw .mobile-view-buttons
     {

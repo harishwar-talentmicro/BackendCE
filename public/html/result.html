@@ -33,7 +33,11 @@
                             <div class="input-group">
                                 <div class="input-group-btn">
                                     <!-- Change Location btn -->
-                                    <button type="button" ng-click="modalVisibility()" class="btn btn-info" title="Click to change Search Location"><i class="fa fa-map-marker"></i> <b class="normal-view-buttons">Location</b></button>
+                                    <button type="button" ng-click="modalVisibility()"
+                                            class="btn btn-info"
+                                            title="Click to change Search Location">
+                                        <i class="fa fa-map-marker"></i> <b class="normal-view-buttons">Location</b>
+                                    </button>
                                     <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
                                         <!-- Index subtracted by 1: As searchType's value is [1,2,3] the array's default index is [0,1,2] -->
                                         <b>{{searchType[params.searchType - 1]}}</b> <span class="caret"></span></button>
@@ -44,7 +48,7 @@
                                     </ul>
                                 </div>
 
-                                <input type="text" ng-keypress="(searchKey($event))" placeholder="{{placeHolderText[params.searchType - 1]}}" ng-model="params.searchTerm" ng-class="(params.searchType === 1) ? 'text-uppercase' : ''" class="form-control" aria-label="...">
+                                <input type="text" ng-keypress="(searchKey($event))" placeholder="{{placeHolderText[params.searchType - 1]}}" ng-model="params.searchTerm" ng-class="(params.searchType === 1) ? 'text-uppercase' : ''" class="form-control width-search-bar" aria-label="...">
                                 <div class="input-group-btn">
                                     <!-- Advance Search BTN -->
                                     <button ng-disabled="params.searchType === 1"  ng-click="(toggleFilterContainer($event,true))(isFilterOptionsShown = false)" type="button" class="btn btn-default dropdown-toggle btn-advanced-filter no-radius" data-toggle="dropdown" title="Click to choose Search Options"><i class="fa fa-check-square-o"></i> Options</Filter></button>
