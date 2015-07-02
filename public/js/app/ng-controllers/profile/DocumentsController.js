@@ -91,7 +91,7 @@ angular.module('ezeidApp').controller('DocumentController',[
 
     $scope.$watch('_userInfo.IsAuthenticate', function () {
         if ($rootScope._userInfo.IsAuthenticate == true) {
-            //console.log(Date.now());
+            ////console.log(Date.now());
             GetUserDetails();
         }
         else {
@@ -108,7 +108,7 @@ angular.module('ezeidApp').controller('DocumentController',[
             method: 'get',
             url: GURL + 'ewtGetDocPin?TokenNo=' + $rootScope._userInfo.Token
         }).success(function (data) {
-            //console.log(data);
+            ////console.log(data);
                $scope.Pin = data[0].DocPIN;
                 userDetailsLoaded = true;
                 if(userDetailsLoaded && documentDetailsLoaded){
@@ -170,7 +170,7 @@ angular.module('ezeidApp').controller('DocumentController',[
     function getDocumentDetails(option){
 
         $scope.form = original_form;
-        //console.log(Date.now());
+        ////console.log(Date.now());
 
         if($rootScope._userInfo && $rootScope._userInfo.Token){
             $http({

@@ -6,6 +6,8 @@ angular.module('ezeidApp').controller('WorkingHourCtrl',['$scope','$rootScope','
     $scope.mInfo = {};
     $scope.saveInfo = {};
     $scope.showAddWorkingHourForm = false;
+    $scope.saveInfo.TID = 0;
+    var workingHourData = "";
     getWorkingHours();
 
     /**
@@ -22,6 +24,15 @@ angular.module('ezeidApp').controller('WorkingHourCtrl',['$scope','$rootScope','
         var mom1 = moment(x);
         return mom1.add((mom1.utcOffset()),'m').format(returnFormat);
     };
+
+    function selectedTimeUtcToLocal(selectedTime)
+    {
+        var x = new Date();
+        var today = moment(x.toISOString()).utc().format('DD-MMM-YYYY');
+
+        var currentTaskDate = moment(today+' '+selectedTime).format('DD-MMM-YYYY H:mm');
+        return convertTimeToLocal(currentTaskDate,'DD-MMM-YYYY H:mm',"H:mm");
+    }
 
     /**
      * Function for converting LOCAL time (local timezone) to server time
@@ -50,7 +61,7 @@ angular.module('ezeidApp').controller('WorkingHourCtrl',['$scope','$rootScope','
                 Token : $rootScope._userInfo.Token
             }
         }).success(function (data) {
-                console.log(data);
+              //  //console.log(data);
                if (data != 'null')
                 {
                    $scope.result = data;
@@ -63,6 +74,46 @@ angular.module('ezeidApp').controller('WorkingHourCtrl',['$scope','$rootScope','
     }
 
     $scope.openAddWorkingHourForm = function(){
+        $scope.saveInfo.TID = 0;
+        workingHourData = "";
+
+        $scope.mInfo.WorkingHrsTemplate = "";
+
+        $scope.mInfo.MO1 = "";
+        $scope.mInfo.MO2 = "";
+        $scope.mInfo.MO3 = "";
+        $scope.mInfo.MO4 = "";
+
+        $scope.mInfo.TU1 = "";
+        $scope.mInfo.TU2 = "";
+        $scope.mInfo.TU3 = "";
+        $scope.mInfo.TU4 = "";
+
+        $scope.mInfo.WE1 = "";
+        $scope.mInfo.WE2 = "";
+        $scope.mInfo.WE3 = "";
+        $scope.mInfo.WE4 = "";
+
+        $scope.mInfo.TH1 = "";
+        $scope.mInfo.TH2 = "";
+        $scope.mInfo.TH3 = "";
+        $scope.mInfo.TH4 = "";
+
+        $scope.mInfo.FR1 = "";
+        $scope.mInfo.FR2 = "";
+        $scope.mInfo.FR3 = "";
+        $scope.mInfo.FR4 = "";
+
+        $scope.mInfo.SA1 = "";
+        $scope.mInfo.SA2 = "";
+        $scope.mInfo.SA3 = "";
+        $scope.mInfo.SA4 = "";
+
+        $scope.mInfo.SU1 = "";
+        $scope.mInfo.SU2 = "";
+        $scope.mInfo.SU3 = "";
+        $scope.mInfo.SU4 = "";
+
         $scope.showAddWorkingHourForm = true;
     };
 
@@ -119,7 +170,7 @@ angular.module('ezeidApp').controller('WorkingHourCtrl',['$scope','$rootScope','
         $scope.saveInfo.WorkingHrsTemplate = $scope.mInfo.WorkingHrsTemplate;
        /* $scope.saveInfo.SpilloverTime = ($scope.mInfo.SpilloverTime == undefined) ? 0 : $scope.mInfo.SpilloverTime;*/
         $scope.saveInfo.SpilloverTime = 0;
-        $scope.saveInfo.TID = 0;
+      //  $scope.saveInfo.TID = 0;
         $scope.saveInfo.Token = $rootScope._userInfo.Token;
 
         $http({
@@ -154,34 +205,75 @@ angular.module('ezeidApp').controller('WorkingHourCtrl',['$scope','$rootScope','
                 });
         };
 
-        function getWorkingHourForEdit()
+        function getWorkingHourForEdit(_TID)
         {
-            $http({ method: 'get', url: GURL + 'ewtWorkingHours',
+            $scope.$emit('$preLoaderStart');
+            workingHourData = "";
+            $http({ method: 'get', url: GURL + 'get_workinghours_details',
                 params : {
                     Token : $rootScope._userInfo.Token,
-                    
+                    TID : _TID
                 }
             }).success(function (data)
                 {
-                    console.log(data);
-                    if (data != 'null')
+                    $scope.$emit('$preLoaderStop');
+                    if (data.status)
                     {
-                        $scope.result = data;
+                       // //console.log(data.data[0]);
+                        workingHourData = data.data[0];
+                        $scope.mInfo.WorkingHrsTemplate = workingHourData.TemplateName;
+
+                        $scope.mInfo.MO1 = (workingHourData.MO1 == "00:00") ? '08:00' : selectedTimeUtcToLocal(workingHourData.MO1);
+                        $scope.mInfo.MO2 = (workingHourData.MO2 == "00:00") ? '13:00' : selectedTimeUtcToLocal(workingHourData.MO2);
+                        $scope.mInfo.MO3 = (workingHourData.MO3 == "00:00") ? '13:00' : selectedTimeUtcToLocal(workingHourData.MO3);
+                        $scope.mInfo.MO4 = (workingHourData.MO4 == "00:00") ? '21:00' : selectedTimeUtcToLocal(workingHourData.MO4);
+
+                        $scope.mInfo.TU1 = (workingHourData.TU1 == "00:00") ? '08:00' : selectedTimeUtcToLocal(workingHourData.TU1);
+                        $scope.mInfo.TU2 = (workingHourData.TU2 == "00:00") ? '13:00' : selectedTimeUtcToLocal(workingHourData.TU2);
+                        $scope.mInfo.TU3 = (workingHourData.TU3 == "00:00") ? '13:00' : selectedTimeUtcToLocal(workingHourData.TU3);
+                        $scope.mInfo.TU4 = (workingHourData.TU4 == "00:00") ? '21:00' : selectedTimeUtcToLocal(workingHourData.TU4);
+
+                        $scope.mInfo.WE1 = (workingHourData.WE1 == "00:00") ? '08:00' : selectedTimeUtcToLocal(workingHourData.WE1);
+                        $scope.mInfo.WE2 = (workingHourData.WE2 == "00:00") ? '13:00' : selectedTimeUtcToLocal(workingHourData.WE2);
+                        $scope.mInfo.WE3 = (workingHourData.WE3 == "00:00") ? '13:00' : selectedTimeUtcToLocal(workingHourData.WE3);
+                        $scope.mInfo.WE4 = (workingHourData.WE4 == "00:00") ? '21:00' : selectedTimeUtcToLocal(workingHourData.WE4);
+
+                        $scope.mInfo.TH1 = (workingHourData.TH1 == "00:00") ? '08:00' : selectedTimeUtcToLocal(workingHourData.TH1);
+                        $scope.mInfo.TH2 = (workingHourData.TH2 == "00:00") ? '13:00' : selectedTimeUtcToLocal(workingHourData.TH2);
+                        $scope.mInfo.TH3 = (workingHourData.TH3 == "00:00") ? '13:00' : selectedTimeUtcToLocal(workingHourData.TH3);
+                        $scope.mInfo.TH4 = (workingHourData.TH4 == "00:00") ? '21:00' : selectedTimeUtcToLocal(workingHourData.TH4);
+
+                        $scope.mInfo.FR1 = (workingHourData.FR1 == "00:00") ? '08:00' : selectedTimeUtcToLocal(workingHourData.FR1);
+                        $scope.mInfo.FR2 = (workingHourData.FR2 == "00:00") ? '13:00' : selectedTimeUtcToLocal(workingHourData.FR2);
+                        $scope.mInfo.FR3 = (workingHourData.FR3 == "00:00") ? '13:00' : selectedTimeUtcToLocal(workingHourData.FR3);
+                        $scope.mInfo.FR4 = (workingHourData.FR4 == "00:00") ? '21:00' : selectedTimeUtcToLocal(workingHourData.FR4);
+
+                        $scope.mInfo.SA1 = (workingHourData.SA1 == "00:00") ? '08:00' : selectedTimeUtcToLocal(workingHourData.SA1);
+                        $scope.mInfo.SA2 = (workingHourData.SA2 == "00:00") ? '13:00' : selectedTimeUtcToLocal(workingHourData.SA2);
+                        $scope.mInfo.SA3 = (workingHourData.SA3 == "00:00") ? '13:00' : selectedTimeUtcToLocal(workingHourData.SA3);
+                        $scope.mInfo.SA4 = (workingHourData.SA4 == "00:00") ? '21:00' : selectedTimeUtcToLocal(workingHourData.SA4);
+
+                        $scope.mInfo.SU1 = (workingHourData.SU1 == "00:00") ? '08:00' : selectedTimeUtcToLocal(workingHourData.SU1);
+                        $scope.mInfo.SU2 = (workingHourData.SU2 == "00:00") ? '13:00' : selectedTimeUtcToLocal(workingHourData.SU2);
+                        $scope.mInfo.SU3 = (workingHourData.SU3 == "00:00") ? '13:00' : selectedTimeUtcToLocal(workingHourData.SU3);
+                        $scope.mInfo.SU4 = (workingHourData.SU4 == "00:00") ? '21:00' : selectedTimeUtcToLocal(workingHourData.SU4);
                     }
                     else
                     {
-                        $scope.result = [];
+                        workingHourData = "";
                     }
+                })
+                .error(function(data, status, headers, config) {
+                    $scope.$emit('$preLoaderStop');
                 });
         }
 
         //Edit Working Hours
         $scope.editWorkingHourTemplate = function(_TID){
 
-            console.log(_TID);
             $scope.showAddWorkingHourForm = true;
-            getWorkingHourForEdit();
-
+            $scope.saveInfo.TID = _TID;
+            getWorkingHourForEdit(_TID);
         };
 
 }]);

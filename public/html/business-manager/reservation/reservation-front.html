@@ -1,5 +1,10 @@
 <!-- Reservation Module -->
 <section id="reservation-wrapper" class="hpw ow rw" ng-controller="ReservationCtrl">
+
+    <!-- Header menu goes here -->
+    <header-section></header-section>
+
+
     <!-- The Panel -->
     <div class="width-75 container p-top-30">
         <div class="panel panel-default shadow-border">
@@ -21,6 +26,7 @@
                                                                     "inline" : true,
                                                                     "maxDate" : "2029/01/01"
                                                                     }'>
+
                         </date-time-picker>
                     </div>
                     <!-- Notes section goes here[Shown only to resource] -->
@@ -85,7 +91,7 @@
                                                     </option>
                                                 </select>
                                             </div>
-                                            <div class="col-lg-7 col-md-7 col-sm-7 col-xs-7">&nbsp;</div>
+                                            <div class="col-lg-7 col-md-7 col-sm-7 col-xs-7 text-1-9 text-primary">&nbsp;</div>
                                         </div>
                                     </div>
                                 </div>
@@ -201,4 +207,8 @@
     <div class="hidden">{{reservationMooduleStarter();ifHtmlLoaded = true}}</div>
     <!-- main container of day - calender end here -->
     <!-- Reservation module ends here -->
+
+    <!-- Footer goes here -->
+    <footer-section></footer-section>
+    <!-- Footer Ends here -->
 </section>
