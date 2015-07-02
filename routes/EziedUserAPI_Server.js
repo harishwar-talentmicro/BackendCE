@@ -6389,7 +6389,6 @@ exports.FnSaveStatusType = function(req, res){
                                 if (!err) {
                                     if(result != null){
                                         if(result.affectedRows > 0){
-                                            console.log(result);
                                             RtnMessage.IsSuccessfull = true;
                                             console.log('FnSaveStatusType: Status type saved successfully');
 
@@ -7878,11 +7877,19 @@ exports.FnDeleteWorkingHours = function(req, res){
                         //console.log('CALL pDeleteWorkinghours(' + db.escape(TID) + ')');
                         db.query('CALL pDeleteWorkinghours(' + db.escape(TID) + ')', function (err, deleteResult) {
                             if (!err){
-                                                                                    
+                                if(deleteResult.affectedRows > 0){
                                     RtnMessage.IsSuccessfull = true;
                                     RtnMessage.Message = 'delete successfully';
                                     res.send(RtnMessage);
                                     console.log('FnDeleteWorkingHours:Working Hours delete successfully');
+
+                                }
+                                else {
+
+                                    RtnMessage.Message = 'No deleted';
+                                    res.send(RtnMessage);
+                                    console.log('FnDeleteWorkingHours:No Working Hours delete successfully');
+                                }
                             }                               
                             else {
                                 console.log('FnDeleteWorkingHours: error in deleting Working Hours' + err);
