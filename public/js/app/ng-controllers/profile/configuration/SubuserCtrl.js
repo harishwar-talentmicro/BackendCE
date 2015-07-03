@@ -234,11 +234,13 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope',
         $http({
             url : GURL + 'ewtEZEIDPrimaryDetails',
             params : {
-                EZEID : '@'+$scope.modalBox.subuser.ezeid,
+                EZEID : ($scope.modalBox.subuser.ezeid) ?
+                    (($scope.modalBox.subuser.ezeid[0] == '@') ? $scope.modalBox.subuser.ezeid : '@'+$scope.modalBox.subuser.ezeid) : '',
                 Token : $rootScope._userInfo.Token
             },
             method : "GET"
         }).success(function(resp){
+            if(resp){
                 if(resp.length > 0){
                     if(resp[0].hasOwnProperty('TID')){
                         $scope.modalBox.isEzeidAvailable = true;
@@ -258,6 +260,10 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope',
                 else{
                     $scope.modalBox.isEzeidAvailable = false;
                 }
+            }
+            else{
+                $scope.modalBox.isEzeidAvailable = false;
+            }
                 $scope.modalBox.availabilityCheck = true;
         }).error(function(err){
                 Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
@@ -331,7 +337,8 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope',
         $http({
             url : GURL + 'ewtEZEIDPrimaryDetails',
             params : {
-                EZEID : '@'+$scope.modalBox.subuser.ezeid,
+                EZEID : ($scope.modalBox.subuser.ezeid) ?
+                    (($scope.modalBox.subuser.ezeid[0] == '@') ? $scope.modalBox.subuser.ezeid : '@'+$scope.modalBox.subuser.ezeid): '',
                 Token : $rootScope._userInfo.Token
             },
             method : "GET"

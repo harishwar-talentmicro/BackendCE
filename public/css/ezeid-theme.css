@@ -406,7 +406,8 @@ label.blank-colums-hide {
 }
 
 .wd48p {
-    width: 48% !important;
+    width: 90% !important;
+    margin:10px !important;
 }
 
 .wd50p {

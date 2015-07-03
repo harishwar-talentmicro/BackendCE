@@ -13,8 +13,14 @@ HeaderApp.directive('headerSection',['Notification','$window' ,function (Notific
             SignCtrl.RegInfo = {};
 
             //login
-            this.LoginUser = function (Logdata, form) {
-
+            this.LoginUser = function (loginFormData, form) {
+                var Logdata = {
+                    UserName : '',
+                    Password : ''
+                };
+                Logdata.UserName = (loginFormData.UserName) ?
+                    ((loginFormData.UserName[0] == '@') ? loginFormData.UserName : '@'+loginFormData.UserName) : '';
+                Logdata.Password = loginFormData.Password;
                 if (!SignCtrl.Captcha) {
                     $http({
                         method: 'post', url: GURL + 'ewLogin', data: Logdata
