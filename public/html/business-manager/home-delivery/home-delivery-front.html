@@ -2,34 +2,49 @@
     <header-section></header-section>
     <div class="container-fluid top-clearfix-padding">
         <div class="row">
-            <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12 col-lg-offset-2 col-md-offset-2 col-xs-offset-0 col-sm-offset-0">
+            <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12 col-lg-offset-2 col-md-offset-2 col-xs-offset-0 col-sm-offset-0 front-business-form">
                 <!----------- Panel starts -------------------------------------------->
 
                 <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h2 class="text-info text-center">
-                            {{ezeone}}
-                        </h2>
+                    <div class="panel-heading front-business-form">
+                        <h4 class="text-info text-center text-white font-roboto no-margin no-padding" style="font-size: 22px;">
+                            {{(masterUser.HomeDeliveryModuleTitle) ? masterUser.HomeDeliveryModuleTitle : 'HomeDelivery Order Form'}}
+                        </h4>
                     </div>
-                    <div class="panel-body profile-manager business-manager-modal">
+                    <div class="panel-body profile-manager business-manager-modal front-business-form">
                         <!-------------- Navigation for Profile Manager ------------------------>
                         <div class="container-fluid">
                             <div class="row">
                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-center bottom-clearfix">
-                                    <h3 class="font-roboto text-success">
-                                        {{(masterUser.HomeDeliveryModuleTitle) ? masterUser.HomeDeliveryModuleTitle : 'Home Delivery Form'}}
-                                    </h3>
+
+
+                                    <h4  class="font-roboto text-success no-margin no-padding front-business-form" style="font-weight:bold">
+                                        {{(masterUser.IDTypeID == 1) ? masterUser.FirstName + ' '+ masterUser.LastName : masterUser.CompanyName}}
+                                        ({{masterUser.EZEID}})
+                                    </h4>
+                                    <h4 ng-show="masterUser.HomeDeliveryFormMsg" class="font-roboto text-left text-success no-margin no-padding front-business-form warning-text">
+                                        <small class="tiny"><i>* {{masterUser.HomeDeliveryFormMsg}}</i></small>
+                                    </h4>
 
                                 </div>
 
-                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 transaction-details-box">
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 transaction-details-box" ng-hide="isEnquiryPosted">
 
-                                    <div ng-show="moduleItems.length" class="row bottom-clearfix">
+                                    <div ng-show="moduleItems.length > 0 && masterUser.HomeDeliveryItemListType > 0" class="row bottom-clearfix">
 
-                                        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12 item-list-box">
-                                            <div class="row">
+                                        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12 item-list-box front-business-form" style="border: 1px solid #BABABA; box-shadow: 0px 0px 10px #DDD;">
+                                            <div class="row" style="background-color: #DDD;">
+                                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                    <h5 class="text-left font-roboto text-warning no-border front-business-form unselected-item-text">Select Items</h5>
+
+                                                </div>
                                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
-                                                    <h4 class="text-center font-roboto text-warning">Select Items</h4>
+                                                    <div class="input-group form-group-sm">
+                                                        <span class="input-group-addon">
+                                                            <i class="fa fa-search"></i>
+                                                        </span>
+                                                        <input type="text" placeholder="Enter item name" class="form-control" ng-model="busItemSearch" />
+                                                    </div>
                                                 </div>
                                             </div>
 
@@ -37,8 +52,8 @@
 
                                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                                     <bussiness-item
-                                                            ng-repeat="item in moduleItems track by item.TID"
-                                                            item="item" item-list-type="homeDeliveryItemListType"
+                                                            ng-repeat="item in moduleItems | filter:busItemSearch track by item.TID"
+                                                            item="item" item-index="$index" item-list-type="homeDeliveryItemListType"
                                                             add-item="addItem(item)" edit-permission="editPermission" edit-mode="editMode">
                                                     </bussiness-item>
                                                 </div>
@@ -47,17 +62,17 @@
 
                                         </div>
 
-                                        <div class="col-lg-8 col-md-8 col-sm-6 col-xs-12">
-                                            <div class="row">
+                                        <div class="col-lg-8 col-md-8 col-sm-6 col-xs-12 tx-item-list-box" style="border: 1px solid #BABABA;box-shadow: 0px 0px 10px #DDD;">
+                                            <div class="row" style="background-color: #DDD;">
                                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                                    <h4 class="text-center font-roboto text-success">Items List </h4>
+                                                    <h5 class="text-left font-roboto text-success no-border front-business-form selected-item-text">Selected Items </h5>
                                                 </div>
                                             </div>
 
                                             <div class="row" id="tx-item-list-container">
 
                                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-center" ng-hide="modalBox.tx.itemList.length > 0">
-                                                    <small class="font-open-sans text-warning">Selected Items</small>
+                                                    <small class="font-open-sans text-warning">No item selected</small>
                                                 </div>
 
                                                 <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12" ng-repeat="item in modalBox.tx.itemList track by item.ItemID">
@@ -73,15 +88,25 @@
                                         </div>
 
 
+                                        <div class="col-lg-4 col-md-4 hidden-sm hidden-xs"></div>
+                                        <div class="col-md-8 col-sm-12 col-xs-12 front-business-form cart-details" ng-show="modalBox.tx.itemList && modalBox.tx.itemList.length > 0">
+                                            <b><i class="fa fa-shopping-cart"></i> {{cartItemString}}
+                                                <span class="pull-right"
+                                                      ng-show="homeDeliveryItemListType > 3">
+                                                    {{cartAmount}}
+                                                </span>
+                                            </b>
+                                        </div>
 
                                     </div>
+
 
                                     <div class="row">
 
 
-                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
                                             <div class="row">
-                                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
+                                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                                     <label> Message</label>
                                                 </div>
                                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
@@ -89,96 +114,135 @@
                                                 </div>
                                             </div>
                                         </div>
+                                    </div>
 
 
-                                        <!--<div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">-->
-                                        <!--<div class="row">-->
-                                        <!--<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">-->
-                                        <!--<label>Additional Note</label>-->
-                                        <!--</div>-->
-                                        <!--<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">-->
+                                    <div class="row">
 
-                                        <!--<textarea rows="1" class="form-control no-radius" ng-model="modalBox.tx.notes" name="notes"></textarea>-->
-
-                                        <!--</div>-->
-                                        <!--</div>-->
-                                        <!--</div>-->
-
-                                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 bottom-clearfix">
-                                            <div class="row">
-                                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
-                                                    <label>Delivery Address</label>
-                                                </div>
-                                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12" ng-hide="modalBox.editMode">
-                                                    <div class="form-group form-group-sm ">
-                                                        <select class="form-control" ng-model="modalBox.tx.locId" ng-change="resolveAddress()">
-                                                            <option value="">Other Location</option>
-                                                            <option value="0">Current Location</option>
-                                                            <option ng-repeat="location in modalBox.locationList track by location.TID" value="{{location.TID}}">{{location.LocTitle}}</option>
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                                                    <div class="form-group form-group-sm ">
-                                                        <input
-                                                                ng-disabled="modalBox.tx.locId > 0"
-                                                                type="text" placeholder="Address Line 1" class="form-control no-radius"  name="area" ng-model="modalBox.tx.address" />
-                                                        <small class="text-danger" ng-show="txerror.address">Please enter address line 1</small>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                                                    <div class="form-group form-group-sm ">
-                                                        <input type="text"
-                                                               ng-disabled="modalBox.tx.locId"
-                                                               placeholder="Locality" class="form-control no-radius"  name="area" ng-model="modalBox.tx.area" />
-                                                        <small class="text-danger" ng-show="txerror.area">Please enter locality</small>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                                                    <div class="form-group form-group-sm ">
-                                                        <input
-                                                                ng-disabled="modalBox.tx.locId"
-                                                                type="text" placeholder="City" class="form-control no-radius" name="city" ng-model="modalBox.tx.city" />
-                                                        <small class="text-danger" ng-show="txerror.city">Please enter city</small>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                                                    <div class="form-group form-group-sm ">
-                                                        <input type="text"
-                                                               ng-disabled="modalBox.tx.locId"
-                                                               placeholder="State" class="form-control no-radius" name="state" ng-model="modalBox.tx.state" />
-                                                        <small class="text-danger" ng-show="txerror.state">Please enter state</small>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                                                    <div class="form-group form-group-sm ">
-                                                        <input type="text"
-                                                               ng-disabled="modalBox.tx.locId"
-                                                               placeholder="Country" class="form-control no-radius"  name="country" ng-model="modalBox.tx.country" />
-                                                        <small class="text-danger" ng-show="txerror.country">Please enter country</small>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                        <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12 bottom-clearfix">
+                                            <label class="display:inline">Delivery Address</label>
                                         </div>
+                                        <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12 bottom-clearfix">
+                                            <label style="font-weight: normal;display:inline;">
+                                                <input type="radio" value="0" ng-checked="addressSelectionType == 0" ng-click="addressSelectionType = 0" name="addressSelection"/> I have EZEOne ID
+                                            </label>
+                                        </div>
+                                        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12 bottom-clearfix">
+                                            <label style="font-weight: normal;display:inline;">
+                                                <input type="radio" value="1" ng-checked="addressSelectionType == 1" ng-click="addressSelectionType = 1" name="addressSelection"/> Deliver at another address
+                                            </label>
+                                        </div>
+
+
+
+
+                                        <!--<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix" xg-show="addressChangeFlag" ng-show="1==0">-->
+                                        <!--<div class="row">-->
+                                        <!--<div class="col-lg-6 col-md-6 col-sm-6 col-xs-12" ng-hide="modalBox.editMode">-->
+
+                                        <!--</div>-->
+                                        <!--<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">-->
+                                        <!--<div class="form-group form-group-sm ">-->
+                                        <!--<input-->
+                                        <!--ng-disabled="modalBox.tx.locId > 0"-->
+                                        <!--type="text" placeholder="Address Line 1" class="form-control no-radius"  name="area" ng-model="modalBox.tx.address" />-->
+                                        <!--<small class="text-danger" ng-show="txerror.address">Please enter address line 1</small>-->
+                                        <!--</div>-->
+                                        <!--</div>-->
+                                        <!--<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">-->
+                                        <!--<div class="form-group form-group-sm ">-->
+                                        <!--<input type="text"-->
+                                        <!--ng-disabled="modalBox.tx.locId"-->
+                                        <!--placeholder="Address Line 2 (Locality)" class="form-control no-radius"  name="area" ng-model="modalBox.tx.area" />-->
+                                        <!--<small class="text-danger" ng-show="txerror.area">Please enter locality</small>-->
+                                        <!--</div>-->
+                                        <!--</div>-->
+                                        <!--<div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">-->
+                                        <!--<div class="form-group form-group-sm ">-->
+                                        <!--<input-->
+                                        <!--ng-disabled="modalBox.tx.locId"-->
+                                        <!--type="text" placeholder="City" class="form-control no-radius" name="city" ng-model="modalBox.tx.city" />-->
+                                        <!--<small class="text-danger" ng-show="txerror.city">Please enter city</small>-->
+                                        <!--</div>-->
+                                        <!--</div>-->
+                                        <!--<div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">-->
+                                        <!--<div class="form-group form-group-sm ">-->
+                                        <!--<input type="text"-->
+                                        <!--ng-disabled="modalBox.tx.locId"-->
+                                        <!--placeholder="State" class="form-control no-radius" name="state" ng-model="modalBox.tx.state" />-->
+                                        <!--<small class="text-danger" ng-show="txerror.state">Please enter state</small>-->
+                                        <!--</div>-->
+                                        <!--</div>-->
+                                        <!--<div class="col-lg-6 col-md-6 col-sm-6 col-xs-8">-->
+                                        <!--<div class="form-group form-group-sm ">-->
+                                        <!--<input type="text"-->
+                                        <!--ng-disabled="modalBox.tx.locId"-->
+                                        <!--placeholder="Country" class="form-control no-radius"  name="country" ng-model="modalBox.tx.country" />-->
+                                        <!--<small class="text-danger" ng-show="txerror.country">Please enter country</small>-->
+                                        <!--</div>-->
+                                        <!--</div>-->
+                                        <!--<div class="col-lg-3 col-md-3 col-sm-3 col-xs-4">-->
+                                        <!--<div class="form-group form-group-sm ">-->
+                                        <!--<input type="text"-->
+                                        <!--ng-disabled="modalBox.tx.locId"-->
+                                        <!--placeholder="PIN/ZIP" title="Pin Code/ Zip Code" class="form-control no-radius"  name="pinCode" ng-model="modalBox.tx.pinCode" />-->
+                                        <!--<small class="text-danger" ng-show="txerror.pinCode"></small>-->
+                                        <!--</div>-->
+                                        <!--</div>-->
+                                        <!--</div>-->
+                                        <!--</div>-->
+
 
 
                                     </div>
 
+                                    <div class="row bottom-clearfix">
+                                        <div class="col-lg-3 col-md-3 col-sm-4 col-xs-12 bottom-clearfix" ng-hide="addressSelectionType">
+                                            <div class="input-group input-group-sm no-radius has-error">
+                                                <span class="input-group-addon">EZEOne ID</span>
+                                                <input type="text" class="form-control" maxlength="20" ng-model="ezeoneAddressId"
+                                                       name="ezeoneAddressId"
+                                                       id="ezeoneAddressId"
+                                                       placeholder="EZEOne ID"/>
+                                                <span class="input-group-btn">
+                                                    <button class="btn btn-success">Go</button>
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        <div ng-hide="addressSelectionType"
+                                             class="col-lg-9 col-md-9 col-sm-12 col-xs-12 bottom-clearfix">
+                                            <p class="text-info center-vertical">
+                                                {{modalBox.tx.DeliveryAddress}}
+                                            </p>
+                                        </div>
+
+                                        <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12 bottom-clearfix" ng-show="addressSelectionType">
+                                            <div class="input-group input-group-sm" ng-class="modalBox.tx.DeliveryAddress">
+                                                <span class="input-group-addon">Address</span>
+                                                <input class="form-control" type="text" id="google-map-search-box" placeholder="Type here your address" />
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+
+
 
                                     <div ng-show="txerror.items" class="row bottom-clearfix">
                                         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                            <small class="text-danger">Please choose a product</small>
+                                            <small class="text-danger">Please choose an item</small>
                                         </div>
                                     </div>
 
                                     <div class="row bottom-clearfix">
 
-                                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
-                                            <button class="btn btn-info btn-sm no-radius" ng-click="saveTransaction()">
+                                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                            <button ng-disabled="(!modalBox.tx.DeliveryAddress)" class="btn btn-success-bright btn-sm no-radius btn-wide" ng-click="saveTransaction()">
                                                 <span class="glyphicon glyphicon-hand-right"></span>
-                                                Place Order
+                                                Submit
                                             </button>
-                                            <button class="btn btn-danger btn-sm no-radius" ng-click="closeForm()">
+                                            <button class="btn btn-danger btn-sm no-radius btn-wide" ng-click="closeForm()">
                                                 <span class="glyphicon glyphicon-remove"></span>
                                                 Cancel
                                             </button>
@@ -189,6 +253,11 @@
 
                                     </div>
 
+                                </div>
+
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-show="isEnquiryPosted">
+                                    <h4 class="font-open-sans text-info text-center">Your enquiry is posted successfully</h4>
+                                    <h3 class="font-open-sans text-warning text-center">Thank You</h3>
                                 </div>
 
                             </div>
@@ -202,51 +271,47 @@
 <footer-section></footer-section>
 
 
+
 <!-- Template for Item having item name,description,picture,qty and rate -->
 <script type="text/ng-template" id="/tpl/tx-item-description-picture-qty-rate.html">
     <div class="row business-manager-item selected">
-        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-            <button ng-hide="(!editPermission) && editMode" class="btn btn-xs btn-danger pull-right no-radius"  ng-click="removeItem(item)">
+
+        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 business-manager-item-thumbnail bottom-clearfix">
+            <img height="32" width="32" class="img-circle" ng-src="{{item.Pic}}" />
+        </div>
+
+        <div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 bottom-clearfix">
+            <b class="font-roboto wrap-text no-margin">
+                {{item.ItemName}}
+            </b>
+        </div>
+        <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1 no-padding">
+            <button ng-hide="(!editPermission) && editMode"
+                    title="Remove"
+                    class="btn btn-xs btn-danger pull-right no-radius business-manager-trash-btn"
+                    ng-click="removeItem(item)">
                 <span class="glyphicon glyphicon-trash"></span>
             </button>
         </div>
-        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 business-manager-item-thumbnail bottom-clearfix">
-            <img height="64" width="64" class="img-circle" ng-src="{{item.Pic}}" />
-        </div>
-        <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 business-manager-item-details bottom-clearfix">
-            <h4 class="font-open-sans">{{item.ItemName}}
 
-            </h4>
-        </div>
 
-        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 business-manager-item-details">
-            <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 business-manager-item-details business-manager-input-control">
 
-                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <input  ng-disabled="!(editPermission && editMode)" class="text-right text-info"
+                    numbers-only type="number"
+                    title="Quantity"
+                    ng-model="item.Qty" ng-change="(!item.Qty) ? (item.Qty = 1) : ''" min="1"
+                    max="10000000000"/>
+            x
+            <input class="text-right text-info"
+                   title="Rate"
+                   type="text" value="{{item.Rate | formatDecimal:'':2}}" disabled/>
 
-                    <div class="input-group form-group-sm bottom-clearfix">
-                        <span class="input-group-addon">
-                            Rate &nbsp; &nbsp;&nbsp;&nbsp;
-                        </span>
-                        <input class="form-control text-right" type="text" value="{{item.Rate | formatDecimal:'':2}}" disabled/>
-                    </div>
-                    <div class="input-group form-group-sm bottom-clearfix">
-                        <span class="input-group-addon">
-                            Quantity
-                        </span>
-                        <input  ng-disabled="!(editPermission && editMode)" class="form-control text-right" numbers-only type="number" ng-model="item.Qty" ng-change="(!item.Qty) ? (item.Qty = 1) : ''" min="1" max="10000000000"/>
-                    </div>
-                    <div class="input-group form-group-sm bottom-clearfix">
-                        <span class="input-group-addon">
-                                Amount &nbsp;
-                        </span>
-                        <input class="form-control text-right"  type="text" value="{{(item.Rate * item.Qty) | formatDecimal:'':2}}" disabled/>
 
-                    </div>
-
-                </div>
-            </div>
-
+            =
+            <input class="text-right text-info"
+                   title="Amount"
+                   type="text" value="{{(item.Rate * item.Qty) | formatDecimal:'':2}}" disabled/>
         </div>
 
     </div>
@@ -255,35 +320,35 @@
 <!-- Template for Item having item name,description,picture and qty -->
 <script type="text/ng-template" id="/tpl/tx-item-description-picture-qty.html">
     <div class="row business-manager-item selected">
-        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-            <button  ng-hide="(!editPermission) && editMode" class="btn btn-xs btn-danger pull-right no-radius" ng-click="removeItem(item)" >
-                <span class="glyphicon glyphicon-trash"></span> Delete
+        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 business-manager-item-thumbnail bottom-clearfix">
+            <img height="32" width="32" class="img-circle" ng-src="{{item.Pic}}" />
+        </div>
+
+        <div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 bottom-clearfix">
+            <b class="font-roboto wrap-text no-margin">
+                {{item.ItemName}}
+            </b>
+        </div>
+        <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1 no-padding">
+            <button ng-hide="(!editPermission) && editMode"
+                    class="btn btn-xs btn-danger pull-right no-radius business-manager-trash-btn"
+                    title="Remove"
+                    ng-click="removeItem(item)">
+                <span class="glyphicon glyphicon-trash"></span>
             </button>
         </div>
 
-        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 business-manager-item-thumbnail bottom-clearfix">
-            <img height="64" width="64" class="img-circle" ng-src="{{item.Pic}}" />
-        </div>
-        <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 business-manager-item-details bottom-clearfix">
-            <h4 class="font-open-sans">{{item.ItemName}}
 
-            </h4>
-        </div>
-
-        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 business-manager-item-details">
-            <div class="row">
-                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 business-manager-item-details business-manager-input-control">
+            <span class="label" style="background: #2FB501; font-size:100%">Quantity</span>
+            <input  ng-disabled="!(editPermission && editMode)" class="text-right text-info"
+                    style="max-width:8em;width: 40%;"
+                    numbers-only type="number"
+                    title="Quantity"
+                    ng-model="item.Qty" ng-change="(!item.Qty) ? (item.Qty = 1) : ''" min="1"
+                    max="10000000000"/>
 
 
-                    <div class="input-group form-group-sm bottom-clearfix">
-                        <span class="input-group-addon">
-                            Quantity
-                        </span>
-                        <input class="form-control text-right" numbers-only type="number" ng-model="item.Qty" ng-change="(!item.Qty) ? (item.Qty = 1) : ''" min="1"/>
-                    </div>
-
-                </div>
-            </div>
 
         </div>
     </div>
@@ -292,27 +357,22 @@
 <!-- Template for Item having item name,description and pic -->
 <script type="text/ng-template" id="/tpl/tx-item-description-picture.html">
     <div class="row business-manager-item selected">
-        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-            <button  ng-hide="(!editPermission) && editMode" class="btn btn-xs btn-danger pull-right no-radius" ng-click="removeItem(item)" >
-                <span class="glyphicon glyphicon-trash"></span> Delete
+        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 business-manager-item-thumbnail bottom-clearfix">
+            <img height="32" width="32" class="img-circle" ng-src="{{item.Pic}}" />
+        </div>
+
+        <div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 bottom-clearfix">
+            <b class="font-roboto wrap-text no-margin">
+                {{item.ItemName}}
+            </b>
+        </div>
+        <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1 no-padding">
+            <button ng-hide="(!editPermission) && editMode"
+                    class="btn btn-xs btn-danger pull-right no-radius business-manager-trash-btn"
+                    title="Remove"
+                    ng-click="removeItem(item)">
+                <span class="glyphicon glyphicon-trash"></span>
             </button>
-        </div>
-        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 business-manager-item-thumbnail bottom-clearfix">
-            <img height="64" width="64" class="img-circle" ng-src="{{item.Pic}}" />
-        </div>
-        <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 business-manager-item-details bottom-clearfix">
-            <h4 class="font-open-sans">{{item.ItemName}}
-
-            </h4>
-        </div>
-
-        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 business-manager-item-details">
-            <div class="row">
-                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-
-                </div>
-            </div>
-
         </div>
     </div>
 </script>
@@ -320,14 +380,19 @@
 <!-- Template for Item having item name and description -->
 <script type="text/ng-template" id="/tpl/tx-item-description.html">
     <div class="row business-manager-item selected">
-        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-            <button  ng-hide="(!editPermission) && editMode" class="btn btn-xs btn-danger pull-right no-radius" ng-click="removeItem(item)" >
-                <span class="glyphicon glyphicon-trash"></span> Delete
-            </button>
+
+        <div class="col-lg-11 col-md-11 col-sm-11 col-xs-11 bottom-clearfix">
+            <b class="font-roboto wrap-text no-margin">
+                {{item.ItemName}}
+            </b>
         </div>
-        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 business-manager-item-details bottom-clearfix">
-            <h4 class="font-open-sans text-center">{{item.ItemName}}
-            </h4>
+        <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1 no-padding">
+            <button ng-hide="(!editPermission) && editMode"
+                    class="btn btn-xs btn-danger pull-right no-radius business-manager-trash-btn"
+                    title="Remove"
+                    ng-click="removeItem(item)">
+                <span class="glyphicon glyphicon-trash"></span>
+            </button>
         </div>
     </div>
 </script>
@@ -340,50 +405,48 @@
 <script type="text/ng-template" id="/tpl/bus-item-description-picture-qty-rate.html">
     <div class="row business-manager-item" title="{{item.Description}}">
 
-        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 business-manager-item-details">
-            <button ng-hide="(!editPermission) && editMode" class="btn btn-xs btn-success pull-right no-radius" ng-click="addItem(item)">
+        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 business-manager-item-thumbnail bottom-clearfix">
+            <img height="32" width="32" class="img-circle" ng-src="{{item.Pic}}" />
+        </div>
+
+        <div class="col-lg-7 col-md-7 col-sm-7 col-xs-7 business-manager-item-details bottom-clearfix text-white">
+            <h5 class="font-roboto text-left no-margin no-border wrap-text">
+                {{item.ItemName}}
+            </h5>
+            Rate : <span class="pull-right"> {{item.Rate | formatDecimal:'':2}}</span>
+        </div>
+
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 business-manager-item-details">
+            <button ng-hide="(!editPermission) && editMode" class="btn btn-xs btn-orange pull-right no-radius" ng-click="addItem(item)">
                 <span class="glyphicon glyphicon-plus-sign"></span>
-                Add Item
+                Add
             </button>
         </div>
 
-        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 business-manager-item-thumbnail bottom-clearfix">
-            <img height="64" width="64" class="img-circle" ng-src="{{item.Pic}}" />
-        </div>
-        <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 business-manager-item-details bottom-clearfix">
-            <h4 class="font-open-sans">{{item.ItemName}}
 
-            </h4>
-        </div>
 
-        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 business-manager-item-details">
-            <div class="row">
-                <div class="col-lg-offset-2 col-md-offset-2 col-sm-offset-2 col-xs-offset-2 col-lg-8 col-md-8 col-sm-8 col-xs-8">
-                    Rate : <span class="pull-right"> {{item.Rate | formatDecimal:'':2}}</span>
-                </div>
 
-            </div>
-
-        </div>
     </div>
 </script>
 
 <!-- Template for Item having item name,description,picture and qty -->
 <script type="text/ng-template" id="/tpl/bus-item-description-picture-qty.html">
     <div class="row business-manager-item" title="{{item.Description}}">
-        <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12">
-            <button ng-hide="(!editPermission) && editMode" class="btn btn-xs btn-success pull-right no-radius" ng-click="addItem(item)">
-                <span class="glyphicon glyphicon-plus-sign"></span>
-                Add Item
-            </button>
+        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 business-manager-item-thumbnail bottom-clearfix">
+            <img height="32" width="32" class="img-circle" ng-src="{{item.Pic}}" />
         </div>
-        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 business-manager-item-thumbnail bottom-clearfix">
-            <img height="64" width="64" class="img-circle" ng-src="{{item.Pic}}" />
-        </div>
-        <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 business-manager-item-details bottom-clearfix">
-            <h4 class="font-open-sans">{{item.ItemName}}
 
-            </h4>
+        <div class="col-lg-7 col-md-7 col-sm-7 col-xs-7 business-manager-item-details bottom-clearfix text-white">
+            <h5 class="font-roboto text-left no-margin no-border wrap-text">
+                {{item.ItemName}}
+            </h5>
+        </div>
+
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 business-manager-item-details">
+            <button ng-hide="(!editPermission) && editMode" class="btn btn-xs btn-orange pull-right no-radius" ng-click="addItem(item)">
+                <span class="glyphicon glyphicon-plus-sign"></span>
+                Add
+            </button>
         </div>
     </div>
 </script>
@@ -391,19 +454,21 @@
 <!-- Template for Item having item name,description and pic -->
 <script type="text/ng-template" id="/tpl/bus-item-description-picture.html">
     <div class="row business-manager-item" title="{{item.Description}}">
-        <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12">
-            <button ng-hide="(!editPermission) && editMode" class="btn btn-xs btn-success pull-right no-radius" ng-click="addItem(item)">
-                <span class="glyphicon glyphicon-plus-sign"></span>
-                Add Item
-            </button>
+        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 business-manager-item-thumbnail bottom-clearfix">
+            <img height="32" width="32" class="img-circle" ng-src="{{item.Pic}}" />
         </div>
-        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 business-manager-item-thumbnail bottom-clearfix">
-            <img height="64" width="64" class="img-circle" ng-src="{{item.Pic}}" />
-        </div>
-        <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 business-manager-item-details bottom-clearfix">
-            <h4 class="font-open-sans">{{item.ItemName}}
 
-            </h4>
+        <div class="col-lg-7 col-md-7 col-sm-7 col-xs-7 business-manager-item-details bottom-clearfix text-white">
+            <h5 class="font-roboto text-left no-margin no-border wrap-text">
+                {{item.ItemName}}
+            </h5>
+        </div>
+
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 business-manager-item-details">
+            <button ng-hide="(!editPermission) && editMode" class="btn btn-xs btn-orange pull-right no-radius" ng-click="addItem(item)">
+                <span class="glyphicon glyphicon-plus-sign"></span>
+                Add
+            </button>
         </div>
     </div>
 </script>
@@ -411,17 +476,17 @@
 <!-- Template for Item having item name and description -->
 <script type="text/ng-template" id="/tpl/bus-item-description.html">
     <div class="row business-manager-item" title="{{item.Description}}">
-        <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12">
-            <button ng-hide="(!editPermission) && editMode" class="btn btn-xs btn-success pull-right no-radius" ng-click="addItem(item)">
-                <span class="glyphicon glyphicon-plus-sign"></span>
-                Add Item
-            </button>
+        <div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 business-manager-item-details bottom-clearfix text-white">
+            <h5 class="font-roboto text-left no-margin no-border wrap-text">
+                {{item.ItemName}}
+            </h5>
         </div>
-        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 business-manager-item-details bottom-clearfix">
-            <h4 class="font-open-sans text-center">{{item.ItemName}}
 
-            </h4>
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 business-manager-item-details">
+            <button ng-hide="(!editPermission) && editMode" class="btn btn-xs btn-orange pull-right no-radius" ng-click="addItem(item)">
+                <span class="glyphicon glyphicon-plus-sign"></span>
+                Add
+            </button>
         </div>
     </div>
 </script>
-
