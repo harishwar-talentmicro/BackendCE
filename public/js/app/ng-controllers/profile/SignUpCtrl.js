@@ -333,7 +333,7 @@ angular.module('ezeidApp').
                 method: 'GET',
                 url: GURL + 'ewGetEZEID',
                 params : {
-                    EZEID : '@'+$scope.ezeid
+                    EZEID : ($scope.ezeid) ? (($scope.ezeid[0] == '@') ? $scope.ezeid : '@'+$scope.ezeid) : ''
                 }
             }).success(function (resp) {
                     if(resp  && resp !== 'null' && resp.hasOwnProperty('IsIdAvailable')){
@@ -917,7 +917,7 @@ angular.module('ezeidApp').
 
                 var signUpData = {
                     IDTypeID : $scope.userType ,
-                    EZEID : '@'+$scope.ezeid ,
+                    EZEID : ($scope.ezeid) ? (($scope.ezeid[0] == '@') ? $scope.ezeid : '@'+$scope.ezeid) : '',
                     Password : $scope.password ,
                     FirstName : $scope.firstName,
                     LastName : $scope.lastName ,
