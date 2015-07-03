@@ -136,16 +136,34 @@
         <div class="row width-75">
             <div class="reservation-form" ng-show="currentServiceArray.length > 0" >
                 <div class="row">
+                    <!-- Reservation services goes here -->
                     <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 text-right">
                         <p class="text-black">Service</p>
 
                     </div>
-                    <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8">
-                        <select id="service" ng-change="updateReservationFormData(reservationService)" class="form-control reservation-service"
-                                ng-model="reservationService">
-                            <option data-id="{{$index}}" value="{{currentServiceArray[$index].tid}}"
-                                    ng-repeat="service in currentServiceArray track by $index">{{currentServiceArray[$index].title}}</option>
-                        </select>
+                    <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 service-dropdown">
+
+                        <button type="button"
+                                ng-click="serviceDropdown()"
+                                class="btn btn-default btn-sm dropdown-toggle form-control"
+                                data-toggle="dropdown">
+                            Select &nbsp; <i class="fa fa-arrow-circle-down"></i>
+                            <!--<span class="caret"></span>-->
+                        </button>
+
+                        <ul class="dropdown-menu services">
+                            <li ng-repeat="service in currentServiceArray track by $index">
+                                <a ng-mouseover="calculateTotalDuration()" href="#" class="small" data-value="{{$index}}">
+                                    <input name="service-chk" class="service-chk" type="checkbox" data-duration="{{currentServiceArray[$index].duration}}"  value="{{currentServiceArray[$index].tid}}" />&nbsp;{{currentServiceArray[$index].title}}</a>
+                            </li>
+                        </ul>
+
+
+                        <!--<select id="service" ng-change="updateReservationFormData(reservationService)" class="form-control reservation-service"-->
+                        <!--ng-model="reservationService">-->
+                        <!--<option data-id="{{$index}}" value="{{currentServiceArray[$index].tid}}"-->
+                        <!--ng-repeat="service in currentServiceArray track by $index">{{currentServiceArray[$index].title}}</option>-->
+                        <!--</select>-->
                     </div>
                 </div>
                 <div class="row">
@@ -156,14 +174,14 @@
                         <input id="start-time" ng-blur="changeEndTime()" type="text" ng-model="startTime" class="form-control" ng-disabled="!modal.isUpdate" />
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 text-right">
-                        <p class="text-black">Approx. End Time</p>
-                    </div>
-                    <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8">
-                        <input id="end-time" type="text" class="form-control" disabled value="{{endTime}}" />
-                    </div>
-                </div>
+                <!--<div class="row">-->
+                    <!--<div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 text-right">-->
+                        <!--<p class="text-black">Approx. End Time</p>-->
+                    <!--</div>-->
+                    <!--<div class="col-lg-8 col-md-8 col-sm-8 col-xs-8">-->
+                        <!--<input id="end-time" type="text" class="form-control" disabled value="{{endTime}}" />-->
+                    <!--</div>-->
+                <!--</div>-->
                 <div class="row">
                     <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 text-right">
                         <p class="text-black">Approx. Duration</p>
