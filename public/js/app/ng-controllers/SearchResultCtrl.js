@@ -635,7 +635,7 @@ var res = angular.module('ezeidApp').
                     else
                     {
                         for (var i = 0; i < $scope.searchResult.length; i++) {
-                            $scope.selectedList.push($scope.searchResult[i].MasterID);
+                            $scope.selectedList.push($scope.searchResult[i].TID);
                         }
 
                         $('.result-checkbox').each(function( index ) {

@@ -54,6 +54,7 @@ angular.module('ezeidApp').controller('bulksalesController',[
     }
     $scope.searchResult = JSON.parse($window.localStorage.getItem("searchResult"));
     salesEnquiry.result = $scope.searchResult;
+
     $scope.searchResult == null ? $scope.showListing = false : $scope.showListing = true;
 
    /* if($scope.searchResult != null)
@@ -62,6 +63,8 @@ angular.module('ezeidApp').controller('bulksalesController',[
             $scope.selectedList.push($scope.searchResult[i].TID);
         }
     }*/
+
+
 
     // To get and remove value of check box
     $scope.toggleCheckbox = function(event){
@@ -74,6 +77,7 @@ angular.module('ezeidApp').controller('bulksalesController',[
             var index = $scope.selectedTID.indexOf(val);
             $scope.selectedTID.splice(index,1);
         }
+
     };
 
     $scope.$watch('_userInfo.IsAuthenticate', function () {
@@ -247,8 +251,9 @@ angular.module('ezeidApp').controller('bulksalesController',[
 
     // send sales enquiry mail
     salesEnquiry.SendEnquiryMail = function () {
+        var selectedMasterIds = [];
 
-       salesEnquiry._info.Token = $rootScope._userInfo.Token;
+        salesEnquiry._info.Token = $rootScope._userInfo.Token;
         if($scope.selectedTID.length > 10)
         {
           Notification.error({ message: 'Maximum Limit: 10 companies…', delay: MsgDelay });
@@ -257,8 +262,21 @@ angular.module('ezeidApp').controller('bulksalesController',[
         {
             if($scope.selectedTID.length > 0)
             {
-               /* $http({ method: 'get', url: GURL + 'ewtSendBulkMailer?Token=' + $rootScope._userInfo.Token + '&TID='+ $scope.selectedTID + '&TemplateID='+ salesEnquiry._info.TID }).success(function (data)*/
-                $http({ method: 'post', url: GURL + 'ewtSendBulkMailer', data: { Token: $rootScope._userInfo.Token, TID: $scope.selectedTID, TemplateID: salesEnquiry._info.TID }}).success(function (data)
+                for (var nCountTid = 0; nCountTid < $scope.selectedTID.length; nCountTid++)
+                {
+                    for (var nCountResult = 0; nCountResult < $scope.searchResult.length; nCountResult++)
+                    {
+                        if($scope.searchResult[nCountResult].TID == $scope.selectedTID[nCountTid])
+                        {
+                             if(selectedMasterIds.indexOf($scope.searchResult[nCountResult].MasterID) == -1)
+                            {
+                                selectedMasterIds.push($scope.searchResult[nCountResult].MasterID);
+                            }
+                        }
+                    }
+                }
+               /* $http({ method: 'post', url: GURL + 'ewtSendBulkMailer', data: { Token: $rootScope._userInfo.Token, TID: $scope.selectedTID, TemplateID: salesEnquiry._info.TID }}).success(function (data)*/
+                $http({ method: 'post', url: GURL + 'ewtSendBulkMailer', data: { Token: $rootScope._userInfo.Token, TID: selectedMasterIds, TemplateID: salesEnquiry._info.TID }}).success(function (data)
                 {
                      if (data != 'null')
                      {
