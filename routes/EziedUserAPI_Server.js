@@ -1,6 +1,18 @@
 var DbHelper = require('./../helpers/DatabaseHandler'),
 db = DbHelper.getDBContext();
 
+function alterEzeoneId(ezeoneId){
+    var alteredEzeoneId = '';
+    if(ezeoneId){
+        if(ezeoneId.toString().substr(0,1) == '@'){
+            alteredEzeoneId = ezeoneId;
+        }
+        else{
+            alteredEzeoneId = '@' + ezeoneId.toString();
+        }
+    }
+    return alteredEzeoneId;
+}
 
 function error(err, req, res, next) {
     // log it
@@ -564,7 +576,7 @@ exports.FnLogin = function (req, res) {
         res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
         res.header('Access-Control-Allow-Headers', 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept');
         //res.setHeader('content-type', 'application/json');
-        var UserName = req.body.UserName;
+        var UserName = alterEzeoneId(req.body.UserName);
         var Password = req.body.Password;
         var RtnMessage = {
             Token: '',
@@ -830,7 +842,7 @@ exports.FnForgetPassword = function (req, res) {
 
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-        var EZEID = req.body.EZEID;
+        var EZEID = alterEzeoneId(req.body.EZEID);
         var RtnMessage = {
             IsChanged: false
         };
@@ -1470,7 +1482,7 @@ exports.FnCheckEzeid = function (req, res) {
     try {
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-        var EZEID = req.query.EZEID;
+        var EZEID = alterEzeoneId(req.query.EZEID);
         var RtnMessage = {
             IsIdAvailable: false
         };
@@ -1651,7 +1663,7 @@ exports.FnRegistration = function (req, res) {
         }
             console.log(SelectionTypes);
         var IDTypeID = req.body.IDTypeID;
-        var EZEID = req.body.EZEID;
+        var EZEID = alterEzeoneId(req.body.EZEID);
        if(EZEID != null)
            EZEID = EZEID.toUpperCase();
         var Password = req.body.Password;
@@ -3844,7 +3856,7 @@ exports.FnGetSearchDocuments = function (req, res) {
     try {
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-        var find = req.query.Keywords;
+        var find = alterEzeoneId(req.query.Keywords);
         var token = req.query.Token;
         //console.log(token);
         if (token != null && find != null && token != '' && find != '') {
@@ -4056,7 +4068,7 @@ exports.FnSearchByKeywords = function (req, res) {
                             console.log(FindArray);
 
                             if (FindArray.length > 0) {
-                                EZEID = FindArray[0];
+                                EZEID = alterEzeoneId(FindArray[0]);
                                 //checking the fisrt condition
                                 if (FindArray.length > 1) {
                                     if (FindArray[1] != '') {
@@ -4514,7 +4526,7 @@ exports.FnGetSearchInformationNew = function (req, res) {
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
         var Token = req.query.Token ? req.query.Token : '';
-        var ezeTerm = req.query.ezeTerm;
+        var ezeTerm = alterEzeoneId(req.query.ezeTerm);
         var CurrentDate = req.query.CurrentDate;
         var IPAddress = req._remoteAddress; //(req.headers['x-forwarded-for'] || req.connection.remoteAddress)
         console.log(IPAddress);
@@ -4606,7 +4618,7 @@ console.log('CALL pSearchInformationNew(' + SearchParameter + ')');
  * @constructor
  */
 exports.FnGetEZEOneIDInfo = function(req,res,next){
-    var ezeTerm = req.query['ezeoneid'];
+    var ezeTerm = alterEzeoneId(req.query['ezeoneid']);
     var token = req.query['token'];
     var locationSeq = 0;
     var pin = null;
@@ -4863,7 +4875,7 @@ exports.FnGetBannerPicture = function(req, res){
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         var SeqNo = parseInt(req.query.SeqNo);
         var StateTitle = req.query.StateTitle;
-        var Ezeid = req.query.Ezeid;
+        var Ezeid = alterEzeoneId(req.query.Ezeid);
         var LocID = req.query.LocID;
        // var TokenNo = req.query.Token;
 
@@ -4961,7 +4973,7 @@ exports.FnSaveWhiteBlackList = function(req, res){
         var List = req.body.List;
         var RelationType =parseInt(req.body.RelationType);
         var Tag = parseInt(req.body.Tag);
-        var EZEID = req.body.EZEID;
+        var EZEID = alterEzeoneId(req.body.EZEID);
         var Token = req.body.Token;
 
         var RtnMessage = {
@@ -5190,7 +5202,7 @@ exports.FnGetWhiteListCount = function (req, res) {
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
         var Token = req.query.Token;
-        var EZEID = req.query.EZEID;
+        var EZEID = alterEzeoneId(req.query.EZEID);
         var List=req.query.List;
         var RtnMessage = {
             WhiteListCount : 0
@@ -5614,7 +5626,7 @@ exports.FnEZEIDPrimaryDetails = function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         var Token = req.query.Token;
-        var EZEID = req.query.EZEID;
+        var EZEID = alterEzeoneId(req.query.EZEID);
         if (Token != null && EZEID != null ) {
             FnValidateToken(Token, function (err, Result) {
                 if (!err) {
@@ -5936,7 +5948,7 @@ exports.FnCreateSubUser = function(req, res){
 
         var Token = req.body.Token;
         var TID = req.body.TID;
-        var UserName = req.body.UserName;
+        var UserName = alterEzeoneId(req.body.UserName);
         var Status  = req.body.Status;
         var FirstName = req.body.FirstName;
         var LastName = req.body.LastName;
@@ -5951,7 +5963,7 @@ exports.FnCreateSubUser = function(req, res){
         var HomeDeliveryRules = req.body.HomeDeliveryRules;
         var ServiceRules = req.body.ServiceRules;
         var ResumeRules = req.body.ResumeRules;
-        var MasterID = req.body.PersonalID;
+        var MasterID = alterEzeoneId(req.body.PersonalID);
         var templateID = parseInt(req.body.templateID);
         if(templateID.toString() == 'NaN')
             templateID =0;  
@@ -7109,7 +7121,7 @@ exports.FnSaveTranscation = function(req, res){
         var FunctionType = req.body.FunctionType;
         var Latitude = req.body.Latitude;
         var Longitude = req.body.Longitude;
-        var EZEID = req.body.EZEID;
+        var EZEID = alterEzeoneId(req.body.EZEID);
         var ContactInfo = req.body.ContactInfo;
         var FolderRuleID = parseInt(req.body.FolderRuleID);
         var Duration = req.body.Duration;
@@ -7124,7 +7136,7 @@ exports.FnSaveTranscation = function(req, res){
             if(DeliveryAddress == '')
                 DeliveryAddress = '';
         var ItemIDList='';
-        var ToEZEID = req.body.ToEZEID;
+        var ToEZEID = alterEzeoneId(req.body.ToEZEID);
         var item_list_type = 0;
         var companyName = req.body.companyName ? req.body.companyName : '' ;
         var company_id = req.body.company_id ? req.body.company_id : 0 ;
@@ -7377,7 +7389,7 @@ exports.FnSaveTranscationOld = function(req, res){
         var FunctionType = req.body.FunctionType;
         var Latitude = req.body.Latitude;
         var Longitude = req.body.Longitude;
-        var EZEID = req.body.EZEID;
+        var EZEID = alterEzeoneId(req.body.EZEID);
         var ContactInfo = req.body.ContactInfo;
         var FolderRuleID = parseInt(req.body.FolderRuleID);
         var Duration = req.body.Duration;
@@ -8104,7 +8116,7 @@ function FnWorkingHours(WorkingContent, CallBack) {
                             else
                             {
                             console.log('Fnworkinghours: no working hours avaiable');
-                            CallBack(null,null);    
+                            CallBack(null,null);
                             }
                         }
                         else{
@@ -9681,7 +9693,7 @@ exports.FnWebLinkRedirect = function(req,res,next){
 
             arr.splice(arr.length - 1,1);
 
-            var ezeid = arr.join('.');
+            var ezeid = alterEzeoneId(arr.join('.'));
 
             var urlBreaker = lastItem.split('');
             if(urlBreaker.length > 1 && urlBreaker.length < 4){
@@ -10937,7 +10949,7 @@ exports.FnGetReservationResource = function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
-        var ezeid = req.query.ezeid;
+        var ezeid = alterEzeoneId(req.query.ezeid);
         var type = req.query.type ? req.query.type : 0 ;
         
         console.log(req.query);
@@ -11273,7 +11285,7 @@ exports.FnGetReservationService = function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
-        var ezeid = req.query.ezeid;
+        var ezeid = alterEzeoneId(req.query.ezeid);
         var responseMessage = {
             status: false,
             data: null,
@@ -11358,7 +11370,7 @@ exports.FnGetReservResourceServiceMap = function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
-        var ezeid = req.query.ezeid;
+        var ezeid = alterEzeoneId(req.query.ezeid);
         var responseMessage = {
             status: false,
             data: null,
@@ -11648,7 +11660,7 @@ exports.FnSaveReservTransaction = function(req, res){
         var Token = req.body.Token ;
         var TID = req.body.TID;
         var contactinfo = req.body.contactinfo;
-        var toEzeid = req.body.toEzeid;
+        var toEzeid = alterEzeoneId(req.body.toEzeid);
         var resourceid = req.body.resourceid;
         var res_datetime = new Date(req.body.res_datetime);
         var duration = req.body.duration;
@@ -11783,7 +11795,7 @@ exports.FnGetMapedServices = function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
-        var ezeid = req.query.ezeid;
+        var ezeid = alterEzeoneId(req.query.ezeid);
         var resourceid = req.query.resourceid;
 
         var responseMessage = {
@@ -11865,7 +11877,7 @@ exports.FnGetReservTask = function (req, res) {
 
         var resourceid = req.query.resourceid;
         var date = new Date(req.query.date);
-        var toEzeid = req.query.toEzeid;
+        var toEzeid = alterEzeoneId(req.query.toEzeid);
         
         var responseMessage = {
             status: false,
@@ -12725,7 +12737,7 @@ exports.FnGetUserDetailsAP = function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         var TokenNo = req.query.Token;
-        var EZEID = req.query.EZEID;
+        var EZEID = alterEzeoneId(req.query.EZEID);
         if (EZEID != null && EZEID != '' && TokenNo != null) {
 
             FnValidateTokenAP(TokenNo, function (err, Result) {
@@ -12794,7 +12806,7 @@ exports.FnUpdateUserProfileAP = function (req, res) {
         res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
         res.header('Access-Control-Allow-Headers', 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept');
 
-        var EZEID = req.body.EZEID;
+        var EZEID = alterEzeoneId(req.body.EZEID);
         var EZEIDVerifiedID = req.body.EZEIDVerifiedID;
         // var TID = parseInt(req.body.TID);
         var CategoryID = req.body.CategoryID;
@@ -13097,7 +13109,7 @@ exports.FnGetEZEIDDetailsAP = function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         var Token = req.query.Token;
-        var EZEID = req.query.EZEID;
+        var EZEID = alterEzeoneId(req.query.EZEID);
         if (Token != null && EZEID != null) {
             FnValidateTokenAP(Token, function (err, Result) {
                 if (!err) {
@@ -13173,7 +13185,7 @@ exports.FnSaveAPEZEID = function (req, res) {
         var Description = req.body.Description;
         var Preferences = req.body.Preferences;
         var Rating = req.body.Rating;
-        var EZEID = req.body.EZEID;
+        var EZEID = alterEzeoneId(req.body.EZEID);
         var Latitude = req.body.Latitude;
         if (Latitude == null || Latitude == '') {
             Latitude = 0.0;
@@ -13495,7 +13507,7 @@ exports.FnSaveBannerPictureAP = function(req, res){
         var SeqNo = parseInt(req.body.SeqNo);
         var Picture = req.body.Picture;
         var Token = req.body.Token;
-        var Ezeid = req.body.Ezeid;
+        var Ezeid = alterEzeoneId(req.body.Ezeid);
         var TID = req.body.TID;
         if(TID == null ){
             TID = 0;
@@ -13578,7 +13590,7 @@ exports.FnGetBannerPictureAP = function(req, res){
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         var SeqNo = parseInt(req.query.SeqNo);
         var Token = req.query.Token;
-        var Ezeid = req.query.Ezeid;
+        var Ezeid = alterEzeoneId(req.query.Ezeid);
 
         if (Token != null  && SeqNo.toString() != 'NaN' && Ezeid != null) {
             FnValidateTokenAP(Token, function (err, Result) {
@@ -13651,7 +13663,7 @@ exports.FnGetAllBannerPicsAP = function(req, res){
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         var Token = req.query.Token;
-        var EZEID = req.query.EZEID;
+        var EZEID = alterEzeoneId(req.query.EZEID);
 
         if (Token != null && EZEID != null) {
             FnValidateTokenAP(Token, function (err, Result) {
@@ -13720,7 +13732,7 @@ exports.FnGetSecondaryLocationListAP = function(req, res){
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
         var Token = req.query.Token;
-        var Ezeid = req.query.EZEID;
+        var Ezeid = alterEzeoneId(req.query.EZEID);
 
         if (Token != null && Ezeid != null) {
             FnValidateTokenAP(Token, function (err, Result) {
@@ -13789,7 +13801,7 @@ exports.FnGetSecondaryLocationAP = function(req, res){
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
         var Token = req.query.Token;
-        var Ezeid = req.query.EZEID;
+        var Ezeid = alterEzeoneId(req.query.EZEID);
         var Locid = req.query.LocID;
 
         if (Token != null && Ezeid != null && Locid!=null) {
@@ -13955,7 +13967,7 @@ exports.FnUpdateIdCardPrintAP = function(req, res){
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         var Token = req.body.Token;
-        var EZEID =req.body.EZEID;
+        var EZEID =alterEzeoneId(req.body.EZEID);
 
         var RtnMessage = {
             IsUpdated: false
@@ -14028,7 +14040,7 @@ exports.FnGetIdCardPrintAP = function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         var Token = req.query.Token;
-        var EZEID = req.query.EZEID;
+        var EZEID = alterEzeoneId(req.query.EZEID);
         if (Token != null && EZEID != null) {
             FnValidateTokenAP(Token, function (err, Result) {
                 if (!err) {
@@ -14219,8 +14231,8 @@ exports.FnUpdateRedFlagAP = function(req, res){
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         var RedFlag = req.body.RedFlag;
         var Token = req.body.Token;
-        var FromEZEID =req.body.FromEZEID;
-        var ToEZEID =req.body.ToEZEID;
+        var FromEZEID =alterEzeoneId(req.body.FromEZEID);
+        var ToEZEID =alterEzeoneId(req.body.ToEZEID);
         var Message =req.body.Message;
         
         
@@ -14306,8 +14318,8 @@ exports.FnUpdateEZEIDAP = function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         var Token = req.body.Token;
-        var OldEZEID = req.body.OldEZEID;
-        var NewEZEID = req.body.NewEZEID;
+        var OldEZEID = alterEzeoneId(req.body.OldEZEID);
+        var NewEZEID = alterEzeoneId(req.body.NewEZEID);
         var RtnMessage = {
             IsChanged: false
         };
@@ -14376,7 +14388,7 @@ exports.FnDeleteBannerPictureAP = function(req, res){
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         var Token = req.body.Token;
-        var EZEID = req.body.EZEID;
+        var EZEID = alterEzeoneId(req.body.EZEID);
         var SeqNo = req.body.SeqNo;
         var RtnMessage = {
             IsSuccessfull: false
@@ -14671,7 +14683,7 @@ exports.FnLoginVES = function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
-        var EZEID = req.query.EZEID;
+        var EZEID = alterEzeoneId(req.query.EZEID);
         var Password = req.query.Password;
         if (EZEID != null && EZEID != '' && Password != null && Password != '') {
             //var EncryptPWD = FnEncryptPassword(Password);
@@ -14723,7 +14735,7 @@ exports.FnSaveContactVES = function(req, res){
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
         var Token = req.body.Token;
-        var EZEID = req.body.EZEID;
+        var EZEID = alterEzeoneId(req.body.EZEID);
         var Pic = req.body.Pic;
         var FirstName = req.body.FirstName;
         var LastName = req.body.LastName;
@@ -14748,7 +14760,7 @@ exports.FnSaveContactVES = function(req, res){
         var Status = req.body.Status;
         var GateNo  = req.body.GateNo;
         var SyncedInout = req.body.SyncedInout;
-        var ContactEZEID = req.body.ContactEZEID;
+        var ContactEZEID = alterEzeoneId(req.body.ContactEZEID);
         var ContactName = req.body.ContactName;
             var InTimeNew = new Date(InTime);
             

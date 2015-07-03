@@ -362,7 +362,7 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope',
         $scope.validateSubUser().then(function(isValid){
             if(!isValid){
                 $scope.$emit('$preLoaderStop');
-                Notification.error({ message : 'We were unable to find personal EZEOne of this subuser !' +
+                Notification.error({ message : 'We were unable to find personal EZEOne ID of this subuser !' +
                 ' Please register him to add as a subuser', delay : MsgDelay});
 
             }
@@ -370,10 +370,10 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope',
                 var data = {
                     Token : $rootScope._userInfo.Token,
 
-                    PersonalID : $scope.modalBox.subuser.ezeid,
+                    PersonalID : '@'+$scope.modalBox.subuser.ezeid,
 
                     TID : $scope.modalBox.subuser.TID,
-                    UserName  : ($rootScope.PersonalID !== $scope.modalBox.subuser.userName) ? ($scope.masterUser.EZEID+'.'+$scope.modalBox.subuser.userName) : $scope.masterUser.EZEID,
+                    UserName  : +($rootScope.PersonalID !== $scope.modalBox.subuser.userName) ? ($scope.masterUser.EZEID+'.'+$scope.modalBox.subuser.userName) : $scope.masterUser.EZEID,
                     Status : $scope.modalBox.subuser.status,
                     FirstName : $scope.modalBox.subuser.firstName,
                     LastName : $scope.modalBox.subuser.lastName,
