@@ -27,7 +27,8 @@
                                             </thead>
                                             <tbody ng-show="showListing">
                                                <tr ng-repeat="_item in bulksalesController.result">
-                                                   <td><input type="checkbox"
+                                                   <td>
+                                                       <input type="checkbox"
                                                                name="companyID"
                                                                data-tid="{{_item.MasterID}}"
                                                                ng-click="toggleCheckbox($event)"

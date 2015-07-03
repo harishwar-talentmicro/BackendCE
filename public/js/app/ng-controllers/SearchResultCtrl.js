@@ -296,6 +296,8 @@ var res = angular.module('ezeidApp').
 
                     var result = data['Result'];
 
+
+
                     $rootScope.$broadcast('$preLoaderStop');
                     /* put the maps coordinates in array */
                     $scope.coordinatesArr = [];
@@ -303,6 +305,8 @@ var res = angular.module('ezeidApp').
                     var count = 0;
 
                     if(result && result !== 'null'){
+
+                        $window.localStorage.setItem("searchResult", JSON.stringify(result));
 
                         var link = '';
                         var searchType = $routeParams.searchType;
@@ -321,10 +325,13 @@ var res = angular.module('ezeidApp').
                     $scope.isResultNumber = (result && result !== 'null') ? ((result.length > 0) ? 1 : 0) : 0;
 
                     $scope.searchListData = (result && result !== 'null') ? ((result.length > 0) ? result : []) : [];
-                    if ( data && data != 'null' && data.length>0)
+
+                    /* document downloading code block */
+                    if (data && data != 'null' && data.length>0)
                     {
                         $scope.SearchResultCount = data.length;
-                        $window.localStorage.setItem("searchResult", JSON.stringify(data));
+
+                       // $window.localStorage.setItem("searchResult", JSON.stringify(data));
                         if(data[0].Filename)
                         {
                             $scope.isResultNumber = true;
@@ -628,7 +635,7 @@ var res = angular.module('ezeidApp').
                     else
                     {
                         for (var i = 0; i < $scope.searchResult.length; i++) {
-                            $scope.selectedList.push($scope.searchResult[i].TID);
+                            $scope.selectedList.push($scope.searchResult[i].MasterID);
                         }
 
                         $('.result-checkbox').each(function( index ) {

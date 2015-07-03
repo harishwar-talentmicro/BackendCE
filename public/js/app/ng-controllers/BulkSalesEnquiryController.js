@@ -13,7 +13,7 @@ angular.module('ezeidApp').controller('bulksalesController',[
 
    if ($rootScope._userInfo) {
     }
-    else {
+   else {
         if (typeof (Storage) !== "undefined") {
             var encrypted = localStorage.getItem("_token");
             if (encrypted) {
@@ -47,13 +47,13 @@ angular.module('ezeidApp').controller('bulksalesController',[
     }
 
     $scope.selectedTID = JSON.parse($window.localStorage.getItem("selectedTids"));
+
     if($scope.selectedTID == null)
     {
         $scope.selectedTID = [];
     }
     $scope.searchResult = JSON.parse($window.localStorage.getItem("searchResult"));
     salesEnquiry.result = $scope.searchResult;
-
     $scope.searchResult == null ? $scope.showListing = false : $scope.showListing = true;
 
    /* if($scope.searchResult != null)
@@ -62,8 +62,6 @@ angular.module('ezeidApp').controller('bulksalesController',[
             $scope.selectedList.push($scope.searchResult[i].TID);
         }
     }*/
-
-
 
     // To get and remove value of check box
     $scope.toggleCheckbox = function(event){

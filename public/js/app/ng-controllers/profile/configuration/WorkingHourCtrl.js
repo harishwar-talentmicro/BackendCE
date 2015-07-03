@@ -206,8 +206,7 @@ angular.module('ezeidApp').controller('WorkingHourCtrl',['$scope','$rootScope','
                 }
             })
             .error(function(data, status, headers, config) {
-               //console.log(data);
-            });
+              });
         };
 
         function getWorkingHourForEdit(_TID)
