@@ -49,6 +49,9 @@ var res = angular.module('ezeidApp').
             $scope.$emit('$preLoaderStart');
             /* SETTINGS GOES HERE======================================== */
 
+            /* current services */
+            $scope.currentServices = [];
+
             /* flag if is HTML loaded */
             $scope.ifHtmlLoaded = false;
 
@@ -141,9 +144,7 @@ var res = angular.module('ezeidApp').
             ///////////////////////////////////////GET DEFAULT CALENDAR DATA////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            //console.log($routeParams);
             $scope.searchedEzeid = $routeParams.ezeone;
-            //console.log($scope.searchedEzeid);
             $scope.$emit('$preLoaderStart');
             function init(){
                 getResource($scope.searchedEzeid).then(function () {
@@ -249,7 +250,6 @@ var res = angular.module('ezeidApp').
                     };
                     $scope.resources.push(tempArr);
                 }
-                //////console.log($scope.resources);
                 setAccessRights($scope.resources[0].operator);
                 $scope.description = $scope.resources.length > 0?$scope.resources[0].description:'';
                 $scope.$emit('$preLoaderStop');
@@ -611,8 +611,6 @@ var res = angular.module('ezeidApp').
                     prevAvailable = $('.available').length;
                 }
 
-                //////console.log('COLOR WORKING HOURS - ',reloadCalanderFlag,reservationMooduleStarterFlag,workingHrs.length, $('.available').length);
-
                 if(workingHrs.length == 0)
                 {
                     return;
@@ -629,7 +627,6 @@ var res = angular.module('ezeidApp').
                 {
                     $scope.colorWorkingHoursFlag = true;
                 }
-                //////console.log('colorWorkingHoursFlag------------------------------------------');
                 /* RESET CALENDAR */////////////////////////////////////////////////////////
                 /* clean the calendar's working hour */
                 cleanCalendarData();
@@ -695,8 +692,7 @@ var res = angular.module('ezeidApp').
             var prevReservedTime;
             var prevReserved;
             $scope.alreadyReserveSlot = function (reloadWorkingHoursFlag,reservationMooduleStarterFlag,calledFromColorWorkingHours) {
-                /* clear the title */
-                $('.reserved').attr('title','');
+                //$('.reserved').attr('title','');
                 if($scope.reservedTime.length == 0)
                 {
                     return;
@@ -939,6 +935,9 @@ var res = angular.module('ezeidApp').
                     $('.color-index-'+i).css('color',$scope.colorIndex[i][0]);
                     $('.color-index-label-'+i).html('<small>'+$scope.colorIndex[i][1]+'</small>');
                 }
+
+                //Small code for preventing the service dropdown to disaapear on click
+                $scope.serviceDropdown();
             };
 
             /**
@@ -1096,6 +1095,11 @@ var res = angular.module('ezeidApp').
                         $scope.startTime = selectedTimeUtcToLocal(resp.data[0].Starttime).substr(0,5);
                         $scope.duration = resp.data[0].duration;
                         $scope.endTime = convertBlockIdToTime((convertHoursToMinutes($scope.startTime) + $scope.duration)/5);
+                        console.log(resp.data[0].serviceids);
+                        /* set this reservation services */
+                        $scope.currentServices = resp.data[0].serviceids;
+                        resetServiceChecks();
+                        $scope.setServices();
                     }
                 }).error(function(err){
                     $scope.$emit('$preLoaderStop');
@@ -1246,6 +1250,13 @@ var res = angular.module('ezeidApp').
              */
             $scope.saveReservation = function()
             {
+                /* check if the services is selected */
+                if(!checkServiceSelected())
+                {
+                    Notification.error({ message: "Please select atleast one service to proceed", delay: MsgDelay });
+                    return ;
+                }
+
                 var tid = 0;
                 var blockId = 0;
                 var saveType = 'save';
@@ -1271,9 +1282,9 @@ var res = angular.module('ezeidApp').
                         toEzeid:$scope.searchedEzeid,
                         resourceid:$scope.activeResourceId,
                         res_datetime:convertTimeToUTC(makeDateTime,'DD-MMM-YYYY HH:mm'),
-                        duration:$scope.duration,
+                        duration:$scope.calculateTotalDuration(),
                         status:0,
-                        serviceid:$('#service').val()+','
+                        serviceid:getSelectedService()//$('#service').val()+','
                     }
                 }).success(function(resp){
                     $scope.$emit('$preLoaderStop');
@@ -1286,6 +1297,7 @@ var res = angular.module('ezeidApp').
                         /* reload reservation hours */
                         updateReservationHoursBlocks(blockId);
                         $scope.$emit('$preLoaderStop');
+                        resetServiceChecks();
                     }
                     else
                     {
@@ -1560,4 +1572,98 @@ var res = angular.module('ezeidApp').
                     $scope.isResource = false;
                 }
             }
+
+            $scope.serviceDropdown = function() {
+                var options = [];
+                $('.dropdown-menu a').on('click', function (event) {
+
+                    var $target = $(event.currentTarget),
+                        val = $target.attr('data-value'),
+                        $inp = $target.find('input'),
+                        idx;
+
+                    if (( idx = options.indexOf(val) ) > -1) {
+                        options.splice(idx, 1);
+                        setTimeout(function () {
+                            $inp.prop('checked', false)
+                        }, 0);
+                    } else {
+                        options.push(val);
+                        setTimeout(function () {
+                            $inp.prop('checked', true)
+                        }, 0);
+                    }
+
+                    $(event.target).blur();
+                    return false;
+                });
+            }
+
+            /**
+             * Get selected service ids
+             */
+            function getSelectedService()
+            {
+                var services = [];
+                $('input[name=service-chk]:checked').each(function() {
+                    services.push($(this).val());
+                });
+                return services.join(",")+",";
+            }
+
+            /**
+             * reset all the selected checkboxes
+             */
+            function resetServiceChecks()
+            {
+                $('input[name=service-chk]:checked').each(function() {
+                    $(this).prop('checked',false);
+                });
+            }
+
+            /**
+             * Calculate the total duration of all the services
+             */
+            $scope.calculateTotalDuration = function()
+            {
+                var duration = 0;
+                $('input[name=service-chk]:checked').each(function() {
+                    duration += $(this).data("duration");
+                });
+                $scope.duration = duration;
+                return duration;
+            }
+
+            /**
+             * Check if the services ares checked
+             */
+            function checkServiceSelected()
+            {
+                var duration = $scope.calculateTotalDuration();
+                if(duration > 0)
+                {
+                    return true;
+                }
+                return false;
+            }
+
+            $scope.setServices = function()
+            {
+                console.log("======================");
+                var serviceIds = $scope.currentServices;
+                var serviceArr = serviceIds.split(',');
+                //resetServiceChecks();
+                if(!serviceArr || !serviceArr.length > 0)
+                {
+                    return ;
+                }
+
+                for(var i = 0;i<serviceArr.length;i++)
+                {
+                    console.log(serviceArr[i]);
+                    $(".services").find("[value='"+serviceArr[i]+"']").prop('checked',true);
+                }
+                console.log("---------------------"+serviceIds);
+            }
+
         }]);

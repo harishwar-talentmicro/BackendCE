@@ -2270,3 +2270,26 @@ sup.tm{
     padding-right: 3px;
     margin-left: -9px;
 }
+
+.hpw #calendar-block .xdsoft_label
+{
+    z-index: 0;
+}
+
+.ow .service-dropdown .btn
+{
+    text-align: left;
+}
+
+.ow .service-dropdown-style > li:hover
+{
+    background-color: aliceblue;
+}
+.ow .service-dropdown-style > li
+{
+    background-color: #ffffff;
+    padding: 2px;
+    padding-left: 5px;
+    border-bottom: 1px solid #d8d8d8;
+    cursor: pointer;
+}
