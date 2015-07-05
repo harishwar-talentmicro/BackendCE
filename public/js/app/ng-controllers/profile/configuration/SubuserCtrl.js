@@ -376,11 +376,11 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope',
             else{
                 var data = {
                     Token : $rootScope._userInfo.Token,
-
-                    PersonalID : '@'+$scope.modalBox.subuser.ezeid,
+                    PersonalID : ($scope.modalBox.subuser.ezeid) ?
+                        (($scope.modalBox.subuser.ezeid[0] == '@') ? $scope.modalBox.subuser.ezeid : '@'+$scope.modalBox.subuser.ezeid) : '',
 
                     TID : $scope.modalBox.subuser.TID,
-                    UserName  : +($rootScope.PersonalID !== $scope.modalBox.subuser.userName) ? ($scope.masterUser.EZEID+'.'+$scope.modalBox.subuser.userName) : $scope.masterUser.EZEID,
+                    UserName  : ($rootScope.PersonalID !== $scope.modalBox.subuser.userName) ? ($scope.masterUser.EZEID+'.'+$scope.modalBox.subuser.userName) : $scope.masterUser.EZEID,
                     Status : $scope.modalBox.subuser.status,
                     FirstName : $scope.modalBox.subuser.firstName,
                     LastName : $scope.modalBox.subuser.lastName,
@@ -405,6 +405,10 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope',
                     ServiceRules : $scope.modalBox.subuser.rules.service.join(','),
                     ResumeRules : $scope.modalBox.subuser.rules.resume.join(',')
                 };
+
+                if(data.UserName[0] !== '@'){
+                    data.UserName = '@'+data.UserName;
+                }
 
                 $http({
                     url : GURL + 'ewtCreateSubUser',
