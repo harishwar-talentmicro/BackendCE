@@ -49,6 +49,11 @@ var res = angular.module('ezeidApp').
             $scope.$emit('$preLoaderStart');
             /* SETTINGS GOES HERE======================================== */
 
+            /* Array of self reservation ID-array */
+            $scope.selfreservation = [];
+            /* check if the logged in user have any reservation */
+            $scope.isSelfReservationExists = false;
+
             /* current services */
             $scope.currentServices = [];
 
@@ -153,6 +158,8 @@ var res = angular.module('ezeidApp').
                             setFinalMappedServices(6);
                             var date = moment().format('DD MMM YYYY h:mm:ss a');
                             getReservationTransactionData($scope.activeResourceId, date, $scope.searchedEzeid).then(function () {
+                                /* set the self reservation array */
+                                setSelfReservationArray();
                                 $scope.$emit('$preLoaderStop');
                                 /* Re-setting VIEW of the complete calendar structure in case its: tablet or mobile */
                                 resetBlock();
@@ -484,6 +491,7 @@ var res = angular.module('ezeidApp').
                 for (var i = 0; i < formatedData['reserved'].length; i++) {
                     $scope.reservedTime.push(formatedData['reserved'][i]);
                 }
+                console.log($scope.reservedTime);
                 /* reload calendar */
             };
 
@@ -710,9 +718,7 @@ var res = angular.module('ezeidApp').
                         prevReserved = $('.reserved').length;
                     }
                 }
-                //////console.log('ALREADY RESERVED SLOT - ',reloadWorkingHoursFlag,reservationMooduleStarterFlag,
-                //    $scope.reservedTime.length,$('.reserved').length);
-                //////console.log('alreadyReserveSlotFlag---------------------------------------------------------');
+
                 //$scope.alreadyReserveSlotFlag = true;
                 for (var i = 0; i < $scope.reservedTime.length; i++) {
                     /* get blocks coming under this range */
@@ -728,7 +734,6 @@ var res = angular.module('ezeidApp').
                     $scope.mergeBlockMaster(data[0], data[1], text, $scope.height,color,title,tid,reserverId);
                     /* strike the text if the status is closed */
                     strikeText($scope.reservedTime[i][6],$scope.reservedTime[i][5]);
-                    //////console.log($('.block-'+(data[0]+1)).attr('class'));
                 }
             };
 
@@ -751,7 +756,6 @@ var res = angular.module('ezeidApp').
                     $scope.colorBlocks(startRange, endRange, color,'reserved');
                     /* add a flag to the first block for making it reserved */
                     $('.block-'+startRange).attr('title',title).attr('data-tid',tid).attr('data-reserver',reserverId);
-                    //////console.log($('.block-'+(startRange+1)).attr('class'));
                 }
             }
 
@@ -839,7 +843,6 @@ var res = angular.module('ezeidApp').
 
             /* Color the blocks */
             $scope.colorBlocks = function (startBlock, endBlock, color, addCss) {
-                //////console.log(startBlock, endBlock, color, addCss);
                 var css = '';
                 if(typeof(addCss) != 'undefined')
                 {
@@ -849,7 +852,6 @@ var res = angular.module('ezeidApp').
                     $('.block-' + j).css('background-color', color);
                     $('.block-' + j).addClass(css);
                 }
-                //////console.log($('.block-'+startBlock).attr('class'));
             }
 
             var getRandomNumber = function (len) {
@@ -865,7 +867,6 @@ var res = angular.module('ezeidApp').
             /* Get the text of for the reserved dates based on the user'is id */
             $scope.getReservedBlockText = function(loggedInUid,reserverId,text)
             {
-                ////console.log(loggedInUid,reserverId);
                 if(!$scope.isResource) {
                     if (loggedInUid != reserverId) {
                         return 'Reserved';
@@ -929,7 +930,6 @@ var res = angular.module('ezeidApp').
                 {
                     $scope.appendColorIndexFlag = true;
                 }
-                //////console.log('test');
                 for (var i = 0; i < $scope.colorIndex.length; i++)
                 {
                     $('.color-index-'+i).css('color',$scope.colorIndex[i][0]);
@@ -1095,7 +1095,7 @@ var res = angular.module('ezeidApp').
                         $scope.startTime = selectedTimeUtcToLocal(resp.data[0].Starttime).substr(0,5);
                         $scope.duration = resp.data[0].duration;
                         $scope.endTime = convertBlockIdToTime((convertHoursToMinutes($scope.startTime) + $scope.duration)/5);
-                        console.log(resp.data[0].serviceids);
+
                         /* set this reservation services */
                         $scope.currentServices = resp.data[0].serviceids;
                         resetServiceChecks();
@@ -1144,7 +1144,6 @@ var res = angular.module('ezeidApp').
              */
             $scope.currentDateTime = moment().format('DD-MMM-YYYY');
             $scope.$watch('currentDateTime',function(newVal,oldVal){
-                //////console.log('===========================================================================================');
                 if(oldVal !== newVal){
                     $scope.activeDate = moment(newVal).format('DD-MMM-YYYY');
                     /* reload calendar */
@@ -1166,7 +1165,6 @@ var res = angular.module('ezeidApp').
              */
             $scope.activateResource = function(tid)
             {
-                //////console.log('=========================================================================================');
                 $scope.activeResourceId = tid;
                 /** check if the logged in uid and this resource id is same
                  * for enabling or disabling the appointment list
@@ -1196,7 +1194,6 @@ var res = angular.module('ezeidApp').
              */
             $scope.reloadCalander = function()
             {
-                //////console.log('R E L O A D CALENDAR');
                 var tid = $scope.activeResourceId;
                 var date = $scope.activeDate;
                 /* http request for getting the new calendar data */
@@ -1544,10 +1541,6 @@ var res = angular.module('ezeidApp').
              */
             function setAccessRights(activatedResourceEzeid)
             {
-                ////console.log(activatedResourceEzeid);
-                ////console.log($rootScope._userInfo.ezeid);
-
-
                 var operatorArr = activatedResourceEzeid.split(',');
 
                 var isSubuser = false;
@@ -1647,9 +1640,11 @@ var res = angular.module('ezeidApp').
                 return false;
             }
 
+            /**
+             * Pre - Check all service checkboxes while editing a reservation
+             */
             $scope.setServices = function()
             {
-                console.log("======================");
                 var serviceIds = $scope.currentServices;
                 var serviceArr = serviceIds.split(',');
                 //resetServiceChecks();
@@ -1660,10 +1655,55 @@ var res = angular.module('ezeidApp').
 
                 for(var i = 0;i<serviceArr.length;i++)
                 {
-                    console.log(serviceArr[i]);
                     $(".services").find("[value='"+serviceArr[i]+"']").prop('checked',true);
                 }
-                console.log("---------------------"+serviceIds);
             }
+
+            /**
+             * Check if the user have any reservation for the present calendar and resource
+             */
+            function setSelfReservationArray()
+            {
+                var reserverEzeid = $scope.reservedTime;
+                if(!reserverEzeid || !reserverEzeid.length > 0)
+                {
+                    $scope.selfreservation = [];
+                    $scope.isSelfReservationExists = false;
+                    console.log("User don't have any self reservation");
+                }
+                /* save all the self reservations in an array */
+                var selfReservationSlot = [];
+                for(var i = 0; i < reserverEzeid.length; i++)
+                {
+                    if(reserverEzeid[i][2] == $rootScope._userInfo.ezeid)//Yay! got a reservation
+                    {
+                        selfReservationSlot.push(reserverEzeid[i][6]);
+                    }
+                }
+                if(selfReservationSlot.length > 0)
+                {
+                    $scope.isSelfReservationExists = true;
+                }
+                $scope.selfreservation = selfReservationSlot;
+            }
+
+            /**
+             * check if the logged in user have any self reservation
+             */
+            $scope.isSelfReservationExist = function(reservationId)
+            {
+                if(!$scope.selfreservation || !$scope.selfreservation.length > 0)
+                {
+                    return false;
+                }
+
+                if(parseInt($scope.selfreservation.indexOf(reservationId)) == -1)
+                {
+                    return false;
+                }
+
+                return true;
+            }
+
 
         }]);
