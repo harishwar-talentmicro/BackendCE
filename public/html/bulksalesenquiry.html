@@ -27,11 +27,12 @@
                                             </thead>
                                             <tbody ng-show="showListing">
                                                <tr ng-repeat="_item in bulksalesController.result">
-                                                   <td><input type="checkbox"
+                                                   <td>
+                                                      <input type="checkbox"
                                                                name="companyID"
-                                                               data-tid="{{_item.MasterID}}"
+                                                               data-tid="{{_item.TID}}"
                                                                ng-click="toggleCheckbox($event)"
-                                                               ng-checked="selectedTID.indexOf(_item.MasterID)!=-1"/>
+                                                               ng-checked="selectedTID.indexOf(_item.TID)!=-1"/>
                                                    </td>
                                                     <td title="{{_item.CompanyName}}" data-th="Company Name">{{_item.CompanyName | truncate:21}}</td>
                                                     <td title="{{_item.city}}" data-th="Country/City">{{_item.city | truncate:9}}</td>
