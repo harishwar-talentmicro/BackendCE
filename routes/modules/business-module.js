@@ -1123,4 +1123,424 @@ BusinessManager.prototype.itemDetails = function(req,res,next){
     }
 };
 
+/**
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ */
+BusinessManager.prototype.getUserwiseFolderList = function(req,res,next){
+    /**
+     * @todo FnGetUserwiseFolderList
+     */
+    var _this = this;
+    try {
+
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+    var Token = req.query.Token;
+    var RuleFunction = req.query.RuleFunction;
+
+    if (Token != null) {
+        FnValidateToken(Token, function (err, Result) {
+            if (!err) {
+                if (Result != null) {
+
+                    _this.db.query('CALL pGetUserWiseFolderList(' + _this.db.escape(Token) + ',' + _this.db.escape(RuleFunction) + ')', function (err, GetResult) {
+                        if (!err) {
+                            if (GetResult != null) {
+                                if (GetResult[0].length > 0) {
+
+                                    console.log('FnGetUserwiseFolderList: Folder list details Send successfully');
+                                    res.send(GetResult[0]);
+                                }
+                                else {
+
+                                    console.log('FnGetUserwiseFolderList:No Folder list details found');
+                                    res.json(null);
+                                }
+                            }
+                            else {
+
+                                console.log('FnGetUserwiseFolderList:No Folder list details found');
+                                res.json(null);
+                            }
+
+                        }
+                        else {
+
+                            console.log('FnGetUserwiseFolderList: error in getting Folder list details' + err);
+                            res.statusCode = 500;
+                            res.json(null);
+                        }
+                    });
+                }
+                else {
+                    res.statusCode = 401;
+                    res.json(null);
+                    console.log('FnGetUserwiseFolderList: Invalid Token');
+                }
+            } else {
+
+                res.statusCode = 500;
+                res.json(null);
+                console.log('FnGetUserwiseFolderList: Error in validating token:  ' + err);
+            }
+        });
+    }
+    else {
+        if (Token == null) {
+            console.log('FnGetUserwiseFolderList: Token is empty');
+        }
+        if (RuleFunction == null) {
+            console.log('FnGetUserwiseFolderList: RuleFunction is empty');
+        }
+
+        res.statusCode=400;
+        res.json(null);
+    }
+}
+catch (ex) {
+    console.log('FnGetUserwiseFolderList error:' + ex.description);
+
+}
+};
+
+/**
+ * Method : POST
+ * @param req
+ * @param res
+ * @param next
+ */
+BusinessManager.prototype.updateBussinessList = function(req,res,next){
+    /**
+     * @todo FnUpdateBussinessListing
+     */
+    var _this = this;
+try {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    var token = req.body.TokenNo;
+    var CategoryID = parseInt(req.body.CategoryID);
+    var Keywords = req.body.Keywords;
+    var RtnMessage = {
+        IsUpdated: false
+    };
+    var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
+
+    if (token != null && token != '' && CategoryID.toString() != 'NaN' && Keywords != null) {
+        FnValidateToken(token, function (err, Result) {
+            if (!err) {
+                if (Result != null) {
+                    //  var fileName = BrochureDocFile.split('.').pop();
+                    var query = _this.db.escape(token) + ',' + _this.db.escape(Keywords) + ',' + _this.db.escape(CategoryID);
+                    //console.log(query);
+                    _this.db.query('CALL pUpdateBusinesslist(' + query + ')', function (err, UpdateResult) {
+                        if (!err) {
+                            //console.log(UpdateResult);
+                            // console.log('FnUpdateMessageStatus: Update result' + UpdateResult);
+                            if (UpdateResult.affectedRows > 0) {
+                                RtnMessage.IsUpdated = true;
+                                res.send(RtnMessage);
+                                console.log('FnUpdateBussinessListing: Bussiness listing update successfully');
+                            }
+                            else {
+                                console.log('FnUpdateBussinessListing: Bussiness listing is not avaiable');
+                                res.send(RtnMessage);
+                            }
+                        }
+                        else {
+                            console.log('FnUpdateBussinessListing: ' + err);
+                            res.statusCode = 500;
+                            res.send(RtnMessage);
+                        }
+                    });
+                }
+                else {
+                    res.statusCode = 401;
+                    console.log('FnUpdateBussinessListing: Invalid token');
+                    res.send(RtnMessage);
+                }
+            }
+            else {
+                res.statusCode = 500;
+                console.log('FnUpdateBussinessListing: : ' + err);
+                res.send(RtnMessage);
+
+            }
+        });
+
+    }
+    else {
+        if (token == null || token == '') {
+            console.log('FnUpdateBussinessListing: token is empty');
+        }
+        else if (CategoryID.toString() == 'NaN') {
+            console.log('FnUpdateMessageStatus: CategoryID is empty');
+        }
+        else if (Keywords == null) {
+            console.log('FnUpdateMessageStatus: Keywords is empty');
+        }
+        res.statusCode = 400;
+        res.send(RtnMessage);
+
+    }
+}
+catch (ex) {
+    console.log('FnUpdateMessageStatus:  error:' + ex.description);
+
+}
+};
+
+/**
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ */
+BusinessManager.prototype.getCompanyDetails = function(req,res,next){
+    /**
+     * @todo FnGetCompanyDetails
+     */
+    var _this = this;
+    try {
+
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+    var Token = req.query.Token;
+    var functiontype =  req.query.functiontype;
+    var responseMessage = {
+        status: false,
+        data: null,
+        error:{},
+        message:''
+    };
+
+    if (Token) {
+
+        _this.db.query('CALL pGetCompanyDetails(' + _this.db.escape(Token) + ',' + _this.db.escape(functiontype) + ')', function (err, GetResult) {
+            if (!err) {
+                if (GetResult) {
+                    if (GetResult[0].length > 0) {
+                        responseMessage.status = true;
+                        responseMessage.data = GetResult[0] ;
+                        responseMessage.error = null;
+                        responseMessage.message = 'Company details Send successfully';
+                        console.log('FnGetCompanyDetails: Company details Send successfully');
+                        res.status(200).json(responseMessage);
+                    }
+                    else {
+
+                        responseMessage.error = {};
+                        responseMessage.message = 'No founded Company details';
+                        console.log('FnGetCompanyDetails: No founded Company details');
+                        res.json(responseMessage);
+                    }
+                }
+                else {
+
+
+                    responseMessage.error = {};
+                    responseMessage.message = 'No founded Company details';
+                    console.log('FnGetCompanyDetails: No founded Company details');
+                    res.json(responseMessage);
+                }
+
+            }
+            else {
+
+                responseMessage.data = null ;
+                responseMessage.error = {};
+                responseMessage.message = 'Error in getting Company details';
+                console.log('FnGetCompanyDetails: error in getting Company details' + err);
+                res.status(500).json(responseMessage);
+            }
+        });
+    }
+
+    else {
+        if (!Token) {
+            responseMessage.message = 'Invalid Token';
+            responseMessage.error = {
+                Token : 'Invalid Token'
+            };
+            console.log('FnGetCompanyDetails: Token is mandatory field');
+        }
+
+        res.status(401).json(responseMessage);
+    }
+}
+catch (ex) {
+    responseMessage.error = {};
+    responseMessage.message = 'An error occured !'
+    console.log('FnGetCompanyDetails:error ' + ex.description);
+    //throw new Error(ex);
+    res.status(400).json(responseMessage);
+}
+};
+
+/**
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ */
+BusinessManager.prototype.getEZEOneIDInfo = function(req,res,next){
+    /**
+     * @title FnGetEZEOneIDInfo
+     * @service /ezeoneid
+     * @server_param
+     *  1. ezeoneid <string> eg. IND1.L1.123, SANDEEP
+     *  2. token
+     * @desc Same as FnGetSearchInformationNew except it has only includes
+     * AddressLine1, AddressLine2, CityTitle, StateTitle, CountryTitle, Latitude, Longitude
+     * @usage Used to load user address information based on EZEOne ID Code
+     * @conditions Will load the result if no pin is there, else have to pass pin and location sequence as EZEONE.L2.123
+     * @param req
+     * @param res
+     * @param next
+     * @constructor
+     */
+    var _this = this;
+var ezeTerm = alterEzeoneId(req.query['ezeoneid']);
+var token = req.query['token'];
+var locationSeq = 0;
+var pin = null;
+var ezeoneId = null;
+
+var respMsg = {
+    status : false,
+    message : 'Please login to continue',
+    data : null,
+    error : null
+};
+
+var error = {};
+var validationFlag = true;
+if(!token){
+    error['token'] = 'Invalid Token';
+    validationFlag *= false;
+}
+if(!ezeTerm){
+    error['ezeoneid'] = 'EZEOne ID not found';
+    validationFlag *= false;
+}
+
+if(!validationFlag){
+    respMsg.message = 'Please check all the errors';
+    respMsg.error = error;
+    res.status(400).json(respMsg);
+    return;
+}
+else{
+    try{
+        FnValidateToken(token,function(err,tokenResult){
+            if(err){
+                respMsg.status = false;
+                respMsg.data = null;
+                respMsg.message = 'Please check all the errors';
+                respMsg.error = {token : 'Invalid Token'};
+                res.status(401).json(respMsg);
+            }
+            else if(!tokenResult){
+                respMsg.status  = false;
+                respMsg.data = null;
+                respMsg.message = 'Please check all the errors';
+                respMsg.error = {token : 'Invalid Token'};
+                res.status(401).json(respMsg);
+            }
+            else{
+                var ezeArr = ezeTerm.split('.');
+                ezeoneId = ezeArr;
+                if(ezeArr.length > 1){
+                    ezeoneId = ezeArr[0];
+
+                    /**
+                     * Try to find if user has passed the location sequence number
+                     */
+                    if(ezeArr[1] && ezeArr[1].substr(0,1).toUpperCase() === 'L'){
+                        var seqNo = parseInt(ezeArr[1].substring(1));
+                        if(seqNo !== NaN && seqNo > -1){
+                            locationSeq = seqNo;
+                        }
+                    }
+
+                    /**
+                     * If location sequence number is not found assuming that user may have passed the pin
+                     * and therefore validating pin using standard rules
+                     */
+                    else if(parseInt(ezeArr[1]) !== NaN && parseInt(ezeArr[1]) > 99 && parseInt(ezeArr[1]) < 1000){
+                        pin = parseInt(ezeArr[1]).toString();
+                    }
+
+                    /**
+                     * If third element is also there in array then strictly assume it as a pin and then
+                     * assign it to pin
+                     */
+                    else if(ezeArr.length > 2){
+                        if(parseInt(ezeArr[2]) !== NaN && parseInt(ezeArr[2]) > 99 && parseInt(ezeArr[2]) < 1000){
+                            pin = parseInt(ezeArr[2]).toString();
+                        }
+                    }
+                }
+
+                var moment = require('moment');
+                var dateTime = moment().format('YYYY-MM-DD HH:mm:ss');
+                var ip = (req.headers['x-forwarded-for'] || req.connection.remoteAddress ||
+                req.socket.remoteAddress || req.connection.socket.remoteAddress);
+
+                var queryParams = _this.db.escape(token) + ',' + _this.db.escape(dateTime) + ',' + _this.db.escape(ip) +
+                    ',' +_this.db.escape(ezeoneId) + ',' + _this.db.escape(locationSeq) + ',' + _this.db.escape(pin);
+                _this.db.query('CALL pSearchinfnPinbased('+queryParams+')',function(err,result){
+                    if(err){
+                        console.log('Error FnGetEZEOneIDInfo :  '+err);
+                        respMsg.status  = false;
+                        respMsg.data = null;
+                        respMsg.message = 'An error occured';
+                        respMsg.error = {server : 'Internal Server Error'};
+                        res.status(400).json(respMsg);
+                        return;
+                    }
+
+
+                    else{
+                        if(result && result.length > 0){
+                            if(result[0].length > 0){
+                                respMsg.status  = true;
+                                respMsg.data = result[0][0];
+                                respMsg.message = 'EZEOne ID found';
+                                respMsg.error = null;
+                                res.status(200).json(respMsg);
+                                return;
+                            }
+                            else{
+                                respMsg.status  = false;
+                                respMsg.data = null;
+                                respMsg.message = 'Nothing found';
+                                respMsg.error = { ezeoneid : 'No results found'};
+                                res.status(404).json(respMsg);
+                            }
+
+                        }
+                        else{
+                            respMsg.status  = false;
+                            respMsg.data = null;
+                            respMsg.message = 'Nothing found';
+                            respMsg.error = { ezeoneid : 'No results found'};
+                            res.status(404).json(respMsg);
+                        }
+                    }
+                });
+
+            }
+        });
+    }
+    catch(ex){
+        console.log('Error : FnGetEZEOneIDInfo' + ex.description);
+    }
+}
+};
+
 module.exports = BusinessManager;
