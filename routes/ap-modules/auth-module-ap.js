@@ -7,6 +7,6 @@
  */
 "use strict";
 
-function Audit(db){
+function Auth_AP(db){
     this.db = db;
 };
