@@ -10,6 +10,13 @@ angular.module('ezeidApp').controller('WorkingHourCtrl',['$scope','$rootScope','
     var workingHourData = "";
     getWorkingHours();
 
+
+    /* modal box for loading Add/edit/join Group */
+    $scope.modalBox = {
+        title: 'Groups',
+        class: ''
+    };
+
     /**
      * Function for converting UTC time from server to LOCAL timezone
      */
@@ -278,5 +285,6 @@ angular.module('ezeidApp').controller('WorkingHourCtrl',['$scope','$rootScope','
             $scope.saveInfo.TID = _TID;
             getWorkingHourForEdit(_TID);
         };
+
 
 }]);
