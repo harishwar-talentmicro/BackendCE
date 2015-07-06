@@ -233,7 +233,7 @@ app.post('/ewtSearchRealEstateAP', LocationManager.FnSearchRealEstateAP);
 app.post('/ewtUpdateRedFlagAP',LocationManager.FnUpdateRedFlagAP);
 app.post('/ewtUpdateEZEIDAP', LocationManager.FnUpdateEZEIDAP);
 app.post('/ewtDeleteBannerPicAP', LocationManager.FnDeleteBannerPictureAP);
-app.post('/crop_imageAP',LocationManager.FnCropImageAP); 
+app.post('/crop_imageAP',LocationManager.FnCropImageAP);
 
 
 //EZEID VAS

@@ -1985,104 +1985,112 @@ exports.FnRegistration = function (req, res) {
                     if (!err) {
                         // console.log('InsertResult: ' + InsertResult);
                         if (InsertResult) {
-                            console.log(InsertResult);
-                            if (InsertResult[0].length > 0) {
-                                 var RegResult = InsertResult[0];
-                                if(RegResult[0].TID != 0)
-                                {
-                                   if(IDTypeID == 2)
-                                RtnMessage.FirstName=CompanyName;
-                                else
-                                RtnMessage.FirstName = FirstName;
-                                RtnMessage.IsAuthenticate = true;
-                                RtnMessage.Token = TokenNo;
-                                RtnMessage.Type = IDTypeID;
-                                RtnMessage.Icon = Icon;
-                                if (Operation == 'I') {
-                                    console.log('FnRegistration:tmaster: Registration success');
-                                    //res.send(RtnMessage);
-                                    if (EMailID != '' || EMailID != null) {
-                                        var fs = require('fs');
-                                        fs.readFile("RegTemplate.txt", "utf8", function (err, data) {
-                                            if (err) throw err;
-                                            data = data.replace("[Firstname]", FirstName);
-                                            data = data.replace("[Lastname]", LastName);
-                                            data = data.replace("[EZEID]", EZEID);
-                                            data = data.replace("[EZEID]", EZEID);  //REG Detials
-                                            data = data.replace("[EZEID]", EZEID); //L1
-                                            data = data.replace("[EZEID]", EZEID); //L2
-                                            data = data.replace("[EZEID]", EZEID); //CV
-                                            data = data.replace("[EZEID]", EZEID); //ID
-                                            data = data.replace("[EZEID]", EZEID); //DL
-                                            data = data.replace("[EZEID]", EZEID); //PP
+                            //  console.log(InsertResult);
+                            if(InsertResult[0]){
+                                if (InsertResult[0].length > 0) {
+                                    var RegResult = InsertResult[0];
+                                    if(RegResult[0].TID != 0)
+                                    {
+                                        if(IDTypeID == 2)
+                                            RtnMessage.FirstName=CompanyName;
+                                        else
+                                            RtnMessage.FirstName = FirstName;
+                                        RtnMessage.IsAuthenticate = true;
+                                        RtnMessage.Token = TokenNo;
+                                        RtnMessage.Type = IDTypeID;
+                                        RtnMessage.Icon = Icon;
+                                        if (Operation == 'I') {
+                                            console.log('FnRegistration:tmaster: Registration success');
+                                            //res.send(RtnMessage);
+                                            if (EMailID != '' || EMailID != null) {
+                                                var fs = require('fs');
+                                                fs.readFile("RegTemplate.txt", "utf8", function (err, data) {
+                                                    if (err) throw err;
+                                                    data = data.replace("[Firstname]", FirstName);
+                                                    data = data.replace("[Lastname]", LastName);
+                                                    data = data.replace("[EZEID]", EZEID);
+                                                    data = data.replace("[EZEID]", EZEID);  //REG Detials
+                                                    data = data.replace("[EZEID]", EZEID); //L1
+                                                    data = data.replace("[EZEID]", EZEID); //L2
+                                                    data = data.replace("[EZEID]", EZEID); //CV
+                                                    data = data.replace("[EZEID]", EZEID); //ID
+                                                    data = data.replace("[EZEID]", EZEID); //DL
+                                                    data = data.replace("[EZEID]", EZEID); //PP
 
-                                            if(PIN == null){
-                                                data = data.replace(".PIN","");
-                                            }
-                                            else
-                                            {
-                                                data = data.replace("PIN",PIN);
-                                            }
+                                                    if(PIN == null){
+                                                        data = data.replace(".PIN","");
+                                                    }
+                                                    else
+                                                    {
+                                                        data = data.replace("PIN",PIN);
+                                                    }
 
-                                            //  console.log(data);
-                                            var mailOptions = {
-                                                from: 'noreply@ezeid.com',
-                                                to: EMailID,
-                                                subject: 'Welcome to EZEID',
-                                                html: data // html body
-                                            };
-                                            //console.log('Mail Option:' + mailOptions);
-                                            // send mail with defined transport object
-                                            var post = { MessageType: 8, Priority: 3, ToMailID: mailOptions.to, Subject: mailOptions.subject, Body: mailOptions.html, SentbyMasterID:RegResult[0].TID };
-                                            // console.log(post);
-                                            var query = db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
-                                                // Neat!
-                                                if (!err) {
-                                                    console.log('FnRegistration: Mail saved Successfully');
-                                                    res.send(RtnMessage);
-                                                }
-                                                else {
-                                                    console.log('FnRegistration: Mail not Saved Successfully' + err);
-                                                    res.send(RtnMessage);
-                                                }
-                                            });
-                                        });
+                                                    //  console.log(data);
+                                                    var mailOptions = {
+                                                        from: 'noreply@ezeid.com',
+                                                        to: EMailID,
+                                                        subject: 'Welcome to EZEID',
+                                                        html: data // html body
+                                                    };
+                                                    //console.log('Mail Option:' + mailOptions);
+                                                    // send mail with defined transport object
+                                                    var post = { MessageType: 8, Priority: 3, ToMailID: mailOptions.to, Subject: mailOptions.subject, Body: mailOptions.html, SentbyMasterID:RegResult[0].TID };
+                                                    // console.log(post);
+                                                    var query = db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
+                                                        // Neat!
+                                                        if (!err) {
+                                                            console.log('FnRegistration: Mail saved Successfully');
+                                                            res.send(RtnMessage);
+                                                        }
+                                                        else {
+                                                            console.log('FnRegistration: Mail not Saved Successfully' + err);
+                                                            res.send(RtnMessage);
+                                                        }
+                                                    });
+                                                });
+                                            }
+                                            else {
+                                                console.log('FnRegistration: tmaster: registration success but email is empty so mail not sent');
+                                                console.log(RtnMessage);
+                                                res.send(RtnMessage);
+                                            }
+                                        }
+                                        else {
+                                            console.log('FnRegistration: tmaster: Update operation success');
+                                            console.log(RtnMessage);
+                                            res.send(RtnMessage);
+                                        }
                                     }
                                     else {
-                                        console.log('FnRegistration: tmaster: registration success but email is empty so mail not sent');
                                         console.log(RtnMessage);
                                         res.send(RtnMessage);
+                                        console.log('FnRegistration:tmaster: Registration Failed');
                                     }
                                 }
-                                else {
-                                    console.log('FnRegistration: tmaster: Update operation success');
+                                else{
                                     console.log(RtnMessage);
                                     res.send(RtnMessage);
+                                    console.log('FnRegistration:tmaster: Registration Failed');
                                 }
                             }
-                            else {
+
+                            else{
+                                console.log(RtnMessage);
+                            res.send(RtnMessage);
+                            console.log('FnRegistration:tmaster: Registration Failed');
+                            }
+                        }
+                        else{
                                 console.log(RtnMessage);
                                 res.send(RtnMessage);
                                 console.log('FnRegistration:tmaster: Registration Failed');
                             }
-                            }
-                                else{
-                                    console.log(RtnMessage);
-                                res.send(RtnMessage);
-                                console.log('FnRegistration:tmaster: Registration Failed');
-                                }
-                        }
-                        else{
-                                    console.log(RtnMessage);
-                                res.send(RtnMessage);
-                                console.log('FnRegistration:tmaster: Registration Failed');
-                                }
                     }
-                            else {
-                            res.statusCode = 500;
-                            res.send(RtnMessage);
-                            console.log('FnRegistration:tmaster:' + err);
-                        }
+                        else {
+                        res.statusCode = 500;
+                        res.send(RtnMessage);
+                        console.log('FnRegistration:tmaster:' + err);
+                    }
                 });
             }
             else {

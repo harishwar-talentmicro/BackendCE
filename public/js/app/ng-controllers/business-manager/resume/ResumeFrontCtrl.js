@@ -723,7 +723,6 @@
                             $scope.isEnquiryPosted = true;
 
                             Notification.success({ message : msg, delay : MsgDelay});
-                            $scope.resetModalBox();
                         }
                         else{
                             Notification.error({ message : 'An error occurred while placing enquiry', delay : MsgDelay});
