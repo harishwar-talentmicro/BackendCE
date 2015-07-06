@@ -1,7 +1,7 @@
 var DbHelper = require('./../helpers/DatabaseHandler'),
     db = DbHelper.getDBContext();
 
-var User = require('./user-module.js');
+var User = require('./modules/user-module.js');
 var userModule = new User(db);
 exports.FnRegistration = userModule.register;
 exports.FnLogin = userModule.login;
@@ -32,7 +32,7 @@ exports.FnGetLoginDetails = userModule.getLoginDetails;
 exports.FnUploadDocument = userModule.uploadDoc;
 exports.FnWebLinkRedirect = userModule.webLinkRedirect;
 
-var Audit = require('./audit-module.js');
+var Audit = require('./modules/audit-module.js');
 var auditModule = new Audit(db);
 exports.FnGetAccessHistory = auditModule.getAccessHistory;
 exports.FnSaveWhiteBlackList = auditModule.saveList;
@@ -46,7 +46,7 @@ exports.FnGetTemplateDetails = auditModule.getTemplateDetails;
 exports.FnSendBulkMailer = auditModule.sendBulkMailer;
 
 
-var Location = require('./location-module.js');
+var Location = require('./modules/location-module.js');
 var locationModule = new Location(db);
 exports.FnGetSecondaryLocation = locationModule.getAll;
 exports.FnAddLocation = locationModule.save;
@@ -54,7 +54,7 @@ exports.FnDeleteLocation = locationModule.deleteLocation;
 exports.FnGetLocationListForEZEID = locationModule.getAllForEzeid;
 exports.FnGetLocationList = locationModule.getLoactionList
 
-var BusinessManager = require('./business-module.js');
+var BusinessManager = require('./modules/business-module.js');
 var businessManager = new BusinessManager(db);
 exports.FnGetTransaction = businessManager.getTransactions;
 exports.FnSaveTransaction = businessManager.saveTransaction;
@@ -72,7 +72,7 @@ exports.FnUpdateBussinessListing = businessManager.updateBussinessList;
 exports.FnGetCompanyDetails = businessManager.getCompanyDetails;
 exports.FnGetEZEOneIDInfo = businessManager.getEZEOneIDInfo;
 
-var Configuration = require('./configuration-module.js');
+var Configuration = require('./modules/configuration-module.js');
 var configurationModule = new Configuration(db);
 exports.FnSaveConfig = configurationModule.save;
 exports.FnGetConfig = configurationModule.get;
@@ -104,7 +104,7 @@ exports.FnDeleteHolidayList = configurationModule.deleteHoliday;
 exports.FnDeleteWorkingHours = configurationModule.deleteWorkingHours;
 exports.FnWorkingHoursDetails = configurationModule.getWorkingHoursDetails;
 
-var Search = require('./search-module.js');
+var Search = require('./modules/search-module.js');
 var searchModule = new Search(db);
 exports.FnSearchByKeywords = searchModule.searchKeyword;
 exports.FnGetSearchInformationNew = searchModule.searchInformation;
@@ -113,11 +113,11 @@ exports.FnGetBannerPicture = searchModule.getBanner;
 exports.FnSearchForTracker = searchModule.searchTracker;
 exports.FnGetSearchDocuments = searchModule.getSearchDoc;
 
-var Image = require('./image-module.js');
+var Image = require('./modules/image-module.js');
 var imageModule = new Image(db);
 exports.FnCropImage = imageModule.cropImage;
 
-var Reservation = require('./reservation-module.js');
+var Reservation = require('./modules/reservation-module.js');
 var reservationModule = new Reservation(db);
 exports.FnSaveReservTransaction = reservationModule.SaveReservTrans;
 exports.FnGetReservTask = reservationModule.getList;
@@ -128,14 +128,14 @@ exports.FnGetworkinghoursList = reservationModule.getworkinghoursList;
 
 
 //ap parts
-var Auth_AP = require('./auth-module-ap.js');
+var Auth_AP = require('./ap-modules/auth-module-ap.js');
 var authModuleAP = new Auth_AP(db);
 exports.FnLoginAP = authModuleAP.loginAP;
 exports.FnLogoutAP = authModuleAP.logoutAP;
 exports.FnForgetPasswordAP = authModuleAP.forgetPasswordAP;
 exports.FnChangePasswordAP = authModuleAP.changePasswordAP;
 
-var User_AP = require('./user-module-ap.js');
+var User_AP = require('./ap-modules/user-module-ap.js');
 var userModuleAP = new User_AP(db);
 exports.FnGetUserDetailsAP = userModuleAP.getUserDetailsAP;
 exports.FnUpdateUserProfileAP = userModuleAP.updateUserProfileAP;
@@ -143,7 +143,7 @@ exports.FnSaveAPEZEID = userModuleAP.saveAPEZEID;
 exports.FnUpdateRedFlagAP = userModuleAP.updateRedFlagAP;
 exports.FnUpdateEZEIDAP = userModuleAP.updateEZEIDAP;
 
-var Image_AP = require('./image-module-ap.js');
+var Image_AP = require('./ap-modules/image-module-ap.js');
 var imageModuleAP = new Image_AP(db);
 exports.FnSaveAPEZEIDPicture = imageModuleAP.saveAPEZEIDPicture;
 exports.FnGetAPEZEIDPicture = imageModuleAP.getAPEZEIDPicture;
@@ -153,25 +153,25 @@ exports.FnGetAllBannerPicsAP = imageModuleAP.getAllBannerPicsAP;
 exports.FnDeleteBannerPictureAP = imageModuleAP.deleteBannerPictureAP;
 exports.FnCropImageAP = imageModuleAP.cropImageAP;
 
-var Location_AP = require('./location-module-ap.js');
+var Location_AP = require('./ap-modules/location-module-ap.js');
 var locationModuleAP = new Location_AP(db);
 exports.FnGetSecondaryLocationListAP = locationModuleAP.getSecondaryLocationListAP;
 exports.FnGetSecondaryLocationAP = locationModuleAP.getSecondaryLocationAP;
 exports.FnUpdateSecondaryLocationAP = locationModuleAP.updateSecondaryLocationAP;
 
-var RealEstate_AP = require('./real-estate-ap.js');
+var RealEstate_AP = require('./ap-modules/real-estate-ap.js');
 var realEstateAP = new RealEstate_AP(db);
 exports.FnGetRealStateDataAP = realEstateAP.getRealStateDataAP;
 exports.FnSearchRealEstateAP = realEstateAP.searchRealEstateAP;
 
-var IDCard_AP = require('./idcard-module-ap.js');
+var IDCard_AP = require('./ap-modules/idcard-module-ap.js');
 var idcardAP = new IDCard_AP(db);
 exports.FnUpdateIdCardPrintAP = idcardAP.updateIdCardPrintAP;
 exports.FnGetIdCardPrintAP = idcardAP.getIdCardPrintAP;
 
 
 //VES Modules
-var VES = require('./ves-module-ap.js');
+var VES = require('./ves-modules/ves-module-ap.js');
 var vesModule= new VES(db);
 exports.FnLoginVES = vesModule.loginVES;
 exports.FnSaveContactVES = vesModule.saveContactVES;
@@ -188,7 +188,7 @@ exports.FnSaveCitysVES = vesModule.saveCitysVES;
 function error(err, req, res, next) {
     // log it
     console.error(err.stack);
-    console.log('Error Happened Please try Again..');
+    console.log('Error Occurred Please try Again..');
     // respond with 500 "Internal Server Error".
     res.json(500,{ status : false, message : 'Internal Server Error', error : {server : 'Exception'}});
 };
@@ -1643,96 +1643,6 @@ exports.FnGetSearchPicture = function(req, res){
     catch (ex) {
         console.log('FnGetSearchPicture error:' + ex.description);
           
-    }
-};
-
-/**
- * Finds the user login status using a cookie login
- * which is created by angular at the time of signin or signup
- * @param req
- * @param res
- * @param next
- * @constructor
- */
-exports.FnSearchBusListing = function(req,res,next){
-    /**
-     * HTML Pages list from angular routings scheme
-     * Any new url pattern addition in angular should be added in this list also
-     * @type {string[]}
-     */
-    var htmlPagesList = [
-        'signup',
-        'messages',
-        'landing',
-        'access-history',
-        'busslist',
-        'terms',
-        'help',
-        'legal',
-        'blackwhitelist',
-        'salesenquiry',
-        'bulksalesenquiry',
-        'viewdirection',
-        'service-reservation',
-        'business-manager',
-        'profile-manager',
-        'searchResult',
-        'searchDetails',
-        'outbox'
-    ];
-
-    var loginCookie = (req.cookies['login']) ? ((req.cookies['login'] === 'true') ? true : false ) : false;
-    if(!loginCookie){
-        /**
-         * Checks if ezeid parameter is existing and checks in the list that is it a
-         * ezeid angular url using the htmlPageList
-         * If not then it will see in the database for
-         * business ID
-         */
-        if(req.params['ezeid'] && htmlPagesList.indexOf(req.params.ezeid) === -1){
-            /**
-             * Checking the EZEID for it's validity
-             */
-            var arr = req.params.ezeid.split('.');
-
-            if(arr.length < 2 && arr.length > 0){
-                /**
-                 * Find if the user type is business or not
-                 */
-                var ezeidQuery = "SELECT tlocations.PIN AS PIN, tmaster.TID, tlocations.TID AS LID ,"+
-                    " tmaster.IDTypeID AS IDTypeID FROM tlocations"+
-                    " INNER JOIN tmaster ON " +
-                    "tmaster.TID = tlocations.MasterID AND tlocations.SeqNo = 0 AND tmaster.EZEID = "+
-                    db.escape(req.params.ezeid)+ " LIMIT 1";
-                db.query(ezeidQuery,function(err,results){
-                    if(!err){
-                        if(results.length > 0){
-                            if((!results[0].PIN) && results[0].IDTypeID !== 1){
-                                res.redirect('/searchDetails?searchType=2&TID='+results[0].LID);
-                            }
-                            else{
-                                next();
-                            }
-                        }
-                        else{
-                            next();
-                        }
-                    }
-                    else{
-                        next();
-                    }
-                });
-            }
-            else{
-                next();
-            }
-        }
-        else{
-            next();
-        }
-    }
-    else{
-        next();
     }
 };
 
