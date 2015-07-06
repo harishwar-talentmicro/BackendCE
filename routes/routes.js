@@ -1334,10 +1334,16 @@ exports.FnGetBussinessListing = function (req, res) {
                         db.query('CALL pGetBusinesslist(' + db.escape(token) + ')', function (err, BussinessListingResult) {
                             if (!err) {
                                 // console.log('FnUpdateMessageStatus: Update result' + UpdateResult);
-                                if (BussinessListingResult[0] != null) {
-                                    if (BussinessListingResult[0].length > 0) {
-                                        res.send(BussinessListingResult[0]);
-                                        console.log('FnGetBussinessListing: Bussiness listing sent successfully');
+                                if(BussinessListingResult){
+                                    if (BussinessListingResult[0] != null) {
+                                        if (BussinessListingResult[0].length > 0) {
+                                            res.send(BussinessListingResult[0]);
+                                            console.log('FnGetBussinessListing: Bussiness listing sent successfully');
+                                        }
+                                        else {
+                                            console.log('FnGetBussinessListing: Bussiness listing is not avaiable');
+                                            res.json(null);
+                                        }
                                     }
                                     else {
                                         console.log('FnGetBussinessListing: Bussiness listing is not avaiable');
@@ -1348,6 +1354,7 @@ exports.FnGetBussinessListing = function (req, res) {
                                     console.log('FnGetBussinessListing: Bussiness listing is not avaiable');
                                     res.json(null);
                                 }
+
                             }
                             else {
                                 console.log('FnGetBussinessListing: ' + err);
