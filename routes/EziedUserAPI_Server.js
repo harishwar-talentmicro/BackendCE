@@ -1656,6 +1656,9 @@ exports.FnRegistration = function (req, res) {
         //console.log(req._remoteAddress);
         //console.log('---------------------------');
         var OperationType = req.body.OperationType;
+        console.log('--------------------------------------------');
+        console.log(OperationType);
+        console.log('--------------------------------------------');
         var IPAddress = req._remoteAddress;
         var SelectionTypes = parseInt(req.body.SelectionType);
         if(SelectionTypes.toString() == 'NaN'){
@@ -11680,7 +11683,8 @@ exports.FnSaveReservTransaction = function(req, res){
         var res_datetime = new Date(req.body.res_datetime);
         var duration = req.body.duration;
         var status = req.body.status;
-        var serviceid = req.body.serviceid;
+        var serviceid = req.body.serviceid ?  req.body.serviceid : '';
+        var notes = req.body.notes;
 		
 		var ID=''
         if(serviceid){
@@ -11708,13 +11712,6 @@ exports.FnSaveReservTransaction = function(req, res){
             responseMessage.error['resourceid'] = 'Invalid Resourceid';
             validateStatus *= false;
         }
-        
-        if(!serviceid){
-            responseMessage.error['serviceid'] = 'Invalid Service_ids';
-            validateStatus *= false;
-        }
-        
-        
         if(!validateStatus){
             console.log('FnSaveReservTransaction  error : ' + JSON.stringify(responseMessage.error));
             responseMessage.message = 'Unable to save resource transaction ! Please check the errors';
@@ -11727,7 +11724,7 @@ exports.FnSaveReservTransaction = function(req, res){
                 if (!err) {
                     if (result != null) {
 
-                        var query = db.escape(TID) + ',' + db.escape(Token) + ',' + db.escape(contactinfo) + ',' + db.escape(toEzeid) + ',' + db.escape(resourceid) + ',' + db.escape(res_datetime) + ',' + db.escape(duration) + ',' + db.escape(status) + ',' + db.escape(serviceid);
+                        var query = db.escape(TID) + ',' + db.escape(Token) + ',' + db.escape(contactinfo) + ',' + db.escape(toEzeid) + ',' + db.escape(resourceid) + ',' + db.escape(res_datetime) + ',' + db.escape(duration) + ',' + db.escape(status) + ',' + db.escape(serviceid) + ',' + db.escape(notes);
 						console.log(query);
 						console.log('CALL pSaveResTrans(' + query + ')');
 						
