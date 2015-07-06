@@ -11683,7 +11683,7 @@ exports.FnSaveReservTransaction = function(req, res){
         var res_datetime = new Date(req.body.res_datetime);
         var duration = req.body.duration;
         var status = req.body.status;
-        var serviceid = req.body.serviceid;
+        var serviceid = req.body.serviceid ?  req.body.serviceid : '';
         var notes = req.body.notes;
 		
 		var ID=''
@@ -11712,13 +11712,6 @@ exports.FnSaveReservTransaction = function(req, res){
             responseMessage.error['resourceid'] = 'Invalid Resourceid';
             validateStatus *= false;
         }
-        
-        if(!serviceid){
-            responseMessage.error['serviceid'] = 'Invalid Service_ids';
-            validateStatus *= false;
-        }
-        
-        
         if(!validateStatus){
             console.log('FnSaveReservTransaction  error : ' + JSON.stringify(responseMessage.error));
             responseMessage.message = 'Unable to save resource transaction ! Please check the errors';

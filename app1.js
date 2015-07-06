@@ -201,29 +201,29 @@ app.get('/get_workinghours_details',LocationManager.FnWorkingHoursDetails);
 
 
 //below service are for EZEIDAP
-app.post('/ewLoginAP', LocationManager.FnLoginAP); //auth
-app.get('/ewLogoutAP', LocationManager.FnLogoutAP); //auth
-app.get('/ewGetUserDetailsAP', LocationManager.FnGetUserDetailsAP); //user
-app.post('/ewUpdateUserProfileAP', LocationManager.FnUpdateUserProfileAP); //user
-app.post('/ewtForgetPasswordAP', LocationManager.FnForgetPasswordAP); //auth
-app.post('/ewtChangePasswordAP', LocationManager.FnChangePasswordAP); //auth
-app.post('/ewtSaveEZEIDDataAP', LocationManager.FnSaveAPEZEID); //user
-app.post('/ewtSaveEZEIDPictureAP', LocationManager.FnSaveAPEZEIDPicture); //picture
-app.get('/ewtGetEstateDataAP', LocationManager.FnGetRealStateDataAP); //real-estate
-app.get('/ewtGetEZEIDPictureAP', LocationManager.FnGetAPEZEIDPicture);  //picture
-app.post('/ewtSaveBannerPictureAP', LocationManager.FnSaveBannerPictureAP);  //picture
-app.get('/ewtGetBannerPictureAP', LocationManager.FnGetBannerPictureAP);  //picture
-app.get('/ewtGetAllBannerPicsAP', LocationManager.FnGetAllBannerPicsAP);  //picture
-app.get('/ewtGetSecondaryLocListAP',LocationManager.FnGetSecondaryLocationListAP); //location
-app.get('/ewtGetSecondaryLocAP',LocationManager.FnGetSecondaryLocationAP); //location
-app.post('/ewtUpdateSecondaryLocationAP', LocationManager.FnUpdateSecondaryLocationAP); //location
-app.post('/ewtUpdateIdCardPrintAP', LocationManager.FnUpdateIdCardPrintAP); //idcard
-app.get('/ewtGetIdCardPrintAP',LocationManager.FnGetIdCardPrintAP); //idcard
-app.post('/ewtSearchRealEstateAP', LocationManager.FnSearchRealEstateAP); //real-estate
-app.post('/ewtUpdateRedFlagAP',LocationManager.FnUpdateRedFlagAP); //user
-app.post('/ewtUpdateEZEIDAP', LocationManager.FnUpdateEZEIDAP); //user
-app.post('/ewtDeleteBannerPicAP', LocationManager.FnDeleteBannerPictureAP); //picture
-app.post('/crop_imageAP',LocationManager.FnCropImageAP); //picture
+app.post('/ewLoginAP', LocationManager.FnLoginAP);
+app.get('/ewLogoutAP', LocationManager.FnLogoutAP);
+app.get('/ewGetUserDetailsAP', LocationManager.FnGetUserDetailsAP);
+app.post('/ewUpdateUserProfileAP', LocationManager.FnUpdateUserProfileAP);
+app.post('/ewtForgetPasswordAP', LocationManager.FnForgetPasswordAP);
+app.post('/ewtChangePasswordAP', LocationManager.FnChangePasswordAP);
+app.post('/ewtSaveEZEIDDataAP', LocationManager.FnSaveAPEZEID);
+app.post('/ewtSaveEZEIDPictureAP', LocationManager.FnSaveAPEZEIDPicture);
+app.get('/ewtGetEstateDataAP', LocationManager.FnGetRealStateDataAP);
+app.get('/ewtGetEZEIDPictureAP', LocationManager.FnGetAPEZEIDPicture);
+app.post('/ewtSaveBannerPictureAP', LocationManager.FnSaveBannerPictureAP);
+app.get('/ewtGetBannerPictureAP', LocationManager.FnGetBannerPictureAP);
+app.get('/ewtGetAllBannerPicsAP', LocationManager.FnGetAllBannerPicsAP);
+app.get('/ewtGetSecondaryLocListAP',LocationManager.FnGetSecondaryLocationListAP);
+app.get('/ewtGetSecondaryLocAP',LocationManager.FnGetSecondaryLocationAP);
+app.post('/ewtUpdateSecondaryLocationAP', LocationManager.FnUpdateSecondaryLocationAP);
+app.post('/ewtUpdateIdCardPrintAP', LocationManager.FnUpdateIdCardPrintAP);
+app.get('/ewtGetIdCardPrintAP',LocationManager.FnGetIdCardPrintAP);
+app.post('/ewtSearchRealEstateAP', LocationManager.FnSearchRealEstateAP);
+app.post('/ewtUpdateRedFlagAP',LocationManager.FnUpdateRedFlagAP);
+app.post('/ewtUpdateEZEIDAP', LocationManager.FnUpdateEZEIDAP);
+app.post('/ewtDeleteBannerPicAP', LocationManager.FnDeleteBannerPictureAP);
+app.post('/crop_imageAP',LocationManager.FnCropImageAP);
 
 
 //EZEID VAS
