@@ -2,51 +2,51 @@
 <section id="outbox-wrapper" class="hpw ow">
     <!-- Header menu goes here -->
     <header-section></header-section>
-
-    <!-- MAIN SECTION OF OUTBOX MODULE -->
-    <div class="width-75 container p-top-30">
-        <div class="panel panel-default shadow-border">
-            <div class="panel-heading text-center menu-text">
-                <h3 class="text-center font-roboto"><i class="fa fa-check-square-o"></i> Your Transactions</h3>
-            </div>
-            <div class="panel-body">
-                <!-- Side menu goes here -->
-                <div class="col-lg-3 col-md-4 col-sm-12 col-xs-12 menu-style">
-                    <ul class="list-unstyled">
-                        <li ng-click="changeSelectedModule(0)"><p ng-class="presentSelectedModule == 0?'active':''"><i class="fa fa-briefcase"></i> Sales</p></li>
-                        <!--<li ng-click="changeSelectedModule(1)"><p ng-class="presentSelectedModule == 1?'active':''"><i class="fa fa-check-square"></i> Reservation</p></li>-->
-                        <li ng-click="changeSelectedModule(2)"><p ng-class="presentSelectedModule == 2?'active':''"><i class="fa fa-truck" ></i> Home Delivery</p></li>
-                        <li ng-click="changeSelectedModule(3)"><p ng-class="presentSelectedModule == 3?'active':''"><i class="fa fa-wrench" ></i> Help Desk</p></li>
-                        <li ng-click="changeSelectedModule(4)"><p ng-class="presentSelectedModule == 4?'active':''"><i class="fa fa-file-word-o"></i> Resume</p></li>
-                    </ul>
+    <section class="page-content">
+        <!-- MAIN SECTION OF OUTBOX MODULE -->
+        <div class="width-75 container p-top-30">
+            <div class="panel panel-default shadow-border">
+                <div class="panel-heading text-center menu-text">
+                    <h3 class="text-center font-roboto"><i class="fa fa-check-square-o"></i> Your Transactions</h3>
                 </div>
-                <!-- Main content goes here -->
-                <div class="col-lg-9 col-md-8 col-sm-12 col-xs-12 ">
-                    <div class="outbox-main-content">
-                        <!-- Transaction history goes here -->
-                        <div class="pagination input-group text-right" ng-show="paginationStatus">
-                            <button ng-disabled="!paginationPrevious" ng-click="getPreviousResultPage()" class="btn btn-primary">Previous <i class="fa fa-arrow-circle-left"></i></button>
-                            <button ng-disabled="!paginationNext" ng-click="getNextResultPage()" class="btn btn-primary"><i class="fa fa-arrow-circle-right"></i> Next &nbsp;&nbsp;</button>
+                <div class="panel-body">
+                    <!-- Side menu goes here -->
+                    <div class="col-lg-3 col-md-4 col-sm-12 col-xs-12 menu-style">
+                        <ul class="list-unstyled">
+                            <li ng-click="changeSelectedModule(0)"><p ng-class="presentSelectedModule == 0?'active':''"><i class="fa fa-briefcase"></i> Sales</p></li>
+                            <!--<li ng-click="changeSelectedModule(1)"><p ng-class="presentSelectedModule == 1?'active':''"><i class="fa fa-check-square"></i> Reservation</p></li>-->
+                            <li ng-click="changeSelectedModule(2)"><p ng-class="presentSelectedModule == 2?'active':''"><i class="fa fa-truck" ></i> Home Delivery</p></li>
+                            <li ng-click="changeSelectedModule(3)"><p ng-class="presentSelectedModule == 3?'active':''"><i class="fa fa-wrench" ></i> Help Desk</p></li>
+                            <li ng-click="changeSelectedModule(4)"><p ng-class="presentSelectedModule == 4?'active':''"><i class="fa fa-file-word-o"></i> Resume</p></li>
+                        </ul>
+                    </div>
+                    <!-- Main content goes here -->
+                    <div class="col-lg-9 col-md-8 col-sm-12 col-xs-12 ">
+                        <div class="outbox-main-content">
+                            <!-- Transaction history goes here -->
+                            <div class="pagination input-group text-right" ng-show="paginationStatus">
+                                <button ng-disabled="!paginationPrevious" ng-click="getPreviousResultPage()" class="btn btn-primary">Previous <i class="fa fa-arrow-circle-left"></i></button>
+                                <button ng-disabled="!paginationNext" ng-click="getNextResultPage()" class="btn btn-primary"><i class="fa fa-arrow-circle-right"></i> Next &nbsp;&nbsp;</button>
+                            </div>
+                            <!-- Individual Strips starts here -->
+                            <div class="individual-transaction" ng-repeat="res in result track by $index">
+                                <transaction-history-item ng-to="res.ToEzeid"
+                                                          ng-initiate-detail="initiateDetail(res.tid)"
+                                                          ng-message="res.Message"
+                                                          ng-quantity="res.statustitle"
+                                                          ng-date="convertTimeToLocal(res.TaskDateTime)"
+                                                          ng-id="res.tid"
+                                                          ng-status="res.statustitle"
+                                                          ng-udate="convertTimeToLocal(res.updatedDate)"> </transaction-history-item>
+                            </div>
+                            <!-- Individual Strips ends here -->
+                            <h4 class="text text-danger text-center" ng-show="!result.length > 0"><i class="fa fa-warning"></i> No Tranaction Found</h4>
                         </div>
-                        <!-- Individual Strips starts here -->
-                        <div class="individual-transaction" ng-repeat="res in result track by $index">
-                            <transaction-history-item ng-to="res.ToEzeid"
-                                                      ng-initiate-detail="initiateDetail(res.tid)"
-                                                      ng-message="res.Message"
-                                                      ng-quantity="res.statustitle"
-                                                      ng-date="convertTimeToLocal(res.TaskDateTime)"
-                                                      ng-id="res.tid"
-                                                      ng-status="res.statustitle"
-                                                      ng-udate="convertTimeToLocal(res.updatedDate)"> </transaction-history-item>
-                        </div>
-                        <!-- Individual Strips ends here -->
-                        <h4 class="text text-danger text-center" ng-show="!result.length > 0"><i class="fa fa-warning"></i> No Tranaction Found</h4>
                     </div>
                 </div>
-
             </div>
         </div>
-    </div>
+    </section>
     <!-- details modal of the transaction history item goes here -->
     <modal mtitle="modalBox.title" mclass="modalBox.class" visible="modalVisible">
         <div class="row">
@@ -100,7 +100,6 @@
         </div>
     </modal>
     <!-- transaction history item modal ends here -->
-
     <!-- Footer goes here -->
     <footer-section></footer-section>
 </section>
