@@ -484,14 +484,13 @@
                          * Do not allow ohter user to see the module if the module is not visible
                          * so that he will not be able to do homeDelivery enquiry
                          */
-                        if(parseInt(visibleModules.split('')[0]) !== 1){
+                        if(parseInt(visibleModules.split('')[2]) !== 1){
                             $window.location.replace('/'+$scope.ezeone);
                         }
 
                         $scope.modalBox.tx.messageType = (parseInt($scope.masterUser.HomeDeliveryItemListType) !== NaN) ? parseInt($scope.masterUser.HomeDeliveryItemListType) : 0;
                         $scope.homeDeliveryItemListType = ($scope.masterUser.HomeDeliveryItemListType &&
                         (!isNaN(parseInt($scope.masterUser.HomeDeliveryItemListType)))) ? parseInt($scope.masterUser.HomeDeliveryItemListType) : 0 ;
-                        //$scope._homeDeliveryModalTitle = ($scope.masterUser.SalesModuleTitle) ? $scope.masterUser.SalesModuleTitle : 'Sales Enquiry';
                         defer.resolve();
                     }
                     else{

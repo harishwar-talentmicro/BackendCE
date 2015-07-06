@@ -80,6 +80,8 @@
                                     <input type="password" name="Password" class="form-control emptyBox" ng-class="SignInForm.Password.$touched && !SignInCtrl.LInfo.Password.length ? 'mandatoryTextBox' : ''"
                                            ng-model="SignInCtrl.LInfo.Password" placeholder="Password" required>
                                 </div>
+                                <div class="clearfix bottom-clearfix"></div>
+                                <span class="pull-left msg_login" ng-model="SignInCtrl.FMessage" style="color:red;">{{SignInCtrl.FMessage}}</span>
                             </li>
                         </ul>
 
@@ -119,7 +121,7 @@
                 <ul style="padding-bottom: 11px!important;margin-bottom:8px!important;" class="pad0px">
                     <li class="dsp_block padT10px">
                         <div class="pull-left wd48p forget_padd">
-                            <input type="text" name="ezeid" class="form-control wd_forget wd_forgetP2 emptyBox" style='text-transform:uppercase' ng-model="SignInCtrl.EzeId" placeholder="Enter Your EZEOne"required/>
+                            <input type="text" name="ezeid" class="form-control wd_forget wd_forgetP2 emptyBox" style='text-transform:uppercase' ng-model="SignInCtrl.EzeId" placeholder="Enter Your EZEOne ID" required/>
                         </div>
                     </li>
                     <div class="clearfix"></div>

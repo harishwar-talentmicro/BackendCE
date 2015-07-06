@@ -407,5 +407,84 @@ Location.prototype.getAllForEzeid = function(req,res,next){
     }
 };
 
+/**
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ */
+Location.prototype.getLoactionList = function(req,res,next){
+    /**
+     * @todo FnGetLocationList
+     */
+    var _this = this;
+    try {
+
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.query.Token;
+
+        if (Token != null) {
+            FnValidateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+
+                        _this.db.query('CALL pGetLocationList(' + _this.db.escape(Token) + ')', function (err, GetResult) {
+                            if (!err) {
+                                if (GetResult != null) {
+                                    if (GetResult[0].length > 0) {
+
+                                        console.log('FnGetLocationList: Location List Send successfully');
+                                        res.send(GetResult[0]);
+                                    }
+                                    else {
+
+                                        console.log('FnGetLocationList:No Location List found');
+                                        res.json(null);
+                                    }
+                                }
+                                else {
+
+                                    console.log('FnGetLocationList:No Location List found');
+                                    res.json(null);
+                                }
+
+                            }
+                            else {
+
+                                console.log('FnGetLocationList: error in getting Resource details' + err);
+                                res.statusCode = 500;
+                                res.json(null);
+                            }
+                        });
+                    }
+                    else {
+                        res.statusCode = 401;
+                        res.json(null);
+                        console.log('FnGetLocationList: Invalid Token');
+                    }
+                } else {
+
+                    res.statusCode = 500;
+                    res.json(null);
+                    console.log('FnGetLocationList: Error in validating token:  ' + err);
+                }
+            });
+        }
+        else {
+            if (Token == null) {
+                console.log('FnGetLocationList: Token is empty');
+            }
+            res.statusCode=400;
+            res.json(null);
+        }
+    }
+    catch (ex) {
+        console.log('FnGetLocationList error:' + ex.description);
+        //throw new Error(ex);
+    }
+};
+
 
 module.exports = Location;

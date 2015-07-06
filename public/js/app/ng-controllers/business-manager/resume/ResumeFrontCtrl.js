@@ -32,6 +32,7 @@
                   GoogleMap) {
 
             $scope.ezeone = $routeParams['ezeone'];
+            $scope.isEnquiryPosted = false;
             /**
              * Returns index of Object from array based on Object Property
              * @param key
@@ -55,43 +56,6 @@
                 return resultIndex;
             };
 
-
-            /**
-             * Creates transaction item from business item from the properties of business item
-             * @param item
-             */
-            var createTxItem = function(businessItem){
-                var txItem = {};
-                var allowProperties = [
-                    'TID',
-                    'Rate',
-                    'ItemName',
-                    'Pic'
-                ];
-                for(var prop in businessItem){
-                    if(allowProperties.indexOf(prop) !== -1){
-                        if(prop == 'TID'){
-                            txItem.ItemID = businessItem['TID'];
-                        }
-                        else if(prop == 'Rate'){
-                            try{
-                                txItem.Rate = parseFloat(businessItem[prop]);
-                            }
-                            catch(ex){
-                                txItem.Rate = 0;
-                            }
-                        }
-                        else{
-                            txItem[prop] = businessItem[prop];
-                        }
-                    }
-                }
-                txItem.TID = 0;
-                txItem.Qty = 1;
-                txItem.Amount = txItem.Qty * txItem.Rate;
-                return txItem;
-            };
-
             $scope.masterUser = null;
             /**
              * List of Items available for searched EZEID
@@ -104,38 +68,12 @@
              * resumeItemListTpe : To be loaded from server but currently no API call is available for this
              */
             $scope.resumeItemListType = 0;
-            $scope.editPermission = true;
-            $scope.editMode = true;
-
-            /**
-             * Add item to the enquiry list
-             * @param item
-             */
-            $scope.addItem = function(item){
-                var txItemIndex  = $scope.modalBox.tx.itemList.indexOfWhere('ItemID',item.TID);
-                if(txItemIndex === -1){
-                    $scope.modalBox.tx.itemList.push(createTxItem(item));
-                }
-                else{
-                    $scope.modalBox.tx.itemList[txItemIndex].Qty += 1;
-                    $scope.modalBox.tx.itemList[txItemIndex].Amount =
-                        ($scope.modalBox.tx.itemList[txItemIndex].Qty * $scope.modalBox.tx.itemList[txItemIndex].Rate);
-                }
-            };
-
-            /**
-             * removes item from enquiry list
-             * @param item
-             */
-            $scope.removeItem = function(txItem){
-                var txItemIndex  = $scope.modalBox.tx.itemList.indexOfWhere('ItemID',txItem.ItemID);
-                ////////////console.log(txItemIndex);
-                $scope.modalBox.tx.itemList.splice(txItemIndex,1);
-            };
+            $scope.editPermission = false;
+            $scope.editMode = false;
 
             /**
              * Modal Box data model
-             * @type {{title: string, class: string, editMode: boolean, locationList: Array, tx: {orderAmount: number, trnNo: string, ezeidTid: number, TID: number, functionType: number, ezeid: string, statusType: number, notes: string, locId: string, country: string, state: string, city: string, area: string, contactInfo: string, deliveryAddress: string, nextAction: number, nextActionDateTime: string, taskDateTime: string, folderRule: number, message: string, messageType: *, latitude: number, longitude: number, duration: number, durationScale: number, itemList: Array}}}
+             * @type {{title: string, class: string, editMode: boolean, locationList: Array, tx: {orderAmount: number, trnNo: string, ezeidTid: number, TID: number, functionType: number, ezeid: string, statusType: number, notes: string, locId: string, country: string, state: string, city: string, area: string, contactInfo: string, DeliveryAddress: string, nextAction: number, nextActionDateTime: string, taskDateTime: string, folderRule: number, message: string, messageType: *, latitude: number, longitude: number, duration: number, durationScale: number, itemList: Array}}}
              */
             $scope.modalBox = {
                 title : 'Transaction Details',
@@ -158,7 +96,7 @@
                     city : '',
                     area : '',
                     contactInfo : '',
-                    deliveryAddress : '',
+                    DeliveryAddress : '',
                     nextAction : 0,
                     nextActionDateTime : '',
                     taskDateTime : '',
@@ -173,122 +111,13 @@
                 }
             };
 
-            $scope.resolveAddress = function(){
-                $scope.$emit('$preLoaderStart');
-                $scope.resolveGeolocationAddress().then(function(){
-                    $scope.$emit('$preLoaderStop');
-                });
-            };
-
-            $scope.resolveGeolocationAddress = function(){
-                var defer = $q.defer();
-                $scope.modalBox.tx.address = '';
-                if($scope.modalBox.tx.locId == ''){
-                    $timeout(function(){
-                        defer.resolve();
-                    },500);
-                    return defer.promise;
-                }
-
-                var googleMap = new GoogleMap();
-
-                var lat = 0;
-                var lng = 0;
-                if($scope.modalBox.tx.locId == 0){
-                    googleMap.getCurrentLocation().then(function(){
-                        lat = googleMap.currentMarkerPosition.latitude;
-                        lng = googleMap.currentMarkerPosition.longitude;
-
-                        $scope.modalBox.tx.latitude = lat;
-                        $scope.modalBox.tx.longitude = lng;
-
-                        googleMap.getReverseGeolocation(lat,lng).then(function(resp){
-
-                            if(resp.data){
-                                var data = googleMap.parseReverseGeolocationData(resp.data);
-                                $scope.modalBox.tx.city = data.city;
-                                $scope.modalBox.tx.state = data.state;
-                                $scope.modalBox.tx.country = data.country;
-                                $scope.modalBox.tx.area = data.area;
-                                //$scope.modalBox.tx.address = data.route + ', '+ data.sublocality3 + ', '+ data.sublocality2;
-                                $scope.modalBox.tx.address = googleMap.createAddressFromGeolocation(data,{
-                                    route : true,
-                                    sublocality3 : true,
-                                    sublocality2 : true,
-                                    area : false,
-                                    city : false,
-                                    state : false,
-                                    country : false,
-                                    postalCode : false
-                                });
-
-                            }
-                            else{
-                                //$scope.$emit('$preLoaderStop');
-                                Notification.error({message : 'Please enable geolocation settings n your browser',delay : MsgDelay});
-                            }
-                            defer.resolve();
-
-                        },function(){
-                            Notification.error({message : 'Please enable geolocation settings n your browser',delay : MsgDelay});
-                            defer.resolve();
-                        });
-
-                    });
-
-                }
-                else{
-                    var locIndex = $scope.modalBox.locationList.indexOfWhere("TID",parseInt($scope.modalBox.tx.locId));
-                    if(locIndex === -1){
-                        $timeout(function(){
-                            defer.resolve();
-                        },500);
-                        return defer.promise;
-                    }
-                    lat = $scope.modalBox.locationList[locIndex].Latitude;
-                    lng = $scope.modalBox.locationList[locIndex].Longitude;
-
-
-                    $scope.modalBox.tx.address = $scope.modalBox.locationList[locIndex].AddressLine1+' ' +
-                        $scope.modalBox.locationList[locIndex].AddressLine2;
-
-                    $scope.modalBox.tx.latitude = lat;
-                    $scope.modalBox.tx.longitude = lng;
-
-                    googleMap.getReverseGeolocation(lat,lng).then(function(resp){
-                        //$scope.$emit('$preLoaderStop');
-                        if(resp.data){
-                            var data = googleMap.parseReverseGeolocationData(resp.data);
-                            $scope.modalBox.tx.city = data.city;
-                            $scope.modalBox.tx.state = data.state;
-                            $scope.modalBox.tx.country = data.country;
-                            $scope.modalBox.tx.area = data.area;
-
-
-                        }
-                        else{
-                            //$scope.$emit('$preLoaderStop');
-                            Notification.error({message : 'Please enable geolocation settings n your browser',delay : MsgDelay});
-                        }
-                        defer.resolve();
-
-                    },function(){
-                        Notification.error({message : 'Please enable geolocation settings n your browser',delay : MsgDelay});
-                        //$scope.$emit('$preLoaderStop');
-                        defer.resolve();
-                    });
-                }
-
-                return defer.promise;
-            };
-
 
             /**
              * Resets modal box data
              */
             $scope.resetModalBox = function(){
                 $scope.modalBox = {
-                    title : 'Transaction Details',
+                    title : 'Submit Resume',
                     class : 'business-manager-modal',
                     locationList : [],
                     editMode : false,
@@ -308,7 +137,7 @@
                         city : '',
                         area : '',
                         contactInfo : '',
-                        deliveryAddress : '',
+                        DeliveryAddress : '',
                         nextAction : 0,
                         nextActionDateTime : '',
                         taskDateTime : '',
@@ -319,17 +148,9 @@
                         longitude : 0,
                         duration : 0,
                         durationScale : 0,
-                        itemList : []
+                        itemList : [],
+                        pinCode : ''
                     }
-                };
-
-                $scope.txerror = {
-                    items : false,
-                    address : false,
-                    area : false,
-                    city : false,
-                    state : false,
-                    country : false
                 };
 
             };
@@ -354,6 +175,12 @@
                     if (resp && resp != 'null' && resp.length > 0) {
                         $scope.loggedInUser = resp[0];
 
+                        if(parseInt($scope.loggedInUser.IDTypeID) !== 1){
+                            Notification.error({ title : 'Permission Denied',
+                                message : 'Business user is not allowed to send resume', delay : MsgDelay});
+                            $location.path('/'+$routeParams['ezeone']);
+                            return;
+                        }
                         //$scope._resumeModalTitle = ($scope.masterUser.resumeModuleTitle) ? $scope.masterUser.resumeModuleTitle : 'resume Enquiry';
                         defer.resolve();
                     }
@@ -369,18 +196,19 @@
                         defer.reject();
                     }
                 });
+                return defer.promise;
             };
 
-            $scope.getLoggedInUserDetails();
+
 
             /**
-             * Loads logged in user details from server
+             * Loads searched user details from server
              * @returns {*}
              */
             $scope.getUserDetails = function(){
                 var defer = $q.defer();
                 $http({
-                    method: 'get',
+                    method: 'GET',
                     url: GURL + 'ewtEZEIDPrimaryDetails',
                     params : {
                         Token : $rootScope._userInfo.Token,
@@ -390,6 +218,11 @@
                         EZEID : $scope.ezeone
                     }
                 }).success(function (resp) {
+
+                    /**
+                     * Check whether resume module visibility is enabled or
+                     * not for the ezeid to which resume enquiry is posted
+                     */
                     if (resp && resp != 'null' && resp.length > 0) {
                         $scope.masterUser = resp[0];
 
@@ -404,14 +237,14 @@
 
                         /**
                          * Do not allow ohter user to see the module if the module is not visible
-                         * so that he will not be able to do sales enquiry
+                         * so that he will not be able to do resume enquiry
                          */
                         if(parseInt(visibleModules.split('')[4]) !== 1){
                             $window.location.replace('/'+$scope.ezeone);
                         }
 
-                        $scope.resumeItemListType = 0
-                        //$scope._resumeModalTitle = ($scope.masterUser.resumeModuleTitle) ? $scope.masterUser.SalesModuleTitle : 'Sales Enquiry';
+                        $scope.modalBox.tx.messageType =  0;
+                        $scope.resumeItemListType = 0;
                         defer.resolve();
                     }
                     else{
@@ -431,82 +264,6 @@
                 return defer.promise;
             };
 
-
-            /**
-             * Get item list for searched EZEID
-             * @returns {*}
-             */
-            $scope.getModuleItemList = function(){
-                var defer = $q.defer();
-                $http({
-                    url : GURL + 'ewtGetItemListForEZEID',
-                    method : 'GET',
-                    params : {
-                        Token: $rootScope._userInfo.Token,
-                        FunctionType: 4,
-                        EZEID: $scope.ezeone
-                    }
-                }).success(function(resp){
-                    if(resp && resp.length > 0 && resp !== 'null'){
-                        $scope.moduleItems = resp;
-                    }
-                    defer.resolve(resp);
-
-                }).error(function(err){
-                    defer.resolve();
-                });
-
-                return defer.promise;
-            };
-
-            /**
-             * Get location list for logged in user
-             */
-            $scope.getLocationList = function(){
-                var defer = $q.defer();
-                $http({
-                    url : GURL + 'ewtGetLocationListForEZEID',
-                    method : 'GET',
-                    params : {
-                        Token : $rootScope._userInfo.Token,
-                        TID :   $scope.loggedInUser.TID
-                    }
-                }).success(function(resp){
-                    if(resp && resp !== 'null'){
-                        $scope.modalBox.locationList = resp.Result;
-                        defer.resolve(resp.Result);
-                    }
-                    else{
-                        defer.reject();
-                    }
-                }).error(function(err){
-                    defer.reject();
-                });
-                return defer.promise;
-            };
-
-
-            var makeAddress = function(){
-                var address = [];
-                if($scope.modalBox.tx.address){
-                    address.push($scope.modalBox.tx.address);
-                }
-                if($scope.modalBox.tx.area){
-                    address.push($scope.modalBox.tx.area);
-                }
-                if($scope.modalBox.tx.city){
-                    address.push($scope.modalBox.tx.city);
-                }
-
-                if($scope.modalBox.tx.state){
-                    address.push($scope.modalBox.tx.state);
-                }
-                if($scope.modalBox.tx.country){
-                    address.push($scope.modalBox.tx.country);
-                }
-                return address.join(', ');
-            };
-
             /**
              * Preparing data for saving transaction
              * @param tx
@@ -517,7 +274,7 @@
                 /**
                  * @todo Implement Validations
                  * 1. Access Rights and permission
-                 * 2. Format of Dates, aciton types and status
+                 * 2. Format of Dates, action types and status
                  * 3. Amount
                  * @type {{TID: number, Token: *, MessageText: string, Status: number, TaskDateTime: string, Notes: string, LocID: *, Country: string, State: string, City: string, Area: string, FunctionType: number, Latitude: number, Longitude: number, EZEID: string, ContactInfo: string, FolderRuleID: number, Duration: number, DurationScales: number, NextAction: number, NextActionDateTime: string, ItemsList: Array, DeliveryAddress: string}}
                  */
@@ -534,7 +291,7 @@
                     State : $scope.modalBox.tx.state,
                     City : $scope.modalBox.tx.city,
                     Area : $scope.modalBox.tx.area,
-                    FunctionType : 4,   // For sales
+                    FunctionType : 4,   // For resume
                     Latitude : $scope.modalBox.tx.latitude,
                     Longitude : $scope.modalBox.tx.longitude,
                     EZEID : $rootScope._userInfo.ezeid,
@@ -545,78 +302,13 @@
                     NextAction : 0,
                     NextActionDateTime : moment().format('DD MMM YYYY hh:mm:ss'),
                     ItemsList: JSON.stringify($scope.modalBox.tx.itemList),
-                    DeliveryAddress : makeAddress(),
-                    company_name : $scope.loggedInUser.CompanyName,
+                    DeliveryAddress : '', // No delivery address for this user
+                    companyName : '',
                     company_id : 0
                 };
                 return preparedTx;
             };
 
-            $scope.txerror = {
-                items : false,
-                address : false,
-                area : false,
-                city : false,
-                state : false,
-                country : false
-            };
-
-            var validateTransaction = function(tx){
-
-                var flag = true;
-                if(!tx.address){
-                    $scope.txerror.address = true;
-                    flag *= false;
-                }
-                if(tx.address && tx.address.trim().length < 1){
-                    $scope.txerror.address = true;
-                    flag *= false;
-                }
-                if(!tx.area){
-                    $scope.txerror.area = true;
-                    flag *= false;
-                }
-                if(tx.area && tx.area.trim().length < 1){
-                    $scope.txerror.area = true;
-                    flag *= false;
-                }
-
-                if(!tx.city){
-                    $scope.txerror.city = true;
-                    flag *= false;
-                }
-
-                if(tx.city && tx.city.trim().length < 1){
-                    $scope.txerror.city = true;
-                    flag *= false;
-                }
-
-                if(!tx.state){
-                    $scope.txerror.state = true;
-                    flag *= false;
-                }
-                if(tx.state && tx.state.trim().length < 1){
-                    $scope.txerror.state = true;
-                    flag *= false;
-                }
-
-                if(!tx.country){
-                    $scope.txerror.country = true;
-                    flag *= false;
-                }
-                if(tx.country && tx.country.trim().length < 1){
-                    $scope.txerror.country = true;
-                    flag *= false;
-                }
-
-                if(tx.itemList.length < 1 && $scope.resumeItemListType > 0 && $scope.moduleItems.length > 0){
-                    $scope.txerror.items = true;
-                    flag *= false;
-                }
-                return flag;
-            };
-
-            $scope.isResumeAttached = true;
             /**
              * Checks that resume is uploaded by the logged in user or not who is actually submitting the
              * resume application
@@ -625,7 +317,7 @@
             var checkResumeAttached = function(){
                 var promise = $q.defer();
                 /**
-                 * @todo Check if resume attached or not for a person who is applying for this job
+                 * Check if resume attached or not for a person who is applying for this job
                  *
                  */
                 $http({
@@ -654,78 +346,18 @@
                 return promise.promise;
             };
 
+            $scope.isResumeAttached = true;
+
             /**
              * Saving transaction in
              * @param editMode
              */
             $scope.saveTransaction = function(){
+                checkResumeAttached().then(function(isResumeAttached){
+                    $scope.isResumeAttached = isResumeAttached;
 
-                checkResumeAttached().then(function(attached){
-                    if(!attached){
-                        $scope.isResumeAttached = false;
-                        Notification.error({ message : 'Please attach resume before submitting the resume application',
-                            delay : MsgDelay});
-                        return;
-                    }
-                    else
-                    if(parseInt($scope.loggedInUser.IDTypeID) !== 1){
-                        Notification.error({ message : 'Individuals are only allowed to submit resumes. Your user type is '
-                            + (parseInt($scope.loggedInUser.IDTypeID) == 2) ? 'Business' : 'Public place',
-                            delay : MsgDelay});
-                        return;
-                    }
-                    else
-                    {
-                        $scope.txerror = {
-                            items : false,
-                            address : false,
-                            area : false,
-                            city : false,
-                            state : false,
-                            country : false
-                        };
-
-                        if(!validateTransaction($scope.modalBox.tx)){
-                            Notification.error({ message : 'Please check all the errors', delay : MsgDelay});
-                            return false;
-                        }
-
+                    if(isResumeAttached){
                         var data = prepareSaveTransaction($scope.modalBox.editMode);
-
-                        if(!data.ContactInfo){
-                            Notification.error({ message : 'Please enter contact information for customer',delay : MsgDelay});
-                            return ;
-                        }
-
-                        if($scope.modalBox.tx.itemList.length <  1 && $scope.resumeItemListType > 0){
-                            Notification.error({ message : 'Please select items for the enquiry',delay : MsgDelay});
-                            return ;
-                        }
-
-
-                        if($scope.modalBox.tx.message.length < 1 && $scope.resumeItemListType > 0){
-                            var itemList = [];
-                            try{
-                                itemList = JSON.parse(data.ItemsList);
-                            }
-                            catch(ex){
-                                //////////console.log(ex);
-                            }
-                            var msg = '';
-                            for(var ct = 0; ct < itemList.length; ct++){
-                                msg += itemList[ct]['ItemName'];
-                                if(itemList[ct]['Qty']){
-                                    msg += ' ('+ itemList[ct]['Qty'] + ')';
-                                }
-                                if(itemList[ct]['Amount']){
-                                    msg += ' : '+ itemList[ct]['Amount'];
-                                }
-                                msg += ', ';
-                            }
-                            msg = msg.substring(0, msg.length - 2);
-                            data.MessageText = msg;
-                        }
-
                         $scope.$emit('$preLoaderStart');
                         $http({
                             url : GURL + 'ewtSaveTranscation',
@@ -734,18 +366,17 @@
                         }).success(function(resp){
                             if(resp && resp.hasOwnProperty('IsSuccessfull')){
                                 if(resp.IsSuccessfull){
-                                    var msg = 'Enquiry is posted successfully';
+                                    var msg = 'Your Resume is submitted successfully';
+                                    $scope.isEnquiryPosted = true;
 
                                     Notification.success({ message : msg, delay : MsgDelay});
-                                    //$scope._toggleSalesModal();
-                                    $scope.resetModalBox();
                                 }
                                 else{
-                                    Notification.error({ message : 'An error occurred while placing enquiry', delay : MsgDelay});
+                                    Notification.error({ message : 'An error occurred while submitting your resume', delay : MsgDelay});
                                 }
                             }
                             else{
-                                Notification.error({ message : 'An error occurred while placing enquiry', delay : MsgDelay});
+                                Notification.error({ message : 'An error occurred while submitting your resume', delay : MsgDelay});
                             }
 
                             $scope.$emit('$preLoaderStop');
@@ -754,31 +385,54 @@
                             Notification.error({ message : err, delay : MsgDelay});
                         });
                     }
+                    else{
+                        Notification.error({ message : 'Please attach resume before submitting it!', delay : MsgDelay});
+                    }
                 });
+            };
 
+            var masterUserLoaded = false;
+            var loggedInUserLoaded = false;
+            //var masterUserItemsLoaded = false;
+            //var loggedInUserLocationsLoaded = true;
+
+            /**
+             * If all the three laoded parameters are true then preloader is stopped
+             */
+            var checkLoaded = function(){
+                //if(masterUserLoaded && loggedInUserLoaded && masterUserItemsLoaded){
+                if(masterUserLoaded && loggedInUserLoaded){
+                    $scope.$emit('$preLoaderStop');
+                    return true;
+                }
+                else{
+                    return false;
+                }
             };
 
 
             var init = function(){
                 $scope.$emit('$preLoaderStart');
                 $scope.getUserDetails().then(function(){
-                    $scope.getModuleItemList().then(function(){
-                        $scope.getLocationList().then(function(){
-                            $scope.$emit('$preLoaderStop');
-                        },function(){
-                            Notification.error({ message : 'An error occured ! Please try again', delay : MsgDelay});
-                            $scope.$emit('$preLoaderStop');
-                        });
-                    },function(){
-                        Notification.error({ message : 'An error occured ! Please try again', delay : MsgDelay});
-                        $scope.$emit('$preLoaderStop');
-                    });
+                    masterUserLoaded = true;
+                    checkLoaded();
                 },function(noInternet){
-                    $scope.$emit('$preLoaderStop');
+                    masterUserLoaded = false;
                     if(!noInternet){
-                        Notification.error({ message : 'An error occured ! Please try again', delay : MsgDelay});
+                        Notification.error({ message : 'An error occurred ! Please try again', delay : MsgDelay});
                     }
+                    checkLoaded();
+                    $location.url('/'+$routeParams.ezeone);
 
+                });
+
+                $scope.getLoggedInUserDetails().then(function(){
+                    loggedInUserLoaded = true;
+                    checkLoaded();
+                },function(){
+                    loggedInUserLoaded = true;
+                    Notification.error({ message : 'An error occurred ! Please try again', delay : MsgDelay});
+                    checkLoaded();
                 });
             };
 
@@ -786,10 +440,12 @@
                 $window.location.replace('/'+$scope.ezeone);
             };
 
+
+
             init();
 
-            //    }
-            ////});
+
+
         }
     ]);
 })();

@@ -13,11 +13,11 @@
  *  });
  */
 (function(){
-    angular.module('ezeidApp').factory('GoogleRecaptcha',['$q','$http',function($q,$http){
+    angular.module('ezeidApp').factory('GoogleRecaptcha',['$q','$http','GURL',function($q,$http,GURL){
         function GoogleRecaptcha(){
             this.siteKey = angular.appSettings['RECAPTCHA_SITE_KEY'];
             this.widgetId = null;
-            this.captchaUrl = GURL + API_CAPTCHA;
+            this.captchaUrl = GURL + 'captcha';
         };
 
         GoogleRecaptcha.prototype.render = function(containerElemId){
@@ -73,13 +73,7 @@
             }
         };
 
-        if(!grecaptcha){
-            console.error('Couldn\'t find google recaptcha library');
-            return null;
-        }
-        else{
-            return GoogleRecaptcha;
-        }
+        return GoogleRecaptcha;
 
     }]);
 })();
