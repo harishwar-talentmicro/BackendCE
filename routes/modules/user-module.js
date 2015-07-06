@@ -706,6 +706,86 @@ User.prototype.logout = function(req,res,next){
  * @param res
  * @param next
  */
+User.prototype.getLoginDetails = function(req,res,next){
+    /**
+     * @todo FnGetLoginDetails
+     */
+    var _this = this;
+
+    try {
+
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.query.Token;
+
+        if (Token != null) {
+            FnValidateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+
+                        _this.db.query('CALL pLoginDetails(' + _this.db.escape(Token) + ')', function (err, GetResult) {
+                            if (!err) {
+                                if (GetResult != null) {
+                                    if (GetResult[0].length > 0) {
+
+                                        console.log('FnGetLoginDetails: Login details Send successfully');
+                                        res.send(GetResult[0]);
+                                    }
+                                    else {
+
+                                        console.log('FnGetLoginDetails:No Login details found');
+                                        res.json(null);
+                                    }
+                                }
+                                else {
+
+                                    console.log('FnGetLoginDetails:No Login details found');
+                                    res.json(null);
+                                }
+
+                            }
+                            else {
+
+                                console.log('FnGetLoginDetails: error in getting Login details' + err);
+                                res.statusCode = 500;
+                                res.json(null);
+                            }
+                        });
+                    }
+                    else {
+                        res.statusCode = 401;
+                        res.json(null);
+                        console.log('FnGetLoginDetails: Invalid Token');
+                    }
+                } else {
+
+                    res.statusCode = 500;
+                    res.json(null);
+                    console.log('FnGetLoginDetails: Error in validating token:  ' + err);
+                }
+            });
+        }
+        else {
+            if (Token == null) {
+                console.log('FnGetLoginDetails: Token is empty');
+            }
+            res.statusCode=400;
+            res.json(null);
+        }
+    }
+    catch (ex) {
+        console.log('FnGetLoginDetails error:' + ex.description);
+        //throw new Error(ex);
+    }
+};
+
+/**
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ */
 User.prototype.getCountry = function(req,res,next){
 
     /**
@@ -2545,5 +2625,196 @@ catch (ex) {
 
 }
 };
+
+var fs = require("fs");
+/**
+ * Method : POST
+ * @param req
+ * @param res
+ * @param next
+ */
+User.prototype.uploadDoc = function(req,res,next) {
+    /**
+     * @todo FnUploadDocument
+     */
+    var _this = this;
+try {
+
+    var deleteTempFile = function(){
+        fs.unlink('../bin/'+req.files.file.path);
+    };
+
+    var RtnMessage = {
+        IsSuccessfull: false
+    };
+    var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
+
+    // console.log(req.files);
+    // console.log(req.body);
+    var Token = req.body.TokenNo;
+    var CntType = req.files.file.mimetype;
+    var RefFileName = req.files.file.path;
+    //var RefFileName = req.body.Filename;
+    var tRefType = req.body.RefType;
+    //console.log(req.body);
+
+    FnValidateToken(Token, function (err, Result) {
+        if (!err) {
+            if (Result != null) {
+                if (req && req.files) {
+                    if (CntType != null && RefFileName != null && tRefType != null && Token != null) {
+
+                        var fileName = '';
+                        if (RefFileName != null) {
+                            fileName = RefFileName.split('.').pop();
+                        }
+                        //console.log(Token);
+                        fs.readFile(RefFileName, function (err, original_data) {
+                            var query = _this.db.escape(Token) + ',' + _this.db.escape( new Buffer(original_data).toString('base64')) + ',' + _this.db.escape(fileName) + ',' + _this.db.escape(tRefType) + ',' + _this.db.escape(CntType);
+                            //console.log(query);
+                            _this.db.query('CALL pSaveDocsFile(' + query + ')', function (err, InsertResult) {
+                                if (!err) {
+                                    //    console.log(InsertResult);
+                                    if (InsertResult.affectedRows > 0) {
+                                        RtnMessage.IsSuccessfull = true;
+                                        console.log('FnUploadDocument: Document Saved successfully');
+                                        res.send(RtnMessage);
+                                        deleteTempFile();
+                                    }
+                                    else {
+                                        console.log('FnUploadDocument: Document not inserted');
+                                        res.send(RtnMessage);
+                                        deleteTempFile();
+                                    }
+                                }
+                                else {
+                                    res.statusCode = 500;
+                                    res.send(RtnMessage);
+                                    console.log('FnUploadDocument: Error in saving documents:' + err);
+                                    deleteTempFile();
+                                }
+                            });
+                        });
+                    }
+                    else {
+                        res.send(RtnMessage);
+                        console.log('FnUploadDocument: Mandatory field are available');
+                        deleteTempFile();
+                    }
+                }
+                else {
+                    res.send(RtnMessage);
+                    console.log('FnUploadDocument: Mandatory field are available');
+                    deleteTempFile();
+                }
+            }
+            else {
+                res.statusCode = 401;
+                res.send(RtnMessage);
+                console.log('FnUploadDocument: Invalid Token');
+                deleteTempFile();
+            }
+        }
+        else {
+            res.statusCode = 500;
+            res.send(RtnMessage);
+            console.log('FnUploadDocument: Error in validating token: ' + err);
+            deleteTempFile();
+        }
+    });
+}
+catch (ex) {
+    console.log('FnGetDocument error:' + ex.description);
+    //throw new Error(ex);
+    deleteTempFile();
+}
+};
+
+var FnGetRedirectLink = function(ezeid,urlSeqNumber,redirectCallback){
+    var Insertquery = _this.db.escape(ezeid) + ',' + _this.db.escape(urlSeqNumber);
+    _this.db.query('CALL pRedirectWebLink(' + Insertquery + ')', function (err, results) {
+        if(err){
+            console.log(err);
+            redirectCallback(null);
+        }
+        else{
+            if(results.length > 0){
+                if(results[0].length > 0){
+                    redirectCallback(results[0][0].URL);
+                }
+                else{
+                    redirectCallback(null);
+                }
+            }
+            else{
+                redirectCallback(null);
+            }
+        }
+    });
+};
+
+/**
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ */
+User.prototype.webLinkRedirect = function(req,res,next) {
+    /**
+     * @todo FnWebLinkRedirect
+     */
+    var _this = this;
+if(req.params.id){
+    var link = req.params.id;
+    var arr = link.split('.');
+    if(arr.length > 1){
+        var lastItem = arr[arr.length - 1];
+
+        arr.splice(arr.length - 1,1);
+
+        var ezeid = arr.join('.');
+
+        var urlBreaker = lastItem.split('');
+        if(urlBreaker.length > 1 && urlBreaker.length < 4){
+            if(urlBreaker[0] === 'U'){
+                urlBreaker.splice(0,1);
+                var urlSeqNumber = parseInt(urlBreaker.join(''));
+                if(!isNaN(urlSeqNumber)){
+                    if(urlSeqNumber > 0 && urlSeqNumber < 100){
+                        FnGetRedirectLink(ezeid,urlSeqNumber,function(url){
+
+                            if(url){
+                                res.redirect(url);
+                            }
+                            else{
+
+                                next();
+                            }
+                        });
+                    }
+                    else{
+                        next();
+                    }
+                }
+                else{
+                    next();
+                }
+            }
+            else{
+                next();
+            }
+        }
+        else{
+            next();
+        }
+    }
+    else{
+        next();
+    }
+}
+else{
+    next();
+}
+}
 
 module.exports = User;

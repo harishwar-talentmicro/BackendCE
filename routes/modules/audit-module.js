@@ -1075,4 +1075,182 @@ Audit.prototype.sendBulkMailer = function(req,res,next){
     }
 };
 
+/**
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ */
+Audit.prototype.getMessages = function(req,res,next){
+    /**
+     * @todo FnGetMessages
+     */
+    var _this = this;
+try {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    var Token = req.query.TokenNo;
+    var Page = parseInt(req.query.Page);
+    var Status = req.query.Status;
+    var MessageType = req.query.MessageType;
+    //console.log(req.query);
+    if (Token != null && Page.toString() != 'NaN' && Page.toString() != '0') {
+        FnValidateToken(Token, function (err, Result) {
+            if (!err) {
+                if (Result != null) {
+                    var ToPage = 25 * Page;
+                    var FromPage = ToPage - 24;
+
+                    if (FromPage <= 1) {
+                        FromPage = 0;
+                    }
+                    //  console.log('From Page: ' + FromPage);
+                    //console.log('To Page: ' + ToPage);
+                    var getMessageQuery = 'CALL pGetMessages(' + _this.db.escape(Token) + ',' + _this.db.escape(FromPage) + ',' + _this.db.escape(ToPage) + ',' + _this.db.escape(Status) + ',' + _this.db.escape(MessageType) + ')';
+                    _this.db.query(getMessageQuery, function (err, MessagesResult) {
+                        if (!err) {
+                            //  console.log(MessagesResult);
+                            if (MessagesResult != null) {
+                                if (MessagesResult[0].length > 0) {
+                                    res.send(MessagesResult[0]);
+                                    console.log('FnGetMessages: Messages sent successfully');
+                                }
+                                else {
+                                    console.log('FnGetMessages: No Messages available');
+                                    res.json(null);
+                                }
+
+                            }
+                            else {
+                                console.log('FnGetMessages: No Messages available');
+                                res.json(null);
+                            }
+                        }
+                        else {
+                            res.statusCode = 500;
+                            console.log('FnGetMessages: Error in sending Messages: ' + err);
+                            res.json(null);
+                        }
+                    });
+                }
+                else {
+                    console.log('FnGetMessages: Invalid Token');
+                    res.statusCode = 401;
+                    res.json(null);
+                }
+            }
+            else {
+                res.statusCode = 500;
+                console.log('FnGetMessages: Token error: ' + err);
+                res.json(null);
+            }
+        });
+    }
+    else {
+        if (Token == null) {
+            console.log('FnGetMessages: Token is empty');
+        } else if (Page.toString() == 'NaN') {
+            console.log('FnGetMessages: Page is empty');
+        }
+        else if (Page.toString() == '0') {
+            console.log('FnGetMessages: Sending page 0');
+        }
+        res.statusCode = 400;
+        res.json(null);
+    }
+}
+catch (ex) {
+    console.log('FnGetMessages error:' + ex.description);
+
+}
+};
+
+/**
+ * Method : POST
+ * @param req
+ * @param res
+ * @param next
+ */
+Audit.prototype.updateMessageStatus = function(req,res,next){
+    /**
+     * @todo FnUpdateMessageStatus
+     */
+    var _this = this;
+    try {
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        var token = req.body.TokenNo;
+        var Status = parseInt(req.body.Status);
+        var TID = parseInt(req.body.TID);
+        var Notes = req.body.Notes;
+        var RtnMessage = {
+            IsUpdated: false
+        };
+        var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
+
+        if (Notes == null)
+            Notes = '';
+        if (token != null && token != '' && Status.toString() != 'NaN' && TID.toString() != 'NaN') {
+            FnValidateToken(token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+                        //var query = 'update tmessages set Status=' + _this.db.escape(Status) + ' where TID=' + _this.db.escape(TID);
+                        var query = 'update ttrans set Status=' + _this.db.escape(Status) + ', Notes=' + _this.db.escape(Notes) + ' where TID=' + _this.db.escape(TID);
+                        // console.log('Update query : ' + query);
+                        _this.db.query(query, function (err, UpdateResult) {
+                            if (!err) {
+                                // console.log('FnUpdateMessageStatus: Update result' + UpdateResult);
+                                if (UpdateResult.affectedRows > 0) {
+                                    RtnMessage.IsUpdated = true;
+                                    res.send(RtnMessage);
+                                    console.log('FnUpdateMessageStatus: Message status update successfully');
+                                }
+                                else {
+                                    console.log('FnUpdateMessageStatus: Update item is not avaiable');
+                                    res.send(RtnMessage);
+                                }
+                            }
+                            else {
+                                console.log('FnUpdateMessageStatus: ' + err);
+                                res.statusCode = 500;
+                                res.send(RtnMessage);
+                            }
+                        });
+                    }
+                    else {
+                        console.log('FnUpdateMessageStatus: Invalid token');
+                        res.statusCode = 401;
+                        res.send(RtnMessage);
+                    }
+                }
+                else {
+                    res.statusCode = 500;
+                    console.log('FnUpdateMessageStatus: : ' + err);
+                    res.send(RtnMessage);
+
+                }
+            });
+
+        }
+        else {
+            if (token == null || token == '') {
+                console.log('FnUpdateMessageStatus: token is empty');
+            }
+            else if (Status.toString() == 'NaN') {
+                console.log('FnUpdateMessageStatus: Status is empty');
+            }
+            else if (TID.toString() != 'NaN') {
+                console.log('FnUpdateMessageStatus: TID is empty');
+            }
+            res.statusCode = 400;
+            res.send(RtnMessage);
+
+        }
+    }
+    catch (ex) {
+        console.log('FnUpdateMessageStatus:  error:' + ex.description);
+
+    }
+};
+
 module.exports = Audit;

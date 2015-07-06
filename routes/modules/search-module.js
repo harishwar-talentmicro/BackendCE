@@ -927,4 +927,175 @@ catch (ex) {
 }
 };
 
+/**
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ */
+Search.prototype.getSearchDoc = function(req,res,next){
+    /**
+     * @todo FnGetSearchDocuments
+     */
+    var _this = this;
+
+    try {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    var find = req.query.Keywords;
+    var token = req.query.Token;
+    //console.log(token);
+    if (token != null && find != null && token != '' && find != '') {
+        FnValidateToken(token, function (err, Result) {
+            if (!err) {
+                if (Result != null) {
+
+                    var EZEID, Pin = null;
+                    var DocType = '';
+                    var FindArray = find.split('.');
+                    var type ='';
+
+                    //console.log('findarray: ' + FindArray.length);
+                    if (FindArray.length > 0) {
+                        EZEID = FindArray[0];
+                        //checking the fisrt condition
+                        if (FindArray.length > 1) {
+                            if (FindArray[1] != '') {
+                                if (FindArray[1].toUpperCase() == 'ID') {
+                                    //console.log('ID');
+                                    DocType = 'ID';
+                                    type = 3;
+                                }
+                                else if (FindArray[1].toUpperCase() == 'DL') {
+                                    //console.log('DL');
+                                    DocType = 'DL';
+                                    type = 7;
+                                }
+                                else if (FindArray[1].toUpperCase() == 'PP') {
+                                    //console.log('PP');
+                                    DocType = 'PP';
+                                    type = 4;
+                                }
+                                else if (FindArray[1].toUpperCase() == 'BR') {
+                                    //console.log('BR');
+                                    DocType = 'BR';
+                                    type = 1;
+                                }
+                                else if (FindArray[1].toUpperCase() == 'CV') {
+                                    //console.log('CV');
+                                    DocType = 'CV';
+                                    type = 2;
+                                }
+                                else if (FindArray[1].toUpperCase() == 'D1') {
+                                    //console.log('D1');
+                                    DocType = 'D1';
+                                    type = 5;
+                                }
+                                else if (FindArray[1].toUpperCase() == 'D2') {
+                                    //console.log('D2');
+                                    DocType = 'D2';
+                                    type = 6;
+                                }
+                                else {
+                                    Pin = FindArray[1];
+                                }
+                                //checking the second condition
+                                if (typeof FindArray[2] != 'undefined') {
+                                    Pin = FindArray[2];
+                                }
+                                //checking the final condition
+                            }
+                        }
+                    }
+                    var SearchQuery = _this.db.escape(EZEID) + ',' + _this.db.escape(Pin) + ',' + _this.db.escape(DocType);
+                    console.log('CALL  PGetSearchDocuments(' + SearchQuery + ')');
+                    _this.db.query('CALL  PGetSearchDocuments(' + SearchQuery + ')', function (err, SearchResult) {
+                        // _this.db.query(searchQuery, function (err, SearchResult) {
+                        if (!err) {
+                            if (SearchResult[0] != null) {
+                                if (SearchResult[0].length > 0) {
+                                    SearchResult = SearchResult[0];
+                                    //console.log(DocumentResult)
+                                    var docs = SearchResult[0];
+                                    res.setHeader('Content-Type', docs.ContentType);
+                                    res.setHeader('Content-Disposition', 'attachment; filename=' + docs.Filename);
+                                    //res.setHeader('Cache-Control', 'public, max-age=86400000');
+                                    res.setHeader('Cache-Control', 'public, max-age=0');
+                                    res.writeHead('200', { 'Content-Type': docs.ContentType });
+                                    res.end(docs.Docs, 'base64');
+                                    console.log('FnGetSearchDocuments: tmaster: Search result sent successfully');
+
+
+                                    var getQuery = 'select TID from tmaster where Token='+_this.db.escape(token);
+                                    _this.db.query(getQuery, function (err, getResult) {
+                                        if(!err){
+                                            var tid = getResult[0].TID;
+                                            console.log(tid);
+                                        }
+                                        var query = _this.db.escape(tid) + ',' + _this.db.escape(EZEID) + ',' + _this.db.escape(req.ip) + ',' + _this.db.escape(type);
+                                        console.log('CALL pCreateAccessHistory(' + query + ')');
+
+                                        _this.db.query('CALL pCreateAccessHistory(' + query + ')', function (err){
+                                            if(!err){
+                                                console.log('FnSearchByKeywords:Access history is created');
+                                            }
+                                            else {
+                                                console.log('FnSearchByKeywords: tmaster: ' + err);
+                                            }
+                                        });
+                                    });
+                                }
+                                else {
+                                    res.json(null);
+
+
+                                    console.log('FnGetSearchDocuments: tmaster: no search found');
+                                }
+                            }
+                            else {
+                                res.json(null);
+                                console.log('FnGetSearchDocuments: tmaster: no search found');
+                            }
+
+                        }
+                        else {
+                            res.statusCode = 500;
+                            res.json(null);
+                            console.log('FnGetSearchDocuments: tmaster: ' + err);
+                        }
+                    });
+
+
+                }
+                else {
+                    console.log('FnGetSearchDocuments: Invalid token');
+                    res.statusCode = 401;
+                    res.json(null);
+                }
+            }
+            else {
+                console.log('FnGetSearchDocuments: ' + err);
+                res.statusCode = 500;
+                res.json(null);
+            }
+        });
+    }
+    else {
+        if (token == null) {
+            console.log('FnGetSearchDocuments: token is empty');
+        }
+        else if (find == null) {
+            console.log('FnGetSearchDocuments: find is empty');
+        }
+        res.statusCode = 400;
+        res.json(null);
+
+    }
+}
+catch (ex) {
+    console.log('FnGetSearchDocuments error:' + ex.description);
+
+}
+};
+
 module.exports = Search;
