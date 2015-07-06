@@ -235,10 +235,10 @@
 }
 
 /*@media screen and (max-width: 844px) {*/
-    /*.hpw .search-result-page-padding*/
-    /*{*/
-        /*padding-top: 355px;*/
-    /*}*/
+/*.hpw .search-result-page-padding*/
+/*{*/
+/*padding-top: 355px;*/
+/*}*/
 /*}*/
 
 @media screen and (max-width: 874px) {
@@ -2301,4 +2301,93 @@ sup.tm{
 .hpw .page-content
 {
     min-height: 600px;
+}
+
+.hpw .panel-outbox-content
+{
+    background-color: rgb(241, 242, 247);
+}
+
+.hpw .inbox-head
+{
+    padding: 20px;
+    background: #41cac0;
+    color: #fff;
+    border-radius: 0 4px 0 0;
+    -webkit-border-radius: 0 4px 0 0;
+    min-height: 80px;
+    font-family: 'Open Sans Light', sans-serif;
+}
+
+.hpw .inbox-head-left
+{
+    padding: 12px;
+    background: #00a8b3;
+    color: #fff;
+    border-radius: 4px 0 0 0;
+    -webkit-border-radius: 4px 0 0 0;
+    min-height: 80px;
+    font-family: 'Open Sans Light', sans-serif;
+}
+
+.hpw .bg-inbox-profile
+{
+    background: #00a8b3;
+}
+
+.hpw ul.inbox-nav {
+    display: inline-block;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.hpw ul.inbox-nav li {
+    display: inline-block;
+    line-height: 45px;
+    width: 100%;
+}
+
+.hpw ul li {
+    list-style: none;
+}
+
+.hpw .index-menu
+{
+    background-color: aliceblue;
+}
+
+.hpw .index-menu-item > a
+{
+    padding: 20px;
+    text-decoration: none;
+    color: #7E7E7E;
+}
+
+.hpw .index-menu ul li .active {
+    background-color: rgb(182, 211, 255);
+}
+.hpw .index-menu ul > li:hover
+{
+    background-color: #E7E7E7;
+}
+
+.hpw .index-menu .group
+{
+    background-color: #D4FFB6;
+}
+
+.hpw .message-content-tbl
+{
+    padding: 10px;
+}
+
+.hpw .message-table
+{
+    padding-left: 10px;
+}
+
+.hpw .index-title
+{
+    border-bottom: 1px solid rgb(203, 203, 203);
 }
