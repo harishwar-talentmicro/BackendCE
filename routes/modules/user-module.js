@@ -15,6 +15,7 @@
 "use strict";
 
 var path ='D:\\EZEIDBanner\\';
+var EZEIDEmail = 'noreply@ezeone.com';
 
 function alterEzeoneId(ezeoneId){
     var alteredEzeoneId = '';
@@ -29,35 +30,13 @@ function alterEzeoneId(ezeoneId){
     return alteredEzeoneId;
 }
 
-function User(db){
+function User(db,stdLib){
     this.db = db;
+    if(stdLib){
+        this.stdLib = stdLib;
+    }
 };
 
-function FnGenerateToken() {
-    try {
-        var text = "";
-        var possible = "1234567890abcdefghjklmnopqrstuvwxyz!@#$%";
-
-        for (var i = 0; i < 10; i++) {
-
-            text += possible.charAt(Math.floor(Math.random() * possible.length));
-        }
-
-        var crypto = require('crypto'),
-            algorithm = 'aes-256-ctr',
-            key = 'hire@123';
-
-        var cipher = crypto.createCipher(algorithm, key)
-        var crypted = cipher.update(text, 'utf8', 'hex')
-        crypted += cipher.final('hex');
-        return crypted;
-    }
-    catch (ex) {
-        console.log('OTP generate error:' + ex.description);
-
-        return 'error'
-    }
-}
 
 /**
  * Method : POST
@@ -190,7 +169,7 @@ User.prototype.register = function(req,res,next){
                 }
 
                 if (Operation == 'I') {
-                    TokenNo = FnGenerateToken();
+                    TokenNo = _this.stdLib.generateToken();
                 }
                 var EncryptPWD = '';
                 if (Password != null) {
@@ -376,7 +355,7 @@ User.prototype.register = function(req,res,next){
                 }
 
                 if (Operation == 'I') {
-                    TokenNo = FnGenerateToken();
+                    TokenNo = _this.stdLib.generateToken();
                 }
                 var EncryptPWD = '';
                 if (Password != null) {
@@ -607,7 +586,7 @@ User.prototype.login = function(req,res,next){
                     if(loginResult) {
                         if (loginResult[0].length > 0) {
                             // console.log('loginResult: ' + loginResult);
-                            var Encrypt = FnGenerateToken();
+                            var Encrypt = _this.stdLib.generateToken();
                             //   console.log('Encrypt: ' + Encrypt);
                             // console.log('TID ' + loginResult[0].TID);
                             var loginDetails = loginResult[0];

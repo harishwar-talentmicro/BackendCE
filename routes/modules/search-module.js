@@ -10,6 +10,7 @@
 "use strict";
 
 var path ='D:\\EZEIDBanner\\';
+var EZEIDEmail = 'noreply@ezeone.com';
 
 function alterEzeoneId(ezeoneId){
     var alteredEzeoneId = '';
@@ -24,8 +25,11 @@ function alterEzeoneId(ezeoneId){
     return alteredEzeoneId;
 }
 
-function Search(db){
+function Search(db,stdLib){
     this.db = db;
+    if(stdLib){
+        this.stdLib = stdLib;
+    }
 };
 
 

@@ -491,7 +491,6 @@ var res = angular.module('ezeidApp').
                 for (var i = 0; i < formatedData['reserved'].length; i++) {
                     $scope.reservedTime.push(formatedData['reserved'][i]);
                 }
-                console.log($scope.reservedTime);
                 /* reload calendar */
             };
 
@@ -606,6 +605,8 @@ var res = angular.module('ezeidApp').
             $scope.colorWorkingHoursFlag = false;
             $scope.colorWorkingHours = function (reloadCalanderFlag,reservationMooduleStarterFlag) {
                 var workingHrs = $scope.workingHrs;
+
+                /* Code block to prevent calling of this function repeatedly */
                 if(reloadCalanderFlag == prevReloadCalanderFlag && reservationMooduleStarterFlag == prevReservationMooduleStarterFlag
                     && workingHrs.length == prevWorkingHrs && $('.available').length == prevAvailable)
                 {
@@ -656,14 +657,14 @@ var res = angular.module('ezeidApp').
                     var addCss = 'available';
                     $scope.colorBlocks(startRange, endRange, availabilityColor, addCss);
                 }
-
+                //console.log($('.block-78').attr('style'));
                 /* call areadyReservedslot in case it have over written or clear the already reserved hours */
                 $scope.alreadyReserveSlot(false,false,true);
             };
 
             function cleanCalendarData()
             {
-                $('.available').each(function(){
+                $('.blk-content').each(function(){
                     if($(this).hasClass('reserved'))
                     {
                         $(this).removeClass('reserved')
@@ -962,6 +963,7 @@ var res = angular.module('ezeidApp').
             $scope.startTime = '00:00';
             $scope.duration = 0;
             $scope.endTime = '00:00';
+            $scope.notes = '';
             /**
              * On Click event handler for whole of the reservation module
              */
@@ -986,10 +988,8 @@ var res = angular.module('ezeidApp').
                     $scope.modal.isUpdate = false;
                 }
 
-                /*  */
-
                 /* show error if the working hour is not in working hour */
-                if(isReserved || isAvailable)
+                if(isReserved || isAvailable || parseInt($scope.accessRight) == 2)
                 {
                     /* check if the resource is available for this resource */
                     if(!$scope.currentServiceArray.length > 0)
@@ -1095,7 +1095,7 @@ var res = angular.module('ezeidApp').
                         $scope.startTime = selectedTimeUtcToLocal(resp.data[0].Starttime).substr(0,5);
                         $scope.duration = resp.data[0].duration;
                         $scope.endTime = convertBlockIdToTime((convertHoursToMinutes($scope.startTime) + $scope.duration)/5);
-
+                        $scope.notes = resp.data[0].Notes
                         /* set this reservation services */
                         $scope.currentServices = resp.data[0].serviceids;
                         resetServiceChecks();
@@ -1204,7 +1204,6 @@ var res = angular.module('ezeidApp').
                         //removeWasteColoredCells();
                     }
                 );
-
             }
 
             /**
@@ -1248,7 +1247,7 @@ var res = angular.module('ezeidApp').
             $scope.saveReservation = function()
             {
                 /* check if the services is selected */
-                if(!checkServiceSelected())
+                if(!checkServiceSelected() && $scope.accessRight != 2)
                 {
                     Notification.error({ message: "Please select atleast one service to proceed", delay: MsgDelay });
                     return ;
@@ -1276,10 +1275,11 @@ var res = angular.module('ezeidApp').
                         Token:$rootScope._userInfo.Token,
                         TID:tid,
                         contactinfo: $('#userMobile').val(),
+                        notes:$('#userNote').val(),
                         toEzeid:$scope.searchedEzeid,
                         resourceid:$scope.activeResourceId,
                         res_datetime:convertTimeToUTC(makeDateTime,'DD-MMM-YYYY HH:mm'),
-                        duration:$scope.calculateTotalDuration(),
+                        duration:$scope.calculateTotalDuration(true),
                         status:0,
                         serviceid:getSelectedService()//$('#service').val()+','
                     }
@@ -1319,8 +1319,6 @@ var res = angular.module('ezeidApp').
             {
                 /* clean the old div [clear title,put the available color] */
                 $('.block-'+blockId).attr('title','').css('background-color',availabilityColor);
-                /* color working hours */
-                //$scope.colorWorkingHours();
                 /* relaod calendar */
                 $scope.reloadCalander();
             }
@@ -1447,7 +1445,10 @@ var res = angular.module('ezeidApp').
              */
             $scope.removeWasteColoredCells = function()
             {
-                $('.blk-content:not(.building-block .available)').removeAttr('style');
+                //$('.blk-content:not(.building-block .available)').removeAttr('style');
+                $('.blk-content').filter(function(index){
+                    return !$(this).hasClass('reserved') && !$(this).hasClass('available')
+                }).removeAttr('style');
             }
 
             /**
@@ -1554,9 +1555,9 @@ var res = angular.module('ezeidApp').
                     $scope.accessRight = 1;//Super User
                     $scope.isResource = true;
                 }
-                else if(isSubuser)//@todo
+                else if(isSubuser)
                 {
-                    $scope.accessRight = 2;
+                    $scope.accessRight = 2;//He is the INTERNAL USER or who is OPERATOR of this resource
                     $scope.isResource = true;
                 }
                 else
@@ -1601,7 +1602,13 @@ var res = angular.module('ezeidApp').
                 $('input[name=service-chk]:checked').each(function() {
                     services.push($(this).val());
                 });
-                return services.join(",")+",";
+
+                if(services.length > 0)
+                {
+                    return services.join(",")+",";
+                }
+
+                return "";
             }
 
             /**
@@ -1617,9 +1624,16 @@ var res = angular.module('ezeidApp').
             /**
              * Calculate the total duration of all the services
              */
-            $scope.calculateTotalDuration = function()
+            $scope.calculateTotalDuration = function(isForSaving)
             {
                 var duration = 0;
+
+                if($scope.accessRight == 2 && isForSaving)
+                {
+                    return $('#duration').val();
+                }
+
+                /* for other users */
                 $('input[name=service-chk]:checked').each(function() {
                     duration += $(this).data("duration");
                 });
@@ -1646,6 +1660,12 @@ var res = angular.module('ezeidApp').
             $scope.setServices = function()
             {
                 var serviceIds = $scope.currentServices;
+                console.log(serviceIds);
+                if(typeof(serviceIds) === 'undefined' || serviceIds || serviceIds === null)
+                {
+                    return;
+                }
+
                 var serviceArr = serviceIds.split(',');
                 //resetServiceChecks();
                 if(!serviceArr || !serviceArr.length > 0)
@@ -1669,7 +1689,6 @@ var res = angular.module('ezeidApp').
                 {
                     $scope.selfreservation = [];
                     $scope.isSelfReservationExists = false;
-                    console.log("User don't have any self reservation");
                 }
                 /* save all the self reservations in an array */
                 var selfReservationSlot = [];

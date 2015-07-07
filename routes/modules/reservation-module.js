@@ -7,6 +7,7 @@
  */
 "use strict";
 var path ='D:\\EZEIDBanner\\';
+var EZEIDEmail = 'noreply@ezeone.com';
 
 function alterEzeoneId(ezeoneId){
     var alteredEzeoneId = '';
@@ -21,8 +22,11 @@ function alterEzeoneId(ezeoneId){
     return alteredEzeoneId;
 }
 
-function Reservation(db){
+function Reservation(db,stdLib){
     this.db = db;
+    if(stdLib){
+        this.stdLib = stdLib;
+    }
 };
 
 

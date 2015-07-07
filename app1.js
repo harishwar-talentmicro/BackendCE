@@ -235,14 +235,6 @@ app.get('/:page/:subpage',function(req,res){
     res.sendFile(__dirname + '/public/html/index.html');
 });
 
-/**
- * When user is not logged in then also let him navigate to searchInformation page of front end
- */
-app.get('/:ezeid',LocationManager.FnSearchBusListing);
-/**
- * Used for WebLinks
- * eg. http://www.ezeid.com/TALENTMICRO.U12
- */
 app.get('/:id',LocationManager.FnWebLinkRedirect);
 
 app.get('/:page',function(req,res){
@@ -259,13 +251,13 @@ app.get('/',function(req,res){
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
     console.log('404 : Page not found');
-    res.status = 404;
+
     if(req.type == 'json')
     {
-            res.type('json').send('Invalid Service call');   
+            res.type('json').status(404).json({message : 'Invalid Service call', status : false});
     }
     else{
-        res.send('');
+        res.status(404).send('');
     }
 });
 
