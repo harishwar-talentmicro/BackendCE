@@ -23,8 +23,11 @@ function alterEzeoneId(ezeoneId){
     return alteredEzeoneId;
 }
 
-function Image(db){
+function Image(db,stdLib){
     this.db = db;
+    if(stdLib){
+        this.stdLib = stdLib;
+    }
 };
 
 /**

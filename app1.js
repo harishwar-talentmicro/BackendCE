@@ -251,13 +251,13 @@ app.get('/',function(req,res){
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
     console.log('404 : Page not found');
-    res.status = 404;
+
     if(req.type == 'json')
     {
-            res.type('json').send('Invalid Service call');   
+            res.type('json').status(404).json({message : 'Invalid Service call', status : false});
     }
     else{
-        res.send('');
+        res.status(404).send('');
     }
 });
 

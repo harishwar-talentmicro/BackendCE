@@ -7,8 +7,11 @@
  */
 "use strict";
 
-function VES(db){
+function VES(db,stdLib){
     this.db = db;
+    if(stdLib){
+        this.stdLib = stdLib;
+    }
 };
 
 function FnEncryptPassword(Password) {
@@ -148,7 +151,7 @@ VES.prototype.saveContactVES = function(req,res,next){
         };
 
         if (Token != null && EZEID != null && ContactID != null) {
-            FnValidateToken(Token, function (err, Result) {
+            _this.stdLib.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
                         var query = db.escape(Token) + ',' + db.escape(EZEID) + ',' + db.escape(Pic) + ',' + db.escape(FirstName) + ',' +db.escape(LastName)
@@ -232,7 +235,7 @@ VES.prototype.getAllContactsVES = function(req,res,next){
         var DateNew2 = new Date(Date2);
 
         if (Token != null && DateNew1 !=null && DateNew2 != null) {
-            FnValidateToken(Token, function (err, Result) {
+            _this.stdLib.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
                         var query = db.escape(Token) + ',' + db.escape(DateNew1) + ',' + db.escape(DateNew2);
@@ -372,7 +375,7 @@ VES.prototype.getContactVES = function(req,res,next){
         var TID = req.query.TID;
 
         if (Token != null && TID != null) {
-            FnValidateToken(Token, function (err, Result) {
+            _this.stdLib.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
 
@@ -464,7 +467,7 @@ VES.prototype.searchContactsVES = function(req,res,next){
 
         if (Token != null && DateNew1 !=null && DateNew2 != null && Status !=null && Keywords != null && Type !=null) {
 
-            FnValidateToken(Token, function (err, Result) {
+            _this.stdLib.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
                         var SearchParameter = db.escape(Token) + ',' + db.escape(DateNew1) + ',' + db.escape(DateNew2) + ',' + db.escape(Status) + ',' + db.escape(Keywords) + ',' + db.escape(Type);
@@ -664,7 +667,7 @@ VES.prototype.saveDepartmentsVES = function(req,res,next){
             TID = 0;
 
         if (Token != null && Name != null) {
-            FnValidateToken(Token, function (err, Result) {
+            _this.stdLib.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
                         var query = db.escape(Token) + ',' + db.escape(Name) + ',' + db.escape(TID);
@@ -761,7 +764,7 @@ VES.prototype.saveGatesVES = function(req,res,next){
             TID = 0;
 
         if (Token != null && Name != null) {
-            FnValidateToken(Token, function (err, Result) {
+            _this.stdLib.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
                         var query = db.escape(Token) + ',' + db.escape(Name) + ',' + db.escape(TID);

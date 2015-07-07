@@ -23,8 +23,11 @@ function alterEzeoneId(ezeoneId){
     return alteredEzeoneId;
 }
 
-function Location_AP(db){
+function Location_AP(db,stdLib){
     this.db = db;
+    if(stdLib){
+        this.stdLib = stdLib;
+    }
 };
 
 /**

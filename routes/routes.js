@@ -1,8 +1,12 @@
 var DbHelper = require('./../helpers/DatabaseHandler'),
     db = DbHelper.getDBContext();
+var StdLib = require('./modules/std-lib.js');
+
+var stdLib = new StdLib(db);
+
 
 var User = require('./modules/user-module.js');
-var userModule = new User(db);
+var userModule = new User(db,stdLib);
 exports.FnRegistration = userModule.register;
 exports.FnLogin = userModule.login;
 exports.FnLogout = userModule.logout;
@@ -37,7 +41,7 @@ exports.FnGetLoginCheck = userModule.getLoginCheck;
 exports.FnGetProxmity = userModule.getProxmity;
 
 var Audit = require('./modules/audit-module.js');
-var auditModule = new Audit(db);
+var auditModule = new Audit(db,stdLib);
 exports.FnGetAccessHistory = auditModule.getAccessHistory;
 exports.FnSaveWhiteBlackList = auditModule.saveList;
 exports.FnGetWhiteBlackList = auditModule.getList;
@@ -52,7 +56,7 @@ exports.FnGetMessages = auditModule.getMessages;
 exports.FnUpdateMessageStatus = auditModule.updateMessageStatus;
 
 var Location = require('./modules/location-module.js');
-var locationModule = new Location(db);
+var locationModule = new Location(db,stdLib);
 exports.FnGetSecondaryLocation = locationModule.getAll;
 exports.FnAddLocation = locationModule.save;
 exports.FnDeleteLocation = locationModule.deleteLocation;
@@ -60,7 +64,7 @@ exports.FnGetLocationListForEZEID = locationModule.getAllForEzeid;
 exports.FnGetLocationList = locationModule.getLoactionList
 
 var BusinessManager = require('./modules/business-module.js');
-var businessManager = new BusinessManager(db);
+var businessManager = new BusinessManager(db,stdLib);
 exports.FnGetTransaction = businessManager.getTransactions;
 exports.FnSaveTransaction = businessManager.saveTransaction;
 exports.FnUpdateTransaction = businessManager.updateTransaction;
@@ -78,7 +82,7 @@ exports.FnGetCompanyDetails = businessManager.getCompanyDetails;
 exports.FnGetEZEOneIDInfo = businessManager.getEZEOneIDInfo;
 
 var Configuration = require('./modules/configuration-module.js');
-var configurationModule = new Configuration(db);
+var configurationModule = new Configuration(db,stdLib);
 exports.FnSaveConfig = configurationModule.save;
 exports.FnGetConfig = configurationModule.get;
 exports.FnGetCategory = configurationModule.getBusinessCategories;
@@ -110,7 +114,7 @@ exports.FnDeleteWorkingHours = configurationModule.deleteWorkingHours;
 exports.FnWorkingHoursDetails = configurationModule.getWorkingHoursDetails;
 
 var Search = require('./modules/search-module.js');
-var searchModule = new Search(db);
+var searchModule = new Search(db,stdLib);
 exports.FnSearchByKeywords = searchModule.searchKeyword;
 exports.FnGetSearchInformationNew = searchModule.searchInformation;
 exports.FnGetWorkingHrsHolidayList = searchModule.getWorkingHrsHolidayList;
@@ -120,11 +124,11 @@ exports.FnGetSearchDocuments = searchModule.getSearchDoc;
 exports.FnSearchBusListing = searchModule.searchBusListing;
 
 var Image = require('./modules/image-module.js');
-var imageModule = new Image(db);
+var imageModule = new Image(db,stdLib);
 exports.FnCropImage = imageModule.cropImage;
 
 var Reservation = require('./modules/reservation-module.js');
-var reservationModule = new Reservation(db);
+var reservationModule = new Reservation(db,stdLib);
 exports.FnSaveReservTransaction = reservationModule.SaveReservTrans;
 exports.FnGetReservTask = reservationModule.getList;
 exports.FnGetMapedServices = reservationModule.getMapedServices;
@@ -135,14 +139,14 @@ exports.FnGetworkinghoursList = reservationModule.getworkinghoursList;
 
 //ap parts
 var Auth_AP = require('./ap-modules/auth-module-ap.js');
-var authModuleAP = new Auth_AP(db);
+var authModuleAP = new Auth_AP(db,stdLib);
 exports.FnLoginAP = authModuleAP.loginAP;
 exports.FnLogoutAP = authModuleAP.logoutAP;
 exports.FnForgetPasswordAP = authModuleAP.forgetPasswordAP;
 exports.FnChangePasswordAP = authModuleAP.changePasswordAP;
 
 var User_AP = require('./ap-modules/user-module-ap.js');
-var userModuleAP = new User_AP(db);
+var userModuleAP = new User_AP(db,stdLib);
 exports.FnGetUserDetailsAP = userModuleAP.getUserDetailsAP;
 exports.FnUpdateUserProfileAP = userModuleAP.updateUserProfileAP;
 exports.FnSaveAPEZEID = userModuleAP.saveAPEZEID;
@@ -150,7 +154,7 @@ exports.FnUpdateRedFlagAP = userModuleAP.updateRedFlagAP;
 exports.FnUpdateEZEIDAP = userModuleAP.updateEZEIDAP;
 
 var Image_AP = require('./ap-modules/image-module-ap.js');
-var imageModuleAP = new Image_AP(db);
+var imageModuleAP = new Image_AP(db,stdLib);
 exports.FnSaveAPEZEIDPicture = imageModuleAP.saveAPEZEIDPicture;
 exports.FnGetAPEZEIDPicture = imageModuleAP.getAPEZEIDPicture;
 exports.FnSaveBannerPictureAP = imageModuleAP.saveBannerPictureAP;
@@ -160,25 +164,25 @@ exports.FnDeleteBannerPictureAP = imageModuleAP.deleteBannerPictureAP;
 exports.FnCropImageAP = imageModuleAP.cropImageAP;
 
 var Location_AP = require('./ap-modules/location-module-ap.js');
-var locationModuleAP = new Location_AP(db);
+var locationModuleAP = new Location_AP(db,stdLib);
 exports.FnGetSecondaryLocationListAP = locationModuleAP.getSecondaryLocationListAP;
 exports.FnGetSecondaryLocationAP = locationModuleAP.getSecondaryLocationAP;
 exports.FnUpdateSecondaryLocationAP = locationModuleAP.updateSecondaryLocationAP;
 
 var RealEstate_AP = require('./ap-modules/real-estate-ap.js');
-var realEstateAP = new RealEstate_AP(db);
+var realEstateAP = new RealEstate_AP(db,stdLib);
 exports.FnGetRealStateDataAP = realEstateAP.getRealStateDataAP;
 exports.FnSearchRealEstateAP = realEstateAP.searchRealEstateAP;
 
 var IDCard_AP = require('./ap-modules/idcard-module-ap.js');
-var idcardAP = new IDCard_AP(db);
+var idcardAP = new IDCard_AP(db,stdLib);
 exports.FnUpdateIdCardPrintAP = idcardAP.updateIdCardPrintAP;
 exports.FnGetIdCardPrintAP = idcardAP.getIdCardPrintAP;
 
 
 //VES Modules
 var VES = require('./ves-modules/ves-module-ap.js');
-var vesModule= new VES(db);
+var vesModule= new VES(db,stdLib);
 exports.FnLoginVES = vesModule.loginVES;
 exports.FnSaveContactVES = vesModule.saveContactVES;
 exports.FnGetAllContactsVES = vesModule.getAllContactsVES;

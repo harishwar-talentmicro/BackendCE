@@ -22,8 +22,11 @@ function alterEzeoneId(ezeoneId){
     return alteredEzeoneId;
 }
 
-function Reservation(db){
+function Reservation(db,stdLib){
     this.db = db;
+    if(stdLib){
+        this.stdLib = stdLib;
+    }
 };
 
 

@@ -26,8 +26,11 @@ function alterEzeoneId(ezeoneId){
     return alteredEzeoneId;
 }
 
-function BusinessManager(db){
+function BusinessManager(db,stdLib){
     this.db = db;
+    if(stdLib){
+        this.stdLib = stdLib;
+    }
 };
 
 /**

@@ -23,8 +23,11 @@ function alterEzeoneId(ezeoneId){
     return alteredEzeoneId;
 }
 
-function IDCard_AP(db){
+function IDCard_AP(db,stdLib){
     this.db = db;
+    if(stdLib){
+        this.stdLib = stdLib;
+    }
 };
 
 /**

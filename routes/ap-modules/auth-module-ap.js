@@ -23,8 +23,11 @@ function alterEzeoneId(ezeoneId){
     return alteredEzeoneId;
 }
 
-function Auth_AP(db){
+function Auth_AP(db,stdLib){
     this.db = db;
+    if(stdLib){
+        this.stdLib = stdLib;
+    }
 };
 
 function FnRandomPassword() {

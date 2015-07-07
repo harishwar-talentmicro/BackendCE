@@ -11641,7 +11641,7 @@ exports.FnSaveReservTransaction = function(req, res){
                             console.log(insertResult);
                             console.log(err);
                              if (!err){
-                                if (insertResult.affectedRows > 0) {
+                                if (insertResult) {
                                     responseMessage.status = true;
                                     responseMessage.error = null;
                                     responseMessage.message = 'Resource Transaction details save successfully';

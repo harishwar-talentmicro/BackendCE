@@ -23,8 +23,11 @@ function alterEzeoneId(ezeoneId){
     return alteredEzeoneId;
 }
 
-function Audit(db){
+function Audit(db,stdLib){
     this.db = db;
+    if(stdLib){
+        this.stdLib = stdLib;
+    }
 };
 
 

@@ -30,8 +30,11 @@ function alterEzeoneId(ezeoneId){
     return alteredEzeoneId;
 }
 
-function User(db){
+function User(db,stdLib){
     this.db = db;
+    if(stdLib){
+        this.stdLib = stdLib;
+    }
 };
 
 
@@ -166,7 +169,7 @@ User.prototype.register = function(req,res,next){
                 }
 
                 if (Operation == 'I') {
-                    TokenNo = FnGenerateToken();
+                    TokenNo = _this.stdLib.generateToken();
                 }
                 var EncryptPWD = '';
                 if (Password != null) {
@@ -352,7 +355,7 @@ User.prototype.register = function(req,res,next){
                 }
 
                 if (Operation == 'I') {
-                    TokenNo = FnGenerateToken();
+                    TokenNo = _this.stdLib.generateToken();
                 }
                 var EncryptPWD = '';
                 if (Password != null) {
@@ -583,7 +586,7 @@ User.prototype.login = function(req,res,next){
                     if(loginResult) {
                         if (loginResult[0].length > 0) {
                             // console.log('loginResult: ' + loginResult);
-                            var Encrypt = FnGenerateToken();
+                            var Encrypt = _this.stdLib.generateToken();
                             //   console.log('Encrypt: ' + Encrypt);
                             // console.log('TID ' + loginResult[0].TID);
                             var loginDetails = loginResult[0];
