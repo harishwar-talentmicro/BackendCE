@@ -292,8 +292,9 @@
                                             </div>
                                         </div>
                                         <div class="flip-tile-row-3 p-5 text-center" ng-click="$event.stopPropagation()">
-                                            <!-- MOPDULE BUTTONS -->
-                                            <div class="module-btns" ng-init="search.VisibleModules = refineModuleVisibility(search.VisibleModules)">
+                                            <!-- MODULE BUTTONS -->
+                                            <span class="hidden">{{search.VisibleModules = refineModuleVisibility(search.VisibleModules,search.TID)}}</span>
+                                            <div class="module-btns" >
                                                 <!-- Sales Btn[0] -->
                                                 <button
                                                         ng-show="(search.IDTypeID == 2 &&
@@ -316,14 +317,14 @@
                                                 <button ng-show="(search.IDTypeID == 2 && search.EZEIDVerifiedID == 2 && search.VisibleModules[2] == 1)"
                                                         class="btn btn-default btn-xs"
                                                         ng-click="redirectUrl('/'+search.EZEID+'/home_delivery')">
-                                                    <i class="fa fa-comments"></i> Help Desk
+                                                    <i class="fa fa-truck"></i> Home Delivery
                                                 </button>
 
                                                 <!-- Help Desk btn[3] -->
                                                 <button ng-show="localStatusFlag = (search.IDTypeID == 2 && search.EZEIDVerifiedID == 2 && search.VisibleModules[3] == 1)"
                                                         class="btn btn-default btn-xs"
                                                         ng-click="redirectUrl('/'+search.EZEID+'/helpdesk')">
-                                                    <i class="fa fa-truck"></i> Home Delivery
+                                                    <i class="fa fa-comments"></i> Help Desk
                                                 </button>
 
                                                 <!-- Resume[4] -->
