@@ -64,7 +64,7 @@ BusinessManager.prototype.getTransactions = function(req,res,next){
         };
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
         if (Token != null && FunctionType.toString() != null && Page.toString() != 'NaN' && Page.toString() != 0) {
-            FnValidateToken(Token, function (err, Result) {
+            _this.stdLib.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result) {
 
@@ -224,7 +224,7 @@ BusinessManager.prototype.saveTransaction = function(req,res,next){
             FolderRuleID=0;
 
         if (Token != null && ItemsList != null) {
-            FnValidateToken(Token, function (err, Result) {
+            _this.stdLib.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result) {
 
@@ -462,7 +462,7 @@ BusinessManager.prototype.getTransactionItems = function(req,res,next){
         var MessageID = req.query.MessageID;
 
         if (Token != null && MessageID != null) {
-            FnValidateToken(Token, function (err, Result) {
+            _this.stdLib.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result) {
 
@@ -554,7 +554,7 @@ try{
     };
 
     if (Token != null && MessageID!= null && ItemID != null && Qty !=null && Rate !=null && Amount != null && Duration !=null) {
-        FnValidateToken(Token, function (err, Result) {
+        _this.stdLib.validateToken(Token, function (err, Result) {
             if (!err) {
                 if (Result != null) {
 
@@ -656,7 +656,7 @@ BusinessManager.prototype.getOutboxTransactions = function(req,res,next){
         };
 
         if (Token) {
-            FnValidateToken(Token, function (err, result) {
+            _this.stdLib.validateToken(Token, function (err, result) {
                 if (!err) {
                     if (result) {
                         _this.db.query('CALL pGetOutboxMessages(' + _this.db.escape(Token) + ',' + _this.db.escape(pagesize) + ',' + _this.db.escape(pagecount)+ ')', function (err, GetResult) {
@@ -846,7 +846,7 @@ BusinessManager.prototype.getItemListForEZEID = function(req,res,next){
     if(Token == "")
         Token= null;
     if (Token != null && FunctionType != null && EZEID != null) {
-        FnValidateToken(Token, function (err, Result) {
+        _this.stdLib.validateToken(Token, function (err, Result) {
             if (!err) {
                 if (Result != null) {
                     console.log('CALL pItemListforEZEID(' +  db.escape(FunctionType)  + ',' + db.escape(EZEID) + ')');
@@ -929,7 +929,7 @@ BusinessManager.prototype.deleteTransaction = function(req,res,next){
             IsSuccessfull:false
         };
         if (Token != null && ItemTID != null){
-            FnValidateToken(Token, function (err, Result) {
+            _this.stdLib.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
 
@@ -1003,7 +1003,7 @@ BusinessManager.prototype.itemList = function(req,res,next){
     var FunctionType = req.query.FunctionType;
 
     if (Token != null && FunctionType != null) {
-        FnValidateToken(Token, function (err, Result) {
+        _this.stdLib.validateToken(Token, function (err, Result) {
             if (!err) {
                 if (Result != null) {
 
@@ -1083,7 +1083,7 @@ BusinessManager.prototype.itemDetails = function(req,res,next){
         var TID = req.query.TID;
 
         if (Token != null && TID != null) {
-            FnValidateToken(Token, function (err, Result) {
+            _this.stdLib.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
                         db.query('CALL pItemDetails(' + db.escape(TID) + ')', function (err, GetResult) {
@@ -1162,7 +1162,7 @@ BusinessManager.prototype.getUserwiseFolderList = function(req,res,next){
     var RuleFunction = req.query.RuleFunction;
 
     if (Token != null) {
-        FnValidateToken(Token, function (err, Result) {
+        _this.stdLib.validateToken(Token, function (err, Result) {
             if (!err) {
                 if (Result != null) {
 
@@ -1249,7 +1249,7 @@ try {
     var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
 
     if (token != null && token != '' && CategoryID.toString() != 'NaN' && Keywords != null) {
-        FnValidateToken(token, function (err, Result) {
+        _this.stdLib.validateToken(token, function (err, Result) {
             if (!err) {
                 if (Result != null) {
                     //  var fileName = BrochureDocFile.split('.').pop();
@@ -1455,7 +1455,7 @@ if(!validationFlag){
 }
 else{
     try{
-        FnValidateToken(token,function(err,tokenResult){
+        _this.stdLib.validateToken(token,function(err,tokenResult){
             if(err){
                 respMsg.status = false;
                 respMsg.data = null;

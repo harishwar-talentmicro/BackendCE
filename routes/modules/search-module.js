@@ -75,7 +75,7 @@ Search.prototype.searchKeyword = function(req,res,next){
         if (type == "1") {
 
             if (find != null && find != '' && CategoryID != null && token != null && token != '' && CurrentDate != null && pagesize != null && pagecount != null) {
-                FnValidateToken(token, function (err, Result) {
+                _this.stdLib.validateToken(token, function (err, Result) {
                     if (!err) {
                         if (Result) {
                             if(CurrentDate != null)
@@ -517,7 +517,7 @@ Search.prototype.getWorkingHrsHolidayList = function (req, res) {
         if(LocID == null)
             LocID = 0;
         if (Token != null && LocID != null) {
-            FnValidateToken(Token, function (err, Result) {
+            _this.stdLib.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
                         var async = require('async');
@@ -879,7 +879,7 @@ try {
     var Proximity = req.body.Proximity;
 
     if (Token != null && Keyword != null && Latitude != null && Longitude != null && Proximity  != null) {
-        FnValidateToken(Token, function (err, Result) {
+        _this.stdLib.validateToken(Token, function (err, Result) {
             if (!err) {
                 if (Result != null) {
                     var query = _this.db.escape(Keyword) + ','  + _this.db.escape(Latitude) + ',' + _this.db.escape(Longitude) + ',' + _this.db.escape(Proximity)+ ',' + _this.db.escape(Token);
@@ -964,7 +964,7 @@ Search.prototype.getSearchDoc = function(req,res,next){
     var token = req.query.Token;
     //console.log(token);
     if (token != null && find != null && token != '' && find != '') {
-        FnValidateToken(token, function (err, Result) {
+        _this.stdLib.validateToken(token, function (err, Result) {
             if (!err) {
                 if (Result != null) {
 

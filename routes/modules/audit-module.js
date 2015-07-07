@@ -49,7 +49,7 @@ Audit.prototype.getAccessHistory = function(req,res,next){
         var Page = parseInt(req.query.Page);
 
         if (Token != null && Page.toString() != 'NaN' && Page.toString() != '0') {
-            FnValidateToken(Token, function (err, Result) {
+            _this.stdLib.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result) {
                         var ToPage = 25 * Page;
@@ -143,7 +143,7 @@ Audit.prototype.saveList = function(req,res,next){
 
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
         if (List!= null && RelationType.toString() != 'NaN' && Tag.toString() != 'NaN' && EZEID !=null && Token != null) {
-            FnValidateToken(Token, function (err, Result) {
+            _this.stdLib.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
                         var query = _this.db.escape(List) + ',' + _this.db.escape(RelationType) + ',' + _this.db.escape(EZEID) + ',' + _this.db.escape(Tag) + ',' +_this.db.escape(Token);
@@ -228,7 +228,7 @@ Audit.prototype.getList = function(req,res,next){
 
 
         if (Token != null) {
-            FnValidateToken(Token, function (err, Result) {
+            _this.stdLib.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
 
@@ -315,7 +315,7 @@ Audit.prototype.deleteList = function(req,res,next){
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
 
         if (TID !=null && Token != null) {
-            FnValidateToken(Token, function (err, Result) {
+            _this.stdLib.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
 
@@ -401,7 +401,7 @@ Audit.prototype.getListCount = function(req,res,next){
 
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
         if (Token != null && EZEID != null && List != null) {
-            FnValidateToken(Token, function (err, Result) {
+            _this.stdLib.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
 
@@ -549,7 +549,7 @@ Audit.prototype.saveMailTemplate = function(req,res,next){
         };
 
         if (Token != null && Title != null && FromName != null && FromEmailID != null && Subject != null && Body != null ) {
-            FnValidateToken(Token, function (err, Result) {
+            _this.stdLib.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
 
@@ -640,7 +640,7 @@ Audit.prototype.getMailTemplate = function(req,res,next) {
         var Token = req.query.Token;
 
         if (Token != null) {
-            FnValidateToken(Token, function (err, Result) {
+            _this.stdLib.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
 
@@ -715,7 +715,7 @@ Audit.prototype.getTemplateDetails = function(req,res,next){
         var TID = req.query.TID;
 
         if (Token != null) {
-            FnValidateToken(Token, function (err, Result) {
+            _this.stdLib.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
 
@@ -805,7 +805,7 @@ Audit.prototype.sendBulkMailer = function(req,res,next){
         if (TID != null) {
 
             if (Token != null && Token != '' && TID != null && TID != '' && TemplateID != null && TemplateID != '') {
-                FnValidateToken(Token, function (err, Result) {
+                _this.stdLib.validateToken(Token, function (err, Result) {
                     if (!err) {
                         if (Result != null) {
                             //var query = _this.db.escape(Token) + ', ' +_this.db.escape(TID);
@@ -832,7 +832,7 @@ Audit.prototype.sendBulkMailer = function(req,res,next){
                                                                         replyto: (TemplateResult[0].FromMailID != 'undefined') ? TemplateResult[0].FromMailID : " ",
                                                                         to: GetResult[i].SalesMailID,
                                                                         subject: TemplateResult[0].Subject,
-                                                                        html: TemplateResult[0].Body, // html body
+                                                                        html: TemplateResult[0].Body // html body
                                                                     };
                                                                     mailOptions.html = mailOptions.html.replace("[FirstName]", GetResult[0].FirstName);
                                                                     mailOptions.html = mailOptions.html.replace("[LastName]", GetResult[0].LastName);
@@ -934,7 +934,7 @@ Audit.prototype.sendBulkMailer = function(req,res,next){
             var fs = require('fs');
 
             if (Token != null && Attachment != null && AttachmentFileName != null && ToMailID != null) {
-                FnValidateToken(Token, function (err, Result) {
+                _this.stdLib.validateToken(Token, function (err, Result) {
                     if (!err) {
                         if (Result != null) {
                             var query = _this.db.escape(Token);
@@ -1114,7 +1114,7 @@ try {
     var MessageType = req.query.MessageType;
     //console.log(req.query);
     if (Token != null && Page.toString() != 'NaN' && Page.toString() != '0') {
-        FnValidateToken(Token, function (err, Result) {
+        _this.stdLib.validateToken(Token, function (err, Result) {
             if (!err) {
                 if (Result != null) {
                     var ToPage = 25 * Page;
@@ -1210,7 +1210,7 @@ Audit.prototype.updateMessageStatus = function(req,res,next){
         if (Notes == null)
             Notes = '';
         if (token != null && token != '' && Status.toString() != 'NaN' && TID.toString() != 'NaN') {
-            FnValidateToken(token, function (err, Result) {
+            _this.stdLib.validateToken(token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
                         //var query = 'update tmessages set Status=' + _this.db.escape(Status) + ' where TID=' + _this.db.escape(TID);

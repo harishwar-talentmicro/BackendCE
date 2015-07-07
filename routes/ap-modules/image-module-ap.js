@@ -56,7 +56,7 @@ Image_AP.prototype.saveAPEZEIDPicture = function(req,res,next){
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
 
         if (Picture != null && Picture != '' && PicNo.toString() != 'NaN' && TID.toString() != 'NaN') {
-            FnValidateTokenAP(Token, function (err, Result) {
+            _this.stdLib.validateTokenAp(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
                         var InsertQuery = _this.db.escape(TID) + ',' + _this.db.escape(Picture) + ',' + _this.db.escape(PicNo);
@@ -139,7 +139,7 @@ Image_AP.prototype.getAPEZEIDPicture = function(req,res,next){
         var PicNo = parseInt(req.query.PicNo);
         var Token = req.query.Token;
         if (Token != null && TID.toString() != 'NaN' && PicNo.toString() != 'NaN') {
-            FnValidateTokenAP(Token, function (err, Result) {
+            _this.stdLib.validateTokenAp(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
                         _this.db.query('CALL pGetRealEstatePicture(' + _this.db.escape(TID) + ',' + _this.db.escape(PicNo) + ')', function (err, PictuerResult) {
@@ -224,7 +224,7 @@ Image_AP.prototype.saveBannerPictureAP = function(req,res,next){
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
 
         if (Token != null && Picture != null  && SeqNo.toString() != 'NaN' && Ezeid != null) {
-            FnValidateTokenAP(Token, function (err, Result) {
+            _this.stdLib.validateTokenAp(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
                         var InsertQuery = _this.db.escape(Ezeid)  + ',' + _this.db.escape(SeqNo) + ',' + _this.db.escape(Picture) + ',' + _this.db.escape(TID);
@@ -308,7 +308,7 @@ Image_AP.prototype.getBannerPictureAP = function(req,res,next){
         var Ezeid = req.query.Ezeid;
 
         if (Token != null  && SeqNo.toString() != 'NaN' && Ezeid != null) {
-            FnValidateTokenAP(Token, function (err, Result) {
+            _this.stdLib.validateTokenAp(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
                         var Query = _this.db.escape(Ezeid)  + ',' + _this.db.escape(SeqNo);
@@ -391,7 +391,7 @@ Image_AP.prototype.getAllBannerPicsAP = function(req,res,next){
         var EZEID = req.query.EZEID;
 
         if (Token != null && EZEID != null) {
-            FnValidateTokenAP(Token, function (err, Result) {
+            _this.stdLib.validateTokenAp(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
                         var Query = _this.db.escape(EZEID);
@@ -476,7 +476,7 @@ Image_AP.prototype.deleteBannerPictureAP = function(req,res,next){
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
 
         if (Token !=null && EZEID != null && SeqNo !=null)  {
-            FnValidateTokenAP(Token, function (err, Result) {
+            _this.stdLib.validateTokenAp(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
                         var query = _this.db.escape(SeqNo) + ',' + _this.db.escape(EZEID);
@@ -598,7 +598,7 @@ Image_AP.prototype.cropImageAP = function(req,res,next){
         return;
     }
 
-    FnValidateTokenAP(token, function (err, Result) {
+    _this.stdLib.validateTokenAp(token, function (err, Result) {
         if (!err) {
             if (Result != null) {
                 try{

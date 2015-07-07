@@ -50,7 +50,7 @@ RealEstate_AP.prototype.getRealStateDataAP = function(req,res,next){
         var Token = req.query.Token;
 
         if(Token != null && TID != null){
-            FnValidateTokenAP(Token, function (err, Result) {
+            _this.stdLib.validateTokenAp(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
                         _this.db.query('CALL pGetRealEstateData(' + _this.db.escape(TID)  + ')', function (err, RealStateResult) {
@@ -166,7 +166,7 @@ RealEstate_AP.prototype.searchRealEstateAP = function(req,res,next){
         /*if (Status!=null && Purpose.toString() != 'NaN' && PropertyType!=null && PrefUser!=null && SpaceType !=null && SpaceQtyF !=null && SpaceQtyT !=null && RatingFrom !=null
          && RatingTo !=null && Latitude !=null && Longitude !=null && Proximity !=null && AreaUOM !=null && AreaFrom !=null
          && AreaTo !=null && FunishedType !=null && AmountFrom !=null && AmountTo !=null) {*/
-        FnValidateTokenAP(Token, function (err, Result) {
+        _this.stdLib.validateTokenAp(Token, function (err, Result) {
             if (!err) {
                 if (Result != null) {
 

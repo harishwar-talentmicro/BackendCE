@@ -80,7 +80,7 @@ Configuration.prototype.save = function(req,res,next){
         };
 
         if (Token != null && Keyword != null && Category != null) {
-            FnValidateToken(Token, function (err, Result) {
+            _this.stdLib.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result) {
 
@@ -167,7 +167,7 @@ Configuration.prototype.get = function(req,res,next){
         var Token = req.query.Token;
 
         if (Token != null) {
-            FnValidateToken(Token, function (err, Result) {
+            _this.stdLib.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result) {
 
@@ -296,7 +296,7 @@ Configuration.prototype.getStatusTypes = function(req,res,next){
         var FunctionType = req.query.FunctionType;
 
         if (Token != null  && FunctionType != null ) {
-            FnValidateToken(Token, function (err, Result) {
+            _this.stdLib.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result) {
 
@@ -382,7 +382,7 @@ Configuration.prototype.StatusTypes = function(req,res,next){
         };
 
         if (Token != null  && FunctionType != null ) {
-            FnValidateToken(Token, function (err, Result) {
+            _this.stdLib.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
                         var StatusAllOpen =
@@ -508,7 +508,7 @@ Configuration.prototype.saveStatusType = function(req,res,next){
         };
 
         if (Token != null && TID.toString() != 'NaN') {
-            FnValidateToken(Token, function (err, Result) {
+            _this.stdLib.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result) {
                         var query = _this.db.escape(Token) + ',' + _this.db.escape(TID) + ',' + _this.db.escape(FunctionType) + ',' + _this.db.escape(StatusTitle)
@@ -594,7 +594,7 @@ Configuration.prototype.getActionTypes = function(req,res,next){
         var FunctionType = req.query.FunctionType;
 
         if (Token != null && FunctionType != null ) {
-            FnValidateToken(Token, function (err, Result) {
+            _this.stdLib.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result) {
 
@@ -685,7 +685,7 @@ Configuration.prototype.saveActionType = function(req,res,next){
         };
 
         if (Token != null && TID.toString() != 'NaN') {
-            FnValidateToken(Token, function (err, Result) {
+            _this.stdLib.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result) {
                         var query = _this.db.escape(Token) + ',' + _this.db.escape(TID) + ',' + _this.db.escape(FunctionType) + ',' + _this.db.escape(ActionTitle)
@@ -770,7 +770,7 @@ Configuration.prototype.getItems = function(req,res,next){
         if(Token == "")
             Token= null;
         if (Token != null && FunctionType != null) {
-            FnValidateToken(Token, function (err, Result) {
+            _this.stdLib.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result) {
                         _this.db.query('CALL pGetItemList(' + _this.db.escape(Token) + ',' + _this.db.escape(FunctionType) + ')', function (err, GetResult) {
@@ -861,7 +861,7 @@ Configuration.prototype.saveItems = function(req,res,next){
         if(Rate == null || Rate =="")
             Rate=0.00;
         if (Token != null  && FunctionType != null && ItemName !=null) {
-            FnValidateToken(Token, function (err, Result) {
+            _this.stdLib.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result) {
 
@@ -942,7 +942,7 @@ Configuration.prototype.getFolders = function(req,res,next){
         var Token = req.query.Token;
         var FunctionType = req.query.FunctionType;
         if (Token != null && FunctionType != null) {
-            FnValidateToken(Token, function (err, Result) {
+            _this.stdLib.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result) {
 
@@ -1036,7 +1036,7 @@ Configuration.prototype.saveFolder = function(req,res,next){
         };
 
         if (Token != null && TID.toString() != 'NaN') {
-            FnValidateToken(Token, function (err, Result) {
+            _this.stdLib.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result) {
                         var query = _this.db.escape(Token) + ',' + _this.db.escape(TID) + ',' + _this.db.escape(FolderTitle) + ',' + _this.db.escape(RuleFunction)
@@ -1113,7 +1113,7 @@ Configuration.prototype.getSubusers = function(req,res,next){
         var Token = req.query.Token;
 
         if (Token != null) {
-            FnValidateToken(Token, function (err, Result) {
+            _this.stdLib.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result) {
 
@@ -1218,7 +1218,7 @@ Configuration.prototype.createSubuser = function(req,res,next){
         /*if (Token!= null && TID!= null && UserName!= null  && Status!= null && FirstName != null && LastName !=null && AccessRights !=null && SalesEmail != null
          && ReservationEmail!= null && HomeDeliveryEmail!= null && ServiceEmail!= null && ResumeEmail !=null  && SalesRules != null
          && ReservationRules != null && HomeDeliveryRules != null && ServiceRules != null && ResumeRules != null) {*/
-        FnValidateToken(Token, function (err, Result) {
+        _this.stdLib.validateToken(Token, function (err, Result) {
             if (!err) {
                 if (Result) {
                     console.log(Result);
@@ -1428,7 +1428,7 @@ Configuration.prototype.saveReservationResource = function(req,res,next){
         }
 
         if (Token && operatorid) {
-            FnValidateToken(Token, function (err, result) {
+            _this.stdLib.validateToken(Token, function (err, result) {
                 if (!err) {
                     if (result) {
 
@@ -1561,7 +1561,7 @@ Configuration.prototype.updateReservationResource = function(req,res,next){
         }
 
         if (Token && operatorid) {
-            FnValidateToken(Token, function (err, result) {
+            _this.stdLib.validateToken(Token, function (err, result) {
                 if (!err) {
                     if (result) {
 
@@ -1785,7 +1785,7 @@ Configuration.prototype.saveReservationService = function(req,res,next){
 
         if (Token) {
 
-            FnValidateToken(Token, function (err, result) {
+            _this.stdLib.validateToken(Token, function (err, result) {
                 if (!err) {
                     if (result) {
 
@@ -1878,7 +1878,7 @@ Configuration.prototype.updateReservationService = function(req,res,next){
 
         var Token = req.body.Token ;
         var TID = parseInt(req.body.TID);
-        var title = (req.body.title) ? ((req.body.title.trim().length > 0) ? req.body.title : null ) : null ;;
+        var title = (req.body.title) ? ((req.body.title.trim().length > 0) ? req.body.title : null ) : null ;
         var duration = req.body.duration;
         var rate = req.body.rate;
         var status = (parseInt(req.body.status)=== 1 || parseInt(req.body.status) === 2) ? req.body.status : 1;
@@ -1914,9 +1914,9 @@ Configuration.prototype.updateReservationService = function(req,res,next){
         }
 
         if (Token) {
-            FnValidateToken(Token, function (err, result) {
+            _this.stdLib.validateToken(Token, function (err, result) {
                 if (!err) {
-                    if (result  null) {
+                    if (result) {
 
                         var query = _this.db.escape(Token) + ', ' + _this.db.escape(TID) + ',' + _this.db.escape(title) + ',' + _this.db.escape(duration) + ',' + _this.db.escape(rate) + ',' + _this.db.escape(status)+ ',' + _this.db.escape(service_IDS);
                         _this.db.query('CALL pSaveResServices(' + query + ')', function (err, insertResult) {
@@ -2097,7 +2097,7 @@ Configuration.prototype.saveResourceServiceMap = function(req,res,next){
         var resourceid = req.body.resourceid;
         var serviceids = req.body.serviceids;
 
-        var ID=''
+        var ID='';
         if(serviceids){
             ID = serviceids + ',' + ID;
             serviceids =ID.slice(0,-1);
@@ -2132,9 +2132,9 @@ Configuration.prototype.saveResourceServiceMap = function(req,res,next){
         }
 
         if (Token) {
-            FnValidateToken(Token, function (err, result) {
+            _this.stdLib.validateToken(Token, function (err, result) {
                 if (!err) {
-                    if (result    null) {
+                    if (result) {
                         var query = _this.db.escape(resourceid) + ',' + _this.db.escape(service_id);
                         _this.db.query('CALL pSaveResResourceServiceMap(' + query + ')', function (err, insertResult) {
 
@@ -2224,7 +2224,7 @@ Configuration.prototype.getWorkingHoursTemplates = function(req,res,next){
 
         var Token = req.query.Token;
         if (Token != null) {
-            FnValidateToken(Token, function (err, Result) {
+            _this.stdLib.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result) {
 
@@ -2339,7 +2339,7 @@ Configuration.prototype.saveWorkingHoursTemplate = function(req,res,next){
         };
 
         if (Token != null && SpilloverTime != null && WorkingHrsTemplate != null && TID != null ) {
-            FnValidateToken(Token, function (err, Result) {
+            _this.stdLib.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result) {
 
@@ -2433,7 +2433,7 @@ Configuration.prototype.getHolidays = function(req,res,next){
         if(LocID == null && LocID == '')
             LocID=0;
         if (Token != null) {
-            FnValidateToken(Token, function (err, Result) {
+            _this.stdLib.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result) {
 
@@ -2520,7 +2520,7 @@ Configuration.prototype.saveHoliday = function(req,res,next){
         };
 
         if (Token != null && TID != null && HolidayTitle != null  && HolidayDate != null && TemplateID != null ) {
-            FnValidateToken(Token, function (err, Result) {
+            _this.stdLib.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result) {
                         var query = _this.db.escape(TID) + ',' + _this.db.escape(Token) + ',' + _this.db.escape(new Date(HolidayDate)) + ',' + _this.db.escape(HolidayTitle) + ',' + _this.db.escape(TemplateID);
@@ -2615,7 +2615,7 @@ Configuration.prototype.deleteHoliday = function(req,res,next){
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
 
         if (Token !=null && TID != null) {
-            FnValidateToken(Token, function (err, Result) {
+            _this.stdLib.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result) {
 
@@ -2697,7 +2697,7 @@ Configuration.prototype.deleteWorkingHours = function(req,res,next){
     var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
 
     if (Token !=null && TID != null) {
-        FnValidateToken(Token, function (err, Result) {
+        _this.stdLib.validateToken(Token, function (err, Result) {
             if (!err) {
                 if (Result != null) {
                     //console.log('CALL pDeleteWorkinghours(' + _this.db.escape(TID) + ')');
