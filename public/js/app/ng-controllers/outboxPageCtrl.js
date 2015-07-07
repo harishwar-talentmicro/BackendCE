@@ -242,5 +242,17 @@ angular.module('ezeidApp').
                 });
             }
 
+            $scope.modalAddGroupVisible = false;
+            $scope.modalAddGroupVisibility = function () {
+                /* toggle map visibility status */
+                $scope.modalAddGroupVisible = !$scope.modalAddGroupVisible;
+            };
+
+            /* modal box for loading Add/edit/join Group */
+            $scope.modal = {
+                title: 'Groups',
+                class: 'business-manager-modal'
+            };
+
 
         }]);

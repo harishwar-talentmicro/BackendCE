@@ -7,12 +7,12 @@
 <!------------- Content goes inside this region ---------------------->
         <div class="container-fluid">
             <div ng-hide="showAddWorkingHourForm" class="row bottom-clearfix">
-                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 no-padding">
                     <button class="btn btn-primary btn-sm marginL10" ng-click="openAddWorkingHourForm()"><span class="glyphicon glyphicon-plus"></span> Add new working calendar</button>
                 </div>
             </div>
 
-            <div ng-hide="showAddWorkingHourForm" class="workingHourConfigListing">
+            <div ng-hide="showAddWorkingHourForm" class="workingHourConfigListing" style="overflow-y: auto; height:200px;">
                 <table class="rwd-table">
                     <tbody>
                    <tr ng-repeat="_item in result">
@@ -376,7 +376,7 @@
                         </div>
                     </div>
 
-    </form>
+                </form>
             </div>
 
         </div>
