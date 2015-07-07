@@ -10,6 +10,21 @@
  */
 "use strict";
 
+var path ='D:\\EZEIDBanner\\';
+
+function alterEzeoneId(ezeoneId){
+    var alteredEzeoneId = '';
+    if(ezeoneId){
+        if(ezeoneId.toString().substr(0,1) == '@'){
+            alteredEzeoneId = ezeoneId;
+        }
+        else{
+            alteredEzeoneId = '@' + ezeoneId.toString();
+        }
+    }
+    return alteredEzeoneId;
+}
+
 function BusinessManager(db){
     this.db = db;
 };
@@ -69,7 +84,7 @@ BusinessManager.prototype.getTransactions = function(req,res,next){
                                         var PageValue = parseInt(totalRecord / limit);
                                         var PageMod = totalRecord % limit;
                                         if (PageMod > 0){
-                                            TotalPage = PageValue + 1;
+                                            var TotalPage = PageValue + 1;
                                         }
                                         else{
                                             TotalPage = PageValue;

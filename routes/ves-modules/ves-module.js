@@ -11,6 +11,25 @@ function VES(db){
     this.db = db;
 };
 
+function FnEncryptPassword(Password) {
+    try {
+        //var text = "";
+        var crypto = require('crypto'),
+            algorithm = 'aes-256-ctr',
+            key = 'ezeid@123';
+
+        var cipher = crypto.createCipher(algorithm, key)
+        var crypted = cipher.update(Password, 'utf8', 'hex')
+        crypted += cipher.final('hex');
+        return crypted;
+    }
+    catch (ex) {
+        console.log('OTP generate error:' + ex.description);
+        //throw new Error(ex);
+        return 'error'
+    }
+}
+
 /**
  * Method : GET
  * @param req

@@ -9,9 +9,25 @@
  */
 "use strict";
 
+var path ='D:\\EZEIDBanner\\';
+
+function alterEzeoneId(ezeoneId){
+    var alteredEzeoneId = '';
+    if(ezeoneId){
+        if(ezeoneId.toString().substr(0,1) == '@'){
+            alteredEzeoneId = ezeoneId;
+        }
+        else{
+            alteredEzeoneId = '@' + ezeoneId.toString();
+        }
+    }
+    return alteredEzeoneId;
+}
+
 function Location(db){
     this.db = db;
 };
+
 
 /**
  * Method : GET
