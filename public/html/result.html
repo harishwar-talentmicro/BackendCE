@@ -199,10 +199,7 @@
                     <div class="filppisg-tiles t1"  ng-hide="searchListMapFlag && !showDownloadLink" >
                         <div class="master-tile">
                             <div class="mobile-parent-tile flip row p-top-10">
-
-
                                 <!-- Here Goes the Individual Tiles -->
-
                                 <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12 flip-card bottom-clearfix pointer" ng-init="color = random();tempVal = $index"
                                      ng-repeat="search in searchListData track by $index"
                                      ng-click="redirectUrl(('/'+((parseInt(search.SeqNo) !== NaN) && (parseInt(search.SeqNo) > 0)) ? (search.EZEID+'.L'+search.SeqNo) : search.EZEID),search.IDTypeID)">

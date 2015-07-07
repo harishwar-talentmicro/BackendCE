@@ -7,9 +7,87 @@
  */
 "use strict";
 
+var path ='D:\\EZEIDBanner\\';
+
+function alterEzeoneId(ezeoneId){
+    var alteredEzeoneId = '';
+    if(ezeoneId){
+        if(ezeoneId.toString().substr(0,1) == '@'){
+            alteredEzeoneId = ezeoneId;
+        }
+        else{
+            alteredEzeoneId = '@' + ezeoneId.toString();
+        }
+    }
+    return alteredEzeoneId;
+}
+
 function Auth_AP(db){
     this.db = db;
 };
+
+function FnGenerateToken() {
+    try {
+        var text = "";
+        var possible = "1234567890abcdefghjklmnopqrstuvwxyz!@#$%";
+
+        for (var i = 0; i < 10; i++) {
+
+            text += possible.charAt(Math.floor(Math.random() * possible.length));
+        }
+
+        var crypto = require('crypto'),
+            algorithm = 'aes-256-ctr',
+            key = 'hire@123';
+
+        var cipher = crypto.createCipher(algorithm, key)
+        var crypted = cipher.update(text, 'utf8', 'hex')
+        crypted += cipher.final('hex');
+        return crypted;
+    }
+    catch (ex) {
+        console.log('OTP generate error:' + ex.description);
+
+        return 'error'
+    }
+}
+
+function FnRandomPassword() {
+    try {
+        var text = "";
+        var possible = "1234567890abcdefghjklmnopqrstuvwxyz!@#$%";
+
+        for (var i = 0; i < 7; i++) {
+
+            text += possible.charAt(Math.floor(Math.random() * possible.length));
+        }
+        return text;
+    }
+    catch (ex) {
+        console.log('OTP generate error:' + ex.description);
+        throw new Error(ex);
+        return 'error'
+    }
+}
+
+function FnEncryptPassword(Password) {
+    try {
+        //var text = "";
+        var crypto = require('crypto'),
+            algorithm = 'aes-256-ctr',
+            key = 'ezeid@123';
+
+        var cipher = crypto.createCipher(algorithm, key)
+        var crypted = cipher.update(Password, 'utf8', 'hex')
+        crypted += cipher.final('hex');
+        return crypted;
+    }
+    catch (ex) {
+        console.log('OTP generate error:' + ex.description);
+        //throw new Error(ex);
+        return 'error'
+    }
+}
 
 
 /**

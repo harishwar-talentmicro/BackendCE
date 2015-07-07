@@ -87,12 +87,8 @@ app.post('/ewSavePrimaryEZEData', LocationManager.FnRegistration);
 app.get('/ewmGetCategory', LocationManager.FnGetCategory);
 app.get('/ewmGetCity', LocationManager.FnGetCity);
 app.get('/ewmGetCountry', LocationManager.FnGetCountry);
-app.get('/ewmGetFunctionRoleMap', LocationManager.FnGetFunctionRoleMap);
 app.get('/ewmGetFunctions', LocationManager.FnGetFunctions);
-app.get('/ewmGetRoles', LocationManager.FnGetRoles);
-app.get('/ewmGetLanguage', LocationManager.FnGetLanguage);
 app.get('/ewmGetRelationType', LocationManager.FnGetRelationType);
-app.get('/ewmGetRoleType', LocationManager.FnGetRoleType);
 app.get('/ewmGetState', LocationManager.FnGetState);
 app.get('/ewmGetMTitle', LocationManager.FnGetMTitle);
 app.get('/ewGetEZEID', LocationManager.FnCheckEzeid);
@@ -107,7 +103,6 @@ app.post('/ewtSendMail', LocationManager.FnSendMail);
 app.get('/ewtGetDoc', LocationManager.FnGetDoc);
 app.post('/ewtSaveDoc', LocationManager.FnSaveDoc);
 app.get('/ewtGetAccessHistory', LocationManager.FnGetAccessHistory);
-app.post('/ewtSaveMessage', LocationManager.FnSaveMessage);
 app.get('/ewtGetMessages', LocationManager.FnGetMessages);
 app.post('/ewtUpdateMessageStatus', LocationManager.FnUpdateMessageStatus);
 app.post('/ewtForgetPassword', LocationManager.FnForgetPassword);
@@ -117,15 +112,10 @@ app.post('/ewtUpdateProfilePicture', LocationManager.FnUpdateProfilePicture);
 app.post('/ewtSaveCVInfo', LocationManager.FnSaveCVInfo);
 app.get('/ewtGetCVInfo', LocationManager.FnGetCVInfo);
 app.post('/ewtUpdateBussinessListing', LocationManager.FnUpdateBussinessListing);
-app.get('/ewtGetBussinessListing', LocationManager.FnGetBussinessListing);
 app.post('/ewtUpdateDocPin', LocationManager.FnUpdateDocPin);
 app.get('/ewtGetDocPin', LocationManager.FnGetDocPin);
 app.get('/ewtGetSearchDocuments', LocationManager.FnGetSearchDocuments);
-app.get('/ewtGetDocument', LocationManager.FnGetDocument);
 app.post('/ewtUploadDoc', LocationManager.FnUploadDocument);
-app.get('/ewmGetFunctionRoleMapping', LocationManager.FnGetFunctionRoleMapping);
-app.get('/ewmUpdatePwdEncryption', LocationManager.FnUpdatePwdEncryption);
-app.post('/ewtCheckCV', LocationManager.FnCheckCV);
 app.get('/ewtGetLoginCheck', LocationManager.FnGetLoginCheck);
 app.get('/ewtGetBannerPicture', LocationManager.FnGetBannerPicture);
 app.post('/ewtSaveWhiteBlackList', LocationManager.FnSaveWhiteBlackList);
@@ -173,7 +163,6 @@ app.post('/ewtWebLink',LocationManager.FnSaveWebLink);
 app.get('/ewtWebLink',LocationManager.FnGetWebLink);
 app.delete('/ewtwebLink',LocationManager.FnDeleteWebLink);
 app.delete('/ewtDeleteTranscation',LocationManager.FnDeleteTransaction);
-app.get('/ewtGetSearchPics', LocationManager.FnGetSearchPicture);
 app.get('/ewtCompanyProfile', LocationManager.FnGetCompanyProfile);
 app.post('/ewtCompanyProfile', LocationManager.FnSaveCompanyProfile);
 app.get('/ewtGetLocationListForEZEID', LocationManager.FnGetLocationListForEZEID);
@@ -245,9 +234,6 @@ app.get('/test',function(req,res){
 app.get('/:page/:subpage',function(req,res){
     res.sendFile(__dirname + '/public/html/index.html');
 });
-
-
-
 
 /**
  * When user is not logged in then also let him navigate to searchInformation page of front end

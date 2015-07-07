@@ -7,6 +7,21 @@
  */
 "use strict";
 
+var path ='D:\\EZEIDBanner\\';
+
+function alterEzeoneId(ezeoneId){
+    var alteredEzeoneId = '';
+    if(ezeoneId){
+        if(ezeoneId.toString().substr(0,1) == '@'){
+            alteredEzeoneId = ezeoneId;
+        }
+        else{
+            alteredEzeoneId = '@' + ezeoneId.toString();
+        }
+    }
+    return alteredEzeoneId;
+}
+
 function RealEstate_AP(db){
     this.db = db;
 };
@@ -91,7 +106,6 @@ RealEstate_AP.prototype.getRealStateDataAP = function(req,res,next){
 
     }
 };
-
 
 /**
  * Method : GET

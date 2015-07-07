@@ -9,11 +9,26 @@
  */
 "use strict";
 
+var path ='D:\\EZEIDBanner\\';
+
+function alterEzeoneId(ezeoneId){
+    var alteredEzeoneId = '';
+    if(ezeoneId){
+        if(ezeoneId.toString().substr(0,1) == '@'){
+            alteredEzeoneId = ezeoneId;
+        }
+        else{
+            alteredEzeoneId = '@' + ezeoneId.toString();
+        }
+    }
+    return alteredEzeoneId;
+}
+
 function Search(db){
     this.db = db;
 };
 
-var path ='D:\\EZEIDBanner\\';
+
 /**
  * Method : POST
  * @param req
@@ -470,7 +485,6 @@ Search.prototype.searchInformation = function(req,res,next){
     }
 };
 
-
 /**
  * Method : GET
  * @param req
@@ -754,10 +768,10 @@ try{
     var LocID = req.query.LocID;
     // var TokenNo = req.query.Token;
 
-    RtnMessage = {
+    var RtnMessage = {
         Picture: ''
     };
-    var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
+    RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
     Ezeid = Ezeid.split(',').pop();
     if ( SeqNo.toString() != 'NaN' && Ezeid != null && LocID != null) {
         var Query = _this.db.escape(Ezeid) + ',' + _this.db.escape(SeqNo) + ',' + _this.db.escape(0);
@@ -775,7 +789,7 @@ try{
                         res.send(RtnMessage);
                     }
                     else {
-                        fs = require('fs');
+                        var fs = require('fs');
                         //  var path = path + StateTitle+'.jpg' ;
                         fs.exists(path + StateTitle + '.jpg', function (exists) {
                             console.log(exists)
@@ -1096,6 +1110,104 @@ catch (ex) {
     console.log('FnGetSearchDocuments error:' + ex.description);
 
 }
+};
+
+/**
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+
+ * Finds the user login status using a cookie login
+ * which is created by angular at the time of signin or signup
+ * @param req
+ * @param res
+ * @param next
+ * @constructor
+ */
+Search.prototype.searchBusListing = function(req,res,next){
+    /**
+     * @todo FnSearchBusListing
+
+
+     * HTML Pages list from angular routings scheme
+     * Any new url pattern addition in angular should be added in this list also
+     * @type {string[]}
+     */
+    var htmlPagesList = [
+        'signup',
+        'messages',
+        'landing',
+        'access-history',
+        'busslist',
+        'terms',
+        'help',
+        'legal',
+        'blackwhitelist',
+        'salesenquiry',
+        'bulksalesenquiry',
+        'viewdirection',
+        'service-reservation',
+        'business-manager',
+        'profile-manager',
+        'searchResult',
+        'searchDetails',
+        'outbox'
+    ];
+
+    var loginCookie = (req.cookies['login']) ? ((req.cookies['login'] === 'true') ? true : false ) : false;
+    if(!loginCookie){
+        /**
+         * Checks if ezeid parameter is existing and checks in the list that is it a
+         * ezeid angular url using the htmlPageList
+         * If not then it will see in the database for
+         * business ID
+         */
+        if(req.params['ezeid'] && htmlPagesList.indexOf(req.params.ezeid) === -1){
+            /**
+             * Checking the EZEID for it's validity
+             */
+            var arr = req.params.ezeid.split('.');
+
+            if(arr.length < 2 && arr.length > 0){
+                /**
+                 * Find if the user type is business or not
+                 */
+                var ezeidQuery = "SELECT tlocations.PIN AS PIN, tmaster.TID, tlocations.TID AS LID ,"+
+                    " tmaster.IDTypeID AS IDTypeID FROM tlocations"+
+                    " INNER JOIN tmaster ON " +
+                    "tmaster.TID = tlocations.MasterID AND tlocations.SeqNo = 0 AND tmaster.EZEID = "+
+                    db.escape(req.params.ezeid)+ " LIMIT 1";
+                db.query(ezeidQuery,function(err,results){
+                    if(!err){
+                        if(results.length > 0){
+                            if((!results[0].PIN) && results[0].IDTypeID !== 1){
+                                res.redirect('/searchDetails?searchType=2&TID='+results[0].LID);
+                            }
+                            else{
+                                next();
+                            }
+                        }
+                        else{
+                            next();
+                        }
+                    }
+                    else{
+                        next();
+                    }
+                });
+            }
+            else{
+                next();
+            }
+        }
+        else{
+            next();
+        }
+    }
+    else{
+        next();
+    }
 };
 
 module.exports = Search;

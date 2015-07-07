@@ -6,10 +6,25 @@
  *
  */
 "use strict";
+var path ='D:\\EZEIDBanner\\';
+
+function alterEzeoneId(ezeoneId){
+    var alteredEzeoneId = '';
+    if(ezeoneId){
+        if(ezeoneId.toString().substr(0,1) == '@'){
+            alteredEzeoneId = ezeoneId;
+        }
+        else{
+            alteredEzeoneId = '@' + ezeoneId.toString();
+        }
+    }
+    return alteredEzeoneId;
+}
 
 function Reservation(db){
     this.db = db;
 };
+
 
 /**
  * Method : POST
@@ -29,12 +44,13 @@ Reservation.prototype.SaveReservTrans = function(req,res,next){
         var Token = req.body.Token ;
         var TID = req.body.TID;
         var contactinfo = req.body.contactinfo;
-        var toEzeid = req.body.toEzeid;
+        var toEzeid = alterEzeoneId(req.body.toEzeid);
         var resourceid = req.body.resourceid;
         var res_datetime = new Date(req.body.res_datetime);
         var duration = req.body.duration;
         var status = req.body.status;
-        var serviceid = req.body.serviceid;
+        var serviceid = req.body.serviceid ?  req.body.serviceid : '';
+        var notes = req.body.notes;
 
         var ID=''
         if(serviceid){
@@ -62,13 +78,6 @@ Reservation.prototype.SaveReservTrans = function(req,res,next){
             responseMessage.error['resourceid'] = 'Invalid Resourceid';
             validateStatus *= false;
         }
-
-        if(!serviceid){
-            responseMessage.error['serviceid'] = 'Invalid Service_ids';
-            validateStatus *= false;
-        }
-
-
         if(!validateStatus){
             console.log('FnSaveReservTransaction  error : ' + JSON.stringify(responseMessage.error));
             responseMessage.message = 'Unable to save resource transaction ! Please check the errors';
@@ -81,7 +90,7 @@ Reservation.prototype.SaveReservTrans = function(req,res,next){
                 if (!err) {
                     if (result != null) {
 
-                        var query = _this.db.escape(TID) + ',' + _this.db.escape(Token) + ',' + _this.db.escape(contactinfo) + ',' + _this.db.escape(toEzeid) + ',' + _this.db.escape(resourceid) + ',' + _this.db.escape(res_datetime) + ',' + _this.db.escape(duration) + ',' + _this.db.escape(status) + ',' + _this.db.escape(serviceid);
+                        var query = _this.db.escape(TID) + ',' + _this.db.escape(Token) + ',' + _this.db.escape(contactinfo) + ',' + _this.db.escape(toEzeid) + ',' + _this.db.escape(resourceid) + ',' + _this.db.escape(res_datetime) + ',' + _this.db.escape(duration) + ',' + _this.db.escape(status) + ',' + _this.db.escape(serviceid) + ',' + _this.db.escape(notes);
                         console.log(query);
                         console.log('CALL pSaveResTrans(' + query + ')');
 
@@ -151,7 +160,7 @@ Reservation.prototype.SaveReservTrans = function(req,res,next){
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
         console.log('FnSaveReservTransaction:error ' + ex.description);
-
+        //throw new Error(ex);
         res.status(400).json(responseMessage);
     }
 };
