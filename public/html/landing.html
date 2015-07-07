@@ -33,7 +33,8 @@
                                     </li>
                                 </ul>
                             </div>
-                            <input type="text" ng-keypress="checkEnterKey($event)" placeholder="{{placeHolderText[searchParams.searchType - 1]}}" ng-model="searchParams.searchTerm" ng-class="(searchParams.searchType === 1) ? 'text-uppercase' : ''" class="form-control" aria-label="...">
+                            <!--<input type="text" ng-keypress="checkEnterKey($event)" placeholder="{{placeHolderText[searchParams.searchType - 1]}}" ng-model="searchParams.searchTerm" ng-class="(searchParams.searchType === 1) ? 'text-uppercase' : ''" class="form-control" aria-label="...">-->
+                            <input type="text" id="tags" ng-keypress="checkEnterKey($event)" placeholder="{{placeHolderText[searchParams.searchType - 1]}}" ng-model="searchParams.searchTerm" ng-class="(searchParams.searchType === 1) ? 'text-uppercase' : ''" class="form-control" aria-label="...">
                             <div class="input-group-btn">
                                 <!-- Filter BTN -->
                                 <button  data-toggle="tooltip"  ng-click="toggleFilterContainer($event,true)" ng-disabled="searchParams.searchType === 1"
@@ -348,11 +349,12 @@
                         <div class="col-lg-4 p-bottom-20">
                             <div class="container mobile-individual-tile mobile-tile3">
                                 <div class="text-center tile-initial-image">
-                                    <i class="fa fa-comments text-white fa-4x"></i>
+                                    <!--<i class="fa fa-comments text-white fa-4x"></i>-->
+                                    <i class="fa fa-envelope-o text-white fa-4x"></i>
                                 </div>
                                 <div class="textbox">
                                     <p class="text text-center text-white text-bolder p3">
-                                        Chat with Friends or Business 24x7. Now you can reach any Business 24x7 and buy when you wish​
+                                        Notify Friends or Business 24x7. Now you can reach any Business 24x7 and buy when you wish​
                                     </p>
                                 </div>
 
