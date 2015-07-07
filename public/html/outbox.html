@@ -27,7 +27,7 @@
                                 <a href="#"><i class="fa fa-trash-o"></i> Trash</a>
                             </li>
                             <li class="index-menu-item group index-title">
-                                <a href="#"><i class=" fa fa-external-link"></i> Groups <span class="label label-info">30</span></a>
+                                <a ng-click="modalAddGroupVisibility()"><i class=" fa fa-external-link"></i> Groups <span class="label label-info">30</span></a>
                             </li>
                             <!-- groups goes here -->
                             <li class="index-menu-item group">
@@ -233,5 +233,204 @@
     </modal>
     <!-- transaction history item modal ends here -->
     <!-- Footer goes here -->
+
+    <!-- Modal Box of Add/Edit Group -->
+    <modal mtitle="modal.title" mclass="modal.class" visible="modalAddGroupVisible">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 bottom-clearfix">
+                </div>
+                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 bottom-clearfix">
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+                </div>
+                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 bottom-clearfix">
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 bottom-clearfix">
+                    <button class="btn btn-primary btn-block" ng-click="closeResourceModalBox()"><span class="glyphicon glyphicon-trash"></span>  Delete(Group)</button>
+                </div>
+                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 bottom-clearfix">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 bottom-clearfix">
+                </div>
+                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 bottom-clearfix">
+                    Group Title
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+                    <div class="form-group">
+                        <input class="form-control" maxlength="50" ng-model="modalBox.item.title"/>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                    <div class="form-group">
+                        <select class="form-control" name="TitleSelect">
+                            <option value = ""> -- Select Action -- </option>
+                            <option value = ""> Delete Group </option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 bottom-clearfix">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 bottom-clearfix">
+                </div>
+                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 bottom-clearfix">
+                    Add New Member
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+                    <div class="form-group">
+                        <input class="form-control" placeholder="Enter EZEOne ID or group name" maxlength="50" ng-model="modalBox.item.title"/>
+                    </div>
+                </div>
+                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 bottom-clearfix">
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 bottom-clearfix">
+                    <button class="btn btn-primary btn-block" ng-click="closeResourceModalBox()"><span class="glyphicon glyphicon-search"></span>  Find</button>
+                </div>
+                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 bottom-clearfix">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 bottom-clearfix">
+                </div>
+                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 bottom-clearfix">
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+                    ###### is valid
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                    <div class="form-group">
+                        <select class="form-control" name="TitleSelect">
+                            <option value = ""> -- Select Action -- </option>
+                            <option value = ""> Join Group </option>
+                            <option value = ""> Add </option>
+                            <option value = ""> Delete </option>
+                            <option value = ""> Accept New Request(s) </option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 bottom-clearfix">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 bottom-clearfix">
+                </div>
+                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 bottom-clearfix">
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+                    Access denied
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+                </div>
+                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 bottom-clearfix">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 bottom-clearfix">
+                </div>
+                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 bottom-clearfix">
+                    Group Members
+                </div>
+                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix" style="overflow-y: auto; height:200px; border: 1px solid #ddd;">
+                    <table class="rwd-table">
+                        <tbody>
+                        <tr>
+                            <td>
+                                <input type="checkbox" name="vehicle" value="Bike">
+                            </td>
+                            <td>
+                                KRUNAL11
+                            </td>
+                            <td>
+                                Active
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <input type="checkbox" name="vehicle" value="Bike">
+                            </td>
+                            <td>
+                                TEST10
+                            </td>
+                            <td>
+                                New Request
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <input type="checkbox" name="vehicle" value="Bike">
+                            </td>
+                            <td>
+                                GOWRI
+                            </td>
+                            <td>
+                                Deleted
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <input type="checkbox" name="vehicle" value="Bike">
+                            </td>
+                            <td>
+                                KRUNALPAID
+                            </td>
+                            <td>
+                                Deleted
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <input type="checkbox" name="vehicle" value="Bike">
+                            </td>
+                            <td>
+                                IND1
+                            </td>
+                            <td>
+                                Declined
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <input type="checkbox" name="vehicle" value="Bike">
+                            </td>
+                            <td>
+                                TEST10
+                            </td>
+                            <td>
+                                New Request
+                            </td>
+                        </tr>
+
+                        </tbody>
+                    </table>
+
+                </div>
+                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 bottom-clearfix">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 bottom-clearfix">
+                </div>
+                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 bottom-clearfix">
+                </div>
+                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix">
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix no-padding">
+                        <input type="checkbox" checked name="vehicle" value="Bike">
+                        Hide Declined
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix no-padding">
+                        <input type="checkbox" checked name="vehicle" value="Bike">
+                        Hide Deleted
+                    </div>
+                </div>
+                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 bottom-clearfix">
+                </div>
+            </div>
+        </div>
+    </modal>
+
     <footer-section></footer-section>
 </section>

@@ -1041,7 +1041,7 @@ var res = angular.module('ezeidApp').
              * @param val: the original module visibility eg: 11111 or 11010
              * @returns {string} 11100 or 10011 : the number of 1s can't be more than 3
              */
-            $scope.refineModuleVisibility = function(val)
+            $scope.refineModuleVisibility = function(val,tid)
             {
                 if(val != null) {
                     val = val.split("");
