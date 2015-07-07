@@ -192,7 +192,6 @@ exports.FnSaveGatesVES = vesModule.saveGatesVES;
 exports.FnSaveCitysVES = vesModule.saveCitysVES;
 
 
-
 function error(err, req, res, next) {
     // log it
     console.error(err.stack);
@@ -212,7 +211,7 @@ var FinalMsgJson = JSON.parse(JSON.stringify(FinalMessage));
 
 var path ='D:\\EZEIDBanner\\';
 //ezeid email id:
-var EZEIDEmail = 'noreply@ezeid.com';
+var EZEIDEmail = 'noreply@ezeone.com';
 
 function FnSendMailEzeid(MailContent, CallBack) {
     try {
@@ -569,6 +568,32 @@ function FnMessageMail(MessageContent, CallBack) {
         return 'error'
     }
 };
+
+function FnGenerateToken() {
+    try {
+        var text = "";
+        var possible = "1234567890abcdefghjklmnopqrstuvwxyz!@#$%";
+
+        for (var i = 0; i < 10; i++) {
+
+            text += possible.charAt(Math.floor(Math.random() * possible.length));
+        }
+
+        var crypto = require('crypto'),
+            algorithm = 'aes-256-ctr',
+            key = 'hire@123';
+
+        var cipher = crypto.createCipher(algorithm, key)
+        var crypted = cipher.update(text, 'utf8', 'hex')
+        crypted += cipher.final('hex');
+        return crypted;
+    }
+    catch (ex) {
+        console.log('OTP generate error:' + ex.description);
+
+        return 'error'
+    }
+}
 
 //method to validate token
 function FnValidateToken(Token, CallBack) {

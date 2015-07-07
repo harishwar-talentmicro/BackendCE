@@ -15,7 +15,7 @@
 "use strict";
 
 var path ='D:\\EZEIDBanner\\';
-var EZEIDEmail = 'noreply@ezeid.com';
+var EZEIDEmail = 'noreply@ezeone.com';
 
 function alterEzeoneId(ezeoneId){
     var alteredEzeoneId = '';
@@ -34,31 +34,6 @@ function User(db){
     this.db = db;
 };
 
-function FnGenerateToken() {
-    try {
-        var text = "";
-        var possible = "1234567890abcdefghjklmnopqrstuvwxyz!@#$%";
-
-        for (var i = 0; i < 10; i++) {
-
-            text += possible.charAt(Math.floor(Math.random() * possible.length));
-        }
-
-        var crypto = require('crypto'),
-            algorithm = 'aes-256-ctr',
-            key = 'hire@123';
-
-        var cipher = crypto.createCipher(algorithm, key)
-        var crypted = cipher.update(text, 'utf8', 'hex')
-        crypted += cipher.final('hex');
-        return crypted;
-    }
-    catch (ex) {
-        console.log('OTP generate error:' + ex.description);
-
-        return 'error'
-    }
-}
 
 /**
  * Method : POST

@@ -12502,7 +12502,7 @@ exports.FnImageURL = function(req, res){
             message:''
         };
         if (image_id == 0 ){
-        if(image_url == 1) {
+            if(image_url == 1) {
             var image_url1 = 'http://104.199.128.226:3001/images/ezeone_pager_img1.jpg';
             var image_url2 = 'http://104.199.128.226:3001/images/ezeone_pager_img2.jpg';
             var image_url3 = 'http://104.199.128.226:3001/images/ezeone_pager_img3.jpg';
