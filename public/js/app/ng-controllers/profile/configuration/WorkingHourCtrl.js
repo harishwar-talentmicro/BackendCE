@@ -279,17 +279,4 @@ angular.module('ezeidApp').controller('WorkingHourCtrl',['$scope','$rootScope','
             getWorkingHourForEdit(_TID);
         };
 
-
-    $scope.modalVisible = false;
-    $scope.modalVisibility = function () {
-         /* toggle map visibility status */
-        $scope.modalVisible = !$scope.modalVisible;
-    };
-
-    /* modal box for loading Add/edit/join Group */
-    $scope.modal = {
-        title: 'Groups',
-        class: 'business-manager-modal'
-    };
-
 }]);
