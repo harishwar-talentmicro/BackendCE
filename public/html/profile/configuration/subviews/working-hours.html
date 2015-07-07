@@ -4,6 +4,203 @@
 </div>
     <div class="panel-body">
 
+    <!-- Modal Box content -->
+    <modal mtitle="modal.title" mclass="modal.class" visible="modalVisible">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 bottom-clearfix">
+                </div>
+                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 bottom-clearfix">
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+                </div>
+                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 bottom-clearfix">
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 bottom-clearfix">
+                    <button class="btn btn-primary btn-block" ng-click="closeResourceModalBox()"><span class="glyphicon glyphicon-trash"></span>  Delete(Group)</button>
+                </div>
+                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 bottom-clearfix">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 bottom-clearfix">
+                </div>
+                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 bottom-clearfix">
+                    Group Title
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+                    <div class="form-group">
+                        <input class="form-control" maxlength="50" ng-model="modalBox.item.title"/>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+                    <div class="form-group">
+                        <select class="form-control" name="TitleSelect">
+                            <option value = ""> -- Select Action -- </option>
+                            <option value = ""> Delete Group </option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 bottom-clearfix">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 bottom-clearfix">
+                </div>
+                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 bottom-clearfix">
+                    Add New Member
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+                    <div class="form-group">
+                        <input class="form-control" placeholder="Enter EZEOne ID or group name" maxlength="50" ng-model="modalBox.item.title"/>
+                    </div>
+                </div>
+                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 bottom-clearfix">
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 bottom-clearfix">
+                    <button class="btn btn-primary btn-block" ng-click="closeResourceModalBox()"><span class="glyphicon glyphicon-search"></span>  Find</button>
+                </div>
+                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 bottom-clearfix">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 bottom-clearfix">
+                </div>
+                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 bottom-clearfix">
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+                    ###### is valid
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+                    <div class="form-group">
+                        <select class="form-control" name="TitleSelect">
+                            <option value = ""> -- Select Action -- </option>
+                            <option value = ""> Join Group </option>
+                            <option value = ""> Add </option>
+                            <option value = ""> Delete </option>
+                            <option value = ""> Accept New Request(s) </option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 bottom-clearfix">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 bottom-clearfix">
+                </div>
+                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 bottom-clearfix">
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+                    Access denied
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
+                </div>
+                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 bottom-clearfix">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 bottom-clearfix">
+                </div>
+                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 bottom-clearfix">
+                    Group Members
+                </div>
+                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix" style="overflow-y: auto; height:200px;">
+                    <table class="rwd-table">
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <input type="checkbox" name="vehicle" value="Bike">
+                                </td>
+                                <td>
+                                    KRUNAL11
+                                </td>
+                                <td>
+                                    Active
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <input type="checkbox" name="vehicle" value="Bike">
+                                </td>
+                                <td>
+                                    TEST10
+                                </td>
+                                <td>
+                                    New Request
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <input type="checkbox" name="vehicle" value="Bike">
+                                </td>
+                                <td>
+                                    GOWRI
+                                </td>
+                                <td>
+                                    Deleted
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <input type="checkbox" name="vehicle" value="Bike">
+                                </td>
+                                <td>
+                                    KRUNALPAID
+                                </td>
+                                <td>
+                                    Deleted
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <input type="checkbox" name="vehicle" value="Bike">
+                                </td>
+                                <td>
+                                    IND1
+                                </td>
+                                <td>
+                                    Declined
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <input type="checkbox" name="vehicle" value="Bike">
+                                </td>
+                                <td>
+                                    TEST10
+                                </td>
+                                <td>
+                                    New Request
+                                </td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+
+                </div>
+                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 bottom-clearfix">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 bottom-clearfix">
+                </div>
+                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 bottom-clearfix">
+                </div>
+                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix">
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix no-padding">
+                        <input type="checkbox" checked name="vehicle" value="Bike">
+                        Hide Declined
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix no-padding">
+                        <input type="checkbox" checked name="vehicle" value="Bike">
+                        Hide Deleted
+                    </div>
+                </div>
+                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 bottom-clearfix">
+                    </div>
+            </div>
+        </div>
+    </modal>
 <!------------- Content goes inside this region ---------------------->
         <div class="container-fluid">
             <div ng-hide="showAddWorkingHourForm" class="row bottom-clearfix">
@@ -12,7 +209,9 @@
                 </div>
             </div>
 
-            <div ng-hide="showAddWorkingHourForm" class="workingHourConfigListing">
+            <button class="btn btn-primary btn-sm marginL10" ng-click="modalVisibility()"><span class="glyphicon glyphicon-plus"></span> Add new group</button>
+
+            <div ng-hide="showAddWorkingHourForm" class="workingHourConfigListing" style="overflow-y: auto; height:200px;">
                 <table class="rwd-table">
                     <tbody>
                    <tr ng-repeat="_item in result">
@@ -42,7 +241,7 @@
 
             <div ng-show="showAddWorkingHourForm">
                 <form name="workingHoursForm" novalidate>
-
+ 
                     <div class="row">
                         <div class="col-lg-5 col-md-5 col-sm-5 col-xs-12 setTopMarginOneNhalf">
                             <span>Working Calendar Template</span>
@@ -376,7 +575,7 @@
                         </div>
                     </div>
 
-    </form>
+                </form>
             </div>
 
         </div>

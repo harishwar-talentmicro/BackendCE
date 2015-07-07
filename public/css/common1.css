@@ -1728,38 +1728,9 @@ table.rwd-table > tbody > tr > td.serachResultSelectAll
     font-size: 13px;
     color:#FFF;
 }
-.workingCalander > .datetimepicker
-{
-    width: 8%;
-    float: right;
-    margin-right: 1%;
-}
-.workingCalander > .datetimepicker > .form-control
-{
-   padding: 6px 3px;
-}
-.workingCalander > .datetimepicker > .input-group-addon
-{
-    padding: 3px 8px;
-    font-size: 10px;
-    display:none;
-}
-
-.hourCell > .datetimepicker > .form-control
-{
-    padding: 6px 3px;
-}
-.hourCell > .datetimepicker > .input-group-addon
-{
-    padding: 3px 8px;
-    font-size: 10px;
-    display:none;
-}
-
 .padding-4px{
     padding: 4px;
 }
-
 .remove-datepicker-addon > .datetimepicker > .input-group-addon{
     display: none;
 }
