@@ -8,7 +8,7 @@
  */
 "use strict";
 var path ='D:\\EZEIDBanner\\';
-
+var EZEIDEmail = 'noreply@ezeid.com';
 function alterEzeoneId(ezeoneId){
     var alteredEzeoneId = '';
     if(ezeoneId){

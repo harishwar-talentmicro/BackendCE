@@ -207,6 +207,7 @@ app.get('/get_outbox_messages',LocationManager.FnGetOutboxMessages);
 app.get('/get_workinghours_list',LocationManager.FnGetworkinghoursList);
 app.get('/ezeoneid',LocationManager.FnGetEZEOneIDInfo);
 app.get('/get_workinghours_details',LocationManager.FnWorkingHoursDetails);
+app.get('/image_url',LocationManager.FnImageURL);
 
 
 
@@ -256,14 +257,6 @@ app.get('/:page/:subpage',function(req,res){
     res.sendFile(__dirname + '/public/html/index.html');
 });
 
-/**
- * When user is not logged in then also let him navigate to searchInformation page of front end
- */
-app.get('/:ezeid',LocationManager.FnSearchBusListing);
-/**
- * Used for WebLinks
- * eg. http://www.ezeid.com/TALENTMICRO.U12
- */
 app.get('/:id',LocationManager.FnWebLinkRedirect);
 
 app.get('/:page',function(req,res){

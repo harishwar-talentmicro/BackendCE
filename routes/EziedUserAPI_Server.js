@@ -10706,96 +10706,6 @@ exports.FnGetLocationListForEZEID = function (req, res) {
     }
 };
 
-/**
- * Finds the user login status using a cookie login
- * which is created by angular at the time of signin or signup
- * @param req
- * @param res
- * @param next
- * @constructor
- */
-exports.FnSearchBusListing = function(req,res,next){
-    /**
-     * HTML Pages list from angular routings scheme
-     * Any new url pattern addition in angular should be added in this list also
-     * @type {string[]}
-     */
-    var htmlPagesList = [
-        'signup',
-        'messages',
-        'landing',
-        'access-history',
-        'busslist',
-        'terms',
-        'help',
-        'legal',
-        'blackwhitelist',
-        'salesenquiry',
-        'bulksalesenquiry',
-        'viewdirection',
-        'service-reservation',
-        'business-manager',
-        'profile-manager',
-        'searchResult',
-        'searchDetails',
-        'outbox'
-    ];
-
-    var loginCookie = (req.cookies['login']) ? ((req.cookies['login'] === 'true') ? true : false ) : false;
-    if(!loginCookie){
-        /**
-         * Checks if ezeid parameter is existing and checks in the list that is it a
-         * ezeid angular url using the htmlPageList
-         * If not then it will see in the database for
-         * business ID
-         */
-        if(req.params['ezeid'] && htmlPagesList.indexOf(req.params.ezeid) === -1){
-            /**
-             * Checking the EZEID for it's validity
-             */
-            var arr = req.params.ezeid.split('.');
-
-            if(arr.length < 2 && arr.length > 0){
-                /**
-                 * Find if the user type is business or not
-                 */
-                var ezeidQuery = "SELECT tlocations.PIN AS PIN, tmaster.TID, tlocations.TID AS LID ,"+
-                    " tmaster.IDTypeID AS IDTypeID FROM tlocations"+
-                    " INNER JOIN tmaster ON " +
-                    "tmaster.TID = tlocations.MasterID AND tlocations.SeqNo = 0 AND tmaster.EZEID = "+
-                    db.escape(req.params.ezeid)+ " LIMIT 1";
-                db.query(ezeidQuery,function(err,results){
-                    if(!err){
-                        if(results.length > 0){
-                            if((!results[0].PIN) && results[0].IDTypeID !== 1){
-                                res.redirect('/searchDetails?searchType=2&TID='+results[0].LID);
-                            }
-                            else{
-                                next();
-                            }
-                        }
-                        else{
-                            next();
-                        }
-                    }
-                    else{
-                        next();
-                    }
-                });
-            }
-            else{
-                next();
-            }
-        }
-        else{
-            next();
-        }
-    }
-    else{
-        next();
-    }
-};
-
 //mehtod to save the reservation resource
 exports.FnSaveReservationResource = function(req, res){
     try{
@@ -12570,6 +12480,84 @@ exports.FnWorkingHoursDetails = function(req, res){
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
         console.log('FnWorkingHours:error ' + ex.description);
+        //throw new Error(ex);
+        res.status(400).json(responseMessage);
+    }
+};
+
+
+exports.FnImageURL = function(req, res){
+    try {
+
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var image_url = req.query.image_url;
+        var image_id = req.query.image_id;
+
+        var responseMessage = {
+            status: false,
+            data: null,
+            error:{},
+            message:''
+        };
+        if (image_id == 0 ){
+        if(image_url == 1) {
+            var image_url1 = 'http://104.199.128.226:3001/images/ezeone_pager_img1.jpg';
+            var image_url2 = 'http://104.199.128.226:3001/images/ezeone_pager_img2.jpg';
+            var image_url3 = 'http://104.199.128.226:3001/images/ezeone_pager_img3.jpg';
+            var image_url4 = 'http://104.199.128.226:3001/images/ezeone_pager_img4.jpg';
+            var image_url5 = 'http://104.199.128.226:3001/images/ezeone_pager_img5.jpg';
+            responseMessage.status = true;
+            responseMessage.data = {pager_url1: image_url1,pager_url2: image_url2, pager_url3: image_url3,pager_url4: image_url4,pager_url5: image_url5};
+            responseMessage.error = null;
+            responseMessage.message = ' Image URL Send successfully';
+            console.log('FnImageURL:Image URL Send successfully');
+            res.status(200).json(responseMessage);
+        }
+
+        else {
+            var image_url1 = 'http://104.199.128.226:3001/images/ezeone_splash_img.jpg';
+
+            responseMessage.status = true;
+            responseMessage.data = {splash_url: image_url1};
+            responseMessage.error = null;
+            responseMessage.message = ' Image URL Send successfully';
+            console.log('FnImageURL:Image URL Send successfully');
+            res.status(200).json(responseMessage);
+        }
+    }
+        else{
+            if(image_url == 1) {
+                var image_url1 = 'http://www.ezeone.com/images/ezeone_pager_img1.jpg';
+                var image_url2 = 'http://www.ezeone.com/images/ezeone_pager_img2.jpg';
+                var image_url3 = 'http://www.ezeone.com/images/ezeone_pager_img3.jpg';
+                var image_url4 = 'http://www.ezeone.com/images/ezeone_pager_img4.jpg';
+                var image_url5 = 'http://www.ezeone.com/images/ezeone_pager_img5.jpg';
+                responseMessage.status = true;
+                responseMessage.data = {pager_url1: image_url1,pager_url2: image_url2, pager_url3: image_url3,pager_url4: image_url4,pager_url5: image_url5};
+                responseMessage.error = null;
+                responseMessage.message = ' Image URL Send successfully';
+                console.log('FnImageURL:Image URL Send successfully');
+                res.status(200).json(responseMessage);
+            }
+
+            else {
+                var image_url1 = 'http://www.ezeone.com/images/ezeone_splash_img.jpg';
+
+                responseMessage.status = true;
+                responseMessage.data = {splash_url: image_url1};
+                responseMessage.error = null;
+                responseMessage.message = ' Image URL Send successfully';
+                console.log('FnImageURL:Image URL Send successfully');
+                res.status(200).json(responseMessage);
+            }
+        }
+    }
+    catch (ex) {
+        responseMessage.error = {};
+        responseMessage.message = 'An error occured !'
+        console.log('FnImageURL:error ' + ex.description);
         //throw new Error(ex);
         res.status(400).json(responseMessage);
     }
