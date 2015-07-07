@@ -279,12 +279,12 @@
              * so that it can be recalculated and saved when internal user changes or updates the order
              * @param msg
              * @usage parameter msg will be like
-             * msg = 'this is message text for this sales enquiry ------------------------------ Nuts(7), Bolts(6)
+             * msg = 'this is message text for this sales enquiry     Nuts(7), Bolts(6)
              * alteredMsg = 'this is message text for this sales enquiry'
              */
             var alterTransactionMessageToEdit = function(msg){
                 var alteredMsg = '';
-                var str = '------------------------------'; //30 characters
+                var str = '   '; //30 characters
                 var indexStr = msg.indexOf(str);
                 if(indexStr !== -1){
                     alteredMsg = msg.substr(0,indexStr);
@@ -1274,7 +1274,7 @@
                         });
                     }
                     else{
-                        if(n!==v){
+                        if(n !== v && (n.length > 0 || v.length > 0) ){
                             $scope.$emit('$preLoaderStart');
                             $scope.loadTransaction(1,$scope.filterStatus,$scope.txSearchTerm,$scope.sortBy).then(function(){
                                 $scope.$emit('$preLoaderStop');
@@ -1593,7 +1593,7 @@
 
 
                 if($scope.modules[moduleIndex].listType > 0){
-                    var separationStr = ' ------------------------------ ';
+                    var separationStr = '     ';
                     var itemList = [];
                     try{
                         itemList = JSON.parse(data.ItemsList);

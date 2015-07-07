@@ -1,6 +1,6 @@
 <div class="panel panel-default" ng-controller="HomeDeliveryCtrl">
     <!--<div class="panel-heading">-->
-    <!--<h3 class="font-roboto business-manager-module-heading">{{(_userInfo.SalesModuleTitle) ? _userInfo.SalesModuleTitle : 'Sales'}}</h3>-->
+    <!--<h3 class="font-roboto business-manager-module-heading">{{(_userInfo.HomeDeliveryModuleTitle) ? _userInfo.HomeDeliveryModuleTitle : 'HomeDelivery'}}</h3>-->
     <!--</div>-->
     <div class="panel-body">
         <div class="row">
@@ -476,33 +476,33 @@
                                 </div>
 
 
-                                <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
-                                    <div class="row">
-                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                            <label>Company</label>
-                                        </div>
-                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12"
-                                             ng-if="!modalBox.editMode" ng-show="!modalBox.editMode">
-                                            <!--<div class="form-group form-group-sm ">-->
-                                            <!--<input type="text" class="form-control no-radius"-->
-                                            <!--placeholder="Company Name"-->
-                                            <!--ng-disabled="modalBox.tx.ezeid"-->
-                                            <!--ng-model="modalBox.tx.companyName"-->
-                                            <!--ng-model-options="{updateOn : 'blur',debounce : {'blur': 0} }"/>-->
+                                <!--<div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">-->
+                                    <!--<div class="row">-->
+                                        <!--<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">-->
+                                            <!--<label>Company</label>-->
+                                        <!--</div>-->
+                                        <!--<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12"-->
+                                             <!--ng-if="!modalBox.editMode" ng-show="!modalBox.editMode">-->
+                                            <!--&lt;!&ndash;<div class="form-group form-group-sm ">&ndash;&gt;-->
+                                            <!--&lt;!&ndash;<input type="text" class="form-control no-radius"&ndash;&gt;-->
+                                            <!--&lt;!&ndash;placeholder="Company Name"&ndash;&gt;-->
+                                            <!--&lt;!&ndash;ng-disabled="modalBox.tx.ezeid"&ndash;&gt;-->
+                                            <!--&lt;!&ndash;ng-model="modalBox.tx.companyName"&ndash;&gt;-->
+                                            <!--&lt;!&ndash;ng-model-options="{updateOn : 'blur',debounce : {'blur': 0} }"/>&ndash;&gt;-->
+                                            <!--&lt;!&ndash;</div>&ndash;&gt;-->
+                                            <!--<autocomplete-->
+                                                    <!--list="companySuggestionList"-->
+                                                    <!--company-id="modalBox.tx.companyId"-->
+                                                    <!--company-name="modalBox.tx.companyName"-->
+                                                    <!--load-suggestion="loadSuggestion"></autocomplete>-->
+                                        <!--</div>-->
+                                        <!--<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-show="modalBox.editMode">-->
+                                            <!--<div class="form-group form-group-sm">-->
+                                                <!--<input class="form-control" disabled type="text" value="{{modalBox.tx.companyName}}"/>-->
                                             <!--</div>-->
-                                            <autocomplete
-                                                    list="companySuggestionList"
-                                                    company-id="modalBox.tx.companyId"
-                                                    company-name="modalBox.tx.companyName"
-                                                    load-suggestion="loadSuggestion"></autocomplete>
-                                        </div>
-                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-show="modalBox.editMode">
-                                            <div class="form-group form-group-sm">
-                                                <input class="form-control" disabled type="text" value="{{modalBox.tx.companyName}}"/>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                                        <!--</div>-->
+                                    <!--</div>-->
+                                <!--</div>-->
 
                                 <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
                                     <div class="row">
@@ -667,9 +667,6 @@
 
                                 <div class="col-lg-12 col-md-12 col-sm-6 col-xs-12">
                                     <div class="row">
-                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                            <label> Address</label>
-                                        </div>
                                         <!--<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-hide="modalBox.editMode">-->
                                         <!--<div class="form-group form-group-sm ">-->
                                         <!--<select class="form-control" ng-model="modalBox.tx.locId" ng-change="findAddress()">-->
@@ -836,7 +833,7 @@
                                         <div class="col-md-12 col-sm-12 col-xs-12 front-business-form cart-details" ng-show="modalBox.tx.itemList && modalBox.tx.itemList.length > 0">
                                             <b><i class="fa fa-shopping-cart"></i> {{cartItemString}}
                                                 <span class="pull-right"
-                                                      ng-show="homeDeliveryItemListType > 3">
+                                                      ng-show="_userInfo.HomeDeliveryItemListType > 3">
                                                     {{cartAmount}}
                                                 </span>
                                             </b>
@@ -861,7 +858,7 @@
                                     </button>
                                     <button ng-click="saveTransaction()"
                                             class="btn btn-success btn-sm no-radius" ng-show="modalBox.editMode"
-                                            title="(homeDeliveryPermissionConf.txUpdate) ? 'Update home delivery order' : 'You do not have editing permission'"
+                                            title="(homeDeliveryPermissionConf.txUpdate) ? 'Update order' : 'You do not have editing permission'"
                                             ng-disabled="(!homeDeliveryPermissionConf.txUpdate)">
                                         <span class="glyphicon glyphicon-ok-circle"></span>
                                         Update

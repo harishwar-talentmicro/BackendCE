@@ -734,7 +734,7 @@
                         msg += ', ';
                     }
                     msg = msg.substring(0, msg.length - 2);
-                    msg = ' ------------------------------ ' + msg; // String 30 characters and 2 spaces
+                    msg = '     ' + msg; // String 30 characters and 2 spaces
                     data.MessageText = $scope.modalBox.tx.message + msg;
                 }
 
