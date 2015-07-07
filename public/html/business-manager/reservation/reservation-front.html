@@ -192,10 +192,10 @@
                 <!--</div>-->
                 <div class="row">
                     <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 text-right">
-                        <p class="text-black">Approx. Duration</p>
+                        <p class="text-black">Duration(mins)</p>
                     </div>
                     <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8">
-                        <input id="duration" data-duration="{{duration}}" type="text" class="form-control" disabled value="{{duration}} mins" />
+                        <input id="duration" data-duration="{{duration}}" type="number" ng-model="duration" class="form-control" ng-disabled="accessRight != 2" />
                     </div>
                 </div>
                 <div class="row">
@@ -204,6 +204,14 @@
                     </div>
                     <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8">
                         <input ng-model="reserverMobile" ng-model-options="{updateOn : 'blur',debounce : { 'blur' : 0} }" numbers-only maxlength="13" id="userMobile" class="form-control" value="" />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 text-right">
+                        <p class="text-black">Notes</p>
+                    </div>
+                    <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8">
+                        <input maxlength="50" id="userNote" class="form-control" value="{{notes}}" placeholder="Notes for resource" />
                     </div>
                 </div>
                 <div class="row p-bottom-3">
