@@ -11638,10 +11638,11 @@ exports.FnSaveReservTransaction = function(req, res){
 						console.log('CALL pSaveResTrans(' + query + ')');
 						
                         db.query('CALL pSaveResTrans(' + query + ')', function (err, insertResult) {
-                            console.log(insertResult);
+                            console.log(insertResult[0]);
+                            console.log(insertResult[0].length);
                             console.log(err);
                              if (!err){
-                                if (insertResult) {
+                                if (insertResult[0].length <= 0) {
                                     responseMessage.status = true;
                                     responseMessage.error = null;
                                     responseMessage.message = 'Resource Transaction details save successfully';

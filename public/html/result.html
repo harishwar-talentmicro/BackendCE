@@ -48,7 +48,7 @@
                                     </ul>
                                 </div>
 
-                                <input type="text" ng-keypress="(searchKey($event))" placeholder="{{placeHolderText[params.searchType - 1]}}" ng-model="params.searchTerm" ng-class="(params.searchType === 1) ? 'text-uppercase' : ''" class="form-control width-search-bar" aria-label="...">
+                                <input type="text" id="tags" ng-keypress="(searchKey($event))" placeholder="{{placeHolderText[params.searchType - 1]}}" ng-model="params.searchTerm" ng-class="(params.searchType === 1) ? 'text-uppercase' : ''" class="form-control width-search-bar" aria-label="...">
                                 <div class="input-group-btn">
                                     <!-- Advance Search BTN -->
                                     <button ng-disabled="params.searchType === 1"  ng-click="(toggleFilterContainer($event,true))(isFilterOptionsShown = false)" type="button" class="btn btn-default dropdown-toggle btn-advanced-filter no-radius" data-toggle="dropdown" title="Click to choose Search Options"><i class="fa fa-check-square-o"></i> Options</Filter></button>

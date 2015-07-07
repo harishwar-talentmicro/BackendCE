@@ -50,7 +50,7 @@ Location.prototype.getAll = function(req,res,next){
         var Token = req.query.Token;
 
         if (Token != null && Token != '') {
-            FnValidateToken(Token, function (err, Result) {
+            _this.stdLib.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result) {
                         _this._this.db.query('CALL pGetSecondaryLocationDetails(' + _this._this.db.escape(Token) + ')', function (err, SecondaryResult) {
@@ -151,7 +151,7 @@ Location.prototype.save = function(req,res,next){
         var TemplateID = (req.body.TemplateID) ? req.body.TemplateID : 0;
 
         if (TID.toString() != 'NaN' && Token != null && CityName != null && StateID.toString() != 'NaN' && CountryID.toString() != 'NaN' && LocTitle != null && AddressLine1 != null && Longitude.toString() != 'NaN' && Latitude.toString() != 'NaN') {
-            FnValidateToken(Token, function (err, Result) {
+            _this.stdLib.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result) {
 
@@ -281,7 +281,7 @@ Location.prototype.deleteLocation = function(req,res,next) {
         };
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
         if (token != null && token != '' && TID.toString() != 'NaN') {
-            FnValidateToken(token, function (err, Result) {
+            _this.stdLib.validateToken(token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
                         var query = 'DELETE FROM tlocations where TID=' + _this.db.escape(TID);
@@ -358,7 +358,7 @@ Location.prototype.getAllForEzeid = function(req,res,next){
         console.log(req.query.Token);
         console.log(Token);
         if (Token && TID) {
-            FnValidateToken(Token, function (err, Result) {
+            _this.stdLib.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result) {
                         //var Query ='select TID, MasterID,LocTitle, Latitude, Longitude,MobileNumber,ifnull((Select FirstName from tmaster where TID='+_this.db.escape(TID)+'),"") as FirstName,ifnull((Select LastName from tmaster where TID='+_this.db.escape(TID)+'),"")  as LastName from tlocations where MasterID='+_this.db.escape(TID);
@@ -446,7 +446,7 @@ Location.prototype.getLoactionList = function(req,res,next){
         var Token = req.query.Token;
 
         if (Token != null) {
-            FnValidateToken(Token, function (err, Result) {
+            _this.stdLib.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
 

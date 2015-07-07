@@ -169,6 +169,40 @@ angular.module('ezeidApp').
              * @param e
              */
             $scope.checkEnterKey = function (e) {
+                var aKeyWords = [];
+                if($scope.searchParams.searchType == 2)
+                {
+                    aKeyWords = [
+                        "Physician Doctor",
+                        "Pharmacy",
+                        "Breakfast",
+                        "Lunch",
+                        "Fast Food",
+                        "Fine Dining",
+                        "Mall",
+                        "Pub",
+                        "Bar & Restaurant",
+                        "Cofee Shop",
+                        "SPA",
+                        "Salon"
+                    ];
+
+                    $( "#tags" ).autocomplete({
+                        source: aKeyWords
+                    });
+
+                    $("#tags").on("autocompleteselect", function( event, ui ) {
+                        $scope.searchParams.searchTerm = ui.item.value;
+                    });
+                }
+                else
+                {
+                    aKeyWords = [];
+                    $( "#tags" ).autocomplete({
+                        source: aKeyWords
+                    });
+                }
+
                 if (e.charCode === 13 && $scope.searchParams.searchTerm.length > 0) {
                     $scope.triggerSearch();
                 }
@@ -523,5 +557,6 @@ angular.module('ezeidApp').
              * Initiate tool tip
              */
             $('[data-toggle="tooltip"]').tooltip();
+
         }]);
 
