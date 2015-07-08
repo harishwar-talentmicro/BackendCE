@@ -95,18 +95,18 @@
                                                     <div ng-hide="(SearchInfo.Redflagstatus == 1)">
                                                         <div ng-show="SearchInfo.BannerImage">
                                                            <!-- <img class="" width="356px" height="356px" ng-src="{{SearchInfo.BannerImage}}" />-->
-                                                            <img width="348px" height="356px" ng-src="{{SearchInfo.BannerImage}}" />
+                                                            <img class="imgSetBorder" width="348px" height="356px" ng-src="{{SearchInfo.BannerImage}}" />
 
                                                             <img class="imgLeft showPointer" ng-show="previousButton == true" ng-click="getPreviousBanner()" src="images/arrow_left.png" />
                                                             <img class="imgRight showPointer" ng-show="nextButton == true" ng-click="getNextBanner()" src="images/arrow_right.png" />
                                                         </div>
                                                         <div ng-hide="SearchInfo.BannerImage">
-                                                            <img class="" width="348px" height="356px" ng-src="images/new_banner.gif" />
+                                                            <img class="imgSetBorder" width="348px" height="356px" ng-src="images/new_banner.gif" />
                                                         </div>
                                                     </div>
 
                                                     <div class="newRedBanner" ng-show="(SearchInfo.Redflagstatus == 1)">
-                                                        <div class="row setRowLeftRightMarginZero searchProximityRange bewareTextSize" style="margin-top: 42%;">
+                                                        <div class="row setRowLeftRightMarginZero searchProximityRange bewareTextSize">
                                                             <b> BEWARE !!! </b>
                                                         </div>
                                                         <div class="row setRowLeftRightMarginZero searchProximityRange bewareTextMessage">
@@ -121,25 +121,25 @@
                                                     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setPaddingLeftRight0">
                                                         <div ng-show="SearchInfo.Picture">
                                                             <div ng-show="SearchInfo.IDTypeID == 1" class="row addItemRowUserEzeid1">
-                                                                <img class="profilePicBorder" width="148px" height="148px" ng-src="{{SearchInfo.Picture}}">
+                                                                <img class="profilePicBorder imgSetBorder" width="148px" height="148px" ng-src="{{SearchInfo.Picture}}">
                                                             </div>
                                                             <div ng-hide="SearchInfo.IDTypeID == 1" class="row addItemRowUserEzeid1">
-                                                                <img class="profilePicBorderBusiness" width="315px" height="155px" ng-src="{{SearchInfo.Picture}}">
+                                                                <img class="profilePicBorderBusiness imgSetBorder" width="315px" height="155px" ng-src="{{SearchInfo.Picture}}">
                                                             </div>
                                                         </div>
                                                         <div ng-hide="SearchInfo.Picture">
                                                             <div ng-show="SearchInfo.IDTypeID == 1" class="row addItemRowUserEzeid1">
-                                                                <img class="profilePicBorder" width="148px" height="148px" ng-src="../images/new_individual.png">
+                                                                <img class="profilePicBorder imgSetBorder" width="148px" height="148px" ng-src="../images/new_individual.png">
                                                             </div>
                                                             <div ng-hide="SearchInfo.IDTypeID == 1" class="row addItemRowUserEzeid1">
-                                                                <img class="profilePicBorderBusiness" width="315px" height="155px" ng-src="../images/business_profile_pic.png">
+                                                                <img class="profilePicBorderBusiness imgSetBorder" width="315px" height="155px" ng-src="../images/business_profile_pic.png">
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                                 <div class="row setRowLeftRightMarginZero">
                                                     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setPaddingLeftRight0">
-                                                        <div class="row addItemRowUserEzeid">
+                                                        <div class="row addItemRowUserEzeid topMarginButton">
                                                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                                                 <span class="ezeidTitle"><b> {{SearchInfo.EZEID}} </b></span>
                                                             </div>
