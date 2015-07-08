@@ -3,7 +3,7 @@ var DbHelper = require('./../helpers/DatabaseHandler'),
 
 var StdLib = require('./modules/std-lib.js');
 var stdLib = new StdLib(db);
-exports.FnSendMail = userModule.sendMail;
+exports.FnSendMail = stdLib.sendMail;
 
 var User = require('./modules/user-module.js');
 var userModule = new User(db,stdLib);
