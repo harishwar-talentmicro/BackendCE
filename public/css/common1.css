@@ -1761,3 +1761,81 @@ table.rwd-table > tbody > tr > td.serachResultSelectAll
     border: 1px solid #FFF;
 }
 
+.idp .ezeid-text
+{
+    text-align: center;
+    padding-top: 22px;
+}
+
+.idp .ezeid-text-font
+{
+    font-size: 1.4em;
+    color: rgb(61, 184, 109);
+}
+
+.idp .company-text
+{
+    text-align: center;
+    padding-top: 5px;
+}
+
+.idp .company-text-font
+{
+    font-size: 1.3em;
+    color: rgb(40, 158, 158);
+    text-shadow: 1px 1px 1px #2970A3 !important;
+}
+
+.idp .text-company-gray
+{
+    color: #ADA1A1 !important;
+}
+
+.idp .text-pink
+{
+    color: rgb(240, 84, 197);
+}
+
+.idp .tag-line
+{
+    font-size: 1.1em;
+    font-style: italic;
+}
+
+.idp .quote-style
+{
+    color: #825BAD !important;
+    font-size: 1.2em;
+}
+
+.idp .pad-top-20
+{
+    padding-top: 20px;
+}
+
+.idp .style-three {
+    border: 0;
+    height: 1px;
+    background-image: -webkit-linear-gradient(left, rgba(0,0,0,0), rgba(252, 153, 0, 0.75), rgba(0,0,0,0));
+    background-image: -moz-linear-gradient(left, rgba(0,0,0,0), rgba(0,0,0,0.75), rgba(0,0,0,0));
+    background-image: -ms-linear-gradient(left, rgba(0,0,0,0), rgba(0,0,0,0.75), rgba(0,0,0,0));
+    background-image: -o-linear-gradient(left, rgba(0,0,0,0), rgba(0,0,0,0.75), rgba(0,0,0,0));
+}
+
+.idp .mobile-font
+{
+    font-size: 1.1em;
+    text-shadow: 1px 1px #BBB;
+    color: grey;
+}
+
+.idp .address-font
+{
+    text-shadow: 1px 1px #CBCBCB;
+    color: rgb(0, 148, 255);
+}
+
+.idp .btn-cont .col-lg-4
+{
+    text-align: center;
+}
