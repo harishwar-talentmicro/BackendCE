@@ -23,25 +23,33 @@
                                                                     "inline" : true,
                                                                     "maxDate" : "2029/01/01"
                                                                     }'>
+
                             </date-time-picker>
                         </div>
                         <!-- Notes section goes here[Shown only to resource] -->
-                        <div ng-show="(isResource && resources.length > 0) && (accessRight == 1 || accessRight  == 2)" ng-hide="!accessRight" id="notes-block">
+                        <div ng-init="reservationAccess = ((isResource && resources.length > 0) && (accessRight == 1 || accessRight  == 2))" ng-show="isSelfReservationExists || ((isResource && resources.length > 0) && (accessRight == 1 || accessRight  == 2))" id="notes-block {{isSelfReservationExists}} {{reservationAccess}}">
                             <div class="notes-heading">
                                 <i class="fa fa-list"></i> Appointments
                             </div>
+                            <!-- just setting the access flag for furthur use -->
                             <!-- Daily Appointments goes here -->
-                            <div class="notes-content border-bottom-gray p-top-7" ng-repeat="rtime in reservedTime track by $index">
+                            <div class="notes-content border-bottom-gray p-top-7"
+                                 ng-repeat="rtime in reservedTime track by $index"
+                                 ng-show="((isResource && resources.length > 0 && reservedTime[$index][2].length > 0) && (accessRight == 1 || accessRight  == 2))
+                                    ||
+                                    isSelfReservationExist(reservedTime[$index][6])">
                                 <!--<div ng-show="reservedTime[$index][2].length > 0">-->
-                                <div ng-show="reservedTime[$index][2].length > 0" ng-click="flashEffect(reservedTime[$index][6])">
+                                <div ng-click="flashEffect(reservedTime[$index][6])">
+
                                     <i>{{reservedTime[$index][2]}}</i>
                                     <small>for <b> {{reservedTime[$index][4]}}</b> ({{convertMinutesToTime(reservedTime[$index][0])}} - {{convertMinutesToTime(reservedTime[$index][1])}})</small>
                                     <br>
                                     <div class="text-right p-bottom-3">
-                                        <button title="Close" ng-disabled="reservedTime[$index][5] == 12" ng-class="[reservedTime[$index][5] == 12?'btn-danger':'btn-primary','btn-'+reservedTime[$index][6]+'-'+12,'btn-'+reservedTime[$index][6]]" ng-click="changeStatus(reservedTime[$index][6],12)" class="btn btn-xs"><i class="fa fa-user-times"></i> No Show</button>
-                                        <button title="Close" ng-disabled="reservedTime[$index][5] == 10" ng-class="[reservedTime[$index][5] == 10?'btn-danger':'btn-primary','btn-'+reservedTime[$index][6]+'-'+10,'btn-'+reservedTime[$index][6]]" ng-click="changeStatus(reservedTime[$index][6],10)" class="btn btn-xs"><i class="fa fa-check-square-o"></i> Close</button>
+                                        <button ng-hide="!reservationAccess && isSelfReservationExists" title="no-show" ng-disabled="reservedTime[$index][5] == 12" ng-class="[reservedTime[$index][5] == 12?'btn-danger':'btn-primary','btn-'+reservedTime[$index][6]+'-'+12,'btn-'+reservedTime[$index][6]]" ng-click="changeStatus(reservedTime[$index][6],12)" class="btn btn-xs"><i class="fa fa-user-times"></i> No Show</button>
+                                        <button ng-hide="!reservationAccess && isSelfReservationExists" title="Close" ng-disabled="reservedTime[$index][5] == 10" ng-class="[reservedTime[$index][5] == 10?'btn-danger':'btn-primary','btn-'+reservedTime[$index][6]+'-'+10,'btn-'+reservedTime[$index][6]]" ng-click="changeStatus(reservedTime[$index][6],10)" class="btn btn-xs"><i class="fa fa-check-square-o"></i> Close</button>
                                         <button title="cancel" ng-disabled="reservedTime[$index][5] == 11" ng-class="[reservedTime[$index][5] == 11?'btn-danger':'btn-primary','btn-'+reservedTime[$index][6]+'-'+11,'btn-'+reservedTime[$index][6]]" ng-click="changeStatus(reservedTime[$index][6],11)" class="btn btn-xs p-bottom-3"><i class="fa fa-times-circle"></i> Cancel</button>
                                     </div>
+
                                 </div>
                                 <!-- No Appointment message -->
                                 <p ng-hide="reservedTime[$index][2].length > 0">No Appointments Available</p>
@@ -87,7 +95,7 @@
                                                         </option>
                                                     </select>
                                                 </div>
-                                                <div class="col-lg-7 col-md-7 col-sm-7 col-xs-7">&nbsp;</div>
+                                                <div class="col-lg-7 col-md-7 col-sm-7 col-xs-7 text-1-9 text-primary">&nbsp;</div>
                                             </div>
                                         </div>
                                     </div>
@@ -127,21 +135,40 @@
             </div>
         </div>
     </section>
+
     <!-- Modal box to make a reservation -->
     <modal mtitle="modal.title" mclass="modal.class" visible="modalVisible">
         <div class="row width-75">
             <div class="reservation-form" ng-show="currentServiceArray.length > 0" >
                 <div class="row">
+                    <!-- Reservation services goes here -->
                     <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 text-right">
                         <p class="text-black">Service</p>
 
                     </div>
-                    <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8">
-                        <select id="service" ng-change="updateReservationFormData(reservationService)" class="form-control reservation-service"
-                                ng-model="reservationService">
-                            <option data-id="{{$index}}" value="{{currentServiceArray[$index].tid}}"
-                                    ng-repeat="service in currentServiceArray track by $index">{{currentServiceArray[$index].title}}</option>
-                        </select>
+                    <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 service-dropdown">
+
+                        <button type="button"
+                                ng-click="serviceDropdown()"
+                                class="btn btn-default btn-sm dropdown-toggle form-control"
+                                data-toggle="dropdown">
+                            Select &nbsp; <i class="fa fa-arrow-circle-down"></i>
+                            <!--<span class="caret"></span>-->
+                        </button>
+
+                        <ul class="dropdown-menu services">
+                            <li ng-repeat="service in currentServiceArray track by $index">
+                                <a ng-mouseover="calculateTotalDuration()" href="#" class="small" data-value="{{$index}}">
+                                    <input name="service-chk" class="service-chk" type="checkbox" data-duration="{{currentServiceArray[$index].duration}}"  value="{{currentServiceArray[$index].tid}}" />&nbsp;{{currentServiceArray[$index].title}}</a>
+                            </li>
+                        </ul>
+
+
+                        <!--<select id="service" ng-change="updateReservationFormData(reservationService)" class="form-control reservation-service"-->
+                        <!--ng-model="reservationService">-->
+                        <!--<option data-id="{{$index}}" value="{{currentServiceArray[$index].tid}}"-->
+                        <!--ng-repeat="service in currentServiceArray track by $index">{{currentServiceArray[$index].title}}</option>-->
+                        <!--</select>-->
                     </div>
                 </div>
                 <div class="row">
@@ -152,20 +179,20 @@
                         <input id="start-time" ng-blur="changeEndTime()" type="text" ng-model="startTime" class="form-control" ng-disabled="!modal.isUpdate" />
                     </div>
                 </div>
+                <!--<div class="row">-->
+                <!--<div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 text-right">-->
+                <!--<p class="text-black">Approx. End Time</p>-->
+                <!--</div>-->
+                <!--<div class="col-lg-8 col-md-8 col-sm-8 col-xs-8">-->
+                <!--<input id="end-time" type="text" class="form-control" disabled value="{{endTime}}" />-->
+                <!--</div>-->
+                <!--</div>-->
                 <div class="row">
                     <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 text-right">
-                        <p class="text-black">Approx. End Time</p>
+                        <p class="text-black">Duration(mins)</p>
                     </div>
                     <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8">
-                        <input id="end-time" type="text" class="form-control" disabled value="{{endTime}}" />
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 text-right">
-                        <p class="text-black">Approx. Duration</p>
-                    </div>
-                    <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8">
-                        <input id="duration" data-duration="{{duration}}" type="text" class="form-control" disabled value="{{duration}} mins" />
+                        <input id="duration" data-duration="{{duration}}" type="number" ng-model="duration" class="form-control" ng-disabled="accessRight != 2" />
                     </div>
                 </div>
                 <div class="row">
@@ -174,6 +201,14 @@
                     </div>
                     <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8">
                         <input ng-model="reserverMobile" ng-model-options="{updateOn : 'blur',debounce : { 'blur' : 0} }" numbers-only maxlength="13" id="userMobile" class="form-control" value="" />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 text-right">
+                        <p class="text-black">Notes</p>
+                    </div>
+                    <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8">
+                        <input maxlength="50" id="userNote" class="form-control" value="{{notes}}" placeholder="Notes for resource" />
                     </div>
                 </div>
                 <div class="row p-bottom-3">
