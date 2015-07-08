@@ -66,7 +66,7 @@ User.prototype.register = function(req,res,next){
         console.log(SelectionTypes);
         var IDTypeID = req.body.IDTypeID;
         var EZEID = alterEzeoneId(req.body.EZEID);
-        if(EZEID != null)
+        if(EZEID)
             EZEID = EZEID.toUpperCase();
         var Password = req.body.Password;
         var FirstName = req.body.FirstName;
@@ -198,7 +198,7 @@ User.prototype.register = function(req,res,next){
                 _this.db.query('CALL pSaveEZEIDData(' + InsertQuery + ')', function (err, InsertResult) {
                     if (!err) {
                         //console.log('InsertResult: ' + InsertResult);
-                        if (InsertResult != null) {
+                        if (InsertResult) {
                             if(InsertResult[0]){
                                 if (InsertResult[0].length > 0) {
                                     var RegResult = InsertResult[0];
@@ -756,14 +756,14 @@ User.prototype.getLoginDetails = function(req,res,next){
 
         var Token = req.query.Token;
 
-        if (Token != null) {
+        if (Token) {
             _this.stdLib.validateToken(Token, function (err, Result) {
                 if (!err) {
-                    if (Result != null) {
+                    if (Result) {
 
                         _this.db.query('CALL pLoginDetails(' + _this.db.escape(Token) + ')', function (err, GetResult) {
                             if (!err) {
-                                if (GetResult != null) {
+                                if (GetResult) {
                                     if (GetResult[0].length > 0) {
 
                                         console.log('FnGetLoginDetails: Login details Send successfully');
@@ -1237,7 +1237,7 @@ User.prototype.forgetPassword = function(req,res,next){
             _this.db.query(Query, function (err, ForgetPasswordResult) {
                 if (!err) {
                     //console.log(InsertResult);
-                    if (ForgetPasswordResult != null) {
+                    if (ForgetPasswordResult) {
                         if (ForgetPasswordResult.affectedRows > 0) {
                             RtnMessage.IsChanged = true;
                             var UserQuery = 'Select a.TID, ifnull(a.FirstName,"") as FirstName,ifnull(a.LastName,"") as LastName,a.Password,ifnull(b.EMailID,"") as EMailID from tmaster a,tlocations b where b.SeqNo=0 and b.EZEID=a.EZEID and a.EZEID=' + _this.db.escape(EZEID);
@@ -1590,7 +1590,7 @@ User.prototype.getWebLink = function(req,res,next){
 
         var Token = req.query.Token;
 
-        if (Token != null) {
+        if (Token) {
             _this.stdLib.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result) {
@@ -1943,7 +1943,7 @@ User.prototype.getResume = function(req,res,next){
             message:''
         };
 
-        if (Token != null) {
+        if (Token) {
             _this.stdLib.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result) {
@@ -2048,7 +2048,7 @@ User.prototype.saveResume = function(req,res,next){
         };
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
 
-        if (Token != null) {
+        if (Token) {
             _this.stdLib.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result) {
@@ -2316,11 +2316,11 @@ User.prototype.getDocPin = function(req,res,next) {
         if (token != null) {
             _this.stdLib.validateToken(token, function (err, Result) {
                 if (!err) {
-                    if (Result != null) {
+                    if (Result) {
                         _this.db.query('CALL pGetDocPIN(' + _this.db.escape(token) + ')', function (err, BussinessListingResult) {
                             if (!err) {
                                 // console.log('FnUpdateMessageStatus: Update result' + UpdateResult);
-                                if (BussinessListingResult[0] != null) {
+                                if (BussinessListingResult[0]) {
                                     if (BussinessListingResult[0].length > 0) {
                                         res.send(BussinessListingResult[0]);
                                         console.log('FnGetDocPin: Bussiness Pin sent successfully');
@@ -2388,11 +2388,11 @@ try {
     if (Token != null && Type.toString() != 'NaN' && Type.toString() != '0') {
         _this.stdLib.validateToken(Token, function (err, Result) {
             if (!err) {
-                if (Result != null) {
+                if (Result) {
                     _this.db.query('CALL pGetDocs(' + _this.db.escape(Token) + ',' + _this.db.escape(Type) + ')', function (err, DocumentResult) {
                         if (!err) {
                             //console.log(DocumentResult);
-                            if (DocumentResult[0] != null) {
+                            if (DocumentResult[0]) {
                                 if (DocumentResult[0].length > 0) {
                                     res.send(DocumentResult[0]);
                                     console.log('FnGetDoc: Document sent successfully');
@@ -2473,7 +2473,7 @@ User.prototype.updateDocPin = function(req,res,next) {
     if (token != null && token != '') {
         _this.stdLib.validateToken(token, function (err, Result) {
             if (!err) {
-                if (Result != null) {
+                if (Result) {
                     var query = _this.db.escape(token) + ',' + _this.db.escape(tPin);
                     _this.db.query('CALL pUpdateDocPIN(' + query + ')', function (err, UpdateResult) {
                         if (!err) {
@@ -2551,7 +2551,7 @@ try {
     };
     var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
 
-    if (Token != null) {
+    if (Token) {
         _this.stdLib.validateToken(Token, function (err, Result) {
             if (!err) {
                 if (Result != null && tRefType.toString() != 'NaN') {
@@ -2697,12 +2697,12 @@ try {
 
     _this.stdLib.validateToken(Token, function (err, Result) {
         if (!err) {
-            if (Result != null) {
+            if (Result) {
                 if (req && req.files) {
                     if (CntType != null && RefFileName != null && tRefType != null && Token != null) {
 
                         var fileName = '';
-                        if (RefFileName != null) {
+                        if (RefFileName) {
                             fileName = RefFileName.split('.').pop();
                         }
                         //console.log(Token);
@@ -2934,12 +2934,12 @@ User.prototype.updateProfilePicture = function(req,res,next) {
         if (Token != null && Picture != null && PictureFileName != null) {
             _this.stdLib.validateToken(Token, function (err, Result) {
                 if (!err) {
-                    if (Result != null) {
+                    if (Result) {
 
                         _this.db.query('select TID from tmaster where Token=' + _this.db.escape(Token), function (err, UserResult) {
                             if (!err) {
                                 //console.log(UserResult);
-                                if (UserResult != null) {
+                                if (UserResult) {
                                     if (UserResult.length > 0) {
                                         var query = 'Update tlocations set Picture = ' + _this.db.escape(Picture) + ',' + 'PictureFileName= ' + _this.db.escape(PictureFileName) + ' where SeqNo=0 and MasterID=' + _this.db.escape(UserResult[0].TID);
                                         // console.log(query);
@@ -3035,7 +3035,7 @@ User.prototype.getLoginCheck = function(req,res,next) {
         if (Token != null && Token != '') {
             _this.stdLib.validateToken(Token, function (err, Result) {
                 if (!err) {
-                    if (Result != null) {
+                    if (Result) {
                         RtnMessage.IsAvailable = true;
                         res.send(RtnMessage);
                         console.log('FnGetLoginCheck: Valid Login');

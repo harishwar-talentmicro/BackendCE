@@ -966,7 +966,7 @@ Search.prototype.getSearchDoc = function(req,res,next){
     if (token != null && find != null && token != '' && find != '') {
         _this.stdLib.validateToken(token, function (err, Result) {
             if (!err) {
-                if (Result != null) {
+                if (Result) {
 
                     var EZEID, Pin = null;
                     var DocType = '';
@@ -1030,7 +1030,7 @@ Search.prototype.getSearchDoc = function(req,res,next){
                     _this.db.query('CALL  PGetSearchDocuments(' + SearchQuery + ')', function (err, SearchResult) {
                         // _this.db.query(searchQuery, function (err, SearchResult) {
                         if (!err) {
-                            if (SearchResult[0] != null) {
+                            if (SearchResult[0]) {
                                 if (SearchResult[0].length > 0) {
                                     SearchResult = SearchResult[0];
                                     //console.log(DocumentResult)

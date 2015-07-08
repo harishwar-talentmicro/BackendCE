@@ -92,36 +92,45 @@ Reservation.prototype.SaveReservTrans = function(req,res,next){
         if (Token) {
             _this.stdLib.validateToken(Token, function (err, result) {
                 if (!err) {
-                    if (result != null) {
+                    if (result) {
 
-                        var query = _this.db.escape(TID) + ',' + _this.db.escape(Token) + ',' + _this.db.escape(contactinfo) + ',' + _this.db.escape(toEzeid) + ',' + _this.db.escape(resourceid) + ',' + _this.db.escape(res_datetime) + ',' + _this.db.escape(duration) + ',' + _this.db.escape(status) + ',' + _this.db.escape(serviceid) + ',' + _this.db.escape(notes);
-                        console.log(query);
+                        var query = db.escape(TID) + ',' + db.escape(Token) + ',' + db.escape(contactinfo) + ',' + db.escape(toEzeid) + ',' + db.escape(resourceid) + ',' + db.escape(res_datetime) + ',' + db.escape(duration) + ',' + db.escape(status) + ',' + db.escape(serviceid) + ',' + db.escape(notes);
+
                         console.log('CALL pSaveResTrans(' + query + ')');
 
-                        _this.db.query('CALL pSaveResTrans(' + query + ')', function (err, insertResult) {
+                        db.query('CALL pSaveResTrans(' + query + ')', function (err, insertResult) {
                             console.log(insertResult);
-                            console.log(err);
-                            if (!err){
-                                if (insertResult.affectedRows > 0) {
-                                    responseMessage.status = true;
-                                    responseMessage.error = null;
-                                    responseMessage.message = 'Resource Transaction details save successfully';
-                                    responseMessage.data = {
-                                        resourceid : req.body.resourceid,
-                                        serviceid : serviceid
-                                    };
-                                    res.status(200).json(responseMessage);
-                                    console.log('FnSaveReservTransaction: Resource Transaction details save successfully');
 
+                            if (!err) {
+                                if (insertResult) {
+
+                                    console.log(insertResult[0]);
+                                    if (insertResult[0] == null && insertResult[0] == undefined) {
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Resource Transaction details save successfully';
+                                        responseMessage.data = {
+                                            resourceid: req.body.resourceid,
+                                            serviceid: serviceid
+                                        };
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnSaveReservTransaction: Resource Transaction details save successfully');
+
+                                    }
+                                    else {
+                                        responseMessage.message = insertResult[0][0];
+                                        responseMessage.error = {};
+                                        res.status(400).json(responseMessage);
+                                        console.log('FnSaveReservTransaction:No save Resource Transaction details');
+                                    }
                                 }
                                 else {
-                                    responseMessage.message = insertResult[0][0];
+                                    responseMessage.message = 'No save Resource Transaction details';
                                     responseMessage.error = {};
                                     res.status(400).json(responseMessage);
                                     console.log('FnSaveReservTransaction:No save Resource Transaction details');
                                 }
                             }
-
                             else {
                                 responseMessage.message = 'An error occured ! Please try again';
                                 responseMessage.error = {};

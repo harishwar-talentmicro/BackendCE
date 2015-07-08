@@ -556,7 +556,7 @@ try{
     if (Token != null && MessageID!= null && ItemID != null && Qty !=null && Rate !=null && Amount != null && Duration !=null) {
         _this.stdLib.validateToken(Token, function (err, Result) {
             if (!err) {
-                if (Result != null) {
+                if (Result) {
 
                     var query = _this.db.escape(MessageID) + ',' + _this.db.escape(ItemID) + ',' + _this.db.escape(Qty) + ',' + _this.db.escape(Rate) + ',' +_this.db.escape(Amount) + ',' +_this.db.escape(Duration);
                     _this.db.query('CALL pSaveTranscationItems(' + query + ')', function (err, InsertResult) {
@@ -848,11 +848,11 @@ BusinessManager.prototype.getItemListForEZEID = function(req,res,next){
     if (Token != null && FunctionType != null && EZEID != null) {
         _this.stdLib.validateToken(Token, function (err, Result) {
             if (!err) {
-                if (Result != null) {
+                if (Result) {
                     console.log('CALL pItemListforEZEID(' +  db.escape(FunctionType)  + ',' + db.escape(EZEID) + ')');
                     db.query('CALL pItemListforEZEID(' +  db.escape(FunctionType)  + ',' + db.escape(EZEID) + ')', function (err, GetResult) {
                         if (!err) {
-                            if (GetResult[0] != null) {
+                            if (GetResult[0]) {
                                 if (GetResult[0].length > 0) {
                                     console.log('FnGetItemListForEZEID: Item list details Send successfully');
                                     res.send(GetResult[0]);
@@ -931,7 +931,7 @@ BusinessManager.prototype.deleteTransaction = function(req,res,next){
         if (Token != null && ItemTID != null){
             _this.stdLib.validateToken(Token, function (err, Result) {
                 if (!err) {
-                    if (Result != null) {
+                    if (Result) {
 
                         db.query('CALL pDeleteTransactionItems(' + db.escape(ItemTID) + ')', function (err, deleteResult) {
                             if (!err) {
@@ -1005,11 +1005,11 @@ BusinessManager.prototype.itemList = function(req,res,next){
     if (Token != null && FunctionType != null) {
         _this.stdLib.validateToken(Token, function (err, Result) {
             if (!err) {
-                if (Result != null) {
+                if (Result) {
 
                     db.query('CALL pItemList(' + db.escape(Token) + ',' + db.escape(FunctionType) + ')', function (err, GetResult) {
                         if (!err) {
-                            if (GetResult != null) {
+                            if (GetResult) {
                                 if (GetResult[0].length > 0) {
                                     console.log('FnItemList: Item list details Send successfully');
                                     res.send(GetResult[0]);
@@ -1085,10 +1085,10 @@ BusinessManager.prototype.itemDetails = function(req,res,next){
         if (Token != null && TID != null) {
             _this.stdLib.validateToken(Token, function (err, Result) {
                 if (!err) {
-                    if (Result != null) {
+                    if (Result) {
                         db.query('CALL pItemDetails(' + db.escape(TID) + ')', function (err, GetResult) {
                             if (!err) {
-                                if (GetResult != null) {
+                                if (GetResult) {
                                     if (GetResult[0].length > 0) {
                                         console.log('FnItemDetails: Item list details Send successfully');
                                         res.send(GetResult[0]);
@@ -1161,14 +1161,14 @@ BusinessManager.prototype.getUserwiseFolderList = function(req,res,next){
     var Token = req.query.Token;
     var RuleFunction = req.query.RuleFunction;
 
-    if (Token != null) {
+    if (Token) {
         _this.stdLib.validateToken(Token, function (err, Result) {
             if (!err) {
-                if (Result != null) {
+                if (Result) {
 
                     _this.db.query('CALL pGetUserWiseFolderList(' + _this.db.escape(Token) + ',' + _this.db.escape(RuleFunction) + ')', function (err, GetResult) {
                         if (!err) {
-                            if (GetResult != null) {
+                            if (GetResult) {
                                 if (GetResult[0].length > 0) {
 
                                     console.log('FnGetUserwiseFolderList: Folder list details Send successfully');
@@ -1251,7 +1251,7 @@ try {
     if (token != null && token != '' && CategoryID.toString() != 'NaN' && Keywords != null) {
         _this.stdLib.validateToken(token, function (err, Result) {
             if (!err) {
-                if (Result != null) {
+                if (Result) {
                     //  var fileName = BrochureDocFile.split('.').pop();
                     var query = _this.db.escape(token) + ',' + _this.db.escape(Keywords) + ',' + _this.db.escape(CategoryID);
                     //console.log(query);

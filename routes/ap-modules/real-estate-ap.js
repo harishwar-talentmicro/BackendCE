@@ -52,11 +52,11 @@ RealEstate_AP.prototype.getRealStateDataAP = function(req,res,next){
         if(Token != null && TID != null){
             _this.stdLib.validateTokenAp(Token, function (err, Result) {
                 if (!err) {
-                    if (Result != null) {
+                    if (Result) {
                         _this.db.query('CALL pGetRealEstateData(' + _this.db.escape(TID)  + ')', function (err, RealStateResult) {
                             if (!err) {
                                 // console.log(PictuerResult);
-                                if (RealStateResult != null) {
+                                if (RealStateResult) {
                                     if (RealStateResult[0].length > 0) {
                                         res.send(RealStateResult[0]);
                                         console.log('FnGetRealStateDataAP: Realstate Data sent successfully');
@@ -168,7 +168,7 @@ RealEstate_AP.prototype.searchRealEstateAP = function(req,res,next){
          && AreaTo !=null && FunishedType !=null && AmountFrom !=null && AmountTo !=null) {*/
         _this.stdLib.validateTokenAp(Token, function (err, Result) {
             if (!err) {
-                if (Result != null) {
+                if (Result) {
 
                     var SearchQuery = _this.db.escape(Status) + ',' + _this.db.escape(Purpose) + ',' + _this.db.escape(PropertyType) + ',' + _this.db.escape(PrefUser) + ',' +
                         _this.db.escape(SpaceType) + ',' + _this.db.escape(SpaceQtyF) + ',' + _this.db.escape(SpaceQtyT) + ',' + _this.db.escape(RatingFrom) + ',' + _this.db.escape(RatingTo) + ',' +
@@ -182,7 +182,7 @@ RealEstate_AP.prototype.searchRealEstateAP = function(req,res,next){
 
                     _this.db.query('CALL pSearchRealEstateData(' + SearchQuery + ')', function (err, SearchResult) {
                         if (!err) {
-                            if (SearchResult[0] != null) {
+                            if (SearchResult[0]) {
                                 if (SearchResult[0].length > 0) {
                                     res.send(SearchResult[0]);
                                     console.log('FnSearchRealEstateAP:Search result sent successfully');

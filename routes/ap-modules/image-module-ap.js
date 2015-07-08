@@ -600,7 +600,7 @@ Image_AP.prototype.cropImageAP = function(req,res,next){
 
     _this.stdLib.validateTokenAp(token, function (err, Result) {
         if (!err) {
-            if (Result != null) {
+            if (Result) {
                 try{
                     console.log(req.files.image.path);
                     //var bitmap = fs.readFileSync('../bin/'+req.files.image.path);

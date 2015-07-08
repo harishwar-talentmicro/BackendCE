@@ -51,7 +51,7 @@ Location_AP.prototype.getSecondaryLocationListAP = function(req,res,next){
         if (Token != null && Ezeid != null) {
             _this.stdLib.validateTokenAp(Token, function (err, Result) {
                 if (!err) {
-                    if (Result != null) {
+                    if (Result) {
 
                         var Query = 'select TID,LocTitle from tlocations where SeqNo>0 and  EZEID=' + _this.db.escape(Ezeid);
                         _this.db.query(Query, function (err, Result) {
@@ -131,7 +131,7 @@ Location_AP.prototype.getSecondaryLocationAP = function(req,res,next){
         if (Token != null && Ezeid != null && Locid!=null) {
             _this.stdLib.validateTokenAp(Token, function (err, Result) {
                 if (!err) {
-                    if (Result != null) {
+                    if (Result) {
 
                         var Query = 'select TID, ifnull(LocTitle,"") as LocTitle, Latitude, Longitude, Picture, PictureFileName, Rating from tlocations where SeqNo > 0 and  EZEID=' + _this.db.escape(Ezeid) +' and TID = ' + _this.db.escape(Locid);
                         _this.db.query(Query, function (err, Result) {
@@ -221,7 +221,7 @@ Location_AP.prototype.updateSecondaryLocationAP = function(req,res,next){
         if (Token != null && Locid != null && LocTitle != null && Longitude.toString() != 'NaN' && Latitude.toString() != 'NaN' && Picture != null && PictureFileName!=null && Rating != null ) {
             _this.stdLib.validateTokenAp(Token, function (err, Result) {
                 if (!err) {
-                    if (Result != null) {
+                    if (Result) {
 
                         var query = _this.db.escape(Locid) + ',' + _this.db.escape(LocTitle) + ',' + _this.db.escape(Picture) + ',' + _this.db.escape(PictureFileName) + ',' + _this.db.escape(Latitude) + ',' + _this.db.escape(Longitude) + ',' + _this.db.escape(Rating);
                         _this.db.query('CALL pUpdateSecondaryLocationAP(' + query + ')', function (err, UpdateResult) {

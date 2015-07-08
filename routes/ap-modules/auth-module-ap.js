@@ -239,7 +239,7 @@ try {
         _this.db.query(Query, function (err, ForgetPasswordResult) {
             if (!err) {
                 //console.log(InsertResult);
-                if (ForgetPasswordResult != null) {
+                if (ForgetPasswordResult) {
                     if (ForgetPasswordResult.affectedRows > 0) {
                         RtnMessage.IsChanged = true;
                         var UserQuery = 'Select ifnull(Fullname,"") as Fullname,APPassword,ifnull(EMailID,"") as EMailID from tapuser where APLoginID=' + _this.db.escape(LoginID);
@@ -343,14 +343,14 @@ Auth_AP.prototype.changePasswordAP = function(req,res,next){
         if (OldPassword != null && OldPassword != '' && NewPassword != null && NewPassword != '' && TokenNo != null) {
             _this.stdLib.validateTokenAp(TokenNo, function (err, Result) {
                 if (!err) {
-                    if (Result != null) {
+                    if (Result) {
                         var EncryptOldPWD = FnEncryptPassword(OldPassword);
                         var EncryptNewPWD = FnEncryptPassword(NewPassword);
                         var Query = _this.db.escape(TokenNo) + ',' + _this.db.escape(EncryptOldPWD) + ',' + _this.db.escape(EncryptNewPWD);
                         _this.db.query('CALL pChangePasswordAP(' + Query + ')', function (err, ChangePasswordResult) {
                             if (!err) {
                                 //console.log(ChangePasswordResult);
-                                if (ChangePasswordResult != null) {
+                                if (ChangePasswordResult) {
                                     if (ChangePasswordResult.affectedRows > 0) {
                                          RtnMessage.IsChanged = true;
                                         res.send(RtnMessage);

@@ -283,7 +283,7 @@ Location.prototype.deleteLocation = function(req,res,next) {
         if (token != null && token != '' && TID.toString() != 'NaN') {
             _this.stdLib.validateToken(token, function (err, Result) {
                 if (!err) {
-                    if (Result != null) {
+                    if (Result) {
                         var query = 'DELETE FROM tlocations where TID=' + _this.db.escape(TID);
                         //  console.log('FnDeleteLocation: DeleteQuery : ' + query);
                         _this.db.query(query, function (err, DeleteResult) {
@@ -445,14 +445,14 @@ Location.prototype.getLoactionList = function(req,res,next){
 
         var Token = req.query.Token;
 
-        if (Token != null) {
+        if (Token) {
             _this.stdLib.validateToken(Token, function (err, Result) {
                 if (!err) {
-                    if (Result != null) {
+                    if (Result) {
 
                         _this.db.query('CALL pGetLocationList(' + _this.db.escape(Token) + ')', function (err, GetResult) {
                             if (!err) {
-                                if (GetResult != null) {
+                                if (GetResult) {
                                     if (GetResult[0].length > 0) {
 
                                         console.log('FnGetLocationList: Location List Send successfully');

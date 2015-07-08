@@ -166,7 +166,7 @@ Configuration.prototype.get = function(req,res,next){
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         var Token = req.query.Token;
 
-        if (Token != null) {
+        if (Token) {
             _this.stdLib.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result) {
@@ -384,7 +384,7 @@ Configuration.prototype.StatusTypes = function(req,res,next){
         if (Token != null  && FunctionType != null ) {
             _this.stdLib.validateToken(Token, function (err, Result) {
                 if (!err) {
-                    if (Result != null) {
+                    if (Result) {
                         var StatusAllOpen =
                         {
                             TID:'-1',
@@ -412,7 +412,7 @@ Configuration.prototype.StatusTypes = function(req,res,next){
                         _this.db.query('CALL pGetStatusType(' + query + ')', function (err, StatusResult) {
 
                             if (!err) {
-                                if (StatusResult != null) {
+                                if (StatusResult) {
                                     if (StatusResult[0].length > 0) {
                                         StatusResult[0].unshift(StatusAll);
                                         StatusResult[0].unshift(StatusAllOpen);
@@ -516,7 +516,7 @@ Configuration.prototype.saveStatusType = function(req,res,next){
                             + ',' + _this.db.escape(StatusValue);
                         _this.db.query('CALL pSaveStatusTypes(' + query + ')', function (err, result) {
                             if (!err) {
-                                if(result != null){
+                                if(result){
                                     if(result.affectedRows > 0){
                                         console.log('FnSaveStatusType: Status type saved successfully');
                                         RtnMessage.IsSuccessfull = true;
@@ -1112,7 +1112,7 @@ Configuration.prototype.getSubusers = function(req,res,next){
 
         var Token = req.query.Token;
 
-        if (Token != null) {
+        if (Token) {
             _this.stdLib.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result) {
@@ -2223,7 +2223,7 @@ Configuration.prototype.getWorkingHoursTemplates = function(req,res,next){
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
         var Token = req.query.Token;
-        if (Token != null) {
+        if (Token) {
             _this.stdLib.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result) {
@@ -2432,7 +2432,7 @@ Configuration.prototype.getHolidays = function(req,res,next){
         var TemplateID = req.query.TemplateID;
         if(LocID == null && LocID == '')
             LocID=0;
-        if (Token != null) {
+        if (Token) {
             _this.stdLib.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result) {
@@ -2699,7 +2699,7 @@ Configuration.prototype.deleteWorkingHours = function(req,res,next){
     if (Token !=null && TID != null) {
         _this.stdLib.validateToken(Token, function (err, Result) {
             if (!err) {
-                if (Result != null) {
+                if (Result) {
                     //console.log('CALL pDeleteWorkinghours(' + _this.db.escape(TID) + ')');
                     _this.db.query('CALL pDeleteWorkinghours(' + _this.db.escape(TID) + ')', function (err, deleteResult) {
                         if (!err){

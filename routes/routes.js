@@ -3,7 +3,7 @@ var DbHelper = require('./../helpers/DatabaseHandler'),
 
 var StdLib = require('./modules/std-lib.js');
 var stdLib = new StdLib(db);
-
+exports.FnSendMail = userModule.sendMail;
 
 var User = require('./modules/user-module.js');
 var userModule = new User(db,stdLib);
@@ -126,6 +126,7 @@ exports.FnSearchBusListing = searchModule.searchBusListing;
 var Image = require('./modules/image-module.js');
 var imageModule = new Image(db,stdLib);
 exports.FnCropImage = imageModule.cropImage;
+exports.FnImageURL = imageModule.imageURL;
 
 var Reservation = require('./modules/reservation-module.js');
 var reservationModule = new Reservation(db,stdLib);

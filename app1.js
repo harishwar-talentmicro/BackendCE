@@ -187,6 +187,7 @@ app.get('/get_outbox_messages',LocationManager.FnGetOutboxMessages);
 app.get('/get_workinghours_list',LocationManager.FnGetworkinghoursList);
 app.get('/ezeoneid',LocationManager.FnGetEZEOneIDInfo);
 app.get('/get_workinghours_details',LocationManager.FnWorkingHoursDetails);
+app.get('/image_url',LocationManager.FnImageURL);
 
 
 //below service are for EZEIDAP
@@ -239,7 +240,7 @@ app.get('/:id',LocationManager.FnWebLinkRedirect);
 
 app.get('/:page',function(req,res){
     res.sendFile(__dirname + '/public/html/index.html');
-    
+
 });
 
 
