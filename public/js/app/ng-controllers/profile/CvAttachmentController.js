@@ -373,17 +373,17 @@ angular.module('ezeidApp').controller('CVAttachController',[
             source: $scope.availableTags
         });
 
-        $("#tags"+_index ).on( "autocompleteselect", function( event, ui ) {
-           $scope.editSkill.skillname = inputData=ui.item.value;
-        } );
+        $("#tags"+_index ).on("autocompleteselect", function( event, ui ) {
+           $scope.editSkill.skillname = ui.item.value;
+        });
     };
 
-        $scope.expertiseLevels = [
-            'Beginner',
-            'Independent',
-            'Expert',
-            'Master'
-        ];
+    $scope.expertiseLevels = [
+        'Beginner',
+        'Independent',
+        'Expert',
+        'Master'
+    ];
 
     $scope.deleteSkilFromMartix=function(_index, _tid)
     {

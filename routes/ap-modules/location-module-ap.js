@@ -49,7 +49,7 @@ Location_AP.prototype.getSecondaryLocationListAP = function(req,res,next){
         var Ezeid = req.query.EZEID;
 
         if (Token != null && Ezeid != null) {
-            FnValidateTokenAP(Token, function (err, Result) {
+            _this.stdLib.validateTokenAp(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
 
@@ -129,7 +129,7 @@ Location_AP.prototype.getSecondaryLocationAP = function(req,res,next){
         var Locid = req.query.LocID;
 
         if (Token != null && Ezeid != null && Locid!=null) {
-            FnValidateTokenAP(Token, function (err, Result) {
+            _this.stdLib.validateTokenAp(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
 
@@ -219,7 +219,7 @@ Location_AP.prototype.updateSecondaryLocationAP = function(req,res,next){
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
 
         if (Token != null && Locid != null && LocTitle != null && Longitude.toString() != 'NaN' && Latitude.toString() != 'NaN' && Picture != null && PictureFileName!=null && Rating != null ) {
-            FnValidateTokenAP(Token, function (err, Result) {
+            _this.stdLib.validateTokenAp(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
 

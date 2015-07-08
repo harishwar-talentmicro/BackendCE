@@ -102,7 +102,7 @@ Auth_AP.prototype.loginAP = function(req,res,next){
             _this.db.query(Query, function (err, loginResult) {
                 if (!err) {
                     if (loginResult.length > 0) {
-                        var Encrypt = FnGenerateToken();
+                        var Encrypt = _this.stdLib.generateToken();
                         var Query = 'update tapuser set Token=' + _this.db.escape(Encrypt) + ' where TID=' + _this.db.escape(loginResult[0].TID);
                         _this.db.query(Query, function (err, TokenResult) {
                             if (!err) {
@@ -341,7 +341,7 @@ Auth_AP.prototype.changePasswordAP = function(req,res,next){
         };
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
         if (OldPassword != null && OldPassword != '' && NewPassword != null && NewPassword != '' && TokenNo != null) {
-            FnValidateTokenAP(TokenNo, function (err, Result) {
+            _this.stdLib.validateTokenAp(TokenNo, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
                         var EncryptOldPWD = FnEncryptPassword(OldPassword);

@@ -1738,3 +1738,21 @@ table.rwd-table > tbody > tr > td.serachResultSelectAll
 {
     margin-top: 10%;
 }
+.skillAction
+{
+    width: 125px !important;
+}
+.skillKeyWord
+{
+    width: 400px !important;
+}
+.skillExperties
+{
+    width: 135px!important;
+}
+.cvAttachLable
+{
+    color: #0072C3;
+    font-size: 14px;
+}
+

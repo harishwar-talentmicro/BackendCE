@@ -667,9 +667,6 @@
 
                         <div class="col-lg-12 col-md-12 col-sm-6 col-xs-12">
                             <div class="row">
-                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                    <label> Address</label>
-                                </div>
                                 <!--<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-hide="modalBox.editMode">-->
                                     <!--<div class="form-group form-group-sm ">-->
                                         <!--<select class="form-control" ng-model="modalBox.tx.locId" ng-change="findAddress()">-->
@@ -836,7 +833,7 @@
                               <div class="col-md-12 col-sm-12 col-xs-12 front-business-form cart-details" ng-show="modalBox.tx.itemList && modalBox.tx.itemList.length > 0">
                                   <b><i class="fa fa-shopping-cart"></i> {{cartItemString}}
                                                 <span class="pull-right"
-                                                      ng-show="salesItemListType > 3">
+                                                      ng-show="_userInfo.SalesItemListType > 3">
                                                     {{cartAmount}}
                                                 </span>
                                   </b>

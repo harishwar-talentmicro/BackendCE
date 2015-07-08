@@ -163,7 +163,7 @@
 
             $scope.showModal = false;
             $scope.modalBox = {
-                title : 'Create New Lead',
+                title : 'Create New Help Desk Enquiry',
                 class : 'business-manager-modal',
                 editMode : false,
                 locationList : [],
@@ -279,12 +279,12 @@
              * so that it can be recalculated and saved when internal user changes or updates the order
              * @param msg
              * @usage parameter msg will be like
-             * msg = 'this is message text for this service enquiry ------------------------------ Nuts(7), Bolts(6)
+             * msg = 'this is message text for this service enquiry     Nuts(7), Bolts(6)
              * alteredMsg = 'this is message text for this service enquiry'
              */
             var alterTransactionMessageToEdit = function(msg){
                 var alteredMsg = '';
-                var str = '------------------------------'; //30 characters
+                var str = '   '; //30 characters
                 var indexStr = msg.indexOf(str);
                 if(indexStr !== -1){
                     alteredMsg = msg.substr(0,indexStr);
@@ -519,7 +519,7 @@
                             //UI updation is not happening properly because ui is not rendered, and model bind before it
                             //therefore once again updating data after ui rendered
                             $timeout(function(){
-                                $scope.modalBox.title = 'Update Lead';
+                                $scope.modalBox.title = 'Update Help desk enquiry';
                                 $scope.modalBox.tx = editTx;
                                 $scope.$emit('$preLoaderStop');
                             },1500);
@@ -1280,7 +1280,7 @@
                         });
                     }
                     else{
-                        if(n!==v){
+                        if(n !== v && (n.length > 0 || v.length > 0) ){
                             $scope.$emit('$preLoaderStart');
                             $scope.loadTransaction(1,$scope.filterStatus,$scope.txSearchTerm,$scope.sortBy).then(function(){
                                 $scope.$emit('$preLoaderStop');
@@ -1443,23 +1443,24 @@
                                     watchPageNumber();
                                     watchSortBy();
                                     watchMyFolders();
-                                    $scope.loadItemList().then(function(){
-                                        $scope.$emit('$preLoaderStop');
-                                    },function(){
-                                        $scope.$emit('$preLoaderStop');
-                                        Notification.error({message : 'Unable to load item list', delay : MsgDelay} );
-                                    });
+                                    //$scope.loadItemList().then(function(){
+                                    //    $scope.$emit('$preLoaderStop');
+                                    //},function(){
+                                    //    $scope.$emit('$preLoaderStop');
+                                    //    Notification.error({message : 'Unable to load item list', delay : MsgDelay} );
+                                    //});
+                                    $scope.$emit('$preLoaderStop');
                                 },function(){
                                     $scope.$emit('$preLoaderStop');
-                                    Notification.error({message : 'Unable to load service transaction list', delay : MsgDelay} );
+                                    Notification.error({message : 'Unable to load help desk records', delay : MsgDelay} );
                                 });
                             },function(){
                                 $scope.$emit('$preLoaderStop');
-                                Notification.error({message : 'Unable to load service transaction status types', delay : MsgDelay} );
+                                Notification.error({message : 'Unable to load help desk status types', delay : MsgDelay} );
                             });
                         },function(){
                             $scope.$emit('$preLoaderStop');
-                            Notification.error({message : 'Unable to load service next actions list', delay : MsgDelay} );
+                            Notification.error({message : 'Unable to load help desk next actions list', delay : MsgDelay} );
                         });
                     },function(){
                         $scope.$emit('$preLoaderStop');
@@ -1593,13 +1594,13 @@
                 }
 
                 if($scope.modalBox.tx.itemList.length <  1 && $scope.modules[moduleIndex].listType > 0){
-                    Notification.error({ message : 'Please select items for the enquiry',delay : MsgDelay});
+                    Notification.error({ message : 'Please select items',delay : MsgDelay});
                     return ;
                 }
 
 
                 if($scope.modules[moduleIndex].listType > 0){
-                    var separationStr = ' ------------------------------ ';
+                    var separationStr = '     ';
                     var itemList = [];
                     try{
                         itemList = JSON.parse(data.ItemsList);

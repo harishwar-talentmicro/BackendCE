@@ -106,39 +106,14 @@
             <table class="table table-striped skillMatrixTable" st-table="rowCollection">
                 <thead>
                 <tr style="background:#ECECEC;; color:#000000;">
-                    <th class="panelPd5px msg_pos">Skill</th>
-                    <th class="panelPd5px date_size msg_pos">Expertise Level</th>
+                    <th class="panelPd5px skillKeyWord msg_pos">Skill</th>
+                    <th class="panelPd5px skillExperties msg_pos">Expertise Level</th>
                     <th class="panelPd5px from_size msg_pos">Experience(Yrs.)</th>
                     <th class="panelPd5px from_size msg_pos">Active Skills</th>
-                    <th class="panelPd5px statusSize msg_pos">Action</th>
+                    <th class="panelPd5px skillAction msg_pos">Action</th>
                 </tr>
                 </thead>
                 <tbody>
-
-                    <!--<tr ng-repeat="skill in skillMatrix">-->
-                        <!--<td class="panelPd5px msg_pos">-->
-                            <!--<div class="ui-widget">-->
-                                <!--<input class="form-control" type="text" id="tags{{$index}}" ng-keyup="complete($index)" ng-model="skillMatrix[$index].skillname" placeholder="Type skill here"/>-->
-                            <!--</div>-->
-                        <!--</td>-->
-                        <!--<td class="panelPd5px msg_pos">-->
-                            <!--<select class="form-control" name="expertiesLevel" ng-model="skillMatrix[$index].expertiseLevel">-->
-                                <!--<option value="0" default selected> Beginner </option>-->
-                                <!--<option value="1"> Independent </option>-->
-                                <!--<option value="2"> Expert </option>-->
-                                <!--<option value="3"> Master </option>-->
-                            <!--</select>-->
-                        <!--</td>-->
-                        <!--<td class="panelPd5px msg_pos">-->
-                           <!--<input type="text" name="experienceYear" decimals-only maxlength="4" ng-model="skillMatrix[$index].exp" ng-blur="checkExp($index)" class="form-control" placeholder="Ex. 5.00"/>-->
-                        <!--</td>-->
-                        <!--<td class="panelPd5px msg_pos">-->
-                            <!--<input type="checkbox" checked="checked" ng-model="skillMatrix[$index].active_status"/>-->
-                        <!--</td>-->
-                        <!--<td class="panelPd5px msg_pos">-->
-                            <!--<label class="btn btn-primary panelTextSize" ng-disabled="$index == 0" ng-click="deleteSkilFromMartix($index,skillMatrix[$index].tid)">Delete</label>-->
-                        <!--</td>-->
-                    <!--</tr>-->
 
                     <tr ng-repeat="skill in skillMatrix" >
                         <td class="panelPd5px msg_pos" ng-hide="(!editMode[$index]) && ($index == 0)">

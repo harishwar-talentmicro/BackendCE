@@ -382,6 +382,45 @@ var res = angular.module('ezeidApp').
              */
             $scope.searchKey = function(e){
 
+                console.log("SAi1");
+                console.log($scope.searchParams.searchType);
+
+                var aKeyWords = [];
+                if($scope.searchParams.searchType == 2)
+                {
+                    console.log("SAi2")
+                    aKeyWords = [
+                        "Physician Doctor",
+                        "Pharmacy",
+                        "Breakfast",
+                        "Lunch",
+                        "Fast Food",
+                        "Fine Dining",
+                        "Mall",
+                        "Pub",
+                        "Bar & Restaurant",
+                        "Cofee Shop",
+                        "SPA",
+                        "Salon"
+                    ];
+
+                    $( "#tags" ).autocomplete({
+                        source: aKeyWords
+                    });
+
+                    $("#tags").on("autocompleteselect", function( event, ui ) {
+                        $scope.params.searchTerm = ui.item.value;
+                    });
+                }
+                else
+                {
+                    console.log("SAi3")
+                    aKeyWords = [];
+                    $( "#tags" ).autocomplete({
+                        source: aKeyWords
+                    });
+                }
+
                 if(e.charCode === 13 && $scope.params.searchTerm.length > 0){
                     $scope.initiateSearch();
                 }

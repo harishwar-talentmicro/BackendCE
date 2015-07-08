@@ -90,7 +90,7 @@ Reservation.prototype.SaveReservTrans = function(req,res,next){
         }
 
         if (Token) {
-            FnValidateToken(Token, function (err, result) {
+            _this.stdLib.validateToken(Token, function (err, result) {
                 if (!err) {
                     if (result != null) {
 
@@ -480,7 +480,7 @@ Reservation.prototype.changeReservStatus = function(req,res,next){
         return;
     }
 
-    FnValidateToken(token,function(err,tokenRes){
+    _this.stdLib.validateToken(token,function(err,tokenRes){
         if(err || (!tokenRes)){
             res.status(401).json(responseMsg);
             return;
