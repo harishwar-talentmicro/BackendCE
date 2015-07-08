@@ -605,7 +605,7 @@
                     NextActionDateTime : moment().format('DD MMM YYYY hh:mm:ss'),
                     ItemsList: JSON.stringify($scope.modalBox.tx.itemList),
                     DeliveryAddress : makeAddress(),
-                    companyName : $scope.loggedInUser.CompanyName,
+                    companyName : '',
                     company_id : 0
                 };
                 return preparedTx;
@@ -733,7 +733,7 @@
                         msg += ', ';
                     }
                     msg = msg.substring(0, msg.length - 2);
-                    msg = ' ------------------------------ ' + msg; // String 30 characters and 2 spaces
+                    msg = '     ' + msg; // String 30 characters and 2 spaces
                     data.MessageText = $scope.modalBox.tx.message + msg;
                 }
 

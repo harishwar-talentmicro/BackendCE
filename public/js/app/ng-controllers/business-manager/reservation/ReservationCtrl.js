@@ -1660,8 +1660,7 @@ var res = angular.module('ezeidApp').
             $scope.setServices = function()
             {
                 var serviceIds = $scope.currentServices;
-                console.log(serviceIds);
-                if(typeof(serviceIds) === 'undefined' || serviceIds || serviceIds === null)
+                if(typeof(serviceIds) === 'undefined' || !serviceIds || serviceIds === null)
                 {
                     return;
                 }

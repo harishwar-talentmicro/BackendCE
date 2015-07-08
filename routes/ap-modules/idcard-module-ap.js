@@ -53,7 +53,7 @@ IDCard_AP.prototype.updateIdCardPrintAP = function(req,res,next){
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
 
         if (Token != null && EZEID != null) {
-            FnValidateTokenAP(Token, function (err, Result) {
+            _this.stdLib.validateTokenAp(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
                         var query = _this.db.escape(EZEID) + ',' + _this.db.escape(Token);
@@ -132,7 +132,7 @@ IDCard_AP.prototype.getIdCardPrintAP = function(req,res,next){
         var Token = req.query.Token;
         var EZEID = req.query.EZEID;
         if (Token != null && EZEID != null) {
-            FnValidateTokenAP(Token, function (err, Result) {
+            _this.stdLib.validateTokenAp(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
                         _this.db.query('CALL pGetIDCardDetailsAP(' + _this.db.escape(EZEID) + ')', function (err, SecLocationResult) {

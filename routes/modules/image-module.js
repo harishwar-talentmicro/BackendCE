@@ -95,7 +95,7 @@ Image.prototype.cropImage = function(req,res,next){
         return;
     }
 
-    FnValidateToken(token, function (err, Result) {
+    _this.stdLib.validateToken(token, function (err, Result) {
         if (!err) {
             if (Result != null) {
                 try{

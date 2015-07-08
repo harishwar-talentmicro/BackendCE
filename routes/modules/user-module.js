@@ -757,7 +757,7 @@ User.prototype.getLoginDetails = function(req,res,next){
         var Token = req.query.Token;
 
         if (Token != null) {
-            FnValidateToken(Token, function (err, Result) {
+            _this.stdLib.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
 
@@ -1012,7 +1012,7 @@ User.prototype.getUserDetails = function(req,res,next){
 
         var Token = req.query.Token;
         if (Token != null && Token != '') {
-            FnValidateToken(Token, function (err, Result) {
+            _this.stdLib.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result) {
                         _this.db.query('CALL pGetEZEIDDetails(' + _this.db.escape(Token) + ')', function (err, UserDetailsResult) {
@@ -1062,7 +1062,7 @@ User.prototype.getUserDetails = function(req,res,next){
     }
     catch (ex) {
         console.log('FnGetUserDetails error:' + ex.description);
-           
+
     }
 };
 
@@ -1117,7 +1117,7 @@ User.prototype.checkEzeid = function(req,res,next){
     }
     catch (ex) {
         console.log('FnCheckEzeid error:' + ex.description);
-           
+
     }
 };
 
@@ -1144,7 +1144,7 @@ User.prototype.changePassword = function(req,res,next){
         };
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
         if (OldPassword != null && OldPassword != '' && NewPassword != null && NewPassword != '' && TokenNo != null) {
-            FnValidateToken(TokenNo, function (err, Result) {
+            _this.stdLib.validateToken(TokenNo, function (err, Result) {
                 if (!err) {
                     if (Result) {
                         var EncryptOldPWD = FnEncryptPassword(OldPassword);
@@ -1203,7 +1203,7 @@ User.prototype.changePassword = function(req,res,next){
     }
     catch (ex) {
         console.log('FnChangePassword error:' + ex.description);
-           
+
     }
 };
 
@@ -1482,7 +1482,7 @@ User.prototype.getCompanyProfile = function(req,res,next){
     }
     catch (ex) {
         console.log('FnGetCompanyProfile error:' + ex.description);
-           
+
     }
 };
 
@@ -1511,7 +1511,7 @@ User.prototype.saveCompanyProfile = function(req,res,next){
         };
 
         if(Token !=  null && CompanyProfile != null){
-            FnValidateToken(Token, function (err, Result) {
+            _this.stdLib.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result) {
                         var query = _this.db.escape(Token)+ ',' + _this.db.escape(CompanyProfile);
@@ -1568,7 +1568,7 @@ User.prototype.saveCompanyProfile = function(req,res,next){
     }
     catch (ex) {
         console.log('FnSaveCompanyProfile: Error:' + ex.description);
-           
+
     }
 };
 
@@ -1591,7 +1591,7 @@ User.prototype.getWebLink = function(req,res,next){
         var Token = req.query.Token;
 
         if (Token != null) {
-            FnValidateToken(Token, function (err, Result) {
+            _this.stdLib.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result) {
 
@@ -1647,7 +1647,7 @@ User.prototype.getWebLink = function(req,res,next){
     }
     catch (ex) {
         console.log('FnGetWebLink error:' + ex.description);
-           
+
     }
 };
 
@@ -1680,7 +1680,7 @@ User.prototype.saveWebLink = function(req,res,next){
             RtnMessage.Message = 'Please Enter a URLNumber 1 t0 99';
 
         if (Token != null && URL != null && URL != '' && URLNumber != null) {
-            FnValidateToken(Token, function (err, Result) {
+            _this.stdLib.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result) {
                         console.log(Token,URL,URLNumber);
@@ -1742,7 +1742,7 @@ User.prototype.saveWebLink = function(req,res,next){
     }
     catch (ex) {
         console.log('FnSaveWebLink:error ' + ex.description);
-           
+
     }
 };
 
@@ -1770,7 +1770,7 @@ User.prototype.deleteWebLink = function(req,res,next){
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
 
         if (Token !=null && TID != null) {
-            FnValidateToken(Token, function (err, Result) {
+            _this.stdLib.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result) {
                         //console.log('CALL pDeleteWorkinghours(' + _this.db.escape(TID) + ')');
@@ -1821,7 +1821,7 @@ User.prototype.deleteWebLink = function(req,res,next){
     }
     catch (ex) {
         console.log('FnDeleteWebLink:error ' + ex.description);
-           
+
     }
 };
 
@@ -1843,7 +1843,7 @@ User.prototype.getEzeidDetails = function(req,res,next){
         var Token = req.query.Token;
         var EZEID = req.query.EZEID;
         if (Token != null && EZEID != null ) {
-            FnValidateToken(Token, function (err, Result) {
+            _this.stdLib.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result) {
                         var LocSeqNo = 0;
@@ -1915,7 +1915,7 @@ User.prototype.getEzeidDetails = function(req,res,next){
     }
     catch (ex) {
         console.log('FnEZEIDDetails error:' + ex.description);
-           
+
     }
 };
 
@@ -1944,7 +1944,7 @@ User.prototype.getResume = function(req,res,next){
         };
 
         if (Token != null) {
-            FnValidateToken(Token, function (err, Result) {
+            _this.stdLib.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result) {
                         _this.db.query('CALL pgetCVInfo(' + _this.db.escape(Token) + ')', function (err, MessagesResult) {
@@ -2002,7 +2002,7 @@ User.prototype.getResume = function(req,res,next){
     }
     catch (ex) {
         console.log('FnGetCVInfo error:' + ex.description);
-           
+
         res.status(400).json(responseMessage);
     }
 };
@@ -2049,7 +2049,7 @@ User.prototype.saveResume = function(req,res,next){
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
 
         if (Token != null) {
-            FnValidateToken(Token, function (err, Result) {
+            _this.stdLib.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result) {
 
@@ -2184,7 +2184,7 @@ User.prototype.saveResume = function(req,res,next){
     }
     catch (ex) {
         console.log('FnSaveCVInfo error:' + ex.description);
-           
+
     }
 };
 
@@ -2249,7 +2249,7 @@ function FnSaveSkills(skill, CallBack) {
     }
     catch (ex) {
         console.log('OTP FnSendMailEzeid error:' + ex.description);
-           
+
         return 'error'
     }
 };
@@ -2314,7 +2314,7 @@ User.prototype.getDocPin = function(req,res,next) {
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         var token = req.query.TokenNo;
         if (token != null) {
-            FnValidateToken(token, function (err, Result) {
+            _this.stdLib.validateToken(token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
                         _this.db.query('CALL pGetDocPIN(' + _this.db.escape(token) + ')', function (err, BussinessListingResult) {
@@ -2386,7 +2386,7 @@ try {
     var Type = parseInt(req.query.Type);
 
     if (Token != null && Type.toString() != 'NaN' && Type.toString() != '0') {
-        FnValidateToken(Token, function (err, Result) {
+        _this.stdLib.validateToken(Token, function (err, Result) {
             if (!err) {
                 if (Result != null) {
                     _this.db.query('CALL pGetDocs(' + _this.db.escape(Token) + ',' + _this.db.escape(Type) + ')', function (err, DocumentResult) {
@@ -2471,7 +2471,7 @@ User.prototype.updateDocPin = function(req,res,next) {
         tPin = null;
     }
     if (token != null && token != '') {
-        FnValidateToken(token, function (err, Result) {
+        _this.stdLib.validateToken(token, function (err, Result) {
             if (!err) {
                 if (Result != null) {
                     var query = _this.db.escape(token) + ',' + _this.db.escape(tPin);
@@ -2552,7 +2552,7 @@ try {
     var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
 
     if (Token != null) {
-        FnValidateToken(Token, function (err, Result) {
+        _this.stdLib.validateToken(Token, function (err, Result) {
             if (!err) {
                 if (Result != null && tRefType.toString() != 'NaN') {
                     if (tRefExpiryDate != null) {
@@ -2695,7 +2695,7 @@ try {
     var tRefType = req.body.RefType;
     //console.log(req.body);
 
-    FnValidateToken(Token, function (err, Result) {
+    _this.stdLib.validateToken(Token, function (err, Result) {
         if (!err) {
             if (Result != null) {
                 if (req && req.files) {
@@ -2932,7 +2932,7 @@ User.prototype.updateProfilePicture = function(req,res,next) {
         //if (PictureFileName == null)
         //    PictureFileName = '';
         if (Token != null && Picture != null && PictureFileName != null) {
-            FnValidateToken(Token, function (err, Result) {
+            _this.stdLib.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
 
@@ -3033,7 +3033,7 @@ User.prototype.getLoginCheck = function(req,res,next) {
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
 
         if (Token != null && Token != '') {
-            FnValidateToken(Token, function (err, Result) {
+            _this.stdLib.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
                         RtnMessage.IsAvailable = true;
