@@ -15,11 +15,14 @@ function error(err, req, res, next) {
     res.json(500,{ status : false, message : 'Internal Server Error', error : {server : 'Exception'}});
 };
 
+
 function StdLib(db){
     this.db = db;
 };
 
 StdLib.prototype.generateToken = function(){
+
+    console.log('generateToken');
     var crypto = require("crypto");
     var algo = "ecdsa-with-SHA1"
     var rand = crypto.randomBytes(64).toString('hex');;
@@ -30,15 +33,18 @@ StdLib.prototype.generateToken = function(){
 };
 
 StdLib.prototype.validateToken = function(Token, CallBack){
+    var _this = this;
+    console.log('validateToken');
+
     try {
 
         //below query to check token exists for the users or not.
         if (Token != null && Token != '') {
             if(Token != 2){
-                var Query = 'select TID,Token from tmaster where Token=' + db.escape(Token);
+                var Query = 'select TID,Token from tmaster where Token=' + _this.db.escape(Token);
                 //var Query = 'select Token from tmaster';
                 //70084b50d3c43822fbef
-                db.query(Query, function (err, Result) {
+               _this.db.query(Query, function (err, Result) {
                     if (!err) {
                         if (Result.length > 0) {
                             // console.log(Result);
@@ -75,14 +81,16 @@ StdLib.prototype.validateToken = function(Token, CallBack){
 };
 
 StdLib.prototype.validateTokenAp = function(Token, CallBack){
+    var _this = this;
+    console.log('validateToken AP');
     try {
 
         //below query to check token exists for the users or not.
         if (Token != null) {
-            var Query = 'select Token from tapuser where Token=' + db.escape(Token);
+            var Query = 'select Token from tapuser where Token=' +_this.db.escape(Token);
             //var Query = 'select Token from tmaster';
             //70084b50d3c43822fbef
-            db.query(Query, function (err, Result) {
+           _this.db.query(Query, function (err, Result) {
                 if (!err) {
                     if (Result.length > 0) {
                         // console.log(Result);
@@ -115,6 +123,7 @@ StdLib.prototype.validateTokenAp = function(Token, CallBack){
 };
 
 StdLib.prototype.sendMail = function(req, res){
+    var _this = this;
 
         try {
             res.setHeader('content-type', 'application/json');
@@ -208,6 +217,7 @@ StdLib.prototype.sendMail = function(req, res){
     };
 
 function FnSendMailEzeid(MailContent, CallBack) {
+    var _this = this;
     try {
 
         //below query to check token exists for the users or not.
@@ -254,6 +264,7 @@ function FnSendMailEzeid(MailContent, CallBack) {
 };
 
 function FnMessageMail(MessageContent, CallBack) {
+    var _this = this;
     try {
 
         //below query to check token exists for the users or not.
@@ -275,10 +286,10 @@ function FnMessageMail(MessageContent, CallBack) {
             } else {
                 MessageType = MessageContent.MessageType;
             }
-            var query = db.escape(MessageContent.Token) + ',' + db.escape(MessageContent.LocID) + ',' + db.escape(MessageType);
+            var query =_this.db.escape(MessageContent.Token) + ',' +_this.db.escape(MessageContent.LocID) + ',' +_this.db.escape(MessageType);
 
             //  console.log(query);//console.log('FnSaveMessage: Inserting data: ' + query);
-            db.query('CALL PgetMailSendingDetails(' + query + ')', function (err, MessageContentResult) {
+           _this.db.query('CALL PgetMailSendingDetails(' + query + ')', function (err, MessageContentResult) {
                 if (!err) {
                     if (MessageContentResult[0] != null) {
                         if (MessageContentResult[0].length > 0) {
@@ -301,9 +312,9 @@ function FnMessageMail(MessageContent, CallBack) {
                                  html: data // html body
                                  };
                                  //console.log(TomailOptions);
-                                 var post = { MessageType: db.escape(MessageContent.MessageType), ToMailID: MessageContentResult[0].ToMailID, Subject: TomailOptions.subject, Body: TomailOptions.html };
+                                 var post = { MessageType:_this.db.escape(MessageContent.MessageType), ToMailID: MessageContentResult[0].ToMailID, Subject: TomailOptions.subject, Body: TomailOptions.html };
                                  //  console.log(post);
-                                 var query = db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
+                                 var query =_this.db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
                                  // Neat!
                                  if (!err) {
                                  console.log('FnMessageMail: Mail saved Successfully');
@@ -334,7 +345,7 @@ function FnMessageMail(MessageContent, CallBack) {
                                         };
                                         var post = { MessageType: MessageContent.MessageType, Priority: 3,ToMailID: MessageContentResult[0].ToMailID, Subject: mailOptions.subject, Body: mailOptions.html,SentbyMasterID: MessageContent.TID };
                                         // console.log(post);
-                                        var query = db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
+                                        var query =_this.db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
                                             // Neat!
                                             if (!err) {
                                                 console.log('FnMessageMail: Mail saved Successfully....1');
@@ -364,7 +375,7 @@ function FnMessageMail(MessageContent, CallBack) {
                                         };
                                         var post = { MessageType: MessageContent.MessageType,Priority: 3, ToMailID: MessageContentResult[0].ToMailID, Subject: mailOptions.subject, Body: mailOptions.html,SentbyMasterID: MessageContent.TID };
                                         // console.log(post);
-                                        var query = db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
+                                        var query =_this.db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
                                             // Neat!
                                             if (!err) {
                                                 console.log('FnMessageMail: Mail saved Successfully....2');
@@ -403,7 +414,7 @@ function FnMessageMail(MessageContent, CallBack) {
                                         };
                                         var post = { MessageType: MessageContent.MessageType, Priority: 3,ToMailID: MessageContentResult[0].ToMailID, Subject: mailOptions.subject, Body: mailOptions.html,SentbyMasterID: MessageContent.TID };
                                         // console.log(post);
-                                        var query = db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
+                                        var query =_this.db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
                                             // Neat!
                                             if (!err) {
                                                 console.log('FnMessageMail: Mail saved Successfully.....3');
@@ -432,7 +443,7 @@ function FnMessageMail(MessageContent, CallBack) {
                                         };
                                         var post = { MessageType: MessageContent.MessageType,Priority: 3, ToMailID: MessageContentResult[0].ToMailID, Subject: mailOptions.subject, Body: mailOptions.html,SentbyMasterID: MessageContent.TID };
                                         // console.log(post);
-                                        var query = db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
+                                        var query =_this.db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
                                             // Neat!
                                             if (!err) {
                                                 console.log('FnMessageMail: Mail saved Successfully.....4');
@@ -474,7 +485,7 @@ function FnMessageMail(MessageContent, CallBack) {
                                         };
                                         var post = { MessageType: MessageContent.MessageType,Priority: 3, ToMailID: MessageContentResult[0].ToMailID, Subject: mailOptions.subject, Body: mailOptions.html,SentbyMasterID: MessageContent.TID };
                                         console.log(post);
-                                        var query = db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
+                                        var query =_this.db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
                                             // Neat!
                                             if (!err) {
                                                 console.log('FnMessageMail: Mail saved Successfully....5');
@@ -515,7 +526,7 @@ function FnMessageMail(MessageContent, CallBack) {
                                  };
                                  var post = { MessageType: MessageContent.MessageType,Priority: 3, ToMailID: MessageContentResult[0].ToMailID, Subject: mailOptions.subject, Body: mailOptions.html,SentbyMasterID: MessageContent.TID };
                                  // console.log(post);
-                                 var query = db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
+                                 var query =_this.db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
                                  // Neat!
                                  if (!err) {
                                  console.log('FnMessageMail: Mail saved Successfully');

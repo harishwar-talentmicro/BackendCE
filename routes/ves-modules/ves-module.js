@@ -7,12 +7,14 @@
  */
 "use strict";
 
+var st = null;
 function VES(db,stdLib){
-    this.db = db;
+
     if(stdLib){
-        this.stdLib = stdLib;
+        st = stdLib;
     }
 };
+
 
 function FnEncryptPassword(Password) {
     try {
@@ -54,9 +56,9 @@ VES.prototype.loginVES = function(req,res,next){
         if (EZEID != null && EZEID != '' && Password != null && Password != '') {
             //var EncryptPWD = FnEncryptPassword(Password);
             //console.log('Encrypt password' +EncryptPWD);
-            db.query('CALL pLoginVES(' + db.escape(EZEID) + ',' + db.escape(Password) + ')', function (err, GetResult) {
+            st.query('CALL pLoginVES(' + st.escape(EZEID) + ',' + st.escape(Password) + ')', function (err, GetResult) {
                 if (!err) {
-                    if (GetResult) {
+                    if (GetResult != null) {
                         if (GetResult[0].length > 0) {
                             console.log('FnLoginVES: LoginVES details Send successfully');
                             res.send(GetResult[0]);
@@ -151,16 +153,16 @@ VES.prototype.saveContactVES = function(req,res,next){
         };
 
         if (Token != null && EZEID != null && ContactID != null) {
-            _this.stdLib.validateToken(Token, function (err, Result) {
+            st.validateToken(Token, function (err, Result) {
                 if (!err) {
-                    if (Result) {
-                        var query = db.escape(Token) + ',' + db.escape(EZEID) + ',' + db.escape(Pic) + ',' + db.escape(FirstName) + ',' +db.escape(LastName)
-                            + ',' +db.escape(PhoneNo) + ',' +db.escape(MobileNo) + ',' +db.escape(EmailID) + ',' +db.escape(CompanyName)
-                            + ',' +db.escape(Address1) + ',' +db.escape(Address2) + ',' +db.escape(CountryID) + ',' +db.escape(StateID) + ',' +db.escape(City)
-                            + ',' + db.escape(PostalCode) + ',' + db.escape(Synced) + ',' + db.escape(ContactID) + ',' +db.escape(LaptopSLNO) + ',' +db.escape(VehicalTypeNo)
-                            + ',' + db.escape(InTimeNew) + ',' + db.escape(OutTimeNew) + ',' + db.escape(ContactDeptID) + ',' + db.escape(PassReturned) + ',' + db.escape(Status)
-                            + ',' + db.escape(GateNo) + ',' + db.escape(SyncedInout) + ',' + db.escape(ContactEZEID) + ',' + db.escape(ContactName);
-                        db.query('CALL pSaveContactVES(' + query + ')', function (err, InsertResult) {
+                    if (Result != null) {
+                        var query = st.escape(Token) + ',' + st.escape(EZEID) + ',' + st.escape(Pic) + ',' + st.escape(FirstName) + ',' +st.escape(LastName)
+                            + ',' +st.escape(PhoneNo) + ',' +st.escape(MobileNo) + ',' +st.escape(EmailID) + ',' +st.escape(CompanyName)
+                            + ',' +st.escape(Address1) + ',' +st.escape(Address2) + ',' +st.escape(CountryID) + ',' +st.escape(StateID) + ',' +st.escape(City)
+                            + ',' + st.escape(PostalCode) + ',' + st.escape(Synced) + ',' + st.escape(ContactID) + ',' +st.escape(LaptopSLNO) + ',' +st.escape(VehicalTypeNo)
+                            + ',' + st.escape(InTimeNew) + ',' + st.escape(OutTimeNew) + ',' + st.escape(ContactDeptID) + ',' + st.escape(PassReturned) + ',' + st.escape(Status)
+                            + ',' + st.escape(GateNo) + ',' + st.escape(SyncedInout) + ',' + st.escape(ContactEZEID) + ',' + st.escape(ContactName);
+                        st.query('CALL pSaveContactVES(' + query + ')', function (err, InsertResult) {
                             if (!err){
                                 if (InsertResult.affectedRows > 0) {
                                     RtnMessage.IsSuccessfull = true;
@@ -235,14 +237,14 @@ VES.prototype.getAllContactsVES = function(req,res,next){
         var DateNew2 = new Date(Date2);
 
         if (Token != null && DateNew1 !=null && DateNew2 != null) {
-            _this.stdLib.validateToken(Token, function (err, Result) {
+            st.validateToken(Token, function (err, Result) {
                 if (!err) {
-                    if (Result) {
-                        var query = db.escape(Token) + ',' + db.escape(DateNew1) + ',' + db.escape(DateNew2);
-                        db.query('CALL pGetAllContactsVES(' + query + ')', function (err, GetResult) {
+                    if (Result != null) {
+                        var query = st.escape(Token) + ',' + st.escape(DateNew1) + ',' + st.escape(DateNew2);
+                        st.query('CALL pGetAllContactsVES(' + query + ')', function (err, GetResult) {
 
                             if (!err) {
-                                if (GetResult) {
+                                if (GetResult != null) {
                                     if (GetResult[0].length > 0) {
 
                                         console.log('FnGetAllContactsVES: ContactsVES details Send successfully');
@@ -319,11 +321,11 @@ VES.prototype.getDepartmentVES = function(req,res,next){
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         var MasterID = req.query.MasterID;
-        if (MasterID) {
-            var Query = 'Select TID,DeptName from mdept where MasterID=' + db.escape(MasterID);
+        if (MasterID != null) {
+            var Query = 'Select TID,DeptName from mdept where MasterID=' + st.escape(MasterID);
             //var MaxQuery = 'Select max(TID) as ID from  mdept';
 
-            db.query(Query, function (err, DeptResult) {
+            st.query(Query, function (err, DeptResult) {
                 if (!err) {
                     if (DeptResult.length > 0) {
                         res.send(DeptResult);
@@ -375,13 +377,13 @@ VES.prototype.getContactVES = function(req,res,next){
         var TID = req.query.TID;
 
         if (Token != null && TID != null) {
-            _this.stdLib.validateToken(Token, function (err, Result) {
+            st.validateToken(Token, function (err, Result) {
                 if (!err) {
-                    if (Result) {
+                    if (Result != null) {
 
-                        db.query('CALL pGetContactVES(' + db.escape(Token) + ',' + db.escape(TID) + ')', function (err, GetResult) {
+                        st.query('CALL pGetContactVES(' + st.escape(Token) + ',' + st.escape(TID) + ')', function (err, GetResult) {
                             if (!err) {
-                                if (GetResult) {
+                                if (GetResult != null) {
                                     if (GetResult[0].length > 0) {
 
                                         console.log('FnGetContactsVES: ContactsVES details Send successfully');
@@ -467,12 +469,12 @@ VES.prototype.searchContactsVES = function(req,res,next){
 
         if (Token != null && DateNew1 !=null && DateNew2 != null && Status !=null && Keywords != null && Type !=null) {
 
-            _this.stdLib.validateToken(Token, function (err, Result) {
+            st.validateToken(Token, function (err, Result) {
                 if (!err) {
-                    if (Result) {
-                        var SearchParameter = db.escape(Token) + ',' + db.escape(DateNew1) + ',' + db.escape(DateNew2) + ',' + db.escape(Status) + ',' + db.escape(Keywords) + ',' + db.escape(Type);
+                    if (Result != null) {
+                        var SearchParameter = st.escape(Token) + ',' + st.escape(DateNew1) + ',' + st.escape(DateNew2) + ',' + st.escape(Status) + ',' + st.escape(Keywords) + ',' + st.escape(Type);
 
-                        db.query('CALL pSearchContactsVES(' + SearchParameter + ')', function (err, Result) {
+                        st.query('CALL pSearchContactsVES(' + SearchParameter + ')', function (err, Result) {
                             if (!err) {
                                 if (Result[0].length > 0) {
                                     res.send(Result[0]);
@@ -552,9 +554,9 @@ VES.prototype.checkPasswordVES = function(req,res,next){
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         var Password = req.query.Password;
-        if (Password) {
-            var Query = 'Select TID from tmaster where StatusID=1 and VESPassword=' + db.escape(Password);
-            db.query(Query, function (err, PasswordResult) {
+        if (Password != null) {
+            var Query = 'Select TID from tmaster where StatusID=1 and VESPassword=' + st.escape(Password);
+            st.query(Query, function (err, PasswordResult) {
                 if (!err) {
                     if (PasswordResult.length > 0) {
                         res.send(PasswordResult);
@@ -605,9 +607,9 @@ VES.prototype.getGatesVES = function(req,res,next){
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         var MasterID = req.query.MasterID;
-        if (MasterID) {
-            var Query = 'Select TID,GateNo from mgates where MasterID=' + db.escape(MasterID);
-            db.query(Query, function (err, Result) {
+        if (MasterID != null) {
+            var Query = 'Select TID,GateNo from mgates where MasterID=' + st.escape(MasterID);
+            st.query(Query, function (err, Result) {
                 if (!err) {
                     if (Result.length > 0) {
                         res.send(Result);
@@ -667,14 +669,14 @@ VES.prototype.saveDepartmentsVES = function(req,res,next){
             TID = 0;
 
         if (Token != null && Name != null) {
-            _this.stdLib.validateToken(Token, function (err, Result) {
+            st.validateToken(Token, function (err, Result) {
                 if (!err) {
-                    if (Result) {
-                        var query = db.escape(Token) + ',' + db.escape(Name) + ',' + db.escape(TID);
-                        db.query('CALL pSaveDepartments(' + query + ')', function (err, InsertResult) {
+                    if (Result != null) {
+                        var query = st.escape(Token) + ',' + st.escape(Name) + ',' + st.escape(TID);
+                        st.query('CALL pSaveDepartments(' + query + ')', function (err, InsertResult) {
                             if (!err) {
                                 //console.log(InsertResult);
-                                if (InsertResult) {
+                                if (InsertResult != null) {
                                     if (InsertResult[0].length > 0) {
                                         RtnMessage.IsSuccessfull = true;
                                         var Insert = InsertResult[0];
@@ -764,14 +766,14 @@ VES.prototype.saveGatesVES = function(req,res,next){
             TID = 0;
 
         if (Token != null && Name != null) {
-            _this.stdLib.validateToken(Token, function (err, Result) {
+            st.validateToken(Token, function (err, Result) {
                 if (!err) {
-                    if (Result) {
-                        var query = db.escape(Token) + ',' + db.escape(Name) + ',' + db.escape(TID);
-                        db.query('CALL pSaveGates(' + query + ')', function (err, InsertResult) {
+                    if (Result != null) {
+                        var query = st.escape(Token) + ',' + st.escape(Name) + ',' + st.escape(TID);
+                        st.query('CALL pSaveGates(' + query + ')', function (err, InsertResult) {
                             if (!err) {
                                 //  console.log(InsertResult);
-                                if (InsertResult) {
+                                if (InsertResult != null) {
                                     if (InsertResult[0].length > 0) {
                                         RtnMessage.IsSuccessfull = true;
                                         var Insert = InsertResult[0];
@@ -864,11 +866,11 @@ VES.prototype.saveCitysVES = function(req,res,next){
 
 
         if (StateID != null && CityTitle != null) {
-            var Insertquery = db.escape(StateID) + ',' + db.escape(CityTitle) + ',' + db.escape(TID);
-            db.query('CALL pSaveCitysVES(' + Insertquery + ')', function (err, InsertResult) {
+            var Insertquery = st.escape(StateID) + ',' + st.escape(CityTitle) + ',' + st.escape(TID);
+            st.query('CALL pSaveCitysVES(' + Insertquery + ')', function (err, InsertResult) {
                 if (!err) {
                     //  console.log(InsertResult);
-                    if (InsertResult) {
+                    if (InsertResult != null) {
                         if (InsertResult[0].length > 0) {
                             RtnMessage.IsSuccessfull = true;
                             var Insert = InsertResult[0];

@@ -25,10 +25,12 @@ function alterEzeoneId(ezeoneId){
     return alteredEzeoneId;
 }
 
+var st = null;
+
 function Location(db,stdLib){
-    this.db = db;
+
     if(stdLib){
-        this.stdLib = stdLib;
+        st = stdLib;
     }
 };
 
@@ -50,10 +52,10 @@ Location.prototype.getAll = function(req,res,next){
         var Token = req.query.Token;
 
         if (Token != null && Token != '') {
-            _this.stdLib.validateToken(Token, function (err, Result) {
+            st.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result) {
-                        _this._this.db.query('CALL pGetSecondaryLocationDetails(' + _this._this.db.escape(Token) + ')', function (err, SecondaryResult) {
+                        st.db.query('CALL pGetSecondaryLocationDetails(' + st.db.escape(Token) + ')', function (err, SecondaryResult) {
                             if (!err) {
                                 // console.log(UserDetailsResult);
                                 if (SecondaryResult[0]) {
@@ -151,17 +153,17 @@ Location.prototype.save = function(req,res,next){
         var TemplateID = (req.body.TemplateID) ? req.body.TemplateID : 0;
 
         if (TID.toString() != 'NaN' && Token != null && CityName != null && StateID.toString() != 'NaN' && CountryID.toString() != 'NaN' && LocTitle != null && AddressLine1 != null && Longitude.toString() != 'NaN' && Latitude.toString() != 'NaN') {
-            _this.stdLib.validateToken(Token, function (err, Result) {
+            st.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result) {
 
-                        var InsertQuery = _this.db.escape(TID) + ',' + _this.db.escape(Token) + ',' + _this.db.escape(LocTitle) + ',' + _this.db.escape(Latitude)
-                            + ',' + _this.db.escape(Longitude) + ',' + _this.db.escape(Altitude) + ',' + _this.db.escape(AddressLine1) + ',' + _this.db.escape(AddressLine2)
-                            + ',' + _this.db.escape(CityName) + ',' + _this.db.escape(StateID) + ',' + _this.db.escape(CountryID) + ',' + _this.db.escape(PostalCode)
-                            + ',' + _this.db.escape(PIN) + ',' + _this.db.escape(PhoneNumber) + ',' + _this.db.escape(MobileNumber)  + ',' + _this.db.escape(Picture)
-                            + ',' + _this.db.escape(PictureFileName) + ',' + _this.db.escape(Website) + ',' +   _this.db.escape(ISDPhoneNumber) + ',' + _this.db.escape(ISDMobileNumber) + ',' + _this.db.escape(ParkingStatus) + ',' + _this.db.escape(TemplateID);
+                        var InsertQuery = st.db.escape(TID) + ',' + st.db.escape(Token) + ',' + st.db.escape(LocTitle) + ',' + st.db.escape(Latitude)
+                            + ',' + st.db.escape(Longitude) + ',' + st.db.escape(Altitude) + ',' + st.db.escape(AddressLine1) + ',' + st.db.escape(AddressLine2)
+                            + ',' + st.db.escape(CityName) + ',' + st.db.escape(StateID) + ',' + st.db.escape(CountryID) + ',' + st.db.escape(PostalCode)
+                            + ',' + st.db.escape(PIN) + ',' + st.db.escape(PhoneNumber) + ',' + st.db.escape(MobileNumber)  + ',' + st.db.escape(Picture)
+                            + ',' + st.db.escape(PictureFileName) + ',' + st.db.escape(Website) + ',' +   st.db.escape(ISDPhoneNumber) + ',' + st.db.escape(ISDMobileNumber) + ',' + st.db.escape(ParkingStatus) + ',' + st.db.escape(TemplateID);
 
-                        _this.db.query('CALL pInsertLocationData(' + InsertQuery + ')', function (err, InsertResult) {
+                        st.db.query('CALL pInsertLocationData(' + InsertQuery + ')', function (err, InsertResult) {
                             if (!err) {
                                 if (InsertResult) {
                                     if (InsertResult.affectedRows > 0) {
@@ -175,10 +177,10 @@ Location.prototype.save = function(req,res,next){
                                             selectqry = selectqry + ' order by tlocations.TID desc limit 1';
                                         }
                                         else {
-                                            selectqry = selectqry + ' where tlocations.TID=' + _this.db.escape(TID);
+                                            selectqry = selectqry + ' where tlocations.TID=' + st.db.escape(TID);
                                         }
                                         //  console.log('AddLocaiton: selectqry: ' + selectqry);
-                                        _this.db.query(selectqry, function (err, SelectResult) {
+                                        st.db.query(selectqry, function (err, SelectResult) {
                                             if (!err) {
                                                 //console.log('AddLocaiton: SelectResult: ' + SelectResult);
                                                 console.log('Addlocation: Sending location details ' + TID);
@@ -281,12 +283,12 @@ Location.prototype.deleteLocation = function(req,res,next) {
         };
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
         if (token != null && token != '' && TID.toString() != 'NaN') {
-            _this.stdLib.validateToken(token, function (err, Result) {
+            st.validateToken(token, function (err, Result) {
                 if (!err) {
-                    if (Result) {
-                        var query = 'DELETE FROM tlocations where TID=' + _this.db.escape(TID);
+                    if (Result != null) {
+                        var query = 'DELETE FROM tlocations where TID=' + st.db.escape(TID);
                         //  console.log('FnDeleteLocation: DeleteQuery : ' + query);
-                        _this.db.query(query, function (err, DeleteResult) {
+                        st.db.query(query, function (err, DeleteResult) {
                             if (!err) {
                                 console.log('DeleteQuery: ' + DeleteResult);
                                 if (DeleteResult.affectedRows > 0) {
@@ -358,11 +360,11 @@ Location.prototype.getAllForEzeid = function(req,res,next){
         console.log(req.query.Token);
         console.log(Token);
         if (Token && TID) {
-            _this.stdLib.validateToken(Token, function (err, Result) {
+            st.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result) {
-                        //var Query ='select TID, MasterID,LocTitle, Latitude, Longitude,MobileNumber,ifnull((Select FirstName from tmaster where TID='+_this.db.escape(TID)+'),"") as FirstName,ifnull((Select LastName from tmaster where TID='+_this.db.escape(TID)+'),"")  as LastName from tlocations where MasterID='+_this.db.escape(TID);
-                        _this.db.query('CALL pGetSubUserLocationList(' + _this.db.escape(TID) + ')', function (err, GetResult) {
+                        //var Query ='select TID, MasterID,LocTitle, Latitude, Longitude,MobileNumber,ifnull((Select FirstName from tmaster where TID='+st.db.escape(TID)+'),"") as FirstName,ifnull((Select LastName from tmaster where TID='+st.db.escape(TID)+'),"")  as LastName from tlocations where MasterID='+st.db.escape(TID);
+                        st.db.query('CALL pGetSubUserLocationList(' + st.db.escape(TID) + ')', function (err, GetResult) {
                             if (!err) {
                                 if (GetResult[0]) {
                                     if (GetResult[0].length > 0) {
@@ -445,14 +447,14 @@ Location.prototype.getLoactionList = function(req,res,next){
 
         var Token = req.query.Token;
 
-        if (Token) {
-            _this.stdLib.validateToken(Token, function (err, Result) {
+        if (Token != null) {
+            st.validateToken(Token, function (err, Result) {
                 if (!err) {
-                    if (Result) {
+                    if (Result != null) {
 
-                        _this.db.query('CALL pGetLocationList(' + _this.db.escape(Token) + ')', function (err, GetResult) {
+                        st.db.query('CALL pGetLocationList(' + st.db.escape(Token) + ')', function (err, GetResult) {
                             if (!err) {
-                                if (GetResult) {
+                                if (GetResult != null) {
                                     if (GetResult[0].length > 0) {
 
                                         console.log('FnGetLocationList: Location List Send successfully');

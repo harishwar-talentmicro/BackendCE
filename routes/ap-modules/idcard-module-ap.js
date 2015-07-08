@@ -23,12 +23,15 @@ function alterEzeoneId(ezeoneId){
     return alteredEzeoneId;
 }
 
+var st = null;
+
 function IDCard_AP(db,stdLib){
-    this.db = db;
+
     if(stdLib){
-        this.stdLib = stdLib;
+        st = stdLib;
     }
 };
+
 
 /**
  * Method : POST
@@ -53,11 +56,11 @@ IDCard_AP.prototype.updateIdCardPrintAP = function(req,res,next){
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
 
         if (Token != null && EZEID != null) {
-            _this.stdLib.validateTokenAp(Token, function (err, Result) {
+            st.validateTokenAp(Token, function (err, Result) {
                 if (!err) {
-                    if (Result) {
-                        var query = _this.db.escape(EZEID) + ',' + _this.db.escape(Token);
-                        _this.db.query('CALL pUpdateIDCardAP(' + query + ')', function (err, UpdateIdResult) {
+                    if (Result != null) {
+                        var query = st.db.escape(EZEID) + ',' + st.db.escape(Token);
+                        st.db.query('CALL pUpdateIDCardAP(' + query + ')', function (err, UpdateIdResult) {
                             if (!err){
                                 if (UpdateIdResult.affectedRows > 0) {
                                     RtnMessage.IsUpdated = true;
@@ -132,12 +135,12 @@ IDCard_AP.prototype.getIdCardPrintAP = function(req,res,next){
         var Token = req.query.Token;
         var EZEID = req.query.EZEID;
         if (Token != null && EZEID != null) {
-            _this.stdLib.validateTokenAp(Token, function (err, Result) {
+            st.validateTokenAp(Token, function (err, Result) {
                 if (!err) {
-                    if (Result) {
-                        _this.db.query('CALL pGetIDCardDetailsAP(' + _this.db.escape(EZEID) + ')', function (err, SecLocationResult) {
+                    if (Result != null) {
+                        st.db.query('CALL pGetIDCardDetailsAP(' + st.db.escape(EZEID) + ')', function (err, SecLocationResult) {
                             if (!err) {
-                                if (SecLocationResult) {
+                                if (SecLocationResult != null) {
                                     if (SecLocationResult[0].length > 0) {
                                         console.log('FnGetIdCardPrintAP: ID Card details Sent successfully');
                                         res.send(SecLocationResult[0]);

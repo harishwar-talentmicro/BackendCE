@@ -23,10 +23,12 @@ function alterEzeoneId(ezeoneId){
     return alteredEzeoneId;
 }
 
-function Configuration(db,stdLib) {
-    this.db = db;
+var st = null;
+
+function Configuration(db,stdLib){
+
     if(stdLib){
-        this.stdLib = stdLib;
+        st = stdLib;
     }
 };
 
@@ -80,18 +82,18 @@ Configuration.prototype.save = function(req,res,next){
         };
 
         if (Token != null && Keyword != null && Category != null) {
-            _this.stdLib.validateToken(Token, function (err, Result) {
+            st.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result) {
 
-                        var query = _this.db.escape(Token) + ',' + _this.db.escape(SalesTitle) + ',' + _this.db.escape(ReservationTitle) + ',' + _this.db.escape(HomeDeliveryTitle) + ',' +_this.db.escape(ServiceTitle)
-                            + ',' +_this.db.escape(ResumeTitle) + ',' +_this.db.escape(VisibleModules) + ',' +_this.db.escape(SalesItemListType) + ',' +_this.db.escape(HomeDeliveryItemListType)
-                            + ',' +_this.db.escape(ResumeKeyword) + ',' +_this.db.escape(Category) + ',' +_this.db.escape(Keyword) + ',' +_this.db.escape(ReservationDisplayFormat) + ',' +_this.db.escape(DataRefreshInterval)
-                            + ',' + _this.db.escape(SalesFormMsg) + ',' + _this.db.escape(ReservationFormMsg) + ',' + _this.db.escape(HomeDeliveryFormMsg) + ',' +_this.db.escape(ServiceFormMsg) + ',' +_this.db.escape(ResumeFormMsg)
-                            + ',' +_this.db.escape(FreshersAccepted) + ',' +_this.db.escape(SalesURL) + ',' +_this.db.escape(ReservationURL)
-                            + ',' +_this.db.escape(HomeDeliveryURL) + ',' +_this.db.escape(ServiceURL) + ',' +_this.db.escape(ResumeURL)  + ',' +_this.db.escape(deal_enable) + ',' +_this.db.escape(deal_banner) + ',' +_this.db.escape(deal_title) + ',' +_this.db.escape(deal_desc);
+                        var query = st.db.escape(Token) + ',' + st.db.escape(SalesTitle) + ',' + st.db.escape(ReservationTitle) + ',' + st.db.escape(HomeDeliveryTitle) + ',' +st.db.escape(ServiceTitle)
+                            + ',' +st.db.escape(ResumeTitle) + ',' +st.db.escape(VisibleModules) + ',' +st.db.escape(SalesItemListType) + ',' +st.db.escape(HomeDeliveryItemListType)
+                            + ',' +st.db.escape(ResumeKeyword) + ',' +st.db.escape(Category) + ',' +st.db.escape(Keyword) + ',' +st.db.escape(ReservationDisplayFormat) + ',' +st.db.escape(DataRefreshInterval)
+                            + ',' + st.db.escape(SalesFormMsg) + ',' + st.db.escape(ReservationFormMsg) + ',' + st.db.escape(HomeDeliveryFormMsg) + ',' +st.db.escape(ServiceFormMsg) + ',' +st.db.escape(ResumeFormMsg)
+                            + ',' +st.db.escape(FreshersAccepted) + ',' +st.db.escape(SalesURL) + ',' +st.db.escape(ReservationURL)
+                            + ',' +st.db.escape(HomeDeliveryURL) + ',' +st.db.escape(ServiceURL) + ',' +st.db.escape(ResumeURL)  + ',' +st.db.escape(deal_enable) + ',' +st.db.escape(deal_banner) + ',' +st.db.escape(deal_title) + ',' +st.db.escape(deal_desc);
 
-                        _this.db.query('CALL pSaveConfig(' + query + ')', function (err, InsertResult) {
+                        st.db.query('CALL pSaveConfig(' + query + ')', function (err, InsertResult) {
                             if (!err){
                                 if (InsertResult.affectedRows > 0) {
                                     RtnMessage.IsSuccessfull = true;
@@ -166,12 +168,12 @@ Configuration.prototype.get = function(req,res,next){
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         var Token = req.query.Token;
 
-        if (Token) {
-            _this.stdLib.validateToken(Token, function (err, Result) {
+        if (Token != null) {
+            st.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result) {
 
-                        _this.db.query('CALL pGetconfiguration(' + _this.db.escape(Token) + ')', function (err, GetResult) {
+                        st.db.query('CALL pGetconfiguration(' + st.db.escape(Token) + ')', function (err, GetResult) {
                             if (!err) {
                                 if (GetResult) {
                                     if (GetResult[0].length > 0) {
@@ -245,8 +247,8 @@ Configuration.prototype.getBusinessCategories = function(req,res,next){
 
         var LangID = parseInt(req.query.LangID);
         if (LangID.toString() != 'NaN') {
-            var Query = 'Select CategoryID, CategoryTitle from mcategory where LangID=' + _this.db.escape(LangID);
-            _this.db.query(Query, function (err, CategoryResult) {
+            var Query = 'Select CategoryID, CategoryTitle from mcategory where LangID=' + st.db.escape(LangID);
+            st.db.query(Query, function (err, CategoryResult) {
                 if (!err) {
                     if (CategoryResult.length > 0) {
                         res.send(CategoryResult);
@@ -296,12 +298,12 @@ Configuration.prototype.getStatusTypes = function(req,res,next){
         var FunctionType = req.query.FunctionType;
 
         if (Token != null  && FunctionType != null ) {
-            _this.stdLib.validateToken(Token, function (err, Result) {
+            st.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result) {
 
-                        var query = _this.db.escape(Token) + ',' + _this.db.escape(FunctionType);
-                        _this.db.query('CALL pGetStatusType(' + query + ')', function (err, StatusResult) {
+                        var query = st.db.escape(Token) + ',' + st.db.escape(FunctionType);
+                        st.db.query('CALL pGetStatusType(' + query + ')', function (err, StatusResult) {
                             if (!err) {
                                 if (StatusResult) {
                                     if (StatusResult[0].length > 0) {
@@ -382,9 +384,9 @@ Configuration.prototype.StatusTypes = function(req,res,next){
         };
 
         if (Token != null  && FunctionType != null ) {
-            _this.stdLib.validateToken(Token, function (err, Result) {
+            st.validateToken(Token, function (err, Result) {
                 if (!err) {
-                    if (Result) {
+                    if (Result != null) {
                         var StatusAllOpen =
                         {
                             TID:'-1',
@@ -408,11 +410,11 @@ Configuration.prototype.StatusTypes = function(req,res,next){
                         };
 
 
-                        var query = _this.db.escape(Token) + ',' + _this.db.escape(FunctionType);
-                        _this.db.query('CALL pGetStatusType(' + query + ')', function (err, StatusResult) {
+                        var query = st.db.escape(Token) + ',' + st.db.escape(FunctionType);
+                        st.db.query('CALL pGetStatusType(' + query + ')', function (err, StatusResult) {
 
                             if (!err) {
-                                if (StatusResult) {
+                                if (StatusResult != null) {
                                     if (StatusResult[0].length > 0) {
                                         StatusResult[0].unshift(StatusAll);
                                         StatusResult[0].unshift(StatusAllOpen);
@@ -508,15 +510,15 @@ Configuration.prototype.saveStatusType = function(req,res,next){
         };
 
         if (Token != null && TID.toString() != 'NaN') {
-            _this.stdLib.validateToken(Token, function (err, Result) {
+            st.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result) {
-                        var query = _this.db.escape(Token) + ',' + _this.db.escape(TID) + ',' + _this.db.escape(FunctionType) + ',' + _this.db.escape(StatusTitle)
-                            + ',' +_this.db.escape(ProgressPercent) + ',' +_this.db.escape(Status) + ',' +_this.db.escape(NotificationMsg) + ',' +_this.db.escape(NotificationMailMsg)
-                            + ',' + _this.db.escape(StatusValue);
-                        _this.db.query('CALL pSaveStatusTypes(' + query + ')', function (err, result) {
+                        var query = st.db.escape(Token) + ',' + st.db.escape(TID) + ',' + st.db.escape(FunctionType) + ',' + st.db.escape(StatusTitle)
+                            + ',' +st.db.escape(ProgressPercent) + ',' +st.db.escape(Status) + ',' +st.db.escape(NotificationMsg) + ',' +st.db.escape(NotificationMailMsg)
+                            + ',' + st.db.escape(StatusValue);
+                        st.db.query('CALL pSaveStatusTypes(' + query + ')', function (err, result) {
                             if (!err) {
-                                if(result){
+                                if(result != null){
                                     if(result.affectedRows > 0){
                                         console.log('FnSaveStatusType: Status type saved successfully');
                                         RtnMessage.IsSuccessfull = true;
@@ -594,13 +596,13 @@ Configuration.prototype.getActionTypes = function(req,res,next){
         var FunctionType = req.query.FunctionType;
 
         if (Token != null && FunctionType != null ) {
-            _this.stdLib.validateToken(Token, function (err, Result) {
+            st.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result) {
 
-                        var query = _this.db.escape(Token) + ',' + _this.db.escape(FunctionType);
+                        var query = st.db.escape(Token) + ',' + st.db.escape(FunctionType);
 
-                        _this.db.query('CALL pGetActionType(' + query + ')', function (err, StatusResult) {
+                        st.db.query('CALL pGetActionType(' + query + ')', function (err, StatusResult) {
                             if (!err) {
                                 if (StatusResult) {
                                     if (StatusResult[0].length > 0) {
@@ -685,12 +687,12 @@ Configuration.prototype.saveActionType = function(req,res,next){
         };
 
         if (Token != null && TID.toString() != 'NaN') {
-            _this.stdLib.validateToken(Token, function (err, Result) {
+            st.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result) {
-                        var query = _this.db.escape(Token) + ',' + _this.db.escape(TID) + ',' + _this.db.escape(FunctionType) + ',' + _this.db.escape(ActionTitle)
-                            + ',' +_this.db.escape(Status);
-                        _this.db.query('CALL pSaveActionTypes(' + query + ')', function (err, result) {
+                        var query = st.db.escape(Token) + ',' + st.db.escape(TID) + ',' + st.db.escape(FunctionType) + ',' + st.db.escape(ActionTitle)
+                            + ',' +st.db.escape(Status);
+                        st.db.query('CALL pSaveActionTypes(' + query + ')', function (err, result) {
                             if (!err) {
                                 if(result){
                                     if(result.affectedRows > 0){
@@ -770,10 +772,10 @@ Configuration.prototype.getItems = function(req,res,next){
         if(Token == "")
             Token= null;
         if (Token != null && FunctionType != null) {
-            _this.stdLib.validateToken(Token, function (err, Result) {
+            st.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result) {
-                        _this.db.query('CALL pGetItemList(' + _this.db.escape(Token) + ',' + _this.db.escape(FunctionType) + ')', function (err, GetResult) {
+                        st.db.query('CALL pGetItemList(' + st.db.escape(Token) + ',' + st.db.escape(FunctionType) + ')', function (err, GetResult) {
                             if (!err) {
                                 if (GetResult[0]) {
                                     if (GetResult[0].length > 0) {
@@ -861,13 +863,13 @@ Configuration.prototype.saveItems = function(req,res,next){
         if(Rate == null || Rate =="")
             Rate=0.00;
         if (Token != null  && FunctionType != null && ItemName !=null) {
-            _this.stdLib.validateToken(Token, function (err, Result) {
+            st.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result) {
 
-                        var query = _this.db.escape(TID) + ',' + _this.db.escape(Token) + ',' + _this.db.escape(FunctionType) + ',' + _this.db.escape(ItemName)
-                            + ',' +_this.db.escape(ItemDescription) + ',' +_this.db.escape(Pic) + ',' +_this.db.escape(Rate) + ',' +_this.db.escape(Status) + ',' +_this.db.escape(ItemDuration);
-                        _this.db.query('CALL pSaveItem(' + query + ')', function (err, InsertResult) {
+                        var query = st.db.escape(TID) + ',' + st.db.escape(Token) + ',' + st.db.escape(FunctionType) + ',' + st.db.escape(ItemName)
+                            + ',' +st.db.escape(ItemDescription) + ',' +st.db.escape(Pic) + ',' +st.db.escape(Rate) + ',' +st.db.escape(Status) + ',' +st.db.escape(ItemDuration);
+                        st.db.query('CALL pSaveItem(' + query + ')', function (err, InsertResult) {
                             if (!err){
                                 if (InsertResult.affectedRows > 0) {
                                     RtnMessage.IsSuccessfull = true;
@@ -942,11 +944,11 @@ Configuration.prototype.getFolders = function(req,res,next){
         var Token = req.query.Token;
         var FunctionType = req.query.FunctionType;
         if (Token != null && FunctionType != null) {
-            _this.stdLib.validateToken(Token, function (err, Result) {
+            st.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result) {
 
-                        _this.db.query('CALL pGetFolderList(' + _this.db.escape(Token) + ',' + _this.db.escape(FunctionType) + ')', function (err, GetResult) {
+                        st.db.query('CALL pGetFolderList(' + st.db.escape(Token) + ',' + st.db.escape(FunctionType) + ')', function (err, GetResult) {
                             if (!err) {
                                 if (GetResult[0]) {
                                     if (GetResult[0].length > 0) {
@@ -1036,13 +1038,13 @@ Configuration.prototype.saveFolder = function(req,res,next){
         };
 
         if (Token != null && TID.toString() != 'NaN') {
-            _this.stdLib.validateToken(Token, function (err, Result) {
+            st.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result) {
-                        var query = _this.db.escape(Token) + ',' + _this.db.escape(TID) + ',' + _this.db.escape(FolderTitle) + ',' + _this.db.escape(RuleFunction)
-                            + ',' +_this.db.escape(RuleType) + ',' +_this.db.escape(CountryID) + ',' +_this.db.escape(MatchAdminLevel) + ',' +_this.db.escape(MappedNames) + ',' + _this.db.escape(Latitude)
-                            + ',' +_this.db.escape(Longitude) + ',' +_this.db.escape(Proximity) + ',' +_this.db.escape(DefaultFolder) + ',' +_this.db.escape(FolderStatus) + ',' +_this.db.escape(SeqNoFrefix);
-                        _this.db.query('CALL pSaveFolderRules(' + query + ')', function (err, InsertResult) {
+                        var query = st.db.escape(Token) + ',' + st.db.escape(TID) + ',' + st.db.escape(FolderTitle) + ',' + st.db.escape(RuleFunction)
+                            + ',' +st.db.escape(RuleType) + ',' +st.db.escape(CountryID) + ',' +st.db.escape(MatchAdminLevel) + ',' +st.db.escape(MappedNames) + ',' + st.db.escape(Latitude)
+                            + ',' +st.db.escape(Longitude) + ',' +st.db.escape(Proximity) + ',' +st.db.escape(DefaultFolder) + ',' +st.db.escape(FolderStatus) + ',' +st.db.escape(SeqNoFrefix);
+                        st.db.query('CALL pSaveFolderRules(' + query + ')', function (err, InsertResult) {
                             if (!err){
                                 console.log(InsertResult);
                                 if (InsertResult.affectedRows > 0) {
@@ -1112,12 +1114,12 @@ Configuration.prototype.getSubusers = function(req,res,next){
 
         var Token = req.query.Token;
 
-        if (Token) {
-            _this.stdLib.validateToken(Token, function (err, Result) {
+        if (Token != null) {
+            st.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result) {
 
-                        _this.db.query('CALL pGetSubUserList(' + _this.db.escape(Token) + ')', function (err, GetResult) {
+                        st.db.query('CALL pGetSubUserList(' + st.db.escape(Token) + ')', function (err, GetResult) {
                             if (!err) {
                                 if (GetResult) {
                                     if (GetResult[0].length > 0) {
@@ -1218,16 +1220,16 @@ Configuration.prototype.createSubuser = function(req,res,next){
         /*if (Token!= null && TID!= null && UserName!= null  && Status!= null && FirstName != null && LastName !=null && AccessRights !=null && SalesEmail != null
          && ReservationEmail!= null && HomeDeliveryEmail!= null && ServiceEmail!= null && ResumeEmail !=null  && SalesRules != null
          && ReservationRules != null && HomeDeliveryRules != null && ServiceRules != null && ResumeRules != null) {*/
-        _this.stdLib.validateToken(Token, function (err, Result) {
+        st.validateToken(Token, function (err, Result) {
             if (!err) {
                 if (Result) {
                     console.log(Result);
-                    var query = _this.db.escape(Token) + ',' + _this.db.escape(TID) + ',' + _this.db.escape(UserName) + ',' +_this.db.escape(Status) + ',' +_this.db.escape(FirstName) + ',' +_this.db.escape(LastName)
-                        + ',' + _this.db.escape(AccessRights) + ',' + _this.db.escape(SalesEmail) + ',' + _this.db.escape(ReservationEmail) + ',' +_this.db.escape(HomeDeliveryEmail)
-                        + ',' + _this.db.escape(ServiceEmail) + ',' + _this.db.escape(ResumeEmail) + ',' + _this.db.escape(SalesRules) + ',' +_this.db.escape(ReservationRules)
-                        + ',' + _this.db.escape(HomeDeliveryRules) + ',' + _this.db.escape(ServiceRules) + ',' + _this.db.escape(ResumeRules) + ',' + _this.db.escape(MasterID) + ',' + _this.db.escape(templateID);
+                    var query = st.db.escape(Token) + ',' + st.db.escape(TID) + ',' + st.db.escape(UserName) + ',' +st.db.escape(Status) + ',' +st.db.escape(FirstName) + ',' +st.db.escape(LastName)
+                        + ',' + st.db.escape(AccessRights) + ',' + st.db.escape(SalesEmail) + ',' + st.db.escape(ReservationEmail) + ',' +st.db.escape(HomeDeliveryEmail)
+                        + ',' + st.db.escape(ServiceEmail) + ',' + st.db.escape(ResumeEmail) + ',' + st.db.escape(SalesRules) + ',' +st.db.escape(ReservationRules)
+                        + ',' + st.db.escape(HomeDeliveryRules) + ',' + st.db.escape(ServiceRules) + ',' + st.db.escape(ResumeRules) + ',' + st.db.escape(MasterID) + ',' + st.db.escape(templateID);
                     console.log(query);
-                    _this.db.query('CALL pCreateSubUser(' + query + ')', function (err, InsertResult) {
+                    st.db.query('CALL pCreateSubUser(' + query + ')', function (err, InsertResult) {
                         if (!err){
                             if (InsertResult[0])
                             {
@@ -1312,9 +1314,9 @@ Configuration.prototype.getReservationResources = function(req,res,next){
         };
 
         if (ezeid) {
-            var query = _this.db.escape(ezeid) + ', ' + _this.db.escape(type);
+            var query = st.db.escape(ezeid) + ', ' + st.db.escape(type);
             console.log(query);
-            _this.db.query('CALL pGetResource(' + query + ')', function (err, GetResult) {
+            st.db.query('CALL pGetResource(' + query + ')', function (err, GetResult) {
 
                 if (!err) {
                     if (GetResult) {
@@ -1428,12 +1430,12 @@ Configuration.prototype.saveReservationResource = function(req,res,next){
         }
 
         if (Token && operatorid) {
-            _this.stdLib.validateToken(Token, function (err, result) {
+            st.validateToken(Token, function (err, result) {
                 if (!err) {
                     if (result) {
 
-                        var query = _this.db.escape(Token) + ', ' + _this.db.escape(TID) + ',' + _this.db.escape(picture) + ',' + _this.db.escape(title) + ',' + _this.db.escape(description) + ',' + _this.db.escape(status)+ ',' + _this.db.escape(operatorid) + ',' + _this.db.escape(workingtemp);
-                        _this.db.query('CALL pSaveResource(' + query + ')', function (err, insertResult) {
+                        var query = st.db.escape(Token) + ', ' + st.db.escape(TID) + ',' + st.db.escape(picture) + ',' + st.db.escape(title) + ',' + st.db.escape(description) + ',' + st.db.escape(status)+ ',' + st.db.escape(operatorid) + ',' + st.db.escape(workingtemp);
+                        st.db.query('CALL pSaveResource(' + query + ')', function (err, insertResult) {
                             if (!err){
                                 if (insertResult) {
                                     responseMessage.status = true;
@@ -1561,15 +1563,15 @@ Configuration.prototype.updateReservationResource = function(req,res,next){
         }
 
         if (Token && operatorid) {
-            _this.stdLib.validateToken(Token, function (err, result) {
+            st.validateToken(Token, function (err, result) {
                 if (!err) {
                     if (result) {
 
-                        var query = _this.db.escape(Token) + ', ' +
-                            _this.db.escape(TID) + ',' + _this.db.escape(picture) +
-                            ',' + _this.db.escape(title) + ',' + _this.db.escape(description) +
-                            ',' + _this.db.escape(status) + ',' + _this.db.escape(operatorid) + ','+_this.db.escape(workingTemp);
-                        _this.db.query('CALL pSaveResource(' + query + ')', function (err, updateResult) {
+                        var query = st.db.escape(Token) + ', ' +
+                            st.db.escape(TID) + ',' + st.db.escape(picture) +
+                            ',' + st.db.escape(title) + ',' + st.db.escape(description) +
+                            ',' + st.db.escape(status) + ',' + st.db.escape(operatorid) + ','+st.db.escape(workingTemp);
+                        st.db.query('CALL pSaveResource(' + query + ')', function (err, updateResult) {
                             if (!err){
                                 if (updateResult.affectedRows > 0) {
                                     responseMessage.status = true;
@@ -1671,7 +1673,7 @@ Configuration.prototype.getReservationServices = function(req,res,next){
         };
 
         if (ezeid) {
-            _this.db.query('CALL pGetResServices(' + _this.db.escape(ezeid) + ')', function (err, GetResult) {
+            st.db.query('CALL pGetResServices(' + st.db.escape(ezeid) + ')', function (err, GetResult) {
                 if (!err) {
                     if (GetResult) {
                         if (GetResult[0].length > 0) {
@@ -1785,12 +1787,12 @@ Configuration.prototype.saveReservationService = function(req,res,next){
 
         if (Token) {
 
-            _this.stdLib.validateToken(Token, function (err, result) {
+            st.validateToken(Token, function (err, result) {
                 if (!err) {
                     if (result) {
 
-                        var query = _this.db.escape(Token) + ', ' + _this.db.escape(TID) + ',' + _this.db.escape(title) + ',' + _this.db.escape(duration) + ',' + _this.db.escape(rate) + ',' + _this.db.escape(status)+ ',' + _this.db.escape(service_ids);
-                        _this.db.query('CALL pSaveResServices(' + query + ')', function (err, insertResult) {
+                        var query = st.db.escape(Token) + ', ' + st.db.escape(TID) + ',' + st.db.escape(title) + ',' + st.db.escape(duration) + ',' + st.db.escape(rate) + ',' + st.db.escape(status)+ ',' + st.db.escape(service_ids);
+                        st.db.query('CALL pSaveResServices(' + query + ')', function (err, insertResult) {
                             if (!err){
                                 if (insertResult) {
                                     responseMessage.status = true;
@@ -1914,12 +1916,12 @@ Configuration.prototype.updateReservationService = function(req,res,next){
         }
 
         if (Token) {
-            _this.stdLib.validateToken(Token, function (err, result) {
+            st.validateToken(Token, function (err, result) {
                 if (!err) {
                     if (result) {
 
-                        var query = _this.db.escape(Token) + ', ' + _this.db.escape(TID) + ',' + _this.db.escape(title) + ',' + _this.db.escape(duration) + ',' + _this.db.escape(rate) + ',' + _this.db.escape(status)+ ',' + _this.db.escape(service_IDS);
-                        _this.db.query('CALL pSaveResServices(' + query + ')', function (err, insertResult) {
+                        var query = st.db.escape(Token) + ', ' + st.db.escape(TID) + ',' + st.db.escape(title) + ',' + st.db.escape(duration) + ',' + st.db.escape(rate) + ',' + st.db.escape(status)+ ',' + st.db.escape(service_IDS);
+                        st.db.query('CALL pSaveResServices(' + query + ')', function (err, insertResult) {
                             if (!err){
                                 if (insertResult) {
                                     responseMessage.status = true;
@@ -2017,7 +2019,7 @@ Configuration.prototype.getResourceServiceMaps = function(req,res,next){
 
         if (ezeid) {
 
-            _this.db.query('CALL pGetResResourceServiceMap(' + _this.db.escape(ezeid) + ')', function (err, GetResult) {
+            st.db.query('CALL pGetResResourceServiceMap(' + st.db.escape(ezeid) + ')', function (err, GetResult) {
                 if (!err) {
                     if (GetResult) {
                         if (GetResult[0].length > 0) {
@@ -2132,11 +2134,11 @@ Configuration.prototype.saveResourceServiceMap = function(req,res,next){
         }
 
         if (Token) {
-            _this.stdLib.validateToken(Token, function (err, result) {
+            st.validateToken(Token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        var query = _this.db.escape(resourceid) + ',' + _this.db.escape(service_id);
-                        _this.db.query('CALL pSaveResResourceServiceMap(' + query + ')', function (err, insertResult) {
+                        var query = st.db.escape(resourceid) + ',' + st.db.escape(service_id);
+                        st.db.query('CALL pSaveResResourceServiceMap(' + query + ')', function (err, insertResult) {
 
                             if (!err){
                                 if (insertResult) {
@@ -2223,12 +2225,12 @@ Configuration.prototype.getWorkingHoursTemplates = function(req,res,next){
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
         var Token = req.query.Token;
-        if (Token) {
-            _this.stdLib.validateToken(Token, function (err, Result) {
+        if (Token != null) {
+            st.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result) {
 
-                        _this.db.query('CALL pGetWorkingHours(' + _this.db.escape(Token) +',' + _this.db.escape(0)+ ')', function (err, GetResult) {
+                        st.db.query('CALL pGetWorkingHours(' + st.db.escape(Token) +',' + st.db.escape(0)+ ')', function (err, GetResult) {
                             if (!err) {
                                 if (GetResult) {
                                     if (GetResult[0].length > 0) {
@@ -2339,19 +2341,19 @@ Configuration.prototype.saveWorkingHoursTemplate = function(req,res,next){
         };
 
         if (Token != null && SpilloverTime != null && WorkingHrsTemplate != null && TID != null ) {
-            _this.stdLib.validateToken(Token, function (err, Result) {
+            st.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result) {
 
-                        var query = _this.db.escape(Token) + ',' + _this.db.escape(SpilloverTime) + ',' + _this.db.escape(MO1) + ',' + _this.db.escape(MO2) + ',' + _this.db.escape(MO3) + ',' + _this.db.escape(MO4)
-                            + ',' + _this.db.escape(TU1) + ',' + _this.db.escape(TU2) + ',' + _this.db.escape(TU3) + ',' + _this.db.escape(TU4)
-                            + ',' + _this.db.escape(WE1) + ',' + _this.db.escape(WE2) + ',' + _this.db.escape(WE3) + ',' + _this.db.escape(WE4)
-                            + ',' + _this.db.escape(TH1) + ',' + _this.db.escape(TH2) + ',' + _this.db.escape(TH3) + ',' + _this.db.escape(TH4)
-                            + ',' + _this.db.escape(FR1) + ',' + _this.db.escape(FR2) + ',' + _this.db.escape(FR3) + ',' + _this.db.escape(FR4)
-                            + ',' + _this.db.escape(SA1) + ',' + _this.db.escape(SA2) + ',' + _this.db.escape(SA3) + ',' + _this.db.escape(SA4)
-                            + ',' + _this.db.escape(SU1) + ',' + _this.db.escape(SU2) + ',' + _this.db.escape(SU3) + ',' + _this.db.escape(SU4)
-                            + ',' + _this.db.escape(WorkingHrsTemplate) + ',' + _this.db.escape(TID);
-                        _this.db.query('CALL pSaveWorkingHours(' + query + ')', function (err, InsertResult) {
+                        var query = st.db.escape(Token) + ',' + st.db.escape(SpilloverTime) + ',' + st.db.escape(MO1) + ',' + st.db.escape(MO2) + ',' + st.db.escape(MO3) + ',' + st.db.escape(MO4)
+                            + ',' + st.db.escape(TU1) + ',' + st.db.escape(TU2) + ',' + st.db.escape(TU3) + ',' + st.db.escape(TU4)
+                            + ',' + st.db.escape(WE1) + ',' + st.db.escape(WE2) + ',' + st.db.escape(WE3) + ',' + st.db.escape(WE4)
+                            + ',' + st.db.escape(TH1) + ',' + st.db.escape(TH2) + ',' + st.db.escape(TH3) + ',' + st.db.escape(TH4)
+                            + ',' + st.db.escape(FR1) + ',' + st.db.escape(FR2) + ',' + st.db.escape(FR3) + ',' + st.db.escape(FR4)
+                            + ',' + st.db.escape(SA1) + ',' + st.db.escape(SA2) + ',' + st.db.escape(SA3) + ',' + st.db.escape(SA4)
+                            + ',' + st.db.escape(SU1) + ',' + st.db.escape(SU2) + ',' + st.db.escape(SU3) + ',' + st.db.escape(SU4)
+                            + ',' + st.db.escape(WorkingHrsTemplate) + ',' + st.db.escape(TID);
+                        st.db.query('CALL pSaveWorkingHours(' + query + ')', function (err, InsertResult) {
                             if (!err){
                                 if (InsertResult.affectedRows > 0) {
                                     RtnMessage.IsSuccessfull = true;
@@ -2432,12 +2434,12 @@ Configuration.prototype.getHolidays = function(req,res,next){
         var TemplateID = req.query.TemplateID;
         if(LocID == null && LocID == '')
             LocID=0;
-        if (Token) {
-            _this.stdLib.validateToken(Token, function (err, Result) {
+        if (Token != null) {
+            st.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result) {
 
-                        _this.db.query('CALL pGetHolidayList(' + _this.db.escape(LocID) + ',' + _this.db.escape(TemplateID)+ ')', function (err, GetResult) {
+                        st.db.query('CALL pGetHolidayList(' + st.db.escape(LocID) + ',' + st.db.escape(TemplateID)+ ')', function (err, GetResult) {
                             if (!err) {
                                 if (GetResult) {
                                     if (GetResult[0].length > 0) {
@@ -2520,11 +2522,11 @@ Configuration.prototype.saveHoliday = function(req,res,next){
         };
 
         if (Token != null && TID != null && HolidayTitle != null  && HolidayDate != null && TemplateID != null ) {
-            _this.stdLib.validateToken(Token, function (err, Result) {
+            st.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result) {
-                        var query = _this.db.escape(TID) + ',' + _this.db.escape(Token) + ',' + _this.db.escape(new Date(HolidayDate)) + ',' + _this.db.escape(HolidayTitle) + ',' + _this.db.escape(TemplateID);
-                        _this.db.query('CALL pSaveHolidayCalendar(' + query + ')', function (err, InsertResult) {
+                        var query = st.db.escape(TID) + ',' + st.db.escape(Token) + ',' + st.db.escape(new Date(HolidayDate)) + ',' + st.db.escape(HolidayTitle) + ',' + st.db.escape(TemplateID);
+                        st.db.query('CALL pSaveHolidayCalendar(' + query + ')', function (err, InsertResult) {
                             if (!err){
                                 if (InsertResult.affectedRows > 0) {
                                     RtnMessage.IsSuccessfull = true;
@@ -2615,12 +2617,12 @@ Configuration.prototype.deleteHoliday = function(req,res,next){
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
 
         if (Token !=null && TID != null) {
-            _this.stdLib.validateToken(Token, function (err, Result) {
+            st.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result) {
 
-                        //var query = _this.db.escape(Token) + ',' + _this.db.escape(TID);
-                        _this.db.query('CALL pDeleteHolidayList(' + _this.db.escape(TID) + ')', function (err, InsertResult) {
+                        //var query = st.db.escape(Token) + ',' + st.db.escape(TID);
+                        st.db.query('CALL pDeleteHolidayList(' + st.db.escape(TID) + ')', function (err, InsertResult) {
                             if (!err){
                                 if (InsertResult.affectedRows > 0) {
                                     RtnMessage.IsSuccessfull = true;
@@ -2697,11 +2699,11 @@ Configuration.prototype.deleteWorkingHours = function(req,res,next){
     var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
 
     if (Token !=null && TID != null) {
-        _this.stdLib.validateToken(Token, function (err, Result) {
+        st.validateToken(Token, function (err, Result) {
             if (!err) {
-                if (Result) {
-                    //console.log('CALL pDeleteWorkinghours(' + _this.db.escape(TID) + ')');
-                    _this.db.query('CALL pDeleteWorkinghours(' + _this.db.escape(TID) + ')', function (err, deleteResult) {
+                if (Result != null) {
+                    //console.log('CALL pDeleteWorkinghours(' + st.db.escape(TID) + ')');
+                    st.db.query('CALL pDeleteWorkinghours(' + st.db.escape(TID) + ')', function (err, deleteResult) {
                         if (!err){
 
                             RtnMessage.IsSuccessfull = true;
@@ -2776,7 +2778,7 @@ Configuration.prototype.getWorkingHoursDetails = function(req,res,next){
 
     if (TID) {
 
-        _this.db.query('CALL PGetworkinghourDetails(' + _this.db.escape(Token) + ',' + _this.db.escape(TID) + ')', function (err, GetResult) {
+        st.db.query('CALL PGetworkinghourDetails(' + st.db.escape(Token) + ',' + st.db.escape(TID) + ')', function (err, GetResult) {
             console.log(GetResult)
             if (!err) {
                 if (GetResult) {

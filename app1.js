@@ -4,7 +4,7 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser'), cors = require('cors'),
-LocationManager = require('./routes/routes');
+    LocationManager = require('./routes/routes.js');
 var compress = require('compression');
 
 var app = express();
@@ -187,7 +187,6 @@ app.get('/get_outbox_messages',LocationManager.FnGetOutboxMessages);
 app.get('/get_workinghours_list',LocationManager.FnGetworkinghoursList);
 app.get('/ezeoneid',LocationManager.FnGetEZEOneIDInfo);
 app.get('/get_workinghours_details',LocationManager.FnWorkingHoursDetails);
-app.get('/image_url',LocationManager.FnImageURL);
 
 
 //below service are for EZEIDAP
@@ -255,7 +254,7 @@ app.use(function(req, res, next) {
 
     if(req.type == 'json')
     {
-            res.type('json').status(404).json({message : 'Invalid Service call', status : false});
+        res.type('json').status(404).json({message : 'Invalid Service call', status : false});
     }
     else{
         res.status(404).send('');

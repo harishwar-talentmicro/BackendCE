@@ -23,12 +23,15 @@ function alterEzeoneId(ezeoneId){
     return alteredEzeoneId;
 }
 
+var st = null;
+
 function Image(db,stdLib){
-    this.db = db;
+
     if(stdLib){
-        this.stdLib = stdLib;
+        st = stdLib;
     }
 };
+
 
 /**
  * Method : POST
@@ -95,9 +98,9 @@ Image.prototype.cropImage = function(req,res,next){
         return;
     }
 
-    _this.stdLib.validateToken(token, function (err, Result) {
+    st.validateToken(token, function (err, Result) {
         if (!err) {
-            if (Result) {
+            if (Result != null) {
                 try{
                     console.log(req.files.image.path);
                     //var bitmap = fs.readFileSync('../bin/'+req.files.image.path);
@@ -264,90 +267,5 @@ Image.prototype.cropImage = function(req,res,next){
 
 };
 
-/**
- * Method : POST
- * @param req
- * @param res
- * @param next
- */
-Image.prototype.imageURL = function(req,res,next){
-    /**
-     * @todo FnImageURL
-     */
-    var _this = this;
-    try {
 
-        res.setHeader("Access-Control-Allow-Origin", "*");
-        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-
-        var image_url = req.query.image_url;
-        var image_id = req.query.image_id;
-
-        var responseMessage = {
-            status: false,
-            data: null,
-            error:{},
-            message:''
-        };
-        if (image_id == 0 ){
-            if(image_url == 1) {
-                var image_url1 = 'http://104.199.128.226:3001/images/sales_enquiry.jpg';
-                var image_url2 = 'http://104.199.128.226:3001/images/home_delivery.jpg';
-                var image_url3 = 'http://104.199.128.226:3001/images/reservations.jpg';
-                var image_url4 = 'http://104.199.128.226:3001/images/help_desk.jpg';
-                var image_url5 = 'http://104.199.128.226:3001/images/human_resources.jpg';
-                responseMessage.status = true;
-                responseMessage.data = {pager_url1: image_url1,pager_url2: image_url2, pager_url3: image_url3,pager_url4: image_url4,pager_url5: image_url5};
-                responseMessage.error = null;
-                responseMessage.message = ' Image URL Send successfully';
-                console.log('FnImageURL:Image URL Send successfully');
-                res.status(200).json(responseMessage);
-            }
-
-            else {
-                var image_url1 = 'http://104.199.128.226:3001/images/ezeone_splash_img.jpg';
-
-                responseMessage.status = true;
-                responseMessage.data = {splash_url: image_url1};
-                responseMessage.error = null;
-                responseMessage.message = ' Image URL Send successfully';
-                console.log('FnImageURL:Image URL Send successfully');
-                res.status(200).json(responseMessage);
-            }
-        }
-        else{
-            if(image_url == 1) {
-                var image_url1 = 'http://www.ezeone.com/images/sales_enquiry.jpg';
-                var image_url2 = 'http://www.ezeone.com/images/home_delivery.jpg';
-                var image_url3 = 'http://www.ezeone.com/images/reservations.jpg';
-                var image_url4 = 'http://www.ezeone.com/images/help_desk.jpg';
-                var image_url5 = 'http://www.ezeone.com/images/human_resources.jpg';
-                responseMessage.status = true;
-                responseMessage.data = {pager_url1: image_url1,pager_url2: image_url2, pager_url3: image_url3,pager_url4: image_url4,pager_url5: image_url5};
-                responseMessage.error = null;
-                responseMessage.message = ' Image URL Send successfully';
-                console.log('FnImageURL:Image URL Send successfully');
-                res.status(200).json(responseMessage);
-            }
-
-            else {
-                var image_url1 = 'http://www.ezeone.com/images/ezeone_splash_img.jpg';
-
-                responseMessage.status = true;
-                responseMessage.data = {splash_url: image_url1};
-                responseMessage.error = null;
-                responseMessage.message = ' Image URL Send successfully';
-                console.log('FnImageURL:Image URL Send successfully');
-                res.status(200).json(responseMessage);
-            }
-        }
-    }
-    catch (ex) {
-        responseMessage.error = {};
-        responseMessage.message = 'An error occured !'
-        console.log('FnImageURL:error ' + ex.description);
-        //throw new Error(ex);
-        res.status(400).json(responseMessage);
-    }
-};
 module.exports = Image;

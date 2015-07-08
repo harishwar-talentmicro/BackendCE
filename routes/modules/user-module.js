@@ -29,13 +29,52 @@ function alterEzeoneId(ezeoneId){
     }
     return alteredEzeoneId;
 }
+function FnEncryptPassword(Password) {
+    try {
+        console.log('encrypt...........');
+        //var text = "";
+        var crypto = require('crypto'),
+            algorithm = 'aes-256-ctr',
+            key = 'ezeid@123';
+
+        var cipher = crypto.createCipher(algorithm, key)
+        var crypted = cipher.update(Password, 'utf8', 'hex')
+        crypted += cipher.final('hex');
+        return crypted;
+    }
+    catch (ex) {
+        console.log('OTP generate error:' + ex.description);
+
+        return 'error'
+    }
+}
+
+function FnDecrypt(EncryptPassword){
+    try {
+        var crypto = require('crypto'),
+            algorithm = 'aes-256-ctr',
+            password = 'ezeid@123';
+        var decipher = crypto.createDecipher(algorithm,password)
+        var dec = decipher.update(EncryptPassword,'hex','utf8')
+        dec += decipher.final('utf8');
+        return dec;
+    }
+    catch(ex){
+        console.log('FnDecrypterror:' + ex.description);
+
+        return 'error'
+    }
+}
+
+var st = null;
 
 function User(db,stdLib){
-    this.db = db;
+
     if(stdLib){
-        this.stdLib = stdLib;
+        st = stdLib;
     }
 };
+
 
 
 /**
@@ -66,7 +105,7 @@ User.prototype.register = function(req,res,next){
         console.log(SelectionTypes);
         var IDTypeID = req.body.IDTypeID;
         var EZEID = alterEzeoneId(req.body.EZEID);
-        if(EZEID)
+        if(EZEID != null)
             EZEID = EZEID.toUpperCase();
         var Password = req.body.Password;
         var FirstName = req.body.FirstName;
@@ -169,7 +208,7 @@ User.prototype.register = function(req,res,next){
                 }
 
                 if (Operation == 'I') {
-                    TokenNo = _this.stdLib.generateToken();
+                    TokenNo = st.generateToken();
                 }
                 var EncryptPWD = '';
                 if (Password != null) {
@@ -182,23 +221,23 @@ User.prototype.register = function(req,res,next){
                     DOBDate = new Date(DOB);
                     // console.log(TaskDate);
                 }
-                var InsertQuery = _this.db.escape(IDTypeID) + ',' + _this.db.escape(EZEID) + ',' + _this.db.escape(EncryptPWD) + ',' + _this.db.escape(FirstName) + ',' +
-                    _this.db.escape(LastName) + ',' + _this.db.escape(CompanyName) + ',' + _this.db.escape(JobTitle) + ',' + _this.db.escape(FunctionID) + ',' +
-                    _this.db.escape(RoleID) + ',' + _this.db.escape(LanguageID) + ',' + _this.db.escape(NameTitleID) + ',' +
-                    _this.db.escape(TokenNo) + ',' + _this.db.escape(Latitude) + ',' + _this.db.escape(Longitude) + ',' + _this.db.escape(Altitude) + ',' +
-                    _this.db.escape(AddressLine1) + ',' + _this.db.escape(AddressLine2) + ',' + _this.db.escape(Citytitle) + ',' + _this.db.escape(StateID) + ',' + _this.db.escape(CountryID) + ',' +
-                    _this.db.escape(PostalCode) + ',' + _this.db.escape(PIN) + ',' + _this.db.escape(PhoneNumber) + ',' + _this.db.escape(MobileNumber) + ',' + _this.db.escape(EMailID) + ',' +
-                    _this.db.escape(Picture) + ',' + _this.db.escape(PictureFileName) + ',' + _this.db.escape(WebSite) + ',' + _this.db.escape(Operation) + ',' + _this.db.escape(AboutCompany) + ','
-                    + _this.db.escape(StatusID) + ',' + _this.db.escape(Icon) + ',' + _this.db.escape(IconFileName) + ',' + _this.db.escape(ISDPhoneNumber) + ',' + _this.db.escape(ISDMobileNumber) + ','
-                    + _this.db.escape(Gender) + ',' + _this.db.escape(DOBDate) + ',' + _this.db.escape(IPAddress) + ',' + _this.db.escape(SelectionTypes) + ',' + _this.db.escape(ParkingStatus)+ ',' + _this.db.escape(TemplateID)  + ',' + _this.db.escape(CategoryID);
+                var InsertQuery = st.db.escape(IDTypeID) + ',' + st.db.escape(EZEID) + ',' + st.db.escape(EncryptPWD) + ',' + st.db.escape(FirstName) + ',' +
+                    st.db.escape(LastName) + ',' + st.db.escape(CompanyName) + ',' + st.db.escape(JobTitle) + ',' + st.db.escape(FunctionID) + ',' +
+                    st.db.escape(RoleID) + ',' + st.db.escape(LanguageID) + ',' + st.db.escape(NameTitleID) + ',' +
+                    st.db.escape(TokenNo) + ',' + st.db.escape(Latitude) + ',' + st.db.escape(Longitude) + ',' + st.db.escape(Altitude) + ',' +
+                    st.db.escape(AddressLine1) + ',' + st.db.escape(AddressLine2) + ',' + st.db.escape(Citytitle) + ',' + st.db.escape(StateID) + ',' + st.db.escape(CountryID) + ',' +
+                    st.db.escape(PostalCode) + ',' + st.db.escape(PIN) + ',' + st.db.escape(PhoneNumber) + ',' + st.db.escape(MobileNumber) + ',' + st.db.escape(EMailID) + ',' +
+                    st.db.escape(Picture) + ',' + st.db.escape(PictureFileName) + ',' + st.db.escape(WebSite) + ',' + st.db.escape(Operation) + ',' + st.db.escape(AboutCompany) + ','
+                    + st.db.escape(StatusID) + ',' + st.db.escape(Icon) + ',' + st.db.escape(IconFileName) + ',' + st.db.escape(ISDPhoneNumber) + ',' + st.db.escape(ISDMobileNumber) + ','
+                    + st.db.escape(Gender) + ',' + st.db.escape(DOBDate) + ',' + st.db.escape(IPAddress) + ',' + st.db.escape(SelectionTypes) + ',' + st.db.escape(ParkingStatus)+ ',' + st.db.escape(TemplateID)  + ',' + st.db.escape(CategoryID);
 
 
                 //console.log(InsertQuery);
 
-                _this.db.query('CALL pSaveEZEIDData(' + InsertQuery + ')', function (err, InsertResult) {
+                st.db.query('CALL pSaveEZEIDData(' + InsertQuery + ')', function (err, InsertResult) {
                     if (!err) {
                         //console.log('InsertResult: ' + InsertResult);
-                        if (InsertResult) {
+                        if (InsertResult != null) {
                             if(InsertResult[0]){
                                 if (InsertResult[0].length > 0) {
                                     var RegResult = InsertResult[0];
@@ -261,7 +300,7 @@ User.prototype.register = function(req,res,next){
                                                     // send mail with defined transport object
                                                     var post = { MessageType: 8, Priority: 3,ToMailID: mailOptions.to, Subject: mailOptions.subject, Body: mailOptions.html,SentbyMasterID:RegResult[0].TID };
                                                     // console.log(post);
-                                                    var query = _this.db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
+                                                    var query = st.db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
                                                         // Neat!
                                                         if (!err) {
                                                             console.log('FnRegistration: Mail saved Successfully');
@@ -355,7 +394,7 @@ User.prototype.register = function(req,res,next){
                 }
 
                 if (Operation == 'I') {
-                    TokenNo = _this.stdLib.generateToken();
+                    TokenNo = st.generateToken();
                 }
                 var EncryptPWD = '';
                 if (Password != null) {
@@ -369,18 +408,18 @@ User.prototype.register = function(req,res,next){
                     // console.log(TaskDate);
                 }
                 //console.log('FnRegistration: Token: ' + TokenNo);
-                var InsertQuery = _this.db.escape(IDTypeID) + ',' + _this.db.escape(EZEID) + ',' + _this.db.escape(EncryptPWD) + ',' + _this.db.escape(FirstName) + ',' +
-                    _this.db.escape(LastName) + ',' + _this.db.escape(CompanyName) + ',' + _this.db.escape(JobTitle) + ',' + _this.db.escape(FunctionID) + ',' +
-                    _this.db.escape(RoleID) + ',' + _this.db.escape(LanguageID) + ',' + _this.db.escape(NameTitleID) + ',' +
-                    _this.db.escape(TokenNo) + ',' + _this.db.escape(Latitude) + ',' + _this.db.escape(Longitude) + ',' + _this.db.escape(Altitude) + ',' +
-                    _this.db.escape(AddressLine1) + ',' + _this.db.escape(AddressLine2) + ',' + _this.db.escape(Citytitle) + ',' + _this.db.escape(StateID) + ',' + _this.db.escape(CountryID) + ',' +
-                    _this.db.escape(PostalCode) + ',' + _this.db.escape(PIN) + ',' + _this.db.escape(PhoneNumber) + ',' + _this.db.escape(MobileNumber) + ',' + _this.db.escape(EMailID) + ',' +
-                    _this.db.escape(Picture) + ',' + _this.db.escape(PictureFileName) + ',' + _this.db.escape(WebSite) + ',' + _this.db.escape(Operation) + ',' + _this.db.escape(AboutCompany)
-                    + ',' + _this.db.escape(StatusID) + ',' + _this.db.escape(Icon) + ',' + _this.db.escape(IconFileName) + ',' + _this.db.escape(ISDPhoneNumber) + ',' + _this.db.escape(ISDMobileNumber)
-                    + ',' + _this.db.escape(Gender) + ',' + _this.db.escape(DOBDate) + ',' + _this.db.escape(IPAddress) + ',' + _this.db.escape(SelectionTypes)+ ',' + _this.db.escape(ParkingStatus) + ',' + _this.db.escape(TemplateID) + ',' + _this.db.escape(CategoryID);
+                var InsertQuery = st.db.escape(IDTypeID) + ',' + st.db.escape(EZEID) + ',' + st.db.escape(EncryptPWD) + ',' + st.db.escape(FirstName) + ',' +
+                    st.db.escape(LastName) + ',' + st.db.escape(CompanyName) + ',' + st.db.escape(JobTitle) + ',' + st.db.escape(FunctionID) + ',' +
+                    st.db.escape(RoleID) + ',' + st.db.escape(LanguageID) + ',' + st.db.escape(NameTitleID) + ',' +
+                    st.db.escape(TokenNo) + ',' + st.db.escape(Latitude) + ',' + st.db.escape(Longitude) + ',' + st.db.escape(Altitude) + ',' +
+                    st.db.escape(AddressLine1) + ',' + st.db.escape(AddressLine2) + ',' + st.db.escape(Citytitle) + ',' + st.db.escape(StateID) + ',' + st.db.escape(CountryID) + ',' +
+                    st.db.escape(PostalCode) + ',' + st.db.escape(PIN) + ',' + st.db.escape(PhoneNumber) + ',' + st.db.escape(MobileNumber) + ',' + st.db.escape(EMailID) + ',' +
+                    st.db.escape(Picture) + ',' + st.db.escape(PictureFileName) + ',' + st.db.escape(WebSite) + ',' + st.db.escape(Operation) + ',' + st.db.escape(AboutCompany)
+                    + ',' + st.db.escape(StatusID) + ',' + st.db.escape(Icon) + ',' + st.db.escape(IconFileName) + ',' + st.db.escape(ISDPhoneNumber) + ',' + st.db.escape(ISDMobileNumber)
+                    + ',' + st.db.escape(Gender) + ',' + st.db.escape(DOBDate) + ',' + st.db.escape(IPAddress) + ',' + st.db.escape(SelectionTypes)+ ',' + st.db.escape(ParkingStatus) + ',' + st.db.escape(TemplateID) + ',' + st.db.escape(CategoryID);
 
                 // console.log(InsertQuery);
-                _this.db.query('CALL pSaveEZEIDData(' + InsertQuery + ')', function (err, InsertResult) {
+                st.db.query('CALL pSaveEZEIDData(' + InsertQuery + ')', function (err, InsertResult) {
                     if (!err) {
                         // console.log('InsertResult: ' + InsertResult);
                         if (InsertResult) {
@@ -435,7 +474,7 @@ User.prototype.register = function(req,res,next){
                                                     // send mail with defined transport object
                                                     var post = { MessageType: 8, Priority: 3, ToMailID: mailOptions.to, Subject: mailOptions.subject, Body: mailOptions.html, SentbyMasterID:RegResult[0].TID };
                                                     // console.log(post);
-                                                    var query = _this.db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
+                                                    var query = st.db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
                                                         // Neat!
                                                         if (!err) {
                                                             console.log('FnRegistration: Mail saved Successfully');
@@ -536,7 +575,7 @@ User.prototype.login = function(req,res,next){
      * @todo FnLogin
      *
      */
-    var _this = this;
+
     try {
         //res.setHeader("Access-Control-Allow-Origin", "*");
         //res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -575,23 +614,25 @@ User.prototype.login = function(req,res,next){
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
         if (UserName != null && UserName != '' && Password != null && Password != '') {
             var EncryptPWD = FnEncryptPassword(Password);
-            // console.log(EncryptPWD);
+
             var FindArray = UserName.split('.');
-            var Query
+           
             //console.log('findarray: ' + FindArray.length);
-            var Query = _this.db.escape(UserName)+','+ _this.db.escape(EncryptPWD);
-            // console.log(Query);
-            _this.db.query('CALL PLogin(' + Query + ')', function (err, loginResult) {
+
+            var Query = st.db.escape(UserName)+','+ st.db.escape(EncryptPWD);
+console.log(Query);
+            st.db.query('CALL PLogin(' + Query + ')', function (err, loginResult) {
+                console.log(loginResult);
                 if (!err) {
                     if(loginResult) {
                         if (loginResult[0].length > 0) {
                             // console.log('loginResult: ' + loginResult);
-                            var Encrypt = _this.stdLib.generateToken();
-                            //   console.log('Encrypt: ' + Encrypt);
-                            // console.log('TID ' + loginResult[0].TID);
+                            var Encrypt = st.generateToken();
+                               console.log(Encrypt);
                             var loginDetails = loginResult[0];
-                            var Query = 'update tmaster set Token=' + _this.db.escape(Encrypt) + ' where TID=' + _this.db.escape(loginDetails[0].TID);
-                            _this.db.query(Query, function (err, TokenResult) {
+                            console.log(loginDetails[0].TID);
+                            var Query = 'update tmaster set Token=' + st.db.escape(Encrypt) + ' where TID=' + st.db.escape(loginDetails[0].TID);
+                            st.db.query(Query, function (err, TokenResult) {
                                 if (!err) {
                                     //  console.log(TokenResult);
 
@@ -670,7 +711,8 @@ User.prototype.login = function(req,res,next){
         }
     }
     catch (ex) {
-        console.log('FnLogin error:' + ex.description);
+        console.log(ex);
+        console.log('FnLogin:: error:' + ex.description);
            
     }
 };
@@ -707,8 +749,8 @@ User.prototype.logout = function(req,res,next){
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
         if (Token != null && Token != '') {
 
-            var Query = 'update tmaster set Token=' + _this.db.escape('') + ' where Token=' + _this.db.escape(Token);
-            _this.db.query(Query, function (err, TokenResult) {
+            var Query = 'update tmaster set Token=' + st.db.escape('') + ' where Token=' + st.db.escape(Token);
+            st.db.query(Query, function (err, TokenResult) {
                 if (!err) {
                     RtnMessage.IsAuthenticate = false;
                     console.log('FnLogout: tmaster: Logout success');
@@ -756,14 +798,14 @@ User.prototype.getLoginDetails = function(req,res,next){
 
         var Token = req.query.Token;
 
-        if (Token) {
-            _this.stdLib.validateToken(Token, function (err, Result) {
+        if (Token != null) {
+            st.validateToken(Token, function (err, Result) {
                 if (!err) {
-                    if (Result) {
+                    if (Result != null) {
 
-                        _this.db.query('CALL pLoginDetails(' + _this.db.escape(Token) + ')', function (err, GetResult) {
+                        st.db.query('CALL pLoginDetails(' + st.db.escape(Token) + ')', function (err, GetResult) {
                             if (!err) {
-                                if (GetResult) {
+                                if (GetResult != null) {
                                     if (GetResult[0].length > 0) {
 
                                         console.log('FnGetLoginDetails: Login details Send successfully');
@@ -835,8 +877,8 @@ User.prototype.getCountry = function(req,res,next){
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         var LangID = parseInt(req.query.LangID);
         if (LangID.toString != 'NaN') {
-            var Query = 'Select CountryID, CountryName, ISDCode from  mcountry where LangID=' + _this.db.escape(LangID);
-            _this.db.query(Query, function (err, CountryResult) {
+            var Query = 'Select CountryID, CountryName, ISDCode from  mcountry where LangID=' + st.db.escape(LangID);
+            st.db.query(Query, function (err, CountryResult) {
                 if (!err) {
                     if (CountryResult.length > 0) {
                         res.send(CountryResult);
@@ -884,13 +926,13 @@ User.prototype.getState = function(req,res,next){
         var CountryID = parseInt(req.query.CountryID);
 
         if (CountryID.toString() != 'NaN' && LangID.toString() != 'NaN') {
-            var Query = 'Select StateID, StateName  from mstate where LangID=' + _this.db.escape(LangID) + ' and CountryID=' + _this.db.escape(CountryID);
+            var Query = 'Select StateID, StateName  from mstate where LangID=' + st.db.escape(LangID) + ' and CountryID=' + st.db.escape(CountryID);
             // console.log(Query);
-            _this.db.query(Query, function (err, StateResult) {
+            st.db.query(Query, function (err, StateResult) {
                 if (!err) {
                     if (StateResult.length > 0) {
-                        var Query = 'Select ifnull(ISDCode,"") as ISDCode from  mcountry where CountryID=' + _this.db.escape(CountryID);
-                        _this.db.query(Query, function (err, CountryResult) {
+                        var Query = 'Select ifnull(ISDCode,"") as ISDCode from  mcountry where CountryID=' + st.db.escape(CountryID);
+                        st.db.query(Query, function (err, CountryResult) {
                             if (!err) {
                                 if (CountryResult.length) {
                                     // console.log(CountryResult);
@@ -958,8 +1000,8 @@ User.prototype.getCity = function(req,res,next){
         var LangID = parseInt(req.query.LangID);
         var StateID = parseInt(req.query.StateID);
         if (LangID.toString() != 'NaN' && StateID.toString() != 'NaN') {
-            var Query = 'Select  CityID, CityName from mcity where LangID=' + _this.db.escape(LangID) + ' and StateID= ' + _this.db.escape(StateID);
-            _this.db.query(Query, function (err, CityResult) {
+            var Query = 'Select  CityID, CityName from mcity where LangID=' + st.db.escape(LangID) + ' and StateID= ' + st.db.escape(StateID);
+            st.db.query(Query, function (err, CityResult) {
                 if (!err) {
                     if (CityResult.length > 0) {
                         res.send(CityResult);
@@ -1012,10 +1054,12 @@ User.prototype.getUserDetails = function(req,res,next){
 
         var Token = req.query.Token;
         if (Token != null && Token != '') {
-            _this.stdLib.validateToken(Token, function (err, Result) {
+            st.validateToken(Token, function (err, Result) {
+                console.log(err);
+                console.log(Result);
                 if (!err) {
                     if (Result) {
-                        _this.db.query('CALL pGetEZEIDDetails(' + _this.db.escape(Token) + ')', function (err, UserDetailsResult) {
+                        st.db.query('CALL pGetEZEIDDetails(' + st.db.escape(Token) + ')', function (err, UserDetailsResult) {
                             if (!err) {
                                 if (UserDetailsResult[0]) {
                                     if (UserDetailsResult[0].length > 0) {
@@ -1086,8 +1130,8 @@ User.prototype.checkEzeid = function(req,res,next){
         };
         RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
         if (EZEID != null && EZEID != '') {
-            var Query = 'Select EZEID from tmaster where EZEID=' + _this.db.escape(EZEID);
-            _this.db.query(Query, function (err, EzediExitsResult) {
+            var Query = 'Select EZEID from tmaster where EZEID=' + st.db.escape(EZEID);
+            st.db.query(Query, function (err, EzediExitsResult) {
                 if (!err) {
                     if (EzediExitsResult.length > 0) {
                         RtnMessage.IsIdAvailable = false;
@@ -1144,13 +1188,13 @@ User.prototype.changePassword = function(req,res,next){
         };
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
         if (OldPassword != null && OldPassword != '' && NewPassword != null && NewPassword != '' && TokenNo != null) {
-            _this.stdLib.validateToken(TokenNo, function (err, Result) {
+            st.validateToken(TokenNo, function (err, Result) {
                 if (!err) {
                     if (Result) {
                         var EncryptOldPWD = FnEncryptPassword(OldPassword);
                         var EncryptNewPWD = FnEncryptPassword(NewPassword);
-                        var Query = _this.db.escape(TokenNo) + ',' + _this.db.escape(EncryptOldPWD) + ',' + _this.db.escape(EncryptNewPWD);
-                        _this.db.query('CALL pChangePassword(' + Query + ')', function (err, ChangePasswordResult) {
+                        var Query = st.db.escape(TokenNo) + ',' + st.db.escape(EncryptOldPWD) + ',' + st.db.escape(EncryptNewPWD);
+                        st.db.query('CALL pChangePassword(' + Query + ')', function (err, ChangePasswordResult) {
                             if (!err) {
                                 //console.log(ChangePasswordResult);
                                 if (ChangePasswordResult) {
@@ -1232,17 +1276,17 @@ User.prototype.forgetPassword = function(req,res,next){
             // console.log(Password);
             var EncryptPWD = FnEncryptPassword(Password);
             // console.log(EncryptPWD);
-            var Query = 'Update tmaster set Password= ' + _this.db.escape(EncryptPWD) + ' where EZEID=' + _this.db.escape(EZEID);
+            var Query = 'Update tmaster set Password= ' + st.db.escape(EncryptPWD) + ' where EZEID=' + st.db.escape(EZEID);
             // console.log('FnForgotPassword: ' + Query);
-            _this.db.query(Query, function (err, ForgetPasswordResult) {
+            st.db.query(Query, function (err, ForgetPasswordResult) {
                 if (!err) {
                     //console.log(InsertResult);
-                    if (ForgetPasswordResult) {
+                    if (ForgetPasswordResult != null) {
                         if (ForgetPasswordResult.affectedRows > 0) {
                             RtnMessage.IsChanged = true;
-                            var UserQuery = 'Select a.TID, ifnull(a.FirstName,"") as FirstName,ifnull(a.LastName,"") as LastName,a.Password,ifnull(b.EMailID,"") as EMailID from tmaster a,tlocations b where b.SeqNo=0 and b.EZEID=a.EZEID and a.EZEID=' + _this.db.escape(EZEID);
+                            var UserQuery = 'Select a.TID, ifnull(a.FirstName,"") as FirstName,ifnull(a.LastName,"") as LastName,a.Password,ifnull(b.EMailID,"") as EMailID from tmaster a,tlocations b where b.SeqNo=0 and b.EZEID=a.EZEID and a.EZEID=' + st.db.escape(EZEID);
                             //  console.log(UserQuery);
-                            _this.db.query(UserQuery, function (err, UserResult) {
+                            st.db.query(UserQuery, function (err, UserResult) {
                                 if (!err) {
                                     //  console.log(UserResult);
 
@@ -1266,7 +1310,7 @@ User.prototype.forgetPassword = function(req,res,next){
                                         //message Type 7 - Forgot password mails service
                                         var post = { MessageType: 7, Priority: 2, ToMailID: mailOptions.to, Subject: mailOptions.subject, Body: mailOptions.html,SentbyMasterID: UserResult[0].TID};
                                         console.log(post);
-                                        var query = _this.db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
+                                        var query = st.db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
                                             // Neat!
                                             if (!err) {
                                                 console.log('FnRegistration: Mail saved Successfully');
@@ -1374,41 +1418,6 @@ function FnRandomPassword() {
     }
 }
 
-function FnEncryptPassword(Password) {
-    try {
-        //var text = "";
-        var crypto = require('crypto'),
-            algorithm = 'aes-256-ctr',
-            key = 'ezeid@123';
-
-        var cipher = crypto.createCipher(algorithm, key)
-        var crypted = cipher.update(Password, 'utf8', 'hex')
-        crypted += cipher.final('hex');
-        return crypted;
-    }
-    catch (ex) {
-        console.log('OTP generate error:' + ex.description);
-
-        return 'error'
-    }
-}
-
-function FnDecrypt(EncryptPassword){
-    try {
-        var crypto = require('crypto'),
-            algorithm = 'aes-256-ctr',
-            password = 'ezeid@123';
-        var decipher = crypto.createDecipher(algorithm,password)
-        var dec = decipher.update(EncryptPassword,'hex','utf8')
-        dec += decipher.final('utf8');
-        return dec;
-    }
-    catch(ex){
-        console.log('FnDecrypterror:' + ex.description);
-
-        return 'error'
-    }
-}
 
 /**
  * Method : GET
@@ -1440,8 +1449,8 @@ User.prototype.getCompanyProfile = function(req,res,next){
             Token = 0;
         }
         if(Token != null && TID != null ){
-            console.log('CALL pGetTagLine(' + _this.db.escape(TID)+ ',' + _this.db.escape(Token) + ')');
-            _this.db.query('CALL pGetTagLine(' + _this.db.escape(TID)+ ',' + _this.db.escape(Token) + ')', function (err, GetResult) {
+            console.log('CALL pGetTagLine(' + st.db.escape(TID)+ ',' + st.db.escape(Token) + ')');
+            st.db.query('CALL pGetTagLine(' + st.db.escape(TID)+ ',' + st.db.escape(Token) + ')', function (err, GetResult) {
                 if (!err) {
                     if (GetResult[0]) {
                         if (GetResult[0].length > 0) {
@@ -1511,11 +1520,11 @@ User.prototype.saveCompanyProfile = function(req,res,next){
         };
 
         if(Token !=  null && CompanyProfile != null){
-            _this.stdLib.validateToken(Token, function (err, Result) {
+            st.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result) {
-                        var query = _this.db.escape(Token)+ ',' + _this.db.escape(CompanyProfile);
-                        _this.db.query('CALL pSaveTagLine(' + query + ')', function (err, InsertResult) {
+                        var query = st.db.escape(Token)+ ',' + st.db.escape(CompanyProfile);
+                        st.db.query('CALL pSaveTagLine(' + query + ')', function (err, InsertResult) {
                             console.log(InsertResult[0]);
                             if (!err) {
                                 if (InsertResult.affectedRows > 0) {
@@ -1590,12 +1599,12 @@ User.prototype.getWebLink = function(req,res,next){
 
         var Token = req.query.Token;
 
-        if (Token) {
-            _this.stdLib.validateToken(Token, function (err, Result) {
+        if (Token != null) {
+            st.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result) {
 
-                        _this.db.query('CALL pGetWebLink(' + _this.db.escape(Token) + ')', function (err, GetResult) {
+                        st.db.query('CALL pGetWebLink(' + st.db.escape(Token) + ')', function (err, GetResult) {
                             if (!err) {
                                 if (GetResult) {
                                     if (GetResult[0].length > 0) {
@@ -1680,12 +1689,12 @@ User.prototype.saveWebLink = function(req,res,next){
             RtnMessage.Message = 'Please Enter a URLNumber 1 t0 99';
 
         if (Token != null && URL != null && URL != '' && URLNumber != null) {
-            _this.stdLib.validateToken(Token, function (err, Result) {
+            st.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result) {
                         console.log(Token,URL,URLNumber);
-                        var query = _this.db.escape(Token) + ',' + _this.db.escape(URL) + ',' + _this.db.escape(URLNumber) ;
-                        _this.db.query('CALL pSaveWebLinks(' + query + ')', function (err, InsertResult) {
+                        var query = st.db.escape(Token) + ',' + st.db.escape(URL) + ',' + st.db.escape(URLNumber) ;
+                        st.db.query('CALL pSaveWebLinks(' + query + ')', function (err, InsertResult) {
                             if (!err){
                                 if (InsertResult.affectedRows > 0) {
                                     RtnMessage.IsSuccessfull = true;
@@ -1770,11 +1779,11 @@ User.prototype.deleteWebLink = function(req,res,next){
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
 
         if (Token !=null && TID != null) {
-            _this.stdLib.validateToken(Token, function (err, Result) {
+            st.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result) {
-                        //console.log('CALL pDeleteWorkinghours(' + _this.db.escape(TID) + ')');
-                        _this.db.query('CALL pDeleteWebLink(' + _this.db.escape(TID) + ')', function (err, deleteResult) {
+                        //console.log('CALL pDeleteWorkinghours(' + st.db.escape(TID) + ')');
+                        st.db.query('CALL pDeleteWebLink(' + st.db.escape(TID) + ')', function (err, deleteResult) {
                             if (!err){
                                 if (deleteResult.affectedRows > 0) {
                                     RtnMessage.IsSuccessfull = true;
@@ -1843,7 +1852,7 @@ User.prototype.getEzeidDetails = function(req,res,next){
         var Token = req.query.Token;
         var EZEID = req.query.EZEID;
         if (Token != null && EZEID != null ) {
-            _this.stdLib.validateToken(Token, function (err, Result) {
+            st.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result) {
                         var LocSeqNo = 0;
@@ -1861,7 +1870,7 @@ User.prototype.getEzeidDetails = function(req,res,next){
                                 }
                             }
                         }
-                        _this.db.query('CALL pEZEIDPrimaryDetails(' + _this.db.escape(EZEID) + ',' + _this.db.escape(LocSeqNo) + ')', function (err, GetResult) {
+                        st.db.query('CALL pEZEIDPrimaryDetails(' + st.db.escape(EZEID) + ',' + st.db.escape(LocSeqNo) + ')', function (err, GetResult) {
                             if (!err) {
                                 if (GetResult[0]) {
                                     if (GetResult[0].length > 0) {
@@ -1943,11 +1952,11 @@ User.prototype.getResume = function(req,res,next){
             message:''
         };
 
-        if (Token) {
-            _this.stdLib.validateToken(Token, function (err, Result) {
+        if (Token != null) {
+            st.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result) {
-                        _this.db.query('CALL pgetCVInfo(' + _this.db.escape(Token) + ')', function (err, MessagesResult) {
+                        st.db.query('CALL pgetCVInfo(' + st.db.escape(Token) + ')', function (err, MessagesResult) {
                             if (!err) {
 
                                 if (MessagesResult[0]) {
@@ -2048,16 +2057,16 @@ User.prototype.saveResume = function(req,res,next){
         };
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
 
-        if (Token) {
-            _this.stdLib.validateToken(Token, function (err, Result) {
+        if (Token != null) {
+            st.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result) {
 
                         if (Pin == '') {
                             Pin = null;
                         }
-                        var query = _this.db.escape(FunctionID) + ',' + _this.db.escape(0) + ',' + _this.db.escape(KeySkills) + ',' + _this.db.escape(Status) + ',' + _this.db.escape(Pin) + ',' + _this.db.escape(Token) + ',' + _this.db.escape(ids);
-                        _this.db.query('CALL pSaveCVInfo(' + query + ')', function (err, InsertResult) {
+                        var query = st.db.escape(FunctionID) + ',' + st.db.escape(0) + ',' + st.db.escape(KeySkills) + ',' + st.db.escape(Status) + ',' + st.db.escape(Pin) + ',' + st.db.escape(Token) + ',' + st.db.escape(ids);
+                        st.db.query('CALL pSaveCVInfo(' + query + ')', function (err, InsertResult) {
                             if (!err) {
                                 if (InsertResult[0]) {
                                     var async = require('async');
@@ -2088,7 +2097,7 @@ User.prototype.saveResume = function(req,res,next){
                                                     };
 
                                                     if (parseInt(skills.tid) != 0) {
-                                                        var query = _this.db.query('UPDATE tskills set ? WHERE TID = ? ',[SkillItems,tid], function (err, result) {
+                                                        var query = st.db.query('UPDATE tskills set ? WHERE TID = ? ',[SkillItems,tid], function (err, result) {
                                                             if (!err) {
                                                                 if (result) {
                                                                     if (result.affectedRows > 0) {
@@ -2108,7 +2117,7 @@ User.prototype.saveResume = function(req,res,next){
                                                         });
                                                     }
                                                     else {
-                                                        var query = _this.db.query('INSERT INTO tskills  SET ?', SkillItems , function (err, result) {
+                                                        var query = st.db.query('INSERT INTO tskills  SET ?', SkillItems , function (err, result) {
                                                             if (!err) {
                                                                 if (result) {
                                                                     if (result.affectedRows > 0) {
@@ -2201,7 +2210,7 @@ function FnSaveSkills(skill, CallBack) {
             };
             RtnResponse = JSON.parse(JSON.stringify((RtnResponse)));
 
-            _this.db.query('Select SkillID from mskill where SkillTitle like ' + _this.db.escape(skill.skillname), function (err, SkillResult) {
+            st.db.query('Select SkillID from mskill where SkillTitle like ' + st.db.escape(skill.skillname), function (err, SkillResult) {
                 if ((!err)) {
                     if (SkillResult[0]) {
                         console.log(SkillResult);
@@ -2212,10 +2221,10 @@ function FnSaveSkills(skill, CallBack) {
                         CallBack(null, RtnResponse);
                     }
                     else {
-                        _this.db.query('insert into mskill (SkillTitle) values (' + _this.db.escape(skill.skillname) + ')', function (err, skillInsertResult) {
+                        st.db.query('insert into mskill (SkillTitle) values (' + st.db.escape(skill.skillname) + ')', function (err, skillInsertResult) {
                             if (!err) {
                                 if (skillInsertResult.affectedRows > 0) {
-                                    _this.db.query('select SkillID from mskill where SkillTitle like ' + _this.db.escape(skill.skillname), function (err, SkillMaxResult) {
+                                    st.db.query('select SkillID from mskill where SkillTitle like ' + st.db.escape(skill.skillname), function (err, SkillMaxResult) {
                                         if (!err) {
                                             if (SkillMaxResult[0]) {
                                                 console.log('New Skill');
@@ -2275,7 +2284,7 @@ User.prototype.getSkills = function(req,res,next){
     };
 
     try{
-        _this.db.query('CALL PGetSkills()',function(err,result){
+        st.db.query('CALL PGetSkills()',function(err,result){
             if(err){
                 console.log('Error : FnPGetSkills ');
                 res.status(400).json(responseMsg);
@@ -2314,13 +2323,13 @@ User.prototype.getDocPin = function(req,res,next) {
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         var token = req.query.TokenNo;
         if (token != null) {
-            _this.stdLib.validateToken(token, function (err, Result) {
+            st.validateToken(token, function (err, Result) {
                 if (!err) {
-                    if (Result) {
-                        _this.db.query('CALL pGetDocPIN(' + _this.db.escape(token) + ')', function (err, BussinessListingResult) {
+                    if (Result != null) {
+                        st.db.query('CALL pGetDocPIN(' + st.db.escape(token) + ')', function (err, BussinessListingResult) {
                             if (!err) {
                                 // console.log('FnUpdateMessageStatus: Update result' + UpdateResult);
-                                if (BussinessListingResult[0]) {
+                                if (BussinessListingResult[0] != null) {
                                     if (BussinessListingResult[0].length > 0) {
                                         res.send(BussinessListingResult[0]);
                                         console.log('FnGetDocPin: Bussiness Pin sent successfully');
@@ -2386,13 +2395,13 @@ try {
     var Type = parseInt(req.query.Type);
 
     if (Token != null && Type.toString() != 'NaN' && Type.toString() != '0') {
-        _this.stdLib.validateToken(Token, function (err, Result) {
+        st.validateToken(Token, function (err, Result) {
             if (!err) {
-                if (Result) {
-                    _this.db.query('CALL pGetDocs(' + _this.db.escape(Token) + ',' + _this.db.escape(Type) + ')', function (err, DocumentResult) {
+                if (Result != null) {
+                    st.db.query('CALL pGetDocs(' + st.db.escape(Token) + ',' + st.db.escape(Type) + ')', function (err, DocumentResult) {
                         if (!err) {
                             //console.log(DocumentResult);
-                            if (DocumentResult[0]) {
+                            if (DocumentResult[0] != null) {
                                 if (DocumentResult[0].length > 0) {
                                     res.send(DocumentResult[0]);
                                     console.log('FnGetDoc: Document sent successfully');
@@ -2471,11 +2480,11 @@ User.prototype.updateDocPin = function(req,res,next) {
         tPin = null;
     }
     if (token != null && token != '') {
-        _this.stdLib.validateToken(token, function (err, Result) {
+        st.validateToken(token, function (err, Result) {
             if (!err) {
-                if (Result) {
-                    var query = _this.db.escape(token) + ',' + _this.db.escape(tPin);
-                    _this.db.query('CALL pUpdateDocPIN(' + query + ')', function (err, UpdateResult) {
+                if (Result != null) {
+                    var query = st.db.escape(token) + ',' + st.db.escape(tPin);
+                    st.db.query('CALL pUpdateDocPIN(' + query + ')', function (err, UpdateResult) {
                         if (!err) {
                             //  console.log(UpdateResult);
                             // console.log('FnUpdateMessageStatus: Update result' + UpdateResult);
@@ -2551,17 +2560,17 @@ try {
     };
     var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
 
-    if (Token) {
-        _this.stdLib.validateToken(Token, function (err, Result) {
+    if (Token != null) {
+        st.validateToken(Token, function (err, Result) {
             if (!err) {
                 if (Result != null && tRefType.toString() != 'NaN') {
                     if (tRefExpiryDate != null) {
                         tRefExpiryDate = new Date(tRefExpiryDate);
                         //console.log(tRefExpiryDate);
                     }
-                    var query = _this.db.escape(Token) + ',' + _this.db.escape(tRefNo) + ',' + _this.db.escape(tRefExpiryDate) + ',' + _this.db.escape(tRefType);
+                    var query = st.db.escape(Token) + ',' + st.db.escape(tRefNo) + ',' + st.db.escape(tRefExpiryDate) + ',' + st.db.escape(tRefType);
                     //console.log('FnSaveDoc: Inserting data: ' + query);
-                    _this.db.query('CALL pSaveDocs(' + query + ')', function (err, InsertResult) {
+                    st.db.query('CALL pSaveDocs(' + query + ')', function (err, InsertResult) {
                         if (!err) {
                             //console.log(InsertResult);
                             if (InsertResult.affectedRows > 0) {
@@ -2630,8 +2639,8 @@ User.prototype.getFunctions = function(req,res,next) {
     res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     var LangID = parseInt(req.query.LangID);
     if (LangID.toString != 'NaN') {
-        var Query = 'select FunctionID, FunctionName  from mfunctiontype where LangID=' + _this.db.escape(LangID);
-        _this.db.query(Query, function (err, FunctionRoleMapResult) {
+        var Query = 'select FunctionID, FunctionName  from mfunctiontype where LangID=' + st.db.escape(LangID);
+        st.db.query(Query, function (err, FunctionRoleMapResult) {
             if (!err) {
                 if (FunctionRoleMapResult.length > 0) {
                     res.send(FunctionRoleMapResult);
@@ -2695,21 +2704,21 @@ try {
     var tRefType = req.body.RefType;
     //console.log(req.body);
 
-    _this.stdLib.validateToken(Token, function (err, Result) {
+    st.validateToken(Token, function (err, Result) {
         if (!err) {
-            if (Result) {
+            if (Result != null) {
                 if (req && req.files) {
                     if (CntType != null && RefFileName != null && tRefType != null && Token != null) {
 
                         var fileName = '';
-                        if (RefFileName) {
+                        if (RefFileName != null) {
                             fileName = RefFileName.split('.').pop();
                         }
                         //console.log(Token);
                         fs.readFile(RefFileName, function (err, original_data) {
-                            var query = _this.db.escape(Token) + ',' + _this.db.escape( new Buffer(original_data).toString('base64')) + ',' + _this.db.escape(fileName) + ',' + _this.db.escape(tRefType) + ',' + _this.db.escape(CntType);
+                            var query = st.db.escape(Token) + ',' + st.db.escape( new Buffer(original_data).toString('base64')) + ',' + st.db.escape(fileName) + ',' + st.db.escape(tRefType) + ',' + st.db.escape(CntType);
                             //console.log(query);
-                            _this.db.query('CALL pSaveDocsFile(' + query + ')', function (err, InsertResult) {
+                            st.db.query('CALL pSaveDocsFile(' + query + ')', function (err, InsertResult) {
                                 if (!err) {
                                     //    console.log(InsertResult);
                                     if (InsertResult.affectedRows > 0) {
@@ -2768,8 +2777,8 @@ catch (ex) {
 };
 
 var FnGetRedirectLink = function(ezeid,urlSeqNumber,redirectCallback){
-    var Insertquery = _this.db.escape(ezeid) + ',' + _this.db.escape(urlSeqNumber);
-    _this.db.query('CALL pRedirectWebLink(' + Insertquery + ')', function (err, results) {
+    var Insertquery = st.db.escape(ezeid) + ',' + st.db.escape(urlSeqNumber);
+    st.db.query('CALL pRedirectWebLink(' + Insertquery + ')', function (err, results) {
         if(err){
             console.log(err);
             redirectCallback(null);
@@ -2872,8 +2881,8 @@ User.prototype.getMTitle = function(req,res,next) {
         var LangID = parseInt(req.query.LangID);
 
         if (LangID.toString != 'NaN') {
-            var Query = 'Select TitleID,Title from mtitle where LangID=' + _this.db.escape(LangID);
-            _this.db.query(Query, function (err, MTitleResult) {
+            var Query = 'Select TitleID,Title from mtitle where LangID=' + st.db.escape(LangID);
+            st.db.query(Query, function (err, MTitleResult) {
                 if (!err) {
                     if (MTitleResult.length > 0) {
                         res.send(MTitleResult);
@@ -2932,18 +2941,18 @@ User.prototype.updateProfilePicture = function(req,res,next) {
         //if (PictureFileName == null)
         //    PictureFileName = '';
         if (Token != null && Picture != null && PictureFileName != null) {
-            _this.stdLib.validateToken(Token, function (err, Result) {
+            st.validateToken(Token, function (err, Result) {
                 if (!err) {
-                    if (Result) {
+                    if (Result != null) {
 
-                        _this.db.query('select TID from tmaster where Token=' + _this.db.escape(Token), function (err, UserResult) {
+                        st.db.query('select TID from tmaster where Token=' + st.db.escape(Token), function (err, UserResult) {
                             if (!err) {
                                 //console.log(UserResult);
-                                if (UserResult) {
+                                if (UserResult != null) {
                                     if (UserResult.length > 0) {
-                                        var query = 'Update tlocations set Picture = ' + _this.db.escape(Picture) + ',' + 'PictureFileName= ' + _this.db.escape(PictureFileName) + ' where SeqNo=0 and MasterID=' + _this.db.escape(UserResult[0].TID);
+                                        var query = 'Update tlocations set Picture = ' + st.db.escape(Picture) + ',' + 'PictureFileName= ' + st.db.escape(PictureFileName) + ' where SeqNo=0 and MasterID=' + st.db.escape(UserResult[0].TID);
                                         // console.log(query);
-                                        _this.db.query(query, function (err, PicResult) {
+                                        st.db.query(query, function (err, PicResult) {
                                             if (!err) {
                                                 //console.log(PicResult);
                                                 if (PicResult.affectedRows > 0) {
@@ -3033,9 +3042,9 @@ User.prototype.getLoginCheck = function(req,res,next) {
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
 
         if (Token != null && Token != '') {
-            _this.stdLib.validateToken(Token, function (err, Result) {
+            st.validateToken(Token, function (err, Result) {
                 if (!err) {
-                    if (Result) {
+                    if (Result != null) {
                         RtnMessage.IsAvailable = true;
                         res.send(RtnMessage);
                         console.log('FnGetLoginCheck: Valid Login');
@@ -3083,8 +3092,8 @@ User.prototype.getProxmity = function(req,res,next) {
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         var LangID = parseInt(req.query.LangID);
         if (LangID.toString != 'NaN') {
-            var Query = 'Select Title,MetersValue, MilesValue from mproximity where LangID=' + _this.db.escape(LangID);
-            _this.db.query(Query, function (err, ProximityResult) {
+            var Query = 'Select Title,MetersValue, MilesValue from mproximity where LangID=' + st.db.escape(LangID);
+            st.db.query(Query, function (err, ProximityResult) {
                 if (!err) {
                     if (ProximityResult.length > 0) {
                         res.send(ProximityResult);

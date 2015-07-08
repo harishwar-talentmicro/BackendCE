@@ -7,7 +7,6 @@
  *
  */
 "use strict";
-
 var path ='D:\\EZEIDBanner\\';
 var EZEIDEmail = 'noreply@ezeone.com';
 
@@ -24,10 +23,12 @@ function alterEzeoneId(ezeoneId){
     return alteredEzeoneId;
 }
 
+var st = null;
+
 function Audit(db,stdLib){
-    this.db = db;
+
     if(stdLib){
-        this.stdLib = stdLib;
+        st = stdLib;
     }
 };
 
@@ -50,7 +51,7 @@ Audit.prototype.getAccessHistory = function(req,res,next){
         var Page = parseInt(req.query.Page);
 
         if (Token != null && Page.toString() != 'NaN' && Page.toString() != '0') {
-            _this.stdLib.validateToken(Token, function (err, Result) {
+            st.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result) {
                         var ToPage = 25 * Page;
@@ -60,7 +61,7 @@ Audit.prototype.getAccessHistory = function(req,res,next){
                             FromPage = 0;
                         }
 
-                        _this.db.query('CALL pAccessHistory(' + _this.db.escape(Token) + ',' + _this.db.escape(FromPage) + ',' + _this.db.escape(ToPage) + ')', function (err, AccessHistoryResult) {
+                        st.db.query('CALL pAccessHistory(' + st.db.escape(Token) + ',' + st.db.escape(FromPage) + ',' + st.db.escape(ToPage) + ')', function (err, AccessHistoryResult) {
                             if (!err) {
                                 //    console.log(AccessHistoryResult);
                                 if (AccessHistoryResult[0]) {
@@ -144,11 +145,11 @@ Audit.prototype.saveList = function(req,res,next){
 
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
         if (List!= null && RelationType.toString() != 'NaN' && Tag.toString() != 'NaN' && EZEID !=null && Token != null) {
-            _this.stdLib.validateToken(Token, function (err, Result) {
+            st.validateToken(Token, function (err, Result) {
                 if (!err) {
-                    if (Result) {
-                        var query = _this.db.escape(List) + ',' + _this.db.escape(RelationType) + ',' + _this.db.escape(EZEID) + ',' + _this.db.escape(Tag) + ',' +_this.db.escape(Token);
-                        _this.db.query('CALL pSavewhiteblacklist(' + query + ')', function (err, InsertResult) {
+                    if (Result != null) {
+                        var query = st.db.escape(List) + ',' + st.db.escape(RelationType) + ',' + st.db.escape(EZEID) + ',' + st.db.escape(Tag) + ',' +st.db.escape(Token);
+                        st.db.query('CALL pSavewhiteblacklist(' + query + ')', function (err, InsertResult) {
                             if (!err){
                                 if (InsertResult.affectedRows > 0) {
                                     RtnMessage.IsSuccessfull = true;
@@ -228,14 +229,14 @@ Audit.prototype.getList = function(req,res,next){
         //var EZEID = req.query.EZEID;
 
 
-        if (Token) {
-            _this.stdLib.validateToken(Token, function (err, Result) {
+        if (Token != null) {
+            st.validateToken(Token, function (err, Result) {
                 if (!err) {
-                    if (Result ) {
+                    if (Result != null) {
 
-                        _this.db.query('CALL pGetwhiteblacklist(' + _this.db.escape(Token) + ')', function (err, GetResult) {
+                        st.db.query('CALL pGetwhiteblacklist(' + st.db.escape(Token) + ')', function (err, GetResult) {
                             if (!err) {
-                                if (GetResult ) {
+                                if (GetResult != null) {
                                     if (GetResult[0].length > 0) {
 
                                         console.log('FnGetWhiteBlackList: white/black list details Sent successfully');
@@ -315,13 +316,13 @@ Audit.prototype.deleteList = function(req,res,next){
 
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
 
-        if (TID !=null && Token ) {
-            _this.stdLib.validateToken(Token, function (err, Result) {
+        if (TID !=null && Token != null) {
+            st.validateToken(Token, function (err, Result) {
                 if (!err) {
-                    if (Result ) {
+                    if (Result != null) {
 
-                        var query = _this.db.escape(Token) + ',' + _this.db.escape(TID);
-                        _this.db.query('CALL pDeletewhiteblacklist(' + query + ')', function (err, InsertResult) {
+                        var query = st.db.escape(Token) + ',' + st.db.escape(TID);
+                        st.db.query('CALL pDeletewhiteblacklist(' + query + ')', function (err, InsertResult) {
                             if (!err){
                                 if (InsertResult.affectedRows > 0) {
                                     RtnMessage.IsSuccessfull = true;
@@ -402,15 +403,15 @@ Audit.prototype.getListCount = function(req,res,next){
 
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
         if (Token != null && EZEID != null && List != null) {
-            _this.stdLib.validateToken(Token, function (err, Result) {
+            st.validateToken(Token, function (err, Result) {
                 if (!err) {
-                    if (Result) {
+                    if (Result != null) {
 
-                        var query = _this.db.escape(Token) + ',' + _this.db.escape(EZEID) + ',' + _this.db.escape(List);
+                        var query = st.db.escape(Token) + ',' + st.db.escape(EZEID) + ',' + st.db.escape(List);
 
-                        _this.db.query('CALL pGetWhiteListCount(' + query + ')', function (err, GetResult) {
+                        st.db.query('CALL pGetWhiteListCount(' + query + ')', function (err, GetResult) {
                             if (!err) {
-                                if (GetResult[0]) {
+                                if (GetResult[0] != null) {
                                     if (GetResult[0].length > 0) {
                                         var WhiteListCount =GetResult[0];
                                         RtnMessage.WhiteListCount=WhiteListCount[0].WhiteListCount;
@@ -488,8 +489,8 @@ Audit.prototype.getRelation = function(req,res,next){
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         var LangID = parseInt(req.query.LangID);
         if (LangID.toString != 'NaN') {
-            var Query = 'Select RelationID, RelationshipTitle from mrelationtype where LangID=' + _this.db.escape(LangID);
-            _this.db.query(Query, function (err, RelationTypeResult) {
+            var Query = 'Select RelationID, RelationshipTitle from mrelationtype where LangID=' + st.db.escape(LangID);
+            st.db.query(Query, function (err, RelationTypeResult) {
                 if (!err) {
                     if (RelationTypeResult.length > 0) {
                         res.send(RelationTypeResult);
@@ -549,14 +550,14 @@ Audit.prototype.saveMailTemplate = function(req,res,next){
             IsSuccessfull: false
         };
 
-        if (Token != null && Title != null && FromName != null && FromEmailID != null && Subject != null && Body ) {
-            _this.stdLib.validateToken(Token, function (err, Result) {
+        if (Token != null && Title != null && FromName != null && FromEmailID != null && Subject != null && Body != null ) {
+            st.validateToken(Token, function (err, Result) {
                 if (!err) {
-                    if (Result) {
+                    if (Result != null) {
 
-                        var query = _this.db.escape(Token) + ', ' +_this.db.escape(Title) + ',' + _this.db.escape(FromName) + ',' + _this.db.escape(FromEmailID)
-                            + ',' + _this.db.escape(CCMailIDS) + ',' + _this.db.escape(BCCMailIDS) + ',' + _this.db.escape(Subject) + ',' + _this.db.escape(Body);
-                        _this.db.query('CALL pSaveMailTemplate(' + query + ')', function (err, InsertResult) {
+                        var query = st.db.escape(Token) + ', ' +st.db.escape(Title) + ',' + st.db.escape(FromName) + ',' + st.db.escape(FromEmailID)
+                            + ',' + st.db.escape(CCMailIDS) + ',' + st.db.escape(BCCMailIDS) + ',' + st.db.escape(Subject) + ',' + st.db.escape(Body);
+                        st.db.query('CALL pSaveMailTemplate(' + query + ')', function (err, InsertResult) {
                             if (!err){
                                 if (InsertResult.affectedRows > 0) {
                                     RtnMessage.IsSuccessfull = true;
@@ -640,14 +641,14 @@ Audit.prototype.getMailTemplate = function(req,res,next) {
 
         var Token = req.query.Token;
 
-        if (Token) {
-            _this.stdLib.validateToken(Token, function (err, Result) {
+        if (Token != null) {
+            st.validateToken(Token, function (err, Result) {
                 if (!err) {
-                    if (Result) {
+                    if (Result != null) {
 
-                        _this.db.query('CALL pgetAllMailtemplate(' + _this.db.escape(Token) + ')', function (err, GetResult) {
+                        st.db.query('CALL pgetAllMailtemplate(' + st.db.escape(Token) + ')', function (err, GetResult) {
                             if (!err) {
-                                if (GetResult) {
+                                if (GetResult != null) {
                                     if (GetResult[0].length > 0) {
 
                                         console.log('FnGetTemplateList: Template list Send successfully');
@@ -715,15 +716,15 @@ Audit.prototype.getTemplateDetails = function(req,res,next){
         var Token = req.query.Token;
         var TID = req.query.TID;
 
-        if (Token) {
-            _this.stdLib.validateToken(Token, function (err, Result) {
+        if (Token != null) {
+            st.validateToken(Token, function (err, Result) {
                 if (!err) {
-                    if (Result) {
+                    if (Result != null) {
 
-                        //var query = _this.db.escape(Token) + ', ' +_this.db.escape(TID);
-                        _this.db.query('CALL pgetMailtemplateDetails(' + _this.db.escape(TID) + ')', function (err, GetResult) {
+                        //var query = st.db.escape(Token) + ', ' +st.db.escape(TID);
+                        st.db.query('CALL pgetMailtemplateDetails(' + st.db.escape(TID) + ')', function (err, GetResult) {
                             if (!err) {
-                                if (GetResult) {
+                                if (GetResult != null) {
                                     if (GetResult[0].length > 0) {
                                         console.log('FnGetTemplateDetails: Template Details Send successfully');
                                         res.send(GetResult[0]);
@@ -803,26 +804,26 @@ Audit.prototype.sendBulkMailer = function(req,res,next){
         var RtnResponse = {
             IsSent: false
         };
-        if (TID) {
+        if (TID != null) {
 
             if (Token != null && Token != '' && TID != null && TID != '' && TemplateID != null && TemplateID != '') {
-                _this.stdLib.validateToken(Token, function (err, Result) {
+                st.validateToken(Token, function (err, Result) {
                     if (!err) {
-                        if (Result) {
-                            //var query = _this.db.escape(Token) + ', ' +_this.db.escape(TID);
+                        if (Result != null) {
+                            //var query = st.db.escape(Token) + ', ' +st.db.escape(TID);
                             var query = 'Select FirstName, LastName, CompanyName,ifnull(SalesMailID," ") as SalesMailID from tmaster where TID in (' + TID + ')';
                             console.log(query);
-                            _this.db.query(query, function (err, GetResult) {
+                            st.db.query(query, function (err, GetResult) {
                                 if (!err) {
-                                    if (GetResult) {
+                                    if (GetResult != null) {
 
                                         console.log(GetResult[0]);
 
                                         if (GetResult.length > 0) {
-                                            var templateQuery = 'Select * from mmailtemplate where TID = ' + _this.db.escape(TemplateID);
-                                            _this.db.query(templateQuery, function (err, TemplateResult) {
+                                            var templateQuery = 'Select * from mmailtemplate where TID = ' + st.db.escape(TemplateID);
+                                            st.db.query(templateQuery, function (err, TemplateResult) {
                                                 if (!err) {
-                                                    if (TemplateResult) {
+                                                    if (TemplateResult != null) {
                                                         if (TemplateResult.length > 0) {
                                                             console.log(TemplateResult);
                                                             RtnResponse.IsSent = true;
@@ -850,7 +851,7 @@ Audit.prototype.sendBulkMailer = function(req,res,next){
                                                                     };
 
                                                                     //console.log(post);
-                                                                    var query = _this.db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
+                                                                    var query = st.db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
                                                                         // Neat!
                                                                         if (!err) {
                                                                             console.log(result);
@@ -935,12 +936,12 @@ Audit.prototype.sendBulkMailer = function(req,res,next){
             var fs = require('fs');
 
             if (Token != null && Attachment != null && AttachmentFileName != null && ToMailID != null) {
-                _this.stdLib.validateToken(Token, function (err, Result) {
+                st.validateToken(Token, function (err, Result) {
                     if (!err) {
-                        if (Result) {
-                            var query = _this.db.escape(Token);
+                        if (Result != null) {
+                            var query = st.db.escape(Token);
                             console.log('CALL pSendMailerDetails(' + query + ')');
-                            _this.db.query('CALL pSendMailerDetails(' + query + ')', function (err, Result) {
+                            st.db.query('CALL pSendMailerDetails(' + query + ')', function (err, Result) {
 
                                 if (!err) {
                                     if (Result.length > 0) {
@@ -1030,7 +1031,7 @@ Audit.prototype.sendBulkMailer = function(req,res,next){
                                                 };
 
                                                 //console.log(post);
-                                                var query = _this.db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
+                                                var query = st.db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
                                                     // Neat!
                                                     if (!err) {
                                                         //console.log(result);
@@ -1117,7 +1118,7 @@ try {
     if (Token != null && Page.toString() != 'NaN' && Page.toString() != '0') {
         _this.stdLib.validateToken(Token, function (err, Result) {
             if (!err) {
-                if (Result) {
+                if (Result != null) {
                     var ToPage = 25 * Page;
                     var FromPage = ToPage - 24;
 
@@ -1126,11 +1127,11 @@ try {
                     }
                     //  console.log('From Page: ' + FromPage);
                     //console.log('To Page: ' + ToPage);
-                    var getMessageQuery = 'CALL pGetMessages(' + _this.db.escape(Token) + ',' + _this.db.escape(FromPage) + ',' + _this.db.escape(ToPage) + ',' + _this.db.escape(Status) + ',' + _this.db.escape(MessageType) + ')';
-                    _this.db.query(getMessageQuery, function (err, MessagesResult) {
+                    var getMessageQuery = 'CALL pGetMessages(' + st.db.escape(Token) + ',' + st.db.escape(FromPage) + ',' + st.db.escape(ToPage) + ',' + st.db.escape(Status) + ',' + st.db.escape(MessageType) + ')';
+                    st.db.query(getMessageQuery, function (err, MessagesResult) {
                         if (!err) {
                             //  console.log(MessagesResult);
-                            if (MessagesResult) {
+                            if (MessagesResult != null) {
                                 if (MessagesResult[0].length > 0) {
                                     res.send(MessagesResult[0]);
                                     console.log('FnGetMessages: Messages sent successfully');
@@ -1211,13 +1212,13 @@ Audit.prototype.updateMessageStatus = function(req,res,next){
         if (Notes == null)
             Notes = '';
         if (token != null && token != '' && Status.toString() != 'NaN' && TID.toString() != 'NaN') {
-            _this.stdLib.validateToken(token, function (err, Result) {
+            st.validateToken(token, function (err, Result) {
                 if (!err) {
-                    if (Result) {
-                        //var query = 'update tmessages set Status=' + _this.db.escape(Status) + ' where TID=' + _this.db.escape(TID);
-                        var query = 'update ttrans set Status=' + _this.db.escape(Status) + ', Notes=' + _this.db.escape(Notes) + ' where TID=' + _this.db.escape(TID);
+                    if (Result != null) {
+                        //var query = 'update tmessages set Status=' + st.db.escape(Status) + ' where TID=' + st.db.escape(TID);
+                        var query = 'update ttrans set Status=' + st.db.escape(Status) + ', Notes=' + st.db.escape(Notes) + ' where TID=' + st.db.escape(TID);
                         // console.log('Update query : ' + query);
-                        _this.db.query(query, function (err, UpdateResult) {
+                        st.db.query(query, function (err, UpdateResult) {
                             if (!err) {
                                 // console.log('FnUpdateMessageStatus: Update result' + UpdateResult);
                                 if (UpdateResult.affectedRows > 0) {
