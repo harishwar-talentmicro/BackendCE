@@ -146,7 +146,7 @@
 
             /**
              *
-             * home delivery items present for this user
+             * Sales items present for this user
              * @type {Array}
              */
             $scope.moduleItems = [];
@@ -163,7 +163,7 @@
 
             $scope.showModal = false;
             $scope.modalBox = {
-                title : 'Create New Lead',
+                title : 'Create New Order',
                 class : 'business-manager-modal',
                 editMode : false,
                 locationList : [],
@@ -173,7 +173,7 @@
                     ezeidTid : 0,
 
                     TID : 0,
-                    functionType : 2, // Function Type will be 2 for home delivery
+                    functionType : 2, // Function Type will be 0 for sales
                     ezeid : '',
                     statusType : 0,
                     notes : '',
@@ -279,12 +279,12 @@
              * so that it can be recalculated and saved when internal user changes or updates the order
              * @param msg
              * @usage parameter msg will be like
-             * msg = 'this is message text for this home delivery enquiry ------------------------------ Nuts(7), Bolts(6)
-             * alteredMsg = 'this is message text for this home delivery enquiry'
+             * msg = 'this is message text for this sales order    Nuts(7), Bolts(6)
+             * alteredMsg = 'this is message text for this sales enquiry'
              */
             var alterTransactionMessageToEdit = function(msg){
                 var alteredMsg = '';
-                var str = '------------------------------'; //30 characters
+                var str = '   '; //30 characters
                 var indexStr = msg.indexOf(str);
                 if(indexStr !== -1){
                     alteredMsg = msg.substr(0,indexStr);
@@ -310,7 +310,7 @@
                     ezeidTid : (tx.EZEID) ? true : 0,
 
                     TID : tx.TID,
-                    functionType : 2, // Function Type will be 2 for home delivery
+                    functionType : 2, // Function Type will be 0 for sales
                     ezeid : (changeUserDetails) ? '' :  tx.RequesterEZEID,
                     statusType : (tx.Status) ? tx.Status : 0,
                     notes : tx.Notes,
@@ -487,7 +487,7 @@
                         defer.resolve([]);
                     }
                 }).error(function(err){
-                    Notification.error({ message : 'Unable to load items for this enquiry ! Please try again', delay : MsgDelay});
+                    Notification.error({ message : 'Unable to load items for this order! Please try again', delay : MsgDelay});
                     defer.reject();
                 });
                 return defer.promise;
@@ -516,7 +516,7 @@
                             //UI updation is not happening properly because ui is not rendered, and model bind before it
                             //therefore once again updating data after ui rendered
                             $timeout(function(){
-                                $scope.modalBox.title = 'Update Lead';
+                                $scope.modalBox.title = 'Update Order';
                                 $scope.modalBox.tx = editTx;
                                 $scope.$emit('$preLoaderStop');
                             },1500);
@@ -719,7 +719,7 @@
 
             $scope.resetModalBox = function(){
                 $scope.modalBox = {
-                    title : 'Create New Lead',
+                    title : 'Add New Order',
                     class : 'business-manager-modal',
                     locationList : [],
                     editMode : false,
@@ -729,7 +729,7 @@
                         ezeidTid : 0,
 
                         TID : 0,
-                        functionType : 2, // Function Type will be 2 for home delivery
+                        functionType : 2, // Function Type will be 0 for sales
                         ezeid : '',
                         statusType : 0,
                         notes : '',
@@ -1058,7 +1058,7 @@
                             Token : $rootScope._userInfo.Token,
                             Page : (pageNo) ? pageNo : 1,
                             Status : (statusType) ? statusType : '',
-                            FunctionType : 2,    // For home delivery
+                            FunctionType : 2,    // For Sales
                             searchkeyword : txSearchKeyword,
                             sort_by : (sortBy) ? sortBy : 0,
                             folder_rules : folderRules
@@ -1107,7 +1107,7 @@
                     method : 'GET',
                     params : {
                         Token : $rootScope._userInfo.Token,
-                        FunctionType : 2    // For home delivery
+                        FunctionType : 2    // For Sales
                     }
                 }).success(function(resp){
                     //////////console.log(resp);
@@ -1141,7 +1141,7 @@
                     method : 'GET',
                     params : {
                         Token : $rootScope._userInfo.Token,
-                        FunctionType : 2    // For home delivery
+                        FunctionType : 2    // For Sales
                     }
                 }).success(function(resp){
                     if(resp && resp !== 'null' && resp.length > 0){
@@ -1170,7 +1170,7 @@
                     method : 'GET',
                     params : {
                         Token : $rootScope._userInfo.Token,
-                        FunctionType : 2    // For home delivery
+                        FunctionType : 2    // For Sales
                     }
                 }).success(function(resp){
                     if(resp && resp !== 'null' && resp.length > 0){
@@ -1211,7 +1211,7 @@
                     method : 'GET',
                     params : {
                         Token : $rootScope._userInfo.Token,
-                        FunctionType : 2    // home delivery
+                        FunctionType : 2    // Sales
                     }
                 }).success(function(resp){
                     if(resp && resp !== 'null' && resp.length > 0){
@@ -1274,7 +1274,7 @@
                         });
                     }
                     else{
-                        if(n!==v){
+                        if(n !== v && (n.length > 0 || v.length > 0) ){
                             $scope.$emit('$preLoaderStart');
                             $scope.loadTransaction(1,$scope.filterStatus,$scope.txSearchTerm,$scope.sortBy).then(function(){
                                 $scope.$emit('$preLoaderStop');
@@ -1328,7 +1328,7 @@
             };
 
             /**
-             * Loads FolderRules for home delivery
+             * Loads FolderRules for Sales
              * @return {*|promise}
              */
             $scope.loadFolderRules = function(){
@@ -1338,7 +1338,7 @@
                     method : 'GET',
                     params : {
                         Token : $rootScope._userInfo.Token,
-                        FunctionType : 2    // home delivery
+                        FunctionType : 2    // Sales
                     }
                 }).success(function(resp){
                     if(resp && resp !== 'null' && resp.length > 0){
@@ -1445,11 +1445,11 @@
                                     });
                                 },function(){
                                     $scope.$emit('$preLoaderStop');
-                                    Notification.error({message : 'Unable to load home delivery transaction list', delay : MsgDelay} );
+                                    Notification.error({message : 'Unable to load home delivery order list', delay : MsgDelay} );
                                 });
                             },function(){
                                 $scope.$emit('$preLoaderStop');
-                                Notification.error({message : 'Unable to load home delivery transaction status types', delay : MsgDelay} );
+                                Notification.error({message : 'Unable to load home delivery status types', delay : MsgDelay} );
                             });
                         },function(){
                             $scope.$emit('$preLoaderStop');
@@ -1552,7 +1552,7 @@
                     State : $scope.modalBox.tx.state,
                     City : $scope.modalBox.tx.city,
                     Area : $scope.modalBox.tx.area,
-                    FunctionType : 2,   // For home delivery
+                    FunctionType : 2,   // For sales
                     Latitude : $scope.modalBox.tx.latitude,
                     Longitude : $scope.modalBox.tx.longitude,
                     EZEID : $scope.modalBox.tx.ezeid,
@@ -1587,13 +1587,13 @@
                 }
 
                 if($scope.modalBox.tx.itemList.length <  1 && $scope.modules[moduleIndex].listType > 0){
-                    Notification.error({ message : 'Please select items for the enquiry',delay : MsgDelay});
+                    Notification.error({ message : 'Please select items',delay : MsgDelay});
                     return ;
                 }
 
 
                 if($scope.modules[moduleIndex].listType > 0){
-                    var separationStr = ' ------------------------------ ';
+                    var separationStr = '     ';
                     var itemList = [];
                     try{
                         itemList = JSON.parse(data.ItemsList);
@@ -1624,13 +1624,13 @@
                 }).success(function(resp){
                     if(resp && resp.hasOwnProperty('IsSuccessfull')){
                         if(resp.IsSuccessfull){
-                            var msg = 'Enquiry is posted successfully';
+                            var msg = 'Order placed successfully';
                             if($scope.modalBox.editMode){
-                                msg = 'Enquiry is updated successfully';
+                                msg = 'Order updated successfully';
                             }
 
                             if($scope.editModes.indexOf(true) !== -1){
-                                msg = 'Enquiry is updated successfully';
+                                msg = 'Order updated successfully';
                             }
                             Notification.success({ message : msg, delay : MsgDelay});
                             if($scope.showModal){
@@ -1646,11 +1646,11 @@
                             });
                         }
                         else{
-                            Notification.error({ message : 'An error occurred while placing enquiry', delay : MsgDelay});
+                            Notification.error({ message : 'An error occurred while placing order', delay : MsgDelay});
                         }
                     }
                     else{
-                        Notification.error({ message : 'An error occurred while placing enquiry', delay : MsgDelay});
+                        Notification.error({ message : 'An error occurred while placing order', delay : MsgDelay});
                     }
 
                     $scope.$emit('$preLoaderStop');
@@ -1676,7 +1676,7 @@
                     /**
                      * If itemListType is > 0, and items are not there then automatically
                      * listType becomes 0 but to restore the actual list type in $rootScope
-                     * this will reassign the values to _userInfo.HomeDeliveryItemListType
+                     * this will reassign the values to _userInfo.SalesItemListType
                      */
                     $rootScope._userInfo.HomeDeliveryItemListType = $scope._tempHomeDeliveryItemListType;
                 }
