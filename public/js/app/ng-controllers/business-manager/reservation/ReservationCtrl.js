@@ -1550,12 +1550,12 @@ var res = angular.module('ezeidApp').
                     isSubuser = true;
                 }
 
-                if($routeParams.ezeone == $rootScope._userInfo.ezeid)
-                {
-                    $scope.accessRight = 1;//Super User
-                    $scope.isResource = true;
-                }
-                else if(isSubuser)
+                //if($routeParams.ezeone == $rootScope._userInfo.ezeid)
+                //{
+                //    $scope.accessRight = 1;//Super User
+                //    $scope.isResource = true;
+                //}
+                if(isSubuser)
                 {
                     $scope.accessRight = 2;//He is the INTERNAL USER or who is OPERATOR of this resource
                     $scope.isResource = true;
@@ -1660,8 +1660,7 @@ var res = angular.module('ezeidApp').
             $scope.setServices = function()
             {
                 var serviceIds = $scope.currentServices;
-                console.log(serviceIds);
-                if(typeof(serviceIds) === 'undefined' || serviceIds || serviceIds === null)
+                if(typeof(serviceIds) === 'undefined' || !serviceIds || serviceIds === null)
                 {
                     return;
                 }

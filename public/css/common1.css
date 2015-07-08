@@ -1060,12 +1060,12 @@ button.btn.btn-primary.btn-block.greenButton {
     position: absolute;
     top: 39.5%;
     z-index: 3;
-    right: 10px;
+    right: 50px;
 }
 .imgLeft {
     position: absolute;
     top: 39.5%;
-    left: 10px;
+    left: 50px;
     z-index: 3;
 }
 .boxMessaageBackgroun {
@@ -1754,5 +1754,10 @@ table.rwd-table > tbody > tr > td.serachResultSelectAll
 {
     color: #0072C3;
     font-size: 14px;
+}
+.imgSetBorder
+{
+    box-shadow: 0px 0px 10px #989898;
+    border: 1px solid #FFF;
 }
 
