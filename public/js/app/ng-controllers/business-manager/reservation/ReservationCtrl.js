@@ -164,7 +164,7 @@ var res = angular.module('ezeidApp').
                             getReservationTransactionData($scope.activeResourceId, date, $scope.searchedEzeid).then(function () {
                                 if(!$scope.workingHrs.length > 0)
                                 {
-                                    Notification.error({message: "No working hour defined for this Resource", delay: MsgDelay});
+                                    Notification.error({message: "No working hour defined for this Resource on this day", delay: MsgDelay});
                                     console.log("******No Result********");
                                     cleanCalendarData();
                                 }
@@ -1110,11 +1110,13 @@ var res = angular.module('ezeidApp').
                     if(resp.status)
                     {
                         $scope.reserverMobile = resp.data[0].ContactInfo;
+                        $('#userMobile').val($scope.reserverMobile);
                         $scope.reservationService = resp.data[0].serviceids;
                         $scope.startTime = selectedTimeUtcToLocal(resp.data[0].Starttime).substr(0,5);
                         $scope.duration = resp.data[0].duration;
                         $scope.endTime = convertBlockIdToTime((convertHoursToMinutes($scope.startTime) + $scope.duration)/5);
                         $scope.notes = resp.data[0].Notes
+                        $('#userNote').val($scope.notes);
                         /* set this reservation services */
                         $scope.currentServices = resp.data[0].serviceids;
                         resetServiceChecks();
@@ -1225,9 +1227,10 @@ var res = angular.module('ezeidApp').
                     function(){
                         console.log("get Reservation tranx Response 11111111111---:"+$scope.workingHrs);
                         console.log("get Reservation tranx Response 22222222222---:"+$scope.reservedTime);
+                        setSelfReservationArray();
                         if(!$scope.workingHrs.length > 0)
                         {
-                            Notification.error({message: "No working hour defined for this Resource", delay: MsgDelay});
+                            Notification.error({message: "No working hour defined for this Resource on this day", delay: MsgDelay});
                             cleanCalendarData();
                             console.log("******No Result********");
                         }
@@ -1421,6 +1424,8 @@ var res = angular.module('ezeidApp').
                     if(resp.status){
                         /* change status button status */
                         chnageStatusButtonAndStrikeText(tid,status);
+                        /* remove the reservation block */
+                        
                         Notification.success({ message: "Reservation status changed successfully", delay: MsgDelay });
                     }
                     else
