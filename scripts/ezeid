@@ -1,0 +1,72 @@
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides:          IndraJeet
+# Required-Start:    $network $local_fs
+# Required-Stop:
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: EZIED NodeJS Application
+# Description:       Hirecraft Softwares Pvt. Ltd.
+#### END INIT INFO
+
+NAME=ezeid
+USER=root
+DEPLOY_DIR="/home/ezeonetalent/ezeid"
+CMD="/usr/bin/nodejs"
+CMD_ARGS="www"
+LOGFILE="/var/log/ezeone.log"
+
+########## Common
+PATH=/sbin:/bin:/usr/sbin:/usr/bin:$PATH
+SSD=start-stop-daemon
+PID=/var/run/${NAME}.pid
+
+
+start () {
+    echo -n "Start $NAME"
+#    /usr/bin/nodejs
+    $SSD -v --start --pidfile $PID --make-pidfile --background -d $DEPLOY_DIR/bin --startas /bin/bash -- -c  "exec $CMD $CMD_ARGS >> $LOGFILE 2>&1"
+    RETVAL=$?
+    echo
+    return $RETVAL
+}
+
+stop () {
+    echo -n "Stop $NAME"
+    $SSD --stop --oknodo --pidfile $PID
+    RETVAL=$?
+    echo
+    return $RETVAL
+}
+
+restart () {
+    stop
+    sleep 1
+    start
+}
+
+
+case "$1" in
+start)
+    start
+    ;;
+
+stop)
+    stop
+    ;;
+
+status)
+ #   echo "not supported"
+        status ezeid
+    ;;
+
+restart)
+    restart
+    ;;
+
+*)
+    echo "Usage: $0 {start|stop|restart}"
+    exit 1
+esac
+
+exit $RETVAL
