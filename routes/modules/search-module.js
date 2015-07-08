@@ -25,12 +25,15 @@ function alterEzeoneId(ezeoneId){
     return alteredEzeoneId;
 }
 
+var st = null;
+
 function Search(db,stdLib){
-    this.db = db;
+
     if(stdLib){
-        this.stdLib = stdLib;
+        st = stdLib;
     }
 };
+
 
 
 /**
@@ -75,7 +78,7 @@ Search.prototype.searchKeyword = function(req,res,next){
         if (type == "1") {
 
             if (find != null && find != '' && CategoryID != null && token != null && token != '' && CurrentDate != null && pagesize != null && pagecount != null) {
-                _this.stdLib.validateToken(token, function (err, Result) {
+                st.validateToken(token, function (err, Result) {
                     if (!err) {
                         if (Result) {
                             if(CurrentDate != null)
@@ -152,15 +155,15 @@ Search.prototype.searchKeyword = function(req,res,next){
                                     }
                                 }
                             }
-                            var SearchQuery = db.escape('') + ',' + db.escape(CategoryID) + ',' + db.escape(0) + ',' + db.escape(Latitude)
-                                + ',' + db.escape(Longitude) +',' + db.escape(EZEID) + ',' + db.escape(LocSeqNo) + ',' + db.escape(Pin) + ',' + db.escape(SearchType) + ',' + db.escape(DocType)
-                                + ',' + db.escape("0") + ',' + db.escape("0") + ',' + db.escape("0") + ',' + db.escape(token)
-                                + ',' + db.escape(HomeDelivery) + ',' + db.escape(CurrentDate) + ',' + db.escape(isPagination) + ',' +
-                                db.escape(pagesize) + ',' + db.escape(pagecount) + ',' + db.escape(total) ;
+                            var SearchQuery = st.db.escape('') + ',' + st.db.escape(CategoryID) + ',' + st.db.escape(0) + ',' + st.db.escape(Latitude)
+                                + ',' + st.db.escape(Longitude) +',' + st.db.escape(EZEID) + ',' + st.db.escape(LocSeqNo) + ',' + st.db.escape(Pin) + ',' + st.db.escape(SearchType) + ',' + st.db.escape(DocType)
+                                + ',' + st.db.escape("0") + ',' + st.db.escape("0") + ',' + st.db.escape("0") + ',' + st.db.escape(token)
+                                + ',' + st.db.escape(HomeDelivery) + ',' + st.db.escape(CurrentDate) + ',' + st.db.escape(isPagination) + ',' +
+                                st.db.escape(pagesize) + ',' + st.db.escape(pagecount) + ',' + st.db.escape(total) ;
 
                             console.log('CALL pSearchResultNew(' + SearchQuery + ')');
-                            db.query('CALL pSearchResultNew(' + SearchQuery + ')', function (err, SearchResult) {
-                                // db.query(searchQuery, function (err, SearchResult) {
+                            st.db.query('CALL pSearchResultNew(' + SearchQuery + ')', function (err, SearchResult) {
+                                // st.db.query(searchQuery, function (err, SearchResult) {
                                 if (!err) {
                                     if (SearchResult[0]) {
                                         if (SearchResult[0].length > 0) {
@@ -176,16 +179,16 @@ Search.prototype.searchKeyword = function(req,res,next){
                                             }
 
                                             if (SearchType == 2){
-                                                var getQuery = 'select TID from tmaster where Token='+db.escape(token);
-                                                db.query(getQuery, function (err, getResult) {
+                                                var getQuery = 'select TID from tmaster where Token='+st.db.escape(token);
+                                                st.db.query(getQuery, function (err, getResult) {
                                                     if(!err){
                                                         var tid = getResult[0].TID;
                                                         console.log(tid);
                                                     }
-                                                    var query = db.escape(tid) + ',' + db.escape(logHistory.ezeid) + ',' + db.escape(logHistory.ip) + ',' + db.escape(logHistory.type);
+                                                    var query = st.db.escape(tid) + ',' + st.db.escape(logHistory.ezeid) + ',' + st.db.escape(logHistory.ip) + ',' + st.db.escape(logHistory.type);
                                                     console.log('CALL pCreateAccessHistory(' + query + ')');
                                                     if(logHistory.type < 1){
-                                                        db.query('CALL pCreateAccessHistory(' + query + ')', function (err){
+                                                        st.db.query('CALL pCreateAccessHistory(' + query + ')', function (err){
                                                             if(!err){
                                                                 console.log('FnSearchByKeywords:Access history is created');
                                                             }
@@ -264,14 +267,14 @@ Search.prototype.searchKeyword = function(req,res,next){
                     ParkingStatus = "1,2,3";
                 }
 
-                var InsertQuery = db.escape(find) + ',' + db.escape(CategoryID) + ',' + db.escape(Proximity) + ',' + db.escape(Latitude)
-                    + ',' + db.escape(Longitude) + ',' + db.escape('') + ',' + db.escape(0) + ',' + db.escape(0) + ',' + db.escape(1)
-                    + ',' + db.escape('') + ',' + db.escape(ParkingStatus) + ',' + db.escape(OpenCloseStatus) + ',' + db.escape(Rating)
-                    + ',' + db.escape(token) + ',' + db.escape(HomeDelivery)+ ',' + db.escape(CurrentDate) + ',' + db.escape(isPagination) + ',' +
-                    db.escape(pagesize) + ',' + db.escape(pagecount)+ ',' + db.escape(total) ;
+                var InsertQuery = st.db.escape(find) + ',' + st.db.escape(CategoryID) + ',' + st.db.escape(Proximity) + ',' + st.db.escape(Latitude)
+                    + ',' + st.db.escape(Longitude) + ',' + st.db.escape('') + ',' + st.db.escape(0) + ',' + st.db.escape(0) + ',' + st.db.escape(1)
+                    + ',' + st.db.escape('') + ',' + st.db.escape(ParkingStatus) + ',' + st.db.escape(OpenCloseStatus) + ',' + st.db.escape(Rating)
+                    + ',' + st.db.escape(token) + ',' + st.db.escape(HomeDelivery)+ ',' + st.db.escape(CurrentDate) + ',' + st.db.escape(isPagination) + ',' +
+                    st.db.escape(pagesize) + ',' + st.db.escape(pagecount)+ ',' + st.db.escape(total) ;
                 console.log('CALL pSearchResultNew(' + InsertQuery + ')');
                 //var link = 'CALL pSearchResult(' + InsertQuery + ')';
-                db.query('CALL pSearchResultNew(' + InsertQuery + ')', function (err, SearchResult) {
+                st.db.query('CALL pSearchResultNew(' + InsertQuery + ')', function (err, SearchResult) {
                     if (!err) {
                         //console.log(SearchResult);
                         if (SearchResult[0] != null) {
@@ -329,13 +332,13 @@ Search.prototype.searchKeyword = function(req,res,next){
                 if (ParkingStatus == 0) {
                     ParkingStatus = "1,2,3";
                 }
-                var InsertQuery = db.escape(find) + ',' + db.escape(CategoryID) + ',' + db.escape(Proximity) + ',' + db.escape(Latitude)
-                    + ',' + db.escape(Longitude) + ',' + db.escape('') + ',' + db.escape(0) + ',' + db.escape(0) + ',' + db.escape(3)
-                    + ',' + db.escape('') + ',' + db.escape(ParkingStatus) + ',' + db.escape(OpenCloseStatus) + ',' + db.escape(Rating)
-                    + ',' + db.escape(token)  + ',' + db.escape(HomeDelivery)+ ',' + db.escape(CurrentDate) + ',' + db.escape(isPagination) + ',' +
-                    db.escape(pagesize) + ',' + db.escape(pagecount)+ ',' + db.escape(total);
+                var InsertQuery = st.db.escape(find) + ',' + st.db.escape(CategoryID) + ',' + st.db.escape(Proximity) + ',' + st.db.escape(Latitude)
+                    + ',' + st.db.escape(Longitude) + ',' + st.db.escape('') + ',' + st.db.escape(0) + ',' + st.db.escape(0) + ',' + st.db.escape(3)
+                    + ',' + st.db.escape('') + ',' + st.db.escape(ParkingStatus) + ',' + st.db.escape(OpenCloseStatus) + ',' + st.db.escape(Rating)
+                    + ',' + st.db.escape(token)  + ',' + st.db.escape(HomeDelivery)+ ',' + st.db.escape(CurrentDate) + ',' + st.db.escape(isPagination) + ',' +
+                    st.db.escape(pagesize) + ',' + st.db.escape(pagecount)+ ',' + st.db.escape(total);
                 console.log('CALL pSearchResultNew(' + InsertQuery + ')');
-                db.query('CALL pSearchResultNew(' + InsertQuery + ')', function (err, SearchResult) {
+                st.db.query('CALL pSearchResultNew(' + InsertQuery + ')', function (err, SearchResult) {
                     if (!err) {
                         console.log(SearchResult);
                         if (SearchResult[0]) {
@@ -451,10 +454,10 @@ Search.prototype.searchInformation = function(req,res,next){
                     }
                 }
             }
-            var SearchParameter = _this.db.escape(Token) + ',' + _this.db.escape(WorkingDate) + ',' + _this.db.escape(IPAddress) + ',' + _this.db.escape(EZEID) + ',' + _this.db.escape(LocSeqNo) + ',' + _this.db.escape(Pin);
+            var SearchParameter = st.db.escape(Token) + ',' + st.db.escape(WorkingDate) + ',' + st.db.escape(IPAddress) + ',' + st.db.escape(EZEID) + ',' + st.db.escape(LocSeqNo) + ',' + st.db.escape(Pin);
             console.log('CALL pSearchInformationNew(' + SearchParameter + ')');
-            _this.db.query('CALL pSearchInformationNew(' + SearchParameter + ')', function (err, UserInfoResult) {
-                // _this.db.query(searchQuery, function (err, SearchResult) {
+            st.db.query('CALL pSearchInformationNew(' + SearchParameter + ')', function (err, UserInfoResult) {
+                // st.db.query(searchQuery, function (err, SearchResult) {
                 if (!err) {
                     // console.log(UserInfoResult);
                     if (UserInfoResult[0].length > 0) {
@@ -517,15 +520,15 @@ Search.prototype.getWorkingHrsHolidayList = function (req, res) {
         if(LocID == null)
             LocID = 0;
         if (Token != null && LocID != null) {
-            _this.stdLib.validateToken(Token, function (err, Result) {
+            st.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
                         var async = require('async');
                         async.parallel([ function FnWorkingHours(CallBack) {
                             try {
 
-                                var query = _this.db.escape(Token) + ',' + _this.db.escape(LocID);
-                                _this.db.query('CALL pGetWorkingHours(' + query + ')', function (err, WorkingResult) {
+                                var query = st.db.escape(Token) + ',' + st.db.escape(LocID);
+                                st.db.query('CALL pGetWorkingHours(' + query + ')', function (err, WorkingResult) {
                                     console.log('CALL pGetWorkingHours(' + query + ')');
 
                                     if (!err) {
@@ -565,8 +568,8 @@ Search.prototype.getWorkingHrsHolidayList = function (req, res) {
                             }
                         } ,function FnHolidayList(CallBack) {
                             try {
-                                var query = _this.db.escape(LocID) + ',' + _this.db.escape(0);
-                                _this.db.query('CALL pGetHolidayList(' + query + ')', function (err, HolidayResult) {
+                                var query = st.db.escape(LocID) + ',' + st.db.escape(0);
+                                st.db.query('CALL pGetHolidayList(' + query + ')', function (err, HolidayResult) {
                                     console.log('CALL pGetHolidayList(' + query + ')');
 
                                     if (!err) {
@@ -658,8 +661,8 @@ function FnWorkingHours(WorkingContent, CallBack) {
             console.log('WorkingContent values');
             console.log(WorkingContent);
 
-            var query = _this.db.escape(WorkingContent.Token) + ',' + _this.db.escape(WorkingContent.LocID);
-            _this.db.query('CALL pGetWorkingHours(' + query + ')', function (err, WorkingResult) {
+            var query = st.db.escape(WorkingContent.Token) + ',' + st.db.escape(WorkingContent.LocID);
+            st.db.query('CALL pGetWorkingHours(' + query + ')', function (err, WorkingResult) {
                 console.log('CALL pGetWorkingHours(' + query + ')');
 
                 if (!err) {
@@ -709,8 +712,8 @@ function FnHolidayList(HolidayContent, CallBack) {
             console.log('HolidayContent values');
             console.log(HolidayContent);
 
-            var query = _this.db.escape(HolidayContent.LocID) + ',' + _this.db.escape(0);
-            _this.db.query('CALL pGetHolidayList(' + query + ')', function (err, HolidayResult) {
+            var query = st.db.escape(HolidayContent.LocID) + ',' + st.db.escape(0);
+            st.db.query('CALL pGetHolidayList(' + query + ')', function (err, HolidayResult) {
                 console.log('CALL pGetHolidayList(' + query + ')');
 
                 if (!err) {
@@ -778,9 +781,9 @@ try{
     RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
     Ezeid = Ezeid.split(',').pop();
     if ( SeqNo.toString() != 'NaN' && Ezeid != null && LocID != null) {
-        var Query = _this.db.escape(Ezeid) + ',' + _this.db.escape(SeqNo) + ',' + _this.db.escape(0);
+        var Query = st.db.escape(Ezeid) + ',' + st.db.escape(SeqNo) + ',' + st.db.escape(0);
         //console.log(InsertQuery);
-        _this.db.query('CALL PGetBannerPicsUsers(' + Query + ')', function (err, BannerResult) {
+        st.db.query('CALL PGetBannerPicsUsers(' + Query + ')', function (err, BannerResult) {
             if (!err) {
                 //console.log(InsertResult);
                 if (BannerResult != null) {
@@ -879,11 +882,11 @@ try {
     var Proximity = req.body.Proximity;
 
     if (Token != null && Keyword != null && Latitude != null && Longitude != null && Proximity  != null) {
-        _this.stdLib.validateToken(Token, function (err, Result) {
+        st.validateToken(Token, function (err, Result) {
             if (!err) {
                 if (Result != null) {
-                    var query = _this.db.escape(Keyword) + ','  + _this.db.escape(Latitude) + ',' + _this.db.escape(Longitude) + ',' + _this.db.escape(Proximity)+ ',' + _this.db.escape(Token);
-                    _this.db.query('CALL pTrackerSearch(' + query + ')', function (err, GetResult) {
+                    var query = st.db.escape(Keyword) + ','  + st.db.escape(Latitude) + ',' + st.db.escape(Longitude) + ',' + st.db.escape(Proximity)+ ',' + st.db.escape(Token);
+                    st.db.query('CALL pTrackerSearch(' + query + ')', function (err, GetResult) {
                         if (!err) {
                             if (GetResult != null) {
                                 if (GetResult[0].length > 0) {
@@ -964,7 +967,7 @@ Search.prototype.getSearchDoc = function(req,res,next){
     var token = req.query.Token;
     //console.log(token);
     if (token != null && find != null && token != '' && find != '') {
-        _this.stdLib.validateToken(token, function (err, Result) {
+        st.validateToken(token, function (err, Result) {
             if (!err) {
                 if (Result != null) {
 
@@ -1025,10 +1028,10 @@ Search.prototype.getSearchDoc = function(req,res,next){
                             }
                         }
                     }
-                    var SearchQuery = _this.db.escape(EZEID) + ',' + _this.db.escape(Pin) + ',' + _this.db.escape(DocType);
+                    var SearchQuery = st.db.escape(EZEID) + ',' + st.db.escape(Pin) + ',' + st.db.escape(DocType);
                     console.log('CALL  PGetSearchDocuments(' + SearchQuery + ')');
-                    _this.db.query('CALL  PGetSearchDocuments(' + SearchQuery + ')', function (err, SearchResult) {
-                        // _this.db.query(searchQuery, function (err, SearchResult) {
+                    st.db.query('CALL  PGetSearchDocuments(' + SearchQuery + ')', function (err, SearchResult) {
+                        // st.db.query(searchQuery, function (err, SearchResult) {
                         if (!err) {
                             if (SearchResult[0] != null) {
                                 if (SearchResult[0].length > 0) {
@@ -1044,16 +1047,16 @@ Search.prototype.getSearchDoc = function(req,res,next){
                                     console.log('FnGetSearchDocuments: tmaster: Search result sent successfully');
 
 
-                                    var getQuery = 'select TID from tmaster where Token='+_this.db.escape(token);
-                                    _this.db.query(getQuery, function (err, getResult) {
+                                    var getQuery = 'select TID from tmaster where Token='+st.db.escape(token);
+                                    st.db.query(getQuery, function (err, getResult) {
                                         if(!err){
                                             var tid = getResult[0].TID;
                                             console.log(tid);
                                         }
-                                        var query = _this.db.escape(tid) + ',' + _this.db.escape(EZEID) + ',' + _this.db.escape(req.ip) + ',' + _this.db.escape(type);
+                                        var query = st.db.escape(tid) + ',' + st.db.escape(EZEID) + ',' + st.db.escape(req.ip) + ',' + st.db.escape(type);
                                         console.log('CALL pCreateAccessHistory(' + query + ')');
 
-                                        _this.db.query('CALL pCreateAccessHistory(' + query + ')', function (err){
+                                        st.db.query('CALL pCreateAccessHistory(' + query + ')', function (err){
                                             if(!err){
                                                 console.log('FnSearchByKeywords:Access history is created');
                                             }

@@ -23,12 +23,15 @@ function alterEzeoneId(ezeoneId){
     return alteredEzeoneId;
 }
 
+var st = null;
+
 function Image(db,stdLib){
-    this.db = db;
+
     if(stdLib){
-        this.stdLib = stdLib;
+        st = stdLib;
     }
 };
+
 
 /**
  * Method : POST
@@ -95,7 +98,7 @@ Image.prototype.cropImage = function(req,res,next){
         return;
     }
 
-    _this.stdLib.validateToken(token, function (err, Result) {
+    st.validateToken(token, function (err, Result) {
         if (!err) {
             if (Result != null) {
                 try{

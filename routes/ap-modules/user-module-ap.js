@@ -23,10 +23,11 @@ function alterEzeoneId(ezeoneId){
     return alteredEzeoneId;
 }
 
+var st = null;
 function User_AP(db,stdLib){
-    this.db = db;
+
     if(stdLib){
-        this.stdLib = stdLib;
+        st = stdLib;
     }
 };
 
@@ -50,7 +51,7 @@ User_AP.prototype.getUserDetailsAP = function(req,res,next){
     var EZEID = req.query.EZEID;
     if (EZEID != null && EZEID != '' && TokenNo != null) {
 
-        _this.stdLib.validateTokenAp(TokenNo, function (err, Result) {
+        st.validateTokenAp(TokenNo, function (err, Result) {
             if (!err) {
                 if (Result != null) {
                     //var Query = 'Select a.TID as MasterID, b.TID as LocationID,IDTypeID,a.EZEID,ifnull(EZEIDVerifiedID,0) as EZEIDVerifiedID,ifnull(EZEIDVerifiedByID,0) EZEIDVerifiedByID,ifnull(StatusID,0) as StatusID,FirstName,ifnull(LastName,"") as LastName,ifnull(CompanyName,"") as CompanyName,ifnull(CategoryID,0) as CategoryID,ifnull(FunctionID,0) as FunctionID,ifnull(RoleID,0) as RoleID,ifnull(JobTitle,"") as JobTitle,ifnull(NameTitleID,0) as NameTitleID,ifnull(AboutCompany,"") as AboutCompany,ifnull(LanguageID,1) as LanguageID,ifnull(Keywords,"") as Keywords,ifnull(LocTitle,"") as LocTitle,Latitude,Longitude,Altitude,ifnull(AddressLine1,"") as AddressLine1,ifnull(AddressLine2,"") as AddressLine2,CityID,StateID,CountryID,ifnull(PostalCode,"") as PostalCode,b.PIN,ifnull(EMailID,"") as EMailID,ifnull(EMailVerifiedID,"") as EMailVerifiedID,ifnull(PhoneNumber,"") as PhoneNumber, ifnull(MobileNumber,"") as MobileNumber,ifnull(LaptopSLNO,"") as LaptopSLNO,ifnull(VehicleNumber,"") as VehicleNumber,ifnull(Website,"") as Website,ifnull(Picture,"") as Picture,ifnull(PictureFileName,"") as PictureFileName ,ifnull((Select CityName from mcity where CityID=b.CityID and LangID=a.LanguageID),"") as CityTitle,ifnull((Select CountryName from mcountry where CountryID=b.CountryID and LangID=a.LanguageID),"") as CountryTitle,ifnull((Select StateName from mstate where StateID=b.StateID and LangID=a.LanguageID),"") as StateTitle,ifnull(d.ParkingStatus,1) as ParkingStatus,ifnull(d.OpenStatus,1) as OpenStatus,ifnull(d.WorkingHours,"") as WorkingHours,ifnull(d.SalesEnquiryButton,1) as SalesEnquiryButton ,ifnull(d.SalesEnquiryMailID,"") as SalesEnquiryMailID,ifnull(d.HomeDeliveryButton,1) as HomeDeliveryButton,ifnull(d.HomeDeliveryMailID,"") as HomeDeliveryMailID,ifnull(d.ReservationButton,1) as ReservationButton,ifnull(d.ReservationMailID,"") as ReservationMailID,ifnull(d.SupportButton,1) as SupportButton,ifnull(d.SupportMailID,"") as SupportMailID,ifnull(d.CVButton,1) as CVButton,ifnull(d.CVMailID,"") as CVMailID,ifnull((Select CategoryTitle from mcategory where CategoryID=a.CategoryID and LangID=a.LanguageID),"") as CategoryTitle, ifnull(a.Icon,"") as Icon, ifnull(a.IconFileName,"") as IconFileName  from tlocations b left outer Join tlcoationsettings d On b.TID=d.LocID,tmaster a left outer Join tDocs c On a.TID=c.MasterID where b.EZEID=a.EZEID and b.SeqNo=0  and a.EZEID= ' + db.escape(EZEID);
@@ -160,7 +161,7 @@ try {
     };
     var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
     if (EZEID != null && Token != null && IDTypeId != null) {
-        _this.stdLib.validateTokenAp(Token, function (err, Result) {
+        st.validateTokenAp(Token, function (err, Result) {
             if (!err) {
                 if (Result != null) {
                     if(IDTypeId == 1){
@@ -312,20 +313,20 @@ User_AP.prototype.saveAPEZEID = function(req,res,next){
         };
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
 
-        _this.stdLib.validateTokenAp(Token, function (err, Result) {
+        st.validateTokenAp(Token, function (err, Result) {
             if (!err) {
                 if (Result != null) {
                     //console.log('FnRegistration: Token: ' + TokenNo);
-                    var InsertQuery = _this.db.escape(Type) + ',' + _this.db.escape(Preffereduser) + ',' + _this.db.escape(AreaSize) + ',' +_this.db.escape(AreaUOM)
-                        + ','  + _this.db.escape(Rate) + ',' + _this.db.escape(Amount) + ',' + _this.db.escape(SpaceQty) + ',' + _this.db.escape(SpaceType)
-                        + ',' + _this.db.escape(FunishedType) + ',' + _this.db.escape(Description) + ',' + _this.db.escape(Preferences) + ',' + _this.db.escape(Rating)
-                        + ',' +_this.db.escape(EZEID) + ',' + _this.db.escape(Status) + ',' + _this.db.escape(Reason) + ',' + _this.db.escape(tAvailableDate) + ',' + _this.db.escape(Token)
-                        + ',' + _this.db.escape(APID) + ',' + _this.db.escape(Latitude) + ',' + _this.db.escape(Longitude) + ',' + _this.db.escape(TID) + ',' + _this.db.escape(Purpose)
-                        + ',' + _this.db.escape(NoCarParking) + ',' + _this.db.escape(NoBikeParking) + ',' + _this.db.escape(OwnerPayment) + ',' + _this.db.escape(AgeOfProperty)
-                        + ',' + _this.db.escape(NoOfBathrooms) + ',' + _this.db.escape(Gas) + ',' + _this.db.escape(Lift)
-                        + ',' + _this.db.escape(Gym) + ',' + _this.db.escape(SwimmingPool) + ',' + _this.db.escape(Security) + ',' + _this.db.escape(UPS);
+                    var InsertQuery = st.db.escape(Type) + ',' + st.db.escape(Preffereduser) + ',' + st.db.escape(AreaSize) + ',' +st.db.escape(AreaUOM)
+                        + ','  + st.db.escape(Rate) + ',' + st.db.escape(Amount) + ',' + st.db.escape(SpaceQty) + ',' + st.db.escape(SpaceType)
+                        + ',' + st.db.escape(FunishedType) + ',' + st.db.escape(Description) + ',' + st.db.escape(Preferences) + ',' + st.db.escape(Rating)
+                        + ',' +st.db.escape(EZEID) + ',' + st.db.escape(Status) + ',' + st.db.escape(Reason) + ',' + st.db.escape(tAvailableDate) + ',' + st.db.escape(Token)
+                        + ',' + st.db.escape(APID) + ',' + st.db.escape(Latitude) + ',' + st.db.escape(Longitude) + ',' + st.db.escape(TID) + ',' + st.db.escape(Purpose)
+                        + ',' + st.db.escape(NoCarParking) + ',' + st.db.escape(NoBikeParking) + ',' + st.db.escape(OwnerPayment) + ',' + st.db.escape(AgeOfProperty)
+                        + ',' + st.db.escape(NoOfBathrooms) + ',' + st.db.escape(Gas) + ',' + st.db.escape(Lift)
+                        + ',' + st.db.escape(Gym) + ',' + st.db.escape(SwimmingPool) + ',' + st.db.escape(Security) + ',' + st.db.escape(UPS);
                     // console.log(InsertQuery);
-                    _this.db.query('CALL psaveRealEstateData(' + InsertQuery + ')', function (err, InsertResult) {
+                    st.db.query('CALL psaveRealEstateData(' + InsertQuery + ')', function (err, InsertResult) {
                         if (!err) {
                             //  console.log(InsertResult);
                             if (InsertResult != null) {
@@ -404,12 +405,12 @@ User_AP.prototype.updateRedFlagAP = function(req,res,next){
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
 
         if (FromEZEID != null && ToEZEID != null && Token != null && RedFlag !=null && Message != null) {
-            _this.stdLib.validateTokenAp(Token, function (err, Result) {
+            st.validateTokenAp(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
 
-                        var query = _this.db.escape(FromEZEID) + ',' + _this.db.escape(ToEZEID) + ',' + _this.db.escape(Token) + ',' + _this.db.escape(RedFlag) + ',' +_this.db.escape(Message);
-                        _this.db.query('CALL pUpdateRedFlagAP(' + query + ')', function (err, UpdateRedflagResult) {
+                        var query = st.db.escape(FromEZEID) + ',' + st.db.escape(ToEZEID) + ',' + st.db.escape(Token) + ',' + st.db.escape(RedFlag) + ',' +st.db.escape(Message);
+                        st.db.query('CALL pUpdateRedFlagAP(' + query + ')', function (err, UpdateRedflagResult) {
                             if (!err){
                                 if (UpdateRedflagResult.affectedRows > 0) {
                                     RtnMessage.IsUpdated = true;
@@ -496,11 +497,11 @@ User_AP.prototype.updateEZEIDAP = function(req,res,next){
         };
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
         if (Token != null && OldEZEID != null && OldEZEID != '' && NewEZEID != null && NewEZEID != '') {
-            _this.stdLib.validateTokenAp(Token, function (err, Result) {
+            st.validateTokenAp(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
-                        var Query = _this.db.escape(OldEZEID) + ',' + _this.db.escape(NewEZEID) + ',' + _this.db.escape(Token);
-                        _this.db.query('CALL pUpdateEZEIDAP(' + Query + ')', function (err, ChangeEZEIDResult) {
+                        var Query = st.db.escape(OldEZEID) + ',' + st.db.escape(NewEZEID) + ',' + st.db.escape(Token);
+                        st.db.query('CALL pUpdateEZEIDAP(' + Query + ')', function (err, ChangeEZEIDResult) {
                             if (!err) {
 
                                 if (ChangeEZEIDResult != null) {

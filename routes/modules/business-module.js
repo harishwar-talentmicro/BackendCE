@@ -26,12 +26,16 @@ function alterEzeoneId(ezeoneId){
     return alteredEzeoneId;
 }
 
+
+var st = null;
+
 function BusinessManager(db,stdLib){
-    this.db = db;
+
     if(stdLib){
-        this.stdLib = stdLib;
+        st = stdLib;
     }
 };
+
 
 /**
  * Method : GET
@@ -64,7 +68,7 @@ BusinessManager.prototype.getTransactions = function(req,res,next){
         };
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
         if (Token != null && FunctionType.toString() != null && Page.toString() != 'NaN' && Page.toString() != 0) {
-            _this.stdLib.validateToken(Token, function (err, Result) {
+            st.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result) {
 
@@ -75,9 +79,9 @@ BusinessManager.prototype.getTransactions = function(req,res,next){
                             FromPage = 0;
                         }
 
-                        var parameters = _this.db.escape(Token) + ',' + _this.db.escape(FunctionType) + ',' + _this.db.escape(Status) + ',' + _this.db.escape(FromPage) + ',' + _this.db.escape(10) + ',' + _this.db.escape(searchkeyword) + ',' + _this.db.escape(sortBy) + ','+ _this.db.escape(folderRules);
+                        var parameters = st.db.escape(Token) + ',' + st.db.escape(FunctionType) + ',' + st.db.escape(Status) + ',' + st.db.escape(FromPage) + ',' + st.db.escape(10) + ',' + st.db.escape(searchkeyword) + ',' + st.db.escape(sortBy) + ','+ st.db.escape(folderRules);
                         console.log('CALL pGetMessagesNew(' + parameters + ')');
-                        _this.db.query('CALL pGetMessagesNew(' + parameters + ')', function (err, GetResult) {
+                        st.db.query('CALL pGetMessagesNew(' + parameters + ')', function (err, GetResult) {
                             console.log(GetResult);
                             if (!err) {
                                 if (GetResult) {
@@ -224,14 +228,14 @@ BusinessManager.prototype.saveTransaction = function(req,res,next){
             FolderRuleID=0;
 
         if (Token != null && ItemsList != null) {
-            _this.stdLib.validateToken(Token, function (err, Result) {
+            st.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result) {
 
-                        var query = _this.db.escape(Token)+","+_this.db.escape(FunctionType)+","+ _this.db.escape(MessageText)+ "," + _this.db.escape(Status) +"," + _this.db.escape(TaskDateNew) + ","  + _this.db.escape(Notes) + "," + _this.db.escape(LocID)  + "," + _this.db.escape(Country)   + "," + _this.db.escape(State) + "," + _this.db.escape(City)   + "," + _this.db.escape(Area) + ","  + _this.db.escape(Latitude)  + "," + _this.db.escape(Longitude)  +  "," + _this.db.escape(EZEID)  + "," + _this.db.escape(ContactInfo)  + "," + _this.db.escape(FolderRuleID)  + "," + _this.db.escape(Duration)  + "," + _this.db.escape(DurationScales) + "," + _this.db.escape(NextAction) + "," + _this.db.escape(NextActionDateTimeNew) + "," + _this.db.escape(TID) + "," + _this.db.escape(((ItemIDList != "") ? ItemIDList : "")) + "," + _this.db.escape(DeliveryAddress) + "," + _this.db.escape(ToEZEID) + "," + _this.db.escape(item_list_type) + "," + _this.db.escape(companyName) + "," + _this.db.escape(company_id);
-                        // _this.db.escape(NextActionDateTime);
+                        var query = st.db.escape(Token)+","+st.db.escape(FunctionType)+","+ st.db.escape(MessageText)+ "," + st.db.escape(Status) +"," + st.db.escape(TaskDateNew) + ","  + st.db.escape(Notes) + "," + st.db.escape(LocID)  + "," + st.db.escape(Country)   + "," + st.db.escape(State) + "," + st.db.escape(City)   + "," + st.db.escape(Area) + ","  + st.db.escape(Latitude)  + "," + st.db.escape(Longitude)  +  "," + st.db.escape(EZEID)  + "," + st.db.escape(ContactInfo)  + "," + st.db.escape(FolderRuleID)  + "," + st.db.escape(Duration)  + "," + st.db.escape(DurationScales) + "," + st.db.escape(NextAction) + "," + st.db.escape(NextActionDateTimeNew) + "," + st.db.escape(TID) + "," + st.db.escape(((ItemIDList != "") ? ItemIDList : "")) + "," + st.db.escape(DeliveryAddress) + "," + st.db.escape(ToEZEID) + "," + st.db.escape(item_list_type) + "," + st.db.escape(companyName) + "," + st.db.escape(company_id);
+                        // st.db.escape(NextActionDateTime);
                         console.log('CALL pSaveTrans(' + query + ')');
-                        _this.db.query('CALL pSaveTrans(' + query + ')', function (err, InsertResult) {
+                        st.db.query('CALL pSaveTrans(' + query + ')', function (err, InsertResult) {
                             if (!err){
                                 console.log(InsertResult);
                                 if (InsertResult[0]) {
@@ -253,7 +257,7 @@ BusinessManager.prototype.saveTransaction = function(req,res,next){
                                             console.log(items);
                                             console.log('TID:' +itemsDetails.TID);
                                             if(itemsDetails.TID == 0){
-                                                var query = _this.db.query('INSERT INTO titems SET ?', items, function (err, result) {
+                                                var query = st.db.query('INSERT INTO titems SET ?', items, function (err, result) {
                                                     // Neat!
                                                     if (!err) {
                                                         if (result) {
@@ -285,7 +289,7 @@ BusinessManager.prototype.saveTransaction = function(req,res,next){
                                                     Duration: itemsDetails.Durations
                                                 };
                                                 console.log('TID:' +itemsDetails.TID);
-                                                var query = _this.db.query("UPDATE titems set ? WHERE TID = ? ",[items,itemsDetails.TID], function (err, result) {
+                                                var query = st.db.query("UPDATE titems set ? WHERE TID = ? ",[items,itemsDetails.TID], function (err, result) {
                                                     // Neat!
                                                     console.log(result);
                                                     if (!err) {
@@ -396,8 +400,8 @@ BusinessManager.prototype.updateTransaction = function(req,res,next){
 
         if(Token){
 
-            var query = _this.db.escape(TID) + ', ' + _this.db.escape(status) + ',' + _this.db.escape(folderRuleID) + ',' + _this.db.escape(nextAction) + ',' + _this.db.escape(nextActionDateTime)+ ', ' + _this.db.escape(Token);
-            _this.db.query('CALL pUpdateTrans(' + query + ')', function (err, updateResult) {
+            var query = st.db.escape(TID) + ', ' + st.db.escape(status) + ',' + st.db.escape(folderRuleID) + ',' + st.db.escape(nextAction) + ',' + st.db.escape(nextActionDateTime)+ ', ' + st.db.escape(Token);
+            st.db.query('CALL pUpdateTrans(' + query + ')', function (err, updateResult) {
                 if (!err){
                     if (updateResult) {
                         responseMessage.status = true;
@@ -462,11 +466,11 @@ BusinessManager.prototype.getTransactionItems = function(req,res,next){
         var MessageID = req.query.MessageID;
 
         if (Token != null && MessageID != null) {
-            _this.stdLib.validateToken(Token, function (err, Result) {
+            st.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result) {
 
-                        _this.db.query('CALL pGetTranscationItems(' + _this.db.escape(MessageID) + ')', function (err, GetResult) {
+                        st.db.query('CALL pGetTranscationItems(' + st.db.escape(MessageID) + ')', function (err, GetResult) {
                             if (!err) {
                                 if (GetResult) {
                                     if (GetResult[0].length > 0) {
@@ -554,12 +558,12 @@ try{
     };
 
     if (Token != null && MessageID!= null && ItemID != null && Qty !=null && Rate !=null && Amount != null && Duration !=null) {
-        _this.stdLib.validateToken(Token, function (err, Result) {
+        st.validateToken(Token, function (err, Result) {
             if (!err) {
                 if (Result != null) {
 
-                    var query = _this.db.escape(MessageID) + ',' + _this.db.escape(ItemID) + ',' + _this.db.escape(Qty) + ',' + _this.db.escape(Rate) + ',' +_this.db.escape(Amount) + ',' +_this.db.escape(Duration);
-                    _this.db.query('CALL pSaveTranscationItems(' + query + ')', function (err, InsertResult) {
+                    var query = st.db.escape(MessageID) + ',' + st.db.escape(ItemID) + ',' + st.db.escape(Qty) + ',' + st.db.escape(Rate) + ',' +st.db.escape(Amount) + ',' +st.db.escape(Duration);
+                    st.db.query('CALL pSaveTranscationItems(' + query + ')', function (err, InsertResult) {
                         if (!err){
                             if (InsertResult.affectedRows > 0) {
                                 RtnMessage.IsSuccessfull = true;
@@ -656,10 +660,10 @@ BusinessManager.prototype.getOutboxTransactions = function(req,res,next){
         };
 
         if (Token) {
-            _this.stdLib.validateToken(Token, function (err, result) {
+            st.validateToken(Token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        _this.db.query('CALL pGetOutboxMessages(' + _this.db.escape(Token) + ',' + _this.db.escape(pagesize) + ',' + _this.db.escape(pagecount)+ ')', function (err, GetResult) {
+                        st.db.query('CALL pGetOutboxMessages(' + st.db.escape(Token) + ',' + st.db.escape(pagesize) + ',' + st.db.escape(pagecount)+ ')', function (err, GetResult) {
                             if (!err) {
                                 if (GetResult) {
                                     if (GetResult[0].length > 0) {
@@ -764,7 +768,7 @@ BusinessManager.prototype.getTransAutoComplete = function(req,res,next){
 
         if (title) {
 
-            _this.db.query('CALL PgetTransAutocomplete(' + _this.db.escape(title) + ',' + _this.db.escape(type) + ')', function (err, GetResult) {
+            st.db.query('CALL PgetTransAutocomplete(' + st.db.escape(title) + ',' + st.db.escape(type) + ')', function (err, GetResult) {
                 if (!err) {
                     if (GetResult) {
                         if (GetResult[0].length > 0) {
@@ -846,7 +850,7 @@ BusinessManager.prototype.getItemListForEZEID = function(req,res,next){
     if(Token == "")
         Token= null;
     if (Token != null && FunctionType != null && EZEID != null) {
-        _this.stdLib.validateToken(Token, function (err, Result) {
+        st.validateToken(Token, function (err, Result) {
             if (!err) {
                 if (Result != null) {
                     console.log('CALL pItemListforEZEID(' +  db.escape(FunctionType)  + ',' + db.escape(EZEID) + ')');
@@ -929,7 +933,7 @@ BusinessManager.prototype.deleteTransaction = function(req,res,next){
             IsSuccessfull:false
         };
         if (Token != null && ItemTID != null){
-            _this.stdLib.validateToken(Token, function (err, Result) {
+            st.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
 
@@ -1003,7 +1007,7 @@ BusinessManager.prototype.itemList = function(req,res,next){
     var FunctionType = req.query.FunctionType;
 
     if (Token != null && FunctionType != null) {
-        _this.stdLib.validateToken(Token, function (err, Result) {
+        st.validateToken(Token, function (err, Result) {
             if (!err) {
                 if (Result != null) {
 
@@ -1083,7 +1087,7 @@ BusinessManager.prototype.itemDetails = function(req,res,next){
         var TID = req.query.TID;
 
         if (Token != null && TID != null) {
-            _this.stdLib.validateToken(Token, function (err, Result) {
+            st.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
                         db.query('CALL pItemDetails(' + db.escape(TID) + ')', function (err, GetResult) {
@@ -1162,11 +1166,11 @@ BusinessManager.prototype.getUserwiseFolderList = function(req,res,next){
     var RuleFunction = req.query.RuleFunction;
 
     if (Token != null) {
-        _this.stdLib.validateToken(Token, function (err, Result) {
+        st.validateToken(Token, function (err, Result) {
             if (!err) {
                 if (Result != null) {
 
-                    _this.db.query('CALL pGetUserWiseFolderList(' + _this.db.escape(Token) + ',' + _this.db.escape(RuleFunction) + ')', function (err, GetResult) {
+                    st.db.query('CALL pGetUserWiseFolderList(' + st.db.escape(Token) + ',' + st.db.escape(RuleFunction) + ')', function (err, GetResult) {
                         if (!err) {
                             if (GetResult != null) {
                                 if (GetResult[0].length > 0) {
@@ -1249,13 +1253,13 @@ try {
     var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
 
     if (token != null && token != '' && CategoryID.toString() != 'NaN' && Keywords != null) {
-        _this.stdLib.validateToken(token, function (err, Result) {
+        st.validateToken(token, function (err, Result) {
             if (!err) {
                 if (Result != null) {
                     //  var fileName = BrochureDocFile.split('.').pop();
-                    var query = _this.db.escape(token) + ',' + _this.db.escape(Keywords) + ',' + _this.db.escape(CategoryID);
+                    var query = st.db.escape(token) + ',' + st.db.escape(Keywords) + ',' + st.db.escape(CategoryID);
                     //console.log(query);
-                    _this.db.query('CALL pUpdateBusinesslist(' + query + ')', function (err, UpdateResult) {
+                    st.db.query('CALL pUpdateBusinesslist(' + query + ')', function (err, UpdateResult) {
                         if (!err) {
                             //console.log(UpdateResult);
                             // console.log('FnUpdateMessageStatus: Update result' + UpdateResult);
@@ -1339,7 +1343,7 @@ BusinessManager.prototype.getCompanyDetails = function(req,res,next){
 
     if (Token) {
 
-        _this.db.query('CALL pGetCompanyDetails(' + _this.db.escape(Token) + ',' + _this.db.escape(functiontype) + ')', function (err, GetResult) {
+        st.db.query('CALL pGetCompanyDetails(' + st.db.escape(Token) + ',' + st.db.escape(functiontype) + ')', function (err, GetResult) {
             if (!err) {
                 if (GetResult) {
                     if (GetResult[0].length > 0) {
@@ -1455,7 +1459,7 @@ if(!validationFlag){
 }
 else{
     try{
-        _this.stdLib.validateToken(token,function(err,tokenResult){
+        st.validateToken(token,function(err,tokenResult){
             if(err){
                 respMsg.status = false;
                 respMsg.data = null;
@@ -1510,9 +1514,9 @@ else{
                 var ip = (req.headers['x-forwarded-for'] || req.connection.remoteAddress ||
                 req.socket.remoteAddress || req.connection.socket.remoteAddress);
 
-                var queryParams = _this.db.escape(token) + ',' + _this.db.escape(dateTime) + ',' + _this.db.escape(ip) +
-                    ',' +_this.db.escape(ezeoneId) + ',' + _this.db.escape(locationSeq) + ',' + _this.db.escape(pin);
-                _this.db.query('CALL pSearchinfnPinbased('+queryParams+')',function(err,result){
+                var queryParams = st.db.escape(token) + ',' + st.db.escape(dateTime) + ',' + st.db.escape(ip) +
+                    ',' +st.db.escape(ezeoneId) + ',' + st.db.escape(locationSeq) + ',' + st.db.escape(pin);
+                st.db.query('CALL pSearchinfnPinbased('+queryParams+')',function(err,result){
                     if(err){
                         console.log('Error FnGetEZEOneIDInfo :  '+err);
                         respMsg.status  = false;

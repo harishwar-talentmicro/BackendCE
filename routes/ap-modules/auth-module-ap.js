@@ -23,10 +23,12 @@ function alterEzeoneId(ezeoneId){
     return alteredEzeoneId;
 }
 
+var st = null;
+
 function Auth_AP(db,stdLib){
-    this.db = db;
+
     if(stdLib){
-        this.stdLib = stdLib;
+        st = stdLib;
     }
 };
 
@@ -98,13 +100,13 @@ Auth_AP.prototype.loginAP = function(req,res,next){
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
         if (UserName != null && UserName != '' && Password != null && Password != '') {
             var encryptPassword= FnEncryptPassword(Password);
-            var Query = 'select TID, FullName,APMasterID from tapuser where APLoginID=' + _this.db.escape(UserName) + ' and APPassword=' + _this.db.escape(encryptPassword);
-            _this.db.query(Query, function (err, loginResult) {
+            var Query = 'select TID, FullName,APMasterID from tapuser where APLoginID=' + st.db.escape(UserName) + ' and APPassword=' + st.db.escape(encryptPassword);
+            st.db.query(Query, function (err, loginResult) {
                 if (!err) {
                     if (loginResult.length > 0) {
-                        var Encrypt = _this.stdLib.generateToken();
-                        var Query = 'update tapuser set Token=' + _this.db.escape(Encrypt) + ' where TID=' + _this.db.escape(loginResult[0].TID);
-                        _this.db.query(Query, function (err, TokenResult) {
+                        var Encrypt = st.generateToken();
+                        var Query = 'update tapuser set Token=' + st.db.escape(Encrypt) + ' where TID=' + st.db.escape(loginResult[0].TID);
+                        st.db.query(Query, function (err, TokenResult) {
                             if (!err) {
                                 if (TokenResult.affectedRows > 0) {
                                     RtnMessage.Token = Encrypt;
@@ -184,8 +186,8 @@ Auth_AP.prototype.logoutAP = function(req,res,next){
     };
     var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
     if (Token != null && Token != '') {
-        var Query = 'update tapuser set Token=' + _this.db.escape('') + ' where Token=' + _this.db.escape(Token);
-        _this.db.query(Query, function (err, TokenResult) {
+        var Query = 'update tapuser set Token=' + st.db.escape('') + ' where Token=' + st.db.escape(Token);
+        st.db.query(Query, function (err, TokenResult) {
             if (!err) {
                 RtnMessage.Token = '';
                 RtnMessage.IsAuthenticate = false;
@@ -234,17 +236,17 @@ try {
     if (LoginID != null) {
         var Password = FnRandomPassword();
         var EncryptPWD = FnEncryptPassword(Password);
-        var Query = 'Update tapuser set APPassword= ' + _this.db.escape(EncryptPWD) + ' where APLoginID=' + _this.db.escape(LoginID);
+        var Query = 'Update tapuser set APPassword= ' + st.db.escape(EncryptPWD) + ' where APLoginID=' + st.db.escape(LoginID);
         // console.log('FnForgotPassword: ' + Query);
-        _this.db.query(Query, function (err, ForgetPasswordResult) {
+        st.db.query(Query, function (err, ForgetPasswordResult) {
             if (!err) {
                 //console.log(InsertResult);
                 if (ForgetPasswordResult != null) {
                     if (ForgetPasswordResult.affectedRows > 0) {
                         RtnMessage.IsChanged = true;
-                        var UserQuery = 'Select ifnull(Fullname,"") as Fullname,APPassword,ifnull(EMailID,"") as EMailID from tapuser where APLoginID=' + _this.db.escape(LoginID);
+                        var UserQuery = 'Select ifnull(Fullname,"") as Fullname,APPassword,ifnull(EMailID,"") as EMailID from tapuser where APLoginID=' + st.db.escape(LoginID);
                         //  console.log(UserQuery);
-                        _this.db.query(UserQuery, function (err, UserResult) {
+                        st.db.query(UserQuery, function (err, UserResult) {
                             if (!err) {
                                 //  console.log(UserResult);
 
@@ -266,7 +268,7 @@ try {
                                     //message Type 7 - Forgot password mails service
                                     var post = { MessageType: 7, ToMailID: mailOptions.to, Subject: mailOptions.subject, Body: mailOptions.html };
                                     // console.log(post);
-                                    var query = _this.db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
+                                    var query = st.db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
                                         // Neat!
                                         if (!err) {
                                             console.log('FnRegistration: Mail saved Successfully');
@@ -341,13 +343,13 @@ Auth_AP.prototype.changePasswordAP = function(req,res,next){
         };
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
         if (OldPassword != null && OldPassword != '' && NewPassword != null && NewPassword != '' && TokenNo != null) {
-            _this.stdLib.validateTokenAp(TokenNo, function (err, Result) {
+            st.validateTokenAp(TokenNo, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
                         var EncryptOldPWD = FnEncryptPassword(OldPassword);
                         var EncryptNewPWD = FnEncryptPassword(NewPassword);
-                        var Query = _this.db.escape(TokenNo) + ',' + _this.db.escape(EncryptOldPWD) + ',' + _this.db.escape(EncryptNewPWD);
-                        _this.db.query('CALL pChangePasswordAP(' + Query + ')', function (err, ChangePasswordResult) {
+                        var Query = st.db.escape(TokenNo) + ',' + st.db.escape(EncryptOldPWD) + ',' + st.db.escape(EncryptNewPWD);
+                        st.db.query('CALL pChangePasswordAP(' + Query + ')', function (err, ChangePasswordResult) {
                             if (!err) {
                                 //console.log(ChangePasswordResult);
                                 if (ChangePasswordResult != null) {

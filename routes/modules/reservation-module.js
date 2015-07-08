@@ -21,14 +21,14 @@ function alterEzeoneId(ezeoneId){
     }
     return alteredEzeoneId;
 }
+var st = null;
 
 function Reservation(db,stdLib){
-    this.db = db;
+
     if(stdLib){
-        this.stdLib = stdLib;
+        st = stdLib;
     }
 };
-
 
 /**
  * Method : POST
@@ -90,15 +90,15 @@ Reservation.prototype.SaveReservTrans = function(req,res,next){
         }
 
         if (Token) {
-            _this.stdLib.validateToken(Token, function (err, result) {
+            st.validateToken(Token, function (err, result) {
                 if (!err) {
                     if (result != null) {
 
-                        var query = _this.db.escape(TID) + ',' + _this.db.escape(Token) + ',' + _this.db.escape(contactinfo) + ',' + _this.db.escape(toEzeid) + ',' + _this.db.escape(resourceid) + ',' + _this.db.escape(res_datetime) + ',' + _this.db.escape(duration) + ',' + _this.db.escape(status) + ',' + _this.db.escape(serviceid) + ',' + _this.db.escape(notes);
+                        var query = st.db.escape(TID) + ',' + st.db.escape(Token) + ',' + st.db.escape(contactinfo) + ',' + st.db.escape(toEzeid) + ',' + st.db.escape(resourceid) + ',' + st.db.escape(res_datetime) + ',' + st.db.escape(duration) + ',' + st.db.escape(status) + ',' + st.db.escape(serviceid) + ',' + st.db.escape(notes);
                         console.log(query);
                         console.log('CALL pSaveResTrans(' + query + ')');
 
-                        _this.db.query('CALL pSaveResTrans(' + query + ')', function (err, insertResult) {
+                        st.db.query('CALL pSaveResTrans(' + query + ')', function (err, insertResult) {
                             console.log(insertResult);
                             console.log(err);
                             if (!err){
@@ -198,7 +198,7 @@ Reservation.prototype.getReservTrans = function(req,res,next){
 
         if (resourceid) {
 
-            _this.db.query('CALL pGetResTrans(' + _this.db.escape(resourceid) + ',' + _this.db.escape(date) + ',' + _this.db.escape(toEzeid) + ')', function (err, GetResult) {
+            st.db.query('CALL pGetResTrans(' + st.db.escape(resourceid) + ',' + st.db.escape(date) + ',' + st.db.escape(toEzeid) + ')', function (err, GetResult) {
                 if (!err) {
                     if (GetResult) {
                         if (GetResult[0].length > 0) {
@@ -286,7 +286,7 @@ Reservation.prototype.getMapedServices = function(req,res,next){
         };
 
         if (ezeid) {
-            _this.db.query('CALL pgetMapedservices(' + _this.db.escape(ezeid) + ',' + _this.db.escape(resourceid) + ')', function (err, GetResult) {
+            st.db.query('CALL pgetMapedservices(' + st.db.escape(ezeid) + ',' + st.db.escape(resourceid) + ')', function (err, GetResult) {
                 if (!err) {
                     if (GetResult) {
                         if (GetResult[0].length > 0) {
@@ -374,7 +374,7 @@ Reservation.prototype.getTransDetails = function(req,res,next){
 
         if (TID) {
 
-            _this.db.query('CALL pGetResTransDetails(' + _this.db.escape(TID) + ')', function (err, GetResult) {
+            st.db.query('CALL pGetResTransDetails(' + st.db.escape(TID) + ')', function (err, GetResult) {
                 if (!err) {
                     if (GetResult) {
                         if (GetResult[0].length > 0) {
@@ -480,14 +480,14 @@ Reservation.prototype.changeReservStatus = function(req,res,next){
         return;
     }
 
-    _this.stdLib.validateToken(token,function(err,tokenRes){
+    st.validateToken(token,function(err,tokenRes){
         if(err || (!tokenRes)){
             res.status(401).json(responseMsg);
             return;
         }
         else{
-            var queryParam = _this.db.escape(tid) + ',' + _this.db.escape(status);
-            _this.db.query('CALL PUpdateResTransStatus(' + queryParam + ')', function (err, updateRes) {
+            var queryParam = st.db.escape(tid) + ',' + st.db.escape(status);
+            st.db.query('CALL PUpdateResTransStatus(' + queryParam + ')', function (err, updateRes) {
                 if(err){
                     responseMsg.message = 'An error occurred ! Please try again';
                     responseMsg.error['server'] = 'Internal Server Error';
@@ -553,7 +553,7 @@ Reservation.prototype.getworkinghoursList = function(req,res,next){
 
         if (Token) {
 
-            _this.db.query('CALL PGetworkinghoursList(' + _this.db.escape(Token) + ')', function (err, GetResult) {
+            st.db.query('CALL PGetworkinghoursList(' + st.db.escape(Token) + ')', function (err, GetResult) {
                 console.log(GetResult)
                 if (!err) {
                     if (GetResult) {

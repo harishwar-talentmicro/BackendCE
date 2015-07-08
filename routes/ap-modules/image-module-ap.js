@@ -23,13 +23,14 @@ function alterEzeoneId(ezeoneId){
     return alteredEzeoneId;
 }
 
+var st = null;
+
 function Image_AP(db,stdLib){
-    this.db = db;
+
     if(stdLib){
-        this.stdLib = stdLib;
+        st = stdLib;
     }
 };
-
 
 /**
  * Method : POST
@@ -56,12 +57,12 @@ Image_AP.prototype.saveAPEZEIDPicture = function(req,res,next){
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
 
         if (Picture != null && Picture != '' && PicNo.toString() != 'NaN' && TID.toString() != 'NaN') {
-            _this.stdLib.validateTokenAp(Token, function (err, Result) {
+            st.validateTokenAp(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
-                        var InsertQuery = _this.db.escape(TID) + ',' + _this.db.escape(Picture) + ',' + _this.db.escape(PicNo);
+                        var InsertQuery = st.db.escape(TID) + ',' + st.db.escape(Picture) + ',' + st.db.escape(PicNo);
                         console.log(InsertQuery);
-                        _this.db.query('CALL psaveRealEstatePicture(' + InsertQuery + ')', function (err, InsertResult) {
+                        st.db.query('CALL psaveRealEstatePicture(' + InsertQuery + ')', function (err, InsertResult) {
                             if (!err) {
                                 console.log(InsertResult);
                                 if (InsertResult != null) {
@@ -139,10 +140,10 @@ Image_AP.prototype.getAPEZEIDPicture = function(req,res,next){
         var PicNo = parseInt(req.query.PicNo);
         var Token = req.query.Token;
         if (Token != null && TID.toString() != 'NaN' && PicNo.toString() != 'NaN') {
-            _this.stdLib.validateTokenAp(Token, function (err, Result) {
+            st.validateTokenAp(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
-                        _this.db.query('CALL pGetRealEstatePicture(' + _this.db.escape(TID) + ',' + _this.db.escape(PicNo) + ')', function (err, PictuerResult) {
+                        st.db.query('CALL pGetRealEstatePicture(' + st.db.escape(TID) + ',' + st.db.escape(PicNo) + ')', function (err, PictuerResult) {
                             if (!err) {
                                 // console.log(PictuerResult);
                                 if (PictuerResult[0] != null) {
@@ -224,12 +225,12 @@ Image_AP.prototype.saveBannerPictureAP = function(req,res,next){
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
 
         if (Token != null && Picture != null  && SeqNo.toString() != 'NaN' && Ezeid != null) {
-            _this.stdLib.validateTokenAp(Token, function (err, Result) {
+            st.validateTokenAp(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
-                        var InsertQuery = _this.db.escape(Ezeid)  + ',' + _this.db.escape(SeqNo) + ',' + _this.db.escape(Picture) + ',' + _this.db.escape(TID);
+                        var InsertQuery = st.db.escape(Ezeid)  + ',' + st.db.escape(SeqNo) + ',' + st.db.escape(Picture) + ',' + st.db.escape(TID);
                         //console.log(InsertQuery);
-                        _this.db.query('CALL PSaveBannerPics(' + InsertQuery + ')', function (err, InsertResult) {
+                        st.db.query('CALL PSaveBannerPics(' + InsertQuery + ')', function (err, InsertResult) {
                             if (!err) {
                                 console.log(InsertResult);
                                 if (InsertResult != null) {
@@ -308,12 +309,12 @@ Image_AP.prototype.getBannerPictureAP = function(req,res,next){
         var Ezeid = req.query.Ezeid;
 
         if (Token != null  && SeqNo.toString() != 'NaN' && Ezeid != null) {
-            _this.stdLib.validateTokenAp(Token, function (err, Result) {
+            st.validateTokenAp(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
-                        var Query = _this.db.escape(Ezeid)  + ',' + _this.db.escape(SeqNo);
+                        var Query = st.db.escape(Ezeid)  + ',' + st.db.escape(SeqNo);
                         //console.log(InsertQuery);
-                        _this.db.query('CALL PGetBannerPics(' + Query + ')', function (err, BannerResult) {
+                        st.db.query('CALL PGetBannerPics(' + Query + ')', function (err, BannerResult) {
                             if (!err) {
                                 //console.log(InsertResult);
                                 if (BannerResult != null) {
@@ -391,12 +392,12 @@ Image_AP.prototype.getAllBannerPicsAP = function(req,res,next){
         var EZEID = req.query.EZEID;
 
         if (Token != null && EZEID != null) {
-            _this.stdLib.validateTokenAp(Token, function (err, Result) {
+            st.validateTokenAp(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
-                        var Query = _this.db.escape(EZEID);
+                        var Query = st.db.escape(EZEID);
                         //console.log(InsertQuery);
-                        _this.db.query('CALL pGetAllBannerPics(' + Query + ')', function (err, BannerResult) {
+                        st.db.query('CALL pGetAllBannerPics(' + Query + ')', function (err, BannerResult) {
                             console.log(err);
 
                             if (!err) {
@@ -476,11 +477,11 @@ Image_AP.prototype.deleteBannerPictureAP = function(req,res,next){
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
 
         if (Token !=null && EZEID != null && SeqNo !=null)  {
-            _this.stdLib.validateTokenAp(Token, function (err, Result) {
+            st.validateTokenAp(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
-                        var query = _this.db.escape(SeqNo) + ',' + _this.db.escape(EZEID);
-                        _this.db.query('CALL pDeleteBanner(' + query + ')', function (err, InsertResult) {
+                        var query = st.db.escape(SeqNo) + ',' + st.db.escape(EZEID);
+                        st.db.query('CALL pDeleteBanner(' + query + ')', function (err, InsertResult) {
                             if (!err){
                                 if (InsertResult.affectedRows > 0) {
                                     RtnMessage.IsSuccessfull = true;
@@ -598,7 +599,7 @@ Image_AP.prototype.cropImageAP = function(req,res,next){
         return;
     }
 
-    _this.stdLib.validateTokenAp(token, function (err, Result) {
+    st.validateTokenAp(token, function (err, Result) {
         if (!err) {
             if (Result != null) {
                 try{
