@@ -11638,7 +11638,8 @@ exports.FnSaveReservTransaction = function(req, res){
 						console.log('CALL pSaveResTrans(' + query + ')');
 						
                         db.query('CALL pSaveResTrans(' + query + ')', function (err, insertResult) {
-                            console.log(insertResult[0]);
+                            console.log(insertResult);
+                            console.log(insertResult.length);
                             console.log(insertResult[0].length);
                             console.log(err);
                              if (!err){
@@ -12504,11 +12505,11 @@ exports.FnImageURL = function(req, res){
         };
         if (image_id == 0 ){
             if(image_url == 1) {
-            var image_url1 = 'http://104.199.128.226:3001/images/ezeone_pager_img1.jpg';
-            var image_url2 = 'http://104.199.128.226:3001/images/ezeone_pager_img2.jpg';
-            var image_url3 = 'http://104.199.128.226:3001/images/ezeone_pager_img3.jpg';
-            var image_url4 = 'http://104.199.128.226:3001/images/ezeone_pager_img4.jpg';
-            var image_url5 = 'http://104.199.128.226:3001/images/ezeone_pager_img5.jpg';
+            var image_url1 = 'http://104.199.128.226:3001/images/sales_enquiry.jpg';
+            var image_url2 = 'http://104.199.128.226:3001/images/home_delivery.jpg';
+            var image_url3 = 'http://104.199.128.226:3001/images/reservations.jpg';
+            var image_url4 = 'http://104.199.128.226:3001/images/help_desk.jpg';
+            var image_url5 = 'http://104.199.128.226:3001/images/human_resources.jpg';
             responseMessage.status = true;
             responseMessage.data = {pager_url1: image_url1,pager_url2: image_url2, pager_url3: image_url3,pager_url4: image_url4,pager_url5: image_url5};
             responseMessage.error = null;
@@ -12530,11 +12531,11 @@ exports.FnImageURL = function(req, res){
     }
         else{
             if(image_url == 1) {
-                var image_url1 = 'http://www.ezeone.com/images/ezeone_pager_img1.jpg';
-                var image_url2 = 'http://www.ezeone.com/images/ezeone_pager_img2.jpg';
-                var image_url3 = 'http://www.ezeone.com/images/ezeone_pager_img3.jpg';
-                var image_url4 = 'http://www.ezeone.com/images/ezeone_pager_img4.jpg';
-                var image_url5 = 'http://www.ezeone.com/images/ezeone_pager_img5.jpg';
+                var image_url1 = 'http://www.ezeone.com/images/sales_enquiry.jpg';
+                var image_url2 = 'http://www.ezeone.com/images/home_delivery.jpg';
+                var image_url3 = 'http://www.ezeone.com/images/reservations.jpg';
+                var image_url4 = 'http://www.ezeone.com/images/help_desk.jpg';
+                var image_url5 = 'http://www.ezeone.com/images/human_resources.jpg';
                 responseMessage.status = true;
                 responseMessage.data = {pager_url1: image_url1,pager_url2: image_url2, pager_url3: image_url3,pager_url4: image_url4,pager_url5: image_url5};
                 responseMessage.error = null;
