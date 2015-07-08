@@ -11634,35 +11634,42 @@ exports.FnSaveReservTransaction = function(req, res){
                     if (result != null) {
 
                         var query = db.escape(TID) + ',' + db.escape(Token) + ',' + db.escape(contactinfo) + ',' + db.escape(toEzeid) + ',' + db.escape(resourceid) + ',' + db.escape(res_datetime) + ',' + db.escape(duration) + ',' + db.escape(status) + ',' + db.escape(serviceid) + ',' + db.escape(notes);
-						console.log(query);
+
 						console.log('CALL pSaveResTrans(' + query + ')');
 						
                         db.query('CALL pSaveResTrans(' + query + ')', function (err, insertResult) {
                             console.log(insertResult);
-                            console.log(insertResult.length);
-                            console.log(insertResult[0].length);
-                            console.log(err);
-                             if (!err){
-                                if (insertResult[0].length <= 0) {
-                                    responseMessage.status = true;
-                                    responseMessage.error = null;
-                                    responseMessage.message = 'Resource Transaction details save successfully';
-                                    responseMessage.data = {
-                                        resourceid : req.body.resourceid,
-                                        serviceid : serviceid
-                                    };
-                                    res.status(200).json(responseMessage);
-                                    console.log('FnSaveReservTransaction: Resource Transaction details save successfully');
-                                    
-                                }
-                                else {
-                                    responseMessage.message = insertResult[0][0];
-                                    responseMessage.error = {};
-                                    res.status(400).json(responseMessage);
-                                    console.log('FnSaveReservTransaction:No save Resource Transaction details');
-                                }
-                            }
 
+                            if (!err) {
+                                 if (insertResult) {
+
+                                     console.log(insertResult[0]);
+                                     if (insertResult[0] == null && insertResult[0] == undefined) {
+                                         responseMessage.status = true;
+                                         responseMessage.error = null;
+                                         responseMessage.message = 'Resource Transaction details save successfully';
+                                         responseMessage.data = {
+                                             resourceid: req.body.resourceid,
+                                             serviceid: serviceid
+                                         };
+                                         res.status(200).json(responseMessage);
+                                         console.log('FnSaveReservTransaction: Resource Transaction details save successfully');
+
+                                     }
+                                     else {
+                                         responseMessage.message = insertResult[0][0];
+                                         responseMessage.error = {};
+                                         res.status(400).json(responseMessage);
+                                         console.log('FnSaveReservTransaction:No save Resource Transaction details');
+                                     }
+                                 }
+                                 else {
+                                     responseMessage.message = 'No save Resource Transaction details';
+                                     responseMessage.error = {};
+                                     res.status(400).json(responseMessage);
+                                     console.log('FnSaveReservTransaction:No save Resource Transaction details');
+                                 }
+                             }
                             else {
                                 responseMessage.message = 'An error occured ! Please try again';
                                 responseMessage.error = {};
