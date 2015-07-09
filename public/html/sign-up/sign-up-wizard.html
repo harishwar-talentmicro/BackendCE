@@ -1,0 +1,126 @@
+<div id="wrapper">
+    <header-section></header-section>
+
+
+    <!----------- Terms and Conditions Popup ------------------->
+
+    <div class="Popup_window form_style map_popup_iconTerm" id="Terms_popup">
+        <div class="window_page  Maping_popup">
+            <span class="closelink" ng-click="toggleTermsAndConditions()">X</span>
+            <div class="clearfix"></div>
+            <div class="row">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
+                    <h3 class="text-center">
+                        <span class="mar_forget">Terms and Conditions</span>
+                    </h3>
+                </div>
+                <div class="col-lg-12 col-xs-12 col-md-12 col-sm-12 bottom-clearfix">
+                    <div ng-include="'html/terms.html'"  style="height: 350px; overflow-y: scroll;">
+                        <!-- Terms.html include hear... -->
+                    </div>
+                </div>
+                <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5 col-lg-offset-5 col-md-offset-5 col-sm-offset-5 col-xs-offset-5 bottom-clearfix">
+                    <button class="btn btn-primary" ng-click="toggleTermsAndConditions()">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!----------- ends : Terms and Conditions Popup ------------------->
+
+    <div class="container-fluid top-clearfix-padding">
+        <div class="row">
+            <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12 col-lg-offset-2 col-md-offset-2 col-xs-offset-0 col-sm-offset-0 sign-up-container">
+
+                <div class="row signup-heading-row">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <h3 class="text-center text-success font-roboto">Register for EZEOne ID</h3>
+                    </div>
+                </div>
+
+                <div class="row signup-selection-row" ng-show="isSignUpTypeBlockVisible">
+                    <div class="col-lg-12 col-md-12 col-xs-12 col-md-12">
+                        <h3 class="text-info text-center font-open-sans">Choose your selection type ?</h3>
+                    </div>
+
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+
+                            <div class="col-lg-12 col-md-12 col-xs-12 signup-selection-type">
+                                <div>
+                                    <h3 class="font-roboto text-center text-black">Individual</h3>
+                                    <h3 class="text-center text-warning" style="color: #008DF4;">
+                                        <i class="fa fa-user fa-3x"></i>
+                                    </h3>
+                                    <div class="text-center">
+                                        <button class="btn btn-block btn-info" ng-click="selectPlan(1,0)">SELECT</button>
+                                    </div>
+                                </div>
+
+
+                            </div>
+
+                    </div>
+
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+
+                            <div class="col-lg-12 col-md-12 col-xs-12 signup-selection-type">
+                                <div>
+                                    <h3 class="font-roboto text-center text-black">Business</h3>
+                                    <h3 class="text-center text-warning" style="color: #FF4C00;">
+                                        <i class="fa fa-suitcase fa-3x"></i>
+                                    </h3>
+                                    <div class="text-center">
+                                        <button class="btn btn-block btn-info" ng-click="selectPlan(2,1)">SELECT</button>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                    </div>
+
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+
+                            <div class="col-lg-12 col-md-12 col-xs-12 signup-selection-type">
+                                <div>
+                                    <h3 class="font-roboto text-center text-black">Public Place</h3>
+                                    <h3 class="text-center text-warning" style="color: #5DE700;">
+                                        <i class="fa fa-street-view fa-3x"></i>
+                                    </h3>
+                                    <div class="text-center">
+                                        <button class="btn btn-block btn-info" ng-click="selectPlan(3,0)">SELECT</button>
+                                    </div>
+                                </div>
+                            </div>
+                    </div>
+
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <div class="alert alert-success text-center no-radius">
+                            <h4 class="font-open-sans text-dark-blue no-margin"><a class="btn-link" ng-click="openFeatureModal()">See feature comparision based on your type </a></h4>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!--<div class="row" ng-show="showBusinnessSelectionType">-->
+                <div class="row signup-business-row">
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 col-lg-offset-3 col-md-offset-3 col-sm-offset-3 col-xs-offset-0">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 signup-business-type">
+                            <div id="signup-business-free">
+                                <h3 class="text-center"> <i class="fa fa-2x fa-reorder"></i> </h3>
+                                <h3 class="text-center"> Free Listing</h3>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 signup-business-type">
+                            <div id="signup-business-paid">
+                                <h3 class="text-center" style="color:#FF000A;"> <i class="fa fa-2x fa-money"></i> </h3>
+                                <h3 class="text-center" style="color:#FF000A;"> Paid Listing</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+<footer-section></footer-section>

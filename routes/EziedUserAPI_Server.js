@@ -57,7 +57,7 @@ function FnGenerateToken() {
     }
     catch (ex) {
         console.log('OTP generate error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
         return 'error'
     }
 }
@@ -94,7 +94,7 @@ function FnEncryptPassword(Password) {
     }
     catch (ex) {
         console.log('OTP generate error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
         return 'error'
     }
 }
@@ -111,7 +111,7 @@ function FnDecrypt(EncryptPassword){
     }
     catch(ex){
         console.log('FnDecrypterror:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
         return 'error'
     }
 }
@@ -138,7 +138,7 @@ try {
 }
     catch(ex){
         console.log('FnDecrypterror:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
         return 'error'
     }
 }
@@ -184,7 +184,7 @@ function FnSendMailEzeid(MailContent, CallBack) {
     }
     catch (ex) {
         console.log('OTP FnSendMailEzeid error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
         return 'error'
     }
 };
@@ -494,7 +494,7 @@ function FnMessageMail(MessageContent, CallBack) {
     }
     catch (ex) {
         console.log('OTP FnMessageMail error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
         return 'error'
     }
 };
@@ -540,7 +540,7 @@ function FnValidateToken(Token, CallBack) {
     }
     catch (ex) {
         console.log('OTP FnValidateToken error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
         return 'error'
     }
 };
@@ -561,7 +561,7 @@ exports.FnToken = function (req, res) {
     }
     catch (ex) {
         console.log('FnToken: OTP FnValidateToken error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
         return 'error'
     }
 };
@@ -702,7 +702,7 @@ exports.FnLogin = function (req, res) {
     }
     catch (ex) {
         console.log('FnLogin error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -755,7 +755,7 @@ exports.FnLogout = function (req, res) {
     }
     catch (ex) {
         console.log('FnLogout error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -832,7 +832,7 @@ exports.FnChangePassword = function (req, res) {
     }
     catch (ex) {
         console.log('FnChangePassword error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -936,7 +936,7 @@ exports.FnForgetPassword = function (req, res) {
     }
     catch (ex) {
         console.log('FnForgetPassword error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -975,7 +975,7 @@ exports.FnGetCategory = function (req, res) {
     }
     catch (ex) {
         console.log('FnCategory error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -1020,7 +1020,7 @@ exports.FnGetCity = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetCity error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -1059,7 +1059,7 @@ exports.FnGetCountry = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetCountry error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -1124,7 +1124,7 @@ exports.FnGetState = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetState error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -1156,7 +1156,7 @@ exports.FnGetFunctionRoleMap = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetFunctionRoleMap error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -1197,7 +1197,7 @@ exports.FnGetFunctions = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetFunctions error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -1245,7 +1245,7 @@ exports.FnGetRoles = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetFunctions error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -1284,7 +1284,7 @@ exports.FnGetLanguage = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetLanguage error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -1324,7 +1324,7 @@ exports.FnGetRelationType = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetRelationType error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -1356,7 +1356,7 @@ exports.FnGetFunctionRoleMapping = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetRoleFunctionMapping error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -1394,7 +1394,7 @@ exports.FnGetRoleType = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetRoleType error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -1435,7 +1435,7 @@ exports.FnGetMTitle = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetMTitle error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -1473,7 +1473,7 @@ exports.FnGetProxmity = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetProxmity error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -1519,7 +1519,7 @@ exports.FnCheckEzeid = function (req, res) {
     }
     catch (ex) {
         console.log('FnCheckEzeid error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -1582,7 +1582,7 @@ exports.FnGetUserDetails = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetUserDetails error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -1645,7 +1645,7 @@ exports.FnGetSecondaryLocation = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetSecondaryLocation error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -2122,7 +2122,7 @@ exports.FnRegistration = function (req, res) {
     }
     catch (ex) {
         console.log('FnRegistration error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -2268,7 +2268,7 @@ exports.FnAddLocation = function (req, res) {
     }
     catch (ex) {
         console.log('FnAddLocation error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -2333,7 +2333,7 @@ exports.FnDeleteLocation = function (req, res) {
     }
     catch (ex) {
         console.log('FnDeleteLocation error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -2425,7 +2425,7 @@ exports.FnSendMail = function (req, res) {
 
     catch (ex) {
         console.log('Logoin error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 
 };
@@ -2502,7 +2502,7 @@ exports.FnGetAccessHistory = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetAccessHistory error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -2624,7 +2624,7 @@ exports.FnSaveMessage = function (req, res) {
     }
     catch (ex) {
         console.log('FnSaveMessage error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -2705,7 +2705,7 @@ exports.FnGetMessages = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetMessages error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -2784,7 +2784,7 @@ exports.FnUpdateMessageStatus = function (req, res) {
     }
     catch (ex) {
         console.log('FnUpdateMessageStatus:  error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -2880,7 +2880,7 @@ exports.FnUpdateProfilePicture = function (req, res) {
     }
     catch (ex) {
         console.log('FnUpdateProfilePicture error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -2944,7 +2944,7 @@ function FnSaveSkills(skill, CallBack) {
     }
     catch (ex) {
         console.log('OTP FnSendMailEzeid error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
         return 'error'
     }
 };
@@ -3114,7 +3114,7 @@ exports.FnSaveCVInfo = function (req, res) {
     }
     catch (ex) {
         console.log('FnSaveCVInfo error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -3191,7 +3191,7 @@ exports.FnGetCVInfo = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetCVInfo error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
         res.status(400).json(responseMessage);
     }
 };
@@ -3263,7 +3263,7 @@ exports.FnUpdateDocPin = function (req, res) {
     }
     catch (ex) {
         console.log('FnUpdateMessageStatus:  error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -3323,7 +3323,7 @@ exports.FnGetDocPin = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetDocPin:  error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -3410,7 +3410,7 @@ exports.FnCheckCV = function (req, res) {
     }
     catch (ex) {
         console.log('FnCheckCV error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 //method to save documents
@@ -3487,7 +3487,7 @@ exports.FnSaveDoc = function (req, res) {
     }
     catch (ex) {
         console.log('FnSaveDoc error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -3558,7 +3558,7 @@ exports.FnGetDoc = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetDoc error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -3634,7 +3634,7 @@ exports.FnUpdateBussinessListing = function (req, res) {
     }
     catch (ex) {
         console.log('FnUpdateMessageStatus:  error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -3694,7 +3694,7 @@ exports.FnGetBussinessListing = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetBussinessListing:  error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -3787,7 +3787,7 @@ exports.FnUploadDocument = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetDocument error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
         deleteTempFile();
     }
 };
@@ -3865,7 +3865,7 @@ exports.FnGetDocument = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetDocument error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -4379,7 +4379,7 @@ exports.FnSearchByKeywords = function (req, res) {
     }
     catch (ex) {
         console.log('FnSearchByKeywords error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -4530,7 +4530,7 @@ exports.FnGetSearchInformation = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetUserDetails error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -4615,7 +4615,7 @@ console.log('CALL pSearchInformationNew(' + SearchParameter + ')');
         }
     catch (ex) {
         console.log('FnGetUserDetails error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -4835,7 +4835,7 @@ exports.FnUpdatePwdEncryption = function (req, res) {
     }
     catch (ex) {
         console.log('FnUpdateUserProfileAP error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -4882,7 +4882,7 @@ exports.FnGetLoginCheck = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetUserDetails error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -4978,7 +4978,7 @@ exports.FnGetBannerPicture = function(req, res){
     }
     catch (ex) {
         console.log('FnGetBannerPicture error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 }
 
@@ -5059,7 +5059,7 @@ exports.FnSaveWhiteBlackList = function(req, res){
     }
     catch (ex) {
         console.log('FnSaveWhiteBlackList:error ' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -5131,7 +5131,7 @@ exports.FnGetWhiteBlackList = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetWhiteBlackList error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -5208,7 +5208,7 @@ exports.FnDeleteWhiteBlackList = function(req, res){
     }
     catch (ex) {
         console.log('FnDeleteWhiteBlackList:error ' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 }
 
@@ -5293,7 +5293,7 @@ exports.FnGetWhiteListCount = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetWhiteListCount error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -5372,7 +5372,7 @@ exports.FnSearchForTracker = function (req, res) {
     }
     catch (ex) {
         console.log('FnSearchForTracker error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -5445,7 +5445,7 @@ exports.FnGetStatusType = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetStatusType error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -5555,7 +5555,7 @@ exports.FnStatusType = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetStatusType error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -5632,7 +5632,7 @@ exports.FnGetActionType = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetActionType error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -5717,7 +5717,7 @@ exports.FnEZEIDPrimaryDetails = function (req, res) {
     }
     catch (ex) {
         console.log('FnEZEIDDetails error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -5789,7 +5789,7 @@ exports.FnGetItemList = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetItemList error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -5855,7 +5855,7 @@ exports.FnGetFolderList = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetRoleList error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -5954,7 +5954,7 @@ exports.FnSaveItem = function(req, res){
     }
     catch (ex) {
         console.log('FnSaveItem:error ' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -6054,7 +6054,7 @@ exports.FnCreateSubUser = function(req, res){
     }
     catch (ex) {
         console.log('FnCreateSubUser:error ' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 }
 //below method get sub user list
@@ -6123,7 +6123,7 @@ exports.FnGetSubUserList = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetSubUserList error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -6197,7 +6197,7 @@ exports.FnGetTranscationItems = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetTranscationItems error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -6292,7 +6292,7 @@ exports.FnSaveTranscationItems = function(req, res){
     }
     catch (ex) {
         console.log('FnSaveTranscationItems:error ' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 }
 
@@ -6375,7 +6375,7 @@ exports.FnSaveFolderRules = function(req, res){
     }
     catch (ex) {
         console.log('FnSaveItem:error ' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -6473,7 +6473,7 @@ exports.FnSaveStatusType = function(req, res){
     }
     catch (ex) {
         console.log('FnSaveStatusType:error ' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -6564,7 +6564,7 @@ exports.FnSaveActionType = function(req, res){
     }
     catch (ex) {
         console.log('FnSaveActionType :error ' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -6635,7 +6635,7 @@ exports.FnItemList = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetItemList error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -6704,7 +6704,7 @@ exports.FnItemDetails = function (req, res) {
     }
     catch (ex) {
         console.log('FnItemDetails error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -6813,7 +6813,7 @@ exports.FnSaveConfig = function(req, res){
     }
     catch (ex) {
         console.log('FnSaveConfig:error ' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -6882,7 +6882,7 @@ exports.FnGetConfig = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetConfig error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -6967,7 +6967,7 @@ exports.FnSaveHolidayCalendar = function(req, res){
     }
     catch (ex) {
         console.log('FnSaveHolidayCalendar:error ' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -7040,7 +7040,7 @@ exports.FnGetHolidayList = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetHolidayList error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 }; 
 
@@ -7114,7 +7114,7 @@ exports.FnDeleteHolidayList = function(req, res){
     }
     catch (ex) {
         console.log('FnDeleteHolidayList:error ' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 }
 
@@ -7313,7 +7313,7 @@ exports.FnSaveTranscation = function(req, res){
     }
     catch (ex) {
         console.log('FnSaveTranscationItems:error ' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -7380,7 +7380,7 @@ try{
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
         console.log('FnUpdateTransaction:error ' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
         res.status(400).json(responseMessage);
     }
     
@@ -7517,7 +7517,7 @@ exports.FnSaveTranscationOld = function(req, res){
     }
     catch (ex) {
         console.log('FnSaveTranscationItems:error ' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -7628,7 +7628,7 @@ exports.FnGetTranscation = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetTranscation error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -7695,7 +7695,7 @@ try{
 }
 catch (ex) {
         console.log('FnDeleteTranscation:error ' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 }
 
@@ -7811,7 +7811,7 @@ exports.FnSaveWorkingHours = function(req, res){
     }
     catch (ex) {
         console.log('FnSaveWorkingHours:error ' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -7880,7 +7880,7 @@ exports.FnGetWorkingHours = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetWorkingHours error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -7953,7 +7953,7 @@ exports.FnDeleteWorkingHours = function(req, res){
     }
     catch (ex) {
         console.log('FnDeleteWorkingHours:error ' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -8019,7 +8019,7 @@ exports.FnGetWorkingHrsHolidayList = function (req, res) {
     }
     catch (ex) {
         console.log('FnWorkingHours error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
         return 'error'
     }
 } ,function FnHolidayList(CallBack) {
@@ -8059,7 +8059,7 @@ exports.FnGetWorkingHrsHolidayList = function (req, res) {
     }
     catch (ex) {
         console.log('FnHolidayList error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
         return 'error'
     }
 } 
@@ -8105,7 +8105,7 @@ exports.FnGetWorkingHrsHolidayList = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetWorkingHours error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -8155,7 +8155,7 @@ function FnWorkingHours(WorkingContent, CallBack) {
     }
     catch (ex) {
         console.log('FnWorkingHours error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
         return 'error'
     }
 }; 
@@ -8206,7 +8206,7 @@ function FnHolidayList(HolidayContent, CallBack) {
     }
     catch (ex) {
         console.log('FnHolidayList error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
         return 'error'
     }
 };
@@ -8281,7 +8281,7 @@ exports.FnGetUserwiseFolderList = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetUserwiseFolderList error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -8353,7 +8353,7 @@ exports.FnGetItemListForEZEID = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetItemListForEZEID error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -8422,7 +8422,7 @@ exports.FnGetLocationList = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetLocationList error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -8491,7 +8491,7 @@ exports.FnGetLoginDetails = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetLoginDetails error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -8582,7 +8582,7 @@ exports.FnSaveMailTemplate = function(req, res){
     }
     catch (ex) {
         console.log('FnSaveMailTemplate:error ' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -8646,7 +8646,7 @@ exports.FnGetTemplateList = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetTemplateList error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -8714,7 +8714,7 @@ exports.FnGetTemplateDetails = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetTemplateDetails error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -8913,7 +8913,7 @@ exports.FnSendBulkMailerOld = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetTemplateDetails error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -9224,7 +9224,7 @@ exports.FnSendBulkMailer = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetTemplateDetails error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -9535,7 +9535,7 @@ exports.FnSaveWebLink = function(req, res){
     }
     catch (ex) {
         console.log('FnSaveWebLink:error ' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -9555,7 +9555,7 @@ exports.FnGetWebLink = function (req, res) {
                         db.query('CALL pGetWebLink(' + db.escape(Token) + ')', function (err, GetResult) {
                             if (!err) {
                                 if (GetResult != null) {
-                                    if (GetResult[0].length > 0) {
+                                    if (GetResult[0]) {
                                         console.log('FnGetWebLink: Web Links Send successfully');
                                         res.send(GetResult[0]);
                                     }
@@ -9604,7 +9604,7 @@ exports.FnGetWebLink = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetWebLink error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -9673,7 +9673,7 @@ exports.FnDeleteWebLink = function(req, res){
     }
     catch (ex) {
         console.log('FnDeleteWebLink:error ' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 }
 
@@ -9818,7 +9818,7 @@ try{
         }
     catch (ex) {
         console.log('FnGetSearchItem error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -9902,7 +9902,7 @@ try{
 }
 catch (ex) {
         console.log('FnSaveChatMessage: error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -9973,7 +9973,7 @@ try{
 }
     catch (ex) {
         console.log('FnSaveGroupChatList: Error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -10037,7 +10037,7 @@ try{
     }
     catch (ex) {
         console.log('FnGetGroupList error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -10116,7 +10116,7 @@ try{
 }
     catch (ex) {
         console.log('FnSaveGroupMembers: Error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -10185,7 +10185,7 @@ try{
     }
     catch (ex) {
         console.log('FnGetMembersList error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -10257,7 +10257,7 @@ try{
     }
     catch (ex) {
         console.log('FnDeleteGroupMembers:error ' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -10329,7 +10329,7 @@ try{
     }
     catch (ex) {
         console.log('FnGetChatDetails error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -10401,7 +10401,7 @@ try{
     }
     catch (ex) {
         console.log('FnGetChatList error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -10476,7 +10476,7 @@ try{
     }
     catch (ex) {
         console.log('FnGetSearchPicture error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -10542,7 +10542,7 @@ exports.FnGetCompanyProfile = function(req, res){
     }
     catch (ex) {
         console.log('FnGetCompanyProfile error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -10618,7 +10618,7 @@ exports.FnSaveCompanyProfile = function(req, res){
     }
     catch (ex) {
         console.log('FnSaveCompanyProfile: Error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -10702,7 +10702,7 @@ exports.FnGetLocationListForEZEID = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetLocationListForEZEID error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -10826,7 +10826,7 @@ exports.FnSaveReservationResource = function(req, res){
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
         console.log('FnSaveReservationResource:error ' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
         res.status(400).json(responseMessage);
     }
 };
@@ -10954,7 +10954,7 @@ exports.FnUpdateReservationResource = function(req, res){
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
         console.log('FnUpdateReservationResource:error ' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
         res.status(400).json(responseMessage);
     }
 };
@@ -11047,7 +11047,7 @@ exports.FnGetReservationResource = function (req, res) {
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
         console.log('FnGetReservationResource:error ' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
         res.status(400).json(responseMessage);
     }
 };
@@ -11168,7 +11168,7 @@ exports.FnSaveReservationService = function(req, res){
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
         console.log('FnSaveReservationService:error ' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
         res.status(400).json(responseMessage);
     }
 };
@@ -11290,7 +11290,7 @@ exports.FnUpdateReservationService = function(req, res){
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
         console.log('FnUpdateReservationService:error ' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
         res.status(400).json(responseMessage);
     }
 };
@@ -11375,7 +11375,7 @@ exports.FnGetReservationService = function (req, res) {
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
         console.log('FnGetReservationService:error ' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
         res.status(400).json(responseMessage);
     }
 };
@@ -11453,7 +11453,7 @@ exports.FnGetReservResourceServiceMap = function (req, res) {
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
         console.log('FnGetReservResourceServiceMap:error ' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
         res.status(400).json(responseMessage);
     }
 };
@@ -11572,7 +11572,7 @@ exports.FnSaveReservResourceServiceMap = function(req, res){
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
         console.log('FnSaveReservResServiceMap:error ' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
         res.status(400).json(responseMessage);
     }
 };
@@ -11712,7 +11712,7 @@ exports.FnSaveReservTransaction = function(req, res){
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
         console.log('FnSaveReservTransaction:error ' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
         res.status(400).json(responseMessage);
     }
 };
@@ -11792,7 +11792,7 @@ exports.FnGetMapedServices = function (req, res) {
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
         console.log('FnGetReservTransaction:error ' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
         res.status(400).json(responseMessage);
     }
 };
@@ -11874,7 +11874,7 @@ exports.FnGetReservTask = function (req, res) {
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
         console.log('FnGetReservTask:error ' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
         res.status(400).json(responseMessage);
     }
 };
@@ -11954,7 +11954,7 @@ exports.FnGetResTransDetails = function (req, res) {
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
         console.log('FnGetResTransDetails:error ' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
         res.status(400).json(responseMessage);
     }
 };
@@ -12150,7 +12150,7 @@ exports.FnGetTransAutoComplete = function (req, res) {
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
         console.log('FnGetTransAutoComplete:error ' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
         res.status(400).json(responseMessage);
     }
 };
@@ -12229,7 +12229,7 @@ exports.FnGetCompanyDetails = function (req, res) {
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
         console.log('FnGetCompanyDetails:error ' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
         res.status(400).json(responseMessage);
     }
 };
@@ -12264,15 +12264,15 @@ exports.FnGetOutboxMessages = function (req, res) {
                                         responseMessage.status = true;
                                         responseMessage.data = GetResult[0] ;
                                         responseMessage.error = null;
-                                        responseMessage.message = 'Company details Send successfully';
-                                        console.log('FnGetOutboxMessages: Company details Send successfully');
+                                        responseMessage.message = 'OutBoxMsg details Send successfully';
+                                        console.log('FnGetOutboxMessages: OutBoxMsg details Send successfully');
                                         res.status(200).json(responseMessage);
                                     }
                                     else {
                                         
                                         responseMessage.error = {};
-                                        responseMessage.message = 'No founded Company details';
-                                        console.log('FnGetOutboxMessages: No founded Company details');
+                                        responseMessage.message = 'No founded OutBoxMsg details';
+                                        console.log('FnGetOutboxMessages: No founded OutBoxMsg details');
                                         res.json(responseMessage);
                                     }
                                 }
@@ -12280,8 +12280,8 @@ exports.FnGetOutboxMessages = function (req, res) {
 
                                     
                                     responseMessage.error = {};
-                                    responseMessage.message = 'No founded Company details';
-                                    console.log('FnGetOutboxMessages: No founded Company details');
+                                    responseMessage.message = 'No founded OutBoxMsg details';
+                                    console.log('FnGetOutboxMessages: No founded OutBoxMsg details');
                                     res.json(responseMessage);
                                 }
 
@@ -12290,8 +12290,8 @@ exports.FnGetOutboxMessages = function (req, res) {
                                 
                                 responseMessage.data = null ;
                                 responseMessage.error = {};
-                                responseMessage.message = 'Error in getting Company details';
-                                console.log('FnGetOutboxMessages: error in getting Company details' + err);
+                                responseMessage.message = 'Error in getting OutBoxMsg details';
+                                console.log('FnGetOutboxMessages: error in getting OutBoxMsg details' + err);
                                 res.status(500).json(responseMessage);
                             }
                         });
@@ -12328,7 +12328,7 @@ exports.FnGetOutboxMessages = function (req, res) {
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
         console.log('FnGetOutboxMessages:error ' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
         res.status(400).json(responseMessage);
     }
 };
@@ -12408,7 +12408,7 @@ exports.FnGetworkinghoursList = function (req, res) {
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
         console.log('FnGetworkinghoursList:error ' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
         res.status(400).json(responseMessage);
     }
 };
@@ -12489,7 +12489,7 @@ exports.FnWorkingHoursDetails = function(req, res){
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
         console.log('FnWorkingHours:error ' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
         res.status(400).json(responseMessage);
     }
 };
@@ -12567,7 +12567,7 @@ exports.FnImageURL = function(req, res){
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
         console.log('FnImageURL:error ' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
         res.status(400).json(responseMessage);
     }
 };
@@ -12610,7 +12610,7 @@ function FnValidateTokenAP(Token, CallBack) {
     }
     catch (ex) {
         console.log('OTP FnValidateToken error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
         return 'error'
     }
 };
@@ -12689,7 +12689,7 @@ exports.FnLoginAP = function (req, res) {
     }
     catch (ex) {
         console.log('FnLogin error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -12734,7 +12734,7 @@ exports.FnLogoutAP = function (req, res) {
     }
     catch (ex) {
         console.log('FnLogoutAP error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -12802,7 +12802,7 @@ exports.FnGetUserDetailsAP = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetUserDetails error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -12934,7 +12934,7 @@ exports.FnUpdateUserProfileAP = function (req, res) {
     }
     catch (ex) {
         console.log('FnUpdateUserProfileAP error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -13009,7 +13009,7 @@ exports.FnChangePasswordAP = function (req, res) {
     }
     catch (ex) {
         console.log('FnChangePassword error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -13107,7 +13107,7 @@ exports.FnForgetPasswordAP = function (req, res) {
     }
     catch (ex) {
         console.log('FnForgetPasswordAP error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -13172,7 +13172,7 @@ exports.FnGetEZEIDDetailsAP = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetEZEIDDetailsAP error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -13290,7 +13290,7 @@ exports.FnSaveAPEZEID = function (req, res) {
     }
     catch (ex) {
         console.log('psaveRealEstateData error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -13369,7 +13369,7 @@ exports.FnSaveAPEZEIDPicture = function (req, res) {
     }
     catch (ex) {
         console.log('FnSaveAPEZEIDPicture error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -13439,7 +13439,7 @@ exports.FnGetRealStateDataAP = function(req,res){
     }
     catch(ex){
         console.log('FnGetRealStateDataAP error: ' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 }
 
@@ -13504,7 +13504,7 @@ exports.FnGetAPEZEIDPicture = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetAPEZEIDPicture error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -13588,7 +13588,7 @@ exports.FnSaveBannerPictureAP = function(req, res){
     }
     catch (ex) {
         console.log('FnSaveBannerPicture error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 }
 
@@ -13662,7 +13662,7 @@ exports.FnGetBannerPictureAP = function(req, res){
     }
     catch (ex) {
         console.log('FnGetBannerPicsAP error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 }
 
@@ -13730,7 +13730,7 @@ exports.FnGetAllBannerPicsAP = function(req, res){
     }
     catch (ex) {
         console.log('FnGetAllBannerPicsAP error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 }
 
@@ -13799,7 +13799,7 @@ exports.FnGetSecondaryLocationListAP = function(req, res){
     }
     catch (ex) {
         console.log('FnGetSecondaryLocationList:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 }
 
@@ -13871,7 +13871,7 @@ exports.FnGetSecondaryLocationAP = function(req, res){
     }
     catch (ex) {
         console.log('FnGetSecondaryLocationAP:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 }
 
@@ -13966,7 +13966,7 @@ exports.FnUpdateSecondaryLocationAP = function(req, res){
     }
     catch (ex) {
         console.log('FnUpdateSecondaryLocationAP:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 }
 
@@ -14038,7 +14038,7 @@ exports.FnUpdateIdCardPrintAP = function(req, res){
     }
     catch (ex) {
         console.log('FnUpdateIdCardPrintAP:error ' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -14103,7 +14103,7 @@ exports.FnGetIdCardPrintAP = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetEZEIDDetailsAP error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -14205,7 +14205,7 @@ exports.FnSearchRealEstateAP = function(req, res){
     }
     catch (ex) {
         console.log('FnSearchRealEstateAP error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -14228,7 +14228,7 @@ exports.Base64Data = function (req, res) {
     }
     catch (ex) {
         console.log('OTP fnCreateFile error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
         return 'error'
     }
 };
@@ -14316,7 +14316,7 @@ exports.FnUpdateRedFlagAP = function(req, res){
     }
     catch (ex) {
         console.log('FnUpdateRedFlagAP:error ' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 }
 
@@ -14387,7 +14387,7 @@ exports.FnUpdateEZEIDAP = function (req, res) {
     }
     catch (ex) {
         console.log('FnUpdateEZEIDAP error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -14458,7 +14458,7 @@ exports.FnDeleteBannerPictureAP = function(req, res){
     }
     catch (ex) {
         console.log('FnDeleteBannerPictureAP:error ' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -14733,7 +14733,7 @@ exports.FnLoginVES = function (req, res) {
     }
     catch (ex) {
         console.log('FnLoginVES error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -14841,7 +14841,7 @@ exports.FnSaveContactVES = function(req, res){
     }
     catch (ex) {
         console.log('FnSaveContactVES:error ' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -14921,7 +14921,7 @@ exports.FnGetAllContactsVES = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetAllContactsVES error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -14962,7 +14962,7 @@ exports.FnGetDepartmentVES = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetDepartmentVES error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -15035,7 +15035,7 @@ exports.FnGetContactVES = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetContactsVES error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -15121,7 +15121,7 @@ exports.FnSearchContactsVES = function (req, res) {
     }
     catch (ex) {
         console.log('FnSearchContactsVES error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -15163,7 +15163,7 @@ exports.FnCheckPasswordVES  = function (req, res) {
     }
     catch (ex) {
         console.log('FnCheckPasswordVES : error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -15202,7 +15202,7 @@ exports.FnGetGatesVES = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetGatesVES error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -15288,7 +15288,7 @@ exports.FnSaveDepartmentsVES = function(req, res){
     }
     catch (ex) {
         console.log('FnSaveContactVES:error ' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -15373,7 +15373,7 @@ exports.FnSaveGatesVES = function(req, res){
     }
     catch (ex) {
         console.log('FnSaveGatesVES:error ' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -15445,7 +15445,7 @@ exports.FnSaveCitysVES = function(req, res){
     }
     catch (ex) {
         console.log('FnSaveCitysVES:error ' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 

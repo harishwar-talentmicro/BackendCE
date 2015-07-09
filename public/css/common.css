@@ -2733,3 +2733,83 @@ h4.front-business-form.warning-text{
 .btn-wide{
     min-width: 30%;
 }
+
+.sign-up-container{
+    border: none!important;
+}
+
+.signup-heading-row{
+    background: #008DF4;
+    color: #FFFFFF;
+    border: 1px solid #008DF4;
+}
+
+.signup-heading-row > div > h3{
+    color:#FFFFFF;
+}
+
+.signup-selection-row,.signup-selection-row{
+    border: 1px solid #DDD;
+    border-top:0px;
+}
+
+.signup-selection-type{
+    min-height: 300px;
+    padding: 10%;
+}
+
+.signup-selection-type > div{
+    background: #F5F5F5;
+    padding: 20px;
+    border: 1px solid #BEBEBE;
+    box-shadow: 0px 0px 50px #F0F0F0;
+}
+
+.text-black{
+    color:#000;
+}
+
+.signup-selection-type .btn-info{
+    background: #1459A8;
+    border: none;
+}
+
+.signup-selection-type .btn-info:hover,
+.signup-selection-type .btn-info:focus,
+.signup-selection-type .btn-info:active{
+    background: #6B6B6B;
+}
+
+.signup-business-row{
+
+}
+
+.signup-business-type{
+
+}
+
+.signup-business-type > div{
+    padding: 10%;
+    border: 1px dashed #0077EC;
+}
+
+.signup-business-type > div:hover,
+.signup-business-type > div:focus,
+.signup-business-type > div:active{
+    box-shadow: 2px 2px 10px #0072C3;
+    border: 1px dashed #0072C3;
+}
+
+.signup-business-type > #signup-business-free:hover,
+.signup-business-type > #signup-business-free:focus,
+.signup-business-type > #signup-business-free:active{
+    box-shadow: 2px 2px 10px #CFCFCF;
+}
+
+.signup-business-type > #signup-business-paid:hover,
+.signup-business-type > #signup-business-paid:focus,
+.signup-business-type > #signup-business-paid:active{
+    box-shadow: 2px 2px 10px #FF000A;
+    border: 1px dashed #FF000A;
+}
+

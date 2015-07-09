@@ -101,21 +101,29 @@ Reservation.prototype.SaveReservTrans = function(req,res,next){
                         st.db.query('CALL pSaveResTrans(' + query + ')', function (err, insertResult) {
                             console.log(insertResult);
                             console.log(err);
-                            if (!err){
-                                if (insertResult.affectedRows > 0) {
-                                    responseMessage.status = true;
-                                    responseMessage.error = null;
-                                    responseMessage.message = 'Resource Transaction details save successfully';
-                                    responseMessage.data = {
-                                        resourceid : req.body.resourceid,
-                                        serviceid : serviceid
-                                    };
-                                    res.status(200).json(responseMessage);
-                                    console.log('FnSaveReservTransaction: Resource Transaction details save successfully');
+                            if (!err) {
+                                if (insertResult) {
+                                    if (!insertResult[0]) {
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Resource Transaction details save successfully';
+                                        responseMessage.data = {
+                                            resourceid: req.body.resourceid,
+                                            serviceid: serviceid
+                                        };
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnSaveReservTransaction: Resource Transaction details save successfully');
 
+                                    }
+                                    else {
+                                        responseMessage.message = insertResult[0][0];
+                                        responseMessage.error = {};
+                                        res.status(400).json(responseMessage);
+                                        console.log('FnSaveReservTransaction:No save Resource Transaction details');
+                                    }
                                 }
                                 else {
-                                    responseMessage.message = insertResult[0][0];
+                                    responseMessage.message = 'No save Resource Transaction details';
                                     responseMessage.error = {};
                                     res.status(400).json(responseMessage);
                                     console.log('FnSaveReservTransaction:No save Resource Transaction details');
