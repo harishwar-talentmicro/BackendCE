@@ -70,10 +70,7 @@ angular.module('ezeidApp').
             $scope.showWorkingHourModel = false;
             $scope.showMapPopupModel = false;
             $scope.showDetailsModal = false;
-           // $scope.showNoticeText = true;
             $scope.form_rating = 0;
-           // $scope.showLoginText = false;
-           // $scope.showNotFound = false;
 
             /**
              * Function for converting UTC time from server to LOCAL timezone
@@ -103,26 +100,9 @@ angular.module('ezeidApp').
                 title : 'EZEID Map',
                 class : 'business-manager-modal'
             };
+             var ezeone = $routeParams.ezeone;
 
-           // var TID = $routeParams.TID;
-
-            console.log($routeParams);
-            var ezeone = $routeParams.ezeone;
-
-
-            //  $scope.SearchType = $routeParams.searchType;
-
-            /*if(($scope.SearchType == 1) && (!$rootScope._userInfo.IsAuthenticate))
-            {
-                $scope.showLoginText = true;
-                $scope.$emit('$preLoaderStop');
-                Notification.error({ message : 'Please login to search for EZEOne', delay : MsgDelay});
-                return false;
-            }
-            else
-            {*/
-               // $scope.showLoginText = false;
-                getSearchInformation(ezeone).then(function(){
+            getSearchInformation(ezeone).then(function(){
                     var visibleStr = ($scope.SearchInfo.VisibleModules) ? $scope.SearchInfo.VisibleModules.toString() : null;
                     var visibleModules = (visibleStr) ? ((visibleStr.length == 5) ? visibleStr : '22222') : '22222';
                     if($routeParams['sales'] && (visibleModules[0] == 1)){
@@ -188,9 +168,6 @@ angular.module('ezeidApp').
                     $rootScope._userInfo.Token = 2;
                     $scope.Token = 2;
                 }
-             /*   $http({ method: 'get',
-                    url: GURL + 'ewtGetSearchInformation?Token=' + $rootScope._userInfo.Token + '&TID=' + _TID + '&SearchType=' + _SearchType + '&CurrentDate=' + CurrentDate}).success(function (data) {
-*/
 
                 $http({ method: 'get',
                     url: GURL + 'ewtGetSearchInformationNew?Token=' + $rootScope._userInfo.Token + '&ezeTerm='+_ezeone+'&CurrentDate='+CurrentDate}).success(function (data) {
@@ -220,11 +197,6 @@ angular.module('ezeidApp').
                                 {
                                     getAboutComapny();
                                 }
-
-                                /*if(TID == $scope.SearchInfo.LocID)
-                                {
-                                    $scope.showNoticeText = false;
-                                }*/
 
                                 $scope.showSalesEnquiry = $scope.SearchInfo.VisibleModules[0];
                                 $scope.shoReserVation = $scope.SearchInfo.VisibleModules[1];
@@ -409,15 +381,6 @@ angular.module('ezeidApp').
 
 
             $scope.getdirections = function (data) {
-
-                /*
-                    $scope.activeTemplate = "html/mapPopView.html";
-                    $scope.showMapPopupModel = true;
-
-                    // var end = new google.maps.LatLng(data.Latitude, data.Longitude);
-
-                */
-
                 var userLoc = {
                     endLat: data.Latitude,
                     endLong : data.Longitude,
@@ -503,21 +466,6 @@ angular.module('ezeidApp').
             $scope._salesModalTitle = 'Sales Enquiry Form';
             $scope._showSalesModal = false;
             $scope._toggleSalesModal = function(){
-                /*if(!$rootScope._userInfo.Token)
-                {
-                    $('#SignIn_popup').slideDown();
-                }
-                else if($rootScope._userInfo.Token == 2)
-                {
-                    $('#SignIn_popup').slideDown();
-                }
-                else {
-                    $scope.businessModalOpen = true;
-                    $scope.showDetailsModal = false;
-                    $timeout(function () {
-                        $scope._showSalesModal = !$scope._showSalesModal;
-                    }, 500);
-                }*/
 
                 if(!$rootScope._userInfo.Token)
                  {
@@ -575,22 +523,7 @@ angular.module('ezeidApp').
             $scope._resumeModalTitle = 'Submit Resume Application';
             $scope._showResumeModal = false;
             $scope._toggleResumeModal = function(){
-                /*if(!$rootScope._userInfo.Token)
-                {
-                    $('#SignIn_popup').slideDown();
-                }
-                else if($rootScope._userInfo.Token == 2)
-                {
-                    $('#SignIn_popup').slideDown();
-                }
-                else {
-                    $scope.businessModalOpen = true;
-                    $scope.showDetailsModal = false;
-                    $timeout(function(){
-                        $scope._showResumeModal = !$scope._showResumeModal;
-                    },500);
-                }*/
-
+                
                 if(!$rootScope._userInfo.Token)
                 {
                     $('#SignIn_popup').slideDown();

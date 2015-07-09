@@ -88,12 +88,8 @@ angular.module('ezeidApp').controller('CVAttachController',[
            $scope.skillMatrix[nCount].active_status = ($scope.skillMatrix[nCount].active_status == true) ? 1 : 0;
        }
 
-        ////console.log($scope.skillMatrix);
-
         if(($scope.skillMatrix[0].skillname == "") && ($scope.skillMatrix[0].exp == ""))
         {
-           // $scope.skillMatrix = [];
-
             var index = 0;
 
             if (index > -1) {
