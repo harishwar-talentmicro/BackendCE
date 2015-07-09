@@ -1,9 +1,10 @@
 <div id="wrapper">
     <header-section></header-section>
+
     <!-- Main jumbotron for a primary marketing message or call to action -->
-    <div class="container" style="padding-top:0px; position:relative;">
+    <div class="container idp" style="padding-top:0px; position:relative;">
         <!-- Example row of columns -->
-        <div class="row">
+        <div class="row hpw">
             <div class="col-lg-10 col-md-10 col-sm-12 col-xs-12" style="margin: auto; float: none;">
                 <div class="panel panel-default" style="min-height: 367px;">
 
@@ -90,7 +91,7 @@
                                          </div>
 
                                         <div class="row setRowLeftRightMarginZero text-center newInfoBorder messgeButtonContainer">
-                                            <div class="col-lg-5 col-md-5 col-sm-12 col-xs-12 setPaddingLeftRight0">
+                                            <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12 setPaddingLeftRight0">
                                                 <div class="row setRowLeftRightMarginZero">
                                                     <div ng-hide="(SearchInfo.Redflagstatus == 1)">
                                                         <div ng-show="SearchInfo.BannerImage">
@@ -116,101 +117,131 @@
 
                                                 </div>
                                             </div>
-                                            <div class="col-lg-7 col-md-7 col-sm-12 col-xs-12 setPaddingLeftRight0">
+
+                                            <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12 setPaddingLeftRight0">
+
                                                 <div class="row setRowLeftRightMarginZero">
                                                     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setPaddingLeftRight0">
-                                                        <div ng-show="SearchInfo.Picture">
-                                                            <div ng-show="SearchInfo.IDTypeID == 1" class="row addItemRowUserEzeid1">
-                                                                <img class="profilePicBorder imgSetBorder" width="148px" height="148px" ng-src="{{SearchInfo.Picture}}">
-                                                            </div>
-                                                            <div ng-hide="SearchInfo.IDTypeID == 1" class="row addItemRowUserEzeid1">
-                                                                <img class="profilePicBorderBusiness imgSetBorder" width="315px" height="155px" ng-src="{{SearchInfo.Picture}}">
+                                                        <div class="row setRowLeftRightMarginZero">
+                                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setPaddingLeftRight0">
+                                                                <div ng-show="SearchInfo.Picture">
+                                                                    <div ng-show="SearchInfo.IDTypeID == 1" class="row addItemRowUserEzeid1">
+                                                                        <img class="profilePicBorder imgSetBorder" width="148px" height="148px" ng-src="{{SearchInfo.Picture}}">
+                                                                    </div>
+                                                                    <div ng-hide="SearchInfo.IDTypeID == 1" class="row addItemRowUserEzeid1">
+                                                                        <img class="profilePicBorderBusiness imgSetBorder" width="315px" height="155px" ng-src="{{SearchInfo.Picture}}">
+                                                                    </div>
+                                                                </div>
+                                                                <div ng-hide="SearchInfo.Picture">
+                                                                    <div ng-show="SearchInfo.IDTypeID == 1" class="row addItemRowUserEzeid1">
+                                                                        <img class="profilePicBorder imgSetBorder" width="148px" height="148px" ng-src="../images/new_individual.png">
+                                                                    </div>
+                                                                    <div ng-hide="SearchInfo.IDTypeID == 1" class="row addItemRowUserEzeid1">
+                                                                        <img class="profilePicBorderBusiness imgSetBorder" width="315px" height="155px" ng-src="../images/business_profile_pic.png">
+                                                                    </div>
+                                                                </div>
                                                             </div>
                                                         </div>
-                                                        <div ng-hide="SearchInfo.Picture">
-                                                            <div ng-show="SearchInfo.IDTypeID == 1" class="row addItemRowUserEzeid1">
-                                                                <img class="profilePicBorder imgSetBorder" width="148px" height="148px" ng-src="../images/new_individual.png">
-                                                            </div>
-                                                            <div ng-hide="SearchInfo.IDTypeID == 1" class="row addItemRowUserEzeid1">
-                                                                <img class="profilePicBorderBusiness imgSetBorder" width="315px" height="155px" ng-src="../images/business_profile_pic.png">
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="row setRowLeftRightMarginZero">
-                                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setPaddingLeftRight0">
-                                                        <div class="row addItemRowUserEzeid topMarginButton">
-                                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                                                <span class="ezeidTitle"><b> {{SearchInfo.EZEID}} </b></span>
-                                                            </div>
+
+                                                        <div class="row setRowLeftRightMarginZero ezeid-text">
+                                                            <span class="ezeid-text-font text-uppercase"><b> {{SearchInfo.EZEID}} </b></span>
                                                         </div>
 
                                                         <div ng-show="SearchInfo.CompanyName || SearchInfo.AboutCompany">
-                                                            <div class="row companyInfo searchButtonMarginSet">
-                                                                <span><b>{{SearchInfo.CompanyName}} </b></span>
+                                                            <div class="row setRowLeftRightMarginZero company-text">
+                                                                <span><p class="company-text-font" style="margin-bottom: 0px;">{{SearchInfo.CompanyName}} </p></span>
                                                             </div>
-                                                            <div class="row centerAlign searchButtonMarginSet">
-                                                                <span title="{{SearchInfo.AboutCompany}}">{{SearchInfo.AboutCompany}}</span>
-                                                            </div>
-                                                        </div>
+                                                            <div class="row setRowLeftRightMarginZero tag-line text-center">
 
-                                                        <div class="row centerAlign searchButtonMarginSet">
-                                                            {{ AddressForInfoTab }}
-                                                        </div>
-
-                                                        <div class="row centerAlign searchButtonMarginSet">
-                                                            <div class="row centerAlign searchButtonMarginSet">
-                                                                {{SearchInfo.MobileNumber != '' ?  SearchInfo.ISDMobileNumber +'-'+ SearchInfo.MobileNumber + ' ' : ''}}{{SearchInfo.PhoneNumber != '' ? '| ' + SearchInfo.ISDPhoneNumber +'-'+ SearchInfo.PhoneNumber : ''}}
-                                                            </div>
-                                                            <div class="row centerAlign searchButtonMarginSet">
-                                                                <a href="mailto:{{SearchInfo.EMailID}}" target="_blank">{{SearchInfo.EMailID +' '}}</a>  <span ng-show="SearchInfo.Website"> | <a target="_blank" href="http://{{SearchInfo.Website}}">{{' '+SearchInfo.Website}}</a> </span>
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="row centerAlign searchButtonMarginSet">
-                                                            <div title="Working hours" class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer setLeftRightPaddingZero" ng-hide="(SearchInfo.IDTypeID == 1)">
-                                                                <img src="../images/open_big.png" ng-click="openWorkingHourPopup()" ng-show="SearchInfo.OpenStatus==1">
-                                                                <img src="../images/close_big.png" ng-click="openWorkingHourPopup()" ng-hide="SearchInfo.OpenStatus==1">
-                                                            </div>
-                                                            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 showPointer setLeftRightPaddingZero" ng-hide="(SearchInfo.IDTypeID == 1)">
-                                                                <div class="" ng-hide="SearchInfo.ParkingStatus==3">
-                                                                    <img title="{{parkingTitle}}" src="../images/parking_new.png">
+                                                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 setPaddingLeftRight0">
                                                                 </div>
-                                                                <div class="" ng-show="SearchInfo.ParkingStatus==3">
-                                                                    <img title="{{parkingTitle}}" src="../images/new_no_parking.png">
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setLeftRightPaddingZero">
-                                                                <img title="Verified" ng-show="(SearchInfo.EZEIDVerifiedID == 2)" src="images/verified_32.png"/>
-                                                                <img title="Not verified" ng-hide="(SearchInfo.EZEIDVerifiedID == 2)" src="images/not_verified_32.png"/>
-                                                            </div>
-                                                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 setLeftRightPaddingZero defaultRatingBox">
-                                                                <div class="starRating">
-                                                                    <div>
-                                                                        <div>
-                                                                            <div>
-                                                                                <div>
-                                                                                    <input id="rating1" disabled type="radio" name="form_rating" ng-model="form_rating" value="1">
-                                                                                    <label for="rating1"><span>1</span></label>
-                                                                                </div>
-                                                                                <input id="rating2" disabled type="radio" name="form_rating" ng-model="form_rating" value="2">
-                                                                                <label for="rating2"><span>2</span></label>
-                                                                            </div>
-                                                                            <input id="rating3" disabled type="radio" name="form_rating" ng-model="form_rating" value="3">
-                                                                            <label for="rating3"><span>3</span></label>
-                                                                        </div>
-                                                                        <input id="rating4" disabled type="radio" name="form_rating" ng-model="form_rating" value="4">
-                                                                        <label for="rating4"><span>4</span></label>
+                                                                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 setPaddingLeftRight0">
+                                                                    <div ng-show="SearchInfo.AboutCompany">
+                                                                        <i class="fa fa-quote-left quote-style"></i>
+                                                                        <span title="{{SearchInfo.AboutCompany}}">{{SearchInfo.AboutCompany}}</span>
+                                                                        <i class="fa fa-quote-right quote-style"></i>
                                                                     </div>
-                                                                    <input id="rating5" disabled type="radio" name="form_rating" ng-model="form_rating" value="5">
-                                                                    <label for="rating5"><span>5</span></label>
+                                                                </div>
+                                                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 setPaddingLeftRight0">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                     <div class="row setRowLeftRightMarginZero p-top-10 ">
+
+                                                         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setPaddingLeftRight0">
+                                                             <hr class="style-three">
+                                                             <!-- Star ratings goes here -->
+                                                             <div class="starRating">
+                                                                 <div>
+                                                                     <div>
+                                                                         <div>
+                                                                             <div>
+                                                                                 <input id="rating1" disabled type="radio" name="form_rating" ng-model="form_rating" value="1">
+                                                                                 <label for="rating1"><span>1</span></label>
+                                                                             </div>
+                                                                             <input id="rating2" disabled type="radio" name="form_rating" ng-model="form_rating" value="2">
+                                                                             <label for="rating2"><span>2</span></label>
+                                                                         </div>
+                                                                         <input id="rating3" disabled type="radio" name="form_rating" ng-model="form_rating" value="3">
+                                                                         <label for="rating3"><span>3</span></label>
+                                                                     </div>
+                                                                     <input id="rating4" disabled type="radio" name="form_rating" ng-model="form_rating" value="4">
+                                                                     <label for="rating4"><span>4</span></label>
+                                                                 </div>
+                                                                 <input id="rating5" disabled type="radio" name="form_rating" ng-model="form_rating" value="5">
+                                                                 <label for="rating5"><span>5</span></label>
+                                                             </div>
+                                                             <div class="small">0 Reviews </div>
+                                                             <hr class="style-three">
+                                                         </div>
+
+
+                                                    </div>
+
+                                                    <div class="row setRowLeftRightMarginZero p-top-10 mobile-font">
+                                                        {{SearchInfo.MobileNumber != '' ?  SearchInfo.ISDMobileNumber +'-'+ SearchInfo.MobileNumber + ' ' : ''}}{{SearchInfo.PhoneNumber != '' ? '| ' + SearchInfo.ISDPhoneNumber +'-'+ SearchInfo.PhoneNumber : ''}}
+                                                    </div>
+                                                    <div class="row setRowLeftRightMarginZero">
+                                                    <a href="mailto:{{SearchInfo.EMailID}}" target="_blank">{{SearchInfo.EMailID +' '}}</a>  <span ng-show="SearchInfo.Website"> | <a target="_blank" href="http://{{SearchInfo.Website}}">{{' '+SearchInfo.Website}}</a> </span>
+                                                    </div>
+
+                                                    <div class="row setRowLeftRightMarginZero address-font">
+                                                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setPaddingLeftRight0">
+                                                        </div>
+                                                        <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 setPaddingLeftRight0">
+                                                            <span>{{ AddressForInfoTab }}</span>
+                                                        </div>
+                                                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setPaddingLeftRight0">
+                                                        </div>
+                                                    </div>
+
+                                                    <hr class="style-two">
+                                                    <div class="row setRowLeftRightMarginZero p-top-10 text-center btn-conts">
+                                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setPaddingLeftRight0">
+                                                            <div class="row setRowLeftRightMarginZero">
+                                                                <div title="Working hours" class="col-lg-4 col-md-4 col-sm-4 col-xs-12 showPointer setLeftRightPaddingZero" ng-hide="(SearchInfo.IDTypeID == 1)">
+                                                                    <img src="../images/open_big.png" ng-click="openWorkingHourPopup()" ng-show="SearchInfo.OpenStatus==1">
+                                                                    <img src="../images/close_big.png" ng-click="openWorkingHourPopup()" ng-hide="SearchInfo.OpenStatus==1">
+                                                                </div>
+                                                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 showPointer setLeftRightPaddingZero" ng-hide="(SearchInfo.IDTypeID == 1)">
+                                                                    <div class="" ng-hide="SearchInfo.ParkingStatus==3">
+                                                                        <img title="{{parkingTitle}}" src="../images/parking_new.png">
+                                                                    </div>
+                                                                    <div class="" ng-show="SearchInfo.ParkingStatus==3">
+                                                                        <img title="{{parkingTitle}}" src="../images/new_no_parking.png">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 setLeftRightPaddingZero">
+                                                                    <img title="Verified" ng-show="(SearchInfo.EZEIDVerifiedID == 2)" src="images/verified_32.png"/>
+                                                                    <img title="Not verified" ng-hide="(SearchInfo.EZEIDVerifiedID == 2)" src="images/not_verified_32.png"/>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
 
                                         <div ng-show="companyTagLine" class="messgeButtonContainer">
                                                 <div ng-show="(SearchType == 2)" class="row setRowLeftRightMarginZero newInfoBorder ">
