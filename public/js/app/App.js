@@ -72,7 +72,8 @@
      * for eg. User cannot open signup page while he is logged in
      */
     ezeid.value('UNAUTHORIZED_ROUTES',[
-        '/signup'
+        '/signup',
+        '/signup1'
     ]);
 
     ezeid.value('MsgDelay',5000);
@@ -164,6 +165,10 @@
             .when('/signup',{
                 templateUrl : 'html/profile/sign-up.html',
                 controller : 'SignUpCtrl'
+            })
+            .when('/signup1',{
+                templateUrl : 'html/sign-up/sign-up-wizard.html',
+                controller : 'SignUpWizardCtrl'
             })
             .when('/business-manager/:subview',{
                 templateUrl : 'html/business-manager/business-manager.html',
