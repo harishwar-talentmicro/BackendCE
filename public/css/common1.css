@@ -1060,12 +1060,12 @@ button.btn.btn-primary.btn-block.greenButton {
     position: absolute;
     top: 39.5%;
     z-index: 3;
-    right: 50px;
+    right: 3px;
 }
 .imgLeft {
     position: absolute;
     top: 39.5%;
-    left: 50px;
+    left: 3px;
     z-index: 3;
 }
 .boxMessaageBackgroun {
@@ -1657,8 +1657,8 @@ table.rwd-table > tbody > tr > td.serachResultSelectAll
 }
 .newInfoBorder
 {
-    box-shadow: 0px 0px 10px #969696;
-    border: 1px solid #C0C0C0;
+    /*box-shadow: 0px 0px 10px #969696;
+    border: 1px solid #C0C0C0;*/
     padding: 5px;
 }
 
@@ -1723,7 +1723,7 @@ table.rwd-table > tbody > tr > td.serachResultSelectAll
 .promoTextContainer
 {
     border-radius: 0px;
-    background-color: #9F01D5;
+    background-color: rgb(61, 184, 109);
     padding: 5px;
     font-size: 13px;
     color:#FFF;
@@ -1838,4 +1838,24 @@ table.rwd-table > tbody > tr > td.serachResultSelectAll
 .idp .btn-cont .col-lg-4
 {
     text-align: center;
+}
+.idp .msgBtnColor
+{
+    background: #D9ECFF;
+    color: #0DA3D8;
+}
+.idp .msgBtnColor:hover
+{
+    /*
+    background-color: #CED1D2;
+    color: #000;*/
+    border: 1px solid #FFF;
+    background: #98F098;
+    color: #3295BA;
+}
+.idp .about-company-text-font
+{
+    font-size: 1.3em;
+    color: rgb(144, 145, 150);
+    text-shadow: 1px 1px 1px #B2B6B8 !important;
 }

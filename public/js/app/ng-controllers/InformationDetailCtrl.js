@@ -106,7 +106,7 @@ angular.module('ezeidApp').
 
            // var TID = $routeParams.TID;
 
-
+            console.log($routeParams);
             var ezeone = $routeParams.ezeone;
 
 
@@ -297,6 +297,8 @@ angular.module('ezeidApp').
                 $http({ method: 'get', url: GURL + 'ewtCompanyProfile?TID=' + $scope.SearchInfo.TID}).success(function (data) {
                     if (data.Result.length > 0) {
                         $scope.companyTagLine = data.Result[0].TagLine;
+
+                        console.log($scope.companyTagLine);
                     }
                 });
             }
