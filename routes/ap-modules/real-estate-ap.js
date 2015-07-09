@@ -23,13 +23,13 @@ function alterEzeoneId(ezeoneId){
     return alteredEzeoneId;
 }
 
+var st = null;
 function RealEstate_AP(db,stdLib){
-    this.db = db;
+
     if(stdLib){
-        this.stdLib = stdLib;
+        st = stdLib;
     }
 };
-
 /**
  * Method : GET
  * @param req
@@ -50,10 +50,10 @@ RealEstate_AP.prototype.getRealStateDataAP = function(req,res,next){
         var Token = req.query.Token;
 
         if(Token != null && TID != null){
-            _this.stdLib.validateTokenAp(Token, function (err, Result) {
+            st.validateTokenAp(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
-                        _this.db.query('CALL pGetRealEstateData(' + _this.db.escape(TID)  + ')', function (err, RealStateResult) {
+                        st.db.query('CALL pGetRealEstateData(' + st.db.escape(TID)  + ')', function (err, RealStateResult) {
                             if (!err) {
                                 // console.log(PictuerResult);
                                 if (RealStateResult != null) {
@@ -166,21 +166,21 @@ RealEstate_AP.prototype.searchRealEstateAP = function(req,res,next){
         /*if (Status!=null && Purpose.toString() != 'NaN' && PropertyType!=null && PrefUser!=null && SpaceType !=null && SpaceQtyF !=null && SpaceQtyT !=null && RatingFrom !=null
          && RatingTo !=null && Latitude !=null && Longitude !=null && Proximity !=null && AreaUOM !=null && AreaFrom !=null
          && AreaTo !=null && FunishedType !=null && AmountFrom !=null && AmountTo !=null) {*/
-        _this.stdLib.validateTokenAp(Token, function (err, Result) {
+        st.validateTokenAp(Token, function (err, Result) {
             if (!err) {
                 if (Result != null) {
 
-                    var SearchQuery = _this.db.escape(Status) + ',' + _this.db.escape(Purpose) + ',' + _this.db.escape(PropertyType) + ',' + _this.db.escape(PrefUser) + ',' +
-                        _this.db.escape(SpaceType) + ',' + _this.db.escape(SpaceQtyF) + ',' + _this.db.escape(SpaceQtyT) + ',' + _this.db.escape(RatingFrom) + ',' + _this.db.escape(RatingTo) + ',' +
-                        _this.db.escape(Latitude) + ',' + _this.db.escape(Longitude) + ',' + _this.db.escape(Proximity) + ',' +_this.db.escape(AreaUOM) + ',' + _this.db.escape(AreaFrom) + ',' +
-                        _this.db.escape(AreaTo) + ',' + _this.db.escape(FunishedType) + ',' + _this.db.escape(AmountFrom) + ',' + _this.db.escape(AmountTo) + ',' +
-                        _this.db.escape(AgeFrom) + ',' + _this.db.escape(AgeTO) + ',' + _this.db.escape(NoOfBathrooms) + ',' +
-                        _this.db.escape(Gas) + ',' + _this.db.escape(Lift) + ',' + _this.db.escape(Gym) + ',' + _this.db.escape(SwimmingPool)
-                        + ',' + _this.db.escape(Security) + ',' + _this.db.escape(UPS);
+                    var SearchQuery = st.db.escape(Status) + ',' + st.db.escape(Purpose) + ',' + st.db.escape(PropertyType) + ',' + st.db.escape(PrefUser) + ',' +
+                        st.db.escape(SpaceType) + ',' + st.db.escape(SpaceQtyF) + ',' + st.db.escape(SpaceQtyT) + ',' + st.db.escape(RatingFrom) + ',' + st.db.escape(RatingTo) + ',' +
+                        st.db.escape(Latitude) + ',' + st.db.escape(Longitude) + ',' + st.db.escape(Proximity) + ',' +st.db.escape(AreaUOM) + ',' + st.db.escape(AreaFrom) + ',' +
+                        st.db.escape(AreaTo) + ',' + st.db.escape(FunishedType) + ',' + st.db.escape(AmountFrom) + ',' + st.db.escape(AmountTo) + ',' +
+                        st.db.escape(AgeFrom) + ',' + st.db.escape(AgeTO) + ',' + st.db.escape(NoOfBathrooms) + ',' +
+                        st.db.escape(Gas) + ',' + st.db.escape(Lift) + ',' + st.db.escape(Gym) + ',' + st.db.escape(SwimmingPool)
+                        + ',' + st.db.escape(Security) + ',' + st.db.escape(UPS);
 
                     console.log(SearchQuery);
 
-                    _this.db.query('CALL pSearchRealEstateData(' + SearchQuery + ')', function (err, SearchResult) {
+                    st.db.query('CALL pSearchRealEstateData(' + SearchQuery + ')', function (err, SearchResult) {
                         if (!err) {
                             if (SearchResult[0] != null) {
                                 if (SearchResult[0].length > 0) {

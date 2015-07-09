@@ -140,7 +140,7 @@ function FnSendMailEzeid(MailContent, CallBack) {
                 toname: '',
                 subject: MailContent.subject,
                 html: MailContent.html,
-                from: 'noreply@ezeid.com',
+                from: 'noreply@ezeone.com',
                 replyto: MailContent.replyTo
             };
 
