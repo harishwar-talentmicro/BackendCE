@@ -151,6 +151,8 @@ angular.module('ezeidApp').
 
             $scope.validateFlag = true;
 
+            $scope.selectionString = '';
+
             /**
              * Feature list for feature list type block
              * @type {{primary: Array, functions: Array}}
@@ -189,6 +191,8 @@ angular.module('ezeidApp').
                 password : ''
             };
 
+
+
             /**
              * Selects a plan (signup business type)
              * @param userType
@@ -203,9 +207,19 @@ angular.module('ezeidApp').
                     $scope.showBusinnessSelectionType = true;
                 }
                 else{
+                    $scope.selectionString = (parseInt($scope.userType) == 1) ? 'Your are signing up as an individual'
+                        : 'You are signing up as a public place';
                     $scope.isEzeidCheckBlockVisible = true;
                 }
 
+            };
+
+            $scope.selectPlanSelectionType = function(planSelectionType){
+                $scope.selectionString = (parseInt(planSelectionType) == 2) ? 'Your are signing up as a business (paid listing)'
+                    : 'You are signing up as a business (free listing)';
+                $scope.showBusinnessSelectionType = false;
+                $scope.planSelectionType = planSelectionType;
+                $scope.isEzeidCheckBlockVisible = true;
             };
 
 
@@ -267,8 +281,24 @@ angular.module('ezeidApp').
                 $scope.resetForm();
                 $scope.signUpForm.$setPristine();
                 $scope.isSignUpTypeBlockVisible = true;
+                $scope.showBusinnessSelectionType = false;
                 $scope.isEzeidCheckBlockVisible = false;
             };
+
+
+            /* toggle modal visibility */
+            $scope.modalVisible = false;
+            $scope.modalVisibility = function () {
+                /* toggle map visibility status */
+                $scope.modalVisible = !$scope.modalVisible;
+            };
+
+            /* detail modal goes here */
+            $scope.modalBox = {
+                title : 'Features',
+                class : 'business-manager-modal'
+            };
+
 
 
             /**

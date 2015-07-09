@@ -72,8 +72,7 @@
      * for eg. User cannot open signup page while he is logged in
      */
     ezeid.value('UNAUTHORIZED_ROUTES',[
-        '/signup',
-        '/signup1'
+        '/signup'
     ]);
 
     ezeid.value('MsgDelay',5000);
@@ -163,10 +162,6 @@
             .when('/showmapview',{templateUrl : 'html/showmapview.html'})
             .when('/viewdirection',{templateUrl : 'html/viewdirection.html'})
             .when('/signup',{
-                templateUrl : 'html/profile/sign-up.html',
-                controller : 'SignUpCtrl'
-            })
-            .when('/signup1',{
                 templateUrl : 'html/sign-up/sign-up-wizard.html',
                 controller : 'SignUpWizardCtrl'
             })
@@ -225,10 +220,6 @@
                 templateUrl : 'html/business-manager/resume/resume-front.html',
                 controller : 'ResumeFrontCtrl'
             })
-            //.when('/:ezeid',{
-            //    templateUrl: 'html/landing.html',
-            //    controller : 'LandingPageCtrl'
-            //})
             .when('/:ezeone',{
                 templateUrl : 'html/informationDetail.html',
                 controller : 'InformationDetailCtrl'
@@ -273,21 +264,6 @@
 
             });
 
-
-
-            //$rootScope.$on('$preLoaderStart',function(){
-            //    if($('#progress-overlay').hasClass('hidden')){
-            //        $('#progress-overlay').removeClass('hidden');
-            //    }
-            //});
-            //
-            //$rootScope.$on('$preLoaderStop',function(){
-            //    if(!$('#progress-overlay').hasClass('hidden')){
-            //
-            //        $('#progress-overlay').addClass('hidden');
-            //    }
-            //});
-
             $rootScope.$on('$preLoaderStart',function(){
                 dataProgress = true;
                 if(!htmlProgress){
@@ -319,7 +295,6 @@
             /**
              * Fetching userInfo From local storage here if userInfo is not found in $rootScope
              */
-            ////////console.log($queryLsToken);
             if(!$rootScope._userInfo){
                 $rootScope._userInfo = $queryLsToken;
             }
