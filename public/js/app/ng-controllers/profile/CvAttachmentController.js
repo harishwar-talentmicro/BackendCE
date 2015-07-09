@@ -19,39 +19,7 @@ angular.module('ezeidApp').controller('CVAttachController',[
     var skillsTid = [];
     $scope.availableTags = [];
 
-    if ($rootScope._userInfo) {
-    }
-    else {
-        if (typeof (Storage) !== "undefined") {
-            var encrypted = localStorage.getItem("_token");
-            if (encrypted) {
-                var decrypted = CryptoJS.AES.decrypt(encrypted, "EZEID");
-                var Jsonstring = decrypted.toString(CryptoJS.enc.Utf8);
-                if (Jsonstring) {
-                    $rootScope._userInfo = JSON.parse(Jsonstring);
-                }
-            }
-            else {
-                $rootScope._userInfo = {
-                    IsAuthenticate: false,
-                    Token: '',
-                    FirstName: '',
-                    Type:'',
-                    Icon:''
-                };
-            }
-        } else {
-            // Sorry! No Web Storage support..
-            $rootScope._userInfo = {
-                IsAuthenticate: false,
-                Token: '',
-                FirstName: '',
-                Type:'',
-                Icon:''
-            };
-            $location.path('/');
-        }
-    }
+
 
     $scope.$watch('_userInfo.IsAuthenticate', function () {
         if ($rootScope._userInfo.IsAuthenticate == true) {
@@ -120,12 +88,8 @@ angular.module('ezeidApp').controller('CVAttachController',[
            $scope.skillMatrix[nCount].active_status = ($scope.skillMatrix[nCount].active_status == true) ? 1 : 0;
        }
 
-        ////console.log($scope.skillMatrix);
-
         if(($scope.skillMatrix[0].skillname == "") && ($scope.skillMatrix[0].exp == ""))
         {
-           // $scope.skillMatrix = [];
-
             var index = 0;
 
             if (index > -1) {
@@ -311,20 +275,57 @@ angular.module('ezeidApp').controller('CVAttachController',[
             }
         });
 
+        function checkSkilExistance()
+        {
+
+        }
         $scope.saveSkillFn = function(index){
+
+            //checkSkilExistance();
             if(index == 0){
+                var ind = $scope.skillMatrix.indexOfWhere('skillname',$scope.editSkill.skillname);
+                if(ind > 0){
+                    $scope.editSkill = {
+                        "tid":0,
+                        "skillname":"",
+                        "expertiseLevel":0,
+                        "exp":"",
+                        "active_status":1
+                    };
+                    return;
+                }
+
                 var newSkill = angular.copy($scope.editSkill);
+                $scope.editMode.push(false);
                 $scope.skillMatrix.push(newSkill);
-                $scope.editSkill = editSkill;
+                $scope.editSkill = {
+                    "tid":0,
+                    "skillname":"",
+                    "expertiseLevel":0,
+                    "exp":"",
+                    "active_status":1
+                };
             }
             else{
                 $scope.skillMatrix[index] = angular.copy($scope.editSkill);
                 $scope.editMode[index] = false;
+                $scope.editMode[0] = true;
+                $scope.editSkill = {
+                    "tid":0,
+                    "skillname":"",
+                    "expertiseLevel":0,
+                    "exp":"",
+                    "active_status":1
+                };
             }
 
-            $scope.skillMatrix[0] = editSkill;
-            $scope.editSkill = editSkill;
-            $scope.editMode[0] = true;
+            $scope.skillMatrix[0] = {
+                "tid":0,
+                "skillname":"",
+                "expertiseLevel":0,
+                "exp":"",
+                "active_status":1
+            };
         };
 
     this.closeCVDocInfo=function(cvForm){
@@ -388,6 +389,9 @@ angular.module('ezeidApp').controller('CVAttachController',[
     $scope.deleteSkilFromMartix=function(_index, _tid)
     {
         if (_index > -1) {
+
+            $scope.editMode.splice(_index,1);
+
             $scope.skillMatrix.splice(_index, 1);
             skillsTid.splice(_index,1);
         }
@@ -395,6 +399,7 @@ angular.module('ezeidApp').controller('CVAttachController',[
         {
             $scope.skillMatrix = [];
             skillsTid = [];
+            $scope.editMode = [];
         }
     };
 
