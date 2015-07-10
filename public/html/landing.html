@@ -8,47 +8,15 @@
 
         <!-- Mid contents of the Header image goes here -->
         <div class="landing-center">
-            <div class="main-title text-bolder">IDENTIFY <i class="fa fa-arrow-circle-right"></i> LOCATE <i class="fa fa-arrow-circle-right"></i> COMMUNICATE</div>
+            <div class="main-title text-bolder">IDENTIFY <i class="fa fa-arrow-circle-right"></i> LOCATE <i class="fa fa-arrow-circle-right"></i> INTERACT</div>
             <div class="main-subtitle">Search any product or service in your neighbourhood. <b>It is Easy, Accurate & Verified</b></div>
             <!-- Search Bar goes here -->
             <div class="container m_top_10">
                 <div class="row">
                     <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 col-lg-offset-2 col-md-offset-2 col-sm-offset-2 col-xs-offset-0">
-                        <div class="input-group p-bottom-3">
-                            <div class="input-group-btn">
-                                <!-- Change Location btn -->
-                                <button  data-toggle="tooltip"
-                                         type="button" ng-click="modalVisibility()" class="btn btn-info normal-view-buttons"
-                                         title="Click to change Search Location"><i class="fa fa-map-marker"></i>
-                                    <b class="">Location</b>
-                                </button>
-                                <!-- Searc type button -->
-                                <button title="Search by" type="button" class="btn btn-default normal-view-buttons dropdown-toggle keyword-btn-radius" data-toggle="dropdown">
-                                    <b>{{searchType[searchParams.searchType - 1]}}</b>
-                                    <span class="caret"></span></button>
-                                <ul class="dropdown-menu" role="menu">
-                                    <li class="btn-link" ng-repeat="search in searchType track by $index">
-                                        <!-- Index incremented by 1: As the array's default index is [0,1,2] & searchType's value is [1,2,3] -->
-                                        <a class="btn-link" ng-click="($event.preventDefault())(searchParams.searchType = $index + 1) (searchParams.searchTerm = '')">{{search}}</a>
-                                    </li>
-                                </ul>
-                            </div>
-                            <!--<input type="text" ng-keypress="checkEnterKey($event)" placeholder="{{placeHolderText[searchParams.searchType - 1]}}" ng-model="searchParams.searchTerm" ng-class="(searchParams.searchType === 1) ? 'text-uppercase' : ''" class="form-control" aria-label="...">-->
-                            <input type="text" id="tags" ng-keypress="checkEnterKey($event)" placeholder="{{placeHolderText[searchParams.searchType - 1]}}" ng-model="searchParams.searchTerm" ng-class="(searchParams.searchType === 1) ? 'text-uppercase' : ''" class="form-control" aria-label="...">
-                            <div class="input-group-btn">
-                                <!-- Filter BTN -->
-                                <button  data-toggle="tooltip"  ng-click="toggleFilterContainer($event,true)" ng-disabled="searchParams.searchType === 1"
-                                         type="button" class="btn no-radius normal-view-buttons btn-default dropdown-toggle btn-advanced-filter" data-toggle="dropdown" title="Click to choose Search Options"><i class="fa fa-check-square-o"></i> <b class="normal-view-buttons">Options</b></button>
-                                <!-- Search BTN -->
-                                <button  data-toggle="tooltip" type="button" class="btn btn-warning"
-                                         title="search" ng-click="triggerSearch()">
-                                    <i class="fa fa-search"></i> <b class="normal-view-buttons">Search</b>
-                                    </b></button>
-                            </div>
-                        </div>
 
                         <!-- Filter buttons goes here in MOBILE VIEW-->
-                        <div class="mobile-view-buttons text-center">
+                        <div class="mobile-view-buttons text-center p-bottom-3">
                             <div class="input-group">
                                 <div class="btn-group">
                                     <button type="button"
@@ -78,6 +46,46 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="input-group p-bottom-3">
+                            <div class="input-group-btn">
+                                <!-- Change Location btn -->
+                                <button  data-toggle="tooltip"
+                                         type="button" ng-click="modalVisibility()" class="btn btn-dark-blue normal-view-buttons"
+                                         title="Click to change Search Location"><i class="fa fa-map-marker"></i>
+                                    <b class="">Location</b>
+                                </button>
+                                <!-- Searc type button -->
+                                <button title="Search by" type="button" class="btn btn-default normal-view-buttons dropdown-toggle keyword-btn-radius" data-toggle="dropdown">
+                                    <b>{{searchType[searchParams.searchType - 1]}}</b>
+                                    <span class="caret"></span></button>
+                                <ul class="dropdown-menu" role="menu">
+                                    <li class="btn-link" ng-repeat="search in searchType track by $index">
+                                        <!-- Index incremented by 1: As the array's default index is [0,1,2] & searchType's value is [1,2,3] -->
+                                        <a class="btn-link" ng-click="($event.preventDefault())(searchParams.searchType = $index + 1) (searchParams.searchTerm = '')">{{search}}</a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <!--<input type="text" ng-keypress="checkEnterKey($event)" placeholder="{{placeHolderText[searchParams.searchType - 1]}}" ng-model="searchParams.searchTerm" ng-class="(searchParams.searchType === 1) ? 'text-uppercase' : ''" class="form-control" aria-label="...">-->
+                            <input type="text" id="searchTextField" ng-keypress="checkEnterKey($event)" placeholder="{{placeHolderText[searchParams.searchType - 1]}}" ng-model="searchParams.searchTerm" ng-class="(searchParams.searchType === 1) ? 'text-uppercase' : ''" class="form-control dropdown-toggle" aria-label="..." data-toggle="dropdown">
+
+                            <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel" style="margin-left: 32%;" ng-show="(params.searchType == 2) && (KeyWords.length > 0) && (params.searchTerm.length)">
+                                <li ng-repeat="KeyWord in KeyWords">
+                                    <a ng-click="setAutoCompeted(KeyWord)">{{KeyWord}}</a>
+                                </li>
+                            </ul>
+                            <div class="input-group-btn">
+                                <!-- Filter BTN -->
+                                <button  data-toggle="tooltip"  ng-click="toggleFilterContainer($event,true)" ng-disabled="searchParams.searchType === 1"
+                                         type="button" class="btn no-radius normal-view-buttons btn-default dropdown-toggle btn-advanced-filter" data-toggle="dropdown" title="Click to choose Search Options"><i class="fa fa-check-square-o"></i> <b class="normal-view-buttons">Options</b></button>
+                                <!-- Search BTN -->
+                                <button  data-toggle="tooltip" type="button" class="btn btn-dark-orange"
+                                         title="search" ng-click="triggerSearch()">
+                                    <i class="fa fa-search"></i> <b class="normal-view-buttons">Search</b>
+                                    </b></button>
+                            </div>
+                        </div>
+
+
                         <!-- User's present location goes here -->
                         <div class="current-location text-center">
                             <p class="text-white">
@@ -160,284 +168,522 @@
             </div>
         </div>
     </div>
-    <div class="tag-line red">
+    <!-- Seperator strip -->
+    <div class="tag-line seperator-bg">
         <div class="container width-75">
-            <p class="text-center text-white text-bolder p-top-7">
-                First of its kind digital place for coexistence of Individuals and Business Organizations. <a ng-hide="$root._userInfo.IsAuthenticate" href="/signup" class="text-white">Sign up now.</a>
+            <p class="text-center text-white text-open-sans p-top-7 tag-line-text">
+                World's first Geo-Marketplace!</p>
+            <hr class="style-two">
+            <p class="tag-line-text-desc">
+                Sign up with EZEOne now and transform the way your share information with others
+                and find anything you need nearest your location and reach their doorstep or
+                transact online.
                 ​</p>
         </div>
     </div>
-    <div class="description-page negetive-z-index">
-        <div class="container width-81">
-            <div class="description-content">
-                <!-- Description contents goes here -->
-                <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 text-center description-tab">
-                    <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12">
-                        <!-- Image goes here -->
-                        <div class="font-awesome-image">
-                            <!--<i class="fa fa-map-marker fa-3x text-red"></i>-->
-                            <img src="../images/radar.png" class="width-100-px" />
-                        </div>
-                    </div>
-                    <div class="col-lg-8 col-md-12 col-sm-12 col-xs-12">
-                        <!-- Description goes here -->
-                        <p class="text-justify">The first proximity based search and e-business platform that connects business with neighbourhood consumers</p>
-                    </div>
-                </div>
 
-                <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 text-center description-tab">
-                    <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12">
-                        <!-- Image goes here -->
-                        <div class="font-awesome-image">
-                            <img src="../images/CRM.png" class="width-100-px" />
-                            <!--<i class="fa fa-recycle fa-3x text-info"></i>-->
-                        </div>
-                    </div>
-                    <div class="col-lg-8 col-md-12 col-sm-12 col-xs-12">
-                        <!-- Description goes here -->
-                        <p class="text-justify">
-                            Business Organization can build online business functionality like​
-                            Online Sales Enquiries, Home Delivery, Appointments/Reservation, Helpdesk and Submit CV.
-                        </p>
-                    </div>
-                </div>
 
-                <div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 text-center description-tab">
-                    <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12">
-                        <!-- Image goes here -->
-                        <div class="font-awesome-image">
-                            <!--<i class="fa fa-thumbs-up fa-3x text-success"></i>-->
-                            <img src="../images/online-shopping.png" class="width-100-px" />
-                        </div>
-                    </div>
-                    <div class="col-lg-8 col-md-12 col-sm-12 col-xs-12">
-                        <!-- Description goes here -->
-                        <p class="text-justify">
-                            Individuals will enjoy the benefits of sharing any personal information just by a short code and locate anything you need in your neighbourhood
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    <!-- Small description strip -->
+    <!--<div class="description-page negetive-z-index">-->
+    <!--<div class="container width-81">-->
+    <!--<div class="description-content">-->
+    <!--&lt;!&ndash; Description contents goes here &ndash;&gt;-->
+    <!--<div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 text-center description-tab">-->
+    <!--<div class="col-lg-4 col-md-12 col-sm-12 col-xs-12">-->
+    <!--&lt;!&ndash; Image goes here &ndash;&gt;-->
+    <!--<div class="font-awesome-image">-->
+    <!--&lt;!&ndash;<i class="fa fa-map-marker fa-3x text-red"></i>&ndash;&gt;-->
+    <!--<img src="../images/radar.png" class="width-100-px" />-->
+    <!--</div>-->
+    <!--</div>-->
+    <!--<div class="col-lg-8 col-md-12 col-sm-12 col-xs-12">-->
+    <!--&lt;!&ndash; Description goes here &ndash;&gt;-->
+    <!--<p class="text-justify">The first proximity based search and e-business platform that connects business with neighbourhood consumers</p>-->
+    <!--</div>-->
+    <!--</div>-->
+
+    <!--<div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 text-center description-tab">-->
+    <!--<div class="col-lg-4 col-md-12 col-sm-12 col-xs-12">-->
+    <!--&lt;!&ndash; Image goes here &ndash;&gt;-->
+    <!--<div class="font-awesome-image">-->
+    <!--<img src="../images/CRM.png" class="width-100-px" />-->
+    <!--&lt;!&ndash;<i class="fa fa-recycle fa-3x text-info"></i>&ndash;&gt;-->
+    <!--</div>-->
+    <!--</div>-->
+    <!--<div class="col-lg-8 col-md-12 col-sm-12 col-xs-12">-->
+    <!--&lt;!&ndash; Description goes here &ndash;&gt;-->
+    <!--<p class="text-justify">-->
+    <!--Business Organization can build online business functionality like​-->
+    <!--Online Sales Enquiries, Home Delivery, Appointments/Reservation, Helpdesk and Submit CV.-->
+    <!--</p>-->
+    <!--</div>-->
+    <!--</div>-->
+
+    <!--<div class="col-lg-4 col-md-6 col-sm-12 col-xs-12 text-center description-tab">-->
+    <!--<div class="col-lg-4 col-md-12 col-sm-12 col-xs-12">-->
+    <!--&lt;!&ndash; Image goes here &ndash;&gt;-->
+    <!--<div class="font-awesome-image">-->
+    <!--&lt;!&ndash;<i class="fa fa-thumbs-up fa-3x text-success"></i>&ndash;&gt;-->
+    <!--<img src="../images/online-shopping.png" class="width-100-px" />-->
+    <!--</div>-->
+    <!--</div>-->
+    <!--<div class="col-lg-8 col-md-12 col-sm-12 col-xs-12">-->
+    <!--&lt;!&ndash; Description goes here &ndash;&gt;-->
+    <!--<p class="text-justify">-->
+    <!--Individuals will enjoy the benefits of sharing any personal information just by a short code and locate anything you need in your neighbourhood-->
+    <!--</p>-->
+    <!--</div>-->
+    <!--</div>-->
+    <!--</div>-->
+    <!--</div>-->
+    <!--</div>-->
+
+
     <!-- Detailed page -->
-    <div class="detailed-page">
-        <div class="container width-75">
-            <div class="description-heading text-center">
-                <div class=" p-top-10">
-                    <h3 class="text-bolder text-white font-roboto">ALL ABOUT EZEONE</h3>
+    <!--<div class="detailed-page">-->
+    <!--<div class="container width-75">-->
+    <!--<div class="description-heading text-center">-->
+    <!--<div class=" p-top-10">-->
+    <!--<h3 class="text-bolder text-white font-roboto">ALL ABOUT EZEONE</h3>-->
 
-                    <h6 class="text-white text-bolder"> Worlds first short coded personal information wallet, business listing & online business platform.</h6>
-                </div>
-                <i class="fa fa-quote-left fa-2x p-top-10 text-gray"></i>
-            </div>
-            <!-- Description content -->
-            <!-- Description 1 -->
-            <div class="row">
-                <div class="col-lg-6 col-md-12 col-sm-6 col-xs-12">
-                    <div class="content p-top-40">
-                        <p class="text text-justify font-roboto text-white text-bolder font-16">
-                            Publish your Business on EZEOne to go online in just a few hours and get maximum exposure to help buyers through Business Tools round the clock.
-                        </p>
-                        <hr class="style-one">
+    <!--<h6 class="text-white text-bolder"> Worlds first short coded personal information wallet, business listing & online business platform.</h6>-->
+    <!--</div>-->
+    <!--<i class="fa fa-quote-left fa-2x p-top-10 text-gray"></i>-->
+    <!--</div>-->
+    <!--&lt;!&ndash; Description content &ndash;&gt;-->
+    <!--&lt;!&ndash; Description 1 &ndash;&gt;-->
+    <!--<div class="row">-->
+    <!--<div class="col-lg-6 col-md-12 col-sm-6 col-xs-12">-->
+    <!--<div class="content p-top-40">-->
+    <!--<p class="text text-justify font-roboto text-white text-bolder font-16">-->
+    <!--Publish your Business on EZEOne to go online in just a few hours and get maximum exposure to help buyers through Business Tools round the clock.-->
+    <!--</p>-->
+    <!--<hr class="style-one">-->
 
-                        <ul class=" font-roboto text-white text-12 text-bolder text-justify p-left-16">
-                            <li>
-                                Unique lifetime EZEOne linked to Geo Location of all your business locations
-                            </li>
-                            <li>
-                                List all your Products and Services to help your neighborhood locate you and be visible to the world​
-                            </li>
-                            <li>
-                                Enable Business Links to help Buyers Order Online (Sales Enquiries, Reservation/Appointments, Home Delivery, Online Helpdesk & Submit CV link for Jobseekers to apply for open positions online)
-                            </li>
-                            <li>
-                                Use EZEOne online CRM software tools free of cost to enable your entire business & recruitment process online
-                            </li>
-                            <li>
-                                Go online in a few minutes or if you are online, then build more traffic by linking EZEOne brand presence to  your online business platform​
-                            </li>
-                        </ul>
+    <!--<ul class=" font-roboto text-white text-12 text-bolder text-justify p-left-16">-->
+    <!--<li>-->
+    <!--Unique lifetime EZEOne linked to Geo Location of all your business locations-->
+    <!--</li>-->
+    <!--<li>-->
+    <!--List all your Products and Services to help your neighborhood locate you and be visible to the world​-->
+    <!--</li>-->
+    <!--<li>-->
+    <!--Enable Business Links to help Buyers Order Online (Sales Enquiries, Reservation/Appointments, Home Delivery, Online Helpdesk & Submit CV link for Jobseekers to apply for open positions online)-->
+    <!--</li>-->
+    <!--<li>-->
+    <!--Use EZEOne online CRM software tools free of cost to enable your entire business & recruitment process online-->
+    <!--</li>-->
+    <!--<li>-->
+    <!--Go online in a few minutes or if you are online, then build more traffic by linking EZEOne brand presence to  your online business platform​-->
+    <!--</li>-->
+    <!--</ul>-->
 
-                    </div>
-                </div>
-                <div class="col-lg-6 col-md-12 col-sm-6 col-xs-12">
-                    <div class="content p-top-40">
-                        <p class="text text-justify font-roboto text-white text-bolder font-16">
-                            EZEOne is the best method to store your Geo Location, Address and all commonly shared documents to share the same with eases.
-                        </p>
-                        <hr class="style-one">
+    <!--</div>-->
+    <!--</div>-->
+    <!--<div class="col-lg-6 col-md-12 col-sm-6 col-xs-12">-->
+    <!--<div class="content p-top-40">-->
+    <!--<p class="text text-justify font-roboto text-white text-bolder font-16">-->
+    <!--EZEOne is the best method to store your Geo Location, Address and all commonly shared documents to share the same with eases.-->
+    <!--</p>-->
+    <!--<hr class="style-one">-->
 
-                        <ul class=" font-roboto text-white text-12 text-bolder text-justify p-left-16">
-                            <li>
-                                Unique lifetime EZEOne linked to Geo Location, Address(s) & Documents(ID, CV, Passport etc…)
-                            </li>
-                            <li>
-                                Share your location or documents on demand just by sharing your EZEOne and the respective Section tag and PIN to make sure your share only specific information and access is secure
-                            </li>
-                            <li>
-                                Locate any business by the product or services in your neighborhood or nearby your place and buy online to save time, cost and efforts.
-                            </li>
-                            <li>
-                                Save time and efforts in sharing detailed location, landmark, address or documents by just sharing your EZEOne followed by the Sections Tag to share only specific data(Example: YOURID.ID.437 to share your ID Card)​
-                                Reach any place using EZEOne right to door-step. Say goodbye to landmarks or directions​
-                            </li>
+    <!--<ul class=" font-roboto text-white text-12 text-bolder text-justify p-left-16">-->
+    <!--<li>-->
+    <!--Unique lifetime EZEOne linked to Geo Location, Address(s) & Documents(ID, CV, Passport etc…)-->
+    <!--</li>-->
+    <!--<li>-->
+    <!--Share your location or documents on demand just by sharing your EZEOne and the respective Section tag and PIN to make sure your share only specific information and access is secure-->
+    <!--</li>-->
+    <!--<li>-->
+    <!--Locate any business by the product or services in your neighborhood or nearby your place and buy online to save time, cost and efforts.-->
+    <!--</li>-->
+    <!--<li>-->
+    <!--Save time and efforts in sharing detailed location, landmark, address or documents by just sharing your EZEOne followed by the Sections Tag to share only specific data(Example: YOURID.ID.437 to share your ID Card)​-->
+    <!--Reach any place using EZEOne right to door-step. Say goodbye to landmarks or directions​-->
+    <!--</li>-->
 
-                        </ul>
+    <!--</ul>-->
 
-                    </div>
-                </div>
-                <!-- Description 2 -->
-                <div class="col-lg-6 col-sm-6 col-md-12 col-xs-12">
+    <!--</div>-->
+    <!--</div>-->
+    <!--&lt;!&ndash; Description 2 &ndash;&gt;-->
+    <!--<div class="col-lg-6 col-sm-6 col-md-12 col-xs-12">-->
 
-                </div>
-            </div>
-        </div>
-    </div>
+    <!--</div>-->
+    <!--</div>-->
+    <!--</div>-->
+    <!--</div>-->
+
+
+
+
+
+
+
     <!-- Mobile App page -->
-    <div class="mobile-app-page ">
-        <div class="container width-75">
-            <div class="col-lg-8">
-                <div class="app-title text-center">
-                    <h2 style="margin-top: 10px;font-family: 'Arial',sans-serif;cursor:pointer"
-                        ng-click="$root.navigateHome()"
-                        class="font-roboto text-black text-bolder">
-                        <span class="text-dark-blue ezeid-eze-style">EZE</span><span class="ezeid-id-style">One
-                    <sup class="tm">TM</sup>
-                </span>
-                    </h2>
-                </div>
+    <!--<div class="mobile-app-page ">-->
+    <!--<div class="container width-75">-->
+    <!--<div class="col-lg-8">-->
+    <!--<div class="app-title text-center">-->
+    <!--<h2 style="margin-top: 10px;font-family: 'Arial',sans-serif;cursor:pointer"-->
+    <!--ng-click="$root.navigateHome()"-->
+    <!--class="font-roboto text-black text-bolder">-->
+    <!--<span class="text-dark-blue ezeid-eze-style">EZE</span><span class="ezeid-id-style">One-->
+    <!--<sup class="tm">TM</sup>-->
+    <!--</span>-->
+    <!--</h2>-->
+    <!--</div>-->
+    <!--</div>-->
+    <!--<div class="col-lg-4">&nbsp;</div>-->
+    <!--&lt;!&ndash;<hr class="style-two">&ndash;&gt;-->
+    <!--<div class="row p-top-30">-->
+    <!--&lt;!&ndash; Basic content &ndash;&gt;-->
+    <!--<div class="col-lg-8 col-md-12 col-sm-12 col-xs-12">-->
+
+    <!--<div class="text-center font-roboto mobile-title-content">-->
+    <!--<h4 class="text-bolder text-center mobile-page-heading">EZEOne is available through web portal, Android App and iOS App</h4>-->
+    <!--<span class="text-center">And it enable you to use the device of your choice.-->
+    <!--Navigation to a located EZEOne(Person or Business ID) is possible only through Mobile Apps,-->
+    <!--but buying online using web portal or mobile apps is easy and fun.-->
+    <!--</span>-->
+    <!--</div>-->
+
+    <!--&lt;!&ndash; Description Tiles &ndash;&gt;-->
+    <!--<div class="mobile-parent-tile tl row p-top-10">-->
+    <!--<div class="col-lg-5 p-bottom-20">-->
+    <!--<div class="container mobile-individual-tile mobile-tile1">-->
+    <!--<div class="text-center tile-initial-image">-->
+    <!--<i class="fa fa-search text-white fa-4x"></i>-->
+    <!--</div>-->
+    <!--<div class="textbox">-->
+    <!--<p class="text text-center text-white text-bolder text-box-justify">Find your Friend or a Business by EZEOne and reach the door step with no further help</p>-->
+    <!--</div>-->
+
+    <!--</div>-->
+    <!--</div>-->
+    <!--<div class="col-lg-7 p-bottom-20">-->
+    <!--<div class="container mobile-individual-tile mobile-tile2">-->
+    <!--<div class="text-center tile-initial-image">-->
+    <!--<i class="fa fa-file-word-o text-white fa-4x"></i>-->
+    <!--</div>-->
+    <!--<div class="textbox">-->
+    <!--<p class="text text-center text-white text-bolder text-box-justify">Submit your CV to matching Employers of your neighbourhood for a happy career</p>-->
+    <!--</div>-->
+
+    <!--</div>-->
+    <!--</div>-->
+    <!--<div class="col-lg-4 p-bottom-20">-->
+    <!--<div class="container mobile-individual-tile mobile-tile3">-->
+    <!--<div class="text-center tile-initial-image">-->
+    <!--&lt;!&ndash;<i class="fa fa-comments text-white fa-4x"></i>&ndash;&gt;-->
+    <!--<i class="fa fa-envelope-o text-white fa-4x"></i>-->
+    <!--</div>-->
+    <!--<div class="textbox">-->
+    <!--<p class="text text-center text-white text-bolder text-box-justify">-->
+    <!--Notify Friends or Business 24x7. Now you can reach any Business 24x7 and buy when you wish​-->
+    <!--</p>-->
+    <!--</div>-->
+
+    <!--</div>-->
+    <!--</div>-->
+    <!--<div class="col-lg-4 p-bottom-20">-->
+    <!--<div class="container mobile-individual-tile mobile-tile4">-->
+    <!--<div class="text-center tile-initial-image">-->
+    <!--<i class="fa fa-user-md text-white fa-4x"></i>-->
+    <!--</div>-->
+    <!--<div class="textbox">-->
+    <!--<p class="text text-center text-white text-bolder text-box-justify">-->
+    <!--Find a Doctor, SPA/Saloon or a Restaurant near  you and block the schedule on the spot​-->
+    <!--</p>-->
+    <!--</div>-->
+
+    <!--</div>-->
+    <!--</div>-->
+    <!--<div class="col-lg-4 p-bottom-20">-->
+    <!--<div class="container mobile-individual-tile mobile-tile5">-->
+    <!--<div class="text-center tile-initial-image">-->
+    <!--<i class="fa fa-shopping-cart text-white fa-4x"></i>-->
+    <!--</div>-->
+    <!--<div class="textbox">-->
+    <!--<p class="text text-center text-white text-bolder text-box-justify">Find a product or service and just click to order online.</p>-->
+    <!--</div>-->
+
+    <!--</div>-->
+    <!--</div>-->
+    <!--&lt;!&ndash; Download Mobile App &ndash;&gt;-->
+    <!--<div class="col-lg-6 p-bottom-20">-->
+    <!--<div class="container mobile-individual-tile mobile-tile6">-->
+    <!--<div class="text-center tile-initial-image">-->
+    <!--<i class="fa fa-mortar-board text-white fa-4x"></i>-->
+    <!--</div>-->
+    <!--<div class="textbox">-->
+    <!--<p class="text text-center text-white text-box-justify">-->
+    <!--Enable Jobseekers to find you by skill keywords you hire and help them submit their CV just by a click of a button. Let nearby jobseekers apply and make a greener world​.-->
+    <!--</p>-->
+    <!--</div>-->
+
+    <!--</div>-->
+    <!--</div>-->
+    <!--<div class="col-lg-6 p-bottom-20">-->
+    <!--<div class="container mobile-individual-tile mobile-tile7">-->
+    <!--<div class="text-center tile-initial-image">-->
+    <!--<i class="fa fa-street-view text-white fa-4x"></i>-->
+    <!--</div>-->
+    <!--<div class="textbox">-->
+    <!--<p class="text text-center text-white text-bolder text-box-justify">-->
+    <!--Sharing an Address/Location or a Document has never been so easy. Welcome to digitally mapped world​.-->
+    <!--</p>-->
+    <!--</div>-->
+
+    <!--</div>-->
+    <!--</div>-->
+
+    <!--</div>-->
+    <!--</div>-->
+    <!--&lt;!&ndash; Image goes here &ndash;&gt;-->
+    <!--<div class="col-lg-4 hidden-1200 hidden-sm hidden-xs">-->
+    <!--<div class="phone-img p-5">-->
+    <!--<img src="../images/iphone_ss.png" />-->
+    <!--</div>-->
+
+    <!--</div>-->
+    <!--</div>-->
+    <!--</div>-->
+    <!--</div>-->
+
+
+    <!-- main page explainatory tiles -->
+    <div class="description desc-bg-color">
+        <div class="head-text-gradient p-top-100">
+            <div class="width-75">
+                <p><i class="fa fa-user"></i> For Peoples</p>
             </div>
-            <div class="col-lg-4">&nbsp;</div>
-            <!--<hr class="style-two">-->
-            <div class="row p-top-30">
-                <!-- Basic content -->
-                <div class="col-lg-8 col-md-12 col-sm-12 col-xs-12">
+        </div>
+        <div class="container width-75 idp">
 
-                    <div class="text-center font-roboto mobile-title-content">
-                        <h4 class="text-bolder text-center mobile-page-heading">EZEOne is available through web portal, Android App and iOS App</h4>
-                            <span class="text-center">And it enable you to use the device of your choice.
-                            Navigation to a located EZEOne(Person or Business ID) is possible only through Mobile Apps,
-                            but buying online using web portal or mobile apps is easy and fun.
-                                </span>
-                    </div>
+            <div class="mobile-parent-tile tl row p-top-10 row">
+                <!-- Individual boxes goes here -->
 
-                    <!-- Description Tiles -->
-                    <div class="mobile-parent-tile tl row p-top-10">
-                        <div class="col-lg-5 p-bottom-20">
-                            <div class="container mobile-individual-tile mobile-tile1">
-                                <div class="text-center tile-initial-image">
-                                    <i class="fa fa-search text-white fa-4x"></i>
-                                </div>
-                                <div class="textbox">
-                                    <p class="text text-center text-white text-bolder p3">Find your Friend or a Business by EZEOne and reach the door step with no further help</p>
-                                </div>
-
+                <!-- Tile 1 -->
+                <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                    <div class="container mobile-individual-tile">
+                        <div class="individual-box tile-initial-image">
+                            <div class="individual-box-heading">
+                                Get your Lifetime ID<br>&nbsp;
                             </div>
-                        </div>
-                        <div class="col-lg-7 p-bottom-20">
-                            <div class="container mobile-individual-tile mobile-tile2">
-                                <div class="text-center tile-initial-image">
-                                    <i class="fa fa-file-word-o text-white fa-4x"></i>
-                                </div>
-                                <div class="textbox">
-                                    <p class="text text-center text-white text-bolder p3">Submit your CV to matching Employers of your neighbourhood for a happy career</p>
-                                </div>
-
+                            <div class="individual-box-image">
+                                <img src="../images/tile1.png" class="width-190-px" />
                             </div>
-                        </div>
-                        <div class="col-lg-4 p-bottom-20">
-                            <div class="container mobile-individual-tile mobile-tile3">
-                                <div class="text-center tile-initial-image">
-                                    <!--<i class="fa fa-comments text-white fa-4x"></i>-->
-                                    <i class="fa fa-envelope-o text-white fa-4x"></i>
-                                </div>
-                                <div class="textbox">
-                                    <p class="text text-center text-white text-bolder p3">
-                                        Notify Friends or Business 24x7. Now you can reach any Business 24x7 and buy when you wish​
-                                    </p>
-                                </div>
-
-                            </div>
-                        </div>
-                        <div class="col-lg-4 p-bottom-20">
-                            <div class="container mobile-individual-tile mobile-tile4">
-                                <div class="text-center tile-initial-image">
-                                    <i class="fa fa-user-md text-white fa-4x"></i>
-                                </div>
-                                <div class="textbox">
-                                    <p class="text text-center text-white text-bolder p3">
-                                        Find a Doctor, SPA/Saloon or a Restaurant near  you and block the schedule on the spot​
-                                    </p>
-                                </div>
-
-                            </div>
-                        </div>
-                        <div class="col-lg-4 p-bottom-20">
-                            <div class="container mobile-individual-tile mobile-tile5">
-                                <div class="text-center tile-initial-image">
-                                    <i class="fa fa-shopping-cart text-white fa-4x"></i>
-                                </div>
-                                <div class="textbox">
-                                    <p class="text text-center text-white text-bolder p3">Find a product or service and just click to order online.</p>
-                                </div>
-
-                            </div>
-                        </div>
-                        <!-- Download Mobile App -->
-                        <div class="col-lg-6 p-bottom-20">
-                            <div class="container mobile-individual-tile mobile-tile6">
-                                <div class="text-center tile-initial-image">
-                                    <i class="fa fa-mortar-board text-white fa-4x"></i>
-                                </div>
-                                <div class="textbox">
-                                    <p class="text text-center text-white p3">
-                                        Enable Jobseekers to find you by skill keywords you hire and help them submit their CV just by a click of a button. Let nearby jobseekers apply and make a greener world​.
-                                    </p>
-                                </div>
-
-                            </div>
-                        </div>
-                        <div class="col-lg-6 p-bottom-20">
-                            <div class="container mobile-individual-tile mobile-tile7">
-                                <div class="text-center tile-initial-image">
-                                    <i class="fa fa-street-view text-white fa-4x"></i>
-                                </div>
-                                <div class="textbox">
-                                    <p class="text text-center text-white text-bolder p3">
-                                        Sharing an Address/Location or a Document has never been so easy. Welcome to digitally mapped world​.
-                                    </p>
-                                </div>
-
+                            <div class="individual-box-description">
+                                EZEOne provides personal ID and Business ID types
+                                linked to Geo Location
                             </div>
                         </div>
 
+                        <div class="textbox tile1">
+                            <p class="text text-center text-white text-bolder text-box-justify">
+                                Sharing an Address/Location or a Document has never been so easy. Welcome to digitally mapped world​.
+                            </p>
+                        </div>
                     </div>
                 </div>
-                <!-- Image goes here -->
-                <div class="col-lg-4 hidden-1200 hidden-sm hidden-xs">
-                    <div class="phone-img p-5">
-                        <img src="../images/iphone_ss.png" />
-                    </div>
+                <!-- Tile 2 -->
+                <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                    <div class="container mobile-individual-tile">
+                        <div class="individual-box tile-initial-image">
+                            <div class="individual-box-heading">
+                                Transform the world into your locality
+                            </div>
+                            <div class="individual-box-image">
+                                <img src="../images/tile2.png" class="width-190-px" />
+                            </div>
+                            <div class="individual-box-description">
+                                Proximity based search helps you find a business by
+                                product or service near your location
+                            </div>
+                        </div>
 
+                        <div class="textbox tile2">
+                            <p class="text text-center text-white text-bolder text-box-justify">
+                                Locate any product, service or a
+                                public spot that is nearest to you
+                                to save time, efforts and help you
+                                do business with your trusted
+                                local business or a service
+                                provider
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Tile 3 -->
+                <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                    <div class="container mobile-individual-tile">
+                        <div class="individual-box tile-initial-image">
+                            <div class="individual-box-heading">
+                                Share location & info by IDShare location & info by ID
+                            </div>
+                            <div class="individual-box-image">
+                                <img src="../images/tile3.png" class="width-190-px" />
+                            </div>
+                            <div class="individual-box-description">
+                                EZEOne helps you share any of your info or location
+                                by ID that makes life easy
+                            </div>
+                        </div>
+
+                        <div class="textbox tile3">
+                            <p class="text text-center text-white text-bolder text-box-justify">
+                                Share your EZEOne ID with
+                                Friends, Home delivery, Taxi or
+                                Ambulance to reach your exact
+                                doorstep using Geo Location . Also
+                                share your document or CV by ID
+                                or link (like www.ezeone.
+                                com/MYID.CV.PIN). You can also
+                                secure info. by PIN.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Tile 4 -->
+                <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                    <div class="container mobile-individual-tile">
+                        <div class="individual-box tile-initial-image">
+                            <div class="individual-box-heading">
+                                Most convenient & safer way for
+                                buyers
+                            </div>
+                            <div class="individual-box-image">
+                                <img src="../images/tile4.png" class="width-190-px" />
+                            </div>
+                            <div class="individual-box-description">
+                                Buying from neighbourhood is now ease and safe through EZEOne Geo-Marketplace.
+                            </div>
+                        </div>
+
+                        <div class="textbox tile4">
+                            <p class="text text-center text-white text-bolder text-box-justify">
+                                Nothing is better than buying from
+                                your Backyard or buying from the
+                                nearest place from your location.
+                                We help you locate business or
+                                services that are verified and
+                                working (open) when you want to
+                                buy
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Tile 5 -->
+                <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                    <div class="container mobile-individual-tile">
+                        <div class="individual-box tile-initial-image">
+                            <div class="individual-box-heading">
+                                Online tools to enable e-commerce<br>&nbsp;
+                            </div>
+                            <div class="individual-box-image">
+                                <img src="../images/tile5.png" class="width-190-px" />
+                            </div>
+                            <div class="individual-box-description">
+                                EZEOne provides all the required software tools to manage your business, servicing and recruitment…
+                            </div>
+                        </div>
+
+                        <div class="textbox tile5">
+                            <p class="text text-center text-white text-bolder text-box-justify">
+                                Online Sales, online Reservation/
+                                Appointments, Home Delivery,
+                                Helpdesk and Submit CV links help
+                                you perform all business activities
+                                based on company profile
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Tile 6 -->
+                <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                    <div class="container mobile-individual-tile">
+                        <div class="individual-box tile-initial-image">
+                            <div class="individual-box-heading">
+                                Search Discount Sales and promotions
+                            </div>
+                            <div class="individual-box-image">
+                                <img src="../images/tile6.png" class="width-190-px" />
+                            </div>
+                            <div class="individual-box-description">
+                                You can search discount sales and promotions near
+                                you and get better deals.
+                            </div>
+                        </div>
+
+                        <div class="textbox tile6">
+                            <p class="text text-center text-white text-bolder text-box-justify">
+                                You will be able to locate
+                                bargains, clearance sales and
+                                promotions near you by product
+                                or service you want to buy
+                            </p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-    <!-- Modal Box content -->
-    <modal mtitle="modal.title" mclass="modal.class" visible="modalVisible">
-        <div class="row">
-            <!-- Map goes here -->
-            <div id="modal-map-ctrl" class="col-lg-12">
-            </div>
-            <!-- Map ends here -->
-            <div class="col-lg-12 text-right">
-                <button class="btn btn-info text-right" ng-click="modalVisibility()">OK</button>
+    <!-- Seperator strip -->
+    <div class="tag-line seperator-bg">
+        <div class="container width-75">
+            <p class="text-center text-white text-open-sans p-top-7 tag-line-text">
+                Take your Business to next generation through  <span class="text-dark-blue ezeid-eze-style">EZE</span><span class="ezeid-id-style">One
+    <sup class="tm">TM</sup>
+    </span>
+            </p>
+        </div>
+    </div>
+
+
+    <div class="description desc-bg-color1">
+        <div class="head-text-gradient1 p-top-100">
+            <div class="width-75">
+                <p><i class="fa fa-briefcase"></i> For Business</p>
             </div>
         </div>
-    </modal>
+        <div class="container width-75 idp">
+            <div class="mobile-parent-tile tl row p-top-10 row">
+                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 p-top-30 p-bottom-20 text-center">
+                    <!-- Individual boxes goes here -->
+                    <img src="../images/tile7.png" class="width-250-px" />
+                </div>
+                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                    <!-- Individual boxes goes here -->
+                    <h2 class="business-heading">
+                        Business visibility to consumers was never so easy?
+                    </h2>
+                    <p class="business-desc">
+                        EZEOne provides you every facility required to take
+                        your business is visible on Geo-Marketplace that
+                        significantly enhance the value of your business and
+                        make your business available to neighbourhood as well
+                        as to the world. CRM tools further enhance your
+                        business capability through business process
+                        automation.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <!-- Modal Box content -->
+        <modal mtitle="modal.title" mclass="modal.class" visible="modalVisible">
+            <div class="row">
+                <!-- Map goes here -->
+                <div id="modal-map-ctrl" class="col-lg-12">
+                </div>
+                <!-- Map ends here -->
+                <div class="col-lg-12 text-right">
+                    <button class="btn btn-primary text-right" ng-click="modalVisibility()">OK</button>
+                </div>
+            </div>
+        </modal>
 
-    <!-- Footer goes here -->
-    <footer-section></footer-section>
-    <!-- Footer Ends here -->
+        <!-- Footer goes here -->
+        <footer-section></footer-section>
+        <!-- Footer Ends here -->
 </section>

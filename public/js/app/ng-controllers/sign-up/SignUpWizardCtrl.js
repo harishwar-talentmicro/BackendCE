@@ -207,7 +207,7 @@ angular.module('ezeidApp').
                     $scope.showBusinnessSelectionType = true;
                 }
                 else{
-                    $scope.selectionString = (parseInt($scope.userType) == 1) ? 'Your are signing up as an individual'
+                    $scope.selectionString = (parseInt($scope.userType) == 1) ? 'You are signing up as an individual'
                         : 'You are signing up as a public place';
                     $scope.isEzeidCheckBlockVisible = true;
                 }
@@ -215,7 +215,7 @@ angular.module('ezeidApp').
             };
 
             $scope.selectPlanSelectionType = function(planSelectionType){
-                $scope.selectionString = (parseInt(planSelectionType) == 2) ? 'Your are signing up as a business (paid listing)'
+                $scope.selectionString = (parseInt(planSelectionType) == 2) ? 'You are signing up as a business (paid listing)'
                     : 'You are signing up as a business (free listing)';
                 $scope.showBusinnessSelectionType = false;
                 $scope.planSelectionType = planSelectionType;

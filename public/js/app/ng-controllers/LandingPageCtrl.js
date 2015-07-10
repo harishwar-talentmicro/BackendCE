@@ -169,42 +169,16 @@ angular.module('ezeidApp').
              * @param e
              */
             $scope.checkEnterKey = function (e) {
-                var aKeyWords = [];
-                if($scope.searchParams.searchType == 2)
-                {
-                    aKeyWords = [
-                        "Physician Doctor",
-                        "Pharmacy",
-                        "Breakfast",
-                        "Lunch",
-                        "Fast Food",
-                        "Fine Dining",
-                        "Mall",
-                        "Pub",
-                        "Bar & Restaurant",
-                        "Cofee Shop",
-                        "SPA",
-                        "Salon"
-                    ];
-
-                    $( "#tags" ).autocomplete({
-                        source: aKeyWords
-                    });
-
-                    $("#tags").on("autocompleteselect", function( event, ui ) {
-                        $scope.searchParams.searchTerm = ui.item.value;
-                    });
-                }
-                else
-                {
-                    aKeyWords = [];
-                    $( "#tags" ).autocomplete({
-                        source: aKeyWords
-                    });
-                }
 
                 if (e.charCode === 13 && $scope.searchParams.searchTerm.length > 0) {
                     $scope.triggerSearch();
+                }
+                else{
+                    $timeout(function(){
+                        var a  = $filter('filter')(suggestion,$scope.params.searchTerm);
+                        console.log(a);
+                        $scope.KeyWords = $filter('filter')(suggestion,$scope.params.searchTerm);
+                    },100);
                 }
             };
 
@@ -482,6 +456,7 @@ angular.module('ezeidApp').
             }
 
             $timeout(function () {
+                return;
                 var image = new Image();
 
                 image.onload = function () {
@@ -557,6 +532,23 @@ angular.module('ezeidApp').
              * Initiate tool tip
              */
             $('[data-toggle="tooltip"]').tooltip();
+
+            var suggestion = [
+                '24 x 7 Physician Doctor',
+                'Pharmacy',
+                'Breakfast',
+                'Lunch',
+                'Fast Food',
+                'Fine Dining',
+                'Mall',
+                'Pub',
+                'Bar & Restaurant',
+                'Cofee Shop',
+                'SPA',
+                'Salon'
+            ];
+
+            $scope.KeyWords = [];
 
         }]);
 

@@ -49,6 +49,7 @@
                                 </div>
 
                                 <input id="searchTextField" type="text" ng-keypress="(searchKey($event))" placeholder="{{placeHolderText[params.searchType - 1]}}" ng-model="params.searchTerm" ng-class="(params.searchType === 1) ? 'text-uppercase' : ''" class="form-control width-search-bar dropdown-toggle" aria-label="..." data-toggle="dropdown">
+
                                 <!--<ul class="dropdown-menu" role="menu" aria-labelledby="dLabel" style="margin-left: 32%;" ng-show="params.searchType == 2">-->
                                     <!--<li ng-repeat="KeyWord in KeyWords | filter:params.searchTerm" ng-model="searchedKeyWords[$index]">-->
                                         <!--<a ng-click="setAutoCompeted(KeyWord.key)">{{KeyWord.key}}{{searchedKeyWords}}</a>-->
