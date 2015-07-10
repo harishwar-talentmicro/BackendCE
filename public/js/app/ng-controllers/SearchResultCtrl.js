@@ -60,7 +60,6 @@ var res = angular.module('ezeidApp').
             $scope.showLoginText = false;
             /* check box status array */
             $scope.checkBoxStatus = [];
-            $scope.searchedKeyWords = [];
 
             $scope.modalBox = {
                 title : 'EZEOne Map',
