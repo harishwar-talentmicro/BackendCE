@@ -25,7 +25,7 @@
                                     <br>
                                     Verified Status of Sender: [IsVerified].<br />
                                     <br />
-                                    Click on<strong style="text-decoration: underline; color: #156685"> https://www.ezeid.com/[EZEID]</strong>  for  the contact information of
+                                    Click on<strong style="text-decoration: underline; color: #156685"> https://www.ezeone.com/</strong><strong style="text-decoration: underline; color: #156685">[EZEID1]</strong>  for  the contact information of
 this Sales Enquiry.
                                     <br />
                                     <br />
@@ -33,7 +33,7 @@ this Sales Enquiry.
                                     <br />
                                     EZE ID Team.
                                     <br />
-                                    Reach us at:<strong style="text-decoration: underline; color: #156685">  https://www.ezeid.com/EZEID </strong>
+                                    Reach us at:<strong style="text-decoration: underline; color: #156685"> https://www.ezeone.com/</strong><strong style="text-decoration: underline; color: #156685">[EZEID1]</strong>
                                     <br>
                                     <br>
                                     This is a system generated message, delete in case received in error.<br />

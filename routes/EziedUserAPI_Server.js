@@ -215,6 +215,8 @@ function FnMessageMail(MessageContent, CallBack) {
 
             //  console.log(query);//console.log('FnSaveMessage: Inserting data: ' + query);
             db.query('CALL PgetMailSendingDetails(' + query + ')', function (err, MessageContentResult) {
+                console.log(' this is Message ContentResult body........................');
+                console.log(MessageContentResult);
                 if (!err) {
                     if (MessageContentResult[0] != null) {
                         if (MessageContentResult[0].length > 0) {
@@ -259,11 +261,11 @@ function FnMessageMail(MessageContent, CallBack) {
                                         data = data.replace("[IsVerified]", MessageContentResult[0].EZEIDVerifiedID);
                                         data = data.replace("[EZEID]", MessageContentResult[0].EZEID);
                                         data = data.replace("[Message]", MessageContent.Message);
-                                        data = data.replace("[https://www.ezeid.com/]", 'https://www.ezeid.com/' + MessageContentResult[0].EZEID);
+                                        data = data.replace("[https://www.ezeid.com/]", 'https://www.ezeone.com/' + MessageContentResult[0].EZEID);
                                         // console.log('Body:' + data);
                                         // console.log(MessageContentResult[0].ToMailID);
                                         var mailOptions = {
-                                            from: 'noreply@ezeid.com',
+                                            from: 'noreply@ezeone.com',
                                             to: MessageContentResult[0].ToMailID,
                                             subject: 'Sales Enquiry from ' + MessageContentResult[0].EZEID,
                                             html: data // html body
@@ -4553,7 +4555,7 @@ exports.FnGetSearchInformationNew = function (req, res) {
              var WorkingDate =  moment(new Date(CurrentDate)).format('YYYY-MM-DD HH:MM');
         else
              var WorkingDate = moment(new Date()).format('YYYY-MM-DD HH:MM');
-        //console.log(WorkingDate);
+        console.log(ezeTerm);
 
         if (ezeTerm) {
             var LocSeqNo = 0;
@@ -7122,6 +7124,7 @@ exports.FnSaveTranscation = function(req, res){
     try{
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        var fs = require("fs");
 
         var Token = req.body.Token;
         var TID = parseInt(req.body.TID);
@@ -7157,6 +7160,22 @@ exports.FnSaveTranscation = function(req, res){
         var item_list_type = req.body.item_list_type ? req.body.item_list_type : 0;
         var companyName = req.body.companyName ? req.body.companyName : '' ;
         var company_id = req.body.company_id ? req.body.company_id : 0 ;
+        var Messagetype;
+        if (FunctionType == 0){
+         Messagetype = 1;
+        }
+        else if (FunctionType == 1){
+            Messagetype = 2;
+        }
+        else if (FunctionType == 2){
+            Messagetype = 3;
+        }
+        else if (FunctionType == 3){
+            Messagetype = 4;
+        }
+        else if (FunctionType == 4){
+            Messagetype = 5;
+        }
         var RtnMessage = {
             IsSuccessfull: false,
             MessageID:0
@@ -7189,12 +7208,12 @@ exports.FnSaveTranscation = function(req, res){
                             if (!err){
                                 console.log(InsertResult);
                                 if (InsertResult[0] != null) {
-                                    if(InsertResult[0].length > 0){
+                                    if(InsertResult[0].length > 0) {
                                         RtnMessage.IsSuccessfull = true;
                                         var Message = InsertResult[0];
-                                        RtnMessage.MessageID=Message[0].MessageID;
+                                        RtnMessage.MessageID = Message[0].MessageID;
                                         console.log(Message);
-                                        for(var i=0; i < ItemsList.length; i++) {
+                                        for (var i = 0; i < ItemsList.length; i++) {
                                             var itemsDetails = ItemsList[i];
                                             var items = {
                                                 MessageID: Message[0].MessageID,
@@ -7205,68 +7224,186 @@ exports.FnSaveTranscation = function(req, res){
                                                 Duration: itemsDetails.Durations
                                             };
                                             console.log(items);
-                                            console.log('TID:' +itemsDetails.TID);
-                                            if(itemsDetails.TID == 0){
-                                            var query = db.query('INSERT INTO titems SET ?', items, function (err, result) {
-                                                // Neat!
-                                                if (!err) {
-                                                    if (result != null) {
-                                                        if (result.affectedRows > 0) {
-                                                            console.log('FnSaveFolderRules: Folder rules saved successfully');
+                                            console.log('TID:' + itemsDetails.TID);
+                                            if (itemsDetails.TID == 0) {
+                                                var query = db.query('INSERT INTO titems SET ?', items, function (err, result) {
+                                                    // Neat!
+                                                    if (!err) {
+                                                        if (result != null) {
+                                                            if (result.affectedRows > 0) {
+                                                                console.log('FnSaveFolderRules: Folder rules saved successfully');
+                                                            }
+                                                            else {
+                                                                console.log('FnSaveFolderRules: Folder rule not saved');
+                                                            }
                                                         }
                                                         else {
                                                             console.log('FnSaveFolderRules: Folder rule not saved');
                                                         }
                                                     }
                                                     else {
-                                                        console.log('FnSaveFolderRules: Folder rule not saved');
+                                                        console.log('FnSaveFolderRules: error in saving folder rules' + err);
                                                     }
-                                                }
-                                                else {
-                                                    console.log('FnSaveFolderRules: error in saving folder rules' + err);
-                                                }
-                                            });
-     
-                                            }
-                                            
-                                            else{
-                                                var items = {
-                                               
-                                                ItemID: itemsDetails.ItemID,
-                                                Qty: itemsDetails.Qty,
-                                                Rate: itemsDetails.Rate,
-                                                Amount: itemsDetails.Amount,
-                                                Duration: itemsDetails.Durations
-                                            };
-                                              console.log('TID:' +itemsDetails.TID);  
-                                            var query = db.query("UPDATE titems set ? WHERE TID = ? ",[items,itemsDetails.TID], function (err, result) {
-                                            // Neat!
-                                            console.log(result);
-                                            if (!err) {
-                                                if(result != null){
-                                                    if(result.affectedRows > 0){
+                                                });
 
-                                                            console.log('FnSaveFolderRules: Folder rules Updated successfully');
-                                                    }
-                                                    else
-                                                    {
-                                                        console.log('FnSaveFolderRules: Folder rule not updated');
-                                                    }
-                                                }
-                                                else
-                                                {
-                                                    console.log('FnSaveFolderRules: Folder rule not updated')
-                                                }
                                             }
-                                            else 
-                                                {
-                                                    console.log('FnSaveFolderRules: error in saving folder rules' +err);
-                                                }
-                                            });
+
+                                            else {
+                                                var items = {
+
+                                                    ItemID: itemsDetails.ItemID,
+                                                    Qty: itemsDetails.Qty,
+                                                    Rate: itemsDetails.Rate,
+                                                    Amount: itemsDetails.Amount,
+                                                    Duration: itemsDetails.Durations
+                                                };
+                                                console.log('TID:' + itemsDetails.TID);
+                                                var query = db.query("UPDATE titems set ? WHERE TID = ? ", [items, itemsDetails.TID], function (err, result) {
+                                                    // Neat!
+                                                    console.log(result);
+                                                    if (!err) {
+                                                        if (result != null) {
+                                                            if (result.affectedRows > 0) {
+
+                                                                console.log('FnSaveFolderRules: Folder rules Updated successfully');
+                                                            }
+                                                            else {
+                                                                console.log('FnSaveFolderRules: Folder rule not updated');
+                                                            }
+                                                        }
+                                                        else {
+                                                            console.log('FnSaveFolderRules: Folder rule not updated')
+                                                        }
+                                                    }
+                                                    else {
+                                                        console.log('FnSaveFolderRules: error in saving folder rules' + err);
+                                                    }
+                                                });
+                                            }
                                         }
-                                    }
-                                    res.send(RtnMessage);
-                                    console.log('FnSaveTranscationItems: Transaction items details save successfully');
+                                        res.send(RtnMessage);
+                                        console.log('FnSaveTranscationItems: Transaction items details save successfully');
+                                        var query1 = 'select EZEID,EZEIDVerifiedID,TID,IDTypeID as id from tmaster where Token=' + db.escape(Token);
+                                        db.query(query1, function (err, getResult) {
+
+                                            if (getResult[0].id == 1) {
+
+                                                fs.readFile("SalesEnquiry.txt", "utf8", function (err, data) {
+
+                                                    if (getResult[0].EZEIDVerifiedID == 1) {
+                                                        var verified = 'Not Verified';
+                                                    }
+                                                    else {
+                                                        var verified = 'Verified';
+                                                    }
+                                                    data = data.replace("[IsVerified]", verified);
+                                                    data = data.replace("[EZEID]", getResult[0].EZEID);
+                                                    data = data.replace("[Message]", MessageText);
+                                                    data = data.replace("[EZEID1]", getResult[0].EZEID);
+                                                    var UserQuery = 'Select EZEID,ifnull(EMailID,"") as EMailID from tlocations where MasterID=' + getResult[0].TID;
+
+                                                    db.query(UserQuery, function (err, get_result) {
+                                                        console.log(get_result);
+                                                        if (get_result) {
+                                                            var mailOptions = {
+                                                                from: 'noreply@ezeone.com',
+                                                                to: get_result[0].EMailID,
+                                                                subject: 'Sales Enquiry from ' + ToEZEID,
+                                                                html: data // html body
+                                                            };
+                                                            console.log(mailOptions);
+                                                            var queryResult = 'select TID from tmaster where EZEID=' + db.escape(ToEZEID);
+                                                            db.query(queryResult, function (err, result) {
+                                                                console.log(result);
+                                                                var post = {
+                                                                    MessageType: Messagetype,
+                                                                    Priority: 3,
+                                                                    ToMailID: mailOptions.to,
+                                                                    Subject: mailOptions.subject,
+                                                                    Body: mailOptions.html,
+                                                                    SentbyMasterID: result[0].TID
+                                                                };
+
+                                                                var query = db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
+                                                                    // Neat!
+                                                                    if (!err) {
+                                                                        console.log('FnMessageMail: Mail saved Successfully....1');
+
+                                                                    }
+                                                                    else {
+                                                                        console.log('FnMessageMail: Mail not Saved Successfully');
+
+                                                                    }
+                                                                });
+                                                            });
+                                                        }
+                                                        else {
+                                                            console.log('FnSendMail:getting error from EmailID ');
+                                                        }
+                                                    });
+                                                });
+
+                                            }
+                                            else {
+
+                                                fs.readFile("SalesEnquiry.txt", "utf8", function (err, data) {
+
+                                                    if (getResult[0].EZEIDVerifiedID == 1) {
+                                                        var verified = 'Not Verified';
+                                                    }
+                                                    else {
+                                                        var verified = 'Verified';
+                                                    }
+                                                    data = data.replace("[IsVerified]", verified);
+                                                    data = data.replace("[EZEID]", getResult[0].EZEID);
+                                                    data = data.replace("[Message]", MessageText);
+                                                    data = data.replace("[EZEID1]", getResult[0].EZEID);
+
+
+                                                    var UserQuery = 'Select EZEID,ifnull(SalesMailID," ") as SalesMailID from tmaster where TID=' + getResult[0].TID;
+                                                    console.log(UserQuery);
+                                                    db.query(UserQuery, function (err, get_result) {
+
+                                                        if (get_result) {
+                                                            var mailOptions = {
+                                                                from: 'noreply@ezeone.com',
+                                                                to: get_result[0].SalesMailID,
+                                                                subject: 'Sales Enquiry from ' + ToEZEID,
+                                                                html: data // html body
+                                                            };
+                                                            console.log(mailOptions);
+                                                            var queryResult = 'select TID from tmaster where EZEID=' + db.escape(ToEZEID);
+                                                            db.query(queryResult, function (err, result) {
+
+                                                                var post = {
+                                                                    MessageType: Messagetype,
+                                                                    Priority: 3,
+                                                                    ToMailID: mailOptions.to,
+                                                                    Subject: mailOptions.subject,
+                                                                    Body: mailOptions.html,
+                                                                    SentbyMasterID: result[0].TID
+                                                                };
+                                                                console.log(post);
+                                                                var query = db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
+                                                                    // Neat!
+                                                                    if (!err) {
+                                                                        console.log('FnMessageMail: Mail saved Successfully....1');
+
+                                                                    }
+                                                                    else {
+                                                                        console.log('FnMessageMail: Mail not Saved Successfully');
+
+                                                                    }
+                                                                });
+                                                            });
+                                                        }
+                                                        else {
+                                                            console.log('FnSendMail:getting error from EmailID ');
+                                                        }
+                                                    });
+                                                });
+                                            }
+                                        });
                                     }
                                     else
                                         {
