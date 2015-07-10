@@ -377,54 +377,6 @@ var res = angular.module('ezeidApp').
                 return defer.promise;
             }
 
-            /**
-             * Search for a keywod
-             */
-            $scope.searchKey = function(e){
-
-                console.log("SAi1");
-                console.log($scope.searchParams.searchType);
-
-                var aKeyWords = [];
-                if($scope.searchParams.searchType == 2)
-                {
-                    console.log("SAi2")
-                    aKeyWords = [
-                        "Physician Doctor",
-                        "Pharmacy",
-                        "Breakfast",
-                        "Lunch",
-                        "Fast Food",
-                        "Fine Dining",
-                        "Mall",
-                        "Pub",
-                        "Bar & Restaurant",
-                        "Cofee Shop",
-                        "SPA",
-                        "Salon"
-                    ];
-
-                    $( "#tags" ).autocomplete({
-                        source: aKeyWords
-                    });
-
-                    $("#tags").on("autocompleteselect", function( event, ui ) {
-                        $scope.params.searchTerm = ui.item.value;
-                    });
-                }
-                else
-                {
-                    console.log("SAi3")
-                    aKeyWords = [];
-                    $( "#tags" ).autocomplete({
-                        source: aKeyWords
-                    });
-                }
-
-                if(e.charCode === 13 && $scope.params.searchTerm.length > 0){
-                    $scope.initiateSearch();
-                }
-            };
 
             /**
              * Master search function
@@ -1148,5 +1100,47 @@ var res = angular.module('ezeidApp').
                 }
                 return '';
             }
+
+            /* set Auto Completed key word to text field */
+            $scope.setAutoCompeted = function(_item)
+            {
+               $('#searchTextField').val(_item);
+            };
+
+            var suggestion = [
+                '24 x 7 Physician Doctor',
+                'Pharmacy',
+                'Breakfast',
+                'Lunch',
+                'Fast Food',
+                'Fine Dining',
+                'Mall',
+                'Pub',
+                'Bar & Restaurant',
+                'Cofee Shop',
+                'SPA',
+                'Salon'
+            ];
+
+            $scope.KeyWords = [];
+
+            /**
+             * Search for a keywod
+             */
+            $scope.searchKey = function(e){
+                if(e.charCode === 13 && $scope.params.searchTerm.length > 0){
+                    $scope.initiateSearch();
+                }
+                else{
+                    $timeout(function(){
+                        var a  = $filter('filter')(suggestion,$scope.params.searchTerm);
+                        console.log(a);
+                        $scope.KeyWords = $filter('filter')(suggestion,$scope.params.searchTerm);
+                    },100);
+
+                }
+            };
+
+
         }
     ]);

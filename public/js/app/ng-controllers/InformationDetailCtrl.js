@@ -165,8 +165,9 @@ angular.module('ezeidApp').
                 }
 
                 if(!$rootScope._userInfo.IsAuthenticate){
-                    $rootScope._userInfo.Token = 2;
-                    $scope.Token = 2;
+                    /*$rootScope._userInfo.Token = 2;*/
+                    $rootScope._userInfo.Token = " ";
+                    /*$scope.Token = 2;*/
                 }
 
                 $http({ method: 'get',
@@ -361,7 +362,7 @@ angular.module('ezeidApp').
                 if(!$rootScope._userInfo.Token){
                     $('#SignIn_popup').slideDown();
                 }
-                if($rootScope._userInfo.Token == 2)
+                if($rootScope._userInfo.Token == " ")
                 {
                     $('#SignIn_popup').slideDown();
                 }
@@ -396,7 +397,7 @@ angular.module('ezeidApp').
 
             //open working hour popup
             $scope.openWorkingHourPopup = function () {
-                if($rootScope._userInfo.Token == 2)
+                if($rootScope._userInfo.Token == " ")
                 {
                     $('#SignIn_popup').slideDown();
                 }
@@ -471,7 +472,7 @@ angular.module('ezeidApp').
                  {
                     $('#SignIn_popup').slideDown();
                  }
-                 else if($rootScope._userInfo.Token == 2)
+                 else if($rootScope._userInfo.Token == " ")
                  {
                     $('#SignIn_popup').slideDown();
                  }
@@ -495,7 +496,7 @@ angular.module('ezeidApp').
                 {
                     $('#SignIn_popup').slideDown();
                 }
-                else if($rootScope._userInfo.Token == 2)
+                else if($rootScope._userInfo.Token == " ")
                 {
                     $('#SignIn_popup').slideDown();
                 }
@@ -511,7 +512,7 @@ angular.module('ezeidApp').
                 {
                     $('#SignIn_popup').slideDown();
                 }
-                else if($rootScope._userInfo.Token == 2)
+                else if($rootScope._userInfo.Token == " ")
                 {
                     $('#SignIn_popup').slideDown();
                 }
@@ -523,12 +524,12 @@ angular.module('ezeidApp').
             $scope._resumeModalTitle = 'Submit Resume Application';
             $scope._showResumeModal = false;
             $scope._toggleResumeModal = function(){
-                
+
                 if(!$rootScope._userInfo.Token)
                 {
                     $('#SignIn_popup').slideDown();
                 }
-                else if($rootScope._userInfo.Token == 2)
+                else if($rootScope._userInfo.Token == " ")
                 {
                     $('#SignIn_popup').slideDown();
                 }

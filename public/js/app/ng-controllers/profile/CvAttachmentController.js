@@ -334,20 +334,6 @@ angular.module('ezeidApp').controller('CVAttachController',[
         }
     };
 
-    $scope.addMoreSkill = function()
-    {
-        if(($scope.skillMatrix[0].skillname) && ($scope.skillMatrix[0].exp))
-        {
-           $scope.skillMatrix.splice(0, 0, {
-                "tid":0,
-                "skillname":"",
-                "expertiseLevel":0,
-                "exp":"",
-                "active_status":true
-            });
-        }
-    };
-
     function getAllSkills(){
         $scope.$emit('$preLoaderStart');
         $http({

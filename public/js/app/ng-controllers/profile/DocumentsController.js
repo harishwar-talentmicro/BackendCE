@@ -181,48 +181,52 @@ angular.module('ezeidApp').controller('DocumentController',[
                     $scope.$emit('$preLoaderStop');
                 }
                  if(data && data.length > 0 && data[0].No != '' && data !='null'){
-                    if($scope.OptionSelected==1){
-                        $scope.IdPlaceHolder = "Enter ID Card number";
-                        $scope.form.RefNo = data[0].No;
-                        $scope.form.RefExpiryDate = $filter('date')(new Date(data[0].ExpiryDate), 'dd-MMM-yyyy');
-                        $scope.form.RefDoc = data[0].IDDoc;
-                        $scope.form.RefFileName = data[0].DocFilename;
-                        $scope.showDownloadLink = $scope.form.RefNo == "" ? false : true;
+                     if(data[0]){
 
-                     }else if($scope.OptionSelected==2){
-                        $scope.IdPlaceHolder = "Enter Passport number";
-                        $scope.form.RefNo = data[0].No;
-                        $scope.form.RefExpiryDate = $filter('date')(new Date(data[0].ExpiryDate), 'dd-MMM-yyyy');
-                        $scope.form.RefDoc = data[0].IDDoc;
-                        $scope.form.RefFileName = data[0].DocFilename;
-                        $scope.showDownloadLink = $scope.form.RefNo == "" ? false : true;
 
-                    }else if($scope.OptionSelected==3){
+                        if($scope.OptionSelected==1){
+                            $scope.IdPlaceHolder = "Enter ID Card number";
+                            $scope.form.RefNo = data[0].No;
+                            $scope.form.RefExpiryDate = $filter('date')(new Date(data[0].ExpiryDate), 'dd-MMM-yyyy');
+                            $scope.form.RefDoc = data[0].IDDoc;
+                            $scope.form.RefFileName = data[0].DocFilename;
+                            $scope.showDownloadLink = $scope.form.RefNo == "" ? false : true;
 
-                        $scope.IdPlaceHolder = "Enter Driver's Licence number";
-                        $scope.form.RefNo = data[0].No;
-                        $scope.form.RefExpiryDate = $filter('date')(new Date(data[0].ExpiryDate), 'dd-MMM-yyyy');
-                        $scope.form.RefDoc = data[0].IDDoc;
-                        $scope.form.RefFileName = data[0].DocFilename;
-                       /* $scope.showDownloadLink = $scope.form.RefFileName == "" ? false : true;*/
-                        $scope.showDownloadLink = $scope.form.RefNo == "" ? false : true;
+                         }else if($scope.OptionSelected==2){
+                            $scope.IdPlaceHolder = "Enter Passport number";
+                            $scope.form.RefNo = data[0].No;
+                            $scope.form.RefExpiryDate = $filter('date')(new Date(data[0].ExpiryDate), 'dd-MMM-yyyy');
+                            $scope.form.RefDoc = data[0].IDDoc;
+                            $scope.form.RefFileName = data[0].DocFilename;
+                            $scope.showDownloadLink = $scope.form.RefNo == "" ? false : true;
 
-                    }else if($scope.OptionSelected==4){
-                        $scope.IdPlaceHolder = "Reference No. for Document #1";
-                        $scope.form.RefNo = data[0].No;
-                        $scope.form.RefExpiryDate = $filter('date')(new Date(data[0].ExpiryDate), 'dd-MMM-yyyy');
-                        $scope.form.RefDoc = data[0].IDDoc;
-                        $scope.form.RefFileName = data[0].DocFilename;
-                        $scope.showDownloadLink = $scope.form.RefNo == "" ? false : true;
+                        }else if($scope.OptionSelected==3){
 
-                    }else if($scope.OptionSelected==5){
-                        $scope.IdPlaceHolder = "Reference No. for Document #2";
-                        $scope.form.RefNo = data[0].No;
-                        $scope.form.RefExpiryDate = $filter('date')(new Date(data[0].ExpiryDate), 'dd-MMM-yyyy');
-                        $scope.form.RefDoc = data[0].IDDoc;
-                        $scope.form.RefFileName = data[0].DocFilename;
-                        $scope.showDownloadLink = $scope.form.RefNo == "" ? false : true;
-                    }
+                            $scope.IdPlaceHolder = "Enter Driver's Licence number";
+                            $scope.form.RefNo = data[0].No;
+                            $scope.form.RefExpiryDate = $filter('date')(new Date(data[0].ExpiryDate), 'dd-MMM-yyyy');
+                            $scope.form.RefDoc = data[0].IDDoc;
+                            $scope.form.RefFileName = data[0].DocFilename;
+                           /* $scope.showDownloadLink = $scope.form.RefFileName == "" ? false : true;*/
+                            $scope.showDownloadLink = $scope.form.RefNo == "" ? false : true;
+
+                        }else if($scope.OptionSelected==4){
+                            $scope.IdPlaceHolder = "Reference No. for Document #1";
+                            $scope.form.RefNo = data[0].No;
+                            $scope.form.RefExpiryDate = $filter('date')(new Date(data[0].ExpiryDate), 'dd-MMM-yyyy');
+                            $scope.form.RefDoc = data[0].IDDoc;
+                            $scope.form.RefFileName = data[0].DocFilename;
+                            $scope.showDownloadLink = $scope.form.RefNo == "" ? false : true;
+
+                        }else if($scope.OptionSelected==5){
+                            $scope.IdPlaceHolder = "Reference No. for Document #2";
+                            $scope.form.RefNo = data[0].No;
+                            $scope.form.RefExpiryDate = $filter('date')(new Date(data[0].ExpiryDate), 'dd-MMM-yyyy');
+                            $scope.form.RefDoc = data[0].IDDoc;
+                            $scope.form.RefFileName = data[0].DocFilename;
+                            $scope.showDownloadLink = $scope.form.RefNo == "" ? false : true;
+                        }
+                     }
                 }
                 else
                     {
