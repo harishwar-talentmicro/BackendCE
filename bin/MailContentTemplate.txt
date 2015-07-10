@@ -16,27 +16,25 @@
                                     [EZEIDNAME] has sent you a "Directions Map" file attached in .PDF format with this mail. Please delete the mail if you are not the intended
 recipient.<br />                                  
                                     <br />
-                                    EZE ID Team
+                                    EZEOne Team
                                     <br />
-                                    ----------------
+                                    -----------------
                                     <br>
                                                                   
-Disclaimer:<br/><br/>
+Disclaimer:<br/>
 <table cellpadding="0" cellspacing="0" border="0" style="width: 600px; padding: 10px; font-family: 'Trebuchet MS', Arial, Helvetica, sans-serif; font-size: 12px; color: #5d5d5d; line-height: 22px;">
 <tr><td>
-	This mail is sent to the registered user of EZE ID or by the
-registered user of EZE ID to help the User by providing required
+	This mail is sent to the registered user of EZE OneID or by the
+registered user of EZE OneID to help the User by providing required
 information. In case you are not the actual intended recipient of this mail,
 please delete the same imediately. If you do not want to receive the same,
-please inform the owner of this EZE ID, [EZEID] by finding the same user
-through search by EZE ID on www.ezeid.com <<strong style="text-decoration: underline; color: #156685">https://www.ezeid.com</strong>> and send a
-communication to the user not to send you any more mail. At EZE ID, we do
+please inform the owner of this EZE OneID, [EZEID] by finding the same user
+through search by EZE OneID on www.ezeone.com <<strong style="text-decoration: underline; color: #156685">https://www.ezeone.com</strong>> and send a
+communication to the user not to send you any more mail. At EZE OneID, we do
 not support spam or any unsolicided mail communication. If you are not able
-to reach the owner of EZE ID and you see that user spamming your mailbox,
-then please write to us on the mail id provided on our eze id "EZEID" to
-investigate and take action necessary against mis use of EZE ID system.<br/>
-
------------------
+to reach the owner of EZE OneID and you see that user spamming your mailbox,
+then please write to us on the mail id provided on our eze id "EZE OneID" to
+investigate and take action necessary against mis use of EZE One system.<br/>
 
                                 </td>
                             </tr>
@@ -48,4 +46,10 @@ investigate and take action necessary against mis use of EZE ID system.<br/>
                     </td>
                 </tr>
                 <tr>
+    	<td style="text-align:center; padding: 15px 0; background:#0b89ba; color:#fff;">The safest and easiest way to share your contact information to others</td>
+    </tr>
+    
+    <tr>
+    	<td style="text-align:center; padding: 15px 0; background:#5d5d5d; color:#fff;">Copyright&copy; 2015: TalentMicro Innovations</td>
+    </tr>
             </table>

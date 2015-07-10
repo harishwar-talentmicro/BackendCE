@@ -2748,7 +2748,7 @@ h4.front-business-form.warning-text{
     color:#FFFFFF;
 }
 
-.signup-selection-row,.signup-selection-row{
+.signup-selection-row,.signup-business-row,.signup-details-row{
     border: 1px solid #DDD;
     border-top:0px;
 }
@@ -2780,10 +2780,6 @@ h4.front-business-form.warning-text{
     background: #6B6B6B;
 }
 
-.signup-business-row{
-
-}
-
 .signup-business-type{
 
 }
@@ -2813,3 +2809,6 @@ h4.front-business-form.warning-text{
     border: 1px dashed #FF000A;
 }
 
+.modal-dialog.modal-lg.business-manager-modal #table-business-features label{
+    color:#FFFFFF!important;
+}
