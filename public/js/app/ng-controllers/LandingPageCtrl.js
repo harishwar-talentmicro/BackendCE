@@ -482,6 +482,7 @@ angular.module('ezeidApp').
             }
 
             $timeout(function () {
+                return;
                 var image = new Image();
 
                 image.onload = function () {
