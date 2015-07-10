@@ -1,4 +1,4 @@
-<div class="search-result hpw">
+<div class="search-result hpw" xmlns="http://www.w3.org/1999/html">
     <section id="result-page-menu-wrapper" class=" rpw" sg-controller="">
         <!-- New header menu goes here -->
         <header-section></header-section>
@@ -41,14 +41,26 @@
                                     <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
                                         <!-- Index subtracted by 1: As searchType's value is [1,2,3] the array's default index is [0,1,2] -->
                                         <b>{{searchType[params.searchType - 1]}}</b> <span class="caret"></span></button>
-                                    <ul class="dropdown-menu" role="menu">
-                                        <li class="btn-link" ng-repeat="search in searchType track by $index">
-                                            <a class="btn-link" ng-click="($event.preventDefault())(params.searchType = $index + 1) (params.searchTerm = '')">{{search}}</a>
-                                        </li>
-                                    </ul>
+                                        <ul class="dropdown-menu" role="menu">
+                                            <li class="btn-link" ng-repeat="search in searchType track by $index">
+                                                <a class="btn-link" ng-click="($event.preventDefault())(params.searchType = $index + 1) (params.searchTerm = '')">{{search}}</a>
+                                            </li>
+                                        </ul>
                                 </div>
 
-                                <input type="text" id="tags" ng-keypress="(searchKey($event))" placeholder="{{placeHolderText[params.searchType - 1]}}" ng-model="params.searchTerm" ng-class="(params.searchType === 1) ? 'text-uppercase' : ''" class="form-control width-search-bar" aria-label="...">
+                                <input id="searchTextField" type="text" ng-keypress="(searchKey($event))" placeholder="{{placeHolderText[params.searchType - 1]}}" ng-model="params.searchTerm" ng-class="(params.searchType === 1) ? 'text-uppercase' : ''" class="form-control width-search-bar dropdown-toggle" aria-label="..." data-toggle="dropdown">
+                                <!--<ul class="dropdown-menu" role="menu" aria-labelledby="dLabel" style="margin-left: 32%;" ng-show="params.searchType == 2">-->
+                                    <!--<li ng-repeat="KeyWord in KeyWords | filter:params.searchTerm" ng-model="searchedKeyWords[$index]">-->
+                                        <!--<a ng-click="setAutoCompeted(KeyWord.key)">{{KeyWord.key}}{{searchedKeyWords}}</a>-->
+                                    <!--</li>-->
+                                <!--</ul>-->
+
+                                <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel" style="margin-left: 32%;" ng-show="(params.searchType == 2) && (KeyWords.length > 0) && (params.searchTerm.length)">
+                                    <li ng-repeat="KeyWord in KeyWords">
+                                        <a ng-click="setAutoCompeted(KeyWord)">{{KeyWord}}</a>
+                                    </li>
+                                </ul>
+
                                 <div class="input-group-btn">
                                     <!-- Advance Search BTN -->
                                     <button ng-disabled="params.searchType === 1"  ng-click="(toggleFilterContainer($event,true))(isFilterOptionsShown = false)" type="button" class="btn btn-default dropdown-toggle btn-advanced-filter no-radius" data-toggle="dropdown" title="Click to choose Search Options"><i class="fa fa-check-square-o"></i> Options</Filter></button>
@@ -56,6 +68,8 @@
                                     <button type="button" class="btn btn-warning" title="search" ng-click="initiateSearch()"><i class="fa fa-search"></i> </button>
                                 </div>
                             </div>
+
+
                         </div>
                         <!-- Toggle buttons for switching betweeen maps and list -->
                         <ul class="nav navbar-nav navbar-right">
@@ -94,6 +108,7 @@
                 <span> NO: {{downloadData.No}}  {{downloadData.date != "" ? "| Expiry Date:"+downloadData.date : ""}}</span>
             </div>
         </div>
+
         <div class="row">
             <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 col-lg-offset-5 col-md-offset-5 col-sm-offset-5 col-xs-offset-0">
                 <div class="filter-container animation-slideup" ng-show="isFilterShown">

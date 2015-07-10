@@ -49,7 +49,7 @@ var MessageScheduler = schedule.scheduleJob(rule, function () {
                        // console.log('Attachment: ');
                        // console.log(RegData.Attachment);
                         var mailOptions = {
-                            from: 'noreply@ezeid.com',
+                            from: 'noreply@ezeone.com',
                             to: RegData.ToMailID,
                             subject: RegData.Subject,
                             html: RegData.Body, // html body

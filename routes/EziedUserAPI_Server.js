@@ -7154,7 +7154,7 @@ exports.FnSaveTranscation = function(req, res){
                 DeliveryAddress = '';
         var ItemIDList='';
         var ToEZEID = alterEzeoneId(req.body.ToEZEID);
-        var item_list_type = 0;
+        var item_list_type = req.body.item_list_type ? req.body.item_list_type : 0;
         var companyName = req.body.companyName ? req.body.companyName : '' ;
         var company_id = req.body.company_id ? req.body.company_id : 0 ;
         var RtnMessage = {
@@ -9555,7 +9555,7 @@ exports.FnGetWebLink = function (req, res) {
                         db.query('CALL pGetWebLink(' + db.escape(Token) + ')', function (err, GetResult) {
                             if (!err) {
                                 if (GetResult != null) {
-                                    if (GetResult[0].length > 0) {
+                                    if (GetResult[0]) {
                                         console.log('FnGetWebLink: Web Links Send successfully');
                                         res.send(GetResult[0]);
                                     }
@@ -12264,15 +12264,15 @@ exports.FnGetOutboxMessages = function (req, res) {
                                         responseMessage.status = true;
                                         responseMessage.data = GetResult[0] ;
                                         responseMessage.error = null;
-                                        responseMessage.message = 'Company details Send successfully';
-                                        console.log('FnGetOutboxMessages: Company details Send successfully');
+                                        responseMessage.message = 'OutBoxMsg details Send successfully';
+                                        console.log('FnGetOutboxMessages: OutBoxMsg details Send successfully');
                                         res.status(200).json(responseMessage);
                                     }
                                     else {
                                         
                                         responseMessage.error = {};
-                                        responseMessage.message = 'No founded Company details';
-                                        console.log('FnGetOutboxMessages: No founded Company details');
+                                        responseMessage.message = 'No founded OutBoxMsg details';
+                                        console.log('FnGetOutboxMessages: No founded OutBoxMsg details');
                                         res.json(responseMessage);
                                     }
                                 }
@@ -12280,8 +12280,8 @@ exports.FnGetOutboxMessages = function (req, res) {
 
                                     
                                     responseMessage.error = {};
-                                    responseMessage.message = 'No founded Company details';
-                                    console.log('FnGetOutboxMessages: No founded Company details');
+                                    responseMessage.message = 'No founded OutBoxMsg details';
+                                    console.log('FnGetOutboxMessages: No founded OutBoxMsg details');
                                     res.json(responseMessage);
                                 }
 
@@ -12290,8 +12290,8 @@ exports.FnGetOutboxMessages = function (req, res) {
                                 
                                 responseMessage.data = null ;
                                 responseMessage.error = {};
-                                responseMessage.message = 'Error in getting Company details';
-                                console.log('FnGetOutboxMessages: error in getting Company details' + err);
+                                responseMessage.message = 'Error in getting OutBoxMsg details';
+                                console.log('FnGetOutboxMessages: error in getting OutBoxMsg details' + err);
                                 res.status(500).json(responseMessage);
                             }
                         });

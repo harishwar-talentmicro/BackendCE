@@ -38,7 +38,7 @@
                     </div>
                 </div>
 
-                <div class="row signup-selection-row">
+                <div class="row signup-selection-row" ng-show="isSignUpTypeBlockVisible">
                     <div class="col-lg-12 col-md-12 col-xs-12 col-md-12">
                         <h3 class="text-info text-center font-open-sans">Choose your selection type ?</h3>
                     </div>
@@ -48,11 +48,11 @@
                             <div class="col-lg-12 col-md-12 col-xs-12 signup-selection-type">
                                 <div>
                                     <h3 class="font-roboto text-center text-black">Individual</h3>
-                                    <h3 class="text-center text-warning" style="color: #B95FCD;">
+                                    <h3 class="text-center text-warning" style="color: #008DF4;">
                                         <i class="fa fa-user fa-3x"></i>
                                     </h3>
                                     <div class="text-center">
-                                        <button class="btn btn-block btn-info">SELECT</button>
+                                        <button class="btn btn-block btn-info" ng-click="selectPlan(1,0)">SELECT</button>
                                     </div>
                                 </div>
 
@@ -70,7 +70,7 @@
                                         <i class="fa fa-suitcase fa-3x"></i>
                                     </h3>
                                     <div class="text-center">
-                                        <button class="btn btn-block btn-info">SELECT</button>
+                                        <button class="btn btn-block btn-info" ng-click="selectPlan(2,1)">SELECT</button>
                                     </div>
                                 </div>
 
@@ -87,23 +87,474 @@
                                         <i class="fa fa-street-view fa-3x"></i>
                                     </h3>
                                     <div class="text-center">
-                                        <button class="btn btn-block btn-info">SELECT</button>
+                                        <button class="btn btn-block btn-info" ng-click="selectPlan(3,0)">SELECT</button>
                                     </div>
                                 </div>
                             </div>
-
                     </div>
 
                     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                         <div class="alert alert-success text-center no-radius">
-                            <h4 class="font-open-sans text-dark-blue">See feature comparision based on your type </h4>
+                            <h4 class="font-open-sans text-dark-blue no-margin"><a class="btn-link" ng-click="modalVisibility()">See feature comparision based on your type </a></h4>
                         </div>
                     </div>
 
                 </div>
+
+                <div class="row signup-business-row" ng-show="showBusinnessSelectionType">
+                <!--<div class="row signup-business-row">-->
+                    <div class="col-lg-12 col-md-12 col-xs-12 col-md-12">
+                        <h3 class="text-info text-center font-open-sans">Choose the type of listing you want?</h3>
+                        <p class="text-center">
+                            <a href="/" ng-click="($event.preventDefault()) (goBack())">
+                                <span class="glyphicon glyphicon-backward"></span> Go Back
+                            </a>
+                        </p>
+                    </div>
+
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 col-lg-offset-3 col-md-offset-3 col-sm-offset-3 col-xs-offset-0 bottom-clearfix">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 signup-business-type">
+                            <div id="signup-business-free" class="btn-link" ng-click="selectPlanSelectionType(1)">
+                                <h3 class="text-center"> <i class="fa fa-2x fa-reorder"></i> </h3>
+                                <h3 class="text-center"> Free Listing</h3>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 signup-business-type">
+                            <div id="signup-business-paid" class="btn-link" ng-click="selectPlanSelectionType(2)">
+                                <h3 class="text-center" style="color:#FF000A;"> <i class="fa fa-2x fa-money"></i> </h3>
+                                <h3 class="text-center" style="color:#FF000A;"> Paid Listing</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!----------------- EZEID Availability Check Block ---------------------------------->
+                <div ng-show="isEzeidCheckBlockVisible" class="animation-slideup signup-details-row row">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix"></div>
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
+                        <h4 class="text-center text-black font-roboto">{{selectionString}}</h4>
+                        <p class="text-center">
+                            <a href="/" ng-click="($event.preventDefault()) (goBack())">
+                                <span class="glyphicon glyphicon-backward"></span> Go Back
+                            </a>
+                        </p>
+
+                    </div>
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <div class="container-fluid">
+                            <form name="signUpForm">
+                                <div class="row">
+
+                                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-4 bottom-clearfix min-form-height">
+                                        <div class="input-group">
+                                            <!---
+                                            Validation Added for ezeid input
+                                            Constraints :
+                                            1. Value of Model should be having a particular pattern
+                                            2. Min and max length is defined by pattern itself
+                                            3. Entering of unwanted characters is disbaled by using ezeid-only directive
+                                            -->
+
+                                            <span class="input-group-addon">@</span>
+                                            <input
+                                                    ng-model="ezeid"
+                                                    max-length="15"
+                                                    ezeid-only capitalize
+                                                    ng-pattern="/^[0-9a-zA-Z]{3,15}$/"
+                                                    name="ezeid" type="text"
+                                                    placeholder="EZIED"
+                                                    ng-change="isEzeidAvailabilityChecked = false"
+                                                    ng-class="(signUpForm.ezeid.$dirty && signUpForm.ezeid.$modelValue.length < 1) ? 'mandatoryTextBox' : ''"
+                                                    class="form-control emptyBox" />
+
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6 bottom-clearfix">
+                                        <div class="form-group">
+                                            <!---
+                                                Validation Added for SignUp form
+                                                Constraints :
+                                                1. Value of Model should not be undefined or empty
+                                                2. Availability is already checked for ezeid or not
+                                            -->
+                                            <button
+                                                    class="form-control btn btn-primary btn-sm"
+                                                    ng-disabled="(!signUpForm.ezeid.$modelValue) || signUpForm.ezeid.$modelValue == '' || isEzeidAvailabilityChecked || isEzeidCheckInProgress"
+                                                    ng-click="checkEzeidAvailability()">
+                                                {{isEzeidCheckInProgress ? 'Checking ...' : 'Check Availability'}}
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-4 bottom-clearfix" ng-show="isEzeidAvailabilityChecked">
+                                        <p class="text-success center-vertical" ng-show="isEzeidAvailable">Available</p>
+                                        <p class="text-danger center-vertical" ng-show="!isEzeidAvailable">Not Available</p>
+                                    </div>
+
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
+                                        <small>*Note : End the EZEOne with atleast 1 numerical digit (Not applicable for paid business listing)</small>
+                                    </div>
+
+                                </div>
+
+
+                                <!------------- Password Box ----------------------------------------------->
+
+                                <div class="row bottom-clearfix" ng-show="isEzeidAvailabilityChecked && isEzeidAvailable">
+                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                                        <div class="form-group">
+                                            <input
+                                                    name="password"
+                                                    ng-model="password"
+                                                    type="password"
+                                                    min-length="4"
+                                                    max-length="20"
+                                                    placeholder="{{'Password'}}"
+                                                    ng-class="(signUpForm.password.$dirty && signUpForm.password.$modelValue.length < 1) ? 'mandatoryTextBox' : ''"
+                                                    class="form-control emptyBox" />
+                                        </div>
+                                        <small class="text-danger">{{error.password}}</small>
+                                    </div>
+                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                                        <div class="form-group">
+                                            <input
+                                                    name="repassword"
+                                                    ng-model="repassword"
+                                                    type="password"
+                                                    min-length="4"
+                                                    max-length="20"
+                                                    placeholder="{{'Re-enter Password'}}"
+                                                    ng-class="(signUpForm.repassword.$dirty && signUpForm.repassword.$modelValue.length < 1) ? 'mandatoryTextBox' : ''"
+                                                    class="form-control emptyBox" />
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4" ng-show="(signUpForm.password.$dirty || signUpForm.repassword.$dirty) && password.length > 0 && repassword.length > 0">
+                                        <div class="form-group">
+                                            <p class="text-success center-vertical" ng-show="password === repassword">Passwords matched</p>
+                                            <p class="text-danger center-vertical" ng-hide="password === repassword">Passwords mismatch</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!------------- end : Password Box ----------------------------------------->
+
+
+
+
+                                <!-------------- This will be visible in case of Public Place and Business User  Only
+                                    Changing of placeholders dynamically in case of public place and business user
+                                ------------------------->
+                                <div class="row bottom-clearfix" ng-show="isEzeidAvailabilityChecked && isEzeidAvailable && (userType !== 1)">
+                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                                        <div class="form-group">
+                                            <input
+                                                    name="companyName"
+                                                    ng-model="companyName"
+                                                    type="text"
+                                                    min-length="1"
+                                                    max-length="150"
+                                                    placeholder="{{(userType == 2) ? 'Company Name': 'Name of Public Place'}}"
+                                                    ng-class="(signUpForm.companyName.$dirty && signUpForm.companyName.$modelValue.length < 1) ? 'mandatoryTextBox' : ''"
+                                                    ng-change="signUpForm.companyName.$setDirty()"
+                                                    class="form-control emptyBox" />
+                                        </div>
+                                        <small class="text-danger">{{error.companyName}}</small>
+
+                                    </div>
+
+                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                                        <div class="form-group">
+                                            <input
+                                                    name="about"
+                                                    ng-model="about"
+                                                    type="text"
+                                                    min-length="1"
+                                                    max-length="50"
+                                                    maxlength="50"
+                                                    placeholder="{{(userType == 2) ? 'Company Tagline': 'Tagline for Public Place'}}"
+                                                    ng-class="(signUpForm.about.$dirty && signUpForm.about.$modelValue.length < 1) ? 'mandatoryTextBox' : ''"
+                                                    ng-change="signUpForm.about.$setDirty()"
+                                                    class="form-control emptyBox" />
+                                        </div>
+                                        <small class="text-danger">{{error.about}}</small>
+                                    </div>
+                                </div>
+                                <!--------------end :  This will be visible in case of Public Place and Business User  Only ---->
+
+                                <div class="row bottom-clearfix" ng-show="isEzeidAvailabilityChecked && isEzeidAvailable">
+                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                                        <div class="form-group">
+                                            <input
+                                                    name="firstName"
+                                                    ng-model="firstName"
+                                                    type="text"
+                                                    min-length="1"
+                                                    max-length="30"
+                                                    placeholder="{{(userType == 2 || userType == 3) ? 'Contact First Name': 'First Name'}}"
+                                                    ng-class="(signUpForm.firstName.$dirty && signUpForm.firstName.$modelValue.length < 1) ? 'mandatoryTextBox' : ''"
+                                                    class="form-control emptyBox" />
+                                        </div>
+                                        <small class="text-danger">{{error.firstName}}</small>
+                                    </div>
+
+                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                                        <div class="form-group">
+                                            <input
+                                                    name="lastName"
+                                                    ng-model="lastName"
+                                                    type="text"
+                                                    min-length="1"
+                                                    max-length="30"
+                                                    placeholder="{{(userType == 2 || userType == 3) ? 'Contact Last Name': 'Last Name'}}"
+                                                    ng-class="(signUpForm.lastName.$dirty && signUpForm.lastName.$modelValue.length < 1) ? 'mandatoryTextBox' : ''"
+                                                    class="form-control " />
+                                        </div>
+                                        <small class="text-danger">{{error.lastName}}</small>
+                                    </div>
+
+                                </div>
+
+                                <!-------------- This will be visible in case of Individual for the sake of displaying the company input box details below
+                                     Changing of placeholders dynamically in case of individual
+                                 ------------------------->
+                                <div class="row bottom-clearfix"ng-show="isEzeidAvailabilityChecked && isEzeidAvailable && (userType == 1)">
+                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                                        <div class="form-group">
+                                            <input
+                                                    name="companyName"
+                                                    ng-model="companyName"
+                                                    type="text"
+                                                    min-length="1"
+                                                    max-length="150"
+                                                    placeholder="{{'Company Name'}}"
+                                                    ng-change="signUpForm.companyName.$setDirty()"
+                                                    ng-class="(signUpForm.companyName.$dirty && signUpForm.companyName.$modelValue.length < 1) ? 'mandatoryTextBox' : ''"
+                                                    class="form-control emptyBox" />
+                                        </div>
+                                        <small class="text-danger">{{error.companyName}}</small>
+                                    </div>
+
+                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                                        <div class="form-group">
+                                            <input
+                                                    name="about"
+                                                    ng-model="about"
+                                                    type="text"
+                                                    min-length="1"
+                                                    max-length="50"
+                                                    maxlength="50"
+                                                    placeholder="{{'Job Title'}}"
+                                                    ng-change="signUpForm.about.$setDirty()"
+                                                    ng-class="(signUpForm.about.$dirty && signUpForm.about.$modelValue.length < 1) ? 'mandatoryTextBox' : ''"
+                                                    class="form-control emptyBox" />
+                                        </div>
+                                        <small class="text-danger">{{error.about}}</small>
+                                    </div>
+
+                                </div>
+                                <!--------------end :  This will be visible in case of Individual Only ---->
+
+
+                                <div class="row bottom-clearfix" ng-show="isEzeidAvailabilityChecked && isEzeidAvailable">
+                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                                        <div class="form-group">
+                                            <input
+                                                    name="email"
+                                                    ng-model="email"
+                                                    type="email"
+                                                    min-length="1"
+                                                    max-length="50"
+                                                    maxlength="50"
+                                                    placeholder="{{'Email'}}"
+                                                    ng-class="(signUpForm.email.$dirty && signUpForm.email.$modelValue.length < 1) ? 'mandatoryTextBox' : ''"
+                                                    class="form-control emptyBox" />
+                                        </div>
+                                        <small class="text-danger">{{error.email}}</small>
+                                    </div>
+
+                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                                        <div class="form-group">
+                                            <input
+                                                    name="mobile"
+                                                    ng-model="mobile"
+                                                    type="text"
+                                                    min-length="10"
+                                                    max-length="13"
+                                                    maxlength="13"
+                                                    numbers-only
+                                                    placeholder="Mobile"
+                                                    ng-class="(signUpForm.mobile.$dirty && signUpForm.mobile.$modelValue.length < 1) ? 'mandatoryTextBox' : ''"
+                                                    class="form-control emptyBox" />
+                                        </div>
+                                        <small class="text-danger">{{error.contact}}</small>
+                                    </div>
+                                </div>
+
+
+                                <!---------------------- Visible only in case of Individual ------------------------->
+                                <div class="row" ng-show="(userType == 1) && isEzeidAvailabilityChecked && isEzeidAvailable">
+                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                                        <div class="form-group">
+                                            <select class="form-control" ng-model="gender">
+                                                <option value="2">Unspecified Gender</option>
+                                                <option value="0">Male</option>
+                                                <option value="1">Female</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-4">
+                                        <div class="form-group">
+                                            <date-time-picker recipient="dateOfBirth" settings='{
+                                                                    "format" : "d-M-Y",
+                                                                    "timepicker" : false,
+                                                                    "mask" : false,
+                                                                    "hours12" : false,
+                                                                    "maxDate" : "+1970/01/01"
+                                                                    }'></date-time-picker>
+                                        </div>
+
+                                        <small class="text-danger">{{error.dateOfBirth}}</small>
+                                    </div>
+                                </div>
+
+                                <!-------------------- PIN Block ----------------------------------------------------->
+                                <div class="row bottom-clearfix" ng-show="isEzeidAvailabilityChecked && isEzeidAvailable">
+
+                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                                        <div class="form-group center-vertical">
+                                            <input type="checkbox" id="pin-applicable" ng-model="isPinApplicable" name="isPinApplicable" ng-click="pinApplicable = (isPinApplicable == true) ? false : true" />
+                                            <label for="pin-applicable">
+                                                Secure Your EZEOne by a PIN
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-3">
+                                        <div class="form-group">
+                                            <input
+                                                    ng-disabled="!isPinApplicable"
+                                                    name="pin"
+                                                    ng-model="pin"
+                                                    type="password"
+                                                    min-length="3"
+                                                    max-length="3"
+                                                    placeholder="{{'PIN'}}"
+                                                    pin-only
+                                                    class="form-control" />
+                                        </div>
+                                        <small class="text-danger">{{error.pin}}</small>
+                                    </div>
+
+                                </div>
+                                <!-------------------- end : PIN Block ----------------------------------------------------->
+
+
+                                <div class="row bottom-clearfix" ng-show="isEzeidAvailabilityChecked && isEzeidAvailable">
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                        <div class="form-group form-group-lg">
+                                            <label for="terms" class="center-vertical">
+                                                <input type="checkbox" ng-model="termsAccepted" id="terms" />
+                                                I have fully read and understood the <a class="btn-link" ng-click="toggleTermsAndConditions()">Terms and Conditions </a> of EZEOne
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row bottom-clearfix" ng-show="isEzeidAvailabilityChecked && isEzeidAvailable">
+                                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-4">
+                                        <div class="form-group">
+                                            <button class="btn btn-primary" ng-click="doSignUp()" ng-disabled="(!isEzeidAvailable) || (!termsAccepted)">Generate EZEOne ID</button>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-2 col-md-2 col-sm-3 col-xs-4">
+                                        <div class="form-group">
+                                            <button class="btn btn-primary" ng-click="closeForm()">Close</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <!----------- Test Block : to be removed ----------------------->
+
+                                <!--<div class="row">-->
+                                <!--<div class="col-lg-4 col-md-4">-->
+                                <!--<button class="btn btn-success btn-sm" ng-click="(isEzeidAvailabilityChecked = true) && (isEzeidAvailable = true)">Availability True</button>-->
+                                <!--</div>-->
+                                <!--</div>-->
+
+                                <!----------- end : Test Block : to be removed ----------------------->
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+                <!----------------- EZEID Availability Check Block ends ---------------------------------->
 
             </div>
         </div>
     </div>
 </div>
 <footer-section></footer-section>
+<modal mtitle="modalBox.title" mclass="modalBox.class" visible="modalVisible">
+    <div class="row">
+        <!-- Detail goes here -->
+        <div class="container">
+            <div class="row">
+
+                    <!------------------ Feature comparision content------------------------>
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <table id="table-business-features" class="table table-striped">
+                        <thead>
+                        <tr class="bg-info">
+                            <th></th>
+                            <th class="text-center">
+                                <label class="clearfix">Business</label>
+                                <label>Free Listing</label>
+                            </th>
+                            <th class="text-center">
+                                <label class="clearfix">Business</label>
+                                <label> Paid Listing</label>
+                            </th>
+                            <th class="text-center"><label>Individual</label></th>
+                            <th class="text-center"><label>Public Place</label></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="feature in signUpFeatures.primary">
+                            <td>{{feature.name}}</td>
+                            <td class="text-center"><span class="{{ feature.businessFree}}"></span></td>
+                            <td class="text-center"><span class="{{feature.businessPaid}}"></span></td>
+                            <td class="text-center"><span class="{{feature.individual}}"></span></td>
+                            <td class="text-center"><span class="{{feature.publicPlace}}"></span></td>
+                        </tr>
+
+                        <tr class="bg-success">
+                            <td><label class="clearfix">Business Functions</label></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr ng-repeat="feature in signUpFeatures.functions">
+                            <td>{{feature.name}}</td>
+                            <td class="text-center"><span class="{{ feature.businessFree}}"></span></td>
+                            <td class="text-center"><span class="{{feature.businessPaid}}"></span></td>
+                            <td class="text-center"><span class="{{feature.individual}}"></span></td>
+                            <td class="text-center"><span class="{{feature.publicPlace}}"></span></td>
+                        </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <p>
+                        <span class="glyphicon glyphicon-ok green"></span> : Available <span style="padding-left:10px;" class="glyphicon glyphicon-remove red"></span> : Not Available
+                        <span style="padding-left:10px;" class="glyphicon glyphicon-ban-circle red"></span> : Not Applicable <span style="padding-left:10px;" class="glyphicon glyphicon-exclamation-sign yellow"></span> : Partial
+                    </p>
+                </div>
+                    <!------------------ end: Feature comparision content------------------------>
+
+            </div>
+        </div>
+    </div>
+</modal>

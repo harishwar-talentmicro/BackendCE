@@ -100,9 +100,9 @@
     <div class="row setRowLeftRightMarginZero" ng-show="true">
         <div class="row">
             <span class="skillText">Skill Matrix ( To find best matching roles ) </span>
-            <button type="button" class="btn btn-primary btn-sm pull-right" ng-click="addMoreSkill()"><span class="glyphicon glyphicon-plus"></span> Add More </button>
         </div>
         <div class="row">
+
             <table class="table table-striped skillMatrixTable" st-table="rowCollection">
                 <thead>
                 <tr style="background:#ECECEC;; color:#000000;">
@@ -114,12 +114,12 @@
                 </tr>
                 </thead>
                 <tbody>
-
                     <tr ng-repeat="skill in skillMatrix" >
                         <td class="panelPd5px msg_pos" ng-hide="(!editMode[$index]) && ($index == 0)">
                             <span ng-hide="editMode[$index]">{{skillMatrix[$index].skillname}}</span>
                             <div class="ui-widget" ng-show="editMode[$index]">
-                                <input class="form-control" type="text" id="tags{{$index}}" ng-keyup="complete($index)" ng-model="editSkill.skillname" placeholder="Type skill here"/>
+                                <input class="form-control" type="text" id="tags{{$index}}" ng-keyup="complete($index)"
+                                       ng-model="editSkill.skillname" placeholder="Type skill here"/>
                             </div>
                         </td>
                         <td class="panelPd5px msg_pos" ng-hide="(!editMode[$index]) && ($index == 0)">
