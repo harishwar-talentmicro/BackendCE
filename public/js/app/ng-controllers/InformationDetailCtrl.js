@@ -159,7 +159,7 @@ angular.module('ezeidApp').
                 $scope.SearchInfo = {};
                 $scope.AddressForInfoTab = "";
                 AutoRefresh = false;
-                    if(!$rootScope._userInfo)
+                if(!$rootScope._userInfo)
                 {
                     $rootScope._userInfo = {};
                 }
@@ -167,7 +167,7 @@ angular.module('ezeidApp').
                 if(!$rootScope._userInfo.IsAuthenticate){
                     /*$rootScope._userInfo.Token = 2;*/
                     $rootScope._userInfo.Token = " ";
-                    $scope.Token = 2;
+                    /*$scope.Token = 2;*/
                 }
 
                 $http({ method: 'get',
