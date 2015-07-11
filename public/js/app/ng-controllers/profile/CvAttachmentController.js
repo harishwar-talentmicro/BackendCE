@@ -166,10 +166,11 @@ angular.module('ezeidApp').controller('CVAttachController',[
             }
         }).success(function (res)
            {
+               console.log(res);
                 if(res.status)
                 {
                     CVAttachCtrl._CVInfo = res.data[0];
-                    if(res.skillMatrix.length == 0)
+                    if((res.skillMatrix.length == 0) && (res.skillMatrix == null) && (res.skillMatrix == 'null'))
                     {
                         $scope.skillMatrix = [
                             {
