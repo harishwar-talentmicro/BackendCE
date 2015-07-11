@@ -176,7 +176,7 @@ angular.module('ezeidApp').controller('CVAttachController',[
                                 "tid":0,
                                 "skillname":"",
                                 "expertiseLevel":0,
-                                "exp":"",
+                                "exp":0,
                                 "active_status":1
                             }
                         ];
@@ -189,7 +189,7 @@ angular.module('ezeidApp').controller('CVAttachController',[
                                 "skillname":"",
                                 "expertiseLevel":0,
                                 "exp":"",
-                                "active_status":1
+                                "active_status":0
                             }
                         );
 
@@ -249,8 +249,8 @@ angular.module('ezeidApp').controller('CVAttachController',[
             "tid":0,
             "skillname":"",
             "expertiseLevel":0,
-            "exp":"",
-            "active_status":1
+            "exp":1,
+            "active_status":0
         };
 
         $scope.editSkillFn = function(index){
@@ -289,8 +289,8 @@ angular.module('ezeidApp').controller('CVAttachController',[
                         "tid":0,
                         "skillname":"",
                         "expertiseLevel":0,
-                        "exp":"",
-                        "active_status":1
+                        "exp":0,
+                        "active_status":0
                     };
                     return;
                 }
@@ -302,8 +302,8 @@ angular.module('ezeidApp').controller('CVAttachController',[
                     "tid":0,
                     "skillname":"",
                     "expertiseLevel":0,
-                    "exp":"",
-                    "active_status":1
+                    "exp":0.0,
+                    "active_status":0
                 };
             }
             else{
@@ -314,8 +314,8 @@ angular.module('ezeidApp').controller('CVAttachController',[
                     "tid":0,
                     "skillname":"",
                     "expertiseLevel":0,
-                    "exp":"",
-                    "active_status":1
+                    "exp":1,
+                    "active_status":0
                 };
             }
 
