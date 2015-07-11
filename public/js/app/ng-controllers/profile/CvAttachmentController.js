@@ -240,6 +240,15 @@ angular.module('ezeidApp').controller('CVAttachController',[
                 else
                 {   CVAttachCtrl._CVInfo.Status= 1;
                     $scope.showLink = false;
+                    $scope.skillMatrix = [
+                        {
+                            "tid":0,
+                            "skillname":"",
+                            "expertiseLevel":0,
+                            "exp":0,
+                            "active_status":1
+                        }
+                    ];
                 }
            });
     };
