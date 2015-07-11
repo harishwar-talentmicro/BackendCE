@@ -175,9 +175,9 @@ angular.module('ezeidApp').
                 }
                 else{
                     $timeout(function(){
-                        var a  = $filter('filter')(suggestion,$scope.params.searchTerm);
+                        var a  = $filter('filter')(suggestion,$scope.searchParams.searchTerm);
                         console.log(a);
-                        $scope.KeyWords = $filter('filter')(suggestion,$scope.params.searchTerm);
+                        $scope.KeyWords = $filter('filter')(suggestion,$scope.searchParams.searchTerm);
                     },100);
                 }
             };

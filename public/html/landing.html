@@ -66,9 +66,12 @@
                                 </ul>
                             </div>
                             <!--<input type="text" ng-keypress="checkEnterKey($event)" placeholder="{{placeHolderText[searchParams.searchType - 1]}}" ng-model="searchParams.searchTerm" ng-class="(searchParams.searchType === 1) ? 'text-uppercase' : ''" class="form-control" aria-label="...">-->
+
                             <input type="text" id="searchTextField" ng-keypress="checkEnterKey($event)" placeholder="{{placeHolderText[searchParams.searchType - 1]}}" ng-model="searchParams.searchTerm" ng-class="(searchParams.searchType === 1) ? 'text-uppercase' : ''" class="form-control dropdown-toggle" aria-label="..." data-toggle="dropdown">
 
-                            <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel" style="margin-left: 32%;" ng-show="(params.searchType == 2) && (KeyWords.length > 0) && (params.searchTerm.length)">
+                           <!-- {{searchParams}}-->
+
+                            <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel" style="margin-left: 32%;" ng-show="(searchParams.searchType == 2) && (KeyWords.length > 0) && (searchParams.searchTerm.length)">
                                 <li ng-repeat="KeyWord in KeyWords">
                                     <a ng-click="setAutoCompeted(KeyWord)">{{KeyWord}}</a>
                                 </li>
