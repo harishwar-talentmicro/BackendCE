@@ -532,6 +532,8 @@
                         });
                     }
                     else{
+                        $scope.modalBox.title = 'Update Help desk enquiry';
+                        $scope.modalBox.tx = editTx;
                         $scope.showModal = !$scope.showModal;
                     }
                 }
@@ -904,20 +906,20 @@
             /**
              * Loads company list as soon as controller is initialized
              */
-            loadCompany();
+            //loadCompany();
 
 
-            $scope.$watch('modalBox.tx.companyId',function(n,v){
-                ////console.log(n);
-                if(n){
-                    ////console.log(companyList);
-                    var indx = companyList.indexOfWhere('id',n);
-                    ////console.log(indx);
-                    if(indx !== -1){
-                        $scope.modalBox.tx.ezeid = companyList[indx].ezeid;
-                    }
-                }
-            });
+            //$scope.$watch('modalBox.tx.companyId',function(n,v){
+            //    ////console.log(n);
+            //    if(n){
+            //        ////console.log(companyList);
+            //        var indx = companyList.indexOfWhere('id',n);
+            //        ////console.log(indx);
+            //        if(indx !== -1){
+            //            $scope.modalBox.tx.ezeid = companyList[indx].ezeid;
+            //        }
+            //    }
+            //});
 
 
             $scope.$watch('modalBox.tx.ezeid',function(newVal,oldVal){

@@ -460,6 +460,8 @@
                         });
                     }
                     else{
+                        $scope.modalBox.title = 'Update Resume application';
+                        $scope.modalBox.tx = editTx;
                         $scope.showModal = !$scope.showModal;
                     }
                 }

@@ -113,14 +113,14 @@
                     </div>
 
 
-                    <div class="col-lg-1 col-md-1 col-sm-6 col-xs-12 bottom-clearfix pull-right">
-                        <button class="btn btn-sm btn-success no-radius"
-                                ng-show="resumePermissionConf.txCreate"
-                                ng-click="toggleModalBox()"
-                                data-toggle="tooltip" title="Add New Lead">
-                            <span class="glyphicon glyphicon-plus-sign"></span> Add New
-                        </button>
-                    </div>
+                    <!--<div class="col-lg-1 col-md-1 col-sm-6 col-xs-12 bottom-clearfix pull-right">-->
+                        <!--<button class="btn btn-sm btn-success no-radius"-->
+                                <!--ng-show="resumePermissionConf.txCreate"-->
+                                <!--ng-click="toggleModalBox()"-->
+                                <!--data-toggle="tooltip" title="Add New Lead">-->
+                            <!--<span class="glyphicon glyphicon-plus-sign"></span> Add New-->
+                        <!--</button>-->
+                    <!--</div>-->
 
 
 
@@ -303,7 +303,7 @@
                     <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12 bottom-clearfix" ng-show="editModes[$index]">
                         <div class="row">
                             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
-                                <label class="tiny">Transaction Status</label>
+                                <label class="tiny">Transaction Stage</label>
                                 <br/>
                                 <div class="form-group form-group-sm">
                                     <select class="form-control" ng-model="modalBox.tx.statusType">
@@ -658,59 +658,59 @@
 
 
 
-                                <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
-                                    <div class="row">
-                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                            <label> Address</label>
-                                        </div>
-                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-hide="modalBox.editMode">
-                                            <div class="form-group form-group-sm ">
-                                                <select class="form-control" ng-model="modalBox.tx.locId" ng-change="findAddress()">
-                                                    <option value="">Other Location</option>
-                                                    <option ng-repeat="location in modalBox.locationList track by location.TID" value="{{location.TID}}">{{location.LocTitle}}</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-hide="modalBox.editMode">
-                                            <div class="form-group form-group-sm ">
-                                                <input
-                                                        ng-disabled="modalBox.tx.locId"
-                                                        type="text" placeholder="Address Line 1" class="form-control no-radius"  name="area" ng-model="modalBox.tx.address" />
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12" ng-hide="modalBox.editMode">
-                                            <div class="form-group form-group-sm ">
-                                                <input type="text"
-                                                       ng-disabled="modalBox.tx.locId"
-                                                       placeholder="Locality" class="form-control no-radius"  name="area" ng-model="modalBox.tx.area" />
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12" ng-hide="modalBox.editMode">
-                                            <div class="form-group form-group-sm ">
-                                                <input
-                                                        ng-disabled="modalBox.tx.locId"
-                                                        type="text" placeholder="City" class="form-control no-radius" name="city" ng-model="modalBox.tx.city" />
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12" ng-hide="modalBox.editMode">
-                                            <div class="form-group form-group-sm ">
-                                                <input type="text"
-                                                       ng-disabled="modalBox.tx.locId"
-                                                       placeholder="State" class="form-control no-radius" name="state" ng-model="modalBox.tx.state" />
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12" ng-hide="modalBox.editMode">
-                                            <div class="form-group form-group-sm ">
-                                                <input type="text"
-                                                       ng-disabled="modalBox.tx.locId"
-                                                       placeholder="Country" class="form-control no-radius"  name="country" ng-model="modalBox.tx.country" />
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-show="modalBox.editMode">
-                                            <textarea  rows="4" class="form-control" ng-model="modalBox.tx.deliveryAddress"></textarea>
-                                        </div>
-                                    </div>
-                                </div>
+                                <!--<div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">-->
+                                    <!--<div class="row">-->
+                                        <!--<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">-->
+                                            <!--<label> Address</label>-->
+                                        <!--</div>-->
+                                        <!--<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-hide="modalBox.editMode">-->
+                                            <!--<div class="form-group form-group-sm ">-->
+                                                <!--<select class="form-control" ng-model="modalBox.tx.locId" ng-change="findAddress()">-->
+                                                    <!--<option value="">Other Location</option>-->
+                                                    <!--<option ng-repeat="location in modalBox.locationList track by location.TID" value="{{location.TID}}">{{location.LocTitle}}</option>-->
+                                                <!--</select>-->
+                                            <!--</div>-->
+                                        <!--</div>-->
+                                        <!--<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-hide="modalBox.editMode">-->
+                                            <!--<div class="form-group form-group-sm ">-->
+                                                <!--<input-->
+                                                        <!--ng-disabled="modalBox.tx.locId"-->
+                                                        <!--type="text" placeholder="Address Line 1" class="form-control no-radius"  name="area" ng-model="modalBox.tx.address" />-->
+                                            <!--</div>-->
+                                        <!--</div>-->
+                                        <!--<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12" ng-hide="modalBox.editMode">-->
+                                            <!--<div class="form-group form-group-sm ">-->
+                                                <!--<input type="text"-->
+                                                       <!--ng-disabled="modalBox.tx.locId"-->
+                                                       <!--placeholder="Locality" class="form-control no-radius"  name="area" ng-model="modalBox.tx.area" />-->
+                                            <!--</div>-->
+                                        <!--</div>-->
+                                        <!--<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12" ng-hide="modalBox.editMode">-->
+                                            <!--<div class="form-group form-group-sm ">-->
+                                                <!--<input-->
+                                                        <!--ng-disabled="modalBox.tx.locId"-->
+                                                        <!--type="text" placeholder="City" class="form-control no-radius" name="city" ng-model="modalBox.tx.city" />-->
+                                            <!--</div>-->
+                                        <!--</div>-->
+                                        <!--<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12" ng-hide="modalBox.editMode">-->
+                                            <!--<div class="form-group form-group-sm ">-->
+                                                <!--<input type="text"-->
+                                                       <!--ng-disabled="modalBox.tx.locId"-->
+                                                       <!--placeholder="State" class="form-control no-radius" name="state" ng-model="modalBox.tx.state" />-->
+                                            <!--</div>-->
+                                        <!--</div>-->
+                                        <!--<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12" ng-hide="modalBox.editMode">-->
+                                            <!--<div class="form-group form-group-sm ">-->
+                                                <!--<input type="text"-->
+                                                       <!--ng-disabled="modalBox.tx.locId"-->
+                                                       <!--placeholder="Country" class="form-control no-radius"  name="country" ng-model="modalBox.tx.country" />-->
+                                            <!--</div>-->
+                                        <!--</div>-->
+                                        <!--<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-show="modalBox.editMode">-->
+                                            <!--<textarea  rows="4" class="form-control" ng-model="modalBox.tx.deliveryAddress"></textarea>-->
+                                        <!--</div>-->
+                                    <!--</div>-->
+                                <!--</div>-->
 
 
                                 <!--<div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">-->
