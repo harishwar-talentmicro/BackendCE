@@ -190,7 +190,7 @@ angular.module('ezeidApp').controller('CVAttachController',[
                                 "skillname":"",
                                 "expertiseLevel":0,
                                 "exp":"",
-                                "active_status":0
+                                "active_status":1
                             }
                         );
 

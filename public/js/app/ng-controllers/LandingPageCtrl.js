@@ -533,6 +533,12 @@ angular.module('ezeidApp').
              */
             $('[data-toggle="tooltip"]').tooltip();
 
+            /* set Auto Completed key word to text field */
+            $scope.setAutoCompeted = function(_item)
+            {
+                $('#searchTextField').val(_item);
+            };
+
             var suggestion = [
                 '24 x 7 Physician Doctor',
                 'Pharmacy',
