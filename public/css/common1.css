@@ -1859,3 +1859,31 @@ table.rwd-table > tbody > tr > td.serachResultSelectAll
     color: rgb(144, 145, 150);
     text-shadow: 1px 1px 1px #B2B6B8 !important;
 }
+.tabs-row-sales .nav > li > a{
+    font-size: 12px;
+    background: rgba(140, 140, 140, 0.10);
+    color: #000000;
+    padding: 5px 15px;
+    width: auto;
+    border: 1px solid rgba(152, 160, 153, 0.41);
+}
+
+.tabs-row-sales .nav > li.active > a
+{
+    background: #B4F5E9;
+    color: #0008A8;
+    border: 1px solid #38A2FC;
+    cursor: pointer;
+}
+
+.tabs-row-sales .nav > li > a:hover,
+.tabs-row-sales .nav > li > a:focus,
+.tabs-row-sales .nav > li > a:active{
+    background: #F2FFF4;
+    color: #4BC0C5;
+    border: 1px solid #4BC0C5;
+}
+
+.tabs-row-sales .nav-tabs{
+    border: none;
+}
