@@ -176,7 +176,6 @@ angular.module('ezeidApp').
                 else{
                     $timeout(function(){
                         var a  = $filter('filter')(suggestion,$scope.searchParams.searchTerm);
-                        console.log(a);
                         $scope.KeyWords = $filter('filter')(suggestion,$scope.searchParams.searchTerm);
                     },100);
                 }
@@ -532,6 +531,12 @@ angular.module('ezeidApp').
              * Initiate tool tip
              */
             $('[data-toggle="tooltip"]').tooltip();
+
+            /* set Auto Completed key word to text field */
+            $scope.setAutoCompeted = function(_item)
+            {
+                $('#searchTextField').val(_item);
+            };
 
             var suggestion = [
                 '24 x 7 Physician Doctor',
