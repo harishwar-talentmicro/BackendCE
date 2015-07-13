@@ -7238,7 +7238,7 @@ exports.FnSaveTranscation = function(req, res){
 
                                             if (getResult[0].id == 1) {
 
-                                                fs.readFile("sales.html", "utf8", function (err, data) {
+                                                fs.readFile("SalesMail.html", "utf8", function (err, data) {
 
                                                     if (getResult[0].EZEIDVerifiedID == 1) {
                                                         verified = 'Not Verified';
@@ -7298,7 +7298,7 @@ exports.FnSaveTranscation = function(req, res){
                                             }
                                             else {
 
-                                                fs.readFile("sales.html", "utf8", function (err, data) {
+                                                fs.readFile("SalesMail.html", "utf8", function (err, data) {
 
                                                     if (getResult[0].EZEIDVerifiedID == 1) {
                                                         verified = 'Not Verified';
