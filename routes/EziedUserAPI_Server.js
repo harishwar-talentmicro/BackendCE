@@ -33,7 +33,7 @@ var FinalMsgJson = JSON.parse(JSON.stringify(FinalMessage));
 
 var path ='D:\\EZEIDBanner\\';
 //ezeid email id:
-var EZEIDEmail = 'noreply@ezeid.com';
+var EZEIDEmail = 'noreply@ezeone.com';
 //EzeId services will start from here
 //method to generate the token
 function FnGenerateToken() {
@@ -191,308 +191,311 @@ function FnSendMailEzeid(MailContent, CallBack) {
 
 function FnMessageMail(MessageContent, CallBack) {
     try {
-        
-        //below query to check token exists for the users or not.
+        var verified;
+        var RtnMessage = {
+            IsSent: false
+        };
         if (MessageContent != null) {
-            var RtnMessage = {
-                IsSuccessfull: false
-            };
-            console.log(' this is MessageContent body............');
+            console.log('MessageContent......');
             console.log(MessageContent);
-            var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
-            var fs = require('fs');
-            var MessageType = null;
-            //  console.log(MessageContent.MessageType);
 
-            if (MessageContent.MessageType == 0) {
-                MessageType = 1;
-            } else if (MessageContent.MessageType == 6) {
-                MessageType = 3;
-            } else {
-                MessageType = MessageContent.MessageType;
-            }
-            var query = db.escape(MessageContent.Token) + ',' + db.escape(MessageContent.LocID) + ',' + db.escape(MessageType);
+            if (MessageContent.MessageType == 1) {
+                fs.readFile("Sales.html", "utf8", function (err, data) {
+                    if (!err) {
+                        var query1 = 'select EZEID,EZEIDVerifiedID,TID,IDTypeID as id from tmaster where Token=' + MessageContent.Token;
+                        db.query(query1, function (err, getResult) {
 
-            //  console.log(query);//console.log('FnSaveMessage: Inserting data: ' + query);
-            db.query('CALL PgetMailSendingDetails(' + query + ')', function (err, MessageContentResult) {
-                console.log(' this is Message ContentResult body........................');
-                console.log(MessageContentResult);
-                if (!err) {
-                    if (MessageContentResult[0] != null) {
-                        if (MessageContentResult[0].length > 0) {
-                            
-                            if (MessageContentResult[0].ToMailID != '') {
-                               /* if (MessageContent.MessageType == 0) {
-                                    fs.readFile("Individual.txt", "utf8", function (err, data) {
-                                        if (err) throw err;
-                                        // console.log(MessageContentResult);
-                                        data = data.replace('[IsVerified]', MessageContentResult[0].EZEIDVerifiedID);
-                                        data = data.replace("[EZEID]", MessageContentResult[0].EZEID);
-                                        data = data.replace("[Message]", MessageContent.Message);
-                                        data = data.replace("[https://www.ezeid.com?ID=]", 'https://www.ezeid.com?ID=' + MessageContentResult[0].EZEID);
-                                        // console.log('Body:' + data);
-                                        //  console.log(MessageContentResult[0].ToMailID);
-                                        var TomailOptions = {
-                                            from: 'noreply@ezeid.com',
-                                            to: MessageContentResult[0].ToMailID,
-                                            subject: 'Message from ' + MessageContentResult[0].EZEID,
-                                            html: data // html body
-                                        };
-                                        //console.log(TomailOptions);
-                                        var post = { MessageType: db.escape(MessageContent.MessageType), ToMailID: MessageContentResult[0].ToMailID, Subject: TomailOptions.subject, Body: TomailOptions.html };
-                                        //  console.log(post);
-                                        var query = db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
-                                            // Neat!
-                                            if (!err) {
-                                                console.log('FnMessageMail: Mail saved Successfully');
-                                                CallBack(null, RtnMessage);
-                                            }
-                                            else {
-                                                console.log('FnMessageMail: mail not saved Successfully: ' + err);
-                                                CallBack(null, null);
-                                            }
-                                        });
-                                    });
+                            if (getResult[0].id == 1) {
+                                if (getResult[0].EZEIDVerifiedID == 1) {
+                                    verified = 'Not Verified';
                                 }
-                                else */
-                                if (MessageContent.MessageType == 1) {
-                                    fs.readFile("SalesEnquiry.txt", "utf8", function (err, data) {
-                                        if (err) throw err;
-                                        data = data.replace("[IsVerified]", MessageContentResult[0].EZEIDVerifiedID);
-                                        data = data.replace("[EZEID]", MessageContentResult[0].EZEID);
-                                        data = data.replace("[Message]", MessageContent.Message);
-                                        data = data.replace("[https://www.ezeid.com/]", 'https://www.ezeone.com/' + MessageContentResult[0].EZEID);
-                                        // console.log('Body:' + data);
-                                        // console.log(MessageContentResult[0].ToMailID);
+                                else {
+                                    verified = 'Verified';
+                                }
+
+                                data = data.replace("[IsVerified]", verified);
+                                data = data.replace("[EZEOneID]", MessageContent.EZEID);
+                                data = data.replace("[EZEID]", MessageContent.EZEID);
+                                data = data.replace("[Message]", MessageContent.MessageText);
+                                var UserQuery = 'Select EZEID,ifnull(EMailID,"") as EMailID from tlocations where MasterID=' + getResult[0].TID;
+
+                                db.query(UserQuery, function (err, get_result) {
+                                    console.log(get_result);
+                                    if (get_result) {
+
                                         var mailOptions = {
                                             from: 'noreply@ezeone.com',
-                                            to: MessageContentResult[0].ToMailID,
-                                            subject: 'Sales Enquiry from ' + MessageContentResult[0].EZEID,
+                                            to: get_result[0].EMailID,
+                                            subject: 'Sales Enquiry from ' + MessageContent.ToEZEID,
                                             html: data // html body
                                         };
-                                        var post = { MessageType: MessageContent.MessageType, Priority: 3,ToMailID: MessageContentResult[0].ToMailID, Subject: mailOptions.subject, Body: mailOptions.html,SentbyMasterID: MessageContent.TID };
-                                        // console.log(post);
-                                        var query = db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
-                                            // Neat!
-                                            if (!err) {
-                                                console.log('FnMessageMail: Mail saved Successfully....1');
-                                                CallBack(null, RtnMessage);
-                                            }
-                                            else {
-                                                console.log('FnMessageMail: Mail not Saved Successfully');
-                                                CallBack(null, null);
-                                            }
-                                        });
-                                    });
-                                } else if (MessageContent.MessageType == 2) {
-                                    fs.readFile("HomeDelivery.txt", "utf8", function (err, data) {
-                                        if (err) throw err;
-                                        data = data.replace("[IsVerified]", MessageContentResult[0].EZEIDVerifiedID);
-                                        data = data.replace("[EZEID]", MessageContentResult[0].EZEID);
-                                        data = data.replace("[Message]", MessageContent.Message);
-                                        data = data.replace("[https://www.ezeid.com/]", 'https://www.ezeid.com/' + MessageContentResult[0].EZEID);
+                                        var queryResult = 'select TID from tmaster where EZEID=' + db.escape(ToEZEID);
+                                        db.query(queryResult, function (err, result) {
 
-                                        // console.log('Body:' + data);
-                                        //  console.log(MessageContentResult[0].ToMailID);
-                                        var mailOptions = {
-                                            from: 'noreply@ezeid.com',
-                                            to: MessageContentResult[0].ToMailID,
-                                            subject: 'Home Delivery request from ' + MessageContentResult[0].EZEID,
-                                            html: data // html body
-                                        };
-                                        var post = { MessageType: MessageContent.MessageType,Priority: 3, ToMailID: MessageContentResult[0].ToMailID, Subject: mailOptions.subject, Body: mailOptions.html,SentbyMasterID: MessageContent.TID };
-                                        // console.log(post);
-                                        var query = db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
-                                            // Neat!
-                                            if (!err) {
-                                                console.log('FnMessageMail: Mail saved Successfully....2');
-                                                CallBack(null, RtnMessage);
-                                            }
-                                            else {
-                                                console.log('FnMessageMail: Mail not Saved Successfully');
-                                                CallBack(null, null);
-                                            }
-                                        });
-                                    });
-                                } else if (MessageContent.MessageType == 3) {
-                                    fs.readFile("Reservation.txt", "utf8", function (err, data) {
-                                        if (err) throw err;
-                                        data = data.replace("[IsVerified]", MessageContentResult[0].EZEIDVerifiedID);
-                                        data = data.replace("[EZEID]", MessageContentResult[0].EZEID);
-                                        data = data.replace("[Message]", MessageContent.Message);
-                                        var moment = require('moment');
-                                        // console.log(moment(dateconvert).format('DD-MMM-YYYY HH:MM a'));
-                                        if (MessageContent.TaskDateTime != null || MessageContent.TaskDateTime == null) {
-                                            MessageContent.TaskDateTime = moment(new Date(MessageContent.TaskDateTime)).format('DD-MMM-YYYY HH:MM a');
-                                        }
-                                        else {
-                                            MessageContent.TaskDateTime = '';
-                                        }
-                                        //  console.log(moment(new Date(MessageContent.TaskDateTime)).format('DD-MMM-YYYY HH:MM a'));
-                                        data = data.replace("[ActionDate]", MessageContent.TaskDateTime);
-                                        data = data.replace("[https://www.ezeid.com/]", 'https://www.ezeid.com/' + MessageContentResult[0].EZEID);
-                                        // console.log('Body:' + data);
-                                        // console.log(MessageContentResult[0].ToMailID);
-                                        var mailOptions = {
-                                            from: 'noreply@ezeid.com',
-                                            to: MessageContentResult[0].ToMailID,
-                                            subject: 'Reservation Request from ' + MessageContentResult[0].EZEID,
-                                            html: data // html body
-                                        };
-                                        var post = { MessageType: MessageContent.MessageType, Priority: 3,ToMailID: MessageContentResult[0].ToMailID, Subject: mailOptions.subject, Body: mailOptions.html,SentbyMasterID: MessageContent.TID };
-                                        // console.log(post);
-                                        var query = db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
-                                            // Neat!
-                                            if (!err) {
-                                                console.log('FnMessageMail: Mail saved Successfully.....3');
-                                                CallBack(null, RtnMessage);
-                                            }
-                                            else {
-                                                console.log('FnMessageMail: Mail not Saved Successfully');
-                                                CallBack(null, null);
-                                            }
-                                        });
-                                    });
-                                } else if (MessageContent.MessageType == 4) {
-                                    fs.readFile("ServiceRequest.txt", "utf8", function (err, data) {
-                                        if (err) throw err;
-                                        data = data.replace("[IsVerified]", MessageContentResult[0].EZEIDVerifiedID);
-                                        data = data.replace("[EZEID]", MessageContentResult[0].EZEID);
-                                        data = data.replace("[Message]", MessageContent.Message);
-                                        data = data.replace("[https://www.ezeid.com/]", 'https://www.ezeid.com/' + MessageContentResult[0].EZEID);
-                                        // console.log('Body:' + data);
-                                        //  console.log(MessageContentResult[0].ToMailID);
-                                        var mailOptions = {
-                                            from: 'noreply@ezeid.com',
-                                            to: MessageContentResult[0].ToMailID,
-                                            subject: 'Service Request from ' + MessageContentResult[0].EZEID,
-                                            html: data // html body
-                                        };
-                                        var post = { MessageType: MessageContent.MessageType,Priority: 3, ToMailID: MessageContentResult[0].ToMailID, Subject: mailOptions.subject, Body: mailOptions.html,SentbyMasterID: MessageContent.TID };
-                                        // console.log(post);
-                                        var query = db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
-                                            // Neat!
-                                            if (!err) {
-                                                console.log('FnMessageMail: Mail saved Successfully.....4');
-                                                CallBack(null, RtnMessage);
-                                            }
-                                            else {
-                                                console.log('FnMessageMail: Mail not Saved Successfully');
-                                                CallBack(null, null);
-                                            }
-                                        });
-                                    });
-                                } else if (MessageContent.MessageType == 5) {
-                                    fs.readFile("CV.txt", "utf8", function (err, data) {
-                                        if (err) throw err;
-                                        console.log('--------------------------');
-                                        console.log(MessageContentResult);
-                                        console.log('--------------------------');
-                                        data = data.replace("[IsVerified]", MessageContentResult[0].EZEIDVerifiedID);
-                                        data = data.replace("[EZEID]", MessageContentResult[0].EZEID);
-                                        data = data.replace("[EZEID]", MessageContentResult[0].EZEID);
-                                        data = data.replace("[Functions]", MessageContentResult[0].Function);
-                                        data = data.replace("[Roles]", MessageContentResult[0].Role);
-                                        data = data.replace("[Keyskills]", MessageContentResult[0].KeySkills);
-                                        data = data.replace("[https://www.ezeid.com/]", 'https://www.ezeid.com/' + MessageContentResult[0].EZEID);
-                                        
-                                        if (MessageContentResult[0].DocPin == '') {
-                                            data = data.replace("[PIN]", MessageContentResult[0].DocPin);
-                                        }
-                                        else {
-                                            data = data.replace("[PIN]", MessageContentResult[0].DocPin);
-                                        }
-                                        // console.log(MessageContentResult[0].ToMailID);
-                                        // console.log('Body:' + data);
-                                        var mailOptions = {
-                                            from: 'noreply@ezeid.com',
-                                            to: MessageContentResult[0].ToMailID,
-                                            subject: 'Application for a Suitable Employment',
-                                            html: data // html body
-                                        };
-                                        var post = { MessageType: MessageContent.MessageType,Priority: 3, ToMailID: MessageContentResult[0].ToMailID, Subject: mailOptions.subject, Body: mailOptions.html,SentbyMasterID: MessageContent.TID };
-                                         console.log(post);
-                                        var query = db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
-                                            // Neat!
-                                            if (!err) {
-                                                console.log('FnMessageMail: Mail saved Successfully....5');
-                                                CallBack(null, RtnMessage);
-                                            }
-                                            else {
-                                                console.log('FnMessageMail: Mail not Saved Successfully');
-                                                CallBack(null, null);
-                                            }
-                                        });
-                                    });
-                                }
-                                /*else if (MessageContent.MessageType == 6) {
-                                    fs.readFile("Appointment.txt", "utf8", function (err, data) {
-                                        if (err) throw err;
-                                        var moment = require('moment');
-                                        if (MessageContent.TaskDateTime != null) {
-                                            MessageContent.TaskDateTime = moment(new Date(MessageContent.TaskDateTime)).format('DD-MMM-YYYY HH:MM a');
-                                        }
-                                        else {
-                                            MessageContent.TaskDateTime = '';
-                                        }
-                                        data = data.replace("[IsVerified]", MessageContentResult[0].EZEIDVerifiedID);
-                                        data = data.replace("[EZEID]", MessageContentResult[0].EZEID);
-                                        data = data.replace("[Message]", MessageContent.Message);
-                                        var moment = require('moment');
-                                        // console.log(moment(dateconvert).format('DD-MMM-YYYY HH:MM a'));
+                                            var post = {
+                                                MessageType: MessageContent.Messagetype,
+                                                Priority: 3,
+                                                ToMailID: mailOptions.to,
+                                                Subject: mailOptions.subject,
+                                                Body: mailOptions.html,
+                                                SentbyMasterID: result[0].TID
+                                            };
+                                            var query = db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
 
-                                        data = data.replace("[ActionDate]", MessageContent.TaskDateTime);
-                                        data = data.replace("[https://www.ezeid.com?ID=]", 'https://www.ezeid.com?ID=' + MessageContentResult[0].EZEID);
-                                        // console.log('Body:' + data);
-                                        // console.log(MessageContentResult[0].ToMailID);
-                                        var mailOptions = {
-                                            from: 'noreply@ezeid.com',
-                                            to: MessageContentResult[0].ToMailID,
-                                            subject: 'Appointment Request from  ' + MessageContentResult[0].EZEID,
-                                            html: data // html body
-                                        };
-                                        var post = { MessageType: MessageContent.MessageType,Priority: 3, ToMailID: MessageContentResult[0].ToMailID, Subject: mailOptions.subject, Body: mailOptions.html,SentbyMasterID: MessageContent.TID };
-                                        // console.log(post);
-                                        var query = db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
-                                            // Neat!
-                                            if (!err) {
-                                                console.log('FnMessageMail: Mail saved Successfully');
-                                                CallBack(null, RtnMessage);
-                                            }
-                                            else {
-                                                console.log('FnMessageMail: Mail not Saved Successfully');
-                                                CallBack(null, null);
-                                            }
+                                                if (!err) {
+                                                    console.log('FnMessageMail: Mail saved Successfully....1');
+                                                    RtnMessage.IsSent = true;
+                                                    CallBack(null, RtnMessage);
+                                                }
+                                                else {
+                                                    console.log('FnMessageMail: Mail not Saved Successfully');
+                                                    CallBack(null, null);
+                                                }
+                                            });
                                         });
-                                    });
-                                }*/
+                                    }
+                                    else {
+                                        console.log('FnSendMail:Error getting from Access EmailID');
+                                    }
+                                });
                             }
                             else {
-                                console.log('FnMessageMail: Email  is empty');
-                                CallBack(null, null);
-                            }
+
+                                if (getResult[0].EZEIDVerifiedID == 1) {
+                                        verified = 'Not Verified';
+                                    }
+                                    else {
+                                        verified = 'Verified';
+                                    }
+                                    data = data.replace("[IsVerified]", verified);
+                                    data = data.replace("[EZEOneID]", getResult[0].EZEID);
+                                    data = data.replace("[EZEID]", getResult[0].EZEID);
+                                    data = data.replace("[Message]", MessageText);
+
+                                    var UserQuery = 'Select EZEID,ifnull(SalesMailID," ") as SalesMailID from tmaster where TID=' + getResult[0].TID;
+                                    console.log(UserQuery);
+                                    db.query(UserQuery, function (err, get_result) {
+
+                                        if (get_result) {
+                                            var mailOptions = {
+                                                from: 'noreply@ezeone.com',
+                                                to: get_result[0].SalesMailID,
+                                                subject: 'Sales Enquiry from ' + ToEZEID,
+                                                html: data // html body
+                                            };
+                                            //console.log(mailOptions);
+                                            var queryResult = 'select TID from tmaster where EZEID=' + db.escape(ToEZEID);
+                                            db.query(queryResult, function (err, result) {
+
+                                                var post = {
+                                                    MessageType: Messagetype,
+                                                    Priority: 3,
+                                                    ToMailID: mailOptions.to,
+                                                    Subject: mailOptions.subject,
+                                                    Body: mailOptions.html,
+                                                    SentbyMasterID: result[0].TID
+                                                };
+                                                //console.log(post);
+                                                var query = db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
+                                                    // Neat!
+                                                    if (!err) {
+                                                        console.log('FnMessageMail: Mail saved Successfully....1');
+
+                                                    }
+                                                    else {
+                                                        console.log('FnMessageMail: Mail not Saved Successfully');
+
+                                                    }
+                                                });
+                                            });
+                                        }
+                                        else {
+                                            console.log('FnSendMail:getting error from EmailID ');
+                                        }
+                                    });
+                                }
+                            });
+                    }
+                    });
+            }
+            else if (MessageContent.MessageType == 2) {
+                fs.readFile("HomeDelivery.txt", "utf8", function (err, data) {
+                    if (err) throw err;
+                    data = data.replace("[IsVerified]", MessageContentResult[0].EZEIDVerifiedID);
+                    data = data.replace("[EZEID]", MessageContentResult[0].EZEID);
+                    data = data.replace("[Message]", MessageContent.Message);
+                    data = data.replace("[https://www.ezeid.com/]", 'https://www.ezeid.com/' + MessageContentResult[0].EZEID);
+
+                    // console.log('Body:' + data);
+                    //  console.log(MessageContentResult[0].ToMailID);
+                    var mailOptions = {
+                        from: 'noreply@ezeid.com',
+                        to: MessageContentResult[0].ToMailID,
+                        subject: 'Home Delivery request from ' + MessageContentResult[0].EZEID,
+                        html: data // html body
+                    };
+                    var post = {
+                        MessageType: MessageContent.MessageType,
+                        Priority: 3,
+                        ToMailID: MessageContentResult[0].ToMailID,
+                        Subject: mailOptions.subject,
+                        Body: mailOptions.html,
+                        SentbyMasterID: MessageContent.TID
+                    };
+                    // console.log(post);
+                    var query = db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
+                        // Neat!
+                        if (!err) {
+                            console.log('FnMessageMail: Mail saved Successfully....2');
+                            CallBack(null, RtnMessage);
                         }
                         else {
-                            console.log('FnMessageMail: Messages not inserted');
+                            console.log('FnMessageMail: Mail not Saved Successfully');
                             CallBack(null, null);
                         }
+                    });
+                });
+            }
+            else if (MessageContent.MessageType == 3) {
+                fs.readFile("Reservation.txt", "utf8", function (err, data) {
+                    if (err) throw err;
+                    data = data.replace("[IsVerified]", MessageContentResult[0].EZEIDVerifiedID);
+                    data = data.replace("[EZEID]", MessageContentResult[0].EZEID);
+                    data = data.replace("[Message]", MessageContent.Message);
+                    var moment = require('moment');
+                    // console.log(moment(dateconvert).format('DD-MMM-YYYY HH:MM a'));
+                    if (MessageContent.TaskDateTime != null || MessageContent.TaskDateTime == null) {
+                        MessageContent.TaskDateTime = moment(new Date(MessageContent.TaskDateTime)).format('DD-MMM-YYYY HH:MM a');
                     }
                     else {
-                        console.log('FnMessageMail: Messages not inserted');
-                        CallBack(null, null);
+                        MessageContent.TaskDateTime = '';
                     }
-                }
-                else {
-                    CallBack(null, null);
-                    console.log('FnMessageMail: Error in saving Messages : ' + err);
-                }
-            });
+                    //  console.log(moment(new Date(MessageContent.TaskDateTime)).format('DD-MMM-YYYY HH:MM a'));
+                    data = data.replace("[ActionDate]", MessageContent.TaskDateTime);
+                    data = data.replace("[https://www.ezeid.com/]", 'https://www.ezeid.com/' + MessageContentResult[0].EZEID);
+                    // console.log('Body:' + data);
+                    // console.log(MessageContentResult[0].ToMailID);
+                    var mailOptions = {
+                        from: 'noreply@ezeid.com',
+                        to: MessageContentResult[0].ToMailID,
+                        subject: 'Reservation Request from ' + MessageContentResult[0].EZEID,
+                        html: data // html body
+                    };
+                    var post = {
+                        MessageType: MessageContent.MessageType,
+                        Priority: 3,
+                        ToMailID: MessageContentResult[0].ToMailID,
+                        Subject: mailOptions.subject,
+                        Body: mailOptions.html,
+                        SentbyMasterID: MessageContent.TID
+                    };
+                    // console.log(post);
+                    var query = db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
+                        // Neat!
+                        if (!err) {
+                            console.log('FnMessageMail: Mail saved Successfully.....3');
+                            CallBack(null, RtnMessage);
+                        }
+                        else {
+                            console.log('FnMessageMail: Mail not Saved Successfully');
+                            CallBack(null, null);
+                        }
+                    });
+                });
+            }
+            else if (MessageContent.MessageType == 4) {
+                fs.readFile("ServiceRequest.txt", "utf8", function (err, data) {
+                    if (err) throw err;
+                    data = data.replace("[IsVerified]", MessageContentResult[0].EZEIDVerifiedID);
+                    data = data.replace("[EZEID]", MessageContentResult[0].EZEID);
+                    data = data.replace("[Message]", MessageContent.Message);
+                    data = data.replace("[https://www.ezeid.com/]", 'https://www.ezeid.com/' + MessageContentResult[0].EZEID);
+                    // console.log('Body:' + data);
+                    //  console.log(MessageContentResult[0].ToMailID);
+                    var mailOptions = {
+                        from: 'noreply@ezeid.com',
+                        to: MessageContentResult[0].ToMailID,
+                        subject: 'Service Request from ' + MessageContentResult[0].EZEID,
+                        html: data // html body
+                    };
+                    var post = {
+                        MessageType: MessageContent.MessageType,
+                        Priority: 3,
+                        ToMailID: MessageContentResult[0].ToMailID,
+                        Subject: mailOptions.subject,
+                        Body: mailOptions.html,
+                        SentbyMasterID: MessageContent.TID
+                    };
+                    // console.log(post);
+                    var query = db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
+                        // Neat!
+                        if (!err) {
+                            console.log('FnMessageMail: Mail saved Successfully.....4');
+                            CallBack(null, RtnMessage);
+                        }
+                        else {
+                            console.log('FnMessageMail: Mail not Saved Successfully');
+                            CallBack(null, null);
+                        }
+                    });
+                });
+            }
+            else if (MessageContent.MessageType == 5) {
+                fs.readFile("CV.txt", "utf8", function (err, data) {
+                    if (err) throw err;
+                    console.log('--------------------------');
+                    console.log(MessageContentResult);
+                    console.log('--------------------------');
+                    data = data.replace("[IsVerified]", MessageContentResult[0].EZEIDVerifiedID);
+                    data = data.replace("[EZEID]", MessageContentResult[0].EZEID);
+                    data = data.replace("[EZEID]", MessageContentResult[0].EZEID);
+                    data = data.replace("[Functions]", MessageContentResult[0].Function);
+                    data = data.replace("[Roles]", MessageContentResult[0].Role);
+                    data = data.replace("[Keyskills]", MessageContentResult[0].KeySkills);
+                    data = data.replace("[https://www.ezeid.com/]", 'https://www.ezeid.com/' + MessageContentResult[0].EZEID);
+
+                    if (MessageContentResult[0].DocPin == '') {
+                        data = data.replace("[PIN]", MessageContentResult[0].DocPin);
+                    }
+                    else {
+                        data = data.replace("[PIN]", MessageContentResult[0].DocPin);
+                    }
+                    // console.log(MessageContentResult[0].ToMailID);
+                    // console.log('Body:' + data);
+                    var mailOptions = {
+                        from: 'noreply@ezeid.com',
+                        to: MessageContentResult[0].ToMailID,
+                        subject: 'Application for a Suitable Employment',
+                        html: data // html body
+                    };
+                    var post = {
+                        MessageType: MessageContent.MessageType,
+                        Priority: 3,
+                        ToMailID: MessageContentResult[0].ToMailID,
+                        Subject: mailOptions.subject,
+                        Body: mailOptions.html,
+                        SentbyMasterID: MessageContent.TID
+                    };
+                    console.log(post);
+                    var query = db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
+                        // Neat!
+                        if (!err) {
+                            console.log('FnMessageMail: Mail saved Successfully....5');
+                            CallBack(null, RtnMessage);
+                        }
+                        else {
+                            console.log('FnMessageMail: Mail not Saved Successfully');
+                            CallBack(null, null);
+                        }
+                    });
+                });
+            }
+
         }
         else {
+            console.log('FnMessageMail:MessageContent empty');
             CallBack(null, null);
-            console.log('FnMessageMail: Token is empty');
         }
-
     }
     catch (ex) {
         console.log('OTP FnMessageMail error:' + ex.description);
@@ -7160,20 +7163,21 @@ exports.FnSaveTranscation = function(req, res){
         var item_list_type = req.body.item_list_type ? req.body.item_list_type : 0;
         var companyName = req.body.companyName ? req.body.companyName : '' ;
         var company_id = req.body.company_id ? req.body.company_id : 0 ;
-        var Messagetype;
+        var Messagetype,verified;
         if (FunctionType == 0){
+            //sales
          Messagetype = 1;
         }
-        else if (FunctionType == 1){
-            Messagetype = 2;
-        }
         else if (FunctionType == 2){
+            //HomeDelivery
             Messagetype = 3;
         }
         else if (FunctionType == 3){
+            //Service
             Messagetype = 4;
         }
         else if (FunctionType == 4){
+            //Cv
             Messagetype = 5;
         }
         var RtnMessage = {
@@ -7201,14 +7205,14 @@ exports.FnSaveTranscation = function(req, res){
                 if (!err) {
                     if (Result != null) {
 
-                        var query = db.escape(Token)+","+db.escape(FunctionType)+","+ db.escape(MessageText)+ "," + db.escape(Status) +"," + db.escape(TaskDateNew) + ","  + db.escape(Notes) + "," + db.escape(LocID)  + "," + db.escape(Country)   + "," + db.escape(State) + "," + db.escape(City)   + "," + db.escape(Area) + ","  + db.escape(Latitude)  + "," + db.escape(Longitude)  +  "," + db.escape(EZEID)  + "," + db.escape(ContactInfo)  + "," + db.escape(FolderRuleID)  + "," + db.escape(Duration)  + "," + db.escape(DurationScales) + "," + db.escape(NextAction) + "," + db.escape(NextActionDateTimeNew) + "," + db.escape(TID) + "," + db.escape(((ItemIDList != "") ? ItemIDList : "")) + "," + db.escape(DeliveryAddress) + "," + db.escape(ToEZEID) + "," + db.escape(item_list_type) + "," + db.escape(companyName) + "," + db.escape(company_id);
+                        var query = db.escape(Token) + "," + db.escape(FunctionType) + "," + db.escape(MessageText) + "," + db.escape(Status) + "," + db.escape(TaskDateNew) + "," + db.escape(Notes) + "," + db.escape(LocID) + "," + db.escape(Country) + "," + db.escape(State) + "," + db.escape(City) + "," + db.escape(Area) + "," + db.escape(Latitude) + "," + db.escape(Longitude) + "," + db.escape(EZEID) + "," + db.escape(ContactInfo) + "," + db.escape(FolderRuleID) + "," + db.escape(Duration) + "," + db.escape(DurationScales) + "," + db.escape(NextAction) + "," + db.escape(NextActionDateTimeNew) + "," + db.escape(TID) + "," + db.escape(((ItemIDList != "") ? ItemIDList : "")) + "," + db.escape(DeliveryAddress) + "," + db.escape(ToEZEID) + "," + db.escape(item_list_type) + "," + db.escape(companyName) + "," + db.escape(company_id);
                         // db.escape(NextActionDateTime);
                         console.log('CALL pSaveTrans(' + query + ')');
                         db.query('CALL pSaveTrans(' + query + ')', function (err, InsertResult) {
-                            if (!err){
+                            if (!err) {
                                 console.log(InsertResult);
                                 if (InsertResult[0] != null) {
-                                    if(InsertResult[0].length > 0) {
+                                    if (InsertResult[0].length > 0) {
                                         RtnMessage.IsSuccessfull = true;
                                         var Message = InsertResult[0];
                                         RtnMessage.MessageID = Message[0].MessageID;
@@ -7283,153 +7287,382 @@ exports.FnSaveTranscation = function(req, res){
                                         }
                                         res.send(RtnMessage);
                                         console.log('FnSaveTranscationItems: Transaction items details save successfully');
-                                        var query1 = 'select EZEID,EZEIDVerifiedID,TID,IDTypeID as id from tmaster where Token=' + db.escape(Token);
-                                        db.query(query1, function (err, getResult) {
+                                        if (Messagetype == 1) {
+                                            fs.readFile("SalesMail.html", "utf8", function (err, data) {
+                                                var query1 = 'select EZEID,EZEIDVerifiedID,TID,IDTypeID as id from tmaster where Token=' + db.escape(Token);
+                                                db.query(query1, function (err, getResult) {
 
-                                            if (getResult[0].id == 1) {
-
-                                                fs.readFile("SalesEnquiry.txt", "utf8", function (err, data) {
-
-                                                    if (getResult[0].EZEIDVerifiedID == 1) {
-                                                        var verified = 'Not Verified';
-                                                    }
-                                                    else {
-                                                        var verified = 'Verified';
-                                                    }
-                                                    data = data.replace("[IsVerified]", verified);
-                                                    data = data.replace("[EZEID]", getResult[0].EZEID);
-                                                    data = data.replace("[Message]", MessageText);
-                                                    data = data.replace("[EZEID1]", getResult[0].EZEID);
-                                                    var UserQuery = 'Select EZEID,ifnull(EMailID,"") as EMailID from tlocations where MasterID=' + getResult[0].TID;
-
-                                                    db.query(UserQuery, function (err, get_result) {
-                                                        console.log(get_result);
-                                                        if (get_result) {
-                                                            var mailOptions = {
-                                                                from: 'noreply@ezeone.com',
-                                                                to: get_result[0].EMailID,
-                                                                subject: 'Sales Enquiry from ' + ToEZEID,
-                                                                html: data // html body
-                                                            };
-                                                            console.log(mailOptions);
-                                                            var queryResult = 'select TID from tmaster where EZEID=' + db.escape(ToEZEID);
-                                                            db.query(queryResult, function (err, result) {
-                                                                console.log(result);
-                                                                var post = {
-                                                                    MessageType: Messagetype,
-                                                                    Priority: 3,
-                                                                    ToMailID: mailOptions.to,
-                                                                    Subject: mailOptions.subject,
-                                                                    Body: mailOptions.html,
-                                                                    SentbyMasterID: result[0].TID
-                                                                };
-
-                                                                var query = db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
-                                                                    // Neat!
-                                                                    if (!err) {
-                                                                        console.log('FnMessageMail: Mail saved Successfully....1');
-
-                                                                    }
-                                                                    else {
-                                                                        console.log('FnMessageMail: Mail not Saved Successfully');
-
-                                                                    }
-                                                                });
-                                                            });
+                                                    if (getResult[0].id == 1) {
+                                                        if (getResult[0].EZEIDVerifiedID == 1) {
+                                                            verified = 'Not Verified';
                                                         }
                                                         else {
-                                                            console.log('FnSendMail:getting error from EmailID ');
+                                                            verified = 'Verified';
                                                         }
-                                                    });
-                                                });
 
-                                            }
-                                            else {
+                                                        data = data.replace("[IsVerified]", verified);
+                                                        data = data.replace("[EZEOneID]", getResult[0].EZEID);
+                                                        data = data.replace("[EZEID]", getResult[0].EZEID);
+                                                        data = data.replace("[Message]", MessageText);
 
-                                                fs.readFile("SalesEnquiry.txt", "utf8", function (err, data) {
+                                                        var UserQuery = 'Select EZEID,ifnull(EMailID,"") as EMailID from tlocations where MasterID=' + getResult[0].TID;
 
-                                                    if (getResult[0].EZEIDVerifiedID == 1) {
-                                                        var verified = 'Not Verified';
+                                                        db.query(UserQuery, function (err, get_result) {
+                                                            console.log(get_result);
+                                                            if (get_result) {
+                                                                var mailOptions = {
+                                                                    from: 'noreply@ezeone.com',
+                                                                    to: get_result[0].EMailID,
+                                                                    subject: 'Sales Enquiry from ' + ToEZEID,
+                                                                    html: data // html body
+                                                                };
+                                                                //console.log(mailOptions);
+                                                                var queryResult = 'select TID from tmaster where EZEID=' + db.escape(ToEZEID);
+                                                                db.query(queryResult, function (err, result) {
+                                                                    console.log(result);
+                                                                    var post = {
+                                                                        MessageType: Messagetype,
+                                                                        Priority: 3,
+                                                                        ToMailID: mailOptions.to,
+                                                                        Subject: mailOptions.subject,
+                                                                        Body: mailOptions.html,
+                                                                        SentbyMasterID: result[0].TID
+                                                                    };
+
+                                                                    var query = db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
+                                                                        // Neat!
+                                                                        if (!err) {
+                                                                            console.log('FnMessageMail: Mail saved Successfully....1');
+                                                                        }
+                                                                        else {
+                                                                            console.log('FnMessageMail: Mail not Saved Successfully');
+
+                                                                        }
+                                                                    });
+                                                                });
+                                                            }
+                                                            else {
+                                                                console.log('FnSendMail:getting error from EmailID ');
+                                                            }
+                                                        });
                                                     }
                                                     else {
-                                                        var verified = 'Verified';
-                                                    }
-                                                    data = data.replace("[IsVerified]", verified);
-                                                    data = data.replace("[EZEID]", getResult[0].EZEID);
-                                                    data = data.replace("[Message]", MessageText);
-                                                    data = data.replace("[EZEID1]", getResult[0].EZEID);
-
-
-                                                    var UserQuery = 'Select EZEID,ifnull(SalesMailID," ") as SalesMailID from tmaster where TID=' + getResult[0].TID;
-                                                    console.log(UserQuery);
-                                                    db.query(UserQuery, function (err, get_result) {
-
-                                                        if (get_result) {
-                                                            var mailOptions = {
-                                                                from: 'noreply@ezeone.com',
-                                                                to: get_result[0].SalesMailID,
-                                                                subject: 'Sales Enquiry from ' + ToEZEID,
-                                                                html: data // html body
-                                                            };
-                                                            console.log(mailOptions);
-                                                            var queryResult = 'select TID from tmaster where EZEID=' + db.escape(ToEZEID);
-                                                            db.query(queryResult, function (err, result) {
-
-                                                                var post = {
-                                                                    MessageType: Messagetype,
-                                                                    Priority: 3,
-                                                                    ToMailID: mailOptions.to,
-                                                                    Subject: mailOptions.subject,
-                                                                    Body: mailOptions.html,
-                                                                    SentbyMasterID: result[0].TID
-                                                                };
-                                                                console.log(post);
-                                                                var query = db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
-                                                                    // Neat!
-                                                                    if (!err) {
-                                                                        console.log('FnMessageMail: Mail saved Successfully....1');
-
-                                                                    }
-                                                                    else {
-                                                                        console.log('FnMessageMail: Mail not Saved Successfully');
-
-                                                                    }
-                                                                });
-                                                            });
+                                                        if (getResult[0].EZEIDVerifiedID == 1) {
+                                                            verified = 'Not Verified';
                                                         }
                                                         else {
-                                                            console.log('FnSendMail:getting error from EmailID ');
+                                                            verified = 'Verified';
                                                         }
-                                                    });
+                                                        data = data.replace("[IsVerified]", verified);
+                                                        data = data.replace("[EZEOneID]", getResult[0].EZEID);
+                                                        data = data.replace("[EZEID]", getResult[0].EZEID);
+                                                        data = data.replace("[Message]", MessageText);
+
+                                                        var UserQuery = 'Select EZEID,ifnull(SalesMailID," ") as SalesMailID from tmaster where TID=' + getResult[0].TID;
+                                                        console.log(UserQuery);
+                                                        db.query(UserQuery, function (err, get_result) {
+
+                                                            if (get_result) {
+                                                                var mailOptions = {
+                                                                    from: 'noreply@ezeone.com',
+                                                                    to: get_result[0].SalesMailID,
+                                                                    subject: 'Sales Enquiry from ' + ToEZEID,
+                                                                    html: data // html body
+                                                                };
+                                                                //console.log(mailOptions);
+                                                                var queryResult = 'select TID from tmaster where EZEID=' + db.escape(ToEZEID);
+                                                                db.query(queryResult, function (err, result) {
+
+                                                                    var post = {
+                                                                        MessageType: Messagetype,
+                                                                        Priority: 3,
+                                                                        ToMailID: mailOptions.to,
+                                                                        Subject: mailOptions.subject,
+                                                                        Body: mailOptions.html,
+                                                                        SentbyMasterID: result[0].TID
+                                                                    };
+                                                                    //console.log(post);
+                                                                    var query = db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
+                                                                        // Neat!
+                                                                        if (!err) {
+                                                                            console.log('FnMessageMail: Mail saved Successfully....1');
+
+                                                                        }
+                                                                        else {
+                                                                            console.log('FnMessageMail: Mail not Saved Successfully');
+
+                                                                        }
+                                                                    });
+                                                                });
+                                                            }
+                                                            else {
+                                                                console.log('FnSendMail:getting error from EmailID ');
+                                                            }
+                                                        });
+                                                    }
                                                 });
-                                            }
-                                        });
-                                    }
-                                    else
-                                        {
-                                            console.log('FnSaveTranscationItems:No Save Transaction items details');
-                                            res.send(RtnMessage);
+                                            });
                                         }
-                                }
-                                    else {
-                                            console.log('FnSaveTranscationItems:No Save Transaction items details');
-                                            res.send(RtnMessage);
-                                    }
-                            }
+                                        else if (Messagetype == 3) {
+                                            fs.readFile("homedelivery.html", "utf8", function (err, data) {
+                                                var query1 = 'select EZEID,EZEIDVerifiedID,TID,IDTypeID as id from tmaster where Token=' + db.escape(Token);
+                                                db.query(query1, function (err, getResult) {
 
-                            else {
+                                                    if (getResult[0].id == 1) {
+                                                        if (getResult[0].EZEIDVerifiedID == 1) {
+                                                            verified = 'Not Verified';
+                                                        }
+                                                        else {
+                                                            verified = 'Verified';
+                                                        }
+
+                                                        data = data.replace("[IsVerified]", verified);
+                                                        data = data.replace("[EZEOneID]", getResult[0].EZEID);
+                                                        data = data.replace("[EZEID]", getResult[0].EZEID);
+                                                        data = data.replace("[Message]", MessageText);
+
+                                                        var UserQuery = 'Select EZEID,ifnull(EMailID,"") as EMailID from tlocations where MasterID=' + getResult[0].TID;
+
+                                                        db.query(UserQuery, function (err, get_result) {
+                                                            console.log(get_result);
+                                                            if (get_result) {
+                                                                var mailOptions = {
+                                                                    from: 'noreply@ezeone.com',
+                                                                    to: get_result[0].EMailID,
+                                                                    subject: 'HomeDelivery from ' + ToEZEID,
+                                                                    html: data // html body
+                                                                };
+                                                                //console.log(mailOptions);
+                                                                var queryResult = 'select TID from tmaster where EZEID=' + db.escape(ToEZEID);
+                                                                db.query(queryResult, function (err, result) {
+                                                                    console.log(result);
+                                                                    var post = {
+                                                                        MessageType: Messagetype,
+                                                                        Priority: 3,
+                                                                        ToMailID: mailOptions.to,
+                                                                        Subject: mailOptions.subject,
+                                                                        Body: mailOptions.html,
+                                                                        SentbyMasterID: result[0].TID
+                                                                    };
+
+                                                                    var query = db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
+                                                                        // Neat!
+                                                                        if (!err) {
+                                                                            console.log('FnMessageMail: Home Delivery Mail saved Successfully....1');
+                                                                        }
+                                                                        else {
+                                                                            console.log('FnMessageMail: Mail not Saved Successfully');
+
+                                                                        }
+                                                                    });
+                                                                });
+                                                            }
+                                                            else {
+                                                                console.log('FnSendMail:getting error from EmailID ');
+                                                            }
+                                                        });
+                                                    }
+                                                    else {
+                                                        if (getResult[0].EZEIDVerifiedID == 1) {
+                                                            verified = 'Not Verified';
+                                                        }
+                                                        else {
+                                                            verified = 'Verified';
+                                                        }
+                                                        data = data.replace("[IsVerified]", verified);
+                                                        data = data.replace("[EZEOneID]", getResult[0].EZEID);
+                                                        data = data.replace("[EZEID]", getResult[0].EZEID);
+                                                        data = data.replace("[Message]", MessageText);
+
+                                                        var UserQuery = 'Select EZEID,ifnull(HomeDeliveryMailID," ") as MailID from tmaster where TID=' + getResult[0].TID;
+                                                        console.log(UserQuery);
+                                                        db.query(UserQuery, function (err, get_result) {
+
+                                                            if (get_result) {
+                                                                var mailOptions = {
+                                                                    from: 'noreply@ezeone.com',
+                                                                    to: get_result[0].MailID,
+                                                                    subject: 'HomeDelivery from ' + ToEZEID,
+                                                                    html: data // html body
+                                                                };
+                                                                //console.log(mailOptions);
+                                                                var queryResult = 'select TID from tmaster where EZEID=' + db.escape(ToEZEID);
+                                                                db.query(queryResult, function (err, result) {
+
+                                                                    var post = {
+                                                                        MessageType: Messagetype,
+                                                                        Priority: 3,
+                                                                        ToMailID: mailOptions.to,
+                                                                        Subject: mailOptions.subject,
+                                                                        Body: mailOptions.html,
+                                                                        SentbyMasterID: result[0].TID
+                                                                    };
+                                                                    //console.log(post);
+                                                                    var query = db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
+                                                                        // Neat!
+                                                                        if (!err) {
+                                                                            console.log('FnMessageMail: HomeDelivery Mail saved Successfully....1');
+
+                                                                        }
+                                                                        else {
+                                                                            console.log('FnMessageMail: Mail not Saved Successfully');
+
+                                                                        }
+                                                                    });
+                                                                });
+                                                            }
+                                                            else {
+                                                                console.log('FnSendMail:getting error from EmailID ');
+                                                            }
+                                                        });
+                                                    }
+                                                });
+                                            });
+                                        }
+                                        else if (Messagetype == 4) {
+                                            fs.readFile("ServiceMail.html", "utf8", function (err, data) {
+                                                var query1 = 'select EZEID,EZEIDVerifiedID,TID,IDTypeID as id from tmaster where Token=' + db.escape(Token);
+                                                db.query(query1, function (err, getResult) {
+
+                                                    if (getResult[0].id == 1) {
+                                                        if (getResult[0].EZEIDVerifiedID == 1) {
+                                                            verified = 'Not Verified';
+                                                        }
+                                                        else {
+                                                            verified = 'Verified';
+                                                        }
+
+                                                        data = data.replace("[IsVerified]", verified);
+                                                        data = data.replace("[EZEOneID]", getResult[0].EZEID);
+                                                        data = data.replace("[EZEID]", getResult[0].EZEID);
+                                                        data = data.replace("[Message]", MessageText);
+
+                                                        var UserQuery = 'Select EZEID,ifnull(EMailID,"") as EMailID from tlocations where MasterID=' + getResult[0].TID;
+
+                                                        db.query(UserQuery, function (err, get_result) {
+                                                            console.log(get_result);
+                                                            if (get_result) {
+                                                                var mailOptions = {
+                                                                    from: 'noreply@ezeone.com',
+                                                                    to: get_result[0].EMailID,
+                                                                    subject: 'Service Request from ' + ToEZEID,
+                                                                    html: data // html body
+                                                                };
+                                                                //console.log(mailOptions);
+                                                                var queryResult = 'select TID from tmaster where EZEID=' + db.escape(ToEZEID);
+                                                                db.query(queryResult, function (err, result) {
+                                                                    console.log(result);
+                                                                    var post = {
+                                                                        MessageType: Messagetype,
+                                                                        Priority: 3,
+                                                                        ToMailID: mailOptions.to,
+                                                                        Subject: mailOptions.subject,
+                                                                        Body: mailOptions.html,
+                                                                        SentbyMasterID: result[0].TID
+                                                                    };
+
+                                                                    var query = db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
+                                                                        // Neat!
+                                                                        if (!err) {
+                                                                            console.log('FnMessageMail: Service Mail saved Successfully....1');
+                                                                        }
+                                                                        else {
+                                                                            console.log('FnMessageMail: Mail not Saved Successfully');
+
+                                                                        }
+                                                                    });
+                                                                });
+                                                            }
+                                                            else {
+                                                                console.log('FnSendMail:getting error from EmailID ');
+                                                            }
+                                                        });
+                                                    }
+                                                    else {
+                                                        if (getResult[0].EZEIDVerifiedID == 1) {
+                                                            verified = 'Not Verified';
+                                                        }
+                                                        else {
+                                                            verified = 'Verified';
+                                                        }
+                                                        data = data.replace("[IsVerified]", verified);
+                                                        data = data.replace("[EZEOneID]", getResult[0].EZEID);
+                                                        data = data.replace("[EZEID]", getResult[0].EZEID);
+                                                        data = data.replace("[Message]", MessageText);
+
+                                                        var UserQuery = 'Select EZEID,ifnull(ServiceMailID," ") as MailID from tmaster where TID=' + getResult[0].TID;
+                                                        console.log(UserQuery);
+                                                        db.query(UserQuery, function (err, get_result) {
+
+                                                            if (get_result) {
+                                                                var mailOptions = {
+                                                                    from: 'noreply@ezeone.com',
+                                                                    to: get_result[0].MailID,
+                                                                    subject: 'Service Request from ' + ToEZEID,
+                                                                    html: data // html body
+                                                                };
+                                                                //console.log(mailOptions);
+                                                                var queryResult = 'select TID from tmaster where EZEID=' + db.escape(ToEZEID);
+                                                                db.query(queryResult, function (err, result) {
+
+                                                                    var post = {
+                                                                        MessageType: Messagetype,
+                                                                        Priority: 3,
+                                                                        ToMailID: mailOptions.to,
+                                                                        Subject: mailOptions.subject,
+                                                                        Body: mailOptions.html,
+                                                                        SentbyMasterID: result[0].TID
+                                                                    };
+                                                                    //console.log(post);
+                                                                    var query = db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
+                                                                        // Neat!
+                                                                        if (!err) {
+                                                                            console.log('FnMessageMail: Mail saved Successfully....1');
+
+                                                                        }
+                                                                        else {
+                                                                            console.log('FnMessageMail: Mail not Saved Successfully');
+
+                                                                        }
+                                                                    });
+                                                                });
+                                                            }
+                                                            else {
+                                                                console.log('FnSendMail:getting error from EmailID ');
+                                                            }
+                                                        });
+                                                    }
+                                                });
+                                            });
+                                        }
+                                    }
+                                        else
+                                            {
+                                                console.log('FnSaveTranscationItems:No Save Transaction items details');
+                                                res.send(RtnMessage);
+                                            }
+                                        }
+
+                                    else {
+                                        console.log('FnSaveTranscationItems:No Save Transaction items details');
+                                        res.send(RtnMessage);
+                                    }
+                                }
+
+                                else {
                                 console.log('FnSaveTranscationItems: error in saving Transaction items' + err);
                                 res.statusCode = 500;
                                 res.send(RtnMessage);
                             }
                         });
                     }
-                    else {
-                        console.log('FnSaveTranscationItems: Invalid token');
-                        res.statusCode = 401;
-                        res.send(RtnMessage);
+                            else {
+                                console.log('FnSaveTranscationItems: Invalid token');
+                                res.statusCode = 401;
+                                res.send(RtnMessage);
+                            }
+
                     }
-                }
                 else {
                     console.log('FnSaveTranscationItems:Error in processing Token' + err);
                     res.statusCode = 500;

@@ -15,6 +15,7 @@
         '$routeParams',
         '$route',
         'GoogleMaps',
+        'UtilityService',
         function (
             $rootScope,
             $scope,
@@ -30,7 +31,8 @@
             $location,
             $routeParams,
             $route,
-            GoogleMap
+            GoogleMap,
+            UtilityService
             ) {
 
             $scope._tempSalesItemListType = $rootScope._userInfo.SalesItemListType;
@@ -1073,11 +1075,14 @@
                              */
                             $scope.totalPages = parseInt(resp.TotalPage);
                             $scope.pageNumber = pageNo;
-                            $scope.txList = resp.Result;
+                            if(resp.Result && angular.isArray(resp.Result)){
+                                for(var a = 0; a < resp.Result.length; a++){
+                                    $scope.editModes.push(false);
+                                    resp.Result[a].TaskDateTime = UtilityService.convertTimeToLocal(resp.Result[a].TaskDateTime,'DD MMM YYYY hh:mm:ss');
+                                }
 
-                            for(var a = 0; a < resp.Result.length; a++){
-                                $scope.editModes.push(false);
                             }
+
                         }
                         else{
 
@@ -1545,7 +1550,8 @@
                     Token : $rootScope._userInfo.Token,
                     MessageText : $scope.modalBox.tx.message,
                     Status : $scope.modalBox.tx.statusType,
-                    TaskDateTime : (!editMode) ? moment().format('DD MMM YYYY hh:mm:ss') : $scope.modalBox.tx.taskDateTime,
+                    TaskDateTime : (!editMode) ? UtilityService.convertTimeToUTC(moment().format('DD MMM YYYY hh:mm:ss'),'DD MMM YYYY hh:mm:ss') :
+                        UtilityService.convertTimeToUTC($scope.modalBox.tx.taskDateTime),
                     Notes : $scope.modalBox.tx.notes,
                     LocID : ($scope.modalBox.tx.locId) ? $scope.modalBox.tx.locId : 0,
                     Country : $scope.modalBox.tx.country,

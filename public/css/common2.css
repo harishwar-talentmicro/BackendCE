@@ -82,6 +82,11 @@
     display: inherit !important;
 }
 
+.hpw .display-table
+{
+    display: table-cell !important;
+}
+
 .hpw .display-in-desktop
 {
     display: none !important;
@@ -668,6 +673,11 @@
 .hpw .p-left-5
 {
     padding-left: 5px !important;
+}
+
+.hpw .p-left-10
+{
+    padding-left: 10px !important;
 }
 
 .hpw .p-left-1
@@ -2449,7 +2459,7 @@ sup.tm{
 {
     padding: 20px;
     text-decoration: none;
-    color: #7E7E7E;
+    color: #301152;
 }
 
 .hpw .index-menu ul li .active {
@@ -2462,7 +2472,14 @@ sup.tm{
 
 .hpw .index-menu .group
 {
+    padding-left: 10px;
     background-color: #D4FFB6;
+}
+
+.hpw .index-menu .people
+{
+    background-color: #FCFF8E;
+    padding-left: 10px;
 }
 
 .hpw .message-content-tbl
@@ -2478,6 +2495,20 @@ sup.tm{
 .hpw .index-title
 {
     border-bottom: 1px solid rgb(203, 203, 203);
+}
+
+.hpw .index-title-group
+{
+    background-color: rgb(119, 253, 119) !important;
+    border-bottom: 1px solid rgb(203, 203, 203);
+    padding-left:0px !important;
+}
+
+.hpw .index-title-people
+{
+    background-color: yellow !important;
+    border-bottom: 1px solid rgb(203, 203, 203);
+    padding-left:0px !important;
 }
 
 .hpw .individual-box
@@ -2622,4 +2653,25 @@ sup.tm{
     padding-top: 20px;
     text-align: justify;
     text-shadow: 0px 1px #FAFAFA;
+}
+
+.hpw .compose-message
+{
+    padding-top: 10px;
+    padding-bottom: 10px;
+    background-color: rgb(133, 134, 195);
+    color: #fff;
+    padding-left: 10px;
+    font-weight: 800;
+}
+
+.hpw .message-body
+{
+    background-color: rgb(228, 228, 228);
+    padding: 10px;
+}
+
+.hpw .filters-dropdown
+{
+    padding: 7px;
 }

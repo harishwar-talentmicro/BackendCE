@@ -57,6 +57,7 @@ var MessageScheduler = schedule.scheduleJob(rule, function () {
                             filename: ((RegData.AttachmentFileName != null) ? RegData.AttachmentFileName:''),
                             replyTo: ((RegData.replyTo != null) ? RegData.replyTo : '')
                         };
+
                         var qry = 'update tMailbox set sentStatus = 1 where TID = ' + RegData.TID;
                         db.query(qry, function (err, UpdateResult) {
                             if (!err) {
