@@ -7474,14 +7474,14 @@ exports.FnSaveTranscation = function(req, res){
                                                         data = data.replace("[EZEID]", getResult[0].EZEID);
                                                         data = data.replace("[Message]", MessageText);
 
-                                                        var UserQuery = 'Select EZEID,ifnull(HomeDeliveryMailID," ") as SalesMailID from tmaster where TID=' + getResult[0].TID;
+                                                        var UserQuery = 'Select EZEID,ifnull(HomeDeliveryMailID," ") as MailID from tmaster where TID=' + getResult[0].TID;
                                                         console.log(UserQuery);
                                                         db.query(UserQuery, function (err, get_result) {
 
                                                             if (get_result) {
                                                                 var mailOptions = {
                                                                     from: 'noreply@ezeone.com',
-                                                                    to: get_result[0].SalesMailID,
+                                                                    to: get_result[0].MailID,
                                                                     subject: 'HomeDelivery from ' + ToEZEID,
                                                                     html: data // html body
                                                                 };
@@ -7501,7 +7501,7 @@ exports.FnSaveTranscation = function(req, res){
                                                                     var query = db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
                                                                         // Neat!
                                                                         if (!err) {
-                                                                            console.log('FnMessageMail: Mail saved Successfully....1');
+                                                                            console.log('FnMessageMail: HomeDelivery Mail saved Successfully....1');
 
                                                                         }
                                                                         else {
@@ -7520,7 +7520,7 @@ exports.FnSaveTranscation = function(req, res){
                                             });
                                         }
                                         else if (Messagetype == 4) {
-                                            fs.readFile("homedelivery.html", "utf8", function (err, data) {
+                                            fs.readFile("ServiceMail.html", "utf8", function (err, data) {
                                                 var query1 = 'select EZEID,EZEIDVerifiedID,TID,IDTypeID as id from tmaster where Token=' + db.escape(Token);
                                                 db.query(query1, function (err, getResult) {
 
@@ -7545,7 +7545,7 @@ exports.FnSaveTranscation = function(req, res){
                                                                 var mailOptions = {
                                                                     from: 'noreply@ezeone.com',
                                                                     to: get_result[0].EMailID,
-                                                                    subject: 'HomeDelivery from ' + ToEZEID,
+                                                                    subject: 'Service Request from ' + ToEZEID,
                                                                     html: data // html body
                                                                 };
                                                                 //console.log(mailOptions);
@@ -7564,7 +7564,7 @@ exports.FnSaveTranscation = function(req, res){
                                                                     var query = db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
                                                                         // Neat!
                                                                         if (!err) {
-                                                                            console.log('FnMessageMail: Home Delivery Mail saved Successfully....1');
+                                                                            console.log('FnMessageMail: Service Mail saved Successfully....1');
                                                                         }
                                                                         else {
                                                                             console.log('FnMessageMail: Mail not Saved Successfully');
@@ -7590,15 +7590,15 @@ exports.FnSaveTranscation = function(req, res){
                                                         data = data.replace("[EZEID]", getResult[0].EZEID);
                                                         data = data.replace("[Message]", MessageText);
 
-                                                        var UserQuery = 'Select EZEID,ifnull(HomeDeliveryMailID," ") as SalesMailID from tmaster where TID=' + getResult[0].TID;
+                                                        var UserQuery = 'Select EZEID,ifnull(ServiceMailID," ") as MailID from tmaster where TID=' + getResult[0].TID;
                                                         console.log(UserQuery);
                                                         db.query(UserQuery, function (err, get_result) {
 
                                                             if (get_result) {
                                                                 var mailOptions = {
                                                                     from: 'noreply@ezeone.com',
-                                                                    to: get_result[0].SalesMailID,
-                                                                    subject: 'HomeDelivery from ' + ToEZEID,
+                                                                    to: get_result[0].MailID,
+                                                                    subject: 'Service Request from ' + ToEZEID,
                                                                     html: data // html body
                                                                 };
                                                                 //console.log(mailOptions);
