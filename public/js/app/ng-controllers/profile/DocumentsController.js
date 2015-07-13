@@ -170,7 +170,6 @@ angular.module('ezeidApp').controller('DocumentController',[
     function getDocumentDetails(option){
 
         $scope.form = original_form;
-        ////console.log(Date.now());
 
         if($rootScope._userInfo && $rootScope._userInfo.Token){
             $http({
