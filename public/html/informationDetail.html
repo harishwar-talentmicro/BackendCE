@@ -122,52 +122,52 @@
                                             <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12 setPaddingLeftRight0">
 
                                                 <div class="row setRowLeftRightMarginZero">
-                                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setPaddingLeftRight0">
-                                                        <div class="row setRowLeftRightMarginZero">
-                                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setPaddingLeftRight0">
-                                                                <div ng-show="SearchInfo.Picture">
-                                                                    <div ng-show="SearchInfo.IDTypeID == 1" class="row addItemRowUserEzeid1">
-                                                                        <img class="profilePicBorder imgSetBorder" width="148px" height="148px" ng-src="{{SearchInfo.Picture}}">
+                                                       <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setPaddingLeftRight0">
+                                                            <div class="row setRowLeftRightMarginZero">
+                                                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setPaddingLeftRight0">
+                                                                    <div ng-show="SearchInfo.Picture">
+                                                                        <div ng-show="SearchInfo.IDTypeID == 1" class="row addItemRowUserEzeid1">
+                                                                            <img class="profilePicBorder imgSetBorder" width="148px" height="148px" ng-src="{{SearchInfo.Picture}}">
+                                                                        </div>
+                                                                        <div ng-hide="SearchInfo.IDTypeID == 1" class="row addItemRowUserEzeid1">
+                                                                            <img class="profilePicBorderBusiness imgSetBorder" width="315px" height="155px" ng-src="{{SearchInfo.Picture}}">
+                                                                        </div>
                                                                     </div>
-                                                                    <div ng-hide="SearchInfo.IDTypeID == 1" class="row addItemRowUserEzeid1">
-                                                                        <img class="profilePicBorderBusiness imgSetBorder" width="315px" height="155px" ng-src="{{SearchInfo.Picture}}">
+                                                                    <div ng-hide="SearchInfo.Picture">
+                                                                        <div ng-show="SearchInfo.IDTypeID == 1" class="row addItemRowUserEzeid1">
+                                                                            <img class="profilePicBorder imgSetBorder" width="148px" height="148px" ng-src="../images/new_individual.png">
+                                                                        </div>
+                                                                        <div ng-hide="SearchInfo.IDTypeID == 1" class="row addItemRowUserEzeid1">
+                                                                            <img class="profilePicBorderBusiness imgSetBorder" width="315px" height="155px" ng-src="../images/business_profile_pic.png">
+                                                                        </div>
                                                                     </div>
                                                                 </div>
-                                                                <div ng-hide="SearchInfo.Picture">
-                                                                    <div ng-show="SearchInfo.IDTypeID == 1" class="row addItemRowUserEzeid1">
-                                                                        <img class="profilePicBorder imgSetBorder" width="148px" height="148px" ng-src="../images/new_individual.png">
+                                                            </div>
+
+                                                            <div class="row setRowLeftRightMarginZero ezeid-text">
+                                                                <span class="ezeid-text-font text-uppercase"><b> {{SearchInfo.EZEID}} </b></span>
+                                                            </div>
+
+                                                            <div ng-show="SearchInfo.CompanyName || SearchInfo.AboutCompany">
+                                                                <div class="row setRowLeftRightMarginZero company-text">
+                                                                    <span><p class="company-text-font" style="margin-bottom: 0px;">{{SearchInfo.CompanyName}} </p></span>
+                                                                </div>
+                                                                <div class="row setRowLeftRightMarginZero tag-line text-center">
+
+                                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 setPaddingLeftRight0">
                                                                     </div>
-                                                                    <div ng-hide="SearchInfo.IDTypeID == 1" class="row addItemRowUserEzeid1">
-                                                                        <img class="profilePicBorderBusiness imgSetBorder" width="315px" height="155px" ng-src="../images/business_profile_pic.png">
+                                                                    <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 setPaddingLeftRight0">
+                                                                        <div ng-show="SearchInfo.AboutCompany">
+                                                                            <i class="fa fa-quote-left quote-style"></i>
+                                                                            <span title="{{SearchInfo.AboutCompany}}">{{SearchInfo.AboutCompany}}</span>
+                                                                            <i class="fa fa-quote-right quote-style"></i>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 setPaddingLeftRight0">
                                                                     </div>
                                                                 </div>
                                                             </div>
                                                         </div>
-
-                                                        <div class="row setRowLeftRightMarginZero ezeid-text">
-                                                            <span class="ezeid-text-font text-uppercase"><b> {{SearchInfo.EZEID}} </b></span>
-                                                        </div>
-
-                                                        <div ng-show="SearchInfo.CompanyName || SearchInfo.AboutCompany">
-                                                            <div class="row setRowLeftRightMarginZero company-text">
-                                                                <span><p class="company-text-font" style="margin-bottom: 0px;">{{SearchInfo.CompanyName}} </p></span>
-                                                            </div>
-                                                            <div class="row setRowLeftRightMarginZero tag-line text-center">
-
-                                                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 setPaddingLeftRight0">
-                                                                </div>
-                                                                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 setPaddingLeftRight0">
-                                                                    <div ng-show="SearchInfo.AboutCompany">
-                                                                        <i class="fa fa-quote-left quote-style"></i>
-                                                                        <span title="{{SearchInfo.AboutCompany}}">{{SearchInfo.AboutCompany}}</span>
-                                                                        <i class="fa fa-quote-right quote-style"></i>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 setPaddingLeftRight0">
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
 
                                                      <div class="row setRowLeftRightMarginZero p-top-10 ">
 

@@ -196,7 +196,7 @@ angular.module('ezeidApp').
 
                                 if($scope.SearchInfo.IDTypeID == 2)
                                 {
-                                    getAboutComapny();
+                                    getAboutCompany();
                                 }
 
                                 $scope.showSalesEnquiry = $scope.SearchInfo.VisibleModules[0];
@@ -259,26 +259,25 @@ angular.module('ezeidApp').
                         if ((data == 'null') || (!data))
                         {
                            $location.url('/');
-                        }  $rootScope.$broadcast('$preLoaderStop');
+                        }
+                        $rootScope.$broadcast('$preLoaderStop');
                     });
                 return defer.promise;
             }
 
             //Below function is for getting about company
-            function getAboutComapny()
+            function getAboutCompany()
             {
                 $http({ method: 'get', url: GURL + 'ewtCompanyProfile?TID=' + $scope.SearchInfo.TID}).success(function (data) {
                     if (data.Result.length > 0) {
                         $scope.companyTagLine = data.Result[0].TagLine;
-
-                        console.log($scope.companyTagLine);
                     }
                 });
             }
 
             //Auto refresh Banner
-            $interval(function() {
-
+            $interval(function()
+            {
                 if(AutoRefresh == true && $scope.SearchInfo.Banners != 1)
                 {
                     currentBanner = currentBanner + 1;
@@ -397,14 +396,17 @@ angular.module('ezeidApp').
 
             //open working hour popup
             $scope.openWorkingHourPopup = function () {
+                $scope.$emit('$preLoaderStart');
                 if($rootScope._userInfo.Token == " ")
                 {
+                    $rootScope.$broadcast('$preLoaderStop');
                     $('#SignIn_popup').slideDown();
                 }
                 else
                 {
                     $http({ method: 'get', url: GURL + 'ewtGetWorkingHrsHolidayList?Token=' + $rootScope._userInfo.Token + '&LocID=' + $scope.SearchInfo.LocID }).success(function (data)
                     {
+                        $rootScope.$broadcast('$preLoaderStop');
                         $scope.showWorkingHourModel = true;
                         if (data != 'null')
                         {
