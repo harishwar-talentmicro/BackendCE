@@ -7165,18 +7165,19 @@ exports.FnSaveTranscation = function(req, res){
         var company_id = req.body.company_id ? req.body.company_id : 0 ;
         var Messagetype,verified;
         if (FunctionType == 0){
+            //sales
          Messagetype = 1;
         }
-        else if (FunctionType == 1){
-            Messagetype = 2;
-        }
         else if (FunctionType == 2){
+            //HomeDelivery
             Messagetype = 3;
         }
         else if (FunctionType == 3){
+            //Service
             Messagetype = 4;
         }
         else if (FunctionType == 4){
+            //Cv
             Messagetype = 5;
         }
         var RtnMessage = {
@@ -7403,6 +7404,122 @@ exports.FnSaveTranscation = function(req, res){
                                             });
                                         }
                                         else if (Messagetype == 3) {
+                                            fs.readFile("homedelivery.html", "utf8", function (err, data) {
+                                                var query1 = 'select EZEID,EZEIDVerifiedID,TID,IDTypeID as id from tmaster where Token=' + db.escape(Token);
+                                                db.query(query1, function (err, getResult) {
+
+                                                    if (getResult[0].id == 1) {
+                                                        if (getResult[0].EZEIDVerifiedID == 1) {
+                                                            verified = 'Not Verified';
+                                                        }
+                                                        else {
+                                                            verified = 'Verified';
+                                                        }
+
+                                                        data = data.replace("[IsVerified]", verified);
+                                                        data = data.replace("[EZEOneID]", getResult[0].EZEID);
+                                                        data = data.replace("[EZEID]", getResult[0].EZEID);
+                                                        data = data.replace("[Message]", MessageText);
+
+                                                        var UserQuery = 'Select EZEID,ifnull(EMailID,"") as EMailID from tlocations where MasterID=' + getResult[0].TID;
+
+                                                        db.query(UserQuery, function (err, get_result) {
+                                                            console.log(get_result);
+                                                            if (get_result) {
+                                                                var mailOptions = {
+                                                                    from: 'noreply@ezeone.com',
+                                                                    to: get_result[0].EMailID,
+                                                                    subject: 'HomeDelivery from ' + ToEZEID,
+                                                                    html: data // html body
+                                                                };
+                                                                //console.log(mailOptions);
+                                                                var queryResult = 'select TID from tmaster where EZEID=' + db.escape(ToEZEID);
+                                                                db.query(queryResult, function (err, result) {
+                                                                    console.log(result);
+                                                                    var post = {
+                                                                        MessageType: Messagetype,
+                                                                        Priority: 3,
+                                                                        ToMailID: mailOptions.to,
+                                                                        Subject: mailOptions.subject,
+                                                                        Body: mailOptions.html,
+                                                                        SentbyMasterID: result[0].TID
+                                                                    };
+
+                                                                    var query = db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
+                                                                        // Neat!
+                                                                        if (!err) {
+                                                                            console.log('FnMessageMail: Home Delivery Mail saved Successfully....1');
+                                                                        }
+                                                                        else {
+                                                                            console.log('FnMessageMail: Mail not Saved Successfully');
+
+                                                                        }
+                                                                    });
+                                                                });
+                                                            }
+                                                            else {
+                                                                console.log('FnSendMail:getting error from EmailID ');
+                                                            }
+                                                        });
+                                                    }
+                                                    else {
+                                                        if (getResult[0].EZEIDVerifiedID == 1) {
+                                                            verified = 'Not Verified';
+                                                        }
+                                                        else {
+                                                            verified = 'Verified';
+                                                        }
+                                                        data = data.replace("[IsVerified]", verified);
+                                                        data = data.replace("[EZEOneID]", getResult[0].EZEID);
+                                                        data = data.replace("[EZEID]", getResult[0].EZEID);
+                                                        data = data.replace("[Message]", MessageText);
+
+                                                        var UserQuery = 'Select EZEID,ifnull(HomeDeliveryMailID," ") as SalesMailID from tmaster where TID=' + getResult[0].TID;
+                                                        console.log(UserQuery);
+                                                        db.query(UserQuery, function (err, get_result) {
+
+                                                            if (get_result) {
+                                                                var mailOptions = {
+                                                                    from: 'noreply@ezeone.com',
+                                                                    to: get_result[0].SalesMailID,
+                                                                    subject: 'HomeDelivery from ' + ToEZEID,
+                                                                    html: data // html body
+                                                                };
+                                                                //console.log(mailOptions);
+                                                                var queryResult = 'select TID from tmaster where EZEID=' + db.escape(ToEZEID);
+                                                                db.query(queryResult, function (err, result) {
+
+                                                                    var post = {
+                                                                        MessageType: Messagetype,
+                                                                        Priority: 3,
+                                                                        ToMailID: mailOptions.to,
+                                                                        Subject: mailOptions.subject,
+                                                                        Body: mailOptions.html,
+                                                                        SentbyMasterID: result[0].TID
+                                                                    };
+                                                                    //console.log(post);
+                                                                    var query = db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
+                                                                        // Neat!
+                                                                        if (!err) {
+                                                                            console.log('FnMessageMail: Mail saved Successfully....1');
+
+                                                                        }
+                                                                        else {
+                                                                            console.log('FnMessageMail: Mail not Saved Successfully');
+
+                                                                        }
+                                                                    });
+                                                                });
+                                                            }
+                                                            else {
+                                                                console.log('FnSendMail:getting error from EmailID ');
+                                                            }
+                                                        });
+                                                    }
+                                                });
+                                            });
+                                        }
+                                        else if (Messagetype == 4) {
                                             fs.readFile("homedelivery.html", "utf8", function (err, data) {
                                                 var query1 = 'select EZEID,EZEIDVerifiedID,TID,IDTypeID as id from tmaster where Token=' + db.escape(Token);
                                                 db.query(query1, function (err, getResult) {
