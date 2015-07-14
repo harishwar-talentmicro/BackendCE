@@ -48,7 +48,7 @@ IDCard_AP.prototype.updateIdCardPrintAP = function(req,res,next){
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         var Token = req.body.Token;
-        var EZEID =req.body.EZEID;
+        var EZEID =alterEzeoneId(req.body.EZEID);
 
         var RtnMessage = {
             IsUpdated: false
@@ -110,6 +110,8 @@ IDCard_AP.prototype.updateIdCardPrintAP = function(req,res,next){
 
     }
     catch (ex) {
+	var errorDate = new Date();
+	console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log('FnUpdateIdCardPrintAP:error ' + ex.description);
 
     }
@@ -133,7 +135,7 @@ IDCard_AP.prototype.getIdCardPrintAP = function(req,res,next){
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         var Token = req.query.Token;
-        var EZEID = req.query.EZEID;
+        var EZEID = alterEzeoneId(req.query.EZEID);
         if (Token != null && EZEID != null) {
             st.validateTokenAp(Token, function (err, Result) {
                 if (!err) {
@@ -187,6 +189,8 @@ IDCard_AP.prototype.getIdCardPrintAP = function(req,res,next){
         }
     }
     catch (ex) {
+	var errorDate = new Date();
+	console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log('FnGetEZEIDDetailsAP error:' + ex.description);
 
     }

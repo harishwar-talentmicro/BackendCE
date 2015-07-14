@@ -129,7 +129,6 @@ Reservation.prototype.SaveReservTrans = function(req,res,next){
                                     console.log('FnSaveReservTransaction:No save Resource Transaction details');
                                 }
                             }
-
                             else {
                                 responseMessage.message = 'An error occured ! Please try again';
                                 responseMessage.error = {};
@@ -169,10 +168,12 @@ Reservation.prototype.SaveReservTrans = function(req,res,next){
 
     }
     catch (ex) {
+
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
         console.log('FnSaveReservTransaction:error ' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
         res.status(400).json(responseMessage);
     }
 };
@@ -195,7 +196,7 @@ Reservation.prototype.getReservTrans = function(req,res,next){
 
         var resourceid = req.query.resourceid;
         var date = new Date(req.query.date);
-        var toEzeid = req.query.toEzeid;
+        var toEzeid = alterEzeoneId(req.query.toEzeid);
 
         var responseMessage = {
             status: false,
@@ -262,6 +263,8 @@ Reservation.prototype.getReservTrans = function(req,res,next){
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
         console.log('FnGetReservTask:error ' + ex.description);
+		var errorDate = new Date();
+		console.log(errorDate.toTimeString() + ' ......... error ...........');
 
         res.status(400).json(responseMessage);
     }
@@ -283,7 +286,7 @@ Reservation.prototype.getMapedServices = function(req,res,next){
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
-        var ezeid = req.query.ezeid;
+        var ezeid = alterEzeoneId(req.query.ezeid);
         var resourceid = req.query.resourceid;
 
         var responseMessage = {
@@ -350,6 +353,8 @@ Reservation.prototype.getMapedServices = function(req,res,next){
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
         console.log('FnGetReservTransaction:error ' + ex.description);
+		var errorDate = new Date();
+		console.log(errorDate.toTimeString() + ' ......... error ...........');
 
         res.status(400).json(responseMessage);
     }
@@ -438,6 +443,8 @@ Reservation.prototype.getTransDetails = function(req,res,next){
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
         console.log('FnGetResTransDetails:error ' + ex.description);
+		var errorDate = new Date();
+		console.log(errorDate.toTimeString() + ' ......... error ...........');
 
         res.status(400).json(responseMessage);
     }
@@ -618,6 +625,8 @@ Reservation.prototype.getworkinghoursList = function(req,res,next){
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
         console.log('FnGetworkinghoursList:error ' + ex.description);
+		var errorDate = new Date();
+		console.log(errorDate.toTimeString() + ' ......... error ...........');
 
         res.status(400).json(responseMessage);
     }

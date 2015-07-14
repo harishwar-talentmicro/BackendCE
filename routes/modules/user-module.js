@@ -43,6 +43,8 @@ function FnEncryptPassword(Password) {
         return crypted;
     }
     catch (ex) {
+	var errorDate = new Date();
+	console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log('OTP generate error:' + ex.description);
 
         return 'error'
@@ -559,6 +561,8 @@ User.prototype.register = function(req,res,next){
 
     }
     catch (ex) {
+	var errorDate = new Date();
+	console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log('FnRegistration error:' + ex.description);
         //throw new Error(ex);
     }
@@ -584,7 +588,7 @@ User.prototype.login = function(req,res,next){
         res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
         res.header('Access-Control-Allow-Headers', 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept');
         //res.setHeader('content-type', 'application/json');
-        var UserName = req.body.UserName;
+        var UserName = alterEzeoneId(req.body.UserName);
         var Password = req.body.Password;
         var RtnMessage = {
             Token: '',
@@ -711,6 +715,8 @@ console.log(Query);
         }
     }
     catch (ex) {
+	var errorDate = new Date();
+	console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log(ex);
         console.log('FnLogin:: error:' + ex.description);
            
@@ -774,6 +780,8 @@ User.prototype.logout = function(req,res,next){
         }
     }
     catch (ex) {
+	var errorDate = new Date();
+	console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log('FnLogout error:' + ex.description);
            
     }
@@ -854,6 +862,8 @@ User.prototype.getLoginDetails = function(req,res,next){
         }
     }
     catch (ex) {
+	var errorDate = new Date();
+	console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log('FnGetLoginDetails error:' + ex.description);
         //throw new Error(ex);
     }
@@ -903,6 +913,8 @@ User.prototype.getCountry = function(req,res,next){
         }
     }
     catch (ex) {
+	var errorDate = new Date();
+	console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log('FnGetCountry error:' + ex.description);
            
     }
@@ -977,6 +989,8 @@ User.prototype.getState = function(req,res,next){
         }
     }
     catch (ex) {
+	var errorDate = new Date();
+	console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log('FnGetState error:' + ex.description);
            
     }
@@ -1031,6 +1045,8 @@ User.prototype.getCity = function(req,res,next){
         }
     }
     catch (ex) {
+	var errorDate = new Date();
+	console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log('FnGetCity error:' + ex.description);
            
     }
@@ -1105,6 +1121,8 @@ User.prototype.getUserDetails = function(req,res,next){
         }
     }
     catch (ex) {
+	var errorDate = new Date();
+	console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log('FnGetUserDetails error:' + ex.description);
 
     }
@@ -1124,7 +1142,7 @@ User.prototype.checkEzeid = function(req,res,next){
     try {
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-        var EZEID = req.query.EZEID;
+        var EZEID = alterEzeoneId(req.query.EZEID);
         var RtnMessage = {
             IsIdAvailable: false
         };
@@ -1160,6 +1178,8 @@ User.prototype.checkEzeid = function(req,res,next){
         }
     }
     catch (ex) {
+	var errorDate = new Date();
+	console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log('FnCheckEzeid error:' + ex.description);
 
     }
@@ -1246,6 +1266,8 @@ User.prototype.changePassword = function(req,res,next){
         }
     }
     catch (ex) {
+	var errorDate = new Date();
+	console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log('FnChangePassword error:' + ex.description);
 
     }
@@ -1266,7 +1288,7 @@ User.prototype.forgetPassword = function(req,res,next){
 
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-        var EZEID = req.body.EZEID;
+        var EZEID = alterEzeoneId(req.body.EZEID);
         var RtnMessage = {
             IsChanged: false
         };
@@ -1359,6 +1381,8 @@ User.prototype.forgetPassword = function(req,res,next){
         }
     }
     catch (ex) {
+	var errorDate = new Date();
+	console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log('FnForgetPassword error:' + ex.description);
     }
 };
@@ -1395,7 +1419,8 @@ User.prototype.decryptPassword = function(req,res,next){
 }
 catch(ex){
     console.log('FnDecrypterror:' + ex.description);
-
+    var errorDate = new Date();
+    console.log(errorDate.toTimeString() + ' ......... error ...........');
     return 'error'
 }
 }
@@ -1412,6 +1437,8 @@ function FnRandomPassword() {
         return text;
     }
     catch (ex) {
+	var errorDate = new Date();
+	console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log('OTP generate error:' + ex.description);
 
         return 'error'
@@ -1490,6 +1517,8 @@ User.prototype.getCompanyProfile = function(req,res,next){
         }
     }
     catch (ex) {
+	var errorDate = new Date();
+	console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log('FnGetCompanyProfile error:' + ex.description);
 
     }
@@ -1576,6 +1605,8 @@ User.prototype.saveCompanyProfile = function(req,res,next){
         }
     }
     catch (ex) {
+	var errorDate = new Date();
+	console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log('FnSaveCompanyProfile: Error:' + ex.description);
 
     }
@@ -1603,11 +1634,12 @@ User.prototype.getWebLink = function(req,res,next){
             st.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result) {
-
+                        console.log('CALL pGetWebLink(' + st.db.escape(Token) + ')');
                         st.db.query('CALL pGetWebLink(' + st.db.escape(Token) + ')', function (err, GetResult) {
+                            console.log(GetResult);
                             if (!err) {
                                 if (GetResult) {
-                                    if (GetResult[0].length > 0) {
+                                    if (GetResult[0]) {
                                         console.log('FnGetWebLink: Web Links Send successfully');
                                         res.send(GetResult[0]);
                                     }
@@ -1655,6 +1687,8 @@ User.prototype.getWebLink = function(req,res,next){
         }
     }
     catch (ex) {
+	var errorDate = new Date();
+	console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log('FnGetWebLink error:' + ex.description);
 
     }
@@ -1750,6 +1784,8 @@ User.prototype.saveWebLink = function(req,res,next){
 
     }
     catch (ex) {
+	var errorDate = new Date();
+	console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log('FnSaveWebLink:error ' + ex.description);
 
     }
@@ -1829,6 +1865,8 @@ User.prototype.deleteWebLink = function(req,res,next){
         }
     }
     catch (ex) {
+	var errorDate = new Date();
+	console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log('FnDeleteWebLink:error ' + ex.description);
 
     }
@@ -1850,7 +1888,8 @@ User.prototype.getEzeidDetails = function(req,res,next){
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         var Token = req.query.Token;
-        var EZEID = req.query.EZEID;
+        var EZEID = alterEzeoneId(req.query.EZEID);
+        console.log(req.query);
         if (Token != null && EZEID != null ) {
             st.validateToken(Token, function (err, Result) {
                 if (!err) {
@@ -1859,6 +1898,7 @@ User.prototype.getEzeidDetails = function(req,res,next){
                         var FindArray =EZEID.split('.');
                         if (FindArray.length > 0) {
                             EZEID = FindArray[0];
+                            console.log(EZEID);
                             if (FindArray.length > 1) {
                                 if (FindArray[1] != '') {
                                     if (FindArray[1].charAt(0).toUpperCase() == 'L') {
@@ -1923,6 +1963,8 @@ User.prototype.getEzeidDetails = function(req,res,next){
         }
     }
     catch (ex) {
+	var errorDate = new Date();
+	console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log('FnEZEIDDetails error:' + ex.description);
 
     }
@@ -2010,6 +2052,8 @@ User.prototype.getResume = function(req,res,next){
         }
     }
     catch (ex) {
+	var errorDate = new Date();
+	console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log('FnGetCVInfo error:' + ex.description);
 
         res.status(400).json(responseMessage);
@@ -2192,6 +2236,8 @@ User.prototype.saveResume = function(req,res,next){
 
     }
     catch (ex) {
+	var errorDate = new Date();
+	console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log('FnSaveCVInfo error:' + ex.description);
 
     }
@@ -2257,6 +2303,8 @@ function FnSaveSkills(skill, CallBack) {
         }
     }
     catch (ex) {
+	var errorDate = new Date();
+	console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log('OTP FnSendMailEzeid error:' + ex.description);
 
         return 'error'
@@ -2303,7 +2351,8 @@ User.prototype.getSkills = function(req,res,next){
     catch(ex){
         res.status(500).json(responseMsg);
         console.log('Error : FnPGetSkills '+ ex.description);
-
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
 };
 
@@ -2372,6 +2421,8 @@ User.prototype.getDocPin = function(req,res,next) {
         }
     }
     catch (ex) {
+	var errorDate = new Date();
+	console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log('FnGetDocPin:  error:' + ex.description);
     }
 };
@@ -2818,7 +2869,7 @@ if(req.params.id){
 
         arr.splice(arr.length - 1,1);
 
-        var ezeid = arr.join('.');
+        var ezeid = alterEzeoneId(arr.join('.'));
 
         var urlBreaker = lastItem.split('');
         if(urlBreaker.length > 1 && urlBreaker.length < 4){
@@ -2908,6 +2959,8 @@ User.prototype.getMTitle = function(req,res,next) {
         }
     }
     catch (ex) {
+	var errorDate = new Date();
+	console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log('FnGetMTitle error:' + ex.description);
 
     }
@@ -3013,6 +3066,8 @@ User.prototype.updateProfilePicture = function(req,res,next) {
 
     }
     catch (ex) {
+	var errorDate = new Date();
+	console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log('FnUpdateProfilePicture error:' + ex.description);
 
     }
@@ -3071,6 +3126,8 @@ User.prototype.getLoginCheck = function(req,res,next) {
         }
     }
     catch (ex) {
+	var errorDate = new Date();
+	console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log('FnGetUserDetails error:' + ex.description);
 
     }
@@ -3118,6 +3175,8 @@ User.prototype.getProxmity = function(req,res,next) {
         }
     }
     catch (ex) {
+	var errorDate = new Date();
+	console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log('FnGetProxmity error:' + ex.description);
         //throw new Error(ex);
     }

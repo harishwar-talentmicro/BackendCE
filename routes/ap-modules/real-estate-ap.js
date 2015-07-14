@@ -107,7 +107,8 @@ RealEstate_AP.prototype.getRealStateDataAP = function(req,res,next){
     }
     catch(ex){
         console.log('FnGetRealStateDataAP error: ' + ex.description);
-
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
 };
 
@@ -219,6 +220,8 @@ RealEstate_AP.prototype.searchRealEstateAP = function(req,res,next){
         });
     }
     catch (ex) {
+	var errorDate = new Date();
+	console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log('FnSearchRealEstateAP error:' + ex.description);
 
     }
