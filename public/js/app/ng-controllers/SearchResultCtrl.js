@@ -1095,11 +1095,30 @@ var res = angular.module('ezeidApp').
                 return '';
             }
 
+
+            /**
+             * Search for a keywod
+             */
+            $scope.searchKey = function(e){
+                if(e.charCode === 13 && $scope.params.searchTerm.length > 0){
+                    $scope.initiateSearch();
+                }
+                else{
+                    $timeout(function(){
+                        var a  = $filter('filter')(suggestion,$scope.params.searchTerm);
+                        $scope.KeyWords = $filter('filter')(suggestion,$scope.params.searchTerm);
+                    },100);
+                }
+
+            };
+
             /* set Auto Completed key word to text field */
             $scope.setAutoCompeted = function(_item)
             {
-               $('#searchTextField').val(_item);
+                $('#searchTextField').val(_item);
+                $scope.params.searchTerm = _item;
             };
+
 
             var suggestion = [
                 '24 x 7 Physician Doctor',
@@ -1118,21 +1137,6 @@ var res = angular.module('ezeidApp').
 
             $scope.KeyWords = [];
 
-            /**
-             * Search for a keywod
-             */
-            $scope.searchKey = function(e){
-                if(e.charCode === 13 && $scope.params.searchTerm.length > 0){
-                    $scope.initiateSearch();
-                }
-                else{
-                    $timeout(function(){
-                        var a  = $filter('filter')(suggestion,$scope.params.searchTerm);
-                        $scope.KeyWords = $filter('filter')(suggestion,$scope.params.searchTerm);
-                    },100);
-
-                }
-            };
 
 
         }
