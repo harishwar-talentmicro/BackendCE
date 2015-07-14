@@ -61,7 +61,9 @@ var res = angular.module('ezeidApp').
             $scope.ifHtmlLoaded = false;
 
             if($location.path() == '/business-manager/reservation'){
-                $routeParams.ezeone = $rootScope._userInfo.ezeid;
+                var ezeone = $rootScope._userInfo.ezeid
+                /* get only the masterID */
+                $routeParams.ezeone = ezeone.split(".")[0];
             }
 
             /* for resources availability background color */

@@ -3,7 +3,19 @@
         <!--<h3 class="font-roboto business-manager-module-heading">{{(_userInfo.SalesModuleTitle) ? _userInfo.SalesModuleTitle : 'Sales'}}</h3>-->
     <!--</div>-->
     <div class="panel-body">
-        <div class="row">
+        <div class="row tabs-row tabs-row-sales" ng-show="false">
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                <ul class="nav nav-tabs">
+                    <li class="active"><a href="#"> <span class="glyphicon glyphicon-copy"></span>  Inquiries</a></li>
+                    <li><a href="#"> <span class="glyphicon glyphicon-signal"></span>  Reports</a></li>
+                </ul>
+            </div>
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+            </div>
+
+        </div>
+
+        <div class="row transactions-row setTopMargin">
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                 <div class="row bottom-clearfix">
 
@@ -446,6 +458,11 @@
             </div>
         </div>
 
+       <!-- <div class="row reports-row">
+            <div id="donut-example"></div>
+            //graphs come here
+        </div>-->
+
         <div class="row">
           <!-- Modal Box starts -->
           <modal mtitle="modalBox.title" mclass="modalBox.class" visible="showModal">
@@ -881,7 +898,6 @@
         </div>
     </div>
 </div>
-
 
 <!----------------------------------------------------------------------------------------------------------------------------->
 
