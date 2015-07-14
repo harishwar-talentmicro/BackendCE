@@ -123,9 +123,8 @@ Image.prototype.cropImage = function(req,res,next){
                                             }
                                             else{
                                                 console.log("executing condition 2 : sOrient: landscape & scale++ & tOrient : landscape");
-                                                scaleWidth = targetWidth.toString();
-                                                ////
-                                                scaleHeight = (size.height * scaleWidth) / size.width;
+                                                scaleHeight = targetHeight;
+                                                scaleWidth = (size.width * scaleHeight) / size.height;
                                             }
                                         }
                                         // scale--
@@ -232,7 +231,7 @@ Image.prototype.cropImage = function(req,res,next){
                                     }
                                 }
                                 else{
-                                    throw new Error('FnCropImage : '+ 'Invalid image file. Unable to find image size');
+                                    throw new Error('FnCropImage : Invalid image file. Unable to find image size');
                                     res.status(400).json(respMsg);
                                 }
                             });
@@ -247,7 +246,9 @@ Image.prototype.cropImage = function(req,res,next){
                 catch(ex){
                     console.log(ex);
                     res.status(400).json(respMsg);
-                    throw new Error('FnCropImage : '+ ex.description);
+                    console.log('FnCropImage : '+ ex.description);
+                    var errorDate = new Date();
+                    console.log(errorDate.toTimeString() + ' ......... error ...........');
                 }
             }
             else{
@@ -351,7 +352,8 @@ Image.prototype.imageURL = function(req,res,next){
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
         console.log('FnImageURL:error ' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
         res.status(400).json(responseMessage);
     }
 };

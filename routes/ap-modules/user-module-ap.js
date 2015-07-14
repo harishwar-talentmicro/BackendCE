@@ -48,7 +48,7 @@ User_AP.prototype.getUserDetailsAP = function(req,res,next){
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     var TokenNo = req.query.Token;
-    var EZEID = req.query.EZEID;
+        var EZEID = alterEzeoneId(req.query.EZEID);
     if (EZEID != null && EZEID != '' && TokenNo != null) {
 
         st.validateTokenAp(TokenNo, function (err, Result) {
@@ -105,7 +105,8 @@ User_AP.prototype.getUserDetailsAP = function(req,res,next){
 }
 catch (ex) {
     console.log('FnGetUserDetails error:' + ex.description);
-
+    var errorDate = new Date();
+    console.log(errorDate.toTimeString() + ' ......... error ...........');
 }
 };
 
@@ -126,7 +127,7 @@ try {
     res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
     res.header('Access-Control-Allow-Headers', 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept');
 
-    var EZEID = req.body.EZEID;
+    var EZEID = alterEzeoneId(req.body.EZEID);
     var EZEIDVerifiedID = req.body.EZEIDVerifiedID;
     // var TID = parseInt(req.body.TID);
     var CategoryID = req.body.CategoryID;
@@ -245,7 +246,8 @@ try {
 }
 catch (ex) {
     console.log('FnUpdateUserProfileAP error:' + ex.description);
-
+    var errorDate = new Date();
+    console.log(errorDate.toTimeString() + ' ......... error ...........');
 }
 };
 
@@ -276,7 +278,7 @@ User_AP.prototype.saveAPEZEID = function(req,res,next){
         var Description = req.body.Description;
         var Preferences = req.body.Preferences;
         var Rating = req.body.Rating;
-        var EZEID = req.body.EZEID;
+        var EZEID = alterEzeoneId(req.body.EZEID);
         var Latitude = req.body.Latitude;
         if (Latitude == null || Latitude == '') {
             Latitude = 0.0;
@@ -372,6 +374,8 @@ User_AP.prototype.saveAPEZEID = function(req,res,next){
 
     }
     catch (ex) {
+	var errorDate = new Date();
+	console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log('psaveRealEstateData error:' + ex.description);
 
     }
@@ -393,8 +397,8 @@ User_AP.prototype.updateRedFlagAP = function(req,res,next){
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         var RedFlag = req.body.RedFlag;
         var Token = req.body.Token;
-        var FromEZEID =req.body.FromEZEID;
-        var ToEZEID =req.body.ToEZEID;
+        var FromEZEID =alterEzeoneId(req.body.FromEZEID);
+        var ToEZEID =alterEzeoneId(req.body.ToEZEID);
         var Message =req.body.Message;
 
 
@@ -469,6 +473,8 @@ User_AP.prototype.updateRedFlagAP = function(req,res,next){
 
     }
     catch (ex) {
+	var errorDate = new Date();
+	console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log('FnUpdateRedFlagAP:error ' + ex.description);
 
     }
@@ -490,8 +496,8 @@ User_AP.prototype.updateEZEIDAP = function(req,res,next){
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         var Token = req.body.Token;
-        var OldEZEID = req.body.OldEZEID;
-        var NewEZEID = req.body.NewEZEID;
+        var OldEZEID = alterEzeoneId(req.body.OldEZEID);
+        var NewEZEID = alterEzeoneId(req.body.NewEZEID);
         var RtnMessage = {
             IsChanged: false
         };
@@ -550,6 +556,8 @@ User_AP.prototype.updateEZEIDAP = function(req,res,next){
         }
     }
     catch (ex) {
+	var errorDate = new Date();
+	console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log('FnUpdateEZEIDAP error:' + ex.description);
 
     }

@@ -44,6 +44,8 @@ function FnRandomPassword() {
         return text;
     }
     catch (ex) {
+	var errorDate = new Date();
+	console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log('OTP generate error:' + ex.description);
         throw new Error(ex);
         return 'error'
@@ -63,6 +65,8 @@ function FnEncryptPassword(Password) {
         return crypted;
     }
     catch (ex) {
+	var errorDate = new Date();
+	console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log('OTP generate error:' + ex.description);
         //throw new Error(ex);
         return 'error'
@@ -153,6 +157,8 @@ Auth_AP.prototype.loginAP = function(req,res,next){
         }
     }
     catch (ex) {
+	var errorDate = new Date();
+	console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log('FnLogin error:' + ex.description);
 
     }
@@ -399,6 +405,8 @@ Auth_AP.prototype.changePasswordAP = function(req,res,next){
         }
     }
     catch (ex) {
+	var errorDate = new Date();
+	console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log('FnChangePassword error:' + ex.description);
 
     }

@@ -80,7 +80,7 @@ Search.prototype.searchKeyword = function(req,res,next){
             if (find != null && find != '' && CategoryID != null && token != null && token != '' && CurrentDate != null && pagesize != null && pagecount != null) {
                 st.validateToken(token, function (err, Result) {
                     if (!err) {
-                        if (Result) {
+                        if (Result != null) {
                             if(CurrentDate != null)
                                 CurrentDate = new Date(CurrentDate);
                             var LocSeqNo = 0;
@@ -98,9 +98,11 @@ Search.prototype.searchKeyword = function(req,res,next){
                                 ip : req.ip,
                                 type : 0
                             };
+                            console.log('FindArray');
+                            console.log(FindArray);
 
                             if (FindArray.length > 0) {
-                                EZEID = FindArray[0];
+                                EZEID = alterEzeoneId(FindArray[0]);
                                 //checking the fisrt condition
                                 if (FindArray.length > 1) {
                                     if (FindArray[1] != '') {
@@ -165,7 +167,7 @@ Search.prototype.searchKeyword = function(req,res,next){
                             st.db.query('CALL pSearchResultNew(' + SearchQuery + ')', function (err, SearchResult) {
                                 // st.db.query(searchQuery, function (err, SearchResult) {
                                 if (!err) {
-                                    if (SearchResult[0]) {
+                                    if (SearchResult[0] != null) {
                                         if (SearchResult[0].length > 0) {
                                             if (SearchResult[0][0].totalcount == 1)
                                             {
@@ -341,7 +343,7 @@ Search.prototype.searchKeyword = function(req,res,next){
                 st.db.query('CALL pSearchResultNew(' + InsertQuery + ')', function (err, SearchResult) {
                     if (!err) {
                         console.log(SearchResult);
-                        if (SearchResult[0]) {
+                        if (SearchResult[0] != null) {
                             if (SearchResult[0].length > 0) {
                                 //res.send(SearchResult[0]);
                                 res.json({totalcount:SearchResult[0][0].totalcount,Result:SearchResult[1]});
@@ -394,9 +396,8 @@ Search.prototype.searchKeyword = function(req,res,next){
     }
     catch (ex) {
         console.log('FnSearchByKeywords error:' + ex.description);
-          
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
-
 };
 
 /**
@@ -416,7 +417,7 @@ Search.prototype.searchInformation = function(req,res,next){
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
         var Token = req.query.Token ? req.query.Token : '';
-        var ezeTerm = req.query.ezeTerm;
+        var ezeTerm = alterEzeoneId(req.query.ezeTerm);
         var CurrentDate = req.query.CurrentDate;
         var IPAddress = req._remoteAddress; //(req.headers['x-forwarded-for'] || req.connection.remoteAddress)
         console.log(IPAddress);
@@ -488,7 +489,8 @@ Search.prototype.searchInformation = function(req,res,next){
     }
     catch (ex) {
         console.log('FnGetUserDetails error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
 };
 
@@ -565,6 +567,8 @@ Search.prototype.getWorkingHrsHolidayList = function (req, res) {
                                 console.log('FnWorkingHours error:' + ex.description);
                                 //throw new Error(ex);
                                 return 'error'
+                                var errorDate = new Date();
+                                console.log(errorDate.toTimeString() + ' ......... error ...........');
                             }
                         } ,function FnHolidayList(CallBack) {
                             try {
@@ -605,6 +609,8 @@ Search.prototype.getWorkingHrsHolidayList = function (req, res) {
                                 console.log('FnHolidayList error:' + ex.description);
                                 //throw new Error(ex);
                                 return 'error'
+                                var errorDate = new Date();
+                                console.log(errorDate.toTimeString() + ' ......... error ...........');
                             }
                         }
                         ],function(err){
@@ -649,7 +655,8 @@ Search.prototype.getWorkingHrsHolidayList = function (req, res) {
     }
     catch (ex) {
         console.log('FnGetWorkingHours error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
 };
 
@@ -701,6 +708,8 @@ function FnWorkingHours(WorkingContent, CallBack) {
         console.log('FnWorkingHours error:' + ex.description);
         //throw new Error(ex);
         return 'error'
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
 };
 
@@ -752,6 +761,8 @@ function FnHolidayList(HolidayContent, CallBack) {
         console.log('FnHolidayList error:' + ex.description);
         //throw new Error(ex);
         return 'error'
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
 };
 
@@ -771,7 +782,7 @@ try{
     res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     var SeqNo = parseInt(req.query.SeqNo);
     var StateTitle = req.query.StateTitle;
-    var Ezeid = req.query.Ezeid;
+    var Ezeid = alterEzeoneId(req.query.Ezeid);
     var LocID = req.query.LocID;
     // var TokenNo = req.query.Token;
 
@@ -857,6 +868,8 @@ try{
 }
 catch (ex) {
     console.log('FnGetBannerPicture error:' + ex.description);
+    var errorDate = new Date();
+    console.log(errorDate.toTimeString() + ' ......... error ...........');
 }
 };
 
@@ -945,6 +958,8 @@ try {
 }
 catch (ex) {
     console.log('FnSearchForTracker error:' + ex.description);
+    var errorDate = new Date();
+    console.log(errorDate.toTimeString() + ' ......... error ...........');
 }
 };
 
@@ -963,7 +978,7 @@ Search.prototype.getSearchDoc = function(req,res,next){
     try {
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    var find = req.query.Keywords;
+        var find = alterEzeoneId(req.query.Keywords);
     var token = req.query.Token;
     //console.log(token);
     if (token != null && find != null && token != '' && find != '') {
@@ -1115,6 +1130,8 @@ Search.prototype.getSearchDoc = function(req,res,next){
 }
 catch (ex) {
     console.log('FnGetSearchDocuments error:' + ex.description);
+    var errorDate = new Date();
+    console.log(errorDate.toTimeString() + ' ......... error ...........');
 
 }
 };

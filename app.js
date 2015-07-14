@@ -4,7 +4,7 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser'), cors = require('cors'),
-LocationManager = require('./routes/EziedUserAPI_Server');
+LocationManager = require('./routes/EziedUserAPI_Server.js');
 var compress = require('compression');
 
 var app = express();
@@ -87,12 +87,8 @@ app.post('/ewSavePrimaryEZEData', LocationManager.FnRegistration);
 app.get('/ewmGetCategory', LocationManager.FnGetCategory);
 app.get('/ewmGetCity', LocationManager.FnGetCity);
 app.get('/ewmGetCountry', LocationManager.FnGetCountry);
-app.get('/ewmGetFunctionRoleMap', LocationManager.FnGetFunctionRoleMap);
 app.get('/ewmGetFunctions', LocationManager.FnGetFunctions);
-app.get('/ewmGetRoles', LocationManager.FnGetRoles);
-app.get('/ewmGetLanguage', LocationManager.FnGetLanguage);
 app.get('/ewmGetRelationType', LocationManager.FnGetRelationType);
-app.get('/ewmGetRoleType', LocationManager.FnGetRoleType);
 app.get('/ewmGetState', LocationManager.FnGetState);
 app.get('/ewmGetMTitle', LocationManager.FnGetMTitle);
 app.get('/ewGetEZEID', LocationManager.FnCheckEzeid);
@@ -101,31 +97,23 @@ app.post('/ewSearchByKeywords', LocationManager.FnSearchByKeywords);
 app.get('/ewtGetUserDetails', LocationManager.FnGetUserDetails);
 app.get('/ewtGetSecondaryLoc', LocationManager.FnGetSecondaryLocation);
 app.post('/ewDeleteLocation', LocationManager.FnDeleteLocation);
-app.get('/ewtGetSearchInformation', LocationManager.FnGetSearchInformation);
 app.get('/ewtGetSearchInformationNew', LocationManager.FnGetSearchInformationNew);
 app.get('/ewmGetProxmity', LocationManager.FnGetProxmity);
 app.post('/ewtSendMail', LocationManager.FnSendMail);
 app.get('/ewtGetDoc', LocationManager.FnGetDoc);
 app.post('/ewtSaveDoc', LocationManager.FnSaveDoc);
 app.get('/ewtGetAccessHistory', LocationManager.FnGetAccessHistory);
-app.post('/ewtSaveMessage', LocationManager.FnSaveMessage);
-app.get('/ewtGetMessages', LocationManager.FnGetMessages);
-app.post('/ewtUpdateMessageStatus', LocationManager.FnUpdateMessageStatus);
 app.post('/ewtForgetPassword', LocationManager.FnForgetPassword);
+app.get('/ewtDecryptPassword', LocationManager.FnDecryptPassword);
 app.post('/ewtChangePassword', LocationManager.FnChangePassword);
 app.post('/ewtUpdateProfilePicture', LocationManager.FnUpdateProfilePicture);
 app.post('/ewtSaveCVInfo', LocationManager.FnSaveCVInfo);
 app.get('/ewtGetCVInfo', LocationManager.FnGetCVInfo);
 app.post('/ewtUpdateBussinessListing', LocationManager.FnUpdateBussinessListing);
-app.get('/ewtGetBussinessListing', LocationManager.FnGetBussinessListing);
 app.post('/ewtUpdateDocPin', LocationManager.FnUpdateDocPin);
 app.get('/ewtGetDocPin', LocationManager.FnGetDocPin);
 app.get('/ewtGetSearchDocuments', LocationManager.FnGetSearchDocuments);
-app.get('/ewtGetDocument', LocationManager.FnGetDocument);
 app.post('/ewtUploadDoc', LocationManager.FnUploadDocument);
-app.get('/ewmGetFunctionRoleMapping', LocationManager.FnGetFunctionRoleMapping);
-app.get('/ewmUpdatePwdEncryption', LocationManager.FnUpdatePwdEncryption);
-app.post('/ewtCheckCV', LocationManager.FnCheckCV);
 app.get('/ewtGetLoginCheck', LocationManager.FnGetLoginCheck);
 app.get('/ewtGetBannerPicture', LocationManager.FnGetBannerPicture);
 app.post('/ewtSaveWhiteBlackList', LocationManager.FnSaveWhiteBlackList);
@@ -140,8 +128,8 @@ app.get('/ewtGetItemList',LocationManager.FnGetItemList);
 app.post('/ewtSearchForTracker', LocationManager.FnSearchForTracker);
 app.get('/ewtGetFolderList',LocationManager.FnGetFolderList);
 app.post('/ewtCreateSubUser',LocationManager.FnCreateSubUser);
-app.get('/ewtGetTranscationItems',LocationManager.FnGetTranscationItems);
-app.post('/ewtSaveTranscationItems',LocationManager.FnSaveTranscationItems);
+app.get('/ewtGetTranscationItems',LocationManager.FnGetTransactionItems);
+app.post('/ewtSaveTranscationItems',LocationManager.FnSaveTransactionItems);
 app.get('/ewtGetSubUserList',LocationManager.FnGetSubUserList);
 app.post('/ewtSaveItem',LocationManager.FnSaveItem);
 app.post('/ewmSaveFolderRules',LocationManager.FnSaveFolderRules);
@@ -157,9 +145,9 @@ app.get('/ewtWorkingHours',LocationManager.FnGetWorkingHours);
 app.delete('/ewtWorkingHours',LocationManager.FnDeleteWorkingHours);
 app.post('/ewtConfig',LocationManager.FnSaveConfig);
 app.get('/ewtConfig',LocationManager.FnGetConfig);
-app.post('/ewtSaveTranscation',LocationManager.FnSaveTranscation);
+app.post('/ewtSaveTranscation',LocationManager.FnSaveTransaction);
 app.get('/ewtGetUserwiseFolderList',LocationManager.FnGetUserwiseFolderList);
-app.get('/ewtGetTranscation',LocationManager.FnGetTranscation);
+app.get('/ewtGetTranscation',LocationManager.FnGetTransaction);
 app.get('/ewtGetItemListForEZEID',LocationManager.FnGetItemListForEZEID);
 app.get('/ewtGetLocationList',LocationManager.FnGetLocationList);
 app.get('/ewtGetLoginDetails',LocationManager.FnGetLoginDetails);
@@ -172,17 +160,7 @@ app.get('/ewtGetWorkingHrsHolidayList',LocationManager.FnGetWorkingHrsHolidayLis
 app.post('/ewtWebLink',LocationManager.FnSaveWebLink);
 app.get('/ewtWebLink',LocationManager.FnGetWebLink);
 app.delete('/ewtwebLink',LocationManager.FnDeleteWebLink);
-app.delete('/ewtDeleteTranscation',LocationManager.FnDeleteTranscation);
-app.get('/ewtGetSearchItem',LocationManager.FnGetSearchItem);
-app.post('/ewtSaveChatMessage', LocationManager.FnSaveChatMessage);
-app.post('/ewtCreateGroup', LocationManager.FnCreateGroup);
-app.get('/ewtGetGroupList', LocationManager.FnGetGroupList);
-app.post('/ewtSaveGroupMembers', LocationManager.FnSaveGroupMembers);
-app.get('/ewtGetMembersList', LocationManager.FnGetMembersList);
-app.delete('/ewtDeleteGroupMembers', LocationManager.FnDeleteGroupMembers);
-app.get('/ewtGetChatDetails', LocationManager.FnGetChatDetails);
-app.get('/ewtGetChatList', LocationManager.FnGetChatList);
-app.get('/ewtGetSearchPics', LocationManager.FnGetSearchPicture);
+app.delete('/ewtDeleteTranscation',LocationManager.FnDeleteTransaction);
 app.get('/ewtCompanyProfile', LocationManager.FnGetCompanyProfile);
 app.post('/ewtCompanyProfile', LocationManager.FnSaveCompanyProfile);
 app.get('/ewtGetLocationListForEZEID', LocationManager.FnGetLocationListForEZEID);
@@ -208,7 +186,6 @@ app.get('/get_workinghours_list',LocationManager.FnGetworkinghoursList);
 app.get('/ezeoneid',LocationManager.FnGetEZEOneIDInfo);
 app.get('/get_workinghours_details',LocationManager.FnWorkingHoursDetails);
 app.get('/image_url',LocationManager.FnImageURL);
-
 
 
 //below service are for EZEIDAP
@@ -273,13 +250,13 @@ app.get('/',function(req,res){
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
     console.log('404 : Page not found');
-    res.status = 404;
+
     if(req.type == 'json')
     {
-            res.type('json').send('Invalid Service call');   
+            res.type('json').status(404).json({message : 'Invalid Service call', status : false});
     }
     else{
-        res.send('');
+        res.status(404).send('');
     }
 });
 
