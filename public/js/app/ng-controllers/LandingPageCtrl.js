@@ -536,6 +536,7 @@ angular.module('ezeidApp').
             $scope.setAutoCompeted = function(_item)
             {
                 $('#searchTextField').val(_item);
+                $scope.searchParams.searchTerm = _item;
             };
 
             var suggestion = [

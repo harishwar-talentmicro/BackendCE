@@ -126,7 +126,11 @@ angular.module('ezeidApp').controller('CVAttachController',[
 
                     }else{
                         Notification.error({message: "Sorry..! not saved", delay: MsgDelay});
+                        $scope.$emit('$preLoaderStop');
                     }
+                })
+                .error(function(data, status, headers, config) {
+                    $scope.$emit('$preLoaderStop');
                 });
 
             if($scope.DocumentToUpload)
@@ -164,7 +168,6 @@ angular.module('ezeidApp').controller('CVAttachController',[
             }
         }).success(function (res)
            {
-               console.log(res);
                 if(res.status)
                 {
                     CVAttachCtrl._CVInfo = res.data[0];
@@ -257,7 +260,7 @@ angular.module('ezeidApp').controller('CVAttachController',[
             "skillname":"",
             "expertiseLevel":0,
             "exp":1,
-            "active_status":0
+            "active_status":1
         };
 
     $scope.editSkillFn = function(index){
@@ -284,29 +287,35 @@ angular.module('ezeidApp').controller('CVAttachController',[
 
 
     $scope.saveSkillFn = function(index){
-
-            if(index == 0){
+         if(index == 0)
+            {
                 var ind = $scope.skillMatrix.indexOfWhere('skillname',$scope.editSkill.skillname);
-                if(ind > 0){
+                    if(ind > 0){
                     $scope.editSkill = {
                         "tid":0,
                         "skillname":"",
                         "expertiseLevel":0,
-                        "exp":0,
-                        "active_status":0
+                        "exp":0.0,
+                        "active_status":true
                     };
                     return;
                 }
 
                 var newSkill = angular.copy($scope.editSkill);
                 $scope.editMode.push(false);
-                $scope.skillMatrix.push(newSkill);
+
+                /*if(newSkill.skillname && newSkill.exp)*/
+                if(newSkill.skillname)
+                {
+                    $scope.skillMatrix.push(newSkill);
+                }
+
                 $scope.editSkill = {
                     "tid":0,
                     "skillname":"",
                     "expertiseLevel":0,
                     "exp":0.0,
-                    "active_status":0
+                    "active_status":true
                 };
             }
             else{
@@ -317,8 +326,8 @@ angular.module('ezeidApp').controller('CVAttachController',[
                     "tid":0,
                     "skillname":"",
                     "expertiseLevel":0,
-                    "exp":1,
-                    "active_status":0
+                    "exp":0.0,
+                    "active_status":true
                 };
             }
 
@@ -327,8 +336,9 @@ angular.module('ezeidApp').controller('CVAttachController',[
                 "skillname":"",
                 "expertiseLevel":0,
                 "exp":"",
-                "active_status":1
+                "active_status":true
             };
+
         };
 
     this.closeCVDocInfo=function(cvForm){
@@ -392,7 +402,7 @@ angular.module('ezeidApp').controller('CVAttachController',[
         }
     };
 
-        $scope.checkExp = function(index){
+    $scope.checkExp = function(index){
             if(parseFloat($scope.skillMatrix[index].exp) == NaN){
                 $scope.skillMatrix[index].exp = 0.00;
             }
