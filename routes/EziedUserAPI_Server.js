@@ -14911,9 +14911,8 @@ exports.FnCropImageAP = function(req,res){
                                     }
                                     else{
 										console.log("executing condition 2 : sOrient: landscape & scale++ & tOrient : landscape");
-                                        scaleWidth = targetWidth.toString();
-                                        ////
-                                        scaleHeight = (size.height * scaleWidth) / size.width;
+                                        scaleHeight = targetHeight;
+                                        scaleWidth = (size.width * scaleHeight) / size.height;
                                     }
                                 }
                                 // scale--
