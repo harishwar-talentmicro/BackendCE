@@ -15,7 +15,7 @@
                             <div class="infoModal" ng-hide="showLoginText">
 
                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                     <section id="main-content">
+                                    <section id="main-content">
 
                                         <!--<div ng-show="SearchInfo.dealenable == 1" class="bottom-clearfix">-->
                                         <div ng-show="SearchInfo.dealenable == 1">
@@ -30,73 +30,73 @@
                                         </div>
 
                                         <div class="row">
-                                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                                 <div class="btn-group inform-btn-group">
-                                                     <a class="btn btn-warning info-btn msgBtnColor no-radius"
-                                                             ng-href="{{SearchInfo.SalesURL}}"
-                                                             target="_blank"
-                                                             ng-show="SearchInfo.EZEIDVerifiedID == '2' && showSalesEnquiry == 1"
-                                                             title="Sales Enquiry"
-                                                             ng-click="(SearchInfo.SalesURL) ? '' : ($event.preventDefault())(_toggleSalesModal())">
-                                                         <i class="fa fa-suitcase"></i>
-                                                         Sales
-                                                     </a>
-                                                     <a class="btn btn-warning info-btn msgBtnColor no-radius"
-                                                             ng-href="{{SearchInfo.ReservationURL}}"
-                                                             target="_blank"
-                                                             ng-show="SearchInfo.EZEIDVerifiedID == '2' && shoReserVation == 1"
-                                                             title="Reservation"
-                                                             ng-click="(SearchInfo.ReservationURL) ? '' : ($event.preventDefault())(openReservationForm(SearchInfo.EZEID))">
-                                                         <i class="fa fa-clock-o"></i>
-                                                         Reservation
-                                                     </a>
-                                                     <a class="btn btn-warning info-btn msgBtnColor no-radius"
-                                                             ng-href="{{SearchInfo.HomeDeliveryURL}}"
-                                                             target="_blank"
-                                                             ng-show="SearchInfo.EZEIDVerifiedID == '2' && showHomeDelivery == 1"
-                                                             title="Home Delivery"
-                                                             ng-click="(SearchInfo.HomeDeliveryURL) ? '' : ($event.preventDefault())(_toggleHomeDeliveryModal())">
-                                                         <i class="fa fa-truck"></i>
-                                                         Home Delivery
-                                                     </a>
+                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                                <div class="btn-group inform-btn-group">
+                                                    <a class="btn btn-warning info-btn msgBtnColor no-radius"
+                                                       ng-href="{{SearchInfo.SalesURL}}"
+                                                       target="_blank"
+                                                       ng-show="SearchInfo.EZEIDVerifiedID == '2' && showSalesEnquiry == 1"
+                                                       title="Sales Enquiry"
+                                                       ng-click="(SearchInfo.SalesURL) ? '' : ($event.preventDefault())(_toggleSalesModal())">
+                                                        <i class="fa fa-suitcase"></i>
+                                                        Sales
+                                                    </a>
+                                                    <a class="btn btn-warning info-btn msgBtnColor no-radius"
+                                                       ng-href="{{SearchInfo.ReservationURL}}"
+                                                       target="_blank"
+                                                       ng-show="SearchInfo.EZEIDVerifiedID == '2' && shoReserVation == 1"
+                                                       title="Reservation"
+                                                       ng-click="(SearchInfo.ReservationURL) ? '' : ($event.preventDefault())(openReservationForm(SearchInfo.EZEID))">
+                                                        <i class="fa fa-clock-o"></i>
+                                                        Reservation
+                                                    </a>
+                                                    <a class="btn btn-warning info-btn msgBtnColor no-radius"
+                                                       ng-href="{{SearchInfo.HomeDeliveryURL}}"
+                                                       target="_blank"
+                                                       ng-show="SearchInfo.EZEIDVerifiedID == '2' && showHomeDelivery == 1"
+                                                       title="Home Delivery"
+                                                       ng-click="(SearchInfo.HomeDeliveryURL) ? '' : ($event.preventDefault())(_toggleHomeDeliveryModal())">
+                                                        <i class="fa fa-truck"></i>
+                                                        Home Delivery
+                                                    </a>
 
-                                                     <a class="btn btn-warning info-btn msgBtnColor no-radius"
-                                                             ng-href="{{SearchInfo.ServiceURL}}"
-                                                             target="_blank"
-                                                             ng-show="SearchInfo.EZEIDVerifiedID == '2' && showServiceRequest == 1"
-                                                             title="Help Desk"
-                                                             ng-click="(SearchInfo.ServiceURL) ? '' : ($event.preventDefault())(_toggleServiceModal())">
-                                                         <i class="fa fa-wrench"></i>
-                                                         Help Desk
-                                                     </a>
+                                                    <a class="btn btn-warning info-btn msgBtnColor no-radius"
+                                                       ng-href="{{SearchInfo.ServiceURL}}"
+                                                       target="_blank"
+                                                       ng-show="SearchInfo.EZEIDVerifiedID == '2' && showServiceRequest == 1"
+                                                       title="Help Desk"
+                                                       ng-click="(SearchInfo.ServiceURL) ? '' : ($event.preventDefault())(_toggleServiceModal())">
+                                                        <i class="fa fa-wrench"></i>
+                                                        Help Desk
+                                                    </a>
 
-                                                     <a class="btn btn-warning info-btn msgBtnColor  no-radius"
-                                                             ng-href="{{SearchInfo.CVURL}}"
-                                                             target="_blank"
-                                                             title="Send CV"
-                                                             ng-click="(SearchInfo.CVURL) ? '' : ($event.preventDefault())(_toggleResumeModal())"
-                                                             ng-show="SearchInfo.EZEIDVerifiedID == 2 && _userInfo.Type == 1 && showSendCv == 1">
-                                                         <i class="fa fa-file"></i>
-                                                         Resume
-                                                     </a>
+                                                    <a class="btn btn-warning info-btn msgBtnColor  no-radius"
+                                                       ng-href="{{SearchInfo.CVURL}}"
+                                                       target="_blank"
+                                                       title="Send CV"
+                                                       ng-click="(SearchInfo.CVURL) ? '' : ($event.preventDefault())(_toggleResumeModal())"
+                                                       ng-show="SearchInfo.EZEIDVerifiedID == 2 && _userInfo.Type == 1 && showSendCv == 1">
+                                                        <i class="fa fa-file"></i>
+                                                        Resume
+                                                    </a>
 
-                                                     <button type="button"
-                                                             ng-click="getdirections(SearchInfo)" title="Map"
-                                                             class="btn btn-warning info-btn msgBtnColor no-radius">
-                                                         <i class="fa fa-globe"></i> Map
-                                                     </button>
+                                                    <button type="button"
+                                                            ng-click="getdirections(SearchInfo)" title="Map"
+                                                            class="btn btn-warning info-btn msgBtnColor no-radius">
+                                                        <i class="fa fa-globe"></i> Map
+                                                    </button>
 
-                                                 </div>
+                                                </div>
 
-                                             </div>
-                                         </div>
+                                            </div>
+                                        </div>
 
                                         <div class="row setRowLeftRightMarginZero text-center messgeButtonContainer">
                                             <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12 setPaddingLeftRight0">
                                                 <div class="row setRowLeftRightMarginZero">
                                                     <div ng-hide="(SearchInfo.Redflagstatus == 1)">
                                                         <div ng-show="SearchInfo.BannerImage">
-                                                           <!-- <img class="" width="356px" height="356px" ng-src="{{SearchInfo.BannerImage}}" />-->
+                                                            <!-- <img class="" width="356px" height="356px" ng-src="{{SearchInfo.BannerImage}}" />-->
                                                             <img class="imgSetBorder" width="348px" height="356px" ng-src="{{SearchInfo.BannerImage}}" />
 
                                                             <img class="imgLeft showPointer" ng-show="previousButton == true" ng-click="getPreviousBanner()" src="images/arrow_left.png" />
@@ -122,81 +122,81 @@
                                             <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12 setPaddingLeftRight0">
 
                                                 <div class="row setRowLeftRightMarginZero">
-                                                       <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setPaddingLeftRight0">
-                                                            <div class="row setRowLeftRightMarginZero">
-                                                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setPaddingLeftRight0">
-                                                                    <div ng-show="SearchInfo.Picture">
-                                                                        <div ng-show="SearchInfo.IDTypeID == 1" class="row addItemRowUserEzeid1">
-                                                                            <img class="profilePicBorder imgSetBorder" width="148px" height="148px" ng-src="{{SearchInfo.Picture}}">
-                                                                        </div>
-                                                                        <div ng-hide="SearchInfo.IDTypeID == 1" class="row addItemRowUserEzeid1">
-                                                                            <img class="profilePicBorderBusiness imgSetBorder" width="315px" height="155px" ng-src="{{SearchInfo.Picture}}">
-                                                                        </div>
+                                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setPaddingLeftRight0">
+                                                        <div class="row setRowLeftRightMarginZero">
+                                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setPaddingLeftRight0">
+                                                                <div ng-show="SearchInfo.Picture">
+                                                                    <div ng-show="SearchInfo.IDTypeID == 1" class="row addItemRowUserEzeid1">
+                                                                        <img class="profilePicBorder imgSetBorder" width="148px" height="148px" ng-src="{{SearchInfo.Picture}}">
                                                                     </div>
-                                                                    <div ng-hide="SearchInfo.Picture">
-                                                                        <div ng-show="SearchInfo.IDTypeID == 1" class="row addItemRowUserEzeid1">
-                                                                            <img class="profilePicBorder imgSetBorder" width="148px" height="148px" ng-src="../images/new_individual.png">
-                                                                        </div>
-                                                                        <div ng-hide="SearchInfo.IDTypeID == 1" class="row addItemRowUserEzeid1">
-                                                                            <img class="profilePicBorderBusiness imgSetBorder" width="315px" height="155px" ng-src="../images/business_profile_pic.png">
-                                                                        </div>
+                                                                    <div ng-hide="SearchInfo.IDTypeID == 1" class="row addItemRowUserEzeid1">
+                                                                        <img class="profilePicBorderBusiness imgSetBorder" width="315px" height="155px" ng-src="{{SearchInfo.Picture}}">
                                                                     </div>
                                                                 </div>
-                                                            </div>
-
-                                                            <div class="row setRowLeftRightMarginZero ezeid-text">
-                                                                <span class="ezeid-text-font text-uppercase"><b> {{SearchInfo.EZEID}} </b></span>
-                                                            </div>
-
-                                                            <div ng-show="SearchInfo.CompanyName || SearchInfo.AboutCompany">
-                                                                <div class="row setRowLeftRightMarginZero company-text">
-                                                                    <span><p class="company-text-font" style="margin-bottom: 0px;">{{SearchInfo.CompanyName}} </p></span>
-                                                                </div>
-                                                                <div class="row setRowLeftRightMarginZero tag-line text-center">
-
-                                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 setPaddingLeftRight0">
+                                                                <div ng-hide="SearchInfo.Picture">
+                                                                    <div ng-show="SearchInfo.IDTypeID == 1" class="row addItemRowUserEzeid1">
+                                                                        <img class="profilePicBorder imgSetBorder" width="148px" height="148px" ng-src="../images/new_individual.png">
                                                                     </div>
-                                                                    <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 setPaddingLeftRight0">
-                                                                        <div ng-show="SearchInfo.AboutCompany">
-                                                                            <i class="fa fa-quote-left quote-style"></i>
-                                                                            <span title="{{SearchInfo.AboutCompany}}">{{SearchInfo.AboutCompany}}</span>
-                                                                            <i class="fa fa-quote-right quote-style"></i>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 setPaddingLeftRight0">
+                                                                    <div ng-hide="SearchInfo.IDTypeID == 1" class="row addItemRowUserEzeid1">
+                                                                        <img class="profilePicBorderBusiness imgSetBorder" width="315px" height="155px" ng-src="../images/business_profile_pic.png">
                                                                     </div>
                                                                 </div>
                                                             </div>
                                                         </div>
 
-                                                     <div class="row setRowLeftRightMarginZero p-top-10 ">
+                                                        <div class="row setRowLeftRightMarginZero ezeid-text">
+                                                            <span class="ezeid-text-font text-uppercase"><b> {{SearchInfo.EZEID}} </b></span>
+                                                        </div>
 
-                                                         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setPaddingLeftRight0">
-                                                             <hr class="style-three">
-                                                             <!-- Star ratings goes here -->
-                                                             <div class="starRating">
-                                                                 <div>
-                                                                     <div>
-                                                                         <div>
-                                                                             <div>
-                                                                                 <input id="rating1" disabled type="radio" name="form_rating" ng-model="form_rating" value="1">
-                                                                                 <label for="rating1"><span>1</span></label>
-                                                                             </div>
-                                                                             <input id="rating2" disabled type="radio" name="form_rating" ng-model="form_rating" value="2">
-                                                                             <label for="rating2"><span>2</span></label>
-                                                                         </div>
-                                                                         <input id="rating3" disabled type="radio" name="form_rating" ng-model="form_rating" value="3">
-                                                                         <label for="rating3"><span>3</span></label>
-                                                                     </div>
-                                                                     <input id="rating4" disabled type="radio" name="form_rating" ng-model="form_rating" value="4">
-                                                                     <label for="rating4"><span>4</span></label>
-                                                                 </div>
-                                                                 <input id="rating5" disabled type="radio" name="form_rating" ng-model="form_rating" value="5">
-                                                                 <label for="rating5"><span>5</span></label>
-                                                             </div>
-                                                             <div class="small">0 Reviews </div>
-                                                             <hr class="style-three">
-                                                         </div>
+                                                        <div ng-show="SearchInfo.CompanyName || SearchInfo.AboutCompany">
+                                                            <div class="row setRowLeftRightMarginZero company-text">
+                                                                <span><p class="company-text-font" style="margin-bottom: 0px;">{{SearchInfo.CompanyName}} </p></span>
+                                                            </div>
+                                                            <div class="row setRowLeftRightMarginZero tag-line text-center">
+
+                                                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 setPaddingLeftRight0">
+                                                                </div>
+                                                                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 setPaddingLeftRight0">
+                                                                    <div ng-show="SearchInfo.AboutCompany">
+                                                                        <i class="fa fa-quote-left quote-style"></i>
+                                                                        <span title="{{SearchInfo.AboutCompany}}">{{SearchInfo.AboutCompany}}</span>
+                                                                        <i class="fa fa-quote-right quote-style"></i>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 setPaddingLeftRight0">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="row setRowLeftRightMarginZero p-top-10 ">
+
+                                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setPaddingLeftRight0">
+                                                            <hr class="style-three">
+                                                            <!-- Star ratings goes here -->
+                                                            <div class="starRating">
+                                                                <div>
+                                                                    <div>
+                                                                        <div>
+                                                                            <div>
+                                                                                <input id="rating1" disabled type="radio" name="form_rating" ng-model="form_rating" value="1">
+                                                                                <label for="rating1"><span>1</span></label>
+                                                                            </div>
+                                                                            <input id="rating2" disabled type="radio" name="form_rating" ng-model="form_rating" value="2">
+                                                                            <label for="rating2"><span>2</span></label>
+                                                                        </div>
+                                                                        <input id="rating3" disabled type="radio" name="form_rating" ng-model="form_rating" value="3">
+                                                                        <label for="rating3"><span>3</span></label>
+                                                                    </div>
+                                                                    <input id="rating4" disabled type="radio" name="form_rating" ng-model="form_rating" value="4">
+                                                                    <label for="rating4"><span>4</span></label>
+                                                                </div>
+                                                                <input id="rating5" disabled type="radio" name="form_rating" ng-model="form_rating" value="5">
+                                                                <label for="rating5"><span>5</span></label>
+                                                            </div>
+                                                            <div ng-click="toggleReviewModalVisibility()" class="small pointer">0 Reviews </div>
+                                                            <hr class="style-three">
+                                                        </div>
 
 
                                                     </div>
@@ -205,7 +205,7 @@
                                                         {{SearchInfo.MobileNumber != '' ?  SearchInfo.ISDMobileNumber +'-'+ SearchInfo.MobileNumber + ' ' : ''}}{{SearchInfo.PhoneNumber != '' ? '| ' + SearchInfo.ISDPhoneNumber +'-'+ SearchInfo.PhoneNumber : ''}}
                                                     </div>
                                                     <div class="row setRowLeftRightMarginZero">
-                                                    <a href="mailto:{{SearchInfo.EMailID}}" target="_blank">{{SearchInfo.EMailID +' '}}</a>  <span ng-show="SearchInfo.Website"> | <a target="_blank" href="http://{{SearchInfo.Website}}">{{' '+SearchInfo.Website}}</a> </span>
+                                                        <a href="mailto:{{SearchInfo.EMailID}}" target="_blank">{{SearchInfo.EMailID +' '}}</a>  <span ng-show="SearchInfo.Website"> | <a target="_blank" href="http://{{SearchInfo.Website}}">{{' '+SearchInfo.Website}}</a> </span>
                                                     </div>
 
                                                     <div class="row setRowLeftRightMarginZero address-font">
@@ -250,17 +250,17 @@
 
                                                 <!--<div ng-show="(SearchType == 2)" class="row setRowLeftRightMarginZero newInfoBorder ">-->
                                                 <!--<div class="row setRowLeftRightMarginZero newInfoBorder ">-->
-                                                     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setPaddingLeftRight0 text-center">
-                                                         <hr class="style-two">
+                                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setPaddingLeftRight0 text-center">
+                                                    <hr class="style-two">
 
-                                                         <div class="row setRowLeftRightMarginZero company-text">
-                                                             <span><p class="about-company-text-font" style="margin-bottom: 0px;">About Company</p></span>
-                                                         </div>
-
-                                                        <div class="row setRowLeftRightMarginZero text-justify">
-                                                            {{companyTagLine}}
-                                                        </div>
+                                                    <div class="row setRowLeftRightMarginZero company-text">
+                                                        <span><p class="about-company-text-font" style="margin-bottom: 0px;">About Company</p></span>
                                                     </div>
+
+                                                    <div class="row setRowLeftRightMarginZero text-justify">
+                                                        {{companyTagLine}}
+                                                    </div>
+                                                </div>
                                                 <!--</div>-->
                                             </div>
                                         </div>
@@ -371,12 +371,12 @@
                             </modal>
                             <div class="mapModal">
                                 <modal showheader="false" mtitle="modalBox.title" visible="showMapPopupModel" mclass="modalBox.class">
-                                <section id="map-content">
-                                    <div class="row setRowLeftRightMarginZero">
-                                        <div ng-include="activeTemplate"></div>
-                                    </div>
-                                </section>
-                            </modal>
+                                    <section id="map-content">
+                                        <div class="row setRowLeftRightMarginZero">
+                                            <div ng-include="activeTemplate"></div>
+                                        </div>
+                                    </section>
+                                </modal>
                             </div>
 
 
@@ -1096,6 +1096,25 @@
                                 <!-- end: ModalBox ends -->
                             </div>
 
+                            <!-- review modal starts here -->
+                            <div class="review-modal-form modal-no-css">
+                                <modal mtitle="reviewModal.title" mclass="reviewModal.class" visible="reviewModalVisibility">
+                                    <div class="review-form-test row">
+
+                                        <div class="close-modal text-center">
+                                            <button ng-click="toggleReviewModalVisibility()" class="btn btn-danger btn-xs">
+                                                <i class="fa fa-times"></i> Close
+                                            </button>
+                                        </div>
+                                        <review-form  ng-trans-type="1"
+                                                      ng-trans-id = "ngTransId"
+                                                      ng-resource-id= "ngResourceId"
+                                                      ng-to-ezeid="ngToEzeId"
+                                                > </review-form>
+                                    </div>
+                                </modal>
+                            </div>
+                            <!-- review modal ends here -->
 
                         </div>
                     </div>

@@ -1,0 +1,26 @@
+
+<div class="feedback-form">
+    <div class="col-lg-3">&nbsp;</div>
+    <div class="col-lg-6">
+        <div class="panel">
+            <div class="panel-heading panel-primary"><i class="fa fa-comments"></i> Write Review</div>
+            <div class="panel-body bg-alice-blue">
+                <div class="star-rating">
+                    <i ng-repeat="star in starArray track by $index"
+                       class="fa fa-star fa-2x"
+                       ng-class="starArray[$index]?'star-rating-color':'star-rating-no-color'"
+                       ng-click="clickStarRating($index)"></i>
+                </div>
+                <div class="review">
+                    <textarea ng-click="removeErrorMessage()" ng-model="review" class="form-control" rows="5" placeholder="Your Reviews"></textarea>
+                    <small class="text-danger">{{commentError}}</small>
+                </div>
+                <div class="submit-review text-right p-top-7">
+                    <button ng-click="saveReviews()" class="btn btn-primary"><i class="fa fa-check-square-o"></i> Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3">&nbsp;</div>
+</div>
+
