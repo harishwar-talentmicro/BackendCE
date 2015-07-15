@@ -15,6 +15,7 @@
         '$routeParams',
         '$route',
         'GoogleMaps',
+        'UtilityService',
         function (
             $rootScope,
             $scope,
@@ -30,7 +31,8 @@
             $location,
             $routeParams,
             $route,
-            GoogleMap
+            GoogleMap,
+            UtilityService
         ) {
 
             $scope._tempSalesItemListType = 0;
@@ -1078,10 +1080,15 @@
                              */
                             $scope.totalPages = parseInt(resp.TotalPage);
                             $scope.pageNumber = pageNo;
-                            $scope.txList = resp.Result;
+                            if(resp.Result && angular.isArray(resp.Result)){
+                                for(var a = 0; a < resp.Result.length; a++){
+                                    $scope.editModes.push(false);
+                                    resp.Result[a].TaskDateTime = UtilityService.convertTimeToLocal(resp.Result[a].TaskDateTime,'DD MMM YYYY hh:mm:ss A');
+                                    resp.Result[a].NextActionDate = (resp.Result[a].NextActionDate) ? UtilityService.convertTimeToLocal(resp.Result[a].NextActionDate,'DD MMM YYYY hh:mm:ss A') :
+                                        UtilityService.convertTimeToLocal(moment().format('DD MMM YYYY hh:mm:ss A'));
+                                }
+                                $scope.txList = resp.Result;
 
-                            for(var a = 0; a < resp.Result.length; a++){
-                                $scope.editModes.push(false);
                             }
                         }
                         else{

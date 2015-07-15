@@ -414,7 +414,7 @@
                         status : ($scope.modalBox.tx.statusType) ? $scope.modalBox.tx.statusType : 0,
                         folderRuleID : ($scope.modalBox.tx.folderRule) ? $scope.modalBox.tx.folderRule : 0,
                         nextAction : ($scope.modalBox.tx.nextAction) ? $scope.modalBox.tx.nextAction : 0,
-                        nextActionDateTime : ($scope.modalBox.tx.nextActionDateTime) ? $scope.modalBox.tx.nextActionDateTime : moment().format('YYYY-MM-DD hh:mm:ss'),
+                        nextActionDateTime : ($scope.modalBox.tx.nextActionDateTime) ? $scope.modalBox.tx.nextActionDateTime : moment().format('YYYY-MM-DD hh:mm:ss A'),
                         Token : $rootScope._userInfo.Token
                     }
                 }).success(function(resp){
@@ -439,9 +439,9 @@
                             ? $scope.txActionTypes[$scope.txActionTypes.indexOfWhere('TID', parseInt(resp.data.nextAction))].ActionTitle : '',
 
                         $scope.txList[id].NextActionID = (parseInt(resp.data.nextAction)!== NaN ) ? parseInt(resp.data.nextAction) : 0 ;
-                        var date = moment().format('DD MMM YYYY hh:mm');
+                        var date = moment().format('DD MMM YYYY hh:mm A');
                         try{
-                            date = moment(resp.data.nextActionDateTime,'YYYY-MM-DD hh:mm:ss').format('DD MMM YYYY hh:mm');
+                            date = moment(resp.data.nextActionDateTime,'YYYY-MM-DD hh:mm:ss').format('DD MMM YYYY hh:mm A');
                         }
                         catch(ex){
 
@@ -1078,8 +1078,11 @@
                             if(resp.Result && angular.isArray(resp.Result)){
                                 for(var a = 0; a < resp.Result.length; a++){
                                     $scope.editModes.push(false);
-                                    resp.Result[a].TaskDateTime = UtilityService.convertTimeToLocal(resp.Result[a].TaskDateTime,'DD MMM YYYY hh:mm:ss');
+                                    resp.Result[a].TaskDateTime = UtilityService.convertTimeToLocal(resp.Result[a].TaskDateTime,'DD MMM YYYY hh:mm:ss A');
+                                    resp.Result[a].NextActionDate = (resp.Result[a].NextActionDate) ? UtilityService.convertTimeToLocal(resp.Result[a].NextActionDate,'DD MMM YYYY hh:mm:ss A') :
+                                        UtilityService.convertTimeToLocal(moment().format('DD MMM YYYY hh:mm:ss A'));
                                 }
+                                $scope.txList = resp.Result;
 
                             }
 
