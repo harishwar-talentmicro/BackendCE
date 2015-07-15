@@ -12950,6 +12950,8 @@ exports.FnSaveFeedback = function(req, res) {
         var comments = req.body.comments;
         var trans_type = req.body.trans_type;
         var trans_id = req.body.trans_id;
+        var resourceid = req.body.resourceid;
+        var toEzeid = req.body.toEzeid;
 
         var responseMessage = {
             status: false,
@@ -12963,8 +12965,6 @@ exports.FnSaveFeedback = function(req, res) {
             responseMessage.error['ezeid'] = 'Invalid ezeid';
             validateStatus *= false;
         }
-
-
         if (!validateStatus) {
             console.log('FnSaveFeedback  error : ' + JSON.stringify(responseMessage.error));
             responseMessage.message = 'Unable to save feedback ! Please check the errors';
@@ -12973,7 +12973,7 @@ exports.FnSaveFeedback = function(req, res) {
         }
 
         if (ezeid) {
-            var query = db.escape(ezeid) + ',' + db.escape(rating) + ',' + db.escape(comments) + ',' + db.escape(trans_type) + ',' + db.escape(trans_id);
+            var query = db.escape(ezeid) + ',' + db.escape(rating) + ',' + db.escape(comments) + ',' + db.escape(trans_type) + ',' + db.escape(trans_id)+ ',' + db.escape(resourceid)+ ',' + db.escape(toEzeid);
 
             console.log('CALL psavefeedback(' + query + ')');
 
@@ -12990,7 +12990,9 @@ exports.FnSaveFeedback = function(req, res) {
                                 rating : req.body.rating,
                                 comments : req.body.comments,
                                 trans_type : req.body.trans_type,
-                                trans_id : req.body.trans_id
+                                trans_id : req.body.trans_id,
+                                resourceid : req.body.resourceid,
+                                toEzeid : req.body.toEzeid
                             };
                             res.status(200).json(responseMessage);
                             console.log('FnSaveFeedback: Feedback details save successfully');
@@ -13003,7 +13005,6 @@ exports.FnSaveFeedback = function(req, res) {
                             console.log('FnSaveFeedback:No save Feedback details');
                         }
                     }
-
                 else {
                     responseMessage.message = 'An error occured ! Please try again';
                     responseMessage.error = {};
@@ -13012,14 +13013,12 @@ exports.FnSaveFeedback = function(req, res) {
                 }
             });
         }
-
         else {
             if (!ezeid) {
                 responseMessage.message = 'Invalid ezeid';
                 responseMessage.error = {Token: 'Invalid ezeid'};
                 console.log('FnSaveFeedback: ezeid is mandatory field');
             }
-
             res.status(401).json(responseMessage);
         }
 

@@ -334,8 +334,8 @@
                     duration : 0,
                     durationScale : 0,
                     itemList : [],
-                    companyId : tx.company_id,
-                    companyName : tx.company_name,
+                    companyId : (changeUserDetails) ? 0 : tx.company_id,
+                    companyName :(changeUserDetails) ? '' :  tx.company_name,
                     amount : (parseFloat(tx.Amount) !== NaN) ? parseFloat(tx.Amount,2) : 0.00
                 };
                 return editModeTx;
