@@ -186,6 +186,8 @@ app.get('/get_workinghours_list',LocationManager.FnGetworkinghoursList);
 app.get('/ezeoneid',LocationManager.FnGetEZEOneIDInfo);
 app.get('/get_workinghours_details',LocationManager.FnWorkingHoursDetails);
 app.get('/image_url',LocationManager.FnImageURL);
+app.post('/save_feedback',LocationManager.FnSaveFeedback);
+
 
 
 //below service are for EZEIDAP
