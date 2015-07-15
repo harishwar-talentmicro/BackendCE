@@ -12950,6 +12950,8 @@ exports.FnSaveFeedback = function(req, res) {
         var comments = req.body.comments;
         var trans_type = req.body.trans_type;
         var trans_id = req.body.trans_id;
+        var resourceid = req.body.resourceid;
+        var toEzeid = req.body.toEzeid;
 
         var responseMessage = {
             status: false,
@@ -12973,7 +12975,7 @@ exports.FnSaveFeedback = function(req, res) {
         }
 
         if (ezeid) {
-            var query = db.escape(ezeid) + ',' + db.escape(rating) + ',' + db.escape(comments) + ',' + db.escape(trans_type) + ',' + db.escape(trans_id);
+            var query = db.escape(ezeid) + ',' + db.escape(rating) + ',' + db.escape(comments) + ',' + db.escape(trans_type) + ',' + db.escape(trans_id)+ ',' + db.escape(resourceid)+ ',' + db.escape(toEzeid);
 
             console.log('CALL psavefeedback(' + query + ')');
 
@@ -12990,7 +12992,9 @@ exports.FnSaveFeedback = function(req, res) {
                                 rating : req.body.rating,
                                 comments : req.body.comments,
                                 trans_type : req.body.trans_type,
-                                trans_id : req.body.trans_id
+                                trans_id : req.body.trans_id,
+                                resourceid : req.body.resourceid,
+                                toEzeid : req.body.toEzeid,
                             };
                             res.status(200).json(responseMessage);
                             console.log('FnSaveFeedback: Feedback details save successfully');
