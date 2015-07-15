@@ -3,7 +3,7 @@
         <!--<h3 class="font-roboto business-manager-module-heading">{{(_userInfo.SalesModuleTitle) ? _userInfo.SalesModuleTitle : 'Sales'}}</h3>-->
     <!--</div>-->
     <div class="panel-body">
-        <div class="row tabs-row tabs-row-sales" ng-show="false">
+        <div class="row tabs-row tabs-row-sales">
             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
                 <ul class="nav nav-tabs">
                     <li class="active"><a href="#"> <span class="glyphicon glyphicon-copy"></span>  Inquiries</a></li>
@@ -351,12 +351,18 @@
 
                             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
                                 <label class="tiny">Next Action Date</label>
+                                <!--<date-time-picker recipient="modalBox.tx.nextActionDateTime" settings='{-->
+                                                                        <!--"format" : "d M Y H:m A",-->
+                                                                        <!--"timepicker" : true,-->
+                                                                        <!--"mask" : false,-->
+                                                                        <!--"hours12" : true,-->
+                                                                        <!--"minDate" : "-1970/01/01"-->
+                                                                        <!--}'></date-time-picker>-->
                                 <date-time-picker recipient="modalBox.tx.nextActionDateTime" settings='{
-                                                                        "format" : "d M Y H:m",
+                                                                        "format" : "d M Y H:m A",
                                                                         "timepicker" : true,
                                                                         "mask" : false,
-                                                                        "hours12" : false,
-                                                                        "minDate" : "-1970/01/01"
+                                                                        "hours12" : false
                                                                         }'></date-time-picker>
                             </div>
 
