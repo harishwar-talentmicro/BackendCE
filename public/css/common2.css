@@ -2499,14 +2499,16 @@ sup.tm{
 
 .hpw .index-title-group
 {
-    background-color: rgb(119, 253, 119) !important;
+    /*background-color: rgb(119, 253, 119) !important;*/
+    background-color: rgb(161, 220, 250) !important;
     border-bottom: 1px solid rgb(203, 203, 203);
     padding-left:0px !important;
 }
 
 .hpw .index-title-people
 {
-    background-color: yellow !important;
+    /*background-color: yellow !important;*/
+    background-color: rgb(161, 220, 250) !important;
     border-bottom: 1px solid rgb(203, 203, 203);
     padding-left:0px !important;
 }
@@ -2674,4 +2676,76 @@ sup.tm{
 .hpw .filters-dropdown
 {
     padding: 7px;
+}
+
+.hpw .panel-heading
+{
+    -webkit-border-radius: 4px 4px 0px 0px;
+    border-radius: 4px 4px 0px 0px;
+    color: #fff;
+    line-height: 20px;
+}
+
+.hpw .panel-danger
+{
+    background: #ff6c60;
+}
+
+.hpw .panel-primary
+{
+    background: #01a89e;
+}
+
+.hpw .bg-alice-blue
+{
+    background: aliceblue;
+}
+
+.hpw .star-rating
+{
+    /*color: rgb(0, 197, 255);*/
+    text-align: center;
+    padding-bottom: 10px;
+    cursor: pointer;
+}
+
+.hpw .star-rating-color
+{
+    color: rgb(0, 197, 255);
+}
+
+.hpw .star-rating-no-color
+{
+    color: rgb(205, 205, 205);
+}
+
+.modal-no-css .modal-body
+{
+    border: 0px !important;
+    padding: 0px !important;
+}
+
+.modal-no-css .modal-content{
+    background-color: rgba(255, 255, 255, 0) !important;
+    padding: 0px !important;
+    box-shadow: 0px 0px 0px !important;
+    border:0px !important;
+}
+
+.modal-no-css .modal-header
+{
+    border:0px !important;
+    display: none !important;
+}
+
+.modal-no-css .feedback-form
+{
+    width: 60%;
+}
+
+.feedback-form
+{
+    display: table !important;
+    margin: 0px auto;
+    width:100% !important;
 }

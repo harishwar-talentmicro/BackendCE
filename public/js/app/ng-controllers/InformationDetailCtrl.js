@@ -35,7 +35,7 @@ angular.module('ezeidApp').
             $routeParams,
             $route,
             UtilityService
-            )
+        )
         {
             if($rootScope._userInfo){
                 if(!$rootScope._userInfo.IsAuthenticate){
@@ -100,47 +100,47 @@ angular.module('ezeidApp').
                 title : 'EZEID Map',
                 class : 'business-manager-modal'
             };
-             var ezeone = $routeParams.ezeone;
+            var ezeone = $routeParams.ezeone;
 
             getSearchInformation(ezeone).then(function(){
-                    var visibleStr = ($scope.SearchInfo.VisibleModules) ? $scope.SearchInfo.VisibleModules.toString() : null;
-                    var visibleModules = (visibleStr) ? ((visibleStr.length == 5) ? visibleStr : '22222') : '22222';
-                    if($routeParams['sales'] && (visibleModules[0] == 1)){
-                        $timeout(function(){
-                            $scope._salesModalTitle = $scope.SearchInfo.EZEID;
-                            $scope._toggleSalesModal();
-                        },1000);
-                    }
+                var visibleStr = ($scope.SearchInfo.VisibleModules) ? $scope.SearchInfo.VisibleModules.toString() : null;
+                var visibleModules = (visibleStr) ? ((visibleStr.length == 5) ? visibleStr : '22222') : '22222';
+                if($routeParams['sales'] && (visibleModules[0] == 1)){
+                    $timeout(function(){
+                        $scope._salesModalTitle = $scope.SearchInfo.EZEID;
+                        $scope._toggleSalesModal();
+                    },1000);
+                }
 
-                    else if($routeParams['reservation'] && (visibleModules[1] == 1)){
-                        $timeout(function(){
-                            $scope._reservationModalTitle = $scope.SearchInfo.EZEID;
-                            $scope._toggleReservationModal();
-                        },1000);
-                    }
+                else if($routeParams['reservation'] && (visibleModules[1] == 1)){
+                    $timeout(function(){
+                        $scope._reservationModalTitle = $scope.SearchInfo.EZEID;
+                        $scope._toggleReservationModal();
+                    },1000);
+                }
 
-                    else if($routeParams['homeDelivery'] && (visibleModules[2] == 1)){
-                        $timeout(function(){
-                            $scope._homeDeliveryTitle = $scope.SearchInfo.EZEID;
-                            $scope._toggleHomeDeliveryModal();
-                        },1000);
-                    }
-                    else if($routeParams['service'] && (visibleModules[3] == 1)){
-                        $timeout(function(){
-                            $scope._serviceModalTitle = $scope.SearchInfo.EZEID;
-                            $scope._toggleServiceModal();
-                        },1000);
-                    }
+                else if($routeParams['homeDelivery'] && (visibleModules[2] == 1)){
+                    $timeout(function(){
+                        $scope._homeDeliveryTitle = $scope.SearchInfo.EZEID;
+                        $scope._toggleHomeDeliveryModal();
+                    },1000);
+                }
+                else if($routeParams['service'] && (visibleModules[3] == 1)){
+                    $timeout(function(){
+                        $scope._serviceModalTitle = $scope.SearchInfo.EZEID;
+                        $scope._toggleServiceModal();
+                    },1000);
+                }
 
-                    else if($routeParams['resume'] && (visibleModules[4] == 1)){
-                        $timeout(function(){
-                            $scope._resumeModalTitle = $scope.SearchInfo.EZEID;
-                            $scope._toggleResumeModal();
-                        },1000);
-                    }
+                else if($routeParams['resume'] && (visibleModules[4] == 1)){
+                    $timeout(function(){
+                        $scope._resumeModalTitle = $scope.SearchInfo.EZEID;
+                        $scope._toggleResumeModal();
+                    },1000);
+                }
 
-                });
-          //  }
+            });
+            //  }
 
             var convertTimeToUTC = function(localTime,dateFormat){
                 if(!dateFormat){
@@ -173,92 +173,92 @@ angular.module('ezeidApp').
                 $http({ method: 'get',
                     url: GURL + 'ewtGetSearchInformationNew?Token=' + $rootScope._userInfo.Token + '&ezeTerm='+_ezeone+'&CurrentDate='+CurrentDate}).success(function (data) {
 
-                        if (data && data != 'null')
-                        {
-                            $rootScope.$broadcast('$preLoaderStop');
-                            $timeout(function () {
-                                $scope.SearchInfo = data[0];
-                                $scope.showDetailsModal = true;
+                    if (data && data != 'null')
+                    {
+                        $rootScope.$broadcast('$preLoaderStop');
+                        $timeout(function () {
+                            $scope.SearchInfo = data[0];
+                            $scope.showDetailsModal = true;
 
-                                destroyModalDetailsWatcher = $scope.$watch('showDetailsModal',function(newVal,oldVal){
-                                    if(!newVal){
-                                        //Below line is for Loading img
-                                        if(!$scope.businessModalOpen){
-                                            $scope.$emit('$preLoaderStart');
-                                            $timeout(function(){
+                            destroyModalDetailsWatcher = $scope.$watch('showDetailsModal',function(newVal,oldVal){
+                                if(!newVal){
+                                    //Below line is for Loading img
+                                    if(!$scope.businessModalOpen){
+                                        $scope.$emit('$preLoaderStart');
+                                        $timeout(function(){
 
-                                                $window.history.back();
-                                            },500);
+                                            $window.history.back();
+                                        },500);
 
-                                        }
                                     }
-                                });
-
-                                if($scope.SearchInfo.IDTypeID == 2)
-                                {
-                                    getAboutCompany();
                                 }
-
-                                $scope.showSalesEnquiry = $scope.SearchInfo.VisibleModules[0];
-                                $scope.shoReserVation = $scope.SearchInfo.VisibleModules[1];
-                                $scope.showHomeDelivery = $scope.SearchInfo.VisibleModules[2];
-                                $scope.showServiceRequest = $scope.SearchInfo.VisibleModules[3];
-                                $scope.showSendCv = $scope.SearchInfo.VisibleModules[4];
-
-                                //Below lines are to show address in info tab
-                                $scope.AddressForInfoTab = ($scope.SearchInfo.AddressLine1 != "") ? $scope.SearchInfo.AddressLine1 +', ' : "";
-                                $scope.AddressForInfoTab += ($scope.SearchInfo.AddressLine2 != "") ? $scope.SearchInfo.AddressLine2 +', ' : "";
-                                $scope.AddressForInfoTab += ($scope.SearchInfo.CityTitle != "") ? $scope.SearchInfo.CityTitle +', ' : "";
-                                $scope.AddressForInfoTab += ($scope.SearchInfo.CountryTitle != "") ? $scope.SearchInfo.CountryTitle +', ' : "";
-                                $scope.AddressForInfoTab += ($scope.SearchInfo.PostalCode != "") ? $scope.SearchInfo.PostalCode : "";
-
-                                $window.localStorage.setItem("myLocation",$scope.SearchInfo.Latitude+","+$scope.SearchInfo.Longitude );
-
-                                if($scope.SearchInfo.ParkingStatus==0)
-                                {
-                                    $scope.parkingTitle = "Parking Status";
-                                }
-                                if($scope.SearchInfo.ParkingStatus==1)
-                                {
-                                    $scope.parkingTitle = "Public Parking";
-                                }
-                                if($scope.SearchInfo.ParkingStatus==2)
-                                {
-                                    $scope.parkingTitle = "Vallet Parking";
-                                }
-                                if($scope.SearchInfo.ParkingStatus==3)
-                                {
-                                    $scope.parkingTitle = "No parking";
-                                }
-
-                                $scope.form_rating = data[0].Rating;
-
-                                //Call for banner
-                                AutoRefresh = true;
-                                getBanner(1);
-
-                                if($scope.SearchInfo.IDTypeID == 2)
-                                {
-                                    $scope.reservationPlaceHolder = "Reservation requirement details";
-                                }
-                                else
-                                {
-                                    $scope.reservationPlaceHolder = "Appointment requirement details";
-                                }
-                                defer.resolve();
                             });
-                        }
-                        else
-                        {
-                            $rootScope.$broadcast('$preLoaderStop');
-                            $location.url('/');
-                        }
-                    })
+
+                            if($scope.SearchInfo.IDTypeID == 2)
+                            {
+                                getAboutCompany();
+                            }
+
+                            $scope.showSalesEnquiry = $scope.SearchInfo.VisibleModules[0];
+                            $scope.shoReserVation = $scope.SearchInfo.VisibleModules[1];
+                            $scope.showHomeDelivery = $scope.SearchInfo.VisibleModules[2];
+                            $scope.showServiceRequest = $scope.SearchInfo.VisibleModules[3];
+                            $scope.showSendCv = $scope.SearchInfo.VisibleModules[4];
+
+                            //Below lines are to show address in info tab
+                            $scope.AddressForInfoTab = ($scope.SearchInfo.AddressLine1 != "") ? $scope.SearchInfo.AddressLine1 +', ' : "";
+                            $scope.AddressForInfoTab += ($scope.SearchInfo.AddressLine2 != "") ? $scope.SearchInfo.AddressLine2 +', ' : "";
+                            $scope.AddressForInfoTab += ($scope.SearchInfo.CityTitle != "") ? $scope.SearchInfo.CityTitle +', ' : "";
+                            $scope.AddressForInfoTab += ($scope.SearchInfo.CountryTitle != "") ? $scope.SearchInfo.CountryTitle +', ' : "";
+                            $scope.AddressForInfoTab += ($scope.SearchInfo.PostalCode != "") ? $scope.SearchInfo.PostalCode : "";
+
+                            $window.localStorage.setItem("myLocation",$scope.SearchInfo.Latitude+","+$scope.SearchInfo.Longitude );
+
+                            if($scope.SearchInfo.ParkingStatus==0)
+                            {
+                                $scope.parkingTitle = "Parking Status";
+                            }
+                            if($scope.SearchInfo.ParkingStatus==1)
+                            {
+                                $scope.parkingTitle = "Public Parking";
+                            }
+                            if($scope.SearchInfo.ParkingStatus==2)
+                            {
+                                $scope.parkingTitle = "Vallet Parking";
+                            }
+                            if($scope.SearchInfo.ParkingStatus==3)
+                            {
+                                $scope.parkingTitle = "No parking";
+                            }
+
+                            $scope.form_rating = data[0].Rating;
+
+                            //Call for banner
+                            AutoRefresh = true;
+                            getBanner(1);
+
+                            if($scope.SearchInfo.IDTypeID == 2)
+                            {
+                                $scope.reservationPlaceHolder = "Reservation requirement details";
+                            }
+                            else
+                            {
+                                $scope.reservationPlaceHolder = "Appointment requirement details";
+                            }
+                            defer.resolve();
+                        });
+                    }
+                    else
+                    {
+                        $rootScope.$broadcast('$preLoaderStop');
+                        $location.url('/');
+                    }
+                })
                     .error(function(data, status, headers, config) {
                         defer.reject();
                         if ((data == 'null') || (!data))
                         {
-                           $location.url('/');
+                            $location.url('/');
                         }
                         $rootScope.$broadcast('$preLoaderStop');
                     });
@@ -303,7 +303,7 @@ angular.module('ezeidApp').
             {
                 $http({ method: 'get', url: GURL + 'ewtGetBannerPicture?SeqNo='+_requestedBannerValue+'&Ezeid='+$scope.SearchInfo.EZEID+'&StateTitle='+ $scope.SearchInfo.StateTitle+'&LocID='+$scope.SearchInfo.LocID}).success(function (data) {
 
-                   /* if (data.Picture != 'null') {*/
+                    /* if (data.Picture != 'null') {*/
                     if(data)
                     {
                         $scope.SearchInfo.BannerImage = data.Picture;
@@ -330,7 +330,7 @@ angular.module('ezeidApp').
                     }
                     else
                     {
-                       // Notification.error({ message: "No Banner found..!", delay: MsgDelay });
+                        // Notification.error({ message: "No Banner found..!", delay: MsgDelay });
                     }
                 });
             }
@@ -471,17 +471,17 @@ angular.module('ezeidApp').
             $scope._toggleSalesModal = function(){
 
                 if(!$rootScope._userInfo.Token)
-                 {
+                {
                     $('#SignIn_popup').slideDown();
-                 }
-                 else if($rootScope._userInfo.Token == " ")
-                 {
+                }
+                else if($rootScope._userInfo.Token == " ")
+                {
                     $('#SignIn_popup').slideDown();
-                 }
-                 else
-                 {
+                }
+                else
+                {
                     $location.url('/'+$scope.SearchInfo.EZEID+'/sales');
-                 }
+                }
             };
 
             $scope._toggleReservationModal = function(){
@@ -571,5 +571,36 @@ angular.module('ezeidApp').
                 }
             });
 
+            /**********************************************************************************************************
+             /**********************************************************************************************************
+             /**********************************************************************************************************
+             * Review MODULE
+             *
+             * @author: Sandeep Gantait
+             * @since: 20140715
+
+             /**********************************************************************************************************
+             /**********************************************************************************************************
+             /**********************************************************************************************************/
+
+            /**
+             * Modal box for making a review
+             */
+            $scope.reviewModal = {
+                title: '',
+                class: 'business-manager-modal'
+            };
+
+            $scope.reviewModalVisibility = true;
+
+            /* toggle map visibility status */
+            $scope.toggleReviewModalVisibility = function () {
+                $scope.reviewModalVisibility = !$scope.reviewModalVisibility;
+            };
+
+            /* basic setting for loading review-form */
+            $scope.ngTransId = '';
+            $scope.ngResourceId = '';
+            $scope.ngToEzeId = 'Alpha';
         }
     ]);
