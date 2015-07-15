@@ -49,12 +49,14 @@
         '/profile-manager',
         '/profile-manager/:subview',
         '/outbox',
+        '/compose-message',
         '/access-history',
         '/:ezeond/sales',
         '/:ezeone/home_delivery',
         '/:ezeone/helpdesk',
         '/:ezeone/resume',
         '/:ezeone/reservation'
+
     ]);
 
     /**
@@ -195,6 +197,10 @@
             .when('/outbox',{
                 templateUrl: 'html/outbox.html',
                 controller : 'outboxPageCtrl'
+            })
+            .when('/compose-message',{
+                templateUrl: 'html/composeMessage.html',
+                controller : 'ComposeMessageCtrl'
             })
             .when('/payment',{
                 templateUrl: 'html/payment-api.html',
