@@ -1,3 +1,4 @@
+"use strict";
 var DbHelper = require('./../helpers/DatabaseHandler'),
     db = DbHelper.getDBContext();
 
@@ -52,8 +53,6 @@ exports.FnSaveMailTemplate = auditModule.saveMailTemplate;
 exports.FnGetTemplateList = auditModule.getMailTemplate;
 exports.FnGetTemplateDetails = auditModule.getTemplateDetails;
 exports.FnSendBulkMailer = auditModule.sendBulkMailer;
-exports.FnGetMessages = auditModule.getMessages;
-exports.FnUpdateMessageStatus = auditModule.updateMessageStatus;
 
 var Location = require('./modules/location-module.js');
 var locationModule = new Location(db,stdLib);

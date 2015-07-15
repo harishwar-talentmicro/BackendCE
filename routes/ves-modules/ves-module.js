@@ -51,7 +51,7 @@ VES.prototype.loginVES = function(req,res,next){
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
-        var EZEID = req.query.EZEID;
+        var EZEID = alterEzeoneId(req.query.EZEID);
         var Password = req.query.Password;
         if (EZEID != null && EZEID != '' && Password != null && Password != '') {
             //var EncryptPWD = FnEncryptPassword(Password);
@@ -113,7 +113,7 @@ VES.prototype.saveContactVES = function(req,res,next){
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
         var Token = req.body.Token;
-        var EZEID = req.body.EZEID;
+        var EZEID = alterEzeoneId(req.body.EZEID);
         var Pic = req.body.Pic;
         var FirstName = req.body.FirstName;
         var LastName = req.body.LastName;
@@ -138,7 +138,7 @@ VES.prototype.saveContactVES = function(req,res,next){
         var Status = req.body.Status;
         var GateNo  = req.body.GateNo;
         var SyncedInout = req.body.SyncedInout;
-        var ContactEZEID = req.body.ContactEZEID;
+        var ContactEZEID = alterEzeoneId(req.body.ContactEZEID);
         var ContactName = req.body.ContactName;
         var InTimeNew = new Date(InTime);
 

@@ -103,7 +103,8 @@ Location.prototype.getAll = function(req,res,next){
     }
     catch (ex) {
         console.log('FnGetSecondaryLocation error:' + ex.description);
-
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
 };
 
@@ -258,7 +259,8 @@ Location.prototype.save = function(req,res,next){
     }
     catch (ex) {
         console.log('FnAddLocation error:' + ex.description);
-
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
 };
 
@@ -332,6 +334,8 @@ Location.prototype.deleteLocation = function(req,res,next) {
     }
     catch (ex) {
         console.log('FnDeleteLocation error:' + ex.description);
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
 };
 
@@ -425,7 +429,8 @@ Location.prototype.getAllForEzeid = function(req,res,next){
     }
     catch (ex) {
         console.log('FnGetLocationListForEZEID error:' + ex.description);
-
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
 };
 
@@ -504,7 +509,8 @@ Location.prototype.getLoactionList = function(req,res,next){
     }
     catch (ex) {
         console.log('FnGetLocationList error:' + ex.description);
-        //throw new Error(ex);
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
 };
 

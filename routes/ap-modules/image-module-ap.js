@@ -116,6 +116,8 @@ Image_AP.prototype.saveAPEZEIDPicture = function(req,res,next){
 
     }
     catch (ex) {
+	var errorDate = new Date();
+	console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log('FnSaveAPEZEIDPicture error:' + ex.description);
 
     }
@@ -191,6 +193,8 @@ Image_AP.prototype.getAPEZEIDPicture = function(req,res,next){
         }
     }
     catch (ex) {
+	var errorDate = new Date();
+	console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log('FnGetAPEZEIDPicture error:' + ex.description);
 
     }
@@ -213,7 +217,7 @@ Image_AP.prototype.saveBannerPictureAP = function(req,res,next){
         var SeqNo = parseInt(req.body.SeqNo);
         var Picture = req.body.Picture;
         var Token = req.body.Token;
-        var Ezeid = req.body.Ezeid;
+        var Ezeid = alterEzeoneId(req.body.Ezeid);
         var TID = req.body.TID;
         if(TID == null ){
             TID = 0;
@@ -285,6 +289,8 @@ Image_AP.prototype.saveBannerPictureAP = function(req,res,next){
 
     }
     catch (ex) {
+	var errorDate = new Date();
+	console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log('FnSaveBannerPicture error:' + ex.description);
 
     }
@@ -306,7 +312,7 @@ Image_AP.prototype.getBannerPictureAP = function(req,res,next){
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         var SeqNo = parseInt(req.query.SeqNo);
         var Token = req.query.Token;
-        var Ezeid = req.query.Ezeid;
+        var Ezeid = alterEzeoneId(req.query.Ezeid);
 
         if (Token != null  && SeqNo.toString() != 'NaN' && Ezeid != null) {
             st.validateTokenAp(Token, function (err, Result) {
@@ -369,6 +375,8 @@ Image_AP.prototype.getBannerPictureAP = function(req,res,next){
 
     }
     catch (ex) {
+	var errorDate = new Date();
+	console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log('FnGetBannerPicsAP error:' + ex.description);
 
     }
@@ -389,7 +397,7 @@ Image_AP.prototype.getAllBannerPicsAP = function(req,res,next){
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         var Token = req.query.Token;
-        var EZEID = req.query.EZEID;
+        var EZEID = alterEzeoneId(req.query.EZEID);
 
         if (Token != null && EZEID != null) {
             st.validateTokenAp(Token, function (err, Result) {
@@ -447,6 +455,8 @@ Image_AP.prototype.getAllBannerPicsAP = function(req,res,next){
 
     }
     catch (ex) {
+	var errorDate = new Date();
+	console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log('FnGetAllBannerPicsAP error:' + ex.description);
 
     }
@@ -468,7 +478,7 @@ Image_AP.prototype.deleteBannerPictureAP = function(req,res,next){
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         var Token = req.body.Token;
-        var EZEID = req.body.EZEID;
+        var EZEID = alterEzeoneId(req.body.EZEID);
         var SeqNo = req.body.SeqNo;
         var RtnMessage = {
             IsSuccessfull: false
@@ -529,6 +539,8 @@ Image_AP.prototype.deleteBannerPictureAP = function(req,res,next){
 
     }
     catch (ex) {
+	var errorDate = new Date();
+	console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log('FnDeleteBannerPictureAP:error ' + ex.description);
 
     }
@@ -624,9 +636,8 @@ Image_AP.prototype.cropImageAP = function(req,res,next){
                                             }
                                             else{
                                                 console.log("executing condition 2 : sOrient: landscape & scale++ & tOrient : landscape");
-                                                scaleWidth = targetWidth.toString();
-                                                ////
-                                                scaleHeight = (size.height * scaleWidth) / size.width;
+                                                scaleHeight = targetHeight;
+                                                scaleWidth = (size.width * scaleHeight) / size.height;
                                             }
                                         }
                                         // scale--
@@ -782,6 +793,8 @@ exports.Base64Data = function (req, res) {
 
     }
     catch (ex) {
+	var errorDate = new Date();
+	console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log('OTP fnCreateFile error:' + ex.description);
 
         return 'error'

@@ -6133,7 +6133,7 @@ exports.FnGetSubUserList = function (req, res) {
 };
 
 //below method get transaction items list
-exports.FnGetTranscationItems = function (req, res) {
+exports.FnGetTransactionItems = function (req, res) {
     try {
 
         res.setHeader("Access-Control-Allow-Origin", "*");
@@ -6207,7 +6207,7 @@ exports.FnGetTranscationItems = function (req, res) {
 };
 
 //below method to save transaction items
-exports.FnSaveTranscationItems = function(req, res){
+exports.FnSaveTransactionItems = function(req, res){
     try{
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -6236,29 +6236,29 @@ exports.FnSaveTranscationItems = function(req, res){
                                 if (InsertResult.affectedRows > 0) {
                                     RtnMessage.IsSuccessfull = true;
                                     res.send(RtnMessage);
-                                    console.log('FnSaveTranscationItems: Transaction items details save successfully');
+                                    console.log('FnSaveTransactionItems: Transaction items details save successfully');
                                 }
                                 else {
-                                    console.log('FnSaveTranscationItems:No Save Transaction items details');
+                                    console.log('FnSaveTransactionItems:No Save Transaction items details');
                                     res.send(RtnMessage);
                                 }
                             }
 
                             else {
-                                console.log('FnSaveTranscationItems: error in saving Transaction items' + err);
+                                console.log('FnSaveTransactionItems: error in saving Transaction items' + err);
                                 res.statusCode = 500;
                                 res.send(RtnMessage);
                             }
                         });
                     }
                     else {
-                        console.log('FnSaveTranscationItems: Invalid token');
+                        console.log('FnSaveTransactionItems: Invalid token');
                         res.statusCode = 401;
                         res.send(RtnMessage);
                     }
                 }
                 else {
-                    console.log('FnSaveTranscationItems:Error in processing Token' + err);
+                    console.log('FnSaveTransactionItems:Error in processing Token' + err);
                     res.statusCode = 500;
                     res.send(RtnMessage);
 
@@ -6269,25 +6269,25 @@ exports.FnSaveTranscationItems = function(req, res){
 
         else {
             if (Token == null) {
-                console.log('FnSaveTranscationItems: Token is empty');
+                console.log('FnSaveTransactionItems: Token is empty');
             }
             else if (MessageID == null) {
-                console.log('FnSaveTranscationItems: MessageID is empty');
+                console.log('FnSaveTransactionItems: MessageID is empty');
             }
             else if (ItemID == null) {
-                console.log('FnSaveTranscationItems: ItemID is empty');
+                console.log('FnSaveTransactionItems: ItemID is empty');
             }
             else if (Qty == null) {
-                console.log('FnSaveTranscationItems: Qty is empty');
+                console.log('FnSaveTransactionItems: Qty is empty');
             }
             else if (Rate == null) {
-                console.log('FnSaveTranscationItems: Rate is empty');
+                console.log('FnSaveTransactionItems: Rate is empty');
             }
             else if (Amount == null) {
-                console.log('FnSaveTranscationItems: Amount is empty');
+                console.log('FnSaveTransactionItems: Amount is empty');
             }
             else if (Duration == null) {
-                console.log('FnSaveTranscationItems: Duration is empty');
+                console.log('FnSaveTransactionItems: Duration is empty');
             }
 
             res.statusCode=400;
@@ -6296,7 +6296,7 @@ exports.FnSaveTranscationItems = function(req, res){
 
     }
     catch (ex) {
-        console.log('FnSaveTranscationItems:error ' + ex.description);
+        console.log('FnSaveTransactionItems:error ' + ex.description);
         var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 }
@@ -7123,7 +7123,7 @@ exports.FnDeleteHolidayList = function(req, res){
     }
 }
 
-exports.FnSaveTranscation = function(req, res){
+exports.FnSaveTransaction = function(req, res){
     try{
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -7891,7 +7891,7 @@ exports.FnSaveTranscationOld = function(req, res){
     }
 };
 
-exports.FnGetTranscation = function (req, res) {
+exports.FnGetTransaction = function (req, res) {
     try {
 
         res.setHeader("Access-Control-Allow-Origin", "*");
@@ -8002,7 +8002,7 @@ exports.FnGetTranscation = function (req, res) {
     }
 };
 
-exports.FnDeleteTranscation = function(req,res){
+exports.FnDeleteTransaction = function(req,res){
 try{
     
     res.setHeader("Access-Control-Allow-Origin", "*");
@@ -8024,28 +8024,28 @@ try{
                                 if (deleteResult.affectedRows > 0) {
                                     RtnMessage.IsSuccessfull = true;
                                     res.send(RtnMessage);
-                                    console.log('FnDeleteTranscation: transaction items delete successfully');
+                                    console.log('FnDeleteTransaction: transaction items delete successfully');
                                 }
                                 else {
-                                    console.log('FnDeleteTranscation:No delete transaction items');
+                                    console.log('FnDeleteTransaction:No delete transaction items');
                                     res.send(RtnMessage);
                                 }
                             }
                             else {
-                                console.log('FnDeleteTranscation: error in deleting transaction items' + err);
+                                console.log('FnDeleteTransaction: error in deleting transaction items' + err);
                                 res.statusCode = 500;
                                 res.send(RtnMessage);
                             }
                         });
                     }
                     else {
-                        console.log('FnDeleteTranscation: Invalid token');
+                        console.log('FnDeleteTransaction: Invalid token');
                         res.statusCode = 401;
                         res.send(RtnMessage);
                     }
                 }
                 else {
-                    console.log('FnDeleteTranscation:Error in processing Token' + err);
+                    console.log('FnDeleteTransaction:Error in processing Token' + err);
                     res.statusCode = 500;
                     res.send(RtnMessage);
 
@@ -8054,17 +8054,17 @@ try{
     }
     else {
             if (Token == null) {
-                console.log('FnDeleteTranscation: Token is empty');
+                console.log('FnDeleteTransaction: Token is empty');
             }
             else if (ItemTID == null) {
-                console.log('FnDeleteTranscation: ItemTID is empty');
+                console.log('FnDeleteTransaction: ItemTID is empty');
             }
             res.statusCode=400;
             res.send(RtnMessage);
         }
 }
 catch (ex) {
-        console.log('FnDeleteTranscation:error ' + ex.description);
+        console.log('FnDeleteTransaction:error ' + ex.description);
         var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 }

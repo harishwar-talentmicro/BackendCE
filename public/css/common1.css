@@ -1887,3 +1887,19 @@ table.rwd-table > tbody > tr > td.serachResultSelectAll
 .tabs-row-sales .nav-tabs{
     border: none;
 }
+.newCvExpField
+{
+    width: 85px;
+}
+.newCvSkillField
+{
+    width: 320px;
+}
+.newCvActveSkills
+{
+    width: 106px;
+}
+.newSkillField
+{
+    width: 367px !important;
+}

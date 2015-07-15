@@ -147,7 +147,8 @@ Configuration.prototype.save = function(req,res,next){
     }
     catch (ex) {
         console.log('FnSaveConfig:error ' + ex.description);
-          
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
 };
 
@@ -226,7 +227,8 @@ Configuration.prototype.get = function(req,res,next){
     }
     catch (ex) {
         console.log('FnGetConfig error:' + ex.description);
-          
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
 };
 
@@ -274,7 +276,8 @@ Configuration.prototype.getBusinessCategories = function(req,res,next){
     }
     catch (ex) {
         console.log('FnCategory error:' + ex.description);
-          
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
 };
 
@@ -356,7 +359,8 @@ Configuration.prototype.getStatusTypes = function(req,res,next){
     }
     catch (ex) {
         console.log('FnGetStatusType error:' + ex.description);
-          
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
 };
 
@@ -476,7 +480,8 @@ Configuration.prototype.StatusTypes = function(req,res,next){
     }
     catch (ex) {
         console.log('FnGetStatusType error:' + ex.description);
-
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
 };
 
@@ -572,7 +577,8 @@ Configuration.prototype.saveStatusType = function(req,res,next){
     }
     catch (ex) {
         console.log('FnSaveStatusType:error ' + ex.description);
-          
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
 };
 
@@ -657,7 +663,8 @@ Configuration.prototype.getActionTypes = function(req,res,next){
     }
     catch (ex) {
         console.log('FnGetActionType error:' + ex.description);
-          
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
 };
 
@@ -747,7 +754,8 @@ Configuration.prototype.saveActionType = function(req,res,next){
     }
     catch (ex) {
         console.log('FnSaveActionType :error ' + ex.description);
-          
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
 };
 
@@ -776,6 +784,7 @@ Configuration.prototype.getItems = function(req,res,next){
                 if (!err) {
                     if (Result) {
                         st.db.query('CALL pGetItemList(' + st.db.escape(Token) + ',' + st.db.escape(FunctionType) + ')', function (err, GetResult) {
+
                             if (!err) {
                                 if (GetResult[0]) {
                                     if (GetResult[0].length > 0) {
@@ -828,7 +837,8 @@ Configuration.prototype.getItems = function(req,res,next){
     }
     catch (ex) {
         console.log('FnGetItemList error:' + ex.description);
-          
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
 };
 
@@ -865,11 +875,20 @@ Configuration.prototype.saveItems = function(req,res,next){
         if (Token != null  && FunctionType != null && ItemName !=null) {
             st.validateToken(Token, function (err, Result) {
                 if (!err) {
-                    if (Result) {
+                    if (Result != null) {
+
+                        var deleteFlag = false;
+
+                        if(parseInt(TID) != NaN && parseInt(TID)> 0 && parseInt(Status) != 1){
+                            deleteFlag = true;
+                        }
 
                         var query = st.db.escape(TID) + ',' + st.db.escape(Token) + ',' + st.db.escape(FunctionType) + ',' + st.db.escape(ItemName)
                             + ',' +st.db.escape(ItemDescription) + ',' +st.db.escape(Pic) + ',' +st.db.escape(Rate) + ',' +st.db.escape(Status) + ',' +st.db.escape(ItemDuration);
+                        console.log('CALL pSaveItem(' + st.db.escape(TID) + ',' + st.db.escape(Token) + ',' + st.db.escape(FunctionType) + ',' + st.db.escape(ItemName)
+                            + ',' +st.db.escape(ItemDescription) + ',' +st.db.escape(Rate) + ',' +st.db.escape(Status) + ',' +st.db.escape(ItemDuration) + ')');
                         st.db.query('CALL pSaveItem(' + query + ')', function (err, InsertResult) {
+                            console.log(InsertResult);
                             if (!err){
                                 if (InsertResult.affectedRows > 0) {
                                     RtnMessage.IsSuccessfull = true;
@@ -877,7 +896,12 @@ Configuration.prototype.saveItems = function(req,res,next){
                                     console.log('FnSaveItem: Item details save successfully');
                                 }
                                 else {
+
+                                    RtnMessage.IsSuccessfull = true;
                                     console.log('FnSaveItem:No Save Item details');
+                                    if(deleteFlag && InsertResult[0][0].deleted){
+                                        RtnMessage.deleted = true;
+                                    }
                                     res.send(RtnMessage);
                                 }
                             }
@@ -923,7 +947,7 @@ Configuration.prototype.saveItems = function(req,res,next){
     }
     catch (ex) {
         console.log('FnSaveItem:error ' + ex.description);
-          
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
 
@@ -999,7 +1023,8 @@ Configuration.prototype.getFolders = function(req,res,next){
     }
     catch (ex) {
         console.log('FnGetRoleList error:' + ex.description);
-          
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
 };
 
@@ -1044,6 +1069,7 @@ Configuration.prototype.saveFolder = function(req,res,next){
                         var query = st.db.escape(Token) + ',' + st.db.escape(TID) + ',' + st.db.escape(FolderTitle) + ',' + st.db.escape(RuleFunction)
                             + ',' +st.db.escape(RuleType) + ',' +st.db.escape(CountryID) + ',' +st.db.escape(MatchAdminLevel) + ',' +st.db.escape(MappedNames) + ',' + st.db.escape(Latitude)
                             + ',' +st.db.escape(Longitude) + ',' +st.db.escape(Proximity) + ',' +st.db.escape(DefaultFolder) + ',' +st.db.escape(FolderStatus) + ',' +st.db.escape(SeqNoFrefix);
+                        console.log('CALL pSaveFolderRules(' + query + ')');
                         st.db.query('CALL pSaveFolderRules(' + query + ')', function (err, InsertResult) {
                             if (!err){
                                 console.log(InsertResult);
@@ -1092,7 +1118,8 @@ Configuration.prototype.saveFolder = function(req,res,next){
     }
     catch (ex) {
         console.log('FnSaveFolderRules:error ' + ex.description);
-          
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
 };
 
@@ -1171,7 +1198,8 @@ Configuration.prototype.getSubusers = function(req,res,next){
     }
     catch (ex) {
         console.log('FnGetSubUserList error:' + ex.description);
-          
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
 };
 
@@ -1192,7 +1220,7 @@ Configuration.prototype.createSubuser = function(req,res,next){
 
         var Token = req.body.Token;
         var TID = req.body.TID;
-        var UserName = req.body.UserName;
+        var UserName = alterEzeoneId(req.body.UserName);
         var Status  = req.body.Status;
         var FirstName = req.body.FirstName;
         var LastName = req.body.LastName;
@@ -1207,7 +1235,7 @@ Configuration.prototype.createSubuser = function(req,res,next){
         var HomeDeliveryRules = req.body.HomeDeliveryRules;
         var ServiceRules = req.body.ServiceRules;
         var ResumeRules = req.body.ResumeRules;
-        var MasterID = req.body.PersonalID;
+        var MasterID = alterEzeoneId(req.body.PersonalID);
         var templateID = parseInt(req.body.templateID);
         if(templateID.toString() == 'NaN')
             templateID =0;
@@ -1281,7 +1309,8 @@ Configuration.prototype.createSubuser = function(req,res,next){
     }
     catch (ex) {
         console.log('FnCreateSubUser:error ' + ex.description);
-          
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
 };
 
@@ -1301,7 +1330,7 @@ Configuration.prototype.getReservationResources = function(req,res,next){
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
-        var ezeid = req.query.ezeid;
+        var ezeid = alterEzeoneId(req.query.ezeid);
         var type = req.query.type ? req.query.type : 0 ;
 
         console.log(req.query);
@@ -1373,7 +1402,8 @@ Configuration.prototype.getReservationResources = function(req,res,next){
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
         console.log('FnGetReservationResource:error ' + ex.description);
-          
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
         res.status(400).json(responseMessage);
     }
 };
@@ -1507,7 +1537,8 @@ Configuration.prototype.saveReservationResource = function(req,res,next){
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
         console.log('FnSaveReservationResource:error ' + ex.description);
-          
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
         res.status(400).json(responseMessage);
     }
 };
@@ -1643,7 +1674,8 @@ Configuration.prototype.updateReservationResource = function(req,res,next){
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
         console.log('FnUpdateReservationResource:error ' + ex.description);
-          
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
         res.status(400).json(responseMessage);
     }
 };
@@ -1664,7 +1696,7 @@ Configuration.prototype.getReservationServices = function(req,res,next){
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
-        var ezeid = req.query.ezeid;
+        var ezeid = alterEzeoneId(req.query.ezeid);
         var responseMessage = {
             status: false,
             data: null,
@@ -1728,7 +1760,8 @@ Configuration.prototype.getReservationServices = function(req,res,next){
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
         console.log('FnGetReservationService:error ' + ex.description);
-          
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
         res.status(400).json(responseMessage);
     }
 };
@@ -1858,7 +1891,8 @@ Configuration.prototype.saveReservationService = function(req,res,next){
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
         console.log('FnSaveReservationService:error ' + ex.description);
-          
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
         res.status(400).json(responseMessage);
     }
 };
@@ -1988,7 +2022,8 @@ Configuration.prototype.updateReservationService = function(req,res,next){
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
         console.log('FnUpdateReservationService:error ' + ex.description);
-          
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
         res.status(400).json(responseMessage);
     }
 };
@@ -2009,7 +2044,7 @@ Configuration.prototype.getResourceServiceMaps = function(req,res,next){
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
-        var ezeid = req.query.ezeid;
+        var ezeid = alterEzeoneId(req.query.ezeid);
         var responseMessage = {
             status: false,
             data: null,
@@ -2075,7 +2110,8 @@ Configuration.prototype.getResourceServiceMaps = function(req,res,next){
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
         console.log('FnGetReservResourceServiceMap:error ' + ex.description);
-          
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
         res.status(400).json(responseMessage);
     }
 };
@@ -2203,7 +2239,8 @@ Configuration.prototype.saveResourceServiceMap = function(req,res,next){
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
         console.log('FnSaveReservResServiceMap:error ' + ex.description);
-          
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
         res.status(400).json(responseMessage);
     }
 };
@@ -2283,7 +2320,8 @@ Configuration.prototype.getWorkingHoursTemplates = function(req,res,next){
     }
     catch (ex) {
         console.log('FnGetWorkingHours error:' + ex.description);
-          
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
 };
 
@@ -2409,7 +2447,8 @@ Configuration.prototype.saveWorkingHoursTemplate = function(req,res,next){
     }
     catch (ex) {
         console.log('FnSaveWorkingHours:error ' + ex.description);
-          
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
 };
 
@@ -2492,7 +2531,8 @@ Configuration.prototype.getHolidays = function(req,res,next){
     }
     catch (ex) {
         console.log('FnGetHolidayList error:' + ex.description);
-          
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
 };
 
@@ -2587,7 +2627,8 @@ Configuration.prototype.saveHoliday = function(req,res,next){
     }
     catch (ex) {
         console.log('FnSaveHolidayCalendar:error ' + ex.description);
-          
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
 };
 
@@ -2671,7 +2712,8 @@ Configuration.prototype.deleteHoliday = function(req,res,next){
     }
     catch (ex) {
         console.log('FnDeleteHolidayList:error ' + ex.description);
-          
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
 };
 
@@ -2745,7 +2787,8 @@ Configuration.prototype.deleteWorkingHours = function(req,res,next){
 }
 catch (ex) {
     console.log('FnDeleteWorkingHours:error ' + ex.description);
-
+    var errorDate = new Date();
+    console.log(errorDate.toTimeString() + ' ......... error ...........');
 }
 };
 
@@ -2835,7 +2878,8 @@ catch (ex) {
     responseMessage.error = {};
     responseMessage.message = 'An error occured !'
     console.log('FnWorkingHours:error ' + ex.description);
-    //throw new Error(ex);
+    var errorDate = new Date();
+    console.log(errorDate.toTimeString() + ' ......... error ...........');
     res.status(400).json(responseMessage);
 }
 };

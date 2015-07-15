@@ -48,7 +48,7 @@ Location_AP.prototype.getSecondaryLocationListAP = function(req,res,next){
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
         var Token = req.query.Token;
-        var Ezeid = req.query.EZEID;
+        var Ezeid = alterEzeoneId(req.query.EZEID);
 
         if (Token != null && Ezeid != null) {
             st.validateTokenAp(Token, function (err, Result) {
@@ -106,6 +106,8 @@ Location_AP.prototype.getSecondaryLocationListAP = function(req,res,next){
         }
     }
     catch (ex) {
+	var errorDate = new Date();
+	console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log('FnGetSecondaryLocationList:' + ex.description);
 
     }
@@ -127,7 +129,7 @@ Location_AP.prototype.getSecondaryLocationAP = function(req,res,next){
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
         var Token = req.query.Token;
-        var Ezeid = req.query.EZEID;
+        var Ezeid = alterEzeoneId(req.query.EZEID);
         var Locid = req.query.LocID;
 
         if (Token != null && Ezeid != null && Locid!=null) {
@@ -188,6 +190,8 @@ Location_AP.prototype.getSecondaryLocationAP = function(req,res,next){
         }
     }
     catch (ex) {
+	var errorDate = new Date();
+	console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log('FnGetSecondaryLocationAP:' + ex.description);
 
     }
@@ -293,6 +297,8 @@ Location_AP.prototype.updateSecondaryLocationAP = function(req,res,next){
 
     }
     catch (ex) {
+	var errorDate = new Date();
+	console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log('FnUpdateSecondaryLocationAP:' + ex.description);
 
     }
