@@ -11946,7 +11946,6 @@ exports.FnSaveReservResourceServiceMap = function(req, res){
     }
 };
 
-
 //method to save reservation transaction
 exports.FnSaveReservTransaction = function(req, res){
     try{
@@ -12863,7 +12862,6 @@ exports.FnWorkingHoursDetails = function(req, res){
     }
 };
 
-
 exports.FnImageURL = function(req, res){
     try {
 
@@ -12941,7 +12939,100 @@ exports.FnImageURL = function(req, res){
     }
 };
 
+//mrthod to save feedback
+exports.FnSaveFeedback = function(req, res) {
+    try {
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
+        var ezeid = req.body.ezeid;
+        var rating = req.body.rating;
+        var comments = req.body.comments;
+        var trans_type = req.body.trans_type;
+        var trans_id = req.body.trans_id;
+
+        var responseMessage = {
+            status: false,
+            error: {},
+            message: '',
+            data: null
+        };
+        var validateStatus = true;
+
+        if (!ezeid) {
+            responseMessage.error['ezeid'] = 'Invalid ezeid';
+            validateStatus *= false;
+        }
+
+
+        if (!validateStatus) {
+            console.log('FnSaveFeedback  error : ' + JSON.stringify(responseMessage.error));
+            responseMessage.message = 'Unable to save feedback ! Please check the errors';
+            res.status(200).json(responseMessage);
+            return;
+        }
+
+        if (ezeid) {
+            var query = db.escape(ezeid) + ',' + db.escape(rating) + ',' + db.escape(comments) + ',' + db.escape(trans_type) + ',' + db.escape(trans_id);
+
+            console.log('CALL psavefeedback(' + query + ')');
+
+            db.query('CALL psavefeedback(' + query + ')', function (err, insertResult) {
+                console.log(insertResult);
+
+                if (!err) {
+                    if (insertResult) {
+                            responseMessage.status = true;
+                            responseMessage.error = null;
+                            responseMessage.message = 'Feedback details save successfully';
+                            responseMessage.data = {
+                                ezeid : req.body.ezeid,
+                                rating : req.body.rating,
+                                comments : req.body.comments,
+                                trans_type : req.body.trans_type,
+                                trans_id : req.body.trans_id
+                            };
+                            res.status(200).json(responseMessage);
+                            console.log('FnSaveFeedback: Feedback details save successfully');
+
+                        }
+                        else {
+                            responseMessage.message = 'No save Feedback details';
+                            responseMessage.error = {};
+                            res.status(400).json(responseMessage);
+                            console.log('FnSaveFeedback:No save Feedback details');
+                        }
+                    }
+
+                else {
+                    responseMessage.message = 'An error occured ! Please try again';
+                    responseMessage.error = {};
+                    res.status(500).json(responseMessage);
+                    console.log('FnSaveFeedback: error in saving Feedback details:' + err);
+                }
+            });
+        }
+
+        else {
+            if (!ezeid) {
+                responseMessage.message = 'Invalid ezeid';
+                responseMessage.error = {Token: 'Invalid ezeid'};
+                console.log('FnSaveFeedback: ezeid is mandatory field');
+            }
+
+            res.status(401).json(responseMessage);
+        }
+
+    }
+
+    catch (ex) {
+        responseMessage.error = {};
+        responseMessage.message = 'An error occured !'
+        console.log('FnSaveFeedback:error ' + ex.description);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
+        res.status(400).json(responseMessage);
+    }
+};
 
 //EZEIDAP Parts
 function FnValidateTokenAP(Token, CallBack) {
