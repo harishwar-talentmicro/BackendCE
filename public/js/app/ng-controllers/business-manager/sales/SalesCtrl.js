@@ -305,15 +305,15 @@
              * @return editModeTx
              */
             var prepareEditTransaction = function(tx,changeUserDetails){
-
                 var editModeTx =  {
                         orderAmount : (!isNaN(parseFloat(tx.Amount))) ? parseFloat(tx.Amount) : 0.00,
                         trnNo : tx.TrnNo,
+                        ezeid : (changeUserDetails) ? '' :  tx.RequesterEZEID,
                         ezeidTid : (tx.EZEID) ? true : 0,
 
                         TID : tx.TID,
                         functionType : 0, // Function Type will be 0 for sales
-                        ezeid : (changeUserDetails) ? '' :  tx.RequesterEZEID,
+
                         statusType : (tx.Status) ? tx.Status : 0,
                         notes : tx.Notes,
                         locId : tx.LocID,
@@ -334,8 +334,8 @@
                         duration : 0,
                         durationScale : 0,
                         itemList : [],
-                        companyId : tx.company_id,
-                        companyName : tx.company_name,
+                        companyId : (changeUserDetails) ? 0 : tx.company_id,
+                        companyName : (changeUserDetails) ? '' : tx.company_name,
                         amount : (parseFloat(tx.Amount) !== NaN) ? parseFloat(tx.Amount,2) : 0.00
                 };
                 return editModeTx;
