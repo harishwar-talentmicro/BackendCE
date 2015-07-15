@@ -1870,8 +1870,8 @@ table.rwd-table > tbody > tr > td.serachResultSelectAll
 
 .tabs-row-sales .nav > li.active > a
 {
-    background: #B4F5E9;
-    color: #0008A8;
+    background: #2CCADF;
+    color: #FFFFFF;
     border: 1px solid #38A2FC;
     cursor: pointer;
 }
@@ -1893,7 +1893,7 @@ table.rwd-table > tbody > tr > td.serachResultSelectAll
 }
 .newCvSkillField
 {
-    width: 320px;
+    width: 245px;
 }
 .newCvActveSkills
 {
@@ -1901,5 +1901,5 @@ table.rwd-table > tbody > tr > td.serachResultSelectAll
 }
 .newSkillField
 {
-    width: 367px !important;
+    width: 245px !important;
 }
