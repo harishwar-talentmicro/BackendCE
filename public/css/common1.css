@@ -1893,7 +1893,7 @@ table.rwd-table > tbody > tr > td.serachResultSelectAll
 }
 .newCvSkillField
 {
-    width: 245px;
+    width: 220px;
 }
 .newCvActveSkills
 {
@@ -1902,4 +1902,24 @@ table.rwd-table > tbody > tr > td.serachResultSelectAll
 .newSkillField
 {
     width: 245px !important;
+}
+.composeMailMenuItem
+{
+    background-color: rgb(231, 190, 190);
+}
+.hpw .index-menu ul > .composeMailMenuItem:hover {
+    background-color: rgb(231, 190, 190);
+}
+.m_top_4
+{
+    margin-top: 4px;
+}
+.hpw .inbox-head-new {
+    padding: 12px;
+    background: #41cac0;
+    color: #fff;
+    border-radius: 0 4px 0 0;
+    -webkit-border-radius: 0 4px 0 0;
+    min-height: 80px;
+    font-family: 'Open Sans Light', sans-serif;
 }

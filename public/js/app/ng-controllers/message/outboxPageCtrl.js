@@ -52,6 +52,7 @@ angular.module('ezeidApp').
             $scope.activeTransactionDetailedInfo = '';
             $scope.permissiontype = '';
 
+            $scope.activeTemplate = "";
 
             /* initialization fot getting all the transaction history */
             getTransactionHistory().then(function(){
@@ -243,8 +244,8 @@ angular.module('ezeidApp').
             }
 
             $scope.modalAddGroupVisible = false;
+            /* toggle Add/edit Group Popup */
             $scope.modalAddGroupVisibility = function () {
-                /* toggle map visibility status */
                 $scope.modalAddGroupVisible = !$scope.modalAddGroupVisible;
             };
 
@@ -254,5 +255,9 @@ angular.module('ezeidApp').
                 class: 'business-manager-modal'
             };
 
+            /* Navigate to compose message page */
+            $scope.openComposeMessage = function () {
+                $location.url('/compose-message');
+            };
 
         }]);

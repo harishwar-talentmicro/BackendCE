@@ -1,6 +1,5 @@
 /**
- * Filter for grouping Business Rules Based upon thier functions(types: Sales, Reservation,HomeDelivery,Service, Resume)
- * Usage (ruleList | ruleFilter:2)
+ * Filter for converting datetime from a specific format to some other format
  */
 (function(){
     angular.module('ezeidApp').filter('dateTimeFilter',function(){

@@ -8,17 +8,20 @@
 
             <div class="panel-body ">
                 <!-- Left Side Content: Messages Indexes -->
-                <div class="col-lg-3 no-padding hidden">
+                <!--<div class="col-lg-3 no-padding hidden">-->
+                <div class="col-lg-3 no-padding">
                     <!-- main indexes -->
                     <div class="inbox-head-left main-index inbox-head-left-bg">
-                        <h3 class="text-white text-center"><i class="fa fa-envelope"></i> MESSAGES</h3>
+                        <h3 class="text-white text-center"><i class="fa fa-envelope"></i> MessageBox</h3>
                     </div>
                     <!-- All the indexes/menu goes here -->
                     <div class="index-menu">
                         <ul class="inbox-nav inbox-divider">
+                            <li class="active index-menu-item composeMailMenuItem">
+                                <a ng-click="openComposeMessage()" class="pointer"> <i class="fa fa-pencil-square-o"></i> Compose</a>
+                            </li>
                             <li class="active index-menu-item">
                                 <a href="#"><i class="fa fa-inbox"></i> Inbox <span class="label label-danger ">2</span></a>
-
                             </li>
                             <li class="index-menu-item">
                                 <a href="#"><i class="fa fa-envelope-o"></i> Outbox</a>
@@ -27,12 +30,11 @@
                                 <a href="#"><i class="fa fa-trash-o"></i> Trash</a>
                             </li>
                             <li class="index-menu-item group index-title-group">
-                                <a ng-click="modalAddGroupVisibility()">
+                                <a>
                                     <i class=" fa fa-external-link"></i> Groups <span class="label label-info">30</span>
                                 </a>
                                 <span class="pull-right">
-                                    <button class="btn btn-primary btn-xs no-radius"><i class="fa fa-plus"></i> New</button>
-                                    <!--<button class="btn btn-success btn-xs no-radius"><i class="fa fa-edit"></i> Edit</button>-->
+                                    <button ng-click="modalAddGroupVisibility()" class="btn btn-primary btn-xs no-radius"><i class="fa fa-plus"></i> New</button>
                                 </span>
                             </li>
                             <!-- groups goes here -->
@@ -59,37 +61,57 @@
                     </div>
                 </div>
                 <!-- Right Side Content: Messages Indexes -->
-                <div class="col-lg-9 no-padding  message-content hidden">
-                    <div class=" inbox-head">
-                        <h3 class="text-white"> </h3>
+                <!--<div class="col-lg-9 no-padding  message-content hidden">-->
+                <div class="col-lg-9 no-padding  message-content">
+                    <div class="inbox-head-new">
+                        <h3 class="text-white">Inbox </h3>
                     </div>
                     <!-- All messages goes here -->
+                    <div ng-show="activeView">
+
+                    </div>
+
                     <div class="message-content-tbl">
-                        <div class="pagination-btn">
-                            <button class="btn btn-default"><i class="fa fa-arrow-circle-left"></i></button>
-                            <button class="btn btn-default"><i class="fa fa-arrow-circle-right"></i></button>
-                            <select class="filters-dropdown">
-                                <option>All</option>
-                                <option>Unread</option>
-                                <option>Read</option>
-                            </select>
+                        <div class="row setRowLeftRightMarginZero">
+                            <div class="pagination-btn">
+                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setLeftRightPaddingZero">
+                                    <select class="filters-dropdown">
+                                        <option>All</option>
+                                        <option>Unread</option>
+                                        <option>Read</option>
+                                    </select>
+                                </div>
+                                <div class="col-lg-7 col-md-7 col-sm-7 col-xs-12 setLeftRightPaddingZero">
+                                </div>
+                                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 setLeftRightPaddingZero">
+                                    <select class="filters-dropdown">
+                                        <option>Mark as Unread</option>
+                                        <option>Mark as Read</option>
+                                        <option>Move to Trash</option>
+                                    </select>
+
+                                    <button class="btn btn-default"><i class="fa fa-arrow-circle-left"></i></button>
+                                    <button class="btn btn-default"><i class="fa fa-arrow-circle-right"></i></button>
+                                </div>
+
+                            </div>
                         </div>
                     </div>
                     <div class="message-table">
                         <table class="table">
                             <thead>
                             <th>
-                            <td>
-
+                            <td class="text-bolder">
+                                <input type="checkbox" /> All
                             </td>
-                            <td>
 
-                            </td>
                             <td class="text-bolder">
                                 Sender
                             </td>
                             <td class="text-bolder">
                                 Message
+                            </td>
+                            <td class="text-bolder">
                             </td>
                             <td class="display-in-full-screen display-table text-bolder">
                                 Target Date
@@ -110,14 +132,15 @@
                                 <td>
                                     <input type="checkbox" />
                                 </td>
-                                <td>
-                                    <i class="fa fa-star"></i>
-                                </td>
+
                                 <td>
                                     Vector King
                                 </td>
                                 <td>
                                     Lorem ipsum dolor imit set.
+                                </td>
+                                <td>
+                                    <span class="glyphicon glyphicon-paperclip"></span>
                                 </td>
                                 <td class="display-in-full-screen display-table">
                                     15/12/2015 13:10
@@ -137,13 +160,13 @@
                                     <input type="checkbox" />
                                 </td>
                                 <td>
-                                    <i class="fa fa-star"></i>
-                                </td>
-                                <td>
                                     Vector King
                                 </td>
                                 <td>
                                     Lorem ipsum dolor imit set.
+                                </td>
+                                <td>
+                                    <span class="glyphicon glyphicon-paperclip"></span>
                                 </td>
                                 <td class="display-in-full-screen display-table">
                                     15/12/2015 13:10
@@ -163,19 +186,19 @@
                                     <input type="checkbox" />
                                 </td>
                                 <td>
-                                    <i class="fa fa-star"></i>
-                                </td>
-                                <td>
                                     Vector King
                                 </td>
                                 <td>
                                     Lorem ipsum dolor imit set.
                                 </td>
-                                <td class="display-in-full-screen display-table">
-
+                                <td>
+                                    <!--<span class="glyphicon glyphicon-paperclip"></span>-->
                                 </td>
                                 <td class="display-in-full-screen display-table">
-
+                                    15/12/2015 13:10
+                                </td>
+                                <td class="display-in-full-screen display-table  ">
+                                    15/12/2014 13:10
                                 </td>
                                 <td>
                                     12:09AM
@@ -189,13 +212,13 @@
                                     <input type="checkbox" />
                                 </td>
                                 <td>
-                                    <i class="fa fa-star"></i>
-                                </td>
-                                <td>
                                     Vector King
                                 </td>
                                 <td>
                                     Lorem ipsum dolor imit set.
+                                </td>
+                                <td>
+                                    <span class="glyphicon glyphicon-paperclip"></span>
                                 </td>
                                 <td class="display-in-full-screen display-table">
                                     15/12/2015 13:10
@@ -211,7 +234,7 @@
                         </table>
                     </div>
                     <!-- Compose message block -->
-                    <div class="width-100 p-left-10">
+                    <!--<div class="width-100 p-left-10">
                         <hr>
                         <div class="compose-message">
                             <i class="fa fa-envelope-o"></i> COMPOSE MESSAGE
@@ -230,7 +253,7 @@
                             <label class="label label-info">myFile.pdf &nbsp;<span title="remove attachment" class="label label-danger">X</span></label>
                             <label class="label label-info">myFile1.pdf  &nbsp;<span title="remove attachment" class="label label-danger">X</span></label>
                             <hr>
-                            <!-- Additional Filters -->
+                            &lt;!&ndash; Additional Filters &ndash;&gt;
                             <div class="additional-filter">
                                 <span class="col-lg-4 no-padding">
                                 <div class="">Priority</div>
@@ -255,7 +278,7 @@
                                 <button class="btn btn-primary no-radius"><i class="fa fa-send"></i> Send</button>
                             </div>
                         </div>
-                    </div>
+                    </div>-->
                 </div>
 
 
@@ -295,7 +318,7 @@
 
                 <!--- Old Design Goes Here //////////////////////////////////////////////////////////////////////////////// --->
                 <!-- MAIN SECTION OF OUTBOX MODULE -->
-                <div class="width-75 container p-top-30 ">
+                <div class="width-75 container p-top-30 hidden">
                     <div class="panel panel-default shadow-border">
                         <div class="panel-heading text-center menu-text">
                             <h3 class="text-center font-roboto"><i class="fa fa-check-square-o"></i> Your Transactions</h3>
@@ -337,6 +360,8 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
     </section>
     <!-- details modal of the transaction history item goes here -->
     <modal mtitle="modalBox.title" mclass="modalBox.class" visible="modalVisible">
