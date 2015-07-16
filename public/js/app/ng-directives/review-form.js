@@ -25,9 +25,10 @@
                 ngTransType:'@',//1:Reservation, 2:Outbox, 3:Sales, 4:Home-Delivery
                 ngTransId:'=',
                 ngResourceId:'=',
-                ngToEzeid :'='
+                ngToEzeid :'=',
+                toggleReviewModalVisibility : '&'
             },
-            controller : function($rootScope,$scope,$http,GURL,MsgDelay){
+            controller : function($rootScope,$scope,$http,GURL,MsgDelay,Notification){
                 $scope.starArray = [];
                 deactivateStars();
                 $scope.starCount = 1;
@@ -96,6 +97,9 @@
                     }).success(function(resp){
                         $scope.$emit('$preLoaderStop');
                         if(resp.status){
+                            /* close the modal box by JQuery */
+                            console.log($scope.reviewModalVisibility);
+                            $scope.toggleReviewModalVisibility();
                             Notification.success({ message: "Thank you for giving your valuable feedback", delay: MsgDelay });
                             $scope.$emit('$preLoaderStop');
                         }
