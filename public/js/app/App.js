@@ -195,11 +195,11 @@
                 controller : 'InformationDetailCtrl'
             })
             .when('/outbox',{
-                templateUrl: 'html/outbox.html',
+                templateUrl: 'html/message/outbox.html',
                 controller : 'outboxPageCtrl'
             })
             .when('/compose-message',{
-                templateUrl: 'html/composeMessage.html',
+                templateUrl: 'html/message/composeMessage.html',
                 controller : 'ComposeMessageCtrl'
             })
             .when('/payment',{

@@ -1914,3 +1914,12 @@ table.rwd-table > tbody > tr > td.serachResultSelectAll
 {
     margin-top: 4px;
 }
+.hpw .inbox-head-new {
+    padding: 12px;
+    background: #41cac0;
+    color: #fff;
+    border-radius: 0 4px 0 0;
+    -webkit-border-radius: 0 4px 0 0;
+    min-height: 80px;
+    font-family: 'Open Sans Light', sans-serif;
+}

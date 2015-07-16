@@ -1,0 +1,53 @@
+
+<!-- Compose message block -->
+<div class="width-100 p-left-10 p-top-10">
+                        <div class="compose-message">
+                            <i class="fa fa-envelope-o"></i> COMPOSE MESSAGE
+                        </div>
+                        <div class="message-body">
+                            <div class="input-group p-bottom-4">
+                                <div class="input-group-addon">To</div>
+                                <input type="text" ng-model="composeMsg.MessageTo" class="form-control" id="to" placeholder="To">
+                            </div>
+                            <div class="input-group p-bottom-4">
+                                <div class="input-group-addon">From</div>
+                                <input type="text" ng-model="composeMsg.MessageFrom" class="form-control" id="from" placeholder="From">
+                            </div>
+
+                            <div class="p-bottom-4">
+                                <textarea class="form-control p-bottom-4" ng-model="composeMsg.MessageBody" placeholder="Your message" rows="5"></textarea>
+                            </div>
+
+
+                            <button class="btn btn-warning"><i class="fa fa-paperclip"></i> Attachments</button>
+                            <label class="label label-info">myFile.pdf &nbsp;<span title="remove attachment" class="label label-danger">X</span></label>
+                            <label class="label label-info">myFile1.pdf  &nbsp;<span title="remove attachment" class="label label-danger">X</span></label>
+                            <hr>
+                            <!-- Additional Filters -->
+                            <div class="additional-filter p-bottom-4">
+                                <span class="col-lg-4 no-padding">
+                                <div class="">Priority</div>
+                                <select class="form-control" ng-model="composeMsg.Priority">
+                                    <option value="1">High</option>
+                                    <option value="2">Medium</option>
+                                    <option value="3">Low</option>
+                                </select>
+                                    </span>
+
+                                <span class="col-lg-4 ">
+                                    <div class="">Target Date</div>
+                                    <!--<input type="text" class="form-control" id="target-date" placeholder="Target Date">-->
+                                    <date-time-picker recipient="composeMsg.TargetDate" settings='{"format" : "d-M-Y", "hours12" : false, "timepicker" : false}' ></date-time-picker>
+                                </span>
+
+                                <span class="col-lg-4 no-padding">
+                                    <div class="">Expiry Date</div>
+                                    <!--<input type="text" class="form-control" id="expiry-date" placeholder="Expiry Date">-->
+                                    <date-time-picker recipient="composeMsg.ExpiryDate" settings='{"format" : "d-M-Y", "hours12" : false, "timepicker" : false}' ></date-time-picker>
+                                </span>
+                            </div>
+                            <div class="send-button text-right p-bottom-4">
+                                <button class="btn btn-primary no-radius p-top-4 m_top_4" ng-click="sendMessage();"><i class="fa fa-send"></i> Send</button>
+                            </div>
+                        </div>
+                    </div>
