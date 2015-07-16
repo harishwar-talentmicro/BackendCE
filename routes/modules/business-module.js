@@ -208,27 +208,27 @@ BusinessManager.prototype.saveTransaction = function(req,res,next){
         var item_list_type = req.body.item_list_type ? req.body.item_list_type : 0;
         var companyName = req.body.companyName ? req.body.companyName : '' ;
         var company_id = req.body.company_id ? req.body.company_id : 0 ;
-        var Messagetype,verified;
         var attachment = req.body.attachment ? req.body.attachment : null ;
         var proabilities = req.body.proabilities ? req.body.proabilities : 0 ;
         var attachment_name = req.body.attachment_name ? req.body.attachment_name : '' ;
         var mime_type = req.body.mime_type ? req.body.mime_type : '' ;
+        var messagetype,verified;
 
         if (FunctionType == 0){
             //sales
-            Messagetype = 1;
+            messagetype = 1;
         }
         else if (FunctionType == 2){
             //HomeDelivery
-            Messagetype = 3;
+            messagetype = 3;
         }
         else if (FunctionType == 3){
             //Service
-            Messagetype = 4;
+            messagetype = 4;
         }
         else if (FunctionType == 4){
             //Cv
-            Messagetype = 5;
+            messagetype = 5;
         }
         var RtnMessage = {
             IsSuccessfull: false,
@@ -347,7 +347,7 @@ BusinessManager.prototype.saveTransaction = function(req,res,next){
                                         }
                                         res.send(RtnMessage);
                                         console.log('FnSaveTranscationItems: Transaction items details save successfully');
-                                        if (Messagetype == 1) {
+                                        if (messagetype == 1) {
                                             fs.readFile("SalesMail.html", "utf8", function (err, data) {
                                                 var query1 = 'select EZEID,EZEIDVerifiedID,TID,IDTypeID as id from tmaster where Token=' + st.db.escape(Token);
                                                 st.db.query(query1, function (err, getResult) {
@@ -365,9 +365,9 @@ BusinessManager.prototype.saveTransaction = function(req,res,next){
                                                         data = data.replace("[EZEID]", getResult[0].EZEID);
                                                         data = data.replace("[Message]", MessageText);
 
-                                                        var UserQuery = 'Select EZEID,ifnull(EMailID,"") as EMailID from tlocations where MasterID=' + getResult[0].TID;
+                                                        var mail_query = 'Select EZEID,ifnull(EMailID,"") as EMailID from tlocations where MasterID=' + getResult[0].TID;
 
-                                                        st.db.query(UserQuery, function (err, get_result) {
+                                                        st.db.query(mail_query, function (err, get_result) {
                                                             console.log(get_result);
                                                             if (get_result) {
                                                                 var mailOptions = {
@@ -418,9 +418,9 @@ BusinessManager.prototype.saveTransaction = function(req,res,next){
                                                         data = data.replace("[EZEID]", getResult[0].EZEID);
                                                         data = data.replace("[Message]", MessageText);
 
-                                                        var UserQuery = 'Select EZEID,ifnull(SalesMailID," ") as SalesMailID from tmaster where TID=' + getResult[0].TID;
-                                                        console.log(UserQuery);
-                                                        st.db.query(UserQuery, function (err, get_result) {
+                                                        var mail_query = 'Select EZEID,ifnull(SalesMailID," ") as SalesMailID from tmaster where TID=' + getResult[0].TID;
+                                                        console.log(mail_query);
+                                                        st.db.query(mail_query, function (err, get_result) {
 
                                                             if (get_result) {
                                                                 var mailOptions = {
@@ -434,7 +434,7 @@ BusinessManager.prototype.saveTransaction = function(req,res,next){
                                                                 st.db.query(queryResult, function (err, result) {
 
                                                                     var post = {
-                                                                        MessageType: Messagetype,
+                                                                        MessageType: messagetype,
                                                                         Priority: 3,
                                                                         ToMailID: mailOptions.to,
                                                                         Subject: mailOptions.subject,
@@ -463,7 +463,7 @@ BusinessManager.prototype.saveTransaction = function(req,res,next){
                                                 });
                                             });
                                         }
-                                        else if (Messagetype == 3) {
+                                        else if (messagetype == 3) {
                                             fs.readFile("homedelivery.html", "utf8", function (err, data) {
                                                 var query1 = 'select EZEID,EZEIDVerifiedID,TID,IDTypeID as id from tmaster where Token=' + st.db.escape(Token);
                                                 st.db.query(query1, function (err, getResult) {
@@ -481,9 +481,9 @@ BusinessManager.prototype.saveTransaction = function(req,res,next){
                                                         data = data.replace("[EZEID]", getResult[0].EZEID);
                                                         data = data.replace("[Message]", MessageText);
 
-                                                        var UserQuery = 'Select EZEID,ifnull(EMailID,"") as EMailID from tlocations where MasterID=' + getResult[0].TID;
+                                                        var mail_query = 'Select EZEID,ifnull(EMailID,"") as EMailID from tlocations where MasterID=' + getResult[0].TID;
 
-                                                        st.db.query(UserQuery, function (err, get_result) {
+                                                        st.db.query(mail_query, function (err, get_result) {
                                                             console.log(get_result);
                                                             if (get_result) {
                                                                 var mailOptions = {
@@ -497,7 +497,7 @@ BusinessManager.prototype.saveTransaction = function(req,res,next){
                                                                 st.db.query(queryResult, function (err, result) {
                                                                     console.log(result);
                                                                     var post = {
-                                                                        MessageType: Messagetype,
+                                                                        MessageType: messagetype,
                                                                         Priority: 3,
                                                                         ToMailID: mailOptions.to,
                                                                         Subject: mailOptions.subject,
@@ -534,9 +534,9 @@ BusinessManager.prototype.saveTransaction = function(req,res,next){
                                                         data = data.replace("[EZEID]", getResult[0].EZEID);
                                                         data = data.replace("[Message]", MessageText);
 
-                                                        var UserQuery = 'Select EZEID,ifnull(HomeDeliveryMailID," ") as MailID from tmaster where TID=' + getResult[0].TID;
-                                                        console.log(UserQuery);
-                                                        st.db.query(UserQuery, function (err, get_result) {
+                                                        var mail_query = 'Select EZEID,ifnull(HomeDeliveryMailID," ") as MailID from tmaster where TID=' + getResult[0].TID;
+                                                        console.log(mail_query);
+                                                        st.db.query(mail_query, function (err, get_result) {
 
                                                             if (get_result) {
                                                                 var mailOptions = {
@@ -550,7 +550,7 @@ BusinessManager.prototype.saveTransaction = function(req,res,next){
                                                                 st.db.query(queryResult, function (err, result) {
 
                                                                     var post = {
-                                                                        MessageType: Messagetype,
+                                                                        MessageType: messagetype,
                                                                         Priority: 3,
                                                                         ToMailID: mailOptions.to,
                                                                         Subject: mailOptions.subject,
@@ -579,7 +579,7 @@ BusinessManager.prototype.saveTransaction = function(req,res,next){
                                                 });
                                             });
                                         }
-                                        else if (Messagetype == 4) {
+                                        else if (messagetype == 4) {
                                             fs.readFile("ServiceMail.html", "utf8", function (err, data) {
                                                 var query1 = 'select EZEID,EZEIDVerifiedID,TID,IDTypeID as id from tmaster where Token=' + st.db.escape(Token);
                                                 st.db.query(query1, function (err, getResult) {
@@ -597,9 +597,9 @@ BusinessManager.prototype.saveTransaction = function(req,res,next){
                                                         data = data.replace("[EZEID]", getResult[0].EZEID);
                                                         data = data.replace("[Message]", MessageText);
 
-                                                        var UserQuery = 'Select EZEID,ifnull(EMailID,"") as EMailID from tlocations where MasterID=' + getResult[0].TID;
+                                                        var mail_query = 'Select EZEID,ifnull(EMailID,"") as EMailID from tlocations where MasterID=' + getResult[0].TID;
 
-                                                        st.db.query(UserQuery, function (err, get_result) {
+                                                        st.db.query(mail_query, function (err, get_result) {
                                                             console.log(get_result);
                                                             if (get_result) {
                                                                 var mailOptions = {
@@ -613,7 +613,7 @@ BusinessManager.prototype.saveTransaction = function(req,res,next){
                                                                 st.db.query(queryResult, function (err, result) {
                                                                     console.log(result);
                                                                     var post = {
-                                                                        MessageType: Messagetype,
+                                                                        MessageType: messagetype,
                                                                         Priority: 3,
                                                                         ToMailID: mailOptions.to,
                                                                         Subject: mailOptions.subject,
@@ -650,9 +650,9 @@ BusinessManager.prototype.saveTransaction = function(req,res,next){
                                                         data = data.replace("[EZEID]", getResult[0].EZEID);
                                                         data = data.replace("[Message]", MessageText);
 
-                                                        var UserQuery = 'Select EZEID,ifnull(ServiceMailID," ") as MailID from tmaster where TID=' + getResult[0].TID;
-                                                        console.log(UserQuery);
-                                                        st.db.query(UserQuery, function (err, get_result) {
+                                                        var mail_query = 'Select EZEID,ifnull(ServiceMailID," ") as MailID from tmaster where TID=' + getResult[0].TID;
+                                                        console.log(mail_query);
+                                                        st.db.query(mail_query, function (err, get_result) {
 
                                                             if (get_result) {
                                                                 var mailOptions = {
@@ -666,7 +666,7 @@ BusinessManager.prototype.saveTransaction = function(req,res,next){
                                                                 st.db.query(queryResult, function (err, result) {
 
                                                                     var post = {
-                                                                        MessageType: Messagetype,
+                                                                        MessageType: messagetype,
                                                                         Priority: 3,
                                                                         ToMailID: mailOptions.to,
                                                                         Subject: mailOptions.subject,
@@ -2045,6 +2045,129 @@ BusinessManager.prototype.getTransAttachment = function(req,res,next){
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
         console.log('FnGetTransAttachment:error ' + ex.description);
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
+        res.status(400).json(responseMessage);
+    }
+};
+
+/**
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ */
+BusinessManager.prototype.getTransactionFilter = function(req,res,next){
+    /**
+     * @todo FnGetTransactionFilter
+     */
+    var _this = this;
+    try {
+
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var from_date = req.query.from_date;
+        var to_date = req.query.to_date;
+        var stages = req.query.stages;
+        var probabilities = req.query.probabilities;
+        var user = req.query.user;
+
+        var responseMessage = {
+            status: false,
+            data: null,
+            error:{},
+            message:''
+        };
+
+        var validateStatus = true;
+
+        if (!stages) {
+            responseMessage.error['stages'] = 'Invalid stages';
+            validateStatus *= false;
+        }
+        if (!probabilities) {
+            responseMessage.error['probabilities'] = 'Invalid probabilities';
+            validateStatus *= false;
+        }
+        if (!user) {
+            responseMessage.error['user'] = 'Invalid user';
+            validateStatus *= false;
+        }
+
+        if (stages && probabilities && user) {
+            var query = st.db.escape(from_date) + ',' + st.db.escape(to_date) + ',' + st.db.escape(stages)
+                + ',' + st.db.escape(probabilities)+ ',' + st.db.escape(user);
+            st.db.query('CALL pTransactionfilter(' + query +')', function (err, GetResult) {
+                if (!err) {
+                    if (GetResult) {
+                        if (GetResult[0].length > 0) {
+                            responseMessage.status = true;
+                            responseMessage.data = GetResult[0] ;
+                            responseMessage.error = null;
+                            responseMessage.message = 'Transactionfilter details Send successfully';
+                            console.log('FnGetTransactionfilter: Transactionfilter details Send successfully');
+                            res.status(200).json(responseMessage);
+                        }
+                        else {
+
+                            responseMessage.error = {};
+                            responseMessage.message = 'No founded Transactionfilter details';
+                            console.log('FnGetTransactionfilter: No founded Transactionfilter details');
+                            res.json(responseMessage);
+                        }
+                    }
+                    else {
+
+
+                        responseMessage.error = {};
+                        responseMessage.message = 'No founded Transactionfilter details';
+                        console.log('FnGetTransactionfilter: No founded Transactionfilter details');
+                        res.json(responseMessage);
+                    }
+
+                }
+                else {
+
+                    responseMessage.data = null ;
+                    responseMessage.error = {};
+                    responseMessage.message = 'Error in getting Transactionfilter details';
+                    console.log('FnGetTransactionfilter: error in getting Transactionfilter details' + err);
+                    res.status(500).json(responseMessage);
+                }
+            });
+        }
+
+        else {
+            if (!stages) {
+                responseMessage.message = 'Invalid stages';
+                responseMessage.error = {
+                    stages : 'Invalid stages'
+                };
+                console.log('FnGetTransactionfilter: stages is mandatory field');
+            }
+            else if (!probabilities) {
+                responseMessage.message = 'Invalid probabilities';
+                responseMessage.error = {
+                    probabilities : 'Invalid probabilities'
+                };
+                console.log('FnGetTransactionfilter: probabilities is mandatory field');
+            }
+            else if (!user) {
+                responseMessage.message = 'Invalid user';
+                responseMessage.error = {
+                    user : 'Invalid user'
+                };
+                console.log('FnGetTransactionfilter: user is mandatory field');
+            }
+
+            res.status(401).json(responseMessage);
+        }
+    }
+    catch (ex) {
+        responseMessage.error = {};
+        responseMessage.message = 'An error occured !'
+        console.log('FnGetTransactionfilter:error ' + ex.description);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
         res.status(400).json(responseMessage);
