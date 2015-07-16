@@ -582,7 +582,6 @@ angular.module('ezeidApp').
              /**********************************************************************************************************
              /**********************************************************************************************************
              /**********************************************************************************************************/
-
             /**
              * Modal box for making a review
              */
@@ -591,7 +590,7 @@ angular.module('ezeidApp').
                 class: 'business-manager-modal'
             };
 
-            $scope.reviewModalVisibility = true;
+            $scope.reviewModalVisibility = false;
 
             /* toggle map visibility status */
             $scope.toggleReviewModalVisibility = function () {
@@ -601,6 +600,6 @@ angular.module('ezeidApp').
             /* basic setting for loading review-form */
             $scope.ngTransId = '';
             $scope.ngResourceId = '';
-            $scope.ngToEzeId = 'Alpha';
+            $scope.ngToEzeId = $routeParams.ezeone;
         }
     ]);
