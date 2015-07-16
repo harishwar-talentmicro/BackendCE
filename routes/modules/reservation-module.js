@@ -55,8 +55,8 @@ Reservation.prototype.SaveReservTrans = function(req,res,next){
         var status = req.body.status;
         var serviceid = req.body.serviceid ?  req.body.serviceid : '';
         var notes = req.body.notes;
-        var Messagetype = 2;
-        var MessageText,Duration,verified;
+        var messagetype = 2;
+        var messageText,duration,verified;
 
 
         var ID=''
@@ -117,7 +117,7 @@ Reservation.prototype.SaveReservTrans = function(req,res,next){
                                         res.status(200).json(responseMessage);
                                         console.log('FnSaveReservTransaction: Resource Transaction details save successfully');
 
-                                        if (Messagetype == 2) {
+                                        if (messagetype == 2) {
                                             fs.readFile("Reservation.html", "utf8", function (err, data) {
                                                 var query1 = 'select EZEID,EZEIDVerifiedID,TID,IDTypeID as id from tmaster where Token=' + st.db.escape(Token);
                                                 st.db.query(query1, function (err, getResult) {
@@ -128,14 +128,14 @@ Reservation.prototype.SaveReservTrans = function(req,res,next){
                                                         else {
                                                             verified = 'Verified';
                                                         }
-
+                                                        //here passing date with 00:00:00 time for getting the reservation data that only date format is put like that
                                                         var date = moment(new Date(req.body.res_datetime)).format('YYYY-MM-DD 00:00:00.000');
                                                         st.db.query('CALL pGetResTrans(' + st.db.escape(resourceid) + ',' + st.db.escape(date) + ',' + st.db.escape(toEzeid) + ')', function (err, res_result) {
                                                             if (res_result) {
                                                                 var i = res_result[0].length - 1;
                                                                 console.log(res_result[0][i]);
-                                                                MessageText = res_result[0][i].service;
-                                                                Duration = res_result[0][i].duration;
+                                                                messageText = res_result[0][i].service;
+                                                                duration = res_result[0][i].duration;
                                                             }
 
                                                             else {
@@ -146,12 +146,12 @@ Reservation.prototype.SaveReservTrans = function(req,res,next){
                                                             data = data.replace("[IsVerified]", verified);
                                                             data = data.replace("[EZEOneID]", getResult[0].EZEID);
                                                             data = data.replace("[EZEID]", getResult[0].EZEID);
-                                                            data = data.replace("[Message]", MessageText);
-                                                            data = data.replace("[Duration]", Duration);
+                                                            data = data.replace("[Message]", messageText);
+                                                            data = data.replace("[Duration]", duration);
                                                             data = data.replace("[ActionDate]", res_datetime.toLocaleString());
-                                                            var UserQuery = 'Select EZEID,ifnull(EMailID,"") as EMailID from tlocations where MasterID=' + getResult[0].TID;
+                                                            var mail_query = 'Select EZEID,ifnull(EMailID,"") as EMailID from tlocations where MasterID=' + getResult[0].TID;
 
-                                                            st.db.query(UserQuery, function (err, get_result) {
+                                                            st.db.query(mail_query, function (err, get_result) {
                                                                 console.log(get_result);
                                                                 if (get_result) {
                                                                     var mailOptions = {
@@ -165,7 +165,7 @@ Reservation.prototype.SaveReservTrans = function(req,res,next){
                                                                     st.db.query(queryResult, function (err, result) {
                                                                         console.log(result);
                                                                         var post = {
-                                                                            MessageType: Messagetype,
+                                                                            MessageType: messagetype,
                                                                             Priority: 3,
                                                                             ToMailID: mailOptions.to,
                                                                             Subject: mailOptions.subject,
@@ -198,12 +198,13 @@ Reservation.prototype.SaveReservTrans = function(req,res,next){
                                                         else {
                                                             verified = 'Verified';
                                                         }
-
+                                                        //here passing date with 00:00:00 time for getting the reservation data that only date format is put like that
                                                         var date = moment(new Date(req.body.res_datetime)).format('YYYY-MM-DD 00:00:00.000');
                                                         st.db.query('CALL pGetResTrans(' + st.db.escape(resourceid) + ',' + st.db.escape(date) + ',' + st.db.escape(toEzeid) + ')', function (err, res_result) {
                                                             if (res_result) {
                                                                 var i = res_result[0].length - 1;
-                                                                MessageText = res_result[0][i].service;
+                                                                messageText = res_result[0][i].service;
+                                                                duration = res_result[0][i].duration;
                                                             }
 
                                                             else {
@@ -212,11 +213,12 @@ Reservation.prototype.SaveReservTrans = function(req,res,next){
                                                             data = data.replace("[IsVerified]", verified);
                                                             data = data.replace("[EZEOneID]", getResult[0].EZEID);
                                                             data = data.replace("[EZEID]", getResult[0].EZEID);
-                                                            data = data.replace("[Message]", MessageText);
+                                                            data = data.replace("[Message]", messageText);
+                                                            data = data.replace("[Duration]", duration);
                                                             data = data.replace("[ActionDate]", res_datetime.toLocaleString());
-                                                            var UserQuery = 'Select EZEID,ifnull(ReservationMailID," ") as MailID from tmaster where TID=' + getResult[0].TID;
-                                                            console.log(UserQuery);
-                                                            st.db.query(UserQuery, function (err, get_result) {
+                                                            var mail_query = 'Select EZEID,ifnull(ReservationMailID," ") as MailID from tmaster where TID=' + getResult[0].TID;
+                                                            console.log(mail_query);
+                                                            st.db.query(mail_query, function (err, get_result) {
 
                                                                 if (get_result) {
                                                                     var mailOptions = {
@@ -798,10 +800,11 @@ Reservation.prototype.saveFeedback = function(req,res,next){
         var ezeid = alterEzeoneId(req.body.ezeid);
         var rating = req.body.rating;
         var comments = req.body.comments;
-        var trans_type = req.body.trans_type;
+        var module = req.body.module;
         var trans_id = req.body.trans_id ? req.body.trans_id : 0;
         var resourceid = req.body.resourceid ? req.body.resourceid : 0;
         var toEzeid = alterEzeoneId(req.body.toEzeid) ? alterEzeoneId(req.body.toEzeid) : '';
+        var type = req.body.type;
 
         var responseMessage = {
             status: false,
@@ -821,8 +824,12 @@ Reservation.prototype.saveFeedback = function(req,res,next){
             validateStatus *= false;
         }
 
-        if (!trans_type) {
-            responseMessage.error['trans_type'] = 'Invalid Trans_type';
+        if (!module) {
+            responseMessage.error['module'] = 'Invalid module';
+            validateStatus *= false;
+        }
+        if (!type) {
+            responseMessage.error['type'] = 'Invalid type';
             validateStatus *= false;
         }
         if (!validateStatus) {
@@ -832,8 +839,10 @@ Reservation.prototype.saveFeedback = function(req,res,next){
             return;
         }
 
-        if (ezeid && rating && trans_type) {
-            var query = st.db.escape(ezeid) + ',' + st.db.escape(rating) + ',' + st.db.escape(comments) + ',' + st.db.escape(trans_type) + ',' + st.db.escape(trans_id)+ ',' + st.db.escape(resourceid)+ ',' + st.db.escape(toEzeid);
+        if (ezeid && rating && module) {
+            var query = st.db.escape(ezeid) + ',' + st.db.escape(rating) + ',' + st.db.escape(comments)
+                + ',' + st.db.escape(module) + ',' + st.db.escape(trans_id)+ ',' + st.db.escape(resourceid)
+                + ',' + st.db.escape(toEzeid)  + ',' + st.db.escape(type);
 
             console.log('CALL psavefeedback(' + query + ')');
 
@@ -849,7 +858,7 @@ Reservation.prototype.saveFeedback = function(req,res,next){
                             ezeid : ezeid,
                             rating : rating,
                             comments : comments,
-                            trans_type : trans_type,
+                            module : module,
                             trans_id : trans_id,
                             resourceid : resourceid,
                             toEzeid : toEzeid
@@ -884,10 +893,10 @@ Reservation.prototype.saveFeedback = function(req,res,next){
                 responseMessage.error = {rating: 'Invalid rating'};
                 console.log('FnSaveFeedback: rating is mandatory field');
             }
-            else if (!trans_type) {
-                responseMessage.message = 'Invalid trans_type';
-                responseMessage.error = {Token: 'Invalid trans_type'};
-                console.log('FnSaveFeedback: trans_type is mandatory field');
+            else if (!module) {
+                responseMessage.message = 'Invalid module';
+                responseMessage.error = {module: 'Invalid module'};
+                console.log('FnSaveFeedback: module is mandatory field');
             }
             res.status(401).json(responseMessage);
         }

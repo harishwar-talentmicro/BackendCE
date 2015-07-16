@@ -1102,14 +1102,15 @@
                                     <div class="review-form-test row">
 
                                         <div class="close-modal text-center">
-                                            <button ng-click="toggleReviewModalVisibility()" class="btn btn-danger btn-xs">
+                                            <button ng-click="toggleReviewModalVisibility()" id="close-review-modal" class="btn btn-danger btn-xs">
                                                 <i class="fa fa-times"></i> Close
                                             </button>
                                         </div>
-                                        <review-form  ng-trans-type="1"
+                                        <review-form  ng-trans-type="5"
                                                       ng-trans-id = "ngTransId"
                                                       ng-resource-id= "ngResourceId"
                                                       ng-to-ezeid="ngToEzeId"
+                                                      toggle-review-modal-visibility="toggleReviewModalVisibility()"
                                                 > </review-form>
                                     </div>
                                 </modal>

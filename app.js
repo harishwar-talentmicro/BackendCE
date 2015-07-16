@@ -188,6 +188,7 @@ app.get('/get_workinghours_details',LocationManager.FnWorkingHoursDetails);
 app.get('/image_url',LocationManager.FnImageURL);
 app.post('/feedback',LocationManager.FnSaveFeedback);
 app.get('/transaction_attachment',LocationManager.FnGetTransAttachment);
+app.get('/transaction_filter',LocationManager.FnGetTransactionFilter);
 
 
 //below service are for EZEIDAP
