@@ -324,7 +324,7 @@
                         contactInfo : tx.ContactInfo,
                         DeliveryAddress : tx.DeliveryAddress,
                         nextAction : (tx.NextActionID && tx.NextActionID !== 'null') ? tx.NextActionID : 0,
-                        nextActionDateTime : $filter('dateTimeFilter')(tx.NextActionDate,'DD MMM YYYY hh:mm:ss A','DD MMM YYYY hh:mm:ss A'),
+                        nextActionDateTime : $filter('dateTimeFilter')(tx.NextActionDate,'DD MMM YYYY hh:mm:ss A','DD MMM YYYY HH:mm'),
                         taskDateTime : tx.TaskDateTime,
                         folderRule : (tx.FolderRuleID && tx.FolderRuleID !== 'null') ? tx.FolderRuleID : 0,
                         message : alterTransactionMessageToEdit(tx.Message),
@@ -904,6 +904,7 @@
              * Loads company list as soon as controller is initialized
              */
             loadCompany();
+
 
 
             $scope.$watch('modalBox.tx.companyId',function(n,v){
@@ -1570,7 +1571,10 @@
                     Duration : 0,
                     DurationScales : 0,
                     NextAction : ($scope.modalBox.tx.nextAction) ? $scope.modalBox.tx.nextAction : 0,
-                    NextActionDateTime : ($scope.modalBox.tx.nextActionDateTime) ? $scope.modalBox.tx.nextActionDateTime : moment().format('YYYY-MM-DD hh:mm:ss'),
+                    NextActionDateTime : UtilityService.convertTimeToUTC(($scope.modalBox.tx.nextActionDateTime) ? $scope.modalBox.tx.nextActionDateTime :
+                            moment().format('YYYY-MM-DD hh:mm:ss'),'YYYY-MM-DD HH:mm:ss'),
+                    //NextActionDateTime : ($scope.modalBox.tx.nextActionDateTime) ? $scope.modalBox.tx.nextActionDateTime :
+                    //    moment().format('YYYY-MM-DD hh:mm:ss'),
                     ItemsList: JSON.stringify($scope.modalBox.tx.itemList),
                     item_list_type : $rootScope._userInfo.SalesItemListType,
                     DeliveryAddress : (!editMode) ?
