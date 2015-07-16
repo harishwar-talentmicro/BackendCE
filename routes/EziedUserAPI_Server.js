@@ -7131,6 +7131,7 @@ exports.FnSaveTransaction = function(req, res){
         var companyName = req.body.companyName ? req.body.companyName : '' ;
         var company_id = req.body.company_id ? req.body.company_id : 0 ;
         var Messagetype,verified;
+        var attachment = req.body.attachment ? req.body.attachment : null ;
         if (FunctionType == 0){
             //sales
          Messagetype = 1;
@@ -7172,7 +7173,7 @@ exports.FnSaveTransaction = function(req, res){
                 if (!err) {
                     if (Result != null) {
 
-                        var query = db.escape(Token) + "," + db.escape(FunctionType) + "," + db.escape(MessageText) + "," + db.escape(Status) + "," + db.escape(TaskDateNew) + "," + db.escape(Notes) + "," + db.escape(LocID) + "," + db.escape(Country) + "," + db.escape(State) + "," + db.escape(City) + "," + db.escape(Area) + "," + db.escape(Latitude) + "," + db.escape(Longitude) + "," + db.escape(EZEID) + "," + db.escape(ContactInfo) + "," + db.escape(FolderRuleID) + "," + db.escape(Duration) + "," + db.escape(DurationScales) + "," + db.escape(NextAction) + "," + db.escape(NextActionDateTimeNew) + "," + db.escape(TID) + "," + db.escape(((ItemIDList != "") ? ItemIDList : "")) + "," + db.escape(DeliveryAddress) + "," + db.escape(ToEZEID) + "," + db.escape(item_list_type) + "," + db.escape(companyName) + "," + db.escape(company_id);
+                        var query = db.escape(Token) + "," + db.escape(FunctionType) + "," + db.escape(MessageText) + "," + db.escape(Status) + "," + db.escape(TaskDateNew) + "," + db.escape(Notes) + "," + db.escape(LocID) + "," + db.escape(Country) + "," + db.escape(State) + "," + db.escape(City) + "," + db.escape(Area) + "," + db.escape(Latitude) + "," + db.escape(Longitude) + "," + db.escape(EZEID) + "," + db.escape(ContactInfo) + "," + db.escape(FolderRuleID) + "," + db.escape(Duration) + "," + db.escape(DurationScales) + "," + db.escape(NextAction) + "," + db.escape(NextActionDateTimeNew) + "," + db.escape(TID) + "," + db.escape(((ItemIDList != "") ? ItemIDList : "")) + "," + db.escape(DeliveryAddress) + "," + db.escape(ToEZEID) + "," + db.escape(item_list_type) + "," + db.escape(companyName) + "," + db.escape(company_id) + "," + db.escape(attachment);
                         // db.escape(NextActionDateTime);
                         console.log('CALL pSaveTrans(' + query + ')');
                         db.query('CALL pSaveTrans(' + query + ')', function (err, InsertResult) {
@@ -11950,6 +11951,7 @@ exports.FnSaveReservTransaction = function(req, res){
         var Messagetype = 2;
         var MessageText,Duration;
 
+
 		var ID=''
         if(serviceid){
             ID = serviceid + ',' + ID;
@@ -13076,13 +13078,13 @@ exports.FnSaveFeedback = function(req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
-        var ezeid = req.body.ezeid;
+        var ezeid = alterEzeoneId(req.body.ezeid);
         var rating = req.body.rating;
         var comments = req.body.comments;
         var trans_type = req.body.trans_type;
         var trans_id = req.body.trans_id ? req.body.trans_id : 0;
         var resourceid = req.body.resourceid ? req.body.resourceid : 0;
-        var toEzeid = req.body.toEzeid ? req.body.toEzeid : '';
+        var toEzeid = alterEzeoneId(req.body.toEzeid) ? alterEzeoneId(req.body.toEzeid) : '';
 
         var responseMessage = {
             status: false,
