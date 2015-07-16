@@ -2051,4 +2051,127 @@ BusinessManager.prototype.getTransAttachment = function(req,res,next){
     }
 };
 
+/**
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ */
+BusinessManager.prototype.getTransactionFilter = function(req,res,next){
+    /**
+     * @todo FnGetTransactionFilter
+     */
+    var _this = this;
+    try {
+
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var from_date = req.query.from_date;
+        var to_date = req.query.to_date;
+        var stages = req.query.stages;
+        var probabilities = req.query.probabilities;
+        var user = req.query.user;
+
+        var responseMessage = {
+            status: false,
+            data: null,
+            error:{},
+            message:''
+        };
+
+        var validateStatus = true;
+
+        if (!stages) {
+            responseMessage.error['stages'] = 'Invalid stages';
+            validateStatus *= false;
+        }
+        if (!probabilities) {
+            responseMessage.error['probabilities'] = 'Invalid probabilities';
+            validateStatus *= false;
+        }
+        if (!user) {
+            responseMessage.error['user'] = 'Invalid user';
+            validateStatus *= false;
+        }
+
+        if (stages && probabilities && user) {
+            var query = st.db.escape(from_date) + ',' + st.db.escape(to_date) + ',' + st.db.escape(stages)
+                + ',' + st.db.escape(probabilities)+ ',' + st.db.escape(user);
+            st.db.query('CALL pTransactionfilter(' + query +')', function (err, GetResult) {
+                if (!err) {
+                    if (GetResult) {
+                        if (GetResult[0].length > 0) {
+                            responseMessage.status = true;
+                            responseMessage.data = GetResult[0] ;
+                            responseMessage.error = null;
+                            responseMessage.message = 'Transactionfilter details Send successfully';
+                            console.log('FnGetTransactionfilter: Transactionfilter details Send successfully');
+                            res.status(200).json(responseMessage);
+                        }
+                        else {
+
+                            responseMessage.error = {};
+                            responseMessage.message = 'No founded Transactionfilter details';
+                            console.log('FnGetTransactionfilter: No founded Transactionfilter details');
+                            res.json(responseMessage);
+                        }
+                    }
+                    else {
+
+
+                        responseMessage.error = {};
+                        responseMessage.message = 'No founded Transactionfilter details';
+                        console.log('FnGetTransactionfilter: No founded Transactionfilter details');
+                        res.json(responseMessage);
+                    }
+
+                }
+                else {
+
+                    responseMessage.data = null ;
+                    responseMessage.error = {};
+                    responseMessage.message = 'Error in getting Transactionfilter details';
+                    console.log('FnGetTransactionfilter: error in getting Transactionfilter details' + err);
+                    res.status(500).json(responseMessage);
+                }
+            });
+        }
+
+        else {
+            if (!stages) {
+                responseMessage.message = 'Invalid stages';
+                responseMessage.error = {
+                    stages : 'Invalid stages'
+                };
+                console.log('FnGetTransactionfilter: stages is mandatory field');
+            }
+            else if (!probabilities) {
+                responseMessage.message = 'Invalid probabilities';
+                responseMessage.error = {
+                    probabilities : 'Invalid probabilities'
+                };
+                console.log('FnGetTransactionfilter: probabilities is mandatory field');
+            }
+            else if (!user) {
+                responseMessage.message = 'Invalid user';
+                responseMessage.error = {
+                    user : 'Invalid user'
+                };
+                console.log('FnGetTransactionfilter: user is mandatory field');
+            }
+
+            res.status(401).json(responseMessage);
+        }
+    }
+    catch (ex) {
+        responseMessage.error = {};
+        responseMessage.message = 'An error occured !'
+        console.log('FnGetTransactionfilter:error ' + ex.description);
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
+        res.status(400).json(responseMessage);
+    }
+};
+
 module.exports = BusinessManager;
