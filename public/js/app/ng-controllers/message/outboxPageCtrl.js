@@ -59,6 +59,8 @@ angular.module('ezeidApp').
 
             $scope.activeTemplate = $scope.inboxListing;
 
+            $scope.titleText = "Inbox";
+
             /* initialization fot getting all the transaction history */
             getTransactionHistory().then(function(){
                 reConfigurePaginationButton();
@@ -263,11 +265,13 @@ angular.module('ezeidApp').
             /* Navigate to compose message page */
             $scope.openComposeMessage = function () {
                 $scope.activeTemplate =  $scope.composeMessage;
+                $scope.titleText = "Compose";
             };
 
             /* open inbox  */
             $scope.openInbox = function () {
                 $scope.activeTemplate = $scope.inboxListing;
+                $scope.titleText = "Inbox";
             };
 
         }]);
