@@ -36,10 +36,9 @@ angular.module('ezeidApp').
             $routeParams,
             UtilityService
         ) {
-            //var composeMsg = this;
             $scope.composeMsg = {};
 
-            $scope.sendMessage = function()
+            this.sendMessage = function()
             {
                 console.log($scope.composeMsg);
             };
