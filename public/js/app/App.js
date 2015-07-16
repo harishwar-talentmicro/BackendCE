@@ -49,6 +49,7 @@
         '/profile-manager',
         '/profile-manager/:subview',
         '/outbox',
+        '/compose-message',
         '/access-history',
         '/:ezeond/sales',
         '/:ezeone/home_delivery',
@@ -191,6 +192,10 @@
             .when('/searchDetails',{
                 templateUrl: 'html/informationDetail.html',
                 controller : 'InformationDetailCtrl'
+            })
+            .when('/outbox/:action',{
+                templateUrl: 'html/message/outbox.html',
+                controller : 'outboxPageCtrl'
             })
             .when('/outbox',{
                 templateUrl: 'html/message/outbox.html',
