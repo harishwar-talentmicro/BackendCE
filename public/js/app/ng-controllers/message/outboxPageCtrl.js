@@ -52,7 +52,12 @@ angular.module('ezeidApp').
             $scope.activeTransactionDetailedInfo = '';
             $scope.permissiontype = '';
 
-            $scope.activeTemplate = "";
+            $scope.inboxListing = "html/message/inbox.html";
+            $scope.composeMessage = "html/message/composeMessage.html";
+            $scope.groupListing = "html/message/composeMessage.html";
+            $scope.chatMessage = "html/chat/chatMessage.html";
+
+            $scope.activeTemplate = $scope.inboxListing;
 
             /* initialization fot getting all the transaction history */
             getTransactionHistory().then(function(){
@@ -257,7 +262,12 @@ angular.module('ezeidApp').
 
             /* Navigate to compose message page */
             $scope.openComposeMessage = function () {
-                $location.url('/compose-message');
+                $scope.activeTemplate =  $scope.composeMessage;
+            };
+
+            /* open inbox  */
+            $scope.openInbox = function () {
+                $scope.activeTemplate = $scope.inboxListing;
             };
 
         }]);
