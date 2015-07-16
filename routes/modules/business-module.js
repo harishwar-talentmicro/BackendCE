@@ -210,6 +210,10 @@ BusinessManager.prototype.saveTransaction = function(req,res,next){
         var companyName = req.body.companyName ? req.body.companyName : '' ;
         var company_id = req.body.company_id ? req.body.company_id : 0 ;
         var Messagetype,verified;
+        var attachment = req.body.attachment ? req.body.attachment : null ;
+        var proabilities = req.body.proabilities ? req.body.proabilities : 0 ;
+        var attachment_name = req.body.attachment_name ? req.body.attachment_name : '' ;
+
         if (FunctionType == 0){
             //sales
             Messagetype = 1;
@@ -251,7 +255,17 @@ BusinessManager.prototype.saveTransaction = function(req,res,next){
                 if (!err) {
                     if (Result != null) {
 
-                        var query = st.db.escape(Token) + "," + st.db.escape(FunctionType) + "," + st.db.escape(MessageText) + "," + st.db.escape(Status) + "," + st.db.escape(TaskDateNew) + "," + st.db.escape(Notes) + "," + st.db.escape(LocID) + "," + st.db.escape(Country) + "," + st.db.escape(State) + "," + st.db.escape(City) + "," + st.db.escape(Area) + "," + st.db.escape(Latitude) + "," + st.db.escape(Longitude) + "," + st.db.escape(EZEID) + "," + st.db.escape(ContactInfo) + "," + st.db.escape(FolderRuleID) + "," + st.db.escape(Duration) + "," + st.db.escape(DurationScales) + "," + st.db.escape(NextAction) + "," + st.db.escape(NextActionDateTimeNew) + "," + st.db.escape(TID) + "," + st.db.escape(((ItemIDList != "") ? ItemIDList : "")) + "," + st.db.escape(DeliveryAddress) + "," + st.db.escape(ToEZEID) + "," + st.db.escape(item_list_type) + "," + st.db.escape(companyName) + "," + st.db.escape(company_id);
+                        var query = st.db.escape(Token) + "," + st.db.escape(FunctionType) + "," + st.db.escape(MessageText)
+                            + "," + st.db.escape(Status) + "," + st.db.escape(TaskDateNew) + "," + st.db.escape(Notes)
+                            + "," + st.db.escape(LocID) + "," + st.db.escape(Country) + "," + st.db.escape(State)
+                            + "," + st.db.escape(City) + "," + st.db.escape(Area) + "," + st.db.escape(Latitude)
+                            + "," + st.db.escape(Longitude) + "," + st.db.escape(EZEID) + "," + st.db.escape(ContactInfo)
+                            + "," + st.db.escape(FolderRuleID) + "," + st.db.escape(Duration) + "," + st.db.escape(DurationScales)
+                            + "," + st.db.escape(NextAction) + "," + st.db.escape(NextActionDateTimeNew) + "," + st.db.escape(TID)
+                            + "," + st.db.escape(((ItemIDList != "") ? ItemIDList : "")) + "," + st.db.escape(DeliveryAddress)
+                            + "," + st.db.escape(ToEZEID) + "," + st.db.escape(item_list_type) + "," + st.db.escape(companyName)
+                            + "," + st.db.escape(company_id) + "," + st.db.escape(attachment)+ "," + st.db.escape(proabilities)
+                            + "," + st.db.escape(attachment_name);
                         // st.db.escape(NextActionDateTime);
                         console.log('CALL pSaveTrans(' + query + ')');
                         st.db.query('CALL pSaveTrans(' + query + ')', function (err, InsertResult) {
@@ -1946,6 +1960,95 @@ else{
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
 }
+};
+
+/**
+* Method : GET
+* @param req
+* @param res
+* @param next
+*/
+BusinessManager.prototype.getTransAttachment = function(req,res,next){
+    /**
+     * @todo FnGetTransAttachment
+     */
+    var _this = this;
+    try {
+
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var tid = req.query.tid;
+
+        var responseMessage = {
+            status: false,
+            data: null,
+            error:{},
+            message:''
+        };
+
+        if (tid) {
+
+            st.db.query('CALL pGetTransAttachment(' + st.db.escape(tid) +')', function (err, GetResult) {
+                if (!err) {
+                    if (GetResult) {
+                        if (GetResult[0].length > 0) {
+                            responseMessage.status = true;
+                            responseMessage.data = GetResult[0] ;
+                            responseMessage.error = null;
+                            responseMessage.message = 'TransAttachment details Send successfully';
+                            console.log('FnGetTransAttachment: TransAttachment details Send successfully');
+                            res.status(200).json(responseMessage);
+                        }
+                        else {
+
+                            responseMessage.error = {};
+                            responseMessage.message = 'No founded TransAttachment details';
+                            console.log('FnGetTransAttachment: No founded TransAttachment details');
+                            res.json(responseMessage);
+                        }
+                    }
+                    else {
+
+
+                        responseMessage.error = {};
+                        responseMessage.message = 'No founded TransAttachment details';
+                        console.log('FnGetTransAttachment: No founded TransAttachment details');
+                        res.json(responseMessage);
+                    }
+
+                }
+                else {
+
+                    responseMessage.data = null ;
+                    responseMessage.error = {};
+                    responseMessage.message = 'Error in getting TransAttachment details';
+                    console.log('FnGetTransAttachment: error in getting TransAttachment details' + err);
+                    res.status(500).json(responseMessage);
+                }
+            });
+        }
+
+        else {
+            if (!tid) {
+                responseMessage.message = 'Invalid tid';
+                responseMessage.error = {
+                    tid : 'Invalid tid'
+                };
+                console.log('FnGetTransAttachment: tid is mandatory field');
+            }
+
+            res.status(401).json(responseMessage);
+        }
+    }
+    catch (ex) {
+        responseMessage.error = {};
+        responseMessage.message = 'An error occured !'
+        console.log('FnGetTransAttachment:error ' + ex.description);
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
+        res.status(400).json(responseMessage);
+    }
 };
 
 module.exports = BusinessManager;

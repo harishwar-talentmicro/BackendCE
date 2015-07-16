@@ -4,7 +4,7 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser'), cors = require('cors'),
-LocationManager = require('./routes/EziedUserAPI_Server.js');
+LocationManager = require('./routes/routes.js');
 var compress = require('compression');
 
 var app = express();
@@ -187,7 +187,7 @@ app.get('/ezeoneid',LocationManager.FnGetEZEOneIDInfo);
 app.get('/get_workinghours_details',LocationManager.FnWorkingHoursDetails);
 app.get('/image_url',LocationManager.FnImageURL);
 app.post('/feedback',LocationManager.FnSaveFeedback);
-
+app.get('/transaction_attachment',LocationManager.FnGetTransAttachment);
 
 
 //below service are for EZEIDAP

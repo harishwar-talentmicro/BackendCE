@@ -632,4 +632,128 @@ Reservation.prototype.getworkinghoursList = function(req,res,next){
     }
 };
 
+/**
+ * Method : POST
+ * @param req
+ * @param res
+ * @param next
+ */
+Reservation.prototype.saveFeedback = function(req,res,next){
+    /**
+     * @todo FnSaveFeedback
+     */
+    var _this = this;
+
+    try {
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var ezeid = alterEzeoneId(req.body.ezeid);
+        var rating = req.body.rating;
+        var comments = req.body.comments;
+        var trans_type = req.body.trans_type;
+        var trans_id = req.body.trans_id ? req.body.trans_id : 0;
+        var resourceid = req.body.resourceid ? req.body.resourceid : 0;
+        var toEzeid = alterEzeoneId(req.body.toEzeid) ? alterEzeoneId(req.body.toEzeid) : '';
+
+        var responseMessage = {
+            status: false,
+            error: {},
+            message: '',
+            data: null
+        };
+        var validateStatus = true;
+
+        if (!ezeid) {
+            responseMessage.error['ezeid'] = 'Invalid ezeid';
+            validateStatus *= false;
+        }
+
+        if (!rating) {
+            responseMessage.error['rating'] = 'Invalid rating';
+            validateStatus *= false;
+        }
+
+        if (!trans_type) {
+            responseMessage.error['trans_type'] = 'Invalid Trans_type';
+            validateStatus *= false;
+        }
+        if (!validateStatus) {
+            console.log('FnSaveFeedback  error : ' + JSON.stringify(responseMessage.error));
+            responseMessage.message = 'Unable to save feedback ! Please check the errors';
+            res.status(200).json(responseMessage);
+            return;
+        }
+
+        if (ezeid && rating && trans_type) {
+            var query = st.db.escape(ezeid) + ',' + st.db.escape(rating) + ',' + st.db.escape(comments) + ',' + st.db.escape(trans_type) + ',' + st.db.escape(trans_id)+ ',' + st.db.escape(resourceid)+ ',' + st.db.escape(toEzeid);
+
+            console.log('CALL psavefeedback(' + query + ')');
+
+            st.db.query('CALL psavefeedback(' + query + ')', function (err, insertResult) {
+                console.log(insertResult);
+
+                if (!err) {
+                    if (insertResult) {
+                        responseMessage.status = true;
+                        responseMessage.error = null;
+                        responseMessage.message = 'Feedback details save successfully';
+                        responseMessage.data = {
+                            ezeid : ezeid,
+                            rating : rating,
+                            comments : comments,
+                            trans_type : trans_type,
+                            trans_id : trans_id,
+                            resourceid : resourceid,
+                            toEzeid : toEzeid
+                        };
+                        res.status(200).json(responseMessage);
+                        console.log('FnSaveFeedback: Feedback details save successfully');
+
+                    }
+                    else {
+                        responseMessage.message = 'No save Feedback details';
+                        responseMessage.error = {};
+                        res.status(400).json(responseMessage);
+                        console.log('FnSaveFeedback:No save Feedback details');
+                    }
+                }
+                else {
+                    responseMessage.message = 'An error occured ! Please try again';
+                    responseMessage.error = {};
+                    res.status(500).json(responseMessage);
+                    console.log('FnSaveFeedback: error in saving Feedback details:' + err);
+                }
+            });
+        }
+        else {
+            if (!ezeid) {
+                responseMessage.message = 'Invalid ezeid';
+                responseMessage.error = {Token: 'Invalid ezeid'};
+                console.log('FnSaveFeedback: ezeid is mandatory field');
+            }
+            else if (!rating) {
+                responseMessage.message = 'Invalid rating';
+                responseMessage.error = {rating: 'Invalid rating'};
+                console.log('FnSaveFeedback: rating is mandatory field');
+            }
+            else if (!trans_type) {
+                responseMessage.message = 'Invalid trans_type';
+                responseMessage.error = {Token: 'Invalid trans_type'};
+                console.log('FnSaveFeedback: trans_type is mandatory field');
+            }
+            res.status(401).json(responseMessage);
+        }
+
+    }
+
+    catch (ex) {
+        responseMessage.error = {};
+        responseMessage.message = 'An error occured !'
+        console.log('FnSaveFeedback:error ' + ex.description);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
+        res.status(400).json(responseMessage);
+    }
+};
+
 module.exports = Reservation;

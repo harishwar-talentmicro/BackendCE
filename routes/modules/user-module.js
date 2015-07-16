@@ -50,15 +50,15 @@ function FnEncryptPassword(Password) {
         return 'error'
     }
 }
-
+/**
 var bcrypt = require('bcrypt');
 
-/**
+
  * Hashes the password for saving into database
  * @param password
  * @returns {*}
- */
-function hashPassword(password){
+
+/**function hashPassword(password){
     if(!password){
         return null;
     }
@@ -66,15 +66,16 @@ function hashPassword(password){
     return hash;
 }
 
-/**
+
  * Compare the password and the hash for authenticating purposes
  * @param password
  * @param hash
  * @returns {*}
- */
+
 function comparePassword(password,hash){
     return bcrypt.compareSync(password,hash);
 }
+*/
 
 /** Now password cannot be decrypted, So this function is useless******/
 function FnDecrypt(EncryptPassword){
