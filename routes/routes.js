@@ -79,6 +79,7 @@ exports.FnGetUserwiseFolderList = businessManager.getUserwiseFolderList;
 exports.FnUpdateBussinessListing = businessManager.updateBussinessList;
 exports.FnGetCompanyDetails = businessManager.getCompanyDetails;
 exports.FnGetEZEOneIDInfo = businessManager.getEZEOneIDInfo;
+exports.FnGetTransAttachment = businessManager.getTransAttachment;
 
 
 var Configuration = require('./modules/configuration-module.js');
@@ -112,7 +113,7 @@ exports.FnSaveHolidayCalendar = configurationModule.saveHoliday;
 exports.FnDeleteHolidayList = configurationModule.deleteHoliday;
 exports.FnDeleteWorkingHours = configurationModule.deleteWorkingHours;
 exports.FnWorkingHoursDetails = configurationModule.getWorkingHoursDetails;
-exports.FnGetTransAttachment = configurationModule.getTransAttachment;
+
 
 var Search = require('./modules/search-module.js');
 var searchModule = new Search(db,stdLib);
