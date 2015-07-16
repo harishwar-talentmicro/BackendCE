@@ -804,6 +804,7 @@ Reservation.prototype.saveFeedback = function(req,res,next){
         var trans_id = req.body.trans_id ? req.body.trans_id : 0;
         var resourceid = req.body.resourceid ? req.body.resourceid : 0;
         var toEzeid = alterEzeoneId(req.body.toEzeid) ? alterEzeoneId(req.body.toEzeid) : '';
+        var type = req.body.type ? req.body.type : 0;
 
         var responseMessage = {
             status: false,
@@ -835,7 +836,9 @@ Reservation.prototype.saveFeedback = function(req,res,next){
         }
 
         if (ezeid && rating && trans_type) {
-            var query = st.db.escape(ezeid) + ',' + st.db.escape(rating) + ',' + st.db.escape(comments) + ',' + st.db.escape(trans_type) + ',' + st.db.escape(trans_id)+ ',' + st.db.escape(resourceid)+ ',' + st.db.escape(toEzeid);
+            var query = st.db.escape(ezeid) + ',' + st.db.escape(rating) + ',' + st.db.escape(comments)
+                + ',' + st.db.escape(trans_type) + ',' + st.db.escape(trans_id)+ ',' + st.db.escape(resourceid)
+                + ',' + st.db.escape(toEzeid)  + ',' + st.db.escape(type);
 
             console.log('CALL psavefeedback(' + query + ')');
 
