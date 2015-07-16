@@ -55,8 +55,8 @@ Reservation.prototype.SaveReservTrans = function(req,res,next){
         var status = req.body.status;
         var serviceid = req.body.serviceid ?  req.body.serviceid : '';
         var notes = req.body.notes;
-        var Messagetype = 2;
-        var MessageText,Duration,verified;
+        var messagetype = 2;
+        var messageText,duration,verified;
 
 
         var ID=''
@@ -117,7 +117,7 @@ Reservation.prototype.SaveReservTrans = function(req,res,next){
                                         res.status(200).json(responseMessage);
                                         console.log('FnSaveReservTransaction: Resource Transaction details save successfully');
 
-                                        if (Messagetype == 2) {
+                                        if (messagetype == 2) {
                                             fs.readFile("Reservation.html", "utf8", function (err, data) {
                                                 var query1 = 'select EZEID,EZEIDVerifiedID,TID,IDTypeID as id from tmaster where Token=' + st.db.escape(Token);
                                                 st.db.query(query1, function (err, getResult) {
@@ -128,14 +128,14 @@ Reservation.prototype.SaveReservTrans = function(req,res,next){
                                                         else {
                                                             verified = 'Verified';
                                                         }
-
+                                                        //here passing date with 00:00:00 time for getting the reservation data that only date format is put like that
                                                         var date = moment(new Date(req.body.res_datetime)).format('YYYY-MM-DD 00:00:00.000');
                                                         st.db.query('CALL pGetResTrans(' + st.db.escape(resourceid) + ',' + st.db.escape(date) + ',' + st.db.escape(toEzeid) + ')', function (err, res_result) {
                                                             if (res_result) {
                                                                 var i = res_result[0].length - 1;
                                                                 console.log(res_result[0][i]);
-                                                                MessageText = res_result[0][i].service;
-                                                                Duration = res_result[0][i].duration;
+                                                                messageText = res_result[0][i].service;
+                                                                duration = res_result[0][i].duration;
                                                             }
 
                                                             else {
@@ -146,12 +146,12 @@ Reservation.prototype.SaveReservTrans = function(req,res,next){
                                                             data = data.replace("[IsVerified]", verified);
                                                             data = data.replace("[EZEOneID]", getResult[0].EZEID);
                                                             data = data.replace("[EZEID]", getResult[0].EZEID);
-                                                            data = data.replace("[Message]", MessageText);
-                                                            data = data.replace("[Duration]", Duration);
+                                                            data = data.replace("[Message]", messageText);
+                                                            data = data.replace("[Duration]", duration);
                                                             data = data.replace("[ActionDate]", res_datetime.toLocaleString());
-                                                            var UserQuery = 'Select EZEID,ifnull(EMailID,"") as EMailID from tlocations where MasterID=' + getResult[0].TID;
+                                                            var mail_query = 'Select EZEID,ifnull(EMailID,"") as EMailID from tlocations where MasterID=' + getResult[0].TID;
 
-                                                            st.db.query(UserQuery, function (err, get_result) {
+                                                            st.db.query(mail_query, function (err, get_result) {
                                                                 console.log(get_result);
                                                                 if (get_result) {
                                                                     var mailOptions = {
@@ -165,7 +165,7 @@ Reservation.prototype.SaveReservTrans = function(req,res,next){
                                                                     st.db.query(queryResult, function (err, result) {
                                                                         console.log(result);
                                                                         var post = {
-                                                                            MessageType: Messagetype,
+                                                                            MessageType: messagetype,
                                                                             Priority: 3,
                                                                             ToMailID: mailOptions.to,
                                                                             Subject: mailOptions.subject,
@@ -198,12 +198,13 @@ Reservation.prototype.SaveReservTrans = function(req,res,next){
                                                         else {
                                                             verified = 'Verified';
                                                         }
-
+                                                        //here passing date with 00:00:00 time for getting the reservation data that only date format is put like that
                                                         var date = moment(new Date(req.body.res_datetime)).format('YYYY-MM-DD 00:00:00.000');
                                                         st.db.query('CALL pGetResTrans(' + st.db.escape(resourceid) + ',' + st.db.escape(date) + ',' + st.db.escape(toEzeid) + ')', function (err, res_result) {
                                                             if (res_result) {
                                                                 var i = res_result[0].length - 1;
-                                                                MessageText = res_result[0][i].service;
+                                                                messageText = res_result[0][i].service;
+                                                                duration = res_result[0][i].duration;
                                                             }
 
                                                             else {
@@ -212,11 +213,12 @@ Reservation.prototype.SaveReservTrans = function(req,res,next){
                                                             data = data.replace("[IsVerified]", verified);
                                                             data = data.replace("[EZEOneID]", getResult[0].EZEID);
                                                             data = data.replace("[EZEID]", getResult[0].EZEID);
-                                                            data = data.replace("[Message]", MessageText);
+                                                            data = data.replace("[Message]", messageText);
+                                                            data = data.replace("[Duration]", duration);
                                                             data = data.replace("[ActionDate]", res_datetime.toLocaleString());
-                                                            var UserQuery = 'Select EZEID,ifnull(ReservationMailID," ") as MailID from tmaster where TID=' + getResult[0].TID;
-                                                            console.log(UserQuery);
-                                                            st.db.query(UserQuery, function (err, get_result) {
+                                                            var mail_query = 'Select EZEID,ifnull(ReservationMailID," ") as MailID from tmaster where TID=' + getResult[0].TID;
+                                                            console.log(mail_query);
+                                                            st.db.query(mail_query, function (err, get_result) {
 
                                                                 if (get_result) {
                                                                     var mailOptions = {
