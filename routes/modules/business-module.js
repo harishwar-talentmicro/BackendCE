@@ -177,7 +177,6 @@ BusinessManager.prototype.saveTransaction = function(req,res,next){
 
         var Token = req.body.Token;
         var TID = parseInt(req.body.TID);
-
         var MessageText =req.body.MessageText;
         var Status = req.body.Status;
         var TaskDateTime = req.body.TaskDateTime;
@@ -213,6 +212,7 @@ BusinessManager.prototype.saveTransaction = function(req,res,next){
         var attachment = req.body.attachment ? req.body.attachment : null ;
         var proabilities = req.body.proabilities ? req.body.proabilities : 0 ;
         var attachment_name = req.body.attachment_name ? req.body.attachment_name : '' ;
+        var mime_type = req.body.mime_type ? req.body.mime_type : '' ;
 
         if (FunctionType == 0){
             //sales
