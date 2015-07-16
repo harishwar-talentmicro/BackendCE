@@ -79,7 +79,7 @@ exports.FnGetUserwiseFolderList = businessManager.getUserwiseFolderList;
 exports.FnUpdateBussinessListing = businessManager.updateBussinessList;
 exports.FnGetCompanyDetails = businessManager.getCompanyDetails;
 exports.FnGetEZEOneIDInfo = businessManager.getEZEOneIDInfo;
-exports.FnSaveFeedback = businessManager.saveFeedback;
+
 
 var Configuration = require('./modules/configuration-module.js');
 var configurationModule = new Configuration(db,stdLib);
@@ -112,6 +112,7 @@ exports.FnSaveHolidayCalendar = configurationModule.saveHoliday;
 exports.FnDeleteHolidayList = configurationModule.deleteHoliday;
 exports.FnDeleteWorkingHours = configurationModule.deleteWorkingHours;
 exports.FnWorkingHoursDetails = configurationModule.getWorkingHoursDetails;
+exports.FnGetTransAttachment = configurationModule.getTransAttachment;
 
 var Search = require('./modules/search-module.js');
 var searchModule = new Search(db,stdLib);
@@ -136,6 +137,7 @@ exports.FnGetMapedServices = reservationModule.getMapedServices;
 exports.FnGetResTransDetails = reservationModule.getTransDetails;
 exports.FnChangeReservationStatus = reservationModule.changeReservStatus;
 exports.FnGetworkinghoursList = reservationModule.getworkinghoursList;
+exports.FnSaveFeedback = reservationModule.saveFeedback;
 
 
 //ap parts
