@@ -2070,7 +2070,7 @@ BusinessManager.prototype.getTransactionFilter = function(req,res,next){
         var from_date = req.query.from_date;
         var to_date = req.query.to_date;
         var stages = req.query.stages;
-        var probabilities = req.query.probabilities;
+        var probabilities = req.query.probabilities ? req.query.probabilities : null;
         var user = req.query.user;
 
         var responseMessage = {
@@ -2086,24 +2086,24 @@ BusinessManager.prototype.getTransactionFilter = function(req,res,next){
             responseMessage.error['stages'] = 'Invalid stages';
             validateStatus *= false;
         }
-        if (!probabilities) {
-            responseMessage.error['probabilities'] = 'Invalid probabilities';
-            validateStatus *= false;
-        }
+
         if (!user) {
             responseMessage.error['user'] = 'Invalid user';
             validateStatus *= false;
         }
 
-        if (stages && probabilities && user) {
+        if (stages && user) {
             var query = st.db.escape(from_date) + ',' + st.db.escape(to_date) + ',' + st.db.escape(stages)
                 + ',' + st.db.escape(probabilities)+ ',' + st.db.escape(user);
             st.db.query('CALL pTransactionfilter(' + query +')', function (err, GetResult) {
+                console.log(GetResult);
                 if (!err) {
                     if (GetResult) {
                         if (GetResult[0].length > 0) {
                             responseMessage.status = true;
-                            responseMessage.data = GetResult[0] ;
+                            responseMessage.data = {
+                                from_date :from_date,
+                            }
                             responseMessage.error = null;
                             responseMessage.message = 'Transactionfilter details Send successfully';
                             console.log('FnGetTransactionfilter: Transactionfilter details Send successfully');
