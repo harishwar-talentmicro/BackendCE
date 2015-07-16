@@ -79,6 +79,7 @@ exports.FnGetUserwiseFolderList = businessManager.getUserwiseFolderList;
 exports.FnUpdateBussinessListing = businessManager.updateBussinessList;
 exports.FnGetCompanyDetails = businessManager.getCompanyDetails;
 exports.FnGetEZEOneIDInfo = businessManager.getEZEOneIDInfo;
+exports.FnSaveFeedback = businessManager.saveFeedback;
 
 var Configuration = require('./modules/configuration-module.js');
 var configurationModule = new Configuration(db,stdLib);
