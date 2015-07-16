@@ -1962,7 +1962,6 @@ else{
 }
 };
 
-
 /**
 * Method : GET
 * @param req
@@ -2051,3 +2050,5 @@ BusinessManager.prototype.getTransAttachment = function(req,res,next){
         res.status(400).json(responseMessage);
     }
 };
+
+module.exports = BusinessManager;
